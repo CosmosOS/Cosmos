@@ -38,6 +38,14 @@ namespace Cosmos.Debug.VSDebugEngine
         public IEnumDebugFrameInfo2 mStackFrame;
         private bool mASMSteppingOut = false;
         private int mASMSteppingOut_NumEndMethodLabelsPassed = 0;
+        private Tuple<UInt32, UInt32, int> ASMBPToStepTo = null;
+
+        //ASM Breakpoints stored as C# Address -> ASM Address, C# BP ID
+        //Allows quick look-up on INT3 occurring
+        private List<Tuple<UInt32, UInt32, int>> ASMBreakpoints = new List<Tuple<UInt32, UInt32, int>>();
+        private ManualResetEvent ASMWindow_CurrentLineUpdated = new ManualResetEvent(false);
+        private ManualResetEvent ASMWindow_NextLine1Updated = new ManualResetEvent(false);
+        private ManualResetEvent ASMWindow_NextAddress1Updated = new ManualResetEvent(false);
 
         // Connection to target environment. Usually serial but is
         // abstracted to allow other transports (ethernet, etc)
@@ -105,9 +113,18 @@ namespace Cosmos.Debug.VSDebugEngine
                         }
                         break;
 
-                    case Windows2Debugger.Continue:
+                    case Windows2Debugger.ToggleAsmBreak2:
                         {
-                            mDbgConnector.Continue();
+                            string xLabel = Encoding.UTF8.GetString(aData);
+                            UInt32 xAddress = mDebugInfoDb.AddressOfLabel(xLabel);
+                            if (GetASMBreakpointInfoFromASMAddress(xAddress) == null)
+                            {
+                                SetASMBreakpoint(xAddress);
+                            }
+                            else
+                            {
+                                ClearASMBreakpoint(xAddress);
+                            }
                         }
                         break;
 
@@ -118,6 +135,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     case Windows2Debugger.CurrentASMLine:
                         {
                             mCurrentASMLine = Encoding.UTF8.GetString(aData);
+                            ASMWindow_CurrentLineUpdated.Set();
                         }
                         break;
                     case Windows2Debugger.NextASMLine1:
@@ -130,6 +148,7 @@ namespace Cosmos.Debug.VSDebugEngine
                             else
                             {
                                 mNextASMLine1 = Encoding.UTF8.GetString(aData);
+                                ASMWindow_NextLine1Updated.Set();
                             }
                         }
                         break;
@@ -137,6 +156,7 @@ namespace Cosmos.Debug.VSDebugEngine
                         {
                             string nextLabel = Encoding.UTF8.GetString(aData);
                             mNextAddress1 = mDebugInfoDb.AddressOfLabel(nextLabel);
+                            ASMWindow_NextAddress1Updated.Set();
                         }
                         break;
 
@@ -148,6 +168,59 @@ namespace Cosmos.Debug.VSDebugEngine
             {
                 //We cannot afford to silently break the pipe!
                 OutputText("AD7Process UpPipe receive error! " + ex.Message);
+            }
+        }
+
+        private List<Tuple<UInt32, UInt32, int>> GetASMBreakpointInfoFromCSAddress(UInt32 csAddress)
+        {
+            return ASMBreakpoints.Where(x => x.Item1 == csAddress).ToList();
+        }
+        private Tuple<UInt32, UInt32, int> GetASMBreakpointInfoFromASMAddress(UInt32 asmAddress)
+        {
+            Tuple<UInt32, UInt32, int> result = null;
+
+            var posBPs = ASMBreakpoints.Where(x => x.Item2 == asmAddress);
+            if (posBPs.Count() > 0)
+            {
+                result = posBPs.First();
+            }
+
+            return result;
+        }
+        private void SetASMBreakpoint(UInt32 aAddress)
+        {
+            if (GetASMBreakpointInfoFromASMAddress(aAddress) == null)
+            {
+                bool set = false;
+                for (int xID = 0; xID < BreakpointManager.MaxBP; xID++)
+                {
+                    if (mEngine.BPMgr.mActiveBPs[xID] == null)
+                    {
+                        UInt32 CSBPAddress = mDebugInfoDb.GetClosestCSharpBPAddress(aAddress);
+                        ASMBreakpoints.Add(new Tuple<UInt32, UInt32, int>(CSBPAddress, aAddress, xID));
+
+                        mEngine.BPMgr.mActiveBPs[xID] = new AD7BoundBreakpoint(CSBPAddress);
+                        mDbgConnector.SetBreakpoint(xID, CSBPAddress);
+
+                        set = true;
+                        break;
+                    }
+                }
+                if (!set)
+                {
+                    throw new Exception("Maximum number of active breakpoints exceeded (" + BreakpointManager.MaxBP + ").");
+                }
+            }
+        }
+        private void ClearASMBreakpoint(UInt32 aAddress)
+        {
+            var bp = GetASMBreakpointInfoFromASMAddress(aAddress);
+            if (bp != null)
+            {
+                var xID = bp.Item3;
+                mDbgConnector.DeleteBreakpoint(xID);
+                mEngine.BPMgr.mActiveBPs[xID] = null;
+                ASMBreakpoints.Remove(bp);
             }
         }
 
@@ -417,17 +490,64 @@ namespace Cosmos.Debug.VSDebugEngine
                 mStackFrame = null;
                 mCurrentAddress = aAddress;
                 mCurrentASMLine = null;
+                bool fullUpdate = true;
                 if (xBoundBreakpoints.Count == 0)
                 {
                     // if no matching breakpoints are found then its one of the following:
                     //   - Stepping operation
-                    //   - Code based break
-                    //   - Asm stepping
+                    //   - Asm break
 
+                    //We _must_ respond to the VS stepping callback if its waiting on one so check this first...
                     if (mStepping)
                     {
                         mCallback.OnStepComplete();
                         mStepping = false;
+                    }
+                    else
+                    {
+                        //Check if current address is the ASM BP we might be looking for
+                        if (ASMBPToStepTo != null && ASMBPToStepTo.Item2 == aAddress)
+                        {
+                            //There is an ASM BP at this address so break
+                            mCallback.OnBreak(mThread);
+                            //Clear what we are stepping towards
+                            ASMBPToStepTo = null;
+                        }
+                        else
+                        {
+                            fullUpdate = false;
+
+                            //Check we aren't already stepping towards an ASM BP
+                            if (ASMBPToStepTo == null)
+                            {
+                                //Check for future ASM breakpoints...
+
+                                //Since we got this far, we know this must be an INT3 for a future ASM BP that has to be in current C# line.
+                                //So get the ASM BP based off current address
+                                var bp = GetASMBreakpointInfoFromCSAddress(aAddress).First();
+                                //Set it as address we are looking for
+                                ASMBPToStepTo = bp;
+                            }
+
+                            //Step towards the ASM BP(step-over since we don't want to go through calls or anything)
+
+                            //We must check we haven't just stepped and address jumped wildely out of range (e.g. conditional jumps)
+                            if (aAddress < ASMBPToStepTo.Item1 || aAddress > ASMBPToStepTo.Item2)
+                            {
+                                //If we have, just continue execution as this BP won't be hit.
+                                mDbgConnector.Continue();
+                                ASMBPToStepTo = null;
+                            }
+                            else
+                            {
+                                //We must do an update of ASM window so Step-Over can function properly
+                                SendAssembly(true);
+                                //Delay / wait for asm window to update
+                                WaitForAssemblyUpdate();
+                                //Do the step-over
+                                ASMStepOver();
+                            }
+                        }
                     }
                 }
                 else
@@ -435,7 +555,10 @@ namespace Cosmos.Debug.VSDebugEngine
                     // Found a bound breakpoint
                     mCallback.OnBreakpoint(mThread, xBoundBreakpoints.AsReadOnly());
                 }
-                RequestFullDebugStubUpdate();
+                if (fullUpdate)
+                {
+                    RequestFullDebugStubUpdate();
+                }
             }
         }
 
@@ -587,9 +710,32 @@ namespace Cosmos.Debug.VSDebugEngine
 
         internal void Continue()
         { // F5
-            mCurrentAddress = null;
-            mCurrentASMLine = null;
-            mDbgConnector.Continue();
+            //Check for a future asm BP on current line
+            //If there is, don't do continue, do AsmStepOver 
+
+            // The current address may or may not be a C# line due to asm stepping
+            //So get the C# INT3 address
+            UInt32 csAddress = mDebugInfoDb.GetClosestCSharpBPAddress(mCurrentAddress.Value);
+            //Get any Asm BPs for this address
+            var bps = GetASMBreakpointInfoFromCSAddress(csAddress).Where(x => x.Item2 > mCurrentAddress.Value).ToList();
+            //If there are any, do AsmStepOver on the next one after current address
+            if (bps.Count > 0)
+            {
+                var bp = bps.OrderBy(x => x.Item2).First();
+                ASMBPToStepTo = bp;
+
+                ASMStepOver();
+
+                mCurrentAddress = null;
+                mCurrentASMLine = null;
+            }
+            else
+            {
+                mCurrentAddress = null;
+                mCurrentASMLine = null;
+                
+                mDbgConnector.Continue();
+            }
         }
 
         bool mStepping = false;
@@ -612,44 +758,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 mStepping = true;
                 if (ASMSteppingMode)
                 {
-                    //ASM Step over : Detect calls and treat them specially.
-                    //If current line has been stepped, get next line (since that is what we will step over)
-                    //If current line hasn't been stepped, use current line
-
-                    //If current line is CALL, set INT3 on next line and do continue
-                    //Else do asm step-into
-
-                    string currentASMLine = mCurrentASMLine;
-
-                    if (string.IsNullOrEmpty(currentASMLine))
-                    {
-                        mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
-                    }
-                    else
-                    {
-                        currentASMLine = currentASMLine.Trim();
-                        string currentASMOp = currentASMLine.Split(' ')[0].ToUpper();
-                        if (currentASMOp == "CALL")
-                        {
-                            //Get the line after the call
-                            string nextASMLine = mNextASMLine1;
-                            UInt32? nextAddress = mNextAddress1;
-                            if (string.IsNullOrEmpty(nextASMLine) || !nextAddress.HasValue)
-                            {
-                                mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
-                            }
-                            else
-                            {
-                                //Set the INT3 at next address
-                                mDbgConnector.SetAsmBreakpoint(nextAddress.Value);
-                                mDbgConnector.Continue();
-                            }
-                        }
-                        else
-                        {
-                            mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
-                        }
-                    }
+                    ASMStepOver();
                 }
                 else
                 {
@@ -691,9 +800,54 @@ namespace Cosmos.Debug.VSDebugEngine
                 mCallback.OnStepComplete(); // Have to call this otherwise VS gets "stuck"
             }
         }
-
-        public void SendAssembly()
+        internal void ASMStepOver()
         {
+            //ASM Step over : Detect calls and treat them specially.
+            //If current line has been stepped, get next line (since that is what we will step over)
+            //If current line hasn't been stepped, use current line
+
+            //If current line is CALL, set INT3 on next line and do continue
+            //Else do asm step-into
+
+            string currentASMLine = mCurrentASMLine;
+
+            if (string.IsNullOrEmpty(currentASMLine))
+            {
+                mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
+            }
+            else
+            {
+                currentASMLine = currentASMLine.Trim();
+                string currentASMOp = currentASMLine.Split(' ')[0].ToUpper();
+                if (currentASMOp == "CALL")
+                {
+                    //Get the line after the call
+                    string nextASMLine = mNextASMLine1;
+                    UInt32? nextAddress = mNextAddress1;
+                    if (string.IsNullOrEmpty(nextASMLine) || !nextAddress.HasValue)
+                    {
+                        mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
+                    }
+                    else
+                    {
+                        //Set the INT3 at next address
+                        mDbgConnector.SetAsmBreakpoint(nextAddress.Value);
+                        mDbgConnector.Continue();
+                    }
+                }
+                else
+                {
+                    mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
+                }
+            }
+        }
+
+        public void SendAssembly(bool noDisplay = false)
+        {
+            ASMWindow_CurrentLineUpdated.Reset();
+            ASMWindow_NextAddress1Updated.Reset();
+            ASMWindow_NextLine1Updated.Reset();
+
             UInt32 xAddress = mCurrentAddress.Value;
             var xSourceInfos = mDebugInfoDb.GetSourceInfos(xAddress);
             if (xSourceInfos.Count > 0)
@@ -730,11 +884,20 @@ namespace Cosmos.Debug.VSDebugEngine
                     xCurrentLabel = "NO_METHOD_LABEL_FOUND";
                 }
 
-                // Insert it to the first line of our data stream
+                // Insert parameters as SECOND(!) line of our data stream
+                xCode.Insert(0, (noDisplay ? "NoDisplay" : "") + "\r\n");
+                // Insert current line's label as FIRST(!) line of our data stream
                 xCode.Insert(0, xCurrentLabel + "\r\n");
+                //THINK ABOUT THE ORDER that he above lines occur in and where they insert data into the stream - don't switch it!
                 mDebugDownPipe.SendCommand(Debugger2Windows.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
 
             }
+        }
+        public void WaitForAssemblyUpdate()
+        {
+            ASMWindow_CurrentLineUpdated.WaitOne(5000);
+            ASMWindow_NextAddress1Updated.WaitOne(5000);
+            ASMWindow_NextLine1Updated.WaitOne(5000);
         }
 
         //TODO: At some point this will probably need to be exposed for access outside of AD7Process

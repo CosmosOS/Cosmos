@@ -51,7 +51,9 @@ namespace Cosmos.VS.Windows
         protected StringBuilder mCode = new StringBuilder();
         protected bool mFilter = true;
         protected string mCurrentLabel;
-        
+        protected string[] mParams;
+        protected List<string> mASMBPs = new List<string>();
+
         public AssemblyUC()
         {
             InitializeComponent();
@@ -62,7 +64,7 @@ namespace Cosmos.VS.Windows
             //butnStepOver.Click += new RoutedEventHandler(butnStepOver_Click);
             //butnStepInto.Click += new RoutedEventHandler(butnStepInto_Click);
             butnStepMode.Click += new RoutedEventHandler(butnStepMode_Click);
-
+            
             Update(null, mData);
         }
 
@@ -163,14 +165,6 @@ namespace Cosmos.VS.Windows
                     }
                     else
                     {
-                        if (xLine is AsmCode)
-                        {
-                            var xAsmCode = (AsmCode)xLine;
-                            if (xAsmCode.IsDebugCode)
-                            {
-                                //continue;
-                            }
-                        }
                         xDisplayLine = xLine.ToString();
                     }
 
@@ -206,6 +200,7 @@ namespace Cosmos.VS.Windows
                 xDisplayLine = xDisplayLine.Replace("\t", "  ");
 
                 var xRun = new Run(xDisplayLine);
+                xRun.MouseDown += xRun_MouseDown;
                 xRun.FontFamily = xFont;
                 mRunsToLines.Add(xRun, xLine);
                 // Set colour of line
@@ -225,9 +220,6 @@ namespace Cosmos.VS.Windows
                         xRun.Foreground = Brushes.WhiteSmoke;
                         xRun.Background = Brushes.DarkRed;
 
-                        Global.PipeUp.SendCommand(Windows2Debugger.CurrentASMLine, xAsmCode.Text);
-                        Global.PipeUp.SendCommand(Windows2Debugger.NextASMLine1, new byte[0]);
-                        
                         Package.StateStorer.CurrLineId = GetLineId(xAsmCode);
                         Package.StoreAllStates();
 
@@ -241,13 +233,11 @@ namespace Cosmos.VS.Windows
                             nextCodeDistFromCurrent++;
                         }
 
-                        if(nextCodeDistFromCurrent == 1)
+                        if(mASMBPs.Contains(GetLineId(xAsmCode)))
                         {
-                            Global.PipeUp.SendCommand(Windows2Debugger.NextASMLine1, xAsmCode.Text);
-                            Global.PipeUp.SendCommand(Windows2Debugger.NextLabel1, xAsmCode.AsmLabel.Label);
+                            xRun.Background = Brushes.MediumVioletRed;
                         }
-
-                        if(Package.StateStorer.ContainsStatesForLine(GetLineId(xAsmCode)))
+                        else if(Package.StateStorer.ContainsStatesForLine(GetLineId(xAsmCode)))
                         {
                             xRun.Background = Brushes.LightYellow;
                         }
@@ -278,6 +268,40 @@ namespace Cosmos.VS.Windows
             ASMScrollViewer.ScrollToVerticalOffset(offset);
         }
 
+        bool justSetBP = false;
+        private void xRun_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs aArgs)
+        {
+            if (aArgs.ClickCount == 2)
+            {
+                Run xRun = (Run)aArgs.OriginalSource;
+
+                if (aArgs.ClickCount == 2)
+                {
+                    justSetBP = true;
+
+                    //Double clicked so don't select it, set it as an ASM BP
+                    var line = mRunsToLines[xRun];
+                    //Search for associated label
+                    if (line is AsmCode)
+                    {
+                        Global.PipeUp.SendCommand(Windows2Debugger.ToggleAsmBreak2, Encoding.UTF8.GetBytes(((AsmCode)line).AsmLabel.Label));
+
+                        string lineId = GetLineId((AsmCode)line);
+                        if (mASMBPs.Contains(lineId))
+                        {
+                            xRun.Background = null;
+                            mASMBPs.Remove(lineId);
+                        }
+                        else
+                        {
+                            xRun.Background = Brushes.MediumVioletRed;
+                            mASMBPs.Add(lineId);
+                        }
+                    }
+                }
+            }
+        }
+
         protected void OnASMCodeTextMouseUp(object aSender, System.Windows.Input.MouseButtonEventArgs aArgs)
         {
             try
@@ -289,7 +313,11 @@ namespace Cosmos.VS.Windows
 
                     try
                     {
-                        if (Package.StateStorer.ContainsStatesForLine(GetLineId((AsmCode)mRunsToLines[mSelectedCodeRun])))
+                        if (mASMBPs.Contains(GetLineId((AsmCode)mRunsToLines[mSelectedCodeRun])))
+                        {
+                            mSelectedCodeRun.Background = Brushes.MediumVioletRed;
+                        }
+                        else if (Package.StateStorer.ContainsStatesForLine(GetLineId((AsmCode)mRunsToLines[mSelectedCodeRun])))
                         {
                             mSelectedCodeRun.Background = Brushes.LightYellow;
                         }
@@ -306,12 +334,19 @@ namespace Cosmos.VS.Windows
                 }
 
                 Run xRun = (Run)aArgs.OriginalSource;
-                // Highlight new selection, if not the current break.
-                if (xRun.Background != Brushes.DarkRed)
+                if (!justSetBP)
                 {
-                    mSelectedCodeRun = xRun;
-                    xRun.Foreground = Brushes.WhiteSmoke;
-                    xRun.Background = Brushes.Blue;
+                    // Highlight new selection, if not the current break.
+                    if (xRun.Background != Brushes.DarkRed)
+                    {
+                        mSelectedCodeRun = xRun;
+                        xRun.Foreground = Brushes.WhiteSmoke;
+                        xRun.Background = Brushes.Blue;
+                    }
+                }
+                else
+                {
+                    justSetBP = false;
                 }
 
                 //Show state for that line
@@ -362,71 +397,98 @@ namespace Cosmos.VS.Windows
             // Should always be \r\n, but just in case we split by \n and ignore \r
             string[] xLines = xCode.Replace("\r", "").Split('\n');
 
-            // First line of packet is not code, but the current label and inserted by caller.
-            mCurrentLabel = xLines[0];
-            bool xSetNextLabelToCurrent = false;
-            
-            AsmLabel xLastAsmAsmLabel = null;
-            for (int i = 1; i < xLines.Length; i++)
+            if (xLines.Length >= 2)
             {
-                string xLine = xLines[i].Trim();
-                string xTestLine = xLine.ToUpper();
-                var xParts = xLine.Split(' ');
+                // First line is not code, but the current label and inserted by caller
+                // Second line is input parameters
+                mCurrentLabel = xLines[0];
+                mParams = xLines[1].Split('|');
+                bool xSetNextLabelToCurrent = false;
 
-                // Skip certain items we never care about. ie remove noise
-                if (xLine.Length == 0)
+                int nextCodeDistFromCurrent = 0;
+                bool foundCurrentLine = false;
+
+                AsmLabel xLastAsmAsmLabel = null;
+                for (int i = 1; i < xLines.Length; i++)
                 {
-                    // Remove all empty lines because we completely reformat output.
-                    // Parse below also expects some data, not empty string.
-                    continue;
-                }
+                    string xLine = xLines[i].Trim();
+                    string xTestLine = xLine.ToUpper();
+                    var xParts = xLine.Split(' ');
 
-                if (xParts[0].EndsWith(":"))
-                { // Label
-                    string xLabel = xParts[0].Substring(0, xParts[0].Length - 1);
-                    var xAsmLabel = new AsmLabel(xLabel);
-                    // See if the label has a comment/tag
-                    if (xParts.Length > 1)
+                    // Skip certain items we never care about. ie remove noise
+                    if (xLine.Length == 0)
                     {
-                        xAsmLabel.Comment = xParts[1].Substring(1).Trim();
-                        // If its an ASM tag, store it for future use to attach to next AsmCode
-                        if (xAsmLabel.Comment.ToUpper() == "ASM")
-                        {
-                            xLastAsmAsmLabel = xAsmLabel;
-                        }
-                    }
-                    mLines.Add(xAsmLabel);
-
-                }
-                else if (xTestLine.StartsWith(";"))
-                { // Comment
-                    string xComment = xLine.Trim().Substring(1).Trim();
-                    mLines.Add(new AsmComment(xComment));
-
-                }
-                else
-                { // Code
-                    var xAsmCode = new AsmCode(xLine);
-                    xAsmCode.AsmLabel = xLastAsmAsmLabel;
-                    xLastAsmAsmLabel = null;
-
-                    if (xSetNextLabelToCurrent)
-                    {
-                        mCurrentLabel = xAsmCode.AsmLabel.Label;
-                        xSetNextLabelToCurrent = false;
-                    }
-
-                    //If its Int3 or so, we need to set the current label to the next non debug op.
-                    if (xAsmCode.IsDebugCode)
-                    {
-                        if (xAsmCode.LabelMatches(mCurrentLabel))
-                        {
-                            xSetNextLabelToCurrent = true;
-                        }
+                        // Remove all empty lines because we completely reformat output.
+                        // Parse below also expects some data, not empty string.
                         continue;
                     }
 
-                    mLines.Add(xAsmCode);
+                    if (xParts[0].EndsWith(":"))
+                    { // Label
+                        string xLabel = xParts[0].Substring(0, xParts[0].Length - 1);
+                        var xAsmLabel = new AsmLabel(xLabel);
+                        // See if the label has a comment/tag
+                        if (xParts.Length > 1)
+                        {
+                            xAsmLabel.Comment = xParts[1].Substring(1).Trim();
+                            // If its an ASM tag, store it for future use to attach to next AsmCode
+                            if (xAsmLabel.Comment.ToUpper() == "ASM")
+                            {
+                                xLastAsmAsmLabel = xAsmLabel;
+                            }
+                        }
+                        mLines.Add(xAsmLabel);
+
+                    }
+                    else if (xTestLine.StartsWith(";"))
+                    { // Comment
+                        string xComment = xLine.Trim().Substring(1).Trim();
+                        mLines.Add(new AsmComment(xComment));
+                    }
+                    else
+                    { // Code
+                        var xAsmCode = new AsmCode(xLine);
+                        xAsmCode.AsmLabel = xLastAsmAsmLabel;
+                        xLastAsmAsmLabel = null;
+
+                        if (xSetNextLabelToCurrent)
+                        {
+                            mCurrentLabel = xAsmCode.AsmLabel.Label;
+                            xSetNextLabelToCurrent = false;
+                        }
+
+                        //If its Int3 or so, we need to set the current label to the next non debug op.
+                        //And we don't want to add debug code to our parsed stuff - it shouldn't be displayed.
+                        if (xAsmCode.IsDebugCode)
+                        {
+                            if (xAsmCode.LabelMatches(mCurrentLabel))
+                            {
+                                xSetNextLabelToCurrent = true;
+                            }
+                            //Skip adding Debug Code (INT3s) to parsed list
+                            continue;
+                        }
+
+                        if (foundCurrentLine)
+                        {
+                            nextCodeDistFromCurrent++;
+                        }
+
+                        if (nextCodeDistFromCurrent == 1)
+                        {
+                            Global.PipeUp.SendCommand(Windows2Debugger.NextASMLine1, xAsmCode.Text);
+                            Global.PipeUp.SendCommand(Windows2Debugger.NextLabel1, xAsmCode.AsmLabel.Label);
+                        }
+                        else if (!foundCurrentLine && xAsmCode.LabelMatches(mCurrentLabel))
+                        {
+                            //Current line of code found
+                            Global.PipeUp.SendCommand(Windows2Debugger.CurrentASMLine, xAsmCode.Text);
+                            Global.PipeUp.SendCommand(Windows2Debugger.NextASMLine1, new byte[0]);
+                            foundCurrentLine = true;
+                        }
+
+                        mLines.Add(xAsmCode);
+                    }
                 }
             }
         }
@@ -451,7 +513,14 @@ namespace Cosmos.VS.Windows
                         }
                     }
                     Parse();
-                    Display(mFilter);
+                    if (mParams != null && mParams[0] == "NoDisplay")
+                    {
+                        //Don't call display
+                    }
+                    else
+                    {
+                        Display(mFilter);
+                    }
                 }
             );
         }

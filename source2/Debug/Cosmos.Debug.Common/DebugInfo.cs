@@ -19,554 +19,629 @@ using DapperExtensions;
 using DapperExtensions.Mapper;
 using DapperExtensions.Sql;
 
-namespace Cosmos.Debug.Common {
-  public class DebugInfo : IDisposable {
-
-    // Please beware this field, it may cause issues if used incorrectly.
-    public static DebugInfo CurrentInstance { get; private set; }
-
-    public class Field_Map {
-      public string TypeName { get; set; }
-      public List<string> FieldNames = new List<string>();
-    }
-
-    protected SQLiteConnection mConnection;
-    protected string mDbName;
-    // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
-    //protected mDataSouce = @".\SQLEXPRESS";
-    protected string mConnStr;
-    
-    public void DeleteDB(string aDbName, string aPathname) {
-      File.Delete(aDbName);
-    }
-
-    public DebugInfo(string aPathname, bool aCreate = false) {
-      CurrentInstance = this;
-
-      if (aCreate)
-      {
-        File.Delete(aPathname);
-      }
-      aCreate = !File.Exists(aPathname);
-
-      // Manually register the data provider. Do not remove this otherwise the data provider doesn't register properly.
-      mConnStr = String.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;", aPathname);
-      // Use the SQLiteConnectionFactory as the default database connection
-      // Do not open mConnection before mEntities.CreateDatabase
-      mConnection = new SQLiteConnection(mConnStr);
-      DapperExtensions.DapperExtensions.DefaultMapper = typeof(PluralizedAutoClassMapper<>);
-      DapperExtensions.DapperExtensions.SqlDialect = new SqliteDialect();
-      if (aCreate) {
-          // DatabaseExists checks if the DBName exists, not physical files.
-          if (aCreate) {
-            mConnection.Open();
-            var xSQL = new SQL(mConnection);
-            xSQL.CreateDB();
-
-            // Be careful with indexes, they slow down inserts. So on tables that we have a 
-            // lot of inserts, but limited look ups, dont add them.
-            //
-            xSQL.MakeIndex("Labels", "Address", false);
-            xSQL.MakeIndex("Labels", "Name", true);
-            xSQL.MakeIndex("Methods", "DocumentID", false);
-          }
-      }
-      if (mConnection.State == ConnectionState.Closed) {
-        mConnection.Open();
-      }
-    }
-
-    public IDbConnection Connection
+namespace Cosmos.Debug.Common
+{
+    public class DebugInfo : IDisposable
     {
-        get
+
+        // Please beware this field, it may cause issues if used incorrectly.
+        public static DebugInfo CurrentInstance { get; private set; }
+
+        public class Field_Map
         {
-            return mConnection;
+            public string TypeName { get; set; }
+            public List<string> FieldNames = new List<string>();
         }
-    }
 
-    // The GUIDs etc are populated by the MSBuild task, so they wont be loaded when the debugger runs.
-    // Because of this, we also allow manual loading.
-    public void LoadLookups() {
-        foreach (var xDoc in Connection.Query<Document>(new SQLinq<Document>().ToSQL().ToQuery()))
+        protected SQLiteConnection mConnection;
+        protected string mDbName;
+        // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
+        //protected mDataSouce = @".\SQLEXPRESS";
+        protected string mConnStr;
+
+        public void DeleteDB(string aDbName, string aPathname)
         {
-            DocumentGUIDs.Add(xDoc.Pathname.ToLower(), xDoc.ID);
+            File.Delete(aDbName);
         }
-    }
 
-    public UInt32 AddressOfLabel(string aLabel)
-    {
-        var xRow = Connection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == aLabel)).FirstOrDefault();
-        
-        if (xRow == null)
+        public DebugInfo(string aPathname, bool aCreate = false)
         {
-            return 0;
-        }
-        return (UInt32)xRow.Address;
-    }
+            CurrentInstance = this;
 
-    public string[] GetLabels(UInt32 aAddress)
-    {
-        var xLabels = Connection.Query<Label>(new SQLinq<Label>().Where(i => i.Address == aAddress)).Select(i => i.Name).ToArray();
-        return xLabels;
-    }
-
-    protected List<string> local_MappingTypeNames = new List<string>();
-    public void WriteFieldMappingToFile(IEnumerable<Field_Map> aMapping)
-    {
-        var xMaps = aMapping.Where(delegate(Field_Map mp)
-        {
-            if (local_MappingTypeNames.Contains(mp.TypeName))
+            if (aCreate)
             {
-                return false;
+                File.Delete(aPathname);
+            }
+            aCreate = !File.Exists(aPathname);
+
+            // Manually register the data provider. Do not remove this otherwise the data provider doesn't register properly.
+            mConnStr = String.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;", aPathname);
+            // Use the SQLiteConnectionFactory as the default database connection
+            // Do not open mConnection before mEntities.CreateDatabase
+            mConnection = new SQLiteConnection(mConnStr);
+            DapperExtensions.DapperExtensions.DefaultMapper = typeof(PluralizedAutoClassMapper<>);
+            DapperExtensions.DapperExtensions.SqlDialect = new SqliteDialect();
+            if (aCreate)
+            {
+                // DatabaseExists checks if the DBName exists, not physical files.
+                if (aCreate)
+                {
+                    mConnection.Open();
+                    var xSQL = new SQL(mConnection);
+                    xSQL.CreateDB();
+
+                    // Be careful with indexes, they slow down inserts. So on tables that we have a 
+                    // lot of inserts, but limited look ups, dont add them.
+                    //
+                    xSQL.MakeIndex("Labels", "Address", false);
+                    xSQL.MakeIndex("Labels", "Name", true);
+                    xSQL.MakeIndex("Methods", "DocumentID", false);
+                }
+            }
+            if (mConnection.State == ConnectionState.Closed)
+            {
+                mConnection.Open();
+            }
+        }
+
+        public IDbConnection Connection
+        {
+            get
+            {
+                return mConnection;
+            }
+        }
+
+        // The GUIDs etc are populated by the MSBuild task, so they wont be loaded when the debugger runs.
+        // Because of this, we also allow manual loading.
+        public void LoadLookups()
+        {
+            foreach (var xDoc in Connection.Query<Document>(new SQLinq<Document>().ToSQL().ToQuery()))
+            {
+                DocumentGUIDs.Add(xDoc.Pathname.ToLower(), xDoc.ID);
+            }
+        }
+
+        public UInt32 AddressOfLabel(string aLabel)
+        {
+            var xRow = Connection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == aLabel)).FirstOrDefault();
+
+            if (xRow == null)
+            {
+                return 0;
+            }
+            return (UInt32)xRow.Address;
+        }
+
+        public string[] GetLabels(UInt32 aAddress)
+        {
+            var xLabels = Connection.Query<Label>(new SQLinq<Label>().Where(i => i.Address == aAddress)).Select(i => i.Name).ToArray();
+            return xLabels;
+        }
+
+        protected List<string> local_MappingTypeNames = new List<string>();
+        public void WriteFieldMappingToFile(IEnumerable<Field_Map> aMapping)
+        {
+            var xMaps = aMapping.Where(delegate(Field_Map mp)
+            {
+                if (local_MappingTypeNames.Contains(mp.TypeName))
+                {
+                    return false;
+                }
+                else
+                {
+                    local_MappingTypeNames.Add(mp.TypeName);
+                    return true;
+                }
+            });
+
+            // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
+            var xItemsToAdd = new List<FIELD_MAPPING>(1024);
+            foreach (var xItem in xMaps)
+            {
+                foreach (var xFieldName in xItem.FieldNames)
+                {
+                    var xRow = new FIELD_MAPPING();
+                    xRow.ID = NewGuid();
+                    xRow.TYPE_NAME = xItem.TypeName;
+                    xRow.FIELD_NAME = xFieldName;
+                    xItemsToAdd.Add(xRow);
+                }
+            }
+            BulkInsert<FIELD_MAPPING>("FIELD_MAPPINGS", xItemsToAdd);
+        }
+
+        public Field_Map GetFieldMap(string aName)
+        {
+            var xMap = new Field_Map();
+            xMap.TypeName = aName;
+            var xRows = mConnection.Query<FIELD_MAPPING>(new SQLinq<FIELD_MAPPING>().Where(i => i.TYPE_NAME == aName));
+            foreach (var xFieldName in xRows)
+            {
+                xMap.FieldNames.Add(xFieldName.FIELD_NAME);
+            }
+            return xMap;
+        }
+
+        public void ReadFieldMappingList(List<Field_Map> aSymbols)
+        {
+            var xMap = new Field_Map();
+            foreach (var xRow in mConnection.GetList<FIELD_MAPPING>())
+            {
+                string xTypeName = xRow.TYPE_NAME;
+                if (xTypeName != xMap.TypeName)
+                {
+                    if (xMap.FieldNames.Count > 0)
+                    {
+                        aSymbols.Add(xMap);
+                    }
+                    xMap = new Field_Map();
+                    xMap.TypeName = xTypeName;
+                }
+                xMap.FieldNames.Add(xRow.FIELD_NAME);
+            }
+            aSymbols.Add(xMap);
+        }
+
+        private static Guid NewGuid()
+        {
+            return Guid.NewGuid();
+        }
+
+        protected List<string> mLocalFieldInfoNames = new List<string>();
+        public void WriteFieldInfoToFile(IList<FIELD_INFO> aFields)
+        {
+            var itemsToAdd = new List<FIELD_INFO>(aFields.Count);
+            foreach (var xItem in aFields)
+            {
+                if (!mLocalFieldInfoNames.Contains(xItem.NAME))
+                {
+                    xItem.ID = NewGuid();
+                    mLocalFieldInfoNames.Add(xItem.NAME);
+                    itemsToAdd.Add(xItem);
+                }
+            }
+            BulkInsert<FIELD_INFO>("FIELD_INFOS", itemsToAdd, 2500, true);
+        }
+
+        public class SequencePoint
+        {
+            public int Offset;
+            public string Document;
+            public int LineStart;
+            public int ColStart;
+            public Int64 LineColStart
+            {
+                get { return ((Int64)LineStart << 32) + ColStart; }
+            }
+            public int LineEnd;
+            public int ColEnd;
+            public Int64 LineColEnd
+            {
+                get { return ((Int64)LineEnd << 32) + ColEnd; }
+            }
+        }
+
+        // This gets the Sequence Points.
+        // Sequence Points are spots that identify what the compiler/debugger says is a spot
+        // that a breakpoint can occur one. Essentially, an atomic source line in C#
+        public SequencePoint[] GetSequencePoints(MethodBase aMethod, bool aFilterHiddenLines = false)
+        {
+            return GetSequencePoints(aMethod.DeclaringType.Assembly.Location, aMethod.MetadataToken, aFilterHiddenLines);
+        }
+
+        public SequencePoint[] GetSequencePoints(string aAsmPathname, int aMethodToken, bool aFilterHiddenLines = false)
+        {
+            var xReader = Microsoft.Samples.Debugging.CorSymbolStore.SymbolAccess.GetReaderForFile(aAsmPathname);
+            if (xReader == null)
+            {
+                return new SequencePoint[0];
+            }
+
+            var xSymbols = xReader.GetMethod(new SymbolToken(aMethodToken));
+            if (xSymbols == null)
+            {
+                return new SequencePoint[0];
+            }
+
+            int xCount = xSymbols.SequencePointCount;
+            var xOffsets = new int[xCount];
+            var xDocuments = new ISymbolDocument[xCount];
+            var xStartLines = new int[xCount];
+            var xStartCols = new int[xCount];
+            var xEndLines = new int[xCount];
+            var xEndCols = new int[xCount];
+
+            xSymbols.GetSequencePoints(xOffsets, xDocuments, xStartLines, xStartCols, xEndLines, xEndCols);
+
+            var xResult = new SequencePoint[xCount];
+            for (int i = 0; i < xCount; i++)
+            {
+                var xSP = new SequencePoint();
+                xResult[i] = xSP;
+                xSP.Offset = xOffsets[i];
+                xSP.Document = xDocuments[i].URL;
+                xSP.LineStart = xStartLines[i];
+                xSP.ColStart = xStartCols[i];
+                xSP.LineEnd = xEndLines[i];
+                xSP.ColEnd = xEndCols[i];
+            }
+
+            if (aFilterHiddenLines)
+            {
+                return xResult.Where(q => q.LineStart != 0xFEEFEE).ToArray();
+            }
+            return xResult;
+        }
+
+        protected List<Method> mMethods = new List<Method>();
+        public void AddMethod(Method aMethod, bool aFlush = false)
+        {
+            if (aMethod != null)
+            {
+                mMethods.Add(aMethod);
+            }
+            BulkInsert("Methods", mMethods, 2500, aFlush);
+        }
+
+        // Quick look up of assemblies so we dont have to go to the database and compare by fullname.
+        // This and other GUID lists contain only a few members, and save us from issuing a lot of selects to SQL.
+        public Dictionary<Assembly, Guid> AssemblyGUIDs = new Dictionary<Assembly, Guid>();
+        List<Cosmos.Debug.Common.AssemblyFile> xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
+        public void AddAssemblies(List<Assembly> aAssemblies, bool aFlush = false)
+        {
+            if (aAssemblies != null)
+            {
+
+                foreach (var xAsm in aAssemblies)
+                {
+                    var xRow = new Cosmos.Debug.Common.AssemblyFile()
+                    {
+                        ID = Guid.NewGuid(),
+                        Pathname = xAsm.Location
+                    };
+                    xAssemblies.Add(xRow);
+
+                    AssemblyGUIDs.Add(xAsm, xRow.ID);
+                }
+            }
+            BulkInsert("AssemblyFiles", xAssemblies, 2500, aFlush);
+        }
+
+        public Dictionary<string, Guid> DocumentGUIDs = new Dictionary<string, Guid>();
+        List<Document> xDocuments = new List<Document>(1);
+        public void AddDocument(string aPathname, bool aFlush = false)
+        {
+            if (aPathname != null)
+            {
+                aPathname = aPathname.ToLower();
+
+                if (!DocumentGUIDs.ContainsKey(aPathname))
+                {
+                    var xRow = new Document()
+                    {
+                        ID = Guid.NewGuid(),
+                        Pathname = aPathname
+                    };
+                    DocumentGUIDs.Add(aPathname, xRow.ID);
+                    // Even though we are inserting only one row, Bulk already has a connection
+                    // open so its probably faster than using EF, and its about the same amount of code.
+                    // Need to insert right away so RI will be ok when dependents are inserted.
+                    xDocuments.Add(xRow);
+                    BulkInsert("Documents", xDocuments, 2500, aFlush);
+                }
             }
             else
             {
-                local_MappingTypeNames.Add(mp.TypeName);
-                return true;
-            }
-        });
-
-        // Is a real DB now, but we still store all in RAM. We don't need to. Need to change to query DB as needed instead.
-        var xItemsToAdd = new List<FIELD_MAPPING>(1024);
-        foreach (var xItem in xMaps)
-        {
-            foreach (var xFieldName in xItem.FieldNames)
-            {
-                var xRow = new FIELD_MAPPING();
-                xRow.ID = NewGuid();
-                xRow.TYPE_NAME = xItem.TypeName;
-                xRow.FIELD_NAME = xFieldName;
-                xItemsToAdd.Add(xRow);
-            }
-        }
-        BulkInsert<FIELD_MAPPING>("FIELD_MAPPINGS", xItemsToAdd);
-    }
-
-    public Field_Map GetFieldMap(string aName)
-    {
-        var xMap = new Field_Map();
-        xMap.TypeName = aName;
-        var xRows = mConnection.Query<FIELD_MAPPING>(new SQLinq<FIELD_MAPPING>().Where(i => i.TYPE_NAME == aName));
-        foreach (var xFieldName in xRows)
-        {
-            xMap.FieldNames.Add(xFieldName.FIELD_NAME);
-        }
-        return xMap;
-    }
-
-    public void ReadFieldMappingList(List<Field_Map> aSymbols)
-    {
-        var xMap = new Field_Map();
-        foreach (var xRow in mConnection.GetList<FIELD_MAPPING>())
-        {
-            string xTypeName = xRow.TYPE_NAME;
-            if (xTypeName != xMap.TypeName)
-            {
-                if (xMap.FieldNames.Count > 0)
-                {
-                    aSymbols.Add(xMap);
-                }
-                xMap = new Field_Map();
-                xMap.TypeName = xTypeName;
-            }
-            xMap.FieldNames.Add(xRow.FIELD_NAME);
-        }
-        aSymbols.Add(xMap);
-    }
-
-    private static Guid NewGuid()
-    {
-      return Guid.NewGuid();
-    }
-
-    protected List<string> mLocalFieldInfoNames = new List<string>();
-    public void WriteFieldInfoToFile(IList<FIELD_INFO> aFields)
-    {
-        var itemsToAdd = new List<FIELD_INFO>(aFields.Count);
-        foreach (var xItem in aFields)
-        {
-            if (!mLocalFieldInfoNames.Contains(xItem.NAME))
-            {
-                xItem.ID = NewGuid();
-                mLocalFieldInfoNames.Add(xItem.NAME);
-                itemsToAdd.Add(xItem);
-            }
-        }
-        BulkInsert<FIELD_INFO>("FIELD_INFOS", itemsToAdd, 2500, true);        
-    }
-
-    public class SequencePoint {
-      public int Offset;
-      public string Document;
-      public int LineStart;
-      public int ColStart;
-      public Int64 LineColStart {
-        get { return ((Int64)LineStart << 32) + ColStart; }
-      }
-      public int LineEnd;
-      public int ColEnd;
-      public Int64 LineColEnd {
-        get { return ((Int64)LineEnd << 32) + ColEnd; }
-      }
-    }
-
-    // This gets the Sequence Points.
-    // Sequence Points are spots that identify what the compiler/debugger says is a spot
-    // that a breakpoint can occur one. Essentially, an atomic source line in C#
-    public SequencePoint[] GetSequencePoints(MethodBase aMethod, bool aFilterHiddenLines = false) {
-      return GetSequencePoints(aMethod.DeclaringType.Assembly.Location, aMethod.MetadataToken, aFilterHiddenLines);
-    }
-
-    public SequencePoint[] GetSequencePoints(string aAsmPathname, int aMethodToken, bool aFilterHiddenLines = false) {
-      var xReader = Microsoft.Samples.Debugging.CorSymbolStore.SymbolAccess.GetReaderForFile(aAsmPathname);
-      if (xReader == null) {
-        return new SequencePoint[0];
-      }
-
-      var xSymbols = xReader.GetMethod(new SymbolToken(aMethodToken));
-      if (xSymbols == null) {
-        return new SequencePoint[0];
-      }
-      
-      int xCount = xSymbols.SequencePointCount;
-      var xOffsets = new int[xCount];
-      var xDocuments = new ISymbolDocument[xCount];
-      var xStartLines = new int[xCount];
-      var xStartCols = new int[xCount];
-      var xEndLines = new int[xCount];
-      var xEndCols = new int[xCount];
-      
-      xSymbols.GetSequencePoints(xOffsets, xDocuments, xStartLines, xStartCols, xEndLines, xEndCols);
-
-      var xResult = new SequencePoint[xCount];
-      for (int i = 0; i < xCount; i++) {
-        var xSP = new SequencePoint();
-        xResult[i] = xSP;
-        xSP.Offset = xOffsets[i];
-        xSP.Document = xDocuments[i].URL;
-        xSP.LineStart = xStartLines[i];
-        xSP.ColStart = xStartCols[i];
-        xSP.LineEnd = xEndLines[i];
-        xSP.ColEnd = xEndCols[i];
-      }
-
-      if (aFilterHiddenLines) {
-        return xResult.Where(q => q.LineStart != 0xFEEFEE).ToArray();
-      }
-      return xResult;
-    }
-
-    protected List<Method> mMethods = new List<Method>();
-    public void AddMethod(Method aMethod, bool aFlush = false) {
-      if (aMethod != null) {
-        mMethods.Add(aMethod);
-      }
-      BulkInsert("Methods", mMethods, 2500, aFlush);
-    }
-
-    // Quick look up of assemblies so we dont have to go to the database and compare by fullname.
-    // This and other GUID lists contain only a few members, and save us from issuing a lot of selects to SQL.
-    public Dictionary<Assembly, Guid> AssemblyGUIDs = new Dictionary<Assembly, Guid>();
-    List<Cosmos.Debug.Common.AssemblyFile> xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
-    public void AddAssemblies(List<Assembly> aAssemblies, bool aFlush = false) {
-        if (aAssemblies != null)
-        {
-            
-            foreach (var xAsm in aAssemblies)
-            {
-                var xRow = new Cosmos.Debug.Common.AssemblyFile()
-                {
-                    ID = Guid.NewGuid(),
-                    Pathname = xAsm.Location
-                };
-                xAssemblies.Add(xRow);
-
-                AssemblyGUIDs.Add(xAsm, xRow.ID);
-            }
-        }
-        BulkInsert("AssemblyFiles", xAssemblies, 2500, aFlush);
-    }
-
-    public Dictionary<string, Guid> DocumentGUIDs = new Dictionary<string, Guid>();
-    List<Document> xDocuments = new List<Document>(1);
-    public void AddDocument(string aPathname, bool aFlush = false)
-    {
-        if (aPathname != null)
-        {
-            aPathname = aPathname.ToLower();
-
-            if (!DocumentGUIDs.ContainsKey(aPathname))
-            {
-                var xRow = new Document()
-                {
-                    ID = Guid.NewGuid(),
-                    Pathname = aPathname
-                };
-                DocumentGUIDs.Add(aPathname, xRow.ID);
-                // Even though we are inserting only one row, Bulk already has a connection
-                // open so its probably faster than using EF, and its about the same amount of code.
-                // Need to insert right away so RI will be ok when dependents are inserted.
-                xDocuments.Add(xRow);
                 BulkInsert("Documents", xDocuments, 2500, aFlush);
             }
         }
-        else
+
+        public void AddSymbols(IList<MethodIlOp> aSymbols, bool aFlush = false)
         {
-            BulkInsert("Documents", xDocuments, 2500, aFlush);
-        }
-    }
-
-    public void AddSymbols(IList<MethodIlOp> aSymbols, bool aFlush = false) {
-      foreach (var x in aSymbols) {
-        x.ID = Guid.NewGuid();
-      }
-      BulkInsert("MethodIlOps", aSymbols, 2500, aFlush);
-    }
-
-    public void WriteAllLocalsArgumentsInfos(IList<LOCAL_ARGUMENT_INFO> aInfos) {
-      foreach (var x in aInfos) {
-        x.ID = Guid.NewGuid();
-      }
-      BulkInsert("LOCAL_ARGUMENT_INFOS", aInfos, aFlush: true);
-    }
-
-    // EF is slow on bulk operations. But we want to retain explicit bindings to the model to avoid unbound mistakes.
-    // SqlBulk operations are on average 15x faster. So we use a hybrid approach by using the entities as containers
-    // and EntityDataReader to bridge the gap to SqlBulk.
-    //
-    // We dont want to issue individual inserts to SQL as this is very slow.
-    // But accumulating too many records in RAM also is a problem. For example 
-    // at time of writing the full structure would take up 11 MB of RAM just for this structure.
-    // This is not a huge amount, but as we compile in more and more this figure will grow.
-    // So as a compromise, we collect 2500 records then bulk insert.
-    public void BulkInsert<T>(string aTableName, IList<T> aList, int aFlushSize = 0, bool aFlush = false) where T: class {
-      if (aList.Count >= aFlushSize || aFlush) {
-        if (aList.Count > 0) {
-          using (var xBulkCopy = new SqliteBulkCopy(mConnection)) {
-            xBulkCopy.DestinationTableName = aTableName;
-            #region debug
-            // for now dump to disk:
-            //using (var reader = aList.AsDataReader())
-            //{
-            //  var dumpIdx = Interlocked.Increment(ref DataDumpIndex);
-            //  using (var writer = new StreamWriter(@"c:\temp\dataout\" + dumpIdx + ".dmp"))
-            //  {
-            //    writer.WriteLine(typeof(T).FullName);
-            //    writer.WriteLine("Flush = {0}", aFlush);
-            //    bool first = true;
-            //    while (reader.Read())
-            //    {
-            //      if (first)
-            //      {
-            //        first = false;
-            //        for (int i = 0; i < reader.FieldCount; i++)
-            //        {
-            //          writer.Write(reader.GetName(i));
-            //          if (i < (reader.FieldCount - 1))
-            //          {
-            //            writer.Write("\t");
-            //          }
-            //        }
-            //        writer.WriteLine();
-            //      }
-            //      for (int i = 0; i < reader.FieldCount; i++)
-            //      {
-            //        writer.Write(reader.GetValue(i));
-            //        if (i < (reader.FieldCount - 1))
-            //        {
-            //          writer.Write("\t");
-            //        }
-            //      }
-            //      writer.WriteLine();
-            //    }
-            //  }
-            //}
-            #endregion region debug
-            //using (var db = DB())
-            //{
-            //    db.Set(typeof(T)).AddRange(aList);
-            //    db.SaveChanges();
-            //}
-            //using (var trans = mConnection.BeginTransaction())
-            //{
-            //    try
-            //    {
-            //        mConnection.Insert<T>(aList);
-            //        trans.Commit();
-            //    }
-            //    catch(Exception E)
-            //    {
-            //        trans.Rollback();
-            //    }
-            //}
-            using (var reader = new ObjectReader<T>(aList.ToArray()))
+            foreach (var x in aSymbols)
             {
-                xBulkCopy.WriteToServer(reader);
+                x.ID = Guid.NewGuid();
             }
-          }
-          aList.Clear();
+            BulkInsert("MethodIlOps", aSymbols, 2500, aFlush);
         }
-      }
-    }
 
-    private static int DataDumpIndex = 0;
-
-    public void AddLabels(IList<Label> aLabels, bool aFlush = false) {
-      // GUIDs inserted by caller
-      BulkInsert("Labels", aLabels, 2500, aFlush);
-    }
-
-    public void Dispose() {
-      if (mConnection != null) {
-          AddAssemblies(null, true);
-          AddDocument(null, true);
-          AddMethod(null, true);
-        var xConn = mConnection;
-        xConn.Close();
-        xConn = null;
-        mConnection = null;
-        // Dont set to null... causes problems because of bad code :(
-        // Need to fix the whole class, but its here for now.
-        //CurrentInstance = null;
-      }
-    }
-
-    public Label GetMethodHeaderLabel(UInt32 aAddress)
-    {
-        var xAddress = (long)aAddress;
-        var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address <= xAddress).OrderByDescending(i => i.Address)).ToArray();
-
-        Label methodHeaderLabel = null;
-        //The first label we find searching upwards with "GUID_" at the start will be the very start of the method header
-        foreach (var xLabel in xLabels)
+        public void WriteAllLocalsArgumentsInfos(IList<LOCAL_ARGUMENT_INFO> aInfos)
         {
-            if (xLabel.Name.StartsWith("GUID_"))
+            foreach (var x in aInfos)
             {
-                methodHeaderLabel = xLabel;
-                break;
+                x.ID = Guid.NewGuid();
             }
-        }
-        return methodHeaderLabel;
-    }
-    public Label[] GetMethodLabels(UInt32 aAddress)
-    {
-        Label methodHeaderLabel = GetMethodHeaderLabel(aAddress);
-        if (methodHeaderLabel == null)
-        {
-            return null;
+            BulkInsert("LOCAL_ARGUMENT_INFOS", aInfos, aFlush: true);
         }
 
-        var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address >= methodHeaderLabel.Address).OrderBy(i => i.Address)).ToArray();
-        List<Label> result = new List<Label>();
-
-        //There are always two END__OF__METHOD_EXCEPTION__2 labels at the end of the method footer.
-        int endOfMethodException2LabelsFound = 0;
-        foreach (var label in xLabels)
+        // EF is slow on bulk operations. But we want to retain explicit bindings to the model to avoid unbound mistakes.
+        // SqlBulk operations are on average 15x faster. So we use a hybrid approach by using the entities as containers
+        // and EntityDataReader to bridge the gap to SqlBulk.
+        //
+        // We dont want to issue individual inserts to SQL as this is very slow.
+        // But accumulating too many records in RAM also is a problem. For example 
+        // at time of writing the full structure would take up 11 MB of RAM just for this structure.
+        // This is not a huge amount, but as we compile in more and more this figure will grow.
+        // So as a compromise, we collect 2500 records then bulk insert.
+        public void BulkInsert<T>(string aTableName, IList<T> aList, int aFlushSize = 0, bool aFlush = false) where T : class
         {
-            if(label.Name.Contains("END__OF__METHOD_EXCEPTION__2"))
+            if (aList.Count >= aFlushSize || aFlush)
             {
-                endOfMethodException2LabelsFound++;
-            }
-            result.Add(label);
-            if(endOfMethodException2LabelsFound >= 2)
-            {
-                break;
-            }
-        }
-
-        return result.ToArray();
-    }
-    public Method GetMethod(UInt32 aAddress)
-    {
-        // The address we have is somewhere in the method, but we need to find 
-        // one that is also in MLSymbol. Asm labels for example wont be found.
-        // So we find all the labels for the method header
-        // Then search through the list for the first IL OP
-
-        var xLabels = GetMethodLabels(aAddress);
-        
-        if(xLabels == null)
-        {
-            return null;
-        }
-
-        MethodIlOp xSymbol = null;
-        foreach (var xLabel in xLabels)
-        {
-            xSymbol = mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(i => i.LabelName == xLabel.Name)).FirstOrDefault();
-            if (xSymbol != null)
-            {
-                break;
-            }
-        }
-
-        if (xSymbol == null)
-        {
-            throw new Exception("Label not found.");
-        }
-        return mConnection.Get<Method>(xSymbol.MethodID);
-    }
-
-    // Gets MLSymbols for a method, given an address within the method.
-    public IEnumerable<MethodIlOp> GetSymbols(Method aMethod) {
-        var xSymbols = mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(i => i.MethodID == aMethod.ID).OrderBy(i => i.IlOffset));
-        return xSymbols;
-    }
-
-    public SourceInfos GetSourceInfos(UInt32 aAddress)
-    {
-        var xResult = new SourceInfos();
-        try
-        {
-            var xMethod = GetMethod(aAddress);
-            if (xMethod != null)
-            {
-                var xSymbols = GetSymbols(xMethod);
-                var xAssemblyFile = mConnection.Get<AssemblyFile>(xMethod.AssemblyFileID);
-                var xSymbolReader = SymbolAccess.GetReaderForFile(xAssemblyFile.Pathname);
-                var xMethodSymbol = xSymbolReader.GetMethod(new SymbolToken(xMethod.MethodToken));
-
-                int xSeqCount = xMethodSymbol.SequencePointCount;
-                var xCodeOffsets = new int[xSeqCount];
-                var xCodeDocuments = new ISymbolDocument[xSeqCount];
-                var xCodeLines = new int[xSeqCount];
-                var xCodeColumns = new int[xSeqCount];
-                var xCodeEndLines = new int[xSeqCount];
-                var xCodeEndColumns = new int[xSeqCount];
-                xMethodSymbol.GetSequencePoints(xCodeOffsets, xCodeDocuments, xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
-
-                foreach (var xSymbol in xSymbols)
+                if (aList.Count > 0)
                 {
-                    var xRow = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == xSymbol.LabelName)).FirstOrDefault();
-                    if (xRow != null)
+                    using (var xBulkCopy = new SqliteBulkCopy(mConnection))
                     {
-                        UInt32 xAddress = (UInt32)xRow.Address;
-                        // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
-                        // So we just ignore duplicate addresses.
-                        if (!xResult.ContainsKey(xAddress))
+                        xBulkCopy.DestinationTableName = aTableName;
+                        #region debug
+                        // for now dump to disk:
+                        //using (var reader = aList.AsDataReader())
+                        //{
+                        //  var dumpIdx = Interlocked.Increment(ref DataDumpIndex);
+                        //  using (var writer = new StreamWriter(@"c:\temp\dataout\" + dumpIdx + ".dmp"))
+                        //  {
+                        //    writer.WriteLine(typeof(T).FullName);
+                        //    writer.WriteLine("Flush = {0}", aFlush);
+                        //    bool first = true;
+                        //    while (reader.Read())
+                        //    {
+                        //      if (first)
+                        //      {
+                        //        first = false;
+                        //        for (int i = 0; i < reader.FieldCount; i++)
+                        //        {
+                        //          writer.Write(reader.GetName(i));
+                        //          if (i < (reader.FieldCount - 1))
+                        //          {
+                        //            writer.Write("\t");
+                        //          }
+                        //        }
+                        //        writer.WriteLine();
+                        //      }
+                        //      for (int i = 0; i < reader.FieldCount; i++)
+                        //      {
+                        //        writer.Write(reader.GetValue(i));
+                        //        if (i < (reader.FieldCount - 1))
+                        //        {
+                        //          writer.Write("\t");
+                        //        }
+                        //      }
+                        //      writer.WriteLine();
+                        //    }
+                        //  }
+                        //}
+                        #endregion region debug
+                        //using (var db = DB())
+                        //{
+                        //    db.Set(typeof(T)).AddRange(aList);
+                        //    db.SaveChanges();
+                        //}
+                        //using (var trans = mConnection.BeginTransaction())
+                        //{
+                        //    try
+                        //    {
+                        //        mConnection.Insert<T>(aList);
+                        //        trans.Commit();
+                        //    }
+                        //    catch(Exception E)
+                        //    {
+                        //        trans.Rollback();
+                        //    }
+                        //}
+                        using (var reader = new ObjectReader<T>(aList.ToArray()))
                         {
-                            int xIdx = SourceInfo.GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.IlOffset);
-                            var xSourceInfo = new SourceInfo()
+                            xBulkCopy.WriteToServer(reader);
+                        }
+                    }
+                    aList.Clear();
+                }
+            }
+        }
+
+        private static int DataDumpIndex = 0;
+
+        public void AddLabels(IList<Label> aLabels, bool aFlush = false)
+        {
+            // GUIDs inserted by caller
+            BulkInsert("Labels", aLabels, 2500, aFlush);
+        }
+
+        public void Dispose()
+        {
+            if (mConnection != null)
+            {
+                AddAssemblies(null, true);
+                AddDocument(null, true);
+                AddMethod(null, true);
+                var xConn = mConnection;
+                xConn.Close();
+                xConn = null;
+                mConnection = null;
+                // Dont set to null... causes problems because of bad code :(
+                // Need to fix the whole class, but its here for now.
+                //CurrentInstance = null;
+            }
+        }
+
+        public Label GetMethodHeaderLabel(UInt32 aAddress)
+        {
+            var xAddress = (long)aAddress;
+            var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address <= xAddress).OrderByDescending(i => i.Address)).ToArray();
+
+            Label methodHeaderLabel = null;
+            //The first label we find searching upwards with "GUID_" at the start will be the very start of the method header
+            foreach (var xLabel in xLabels)
+            {
+                if (xLabel.Name.StartsWith("GUID_"))
+                {
+                    methodHeaderLabel = xLabel;
+                    break;
+                }
+            }
+            return methodHeaderLabel;
+        }
+        public Label[] GetMethodLabels(UInt32 aAddress)
+        {
+            Label methodHeaderLabel = GetMethodHeaderLabel(aAddress);
+            if (methodHeaderLabel == null)
+            {
+                return null;
+            }
+
+            var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address >= methodHeaderLabel.Address).OrderBy(i => i.Address)).ToArray();
+            List<Label> result = new List<Label>();
+
+            //There are always two END__OF__METHOD_EXCEPTION__2 labels at the end of the method footer.
+            int endOfMethodException2LabelsFound = 0;
+            foreach (var label in xLabels)
+            {
+                if (label.Name.Contains("END__OF__METHOD_EXCEPTION__2"))
+                {
+                    endOfMethodException2LabelsFound++;
+                }
+                result.Add(label);
+                if (endOfMethodException2LabelsFound >= 2)
+                {
+                    break;
+                }
+            }
+
+            return result.ToArray();
+        }
+        public Method GetMethod(UInt32 aAddress)
+        {
+            // The address we have is somewhere in the method, but we need to find 
+            // one that is also in MLSymbol. Asm labels for example wont be found.
+            // So we find all the labels for the method header
+            // Then search through the list for the first IL OP
+
+            var xLabels = GetMethodLabels(aAddress);
+
+            if (xLabels == null)
+            {
+                return null;
+            }
+
+            MethodIlOp xSymbol = null;
+            foreach (var xLabel in xLabels)
+            {
+                xSymbol = mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(i => i.LabelName == xLabel.Name)).FirstOrDefault();
+                if (xSymbol != null)
+                {
+                    break;
+                }
+            }
+
+            if (xSymbol == null)
+            {
+                throw new Exception("Label not found.");
+            }
+            return mConnection.Get<Method>(xSymbol.MethodID);
+        }
+
+        // Gets MLSymbols for a method, given an address within the method.
+        public IEnumerable<MethodIlOp> GetSymbols(Method aMethod)
+        {
+            var xSymbols = mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(i => i.MethodID == aMethod.ID).OrderBy(i => i.IlOffset));
+            return xSymbols;
+        }
+
+        public SourceInfos GetSourceInfos(UInt32 aAddress)
+        {
+            var xResult = new SourceInfos();
+            try
+            {
+                var xMethod = GetMethod(aAddress);
+                if (xMethod != null)
+                {
+                    var xSymbols = GetSymbols(xMethod);
+                    var xAssemblyFile = mConnection.Get<AssemblyFile>(xMethod.AssemblyFileID);
+                    var xSymbolReader = SymbolAccess.GetReaderForFile(xAssemblyFile.Pathname);
+                    var xMethodSymbol = xSymbolReader.GetMethod(new SymbolToken(xMethod.MethodToken));
+
+                    int xSeqCount = xMethodSymbol.SequencePointCount;
+                    var xCodeOffsets = new int[xSeqCount];
+                    var xCodeDocuments = new ISymbolDocument[xSeqCount];
+                    var xCodeLines = new int[xSeqCount];
+                    var xCodeColumns = new int[xSeqCount];
+                    var xCodeEndLines = new int[xSeqCount];
+                    var xCodeEndColumns = new int[xSeqCount];
+                    xMethodSymbol.GetSequencePoints(xCodeOffsets, xCodeDocuments, xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
+
+                    foreach (var xSymbol in xSymbols)
+                    {
+                        var xRow = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == xSymbol.LabelName)).FirstOrDefault();
+                        if (xRow != null)
+                        {
+                            UInt32 xAddress = (UInt32)xRow.Address;
+                            // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
+                            // So we just ignore duplicate addresses.
+                            if (!xResult.ContainsKey(xAddress))
                             {
-                                SourceFile = xCodeDocuments[xIdx].URL,
-                                Line = xCodeLines[xIdx],
-                                LineEnd = xCodeEndLines[xIdx],
-                                Column = xCodeColumns[xIdx],
-                                ColumnEnd = xCodeEndColumns[xIdx],
-                                MethodName = xMethod.LabelCall
-                            };
-                            xResult.Add(xAddress, xSourceInfo);
+                                int xIdx = SourceInfo.GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.IlOffset);
+                                var xSourceInfo = new SourceInfo()
+                                {
+                                    SourceFile = xCodeDocuments[xIdx].URL,
+                                    Line = xCodeLines[xIdx],
+                                    LineEnd = xCodeEndLines[xIdx],
+                                    Column = xCodeColumns[xIdx],
+                                    ColumnEnd = xCodeEndColumns[xIdx],
+                                    MethodName = xMethod.LabelCall
+                                };
+                                xResult.Add(xAddress, xSourceInfo);
+                            }
                         }
                     }
                 }
             }
+            catch (Exception ex)
+            {
+            }
+            return xResult;
         }
-        catch(Exception ex)
-        { 
-        }
-        return xResult;
-    }
 
-  }
+
+        public UInt32 GetClosestCSharpBPAddress(UInt32 aAddress)
+        {
+            // Get the method this address belongs to
+            var xMethod = GetMethod(aAddress);
+
+            // Get the assembly file this method belongs to
+            var asm = Connection.Get<AssemblyFile>(xMethod.AssemblyFileID);
+            // Get the Sequence Points for this method
+            var xSPs = GetSequencePoints(asm.Pathname, xMethod.MethodToken);
+            // Get the IL Offsets for these sequence points
+            var xSPOffsets = xSPs.Select(x => x.Offset);
+
+            // Get all the MethodILOps for this method 
+            // Then filter to get only the MethodILOps that also have sequence points
+            // Then get the MethodILOp with the highest address <= to aAddress
+
+            // Get all ILOps for current method
+            // Filter out ones that don't have sequence points associated with them
+            // Oorder by increasing address (this will happen by order by method ID because of how label names are constructed)
+            var xOps = Connection.Query(new SQLinq<MethodIlOp>().Where(q => q.MethodID == xMethod.ID)).Where(delegate(MethodIlOp x)
+            {
+                return xSPOffsets.Contains(x.IlOffset);
+            }).OrderBy(x => x.MethodID);
+
+            //Search for first one with address > aAddress then use the previous
+            UInt32 address = 0;
+            foreach (var op in xOps)
+            {
+                UInt32 addr = AddressOfLabel(op.LabelName);
+                if (addr > aAddress)
+                {
+                    break;
+                }
+                else
+                {
+                    address = addr;
+                }
+            }
+
+            return address;
+        }
+    }
 
 }

@@ -10,6 +10,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     // that creates it. Unless the pending breakpoint only has one bound breakpoint, each bound breakpoint is displayed as a child of the
     // pending breakpoint in the breakpoints window. Otherwise, only one is displayed.
     public class AD7BoundBreakpoint : IDebugBoundBreakpoint2 {
+        
         protected AD7PendingBreakpoint m_pendingBreakpoint;
         protected AD7BreakpointResolution m_breakpointResolution;
         protected AD7Engine mEngine;
@@ -22,6 +23,13 @@ namespace Cosmos.Debug.VSDebugEngine {
             get { return mRemoteID; }
         }
 
+        public AD7BoundBreakpoint(uint aAddress)
+        {
+            mEngine = null;
+            mAddress = aAddress;
+            m_pendingBreakpoint = null;
+            m_breakpointResolution = null;
+        }
         public AD7BoundBreakpoint(AD7Engine aEngine, uint aAddress, AD7PendingBreakpoint aPendingBP, AD7BreakpointResolution breakpointResolution) {
             mEngine = aEngine;
             mAddress = aAddress;

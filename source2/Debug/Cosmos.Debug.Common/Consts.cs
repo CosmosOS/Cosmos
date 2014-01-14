@@ -108,6 +108,8 @@ namespace Cosmos.Debug.Common {
     public const byte CurrentASMLine = 7;
     public const byte NextASMLine1 = 8;
     public const byte NextLabel1 = 9;
+
+    public const byte ToggleAsmBreak2 = 10;
   }
 
 }
