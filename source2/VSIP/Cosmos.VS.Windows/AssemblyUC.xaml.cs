@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Collections.Generic;
 using Cosmos.Debug.Common;
 using System.Windows.Threading;
+using System.Windows.Shapes;
 
 namespace Cosmos.VS.Windows
 {
@@ -47,6 +48,8 @@ namespace Cosmos.VS.Windows
     {
         protected List<AsmLine> mLines = new List<AsmLine>();
         protected Dictionary<Run, AsmLine> mRunsToLines = new Dictionary<Run, AsmLine>();
+        protected Dictionary<Rectangle, Run> mGutterRectsToRun = new Dictionary<Rectangle, Run>();
+        protected Dictionary<Rectangle, AsmCode> mGutterRectsToCode = new Dictionary<Rectangle, AsmCode>();
         // Text of code as rendered. Used for clipboard etc.
         protected StringBuilder mCode = new StringBuilder();
         protected bool mFilter = true;
@@ -200,9 +203,17 @@ namespace Cosmos.VS.Windows
                 xDisplayLine = xDisplayLine.Replace("\t", "  ");
 
                 var xRun = new Run(xDisplayLine);
-                xRun.MouseDown += xRun_MouseDown;
                 xRun.FontFamily = xFont;
                 mRunsToLines.Add(xRun, xLine);
+
+                var gutterRect = new Rectangle()
+                {
+                    Width = 11,
+                    Height = 11,
+                    Fill = Brushes.WhiteSmoke
+                };
+                tblkSource.Inlines.Add(gutterRect);
+
                 // Set colour of line
                 if (xLine is AsmLabel)
                 {
@@ -215,6 +226,12 @@ namespace Cosmos.VS.Windows
                 else if (xLine is AsmCode)
                 {
                     var xAsmCode = (AsmCode)xLine;
+
+                    gutterRect.MouseUp += gutterRect_MouseUp;
+                    gutterRect.Fill = Brushes.LightGray;
+                    mGutterRectsToCode.Add(gutterRect, xAsmCode);
+                    mGutterRectsToRun.Add(gutterRect, xRun);
+
                     if (xAsmCode.LabelMatches(mCurrentLabel))
                     {
                         xRun.Foreground = Brushes.WhiteSmoke;
@@ -264,44 +281,54 @@ namespace Cosmos.VS.Windows
             }
             //EdMan196: This line of code was worked out by trial and error. 
             //If you change it proper testing/thinking, you will have to add RIP to your name.
-            double offset = mCurrentLineNumber * ((tblkSource.FontSize * tblkSource.FontFamily.LineSpacing) - 2.1);
+            double offset = mCurrentLineNumber * 15.1;
             ASMScrollViewer.ScrollToVerticalOffset(offset);
         }
 
-        bool justSetBP = false;
-        private void xRun_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs aArgs)
+        private void gutterRect_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (aArgs.ClickCount == 2)
+            var rect = (Rectangle)e.OriginalSource;
+
+            //Double clicked so don't select it, set it as an ASM BP
+            var line = mGutterRectsToCode[rect];
+            var xRun = mGutterRectsToRun[rect];
+            //Search for associated label
+            Global.PipeUp.SendCommand(Windows2Debugger.ToggleAsmBreak2, Encoding.UTF8.GetBytes(((AsmCode)line).AsmLabel.Label));
+
+            string lineId = GetLineId((AsmCode)line);
+            if (mASMBPs.Contains(lineId))
             {
-                Run xRun = (Run)aArgs.OriginalSource;
-
-                if (aArgs.ClickCount == 2)
+                if (line.LabelMatches(mCurrentLabel))
                 {
-                    justSetBP = true;
-
-                    //Double clicked so don't select it, set it as an ASM BP
-                    var line = mRunsToLines[xRun];
-                    //Search for associated label
-                    if (line is AsmCode)
-                    {
-                        Global.PipeUp.SendCommand(Windows2Debugger.ToggleAsmBreak2, Encoding.UTF8.GetBytes(((AsmCode)line).AsmLabel.Label));
-
-                        string lineId = GetLineId((AsmCode)line);
-                        if (mASMBPs.Contains(lineId))
-                        {
-                            xRun.Background = null;
-                            mASMBPs.Remove(lineId);
-                        }
-                        else
-                        {
-                            xRun.Background = Brushes.MediumVioletRed;
-                            mASMBPs.Add(lineId);
-                        }
-                    }
+                    xRun.Foreground = Brushes.WhiteSmoke;
+                    xRun.Background = Brushes.DarkRed;
                 }
+                else if (Package.StateStorer.ContainsStatesForLine(GetLineId((AsmCode)mRunsToLines[xRun])))
+                {
+                    xRun.Foreground = Brushes.Blue;
+                    xRun.Background = Brushes.LightYellow;
+                }
+                else
+                {
+                    xRun.Foreground = Brushes.Blue;
+                    xRun.Background = Brushes.WhiteSmoke;
+                }
+
+                rect.Fill = Brushes.LightGray;
+                mASMBPs.Remove(lineId);
+            }
+            else
+            {
+                if (!line.LabelMatches(mCurrentLabel))
+                {
+                    xRun.Background = Brushes.MediumVioletRed;
+                }
+
+                rect.Fill = Brushes.MediumVioletRed;
+                mASMBPs.Add(lineId);
             }
         }
-
+        
         protected void OnASMCodeTextMouseUp(object aSender, System.Windows.Input.MouseButtonEventArgs aArgs)
         {
             try
@@ -334,21 +361,14 @@ namespace Cosmos.VS.Windows
                 }
 
                 Run xRun = (Run)aArgs.OriginalSource;
-                if (!justSetBP)
+                // Highlight new selection, if not the current break.
+                if (xRun.Background != Brushes.DarkRed)
                 {
-                    // Highlight new selection, if not the current break.
-                    if (xRun.Background != Brushes.DarkRed)
-                    {
-                        mSelectedCodeRun = xRun;
-                        xRun.Foreground = Brushes.WhiteSmoke;
-                        xRun.Background = Brushes.Blue;
-                    }
+                    mSelectedCodeRun = xRun;
+                    xRun.Foreground = Brushes.WhiteSmoke;
+                    xRun.Background = Brushes.Blue;
                 }
-                else
-                {
-                    justSetBP = false;
-                }
-
+                
                 //Show state for that line
                 //IL Labels should be unique for any given section
                 var asmLine = mRunsToLines[xRun];
