@@ -71,11 +71,6 @@ function ProcessCommand {
 		AckCommand()
 		return
 	}
-	if AL = #Vs2Ds_AsmStepInto {
-		SetINT1_TrapFLAG()
-		AckCommand()
-		return
-	}
 
 
 Exit:

@@ -73,12 +73,6 @@ Call DebugStub_Ping
 Call DebugStub_AckCommand
 Jmp DebugStub_ProcessCommand_Exit
 DebugStub_ProcessCommand_Block10_End:
-Cmp AL, DebugStub_Const_Vs2Ds_AsmStepInto
-JNE DebugStub_ProcessCommand_Block11_End
-Call DebugStub_SetINT1_TrapFLAG
-Call DebugStub_AckCommand
-Jmp DebugStub_ProcessCommand_Exit
-DebugStub_ProcessCommand_Block11_End:
 
 
 DebugStub_ProcessCommand_Exit:

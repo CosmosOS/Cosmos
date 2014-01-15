@@ -64,9 +64,6 @@ function Executing {
 	   
 	   ResetINT1_TrapFLAG()
 
-	   AL = 21
-	   ComWriteAL()
-
 	   Break()
 	   goto Normal
 	 }
@@ -175,6 +172,7 @@ WaitCmd:
 
 	//If Asm step into, we need to continue execution
 	if AL = #Vs2Ds_AsmStepInto {
+		SetINT1_TrapFLAG()
 		goto Done
 	}
 

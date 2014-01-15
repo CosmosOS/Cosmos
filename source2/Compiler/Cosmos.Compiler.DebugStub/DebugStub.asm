@@ -40,9 +40,6 @@ MOV DR6, EAX
 
 Call DebugStub_ResetINT1_TrapFLAG
 
-Mov AL, 21
-Call DebugStub_ComWriteAL
-
 Call DebugStub_Break
 Jmp DebugStub_Executing_Normal
 DebugStub_Executing_Block1_End:
@@ -124,6 +121,7 @@ JE DebugStub_Break_Done
 
 Cmp AL, DebugStub_Const_Vs2Ds_AsmStepInto
 JNE DebugStub_Break_Block1_End
+Call DebugStub_SetINT1_TrapFLAG
 Jmp DebugStub_Break_Done
 DebugStub_Break_Block1_End:
 
