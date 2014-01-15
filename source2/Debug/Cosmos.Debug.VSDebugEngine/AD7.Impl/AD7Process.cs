@@ -20,7 +20,7 @@ namespace Cosmos.Debug.VSDebugEngine
 {
     public class AD7Process : IDebugProcess2
     {
-        private bool ASMSteppingMode = false;
+        public bool ASMSteppingMode = false;
 
         public Guid ID = Guid.NewGuid();
         protected EngineCallback mCallback;
@@ -47,6 +47,8 @@ namespace Cosmos.Debug.VSDebugEngine
         private ManualResetEvent ASMWindow_NextLine1Updated = new ManualResetEvent(false);
         private ManualResetEvent ASMWindow_NextAddress1Updated = new ManualResetEvent(false);
 
+        private ManualResetEvent StackDataUpdated = new ManualResetEvent(false);
+
         // Connection to target environment. Usually serial but is
         // abstracted to allow other transports (ethernet, etc)
         public DebugConnector mDbgConnector;
@@ -65,7 +67,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public string mISO;
         public string mProjectFile;
-
+        
         protected void DbgCmdRegisters(byte[] aData)
         {
             mDebugDownPipe.SendCommand(Debugger2Windows.Registers, aData);
@@ -885,7 +887,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
 
                 // Insert parameters as SECOND(!) line of our data stream
-                xCode.Insert(0, (noDisplay ? "NoDisplay" : "") + "\r\n");
+                xCode.Insert(0, (noDisplay ? "NoDisplay" : "") + "|" + (ASMSteppingMode ? "AsmStepMode" : "") + "\r\n");
                 // Insert current line's label as FIRST(!) line of our data stream
                 xCode.Insert(0, xCurrentLabel + "\r\n");
                 //THINK ABOUT THE ORDER that he above lines occur in and where they insert data into the stream - don't switch it!

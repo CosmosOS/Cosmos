@@ -36,7 +36,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     // An array of this frame's locals
     private DebugLocalInfo[] mLocals;
     private AD7Process mProcess;
-
+      
     public AD7StackFrame(AD7Engine aEngine, AD7Thread aThread, AD7Process aProcess)
     {
         mEngine = aEngine;

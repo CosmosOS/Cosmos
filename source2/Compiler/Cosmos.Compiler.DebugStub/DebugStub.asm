@@ -35,10 +35,13 @@ And EAX, 0x4000
 Cmp EAX, 0x4000
 JNE DebugStub_Executing_Block1_End
 
-Xor EAX, 0x4000
+And EAX, 0xBFFF
 MOV DR6, EAX
 
 Call DebugStub_ResetINT1_TrapFLAG
+
+Mov AL, 21
+Call DebugStub_ComWriteAL
 
 Call DebugStub_Break
 Jmp DebugStub_Executing_Normal

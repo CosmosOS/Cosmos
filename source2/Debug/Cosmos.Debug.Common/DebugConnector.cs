@@ -136,9 +136,11 @@ namespace Cosmos.Debug.Common
                         xData[0] = (byte)aCmd;
                         aData.CopyTo(xData, 2);
 
+                        bool resetID = false;
                         if (mCommandID == 255)
                         {
                             mCommandID = 0;
+                            resetID = true;
                         }
                         else
                         {
@@ -155,7 +157,24 @@ namespace Cosmos.Debug.Common
                                 // with an ACK. The ACK will set the event and allow us to proceed.
                                 // This wait causes this method to wait on the ACK to be receive back from
                                 // DebugStub.
-                                mCmdWait.WaitOne(2000/*60000*/);
+
+                                //Sometimes we get out of sync or recieve something we aren't expecting
+                                //So this forces us to only return when we are back in-sync or after we think we've frozen the system for 
+                                //too long
+                                //If we haven't gone past the command already!
+                                if ((!resetID && lastCmdCompletedID < mCommandID) || (resetID && lastCmdCompletedID > 5))
+                                {
+                                    int attempts = 0;
+                                    do
+                                    {
+                                        mCmdWait.WaitOne(/*2000*/60000);
+                                    }
+                                    while ((
+                                            (!resetID && lastCmdCompletedID < mCommandID) ||
+                                            (resetID && lastCmdCompletedID > 5)
+                                           ) && 
+                                           ++attempts < 10);
+                                }
                             }
                         }
                     }
@@ -257,8 +276,8 @@ namespace Cosmos.Debug.Common
             Array.Copy(BitConverter.GetBytes(address), 0, xData, 0, 4);
             Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
             SendCmd(Vs2Ds.SendMemory, xData);
-            var xResult = mData;
-            mData = null;
+            var xResult = MemoryDatas.First();
+            MemoryDatas.RemoveAt(0);
             if (xResult.Length != size)
             {
                 throw new Exception("Retrieved a different size than requested!");
@@ -282,8 +301,6 @@ namespace Cosmos.Debug.Common
             }
             var xData = new byte[8];
             mDataSize = (int)size;
-            ////TODO find out wherefrom this discrepancy
-            //offsetToEBP --;
 
             // EBP is first
             //offsetToEBP += 4;
@@ -291,17 +308,19 @@ namespace Cosmos.Debug.Common
             Array.Copy(BitConverter.GetBytes(offsetToEBP), 0, xData, 0, 4);
             Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
             SendCmd(Vs2Ds.SendMethodContext, xData);
+            
             // todo: make "crossplatform". this code assumes stack space of 32bit per "item"
 
             byte[] xResult;
 
-            xResult = mData;
-            mData = null;
+            xResult = MethodContextDatas.First();
+            MethodContextDatas.RemoveAt(0);
             return xResult;
         }
 
         private int mDataSize;
-        private byte[] mData;
+        private List<byte[]> MethodContextDatas = new List<byte[]>();
+        private List<byte[]> MemoryDatas = new List<byte[]>();
 
         public void DeleteBreakpoint(int aID)
         {
@@ -463,56 +482,53 @@ namespace Cosmos.Debug.Common
 
         protected void PacketMethodContext(byte[] aPacket)
         {
-            mData = aPacket.ToArray();
+            MethodContextDatas.Add(aPacket.ToArray());
             WaitForMessage();
         }
 
         protected void PacketMemoryData(byte[] aPacket)
         {
-            mData = aPacket.ToArray();
+            MemoryDatas.Add(aPacket.ToArray());
             WaitForMessage();
         }
 
         protected void PacketRegisters(byte[] aPacket)
         {
-            mData = aPacket.ToArray();
             if (CmdRegisters != null)
             {
-                CmdRegisters(mData);
+                CmdRegisters(aPacket.ToArray());
             }
             WaitForMessage();
         }
 
         protected void PacketFrame(byte[] aPacket)
         {
-            mData = aPacket.ToArray();
             if (CmdFrame != null)
             {
-                CmdFrame(mData);
+                CmdFrame(aPacket.ToArray());
             }
             WaitForMessage();
         }
 
         protected void PacketPong(byte[] aPacket)
         {
-            mData = aPacket;
             if (CmdPong != null)
             {
-                CmdPong(mData);
+                CmdPong(aPacket.ToArray());
             }
             WaitForMessage();
         }
 
         protected void PacketStack(byte[] aPacket)
         {
-            mData = aPacket;
             if (CmdStack != null)
             {
-                CmdStack(mData);
+                CmdStack(aPacket.ToArray());
             }
             WaitForMessage();
         }
 
+        private int lastCmdCompletedID = -1;
         protected void PacketCmdCompleted(byte[] aPacket)
         {
             byte xCmdID = aPacket[0];
@@ -522,6 +538,7 @@ namespace Cosmos.Debug.Common
                 DoDebugMsg("DebugStub CmdCompleted Mismatch. Expected " + mCurrCmdID + ", received " + xCmdID + ".");
             }
             // Release command
+            lastCmdCompletedID = xCmdID;
             mCmdWait.Set();
             WaitForMessage();
         }

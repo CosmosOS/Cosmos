@@ -59,10 +59,13 @@ function Executing {
 	   //This was INT1
 
 	   //Reset the debug register
-	   EAX ^ $4000
+	   EAX & $BFFF
 	   ! MOV DR6, EAX
 	   
 	   ResetINT1_TrapFLAG()
+
+	   AL = 21
+	   ComWriteAL()
 
 	   Break()
 	   goto Normal

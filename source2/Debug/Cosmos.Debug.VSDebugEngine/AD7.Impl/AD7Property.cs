@@ -26,6 +26,13 @@ namespace Cosmos.Debug.VSDebugEngine
         const uint xArrayFirstElementOffset = 16;
         private const string NULL = "null";
 
+        protected Int32 OFFSET
+        {
+            get
+            {
+                return mDebugInfo.OFFSET;
+            }
+        }
 
         public AD7Property(DebugLocalInfo localInfo, AD7Process process, AD7StackFrame stackFrame)
         {
@@ -57,7 +64,7 @@ namespace Cosmos.Debug.VSDebugEngine
             byte[] xData;
             if (m_variableInformation.IsArrayElement)
             {
-                xData = mProcess.mDbgConnector.GetMemoryData((uint)mDebugInfo.OFFSET, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
+                xData = mProcess.mDbgConnector.GetMemoryData((uint)OFFSET, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
                 if (xData == null)
                 {
                     propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
@@ -69,7 +76,7 @@ namespace Cosmos.Debug.VSDebugEngine
             }
             else
             {
-                xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
+                xData = mProcess.mDbgConnector.GetStackData(OFFSET, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
                 if (xData == null)
                 {
                     propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
@@ -85,7 +92,7 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             byte[] xData;
 
-            xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
+            xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
             if (xData == null)
             {
                 propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
@@ -169,7 +176,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         const uint xStringLengthOffset = 12;
                         const uint xStringFirstCharOffset = 16;
-                        xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
+                        xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
                         if (xData == null)
                         {
                             propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
@@ -242,7 +249,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     #region Char
                     else if (mDebugInfo.TYPENAME == typeof(char).AssemblyQualifiedName)
                     {
-                        xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 2);
+                        xData = mProcess.mDbgConnector.GetStackData(OFFSET, 2);
                         if (xData == null)
                         {
                             propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
@@ -255,7 +262,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     }
                     else if (mDebugInfo.TYPENAME == typeof(char[]).AssemblyQualifiedName)
                     {
-                        xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
+                        xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
                         if (xData == null)
                         {
                             propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
@@ -418,7 +425,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     }
                     else
                     {
-                        xData = mProcess.mDbgConnector.GetStackData(mDebugInfo.OFFSET, 4);
+                        xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
                         if (xData == null)
                         {
                             propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");

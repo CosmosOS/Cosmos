@@ -533,13 +533,25 @@ namespace Cosmos.VS.Windows
                         }
                     }
                     Parse();
-                    if (mParams != null && mParams[0] == "NoDisplay")
+                    if (mParams != null && mParams.Length > 0 && mParams[0] == "NoDisplay")
                     {
                         //Don't call display
                     }
                     else
                     {
                         Display(mFilter);
+                    }
+
+                    if (mParams != null && mParams.Length > 1) 
+                    {
+                        if (mParams[1] == "AsmStepMode")
+                        {
+                            butnStepMode.BorderBrush = Brushes.LightBlue;
+                        }
+                        else
+                        {
+                            butnStepMode.BorderBrush = Brushes.Black;
+                        }
                     }
                 }
             );
