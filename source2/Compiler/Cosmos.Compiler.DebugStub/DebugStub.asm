@@ -19,11 +19,44 @@ Mov ECX, EAX
 Mov EAX, 0
 Call DebugStub_ComReadAL
 
+Push EAX
+
 Mov EBX, DebugStub_DebugBPs
 SHL EAX, 2
 Add EBX, EAX
 
 Mov [EBX + 0], ECX
+
+Pop EAX
+
+
+Mov ECX, 256
+DebugStub_BreakOnAddress_FindBPLoop:
+Dec ECX
+
+Mov EBX, DebugStub_DebugBPs
+Mov EAX, ECX
+SHL EAX, 2
+Add EBX, EAX
+
+Mov EAX, [EBX + 0]
+Cmp EAX, 0
+JE DebugStub_BreakOnAddress_Block1_End
+
+Inc ECX
+Mov [DebugStub_MaxBPId], ECX
+Jmp DebugStub_BreakOnAddress_Continue
+DebugStub_BreakOnAddress_Block1_End:
+Cmp ECX, 0
+JNE DebugStub_BreakOnAddress_Block2_End
+Jmp DebugStub_BreakOnAddress_FindBPLoopExit
+DebugStub_BreakOnAddress_Block2_End:
+Jmp DebugStub_BreakOnAddress_FindBPLoop
+
+DebugStub_BreakOnAddress_FindBPLoopExit:
+Mov dword [DebugStub_MaxBPId], 0
+
+DebugStub_BreakOnAddress_Continue:
 DebugStub_BreakOnAddress_Exit:
 Popad
 Ret
@@ -51,57 +84,65 @@ Call DebugStub_DoAsmBreak
 Jmp DebugStub_Executing_Normal
 DebugStub_Executing_Block2_End:
 
-Mov EAX, [DebugStub_CallerEIP]
-Mov EDI, DebugStub_DebugBPs
-Mov ECX, 256
-repne scasd
+
+Mov EAX, [DebugStub_MaxBPId]
+Cmp EAX, 0
 JNE DebugStub_Executing_Block3_End
-Call DebugStub_Break
-Jmp DebugStub_Executing_Normal
+Jmp DebugStub_Executing_SkipBPScan
 DebugStub_Executing_Block3_End:
 
-
-Cmp dword [DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Into
+Mov EAX, [DebugStub_CallerEIP]
+Mov EDI, DebugStub_DebugBPs
+Mov ECX, [DebugStub_MaxBPId]
+repne scasd
 JNE DebugStub_Executing_Block4_End
 Call DebugStub_Break
 Jmp DebugStub_Executing_Normal
 DebugStub_Executing_Block4_End:
+DebugStub_Executing_SkipBPScan:
+
+
+Cmp dword [DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Into
+JNE DebugStub_Executing_Block5_End
+Call DebugStub_Break
+Jmp DebugStub_Executing_Normal
+DebugStub_Executing_Block5_End:
 
 Mov EAX, [DebugStub_CallerEBP]
 
 Cmp dword [DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Over
-JNE DebugStub_Executing_Block5_End
+JNE DebugStub_Executing_Block6_End
 Cmp EAX, [DebugStub_BreakEBP]
-JB DebugStub_Executing_Block6_End
+JB DebugStub_Executing_Block7_End
 Call DebugStub_Break
-DebugStub_Executing_Block6_End:
+DebugStub_Executing_Block7_End:
 Jmp DebugStub_Executing_Normal
-DebugStub_Executing_Block5_End:
+DebugStub_Executing_Block6_End:
 
 Cmp dword [DebugStub_DebugBreakOnNextTrace], DebugStub_Const_StepTrigger_Out
-JNE DebugStub_Executing_Block7_End
+JNE DebugStub_Executing_Block8_End
 Cmp EAX, [DebugStub_BreakEBP]
-JBE DebugStub_Executing_Block8_End
+JBE DebugStub_Executing_Block9_End
 Call DebugStub_Break
-DebugStub_Executing_Block8_End:
+DebugStub_Executing_Block9_End:
 Jmp DebugStub_Executing_Normal
-DebugStub_Executing_Block7_End:
+DebugStub_Executing_Block8_End:
 
 DebugStub_Executing_Normal:
 Cmp dword [DebugStub_TraceMode], DebugStub_Const_Tracing_On
-JNE DebugStub_Executing_Block9_End
+JNE DebugStub_Executing_Block10_End
 Call DebugStub_SendTrace
-DebugStub_Executing_Block9_End:
+DebugStub_Executing_Block10_End:
 
 DebugStub_Executing_CheckForCmd:
 Mov DX, [DebugStub_ComAddr]
 Add DX, 5
 In AL, DX
 Test AL, 1
-JZ DebugStub_Executing_Block10_End
+JZ DebugStub_Executing_Block11_End
 Call DebugStub_ProcessCommand
 Jmp DebugStub_Executing_CheckForCmd
-DebugStub_Executing_Block10_End:
+DebugStub_Executing_Block11_End:
 DebugStub_Executing_Exit:
 Ret
 

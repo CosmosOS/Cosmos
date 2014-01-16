@@ -1,6 +1,7 @@
 ﻿namespace DebugStub
 
 var DebugBPs dword[256]
+var MaxBPId
 
 // Called before Kernel runs. Inits debug stub, etc
 function Init {

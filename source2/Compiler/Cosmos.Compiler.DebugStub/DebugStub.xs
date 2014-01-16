@@ -36,13 +36,62 @@ function BreakOnAddress {
     EAX = 0
     ComReadAL()
 
-    // Calculate location in table
+    //Push EAX so we preserve it for later
+	+EAX
+    
+	// Calculate location in table
     // Mov [EBX + EAX * 4], ECX would be better, but our X# doesn't handle this yet
-    EBX = @.DebugBPs
+	EBX = @.DebugBPs
     EAX << 2
     EBX + EAX
 
     EBX[0] = ECX
+	
+	//Restore EAX - the BP Id
+	-EAX
+	
+	//Re-scan for max BP Id	
+	//We _could_ try and work it out based on what happened...but my attempts to do so
+	//proved futile...so I just programmed it to re-scan and find highest BP Id every time.
+
+	//Scan to find our highest BP Id
+	ECX = 256
+	//Scan backwards to find the highest BP Id
+FindBPLoop:
+	ECX--
+
+	//Load the current BP Id we are testing against
+	EBX = @.DebugBPs
+	EAX = ECX
+	//4 bytes per Id
+	EAX << 2
+	EBX + EAX
+
+	//Set EAX to be the value at the address stored by EAX
+	//I.e. the ASM address of the BP with BP Id of ECX (if there is one - it will be 0 if no BP at this BP Id)
+	EAX = EBX[0]
+	//If it isn't 0 there must be a BP at this address
+	if EAX != 0 {
+
+		//BP found
+		//Add 1 to the Id because the old searching loop (see Executing()) started at 256 so i guess we should allow for that.
+		//Plus it means 0 can indicate no BPs
+		ECX++
+		.MaxBPId = ECX
+		goto Continue
+	}
+	//Has our count reached 0? If so, exit the loop as no BPs found...
+	if ECX = 0 {
+		goto FindBPLoopExit
+	}
+	goto FindBPLoop
+
+FindBPLoopExit:
+	//No BPs found
+	//0 indicates no BPs - see comment above
+	.MaxBPId = 0
+
+Continue:
 Exit:
 	-All
 }
@@ -81,18 +130,25 @@ function Executing {
     // Look for a possible matching BP
     // TODO: This is slow on every Int3...
     //   -Find a faster way - a list of 256 straight compares and code modifation?
-    //   -Count BPs and modify ECX since we usually dont have 256 of them?
     //   -Move this scan earlier - Have to set a global flag when anything (StepTriggers, etc below) is going on at all
     //     A selective disable of the DS
-    //   -If there are 0 BPs, skip scan - easy and should have a good increase
-    EAX = .CallerEIP
+    
+	//If there are 0 BPs, skip scan - easy and should have a good increase
+    EAX = .MaxBPId
+	if EAX = 0 {
+		goto SkipBPScan
+	}
+
+	//Only search backwards from the maximum BP Id - no point searching for before that
+	EAX = .CallerEIP
     EDI = @.DebugBPs
-    ECX = 256
+    ECX = .MaxBPId
 	! repne scasd
 	if = {
 		Break()
 		goto Normal
 	}
+SkipBPScan:
 
     // Only one of the following can be active at a time (F10, F11, ShiftF11)
 

@@ -1,4 +1,5 @@
 DebugStub_DebugBPs TIMES 256 dd 0
+DebugStub_MaxBPId dd 0
 
 
 
@@ -34,6 +35,7 @@ Mov ESI, ESP
 Call DebugStub_ComWrite32
 
 Pop EAX
+
 
 Mov AL, DebugStub_Const_Ds2Vs_Started
 Call DebugStub_ComWriteAL
