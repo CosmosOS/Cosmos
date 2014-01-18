@@ -167,7 +167,7 @@ namespace Cosmos.Debug.Common
                                     int attempts = 0;
                                     do
                                     {
-                                        mCmdWait.WaitOne(/*2000*/60000);
+                                        mCmdWait.WaitOne(2000/*60000*/);
                                     }
                                     while ((
                                             (!resetID && lastCmdCompletedID < mCommandID) ||

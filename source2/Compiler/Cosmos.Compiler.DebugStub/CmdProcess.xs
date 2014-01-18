@@ -32,8 +32,10 @@ function ProcessCommand {
 		return
 	}
 	if AL = #Vs2Ds_Break {
-		Break()
+		// Ack command for a break must be done first 
+		// Otherwise we Break then ProcessCommands and get stuck because we don't send this Ack until execution continues
 		AckCommand()
+		Break()
 		return
 	}
 	if AL = #Vs2Ds_BreakOnAddress {

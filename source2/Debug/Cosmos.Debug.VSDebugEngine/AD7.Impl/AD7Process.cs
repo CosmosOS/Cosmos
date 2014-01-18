@@ -457,13 +457,13 @@ namespace Cosmos.Debug.VSDebugEngine
                 string[] currentASMLabels = mDebugInfoDb.GetLabels(aAddress);
                 foreach (string aLabel in currentASMLabels)
                 {
-                    if(aLabel.Contains("END__OF__METHOD_EXCEPTION__2"))
+                    if (aLabel.Contains("END__OF__METHOD_EXCEPTION__2"))
                     {
                         mASMSteppingOut_NumEndMethodLabelsPassed++;
                         break;
                     }
                 }
-                if(mASMSteppingOut_NumEndMethodLabelsPassed >= 2)
+                if (mASMSteppingOut_NumEndMethodLabelsPassed >= 2)
                 {
                     mASMSteppingOut = false;
                 }
@@ -474,17 +474,23 @@ namespace Cosmos.Debug.VSDebugEngine
             }
             else
             {
+                bool fullUpdate = true;
+
+
                 var xActionPoints = new List<object>();
                 var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
 
-                // Search the BPs and find ones that match our address.
-                foreach (var xBP in mEngine.BPMgr.mPendingBPs)
+                if (!mBreaking)
                 {
-                    foreach (var xBBP in xBP.mBoundBPs)
+                    // Search the BPs and find ones that match our address.
+                    foreach (var xBP in mEngine.BPMgr.mPendingBPs)
                     {
-                        if (xBBP.mAddress == aAddress)
+                        foreach (var xBBP in xBP.mBoundBPs)
                         {
-                            xBoundBreakpoints.Add(xBBP);
+                            if (xBBP.mAddress == aAddress)
+                            {
+                                xBoundBreakpoints.Add(xBBP);
+                            }
                         }
                     }
                 }
@@ -492,15 +498,21 @@ namespace Cosmos.Debug.VSDebugEngine
                 mStackFrame = null;
                 mCurrentAddress = aAddress;
                 mCurrentASMLine = null;
-                bool fullUpdate = true;
                 if (xBoundBreakpoints.Count == 0)
                 {
-                    // if no matching breakpoints are found then its one of the following:
+                    // If no matching breakpoints are found then its one of the following:
+                    //   - VS Break
                     //   - Stepping operation
                     //   - Asm break
 
-                    //We _must_ respond to the VS stepping callback if its waiting on one so check this first...
-                    if (mStepping)
+
+                    //We _must_ respond to the VS commands via callback if VS is waiting on one so check this first...
+                    if (mBreaking)
+                    {
+                        mCallback.OnBreak(mThread);
+                        mBreaking = false;
+                    }
+                    else if (mStepping)
                     {
                         mCallback.OnStepComplete();
                         mStepping = false;
@@ -589,9 +601,12 @@ namespace Cosmos.Debug.VSDebugEngine
             throw new NotImplementedException();
         }
 
+        bool mBreaking = false;
         public int CauseBreak()
         {
-            throw new NotImplementedException();
+            mBreaking = true;
+            mDbgConnector.SendCmd(Vs2Ds.Break);
+            return VSConstants.S_OK;
         }
 
         public int Detach()

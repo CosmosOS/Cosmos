@@ -27,8 +27,8 @@ Jmp DebugStub_ProcessCommand_Exit
 DebugStub_ProcessCommand_Block2_End:
 Cmp AL, DebugStub_Const_Vs2Ds_Break
 JNE DebugStub_ProcessCommand_Block3_End
-Call DebugStub_Break
 Call DebugStub_AckCommand
+Call DebugStub_Break
 Jmp DebugStub_ProcessCommand_Exit
 DebugStub_ProcessCommand_Block3_End:
 Cmp AL, DebugStub_Const_Vs2Ds_BreakOnAddress

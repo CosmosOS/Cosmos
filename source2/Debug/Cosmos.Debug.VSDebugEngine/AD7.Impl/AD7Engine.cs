@@ -391,11 +391,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     // The debugger calls CauseBreak when the user clicks on the pause button in VS. The debugger should respond by entering
     // breakmode. 
     public int CauseBreak() {
-      //m_pollThread.RunOperation(new Operation(delegate {
-      //    //m_debuggedProcess.Break();
-      //}));
-
-      return VSConstants.S_OK;
+      return this.mProcess.CauseBreak();
     }
 
     // EnumCodePaths is used for the step-into specific feature -- right click on the current statment and decide which
