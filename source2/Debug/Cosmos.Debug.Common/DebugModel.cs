@@ -474,4 +474,35 @@ namespace Cosmos.Debug.Common
             set;
         }
     }
+    
+    /// <summary>
+    /// No Metadata Documentation available.
+    /// </summary>
+    [Serializable()]
+    [DataContractAttribute(IsReference = true)]
+    [SQLinqTable("INT3LABELS")]
+    public partial class INT3Label
+    {
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [DataMemberAttribute()]
+        [SQLinqColumn("LABELNAME")]
+        public global::System.String LabelName
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [DataMemberAttribute()]
+        [SQLinqColumn("METHODID")]
+        public Nullable<global::System.Guid> MethodID
+        {
+            get;
+            set;
+        }
+    }
 }

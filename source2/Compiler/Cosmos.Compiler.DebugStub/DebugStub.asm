@@ -25,7 +25,22 @@ Mov EBX, DebugStub_DebugBPs
 SHL EAX, 2
 Add EBX, EAX
 
+Cmp ECX, 0
+JNE DebugStub_BreakOnAddress_Block1_End
+
+Mov EDI, [EBX + 0]
+Mov AL, 0x90
+Mov [EDI + 0], AL
+
+Jmp DebugStub_BreakOnAddress_DontSetBP
+DebugStub_BreakOnAddress_Block1_End:
+
 Mov [EBX + 0], ECX
+Mov EDI, [EBX + 0]
+Mov AL, 0xCC
+Mov [EDI + 0], AL
+
+DebugStub_BreakOnAddress_DontSetBP:
 
 Pop EAX
 
@@ -41,16 +56,16 @@ Add EBX, EAX
 
 Mov EAX, [EBX + 0]
 Cmp EAX, 0
-JE DebugStub_BreakOnAddress_Block1_End
+JE DebugStub_BreakOnAddress_Block2_End
 
 Inc ECX
 Mov [DebugStub_MaxBPId], ECX
 Jmp DebugStub_BreakOnAddress_Continue
-DebugStub_BreakOnAddress_Block1_End:
-Cmp ECX, 0
-JNE DebugStub_BreakOnAddress_Block2_End
-Jmp DebugStub_BreakOnAddress_FindBPLoopExit
 DebugStub_BreakOnAddress_Block2_End:
+Cmp ECX, 0
+JNE DebugStub_BreakOnAddress_Block3_End
+Jmp DebugStub_BreakOnAddress_FindBPLoopExit
+DebugStub_BreakOnAddress_Block3_End:
 Jmp DebugStub_BreakOnAddress_FindBPLoop
 
 DebugStub_BreakOnAddress_FindBPLoopExit:
@@ -58,6 +73,29 @@ Mov dword [DebugStub_MaxBPId], 0
 
 DebugStub_BreakOnAddress_Continue:
 DebugStub_BreakOnAddress_Exit:
+Popad
+Ret
+
+DebugStub_SetINT3:
+Pushad
+
+Call DebugStub_ComReadEAX
+Mov EDI, EAX
+Mov AL, 0xCC
+Mov [EDI + 0], AL
+
+DebugStub_SetINT3_Exit:
+Popad
+Ret
+DebugStub_ClearINT3:
+Pushad
+
+Call DebugStub_ComReadEAX
+Mov EDI, EAX
+Mov AL, 0x90
+Mov [EDI + 0], AL
+
+DebugStub_ClearINT3_Exit:
 Popad
 Ret
 

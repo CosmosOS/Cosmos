@@ -45,7 +45,22 @@ function BreakOnAddress {
     EAX << 2
     EBX + EAX
 
+	if ECX = 0 {
+		//This is a BP removal
+		
+		EDI = EBX[0]
+		AL = $90
+		EDI[0] = AL
+
+		goto DontSetBP
+	}
+
     EBX[0] = ECX
+	EDI = EBX[0]
+	AL = $CC
+	EDI[0] = AL
+
+DontSetBP:
 	
 	//Restore EAX - the BP Id
 	-EAX
@@ -92,6 +107,33 @@ FindBPLoopExit:
 	.MaxBPId = 0
 
 Continue:
+Exit:
+	-All
+}
+
+function SetINT3 {
+	+All
+
+    // BP Address
+    ComReadEAX()
+	// Set to INT3 ($CC)
+    EDI = EAX
+	AL = $CC
+	EDI[0] = AL
+
+Exit:
+	-All
+}
+function ClearINT3 {
+	+All
+
+	// BP Address
+    ComReadEAX()
+	// Clear to NOP ($90)
+    EDI = EAX
+	AL = $90
+	EDI[0] = AL
+
 Exit:
 	-All
 }

@@ -13,7 +13,7 @@ namespace Cosmos.VS.Windows {
       get { return mText; }
       set { 
         mText = value;
-        mIsDebugCode = mText.Trim().ToUpper() == "INT3";
+        mIsDebugCode = mText.Trim().ToUpper().StartsWith("INT3");
       }
     }
 

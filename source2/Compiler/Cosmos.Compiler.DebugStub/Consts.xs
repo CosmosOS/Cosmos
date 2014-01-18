@@ -35,8 +35,10 @@ const Vs2Ds_SendStack = 15
 // User must call continue after.
 const Vs2Ds_SetAsmBreak = 16
 const Vs2Ds_Ping = 17 
-const Vs2Ds_AsmStepInto = 18
-const Vs2Ds_Max = 19
+const Vs2Ds_AsmStepInto = 18 
+const Vs2Ds_SetINT3 = 19 
+const Vs2Ds_ClearINT3 = 20 
+const Vs2Ds_Max = 21 
 
 const Ds2Vs_Noop = 0
 const Ds2Vs_TracePoint = 1

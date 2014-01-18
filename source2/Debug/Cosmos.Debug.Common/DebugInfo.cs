@@ -446,6 +446,11 @@ namespace Cosmos.Debug.Common
             BulkInsert("Labels", aLabels, 2500, aFlush);
         }
 
+        public void AddINT3Labels(IList<INT3Label> aLabels, bool aFlush = false)
+        {
+            BulkInsert("INT3Labels", aLabels, 2500, aFlush);
+        }
+
         public void Dispose()
         {
             if (mConnection != null)
@@ -600,7 +605,11 @@ namespace Cosmos.Debug.Common
             return xResult;
         }
 
-
+        public List<UInt32> GetAllINT3AddressesForMethod(Method aMethod)
+        {
+            var INT3Labels = Connection.Query<INT3Label>(new SQLinq<INT3Label>().Where(i => i.MethodID == aMethod.ID));
+            return INT3Labels.Select(x => AddressOfLabel(x.LabelName)).ToList();
+        }
         public UInt32 GetClosestCSharpBPAddress(UInt32 aAddress)
         {
             // Get the method this address belongs to

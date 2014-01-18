@@ -242,6 +242,17 @@ namespace Cosmos.Debug.Common
             SendCmd(Vs2Ds.SetAsmBreak, xData);
         }
 
+        public void SetINT3(uint aAddress)
+        {
+            var xData = BitConverter.GetBytes(aAddress);
+            SendCmd(Vs2Ds.SetINT3, xData);
+        }
+        public void ClearINT3(uint aAddress)
+        {
+            var xData = BitConverter.GetBytes(aAddress);
+            SendCmd(Vs2Ds.ClearINT3, xData);
+        }
+
         public void Continue()
         {
             SendCmd(Vs2Ds.Continue);

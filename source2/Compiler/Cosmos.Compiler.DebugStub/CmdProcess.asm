@@ -73,6 +73,18 @@ Call DebugStub_Ping
 Call DebugStub_AckCommand
 Jmp DebugStub_ProcessCommand_Exit
 DebugStub_ProcessCommand_Block10_End:
+Cmp AL, DebugStub_Const_Vs2Ds_SetINT3
+JNE DebugStub_ProcessCommand_Block11_End
+Call DebugStub_SetINT3
+Call DebugStub_AckCommand
+Jmp DebugStub_ProcessCommand_Exit
+DebugStub_ProcessCommand_Block11_End:
+Cmp AL, DebugStub_Const_Vs2Ds_ClearINT3
+JNE DebugStub_ProcessCommand_Block12_End
+Call DebugStub_ClearINT3
+Call DebugStub_AckCommand
+Jmp DebugStub_ProcessCommand_Exit
+DebugStub_ProcessCommand_Block12_End:
 
 
 DebugStub_ProcessCommand_Exit:

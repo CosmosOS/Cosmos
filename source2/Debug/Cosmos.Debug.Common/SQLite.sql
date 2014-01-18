@@ -72,6 +72,12 @@ CREATE TABLE [Documents] (
     [Pathname] nvarchar(256)  NOT NULL
 );
 
+-- Creating table 'INT3Labels'
+CREATE TABLE [INT3Labels] (
+	[LabelName] nvarchar(256) NOT NULL,
+	[MethodID] uniqueidentifier NOT NULL
+);
+
 alter table methods
   add column AssemblyFileID uniqueidentifier null;-- references AssemblyFiles(ID);
 alter table methods

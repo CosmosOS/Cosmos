@@ -569,10 +569,13 @@ namespace Cosmos.Debug.VSDebugEngine
             // We catch and resend data rather than using a second serial port because
             // while this would work fine in a VM, it would require 2 serial ports
             // when real hardware is used.
-            SendAssembly();
-            mDbgConnector.SendRegisters();
-            mDbgConnector.SendFrame();
-            mDbgConnector.SendStack();
+            new System.Threading.Tasks.Task(() =>
+            {
+                SendAssembly();
+                mDbgConnector.SendRegisters();
+                mDbgConnector.SendFrame();
+                mDbgConnector.SendStack();
+            }).Start();
         }
 
         public int Attach(IDebugEventCallback2 pCallback, Guid[] rgguidSpecificEngines, uint celtSpecificEngines, int[] rghrEngineAttach)
@@ -712,6 +715,8 @@ namespace Cosmos.Debug.VSDebugEngine
 
         internal void Continue()
         { // F5
+            ClearINT3sOnCurrentMethod();
+            
             //Check for a future asm BP on current line
             //If there is, don't do continue, do AsmStepOver 
 
@@ -752,6 +757,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
                 else
                 {
+                    SetINT3sOnCurrentMethod();
                     mDbgConnector.SendCmd(Vs2Ds.StepInto);
                 }
             }
@@ -764,11 +770,14 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
                 else
                 {
+                    SetINT3sOnCurrentMethod();
                     mDbgConnector.SendCmd(Vs2Ds.StepOver);
                 }
             }
             else if (aKind == enum_STEPKIND.STEP_OUT)
             { // Shift-F11
+                ClearINT3sOnCurrentMethod();
+
                 mStepping = true;
                 if (ASMSteppingMode)
                 {
@@ -802,6 +811,60 @@ namespace Cosmos.Debug.VSDebugEngine
                 mCallback.OnStepComplete(); // Have to call this otherwise VS gets "stuck"
             }
         }
+        internal void SetINT3sOnCurrentMethod()
+        {
+            //Set all the CS Tracepoints to INT3 but without setting them like BPs
+            //Don't bother setting existing CS BPs
+
+            ChangeINT3sOnCurrentMethod(false);
+        }
+        internal void ClearINT3sOnCurrentMethod()
+        {
+            //Clear all the CS Tracepoints to NOP but without treating them like BPs
+            //Don't clear existing/actual CS BPs
+
+            ChangeINT3sOnCurrentMethod(true);
+        }
+        List<UInt32> INT3sSet = new List<UInt32>();
+        internal void ChangeINT3sOnCurrentMethod(bool clear)
+        {
+            if (mCurrentAddress.HasValue)
+            {
+                var currMethod = mDebugInfoDb.GetMethod(mCurrentAddress.Value);
+                var tpAdresses = mDebugInfoDb.GetAllINT3AddressesForMethod(currMethod);
+
+                var bps = mEngine.BPMgr.mPendingBPs.Select(x => x.mBoundBPs).ToList();
+                var bpAddressessUnified = new List<UInt32>();
+                foreach (var bp in bps)
+                {
+                    bpAddressessUnified.AddRange(bp.Select(x => x != null ? x.mAddress : 0));
+                }
+                bpAddressessUnified.AddRange(mEngine.BPMgr.mActiveBPs.Select(x => x != null ? x.mAddress : 0));
+
+                foreach (uint address in tpAdresses)
+                {
+                    //Don't set/clear actual BPs
+                    if (!bpAddressessUnified.Contains(address))
+                    {
+                        bool set = INT3sSet.Contains(address);
+
+                        if (clear && set)
+                        {
+                            //Clear the INT3
+                            mDbgConnector.ClearINT3(address);
+                            INT3sSet.Remove(address);
+                        }
+                        else if(!clear && !set)
+                        {
+                            //Set the INT3
+                            mDbgConnector.SetINT3(address);
+                            INT3sSet.Add(address);
+                        }
+                    }
+                }
+            }
+        }
+
         internal void ASMStepOver()
         {
             //ASM Step over : Detect calls and treat them specially.

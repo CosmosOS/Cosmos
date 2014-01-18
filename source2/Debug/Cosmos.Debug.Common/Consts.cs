@@ -63,9 +63,12 @@ namespace Cosmos.Debug.Common {
     public const byte Ping = 17;
 
     public const byte AsmStepInto = 18;
+    public const byte SetINT3 = 19;
+    public const byte ClearINT3 = 20;
+
 
     // Make sure this is always the last entry. Used by DebugStub to verify commands.
-    public const byte Max = 19;
+    public const byte Max = 21;
   }
 
   static public class Pipes {

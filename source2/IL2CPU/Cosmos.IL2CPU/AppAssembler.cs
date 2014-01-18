@@ -34,6 +34,7 @@ namespace Cosmos.IL2CPU
         public bool IgnoreDebugStubAttribute;
         protected static HashSet<string> mDebugLines = new HashSet<string>();
         protected List<MethodIlOp> mSymbols = new List<MethodIlOp>();
+        protected List<INT3Label> mINT3Labels = new List<INT3Label>();
         public readonly Cosmos.Assembler.Assembler Assembler;
         //
         protected string mCurrentMethodLabel;
@@ -350,6 +351,7 @@ namespace Cosmos.IL2CPU
             DebugInfo.AddMethod(null, true);
             DebugInfo.WriteAllLocalsArgumentsInfos(mLocals_Arguments_Infos);
             DebugInfo.AddSymbols(mSymbols, true);
+            DebugInfo.AddINT3Labels(mINT3Labels, true);
         }
 
         public static uint GetResultCodeOffset(uint aResultSize, uint aTotalArgumentSize)
@@ -399,6 +401,14 @@ namespace Cosmos.IL2CPU
             }
             else
             {
+                //Conditions under which we should emit an INT3 instead of a plceholder NOP:
+                /* - First instruction in a Method / Loop / If / Else etc.
+                 *   -- In essence, whenever there is a opening {
+                 *   -- C# Debug builds automatically insert NOPs at these locations (otherwise NOP is not used)
+                 *   -- So only insert an INT3 when we are about to insert a NOP that came from IL code
+                 */
+
+                bool emitINT3 = true;
                 foreach (var xOpCode in aOpCodes)
                 {
                     ushort xOpCodeVal = (ushort)xOpCode.OpCode;
@@ -414,7 +424,13 @@ namespace Cosmos.IL2CPU
                     mLog.WriteLine("\t{0} {1}", Assembler.Stack.Count, xILOp.GetType().Name);
                     mLog.Flush();
 
-                    BeforeOp(aMethod, xOpCode);
+                    //Only emit INT3 as per conditions above...
+                    bool INT3Emitted = false;
+                    BeforeOp(aMethod, xOpCode, emitINT3, out INT3Emitted);
+                    //Emit INT3 on the first non-NOP instruction immediately after a NOP
+                    // - This is because TracePoints for NOP are automatically ignored in code called below this
+                    emitINT3 = (emitINT3 && !INT3Emitted) || xILOp is Cosmos.IL2CPU.X86.IL.Nop;
+
                     new Comment(xILOp.ToString());
                     var xNextPosition = xOpCode.Position + 1;
                     #region Exception handling support code
@@ -1102,7 +1118,7 @@ namespace Cosmos.IL2CPU
             new Comment("Stack contains " + Assembler.Stack.Count + " items: (" + xContents + ")");
         }
 
-        protected void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode)
+        protected void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode, bool emitInt3NotNop, out bool INT3Emitted)
         {
             string xLabel = TmpPosLabel(aMethod, aOpCode);
             Assembler.CurrentIlLabel = xLabel;
@@ -1111,7 +1127,7 @@ namespace Cosmos.IL2CPU
             if (mSymbols != null)
             {
                 var xMLSymbol = new MethodIlOp();
-                xMLSymbol.LabelName = TmpPosLabel(aMethod, aOpCode);
+                xMLSymbol.LabelName = xLabel;
 
                 var xStackSize = (from item in Assembler.Stack
                                   let xSize = (item.Size % 4u == 0u) ? item.Size : (item.Size + (4u - (item.Size % 4u)))
@@ -1135,16 +1151,29 @@ namespace Cosmos.IL2CPU
             }
             DebugInfo.AddSymbols(mSymbols, false);
 
-            EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace);
+            bool INT3PlaceholderEmitted = false;
+            EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace, emitInt3NotNop, out INT3Emitted, out INT3PlaceholderEmitted);
+
+            if (INT3Emitted || INT3PlaceholderEmitted)
+            {
+                var xINT3Label = new INT3Label();
+                xINT3Label.LabelName = xLabel;
+                xINT3Label.MethodID = mCurrentMethodGuid;
+                mINT3Labels.Add(xINT3Label);
+                DebugInfo.AddINT3Labels(mINT3Labels);
+            }
         }
 
-        protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace)
+        protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, bool emitInt3NotNop, out bool INT3Emitted, out bool INT3PlaceholderEmitted)
         {
             // NOTE - These if statements can be optimized down - but clarity is
             // more important the optimizations. Furthermoer the optimazations available
             // would not offer much benefit
 
             // Determine if a new DebugStub should be emitted
+
+            INT3Emitted = false;
+            INT3PlaceholderEmitted = false;
 
             if (aOp.OpCode == ILOpCode.Code.Nop)
             {
@@ -1224,7 +1253,20 @@ namespace Cosmos.IL2CPU
             }
 
             // If we made it this far without a return, emit the Tracer
-            new INT3();
+            // We used to emit an INT3, but this meant the DS would brwak after every C# line
+            // Breaking that frequently is of course, pointless and slow.
+            // So now we emit mostly NOPs and only put an INT3 when told to.
+            // We should only be told to put an INT3 at the start of method but this may change so search for more comments on this.
+            if (emitInt3NotNop)
+            {
+                INT3Emitted = true;
+                new INT3();
+            }
+            else
+            {
+                INT3PlaceholderEmitted = true;
+                new DebugNoop();
+            }
         }
 
         protected MethodDefinition GetCecilMethodDefinitionForSymbolReading(MethodBase methodBase)

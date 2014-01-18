@@ -56,8 +56,16 @@ namespace Cosmos.Debug.Common
             System.Diagnostics.Debug.WriteLine(String.Format("DC - sending: {0}", BytesToString(aBytes, 0, aBytes.Length)));
             if (mStream != null)
             {
-                mStream.Write(aBytes, 0, aBytes.Length);
-                OK = true;
+                try
+                {
+                    mStream.Write(aBytes, 0, aBytes.Length);
+                    OK = true;
+                }
+                catch (IOException)
+                {
+                    //Catches the stream terminate exception
+                    OK = false;
+                }
             }
             else
             {

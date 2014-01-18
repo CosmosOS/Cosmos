@@ -71,6 +71,16 @@ function ProcessCommand {
 		AckCommand()
 		return
 	}
+	if AL = #Vs2Ds_SetINT3 {
+		SetINT3()
+		AckCommand()
+		return
+	}
+	if AL = #Vs2Ds_ClearINT3 {
+		ClearINT3()
+		AckCommand()
+		return
+	}
 
 
 Exit:
