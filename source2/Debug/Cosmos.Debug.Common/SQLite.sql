@@ -75,7 +75,8 @@ CREATE TABLE [Documents] (
 -- Creating table 'INT3Labels'
 CREATE TABLE [INT3Labels] (
 	[LabelName] nvarchar(256) NOT NULL,
-	[MethodID] uniqueidentifier NOT NULL
+	[MethodID] uniqueidentifier NOT NULL,
+	[LeaveAsINT3] bit NOT NULL
 );
 
 alter table methods

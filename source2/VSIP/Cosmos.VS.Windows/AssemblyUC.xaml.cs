@@ -55,6 +55,7 @@ namespace Cosmos.VS.Windows
         protected bool mFilter = true;
         protected string mCurrentLabel;
         protected string[] mParams;
+        protected string[] mFilterLabels;
         protected List<string> mASMBPs = new List<string>();
 
         public AssemblyUC()
@@ -417,19 +418,20 @@ namespace Cosmos.VS.Windows
             // Should always be \r\n, but just in case we split by \n and ignore \r
             string[] xLines = xCode.Replace("\r", "").Split('\n');
 
-            if (xLines.Length >= 2)
+            if (xLines.Length >= 3)
             {
                 // First line is not code, but the current label and inserted by caller
                 // Second line is input parameters
                 mCurrentLabel = xLines[0];
                 mParams = xLines[1].Split('|');
+                mFilterLabels = xLines[2].Split('|');
                 bool xSetNextLabelToCurrent = false;
 
                 int nextCodeDistFromCurrent = 0;
                 bool foundCurrentLine = false;
 
                 AsmLabel xLastAsmAsmLabel = null;
-                for (int i = 1; i < xLines.Length; i++)
+                for (int i = 3; i < xLines.Length; i++)
                 {
                     string xLine = xLines[i].Trim();
                     string xTestLine = xLine.ToUpper();
@@ -480,6 +482,32 @@ namespace Cosmos.VS.Windows
                         //If its Int3 or so, we need to set the current label to the next non debug op.
                         //And we don't want to add debug code to our parsed stuff - it shouldn't be displayed.
                         if (xAsmCode.IsDebugCode)
+                        {
+                            bool skip = true;
+                            if (xAsmCode.LabelMatches(mCurrentLabel))
+                            {
+                                xSetNextLabelToCurrent = true;
+                            }
+                            else
+                            {
+                                //Allow debug NOPs that have not been set to INT3 to be shown
+                                if(xAsmCode.Text.Trim().ToUpper().StartsWith("NOP"))
+                                {
+                                    if (!mFilterLabels.Contains(xAsmCode.AsmLabel.Label))
+                                    {
+                                        skip = false;
+                                    }
+                                }
+                            }
+                            if (skip)
+                            {
+                                //Skip adding Debug Code (INT3s) to parsed list
+                                continue;
+                            }
+                        }
+
+                        //If we want to filter this label because it is a debug INT3/NOP but not a permanent INT3
+                        if (mFilterLabels.Contains(xAsmCode.AsmLabel.Label))
                         {
                             if (xAsmCode.LabelMatches(mCurrentLabel))
                             {

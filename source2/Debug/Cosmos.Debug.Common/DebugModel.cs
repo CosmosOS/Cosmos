@@ -499,7 +499,18 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [SQLinqColumn("METHODID")]
-        public Nullable<global::System.Guid> MethodID
+        public global::System.Guid MethodID
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [DataMemberAttribute()]
+        [SQLinqColumn("LEAVEASINT3")]
+        public global::System.Boolean LeaveAsINT3
         {
             get;
             set;

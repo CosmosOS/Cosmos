@@ -1159,6 +1159,7 @@ namespace Cosmos.IL2CPU
                 var xINT3Label = new INT3Label();
                 xINT3Label.LabelName = xLabel;
                 xINT3Label.MethodID = mCurrentMethodGuid;
+                xINT3Label.LeaveAsINT3 = INT3Emitted;
                 mINT3Labels.Add(xINT3Label);
                 DebugInfo.AddINT3Labels(mINT3Labels);
             }

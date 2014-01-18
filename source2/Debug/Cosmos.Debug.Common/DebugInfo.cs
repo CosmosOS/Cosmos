@@ -605,10 +605,14 @@ namespace Cosmos.Debug.Common
             return xResult;
         }
 
-        public List<UInt32> GetAllINT3AddressesForMethod(Method aMethod)
+        public List<KeyValuePair<uint, string>> GetAllINT3AddressesForMethod(Method aMethod, bool filterPermanentINT3s)
         {
             var INT3Labels = Connection.Query<INT3Label>(new SQLinq<INT3Label>().Where(i => i.MethodID == aMethod.ID));
-            return INT3Labels.Select(x => AddressOfLabel(x.LabelName)).ToList();
+            if (filterPermanentINT3s)
+            {
+                INT3Labels = INT3Labels.Where(x => !x.LeaveAsINT3);
+            }
+            return INT3Labels.Select(x => new KeyValuePair<uint, string>(AddressOfLabel(x.LabelName), x.LabelName)).ToList();
         }
         public UInt32 GetClosestCSharpBPAddress(UInt32 aAddress)
         {
