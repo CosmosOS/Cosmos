@@ -498,15 +498,15 @@ namespace Cosmos.System.Plugs.System
         }
         #endregion
 
-        #region Factorial (only used in Sin(), not plug )
-        public static int Factorial(int n)
-        {
-            if (n == 0)
-                return 1;
-            else
-                return n * Factorial(n - 1);
-        }
-        #endregion
+        //#region Factorial (only used in Sin(), not plug )
+        //public static int Factorial(int n)
+        //{
+        //    if (n == 0)
+        //        return 1;
+        //    else
+        //        return n * Factorial(n - 1);
+        //}
+        //#endregion
 
         #region Internaly used functions
 

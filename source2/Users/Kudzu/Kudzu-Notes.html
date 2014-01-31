@@ -3,7 +3,11 @@
 <body>
     <h3>General list of stuff left to do...</h3>
 		<ul>
-			<li>ATA / FAT</li>
+			<li>ATA / FAT
+				<ul>
+					<li>Extend System.IO plugs so FAT16/32 etc. can be used</li>
+				</ul>
+			</li>
 			<li>X#
 				<ul>
 					<li>use includes for compiling nasm</li>
@@ -37,8 +41,6 @@
 			<li>Debug Stub
 				<ul> 
 					<li>Increase speed of DebugStub</li>
-					<li>debugstub.SkipMethod</li>
-					<li>SkipClass</li>
 				</ul>
 			</li>
 			<li>Compile / Build speed. Current slow areas. Time each of these.
@@ -49,10 +51,12 @@
 					<li>ExtractMapFromElfFile - SQL is slow on inserts. Only store GUID labels. Add .asm file position and when we need a label in between, parse just those parts of ASM to get them. Also if we do this, probably dont need to store actual label name at all.</li>
 				</ul>
 			</li>
-			<li>Watches
+			<li>Watches and Locals
 				<ul>
-					<li>Memory watches</li>
-					<li>Watches that can see fields/members (of other classes besides <i>this</i>)</li>
+					<li>Locals that can understand more types / see deeper into more than just the <i>this</i> object</i>
+					<li>Watches that can get data for a specified memory address (<i>memory watches</i>)</li>
+					<li>Watches that can see locals</li>
+					<li>Watches/hover-over-objects that can see for than just locals</li>
 				</ul>
 			</li>
 			<li>Ring attributes and enforcement
@@ -86,15 +90,16 @@
 		<ul>
 			<li>localloc - int.parse needs plug for now because of this.</li>
 			<li>Filesystem</li>
-			<li>Memory Manager<ul>
-				<li>http://www.osdever.net/tutorials/view/memory-management-1</li>
-				<li>http://www.osdever.net/tutorials/view/memory-management-2</li>
+			<li>Memory Manager
+				<ul>
+					<li>http://www.osdever.net/tutorials/view/memory-management-1</li>
+					<li>http://www.osdever.net/tutorials/view/memory-management-2</li>
 				</ul>
 			</li>
 			<li>UDP</li>
 			<li>TCP</li>
 			<li>Cosmos.Debug.Common - much in here is not common and should be moved to 
-	VSDebug.. Add&nbsp; Readme.html that NASM and VSDebug use whats left</li>
+	VSDebug.. Add&nbsp; Readme.html that NASM and VSDebug use what's left</li>
 			<li>foreach / interfaces</li>
 		</ul>
 	<h3>Even Later</h3>

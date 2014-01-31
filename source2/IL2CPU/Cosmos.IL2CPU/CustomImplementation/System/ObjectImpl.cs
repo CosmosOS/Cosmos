@@ -29,9 +29,9 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
             return "<Object.ToString not yet implemented!>";
 		}
 
-		public static bool InternalEquals(object a, object b) {
-			return false;
-		}
+        //public static bool InternalEquals(object a, object b) {
+        //    return false;
+        //}
 
 		/// <summary>
 		///		<para>

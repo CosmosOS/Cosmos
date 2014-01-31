@@ -43,6 +43,10 @@ namespace Cosmos.IL2CPU.Profiler {
         var xAsmblr = new AppAssembler(1);
         using (var xScanner = new ILScanner(xAsmblr))
         {
+            xScanner.LogException = (Exception e) =>
+            {
+                Console.WriteLine("ILScanner exception : " + e.Message);
+            };
             using (var xDebugInfo = new DebugInfo(MDFFile, true))
             {
                 xAsmblr.DebugInfo = xDebugInfo;

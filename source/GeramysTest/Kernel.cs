@@ -16,17 +16,16 @@ namespace GeramysTest
 
         protected override void Run()
         {
-            Console.WriteLine("Test");
-            Console.ReadLine();
             Cosmos.Core.IOGroup.ATA ataOne = Cosmos.Core.Global.BaseIOGroups.ATA1;
             var xATA = new Cosmos.Hardware.BlockDevice.AtaPio(ataOne, Cosmos.Hardware.BlockDevice.Ata.ControllerIdEnum.Primary, Cosmos.Hardware.BlockDevice.Ata.BusPositionEnum.Master);
-            Console.WriteLine(Cosmos.Hardware.BlockDevice.BlockDevice.Devices == null ? "BlockDevice, Devices List is null" : "BlockDevice, Devices Listisnt null");
+            Console.WriteLine(Cosmos.Hardware.BlockDevice.BlockDevice.Devices == null ? "BlockDevice, Devices List is null" : "BlockDevice, Devices List isn't null");
             for (int i = 0; i < Cosmos.Hardware.BlockDevice.BlockDevice.Devices.Count; i++) {
                 var xDevice = Cosmos.Hardware.BlockDevice.BlockDevice.Devices[i];
               if (xDevice is AtaPio) {
                 xATA = (AtaPio)xDevice;
               }
             }
+            Console.WriteLine();
             Console.WriteLine("--------------------------");
             Console.WriteLine("Type: " + (xATA.DriveType == AtaPio.SpecLevel.ATA ? "ATA" : "ATAPI"));
             Console.WriteLine("Serial No: " + xATA.SerialNo);
@@ -42,11 +41,43 @@ namespace GeramysTest
                 xPartition = (Partition)xDevice;
               }
             }
-            var xFS = new FatFileSystem(xPartition);
+            if (xPartition != null)
+            {
+                Console.WriteLine();
+                Console.WriteLine("--------------------------");
 
-            Console.Write("Input: ");
-            string input = Console.ReadLine();
-            Console.WriteLine(input);
+                Console.WriteLine("Partition found.");
+                var xFS = new FatFileSystem(xPartition);
+
+                Console.WriteLine();
+                Console.WriteLine("BytesPerSector : " + xFS.BytesPerSector.ToString());
+                Console.WriteLine("SectorsPerCluster : " + xFS.SectorsPerCluster.ToString());
+                Console.WriteLine("BytesPerCluster : " + xFS.BytesPerCluster.ToString());
+    
+                Console.WriteLine("ReservedSectorCount : " + xFS.ReservedSectorCount.ToString());
+                Console.WriteLine("TotalSectorCount : " + xFS.TotalSectorCount.ToString());
+                Console.WriteLine("ClusterCount : " + xFS.ClusterCount.ToString());
+    
+                Console.WriteLine("NumberOfFATs : " + xFS.NumberOfFATs.ToString());
+                Console.WriteLine("FatSectorCount : " + xFS.FatSectorCount.ToString());
+
+                Console.WriteLine("RootSector : " + xFS.RootSector.ToString());
+                Console.WriteLine("RootSectorCount : " + xFS.RootSectorCount.ToString());
+                Console.WriteLine("RootCluster : " + xFS.RootCluster.ToString());
+                Console.WriteLine("RootEntryCount : " + xFS.RootEntryCount.ToString());
+
+                Console.WriteLine("DataSector : " + xFS.DataSector.ToString());
+                Console.WriteLine("DataSectorCount : " + xFS.DataSectorCount.ToString());
+            }
+            else
+            {
+                Console.WriteLine("Partition not found.");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("--------------------------");
+            Console.Write("Pausing... (Press enter to continue.)");
+            Console.ReadLine();
         }
     }
 }

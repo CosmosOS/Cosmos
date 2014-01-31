@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU {
 			throw new NotSupportedException("Reflection not supported");
 		}
 
-		public static string get_Name(uint aThis) {
+		public static string get_Name(object aThis) {
 			return "**Reflection not supported yet**";
 		}
 

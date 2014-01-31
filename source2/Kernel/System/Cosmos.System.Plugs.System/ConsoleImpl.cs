@@ -24,7 +24,7 @@ namespace Cosmos.System.Plugs.System.System {
 			return -1;
 		}
 
-		public static void set_BufferHeight() {
+		public static void set_BufferHeight(int aHeight) {
 			WriteLine("Not implemented: set_BufferHeight");
 		}
 
@@ -33,7 +33,7 @@ namespace Cosmos.System.Plugs.System.System {
 			return -1;
 		}
 
-		public static void set_BufferWidth() {
+        public static void set_BufferWidth(int aWidth) {
 			WriteLine("Not implemented: set_BufferWidth");
 		}
 
@@ -55,7 +55,7 @@ namespace Cosmos.System.Plugs.System.System {
 			return -1;
 		}
 
-		public static void set_CursorSize() {
+		public static void set_CursorSize(int aSize) {
 			WriteLine("Not implemented: set_CursorSize");
 		}
 
@@ -486,9 +486,10 @@ namespace Cosmos.System.Plugs.System.System {
 			WriteLine("Not implemented: Write");
 		}
 
-        public static void Write(byte aByte) {
-            Write(aByte.ToString());
-        }
+        //You'd expect this to be on System.Console wouldn't you? Well, it ain't so we just rely on Write(object value)
+        //public static void Write(byte aByte) {
+        //    Write(aByte.ToString());
+        //}
 
         #endregion
 
