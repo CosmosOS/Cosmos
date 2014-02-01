@@ -28,36 +28,60 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
+            this.LoadPlugsButton = new System.Windows.Forms.Button();
+            this.PlugsListBox = new System.Windows.Forms.ListBox();
+            this.ExceptionsListBox = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
-            // label1
+            // LoadPlugsButton
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(85, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Plugs assembly :";
+            this.LoadPlugsButton.Location = new System.Drawing.Point(13, 13);
+            this.LoadPlugsButton.Name = "LoadPlugsButton";
+            this.LoadPlugsButton.Size = new System.Drawing.Size(75, 23);
+            this.LoadPlugsButton.TabIndex = 0;
+            this.LoadPlugsButton.Text = "Load Plugs";
+            this.LoadPlugsButton.UseVisualStyleBackColor = true;
+            this.LoadPlugsButton.Click += new System.EventHandler(this.LoadPlugsButton_Click);
+            // 
+            // PlugsListBox
+            // 
+            this.PlugsListBox.FormattingEnabled = true;
+            this.PlugsListBox.Location = new System.Drawing.Point(13, 42);
+            this.PlugsListBox.Name = "PlugsListBox";
+            this.PlugsListBox.Size = new System.Drawing.Size(642, 511);
+            this.PlugsListBox.Sorted = true;
+            this.PlugsListBox.TabIndex = 1;
+            // 
+            // ExceptionsListBox
+            // 
+            this.ExceptionsListBox.FormattingEnabled = true;
+            this.ExceptionsListBox.Location = new System.Drawing.Point(661, 42);
+            this.ExceptionsListBox.Name = "ExceptionsListBox";
+            this.ExceptionsListBox.Size = new System.Drawing.Size(505, 511);
+            this.ExceptionsListBox.TabIndex = 2;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1178, 568);
-            this.Controls.Add(this.label1);
+            this.Controls.Add(this.ExceptionsListBox);
+            this.Controls.Add(this.PlugsListBox);
+            this.Controls.Add(this.LoadPlugsButton);
             this.Name = "Form1";
             this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Plugs Inspector";
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Button LoadPlugsButton;
+        private System.Windows.Forms.ListBox PlugsListBox;
+        private System.Windows.Forms.ListBox ExceptionsListBox;
+
     }
 }
 

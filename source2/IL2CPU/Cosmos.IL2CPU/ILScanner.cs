@@ -14,6 +14,8 @@ using _MemberInfo = System.Runtime.InteropServices._MemberInfo;
 
 namespace Cosmos.IL2CPU
 {
+    public delegate void LogExceptionDelegate(Exception e);
+
     // This is necessary because HashSet and Dictionary
     // have troubles when different types of objects are stored
     // in them. I dont remember the exact problem, but something
@@ -58,7 +60,6 @@ namespace Cosmos.IL2CPU
 
     public class ILScanner : IDisposable
     {
-        public delegate void LogExceptionDelegate(Exception e);
         public LogExceptionDelegate LogException = null;
 
         protected ILReader mReader;
@@ -100,7 +101,7 @@ namespace Cosmos.IL2CPU
             mAsmblr = aAsmblr;
             mReader = new ILReader();
 
-            mPlugManager = new PlugManager(this.ScanMethod, this.Queue);
+            mPlugManager = new PlugManager(this.LogException, this.ScanMethod, this.Queue);
         }
 
         public void EnableLogging(string aPathname)

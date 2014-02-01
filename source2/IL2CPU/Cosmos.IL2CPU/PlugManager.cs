@@ -16,7 +16,8 @@ namespace Cosmos.IL2CPU
 {
     public class PlugManager
     {
-        public delegate void LogExceptionDelegate(Exception e);
+        public bool ThrowExceptions = true;
+
         public LogExceptionDelegate LogException = null;
 
         public delegate void ScanMethodDelegate(MethodBase aMethod, bool aIsPlug, object sourceItem);
@@ -63,11 +64,13 @@ namespace Cosmos.IL2CPU
         }
         
 
-        public PlugManager()
+        public PlugManager(LogExceptionDelegate aLogException)
         {
+            LogException = aLogException;
         }
-        public PlugManager(ScanMethodDelegate aScanMethod, QueueDelegate aQueueMethod)
+        public PlugManager(LogExceptionDelegate aLogException, ScanMethodDelegate aScanMethod, QueueDelegate aQueueMethod)
         {
+            LogException = aLogException;
             ScanMethod = aScanMethod;
             Queue = aQueueMethod;
         }
@@ -319,7 +322,15 @@ namespace Cosmos.IL2CPU
                         {
                             if (xAttrib.IsWildcard && xAttrib.Assembler == null)
                             {
-                                throw new Exception("Wildcard PlugMethods need to use an assembler for now.");
+                                Exception anEx = new Exception("Wildcard PlugMethods need to use an assembler for now.");
+                                if (ThrowExceptions)
+                                {
+                                    throw anEx;
+                                }
+                                else
+                                {
+                                    LogException(anEx);
+                                }
                             }
                             if (xAttrib.Enabled && !xAttrib.IsMonoOnly)
                             {
@@ -342,7 +353,15 @@ namespace Cosmos.IL2CPU
                         }
                         if (xFields.ContainsKey(xField.FieldId))
                         {
-                            throw new Exception("Duplicate PlugField found for field '" + xField.FieldId + "'!");
+                            Exception anEx = new Exception("Duplicate PlugField found for field '" + xField.FieldId + "'!");
+                            if (ThrowExceptions)
+                            {
+                                throw anEx;
+                            }
+                            else
+                            {
+                                LogException(anEx);
+                            }
                         }
                         xFields.Add(xField.FieldId, xField);
                     }
@@ -718,5 +737,13 @@ namespace Cosmos.IL2CPU
             }
         }
 
+        public void Clean()
+        {
+            mPlugImpls = new Dictionary<Type, List<Type>>();
+            mPlugImplsInhrt = new Dictionary<Type, List<Type>>();
+            mPlugFields = new Dictionary<Type, IDictionary<string, PlugFieldAttribute>>();
+
+            ResolvedPlugs = new Orvid.Collections.SkipList();
+        }
     }
 }
