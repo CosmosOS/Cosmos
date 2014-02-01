@@ -18,6 +18,51 @@ namespace PlugsInspector
         PlugManager plugManager;
         bool LoadingPlugs = false;
 
+        public NetClassPlugInfo SelectedNetClassInfo
+        {
+            get
+            {
+                if (NetPlugClassesListBox.SelectedIndex > -1)
+                {
+                    return (NetClassPlugInfo)NetPlugClassesListBox.Items[NetPlugClassesListBox.SelectedIndex];
+                }
+                return null;
+            }
+        }
+        public CosmosClassPlugInfo SelectedCosmosClassInfo
+        {
+            get
+            {
+                if (CosmosPlugClassesListBox.SelectedIndex > -1)
+                {
+                    return (CosmosClassPlugInfo)CosmosPlugClassesListBox.Items[CosmosPlugClassesListBox.SelectedIndex];
+                }
+                return null;
+            }
+        }
+        public MethodPlugInfo SelectedPluggedMethodInfo
+        {
+            get
+            {
+                if (PluggedMethodsListBox.SelectedIndex > -1)
+                {
+                    return (MethodPlugInfo)PluggedMethodsListBox.Items[PluggedMethodsListBox.SelectedIndex];
+                }
+                return null;
+            }
+        }
+        public MethodPlugInfo SelectedUnPluggedMethodInfo
+        {
+            get
+            {
+                if (UnPluggedMethodsListBox.SelectedIndex > -1)
+                {
+                    return (MethodPlugInfo)UnPluggedMethodsListBox.Items[UnPluggedMethodsListBox.SelectedIndex];
+                }
+                return null;
+            }
+        }
+
         public Form1()
         {
             InitializeComponent();
@@ -37,7 +82,10 @@ namespace PlugsInspector
         {
             if (!LoadingPlugs)
             {
-                PlugsListBox.Items.Clear();
+                NetPlugClassesListBox.Items.Clear();
+                CosmosPlugClassesListBox.Items.Clear();
+                PluggedMethodsListBox.Items.Clear();
+                UnPluggedMethodsListBox.Items.Clear();
                 ExceptionsListBox.Items.Clear();
 
                 new Task(LoadPlugs).Start();
@@ -56,40 +104,22 @@ namespace PlugsInspector
 
                 plugManager.FindPlugImpls();
                 plugManager.ScanFoundPlugs();
-                foreach (Type pluggedMethodType in plugManager.PlugImpls.Keys)
+                foreach (Type pluggedClassType in plugManager.PlugImpls.Keys)
                 {
-                    string name = "";
-                    if (pluggedMethodType.DeclaringType != null)
-                    {
-                        name += pluggedMethodType.DeclaringType.Name + ".";
-                    }
-                    name += pluggedMethodType.Name;
-                    AddPlugEntry(name);
+                    AddPlugEntry(new NetClassPlugInfo(pluggedClassType), NetPlugClassesListBox);
                 }
-                foreach (Type pluggedMethodType in plugManager.PlugImplsInhrt.Keys)
+                foreach (Type pluggedClassType in plugManager.PlugImplsInhrt.Keys)
                 {
-                    string name = "";
-                    if (pluggedMethodType.DeclaringType != null)
-                    {
-                        name += pluggedMethodType.DeclaringType.Name + ".";
-                    }
-                    name += pluggedMethodType.Name;
-                    AddPlugEntry(name);
+                    AddPlugEntry(new NetClassPlugInfo(pluggedClassType), NetPlugClassesListBox);
                 }
                 foreach (Type pluggedFieldType in plugManager.PlugFields.Keys)
                 {
-                    string name = "";
-                    if (pluggedFieldType.DeclaringType != null)
-                    {
-                        name += pluggedFieldType.DeclaringType.Name + ".";
-                    }
-                    name += pluggedFieldType.Name;
-                    AddPlugEntry(name);
+                    AddPlugEntry(new NetClassPlugInfo(pluggedFieldType), NetPlugClassesListBox);
                 }
             }
             catch(Exception ex)
             {
-                AddPlugEntry("Error loading plugs: " + ex.Message);
+                AddExceptionEntry("Error loading plugs: " + ex.Message);
             }
             finally
             {
@@ -98,25 +128,21 @@ namespace PlugsInspector
         }
         private void ScanMethod(MethodBase aMethod, bool aIsPlug, object sourceItem)
         {
-            string name = "";
-            if (aMethod.DeclaringType != null)
-            {
-                name += aMethod.DeclaringType.Name + ".";
-            }
-            name += aMethod.Name;
-            AddPlugEntry(name);
+            //Hmm...
         }
 
-        private delegate void AddPlugEntryCallback(string text);
-        private void AddPlugEntry(string text)
+
+        private delegate void VoidDelegate();
+        private delegate void AddPlugEntryCallback(PlugInfo anInfo, ListBox aBox);
+        private void AddPlugEntry(PlugInfo anInfo, ListBox aBox)
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new AddPlugEntryCallback(this.AddPlugEntry), new object[] { text });
+                this.Invoke(new AddPlugEntryCallback(this.AddPlugEntry), new object[] { anInfo, aBox });
             }
             else
             {
-                this.PlugsListBox.Items.Add(text);
+                aBox.Items.Add(anInfo);
             }
         }
         private delegate void AddExceptionEntryCallback(string text);
@@ -130,6 +156,141 @@ namespace PlugsInspector
             {
                 this.ExceptionsListBox.Items.Add(text);
             }
+        }
+
+
+        private void NetPlugCalssesListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            CosmosPlugClassesListBox.Items.Clear();
+            PluggedMethodsListBox.Items.Clear();
+            UnPluggedMethodsListBox.Items.Clear();
+
+            NetClassPlugInfo plugInfo = SelectedNetClassInfo;
+            if(SelectedNetClassInfo != null)
+            {
+                List<Type> cosmosPlugClassTypes = plugManager.PlugImpls[plugInfo.NetClassType];
+                foreach(Type aCosmosPlugClassType in cosmosPlugClassTypes)
+                {
+                    AddPlugEntry(new CosmosClassPlugInfo(aCosmosPlugClassType), CosmosPlugClassesListBox);
+                }
+
+                //Get all methods on the Net class
+                //Then try and resolve them :)
+
+                Type netType = plugInfo.NetClassType;
+
+                var netMethods = netType.GetMethods(BindingFlags.Instance | BindingFlags.Static |
+                                   BindingFlags.NonPublic | BindingFlags.Public);
+                foreach (System.Reflection.MethodInfo netMethodInfo in netMethods)
+                {
+                    var netParams = netMethodInfo.GetParameters();
+                    var netParamTypes = netParams.Select(q => q.ParameterType).ToArray();
+                    var cosmosMethodInfo = plugManager.ResolvePlug(netMethodInfo, netParamTypes);
+
+                    MethodPlugInfo methodPlugInfo = new MethodPlugInfo(netMethodInfo, cosmosMethodInfo);
+                    if (cosmosMethodInfo != null)
+                    {
+                        AddPlugEntry(methodPlugInfo, PluggedMethodsListBox);
+                    }
+                    else
+                    {
+                        AddPlugEntry(methodPlugInfo, UnPluggedMethodsListBox);
+                    }
+                }
+            }
+        }
+
+        private void RunWithNullParamsButton_Click(object sender, EventArgs e)
+        {
+            MethodPlugInfo plugInfo = SelectedPluggedMethodInfo;
+            if (plugInfo != null)
+            {
+                MethodBase cosmosPlugMethod = plugInfo.CosmosMethodInfo;
+                try
+                {
+                    //I'm expecting all plug methods to be static (because they are at the moment).
+                    //Should this ever change, the following code will need a complete re-write
+                    
+                    var netParams = cosmosPlugMethod.GetParameters();
+                    object[] paramVals = new object[netParams.Length];
+                    for (int i = 0; i < paramVals.Length; i++)
+                    {
+                        paramVals[i] = null;
+                    }
+                    object result = cosmosPlugMethod.Invoke(null, paramVals);
+                    RunResultBox.Text = "Successful! \r\nOutput object:\r\n" + result.ToString();
+                }
+                catch(Exception ex)
+                {
+                    RunResultBox.Text = "Exception: " + ex.GetType().Name + "\r\n" + ex.Message;
+                }
+            }
+        }
+
+    }
+
+    public abstract class PlugInfo
+    {
+        public PlugInfo()
+        {
+        }
+    }
+    public class NetClassPlugInfo : PlugInfo
+    {
+        public Type NetClassType;
+        public NetClassPlugInfo(Type aNetClassType)
+        {
+            NetClassType = aNetClassType;
+        }
+
+        public override string ToString()
+        {
+            return NetClassType.Namespace + "." + NetClassType.Name;
+        }
+    }
+    public class CosmosClassPlugInfo : PlugInfo
+    {
+        public Type CosmosClassType;
+        public CosmosClassPlugInfo(Type aCosmosClassType)
+        {
+            CosmosClassType = aCosmosClassType;
+        }
+
+        public override string ToString()
+        {
+            return CosmosClassType.Namespace + "." + CosmosClassType.Name;
+        }
+    }
+    public class MethodPlugInfo : PlugInfo
+    {
+        public MethodBase NetMethodInfo;
+        public MethodBase CosmosMethodInfo;
+        public MethodPlugInfo(MethodBase aNetMethodInfo, MethodBase aCosmosMethodInfo)
+        {
+            NetMethodInfo = aNetMethodInfo;
+            CosmosMethodInfo = aCosmosMethodInfo;
+        }
+
+        public override string ToString()
+        {
+            string name = NetMethodInfo.Name;
+            
+            name += "(";
+            var netParams = NetMethodInfo.GetParameters();
+            var netParamTypes = netParams.Select(q => q.ParameterType).ToArray();
+            bool first = true;
+            foreach (Type aType in netParamTypes)
+            {
+                if(!first)
+                {
+                    name += ", ";
+                }
+                first = false;
+                name += aType.Name;
+            }
+            name += ")";
+
+            return name;
         }
     }
 }
