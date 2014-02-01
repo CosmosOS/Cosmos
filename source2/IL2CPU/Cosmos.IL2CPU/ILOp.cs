@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 
 namespace Cosmos.IL2CPU {
   public abstract class ILOp {
-    public static IDictionary<Type, IDictionary<string, PlugFieldAttribute>> mPlugFields;
+    public static PlugManager mPlugManager;
     protected readonly Cosmos.Assembler.Assembler Assembler;
 
     protected ILOp(Cosmos.Assembler.Assembler aAsmblr) {
@@ -208,7 +208,7 @@ namespace Cosmos.IL2CPU {
 
       // now check plugs
       IDictionary<string, PlugFieldAttribute> xPlugFields;
-      if (mPlugFields.TryGetValue(aType, out xPlugFields)) {
+      if (mPlugManager.PlugFields.TryGetValue(aType, out xPlugFields)) {
         foreach (var xPlugField in xPlugFields) {
           X86.IL.FieldInfo xPluggedField = null;
           if (xCurList.TryGetValue(xPlugField.Key, out xPluggedField)) {

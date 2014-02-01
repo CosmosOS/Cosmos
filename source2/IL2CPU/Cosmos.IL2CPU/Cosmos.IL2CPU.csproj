@@ -170,6 +170,7 @@
     <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="OurHashSet.cs" />
     <Compile Include="PlugInfo.cs" />
+    <Compile Include="PlugManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ILScanner.cs" />
     <Compile Include="ReflectionUtilities.cs" />
