@@ -210,7 +210,7 @@ namespace PlugsInspector
                 {
                     //I'm expecting all plug methods to be static (because they are at the moment).
                     //Should this ever change, the following code will need a complete re-write
-                    
+
                     var netParams = cosmosPlugMethod.GetParameters();
                     object[] paramVals = new object[netParams.Length];
                     for (int i = 0; i < paramVals.Length; i++)
@@ -220,9 +220,13 @@ namespace PlugsInspector
                     object result = cosmosPlugMethod.Invoke(null, paramVals);
                     RunResultBox.Text = "Successful! \r\nOutput object:\r\n" + result.ToString();
                 }
-                catch(Exception ex)
+                catch (TargetInvocationException ex)
                 {
-                    RunResultBox.Text = "Exception: " + ex.GetType().Name + "\r\n" + ex.Message;
+                    RunResultBox.Text = "Target threw exception: " + ex.InnerException.GetType().Name + "\r\n" + ex.InnerException.Message;
+                }
+                catch (Exception ex)
+                {
+                    RunResultBox.Text = "Exception (probably invalid parameters): " + ex.GetType().Name + "\r\n" + ex.Message;
                 }
             }
         }
