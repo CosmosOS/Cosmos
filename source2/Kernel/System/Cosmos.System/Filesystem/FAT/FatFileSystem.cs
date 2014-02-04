@@ -231,8 +231,24 @@ namespace Cosmos.System.Filesystem.FAT {
               // Leading and trailing spaces are to be ignored according to spec.
               // Many programs (including Windows) pad trailing spaces although it 
               // it is not required for long names.
-              // TODO: As per spec, ignore trailing periods
+              // As per spec, ignore trailing periods
               xName = xLongName.Trim();
+              
+              //If there are trailing periods
+              int nameIndex = xName.Length - 1;
+              if (xName[nameIndex] == '.')
+              {
+                  //Search backwards till we find the first non-period character
+                  for (; nameIndex > 0; nameIndex--)
+                  {
+                      if (xName[nameIndex] != '.')
+                      {
+                          break;
+                      }
+                  }
+                  //Substring to remove the periods
+                  xName = xName.Substring(0, nameIndex + 1);
+              }
             } else {
               string xEntry = xData.GetAsciiString(i, 11);
               xName = xEntry.Substring(0, 8).TrimEnd();

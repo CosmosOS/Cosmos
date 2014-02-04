@@ -36,7 +36,7 @@ namespace Cosmos.Assembler {
     public static string Get(string aMethodLabel, int aIlPos) {
       return aMethodLabel + ".IL_" + aIlPos.ToString("X4");
     }
-    public static System.Text.RegularExpressions.Regex IllegalCharsReplace = new System.Text.RegularExpressions.Regex(@"[&.,+$<>{}\-\`\\'/\\ \(\)\[\]\*!=_]", System.Text.RegularExpressions.RegexOptions.Compiled);
+    public static System.Text.RegularExpressions.Regex IllegalCharsReplace = new System.Text.RegularExpressions.Regex(@"[&.,+$<>{}\-\`\\'/\\ \(\)\[\]\*!=]", System.Text.RegularExpressions.RegexOptions.Compiled);
     public static string Final(string xName) {
       //var xSB = new StringBuilder(xName);
       
