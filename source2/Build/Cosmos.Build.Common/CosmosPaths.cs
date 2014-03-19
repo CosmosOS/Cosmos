@@ -44,14 +44,11 @@ namespace Cosmos.Build.Common {
       GdbClientExe = CheckPath(UserKit, @"Build\VSIP\Cosmos.Debug.GDB.exe");
       DebugStubSrc = CheckPath(UserKit, @"XSharp\DebugStub");
 
+      // Not finding this ones is not an issue. We will fallback to already retrieved stub from UserKit
       using (var xReg = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos", false)) {
         if (xReg != null) {
           DevKit = (string)xReg.GetValue("DevKit");
-          if (null == DevKit) {
-            throw new Exception(@"HKEY_CURRENT_USER\SOFTWARE\Cosmos\@DevKit was not found but DevKit is installed!");
-          }
           try { DebugStubSrc = CheckPath(DevKit, @"source2\Compiler\Cosmos.Compiler.DebugStub"); }
-          // Not finding this one is not an issue. We will fallback to already retrieved stun from UserKit
           catch { }
         }
       }

@@ -27,7 +27,7 @@
 AppId=CosmosUserKit
 AppName=Cosmos User Kit
 AppVerName=Cosmos User Kit v{#ChangeSetVersion}
-AppCopyright=Copyright © 2007-2012 The Cosmos Project
+AppCopyright=Copyright © 2007-2014 The Cosmos Project
 AppPublisher=Cosmos Project
 AppPublisherURL=http://www.goCosmos.org/
 AppSupportURL=http://www.goCosmos.org/
@@ -36,7 +36,11 @@ AppVersion={#ChangeSetVersion}
 DefaultDirName={userappdata}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup2\Output
+#if BuildConfiguration == "Devkit"
+OutputBaseFilename=CosmosDevKit-{#ChangeSetVersion}
+#else
 OutputBaseFilename=CosmosUserKit-{#ChangeSetVersion}
+#endif
 #ifdef Compress
 Compression=lzma2/ultra64
 InternalCompressLevel=ultra64
@@ -251,20 +255,13 @@ Root: HKCR; Subkey: "XSharp\shell\open\command"; ValueType: string; ValueName: "
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v4.5\AssemblyFoldersEx\Cosmos; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v4.5\AssemblyFoldersEx\Cosmos; ValueType: string; ValueName: ; ValueData: {app}\Kernel\; Flags: uninsdeletevalue
 
-; Old keys
-Root: HKLM; SubKey: Software\Cosmos; ValueType: none; Flags: deletevalue;
-Root: HKLM64; SubKey: Software\Cosmos; ValueType: none; Flags: deletekey; Check: IsWin64
-
 ; User Kit Folder
-Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "UserKit"; ValueData: {app}; Flags: uninsdeletevalue
+Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "UserKit"; ValueData: {app}; Flags: uninsdeletekey
 
 ; Dev Kit Folder - Set by builder only, but we delete it here. See comments in builder.
-; HKCU because Builder doesnt run as admin
+; HKCU because Builder doesn't run as admin
 ; Note HKCU is not part of registry redirection
-Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags: deletevalue;
-
-; Easter Egg
-Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "World Domination" ; ValueData: "true"; Flags: uninsdeletevalue
+Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags: deletekey
 
 ; VSIP package
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: none; Flags: uninsdeletekey
@@ -396,5 +393,3 @@ Filename: {code:VSNET2013_PATH}\VSIXInstaller.exe; Parameters: "/quiet {app}\Bui
 
 [UninstallRun]
 Filename: {code:VSNET2013_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
-
-
