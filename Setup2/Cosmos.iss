@@ -36,11 +36,7 @@ AppVersion={#ChangeSetVersion}
 DefaultDirName={userappdata}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup2\Output
-#if BuildConfiguration == "Devkit"
-OutputBaseFilename=CosmosDevKit-{#ChangeSetVersion}
-#else
 OutputBaseFilename=CosmosUserKit-{#ChangeSetVersion}
-#endif
 #ifdef Compress
 Compression=lzma2/ultra64
 InternalCompressLevel=ultra64

@@ -532,7 +532,7 @@ namespace Cosmos.Build.Builder
             }
             else
             {
-                Start(mCosmosDir + @"\Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe", @"/SILENT");
+                Start(mCosmosDir + @"Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe", @"/SILENT");
             }
         }
 
