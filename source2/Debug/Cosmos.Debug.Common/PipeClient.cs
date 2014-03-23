@@ -44,7 +44,7 @@ namespace Cosmos.Debug.Common {
             // or maybe not - what we have seems to work just fine...
 
             xPipe.Connect(500);
-          } catch (TimeoutException ex) {
+          } catch (TimeoutException) {
             xPipe.Close();
             return;
           }

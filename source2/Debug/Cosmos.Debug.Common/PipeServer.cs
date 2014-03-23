@@ -87,7 +87,7 @@ namespace Cosmos.Debug.Common {
             }
           }
         }
-      } catch (Exception ex) {
+      } catch (Exception) {
         // Threads MUST have an exception handler
         // Otherwise there are side effects when an exception occurs
       }

@@ -40,9 +40,8 @@ namespace Cosmos.Debug.VSDebugEngine {
       if (args == null) {
         args = "";
       } else if (args != String.Empty) {
-        if (afterExe != String.Empty)
           afterExe = "\" ";
-        else
+      } else {
           afterExe = " ";
       }
 
@@ -61,7 +60,6 @@ namespace Cosmos.Debug.VSDebugEngine {
 
       return location;
     }
-
 
     public static void CheckOk(int hr) {
       if (hr != 0) {

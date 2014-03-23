@@ -111,7 +111,7 @@ namespace Cosmos.IL2CPU
             mLogEnabled = true;
         }
 
-        protected void Queue(_MemberInfo aItem, object aSrc, string aSrcType, object sourceItem = null)
+        protected void Queue(_MemberInfo aItem, object aSrc, string aSrcType, string sourceItem = null)
         {
             var xMemInfo = aItem as MemberInfo;
             //TODO: fix this, as each label/symbol should also contain an assembly specifier.
@@ -388,16 +388,17 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        protected void ScanMethod(MethodBase aMethod, bool aIsPlug, object sourceItem)
+        protected void ScanMethod(MethodBase aMethod, bool aIsPlug, string sourceItem)
         {
             var xParams = aMethod.GetParameters();
             var xParamTypes = new Type[xParams.Length];
             // Dont use foreach, enum generaly keeps order but
             // isn't guaranteed.
+            string xMethodFullName = LabelName.GenerateFullName(aMethod);
             for (int i = 0; i < xParams.Length; i++)
             {
                 xParamTypes[i] = xParams[i].ParameterType;
-                Queue(xParamTypes[i], LabelName.GenerateFullName(aMethod), "Parameter");
+                Queue(xParamTypes[i], xMethodFullName, "Parameter");
             }
             var xIsDynamicMethod = aMethod.DeclaringType == null;
             // Queue Types directly related to method
@@ -469,12 +470,8 @@ namespace Cosmos.IL2CPU
                 // care of new additions.
                 if (xVirtMethod != null)
                 {
-                    Queue(xVirtMethod, LabelName.GenerateFullName(aMethod), "Virtual Base");
+                    Queue(xVirtMethod, xMethodFullName, "Virtual Base");
                     mVirtuals.Add(xVirtMethod);
-                    if (aMethod.Name == "ToString")
-                    {
-                        Console.Write("");
-                    }
 
                     // List changes as we go, cant be foreach
                     for (int i = 0; i < mItemsList.Count; i++)
@@ -491,7 +488,7 @@ namespace Cosmos.IL2CPU
                                     // "replace" a virtual above it?
                                     if (xNewMethod.IsVirtual)
                                     {
-                                        Queue(xNewMethod, LabelName.GenerateFullName(aMethod), "Virtual Downscan");
+                                        Queue(xNewMethod, xMethodFullName, "Virtual Downscan");
                                     }
                                 }
                             }

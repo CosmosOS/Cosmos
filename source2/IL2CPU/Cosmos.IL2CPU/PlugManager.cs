@@ -20,9 +20,9 @@ namespace Cosmos.IL2CPU
 
         public LogExceptionDelegate LogException = null;
 
-        public delegate void ScanMethodDelegate(MethodBase aMethod, bool aIsPlug, object sourceItem);
+        public delegate void ScanMethodDelegate(MethodBase aMethod, bool aIsPlug, string sourceItem);
         public ScanMethodDelegate ScanMethod = null;
-        public delegate void QueueDelegate(_MemberInfo aItem, object aSrc, string aSrcType, object sourceItem = null);
+        public delegate void QueueDelegate(_MemberInfo aItem, object aSrc, string aSrcType, string sourceItem = null);
         public QueueDelegate Queue = null;
 
         // Contains a list of plug implementor classes
@@ -688,17 +688,13 @@ namespace Cosmos.IL2CPU
         public MethodBase ResolvePlug(MethodBase aMethod, Type[] aParamTypes)
         {
             MethodBase xResult = null;
-            if (ResolvedPlugs.Contains(BuildMethodKeyName(aMethod), out xResult))
+            var xMethodKey = BuildMethodKeyName(aMethod);
+            if (ResolvedPlugs.Contains(xMethodKey, out xResult))
             {
                 return xResult;
             }
             else
             {
-                if (aMethod.DeclaringType.Name == "Delegate" && aMethod.Name == "InternalAllocLike" && aMethod.GetParameters().Length > 0)
-                {
-                    Console.Write("");
-                }
-
                 // TODO: Right now plugs are compiled in, even if they are not needed.
                 // Maybe change this so plugs that are not needed are not compiled in?
                 // To do so, maybe plugs could be marked as they are used
@@ -731,7 +727,7 @@ namespace Cosmos.IL2CPU
                     }
                 }
 
-                ResolvedPlugs.Add(BuildMethodKeyName(aMethod), xResult);
+                ResolvedPlugs.Add(xMethodKey, xResult);
 
                 return xResult;
             }

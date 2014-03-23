@@ -438,8 +438,6 @@ namespace Cosmos.Debug.Common
             }
         }
 
-        private static int DataDumpIndex = 0;
-
         public void AddLabels(IList<Label> aLabels, bool aFlush = false)
         {
             // GUIDs inserted by caller
@@ -599,7 +597,7 @@ namespace Cosmos.Debug.Common
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
             return xResult;
