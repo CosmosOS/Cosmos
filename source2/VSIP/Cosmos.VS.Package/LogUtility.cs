@@ -1,8 +1,6 @@
 ﻿#define FULL_DEBUG
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
 using System.IO;
 
@@ -17,7 +15,7 @@ namespace Cosmos.VS.Package
 #if FULL_DEBUG
             lock (mLockObj)
             {
-              File.AppendAllText(GetLogFilePath(), DateTime.Now.ToString() + " - " + String.Format(message, args) + "\r\n");
+                File.AppendAllText(GetLogFilePath(), DateTime.Now.ToString() + " - " + String.Format(message, args) + Environment.NewLine);
             }
 #endif
         }
@@ -39,22 +37,40 @@ namespace Cosmos.VS.Package
         private static string _logFilePath;
         private static string GetLogFilePath()
         {
-          if (null != _logFilePath) { return _logFilePath; }
+          if (null != _logFilePath)
+          {
+              CreateDirectoryForFilePath(_logFilePath);
+              return _logFilePath;
+          }
           _logFilePath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "Cosmos", "CosmosPkg.log");
-          Stack<DirectoryInfo> missingDirectories = new Stack<DirectoryInfo>();
-          DirectoryInfo scannedDirectory = new FileInfo(_logFilePath).Directory;
-
-          while (!scannedDirectory.Exists) {
-            missingDirectories.Push(scannedDirectory);
-            scannedDirectory = scannedDirectory.Parent;
-          }
-          while (0 < missingDirectories.Count) {
-            try { Directory.CreateDirectory(missingDirectories.Pop().FullName); }
-            catch { break; }
-          }
+          CreateDirectoryForFilePath(_logFilePath);
           return _logFilePath;
+        }
+
+        private static void CreateDirectoryForFilePath(string filePath)
+        {
+            DirectoryInfo scannedDirectory = new FileInfo(filePath).Directory;
+
+            if (scannedDirectory.Exists)
+                return;
+
+            Stack<DirectoryInfo> missingDirectories = new Stack<DirectoryInfo>();
+
+            do
+            {
+                missingDirectories.Push(scannedDirectory);
+                scannedDirectory = scannedDirectory.Parent;
+            }
+            while (!scannedDirectory.Exists);
+
+            do
+            {
+                try { Directory.CreateDirectory(missingDirectories.Pop().FullName); }
+                catch { break; }
+            }
+            while (0 < missingDirectories.Count);
         }
     }
 }
