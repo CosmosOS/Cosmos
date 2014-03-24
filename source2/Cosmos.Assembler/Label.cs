@@ -1,15 +1,9 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
-
-namespace Cosmos.Assembler {
+﻿namespace Cosmos.Assembler {
   public class Label : Instruction {
     public string Comment { get; set; }
 
     public Label(string aName)
-      : this(aName, "") {
+      : this(aName, string.Empty) {
     }
 
     public Label(string aName, string aComment) {
@@ -33,7 +27,7 @@ namespace Cosmos.Assembler {
     public static string GetLabel(object aObject) {
       Label xLabel = aObject as Label;
       if (xLabel == null) {
-        return "";
+        return string.Empty;
       }
       return xLabel.Name;
     }
@@ -60,7 +54,7 @@ namespace Cosmos.Assembler {
         aOutput.WriteLine("global " + QualifiedName);
       }
       aOutput.Write(QualifiedName + ":");
-      if (Comment != "") {
+      if (Comment.Length > 0) {
         aOutput.Write(" ;" + Comment);
       }
     }

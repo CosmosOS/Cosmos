@@ -52,7 +52,7 @@ namespace Cosmos.VS.Windows
         /// <summary>A pipe server that will receive responses from the AD7Process</summary>
         Cosmos.Debug.Common.PipeServer mPipeDown;
 
-        protected StateStorer mStateStorer;
+        private StateStorer mStateStorer;
         public StateStorer StateStorer
         {
             get
@@ -83,8 +83,8 @@ namespace Cosmos.VS.Windows
 
             mStateStorer = new StateStorer();
         }
-        
-        protected ToolWindowPane2 FindWindow(Type aWindowType)
+
+        private ToolWindowPane2 FindWindow(Type aWindowType)
         {
             try
             {
@@ -107,14 +107,14 @@ namespace Cosmos.VS.Windows
             return xWindow as ToolWindowPane2;
         }
 
-        protected void ShowWindow(Type aWindowType)
+        private void ShowWindow(Type aWindowType)
         {
             var xWindow = FindWindow(aWindowType);
             var xFrame = (IVsWindowFrame)xWindow.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(xFrame.Show());
         }
 
-        protected void UpdateWindow(Type aWindowType, string aTag, byte[] aData)
+        private void UpdateWindow(Type aWindowType, string aTag, byte[] aData)
         {
             System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
                 (Action)delegate()
@@ -174,7 +174,7 @@ namespace Cosmos.VS.Windows
             // Dont show Internal Window, most Cosmos users wont use it.
         }
 
-        protected void AddCommand(OleMenuCommandService aMcs, uint aCmdID, EventHandler aHandler)
+        private void AddCommand(OleMenuCommandService aMcs, uint aCmdID, EventHandler aHandler)
         {
             // Create the command for the assembly tool window
             var xCmdID = new CommandID(GuidList.guidCosmosMenu, (int)aCmdID);

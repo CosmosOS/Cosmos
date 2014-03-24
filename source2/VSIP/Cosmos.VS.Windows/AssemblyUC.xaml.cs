@@ -555,10 +555,10 @@ namespace Cosmos.VS.Windows
                     else
                     {
                         // Used for creating a test file for Cosmos.VS.Windows.Test
-                        if (false)
+                        /*if (false)
                         {
                             System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
-                        }
+                        }/**/
                     }
                     Parse();
                     if (mParams != null && mParams.Length > 0 && mParams[0] == "NoDisplay")

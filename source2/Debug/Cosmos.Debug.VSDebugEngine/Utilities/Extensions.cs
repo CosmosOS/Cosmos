@@ -58,7 +58,7 @@ namespace System
             var xParams = aMethod.GetParameters();
             for (var i = 0; i < xParams.Length; i++)
             {
-                if (xParams[i].Name == "aThis" && i == 0)
+                if (i == 0 && xParams[i].Name == "aThis")
                 {
                     continue;
                 }

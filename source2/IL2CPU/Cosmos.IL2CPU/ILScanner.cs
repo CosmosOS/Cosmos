@@ -70,7 +70,7 @@ namespace Cosmos.IL2CPU
         // other unused assemblies. So instead we collect a list of assemblies as we scan.
         protected List<Assembly> mUsedAssemblies = new List<Assembly>();
 
-        protected OurHashSet<object> mItems = new OurHashSet<object>();
+        protected OurHashSet<_MemberInfo> mItems = new OurHashSet<_MemberInfo>();
         protected List<object> mItemsList = new List<object>();
         // Contains items to be scanned, both types and methods
         protected Queue<ScannerQueueItem> mQueue = new Queue<ScannerQueueItem>();

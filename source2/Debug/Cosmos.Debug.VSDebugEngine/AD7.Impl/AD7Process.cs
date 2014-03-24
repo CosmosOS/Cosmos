@@ -697,7 +697,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 OutputText("\r\n");
                 OutputText("You probably need to install the VMWare VIX API!");
 
-                MessageBox.Show("Failed to stop debugger! You probably need to install the VMWare VIX API! \r\n\r\nCheck Output window for more details.");
+                MessageBox.Show("Failed to stop debugger! You probably need to install the VMWare VIX API!\r\n\r\nCheck Output window for more details.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
             return VSConstants.E_FAIL;

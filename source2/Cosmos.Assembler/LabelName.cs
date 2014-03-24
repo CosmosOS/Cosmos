@@ -3,8 +3,6 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Diagnostics;
-using System.Reflection.Emit;
 
 namespace Cosmos.Assembler {
   public static class LabelName {
@@ -48,28 +46,29 @@ namespace Cosmos.Assembler {
       foreach (char c in xIllegalChars) {
         xSB.Replace(c.ToString(), "");
       }*/
-      xName = IllegalCharsReplace.Replace(xName, "");
-      var xSB = new StringBuilder(xName);
-      if (xSB.Length > MaxLengthWithoutSuffix) {
+      xName = IllegalCharsReplace.Replace(xName, string.Empty);
+      if (xName.Length > MaxLengthWithoutSuffix) {
         using (var xHash = MD5.Create()) {
           var xValue = xHash.ComputeHash(Encoding.Default.GetBytes(xName));
+          var xSB = new StringBuilder(xName);
           // Keep length max same as before.
           xSB.Length = MaxLengthWithoutSuffix - xValue.Length * 2;
           foreach (var xByte in xValue) {
             xSB.Append(xByte.ToString("X2"));
           }
+          xName = xSB.ToString();
         }
       }
 
       LabelCount++;
-      return xSB.ToString();
+      return xName;
     }
 
     public static string GetFullName(Type aType) {
       if (aType.IsGenericParameter) {
         return aType.FullName;
       }
-      var xSB = new StringBuilder();
+      StringBuilder xSB = new StringBuilder(256);
       if (aType.IsArray) {
         xSB.Append(GetFullName(aType.GetElementType()));
         xSB.Append("[");
@@ -143,7 +142,7 @@ namespace Cosmos.Assembler {
       xBuilder.Append("(");
       var xParams = aMethod.GetParameters();
       for (var i = 0; i < xParams.Length; i++) {
-        if (xParams[i].Name == "aThis" && i == 0) {
+        if (i == 0 && xParams[i].Name == "aThis") {
           continue;
         }
         xBuilder.Append(GetFullName(xParams[i].ParameterType));
