@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Collections;
+using System.Runtime.InteropServices;
 
 namespace Cosmos.IL2CPU
 {
@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU
 	// is that the Contains method in OurHashSet checked only the
 	// default Hashcode. With adding DeclaringType in the Hashcode it runs.
 
-	public class OurHashSet<T> : IEnumerable<T>
+	public class OurHashSet<T> : IEnumerable<T> where T:_MemberInfo
 	{
 		private Dictionary<int, T> mItems = new Dictionary<int, T>();
 
@@ -60,16 +60,9 @@ namespace Cosmos.IL2CPU
 					select item.Value).GetEnumerator();
 		}
 
-		public static Type GetDeclareType(T item)
-		{
-			var xMethodDeclaringType = item.GetType().GetMethod("get_DeclaringType");
-			var xDeclaringType = xMethodDeclaringType.Invoke(item, null) as Type;
-			return xDeclaringType;
-		}
-
 		public static string GetDeclareTypeString(T item)
 		{
-			var xName = GetDeclareType(item);
+			var xName = item.DeclaringType;
 			return xName == null ? string.Empty : xName.ToString();
 		}
 
@@ -78,5 +71,4 @@ namespace Cosmos.IL2CPU
 			return (item.ToString() + GetDeclareTypeString(item)).GetHashCode();
 		}
 	}
-
 }
