@@ -53,26 +53,28 @@ namespace Cosmos.Build.MSBuild {
       return xResult;
     }
 
-    public override bool ExtendLineError(int exitCode, ref string errorMessage, out WriteType typ) {
-      typ = WriteType.Error;
+    public override bool ExtendLineError(int exitCode, string errorMessage, out LogInfo log) {
+      log = new LogInfo();
       try {
         if (errorMessage.StartsWith(InputFile)) {
           int IndexFile = errorMessage.LastIndexOf('\\', InputFile.Length);
-          string file = errorMessage.Substring(IndexFile + 1, InputFile.Length - IndexFile - 1);
+          log.file = errorMessage.Substring(IndexFile + 1, InputFile.Length - IndexFile - 1);
           string[] split = errorMessage.Substring(InputFile.Length).Split(':');
           if (split.Length > 3 && split[2].Contains("warning"))
-            typ = WriteType.Warning;
-          uint lineNumber = uint.Parse(split[1]);
-          errorMessage = file + (split.Length == 4 ? split[3] : string.Empty) + " Line: " + lineNumber + " Code: " + GetLine(InputFile, lineNumber).Trim();
+            log.logType = WriteType.Warning;
+          else
+            log.logType = WriteType.Error;
+          log.lineNumber = int.Parse(split[1]);
+          log.message = (split.Length == 4 ? split[3].TrimStart(' ') : string.Empty) + " Code: " + GetLine(InputFile, log.lineNumber).Trim();
         }
       } catch (Exception) {
       }
       return true;
     }
 
-    private static string GetLine(string fileName, uint line) {
+    private static string GetLine(string fileName, int line) {
       using (var sr = new StreamReader(fileName)) {
-        for (uint i = 1; i < line; i++)
+        for (int i = 1; i < line; i++)
           sr.ReadLine();
         return sr.ReadLine();
       }

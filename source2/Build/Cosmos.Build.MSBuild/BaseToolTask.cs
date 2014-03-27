@@ -17,6 +17,70 @@ namespace Cosmos.Build.MSBuild
 		Info
 	}
 
+    public class LogInfo
+    {
+        /// <summary>
+        /// Specifies if warning, error, info or message.
+        /// </summary>
+        public WriteType logType;
+
+        /// <summary>
+        /// Description of the type (can be null).
+        /// </summary>
+        public string subcategory;
+        
+        /// <summary>
+        /// Message, Warning or Error code (can be null)
+        /// </summary>
+        public string code;
+
+        /// <summary>
+        /// The help keyword for the host IDE (can be null).
+        /// </summary>
+        public string helpKeyword;
+
+        /// <summary>
+        /// The path to the file causing the message (can be null).
+        /// </summary>
+        public string file;
+
+        /// <summary>
+        /// The line in the file causing the message (set to zero if not available).
+        /// </summary>
+        public int lineNumber;
+
+        /// <summary>
+        /// The column in the file causing the message (set to zero if not available).
+        /// </summary>
+        public int columnNumber;
+
+        /// <summary>
+        /// The last line of a range of lines in the file causing the message (set to zero if not available).
+        /// </summary>
+        public int endLineNumber;
+
+        /// <summary>
+        /// The last column of a range of columns in the file causing the message (set to zero if not available).
+        /// </summary>
+        public int endColumnNumber;
+
+        /// <summary>
+        /// Importance of the message. (default is High)
+        /// </summary>
+        public MessageImportance importance;
+
+        /// <summary>
+        /// The message string.
+        /// </summary>
+        public string message;
+
+        /// <summary>
+        /// Optional arguments for formatting the message string.
+        /// </summary>
+        public object[] messageArgs;//TODO check if null is allowed, if yes document it here
+    }
+
+
 	public abstract class BaseToolTask : AppDomainIsolatedTask
 	{
 		protected bool ExecuteTool(string workingDir, string filename, string arguments, string name)
@@ -57,17 +121,15 @@ namespace Cosmos.Build.MSBuild
 						Log.LogError("Error occurred while invoking {0}.", name);
 					}
 				}
-				WriteType typ;
+				LogInfo logContent;
 				foreach (var xError in mErrors) {
-					string error = xError;
-					if(ExtendLineError(xProcess.ExitCode, ref error, out typ)) {
-						Logs(typ, error);
+					if(ExtendLineError(xProcess.ExitCode, xError, out logContent)) {
+                        Logs(logContent);
 					}
 				}
 				foreach (var xOutput in mOutput) {
-					string output = xOutput;
-					if (ExtendLineError(xProcess.ExitCode, ref output, out typ)) {
-						Logs(typ, output);
+					if (ExtendLineError(xProcess.ExitCode, xOutput, out logContent)) {
+						Logs(logContent);
 					}
 				}
 				return xProcess.ExitCode == 0;
@@ -77,39 +139,40 @@ namespace Cosmos.Build.MSBuild
 		private List<string> mErrors;
 		private List<string> mOutput;
 
-		public virtual bool ExtendLineError(int exitCode, ref string errorMessage, out WriteType typ)
+		public virtual bool ExtendLineError(int exitCode, string errorMessage, out LogInfo log)
 		{
-			typ = WriteType.Error;
+            log = new LogInfo();
+			log.logType = WriteType.Error;
 			if (exitCode == 0)
 				return false;
 			return true;
 		}
 
-		public virtual bool ExtendLineOutput(int exitCode, ref string errorMessage, out WriteType typ)
+		public virtual bool ExtendLineOutput(int exitCode, ref string errorMessage, out LogInfo log)
 		{
-			typ = WriteType.Info;
+            log = new LogInfo();
+            log.logType = WriteType.Info;
 			return true;
 		}
 
-		public void Logs(WriteType typ, string message)
+        public void Logs(LogInfo logInfo)// string message, string category, string filename, string lineNumber = 0, string columnNumber = 0)
 		{
-			switch (typ)
+            switch (logInfo.logType)
 			{
 				case WriteType.Warning:
-					Log.LogWarning(message);
-					break;
-				case WriteType.Error:
-					Log.LogError(message);
+                    //Log.LogWarning(category, string.Empty, string.Empty, filename, lineNumber, columnNumber, lineNumber, columnNumber, message);
+                    Log.LogWarning(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message, logInfo.messageArgs);
 					break;
 				case WriteType.Message:
-					Log.LogMessage(message);
+                    Log.LogMessage(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message, logInfo.messageArgs);
 					break;
 				case WriteType.Info:
 					// changed IDEBuildLogger.cs for this behavior of add to ErrorList Messages
-					Log.LogMessage(MessageImportance.High, message);
+                    Log.LogMessage(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.importance, logInfo.message, logInfo.messageArgs);
 					break;
+                case WriteType.Error:
 				default:
-					Log.LogError(message);
+					Log.LogError(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message, logInfo.messageArgs);;
 					break;
 			}
 		}
