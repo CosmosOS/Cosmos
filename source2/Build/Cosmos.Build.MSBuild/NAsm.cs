@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.Utilities;
 using Microsoft.Build.Framework;
 using System.IO;
-using System.Diagnostics;
 
 namespace Cosmos.Build.MSBuild {
   public class NAsm : BaseToolTask {
@@ -40,10 +35,10 @@ namespace Cosmos.Build.MSBuild {
         File.Delete(OutputFile);
       }
       if (!File.Exists(InputFile)) {
-        Log.LogError("Input file does not exist!");
+        Log.LogError("Input file \"" + InputFile + "\" does not exist!");
         return false;
       } else if (!File.Exists(ExePath)) {
-        Log.LogError("Exe file not found! (File = '" + ExePath + "')");
+        Log.LogError("Exe file not found! (File = \"" + ExePath + "\")");
         return false;
       }
 
@@ -68,9 +63,7 @@ namespace Cosmos.Build.MSBuild {
           if (split.Length > 3 && split[2].Contains("warning"))
             typ = WriteType.Warning;
           uint lineNumber = uint.Parse(split[1]);
-          errorMessage = file + " Line: " + lineNumber + " Code: " + GetLine(InputFile, lineNumber).Trim();
-          this.BuildEngine.LogMessageEvent(
-            new BuildMessageEventArgs(errorMessage, string.Empty, string.Empty, MessageImportance.High));
+          errorMessage = file + (split.Length == 4 ? split[3] : string.Empty) + " Line: " + lineNumber + " Code: " + GetLine(InputFile, lineNumber).Trim();
         }
       } catch (Exception) {
       }
