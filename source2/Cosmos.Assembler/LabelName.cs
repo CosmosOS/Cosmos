@@ -34,7 +34,8 @@ namespace Cosmos.Assembler {
     public static string Get(string aMethodLabel, int aIlPos) {
       return aMethodLabel + ".IL_" + aIlPos.ToString("X4");
     }
-    public static System.Text.RegularExpressions.Regex IllegalCharsReplace = new System.Text.RegularExpressions.Regex(@"[&.,+$<>{}\-\`\\'/\\ \(\)\[\]\*!=]", System.Text.RegularExpressions.RegexOptions.Compiled);
+    // no array bracket, they need to replace, for unique names for used types in methods
+    public static System.Text.RegularExpressions.Regex IllegalCharsReplace = new System.Text.RegularExpressions.Regex(@"[&.,+$<>{}\-\`\\'/\\ \(\)\*!=]", System.Text.RegularExpressions.RegexOptions.Compiled);
     public static string Final(string xName) {
       //var xSB = new StringBuilder(xName);
       
@@ -47,6 +48,7 @@ namespace Cosmos.Assembler {
         xSB.Replace(c.ToString(), "");
       }*/
       xName = IllegalCharsReplace.Replace(xName, string.Empty);
+      xName = xName.Replace("[]", "array");
       if (xName.Length > MaxLengthWithoutSuffix) {
         using (var xHash = MD5.Create()) {
           var xValue = xHash.ComputeHash(Encoding.Default.GetBytes(xName));
