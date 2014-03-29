@@ -227,7 +227,13 @@ namespace Cosmos.Build.MSBuild
                             xScanner.TempDebug += x => LogMessage(x);
                             if (EnableLogging)
                             {
-                                xScanner.EnableLogging(xOutputFilename + ".log.html");
+                                var xLogFile = xOutputFilename + ".log.html";
+                                if (false == xScanner.EnableLogging(xLogFile))
+                                {
+                                    // file creation not possible
+                                    EnableLogging = false;
+                                    LogWarning("Could not create the file \"" + xLogFile + "\"! No log will be created!");
+                                }
                             }
                             xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
                             xScanner.Execute(xInitMethod);

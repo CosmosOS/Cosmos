@@ -104,11 +104,22 @@ namespace Cosmos.IL2CPU
             mPlugManager = new PlugManager(this.LogException, this.ScanMethod, this.Queue);
         }
 
-        public void EnableLogging(string aPathname)
+        public bool EnableLogging(string aPathname)
         {
             mLogMap = new Dictionary<object, List<LogItem>>();
             mMapPathname = aPathname;
             mLogEnabled = true;
+
+            // be sure that file could be written, to prevent exception on Dispose call, cause we could not make Task log in it
+            try
+            {
+                File.CreateText(aPathname).Dispose();
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
         }
 
         protected void Queue(_MemberInfo aItem, object aSrc, string aSrcType, string sourceItem = null)
@@ -408,12 +419,12 @@ namespace Cosmos.IL2CPU
                 if (!xIsDynamicMethod)
                 {
                     // dont queue declaring types of dynamic methods either, those dont have a declaring type
-                    Queue(aMethod.DeclaringType, LabelName.GenerateFullName(aMethod), "Declaring Type");
+                    Queue(aMethod.DeclaringType, xMethodFullName, "Declaring Type");
                 }
             }
             if (aMethod is System.Reflection.MethodInfo)
             {
-                Queue(((System.Reflection.MethodInfo)aMethod).ReturnType, LabelName.GenerateFullName(aMethod), "Return Type");
+                Queue(((System.Reflection.MethodInfo)aMethod).ReturnType, xMethodFullName, "Return Type");
             }
 
             // Scan virtuals
@@ -555,22 +566,22 @@ namespace Cosmos.IL2CPU
                     {
                         if (xOpCode is ILOpCodes.OpMethod)
                         {
-                            Queue(((ILOpCodes.OpMethod)xOpCode).Value, LabelName.GenerateFullName(aMethod), "Call", sourceItem);
+                            Queue(((ILOpCodes.OpMethod)xOpCode).Value, xMethodFullName, "Call", sourceItem);
                         }
                         else if (xOpCode is ILOpCodes.OpType)
                         {
-                            Queue(((ILOpCodes.OpType)xOpCode).Value, LabelName.GenerateFullName(aMethod), "OpCode Value");
+                            Queue(((ILOpCodes.OpType)xOpCode).Value, xMethodFullName, "OpCode Value");
                         }
                         else if (xOpCode is ILOpCodes.OpField)
                         {
                             var xOpField = (ILOpCodes.OpField)xOpCode;
                             //TODO: Need to do this? Will we get a ILOpCodes.OpType as well?
-                            Queue(xOpField.Value.DeclaringType, LabelName.GenerateFullName(aMethod), "OpCode Value");
+                            Queue(xOpField.Value.DeclaringType, xMethodFullName, "OpCode Value");
                             if (xOpField.Value.IsStatic)
                             {
                                 //TODO: Why do we add static fields, but not instance?
                                 // AW: instance fields are "added" always, as part of a type, but for static fields, we need to emit a datamember
-                                Queue(xOpField.Value, LabelName.GenerateFullName(aMethod), "OpCode Value");
+                                Queue(xOpField.Value, xMethodFullName, "OpCode Value");
                             }
                         }
                         else if (xOpCode is ILOpCodes.OpToken)
@@ -578,16 +589,16 @@ namespace Cosmos.IL2CPU
                             var xTokenOp = (ILOpCodes.OpToken)xOpCode;
                             if (xTokenOp.ValueIsType)
                             {
-                                Queue(xTokenOp.ValueType, LabelName.GenerateFullName(aMethod), "OpCode Value");
+                                Queue(xTokenOp.ValueType, xMethodFullName, "OpCode Value");
                             }
                             if (xTokenOp.ValueIsField)
                             {
-                                Queue(xTokenOp.ValueField.DeclaringType, LabelName.GenerateFullName(aMethod), "OpCode Value");
+                                Queue(xTokenOp.ValueField.DeclaringType, xMethodFullName, "OpCode Value");
                                 if (xTokenOp.ValueField.IsStatic)
                                 {
                                     //TODO: Why do we add static fields, but not instance?
                                     // AW: instance fields are "added" always, as part of a type, but for static fields, we need to emit a datamember
-                                    Queue(xTokenOp.ValueField, LabelName.GenerateFullName(aMethod), "OpCode Value");
+                                    Queue(xTokenOp.ValueField, xMethodFullName, "OpCode Value");
                                 }
                             }
                         }
@@ -598,10 +609,6 @@ namespace Cosmos.IL2CPU
 
         protected void ScanType(Type aType)
         {
-            if (aType.IsArray)
-            {
-                Console.Write("");
-            }
             // Add immediate ancestor type
             // We dont need to crawl up farther, when the BaseType is scanned 
             // it will add its BaseType, and so on.

@@ -456,13 +456,13 @@ namespace Cosmos.Build.Builder
 
             CD(mOutputDir);
             SrcPath = Path.Combine(mCosmosDir, @"source2\VSIP\Cosmos.VS.Package\obj\x86\Debug");
-            Copy("CosmosProject (C#).zip");
-            Copy("CosmosKernel (C#).zip");
-            Copy("CosmosProject (F#).zip");
-            Copy("Cosmos.zip");
-            Copy("CosmosProject (VB).zip");
-            Copy("CosmosKernel (VB).zip");
-            Copy(mCosmosDir + @"source2\VSIP\Cosmos.VS.XSharp\Template\XSharpFileItem.zip");
+            Copy("CosmosProject (C#).zip", true);
+            Copy("CosmosKernel (C#).zip", true);
+            Copy("CosmosProject (F#).zip", true);
+            Copy("Cosmos.zip", true);
+            Copy("CosmosProject (VB).zip", true);
+            Copy("CosmosKernel (VB).zip", true);
+            Copy(mCosmosDir + @"source2\VSIP\Cosmos.VS.XSharp\Template\XSharpFileItem.zip", true);
         }
 
         void CreateSetup()

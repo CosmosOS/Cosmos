@@ -141,10 +141,10 @@ namespace Cosmos.Build.Installer {
       }
     }
 
-    public void Copy(string aSrcPathname) {
-      Copy(aSrcPathname, Path.GetFileName(aSrcPathname));
+    public void Copy(string aSrcPathname, bool clearReadonlyIfDestExists) {
+      Copy(aSrcPathname, Path.GetFileName(aSrcPathname), clearReadonlyIfDestExists);
     }
-    public void Copy(string aSrcPathname, string aDestPathname) {
+    public void Copy(string aSrcPathname, string aDestPathname, bool clearReadonlyIfDestExists) {
       Log.WriteLine("Copy");
 
       string xSrc = Path.Combine(SrcPath, aSrcPathname);
@@ -153,9 +153,8 @@ namespace Cosmos.Build.Installer {
       string xDest = Path.Combine(CurrPath, aDestPathname);
       Log.WriteLine("  To: " + xDest);
 
-      // TODO: Make overwrite a param and make this part of the logic
       // Copying files that are in TFS often they will be read only, so need to kill this file before copy
-      if (File.Exists(xDest)) {
+      if (clearReadonlyIfDestExists && File.Exists(xDest)) {
         ResetReadOnly(xDest);
       }
       File.Copy(xSrc, xDest, true);
