@@ -15,8 +15,6 @@
         </Project>
     </TemplateContent>
     <WizardExtension>
-        <!--<Assembly>Cosmos.VS.Package, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f4d94ac959d59ec3</Assembly>
-        <FullClassName>Cosmos.VS.Package.Templates.GenerateCosmosProjectWizard</FullClassName>-->
         <Assembly>Cosmos.VS.Wizards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ca09551317f1435</Assembly>
         <FullClassName>Cosmos.VS.Package.Templates.GenerateCosmosProjectWizard</FullClassName>
     </WizardExtension>
