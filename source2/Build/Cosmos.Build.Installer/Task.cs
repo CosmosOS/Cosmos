@@ -96,7 +96,7 @@ namespace Cosmos.Build.Installer {
           xProcess.WaitForExit();
           if (xProcess.ExitCode != 0) {
             Log.SetError();
-            throw new Exception("Application returned exit code.");
+            throw new ApplicationException("Application returned exit code 0x" + xProcess.ExitCode.ToString("X8") + ".");
           }
         }
       }
