@@ -38,12 +38,6 @@ namespace Cosmos.Build.Builder
                 Echo("  " + mOutputDir);
                 Directory.Delete(mOutputDir, true);
             }
-            else
-            {
-                Echo("Creating build output directory.");
-                Echo("  " + mOutputDir);
-                Directory.CreateDirectory(mOutputDir);
-            }
 
             if (Directory.Exists(mAppDataDir))
             {
