@@ -169,7 +169,7 @@ namespace Cosmos.Build.MSBuild {
       }
 
       var xTempBatFile = Path.Combine(WorkingDir, "ExtractElfMap.bat");
-      File.WriteAllText(xTempBatFile, "@ECHO OFF\r\n\"" + Path.Combine(CosmosBuildDir, @"tools\cygwin\objdump.exe") + "\" --wide --syms \"" + InputFile + "\" >" + Path.GetFileName(xMapFile));
+      File.WriteAllText(xTempBatFile, "@ECHO OFF\r\n\"" + Path.Combine(CosmosBuildDir, @"tools\cygwin\objdump.exe") + "\" --wide --syms \"" + InputFile + "\" > \"" + Path.GetFileName(xMapFile) + "\"");
 
       if (!ExecuteTool(WorkingDir, xTempBatFile, "", "objdump")) {
         throw new Exception("Error extracting map from " + InputFile);
