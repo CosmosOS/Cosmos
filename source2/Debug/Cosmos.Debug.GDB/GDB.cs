@@ -203,7 +203,7 @@ namespace Cosmos.Debug.GDB {
             mGDBProcess.BeginOutputReadLine();
 
 			SendCmd("set target-async 1"); // doc http://sourceware.org/gdb/onlinedocs/gdb/Asynchronous-and-non_002dstop-modes.html
-            SendCmd("symbol-file " + Settings.ObjFile);
+            SendCmd("add-symbol-file " + Settings.ObjFile + " 0x02000000");
 			SendCmd("set architecture i386");
 			SendCmd("set language asm");
 			SendCmd("set disassembly-flavor intel");

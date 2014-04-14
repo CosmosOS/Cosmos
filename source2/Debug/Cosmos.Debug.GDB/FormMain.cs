@@ -85,6 +85,7 @@ namespace Cosmos.Debug.GDB {
                     if (xCmd == "disassemble") {
                         OnDisassemble(aResponse);
                     } else if (xCmd == "symbol-file") { // nothing
+                    } else if (xCmd == "add-symbol-file") { //nothing
                     } else if (xCmd == "set") { // nothing
                     } else if (xCmd == "target") {
 
