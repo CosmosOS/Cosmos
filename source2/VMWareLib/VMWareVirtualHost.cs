@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Interop.VixCOM;
+using Microsoft.Win32;
 
 namespace Vestris.VMWareLib
 {
@@ -253,6 +254,16 @@ namespace Vestris.VMWareLib
         {
             try
             {
+                // check if VmWare COM object could be loaded
+                // if we try to load a COM object which does not exist, an RCW exception will occure on exit of Visual Studio 2013
+                using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, RegistryView.Registry32)) {
+                  using (var xReg = baseKey.OpenSubKey(@"CLSID\{6874E949-7186-4308-A1B9-D55A91F60728}", false)) {
+                    if (xReg == null) {
+                      throw new ApplicationException("No Vmware Library installed!");
+                    }
+                  }
+                }
+
                 int serviceProvider = (int)serviceProviderType;
                 VMWareJobCallback callback = new VMWareJobCallback();
                 using (VMWareJob job = new VMWareJob(new VixLib().Connect(
@@ -262,6 +273,10 @@ namespace Vestris.VMWareLib
                     _handle = job.Wait<IHost>(Constants.VIX_PROPERTY_JOB_RESULT_HANDLE, timeout);
                 }
                 _serviceProviderType = serviceProviderType;
+            }
+            catch (ApplicationException)
+            {
+                throw;
             }
             catch (Exception ex)
             {

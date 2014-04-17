@@ -691,6 +691,14 @@ namespace Cosmos.Debug.VSDebugEngine
                 OutputText("Debugger terminated.");
                 return VSConstants.S_OK;
             }
+            catch (ApplicationException ex)
+            {
+                OutputText("Failed to stop debugger!");
+                OutputText("\r\n");
+                OutputText("You need to install the VMWare VIX API!");
+
+                MessageBox.Show("Failed to stop debugger! You need to install the VMWare VIX API!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             catch (Exception ex)
             {
                 OutputText("Failed to stop debugger! Exception message: " + ex.Message);
