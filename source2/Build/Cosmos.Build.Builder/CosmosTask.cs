@@ -481,7 +481,7 @@ namespace Cosmos.Build.Builder
         {
             Section("Launching Visual Studio");
 
-            string xVisualStudio = Paths.ProgFiles32 + @"\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe";
+            string xVisualStudio = Paths.VSInstall + @"\devenv.exe";
             if (!File.Exists(xVisualStudio))
             {
                 throw new Exception("Cannot find Visual Studio.");
