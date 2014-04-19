@@ -227,8 +227,8 @@ namespace Cosmos.Debug.GDB {
 				// get current address
 				var xAddr = Global.FromHexWithLeadingZeroX(res.Text[1].Substring(0, res.Text[1].IndexOf(' ')));
 				// only use breakpoint if not already deep in OS
-				const int START_ADDRESS = 0x000ffff0;
-				if (xAddr <= START_ADDRESS)
+                const uint START_ADDRESS = 0xFFFFFFF0;
+				if (xAddr == START_ADDRESS)
 				{
 					SendCmd("break Kernel_Start");
 					SendCmd("continue");
