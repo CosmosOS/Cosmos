@@ -250,9 +250,19 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "EdNuttingsTestBoot", "..\so
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlugsInspector", "..\source2\Tools\PlugsInspector\PlugsInspector.csproj", "{44604DA8-CABD-4CBC-AA9A-258AC59F03AD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LouisWatson", "LouisWatson", "{C7ED99CA-E474-49B4-B3ED-BE4367C8FEA5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LWatson", "LWatson\LWatson.csproj", "{3B82BB82-56C4-4449-AB24-47770EC3293E}"
+EndProject
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "LWatsonBoot", "LWatson\LWatsonBoot.Cosmos", "{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315} = {B97A2956-C363-47F2-A6AA-B4FCCFF4D315}
+		{7C64B97F-516D-4A6D-B9E1-3FE48F561409} = {7C64B97F-516D-4A6D-B9E1-3FE48F561409}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 65
+		SccNumberOfProjects = 67
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -514,6 +524,14 @@ Global
 		SccProjectTopLevelParentUniqueName64 = Cosmos.sln
 		SccProjectName64 = ../source2/Tools/PlugsInspector
 		SccLocalPath64 = ..\\source2\\Tools\\PlugsInspector
+		SccProjectUniqueName65 = LWatson\\LWatson.csproj
+		SccProjectTopLevelParentUniqueName65 = Cosmos.sln
+		SccProjectName65 = LWatson
+		SccLocalPath65 = LWatson
+		SccProjectUniqueName66 = LWatson\\LWatsonBoot.Cosmos
+		SccProjectTopLevelParentUniqueName66 = Cosmos.sln
+		SccProjectName66 = LWatson
+		SccLocalPath66 = LWatson
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1209,6 +1227,30 @@ Global
 		{44604DA8-CABD-4CBC-AA9A-258AC59F03AD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{44604DA8-CABD-4CBC-AA9A-258AC59F03AD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{44604DA8-CABD-4CBC-AA9A-258AC59F03AD}.Release|x86.ActiveCfg = Release|Any CPU
+		{3B82BB82-56C4-4449-AB24-47770EC3293E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B82BB82-56C4-4449-AB24-47770EC3293E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B82BB82-56C4-4449-AB24-47770EC3293E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{3B82BB82-56C4-4449-AB24-47770EC3293E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{3B82BB82-56C4-4449-AB24-47770EC3293E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3B82BB82-56C4-4449-AB24-47770EC3293E}.Debug|x86.Build.0 = Debug|Any CPU
+		{3B82BB82-56C4-4449-AB24-47770EC3293E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B82BB82-56C4-4449-AB24-47770EC3293E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B82BB82-56C4-4449-AB24-47770EC3293E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{3B82BB82-56C4-4449-AB24-47770EC3293E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{3B82BB82-56C4-4449-AB24-47770EC3293E}.Release|x86.ActiveCfg = Release|Any CPU
+		{3B82BB82-56C4-4449-AB24-47770EC3293E}.Release|x86.Build.0 = Release|Any CPU
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}.Debug|Any CPU.Build.0 = Debug|x86
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}.Debug|x86.ActiveCfg = Debug|x86
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}.Debug|x86.Build.0 = Debug|x86
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}.Release|Any CPU.ActiveCfg = Debug|x86
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}.Release|Any CPU.Build.0 = Debug|x86
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}.Release|Mixed Platforms.ActiveCfg = Debug|x86
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}.Release|Mixed Platforms.Build.0 = Debug|x86
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}.Release|x86.ActiveCfg = Debug|x86
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE}.Release|x86.Build.0 = Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1238,6 +1280,7 @@ Global
 		{CB974478-09B8-4907-980F-6B7889645D93} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{7D29D57D-A78B-4E67-BBC3-DF84BD10FC6D} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{2BFDA1D7-02C3-45A7-9FC1-E79D2C737DE8} = {A4478219-065D-4928-BB4D-4358CAD39A03}
+		{C7ED99CA-E474-49B4-B3ED-BE4367C8FEA5} = {A4478219-065D-4928-BB4D-4358CAD39A03}
 		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
 		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9} = {9D82B35C-7133-4ADE-AA5C-0FFB2BFA8BA6}
@@ -1292,5 +1335,7 @@ Global
 		{138FA8BF-3728-430F-B17D-6CBCA7ADEE2F} = {CB974478-09B8-4907-980F-6B7889645D93}
 		{05FC6729-A0E3-48A4-AC5C-A0126F1972F4} = {2BFDA1D7-02C3-45A7-9FC1-E79D2C737DE8}
 		{6C741857-F812-4D37-85CA-A0487B95A8D7} = {2BFDA1D7-02C3-45A7-9FC1-E79D2C737DE8}
+		{3B82BB82-56C4-4449-AB24-47770EC3293E} = {C7ED99CA-E474-49B4-B3ED-BE4367C8FEA5}
+		{472C46F6-C64C-4D71-B5EC-E6BD4BA164CE} = {C7ED99CA-E474-49B4-B3ED-BE4367C8FEA5}
 	EndGlobalSection
 EndGlobal

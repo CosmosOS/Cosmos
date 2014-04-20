@@ -6,11 +6,11 @@ using System.Text;
 namespace Cosmos.System.Filesystem.FAT.Listing {
   public class FatFile : Cosmos.System.Filesystem.Listing.File {
     public readonly FatFileSystem FileSystem;
-    public readonly UInt32 FirstClusterNum;
+    public readonly UInt64 FirstClusterNum;
 
     // Size is UInt32 because FAT doesn't support bigger.
     // Dont change to UInt64
-    public FatFile(FatFileSystem aFileSystem, string aName, UInt32 aSize, UInt32 aFirstCluster)
+    public FatFile(FatFileSystem aFileSystem, string aName, UInt32 aSize, UInt64 aFirstCluster)
       : base(aFileSystem, aName, aSize) {
       FileSystem = aFileSystem;
       FirstClusterNum = aFirstCluster;
@@ -18,9 +18,9 @@ namespace Cosmos.System.Filesystem.FAT.Listing {
 
     //TODO: Seperate out the file mechanics from the Listing class
     // so a file can exist without a listing instance
-    public List<UInt32> GetFatTable() {
-      var xResult = new List<UInt32>((int)(Size / (FileSystem.SectorsPerCluster * FileSystem.BytesPerSector)));
-      UInt32 xClusterNum = FirstClusterNum;
+    public List<UInt64> GetFatTable() {
+      var xResult = new List<UInt64>((int)(Size / (FileSystem.SectorsPerCluster * FileSystem.BytesPerSector)));
+      UInt64 xClusterNum = FirstClusterNum;
 
       byte[] xSector = new byte[FileSystem.BytesPerSector];
       UInt32? xSectorNum = null;

@@ -41,11 +41,11 @@ namespace Cosmos.System.Filesystem.FAT {
 
     Cosmos.Hardware.BlockDevice.BlockDevice mDevice;
 
-    public void ReadFatTableSector(UInt32 xSectorNum, byte[] aData) {
+    public void ReadFatTableSector(UInt64 xSectorNum, byte[] aData) {
       mDevice.ReadBlock(ReservedSectorCount + xSectorNum, 1, aData);
     }
 
-    public bool FatEntryIsEOF(UInt32 aValue) {
+    public bool FatEntryIsEOF(UInt64 aValue) {
       if (FatType == FatTypeEnum.Fat12) {
         return aValue >= 0x0FF8;
       } else if (FatType == FatTypeEnum.Fat16) {
@@ -55,7 +55,7 @@ namespace Cosmos.System.Filesystem.FAT {
       }
     }
 
-    public UInt32 GetFatEntry(byte[] aSector, UInt32 aClusterNum, UInt32 aOffset) {
+    public UInt64 GetFatEntry(byte[] aSector, UInt64 aClusterNum, UInt64 aOffset) {
       if (FatType == FatTypeEnum.Fat12) {
         if (aOffset == (BytesPerSector - 1)) {
           throw new Exception("TODO: Sector Span");
@@ -158,13 +158,13 @@ namespace Cosmos.System.Filesystem.FAT {
       return new byte[BytesPerCluster];
     }
 
-    public void ReadCluster(UInt32 aCluster, byte[] aData) {
+    public void ReadCluster(UInt64 aCluster, byte[] aData) {
       UInt64 xSector = DataSector + ((aCluster - 2) * SectorsPerCluster);
       mDevice.ReadBlock(xSector, SectorsPerCluster, aData);
     }
 
-    public void GetFatTableSector(UInt32 aClusterNum, out UInt32 oSector, out UInt32 oOffset) {
-      UInt32 xOffset = 0;
+    public void GetFatTableSector(UInt64 aClusterNum, out UInt32 oSector, out UInt32 oOffset) {
+      UInt64 xOffset = 0;
       if (FatType == FatTypeEnum.Fat12) {
         // Multiply by 1.5 without using floating point, the divide by 2 rounds DOWN
         xOffset = aClusterNum + (aClusterNum / 2);
@@ -173,8 +173,8 @@ namespace Cosmos.System.Filesystem.FAT {
       } else if (FatType == FatTypeEnum.Fat32) {
         xOffset = aClusterNum * 4;
       }
-      oSector = xOffset / BytesPerSector;
-      oOffset = xOffset % BytesPerSector;
+      oSector = (UInt32)(xOffset / BytesPerSector);
+      oOffset = (UInt32)(xOffset % BytesPerSector);
     }
 
     public List<Cosmos.System.Filesystem.Listing.Base> GetRoot() {

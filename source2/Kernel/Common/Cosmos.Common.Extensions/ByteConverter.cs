@@ -16,11 +16,11 @@ namespace Cosmos.Common.Extensions {
   // Default methods are LittleEndian
   static public class ByteConverter {
 
-    static public UInt16 ToUInt16(this byte[] n, UInt32 aPos) {
+    static public UInt16 ToUInt16(this byte[] n, UInt64 aPos) {
       return (UInt16)(n[aPos + 1] << 8 | n[aPos]);
     }
 
-    static public UInt32 ToUInt32(this byte[] n, UInt32 aPos) {
+    static public UInt32 ToUInt32(this byte[] n, UInt64 aPos) {
       return (UInt32)(n[aPos + 3] << 24 | n[aPos + 2] << 16 | n[aPos + 1] << 8 | n[aPos]);
     }
 

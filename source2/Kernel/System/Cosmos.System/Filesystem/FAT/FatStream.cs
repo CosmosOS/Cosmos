@@ -15,7 +15,7 @@ namespace Cosmos.System.Filesystem.FAT {
     // so we might consider a way to flush it and only keep parts.
     // Example, a 100 MB file will require 2MB for this structure. That is
     // probably acceptable for the mid term future.
-    protected List<UInt32> mFatTable;
+    protected List<UInt64> mFatTable;
     protected UInt64? mReadBufferPosition;
 
     public FatStream(Listing.FatFile aFile) {
@@ -57,7 +57,8 @@ namespace Cosmos.System.Filesystem.FAT {
       }
     }
 
-    public override int Read(byte[] aBuffer, int aOffset, int aCount) {
+		public override int Read(byte[] aBuffer, Int64 aOffset, Int64 aCount)
+		{
       if (aCount < 0) {
         throw new ArgumentOutOfRangeException("aCount");
 	  }
@@ -87,7 +88,7 @@ namespace Cosmos.System.Filesystem.FAT {
       while (xCount > 0) {
         UInt64 xClusterIdx = mPosition / xClusterSize;
         UInt64 xPosInCluster = mPosition % xClusterSize;
-        mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
+        mFS.ReadCluster((ulong)mFatTable[(int)xClusterIdx], xCluster);
         long xReadSize;
         if (xPosInCluster + xCount > xClusterSize) {
 		  xReadSize = (long)(xClusterSize - xPosInCluster - 1);
@@ -96,14 +97,14 @@ namespace Cosmos.System.Filesystem.FAT {
         }
 		// no need for a long version, because internal Array.Copy() does a cast down to int, and a range check,
 		// or we do a semantic change here
-		Array.Copy(xCluster, (int)xPosInCluster, aBuffer, aOffset, (int)xReadSize);
+		Array.Copy(xCluster, (long)xPosInCluster, aBuffer, aOffset, xReadSize);
 		//TODO for Kudzu: should aOffset replaced by a local Int64?
         aOffset = (int)(aOffset + xReadSize);
         xCount -= (ulong)xReadSize;
       }
 
 	  mPosition += (ulong)aOffset;
-      return aOffset;
+      return (int)aOffset;
 	}
 
     public override void Flush() {
