@@ -23,7 +23,6 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
           var xOpMethod = aOpCode as OpMethod;
-          string xCurrentMethodLabel = GetLabel(aMethod, aOpCode.Position);
           DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode);
         }
 
@@ -224,7 +223,6 @@ namespace Cosmos.IL2CPU.X86.IL
           if (xReturnSize > 0) {
             Assembler.Stack.Push(new StackContents.Item(xReturnSize, typeof(Int32)));
           }
-          //throw new NotImplementedException();
         }
     }
 }
