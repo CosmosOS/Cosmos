@@ -13,7 +13,8 @@ namespace Cosmos.VS.Package {
       get { return imageIndex; }
     }
 
-    private VSProject package;
+    // we hold reference, that it is not collected by GC, get still events
+    EnvDTE.BuildEvents buildEvents;
 
     protected override bool SupportsProjectDesigner {
       get { return true; }
@@ -23,7 +24,11 @@ namespace Cosmos.VS.Package {
     public VSProjectNode(VSProject package) {
       LogUtility.LogString("Entering Cosmos.VS.Package.VSProjectNode.ctor(VSProject)");
       try {
-        this.package = package;
+        this.Package = package;
+
+        var dte = (EnvDTE.DTE)((IServiceProvider)this.Package).GetService(typeof(EnvDTE.DTE));
+        buildEvents = dte.Events.BuildEvents;
+        buildEvents.OnBuildProjConfigDone += buildEvents_OnBuildProjConfigDone;
 
         imageIndex = this.ImageHandler.ImageList.Images.Count;
 
@@ -35,6 +40,15 @@ namespace Cosmos.VS.Package {
       } finally {
         LogUtility.LogString("Exiting Cosmos.VS.Package.VSProjectNode.ctor(VSProject)");
       }
+    }
+
+    void buildEvents_OnBuildProjConfigDone(string Project, string ProjectConfig, string Platform, string SolutionConfig, bool Success)
+    {
+        if (false == Success)
+        {
+            var dte = (EnvDTE.DTE)((IServiceProvider)this.Package).GetService(typeof(EnvDTE.DTE));
+            dte.DTE.ExecuteCommand("Build.Cancel");
+        }
     }
 
     public override MSBuildResult Build(uint vsopts, string config, IVsOutputWindowPane output, string target) {
