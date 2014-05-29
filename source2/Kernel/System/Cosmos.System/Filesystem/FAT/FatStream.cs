@@ -57,8 +57,11 @@ namespace Cosmos.System.Filesystem.FAT {
       }
     }
 
-		public override int Read(byte[] aBuffer, Int64 aOffset, Int64 aCount)
-		{
+	public override int Read(byte[] aBuffer, int aOffset, int aCount) {
+		return Read(aBuffer , (Int64)aOffset , (Int64)aCount);
+	}
+	
+	public int Read(byte[] aBuffer, Int64 aOffset, Int64 aCount) {
       if (aCount < 0) {
         throw new ArgumentOutOfRangeException("aCount");
 	  }
@@ -119,7 +122,11 @@ namespace Cosmos.System.Filesystem.FAT {
       throw new NotImplementedException();
     }
 
-    public override void Write(byte[] buffer, int offset, int count) {
+	public override void Write(byte[] aBuffer, int aOffset, int aCount) {
+		Write(aBuffer , (long)aOffset , (long)aCount);
+	}
+
+    public void Write(byte[] buffer, long offset, long count) {
       throw new NotImplementedException();
     }
   }
