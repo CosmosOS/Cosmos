@@ -117,12 +117,17 @@ namespace Cosmos.Sys.FileSystem.FAT32
             CurrentCluster = fs.ReadCluster(CurrentClusterNumber);
         }
 
-        public override int Read(byte[] buffer, int offset, int count)
+        public override int Read(byte[] aBuffer, int aOffset, int aCount)
+		{
+			return Read(aBuffer , (long)aOffset , (long)aCount);
+		}
+		
+        public int Read(byte[] buffer, long offset, long count)
         {
             int read=0;
             while (count > 0)
             {
-                int left = (int)(CurrentClusterEnd - Position);
+                long left = CurrentClusterEnd - Position;
                 if (left > count)
                     left = count;
                 Array.Copy(CurrentCluster, position - CurrentClusterStart,
@@ -157,7 +162,12 @@ namespace Cosmos.Sys.FileSystem.FAT32
             throw new NotImplementedException();
         }
 
-        public override void Write(byte[] buffer, int offset, int count)
+        public override void Write(byte[] aBuffer, int aOffset, int aCount)
+        {
+            Write(aBuffer , (long)aOffset , (long)aCount);
+        }
+
+        public void Write(byte[] buffer, long offset, long count)
         {
             throw new NotImplementedException();
         }
