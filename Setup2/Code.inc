@@ -107,7 +107,6 @@ end;
 
 function VSNET2013: Boolean;
 begin
-  InitializePaths;
   Result := __VSNET2013;
 end;
 
@@ -118,19 +117,16 @@ end;
 
 function VSNET2013_PATH(dummy: string): string;
 begin
-  InitializePaths;
   Result := __VSNET2013_PATH;
 end;
 
 function FRAMEWORK_INSTALL_ROOT(dummy: string): string;
 begin
-  InitializePaths;
   Result := __FRAMEWORK_INSTALL_ROOT;
 end;
 
 function FRAMEWORK64_INSTALL_ROOT(dummy: string): string;
 begin
-  InitializePaths;
   Result := __FRAMEWORK64_INSTALL_ROOT;
 end;
 
@@ -173,26 +169,21 @@ end;
 
 function VSNET2013_BASE_PATH(dummy: string): string;
 begin
-  InitializePaths;
   Result := __VSNET2013_BASE_PATH;
 end;
 
 function VS13_BASE_PATH(dummy: string): string;
 begin
-  InitializePaths;
   Result := __VSNET2013_BASE_PATH;
 end;
 
-
 function Get_SDK_INSTALL_ROOT(dummy: string): string;
 begin
-  InitializePaths;
   Result := __SDK_INSTALL_ROOT;
 end;
 
 function Get_SDK2_INSTALL_ROOT(dummy: string): string;
 begin
-  InitializePaths;
   Result := __SDK2_INSTALL_ROOT;
 end;
 
@@ -225,7 +216,6 @@ end;
 
 function GetCSharpExpress2013ProjectTemplatePath(dummy: string): string;
 begin
-	InitializePaths;
 	Result := __CSharpExpress2013ProjectTemplatePath;
 end;
 
@@ -236,7 +226,6 @@ end;
 
 function GetVBExpress2013ProjectTemplatePath(dummy: string) : string;
 begin
-	InitializePaths;
 	Result := __CSharpExpress2013ProjectTemplatePath;
 end;
 
@@ -246,6 +235,7 @@ begin
     MsgBox(ExpandConstant('Visual Studio 2013 not installed! Please see CodePlex docs for supported editions/versions.'), MbError, MB_OK);
     Result := false;
     exit;
-   end;
+  end;
+  InitializePaths;
   Result := true;
 end;
