@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
@@ -75,7 +72,7 @@ namespace Cosmos.Build.Installer {
         if (xProcess.ExitCode != 0) {
           Log.SetError();
           Log.WriteLine(xProcess.StandardError.ReadToEnd());
-          throw new Exception("Console returned exit code. (" + xProcess.ExitCode + ")");
+          throw new Exception("Console returned exit code. (0x" + xProcess.ExitCode.ToString("X8") + ")");
         }
       }
     }
@@ -96,7 +93,7 @@ namespace Cosmos.Build.Installer {
           xProcess.WaitForExit();
           if (xProcess.ExitCode != 0) {
             Log.SetError();
-            throw new ApplicationException("Application returned exit code 0x" + xProcess.ExitCode.ToString("X8") + ".");
+            throw new ApplicationException("Application returned exit code. (0x" + xProcess.ExitCode.ToString("X8") + ")");
           }
         }
       }
