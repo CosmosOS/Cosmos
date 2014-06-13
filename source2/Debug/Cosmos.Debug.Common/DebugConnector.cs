@@ -354,7 +354,7 @@ namespace Cosmos.Debug.Common
             mCurrentMsgType = aPacket[0];
 
             System.Diagnostics.Debug.WriteLine(String.Format("DC - PacketMsg: {0}", DebugConnectorStream.BytesToString(aPacket, 0, aPacket.Length)));
-            System.Diagnostics.Debug.WriteLine("DC - " + mCurrentMsgType.ToString());
+            System.Diagnostics.Debug.WriteLine("DC - " + mCurrentMsgType);
 
             // Could change to an array, but really not much benefit
             switch (mCurrentMsgType)
