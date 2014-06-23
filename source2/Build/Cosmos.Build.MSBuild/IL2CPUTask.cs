@@ -80,11 +80,6 @@ namespace Cosmos.Build.MSBuild
             if (xShortName.Contains(','))
             {
                 xShortName = xShortName.Substring(0, xShortName.IndexOf(','));
-                // TODO: remove following statement if it proves unnecessary
-                if (xShortName.Contains(','))
-                {
-                    throw new Exception("Algo error");
-                }
             }
             foreach (var xDir in mSearchDirs)
             {
@@ -98,6 +93,12 @@ namespace Cosmos.Build.MSBuild
                 {
                     return Assembly.LoadFrom(xPath);
                 }
+            }
+            // check for path in as requested dll is stored, this makes refrenced dll project working
+            var xPathAsRequested = Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), xShortName + ".dll");
+            if (File.Exists(xPathAsRequested))
+            {
+                return Assembly.LoadFrom(xPathAsRequested);
             }
             if (mStaticLog != null)
             {
