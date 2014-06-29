@@ -27,7 +27,7 @@ namespace Cosmos.Build.Builder {
     protected List<TextBlock> mTailLines = new List<TextBlock>();
     protected string mCosmosDir;
     protected string mSetupPath;
-      //Needs updating with each new release.
+    // Needs updating with each new release.
     protected int mReleaseNo = 106027;
 
     public MainWindow() {
@@ -71,7 +71,7 @@ namespace Cosmos.Build.Builder {
 
     // Install the UAC bypass CosmosTask. This must be performed while the program is running under
     // administrator credentials with elevation.
-     void InstallScheduledTask() {
+    void InstallScheduledTask() {
       ITaskService xService = new TaskScheduler.TaskScheduler();
       xService.Connect();
       ITaskFolder xFolder = xService.GetFolder(@"\");
@@ -94,7 +94,7 @@ namespace Cosmos.Build.Builder {
       xExecAction.Path = mSetupPath;
       xExecAction.Arguments = @"/SILENT";
 
-      // 6 as argument means this task can be created or updated ["CreateOrUpdate" flag]
+      // 6 = task can be created or updated ["CreateOrUpdate" flag]
       // if Name id empty or null, System will create a task with name as GUID
       xTask = xFolder.RegisterTaskDefinition(InstallScheduledTaskName, xTaskDef, 6, null, null, _TASK_LOGON_TYPE.TASK_LOGON_NONE, null);
     }
