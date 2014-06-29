@@ -133,6 +133,14 @@ namespace Cosmos.Debug.VSDebugEngine
                     case Windows2Debugger.ToggleStepMode:
                         ASMSteppingMode = !ASMSteppingMode;
                         break;
+                    
+                    case Windows2Debugger.SetStepModeAssembler:
+                        ASMSteppingMode = true;
+                        break;
+
+                    case Windows2Debugger.SetStepModeSource:
+                        ASMSteppingMode = false;
+                        break;
 
                     case Windows2Debugger.CurrentASMLine:
                         {
@@ -279,6 +287,7 @@ namespace Cosmos.Debug.VSDebugEngine
             mDbgConnector.CmdFrame += new Action<byte[]>(DbgCmdFrame);
             mDbgConnector.CmdStack += new Action<byte[]>(DbgCmdStack);
             mDbgConnector.CmdPong += new Action<byte[]>(DbgCmdPong);
+            
         }
 
         internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)

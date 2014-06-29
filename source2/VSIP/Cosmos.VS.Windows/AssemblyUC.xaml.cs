@@ -65,8 +65,8 @@ namespace Cosmos.VS.Windows
             mitmCopy.Click += new RoutedEventHandler(mitmCopy_Click);
             butnFilter.Click += new RoutedEventHandler(butnFilter_Click);
             butnCopy.Click += new RoutedEventHandler(mitmCopy_Click);
-            //butnStepOver.Click += new RoutedEventHandler(butnStepOver_Click);
-            //butnStepInto.Click += new RoutedEventHandler(butnStepInto_Click);
+            butnStepOver.Click += new RoutedEventHandler(butnStepOver_Click);
+            butnStepInto.Click += new RoutedEventHandler(butnStepInto_Click);
             butnStepMode.Click += new RoutedEventHandler(butnStepMode_Click);
             
             Update(null, mData);
@@ -77,12 +77,15 @@ namespace Cosmos.VS.Windows
             if(butnStepMode.BorderBrush == Brushes.Black)
             {
                 butnStepMode.BorderBrush = Brushes.LightBlue;
+                Global.PipeUp.SendCommand(Windows2Debugger.SetStepModeSource);
+                butnStepMode.Content = "Step mode: Source";
             }
             else
             {
                 butnStepMode.BorderBrush = Brushes.Black;
+                Global.PipeUp.SendCommand(Windows2Debugger.SetStepModeAssembler);
+                butnStepMode.Content = "Step mode: Assembler";
             }
-            Global.PipeUp.SendCommand(Windows2Debugger.ToggleStepMode);
         }
 
         void butnStepInto_Click(object sender, RoutedEventArgs e)
@@ -507,7 +510,7 @@ namespace Cosmos.VS.Windows
                         }
 
                         //If we want to filter this label because it is a debug INT3/NOP but not a permanent INT3
-                        if (mFilterLabels.Contains(xAsmCode.AsmLabel.Label))
+                        if (xAsmCode.AsmLabel != null && mFilterLabels.Contains(xAsmCode.AsmLabel.Label))
                         {
                             if (xAsmCode.LabelMatches(mCurrentLabel))
                             {

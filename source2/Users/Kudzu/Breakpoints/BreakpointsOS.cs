@@ -133,6 +133,12 @@ namespace Kudzu.BreakpointsKernel {
         aData[22] = 0x0F; aData[23] = 0xFF;//Number of sectors per FAT. FAT12/FAT16 only.
         p.WriteBlock(0, 1U, aData);
     }
+
+    /// <summary>
+    /// - Gets the first AtaPio device found
+    /// - Prints info about it (kind, serial/model numbers, firmware version, sizes, etc)
+    /// - Maps Fat32 to all partitions, finds a \Root.txt and a \Kudzu.txt file, and reads its contents
+    /// </summary>
     protected void TestATA()
     {
         #region Comment(OLD)

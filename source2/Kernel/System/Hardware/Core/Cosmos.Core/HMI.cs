@@ -1,4 +1,8 @@
-﻿using System;
+﻿#define OLD_HEAP
+// BE CAREFUL: enabling/disabling the OLD_HEAP define must happen in HMI.cs as well!
+
+#if !OLD_HEAP
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -423,5 +427,33 @@ namespace Cosmos.Core
 
     }
 }
+#else
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Cosmos.IL2CPU.Plugs;
+using Cosmos.Common.Extensions;
 
+namespace Cosmos.Core
+{
+    //Coded by: Forest201
 
+    //Heap Memory Interface
+    //Should be Started after Boot
+    public static class HMI
+    {
+        // dummy implementation
+        public static void GCMonitor()
+        {
+
+        }
+
+        public static void GCFreeAll()
+        {
+
+        }
+    }
+}
+
+#endif

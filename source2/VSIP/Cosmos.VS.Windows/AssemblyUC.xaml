@@ -18,16 +18,16 @@
                 <Image Source="/Cosmos.VS.Windows;component/Images/Copy_Icon_2.jpg" />
             </Button>
             <Rectangle Width="8" />
-            <Button ToolTip="Stepping Mode" Name="butnStepMode" BorderBrush="Black" Margin="1" Width="60" Height="24">
-                <Image Source="/Cosmos.VS.Windows;component/Images/StepMode.png" />
+            <Button ToolTip="Stepping Mode: Source" Name="butnStepMode" BorderBrush="Black" Margin="1" Height="24">
+              Step mode: Source
             </Button>
-            <!--<Button ToolTip="Step Into" Name="butnStepInto" BorderBrush="Black" Margin="1" Width="24" Height="24">
+            <Button ToolTip="Step Into" Name="butnStepInto" BorderBrush="Black" Margin="1" Width="24" Height="24">
                 <Image Source="/Cosmos.VS.Windows;component/Images/StepInto.png" />
             </Button>
             <Rectangle Width="8" />
             <Button ToolTip="Step Over" Name="butnStepOver" BorderBrush="Black" Margin="1" Width="24" Height="24">
                 <Image Source="/Cosmos.VS.Windows;component/Images/StepOver.png" />
-            </Button>-->
+            </Button>
             <Rectangle Width="8" />
         </ToolBar>
         <ScrollViewer Name="ASMScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
