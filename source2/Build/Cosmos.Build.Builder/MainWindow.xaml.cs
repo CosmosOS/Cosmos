@@ -157,11 +157,17 @@ namespace Cosmos.Build.Builder {
 
     public bool Build() {
       if (App.IsUserKit) {
-        string x = Interaction.InputBox("Enter Release Number", "Cosmos Builder");
-        if (string.IsNullOrEmpty(x)) {
-          return false;
-        }
-        mReleaseNo = int.Parse(x);
+        do {
+          string x = Interaction.InputBox("Enter Release Number", "Cosmos Builder");
+          if (string.IsNullOrEmpty(x))
+          {
+            return false;
+          }
+          if (false == int.TryParse(x, out mReleaseNo))
+            MessageBox.Show("Please use only a number!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+          else
+            break;
+        } while (true);
       } else {
         if (App.UseTask) {
           if (!ScheduledTaskIsInstalled()) {
@@ -286,7 +292,7 @@ namespace Cosmos.Build.Builder {
     protected bool mLoaded = false;
     void Window_Loaded(object sender, RoutedEventArgs e) {
       if (!App.HasParams) {
-        MessageBox.Show("Builder not meant to be called directly. Use install.bat instead.");
+        MessageBox.Show("Builder not meant to be called directly. Use install.bat instead.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         Close();
         return;
       }
