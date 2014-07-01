@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TemplateWizard;
 using System.Windows.Forms;
 using System.IO;
 using EnvDTE;
+using System.Runtime.InteropServices;
 
 namespace Cosmos.VS.Package.Templates {
   public class GenerateCosmosProjectWizard : IWizard {
@@ -56,7 +57,16 @@ namespace Cosmos.VS.Package.Templates {
       xFilename = Path.Combine(xFilename, project.Name + "Boot");
       xFilename += ".Cosmos";
       File.WriteAllText(xFilename, xInputString);
-      var xCosmosProject = project.DTE.Solution.AddFromFile(xFilename, false);
+
+      Project xCosmosProject;
+        try
+        {
+            xCosmosProject = project.DTE.Solution.AddFromFile(xFilename, false);
+        }
+        catch(COMException)
+        {
+            return;
+        }
 
       //This throws an error - ProjectIDGuid not found on xCosmosBootProjectObj
       //Also this doesn't seem to do anything... and the reference from Boot proj to Library proj makes it dependant anyway...
