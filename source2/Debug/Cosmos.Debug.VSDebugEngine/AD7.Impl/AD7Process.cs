@@ -15,6 +15,7 @@ using Cosmos.Debug.Common;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.Win32;
+using Label = Cosmos.Debug.Common.Label;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -71,6 +72,21 @@ namespace Cosmos.Debug.VSDebugEngine
         protected void DbgCmdRegisters(byte[] aData)
         {
             mDebugDownPipe.SendCommand(Debugger2Windows.Registers, aData);
+
+            if (aData.Length < 40)
+            {
+                mCurrentAddress = null;
+            }
+            else
+            {
+                UInt32 x32 = (UInt32)
+                    (aData[39] << 24 |
+                     aData[38] << 16 |
+                     aData[37] << 8 |
+                     aData[36]);
+                mCurrentAddress = x32;
+                //SendAssembly(true);
+            }
         }
 
         protected void DbgCmdFrame(byte[] aData)
@@ -792,6 +808,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 if (ASMSteppingMode)
                 {
                     mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
+                    mDbgConnector.SendRegisters();
                 }
                 else
                 {
@@ -974,10 +991,42 @@ namespace Cosmos.Debug.VSDebugEngine
                 // - We use the method header label as a start point and find all asm labels till the method footer label
                 // - We then find all the asm for these labels and display it.
 
-                var xLabels = mDebugInfoDb.GetMethodLabels(xAddress);
+                Label[] xLabels = mDebugInfoDb.GetMethodLabels(xAddress);
+
+                // get the label of our current position, or the closest one before
+                var curPosLabel = xLabels.Where(i => i.Address <= xAddress).OrderByDescending(i => i.Address).FirstOrDefault();
+                // if curPosLabel is null, grab the first one.
+                if (curPosLabel == null)
+                {
+                    curPosLabel = xLabels[0];
+                }
+
+                var curPosIndex = Array.IndexOf(xLabels, curPosLabel);
+                // we want 50 items before and after the current item, so 100 in total.
+                var itemsBefore = 50;
+                var itemsAfter = 50;
+
+                if (curPosIndex < itemsBefore)
+                {
+                    // there are no 50 items before the current one, so adjust
+                    itemsBefore = curPosIndex;
+                }
+                if ((curPosIndex + itemsAfter) >= xLabels.Length)
+                {
+                    // there are no 50 items after the current one, so adjust
+                    itemsAfter = xLabels.Length - curPosIndex;
+                }
+
+                var newArr = new Label[itemsBefore + itemsAfter];
+                for (int i = 0; i < newArr.Length; i++)
+                {
+                    newArr[i] = xLabels[(curPosIndex - itemsBefore) + i];
+                }
+                xLabels = newArr;
+
                 //The ":" has to be added in because labels in asm code have it on the end - it's easier to add it here than
                 //strip them out of the read asm
-                var xLabelNames = xLabels.ToList().ConvertAll<string>(x => x.Name + ":").ToList();
+                var xLabelNames = xLabels.Select(x => x.Name + ":").ToList();
 
                 // Get assembly source
                 var xCode = AsmSource.GetSourceForLabels(Path.ChangeExtension(mISO, ".asm"), xLabelNames);

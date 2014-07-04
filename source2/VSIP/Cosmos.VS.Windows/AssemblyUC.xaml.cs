@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -94,6 +95,7 @@ namespace Cosmos.VS.Windows
             //butnStepOver.IsEnabled = false;
             //butnStepInto.IsEnabled = false;
             Global.PipeUp.SendCommand(Windows2Debugger.AsmStepInto);
+            Display(mFilter);
         }
         void butnStepOver_Click(object sender, RoutedEventArgs e)
         {
@@ -285,7 +287,7 @@ namespace Cosmos.VS.Windows
             }
             //EdMan196: This line of code was worked out by trial and error. 
             //If you change it proper testing/thinking, you will have to add RIP to your name.
-            double offset = mCurrentLineNumber * 15.1;
+            double offset = mCurrentLineNumber * 13.1;
             ASMScrollViewer.ScrollToVerticalOffset(offset);
         }
 
@@ -415,131 +417,206 @@ namespace Cosmos.VS.Windows
             return lineId;
         }
 
+        //protected void Parse()
+        //{
+        //    string xCode = Encoding.UTF8.GetString(mData);
+        //    // Should always be \r\n, but just in case we split by \n and ignore \r
+        //    string[] xLines = xCode.Replace("\r", "").Split('\n');
+
+        //    if (xLines.Length >= 3)
+        //    {
+        //        // First line is not code, but the current label and inserted by caller
+        //        // Second line is input parameters
+        //        mCurrentLabel = xLines[0];
+        //        mParams = xLines[1].Split('|');
+        //        mFilterLabels = xLines[2].Split('|');
+        //        bool xSetNextLabelToCurrent = false;
+
+        //        int nextCodeDistFromCurrent = 0;
+        //        bool foundCurrentLine = false;
+
+        //        AsmLabel xLastAsmAsmLabel = null;
+        //        for (int i = 3; i < xLines.Length; i++)
+        //        {
+        //            string xLine = xLines[i].Trim();
+        //            string xTestLine = xLine.ToUpper();
+        //            var xParts = xLine.Split(' ');
+
+        //            // Skip certain items we never care about. ie remove noise
+        //            if (xLine.Length == 0)
+        //            {
+        //                // Remove all empty lines because we completely reformat output.
+        //                // Parse below also expects some data, not empty string.
+        //                continue;
+        //            }
+
+        //            if (xParts[0].EndsWith(":"))
+        //            { // Label
+        //                string xLabel = xParts[0].Substring(0, xParts[0].Length - 1);
+        //                var xAsmLabel = new AsmLabel(xLabel);
+        //                // See if the label has a comment/tag
+        //                if (xParts.Length > 1)
+        //                {
+        //                    xAsmLabel.Comment = xParts[1].Substring(1).Trim();
+        //                    // If its an ASM tag, store it for future use to attach to next AsmCode
+        //                    if (xAsmLabel.Comment.ToUpper() == "ASM")
+        //                    {
+        //                        xLastAsmAsmLabel = xAsmLabel;
+        //                    }
+        //                }
+        //                mLines.Add(xAsmLabel);
+
+        //            }
+        //            else if (xTestLine.StartsWith(";"))
+        //            { // Comment
+        //                string xComment = xLine.Trim().Substring(1).Trim();
+        //                mLines.Add(new AsmComment(xComment));
+        //            }
+        //            else
+        //            { // Code
+        //                var xAsmCode = new AsmCode(xLine);
+        //                xAsmCode.AsmLabel = xLastAsmAsmLabel;
+        //                xLastAsmAsmLabel = null;
+
+        //                if (xSetNextLabelToCurrent)
+        //                {
+        //                    mCurrentLabel = xAsmCode.AsmLabel.Label;
+        //                    xSetNextLabelToCurrent = false;
+        //                }
+
+        //                //If its Int3 or so, we need to set the current label to the next non debug op.
+        //                //And we don't want to add debug code to our parsed stuff - it shouldn't be displayed.
+        //                if (xAsmCode.IsDebugCode)
+        //                {
+        //                    bool skip = true;
+        //                    if (xAsmCode.LabelMatches(mCurrentLabel))
+        //                    {
+        //                        xSetNextLabelToCurrent = true;
+        //                    }
+        //                    else
+        //                    {
+        //                        //Allow debug NOPs that have not been set to INT3 to be shown
+        //                        if(xAsmCode.Text.Trim().ToUpper().StartsWith("NOP"))
+        //                        {
+        //                            if (!mFilterLabels.Contains(xAsmCode.AsmLabel.Label))
+        //                            {
+        //                                skip = false;
+        //                            }
+        //                        }
+        //                    }
+        //                    if (skip)
+        //                    {
+        //                        //Skip adding Debug Code (INT3s) to parsed list
+        //                        continue;
+        //                    }
+        //                }
+
+        //                //If we want to filter this label because it is a debug INT3/NOP but not a permanent INT3
+        //                if (xAsmCode.AsmLabel != null && mFilterLabels.Contains(xAsmCode.AsmLabel.Label))
+        //                {
+        //                    if (xAsmCode.LabelMatches(mCurrentLabel))
+        //                    {
+        //                        xSetNextLabelToCurrent = true;
+        //                    }
+        //                    //Skip adding Debug Code (INT3s) to parsed list
+        //                    continue;
+        //                }
+
+        //                if (foundCurrentLine)
+        //                {
+        //                    nextCodeDistFromCurrent++;
+        //                }
+
+        //                if (nextCodeDistFromCurrent == 1)
+        //                {
+        //                    Global.PipeUp.SendCommand(Windows2Debugger.NextASMLine1, xAsmCode.Text);
+        //                    Global.PipeUp.SendCommand(Windows2Debugger.NextLabel1, xAsmCode.AsmLabel.Label);
+        //                }
+        //                else if (!foundCurrentLine && xAsmCode.LabelMatches(mCurrentLabel))
+        //                {
+        //                    //Current line of code found
+        //                    Global.PipeUp.SendCommand(Windows2Debugger.CurrentASMLine, xAsmCode.Text);
+        //                    Global.PipeUp.SendCommand(Windows2Debugger.NextASMLine1, new byte[0]);
+        //                    foundCurrentLine = true;
+        //                }
+
+        //                mLines.Add(xAsmCode);
+        //            }
+        //        }
+        //    }
+        //}
+
         protected void Parse()
         {
             string xCode = Encoding.UTF8.GetString(mData);
             // Should always be \r\n, but just in case we split by \n and ignore \r
             string[] xLines = xCode.Replace("\r", "").Split('\n');
 
-            if (xLines.Length >= 3)
+            // First line of packet is not code, but the current label and inserted by caller.
+            mCurrentLabel = xLines[0];
+            bool xSetNextLabelToCurrent = false;
+
+            AsmLabel xLastAsmAsmLabel = null;
+            for (int i = 1; i < xLines.Length; i++)
             {
-                // First line is not code, but the current label and inserted by caller
-                // Second line is input parameters
-                mCurrentLabel = xLines[0];
-                mParams = xLines[1].Split('|');
-                mFilterLabels = xLines[2].Split('|');
-                bool xSetNextLabelToCurrent = false;
+                string xLine = xLines[i].Trim();
+                string xTestLine = xLine.ToUpper();
+                var xParts = xLine.Split(' ');
 
-                int nextCodeDistFromCurrent = 0;
-                bool foundCurrentLine = false;
-
-                AsmLabel xLastAsmAsmLabel = null;
-                for (int i = 3; i < xLines.Length; i++)
+                // Skip certain items we never care about. ie remove noise
+                if (xLine.Length == 0)
                 {
-                    string xLine = xLines[i].Trim();
-                    string xTestLine = xLine.ToUpper();
-                    var xParts = xLine.Split(' ');
+                    // Remove all empty lines because we completely reformat output.
+                    // Parse below also expects some data, not empty string.
+                    continue;
+                }
 
-                    // Skip certain items we never care about. ie remove noise
-                    if (xLine.Length == 0)
+                if (xParts[0].EndsWith(":"))
+                { // Label
+                    string xLabel = xParts[0].Substring(0, xParts[0].Length - 1);
+                    var xAsmLabel = new AsmLabel(xLabel);
+                    // See if the label has a comment/tag
+                    if (xParts.Length > 1)
                     {
-                        // Remove all empty lines because we completely reformat output.
-                        // Parse below also expects some data, not empty string.
+                        xAsmLabel.Comment = xParts[1].Substring(1).Trim();
+                        // If its an ASM tag, store it for future use to attach to next AsmCode
+                        if (xAsmLabel.Comment.ToUpper() == "ASM")
+                        {
+                            xLastAsmAsmLabel = xAsmLabel;
+                        }
+                    }
+                    mLines.Add(xAsmLabel);
+
+                }
+                else if (xTestLine.StartsWith(";"))
+                { // Comment
+                    string xComment = xLine.Trim().Substring(1).Trim();
+                    mLines.Add(new AsmComment(xComment));
+
+                }
+                else
+                { // Code
+                    var xAsmCode = new AsmCode(xLine);
+                    xAsmCode.AsmLabel = xLastAsmAsmLabel;
+                    xLastAsmAsmLabel = null;
+
+                    if (xSetNextLabelToCurrent)
+                    {
+                        mCurrentLabel = xAsmCode.AsmLabel.Label;
+                        xSetNextLabelToCurrent = false;
+                    }
+
+                    // If its Int3 or so, we need to set the current label to the next non debug op.
+                    if (xAsmCode.IsDebugCode)
+                    {
+                        if (xAsmCode.LabelMatches(mCurrentLabel))
+                        {
+                            xSetNextLabelToCurrent = true;
+                        }
                         continue;
                     }
 
-                    if (xParts[0].EndsWith(":"))
-                    { // Label
-                        string xLabel = xParts[0].Substring(0, xParts[0].Length - 1);
-                        var xAsmLabel = new AsmLabel(xLabel);
-                        // See if the label has a comment/tag
-                        if (xParts.Length > 1)
-                        {
-                            xAsmLabel.Comment = xParts[1].Substring(1).Trim();
-                            // If its an ASM tag, store it for future use to attach to next AsmCode
-                            if (xAsmLabel.Comment.ToUpper() == "ASM")
-                            {
-                                xLastAsmAsmLabel = xAsmLabel;
-                            }
-                        }
-                        mLines.Add(xAsmLabel);
-
-                    }
-                    else if (xTestLine.StartsWith(";"))
-                    { // Comment
-                        string xComment = xLine.Trim().Substring(1).Trim();
-                        mLines.Add(new AsmComment(xComment));
-                    }
-                    else
-                    { // Code
-                        var xAsmCode = new AsmCode(xLine);
-                        xAsmCode.AsmLabel = xLastAsmAsmLabel;
-                        xLastAsmAsmLabel = null;
-
-                        if (xSetNextLabelToCurrent)
-                        {
-                            mCurrentLabel = xAsmCode.AsmLabel.Label;
-                            xSetNextLabelToCurrent = false;
-                        }
-
-                        //If its Int3 or so, we need to set the current label to the next non debug op.
-                        //And we don't want to add debug code to our parsed stuff - it shouldn't be displayed.
-                        if (xAsmCode.IsDebugCode)
-                        {
-                            bool skip = true;
-                            if (xAsmCode.LabelMatches(mCurrentLabel))
-                            {
-                                xSetNextLabelToCurrent = true;
-                            }
-                            else
-                            {
-                                //Allow debug NOPs that have not been set to INT3 to be shown
-                                if(xAsmCode.Text.Trim().ToUpper().StartsWith("NOP"))
-                                {
-                                    if (!mFilterLabels.Contains(xAsmCode.AsmLabel.Label))
-                                    {
-                                        skip = false;
-                                    }
-                                }
-                            }
-                            if (skip)
-                            {
-                                //Skip adding Debug Code (INT3s) to parsed list
-                                continue;
-                            }
-                        }
-
-                        //If we want to filter this label because it is a debug INT3/NOP but not a permanent INT3
-                        if (xAsmCode.AsmLabel != null && mFilterLabels.Contains(xAsmCode.AsmLabel.Label))
-                        {
-                            if (xAsmCode.LabelMatches(mCurrentLabel))
-                            {
-                                xSetNextLabelToCurrent = true;
-                            }
-                            //Skip adding Debug Code (INT3s) to parsed list
-                            continue;
-                        }
-
-                        if (foundCurrentLine)
-                        {
-                            nextCodeDistFromCurrent++;
-                        }
-
-                        if (nextCodeDistFromCurrent == 1)
-                        {
-                            Global.PipeUp.SendCommand(Windows2Debugger.NextASMLine1, xAsmCode.Text);
-                            Global.PipeUp.SendCommand(Windows2Debugger.NextLabel1, xAsmCode.AsmLabel.Label);
-                        }
-                        else if (!foundCurrentLine && xAsmCode.LabelMatches(mCurrentLabel))
-                        {
-                            //Current line of code found
-                            Global.PipeUp.SendCommand(Windows2Debugger.CurrentASMLine, xAsmCode.Text);
-                            Global.PipeUp.SendCommand(Windows2Debugger.NextASMLine1, new byte[0]);
-                            foundCurrentLine = true;
-                        }
-
-                        mLines.Add(xAsmCode);
-                    }
+                    mLines.Add(xAsmCode);
                 }
             }
         }

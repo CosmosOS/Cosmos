@@ -7,9 +7,6 @@ del source2\Build\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.*
 
 @for /f "tokens=4-6 delims=.] " %%i in ('ver') do set VERSION=%%i.%%j.%%k
 
-@rem Windows 8.1 detect UAC, no task needed
-@if "%version%" == "6.3.9600" set TASK=-NOTASK
-
 start source2\Build\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe -bat %TASK% %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 @exit

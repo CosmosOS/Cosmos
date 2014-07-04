@@ -74,7 +74,9 @@ namespace Cosmos.Debug.Common {
             while (mPipe.IsConnected && !KillThread) {
               xCmd = ReadByte();
 
-              xSize = ReadByte() << 8;
+              xSize = ReadByte() << 24;
+              xSize = xSize | ReadByte() << 16;
+              xSize = xSize | ReadByte() << 8;
               xSize = xSize | ReadByte();
 
               byte[] xMsg = new byte[xSize];

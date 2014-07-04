@@ -37,6 +37,7 @@ namespace Cosmos.Debug.Common {
         if (mPipe == null) {
           var xPipe = new NamedPipeClientStream(".", mPipeName, PipeDirection.Out);
           try {
+              
             // For now we assume its there or not from the first call.
             // If we don't find the server, we disable it to avoid causing lag.
             // TODO: In future - try this instead:
@@ -53,28 +54,31 @@ namespace Cosmos.Debug.Common {
           mPipe = xPipe;
         }
       }
-      try
-      {
-          mPipe.WriteByte(aCmd);
+        try
+        {
+            mPipe.WriteByte(aCmd);
 
-          byte[] xData = aData;
-          if (xData == null)
-          {
-              xData = new byte[0];
-          }
-          int xLength = Math.Min(xData.Length, 32768);
-          mPipe.WriteByte((byte)(xLength >> 8));
-          mPipe.WriteByte((byte)(xLength & 0xFF));
-          if (xLength > 0)
-          {
-              mPipe.Write(xData, 0, xLength);
-          }
+            byte[] xData = aData;
+            if (xData == null)
+            {
+                xData = new byte[0];
+            }
 
-          mPipe.Flush();
-      }
-      catch
-      {
-      }
+            //int xLength = Math.Min(xData.Length, 32768);
+            int xLength = xData.Length;
+            mPipe.WriteByte((byte) (xLength >> 24));
+            mPipe.WriteByte((byte) (xLength >> 16));
+            mPipe.WriteByte((byte) (xLength >> 8));
+            mPipe.WriteByte((byte) (xLength & 0xFF));
+            if (xLength > 0)
+            {
+                mPipe.Write(xData, 0, xLength);
+            }
+            mPipe.Flush();
+        }
+        catch
+        {
+        }
     }
 
   }

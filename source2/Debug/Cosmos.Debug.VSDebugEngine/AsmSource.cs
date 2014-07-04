@@ -35,10 +35,14 @@ namespace Cosmos.Debug.VSDebugEngine
                         }
                     }
                 }
-
+                var lineCount = 0;
                 // Extract the pertinent lines
                 while (xLine != null)
                 {
+                    if (lineCount > 100)
+                    {
+                        break;
+                    }
                     var xParts = xLine.Trim().Split(' ');
                     if (xParts.Length > 0 && xParts[0].EndsWith(":"))
                     {
@@ -47,11 +51,13 @@ namespace Cosmos.Debug.VSDebugEngine
                         {
                             // ASM label
                             xCode.AppendLine(xLine);
+                            lineCount ++;
                         }
                         else if (aLabels.Contains(xParts[0]))
                         { 
                             // Normal label
                             xCode.AppendLine(xLine);
+                            lineCount ++;
                         }
                         else
                         {
