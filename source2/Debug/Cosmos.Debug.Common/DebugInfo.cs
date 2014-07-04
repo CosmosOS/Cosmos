@@ -143,7 +143,7 @@ namespace Cosmos.Debug.Common
                 foreach (var xFieldName in xItem.FieldNames)
                 {
                     var xRow = new FIELD_MAPPING();
-                    xRow.ID = NewGuid();
+                    xRow.ID = Guid.NewGuid();
                     xRow.TYPE_NAME = xItem.TypeName;
                     xRow.FIELD_NAME = xFieldName;
                     xItemsToAdd.Add(xRow);
@@ -184,11 +184,6 @@ namespace Cosmos.Debug.Common
             aSymbols.Add(xMap);
         }
 
-        private static Guid NewGuid()
-        {
-            return Guid.NewGuid();
-        }
-
         protected List<string> mLocalFieldInfoNames = new List<string>();
         public void WriteFieldInfoToFile(IList<FIELD_INFO> aFields)
         {
@@ -197,7 +192,7 @@ namespace Cosmos.Debug.Common
             {
                 if (!mLocalFieldInfoNames.Contains(xItem.NAME))
                 {
-                    xItem.ID = NewGuid();
+                    xItem.ID = Guid.NewGuid();
                     mLocalFieldInfoNames.Add(xItem.NAME);
                     itemsToAdd.Add(xItem);
                 }
