@@ -55,10 +55,11 @@ namespace Cosmos.Debug.Common
             aCreate = !File.Exists(aPathname);
 
             // Manually register the data provider. Do not remove this otherwise the data provider doesn't register properly.
-            mConnStr = String.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;", aPathname);
+            mConnStr = String.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;BinaryGuid=false", aPathname);
             // Use the SQLiteConnectionFactory as the default database connection
             // Do not open mConnection before mEntities.CreateDatabase
             mConnection = new SQLiteConnection(mConnStr);
+            
             DapperExtensions.DapperExtensions.DefaultMapper = typeof(PluralizedAutoClassMapper<>);
             DapperExtensions.DapperExtensions.SqlDialect = new SqliteDialect();
             if (aCreate)
@@ -470,7 +471,7 @@ namespace Cosmos.Debug.Common
         {
             var xAddress = (long)aAddress;
             var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address <= xAddress).OrderByDescending(i => i.Address)).ToArray();
-
+            
             Label methodHeaderLabel = null;
             //The first label we find searching upwards with "GUID_" at the start will be the very start of the method header
             foreach (var xLabel in xLabels)
@@ -483,22 +484,19 @@ namespace Cosmos.Debug.Common
             }
             return methodHeaderLabel;
         }
-        public Label[] GetMethodLabels(UInt32 aAddress)
+        
+        public Label[] GetMethodLabels(uint address)
         {
-            Label methodHeaderLabel = GetMethodHeaderLabel(aAddress);
-            if (methodHeaderLabel == null)
-            {
-                return null;
-            }
-
-            var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address >= methodHeaderLabel.Address).OrderBy(i => i.Address)).ToArray();
-            List<Label> result = new List<Label>();
-
+            var method = GetMethod(address);
+            var first = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.ID == method.LabelStartID)).Single();
+            var last = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.ID == method.LabelEndID)).Single();
+            var temp = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address >= first.Address && i.Address <= last.Address)).ToArray();
+            var result = new List<Label>(temp.Length);
             //There are always two END__OF__METHOD_EXCEPTION__2 labels at the end of the method footer.
             int endOfMethodException2LabelsFound = 0;
-            foreach (var label in xLabels)
+            foreach (var label in temp)
             {
-                if (label.Name.Contains("END__OF__METHOD_EXCEPTION__2"))
+                if (label.Name.IndexOf("END__OF__METHOD_EXCEPTION__2", StringComparison.Ordinal) > -1)
                 {
                     endOfMethodException2LabelsFound++;
                 }
@@ -511,41 +509,21 @@ namespace Cosmos.Debug.Common
 
             return result.ToArray();
         }
+
         public Method GetMethod(UInt32 aAddress)
         {
-            // The address we have is somewhere in the method, but we need to find 
-            // one that is also in MLSymbol. Asm labels for example wont be found.
-            // So we find all the labels for the method header
-            // Then search through the list for the first IL OP
-
-            var xLabels = GetMethodLabels(aAddress);
-
-            if (xLabels == null)
-            {
-                return null;
-            }
-
-            MethodIlOp xSymbol = null;
-            foreach (var xLabel in xLabels)
-            {
-                xSymbol = mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(i => i.LabelName == xLabel.Name)).FirstOrDefault();
-                if (xSymbol != null)
-                {
-                    break;
-                }
-            }
-
-            if (xSymbol == null)
-            {
-                throw new Exception("Label not found.");
-            }
-            return mConnection.Get<Method>(xSymbol.MethodID);
+            var method = mConnection.Query<Method>(
+                "select Methods.* from methods " +
+                "inner join Labels LStart on LStart.ID = methods.LabelStartID " +
+                "inner join Labels LEnd on LEnd.ID = Methods.LabelEndID " +
+                "where LStart.Address <= @Address and LEnd.Address > @Address;", new { Address = aAddress }).Single();
+            return method;
         }
-
+        
         // Gets MLSymbols for a method, given an address within the method.
         public IEnumerable<MethodIlOp> GetSymbols(Method aMethod)
         {
-            var xSymbols = mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(i => i.MethodID == aMethod.ID).OrderBy(i => i.IlOffset));
+            var xSymbols = mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(i => i.MethodID == aMethod.ID).OrderBy(i => i.IlOffset)).ToArray();
             return xSymbols;
         }
 
