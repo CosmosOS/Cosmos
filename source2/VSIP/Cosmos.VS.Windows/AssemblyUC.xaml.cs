@@ -121,9 +121,11 @@ namespace Cosmos.VS.Windows
         protected Run mSelectedCodeRun = null;
         protected void Display(bool aFilter)
         {
+            Log("Display({0})", aFilter);
             mCode.Clear();
             tblkSource.Inlines.Clear();
             mRunsToLines.Clear();
+            Log("Display - Done clearing");
             if (mData.Length == 0)
             {
                 return;
@@ -141,6 +143,7 @@ namespace Cosmos.VS.Windows
             bool foundMETHOD_Prefix = false;
             bool foundMethodName = false;
             int mCurrentLineNumber = 0;
+            Log("Display - Processing lines");
             foreach (var xLine in mLines)
             {
                 string xDisplayLine = xLine.ToString();
@@ -285,9 +288,10 @@ namespace Cosmos.VS.Windows
 
                 mCode.AppendLine(xDisplayLine);
             }
+            Log("Display - Done processing lines");
             //EdMan196: This line of code was worked out by trial and error. 
-            //If you change it proper testing/thinking, you will have to add RIP to your name.
             double offset = mCurrentLineNumber * 13.1;
+            Log("Display - Scroll to offset");
             ASMScrollViewer.ScrollToVerticalOffset(offset);
         }
 
@@ -621,8 +625,14 @@ namespace Cosmos.VS.Windows
             }
         }
 
+        private static void Log(string message, params object[] args)
+        {
+            //File.AppendAllText(@"c:\data\sources\AssemblyUC.log", DateTime.Now.ToString("HH:mm:ss.ffffff: ") + String.Format(message, args) + Environment.NewLine);
+        }
+
         protected override void DoUpdate(string aTag)
         {
+            Log("DoUpdate");
             mLines.Clear();
             
             System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
@@ -640,14 +650,18 @@ namespace Cosmos.VS.Windows
                             System.IO.File.WriteAllBytes(@"D:\source\Cosmos\source2\VSIP\Cosmos.VS.Windows.Test\SourceTest.bin", mData);
                         }/**/
                     }
+                    Log("DoUpdate - Parse input");
                     Parse();
+                    Log("DoUpdate - Done");
                     if (mParams != null && mParams.Length > 0 && mParams[0] == "NoDisplay")
                     {
                         //Don't call display
                     }
                     else
                     {
+                        Log("DoUpdate - Displaying");
                         Display(mFilter);
+                        Log("DoUpdate - Done");
                     }
 
                     if (mParams != null && mParams.Length > 1) 

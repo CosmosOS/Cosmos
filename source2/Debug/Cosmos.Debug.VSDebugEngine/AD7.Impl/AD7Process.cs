@@ -974,12 +974,14 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public void SendAssembly(bool noDisplay = false)
         {
+            AD7Util.Log("SendAssembly");
             ASMWindow_CurrentLineUpdated.Reset();
             ASMWindow_NextAddress1Updated.Reset();
             ASMWindow_NextLine1Updated.Reset();
 
             UInt32 xAddress = mCurrentAddress.Value;
             var xSourceInfos = mDebugInfoDb.GetSourceInfos(xAddress);
+            AD7Util.Log("SendAssembly - SourceInfos retrieved for address 0x{0}", xAddress.ToString("X8"));
             if (xSourceInfos.Count > 0)
             {
                 //We should be able to display the asesembler source for any address regardless of whether a C#
@@ -990,9 +992,9 @@ namespace Cosmos.Debug.VSDebugEngine
                 // - We take the current address amd find the method it is part of
                 // - We use the method header label as a start point and find all asm labels till the method footer label
                 // - We then find all the asm for these labels and display it.
-
+                
                 Label[] xLabels = mDebugInfoDb.GetMethodLabels(xAddress);
-
+                AD7Util.Log("SendAssembly - MethodLabels retrieved");
                 // get the label of our current position, or the closest one before
                 var curPosLabel = xLabels.Where(i => i.Address <= xAddress).OrderByDescending(i => i.Address).FirstOrDefault();
                 // if curPosLabel is null, grab the first one.
@@ -1003,8 +1005,8 @@ namespace Cosmos.Debug.VSDebugEngine
 
                 var curPosIndex = Array.IndexOf(xLabels, curPosLabel);
                 // we want 50 items before and after the current item, so 100 in total.
-                var itemsBefore = 50;
-                var itemsAfter = 50;
+                var itemsBefore = 10;
+                var itemsAfter = 10;
 
                 if (curPosIndex < itemsBefore)
                 {
@@ -1030,6 +1032,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
                 // Get assembly source
                 var xCode = AsmSource.GetSourceForLabels(Path.ChangeExtension(mISO, ".asm"), xLabelNames);
+                AD7Util.Log("SendAssembly - SourceForLabels retrieved");
 
                 // Get label for current address.
                 // A single address can have multiple labels (IL, Asm). Because of this we search
@@ -1063,8 +1066,9 @@ namespace Cosmos.Debug.VSDebugEngine
                 // Insert current line's label as FIRST(!) line of our data stream
                 xCode.Insert(0, xCurrentLabel + "\r\n");
                 //THINK ABOUT THE ORDER that he above lines occur in and where they insert data into the stream - don't switch it!
+                AD7Util.Log("SendAssembly - Sending through pipe now");
                 mDebugDownPipe.SendCommand(Debugger2Windows.AssemblySource, Encoding.UTF8.GetBytes(xCode.ToString()));
-
+                AD7Util.Log("SendAssembly - Done");
             }
         }
         public void WaitForAssemblyUpdate()

@@ -100,7 +100,7 @@ namespace Cosmos.Build.MSBuild {
                         }
                         catch (Exception ex)
                         {
-                            Log.LogError("Error processing line '" + xLine + "' " + ex.Message);
+                            LogError("Error processing line '" + xLine + "' " + ex.Message);
                             throw;
                         }
 
@@ -156,7 +156,7 @@ namespace Cosmos.Build.MSBuild {
         }
         catch (Exception E)
         {
-            base.Log.LogError("An error occurred: {0}", E.ToString());
+            LogError("An error occurred: {0}", E.ToString());
             return false;
         }
     }

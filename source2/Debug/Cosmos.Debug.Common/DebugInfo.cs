@@ -143,7 +143,7 @@ namespace Cosmos.Debug.Common
                 foreach (var xFieldName in xItem.FieldNames)
                 {
                     var xRow = new FIELD_MAPPING();
-                    xRow.ID = Guid.NewGuid();
+                    xRow.ID = Guid_NewGuid();
                     xRow.TYPE_NAME = xItem.TypeName;
                     xRow.FIELD_NAME = xFieldName;
                     xItemsToAdd.Add(xRow);
@@ -192,7 +192,7 @@ namespace Cosmos.Debug.Common
             {
                 if (!mLocalFieldInfoNames.Contains(xItem.NAME))
                 {
-                    xItem.ID = Guid.NewGuid();
+                    xItem.ID = Guid_NewGuid();
                     mLocalFieldInfoNames.Add(xItem.NAME);
                     itemsToAdd.Add(xItem);
                 }
@@ -293,7 +293,7 @@ namespace Cosmos.Debug.Common
                 {
                     var xRow = new Cosmos.Debug.Common.AssemblyFile()
                     {
-                        ID = Guid.NewGuid(),
+                        ID = Guid_NewGuid(),
                         Pathname = xAsm.Location
                     };
                     xAssemblies.Add(xRow);
@@ -316,7 +316,7 @@ namespace Cosmos.Debug.Common
                 {
                     var xRow = new Document()
                     {
-                        ID = Guid.NewGuid(),
+                        ID = Guid_NewGuid(),
                         Pathname = aPathname
                     };
                     DocumentGUIDs.Add(aPathname, xRow.ID);
@@ -337,7 +337,7 @@ namespace Cosmos.Debug.Common
         {
             foreach (var x in aSymbols)
             {
-                x.ID = Guid.NewGuid();
+                x.ID = Guid_NewGuid();
             }
             BulkInsert("MethodIlOps", aSymbols, 2500, aFlush);
         }
@@ -346,7 +346,7 @@ namespace Cosmos.Debug.Common
         {
             foreach (var x in aInfos)
             {
-                x.ID = Guid.NewGuid();
+                x.ID = Guid_NewGuid();
             }
             BulkInsert("LOCAL_ARGUMENT_INFOS", aInfos, aFlush: true);
         }
@@ -516,7 +516,7 @@ namespace Cosmos.Debug.Common
         }
         
         // Gets MLSymbols for a method, given an address within the method.
-        public IEnumerable<MethodIlOp> GetSymbols(Method aMethod)
+        public MethodIlOp[] GetSymbols(Method aMethod)
         {
             var xSymbols = mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(i => i.MethodID == aMethod.ID).OrderBy(i => i.IlOffset)).ToArray();
             return xSymbols;
@@ -543,28 +543,43 @@ namespace Cosmos.Debug.Common
                     var xCodeEndLines = new int[xSeqCount];
                     var xCodeEndColumns = new int[xSeqCount];
                     xMethodSymbol.GetSequencePoints(xCodeOffsets, xCodeDocuments, xCodeLines, xCodeColumns, xCodeEndLines, xCodeEndColumns);
-
-                    foreach (var xSymbol in xSymbols)
+                    if (xSymbols.Length == 0 && xSeqCount > 0)
                     {
-                        var xRow = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == xSymbol.LabelName)).FirstOrDefault();
-                        if (xRow != null)
+                        var xSourceInfo = new SourceInfo()
                         {
-                            UInt32 xAddress = (UInt32)xRow.Address;
-                            // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
-                            // So we just ignore duplicate addresses.
-                            if (!xResult.ContainsKey(xAddress))
+                            SourceFile = xCodeDocuments[0].URL,
+                            Line = xCodeLines[0],
+                            LineEnd = xCodeEndLines[0],
+                            Column = xCodeColumns[0],
+                            ColumnEnd = xCodeEndColumns[0],
+                            MethodName = xMethod.LabelCall
+                        };
+                        xResult.Add(aAddress, xSourceInfo);
+                    }
+                    else
+                    {
+                        foreach (var xSymbol in xSymbols)
+                        {
+                            var xRow = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == xSymbol.LabelName)).FirstOrDefault();
+                            if (xRow != null)
                             {
-                                int xIdx = SourceInfo.GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.IlOffset);
-                                var xSourceInfo = new SourceInfo()
+                                UInt32 xAddress = (UInt32) xRow.Address;
+                                // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
+                                // So we just ignore duplicate addresses.
+                                if (!xResult.ContainsKey(xAddress))
                                 {
-                                    SourceFile = xCodeDocuments[xIdx].URL,
-                                    Line = xCodeLines[xIdx],
-                                    LineEnd = xCodeEndLines[xIdx],
-                                    Column = xCodeColumns[xIdx],
-                                    ColumnEnd = xCodeEndColumns[xIdx],
-                                    MethodName = xMethod.LabelCall
-                                };
-                                xResult.Add(xAddress, xSourceInfo);
+                                    int xIdx = SourceInfo.GetIndexClosestSmallerMatch(xCodeOffsets, xSymbol.IlOffset);
+                                    var xSourceInfo = new SourceInfo()
+                                    {
+                                        SourceFile = xCodeDocuments[xIdx].URL,
+                                        Line = xCodeLines[xIdx],
+                                        LineEnd = xCodeEndLines[xIdx],
+                                        Column = xCodeColumns[xIdx],
+                                        ColumnEnd = xCodeEndColumns[xIdx],
+                                        MethodName = xMethod.LabelCall
+                                    };
+                                    xResult.Add(xAddress, xSourceInfo);
+                                }
                             }
                         }
                     }
@@ -625,6 +640,29 @@ namespace Cosmos.Debug.Common
             }
 
             return address;
+        }
+
+        public static UInt64 mLastGuid = 0;
+        private static Guid Guid_NewGuid()
+        {
+            // Old code: 
+            //return Guid.NewGuid();
+            // Do NOT use Guid.NewGuid(). During compilation we're generating
+            // about 60 milion guids. Guid.NewGuid slows down compilation significantly (about half the time!)
+
+            mLastGuid++;
+            var bytes = new byte[16];
+            bytes[0] = (byte)(mLastGuid >> 56);
+            bytes[1] = (byte)(mLastGuid >> 48);
+            bytes[2] = (byte)(mLastGuid >> 40);
+            bytes[3] = (byte)(mLastGuid >> 32);
+            bytes[4] = (byte)(mLastGuid >> 24);
+            bytes[5] = (byte)(mLastGuid >> 16);
+            bytes[6] = (byte)(mLastGuid >> 8);
+            bytes[7] = (byte)(mLastGuid);
+
+            var r = new Guid(bytes);
+            return r;
         }
     }
 

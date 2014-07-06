@@ -115,10 +115,10 @@ namespace Cosmos.Build.MSBuild
 				if (xProcess.ExitCode != 0) {
 					if (!xProcess.HasExited) {
 						xProcess.Kill();
-						Log.LogError("{0} timed out.", name);
+						LogError("{0} timed out.", name);
 					}
 					else {
-						Log.LogError("Error occurred while invoking {0}.", name);
+						LogError("Error occurred while invoking {0}.", name);
 					}
 				}
 				LogInfo logContent;
@@ -172,9 +172,34 @@ namespace Cosmos.Build.MSBuild
 					break;
                 case WriteType.Error:
 				default:
-					Log.LogError(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message, logInfo.messageArgs);;
-					break;
+			        if (UseConsoleForLog)
+			        {
+			            LogError(logInfo.message, logInfo.messageArgs);
+			        }
+			        else
+			        {
+			            Log.LogError(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message, logInfo.messageArgs);
+			        }
+			        break;
 			}
 		}
+
+        protected void LogError(string message, params object[] args)
+        {
+            if (UseConsoleForLog)
+            {
+                if (message == null)
+                {
+                    return;
+                }
+                Console.WriteLine("Error: " + String.Format(message, args));
+            }
+            else
+            {
+                Log.LogError(message, args);
+            }
+        }
+
+        public bool UseConsoleForLog { get; set; }
 	}
 }

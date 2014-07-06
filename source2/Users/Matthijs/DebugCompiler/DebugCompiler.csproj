@@ -50,6 +50,7 @@
       <HintPath>..\..\..\..\Resources\Dependencies\Dapper\DapperExtensions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
     <Reference Include="SQLinq, Version=3.0.1.0, Culture=neutral, PublicKeyToken=1c5d57eb9e11fe4b, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Resources\Dependencies\Dapper\SQLinq.dll</HintPath>
@@ -71,8 +72,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Program.ExtractMap.cs" />
     <Compile Include="Program.TestCompiler.cs" />
+    <Compile Include="Program.TestGetSourceInfos.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
