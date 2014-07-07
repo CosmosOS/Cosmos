@@ -176,3 +176,29 @@ function SendStackCorruptionOccurred {
     ESI = @.CallerEIP
     ComWrite32()
 }
+
+// Input: Stack
+// Output: None
+// Modifies: EAX, ECX, EDX, ESI
+function SendMessageBox {
+	// Write the type
+    AL = #Ds2Vs_MessageBox
+    ComWriteAL()
+
+    // Write Length
+    ESI = EBP
+    ESI + 12
+    ECX = ESI[0]
+    ComWrite16()
+
+    // Address of string
+    ESI = EBP[8]
+WriteChar:
+    if ECX = 0 return
+    ComWrite8()
+    ECX--
+    // We are storing as 16 bits, but for now I will transmit 8 bits
+    // So we inc again to skip the 0
+    ESI++
+    goto WriteChar
+}

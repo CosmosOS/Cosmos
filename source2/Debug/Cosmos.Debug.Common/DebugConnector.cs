@@ -20,6 +20,7 @@ namespace Cosmos.Debug.Common
         public Action<UInt32> CmdBreak;
         public Action<byte[]> CmdMethodContext;
         public Action<string> CmdText;
+        public Action<string> CmdMessageBox;
         public Action CmdStarted;
         public Action<string> OnDebugMsg;
         public Action<byte[]> CmdRegisters;
@@ -375,6 +376,11 @@ namespace Cosmos.Debug.Common
                     Next(2, PacketTextSize);
                     break;
 
+                case Ds2Vs.MessageBox:
+                    DoDebugMsg("DC Recv: MessageBox");
+                    Next(2, PacketMessageBoxTextSize);
+                    break;
+
                 case Ds2Vs.Started:
                     DoDebugMsg("DC Recv: Started");
                     // Call WaitForMessage first, else it blocks because Ds2Vs.Started triggers
@@ -497,6 +503,11 @@ namespace Cosmos.Debug.Common
             Next(GetUInt16(aPacket, 0), PacketText);
         }
 
+        protected void PacketMessageBoxTextSize(byte[] aPacket)
+        {
+            Next(GetUInt16(aPacket, 0), PacketMessageBoxText);
+        }
+
         protected void PacketMethodContext(byte[] aPacket)
         {
             MethodContextDatas.Add(aPacket.ToArray());
@@ -587,6 +598,12 @@ namespace Cosmos.Debug.Common
         {
             WaitForMessage();
             CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
+        }
+
+        protected void PacketMessageBoxText(byte[] aPacket)
+        {
+            WaitForMessage();
+            CmdMessageBox(ASCIIEncoding.ASCII.GetString(aPacket));
         }
     }
 }

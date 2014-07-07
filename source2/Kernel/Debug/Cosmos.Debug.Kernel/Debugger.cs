@@ -27,6 +27,23 @@ namespace Cosmos.Debug.Kernel {
             }
         }
 
+        public unsafe void SendMessageBox(int aLength, char* aText) { } // Plugged
+        public unsafe void SendMessageBox(string aText)
+        {
+            // TODO: Need to fix this so it can send empty strings.
+            // Sending empty strings locks it up right now
+            if (aText.Length == 0)
+            {
+                return;
+            }
+
+            var xChars = aText.ToCharArray();
+            fixed (char* xPtr = &xChars[0])
+            {
+                SendMessageBox(xChars.Length, xPtr);
+            }
+        }
+
         // TODO: Kudzu repacement methods for Cosmos.Hardware.DebugUtil
         public unsafe void SendMessage(string aModule, string aData) {
             //string xSingleString;

@@ -151,3 +151,23 @@ Call DebugStub_ComWrite32
 DebugStub_SendStackCorruptionOccurred_Exit:
 Ret
 
+DebugStub_SendMessageBox:
+Mov AL, DebugStub_Const_Ds2Vs_MessageBox
+Call DebugStub_ComWriteAL
+
+Mov ESI, EBP
+Add ESI, 12
+Mov ECX, [ESI + 0]
+Call DebugStub_ComWrite16
+
+Mov ESI, [EBP + 8]
+DebugStub_SendMessageBox_WriteChar:
+Cmp ECX, 0
+JE DebugStub_SendMessageBox_Exit
+Call DebugStub_ComWrite8
+Dec ECX
+Inc ESI
+Jmp DebugStub_SendMessageBox_WriteChar
+DebugStub_SendMessageBox_Exit:
+Ret
+

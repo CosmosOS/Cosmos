@@ -56,3 +56,4 @@ const Ds2Vs_Stack = 12
 const Ds2Vs_Pong = 13
 const Ds2Vs_BreakPointAsm = 14
 const Ds2Vs_StackCorruptionOccurred = 15
+const Ds2Vs_MessageBox = 16

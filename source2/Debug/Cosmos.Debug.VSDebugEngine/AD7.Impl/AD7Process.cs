@@ -304,11 +304,17 @@ namespace Cosmos.Debug.VSDebugEngine
             mDbgConnector.CmdStack += new Action<byte[]>(DbgCmdStack);
             mDbgConnector.CmdPong += new Action<byte[]>(DbgCmdPong);
             mDbgConnector.CmdStackCorruptionOccurred += DbgCmdStackCorruptionOccurred;
+            mDbgConnector.CmdMessageBox += DbgCmdMessageBox;
         }
 
         private void DbgCmdStackCorruptionOccurred(uint lastEIPAddress)
         {
             MessageBox.Show(String.Format("Stack corruption occurred at address 0x{0:X8}! Halting now.", lastEIPAddress));
+        }
+
+        private void DbgCmdMessageBox(string message)
+        {
+            MessageBox.Show("Message from your Cosmos operating system:\r\n\r\n" + message);
         }
 
         internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)

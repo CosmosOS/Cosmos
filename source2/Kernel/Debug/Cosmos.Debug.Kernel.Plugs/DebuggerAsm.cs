@@ -13,6 +13,9 @@ namespace Cosmos.Debug.Kernel.Plugs {
     [PlugMethod(Assembler = typeof(DebugSend))]
     public static unsafe void Send(Kernel.Debugger aThis, int aLength, char* aText) { }
 
+    [PlugMethod(Assembler = typeof(DebugSendMessageBox))]
+    public static unsafe void SendMessageBox(Kernel.Debugger aThis, int aLength, char* aText) { }
+
     [PlugMethod(Assembler = typeof(DebugSendPtr))]
     public static unsafe void SendPtr(Kernel.Debugger aThis, object aPtr) { }
 
@@ -62,6 +65,18 @@ namespace Cosmos.Debug.Kernel.Plugs {
       aAssembler.Add(new LiteralAssemblerCode("popad"));
       aAssembler.Add(new LiteralAssemblerCode("%endif"));
     }
+  }
+
+  public class DebugSendMessageBox : AssemblerMethod
+  {
+      public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+      {
+          aAssembler.Add(new LiteralAssemblerCode("%ifdef DEBUGSTUB"));
+          aAssembler.Add(new LiteralAssemblerCode("pushad"));
+          aAssembler.Add(new LiteralAssemblerCode("Call DebugStub_SendMessageBox"));
+          aAssembler.Add(new LiteralAssemblerCode("popad"));
+          aAssembler.Add(new LiteralAssemblerCode("%endif"));
+      }
   }
 
   public class DebugSendPtr : AssemblerMethod {
