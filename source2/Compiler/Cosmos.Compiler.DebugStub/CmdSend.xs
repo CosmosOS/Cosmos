@@ -163,3 +163,16 @@ function SendPtr {
     ESI = EBP[8]
     ComWrite32()
 }
+
+// Input: Stack
+// Output: None
+// Modifies: EAX, ECX, EDX, ESI
+function SendStackCorruptionOccurred {
+    // Write the type
+    AL = #Ds2Vs_StackCorruptionOccurred
+    ComWriteAL()
+
+    // pointer value
+    ESI = @.CallerEIP
+    ComWrite32()
+}

@@ -56,7 +56,8 @@ namespace Cosmos.Assembler.x86 {
         ST4,
         ST5,
         ST6,
-        ST7
+        ST7,
+        EIP,
     }
     public static class Registers {
         public const RegistersEnum EAX = RegistersEnum.EAX;
@@ -195,6 +196,8 @@ namespace Cosmos.Assembler.x86 {
             mRegToName.Add(ST5, "ST5");
             mRegToName.Add(ST6, "ST6");
             mRegToName.Add(ST7, "ST7");
+            mRegToName.Add(RegistersEnum.EIP, "EIP");
+            mNameToReg.Add("EIP", RegistersEnum.EIP);
             mNameToReg.Add("EAX", EAX);
             mNameToReg.Add("AX", AX);
             mNameToReg.Add("AH", AH);
@@ -382,7 +385,8 @@ namespace Cosmos.Assembler.x86 {
 
         public static bool Is32Bit(RegistersEnum aRegister)
         {
-            return aRegister == EAX || aRegister == EBX || aRegister == ECX || aRegister == EDX || aRegister == ESP || aRegister == EBP || aRegister == ESI || aRegister == EDI || aRegister == CR0 || aRegister == CR1 || aRegister == CR2 || aRegister == CR3 || aRegister == CR4;
+            return aRegister == EAX || aRegister == EBX || aRegister == ECX || aRegister == EDX || aRegister == ESP || aRegister == EBP || aRegister == ESI || aRegister == EDI || aRegister == CR0 || aRegister == CR1 || aRegister == CR2 || aRegister == CR3 || aRegister == CR4
+                || aRegister == RegistersEnum.EIP;
         }
 
         public static bool Is16Bit(RegistersEnum aRegister)

@@ -29,6 +29,7 @@ namespace Cosmos.Debug.Common {
     public const byte Stack = 12;
     public const byte Pong = 13;
     public const byte BreakPointAsm = 14;
+      public const byte StackCorruptionOccurred = 15;
   }
 
   // Messages from Host (VS) to Guest (Cosmos)

@@ -330,6 +330,21 @@ namespace Cosmos.IL2CPU
                     }
                 }
             }
+            //if (DebugMode == )
+            {
+                // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value. 
+                // if not, we should somehow break here.
+                new Compare {SourceReg = RegistersEnum.EBP, DestinationReg = RegistersEnum.ESP};
+                new ConditionalJump {Condition = ConditionalTestEnum.Equal, DestinationLabel = ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException + "__2"};
+                new ClrInterruptFlag();
+                // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+                new Call {DestinationLabel = ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException + "__Break_on_location"};
+                new Assembler.Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException + "__Break_on_location");
+                new Pop {DestinationReg = RegistersEnum.EAX};
+                new Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX};
+                new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
+                new Halt();
+            }
             new Cosmos.Assembler.Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException + "__2");
             new Pop { DestinationReg = Registers.EBP };
             var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);

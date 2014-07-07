@@ -26,6 +26,7 @@ namespace Cosmos.Debug.Common
         public Action<byte[]> CmdFrame;
         public Action<byte[]> CmdStack;
         public Action<byte[]> CmdPong;
+        public Action<UInt32> CmdStackCorruptionOccurred;
 
         protected byte mCurrentMsgType;
         protected AutoResetEvent mCmdWait = new AutoResetEvent(false);
@@ -436,6 +437,11 @@ namespace Cosmos.Debug.Common
                     Next(0, PacketPong);
                     break;
 
+                case Ds2Vs.StackCorruptionOccurred:
+                    DoDebugMsg("DC Recv: StackCorruptionOccurred");
+                    Next(4, PacketStackCorruptionOccurred);
+                    break;
+
                 default:
                     // Exceptions crash VS so use MsgBox instead
                     DoDebugMsg("Unknown debug command: " + mCurrentMsgType);
@@ -526,6 +532,15 @@ namespace Cosmos.Debug.Common
             if (CmdPong != null)
             {
                 CmdPong(aPacket.ToArray());
+            }
+            WaitForMessage();
+        }
+
+        protected void PacketStackCorruptionOccurred(byte[] aPacket)
+        {
+            if (CmdStackCorruptionOccurred != null)
+            {
+                CmdStackCorruptionOccurred(GetUInt32(aPacket, 0));
             }
             WaitForMessage();
         }
