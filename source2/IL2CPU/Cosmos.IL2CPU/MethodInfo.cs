@@ -18,6 +18,7 @@ namespace Cosmos.IL2CPU
         public readonly bool IsInlineAssembler = false;
         public readonly bool DebugStubOff;
         public MethodInfo PluggedMethod;
+        public uint LocalVariablesSize;
 
         public MethodInfo(MethodBase aMethodBase, UInt32 aUID, TypeEnum aType, MethodInfo aPlugMethod, Type aMethodAssembler) : this(aMethodBase, aUID, aType, aPlugMethod, false)
         {

@@ -5,8 +5,13 @@ using System.Text;
 using System.IO;
 
 namespace Cosmos.Assembler.x86 {
-  public abstract class JumpBase : InstructionWithDestination {
-    public string DestinationLabel {
+  public abstract class JumpBase : InstructionWithDestination
+  {
+      public JumpBase(string mnemonic =null) : base(mnemonic)
+      {
+      }
+
+      public string DestinationLabel {
       get {
         if (DestinationRef != null) {
           return DestinationRef.Name;

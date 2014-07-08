@@ -5,6 +5,17 @@ using System.Text;
 
 namespace Cosmos.Assembler.x86 {
     public abstract class InstructionWithDestinationAndSource : InstructionWithDestination, IInstructionWithSource {
+
+        public InstructionWithDestinationAndSource()
+        {
+            
+        }
+
+        public InstructionWithDestinationAndSource(string mnemonic):base(mnemonic)
+        {
+
+        }
+
         public Cosmos.Assembler.ElementReference SourceRef {
             get;
             set;

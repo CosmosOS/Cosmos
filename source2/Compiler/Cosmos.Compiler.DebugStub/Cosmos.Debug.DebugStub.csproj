@@ -118,6 +118,10 @@
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>TracerEntry.asm</LastGenOutput>
     </None>
+    <None Include="Utilities.xs">
+      <Generator>CosmosXSharpGenerator</Generator>
+      <LastGenOutput>Utilities.asm</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="AsmBreak.asm">
@@ -169,6 +173,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>TracerEntry.xs</DependentUpon>
+    </Content>
+    <Content Include="Utilities.asm">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Utilities.xs</DependentUpon>
     </Content>
   </ItemGroup>
   <ItemGroup />

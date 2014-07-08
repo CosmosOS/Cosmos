@@ -8,6 +8,16 @@ namespace Cosmos.Assembler.x86 {
         // todo: do all instructions with two operands have a size?
         //todo should validate Instructions or use a constructor and no set properties. 
         protected byte mSize;
+
+        public InstructionWithDestinationAndSourceAndSize()
+        {
+            
+        }
+
+        public InstructionWithDestinationAndSourceAndSize(string mnemonic):base(mnemonic)
+        {
+
+        }
         
         //Size in bits
         public byte Size

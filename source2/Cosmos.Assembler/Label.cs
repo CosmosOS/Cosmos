@@ -1,17 +1,27 @@
 ﻿namespace Cosmos.Assembler {
   public class Label : Instruction {
-    public string Comment { get; set; }
+      public string Comment
+      {
+          get
+          {
+              return mComment;
+          }
+      }
 
-    public Label(string aName)
-      : this(aName, string.Empty) {
+      private readonly string mComment;
+
+      public Label(string aName, bool isGlobal = false)
+      : this(aName, string.Empty)
+    {
+        mIsGlobal = isGlobal;
     }
 
     public Label(string aName, string aComment) {
       mName = aName;
       if (aName.StartsWith(".")) {
-        QualifiedName = LastFullLabel + aName;
+        mQualifiedName = LastFullLabel + aName;
       } else {
-        QualifiedName = aName;
+        mQualifiedName = aName;
         // Some older code passes the whole label in the argument, so we check for any . in it.
         // That assumes that the main prefix can never have a . in it.
         // This code isnt perfect and doenst label X# code properly, but we don't care about
@@ -21,7 +31,7 @@
           LastFullLabel = aName;
         }
       }
-      Comment = aComment;
+      mComment = aComment;
     }
 
     public static string GetLabel(object aObject) {
@@ -35,31 +45,45 @@
     public static string LastFullLabel { get; set; }
 
     public string QualifiedName {
-      get;
-      private set;
+        get
+        {
+            return mQualifiedName;
+        }
     }
+
+      private readonly string mQualifiedName;
 
     public bool IsGlobal {
-      get;
-      set;
+        get
+        {
+            return mIsGlobal;
+        }
     }
 
-    private string mName;
+      private readonly bool mIsGlobal;
+
+    private readonly string mName;
     public string Name {
       get { return mName; }
     }
 
-    public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput) {
-      if (IsGlobal) {
-        aOutput.WriteLine("global " + QualifiedName);
+      public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
+      {
+          if (IsGlobal)
+          {
+              aOutput.Write("global ");
+              aOutput.WriteLine(QualifiedName);
+          }
+          aOutput.Write(QualifiedName);
+          aOutput.Write(":");
+          if (Comment.Length > 0)
+          {
+              aOutput.Write(" ; ");
+              aOutput.Write(Comment);
+          }
       }
-      aOutput.Write(QualifiedName + ":");
-      if (Comment.Length > 0) {
-        aOutput.Write(" ;" + Comment);
-      }
-    }
 
-    public override bool IsComplete(Assembler aAssembler) {
+      public override bool IsComplete(Assembler aAssembler) {
       return true;
     }
 

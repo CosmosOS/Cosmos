@@ -402,7 +402,7 @@ namespace Cosmos.Assembler {
       }
 
       // This is our first entry point. Multiboot uses this as Cosmos entry point.
-      new Label("Kernel_Start") { IsGlobal = true };
+      new Label("Kernel_Start", isGlobal: true);
 
       // Displays "Cosmos" in top left. Used to make sure Cosmos is booted in case of hang.
       // ie bootloader debugging. This must be the FIRST code, even before setup so we know

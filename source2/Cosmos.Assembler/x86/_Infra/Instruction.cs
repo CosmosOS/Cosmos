@@ -35,8 +35,8 @@ namespace Cosmos.Assembler.x86 {
       IndirectRegOffset = 4
     }
 
-    protected Instruction() {  }
-    protected Instruction(bool aAddToAssembler) {  }
+    protected Instruction(string mnemonic = null) {  }
+    protected Instruction(bool aAddToAssembler, string mnemonic = null):base(aAddToAssembler, mnemonic) {  }
 
     protected static string SizeToString(byte aSize) {
       switch (aSize) {

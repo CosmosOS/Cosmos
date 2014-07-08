@@ -16,8 +16,6 @@ namespace Kudzu.BreakpointsKernel {
 
     protected override void Run() {
       Test xTest;
-        var ourDbg = new Debugger("", "");
-        ourDbg.SendMessageBox("Hello, World!");
 
       var xATA = new Cosmos.Hardware.BlockDevice.AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1
         , Cosmos.Hardware.BlockDevice.Ata.ControllerIdEnum.Primary

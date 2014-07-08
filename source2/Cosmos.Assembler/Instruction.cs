@@ -23,18 +23,23 @@ namespace Cosmos.Assembler {
       aOutput.Write(mMnemonic);
     }
 
-    protected Instruction() : this(true) {
+    protected Instruction(string mnemonic = null) : this(true) {
     }
 
-    protected Instruction(bool aAddToAssembler) {
+    protected Instruction(bool aAddToAssembler, string mnemonic=null) {
       if (aAddToAssembler) {
         Cosmos.Assembler.Assembler.CurrentInstance.Add(this);
       }
-      var xAttribs = GetType().GetCustomAttributes(typeof(OpCodeAttribute), false);
-      if (xAttribs != null && xAttribs.Length > 0) {
-        var xAttrib = (OpCodeAttribute)xAttribs[0];
-        mMnemonic = xAttrib.Mnemonic;
-      }
+        mMnemonic = mnemonic;
+        if (mMnemonic == null)
+        {
+            var xAttribs = GetType().GetCustomAttributes(typeof (OpCodeAttribute), false);
+            if (xAttribs != null && xAttribs.Length > 0)
+            {
+                var xAttrib = (OpCodeAttribute) xAttribs[0];
+                mMnemonic = xAttrib.Mnemonic;
+            }
+        }
     }
 
     public override ulong? ActualAddress {

@@ -5,6 +5,10 @@ using System.Text;
 
 namespace Cosmos.Assembler.x86 {
     public abstract class InstructionWithDestinationAndSize : InstructionWithDestination, IInstructionWithSize {
+        public InstructionWithDestinationAndSize(string mnemonic = null) : base(mnemonic)
+        {
+        }
+
         private byte mSize;
         public byte Size {
             get {

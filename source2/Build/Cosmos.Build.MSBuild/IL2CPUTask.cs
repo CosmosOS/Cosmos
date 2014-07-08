@@ -239,11 +239,30 @@ namespace Cosmos.Build.MSBuild
                             xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
                             xScanner.Execute(xInitMethod);
 
-                            using (var xOut = new StreamWriter(OutputFilename, false))
+                            using (var xOut = new StreamWriter(OutputFilename, false, Encoding.ASCII , 128*1024))
                             {
                                 //if (EmitDebugSymbols) {
                                 xAsm.Assembler.FlushText(xOut);
                                 xAsm.FinalizeDebugInfo();
+                                //// for now: write debug info to console
+                                //Console.WriteLine("Wrote {0} instructions and {1} datamembers", xAsm.Assembler.Instructions.Count, xAsm.Assembler.DataMembers.Count);
+                                //var dict = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+                                //foreach (var instr in xAsm.Assembler.Instructions)
+                                //{
+                                //    var mn = instr.Mnemonic ?? "";
+                                //    if (dict.ContainsKey(mn))
+                                //    {
+                                //        dict[mn] = dict[mn] + 1;
+                                //    }
+                                //    else
+                                //    {
+                                //        dict[mn] = 1;
+                                //    }
+                                //}
+                                //foreach (var entry in dict)
+                                //{
+                                //    Console.WriteLine("{0}|{1}", entry.Key, entry.Value);
+                                //}
                             }
                         }
                         // If you want to uncomment this line make sure to enable PERSISTANCE_PROFILING symbol in

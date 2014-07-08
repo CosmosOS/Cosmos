@@ -65,48 +65,53 @@ namespace Cosmos.System.Filesystem.FAT {
       if (aCount < 0) {
         throw new ArgumentOutOfRangeException("aCount");
 	  }
-	  else if (aOffset < 0) {
-		throw new ArgumentOutOfRangeException("aOffset");
+	  if (aOffset < 0) {
+		  throw new ArgumentOutOfRangeException("aOffset");
 	  }
-	  else if(aBuffer == null || aBuffer.Length - aOffset < aCount) {
+	  if(aBuffer == null || aBuffer.Length - aOffset < aCount) {
         throw new ArgumentException("Invalid offset length!");
-      } else if (mFile.FirstClusterNum == 0) {
+      } 
+    if (mFile.FirstClusterNum == 0) {
         // FirstSector can be 0 for 0 length files
         return 0;
-      } else if (mPosition == mFile.Size) {
+      } 
+    if (mPosition == mFile.Size) {
         // EOF
         return 0;
       }
 
-	  // reduce count, so that no out of bound exception occurs if not existing
-	  // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
-	  ulong xMaxReadableBytes = mFile.Size - mPosition;
-	  ulong xCount = (ulong)aCount;
+      // reduce count, so that no out of bound exception occurs if not existing
+      // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
+      ulong xMaxReadableBytes = mFile.Size - mPosition;
+      ulong xCount = (ulong)aCount;
 	  if (xCount > xMaxReadableBytes)
-		  xCount = xMaxReadableBytes;
+	  {
+	    xCount = xMaxReadableBytes;
+	  }
 
-      var xCluster = mFS.NewClusterArray();
+	  var xCluster = mFS.NewClusterArray();
       UInt32 xClusterSize = mFS.BytesPerCluster;
 
       while (xCount > 0) {
         UInt64 xClusterIdx = mPosition / xClusterSize;
         UInt64 xPosInCluster = mPosition % xClusterSize;
         mFS.ReadCluster((ulong)mFatTable[(int)xClusterIdx], xCluster);
-        long xReadSize;
-        if (xPosInCluster + xCount > xClusterSize) {
-		  xReadSize = (long)(xClusterSize - xPosInCluster - 1);
-        } else {
-          xReadSize = (long)xCount;
-        }
-		// no need for a long version, because internal Array.Copy() does a cast down to int, and a range check,
-		// or we do a semantic change here
-		Array.Copy(xCluster, (long)xPosInCluster, aBuffer, aOffset, xReadSize);
+      //  long xReadSize;
+      //  if (xPosInCluster + xCount > xClusterSize) {
+      //    xReadSize = (long)(xClusterSize - xPosInCluster - 1);
+      //  } else {
+      //    xReadSize = (long)xCount;
+      //  }
+      //  // no need for a long version, because internal Array.Copy() does a cast down to int, and a range check,
+      //  // or we do a semantic change here
+      //  Array.Copy(xCluster, (long)xPosInCluster, aBuffer, aOffset, xReadSize);
 
-        aOffset += xReadSize;
-        xCount -= (ulong)xReadSize;
+      //  aOffset += xReadSize;
+        //xCount -= (ulong)xReadSize;
+        xCount = 0;
       }
 
-	  mPosition += (ulong)aOffset;
+      mPosition += (ulong)aOffset;
       return (int)aOffset;
 	}
 
