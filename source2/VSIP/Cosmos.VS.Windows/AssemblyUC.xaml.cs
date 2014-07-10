@@ -122,6 +122,7 @@ namespace Cosmos.VS.Windows
         protected void Display(bool aFilter)
         {
             Log("Display({0})", aFilter);
+            Log("Current Label '{0}'", mCurrentLabel);
             mCode.Clear();
             tblkSource.Inlines.Clear();
             mRunsToLines.Clear();
@@ -240,7 +241,7 @@ namespace Cosmos.VS.Windows
                     gutterRect.Fill = Brushes.LightGray;
                     mGutterRectsToCode.Add(gutterRect, xAsmCode);
                     mGutterRectsToRun.Add(gutterRect, xRun);
-
+                    Log("Current AsmCodeLabel: '{0}'", xAsmCode.AsmLabel);
                     if (xAsmCode.LabelMatches(mCurrentLabel))
                     {
                         xRun.Foreground = Brushes.WhiteSmoke;
@@ -552,6 +553,7 @@ namespace Cosmos.VS.Windows
 
         protected void Parse()
         {
+            Log("Start parsing {0} bytes", mData.Length);
             string xCode = Encoding.UTF8.GetString(mData);
             // Should always be \r\n, but just in case we split by \n and ignore \r
             string[] xLines = xCode.Replace("\r", "").Split('\n');
@@ -564,6 +566,7 @@ namespace Cosmos.VS.Windows
             for (int i = 1; i < xLines.Length; i++)
             {
                 string xLine = xLines[i].Trim();
+                Log("Parsing line '{0}'", xLine);
                 string xTestLine = xLine.ToUpper();
                 var xParts = xLine.Split(' ');
 
@@ -627,6 +630,7 @@ namespace Cosmos.VS.Windows
 
         private static void Log(string message, params object[] args)
         {
+            // this method doesn't do anything normally, but keep it for debugging
             //File.AppendAllText(@"c:\data\sources\AssemblyUC.log", DateTime.Now.ToString("HH:mm:ss.ffffff: ") + String.Format(message, args) + Environment.NewLine);
         }
 

@@ -153,15 +153,16 @@ namespace Cosmos.Assembler {
     }
 
     public void Add(Instruction aReader) {
-      if (aReader is Label || aReader is Comment) {
-      }
-      else if (EmitAsmLabels)
-      {
-          // Only issue label if its executable code.
-          new Label("." + AsmIlIdx.ToString("X2"), "Asm");
-          mAsmIlIdx++;
-      }
-      mInstructions.Add(aReader);
+        if (aReader is Label || aReader is Comment)
+        {
+        }
+        else if (EmitAsmLabels)
+        {
+            // Only issue label if its executable code.
+            new Label("." + AsmIlIdx.ToString("X2"), "Asm");
+            mAsmIlIdx++;
+        }
+        mInstructions.Add(aReader);
     }
 
     public void Add(params Instruction[] aReaders) {

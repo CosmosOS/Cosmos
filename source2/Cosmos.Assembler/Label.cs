@@ -78,17 +78,13 @@
           aOutput.Write(":");
           if (Comment.Length > 0)
           {
-              aOutput.Write(" ; ");
+              aOutput.Write(" ;");
               aOutput.Write(Comment);
           }
       }
 
       public override bool IsComplete(Assembler aAssembler) {
       return true;
-    }
-
-    public override void UpdateAddress(Cosmos.Assembler.Assembler aAssembler, ref ulong aAddress) {
-      base.UpdateAddress(aAssembler, ref aAddress);
     }
 
     public override void WriteData(Cosmos.Assembler.Assembler aAssembler, System.IO.Stream aOutput) { }

@@ -14,7 +14,7 @@ namespace Cosmos.Debug.VSDebugEngine
             var xCode = new StringBuilder();
 
             // Find line in ASM that starts the code block.
-            using (var xSR = new StreamReader(aAsmFile))
+            using (var xSR = new StreamReader(aAsmFile, Encoding.ASCII))
             {
                 string xLine;
                 while (true)
