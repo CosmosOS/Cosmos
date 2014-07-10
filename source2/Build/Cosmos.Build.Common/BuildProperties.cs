@@ -118,6 +118,12 @@ namespace Cosmos.Build.Common {
       get { return GetProperty(DebugEnabledString, true); }
       set { SetProperty(DebugEnabledString, value); }
     }
+    public const string StackCorruptionDetectionEnabledString = "StackCorruptionDetectionEnabled";
+    public bool StackCorruptionDetectionEnabled
+    {
+      get { return GetProperty(StackCorruptionDetectionEnabledString, true); }
+      set { SetProperty(StackCorruptionDetectionEnabledString, value); }
+    }
     public const string DebugModeString = "DebugMode";
     public DebugMode DebugMode {
       get { return GetProperty(DebugModeString, DebugMode.Source); }

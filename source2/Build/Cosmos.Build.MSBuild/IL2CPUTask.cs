@@ -175,6 +175,7 @@ namespace Cosmos.Build.MSBuild
         }
 
         public bool DebugEnabled = false;
+        public bool StackCorruptionDetectionEnabled = false;
         protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.Source;
         protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
 
@@ -213,6 +214,7 @@ namespace Cosmos.Build.MSBuild
                     {
                         xAsm.DebugInfo = xDebugInfo;
                         xAsm.DebugEnabled = DebugEnabled;
+                        xAsm.StackCorruptionDetection = StackCorruptionDetectionEnabled;
                         xAsm.DebugMode = mDebugMode;
                         xAsm.TraceAssemblies = mTraceAssemblies;
                         xAsm.IgnoreDebugStubAttribute = IgnoreDebugStubAttribute;

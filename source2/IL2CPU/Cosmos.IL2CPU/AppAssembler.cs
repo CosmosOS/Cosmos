@@ -338,7 +338,9 @@ namespace Cosmos.IL2CPU
             {
                 // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value. 
                 // if not, we should somehow break here.
-                new Compare {SourceReg = RegistersEnum.EBP, DestinationReg = RegistersEnum.ESP};
+              new Mov {DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP};
+              new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
+                new Compare {SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX};
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabelExc + "__2" };
                 new ClrInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
@@ -1183,54 +1185,54 @@ namespace Cosmos.IL2CPU
                 DebugInfo.AddINT3Labels(mINT3Labels);
             }
 
-            if (DebugEnabled && StackCorruptionDetection)
-            {
-                // if debugstub is active, emit a stack corruption detection. at this point, the difference between EBP and ESP
-                // should be equal to the local variables sizes and the IL stack. 
-                // if not, we should break here.
+            //if (DebugEnabled && StackCorruptionDetection)
+            //{
+            //    // if debugstub is active, emit a stack corruption detection. at this point, the difference between EBP and ESP
+            //    // should be equal to the local variables sizes and the IL stack. 
+            //    // if not, we should break here.
 
-                // first, calculate the expected difference
-                var expectedDifference = aMethod.LocalVariablesSize;
-                foreach (var item in Assembler.Stack)
-                {
-                    expectedDifference += item.Size;
-                }
+            //    // first, calculate the expected difference
+            //    var expectedDifference = aMethod.LocalVariablesSize;
+            //    foreach (var item in Assembler.Stack)
+            //    {
+            //        expectedDifference += item.Size;
+            //    }
 
-                //new Comment("Expected difference = " + expectedDifference);
-                ////new Call {DestinationLabel = "DebugStub_CheckStack"};
-                //// now we have the expected difference, subtract EBP from ESP and see if the result equals the expectedDifference, if not, break.
-                //new Mov { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBP };
-                //new Sub { DestinationReg = Registers.EAX, SourceReg = Registers.ESP };
-                //new Compare { DestinationReg = RegistersEnum.EAX, SourceValue = expectedDifference };
-                //new ConditionalJump { DestinationLabel = xLabel + ".AfterStackCorruptionCheck", Condition = ConditionalTestEnum.Equal };
-                //new ClrInterruptFlag();
-                //// don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-                //new Call { DestinationLabel = xLabel + ".Break_on_location" };
-                //new Assembler.Label(xLabel + ".Break_on_location");
-                //new Pop { DestinationReg = RegistersEnum.EAX };
-                //new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
-                //new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
-                //new Halt();
-                //new Assembler.Label(xLabel + ".AfterStackCorruptionCheck");
+            //    //new Comment("Expected difference = " + expectedDifference);
+            //    ////new Call {DestinationLabel = "DebugStub_CheckStack"};
+            //    //// now we have the expected difference, subtract EBP from ESP and see if the result equals the expectedDifference, if not, break.
+            //    //new Mov { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBP };
+            //    //new Sub { DestinationReg = Registers.EAX, SourceReg = Registers.ESP };
+            //    //new Compare { DestinationReg = RegistersEnum.EAX, SourceValue = expectedDifference };
+            //    //new ConditionalJump { DestinationLabel = xLabel + ".AfterStackCorruptionCheck", Condition = ConditionalTestEnum.Equal };
+            //    //new ClrInterruptFlag();
+            //    //// don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+            //    //new Call { DestinationLabel = xLabel + ".Break_on_location" };
+            //    //new Assembler.Label(xLabel + ".Break_on_location");
+            //    //new Pop { DestinationReg = RegistersEnum.EAX };
+            //    //new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
+            //    //new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
+            //    //new Halt();
+            //    //new Assembler.Label(xLabel + ".AfterStackCorruptionCheck");
 
-                // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value. 
-                // if not, we should somehow break here.
-                new Mov {DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP};
-                new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
-                new Add {DestinationReg = Registers.EAX, SourceValue = expectedDifference};
-                new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
-                new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".After_Break_on_location" };
-                new ClrInterruptFlag();
-                // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-                new Call { DestinationLabel = xLabel + ".Break_on_location" };
-                new Assembler.Label(xLabel + ".Break_on_location");
-                new Pop { DestinationReg = RegistersEnum.EAX };
-                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
-                new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
-                new Halt();
-                new Assembler.Label(xLabel + ".After_Break_on_location");
+            //    // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value. 
+            //    // if not, we should somehow break here.
+            //    new Mov {DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP};
+            //    new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
+            //    new Add {DestinationReg = Registers.EAX, SourceValue = expectedDifference};
+            //    new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
+            //    new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".After_Break_on_location" };
+            //    new ClrInterruptFlag();
+            //    // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+            //    new Call { DestinationLabel = xLabel + ".Break_on_location" };
+            //    new Assembler.Label(xLabel + ".Break_on_location");
+            //    new Pop { DestinationReg = RegistersEnum.EAX };
+            //    new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
+            //    new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
+            //    new Halt();
+            //    new Assembler.Label(xLabel + ".After_Break_on_location");
                 
-            }
+            //}
         }
 
         protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, bool emitInt3NotNop, out bool INT3Emitted, out bool INT3PlaceholderEmitted)

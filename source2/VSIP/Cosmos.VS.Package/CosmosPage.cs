@@ -138,6 +138,7 @@ namespace Cosmos.VS.Package {
       } else if (mProps.Profile == "VMware") {
         mShowTabVMware = true;
         chckEnableDebugStub.Checked = true;
+        chkEnableStackCorruptionDetection.Checked = true;
         cmboCosmosDebugPort.Enabled = false;
         cmboVisualStudioDebugPort.Enabled = false;
         cmboVisualStudioDebugPort.SelectedIndex = mVMwareAndBochsDebugPipe;
@@ -148,6 +149,7 @@ namespace Cosmos.VS.Package {
       } else if (mProps.Profile == "Bochs") {
           mShowTabBochs = true;
           chckEnableDebugStub.Checked = true;
+          chkEnableStackCorruptionDetection.Checked = true;
           cmboCosmosDebugPort.Enabled = false;
           cmboVisualStudioDebugPort.Enabled = false;
           cmboVisualStudioDebugPort.SelectedIndex = mVMwareAndBochsDebugPipe;
@@ -179,6 +181,7 @@ namespace Cosmos.VS.Package {
       lboxLaunch.SelectedItem = EnumValue.Find(lboxLaunch.Items, mProps.Launch);
       cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);
       chckEnableDebugStub.Checked = mProps.DebugEnabled;
+      chkEnableStackCorruptionDetection.Checked = mProps.StackCorruptionDetectionEnabled;
       panlDebugSettings.Enabled = mProps.DebugEnabled;
       cmboCosmosDebugPort.SelectedIndex = cmboCosmosDebugPort.Items.IndexOf(mProps.CosmosDebugPort);
       cmboVisualStudioDebugPort.SelectedIndex = cmboVisualStudioDebugPort.Items.IndexOf(mProps.VisualStudioDebugPort);
@@ -628,5 +631,10 @@ namespace Cosmos.VS.Package {
       }
     }
 
+    private void chkEnableStacckCorruptionDetection_CheckedChanged(object sender, EventArgs e)
+    {
+      IsDirty = true;
+      mProps.StackCorruptionDetectionEnabled = chkEnableStackCorruptionDetection.Checked;
+    }
   }
 }

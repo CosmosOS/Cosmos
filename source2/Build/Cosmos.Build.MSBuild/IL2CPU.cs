@@ -30,6 +30,12 @@ namespace Cosmos.Build.MSBuild {
       set;
     }
 
+    public bool StackCorruptionDetectionEnabled
+    {
+      get; 
+      set;
+    }
+
     public string TraceAssemblies {
       get;
       set;
@@ -103,6 +109,7 @@ namespace Cosmos.Build.MSBuild {
         mTask.OnLogException = LogException;
 
         mTask.DebugEnabled = DebugEnabled;
+        mTask.StackCorruptionDetectionEnabled = StackCorruptionDetectionEnabled;
         mTask.DebugMode = DebugMode;
         mTask.TraceAssemblies = TraceAssemblies;
         mTask.DebugCom = DebugCom;

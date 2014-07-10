@@ -30,6 +30,7 @@
 
     <IL2CPU  DebugMode="$(DebugMode)"
              DebugEnabled="$(DebugEnabled)"
+             StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)"
              TraceAssemblies="$(TraceAssemblies)"
              IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)"
              DebugCom="1"

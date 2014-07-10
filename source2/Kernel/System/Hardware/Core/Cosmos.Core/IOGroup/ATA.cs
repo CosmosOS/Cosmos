@@ -23,9 +23,12 @@ namespace Cosmos.Core.IOGroup {
     public readonly IOPortWrite Control;
     //* DEVADDRESS: BAR1 + 2; // I don't know what is the benefit from this register
 
-    internal ATA(bool aSecondary) {
-      UInt16 xBAR0 = (UInt16)(aSecondary ? 0x0170 : 0x01F0);
-      UInt16 xBAR1 = (UInt16)(aSecondary ? 0x0374 : 0x03F4);
+    internal ATA(bool aSecondary)
+    {
+      Console.WriteLine("Creating ATA IOGroup");
+
+      var xBAR0 = GetBAR0(aSecondary);
+      var xBAR1 = GetBAR1(aSecondary);
       Data = new IOPort(xBAR0);
       SectorCount = new IOPortWrite(xBAR0, 2);
       LBA0 = new IOPort(xBAR0, 3);
@@ -35,6 +38,18 @@ namespace Cosmos.Core.IOGroup {
       Status = new IOPortRead(xBAR0, 7);
       DeviceSelect = new IOPortWrite(xBAR0, 6);
       Control = new IOPortWrite(xBAR1, 2);
+    }
+
+    private static ushort GetBAR1(bool aSecondary)
+    {
+      UInt16 xBAR1 = (UInt16) (aSecondary ? 0x0374 : 0x03F4);
+      return xBAR1;
+    }
+
+    private static ushort GetBAR0(bool aSecondary)
+    {
+      UInt16 xBAR0 = (UInt16) (aSecondary ? 0x0170 : 0x01F0);
+      return xBAR0;
     }
   }
 }

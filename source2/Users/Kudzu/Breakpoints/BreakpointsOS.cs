@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Playground.Kudzu.BreakpointsKernel.FAT;
+using Playground.Kudzu.BreakpointsKernel.FAT.Listing;
 using Sys = Cosmos.System;
 using Cosmos.Debug.Kernel;
 using Cosmos.Common.Extensions;
 using Cosmos.Hardware.BlockDevice;
-using FAT = Cosmos.System.Filesystem.FAT;
 
 namespace Kudzu.BreakpointsKernel {
   public class BreakpointsOS : Sys.Kernel {
@@ -14,7 +15,8 @@ namespace Kudzu.BreakpointsKernel {
       ClearScreen = false;
     }
 
-    protected override void Run() {
+    protected override void Run()
+    {
       Test xTest;
 
       var xATA = new Cosmos.Hardware.BlockDevice.AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1
@@ -286,16 +288,16 @@ namespace Kudzu.BreakpointsKernel {
             //Partition Detecting
             Partition xPartition = null;
             if (BlockDevice.Devices.Count > 0)
-            {                
+            {
                 for (int i = 0; i < BlockDevice.Devices.Count; i++)
                 {
                     var xDevice = BlockDevice.Devices[i];
                     if (xDevice is Partition)
-                    {                                          
+                    {
                         xPartition = (Partition)xDevice;
 
                         Console.WriteLine("FAT FS");
-                        var xFS = new FAT.FatFileSystem(xPartition);
+                        var xFS = new MyFatFileSystem(xPartition);
 
                         Console.WriteLine("Mapping...");
                         Sys.Filesystem.FileSystem.AddMapping("C", xFS);
@@ -305,8 +307,8 @@ namespace Kudzu.BreakpointsKernel {
                         Console.WriteLine("Root directory");
 
                         var xListing = xFS.GetRoot();
-                        FAT.Listing.FatFile xRootFile = null;
-                        FAT.Listing.FatFile xKudzuFile = null;
+                        MyFatFile xRootFile = null;
+                        MyFatFile xKudzuFile = null;
 
 
                         for (int j = 0; j < xListing.Count; j++)
@@ -323,20 +325,20 @@ namespace Kudzu.BreakpointsKernel {
                                 Console.WriteLine("<FILE> " + xListing[j].Name + " (" + xListing[j].Size + ")");
                                 if (xListing[j].Name == "Root.txt")
                                 {
-                                    xRootFile = (FAT.Listing.FatFile)xListing[j];
+                                    xRootFile = (MyFatFile)xListing[j];
                                 }
                                 else if (xListing[j].Name == "Kudzu.txt")
                                 {
-                                    xKudzuFile = (FAT.Listing.FatFile)xListing[j];
+                                    xKudzuFile = (MyFatFile)xListing[j];
                                 }
-                            }   
+                            }
                         }
 
                         try
                         {
                             Console.WriteLine();
                             Console.WriteLine("StreamReader - Root File");
-                            var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
+                            var xStream = new MyFatStream(xRootFile);
                             var xData = new byte[xRootFile.Size];
                             xStream.Read(xData, 0, (int)xRootFile.Size);
                             var xText = Encoding.ASCII.GetString(xData);
@@ -346,13 +348,13 @@ namespace Kudzu.BreakpointsKernel {
                         {
                             Console.WriteLine("Error: " + e.Message);
                         }
-                        
-                        var xKudzuStream = new Sys.Filesystem.FAT.FatStream(xKudzuFile);
+
+                        var xKudzuStream = new MyFatStream(xKudzuFile);
                         var xKudzuData = new byte[xKudzuFile.Size];
                         xKudzuStream.Read(xKudzuData, 0, (int)xKudzuFile.Size);
 
                         var xFile = new System.IO.FileStream(@"c:\Root.txt", System.IO.FileMode.Open);
-                                        
+
                     }
                 }
             }

@@ -31,6 +31,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BreakpointsOS.cs" />
+    <Compile Include="FAT\FatFileSystem.cs" />
+    <Compile Include="FAT\FatStream.cs" />
+    <Compile Include="FAT\Listing\FatDirectory.cs" />
+    <Compile Include="FAT\Listing\FatFile.cs" />
     <Compile Include="FieldInitTest.cs" />
     <Compile Include="Int64Test.cs" />
     <Compile Include="NullableTest.cs" />
@@ -60,9 +64,6 @@
       <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
       <Name>Cosmos.Hardware</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

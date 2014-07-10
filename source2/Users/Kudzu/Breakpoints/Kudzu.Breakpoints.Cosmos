@@ -126,6 +126,8 @@
     <VMware_ShowLaunchConsole>False</VMware_ShowLaunchConsole>
     <ISO_ShowLaunchConsole>False</ISO_ShowLaunchConsole>
     <ISO_VisualStudioDebugPort>Pipe: Cosmos\Serial</ISO_VisualStudioDebugPort>
+    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>
@@ -233,6 +235,8 @@
     <ISO_VisualStudioDebugPort>Pipe: Cosmos\Serial</ISO_VisualStudioDebugPort>
     <ISO_TraceAssemblies>All</ISO_TraceAssemblies>
     <USB_TraceAssemblies>All</USB_TraceAssemblies>
+    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Compile last with NASM.bat">
