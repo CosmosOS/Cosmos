@@ -9,9 +9,20 @@ using Cosmos.Debug.Kernel;
 using Cosmos.Common.Extensions;
 using Cosmos.Hardware.BlockDevice;
 
-namespace Kudzu.BreakpointsKernel {
-  public class BreakpointsOS : Sys.Kernel {
-    public BreakpointsOS() {
+using TheFatStream = Playground.Kudzu.BreakpointsKernel.FAT.MyFatStream;
+using TheFatFile = Playground.Kudzu.BreakpointsKernel.FAT.Listing.MyFatFile;
+using TheFatFileSystem = Playground.Kudzu.BreakpointsKernel.FAT.MyFatFileSystem;
+
+//using TheFatStream = Cosmos.System.Filesystem.FAT.FatStream;
+//using TheFatFile = Cosmos.System.Filesystem.FAT.Listing.FatFile;
+//using TheFatFileSystem = Cosmos.System.Filesystem.FAT.FatFileSystem;
+
+namespace Kudzu.BreakpointsKernel
+{
+  public class BreakpointsOS : Sys.Kernel
+  {
+    public BreakpointsOS()
+    {
       ClearScreen = false;
     }
 
@@ -53,11 +64,13 @@ namespace Kudzu.BreakpointsKernel {
       Stop();
     }
 
-    protected override void BeforeRun() {
+    protected override void BeforeRun()
+    {
       Console.WriteLine("Cosmos boot complete. KudzuPlayground");
     }
 
-    protected void TestSB() {
+    protected void TestSB()
+    {
       if (String.Empty == null)
       {
         Console.WriteLine("String.Empty is not even assigned!");
@@ -76,37 +89,45 @@ namespace Kudzu.BreakpointsKernel {
       Console.WriteLine(xDisplay);
     }
 
-    void Trace1() {
+    private void Trace1()
+    {
       int x = 4;
       Trace2();
       int y = 5;
       int z = 6;
     }
 
-    void Trace2() {
+    private void Trace2()
+    {
       int x2 = 4;
       Trace3();
       int y2 = 5;
       int z2 = 6;
     }
 
-    void Trace3() {
+    private void Trace3()
+    {
       int x3 = 4;
       int y3 = 5;
       int z3 = 6;
     }
 
-    void TestCompare() {
+    private void TestCompare()
+    {
       UInt32 x = UInt32.MaxValue;
       int y = 0;
-      if (y >= x) {
+      if (y >= x)
+      {
         Console.WriteLine("Compare failed.");
-      } else {
+      }
+      else
+      {
         Console.WriteLine("Compare OK.");
       }
     }
 
-    void TestStringCtor() {
+    private void TestStringCtor()
+    {
       char[] xChars = new char[5];
       xChars[0] = 'A';
       xChars[1] = 'B';
@@ -120,20 +141,26 @@ namespace Kudzu.BreakpointsKernel {
 
     public void Format(Partition p)
     {
-        byte[] aData = p.NewBlockArray(1);
-        p.ReadBlock(0, 1U, aData);
+      byte[] aData = p.NewBlockArray(1);
+      p.ReadBlock(0, 1U, aData);
 
-        aData[510] = 0xAA; aData[511] = 0x55;
+      aData[510] = 0xAA;
+      aData[511] = 0x55;
 
-        //The number of Bytes per sector (remember, all numbers are in the little-endian format).
-        aData[11] = 0x01; aData[12] = 0xCA;
-        aData[13] = 0x08; //Number of sectors per cluster.
-        aData[14] = 0x01; aData[15] = 0xFF;//Number of reserved sectors. The boot record sectors are included in this value
-        aData[16] = 0x02;//Number of File Allocation Tables (FAT's) on the storage media. Often this value is 2.
-        aData[17] = 0x00; aData[18] = 0x0f;//Number of directory entries (must be set so that the root directory occupies entire sectors).
-        aData[19] = 0xFF; aData[20] = 0xFF;//The total sectors in the logical volume. If this value is 0, it means there are more than 65535 sectors in the volume, and the actual count is stored in "Large Sectors (bytes 32-35).
-        aData[22] = 0x0F; aData[23] = 0xFF;//Number of sectors per FAT. FAT12/FAT16 only.
-        p.WriteBlock(0, 1U, aData);
+      //The number of Bytes per sector (remember, all numbers are in the little-endian format).
+      aData[11] = 0x01;
+      aData[12] = 0xCA;
+      aData[13] = 0x08; //Number of sectors per cluster.
+      aData[14] = 0x01;
+      aData[15] = 0xFF; //Number of reserved sectors. The boot record sectors are included in this value
+      aData[16] = 0x02; //Number of File Allocation Tables (FAT's) on the storage media. Often this value is 2.
+      aData[17] = 0x00;
+      aData[18] = 0x0f; //Number of directory entries (must be set so that the root directory occupies entire sectors).
+      aData[19] = 0xFF;
+      aData[20] = 0xFF; //The total sectors in the logical volume. If this value is 0, it means there are more than 65535 sectors in the volume, and the actual count is stored in "Large Sectors (bytes 32-35).
+      aData[22] = 0x0F;
+      aData[23] = 0xFF; //Number of sectors per FAT. FAT12/FAT16 only.
+      p.WriteBlock(0, 1U, aData);
     }
 
     /// <summary>
@@ -143,8 +170,9 @@ namespace Kudzu.BreakpointsKernel {
     /// </summary>
     protected void TestATA()
     {
-        #region Comment(OLD)
-        /*
+      #region Comment(OLD)
+
+      /*
       try
       {
         Console.WriteLine();
@@ -259,129 +287,132 @@ namespace Kudzu.BreakpointsKernel {
         Console.WriteLine("Exception: " + e.Message);
         Stop();
       }*/
-        #endregion
-        try
+
+      #endregion
+
+      try
+      {
+
+        Console.WriteLine();
+        Console.WriteLine("Block devices found: " + BlockDevice.Devices.Count);
+
+        AtaPio xATA = null;
+        for (int i = 0; i < BlockDevice.Devices.Count; i++)
         {
-
-            Console.WriteLine();
-            Console.WriteLine("Block devices found: " + BlockDevice.Devices.Count);
-
-            AtaPio xATA = null;
-            for (int i = 0; i < BlockDevice.Devices.Count; i++)
-            {
-                var xDevice = BlockDevice.Devices[i];
-                if (xDevice is AtaPio)
-                {
-                    xATA = (AtaPio)xDevice;
-                }
-            }
-
-            //Info
-            Console.WriteLine("--------------------------");
-            Console.WriteLine("Type: " + (xATA.DriveType == AtaPio.SpecLevel.ATA ? "ATA" : "ATAPI"));
-            Console.WriteLine("Serial No: " + xATA.SerialNo);
-            Console.WriteLine("Firmware Rev: " + xATA.FirmwareRev);
-            Console.WriteLine("Model No: " + xATA.ModelNo);
-            Console.WriteLine("Block Size: " + xATA.BlockSize + " bytes");
-            Console.WriteLine("Size: " + xATA.BlockCount * xATA.BlockSize / 1024 / 1024 + " MB");
-
-            //Partition Detecting
-            Partition xPartition = null;
-            if (BlockDevice.Devices.Count > 0)
-            {
-                for (int i = 0; i < BlockDevice.Devices.Count; i++)
-                {
-                    var xDevice = BlockDevice.Devices[i];
-                    if (xDevice is Partition)
-                    {
-                        xPartition = (Partition)xDevice;
-
-                        Console.WriteLine("FAT FS");
-                        var xFS = new MyFatFileSystem(xPartition);
-
-                        Console.WriteLine("Mapping...");
-                        Sys.Filesystem.FileSystem.AddMapping("C", xFS);
-
-
-                        Console.WriteLine();
-                        Console.WriteLine("Root directory");
-
-                        var xListing = xFS.GetRoot();
-                        MyFatFile xRootFile = null;
-                        MyFatFile xKudzuFile = null;
-
-
-                        for (int j = 0; j < xListing.Count; j++)
-                        {
-                            var xItem = xListing[j];
-                            if (xItem is Sys.Filesystem.Listing.Directory)
-                            {
-                                //Detecting Dir in HDD
-                                Console.WriteLine("<DIR> " + xListing[j].Name);
-                            }
-                            else if (xItem is Sys.Filesystem.Listing.File)
-                            {
-                                //Detecting File in HDD
-                                Console.WriteLine("<FILE> " + xListing[j].Name + " (" + xListing[j].Size + ")");
-                                if (xListing[j].Name == "Root.txt")
-                                {
-                                    xRootFile = (MyFatFile)xListing[j];
-                                  Console.WriteLine("Root file found");
-                                }
-                                else if (xListing[j].Name == "Kudzu.txt")
-                                {
-                                    xKudzuFile = (MyFatFile)xListing[j];
-                                  Console.WriteLine("Kudzu file found");
-                                }
-                            }
-                        }
-
-                        try
-                        {
-                            Console.WriteLine();
-                            Console.WriteLine("StreamReader - Root File");
-                          if (xRootFile == null)
-                          {
-                            Console.WriteLine("RootFile not found!");
-                          }
-                            var xStream = new MyFatStream(xRootFile);
-                            var xData = new byte[xRootFile.Size];
-                          var size = (int) xRootFile.Size;
-                          Console.WriteLine("Size: " + size);
-                            xStream.Read(xData, 0, (int)xRootFile.Size);
-                            var xText = Encoding.ASCII.GetString(xData);
-                            Console.WriteLine(xText);
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("Error: " + e.Message);
-                        }
-
-                        if (xKudzuFile == null)
-                        {
-                          Console.WriteLine("KudzuFile not found!");
-                        }
-                        var xKudzuStream = new MyFatStream(xKudzuFile);
-                        var xKudzuData = new byte[xKudzuFile.Size];
-                        xKudzuStream.Read(xKudzuData, 0, (int)xKudzuFile.Size);
-
-                        var xFile = new System.IO.FileStream(@"c:\Root.txt", System.IO.FileMode.Open);
-
-                    }
-                }
-            }
-            else
-            {
-                Console.WriteLine("No Block Device Found! ");
-            }
+          var xDevice = BlockDevice.Devices[i];
+          if (xDevice is AtaPio)
+          {
+            xATA = (AtaPio) xDevice;
+          }
         }
-        catch (Exception e)
+
+        //Info
+        Console.WriteLine("--------------------------");
+        Console.WriteLine("Type: " + (xATA.DriveType == AtaPio.SpecLevel.ATA ? "ATA" : "ATAPI"));
+        Console.WriteLine("Serial No: " + xATA.SerialNo);
+        Console.WriteLine("Firmware Rev: " + xATA.FirmwareRev);
+        Console.WriteLine("Model No: " + xATA.ModelNo);
+        Console.WriteLine("Block Size: " + xATA.BlockSize + " bytes");
+        Console.WriteLine("Size: " + xATA.BlockCount*xATA.BlockSize/1024/1024 + " MB");
+
+        //Partition Detecting
+        Partition xPartition = null;
+        if (BlockDevice.Devices.Count > 0)
         {
-            Console.WriteLine("Error: " + e.Message);
+          for (int i = 0; i < BlockDevice.Devices.Count; i++)
+          {
+            var xDevice = BlockDevice.Devices[i];
+            if (xDevice is Partition)
+            {
+              xPartition = (Partition) xDevice;
+
+              Console.WriteLine("FAT FS");
+              var xFS = new TheFatFileSystem(xPartition);
+
+              Console.WriteLine("Mapping...");
+              Sys.Filesystem.FileSystem.AddMapping("C", xFS);
+
+
+              Console.WriteLine();
+              Console.WriteLine("Root directory");
+
+              var xListing = xFS.GetRoot();
+              TheFatFile xRootFile = null;
+              TheFatFile xKudzuFile = null;
+
+
+              for (int j = 0; j < xListing.Count; j++)
+              {
+                var xItem = xListing[j];
+                if (xItem is Sys.Filesystem.Listing.Directory)
+                {
+                  //Detecting Dir in HDD
+                  Console.WriteLine("<DIR> " + xListing[j].Name);
+                }
+                else if (xItem is Sys.Filesystem.Listing.File)
+                {
+                  //Detecting File in HDD
+                  Console.WriteLine("<FILE> " + xListing[j].Name + " (" + xListing[j].Size + ")");
+                  if (xListing[j].Name == "Root.txt")
+                  {
+                    xRootFile = (TheFatFile) xListing[j];
+                    Console.WriteLine("Root file found");
+                  }
+                  else if (xListing[j].Name == "Kudzu.txt")
+                  {
+                    xKudzuFile = (TheFatFile) xListing[j];
+                    Console.WriteLine("Kudzu file found");
+                  }
+                }
+              }
+
+              try
+              {
+                Console.WriteLine();
+                Console.WriteLine("StreamReader - Root File");
+                if (xRootFile == null)
+                {
+                  Console.WriteLine("RootFile not found!");
+                }
+                var xStream = new TheFatStream(xRootFile);
+                var xData = new byte[xRootFile.Size];
+                var size = (int) xRootFile.Size;
+                Console.WriteLine("Size: " + size);
+                xStream.Read(xData, 0, (int) xRootFile.Size);
+                var xText = Encoding.ASCII.GetString(xData);
+                Console.WriteLine(xText);
+              }
+              catch (Exception e)
+              {
+                Console.WriteLine("Error: " + e.Message);
+              }
+
+              if (xKudzuFile == null)
+              {
+                Console.WriteLine("KudzuFile not found!");
+              }
+              var xKudzuStream = new TheFatStream(xKudzuFile);
+              var xKudzuData = new byte[xKudzuFile.Size];
+              xKudzuStream.Read(xKudzuData, 0, (int) xKudzuFile.Size);
+
+              var xFile = new System.IO.FileStream(@"c:\Root.txt", System.IO.FileMode.Open);
+
+            }
+          }
         }
+        else
+        {
+          Console.WriteLine("No Block Device Found! ");
+        }
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine("Error: " + e.Message);
+      }
     }
 
-    protected override void AfterRun() {
+    protected override void AfterRun()
+    {
       Console.Write("Done");
       Console.ReadLine();
     }

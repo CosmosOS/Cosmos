@@ -106,7 +106,6 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
 
       // reduce count, so that no out of bound exception occurs if not existing
       // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
-//error volgens analytische stack zou er niks op moeten zitten hieronder, maar is wel zo. steppen.
       ulong xMaxReadableBytes = mFile.Size - mPosition;
       ulong xCount = (ulong)aCount;
       if (xCount > xMaxReadableBytes)
