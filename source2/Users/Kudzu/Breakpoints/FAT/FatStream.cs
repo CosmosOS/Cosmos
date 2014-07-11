@@ -23,6 +23,10 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
 
     public MyFatStream(Listing.MyFatFile aFile)
     {
+      if (aFile == null)
+      {
+        throw new ArgumentNullException("aFile");
+      }
       mFile = aFile;
       mFS = mFile.FileSystem;
       mReadBuffer = mFile.FileSystem.NewClusterArray();
@@ -77,18 +81,71 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
 
     public int Read(byte[] aBuffer, Int64 aOffset, Int64 aCount)
     {
-      //ulong xCount = (ulong)aCount;
-      
-      var xCluster = mFS.NewClusterArray();
-      
+      //if (aCount < 0)
+      //{
+      //  throw new ArgumentOutOfRangeException("aCount");
+      //}
+      //if (aOffset < 0)
+      //{
+      //  throw new ArgumentOutOfRangeException("aOffset");
+      //}
+      //if (aBuffer == null || aBuffer.Length - aOffset < aCount)
+      //{
+      //  throw new ArgumentException("Invalid offset length!");
+      //}
+      //if (mFile.FirstClusterNum == 0)
+      //{
+      //  // FirstSector can be 0 for 0 length files
+      //  return 0;
+      //}
+      //if (mPosition == mFile.Size)
+      //{
+      //  // EOF
+      //  return 0;
+      //}
 
-      //while (xCount > 0)
+      // reduce count, so that no out of bound exception occurs if not existing
+      // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
+//error volgens analytische stack zou er niks op moeten zitten hieronder, maar is wel zo. steppen.
+      ulong xMaxReadableBytes = mFile.Size - mPosition;
+      ulong xCount = (ulong)aCount;
+      if (xCount > xMaxReadableBytes)
       {
-        UInt64 xClusterIdx = 1;
-        mFS.ReadCluster((ulong)mFatTable[(int)xClusterIdx], xCluster);
-        //xCount = 0;
+        xCount = xMaxReadableBytes;
       }
 
+      var xCluster = mFS.NewClusterArray();
+      if (xCluster == null)
+      {
+        Console.WriteLine("xCluster is null!");
+      }
+      UInt32 xClusterSize = mFS.BytesPerCluster;
+
+      while (xCount > 0)
+      {
+        UInt64 xClusterIdx = mPosition/xClusterSize;
+        UInt64 xPosInCluster = mPosition%xClusterSize;
+        var aCluster = (ulong) mFatTable[(int) xClusterIdx];
+        mFS.ReadCluster(aCluster, xCluster);
+        Console.WriteLine("Byte at position 0: " + (int)xCluster[0]);
+        long xReadSize;
+        if (xPosInCluster + xCount > xClusterSize)
+        {
+          xReadSize = (long) (xClusterSize - xPosInCluster - 1);
+        }
+        else
+        {
+          xReadSize = (long) xCount;
+        }
+        // no need for a long version, because internal Array.Copy() does a cast down to int, and a range check,
+        // or we do a semantic change here
+        Array.Copy(xCluster, (long) xPosInCluster, aBuffer, aOffset, xReadSize);
+
+        aOffset += xReadSize;
+        xCount -= (ulong)xReadSize;
+      }
+
+      mPosition += (ulong)aOffset;
       return (int)aOffset;
     }
 

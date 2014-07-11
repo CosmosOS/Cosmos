@@ -62,24 +62,33 @@ namespace Cosmos.IL2CPU.X86.IL
             }
 
             return (int)(xOffset + xCurArgSize - 4);
-          } else {
-            for (int i = xParams.Length - 1; i > xCorrectedOpValValue; i--) {
-              var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
-              xOffset += xSize;
-            }
-            var xCurArgSize = Align(SizeOfType(xParams[xCorrectedOpValValue].ParameterType), 4);
-            uint xArgSize = 0;
-            foreach (var xParam in xParams) {
-              xArgSize += Align(SizeOfType(xParam.ParameterType), 4);
-            }
-            xReturnSize = 0;
+        } else {
+            try
+            {
+                for (int i = xParams.Length - 1; i > xCorrectedOpValValue; i--)
+                {
+                    var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
+                    xOffset += xSize;
+                }
+                var xCurArgSize = Align(SizeOfType(xParams[xCorrectedOpValValue].ParameterType), 4);
+                uint xArgSize = 0;
+                foreach (var xParam in xParams)
+                {
+                    xArgSize += Align(SizeOfType(xParam.ParameterType), 4);
+                }
+                xReturnSize = 0;
 
-            if (xReturnSize > xArgSize) {
-				uint xExtraSize = xReturnSize - xArgSize;
-				xOffset += xExtraSize;
+                if (xReturnSize > xArgSize)
+                {
+                    uint xExtraSize = xReturnSize - xArgSize;
+                    xOffset += xExtraSize;
+                }
+                return (int)(xOffset + xCurArgSize - 4);
             }
-
-            return (int)(xOffset + xCurArgSize - 4);
+            catch
+            {
+                throw;
+            }
           }
         }
 

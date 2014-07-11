@@ -66,6 +66,39 @@ namespace Cosmos.IL2CPU
             new Comment("Type: " + aMethod.MethodBase.DeclaringType.ToString());
             new Comment("Name: " + aMethod.MethodBase.Name);
             new Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
+            // for now:
+            var shouldIncludeArgAndLocalsComment = true;
+            if (shouldIncludeArgAndLocalsComment)
+            {
+                if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
+                {
+                    // the body of aMethod is getting emitted
+                    var xBody = aMethod.MethodBase.GetMethodBody();
+                    if (xBody != null)
+                    {
+                        foreach (var localVariable in xBody.LocalVariables)
+                        {
+                            new Comment(String.Format("Local {0} at EBP-{1}", localVariable.LocalIndex, ILOp.GetEBPOffsetForLocal(aMethod, localVariable.LocalIndex)));
+                        }
+                    }
+                    var xIdxOffset = 0u;
+                    if (!aMethod.MethodBase.IsStatic)
+                    {
+                        new Comment(String.Format("Argument $this at EBP+{0}", X86.IL.Ldarg.GetArgumentDisplacement(aMethod, 0)));
+                        xIdxOffset++;
+                    }
+
+                    var xParams = aMethod.MethodBase.GetParameters();
+                    var xParamCount = (ushort) xParams.Length;
+
+                    for (ushort i = 0; i < xParamCount; i++)
+                    {
+                        var xOffset = X86.IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort) (i + xIdxOffset));
+                        // if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
+                        new Comment(String.Format("Argument {0} at EBP+{1}", xParams[i].Name, xOffset));
+                    }
+                }
+            }
 
             // Issue label that is used for calls etc.
             string xMethodLabel;

@@ -326,10 +326,12 @@ namespace Kudzu.BreakpointsKernel {
                                 if (xListing[j].Name == "Root.txt")
                                 {
                                     xRootFile = (MyFatFile)xListing[j];
+                                  Console.WriteLine("Root file found");
                                 }
                                 else if (xListing[j].Name == "Kudzu.txt")
                                 {
                                     xKudzuFile = (MyFatFile)xListing[j];
+                                  Console.WriteLine("Kudzu file found");
                                 }
                             }
                         }
@@ -338,8 +340,14 @@ namespace Kudzu.BreakpointsKernel {
                         {
                             Console.WriteLine();
                             Console.WriteLine("StreamReader - Root File");
+                          if (xRootFile == null)
+                          {
+                            Console.WriteLine("RootFile not found!");
+                          }
                             var xStream = new MyFatStream(xRootFile);
                             var xData = new byte[xRootFile.Size];
+                          var size = (int) xRootFile.Size;
+                          Console.WriteLine("Size: " + size);
                             xStream.Read(xData, 0, (int)xRootFile.Size);
                             var xText = Encoding.ASCII.GetString(xData);
                             Console.WriteLine(xText);
@@ -349,6 +357,10 @@ namespace Kudzu.BreakpointsKernel {
                             Console.WriteLine("Error: " + e.Message);
                         }
 
+                        if (xKudzuFile == null)
+                        {
+                          Console.WriteLine("KudzuFile not found!");
+                        }
                         var xKudzuStream = new MyFatStream(xKudzuFile);
                         var xKudzuData = new byte[xKudzuFile.Size];
                         xKudzuStream.Read(xKudzuData, 0, (int)xKudzuFile.Size);

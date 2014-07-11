@@ -186,7 +186,7 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
     {
       //Console.WriteLine("ReadCluster now");
       UInt64 xSector = DataSector + ((aCluster - 2) * SectorsPerCluster);
-      //mDevice.ReadBlock(xSector, SectorsPerCluster, aData);
+      mDevice.ReadBlock(xSector, SectorsPerCluster, aData);
     }
 
     public void GetFatTableSector(UInt64 aClusterNum, out UInt32 oSector, out UInt32 oOffset)
