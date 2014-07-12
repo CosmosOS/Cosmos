@@ -26,7 +26,7 @@ namespace Cosmos.VS.XSharp {
   // This attribute is used to register the informations needed to show the this package
   // in the Help/About dialog of Visual Studio.
   [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
-  [Guid(GuidList.guidCosmos_VS_XSharpPkgString)]
+  [Guid(Guids.guidCosmos_VS_XSharpPkgString)]
 
   // Registering a Language Service (MPF)
   // http://msdn.microsoft.com/en-us/library/bb166498

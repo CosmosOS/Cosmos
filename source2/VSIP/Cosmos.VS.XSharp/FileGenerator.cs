@@ -8,9 +8,11 @@ using System.Runtime.InteropServices;
 using System.IO;
 
 namespace Cosmos.VS.XSharp {
-  // The .asm is not used for compiling. But for now we still generate .asm files on save because:
+  // This class generates .asm files from .xs files.
+  //
+  // The .asm is not used for actual compiling, but for now we still generate .asm files on save because:
   // 1) It allow user to syntax check by saving, or running custom tool.
-  // 2) IT allows easy viewing of the output (XSharp.Test can also be used)
+  // 2) It allows easy viewing of the output (XSharp.Test can also be used)
   // When we get .xsproj types, we can eliminate this class.
   public class FileGenerator : IVsSingleFileGenerator {
     public int DefaultExtension(out string oDefaultExt) {

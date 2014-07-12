@@ -18,17 +18,10 @@ namespace Cosmos.VS.XSharp {
       return null;
     }
 
-
-    public override string Goto(VSConstants.VSStd97CmdID cmd, IVsTextView textView, int line, int col, out TextSpan span)
-    {
+    public override string Goto(VSConstants.VSStd97CmdID cmd, IVsTextView textView, int line, int col, out TextSpan span) {
         span = new TextSpan();
         return null;
     }
-    //public override string Goto(VSConstants.VSStd97CmdID cmd, IVsTextView textView, int line, int col, out TextSpan span)
-    //{
-    //    span = new TextSpan();
-    //    return null;
-    //}
 
     public override Methods GetMethods(int line, int col, string name) {
       return null;

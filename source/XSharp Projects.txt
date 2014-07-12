@@ -1,12 +1,15 @@
+Overview
+-Custom tool compiles .xs files to .asm files by Cosmos.VS.XSharp:FileGenerator.cs
+
+-----------------------------------------------------------------------------
 Cosmos.Compiler.XSharp
 Library
 Compiler for XSharp
 
 -----------------------------------------------------------------------------
 Cosmos.VS.XSharp
-Library
+Library - VS Language Service
 VS extension for support for X#.
-Currently used? Says .asm but we use .xs?
 
 -----------------------------------------------------------------------------
 XSharp.NASM
