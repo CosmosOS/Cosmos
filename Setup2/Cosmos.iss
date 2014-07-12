@@ -190,7 +190,6 @@ Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: 
 Source: ".\Build\VSIP\Cosmos.VS.Package.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Windows.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Wizards.*"; DestDir: "{code:VSNET2013_PATH}\PrivateAssemblies"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.VS.XSharp.vsix"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Debug.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Assembler.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
@@ -362,7 +361,6 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\ToolWindows\{{a64d0fcc-
 
 ; mark our msbuild file as safe
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets; Flags: uninsdeletevalue
-Root: HKCU; SubKey: Software\Microsoft\VisualStudio\12.0Exp\Configuration\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets; Flags: uninsdeletevalue
 
 ; Register .cosmos file association:
 Root: HKCR; SubKey: .Cosmos; ValueType: string; ValueName: ; ValueData: Cosmos.ProjectFile; Flags: uninsdeletevalue
@@ -370,14 +368,32 @@ Root: HKCR; SubKey: Cosmos.ProjectFile; ValueType: string; ValueName: ; ValueDat
 Root: HKCR; SubKey: Cosmos.ProjectFile\DefaultIcon; ValueType: string; ValueName: ; ValueData: {app}\Cosmos.ico
 Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; ValueName: ; ValueData: """{pf32}\Microsoft Visual Studio 12.0\Common7\IDE\devenv.exe"" ""%1"""
 
-[Run]
-; http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/645bcdb8-135f-4cdd-af95-bc1a3b36d5d1
-; VSIX upgrades are ugly, complicated by a bug in the VSIX installer with /quiet option. See above link.
-; Yes we have to call /u TWICE!! See above link..
-; !!!!!!!!!!! Above described hack should no longer be necessary
-Filename: {code:VSNET2013_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
-Filename: {code:VSNET2013_PATH}\VSIXInstaller.exe; Parameters: "/quiet {app}\Build\VSIP\Cosmos.VS.XSharp.vsix"; Flags: waituntilterminated
+; X# Registration:
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\InstalledProducts\Cosmos_VS_XSharpPackage; ValueType: string; ValueData: #110;
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\InstalledProducts\Cosmos_VS_XSharpPackage; ValueName: Package; ValueType: string; ValueData: {{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\InstalledProducts\Cosmos_VS_XSharpPackage; ValueName: PID; ValueType: string; ValueData: 1.0
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\InstalledProducts\Cosmos_VS_XSharpPackage; ValueName: ProductDetails; ValueType: string; ValueData: #112
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\InstalledProducts\Cosmos_VS_XSharpPackage; ValueName: LogoID; ValueType: string; ValueData: #400
 
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Packages\{{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}; ValueType: string; ValueData: Cosmos_VS_XSharpPackage
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Packages\{{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}; ValueName: InprocServer32; ValueType: string; ValueData: {sys}\MSCOREE.DLL
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Packages\{{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}; ValueName: Class; ValueType: string; ValueData: Cosmos.VS.XSharp.Cosmos_VS_XSharpPackage
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Packages\{{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}; ValueName: CodeBase; ValueType: string; ValueData: {app}\Build\VSIP\Cosmos.VS.XSharp.dll
+
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Languages\File Extensions\.xs; ValueType: string; ValueData: {{3fb852ed-3562-3da4-98dc-55759744328c}
+
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Languages\Language Services\X#; ValueType: string; ValueData: {{3fb852ed-3562-3da4-98dc-55759744328c}
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Languages\Language Services\X#; ValueName: Package; ValueType: string; ValueData: {{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Languages\Language Services\X#; ValueName: LangResID; ValueType: dword; ValueData: $6B
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Languages\Language Services\X#; ValueName: RequestStockColors; ValueType: dword; ValueData: 1
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Languages\Language Services\X#; ValueName: EnableAsyncCompletion; ValueType: dword; ValueData: 1
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Languages\Language Services\X#; ValueName: EnableCommenting; ValueType: dword; ValueData: 0
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Languages\Language Services\X#; ValueName: CodeSense; ValueType: dword; ValueData: 0
+
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Services\{{3fb852ed-3562-3da4-98dc-55759744328c}; ValueType: string; ValueData: {{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Services\{{3fb852ed-3562-3da4-98dc-55759744328c}; ValueName: Name; ValueType: string; ValueData: X# Language Service
+
+[Run]
 ; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
 #if BuildConfiguration == "Devkit"
 	; /setup without nosetupvstemplates takes a LONG time... so we dont run it every time.. for DevKit users, they will need to run it one time first as user kit - see new note above in X# template
@@ -386,6 +402,3 @@ Filename: {code:VSNET2013_PATH}\VSIXInstaller.exe; Parameters: "/quiet {app}\Bui
 #else 
 	Filename: {code:VSNET2013_PATH}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
 #endif
-
-[UninstallRun]
-Filename: {code:VSNET2013_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
