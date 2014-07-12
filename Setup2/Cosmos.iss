@@ -374,7 +374,7 @@ Root: HKCR; SubKey: Cosmos.ProjectFile\shell\open\command; ValueType: string; Va
 ; http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/645bcdb8-135f-4cdd-af95-bc1a3b36d5d1
 ; VSIX upgrades are ugly, complicated by a bug in the VSIX installer with /quiet option. See above link.
 ; Yes we have to call /u TWICE!! See above link..
-; Above described hack should no longer be necessary
+; !!!!!!!!!!! Above described hack should no longer be necessary
 Filename: {code:VSNET2013_PATH}\VSIXInstaller.exe; Parameters: "/quiet /u:e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d"; Flags: waituntilterminated
 Filename: {code:VSNET2013_PATH}\VSIXInstaller.exe; Parameters: "/quiet {app}\Build\VSIP\Cosmos.VS.XSharp.vsix"; Flags: waituntilterminated
 
