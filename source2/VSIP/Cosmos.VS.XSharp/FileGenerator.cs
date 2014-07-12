@@ -14,7 +14,9 @@ namespace Cosmos.VS.XSharp {
   // 1) It allow user to syntax check by saving, or running custom tool.
   // 2) It allows easy viewing of the output (XSharp.Test can also be used)
   // When we get .xsproj types, we can eliminate this class.
-  public class FileGenerator : IVsSingleFileGenerator {
+  public class XsToAsmFileGenerator : IVsSingleFileGenerator {
+    // Classname is registered in Cosmos.iss. If renamed, fix in Cosmos.iss.
+
     public int DefaultExtension(out string oDefaultExt) {
       oDefaultExt = ".asm";
       return VSConstants.S_OK;
@@ -31,15 +33,14 @@ namespace Cosmos.VS.XSharp {
               xResult = xOutputData.ToString() + "\r\n"
                 + xOutputCode.ToString() + "\r\n";
             } catch (Exception ex) {
-              StringBuilder builder = new StringBuilder();
+              var xSB = new StringBuilder();
 
-              builder.AppendLine(xOutputData.ToString());
-              builder.AppendLine(xOutputCode.ToString());
-              for (Exception e = ex; null != e; e = e.InnerException)
-              {
-                  builder.AppendLine(e.Message);
+              xSB.AppendLine(xOutputData.ToString());
+              xSB.AppendLine(xOutputCode.ToString());
+              for (Exception e = ex; e != null; e = e.InnerException) {
+                  xSB.AppendLine(e.Message);
               }
-              xResult = builder.ToString();
+              xResult = xSB.ToString();
             }
           }
         }
