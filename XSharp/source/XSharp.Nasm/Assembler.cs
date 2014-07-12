@@ -40,17 +40,5 @@ namespace XSharp.Nasm {
       return xResult;
     }
 
-    public string GetData(bool aEndNewLine = true) {
-      string xResult = "";
-
-      foreach (string x in Data) {
-        xResult += x + Environment.NewLine;
-      }
-      if (!aEndNewLine) {
-        xResult = xResult.Remove(xResult.Length - Environment.NewLine.Length);
-      }
-
-      return xResult;
-    }
   }
 }

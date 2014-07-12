@@ -150,8 +150,7 @@ namespace Cosmos.Compiler.XSharp {
     /// <summary>Builds a label at function level having the given name.</summary>
     /// <param name="aLabel">Local label name at function level.</param>
     /// <returns>The label name</returns>
-    protected string FuncLabel(string aLabel)
-    {
+    protected string FuncLabel(string aLabel) {
       return GetNamespace() + "_" + mFuncName + "_" + aLabel;
     }
 
@@ -190,9 +189,8 @@ namespace Cosmos.Compiler.XSharp {
     /// <summary>Get a flag that tell if we are in a function body or not. This is used by the
     /// assembler generator when end of source file is reached to make sure the last function
     /// or interrupt handler is properly closed (see issue #15666)</summary>
-    internal bool InFunctionBody
-    {
-        get { return !string.IsNullOrEmpty(mFuncName); }
+    internal bool InFunctionBody {
+      get { return !string.IsNullOrEmpty(mFuncName); }
     }
 
     /// <summary>Start a new function having the given name. The current blocks collection is
@@ -219,8 +217,7 @@ namespace Cosmos.Compiler.XSharp {
       if (null == mFuncName) {
         throw new Exception("Found a closing curly brace that doesn't match an opening curly brace.");
       }
-      if (!mFuncExitFound)
-      {
+      if (!mFuncExitFound) {
         aAsm += GetNamespace() + "_" + mFuncName + "_Exit:";
       }
       if (mInIntHandler) {
@@ -291,9 +288,9 @@ namespace Cosmos.Compiler.XSharp {
         rIdx += 1;
         return xToken1;
 
-      } else if(xToken1.Type==TokenType.Call) {
-          rIdx += 1;
-          return "@ret_on_stack@";
+      } else if (xToken1.Type == TokenType.Call) {
+        rIdx += 1;
+        return "@ret_on_stack@";
       } else if (xToken1.Value == "#") {
         rIdx += 2;
         return ConstLabel(xToken2);
@@ -422,67 +419,69 @@ namespace Cosmos.Compiler.XSharp {
         aAsm += "Call " + GetLabel(aTokens[1]);
       });
       AddPattern("_PCALL", delegate(TokenList aTokens, Assembler aAsm) {
-          if (aTokens.Count != 1 || aTokens[0].Type != TokenType.Call)
-              throw new Exception("Error occured in parametrized call parsing");
-          else
-          {
-              List<string> mparts = aTokens[0].Value.Remove(aTokens[0].Value.Length-1).Split('(').ToList();
-              if (mparts.Count < 2)
-                  throw new Exception("Error occured in parametrized call parsing");
-              string fname = mparts[0];
-              mparts.RemoveAt(0);
-              aTokens[0].Value = String.Join("(", mparts).Trim();
-              string val = "";
-              int idx;
-
-              List<string> prams = new List<string>();
-              int level = 0;
-              foreach (char c in aTokens[0].Value)
-              {
-                  switch (c) {
-                      case ',':
-                          if (level == 0)
-                          {
-                              prams.Add(val.Trim());
-                              val = "";
-                          }
-                          break;
-                      case '(':
-                          level++;
-                          val += c;
-                          break;
-                      case ')':
-                          level--;
-                          val += c;
-                          break;
-                      default:
-                          val += c;
-                          break;
-                  }
-              }
-              if(!String.IsNullOrEmpty(val.Trim()))
-                prams.Add(val);
-              if(level!=0)
-                  throw new Exception("'(' occured without closing equivalent ')' in parametrized function call");
-
-              Parser par; prams.Reverse();
-              foreach (string p in prams)
-              {
-                  par = new Parser(p, 0, false, false);
-                  idx = 0;
-                  val = GetRef(par.Tokens, ref idx);
-                  if (val != "@ret_on_stack@")
-                      aAsm += "Push " + val;
-                  else aAsm += GetPatternCode(par.Tokens).GetCode(false);
-              }
-              aAsm += "Call " + GroupLabel(fname);
+        if (aTokens.Count != 1 || aTokens[0].Type != TokenType.Call) {
+          throw new Exception("Error occured in parametrized call parsing");
+        }  else {
+          List<string> mparts = aTokens[0].Value.Remove(aTokens[0].Value.Length - 1).Split('(').ToList();
+          if (mparts.Count < 2) {
+            throw new Exception("Error occured in parametrized call parsing");
           }
+          string fname = mparts[0];
+          mparts.RemoveAt(0);
+          aTokens[0].Value = String.Join("(", mparts).Trim();
+          string val = "";
+          int idx;
+
+          var xParams = new List<string>();
+          int level = 0;
+          foreach (char c in aTokens[0].Value) {
+            switch (c) {
+              case ',':
+                if (level == 0) {
+                  xParams.Add(val.Trim());
+                  val = "";
+                }
+                break;
+              case '(':
+                level++;
+                val += c;
+                break;
+              case ')':
+                level--;
+                val += c;
+                break;
+              default:
+                val += c;
+                break;
+            }
+          }
+          if (!String.IsNullOrEmpty(val.Trim())) {
+            xParams.Add(val);
+          }
+          if (level != 0) {
+            throw new Exception("'(' occured without closing equivalent ')' in parametrized function call");
+          }
+
+          Parser xParser;
+          xParams.Reverse();
+          foreach (string p in xParams) {
+            xParser = new Parser(p, 0, false, false);
+            idx = 0;
+            val = GetRef(xParser.Tokens, ref idx);
+            if (val != "@ret_on_stack@") {
+              aAsm += "Push " + val;
+            } else {
+              aAsm += GetPatternCode(xParser.Tokens).GetCode(false);
+            }
+          }
+          aAsm += "Call " + GroupLabel(fname);
+        }
       });
 
       AddPattern("Goto _ABC", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += "Jmp " + GetLabel(aTokens[1]);
       });
-      
+
 
       // Defines a constant having the given name and initial value.
       AddPattern("const _ABC = 123", delegate(TokenList aTokens, Assembler aAsm) {
@@ -604,7 +603,7 @@ namespace Cosmos.Compiler.XSharp {
       });
 
       AddPattern("_REG = _REG", "Mov {0}, {2}");
-      AddPattern("_REGADDR[1] = _REG",  "Mov [{0} + {2}], {5}");
+      AddPattern("_REGADDR[1] = _REG", "Mov [{0} + {2}], {5}");
       AddPattern("_REGADDR[-1] = _REG", "Mov [{0} - {2}], {5}");
       AddPattern("_REG = _REGADDR[1]", "Mov {0}, [{2} + {4}]");
       AddPattern("_REG = _REGADDR[-1]", "Mov {0}, [{2} - {4}]");
@@ -615,7 +614,7 @@ namespace Cosmos.Compiler.XSharp {
       AddPattern("[_REG] = _REG", "Mov [{1}], {4}");
       AddPattern("[_REG + 1] = _REG", "Mov [{1} + {3}], {4}");
       AddPattern("[_REG - 1] = _REG", "Mov [{1} - {3}], {4}");
-      
+
       AddPattern("_REG = _ABC", delegate(TokenList aTokens, Assembler aAsm) {
         aAsm.Mov(aTokens[0], "[" + GetLabel(aTokens[2]) + "]");
       });
@@ -654,11 +653,11 @@ namespace Cosmos.Compiler.XSharp {
         "+#_ABC as word",
         "+#_ABC as dword"
         }, delegate(TokenList aTokens, Assembler aAsm) {
-          string xSize = "dword ";
-          if (aTokens.Count > 2) {
-            xSize = aTokens[3].Value + " ";
-          }
-          aAsm += "Push " + xSize + ConstLabel(aTokens[1]);
+        string xSize = "dword ";
+        if (aTokens.Count > 2) {
+          xSize = aTokens[3].Value + " ";
+        }
+        aAsm += "Push " + xSize + ConstLabel(aTokens[1]);
       });
       AddPattern("+All", "Pushad");
       AddPattern("-All", "Popad");
@@ -696,45 +695,35 @@ namespace Cosmos.Compiler.XSharp {
         "_REG * 1",
         "_REG * _REG"
       }, delegate(TokenList aTokens, Assembler aAsm) {
-          int targetRegisterSize = 0;
-          for (int index = 0; index < 2; index++)
-          {
-              Token scannedToken = (0 == index) ? aTokens[0] : aTokens[2];
+        int targetRegisterSize = 0;
+        for (int index = 0; index < 2; index++) {
+          Token scannedToken = (0 == index) ? aTokens[0] : aTokens[2];
 
-              if (TokenType.Register != scannedToken.Type) { continue; }
-              string canonicScannedTokenValue = scannedToken.Value.ToUpper();
+          if (TokenType.Register != scannedToken.Type) { continue; }
+          string canonicScannedTokenValue = scannedToken.Value.ToUpper();
 
-              if (Parser.Registers8.Contains<string>(scannedToken.Value.ToUpper()))
-              {
-                  throw new Exception(string.Format(
-                      "Multiplication is not supported on byte sized register '{0}' at line {1}, col {2}",
-                      scannedToken.Value, scannedToken.LineNumber, scannedToken.SrcPosStart));
-              }
-              if (0 == index)
-              {
-                  if (Parser.Registers16.Contains<string>(canonicScannedTokenValue)) { targetRegisterSize = 16; }
-                  else if (Parser.Registers32.Contains<string>(canonicScannedTokenValue)) { targetRegisterSize = 32; }
-                  else { throw new Exception("Algorithmic error."); }
-              }
-              else
-              {
-                  int sourceRegisterSize;
-                  if (Parser.Registers16.Contains<string>(canonicScannedTokenValue)) { sourceRegisterSize = 16; }
-                  else if (Parser.Registers32.Contains<string>(canonicScannedTokenValue)) { sourceRegisterSize = 32; }
-                  else { throw new Exception("Algorithmic error."); }
-
-                  if (sourceRegisterSize != targetRegisterSize)
-                  {
-                      throw new Exception(string.Format("Register '{0}' and '{1}' must be of the same size for multiplication on line {2}.",
-                          aTokens[0], aTokens[2], aTokens[0].LineNumber));
-                  }
-              }
+          if (Parser.Registers8.Contains<string>(scannedToken.Value.ToUpper())) {
+            throw new Exception(string.Format(
+                "Multiplication is not supported on byte sized register '{0}' at line {1}, col {2}",
+                scannedToken.Value, scannedToken.LineNumber, scannedToken.SrcPosStart));
           }
-          aAsm += string.Format("Imul {0}, {1}", aTokens[0], aTokens[2]);
+          if (0 == index) {
+            if (Parser.Registers16.Contains<string>(canonicScannedTokenValue)) { targetRegisterSize = 16; } else if (Parser.Registers32.Contains<string>(canonicScannedTokenValue)) { targetRegisterSize = 32; } else { throw new Exception("Algorithmic error."); }
+          } else {
+            int sourceRegisterSize;
+            if (Parser.Registers16.Contains<string>(canonicScannedTokenValue)) { sourceRegisterSize = 16; } else if (Parser.Registers32.Contains<string>(canonicScannedTokenValue)) { sourceRegisterSize = 32; } else { throw new Exception("Algorithmic error."); }
+
+            if (sourceRegisterSize != targetRegisterSize) {
+              throw new Exception(string.Format("Register '{0}' and '{1}' must be of the same size for multiplication on line {2}.",
+                  aTokens[0], aTokens[2], aTokens[0].LineNumber));
+            }
+          }
+        }
+        aAsm += string.Format("Imul {0}, {1}", aTokens[0], aTokens[2]);
       });
       AddPattern("_REG++", "Inc {0}");
       AddPattern("_REG--", "Dec {0}");
-      
+
       AddPattern(new string[] {
         "_REG & 1",
         "_REG & _REG"
@@ -831,33 +820,29 @@ namespace Cosmos.Compiler.XSharp {
     /// <summary>Fix issue #15660. This method escapes double quotes in the candidate string.</summary>
     /// <param name="from">The string to be sanitized.</param>
     /// <returns>The original string with escaped double quotes.</returns>
-    private static string EscapeBackQuotes(string from)
-    {
-        StringBuilder builder = new StringBuilder();
-        bool sanitized = false;
-        bool escaped = false;
-        foreach (char scannedCharacter in from)
-        {
-            switch (scannedCharacter)
-            {
-                case '\\':
-                    escaped = !escaped;
-                    break;
-                case '`':
-                    if (!escaped)
-                    {
-                        sanitized = true;
-                        builder.Append('\\');
-                    }
-                    escaped = false;
-                    break;
-                default:
-                    escaped = false;
-                    break;
+    private static string EscapeBackQuotes(string from) {
+      StringBuilder builder = new StringBuilder();
+      bool sanitized = false;
+      bool escaped = false;
+      foreach (char scannedCharacter in from) {
+        switch (scannedCharacter) {
+          case '\\':
+            escaped = !escaped;
+            break;
+          case '`':
+            if (!escaped) {
+              sanitized = true;
+              builder.Append('\\');
             }
-            builder.Append(scannedCharacter);
+            escaped = false;
+            break;
+          default:
+            escaped = false;
+            break;
         }
-        return (sanitized) ? builder.ToString() : from;
+        builder.Append(scannedCharacter);
+      }
+      return (sanitized) ? builder.ToString() : from;
     }
 
     protected Pattern FindMatch(TokenList aTokens) {
@@ -882,7 +867,7 @@ namespace Cosmos.Compiler.XSharp {
 
       var xResult = new Assembler();
       xPattern.Code(aTokens, xResult);
-      
+
       // Apply {0} etc into string
       // This happens twice for block code, but its ok because the first pass
       // strips out all tags.
@@ -938,12 +923,10 @@ namespace Cosmos.Compiler.XSharp {
     /// pattern reserved syntax.</param>
     /// <param name="aCode">The associated code transformation handler.</param>
     protected void AddPattern(string aPattern, CodeFunc aCode) {
-        Parser xParser = null;
-        try { xParser = new Parser(aPattern, 1, false, true); }
-        catch (Exception e)
-        {
-            throw new Exception(string.Format("Invalid pattern '{0}'", aPattern ?? "NULL"), e);
-        }
+      Parser xParser = null;
+      try { xParser = new Parser(aPattern, 1, false, true); } catch (Exception e) {
+        throw new Exception(string.Format("Invalid pattern '{0}'", aPattern ?? "NULL"), e);
+      }
       var xPattern = new Pattern(xParser.Tokens, aCode);
       mPatterns.Add(xPattern);
     }
@@ -964,8 +947,7 @@ namespace Cosmos.Compiler.XSharp {
     /// <param name="aPattern">A single line of X# code that define the pattern optionally using
     /// pattern reserved syntax.</param>
     /// <param name="aCode">The constant transformation result.</param>
-    protected void AddPattern(string aPattern, string aCode)
-    {
+    protected void AddPattern(string aPattern, string aCode) {
       AddPattern(aPattern, delegate(TokenList aTokens, Assembler aAsm) {
         aAsm += aCode;
       });
@@ -977,8 +959,7 @@ namespace Cosmos.Compiler.XSharp {
     /// pattern optionally using the pattern reserved syntax.</param>
     /// <param name="aCode">The constant transformation resultthat is common abmongst all the
     /// patterns from the collection.
-    protected void AddPattern(string[] aPatterns, string aCode)
-    {
+    protected void AddPattern(string[] aPatterns, string aCode) {
       foreach (var xPattern in aPatterns) {
         AddPattern(xPattern, aCode);
       }
