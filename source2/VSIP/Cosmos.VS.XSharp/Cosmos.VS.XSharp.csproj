@@ -146,7 +146,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scanner.cs" />
     <Compile Include="LanguageService.cs" />
-    <Compile Include="FileGenerator.cs" />
+    <Compile Include="XsToAsmFileGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">

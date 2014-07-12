@@ -25,20 +25,25 @@ namespace Cosmos.VS.XSharp {
     public int Generate(string aInputFilePath, string aInputFileContents, string aDefaultNamespace, IntPtr[] aOutputFileContents, out uint oPcbOutput, IVsGeneratorProgress aGenerateProgress) {
       string xResult;
       using (var xInput = new StringReader(aInputFileContents)) {
-        using (var xOutputData = new StringWriter()) {
-          using (var xOutputCode = new StringWriter()) {
+        using (var xOutData = new StringWriter()) {
+          using (var xOutCode = new StringWriter()) {
             try {
-              var xGenerator = new Cosmos.Compiler.XSharp.AsmGenerator();
-              xGenerator.Generate(xInput, xOutputData, xOutputCode);
-              xResult = xOutputData.ToString() + "\r\n"
-                + xOutputCode.ToString() + "\r\n";
+              var xGen = new Cosmos.Compiler.XSharp.AsmGenerator();
+              xGen.Generate(xInput, xOutData, xOutCode);
+              xResult =
+                "; Generated at " + DateTime.Now.ToString() + "\r\n"
+                 + "\r\n"
+                + xOutData.ToString() + "\r\n"
+                + xOutCode.ToString() + "\r\n";
             } catch (Exception ex) {
               var xSB = new StringBuilder();
+              xSB.Append(xOutData);
+              xSB.AppendLine();
+              xSB.Append(xOutCode);
+              xSB.AppendLine();
 
-              xSB.AppendLine(xOutputData.ToString());
-              xSB.AppendLine(xOutputCode.ToString());
               for (Exception e = ex; e != null; e = e.InnerException) {
-                  xSB.AppendLine(e.Message);
+                xSB.AppendLine(e.Message);
               }
               xResult = xSB.ToString();
             }
@@ -46,15 +51,15 @@ namespace Cosmos.VS.XSharp {
         }
       }
 
+      aOutputFileContents[0] = IntPtr.Zero;
+      oPcbOutput = 0;
       var xBytes = Encoding.UTF8.GetBytes(xResult);
       if (xBytes.Length > 0) {
         aOutputFileContents[0] = Marshal.AllocCoTaskMem(xBytes.Length);
         Marshal.Copy(xBytes, 0, aOutputFileContents[0], xBytes.Length);
         oPcbOutput = (uint)xBytes.Length;
-      } else {
-        aOutputFileContents[0] = IntPtr.Zero;
-        oPcbOutput = 0;
       }
+
       return VSConstants.S_OK;
     }
 

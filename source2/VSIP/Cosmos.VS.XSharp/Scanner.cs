@@ -21,9 +21,11 @@ namespace Cosmos.VS.XSharp {
     static TokenData[] mTokenMap;
 
     static Scanner() {
-      int xEnumMax = Enum.GetValues(typeof(XSC.TokenType)).Cast<int>().Max();
+      int xEnumMax = Enum.GetValues(typeof(XSC.TokenType)).GetUpperBound(0);
       mTokenMap = new TokenData[xEnumMax + 1];
-      for(int i = 0; i < xEnumMax; i++) {
+
+      // Set Default values
+      foreach(int i in Enum.GetValues(typeof(XSC.TokenType))) {
         mTokenMap[i].Type = TokenType.Unknown;
         mTokenMap[i].Color = TokenColor.Text;
       }
