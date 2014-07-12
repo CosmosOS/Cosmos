@@ -123,6 +123,8 @@ namespace Cosmos.Core
             mStart = mStartAddress = aStartAddress + (4 - (aStartAddress % 4));
             mLength = aEndOfRam - aStartAddress;
             mLength = (mLength / 4) * 4;
+            ClearMemory(aStartAddress, mLength);
+           
             mStartAddress += 1024;
             mEndOfRam = aEndOfRam;
             mStartAddress = (mStartAddress / 4) * 4;

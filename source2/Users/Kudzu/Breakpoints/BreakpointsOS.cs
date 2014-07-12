@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Playground.Kudzu.BreakpointsKernel;
 using Playground.Kudzu.BreakpointsKernel.FAT;
 using Playground.Kudzu.BreakpointsKernel.FAT.Listing;
 using Sys = Cosmos.System;
@@ -39,6 +40,9 @@ namespace Kudzu.BreakpointsKernel
       xTest = new FieldInitTest();
       xTest.Run();
 
+      Console.WriteLine("Running ListTest");
+      xTest = new ListTest();
+      xTest.Run();
       Console.WriteLine("Running NullableTest");
       xTest = new NullableTest();
       xTest.Run();

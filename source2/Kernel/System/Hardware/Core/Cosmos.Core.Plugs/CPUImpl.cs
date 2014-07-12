@@ -58,7 +58,7 @@ namespace Cosmos.Core.Plugs {
         }
         [PlugMethod(Assembler = typeof(ZeroFillAsm))]
         // TODO: implement this using REP STOSB and REPO STOSD
-        public static void ZeroFill(CPU aThis, uint aStartAddress, uint aLength) { }
+        public static void ZeroFill(uint aStartAddress, uint aLength) { }
 
         public class InitFloatAsm : AssemblerMethod {
             public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {

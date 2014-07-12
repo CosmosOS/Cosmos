@@ -50,13 +50,15 @@ namespace Cosmos.IL2CPU.X86.IL
               {
                   xCurArgSize = Align(SizeOfType(xMethodBase.DeclaringType), 4);
               }
-
+              var xTotalArgsSize = 0L;
             for (int i = xParams.Length - 1; i >= aParam; i--) {
               var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
+                xTotalArgsSize += xSize;
               xOffset += xSize;
             }
 
-            if (xReturnSize > xCurArgSize) {
+            if (xReturnSize > xTotalArgsSize)
+            {
 				uint xExtraSize = xReturnSize - xCurArgSize;
 				xOffset += xExtraSize;
             }

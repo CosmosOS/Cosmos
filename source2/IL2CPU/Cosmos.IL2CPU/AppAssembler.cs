@@ -66,6 +66,10 @@ namespace Cosmos.IL2CPU
             new Comment("Type: " + aMethod.MethodBase.DeclaringType.ToString());
             new Comment("Name: " + aMethod.MethodBase.Name);
             new Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
+            if (aMethod.MethodBase.Name == "GetFatEntry")
+            {
+                Console.Write("");
+            }
             // for now:
             var shouldIncludeArgAndLocalsComment = true;
             if (shouldIncludeArgAndLocalsComment)
@@ -94,8 +98,9 @@ namespace Cosmos.IL2CPU
                     for (ushort i = 0; i < xParamCount; i++)
                     {
                         var xOffset = X86.IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort) (i + xIdxOffset));
+                        var xSize = X86.IL.Ldarg.SizeOfType(xParams[i].ParameterType);
                         // if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
-                        new Comment(String.Format("Argument {0} at EBP+{1}", xParams[i].Name, xOffset));
+                        new Comment(String.Format("Argument {0} at EBP+{1}, size = {2}", xParams[i].Name, xOffset, xSize));
                     }
                 }
             }

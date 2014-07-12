@@ -66,7 +66,16 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT.Listing
         }
 
         xResult.Add(xClusterNum);
-        xClusterNum = FileSystem.GetFatEntry(xSector, xClusterNum, xNextSectorOffset);
+        if (FileSystem == null)
+        {
+          Console.WriteLine("$this.FileSystem is null (2)");
+        }
+        var xFS = FileSystem;
+        if (xFS == null)
+        {
+          Console.WriteLine("xFS is null (2)");
+        }
+        xClusterNum = xFS.GetFatEntry(xSector, xClusterNum, xNextSectorOffset);
       } while (!FileSystem.FatEntryIsEOF(xClusterNum));
 
       return xResult;

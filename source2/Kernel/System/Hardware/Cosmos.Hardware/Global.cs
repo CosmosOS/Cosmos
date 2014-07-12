@@ -38,8 +38,9 @@ namespace Cosmos.Hardware {
 
           // TODO Change this to foreach when foreach is supported
           Console.WriteLine("Number of MBR partitions found:  " + xMBR.Partitions.Count);
-          for (int i = 0; i < xMBR.Partitions.Count; i++) {
-            var xPart = xMBR.Partitions[i];
+          for (int i = 0; i < xMBR.Partitions.Count; i++)
+          {
+              var xPart = xMBR.Partitions[i];
               if (xPart == null)
               {
                   Console.WriteLine("Null partition found at idx " + i);

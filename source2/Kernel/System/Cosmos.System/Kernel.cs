@@ -50,7 +50,7 @@ namespace Cosmos.System
 
                 Global.Dbg.Send("Run");
                 while (!mStopped) {
-                    Network.NetworkStack.Update();
+                    //Network.NetworkStack.Update();
                     Run();
                 }
 

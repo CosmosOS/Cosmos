@@ -37,6 +37,7 @@
     <Compile Include="FAT\Listing\FatFile.cs" />
     <Compile Include="FieldInitTest.cs" />
     <Compile Include="Int64Test.cs" />
+    <Compile Include="ListTest.cs" />
     <Compile Include="NullableTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StringBuilderTest.cs" />

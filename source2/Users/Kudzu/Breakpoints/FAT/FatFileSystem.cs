@@ -70,6 +70,15 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
 
     public UInt64 GetFatEntry(byte[] aSector, UInt64 aClusterNum, UInt64 aOffset)
     {
+      if (aSector == null)
+      {
+        throw new ArgumentNullException("aSector");
+      }
+      if (this == null)
+      {
+        Console.WriteLine("$this == null!");
+        while (true) ;
+      }
       if (FatType == FatTypeEnum.Fat12)
       {
         if (aOffset == (BytesPerSector - 1))
