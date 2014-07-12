@@ -86,16 +86,6 @@ namespace Cosmos.VS.Windows
 
         private ToolWindowPane2 FindWindow(Type aWindowType)
         {
-            try
-            {
-
-            }
-            catch (System.Reflection.TargetInvocationException e)
-            {
-                Exception innerException = e.InnerException;
-                Global.OutputPane.OutputString(innerException.Message + "\r\n");
-                Global.OutputPane.OutputString(innerException.StackTrace + "\r\n");
-            }
             // Get the instance number 0 of this tool window.
             // Our windows are single instance so this instance will be the only one.
             // The last flag is set to true so that if the tool window does not exists it will be created.
@@ -116,7 +106,7 @@ namespace Cosmos.VS.Windows
 
         private void UpdateWindow(Type aWindowType, string aTag, byte[] aData)
         {
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
                 (Action)delegate()
                 {
                     var xWindow = FindWindow(aWindowType);
@@ -128,42 +118,22 @@ namespace Cosmos.VS.Windows
 
         private void ShowWindowAssembly(object aCommand, EventArgs e)
         {
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-                (Action)delegate()
-                {
-                    ShowWindow(typeof(AssemblyTW));
-                }
-            );
+            ShowWindow(typeof(AssemblyTW));
         }
 
         private void ShowWindowInternal(object aCommand, EventArgs e)
         {
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-                (Action)delegate()
-                {
-                    ShowWindow(typeof(InternalTW));
-                }
-            );
+            ShowWindow(typeof(InternalTW));
         }
 
         private void ShowWindowRegisters(object aCommand, EventArgs e)
         {
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-                (Action)delegate()
-                {
-                    ShowWindow(typeof(RegistersTW));
-                }
-            );
+            ShowWindow(typeof(RegistersTW));
         }
 
         private void ShowWindowStack(object aCommand, EventArgs e)
         {
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-                (Action)delegate()
-                {
-                    ShowWindow(typeof(StackTW));
-                }
-            );
+            ShowWindow(typeof(StackTW));
         }
 
         private void ShowWindowAll(object aCommand, EventArgs e)
@@ -228,30 +198,15 @@ namespace Cosmos.VS.Windows
                         break;
 
                     case Debugger2Windows.Stack:
-                        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-                            (Action)delegate()
-                            {
-                                UpdateWindow(typeof(StackTW), "STACK", xMsg);
-                            }
-                        );
+                        UpdateWindow(typeof(StackTW), "STACK", xMsg);
                         break;
 
                     case Debugger2Windows.Frame:
-                        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-                            (Action)delegate()
-                            {
-                                UpdateWindow(typeof(StackTW), "FRAME", xMsg);
-                            }
-                        );
+                        UpdateWindow(typeof(StackTW), "FRAME", xMsg);
                         break;
 
                     case Debugger2Windows.Registers:
-                        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-                            (Action)delegate()
-                            {
-                                UpdateWindow(typeof(RegistersTW), null, xMsg);
-                            }
-                        );
+                        UpdateWindow(typeof(RegistersTW), null, xMsg);
                         break;
 
                     case Debugger2Windows.Quit:
@@ -271,7 +226,7 @@ namespace Cosmos.VS.Windows
                         break;
 
                     case Debugger2Windows.OutputPane:
-                        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+                        System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
                           (Action)delegate()
                         {
                             Global.OutputPane.OutputString(System.Text.Encoding.UTF8.GetString(xMsg));
@@ -280,7 +235,7 @@ namespace Cosmos.VS.Windows
                         break;
 
                     case Debugger2Windows.OutputClear:
-                        System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+                        System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
                           (Action)delegate()
                         {
                             Global.OutputPane.Clear();

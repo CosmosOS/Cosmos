@@ -51,48 +51,32 @@ namespace Cosmos.VS.Windows
 
         public override void Update(string aTag, byte[] aData)
         {
-            Dispatcher.Invoke(DispatcherPriority.Normal,
-              (Action)delegate()
+            if (aTag == "FRAME")
             {
-                if (aTag == "FRAME")
-                {
-                    mData = aData;
-                }
-                else
-                {
-                    stackData = aData;
-                }
-                DoUpdate(aTag);
+                mData = aData;
             }
-            );
+            else
+            {
+                stackData = aData;
+            }
+            DoUpdate(aTag);
         }
 
         protected override void DoUpdate(string aTag)
         {
             if (aTag == "STACK")
             {
-                System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-                      (Action)delegate()
-                      {
-                          UpdateStack(stackData);
-                      }
-                  );
-
+                UpdateStack(stackData);
             }
             else if (aTag == "FRAME")
             {
-                System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
-                    (Action)delegate()
-                    {
-                        UpdateFrame(mData);
-                    }
-                );
+                UpdateFrame(mData);
             }
         }
 
         public void UpdateFrame(byte[] aData)
         {
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
                 (Action)delegate()
                 {
                     if (aData == null)
@@ -125,7 +109,7 @@ namespace Cosmos.VS.Windows
 
         public void UpdateStack(byte[] aData)
         {
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
                 (Action)delegate()
                 {
                     if (aData == null)
@@ -152,7 +136,6 @@ namespace Cosmos.VS.Windows
                 }
             );
         }
-
 
         public override byte[] GetCurrentState()
         {

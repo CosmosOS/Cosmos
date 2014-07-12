@@ -26,13 +26,8 @@ namespace Cosmos.VS.Windows
 
         public virtual void Update(string aTag, byte[] aData)
         {
-            Dispatcher.Invoke(DispatcherPriority.Normal,
-              (Action)delegate()
-            {
-                mData = aData;
-                DoUpdate(aTag);
-            }
-            );
+            mData = aData;
+            DoUpdate(aTag);
         }
 
         protected virtual void DoUpdate(string aTag)

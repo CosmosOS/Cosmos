@@ -95,7 +95,7 @@ namespace Cosmos.VS.Windows
             // ESP 32
             // EIP 36
             //
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
                 (Action)delegate()
                 {
                     if (mData == null)

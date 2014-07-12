@@ -638,8 +638,8 @@ namespace Cosmos.VS.Windows
         {
             Log("DoUpdate");
             mLines.Clear();
-            
-            System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Normal,
+
+            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
                 (Action)delegate()
                 {
                     if (mData.Length == 0)
