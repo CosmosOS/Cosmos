@@ -60,7 +60,9 @@ namespace Cosmos.Build.MSBuild {
     //}
     #endregion
 
-    public override bool Execute() {
+    public override bool Execute()
+    {
+        var sw = Stopwatch.StartNew();
         try
         {
             // Important! A given address can have more than one label.
@@ -158,6 +160,11 @@ namespace Cosmos.Build.MSBuild {
         {
             LogError("An error occurred: {0}", E.ToString());
             return false;
+        }
+        finally
+        {
+            sw.Stop();
+            Log.LogMessage(MessageImportance.High, "Extracting Map file took {0}", sw.Elapsed);
         }
     }
 

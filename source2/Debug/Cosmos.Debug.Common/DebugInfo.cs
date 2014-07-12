@@ -643,7 +643,7 @@ namespace Cosmos.Debug.Common
         }
 
         public static UInt64 mLastGuid = 0;
-        private static Guid Guid_NewGuid()
+        public static Guid Guid_NewGuid()
         {
             // Old code: 
             //return Guid.NewGuid();

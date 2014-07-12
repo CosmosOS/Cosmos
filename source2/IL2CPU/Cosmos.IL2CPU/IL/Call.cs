@@ -165,8 +165,8 @@ namespace Cosmos.IL2CPU.X86.IL {
               new CPUx86.ConditionalJump {DestinationLabel = ".AfterNullCheck", Condition = CPU.ConditionalTestEnum.NotEqual};
               new CPUx86.ClrInterruptFlag();
               // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-              new CPUx86.Call {DestinationLabel = ".Break_on_location"};
-              new Assembler.Label(".Break_on_location");
+              new CPUx86.Call {DestinationLabel = ".NullCheck_GetCurrAddress"};
+              new Assembler.Label(".NullCheck_GetCurrAddress");
               new CPUx86.Pop {DestinationReg = CPU.RegistersEnum.EAX};
               new CPUx86.Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = CPU.RegistersEnum.EAX};
               new CPUx86.Call {DestinationLabel = "DebugStub_SendNullReferenceOccurred"};

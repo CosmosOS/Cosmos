@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime;
 using System.Text;
+using System.Threading;
 using Cosmos.Build.MSBuild;
 using Microsoft.Build.Framework;
 using System.Diagnostics;
@@ -25,7 +26,6 @@ namespace DebugCompiler
 
         private static void Main(string[] args)
         {
-            var xTimespans = new List<TimeSpan>();
             var xSW = Stopwatch.StartNew();
             try
             {
