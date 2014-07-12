@@ -1,0 +1,25 @@
+Cosmos.Compiler.XSharp
+Library
+Compiler for XSharp
+
+-----------------------------------------------------------------------------
+Cosmos.VS.XSharp
+Library
+VS extension for support for X#.
+Currently used? Says .asm but we use .xs?
+
+-----------------------------------------------------------------------------
+XSharp.NASM
+Library
+
+Simple library to assist in generating output for NASM.
+
+-----------------------------------------------------------------------------
+XSharp.Test
+WinForms Application
+
+-----------------------------------------------------------------------------
+XSharp.XSC
+Console Application
+
+Compiles .xs to .asm.

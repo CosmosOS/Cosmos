@@ -72,6 +72,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{FD42844B-2767-4DF4-B0AF-EA5F7CB11528}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{9C8A3E55-9045-44CA-BFD4-16D5B4343A90}"
+	ProjectSection(SolutionItems) = preProject
+		XSharp Projects.txt = XSharp Projects.txt
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MDbg", "MDbg", "{43291572-4714-44FD-BF37-F5C21A758C33}"
 EndProject
@@ -506,31 +509,31 @@ Global
 		SccProjectTopLevelParentUniqueName60 = Cosmos.sln
 		SccProjectName60 = ../source2/Users/Matthijs/DebugCompiler
 		SccLocalPath60 = ..\\source2\\Users\\Matthijs\\DebugCompiler
-		SccWebProject61 = true
-		SccProjectUniqueName61 = ..\\Docs
-		SccProjectName61 = ../Docs
-		SccLocalPath61 = ..\\Docs
-		SccProjectEnlistmentChoice61 = 2
-		SccProjectUniqueName62 = ..\\source2\\Users\\EdNutting\\EdNuttingsTest\\EdNuttingsTest.csproj
+		SccProjectUniqueName61 = ..\\source2\\Users\\EdNutting\\EdNuttingsTest\\EdNuttingsTest.csproj
+		SccProjectTopLevelParentUniqueName61 = Cosmos.sln
+		SccProjectName61 = ../source2/Users/EdNutting/EdNuttingsTest
+		SccLocalPath61 = ..\\source2\\Users\\EdNutting\\EdNuttingsTest
+		SccProjectUniqueName62 = ..\\source2\\Users\\EdNutting\\EdNuttingsTest\\EdNuttingsTestBoot.Cosmos
 		SccProjectTopLevelParentUniqueName62 = Cosmos.sln
 		SccProjectName62 = ../source2/Users/EdNutting/EdNuttingsTest
 		SccLocalPath62 = ..\\source2\\Users\\EdNutting\\EdNuttingsTest
-		SccProjectUniqueName63 = ..\\source2\\Users\\EdNutting\\EdNuttingsTest\\EdNuttingsTestBoot.Cosmos
+		SccProjectUniqueName63 = ..\\source2\\Tools\\PlugsInspector\\PlugsInspector.csproj
 		SccProjectTopLevelParentUniqueName63 = Cosmos.sln
-		SccProjectName63 = ../source2/Users/EdNutting/EdNuttingsTest
-		SccLocalPath63 = ..\\source2\\Users\\EdNutting\\EdNuttingsTest
-		SccProjectUniqueName64 = ..\\source2\\Tools\\PlugsInspector\\PlugsInspector.csproj
+		SccProjectName63 = ../source2/Tools/PlugsInspector
+		SccLocalPath63 = ..\\source2\\Tools\\PlugsInspector
+		SccProjectUniqueName64 = LWatson\\LWatson.csproj
 		SccProjectTopLevelParentUniqueName64 = Cosmos.sln
-		SccProjectName64 = ../source2/Tools/PlugsInspector
-		SccLocalPath64 = ..\\source2\\Tools\\PlugsInspector
-		SccProjectUniqueName65 = LWatson\\LWatson.csproj
+		SccProjectName64 = LWatson
+		SccLocalPath64 = LWatson
+		SccProjectUniqueName65 = LWatson\\LWatsonBoot.Cosmos
 		SccProjectTopLevelParentUniqueName65 = Cosmos.sln
 		SccProjectName65 = LWatson
 		SccLocalPath65 = LWatson
-		SccProjectUniqueName66 = LWatson\\LWatsonBoot.Cosmos
-		SccProjectTopLevelParentUniqueName66 = Cosmos.sln
-		SccProjectName66 = LWatson
-		SccLocalPath66 = LWatson
+		SccWebProject66 = true
+		SccProjectUniqueName66 = ..\\Docs
+		SccProjectName66 = ../Docs
+		SccLocalPath66 = ..\\Docs
+		SccProjectEnlistmentChoice66 = 2
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
