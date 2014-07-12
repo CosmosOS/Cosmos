@@ -41,3 +41,6 @@
 ################################################################################
 
 \Build\VSIP
+UserKit.iss
+\Build\VMWare\Workstation\Cosmos.vmsd
+\Build\VMWare\Workstation\Cosmos.vmxf
