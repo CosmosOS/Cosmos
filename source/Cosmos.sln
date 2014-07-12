@@ -26,7 +26,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudzu", "Kudzu", "{9D82B35C
 	ProjectSection(SolutionItems) = preProject
 		..\source2\Users\Kudzu\Kudzu-Notes.html = ..\source2\Users\Kudzu\Kudzu-Notes.html
 		..\source2\Users\Kudzu\Old-IDANotes.html = ..\source2\Users\Kudzu\Old-IDANotes.html
-		ToDo.txt = ToDo.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Visual Studio", "Visual Studio", "{CD3F5E45-8B24-424F-ADF1-0211712F4CB7}"
