@@ -382,8 +382,8 @@ namespace Cosmos.IL2CPU
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabelExc + "__2" };
                 new ClrInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-                new Call { DestinationLabel = xLabelExc + "__Break_on_location" };
-                new Assembler.Label(xLabelExc + "__Break_on_location");
+                new Call { DestinationLabel = xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location" };
+                new Assembler.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
                 new Pop {DestinationReg = RegistersEnum.EAX};
                 new Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX};
                 new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
@@ -1242,16 +1242,16 @@ namespace Cosmos.IL2CPU
                 new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
                 new Add { DestinationReg = Registers.EAX, SourceValue = expectedDifference };
                 new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
-                new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".After_Break_on_location" };
+                new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".StackCorruptionCheck_End" };
                 new ClrInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-                new Call { DestinationLabel = xLabel + ".Break_on_location" };
-                new Assembler.Label(xLabel + ".Break_on_location");
+                new Call { DestinationLabel = xLabel + ".StackCorruptionCheck_GetAddress" };
+                new Assembler.Label(xLabel + ".StackCorruptionCheck_GetAddress");
                 new Pop { DestinationReg = RegistersEnum.EAX };
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
                 new Halt();
-                new Assembler.Label(xLabel + ".After_Break_on_location");
+                new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
 
             }
         }
