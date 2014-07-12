@@ -13,7 +13,7 @@ namespace Cosmos.Core {
         public static uint GetEndOfKernel() { return 0; } // Plugged
         public void UpdateIDT(bool aEnableInterruptsImmediately) { } // Plugged
         public void InitFloat() { } // Plugged
-        public void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged
+        public static void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged
         public void Halt() { } // Plugged
 
         public void Reboot() {

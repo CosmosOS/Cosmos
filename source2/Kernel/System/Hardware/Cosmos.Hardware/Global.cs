@@ -30,17 +30,26 @@ namespace Cosmos.Hardware {
 
               for (int i = 0; i < xEBR.Partitions.Count; i++)
               {
-                  var xPart = xEBR.Partitions[i];
-                  var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
-                  BlockDevice.BlockDevice.Devices.Add(xPartDevice);
+                  //var xPart = xEBR.Partitions[i];
+                  //var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
+                  //BlockDevice.BlockDevice.Devices.Add(xPartDevice);
               }
           }
 
           // TODO Change this to foreach when foreach is supported
+          Console.WriteLine("Number of MBR partitions found:  " + xMBR.Partitions.Count);
           for (int i = 0; i < xMBR.Partitions.Count; i++) {
             var xPart = xMBR.Partitions[i];
-            var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
-            BlockDevice.BlockDevice.Devices.Add(xPartDevice);
+              if (xPart == null)
+              {
+                  Console.WriteLine("Null partition found at idx " + i);
+              }
+              else
+              {
+                  var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
+                  BlockDevice.BlockDevice.Devices.Add(xPartDevice);
+                  Console.WriteLine("Found partition at idx " + i);
+              }
           }
       }
     }

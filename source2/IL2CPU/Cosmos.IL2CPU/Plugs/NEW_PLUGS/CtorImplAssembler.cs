@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
       new Comment("-- ldarg 1");
       Ldarg.DoExecute(xAssembler, xMethodInfo, 1);
       new Comment("-- stfld _target");
-      Stfld.DoExecute(xAssembler, xMethodInfo, "System.Object System.Delegate._target", xMethodInfo.MethodBase.DeclaringType, true);
+      Stfld.DoExecute(xAssembler, xMethodInfo, "System.Object System.Delegate._target", xMethodInfo.MethodBase.DeclaringType, true, false);
       new Comment("Save method pointer to field");
       //Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
       new Comment("-- ldarg 0");
@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
       new Comment("-- ldarg 2");
       Ldarg.DoExecute(xAssembler, xMethodInfo, 2);
       new Comment("-- stfld _methodPtr");
-      Stfld.DoExecute(xAssembler, xMethodInfo, "System.IntPtr System.Delegate._methodPtr", xMethodInfo.MethodBase.DeclaringType, true);
+      Stfld.DoExecute(xAssembler, xMethodInfo, "System.IntPtr System.Delegate._methodPtr", xMethodInfo.MethodBase.DeclaringType, true, false);
       new Comment("Saving ArgSize to field");
       uint xSize = 0;
       foreach (var xArg in xMethodInfo.MethodBase.DeclaringType.GetMethod("Invoke").GetParameters()) {
@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
       new CPUx86.Push { DestinationValue = xSize };
       xAssembler.Stack.Push(ILOp.SizeOfType(typeof(int)), typeof(Int32));
       new Comment("-- stfld ArgSize");
-      Stfld.DoExecute(xAssembler, xMethodInfo, "$$ArgSize$$", xMethodInfo.MethodBase.DeclaringType, true);
+      Stfld.DoExecute(xAssembler, xMethodInfo, "$$ArgSize$$", xMethodInfo.MethodBase.DeclaringType, true, false);
 
 
           //public static void Ctor(Delegate aThis, object aObject, IntPtr aMethod, 

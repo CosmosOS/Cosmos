@@ -28,6 +28,7 @@ namespace Cosmos.Debug.Common
         public Action<byte[]> CmdStack;
         public Action<byte[]> CmdPong;
         public Action<UInt32> CmdStackCorruptionOccurred;
+        public Action<UInt32> CmdNullReferenceOccurred;
 
         protected byte mCurrentMsgType;
         protected AutoResetEvent mCmdWait = new AutoResetEvent(false);
@@ -448,6 +449,11 @@ namespace Cosmos.Debug.Common
                     Next(4, PacketStackCorruptionOccurred);
                     break;
 
+                case Ds2Vs.NullReferenceOccurred:
+                    DoDebugMsg("DC Recv: NullReferenceOccurred");
+                    Next(4, PacketNullReferenceOccurred);
+                    break;
+
                 default:
                     // Exceptions crash VS so use MsgBox instead
                     DoDebugMsg("Unknown debug command: " + mCurrentMsgType);
@@ -543,6 +549,15 @@ namespace Cosmos.Debug.Common
             if (CmdPong != null)
             {
                 CmdPong(aPacket.ToArray());
+            }
+            WaitForMessage();
+        }
+
+        protected void PacketNullReferenceOccurred(byte[] aPacket)
+        {
+            if (CmdNullReferenceOccurred != null)
+            {
+                CmdNullReferenceOccurred(GetUInt32(aPacket, 0));
             }
             WaitForMessage();
         }

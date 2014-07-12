@@ -11,6 +11,7 @@
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Profile>VMware</Profile>
@@ -20,9 +21,9 @@
     <DebugEnabled>True</DebugEnabled>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
-    <EnableGDB>False</EnableGDB>
+    <EnableGDB>True</EnableGDB>
     <StartCosmosGDB>False</StartCosmosGDB>
-    <VMWareEdition>Player</VMWareEdition>
+    <VMWareEdition>Workstation</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
     <Name>PlaygroundBoot</Name>
     <Description>Use VMware Player or Workstation to deploy and debug.</Description>
@@ -37,11 +38,13 @@
     <VMware_DebugEnabled>True</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
-    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
+    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_TraceAssemblies>User</VMware_TraceAssemblies>
-    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_EnableGDB>True</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
+    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
@@ -59,9 +62,10 @@
       <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include=".\Playground.">
+    <ProjectReference Include="..\Playground\Playground.csproj">
       <Name>Playground</Name>
-      <Project>{380cbca2-3283-4667-a824-196036f95ced}</Project>
+      <Project>{89868cad-aafc-45f1-81b3-c323f87d5742}</Project>
+      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />

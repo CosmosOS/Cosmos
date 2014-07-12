@@ -555,7 +555,7 @@ namespace Cosmos.IL2CPU
                         Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
                         Assembler.Stack.Push(4, typeof(Exception));
                     }
-
+                    xILOp.DebugEnabled = DebugEnabled;
                     xILOp.Execute(aMethod, xOpCode);
 
                     AfterOp(aMethod, xOpCode);
@@ -1146,7 +1146,7 @@ namespace Cosmos.IL2CPU
             X86.IL.Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
             xCurLabel = Cosmos.Assembler.Assembler.EntryPointName + ".CallStart";
             new Cosmos.Assembler.Label(xCurLabel);
-            X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, Cosmos.Assembler.Assembler.EntryPointName + ".AfterStart");
+            X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, Cosmos.Assembler.Assembler.EntryPointName + ".AfterStart", DebugEnabled);
             new Cosmos.Assembler.Label(Cosmos.Assembler.Assembler.EntryPointName + ".AfterStart");
             new Pop { DestinationReg = Registers.EBP };
             new Return();

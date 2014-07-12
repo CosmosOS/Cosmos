@@ -69,14 +69,14 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpMethod = aOpCode as OpMethod;
-      DoExecute(Assembler, aMethod, xOpMethod.Value, aOpCode, LabelName.Get(aMethod.MethodBase));
+      DoExecute(Assembler, aMethod, xOpMethod.Value, aOpCode, LabelName.Get(aMethod.MethodBase), DebugEnabled);
     }
 
-    public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel)
+    public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, bool debugEnabled)
     {
-        DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, ILOp.GetLabel(aCurrentMethod, aCurrent.NextPosition));
+        DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, ILOp.GetLabel(aCurrentMethod, aCurrent.NextPosition), debugEnabled);
     }
-    public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel) {
+    public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel, bool debugEnabled) {
       //if (aTargetMethod.IsVirtual) {
       //  Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
       //  return;
@@ -96,7 +96,18 @@ namespace Cosmos.IL2CPU.X86.IL {
       int xArgCount = xParameters.Length;
       // todo: implement exception support
       uint xExtraStackSize = GetStackSizeToReservate(aTargetMethod);
-      if (xExtraStackSize > 0) {
+        if (!aTargetMethod.IsStatic && debugEnabled)
+        {
+            uint xThisOffset = 0;
+            foreach (var xItem in xParameters)
+            {
+                xThisOffset += Align(SizeOfType(xItem.ParameterType), 4);
+            }
+            var stackOffsetToCheck = xThisOffset;
+            DoNullReferenceCheck(Assembler, debugEnabled, stackOffsetToCheck);
+        }
+
+        if (xExtraStackSize > 0) {
         new CPUx86.Sub {
           DestinationReg = CPUx86.Registers.ESP,
           SourceValue = (uint)xExtraStackSize
@@ -145,5 +156,23 @@ namespace Cosmos.IL2CPU.X86.IL {
       Assembler.Stack.Push(ILOp.Align(SizeOfType(xMethodInfo.ReturnType), 4),
                               xMethodInfo.ReturnType);
     }
+
+      public static void DoNullReferenceCheck(Assembler.Assembler assembler, bool debugEnabled, uint stackOffsetToCheck)
+      {
+          if (debugEnabled)
+          {
+              new CPUx86.Compare {DestinationReg = CPU.RegistersEnum.ESP, DestinationDisplacement = (int) stackOffsetToCheck, DestinationIsIndirect = true, SourceValue = 0};
+              new CPUx86.ConditionalJump {DestinationLabel = ".AfterNullCheck", Condition = CPU.ConditionalTestEnum.NotEqual};
+              new CPUx86.ClrInterruptFlag();
+              // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+              new CPUx86.Call {DestinationLabel = ".Break_on_location"};
+              new Assembler.Label(".Break_on_location");
+              new CPUx86.Pop {DestinationReg = CPU.RegistersEnum.EAX};
+              new CPUx86.Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = CPU.RegistersEnum.EAX};
+              new CPUx86.Call {DestinationLabel = "DebugStub_SendNullReferenceOccurred"};
+              new CPUx86.Halt();
+              new Label(".AfterNullCheck");
+          }
+      }
   }
 }

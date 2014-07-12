@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Hardware;
 
 namespace Cosmos.System {
     public class Console {
@@ -30,8 +31,8 @@ namespace Cosmos.System {
         public int Rows {
             get { return mText.Rows; }
         }
-        
-        protected Hardware.TextScreen mText = Hardware.Global.TextScreen;
+
+        protected Hardware.TextScreen mText = new TextScreen();
 
         public void Clear() {
             mText.Clear();

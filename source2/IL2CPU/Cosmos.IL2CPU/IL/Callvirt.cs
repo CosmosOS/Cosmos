@@ -23,10 +23,10 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
           var xOpMethod = aOpCode as OpMethod;
-          DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode);
+          DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode, DebugEnabled);
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp) {
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp, bool debugEnabled) {
                        
           string xCurrentMethodLabel = GetLabel(aMethod, aOp.Position);
           
@@ -64,7 +64,7 @@ namespace Cosmos.IL2CPU.X86.IL
             //xThisOffset += Align(SizeOfType(aTargetMethod.DeclaringType), 4);
             Assembler.Stack.Pop();
           }
-
+            
           // This is finding offset to self? It looks like we dont need offsets of other
           // arguments, but only self. If so can calculate without calculating all fields
           // Might have to go to old data structure for the offset...
@@ -73,6 +73,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
           
           new Comment(Assembler, "ThisOffset = " + xThisOffset);
+            Call.DoNullReferenceCheck(Assembler, debugEnabled, xThisOffset);
 
           //             Action xEmitCleanup = delegate() {
           //                                       foreach (MethodInformation.Argument xArg in mTargetMethodInfo.Arguments) {

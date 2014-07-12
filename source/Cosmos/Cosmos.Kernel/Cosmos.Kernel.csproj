@@ -93,5 +93,11 @@
   <ItemGroup>
     <None Include="Cosmos.snk" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\source2\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj">
+      <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
+      <Name>Cosmos.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime;
 using System.Text;
 using Cosmos.Build.MSBuild;
 using Microsoft.Build.Framework;
@@ -29,12 +30,12 @@ namespace DebugCompiler
           try
           {
               var xTask = new IL2CPUTask();
-              xTask.DebugEnabled = false;
+              xTask.DebugEnabled = true;
               xTask.DebugMode = "Source";
               xTask.TraceAssemblies = "User";
               xTask.DebugCom = 1;
               xTask.UseNAsm = true;
-              xTask.OutputFilename = CosmosRoot + @"\source2\Users\Kudzu\Breakpoints\bin\Debug\Kudzu.Breakpoints.asm";
+              xTask.OutputFilename = CosmosRoot + @"\source2\Users\Matthijs\Playground\bin\Debug\Kudzu.Breakpoints.asm";
               xTask.EnableLogging = true;
               xTask.EmitDebugSymbols = true;
               xTask.IgnoreDebugStubAttribute = false;
@@ -91,7 +92,7 @@ namespace DebugCompiler
     private static ITaskItem[] GetReferences()
     {
       return new ITaskItem[]{
-                new TaskItemImpl(CosmosRoot + @"\source2\Users\Kudzu\Breakpoints\bin\Debug\Playground.Kudzu.BreakpointsKernel.dll"),
+                new TaskItemImpl(CosmosRoot + @"\source2\Users\Matthijs\Playground\bin\Debug\Playground.dll"),
                 new TaskItemImpl(CosmosRoot + @"\source2\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\bin\x86\Debug\Cosmos.Core.Plugs.dll"),
                 new TaskItemImpl(CosmosRoot + @"\source2\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\bin\x86\Debug\Cosmos.Debug.Kernel.Plugs.dll"),
                 new TaskItemImpl(CosmosRoot + @"\source2\Kernel\System\Hardware\Cosmos.Hardware\bin\x86\Debug\Cosmos.Hardware.dll"),

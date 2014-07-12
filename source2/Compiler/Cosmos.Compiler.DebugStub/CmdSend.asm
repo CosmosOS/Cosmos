@@ -151,6 +151,15 @@ Call DebugStub_ComWrite32
 DebugStub_SendStackCorruptionOccurred_Exit:
 Ret
 
+DebugStub_SendNullReferenceOccurred:
+Mov AL, DebugStub_Const_Ds2Vs_NullReferenceOccurred
+Call DebugStub_ComWriteAL
+
+Mov ESI, DebugStub_CallerEIP
+Call DebugStub_ComWrite32
+DebugStub_SendNullReferenceOccurred_Exit:
+Ret
+
 DebugStub_SendMessageBox:
 Mov AL, DebugStub_Const_Ds2Vs_MessageBox
 Call DebugStub_ComWriteAL

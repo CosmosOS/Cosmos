@@ -16,7 +16,7 @@ namespace Cosmos.Hardware {
     protected UInt32 mScrollSize;
     protected UInt32 mRowSize32;
 
-    protected Core.IOGroup.TextScreen IO = Core.Global.BaseIOGroups.TextScreen;
+      protected Core.IOGroup.TextScreen IO = new Cosmos.Core.IOGroup.TextScreen();
     protected readonly MemoryBlock08 mRAM;
 
     public TextScreen() {

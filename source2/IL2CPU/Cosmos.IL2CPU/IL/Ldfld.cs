@@ -47,7 +47,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
           var xOpCode = (ILOpCodes.OpField)aOpCode;
-          DoExecute(Assembler, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true);
+          DoExecute(Assembler, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true, DebugEnabled);
         }
         public static int GetFieldOffset(Type aDeclaringType, string aFieldId) {
           int xExtraOffset = 0;
@@ -62,7 +62,7 @@ namespace Cosmos.IL2CPU.X86.IL
           return (int)(xExtraOffset + xFieldInfo.Offset);
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField) {
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField, bool debugEnabled) {
           var xStackValue = Assembler.Stack.Pop();
           var xOffset = GetFieldOffset(aDeclaringType, xFieldId);
           var xFields = GetFieldsInfo(aDeclaringType);
@@ -70,6 +70,8 @@ namespace Cosmos.IL2CPU.X86.IL
                             where item.Id == xFieldId
                             select item).Single();
           new Comment("Field = '" + xFieldId + "'");
+
+            Call.DoNullReferenceCheck(Assembler, debugEnabled, 0);
           
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 

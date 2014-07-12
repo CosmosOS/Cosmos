@@ -180,6 +180,19 @@ function SendStackCorruptionOccurred {
 // Input: Stack
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
+function SendNullReferenceOccurred {
+    // Write the type
+    AL = #Ds2Vs_NullReferenceOccurred
+    ComWriteAL()
+
+    // pointer value
+    ESI = @.CallerEIP
+    ComWrite32()
+}
+
+// Input: Stack
+// Output: None
+// Modifies: EAX, ECX, EDX, ESI
 function SendMessageBox {
 	// Write the type
     AL = #Ds2Vs_MessageBox

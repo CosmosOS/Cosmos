@@ -20,6 +20,8 @@ namespace Cosmos.IL2CPU {
       Assembler = aAsmblr;
     }
 
+      public bool DebugEnabled;
+
     // This is called execute and not assemble, as the scanner
     // could be used for other things, profiling, analysis, reporting, etc
     public abstract void Execute(MethodInfo aMethod, ILOpCode aOpCode);

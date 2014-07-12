@@ -13,10 +13,10 @@ namespace Cosmos.IL2CPU.X86.IL {
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpCode = (ILOpCodes.OpField)aOpCode;
       var xField = xOpCode.Value;
-      DoExecute(Assembler, aMethod, xField);
+      DoExecute(Assembler, aMethod, xField, DebugEnabled);
     }
 
-    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler,  MethodInfo aMethod, string aFieldId, Type aDeclaringObject, bool aNeedsGC) {
+    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler,  MethodInfo aMethod, string aFieldId, Type aDeclaringObject, bool aNeedsGC, bool debugEnabled) {
       var xType = aMethod.MethodBase.DeclaringType;
       int xExtraOffset = aNeedsGC ? 12 : 0;
 
@@ -35,6 +35,12 @@ namespace Cosmos.IL2CPU.X86.IL {
       uint xRoundedSize = Align(xSize, 4);
 
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
+        if (debugEnabled)
+        {
+            new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.ECX};
+            Call.DoNullReferenceCheck(aAssembler, debugEnabled, 0);
+            new CPUx86.Pop {DestinationReg = CPUx86.RegistersEnum.ECX};
+        }
       new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xActualOffset) };
       //TODO: Can't we use an x86 op to do a byte copy instead and be faster?
       for (int i = 0; i < (xSize / 4); i++) {
@@ -81,10 +87,11 @@ namespace Cosmos.IL2CPU.X86.IL {
       aAssembler.Stack.Pop();
     }
 
-    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler,  MethodInfo aMethod, System.Reflection.FieldInfo aField) {
+    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethod, System.Reflection.FieldInfo aField, bool debugEnabled)
+    {
       bool xNeedsGC = aField.DeclaringType.IsClass && !aField.DeclaringType.IsValueType;
 
-      DoExecute(aAssembler, aMethod, aField.GetFullName(), aField.DeclaringType, xNeedsGC);
+      DoExecute(aAssembler, aMethod, aField.GetFullName(), aField.DeclaringType, xNeedsGC, debugEnabled);
     }
 
   }

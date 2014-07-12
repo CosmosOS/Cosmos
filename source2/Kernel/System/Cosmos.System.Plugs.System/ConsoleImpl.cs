@@ -6,9 +6,16 @@ using Plug = Cosmos.IL2CPU.Plugs.PlugAttribute;
 namespace Cosmos.System.Plugs.System.System {
 	[Plug(Target = typeof(global::System.Console))]
 	public static class ConsoleImpl {
-
 		private static ConsoleColor mForeground = ConsoleColor.White;
 		private static ConsoleColor mBackground = ConsoleColor.Black;
+        
+	    private static readonly Console mFallbackConsole = new Console();
+
+	    private static Console GetConsole()
+	    {
+	        var result = Global.Console ?? mFallbackConsole;
+	        return result;
+	    }
 
 		public static ConsoleColor get_BackgroundColor() {
 			return mBackground;
@@ -43,11 +50,11 @@ namespace Cosmos.System.Plugs.System.System {
 		}
 
 		public static int get_CursorLeft() {
-			return Global.Console.X;
+            return GetConsole().X;
 		}
 
 		public static void set_CursorLeft(int x) {
-			Global.Console.X = x;
+            GetConsole().X = x;
 		}
 
 		public static int get_CursorSize() {
@@ -60,11 +67,11 @@ namespace Cosmos.System.Plugs.System.System {
 		}
 
 		public static int get_CursorTop() {
-			return Global.Console.Y;
+            return GetConsole().Y;
 		}
 
 		public static void set_CursorTop(int y) {
-			Global.Console.Y = y;
+            GetConsole().Y = y;
 		}
 
 		public static bool get_CursorVisible() {
@@ -162,7 +169,7 @@ namespace Cosmos.System.Plugs.System.System {
 		}
 
 		public static int get_WindowHeight() {
-			return Global.Console.Rows;
+            return GetConsole().Rows;
 		}
 
 		public static void set_WindowHeight(int value) {
@@ -188,7 +195,7 @@ namespace Cosmos.System.Plugs.System.System {
 		}
 
 		public static int get_WindowWidth() {
-			return Global.Console.Cols;
+            return GetConsole().Cols;
 		}
 
 		public static void set_WindowWidth(int value) {
@@ -217,7 +224,7 @@ namespace Cosmos.System.Plugs.System.System {
 
 		//TODO: Console uses TextWriter - intercept and plug it instead
 		public static void Clear() {
-			Global.Console.Clear();
+            GetConsole().Clear();
 		}
 
 		//  MoveBufferArea(int, int, int, int, int, int) is pure CIL
@@ -285,9 +292,9 @@ namespace Cosmos.System.Plugs.System.System {
 				{
 					if (currentCount > 0)
 					{
-						int curCharTemp = Global.Console.X;
+                        int curCharTemp = GetConsole().X;
 						chars.RemoveAt(currentCount - 1);
-						Global.Console.X = Global.Console.X - 1;
+                        GetConsole().X = GetConsole().X - 1;
 
 						//Move characters to the left
 						for (int x = currentCount - 1; x < chars.Count; x++)
@@ -297,7 +304,7 @@ namespace Cosmos.System.Plugs.System.System {
 
 						Write(' ');
 
-						Global.Console.X = curCharTemp - 1;
+                        GetConsole().X = curCharTemp - 1;
 
 						currentCount--;
 					}
@@ -307,7 +314,7 @@ namespace Cosmos.System.Plugs.System.System {
 				{
 					if (currentCount > 0)
 					{
-						Global.Console.X = Global.Console.X - 1;
+                        GetConsole().X = GetConsole().X - 1;
 						currentCount--;
 					}
 					continue;
@@ -316,7 +323,7 @@ namespace Cosmos.System.Plugs.System.System {
 				{
 					if (currentCount < chars.Count)
 					{
-						Global.Console.X = Global.Console.X + 1;
+                        GetConsole().X = GetConsole().X + 1;
 						currentCount++;
 					}
 					continue;
@@ -354,7 +361,7 @@ namespace Cosmos.System.Plugs.System.System {
 						Write(chars[x]);
 					}
 
-					Global.Console.X -= (chars.Count - currentCount) - 1;
+                    GetConsole().X -= (chars.Count - currentCount) - 1;
 					currentCount++;
 				}
 			}
@@ -403,7 +410,7 @@ namespace Cosmos.System.Plugs.System.System {
 		}
 
 		public static void Write(char aChar) {
-			Global.Console.WriteChar(aChar);
+            GetConsole().WriteChar(aChar);
 		}
 
         public static void Write(char[] aBuffer) {
@@ -437,7 +444,7 @@ namespace Cosmos.System.Plugs.System.System {
 		}
 
 		public static void Write(string aText) {
-			Global.Console.Write(aText);
+            GetConsole().Write(aText);
 		}
 
 		public static void Write(uint aInt) {
@@ -496,22 +503,22 @@ namespace Cosmos.System.Plugs.System.System {
         #region WriteLine
 
         public static void WriteLine() {
-            Global.Console.NewLine();
+            GetConsole().NewLine();
         }
 
 		public static void WriteLine(bool aBool) {
 			Write(aBool.ToString());
-			Global.Console.NewLine();
+            GetConsole().NewLine();
 		}
 
 		public static void WriteLine(char aChar) {
 			Write(aChar);
-			Global.Console.NewLine();
+            GetConsole().NewLine();
 		}
 
 		public static void WriteLine(char[] aBuffer) {
 			Write(aBuffer, 0, aBuffer.Length);
-			Global.Console.NewLine();
+            GetConsole().NewLine();
 		}
 
 		//public static void WriteLine(decimal aDecimal) {
@@ -521,45 +528,45 @@ namespace Cosmos.System.Plugs.System.System {
 
 		public static void WriteLine(double aDouble) {
 			Write(aDouble.ToString());
-			Global.Console.NewLine();
+            GetConsole().NewLine();
 		}
 
 		public static void WriteLine(float aFloat) {
 			Write(aFloat.ToString());
-			Global.Console.NewLine();
+            GetConsole().NewLine();
 		}
 
 		public static void WriteLine(int aInt) {
 			Write(aInt.ToString());
-			Global.Console.NewLine();
+            GetConsole().NewLine();
 		}
 
 		public static void WriteLine(long aLong) {
 			Write(aLong.ToString());
-			Global.Console.NewLine();
+            GetConsole().NewLine();
 		}
 
 		public static void WriteLine(object value) {
 			if (value != null)
 			{
 				Write(value.ToString());
-				Global.Console.NewLine();
+                GetConsole().NewLine();
 			}
 		}
 
 		public static void WriteLine(string aText) {
-			Global.Console.Write(aText);
-			Global.Console.NewLine();
+            GetConsole().Write(aText);
+            GetConsole().NewLine();
 		}
 
 		public static void WriteLine(uint aInt) {
 			Write(aInt.ToString());
-			Global.Console.NewLine();
+            GetConsole().NewLine();
 		}
 
 		public static void WriteLine(ulong aLong) {
 			Write(aLong.ToString());
-			Global.Console.NewLine();
+            GetConsole().NewLine();
 		}
 
 		public static void WriteLine(string format, object arg0) {
@@ -572,7 +579,7 @@ namespace Cosmos.System.Plugs.System.System {
 
 		public static void WriteLine(char[] aBuffer, int aIndex, int aCount) {
 			Write(aBuffer, aIndex, aCount);
-			Global.Console.NewLine();
+            GetConsole().NewLine();
 		}
 
 		public static void WriteLine(string format, object arg0, object arg1) {

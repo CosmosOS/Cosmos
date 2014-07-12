@@ -53,4 +53,5 @@ DebugStub_Const_Ds2Vs_Pong equ 13
 DebugStub_Const_Ds2Vs_BreakPointAsm equ 14
 DebugStub_Const_Ds2Vs_StackCorruptionOccurred equ 15
 DebugStub_Const_Ds2Vs_MessageBox equ 16
+DebugStub_Const_Ds2Vs_NullReferenceOccurred equ 17
 

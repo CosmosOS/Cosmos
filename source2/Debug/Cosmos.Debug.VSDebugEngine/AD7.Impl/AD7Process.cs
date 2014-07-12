@@ -304,12 +304,18 @@ namespace Cosmos.Debug.VSDebugEngine
             mDbgConnector.CmdStack += new Action<byte[]>(DbgCmdStack);
             mDbgConnector.CmdPong += new Action<byte[]>(DbgCmdPong);
             mDbgConnector.CmdStackCorruptionOccurred += DbgCmdStackCorruptionOccurred;
+            mDbgConnector.CmdNullReferenceOccurred += DbgCmdNullReferenceOccurred;
             mDbgConnector.CmdMessageBox += DbgCmdMessageBox;
         }
 
         private void DbgCmdStackCorruptionOccurred(uint lastEIPAddress)
         {
             MessageBox.Show(String.Format("Stack corruption occurred at address 0x{0:X8}! Halting now.", lastEIPAddress));
+        }
+
+        private void DbgCmdNullReferenceOccurred(uint lastEIPAddress)
+        {
+            MessageBox.Show(String.Format("NullReferenceException occurred at address 0x{0:X8}! Halting now.", lastEIPAddress));
         }
 
         private void DbgCmdMessageBox(string message)

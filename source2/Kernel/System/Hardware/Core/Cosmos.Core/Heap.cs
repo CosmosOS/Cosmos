@@ -117,8 +117,7 @@ namespace Cosmos.Core
         private static uint mStartAddress;
         private static uint mLength;
         private static uint mEndOfRam;
-
-
+        
         private static void DoInitialize(uint aStartAddress, uint aEndOfRam)
         {
             mStart = mStartAddress = aStartAddress + (4 - (aStartAddress % 4));
@@ -144,7 +143,7 @@ namespace Cosmos.Core
         private static void ClearMemory(uint aStartAddress, uint aLength)
         {
             //TODO: Move to memory. Internal access only...
-            Global.CPU.ZeroFill(aStartAddress, aLength);
+            CPU.ZeroFill(aStartAddress, aLength);
         }
 
         private static void WriteNumber(uint aNumber, byte aBits)
