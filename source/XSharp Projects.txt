@@ -9,6 +9,8 @@ Compiler for XSharp
 -----------------------------------------------------------------------------
 Cosmos.VS.XSharp
 Library - VS Language Service
+Rebuild - Rerun install.bat
+
 VS extension for support for X#.
 
 -----------------------------------------------------------------------------

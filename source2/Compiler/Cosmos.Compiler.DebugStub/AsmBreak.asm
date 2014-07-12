@@ -57,6 +57,7 @@ Pop EAX
 Pop EBP
 DebugStub_SetINT1_TrapFLAG_Exit:
 Ret
+
 DebugStub_ResetINT1_TrapFLAG:
 Push EBP
 Push EAX

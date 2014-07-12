@@ -71,6 +71,7 @@ function SetINT1_TrapFLAG {
 	-EAX
 	-EBP
 }
+
 function ResetINT1_TrapFLAG {
 	//Push EAX to make sure whatever we do below doesn't affect code afterwards
 	+EBP

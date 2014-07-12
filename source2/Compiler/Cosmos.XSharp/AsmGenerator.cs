@@ -7,9 +7,9 @@ using System.IO;
 using XSharp.Nasm;
 
 namespace Cosmos.Compiler.XSharp {
-  /// <summary>This class performs the translation from X# source code into a target
-  /// assembly language. At current time the only supported assembler syntax is NASM.
-  /// </summary>
+  // This class performs the translation from X# source code into a target
+  // assembly language. At current time the only supported assembler syntax is NASM.
+
   public class AsmGenerator {
     protected TokenPatterns mPatterns = new TokenPatterns();
 
@@ -20,11 +20,11 @@ namespace Cosmos.Compiler.XSharp {
 
     /// <summary>Invoke this method when end of source code file is reached to make sure the last
     /// function or interrupt handler has well balanced opening/closing curly braces.</summary>
-    private void AssertLastFunctionComplete()
-    {
-        if (!mPatterns.InFunctionBody) { return; }
-        throw new Exception(
-            "The last function or interrupt handler from source code file is missing a curly brace.");
+    private void AssertLastFunctionComplete() {
+      if (!mPatterns.InFunctionBody) {
+        return;
+      }
+      throw new Exception("The last function or interrupt handler from source code file is missing a curly brace.");
     }
 
     /// <summary>Parse the input X# source code file and generate the matching target assembly
@@ -33,28 +33,25 @@ namespace Cosmos.Compiler.XSharp {
     /// <returns>The resulting target assembler content. The returned object contains
     /// a code and a data block.</returns>
     public Assembler Generate(string aSrcPathname) {
-            mPatterns.EmitUserComments = EmitUserComments;
-            mLineNo = 0;
-            var xResult = new Assembler();
-            using (var xInput = new StreamReader(aSrcPathname))
-            {
-                // Read one X# source code line at a time and process it.
-                while (true)
-                {
-                    mLineNo++;
-                    string xLine = xInput.ReadLine();
-                    if (xLine == null)
-                    {
-                        break;
-                    }
+      mPatterns.EmitUserComments = EmitUserComments;
+      mLineNo = 0;
+      var xResult = new Assembler();
+      using (var xInput = new StreamReader(aSrcPathname)) {
+        // Read one X# source code line at a time and process it.
+        while (true) {
+          mLineNo++;
+          string xLine = xInput.ReadLine();
+          if (xLine == null) {
+            break;
+          }
 
-                    var xAsm = ProcessLine(xLine, mLineNo);
-                    xResult.Data.AddRange(xAsm.Data);
-                    xResult.Code.AddRange(xAsm.Code);
-                }
-            }
-            AssertLastFunctionComplete();
-            return xResult;
+          var xAsm = ProcessLine(xLine, mLineNo);
+          xResult.Data.AddRange(xAsm.Data);
+          xResult.Code.AddRange(xAsm.Code);
+        }
+      }
+      AssertLastFunctionComplete();
+      return xResult;
     }
 
     /// <summary>Parse the input X# source code file and generate two new files with target
@@ -81,8 +78,7 @@ namespace Cosmos.Compiler.XSharp {
       mPatterns.EmitUserComments = EmitUserComments;
       mLineNo = 0;
       // Read one X# source code line at a time and process it.
-      while (true)
-      {
+      while (true) {
         mLineNo++;
         string xLine = aInput.ReadLine();
         if (xLine == null) {
@@ -106,8 +102,7 @@ namespace Cosmos.Compiler.XSharp {
     /// <param name="lineNumber">Line number for debugging and diagnostic messages.</param>
     /// <returns>The resulting target assembler content. The returned object contains
     /// a code and a data block.</returns>
-    protected Assembler ProcessLine(string aLine, int lineNumber)
-    {
+    protected Assembler ProcessLine(string aLine, int lineNumber) {
       Assembler xAsm;
 
       aLine = aLine.Trim();

@@ -325,7 +325,7 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\Generators\{{FAE04EC1-3
 ; X# file generator type
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.VS.XSharp
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.XSharp.FileGenerator
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.XSharp.XsToAsmFileGenerator
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.VS.XSharp.dll
 
