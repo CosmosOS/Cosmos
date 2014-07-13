@@ -324,10 +324,10 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\Generators\{{FAE04EC1-3
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\Generators\{{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}\CosmosXSharpGenerator; ValueType: dword; ValueName: GeneratesDesignTimeSource; ValueData: 1
 ; X# file generator type
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: none; Flags: uninsdeletekey
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.VS.XSharp
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.XSharp.XsToAsmFileGenerator
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.XSharp.VS
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: Class; ValueData: Cosmos.XSharp.VS.XsToAsmFileGenerator
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.VS.XSharp.dll
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.XSharp.VS.dll
 
 ; program provider
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: none; Flags: uninsdeletekey
@@ -377,8 +377,8 @@ Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\InstalledProducts\Cosmo
 
 Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Packages\{{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}; ValueType: string; ValueData: Cosmos_VS_XSharpPackage
 Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Packages\{{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}; ValueName: InprocServer32; ValueType: string; ValueData: {sys}\MSCOREE.DLL
-Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Packages\{{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}; ValueName: Class; ValueType: string; ValueData: Cosmos.VS.XSharp.Cosmos_VS_XSharpPackage
-Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Packages\{{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}; ValueName: CodeBase; ValueType: string; ValueData: {app}\Build\VSIP\Cosmos.VS.XSharp.dll
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Packages\{{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}; ValueName: Class; ValueType: string; ValueData: Cosmos.XSharp.VS.Cosmos_VS_XSharpPackage
+Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Packages\{{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}; ValueName: CodeBase; ValueType: string; ValueData: {app}\Build\VSIP\Cosmos.XSharp.VS.dll
 
 Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Languages\File Extensions\.xs; ValueType: string; ValueData: {{3fb852ed-3562-3da4-98dc-55759744328c}
 

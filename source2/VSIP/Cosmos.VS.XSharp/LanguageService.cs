@@ -16,7 +16,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 // Managed Babel
 //   http://msdn.microsoft.com/en-us/library/bb165037.aspx
 
-namespace Cosmos.VS.XSharp {
+namespace Cosmos.XSharp.VS {
   public class XSharpLanguageService : LanguageService {
     public override string GetFormatFilterList() {
       return "X# files (*.xs)\n*.xs\n";

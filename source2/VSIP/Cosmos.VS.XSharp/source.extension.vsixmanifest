@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
   <Identifier Id="e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d">
-    <Name>Cosmos.VS.XSharp</Name>
+    <Name>Cosmos.XSharp.VS</Name>
     <Author>Cosmos</Author>
     <Version>1.0</Version>
     <Description xml:space="preserve">Cosmos X# Language</Description>

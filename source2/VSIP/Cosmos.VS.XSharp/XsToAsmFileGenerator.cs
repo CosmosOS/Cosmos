@@ -7,7 +7,7 @@ using Microsoft.VisualStudio;
 using System.Runtime.InteropServices;
 using System.IO;
 
-namespace Cosmos.VS.XSharp {
+namespace Cosmos.XSharp.VS {
   // This class generates .asm files from .xs files.
   //
   // The .asm is not used for actual compiling, but for now we still generate .asm files on save because:
