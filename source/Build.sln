@@ -86,8 +86,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "..\s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{49A7A478-E046-4B7D-9144-81D359A13719}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.XSC", "..\XSharp\source\XSharp.XSC\XSharp.XSC.csproj", "{7B8499A7-0A8D-44FC-8181-9666CC198025}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Nasm", "..\XSharp\source\XSharp.Nasm\XSharp.Nasm.csproj", "{841A734E-9606-4AAB-9C4A-74E7E303FF5D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MDbg", "MDbg", "{6248DD1D-EAE8-4A54-AFC6-1A2DEC913DE5}"
@@ -102,7 +100,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.VS", "..\source2\VSI
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 31
+		SccNumberOfProjects = 30
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -203,30 +201,26 @@ Global
 		SccProjectTopLevelParentUniqueName24 = Build.sln
 		SccProjectName24 = ../source2/Cosmos.Deploy.Pixie
 		SccLocalPath24 = ..\\source2\\Cosmos.Deploy.Pixie
-		SccProjectUniqueName25 = ..\\XSharp\\source\\XSharp.XSC\\XSharp.XSC.csproj
+		SccProjectUniqueName25 = ..\\XSharp\\source\\XSharp.Nasm\\XSharp.Nasm.csproj
 		SccProjectTopLevelParentUniqueName25 = Build.sln
-		SccProjectName25 = ../XSharp/source/XSharp.XSC
-		SccLocalPath25 = ..\\XSharp\\source\\XSharp.XSC
-		SccProjectUniqueName26 = ..\\XSharp\\source\\XSharp.Nasm\\XSharp.Nasm.csproj
+		SccProjectName25 = ../XSharp/source/XSharp.Nasm
+		SccLocalPath25 = ..\\XSharp\\source\\XSharp.Nasm
+		SccProjectUniqueName26 = ..\\source2\\MDbg4\\src\\debugger\\raw\\raw.csproj
 		SccProjectTopLevelParentUniqueName26 = Build.sln
-		SccProjectName26 = ../XSharp/source/XSharp.Nasm
-		SccLocalPath26 = ..\\XSharp\\source\\XSharp.Nasm
-		SccProjectUniqueName27 = ..\\source2\\MDbg4\\src\\debugger\\raw\\raw.csproj
+		SccProjectName26 = ../source2/MDbg4/src/debugger/raw
+		SccLocalPath26 = ..\\source2\\MDbg4\\src\\debugger\\raw
+		SccProjectUniqueName27 = ..\\source2\\MDbg4\\src\\debugger\\NativeDebugWrappers\\NativeDebugWrappers.csproj
 		SccProjectTopLevelParentUniqueName27 = Build.sln
-		SccProjectName27 = ../source2/MDbg4/src/debugger/raw
-		SccLocalPath27 = ..\\source2\\MDbg4\\src\\debugger\\raw
-		SccProjectUniqueName28 = ..\\source2\\MDbg4\\src\\debugger\\NativeDebugWrappers\\NativeDebugWrappers.csproj
+		SccProjectName27 = ../source2/MDbg4/src/debugger/NativeDebugWrappers
+		SccLocalPath27 = ..\\source2\\MDbg4\\src\\debugger\\NativeDebugWrappers
+		SccProjectUniqueName28 = ..\\source2\\MDbg4\\src\\debugger\\corapi\\corapi.csproj
 		SccProjectTopLevelParentUniqueName28 = Build.sln
-		SccProjectName28 = ../source2/MDbg4/src/debugger/NativeDebugWrappers
-		SccLocalPath28 = ..\\source2\\MDbg4\\src\\debugger\\NativeDebugWrappers
-		SccProjectUniqueName29 = ..\\source2\\MDbg4\\src\\debugger\\corapi\\corapi.csproj
+		SccProjectName28 = ../source2/MDbg4/src/debugger/corapi
+		SccLocalPath28 = ..\\source2\\MDbg4\\src\\debugger\\corapi
+		SccProjectUniqueName29 = ..\\source2\\VSIP\\Cosmos.VS.XSharp\\XSharp.VS.csproj
 		SccProjectTopLevelParentUniqueName29 = Build.sln
-		SccProjectName29 = ../source2/MDbg4/src/debugger/corapi
-		SccLocalPath29 = ..\\source2\\MDbg4\\src\\debugger\\corapi
-		SccProjectUniqueName30 = ..\\source2\\VSIP\\Cosmos.VS.XSharp\\XSharp.VS.csproj
-		SccProjectTopLevelParentUniqueName30 = Build.sln
-		SccProjectName30 = ../source2/VSIP/Cosmos.VS.XSharp
-		SccLocalPath30 = ..\\source2\\VSIP\\Cosmos.VS.XSharp
+		SccProjectName29 = ../source2/VSIP/Cosmos.VS.XSharp
+		SccLocalPath29 = ..\\source2\\VSIP\\Cosmos.VS.XSharp
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -520,17 +514,6 @@ Global
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|Mixed Platforms.Build.0 = Release|x86
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|x86.ActiveCfg = Release|x86
 		{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}.Release|x86.Build.0 = Release|x86
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Debug|x86.Build.0 = Debug|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{7B8499A7-0A8D-44FC-8181-9666CC198025}.Release|x86.ActiveCfg = Release|Any CPU
 		{841A734E-9606-4AAB-9C4A-74E7E303FF5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{841A734E-9606-4AAB-9C4A-74E7E303FF5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{841A734E-9606-4AAB-9C4A-74E7E303FF5D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -618,7 +601,6 @@ Global
 		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315} = {E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E} = {CDF13174-7897-4334-9AE4-B1DCC013F6BD}
 		{A281A1B1-C718-4BCB-A7BE-ED840A70449A} = {49A7A478-E046-4B7D-9144-81D359A13719}
-		{7B8499A7-0A8D-44FC-8181-9666CC198025} = {49A7A478-E046-4B7D-9144-81D359A13719}
 		{841A734E-9606-4AAB-9C4A-74E7E303FF5D} = {49A7A478-E046-4B7D-9144-81D359A13719}
 		{FB71E8EF-E229-4D81-984A-B9170D752BF9} = {49A7A478-E046-4B7D-9144-81D359A13719}
 		{3D84CF8B-C6DF-4D78-8DE1-708582B43711} = {FD42844B-2767-4DF4-B0AF-EA5F7CB11528}
