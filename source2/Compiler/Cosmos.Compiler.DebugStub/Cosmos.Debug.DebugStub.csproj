@@ -71,16 +71,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Cosmos.Assembler\Cosmos.Assembler.csproj">
-      <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
-      <Name>Cosmos.Assembler</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="AsmBreak.xs">
+    <EmbeddedResource Include="AsmBreak.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>AsmBreak.asm</LastGenOutput>
-    </None>
+    </EmbeddedResource>
     <None Include="CmdMisc.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>CmdMisc.asm</LastGenOutput>
