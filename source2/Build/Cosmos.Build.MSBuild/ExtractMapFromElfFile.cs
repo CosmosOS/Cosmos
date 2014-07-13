@@ -126,7 +126,7 @@ namespace Cosmos.Build.MSBuild {
                         }
                         else
                         {
-                            xGuid = Guid.NewGuid();
+                            xGuid = DebugInfo.Guid_NewGuid();
                         }
 
                         xLabels.Add(new Label()
@@ -139,19 +139,6 @@ namespace Cosmos.Build.MSBuild {
                     }
                     xDebugInfo.AddLabels(xLabels, true);
                 }
-
-                //// All labels are in DB, now go back and match up Method.LabelStart
-                //using (var xDB = xDebugInfo.DB())
-                //{
-                //    //TODO: EF keeps all items in RAM, even after AcceptChanges.
-                //    // Right now we only have a few hundred methods, but when this grows we 
-                //    // need to find a way around this. Future EF versions might addresst this better.
-                //    // Current EF versions require us to destroy the context and create a new one.
-                //    foreach (var xMethod in xDB.Methods)
-                //    {
-                //        //xMethod
-                //    }
-                //}
             }
 
             return true;

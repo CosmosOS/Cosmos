@@ -154,7 +154,7 @@ namespace DebugCompiler
             {
                 get
                 {
-                    return new String[] {"FullPath"};
+                    return new String[] { "FullPath" };
                 }
             }
 

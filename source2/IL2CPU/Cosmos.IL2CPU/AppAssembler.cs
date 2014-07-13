@@ -1233,7 +1233,7 @@ namespace Cosmos.IL2CPU
                 var expectedDifference = aMethod.LocalVariablesSize;
                 foreach (var item in Assembler.Stack)
                 {
-                    expectedDifference += item.Size;
+                    expectedDifference += X86.IL.Ldarg.Align(item.Size, 4);
                 }
 
                 // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value. 

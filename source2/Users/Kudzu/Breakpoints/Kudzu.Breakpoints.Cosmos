@@ -19,7 +19,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <EnableGDB>False</EnableGDB>
+    <EnableGDB>True</EnableGDB>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>PXE</BuildTarget>
@@ -66,7 +66,7 @@
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
-    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_EnableGDB>True</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
     <ISO_Launch>None</ISO_Launch>
@@ -136,7 +136,7 @@
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
     <DebugMode>Source</DebugMode>
-    <EnableGDB>False</EnableGDB>
+    <EnableGDB>True</EnableGDB>
     <TraceMode>
     </TraceMode>
     <VMWareFlavor>Workstation</VMWareFlavor>
@@ -212,7 +212,7 @@
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
-    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_EnableGDB>True</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <User001_Name>PXE with Slave (Kudzu)</User001_Name>
     <User001_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</User001_Description>

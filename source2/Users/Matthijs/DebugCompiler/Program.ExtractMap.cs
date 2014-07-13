@@ -15,7 +15,7 @@
 //            var task = new ExtractMapFromElfFile
 //            {
 //                CosmosBuildDir = @"c:\Data\Sources\Cosmos\Build",
-//                DebugInfoFile=@"c:\data\sources\dbg.cdb",
+//                DebugInfoFile = @"c:\Data\Sources\Cosmos\source2\Users\Kudzu\Breakpoints\bin\Debug\Kudzu.Breakpoints.cdb",
 //                InputFile = @"c:\Data\Sources\Cosmos\source2\Users\Kudzu\Breakpoints\bin\Debug\Kudzu.Breakpoints.bin",
 //                WorkingDir = @"c:\Data\Sources\Cosmos\source2\Users\Kudzu\Breakpoints\bin\Debug\"
 //            };
