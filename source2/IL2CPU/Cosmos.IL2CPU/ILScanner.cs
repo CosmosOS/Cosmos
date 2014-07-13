@@ -16,36 +16,6 @@ namespace Cosmos.IL2CPU
 {
     public delegate void LogExceptionDelegate(Exception e);
 
-    // This is necessary because HashSet and Dictionary
-    // have troubles when different types of objects are stored
-    // in them. I dont remember the exact problem, but something
-    // with how it compares objects. ie when HashSet<object> is used, this is necessary.
-    /*public class HashcodeComparer<T> : IEqualityComparer<T> {
-        public bool Equals(T x, T y) {
-      return internalEqualsSinceNET40(x, y);// x.GetHashCode() == y.GetHashCode();
-        }
-
-    public bool internalEqualsSinceNET40(T left, T right)
-    {
-      var methodDeclaringType = left.GetType().GetMethod("get_DeclaringType");
-      var leftDeclaringType = methodDeclaringType.Invoke(left, null);
-
-      var method = right.GetType().GetMethod("get_DeclaringType");
-      var rightDeclaringType = method.Invoke(right, null);
-
-      if (left.ToString() == right.ToString()
-        && leftDeclaringType == rightDeclaringType)
-      {
-        return true;
-      }
-      return false;
-    }
-
-        public int GetHashCode(T obj) {
-            return obj.GetHashCode();
-        }
-    }*/
-
     public class ScannerQueueItem
     {
         public _MemberInfo Item;

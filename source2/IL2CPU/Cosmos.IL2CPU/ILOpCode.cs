@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using SR = System.Reflection;
@@ -10,6 +11,7 @@ namespace Cosmos.IL2CPU {
   //   Include reference to ILOp, the scanner should do that
   //   Include referense to System.Reflection.Emit, this is metadata
   //     only needed by reader and not ILOpCode
+  //[DebuggerDisplay("IL_{Position}{:{OpCode}")]
   public abstract class ILOpCode {
 
     public enum Code : ushort {
@@ -258,5 +260,9 @@ namespace Cosmos.IL2CPU {
       CurrentExceptionHandler = aCurrentExceptionHandler;
     }
 
+    public override string ToString()
+    {
+        return String.Format("IL_{0}: {1}", Position.ToString("X4"), OpCode);
+    }
   }
 }

@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
+using Cosmos.Assembler.x86._486AndUp;
 using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.Plugs;
@@ -66,10 +67,6 @@ namespace Cosmos.IL2CPU
             new Comment("Type: " + aMethod.MethodBase.DeclaringType.ToString());
             new Comment("Name: " + aMethod.MethodBase.Name);
             new Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
-            if (aMethod.MethodBase.Name == "GetFatEntry")
-            {
-                Console.Write("");
-            }
             // for now:
             var shouldIncludeArgAndLocalsComment = true;
             if (shouldIncludeArgAndLocalsComment)
@@ -460,6 +457,8 @@ namespace Cosmos.IL2CPU
             }
             else
             {
+                // now emit the actual assembler code for this method.
+                
                 //Conditions under which we should emit an INT3 instead of a plceholder NOP:
                 /* - First instruction in a Method / Loop / If / Else etc.
                  *   -- In essence, whenever there is a opening {
@@ -467,107 +466,166 @@ namespace Cosmos.IL2CPU
                  *   -- So only insert an INT3 when we are about to insert a NOP that came from IL code
                  */
 
+                /* We group opcodes together by logical statement. Each statement will have its logical stack cleared.
+                 * Also, this lets us do optimizations later on.
+                 */
                 bool emitINT3 = true;
-                foreach (var xOpCode in aOpCodes)
+                DebugInfo.SequencePoint xPreviousSequencePoint = null;
+                var xCurrentGroup = new List<ILOpCode>();
+                foreach (var xRawOpcode in aOpCodes)
                 {
-                    ushort xOpCodeVal = (ushort)xOpCode.OpCode;
-                    ILOp xILOp;
-                    if (xOpCodeVal <= 0xFF)
+                    var xSP = mSequences.FirstOrDefault(q => q.Offset == xRawOpcode.Position && q.LineStart != 0xFEEFEE);
+                    var hasNewSP = false;
+                    // detect if we're at a new statement.
+                    if (xPreviousSequencePoint == null && xSP != null)
                     {
-                        xILOp = mILOpsLo[xOpCodeVal];
+                        
                     }
-                    else
+                    if (xSP != null && xCurrentGroup.Count > 0)
                     {
-                        xILOp = mILOpsHi[xOpCodeVal & 0xFF];
+                        EmitInstructions(aMethod, xCurrentGroup, ref emitINT3);
+                        xCurrentGroup.Clear();
+                        xPreviousSequencePoint = xSP;
                     }
-                    mLog.WriteLine("\t{0} {1}", Assembler.Stack.Count, xILOp.GetType().Name);
-                    mLog.Flush();
-
-                    //Only emit INT3 as per conditions above...
-                    bool INT3Emitted = false;
-                    BeforeOp(aMethod, xOpCode, emitINT3, out INT3Emitted);
-                    //Emit INT3 on the first non-NOP instruction immediately after a NOP
-                    // - This is because TracePoints for NOP are automatically ignored in code called below this
-                    emitINT3 = (emitINT3 && !INT3Emitted) || xILOp is Cosmos.IL2CPU.X86.IL.Nop;
-
-                    new Comment(xILOp.ToString());
-                    var xNextPosition = xOpCode.Position + 1;
-                    #region Exception handling support code
-                    ExceptionHandlingClause xCurrentHandler = null;
-                    var xBody = aMethod.MethodBase.GetMethodBody();
-                    // todo: add support for nested handlers using a stack or so..
-                    foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses)
-                    {
-                        if (xHandler.TryOffset > 0)
-                        {
-                            if (xHandler.TryOffset <= xNextPosition && (xHandler.TryLength + xHandler.TryOffset) > xNextPosition)
-                            {
-                                if (xCurrentHandler == null)
-                                {
-                                    xCurrentHandler = xHandler;
-                                    continue;
-                                }
-                                else if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset))
-                                {
-                                    // only replace if the current found handler is narrower
-                                    xCurrentHandler = xHandler;
-                                    continue;
-                                }
-                            }
-                        }
-                        if (xHandler.HandlerOffset > 0)
-                        {
-                            if (xHandler.HandlerOffset <= xNextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xNextPosition)
-                            {
-                                if (xCurrentHandler == null)
-                                {
-                                    xCurrentHandler = xHandler;
-                                    continue;
-                                }
-                                else if (xHandler.HandlerOffset > xCurrentHandler.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentHandler.HandlerOffset + xCurrentHandler.HandlerLength))
-                                {
-                                    // only replace if the current found handler is narrower
-                                    xCurrentHandler = xHandler;
-                                    continue;
-                                }
-                            }
-                        }
-                        if ((xHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0)
-                        {
-                            if (xHandler.FilterOffset > 0)
-                            {
-                                if (xHandler.FilterOffset <= xNextPosition)
-                                {
-                                    if (xCurrentHandler == null)
-                                    {
-                                        xCurrentHandler = xHandler;
-                                        continue;
-                                    }
-                                    else if (xHandler.FilterOffset > xCurrentHandler.FilterOffset)
-                                    {
-                                        // only replace if the current found handler is narrower
-                                        xCurrentHandler = xHandler;
-                                        continue;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    #endregion
-                    var xNeedsExceptionPush = (xCurrentHandler != null) && (((xCurrentHandler.HandlerOffset > 0 && xCurrentHandler.HandlerOffset == xOpCode.Position) || ((xCurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && xCurrentHandler.FilterOffset > 0 && xCurrentHandler.FilterOffset == xOpCode.Position)) && (xCurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause));
-                    if (xNeedsExceptionPush)
-                    {
-                        Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
-                        Assembler.Stack.Push(4, typeof(Exception));
-                    }
-                    xILOp.DebugEnabled = DebugEnabled;
-                    xILOp.Execute(aMethod, xOpCode);
-
-                    AfterOp(aMethod, xOpCode);
-                    //mLog.WriteLine( " end: " + Stack.Count.ToString() );
+                    xCurrentGroup.Add(xRawOpcode);                    
+                }
+                if (xCurrentGroup.Count > 0)
+                {
+                    EmitInstructions(aMethod, xCurrentGroup, ref emitINT3);
                 }
             }
             MethodEnd(aMethod);
+        }
+
+        private void BeforeEmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
+        {
+            // do optimizations
+        }
+
+        private void AfterEmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
+        {
+            // do optimizations
+            if (Assembler.Stack.Count > 0)
+            {
+                if (mDebugStackErrors)
+                {
+                    Console.WriteLine("StackCorruption in Analytical stack:");
+                    Console.WriteLine("- Method: {0}", aMethod.MethodBase.GetFullName());
+                    Console.WriteLine("- Last ILOpCode offset: {0}", aCurrentGroup.Last().Position.ToString("X"));
+                }
+            }
+        }
+
+        private static bool mDebugStackErrors = true;
+        private void EmitInstructions(MethodInfo aMethod, List<ILOpCode> xCurrentGroup, ref bool emitINT3)
+        {
+            new Comment(String.Format("New Group Offset {0} - Offset {1}", xCurrentGroup.First().Position.ToString("X"), xCurrentGroup.Last().Position.ToString("X")));
+            BeforeEmitInstructions(aMethod, xCurrentGroup);
+            var xFirstInstruction = true;
+            foreach (var xOpCode in xCurrentGroup)
+            {
+                ushort xOpCodeVal = (ushort) xOpCode.OpCode;
+                ILOp xILOp;
+                if (xOpCodeVal <= 0xFF)
+                {
+                    xILOp = mILOpsLo[xOpCodeVal];
+                }
+                else
+                {
+                    xILOp = mILOpsHi[xOpCodeVal & 0xFF];
+                }
+                mLog.WriteLine("\t{0} {1}", Assembler.Stack.Count, xILOp.GetType().Name);
+                mLog.Flush();
+
+                //Only emit INT3 as per conditions above...
+                bool INT3Emitted = false;
+                BeforeOp(aMethod, xOpCode, emitINT3, out INT3Emitted, xFirstInstruction);
+                xFirstInstruction = false;
+                //Emit INT3 on the first non-NOP instruction immediately after a NOP
+                // - This is because TracePoints for NOP are automatically ignored in code called below this
+                emitINT3 = (emitINT3 && !INT3Emitted) || xILOp is Cosmos.IL2CPU.X86.IL.Nop;
+
+                new Comment(xILOp.ToString());
+                var xNextPosition = xOpCode.Position + 1;
+
+                #region Exception handling support code
+
+                ExceptionHandlingClause xCurrentHandler = null;
+                var xBody = aMethod.MethodBase.GetMethodBody();
+                // todo: add support for nested handlers using a stack or so..
+                foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses)
+                {
+                    if (xHandler.TryOffset > 0)
+                    {
+                        if (xHandler.TryOffset <= xNextPosition && (xHandler.TryLength + xHandler.TryOffset) > xNextPosition)
+                        {
+                            if (xCurrentHandler == null)
+                            {
+                                xCurrentHandler = xHandler;
+                                continue;
+                            }
+                            else if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset))
+                            {
+                                // only replace if the current found handler is narrower
+                                xCurrentHandler = xHandler;
+                                continue;
+                            }
+                        }
+                    }
+                    if (xHandler.HandlerOffset > 0)
+                    {
+                        if (xHandler.HandlerOffset <= xNextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xNextPosition)
+                        {
+                            if (xCurrentHandler == null)
+                            {
+                                xCurrentHandler = xHandler;
+                                continue;
+                            }
+                            else if (xHandler.HandlerOffset > xCurrentHandler.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentHandler.HandlerOffset + xCurrentHandler.HandlerLength))
+                            {
+                                // only replace if the current found handler is narrower
+                                xCurrentHandler = xHandler;
+                                continue;
+                            }
+                        }
+                    }
+                    if ((xHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0)
+                    {
+                        if (xHandler.FilterOffset > 0)
+                        {
+                            if (xHandler.FilterOffset <= xNextPosition)
+                            {
+                                if (xCurrentHandler == null)
+                                {
+                                    xCurrentHandler = xHandler;
+                                    continue;
+                                }
+                                else if (xHandler.FilterOffset > xCurrentHandler.FilterOffset)
+                                {
+                                    // only replace if the current found handler is narrower
+                                    xCurrentHandler = xHandler;
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                #endregion
+
+                var xNeedsExceptionPush = (xCurrentHandler != null) && (((xCurrentHandler.HandlerOffset > 0 && xCurrentHandler.HandlerOffset == xOpCode.Position) || ((xCurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && xCurrentHandler.FilterOffset > 0 && xCurrentHandler.FilterOffset == xOpCode.Position)) && (xCurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause));
+                if (xNeedsExceptionPush)
+                {
+                    Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
+                    Assembler.Stack.Push(4, typeof (Exception));
+                }
+                xILOp.DebugEnabled = DebugEnabled;
+                xILOp.Execute(aMethod, xOpCode);
+
+                AfterOp(aMethod, xOpCode);
+                //mLog.WriteLine( " end: " + Stack.Count.ToString() );
+            }
+            AfterEmitInstructions(aMethod, xCurrentGroup);
         }
 
         protected void InitILOps()
@@ -1177,7 +1235,7 @@ namespace Cosmos.IL2CPU
             new Comment("Stack contains " + Assembler.Stack.Count + " items: (" + xContents + ")");
         }
 
-        protected void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode, bool emitInt3NotNop, out bool INT3Emitted)
+        protected void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode, bool emitInt3NotNop, out bool INT3Emitted, bool hasSourcePoint)
         {
             string xLabel = TmpPosLabel(aMethod, aOpCode);
             Assembler.CurrentIlLabel = xLabel;
@@ -1211,7 +1269,7 @@ namespace Cosmos.IL2CPU
             DebugInfo.AddSymbols(mSymbols, false);
 
             bool INT3PlaceholderEmitted = false;
-            EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace, emitInt3NotNop, out INT3Emitted, out INT3PlaceholderEmitted);
+            EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace, emitInt3NotNop, out INT3Emitted, out INT3PlaceholderEmitted, hasSourcePoint);
 
             if (INT3Emitted || INT3PlaceholderEmitted)
             {
@@ -1223,43 +1281,43 @@ namespace Cosmos.IL2CPU
                 DebugInfo.AddINT3Labels(mINT3Labels);
             }
 
-            if (DebugEnabled && StackCorruptionDetection)
-            {
-                // if debugstub is active, emit a stack corruption detection. at this point, the difference between EBP and ESP
-                // should be equal to the local variables sizes and the IL stack. 
-                // if not, we should break here.
+            //if (DebugEnabled && StackCorruptionDetection)
+            //{
+            //    // if debugstub is active, emit a stack corruption detection. at this point, the difference between EBP and ESP
+            //    // should be equal to the local variables sizes and the IL stack. 
+            //    // if not, we should break here.
 
-                // first, calculate the expected difference
-                var expectedDifference = aMethod.LocalVariablesSize;
-                foreach (var item in Assembler.Stack)
-                {
-                    expectedDifference += X86.IL.Ldarg.Align(item.Size, 4);
-                }
+            //    // first, calculate the expected difference
+            //    var expectedDifference = aMethod.LocalVariablesSize;
+            //    foreach (var item in Assembler.Stack)
+            //    {
+            //        expectedDifference += X86.IL.Ldarg.Align(item.Size, 4);
+            //    }
 
-                // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value. 
-                // if not, we should somehow break here.
-                new Mov { DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP };
-                new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
-                new Add { DestinationReg = Registers.EAX, SourceValue = expectedDifference };
-                new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
-                new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".StackCorruptionCheck_End" };
-                new ClrInterruptFlag();
-                // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-                new Call { DestinationLabel = xLabel + ".StackCorruptionCheck_GetAddress" };
-                new Assembler.Label(xLabel + ".StackCorruptionCheck_GetAddress");
-                new Pop { DestinationReg = RegistersEnum.EAX };
-                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
-                new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
-                new Halt();
-                new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
+            //    // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value. 
+            //    // if not, we should somehow break here.
+            //    new Mov { DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP };
+            //    new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
+            //    new Add { DestinationReg = Registers.EAX, SourceValue = expectedDifference };
+            //    new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
+            //    new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".StackCorruptionCheck_End" };
+            //    new ClrInterruptFlag();
+            //    // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+            //    new Call { DestinationLabel = xLabel + ".StackCorruptionCheck_GetAddress" };
+            //    new Assembler.Label(xLabel + ".StackCorruptionCheck_GetAddress");
+            //    new Pop { DestinationReg = RegistersEnum.EAX };
+            //    new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
+            //    new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
+            //    new Halt();
+            //    new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
 
-            }
+            //}
         }
 
-        protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, bool emitInt3NotNop, out bool INT3Emitted, out bool INT3PlaceholderEmitted)
+        protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, bool emitInt3NotNop, out bool INT3Emitted, out bool INT3PlaceholderEmitted, bool isNewSourcePoint)
         {
             // NOTE - These if statements can be optimized down - but clarity is
-            // more important the optimizations. Furthermoer the optimazations available
+            // more important than the optimizations. Furthermore the optimizations available
             // would not offer much benefit
 
             // Determine if a new DebugStub should be emitted
@@ -1282,14 +1340,8 @@ namespace Cosmos.IL2CPU
             {
                 // If the current position equals one of the offsets, then we have
                 // reached a new atomic C# statement
-                var xSP = mSequences.SingleOrDefault(q => q.Offset == aOp.Position);
-                if (xSP == null)
+                if (!isNewSourcePoint)
                 {
-                    return;
-                }
-                else if (xSP.LineStart == 0xFEEFEE)
-                {
-                    // 0xFEEFEE means hiddenline -> we dont want to stop there
                     return;
                 }
             }
