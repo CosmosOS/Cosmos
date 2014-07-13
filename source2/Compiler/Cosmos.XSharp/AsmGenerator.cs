@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.IO;
 using XSharp.Nasm;
 
-namespace Cosmos.Compiler.XSharp {
+namespace XSharp.Compiler {
   // This class performs the translation from X# source code into a target
   // assembly language. At current time the only supported assembler syntax is NASM.
 

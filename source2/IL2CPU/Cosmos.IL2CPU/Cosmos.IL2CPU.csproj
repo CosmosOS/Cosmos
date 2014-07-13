@@ -387,9 +387,9 @@
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Compiler\Cosmos.XSharp\Cosmos.Compiler.XSharp.csproj">
+    <ProjectReference Include="..\..\Compiler\Cosmos.XSharp\XSharp.Compiler.csproj">
       <Project>{A281A1B1-C718-4BCB-A7BE-ED840A70449A}</Project>
-      <Name>Cosmos.Compiler.XSharp</Name>
+      <Name>XSharp.Compiler</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Cosmos.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>

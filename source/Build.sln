@@ -74,7 +74,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{6A
 		Cosmos.Compiler.html = Cosmos.Compiler.html
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.XSharp", "..\source2\Compiler\Cosmos.XSharp\Cosmos.Compiler.XSharp.csproj", "{A281A1B1-C718-4BCB-A7BE-ED840A70449A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Compiler", "..\source2\Compiler\Cosmos.XSharp\XSharp.Compiler.csproj", "{A281A1B1-C718-4BCB-A7BE-ED840A70449A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VMWareLib", "..\source2\VMWareLib\VMWareLib.csproj", "{76CDB55D-55E3-4B53-AE33-12EC31430826}"
 EndProject
@@ -98,7 +98,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeDebugWrappers", "..\s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "corapi", "..\source2\MDbg4\src\debugger\corapi\corapi.csproj", "{04EF9865-E1B1-403D-802B-E4FAEA50A634}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.XSharp.VS", "..\source2\VSIP\Cosmos.VS.XSharp\Cosmos.XSharp.VS.csproj", "{FB71E8EF-E229-4D81-984A-B9170D752BF9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.VS", "..\source2\VSIP\Cosmos.VS.XSharp\XSharp.VS.csproj", "{FB71E8EF-E229-4D81-984A-B9170D752BF9}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -187,7 +187,7 @@ Global
 		SccProjectTopLevelParentUniqueName20 = Build.sln
 		SccProjectName20 = ../source2/Cosmos.Assembler
 		SccLocalPath20 = ..\\source2\\Cosmos.Assembler
-		SccProjectUniqueName21 = ..\\source2\\Compiler\\Cosmos.XSharp\\Cosmos.Compiler.XSharp.csproj
+		SccProjectUniqueName21 = ..\\source2\\Compiler\\Cosmos.XSharp\\XSharp.Compiler.csproj
 		SccProjectTopLevelParentUniqueName21 = Build.sln
 		SccProjectName21 = ../source2/Compiler/Cosmos.XSharp
 		SccLocalPath21 = ..\\source2\\Compiler\\Cosmos.XSharp
@@ -223,7 +223,7 @@ Global
 		SccProjectTopLevelParentUniqueName29 = Build.sln
 		SccProjectName29 = ../source2/MDbg4/src/debugger/corapi
 		SccLocalPath29 = ..\\source2\\MDbg4\\src\\debugger\\corapi
-		SccProjectUniqueName30 = ..\\source2\\VSIP\\Cosmos.VS.XSharp\\Cosmos.XSharp.VS.csproj
+		SccProjectUniqueName30 = ..\\source2\\VSIP\\Cosmos.VS.XSharp\\XSharp.VS.csproj
 		SccProjectTopLevelParentUniqueName30 = Build.sln
 		SccProjectName30 = ../source2/VSIP/Cosmos.VS.XSharp
 		SccLocalPath30 = ..\\source2\\VSIP\\Cosmos.VS.XSharp

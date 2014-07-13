@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using XSharp.Nasm;
 
-namespace Cosmos.Compiler.XSharp {
+namespace XSharp.Compiler {
   /// <summary>This class is able to translate a single X# source code line into one or more
   /// target assembler source code and data lines. The class is a group of pattern each of
   /// which defines a transformation function from the X# syntax to the target assembler

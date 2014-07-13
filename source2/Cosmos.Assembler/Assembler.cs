@@ -493,7 +493,7 @@ namespace Cosmos.Assembler {
       new Jump { DestinationLabel = ".loop" };
 
       if (mComPort > 0) {
-        var xGen = new Cosmos.Compiler.XSharp.AsmGenerator();
+        var xGen = new XSharp.Compiler.AsmGenerator();
         foreach (var xFile in Directory.GetFiles(Cosmos.Build.Common.CosmosPaths.DebugStubSrc, "*.xs")) {
           var xAsm = xGen.Generate(xFile);
           foreach (var xData in xAsm.Data) {

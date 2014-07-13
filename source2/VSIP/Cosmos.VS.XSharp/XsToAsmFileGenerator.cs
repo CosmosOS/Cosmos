@@ -7,7 +7,7 @@ using Microsoft.VisualStudio;
 using System.Runtime.InteropServices;
 using System.IO;
 
-namespace Cosmos.XSharp.VS {
+namespace XSharp.VS {
   // This class generates .asm files from .xs files.
   //
   // The .asm is not used for actual compiling, but for now we still generate .asm files on save because:
@@ -28,7 +28,7 @@ namespace Cosmos.XSharp.VS {
         using (var xOutData = new StringWriter()) {
           using (var xOutCode = new StringWriter()) {
             try {
-              var xGen = new Cosmos.Compiler.XSharp.AsmGenerator();
+              var xGen = new XSharp.Compiler.AsmGenerator();
               xGen.Generate(xInput, xOutData, xOutCode);
               xResult =
                 "; Generated at " + DateTime.Now.ToString() + "\r\n"

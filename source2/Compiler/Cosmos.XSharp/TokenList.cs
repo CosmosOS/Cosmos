@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Compiler.XSharp {
+namespace XSharp.Compiler {
   public class TokenList : List<Token> {
 
     public new Token this[int aIdx] {

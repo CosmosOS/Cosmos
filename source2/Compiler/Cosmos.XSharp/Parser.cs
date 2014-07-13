@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Compiler.XSharp {
+namespace XSharp.Compiler {
   public class Parser {
     /// <summary>Index in <see cref="mData"/> of the first yet unconsumed character.</summary>
     protected int mStart = 0;

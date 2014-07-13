@@ -9,8 +9,8 @@
     <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.XSharp.VS</RootNamespace>
-    <AssemblyName>Cosmos.VS.XSharp</AssemblyName>
+    <RootNamespace>XSharp.VS</RootNamespace>
+    <AssemblyName>XSharp.VS</AssemblyName>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -172,9 +172,9 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Compiler\Cosmos.XSharp\Cosmos.Compiler.XSharp.csproj">
+    <ProjectReference Include="..\..\Compiler\Cosmos.XSharp\XSharp.Compiler.csproj">
       <Project>{A281A1B1-C718-4BCB-A7BE-ED840A70449A}</Project>
-      <Name>Cosmos.Compiler.XSharp</Name>
+      <Name>XSharp.Compiler</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

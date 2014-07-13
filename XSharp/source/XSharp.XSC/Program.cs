@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Cosmos.Compiler.XSharp;
+using XSharp.Compiler;
 
 namespace XSharp.XSC {
   class Program {

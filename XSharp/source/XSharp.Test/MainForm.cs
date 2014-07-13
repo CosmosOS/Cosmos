@@ -135,7 +135,7 @@ namespace XSharp.Test {
         using (var xOutputCode = new StringWriter()) {
           using (var xOutputData = new StringWriter()) {
             try {
-              var xGenerator = new Cosmos.Compiler.XSharp.AsmGenerator();
+              var xGenerator = new XSharp.Compiler.AsmGenerator();
 
               xOutputData.WriteLine("ORIGIN:");
               xGenerator.Generate(xInput, xOutputData, xOutputCode);

@@ -6,9 +6,9 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
-using XSC = Cosmos.Compiler.XSharp;
+using XSC = XSharp.Compiler;
 
-namespace Cosmos.XSharp.VS {
+namespace XSharp.VS {
   internal class Scanner : IScanner {
     struct TokenData {
       public TokenType Type;

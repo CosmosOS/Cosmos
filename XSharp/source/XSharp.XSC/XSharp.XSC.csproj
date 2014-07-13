@@ -72,9 +72,9 @@
     <None Include="XSharp.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source2\Compiler\Cosmos.XSharp\Cosmos.Compiler.XSharp.csproj">
+    <ProjectReference Include="..\..\..\source2\Compiler\Cosmos.XSharp\XSharp.Compiler.csproj">
       <Project>{A281A1B1-C718-4BCB-A7BE-ED840A70449A}</Project>
-      <Name>Cosmos.Compiler.XSharp</Name>
+      <Name>XSharp.Compiler</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
