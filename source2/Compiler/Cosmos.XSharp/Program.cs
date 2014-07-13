@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using XSharp.Compiler;
 
-namespace XSharp.XSC {
+namespace XSharp.Compiler {
   class Program {
     static void Main(string[] aArgs) {
       try {
