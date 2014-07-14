@@ -126,7 +126,7 @@ namespace Cosmos.Build.MSBuild {
                         }
                         else
                         {
-                            xGuid = DebugInfo.Guid_NewGuid();
+                            xGuid = Guid.NewGuid();
                         }
 
                         xLabels.Add(new Label()

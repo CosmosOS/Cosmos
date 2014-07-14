@@ -1,0 +1,3 @@
+; 4-column space indentation
+[*.cs]
+indent_size = 2
