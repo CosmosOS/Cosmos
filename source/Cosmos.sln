@@ -176,15 +176,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugCompiler", "..\Users\M
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{4D3F3613-E112-4013-AB81-B8CCED78A555}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.0.Core", "Cosmos.0.Core\Cosmos.0.Core.csproj", "{A13D729F-1344-4A18-A0D5-964676175951}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core", "Cosmos.Core\Cosmos.Core.csproj", "{A13D729F-1344-4A18-A0D5-964676175951}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.1.HAL", "Cosmos.1.HAL\Cosmos.1.HAL.csproj", "{FEC4BF88-8531-440E-B1BA-E2E066B36301}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.HAL", "Cosmos.HAL\Cosmos.HAL.csproj", "{FEC4BF88-8531-440E-B1BA-E2E066B36301}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.2.System", "Cosmos.2.System\Cosmos.2.System.csproj", "{3DEF0461-08AB-471A-8F03-A9C556652A0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System", "Cosmos.System\Cosmos.System.csproj", "{3DEF0461-08AB-471A-8F03-A9C556652A0F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 Core", "0 Core", "{360A9DE9-F8CF-4A38-9593-3699648DA616}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 HAL", "1 HAL", "{22583FFE-B418-447E-ACE4-615950C5F373}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 System", "2 System", "{056A94C1-6C75-4730-B62A-675779CD07FB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{CAF5EB57-6CAD-446D-8FC7-4C03D4B996A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common", "Cosmos.Common\Cosmos.Common.csproj", "{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 49
+		SccNumberOfProjects = 50
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -370,18 +380,22 @@ Global
 		SccProjectTopLevelParentUniqueName45 = Cosmos.sln
 		SccProjectName45 = ../Users/Matthijs/DebugCompiler
 		SccLocalPath45 = ..\\Users\\Matthijs\\DebugCompiler
-		SccProjectUniqueName46 = Cosmos.0.Core\\Cosmos.0.Core.csproj
+		SccProjectUniqueName46 = Cosmos.System\\Cosmos.System.csproj
 		SccProjectTopLevelParentUniqueName46 = Cosmos.sln
-		SccProjectName46 = Cosmos.0.Core
-		SccLocalPath46 = Cosmos.0.Core
-		SccProjectUniqueName47 = Cosmos.1.HAL\\Cosmos.1.HAL.csproj
+		SccProjectName46 = Cosmos.System
+		SccLocalPath46 = Cosmos.System
+		SccProjectUniqueName47 = Cosmos.HAL\\Cosmos.HAL.csproj
 		SccProjectTopLevelParentUniqueName47 = Cosmos.sln
-		SccProjectName47 = Cosmos.1.HAL
-		SccLocalPath47 = Cosmos.1.HAL
-		SccProjectUniqueName48 = Cosmos.2.System\\Cosmos.2.System.csproj
+		SccProjectName47 = Cosmos.HAL
+		SccLocalPath47 = Cosmos.HAL
+		SccProjectUniqueName48 = Cosmos.Core\\Cosmos.Core.csproj
 		SccProjectTopLevelParentUniqueName48 = Cosmos.sln
-		SccProjectName48 = Cosmos.2.System
-		SccLocalPath48 = Cosmos.2.System
+		SccProjectName48 = Cosmos.Core
+		SccLocalPath48 = Cosmos.Core
+		SccProjectUniqueName49 = Cosmos.Common\\Cosmos.Common.csproj
+		SccProjectTopLevelParentUniqueName49 = Cosmos.sln
+		SccProjectName49 = Cosmos.Common
+		SccLocalPath49 = Cosmos.Common
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -916,6 +930,16 @@ Global
 		{3DEF0461-08AB-471A-8F03-A9C556652A0F}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{3DEF0461-08AB-471A-8F03-A9C556652A0F}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{3DEF0461-08AB-471A-8F03-A9C556652A0F}.Release|x86.ActiveCfg = Release|Any CPU
+		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -923,9 +947,10 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{426E77A5-80AA-48DC-97F9-037071345778} = {4D3F3613-E112-4013-AB81-B8CCED78A555}
 		{0D558E33-78B0-47DB-B5EF-B7C2F3114D75} = {4D3F3613-E112-4013-AB81-B8CCED78A555}
-		{A13D729F-1344-4A18-A0D5-964676175951} = {4D3F3613-E112-4013-AB81-B8CCED78A555}
-		{FEC4BF88-8531-440E-B1BA-E2E066B36301} = {4D3F3613-E112-4013-AB81-B8CCED78A555}
-		{3DEF0461-08AB-471A-8F03-A9C556652A0F} = {4D3F3613-E112-4013-AB81-B8CCED78A555}
+		{360A9DE9-F8CF-4A38-9593-3699648DA616} = {4D3F3613-E112-4013-AB81-B8CCED78A555}
+		{22583FFE-B418-447E-ACE4-615950C5F373} = {4D3F3613-E112-4013-AB81-B8CCED78A555}
+		{056A94C1-6C75-4730-B62A-675779CD07FB} = {4D3F3613-E112-4013-AB81-B8CCED78A555}
+		{CAF5EB57-6CAD-446D-8FC7-4C03D4B996A6} = {4D3F3613-E112-4013-AB81-B8CCED78A555}
 		{FD42844B-2767-4DF4-B0AF-EA5F7CB11528} = {D95021E1-A2C9-4829-819E-ED433AF13162}
 		{0462E82B-8C29-41A9-8265-9C89038ADB29} = {D95021E1-A2C9-4829-819E-ED433AF13162}
 		{BC6AE974-1F18-4A19-A956-5062E4D3FD53} = {D95021E1-A2C9-4829-819E-ED433AF13162}
@@ -981,5 +1006,9 @@ Global
 		{A73433E8-3B9D-4131-AB8F-72441F1D89EE} = {8CE8178D-F3CB-44B9-8D5D-8763139DBA30}
 		{A0073D91-D9D3-4A90-9845-10E5CDBA5511} = {8CE8178D-F3CB-44B9-8D5D-8763139DBA30}
 		{3720749F-1519-4A35-B944-FF05AD01F8DC} = {A0073D91-D9D3-4A90-9845-10E5CDBA5511}
+		{A13D729F-1344-4A18-A0D5-964676175951} = {360A9DE9-F8CF-4A38-9593-3699648DA616}
+		{FEC4BF88-8531-440E-B1BA-E2E066B36301} = {22583FFE-B418-447E-ACE4-615950C5F373}
+		{3DEF0461-08AB-471A-8F03-A9C556652A0F} = {056A94C1-6C75-4730-B62A-675779CD07FB}
+		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4} = {CAF5EB57-6CAD-446D-8FC7-4C03D4B996A6}
 	EndGlobalSection
 EndGlobal
