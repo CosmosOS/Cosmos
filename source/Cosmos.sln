@@ -135,9 +135,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel", "..\s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel.Plugs", "..\source2\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj", "{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuessKernel", "..\source2\Demos\Guess\GuessKernel.csproj", "{73CF15C1-0AB6-4B3A-8142-D326ADA72970}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuessKernel", "..\Demos\Guess\GuessKernel.csproj", "{73CF15C1-0AB6-4B3A-8142-D326ADA72970}"
 EndProject
-Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Guess", "..\source2\Demos\Guess\Guess.Cosmos", "{5B2C0369-7A84-4113-892C-F71B50E1DA12}"
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Guess", "..\Demos\Guess\Guess.Cosmos", "{5B2C0369-7A84-4113-892C-F71B50E1DA12}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common.Extensions", "..\source2\Kernel\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions.csproj", "{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}"
 EndProject
@@ -272,14 +272,14 @@ Global
 		SccProjectTopLevelParentUniqueName23 = Cosmos.sln
 		SccProjectName23 = ../source2/Kernel/Debug/Cosmos.Debug.Kernel.Plugs
 		SccLocalPath23 = ..\\source2\\Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs
-		SccProjectUniqueName24 = ..\\source2\\Demos\\Guess\\GuessKernel.csproj
+		SccProjectUniqueName24 = ..\\Demos\\Guess\\GuessKernel.csproj
 		SccProjectTopLevelParentUniqueName24 = Cosmos.sln
-		SccProjectName24 = ../source2/Demos/Guess
-		SccLocalPath24 = ..\\source2\\Demos\\Guess
-		SccProjectUniqueName25 = ..\\source2\\Demos\\Guess\\Guess.Cosmos
+		SccProjectName24 = ../Demos/Guess
+		SccLocalPath24 = ..\\Demos\\Guess
+		SccProjectUniqueName25 = ..\\Demos\\Guess\\Guess.Cosmos
 		SccProjectTopLevelParentUniqueName25 = Cosmos.sln
-		SccProjectName25 = ../source2/Demos/Guess
-		SccLocalPath25 = ..\\source2\\Demos\\Guess
+		SccProjectName25 = ../Demos/Guess
+		SccLocalPath25 = ..\\Demos\\Guess
 		SccProjectUniqueName26 = ..\\source2\\Kernel\\Common\\Cosmos.Common.Extensions\\Cosmos.Common.Extensions.csproj
 		SccProjectTopLevelParentUniqueName26 = Cosmos.sln
 		SccProjectName26 = ../source2/Kernel/Common/Cosmos.Common.Extensions
