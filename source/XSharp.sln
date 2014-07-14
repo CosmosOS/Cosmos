@@ -13,29 +13,22 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Nasm", "XSharp.Nasm\
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 4
+		SccNumberOfProjects = 5
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccProjectUniqueName0 = XSharp.Compiler\\XSharp.Compiler.csproj
 		SccProjectName0 = XSharp.Compiler
-		SccAuxPath0 = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = XSharp.Compiler
-		SccProvider0 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccProjectUniqueName1 = XSharp.Test\\XSharp.Test.csproj
 		SccProjectName1 = XSharp.Test
-		SccAuxPath1 = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath1 = XSharp.Test
-		SccProvider1 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccProjectUniqueName2 = XSharp.Nasm\\XSharp.Nasm.csproj
 		SccProjectName2 = XSharp.Nasm
-		SccAuxPath2 = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath2 = XSharp.Nasm
-		SccProvider2 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccProjectUniqueName3 = XSharp.VS\\XSharp.VS.csproj
 		SccProjectName3 = XSharp.VS
-		SccAuxPath3 = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath3 = XSharp.VS
-		SccProvider3 = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccLocalPath4 = .
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
