@@ -19,26 +19,33 @@
     <h3>
         Levels</h3>
     <p>
-        Many operating systems refer to their security &quot;areas&quot; as rings. ie Kernel ring, etc. Rings are harder to draw in text and make diagramming a bit harder, so for now we will refer to our &quot;areas&quot; as levels and the analogy of floors in a building will be used.</p>
+        Many operating systems refer to their security &quot;areas&quot; as rings. ie Kernel ring, etc. Rings are harder to draw in text and make diagramming a bit harder, so for now we will refer to our &quot;areas&quot; as levels.</p>
     <p>
         Cosmos is split into the following levels:</p>
     <ul>
-      <li>Core</li>
-      <li>System</li>
-      <li>User</li>
+      <li>0 Core</li>
+      <li>1 Hardware</li>
+      <li>2 System</li>
+      <li>3 User</li>
     </ul>
     <p>
-      Each level can only communicate with adjacent levels. If the levels were floors in a building, user would be the ground floor with entry door. To access Core (3rd floor - American convention) one would have to pass through System (2nd floor) to get to the core.</p>
+      Each level can only communicate with adjacent levels. That is User can only talk to System, but not Core.</p>
+    <h3>Core Level</h3>
     <p>
-      Core Level</p>
+      Core level has special permissions which basically let it do anyting it wants. core code should be very limited with most kernel code existing in the System level. Core code should be kept to a minimum with code not requiring special permissions should be moved or split into the system level.</p>
+    <p>
+      Special permissions that core has exclusively:</p>
+    <ol>
+      <li>Assembly plugs</li>
+    </ol>
+    <h3>Hardware Level</h3>
+    <h3>System Level</h3>
+    <p>
+      From the system level up, none of the special permissions available in core level are available. If such code is needed, it must be split between system and core.</p>
+    <h3>User Level</h3>
     <p>
       &nbsp;</p>
-    <p>
-      System Level</p>
-    <p>
-      &nbsp;</p>
-    <p>
-      User Level</p>
+    <h3>Namespace</h3>
     <p>
       &nbsp;</p>
     <h1>
