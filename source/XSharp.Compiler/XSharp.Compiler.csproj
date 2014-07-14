@@ -41,7 +41,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -64,12 +64,12 @@
     <Compile Include="TokenPatterns.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\Cosmos.snk">
+    <None Include="..\Cosmos.snk">
       <Link>Cosmos.snk</Link>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\XSharp\source\XSharp.Nasm\XSharp.Nasm.csproj">
+    <ProjectReference Include="..\XSharp.Nasm\XSharp.Nasm.csproj">
       <Project>{841A734E-9606-4AAB-9C4A-74E7E303FF5D}</Project>
       <Name>XSharp.Nasm</Name>
     </ProjectReference>

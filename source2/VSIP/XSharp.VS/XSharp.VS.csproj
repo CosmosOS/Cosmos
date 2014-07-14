@@ -172,7 +172,7 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Compiler\Cosmos.XSharp\XSharp.Compiler.csproj">
+    <ProjectReference Include="..\..\..\source\XSharp.Compiler\XSharp.Compiler.csproj">
       <Project>{A281A1B1-C718-4BCB-A7BE-ED840A70449A}</Project>
       <Name>XSharp.Compiler</Name>
     </ProjectReference>

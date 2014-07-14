@@ -74,7 +74,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{6A
 		Cosmos.Compiler.html = Cosmos.Compiler.html
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Compiler", "..\source2\Compiler\Cosmos.XSharp\XSharp.Compiler.csproj", "{A281A1B1-C718-4BCB-A7BE-ED840A70449A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Compiler", "XSharp.Compiler\XSharp.Compiler.csproj", "{A281A1B1-C718-4BCB-A7BE-ED840A70449A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VMWareLib", "..\source2\VMWareLib\VMWareLib.csproj", "{76CDB55D-55E3-4B53-AE33-12EC31430826}"
 EndProject
@@ -185,10 +185,10 @@ Global
 		SccProjectTopLevelParentUniqueName20 = Build.sln
 		SccProjectName20 = ../source2/Cosmos.Assembler
 		SccLocalPath20 = ..\\source2\\Cosmos.Assembler
-		SccProjectUniqueName21 = ..\\source2\\Compiler\\Cosmos.XSharp\\XSharp.Compiler.csproj
+		SccProjectUniqueName21 = XSharp.Compiler\\XSharp.Compiler.csproj
 		SccProjectTopLevelParentUniqueName21 = Build.sln
-		SccProjectName21 = ../source2/Compiler/Cosmos.XSharp
-		SccLocalPath21 = ..\\source2\\Compiler\\Cosmos.XSharp
+		SccProjectName21 = XSharp.Compiler
+		SccLocalPath21 = XSharp.Compiler
 		SccProjectUniqueName22 = ..\\source2\\VMWareLib\\VMWareLib.csproj
 		SccProjectTopLevelParentUniqueName22 = Build.sln
 		SccProjectName22 = ../source2/VMWareLib
