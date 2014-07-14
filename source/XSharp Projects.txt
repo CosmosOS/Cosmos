@@ -2,12 +2,12 @@ Overview
 -Custom tool compiles .xs files to .asm files by Cosmos.VS.XSharp:FileGenerator.cs
 
 -----------------------------------------------------------------------------
-Cosmos.Compiler.XSharp
-Library
+XSharp.Compiler
+Console EXE / Link to as lib
 Compiler for XSharp
 
 -----------------------------------------------------------------------------
-Cosmos.VS.XSharp
+XSharp.VS
 Library - VS Language Service
 Rebuild - Rerun install.bat
 
@@ -23,8 +23,3 @@ Simple library to assist in generating output for NASM.
 XSharp.Test
 WinForms Application
 
------------------------------------------------------------------------------
-XSharp.XSC
-Console Application
-
-Compiles .xs to .asm.
