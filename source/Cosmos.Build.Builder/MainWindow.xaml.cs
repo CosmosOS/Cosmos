@@ -301,7 +301,7 @@ namespace Cosmos.Build.Builder {
       mLoaded = true;
 
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
-      mCosmosDir = Path.GetFullPath(xAppPath + @"..\..\..\..\..\");
+      mCosmosDir = Path.GetFullPath(xAppPath + @"..\..\..\..\");
       mSetupPath = Path.Combine(mCosmosDir, @"Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe");
       if (App.InstallTask) {
         InstallScheduledTask();
