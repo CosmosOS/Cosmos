@@ -82,40 +82,8 @@
       <li>User applications</li>
       <li>System applications</li>
     </ol>
-    <h3>Namespace</h3>
-    <p>
-      Projects have been named with the level number in them to allow sorting (ie Cosmos.0.Core) in VS, but the output libraries and namespaces do not include such numbers (ie Cosmos.Core.dll, Cosmos.Core). This produces cleaner code, but also easily allows future levels to be inserted or changed.</p>
     <h1>
         Older Ring Docs</h1>
-    <p>
-        Surely our security model will evolve as Cosmos evolves. However we need 
-        something simple, efficient, and with minimal impact to the users. I feel this 
-        is something most operating systems today fail greatly at.</p>
-    <p>
-        A new assembly level attribute will be created for processing by IL2CPU. If the 
-        attribute is not present User Ring is the default.</p>
-    <p>
-        Rings from highest to lowest:</p>
-    <ul>
-        <li>User<ul>
-            <li>System<ul>
-                <li>Hardware<ul>
-                    <li>Core</li>
-                    </ul>
-                </li>
-                </ul>
-            </li>
-            </ul>
-        </li>
-    </ul>
-    <h3>
-        Ring Control</h3>
-    <p>
-        Rings can only access assemblies in the same ring, or the next lower ring.</p>
-    <p style="margin-left: 40px">
-        Core &lt;-- Hardware &lt;-- System &lt;-- User</p>
-    <p>
-        For example, System can consume classes in Hardware but not Kernel.</p>
     <h3>
         Core Ring</h3>
     <p>
@@ -163,22 +131,6 @@
         example, a driver may exist for the USB Controller and it would require access 
         to the core ring. But drivers implementing USB devices do not need to talk to 
         hardware directly, but instead talk to the USB Controller driver.</p>
-    <h3>
-        System Ring</h3>
-    <p>
-        The system ring contains code which builds functionality on top of hardware or 
-        other system assemblies.</p>
-    <p>
-        The system ring includes functionality such as:</p>
-    <ul>
-        <li>File systems</li>
-        <li>TCP/IP</li>
-    </ul>
-    <h3>
-        User Ring</h3>
-    <p>
-        The user ring is compromised of all user code including applications and 
-        services.</p>
-
+    
 </body>
 </html>
