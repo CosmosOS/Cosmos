@@ -15,7 +15,13 @@
     <h3>
         Future</h3>
     <p>
-        Currently only the structure exists, no checking occurs but in the future will occur via attributes and other methods.</p>
+        Currently only the structure exists, no checking occurs but in the future will occur via attributes and other methods. Future checks to include:</p>
+    <ol>
+      <li>Restriction of core level exclusive abilities at the assembly level by attribute.</li>
+      <li>Restriction of references list to higher levels only. ie HAL can reference Core but not vice versa. Also via attribute. That is an assembly level attribute to mark which level an assembly is.</li>
+    </ol>
+    <p>
+      For now we must be vigilant to watch these restrictions manually.</p>
     <h3>
         Levels</h3>
     <p>
@@ -30,24 +36,24 @@
     </ul>
     <p>
       Each level can only communicate with adjacent levels. That is User can only talk to System, but not Core.</p>
-    <h3>Core Level</h3>
+    <h3>0 Core Level</h3>
     <p>
       Core level has special permissions which basically let it do anyting it wants. core code should be very limited with most kernel code existing in the System level. Core code should be kept to a minimum with code not requiring special permissions should be moved or split into the system level.</p>
     <p>
-      Special permissions that core has exclusively:</p>
+      Special abilities that core has exclusively:</p>
     <ol>
       <li>Assembly plugs</li>
     </ol>
-    <h3>Hardware Level</h3>
-    <h3>System Level</h3>
+    <h3>1 HAL (Hardware) Level</h3>
     <p>
-      From the system level up, none of the special permissions available in core level are available. If such code is needed, it must be split between system and core.</p>
-    <h3>User Level</h3>
+      From the HAL level up, none of the special permissions available in core level are available. If such code is needed, it must be split between system and core.</p>
+    <h3>2 System Level</h3>
+    <h3>3 User Level</h3>
     <p>
-      &nbsp;</p>
+      No Cosmos.3.User project exists because level 3 is user code. ie applications.</p>
     <h3>Namespace</h3>
     <p>
-      &nbsp;</p>
+      Projects have been named with the level number in them to allow sorting (ie Cosmos.0.Core) in VS, but the output libraries and namespaces do not include such numbers (ie Cosmos.Core.dll, Cosmos.Core)</p>
     <h1>
         Older Ring Docs</h1>
     <p>
