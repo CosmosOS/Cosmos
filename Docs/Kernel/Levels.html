@@ -7,15 +7,46 @@
 <body>
 
     <p>
+        The security model of&nbsp; Cosmos will evolve and mature as Cosmos does, however the base model is presented here.</p>
+    <h3>
+        Goals</h3>
+    <p>
+        Most operating systems today use hardware to enforce security between the kernel, user code, etc. This creates a lot of overhead at runtime and decreases performance. Intel CPUs have built this into the hardware, but adds a fair bit of circuitry and complexity. Despite being in hardware, it still incurs a measureable performance penalty. Since Cosmos can control execution and rebuild its compiler and recompile all code at any time, Cosmos can be much more flexible and most restrictions can be enforced at compile or installation time rather than the need to perform such CPU checks in live CPU code. This creates huge performance gains but also allows a lot more flexibility.</p>
+    <h3>
+        Future</h3>
+    <p>
+        Currently only the structure exists, no checking occurs but in the future will occur via attributes and other methods.</p>
+    <h3>
+        Levels</h3>
+    <p>
+        Many operating systems refer to their security &quot;areas&quot; as rings. ie Kernel ring, etc. Rings are harder to draw in text and make diagramming a bit harder, so for now we will refer to our &quot;areas&quot; as levels and the analogy of floors in a building will be used.</p>
+    <p>
+        Cosmos is split into the following levels:</p>
+    <ul>
+      <li>Core</li>
+      <li>System</li>
+      <li>User</li>
+    </ul>
+    <p>
+      Each level can only communicate with adjacent levels. If the levels were floors in a building, user would be the ground floor with entry door. To access Core (3rd floor - American convention) one would have to pass through System (2nd floor) to get to the core.</p>
+    <p>
+      Core Level</p>
+    <p>
+      &nbsp;</p>
+    <p>
+      System Level</p>
+    <p>
+      &nbsp;</p>
+    <p>
+      User Level</p>
+    <p>
+      &nbsp;</p>
+    <h1>
+        Older Ring Docs</h1>
+    <p>
         Surely our security model will evolve as Cosmos evolves. However we need 
         something simple, efficient, and with minimal impact to the users. I feel this 
         is something most operating systems today fail greatly at.</p>
-    <p>
-        Cosmos will be divided into rings. In some senses they are similar to 
-        traditional operating system rings however they are not enforced by hardware and 
-        thus do not have the runtime overhead. Instead they are enforced by the compiler 
-        and later by the installation system which will verify assemblies are part of 
-        installation.</p>
     <p>
         A new assembly level attribute will be created for processing by IL2CPU. If the 
         attribute is not present User Ring is the default.</p>
