@@ -302,7 +302,7 @@ namespace Cosmos.Build.Builder {
 
       string xAppPath = System.AppDomain.CurrentDomain.BaseDirectory;
       mCosmosDir = Path.GetFullPath(xAppPath + @"..\..\..\..\");
-      mSetupPath = Path.Combine(mCosmosDir, @"Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe");
+      mSetupPath = Path.Combine(mCosmosDir, @"Setup\Output\CosmosUserKit-" + mReleaseNo + ".exe");
       if (App.InstallTask) {
         InstallScheduledTask();
         Close();

@@ -21,7 +21,7 @@ namespace Cosmos.Build.Builder {
       mCosmosDir = aCosmosDir;
       mAppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cosmos User Kit");
       mReleaseNo = aReleaseNo;
-      mInnoFile = Path.Combine(mCosmosDir, @"Setup2\Cosmos.iss");
+      mInnoFile = Path.Combine(mCosmosDir, @"Setup\Cosmos.iss");
     }
 
     void Cleanup() {
@@ -438,7 +438,7 @@ namespace Cosmos.Build.Builder {
         Echo("Waiting for Setup to complete.");
         WaitForExit("CosmosUserKit-" + mReleaseNo);
       } else {
-        Start(mCosmosDir + @"Setup2\Output\CosmosUserKit-" + mReleaseNo + ".exe", @"/SILENT");
+        Start(mCosmosDir + @"Setup\Output\CosmosUserKit-" + mReleaseNo + ".exe", @"/SILENT");
       }
     }
 

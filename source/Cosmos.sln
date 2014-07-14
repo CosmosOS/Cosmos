@@ -169,13 +169,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeDebugWrappers", "..\s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "corapi", "..\source2\MDbg4\src\debugger\corapi\corapi.csproj", "{04EF9865-E1B1-403D-802B-E4FAEA50A634}"
 EndProject
-Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GuessForBochs", "..\source2\Users\BlueSkeye\GuessForBochs\GuessForBochs.Cosmos", "{5DE37AE3-3F59-4D15-851B-945C23DBB633}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlugsInspector", "..\source2\Tools\PlugsInspector\PlugsInspector.csproj", "{44604DA8-CABD-4CBC-AA9A-258AC59F03AD}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 46
+		SccNumberOfProjects = 45
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -340,27 +338,23 @@ Global
 		SccProjectTopLevelParentUniqueName40 = Cosmos.sln
 		SccProjectName40 = ../source2/MDbg4/src/debugger/corapi
 		SccLocalPath40 = ..\\source2\\MDbg4\\src\\debugger\\corapi
-		SccProjectUniqueName41 = ..\\source2\\Users\\BlueSkeye\\GuessForBochs\\GuessForBochs.Cosmos
+		SccProjectUniqueName41 = ..\\source2\\Tools\\PlugsInspector\\PlugsInspector.csproj
 		SccProjectTopLevelParentUniqueName41 = Cosmos.sln
-		SccProjectName41 = ../source2/Users/BlueSkeye/GuessForBochs
-		SccLocalPath41 = ..\\source2\\Users\\BlueSkeye\\GuessForBochs
-		SccProjectUniqueName42 = ..\\source2\\Tools\\PlugsInspector\\PlugsInspector.csproj
-		SccProjectTopLevelParentUniqueName42 = Cosmos.sln
-		SccProjectName42 = ../source2/Tools/PlugsInspector
-		SccLocalPath42 = ..\\source2\\Tools\\PlugsInspector
-		SccWebProject43 = true
-		SccProjectUniqueName43 = ..\\Docs
-		SccProjectName43 = ../Docs
-		SccLocalPath43 = ..\\Docs
-		SccProjectEnlistmentChoice43 = 2
-		SccProjectUniqueName44 = XSharp.Compiler\\XSharp.Compiler.csproj
+		SccProjectName41 = ../source2/Tools/PlugsInspector
+		SccLocalPath41 = ..\\source2\\Tools\\PlugsInspector
+		SccWebProject42 = true
+		SccProjectUniqueName42 = ..\\Docs
+		SccProjectName42 = ../Docs
+		SccLocalPath42 = ..\\Docs
+		SccProjectEnlistmentChoice42 = 2
+		SccProjectUniqueName43 = XSharp.Compiler\\XSharp.Compiler.csproj
+		SccProjectTopLevelParentUniqueName43 = Cosmos.sln
+		SccProjectName43 = XSharp.Compiler
+		SccLocalPath43 = XSharp.Compiler
+		SccProjectUniqueName44 = XSharp.VS\\XSharp.VS.csproj
 		SccProjectTopLevelParentUniqueName44 = Cosmos.sln
-		SccProjectName44 = XSharp.Compiler
-		SccLocalPath44 = XSharp.Compiler
-		SccProjectUniqueName45 = XSharp.VS\\XSharp.VS.csproj
-		SccProjectTopLevelParentUniqueName45 = Cosmos.sln
-		SccProjectName45 = XSharp.VS
-		SccLocalPath45 = XSharp.VS
+		SccProjectName44 = XSharp.VS
+		SccLocalPath44 = XSharp.VS
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -845,16 +839,6 @@ Global
 		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{04EF9865-E1B1-403D-802B-E4FAEA50A634}.Release|x86.ActiveCfg = Release|Any CPU
-		{5DE37AE3-3F59-4D15-851B-945C23DBB633}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{5DE37AE3-3F59-4D15-851B-945C23DBB633}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{5DE37AE3-3F59-4D15-851B-945C23DBB633}.Debug|Mixed Platforms.Build.0 = Debug|x86
-		{5DE37AE3-3F59-4D15-851B-945C23DBB633}.Debug|x86.ActiveCfg = Debug|x86
-		{5DE37AE3-3F59-4D15-851B-945C23DBB633}.Debug|x86.Build.0 = Debug|x86
-		{5DE37AE3-3F59-4D15-851B-945C23DBB633}.Release|Any CPU.ActiveCfg = Release|x86
-		{5DE37AE3-3F59-4D15-851B-945C23DBB633}.Release|Mixed Platforms.ActiveCfg = Release|x86
-		{5DE37AE3-3F59-4D15-851B-945C23DBB633}.Release|Mixed Platforms.Build.0 = Release|x86
-		{5DE37AE3-3F59-4D15-851B-945C23DBB633}.Release|x86.ActiveCfg = Release|x86
-		{5DE37AE3-3F59-4D15-851B-945C23DBB633}.Release|x86.Build.0 = Release|x86
 		{44604DA8-CABD-4CBC-AA9A-258AC59F03AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{44604DA8-CABD-4CBC-AA9A-258AC59F03AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44604DA8-CABD-4CBC-AA9A-258AC59F03AD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
@@ -902,7 +886,6 @@ Global
 		{D9A87AAD-FCC9-4517-B31D-E904DAD00784} = {ADDA07A5-ADA8-4D71-831B-0A421F04A546}
 		{73CF15C1-0AB6-4B3A-8142-D326ADA72970} = {C4941654-3D7A-484B-9F5C-3D331AB8F585}
 		{5B2C0369-7A84-4113-892C-F71B50E1DA12} = {C4941654-3D7A-484B-9F5C-3D331AB8F585}
-		{5DE37AE3-3F59-4D15-851B-945C23DBB633} = {C4941654-3D7A-484B-9F5C-3D331AB8F585}
 		{61607F1E-58F9-41CF-972F-128384F3E115} = {E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}
 		{B97A2956-C363-47F2-A6AA-B4FCCFF4D315} = {E3779B95-E47B-4CAD-B8C1-0549E30AA4F2}
 		{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E} = {CDF13174-7897-4334-9AE4-B1DCC013F6BD}
