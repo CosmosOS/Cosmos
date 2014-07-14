@@ -4,21 +4,21 @@
     <title>Directories</title>
 </head>
 <body>
-<h3>Directories</h3>
+<h3>Topic is out of date!</h3>
+  <h3>Directories</h3>
 <p>At a first look, the directory structure of Cosmos is quite confusing. There are folders with same names, two source folders and so on. I'll try to show you how the directories are structured, so that you can find what you're looking for</p>
 <h4>\Build</h4>
 <p>The build directory contains file used to build ISO images and Virtual Machines files and images. There is a folder with support files for BOCHS, for VirtualPc, for VMware, QEMU, for support for boot from ISO CD, USB, Ethernet (PXE)</p>
 <p>There is also an additional folder <b>VSIP</b>. It normally contains a file called <i>install.bat</i>. That file must be executed as you download the code and everytime you change some code which is non-kernel related (eg. the debugger, the VS integration package, the IL2CPU code etc)</p>
 <p>It compiles all the projects to libraries, creates a Win32 Installer and setups the Visual Studio IP. At the end it starts Visual Studio.</p>
 <p>You should close Visual Studio before executing install.bat.</p>
-<h4>\Docs</h4>
+<h4>Docs</h4>
 <p>Just a bunch of bad-structured documentation about Cosmos</p>
-<h4>\QA</h4>
+<h4>QA</h4>
 <p>Todo.</p>
-<h4>\Resources</h4>
-<p>Here you can put any pdf, doc, rtf, txt which can be used as a reference help to develop Cosmos.</p>
-<p>It contains the folder <b>x86</b>. Inside you can find many interesting references about the x86 architecture.</p>
-<h4>\Setup2</h4>
+<h4>Resources</h4>
+<p>Here you can put any pdf, doc, rtf, txt which can be used as a reference help to develop Cosmos. It also contains the folder <b>x86</b>. Inside you can find many interesting references about the x86 architecture.</p>
+<h4>Setup</h4>
 <p>Contains scripts and languages to build the Cosmos User Kit Installer. The creation (and execution) of the installer is started from \Build\VSIP\install.bat</p>
 <h4>\Source</h4>
 <p><b>TODO: Check correctness of the following sentences: </b>Contains a lot of code which is now not used. It was used previously, but it was decided to take it away and to restructure the code organization. It may be reintegrated however in future, with some code changes.</p>
