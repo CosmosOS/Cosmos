@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpToken : ILOpCode {
-      public readonly Int32 Value;
+    public readonly Int32 Value;
     public readonly FieldInfo ValueField;
     public readonly Type ValueType;
 

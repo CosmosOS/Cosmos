@@ -79,11 +79,11 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       switch (OpCode)
       {
         case Code.Initobj:
-          StackPopTypes[0] = typeof (IntPtr);
+          StackPopTypes[0] = typeof(void*);
           return;
         case Code.Ldelema:
           StackPopTypes[1] = Value.MakeArrayType();
-          StackPushTypes[0] = typeof (IntPtr);
+          StackPushTypes[0] = typeof(void*);
           return;
         case Code.Box:
           StackPopTypes[0] = Value;

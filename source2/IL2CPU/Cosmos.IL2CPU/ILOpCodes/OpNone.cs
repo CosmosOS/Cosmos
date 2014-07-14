@@ -277,37 +277,37 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       {
         case Code.Stind_I:
           StackPopTypes[0] = typeof (IntPtr);
-          StackPopTypes[1] = typeof (IntPtr);
+          StackPopTypes[1] = typeof(void*);
           return;
 
         case Code.Stind_I1:
           StackPopTypes[0] = typeof (sbyte);
-          StackPopTypes[1] = typeof (IntPtr);
+          StackPopTypes[1] = typeof(void*);
           return;
 
         case Code.Stind_I2:
           StackPopTypes[0] = typeof (short);
-          StackPopTypes[1] = typeof (IntPtr);
+          StackPopTypes[1] = typeof(void*);
           return;
 
         case Code.Stind_I4:
           StackPopTypes[0] = typeof (int);
-          StackPopTypes[1] = typeof (IntPtr);
+          StackPopTypes[1] = typeof(void*);
           return;
 
         case Code.Stind_I8:
           StackPopTypes[0] = typeof (long);
-          StackPopTypes[1] = typeof (IntPtr);
+          StackPopTypes[1] = typeof(void*);
           return;
 
         case Code.Ldind_U1:
           StackPushTypes[0] = typeof (byte);
-          StackPopTypes[0] = typeof (IntPtr);
+          StackPopTypes[0] = typeof(void*);
           return;
 
         case Code.Ldind_U2:
           StackPushTypes[0] = typeof (ushort);
-          StackPopTypes[0] = typeof (IntPtr);
+          StackPopTypes[0] = typeof(void*);
           return;
 
         case Code.Ldind_U4:
@@ -317,12 +317,12 @@ namespace Cosmos.IL2CPU.ILOpCodes {
 
         case Code.Ldind_R4:
           StackPushTypes[0] = typeof (Single);
-          StackPopTypes[0] = typeof (IntPtr);
+          StackPopTypes[0] = typeof(void*);
           return;
 
         case Code.Ldind_R8:
           StackPushTypes[0] = typeof (Double);
-          StackPopTypes[0] = typeof (IntPtr);
+          StackPopTypes[0] = typeof(void*);
           return;
 
         case Code.Conv_I:

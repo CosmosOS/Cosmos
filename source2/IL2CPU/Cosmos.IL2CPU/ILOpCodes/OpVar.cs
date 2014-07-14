@@ -62,10 +62,10 @@ namespace Cosmos.IL2CPU.ILOpCodes
       switch (OpCode)
       {
         case Code.Ldloca:
-          StackPushTypes[0] = typeof (IntPtr);
+          StackPushTypes[0] = typeof(void*);
           return;
         case Code.Ldarga:
-          StackPushTypes[0] = typeof (IntPtr);
+          StackPushTypes[0] = typeof (void*);
           return;
         default:
           break;
