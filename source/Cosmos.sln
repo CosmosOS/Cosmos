@@ -172,11 +172,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kudzu", "Kudzu", "{A73433E8
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Matthijs", "Matthijs", "{A0073D91-D9D3-4A90-9845-10E5CDBA5511}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DebugCompiler", "..\Users\Matthijs\DebugCompiler\DebugCompiler.csproj", "{3720749F-1519-4A35-B944-FF05AD01F8DC}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{4D3F3613-E112-4013-AB81-B8CCED78A555}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 45
+		SccNumberOfProjects = 46
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -358,6 +360,10 @@ Global
 		SccProjectTopLevelParentUniqueName44 = Cosmos.sln
 		SccProjectName44 = XSharp.VS
 		SccLocalPath44 = XSharp.VS
+		SccProjectUniqueName45 = ..\\Users\\Matthijs\\DebugCompiler\\DebugCompiler.csproj
+		SccProjectTopLevelParentUniqueName45 = Cosmos.sln
+		SccProjectName45 = ../Users/Matthijs/DebugCompiler
+		SccLocalPath45 = ..\\Users\\Matthijs\\DebugCompiler
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -852,6 +858,16 @@ Global
 		{44604DA8-CABD-4CBC-AA9A-258AC59F03AD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{44604DA8-CABD-4CBC-AA9A-258AC59F03AD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{44604DA8-CABD-4CBC-AA9A-258AC59F03AD}.Release|x86.ActiveCfg = Release|Any CPU
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Debug|x86.ActiveCfg = Debug|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Debug|x86.Build.0 = Debug|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Release|Any CPU.ActiveCfg = Release|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Release|Mixed Platforms.Build.0 = Release|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Release|x86.ActiveCfg = Release|x86
+		{3720749F-1519-4A35-B944-FF05AD01F8DC}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -913,5 +929,6 @@ Global
 		{A0073D91-D9D3-4A90-9845-10E5CDBA5511} = {8CE8178D-F3CB-44B9-8D5D-8763139DBA30}
 		{426E77A5-80AA-48DC-97F9-037071345778} = {4D3F3613-E112-4013-AB81-B8CCED78A555}
 		{0D558E33-78B0-47DB-B5EF-B7C2F3114D75} = {4D3F3613-E112-4013-AB81-B8CCED78A555}
+		{3720749F-1519-4A35-B944-FF05AD01F8DC} = {A0073D91-D9D3-4A90-9845-10E5CDBA5511}
 	EndGlobalSection
 EndGlobal

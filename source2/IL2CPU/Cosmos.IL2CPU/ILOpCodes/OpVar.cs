@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Cosmos.IL2CPU.ILOpCodes
@@ -55,9 +56,9 @@ namespace Cosmos.IL2CPU.ILOpCodes
       }
     }
 
-    protected override void DoInitStackAnalysis()
+    protected override void DoInitStackAnalysis(MethodBase aMethod)
     {
-      base.DoInitStackAnalysis();
+      base.DoInitStackAnalysis(aMethod);
 
       switch (OpCode)
       {
@@ -66,6 +67,19 @@ namespace Cosmos.IL2CPU.ILOpCodes
           return;
         case Code.Ldarga:
           StackPushTypes[0] = typeof (void*);
+          return;
+        case Code.Ldarg:
+          var xArgIndexCorrection = 0;
+          if (!aMethod.IsStatic)
+          {
+            if (Value == 0)
+            {
+              StackPushTypes[0] = aMethod.DeclaringType;
+            }
+            xArgIndexCorrection = -1;
+          }
+          var xParams = aMethod.GetParameters();
+          StackPushTypes[0] = xParams[Value + xArgIndexCorrection].ParameterType;
           return;
         default:
           break;

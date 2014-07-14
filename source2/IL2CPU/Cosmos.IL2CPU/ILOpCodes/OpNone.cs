@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Cosmos.IL2CPU.ILOpCodes {
@@ -269,9 +270,9 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       }
     }
 
-    protected override void DoInitStackAnalysis()
+    protected override void DoInitStackAnalysis(MethodBase aMethod)
     {
-      base.DoInitStackAnalysis();
+      base.DoInitStackAnalysis(aMethod);
 
       switch (OpCode)
       {

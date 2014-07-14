@@ -295,15 +295,24 @@ namespace Cosmos.IL2CPU {
       private set;
     }
 
-    internal void InitStackAnalysis()
+    internal void InitStackAnalysis(SR.MethodBase aMethod)
     {
       StackPopTypes = new Type[NumberOfStackPops];
       StackPushTypes = new Type[NumberOfStackPushes];
-      DoInitStackAnalysis();
+      DoInitStackAnalysis(aMethod);
     }
 
-    protected virtual void DoInitStackAnalysis()
+    protected virtual void DoInitStackAnalysis(SR.MethodBase aMethod)
     {
+    }
+
+    public virtual void InterpretStackTypes(IDictionary<int, ILOpCode> aOpCodes, int aMaxRecursionDepth) 
+    {
+      if (aMaxRecursionDepth == 0)
+      {
+        throw new Exception("Safety Error: MaxRecursionDepth reached!");
+      }
+      
     }
   }
 }

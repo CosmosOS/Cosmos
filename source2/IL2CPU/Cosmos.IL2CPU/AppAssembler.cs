@@ -517,12 +517,12 @@ namespace Cosmos.IL2CPU
         }
 
         private static bool mDebugStackErrors = true;
-        private void EmitInstructions(MethodInfo aMethod, List<ILOpCode> xCurrentGroup, ref bool emitINT3)
+        private void EmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup, ref bool emitINT3)
         {
-            new Comment(String.Format("New Group Offset {0} - Offset {1}", xCurrentGroup.First().Position.ToString("X"), xCurrentGroup.Last().Position.ToString("X")));
-            BeforeEmitInstructions(aMethod, xCurrentGroup);
+            InterpretInstructionsToDetermineStackTypes(aCurrentGroup);
+            BeforeEmitInstructions(aMethod, aCurrentGroup);
             var xFirstInstruction = true;
-            foreach (var xOpCode in xCurrentGroup)
+            foreach (var xOpCode in aCurrentGroup)
             {
                 ushort xOpCodeVal = (ushort) xOpCode.OpCode;
                 ILOp xILOp;
@@ -625,7 +625,24 @@ namespace Cosmos.IL2CPU
                 AfterOp(aMethod, xOpCode);
                 //mLog.WriteLine( " end: " + Stack.Count.ToString() );
             }
-            AfterEmitInstructions(aMethod, xCurrentGroup);
+            AfterEmitInstructions(aMethod, aCurrentGroup);
+        }
+
+        private static void InterpretInstructionsToDetermineStackTypes(List<ILOpCode> aCurrentGroup)
+        {
+            //var xGroupILByILOffset = aCurrentGroup.ToDictionary(i => i.Position);
+            //var xMaxInterpreterRecursionDepth = 10;
+            //aCurrentGroup.First().InterpretStackTypes(xGroupILByILOffset, xMaxInterpreterRecursionDepth);
+            //foreach (var xOp in aCurrentGroup)
+            //{
+            //    foreach (var xStackEntry in xOp.StackPopTypes.Concat(xOp.StackPushTypes))
+            //    {
+            //        if (xStackEntry == null)
+            //        {
+            //            throw new Exception(String.Format("Instruction '{0}' has not been fully analysed yet!", xOp));
+            //        }
+            //    }
+            //}
         }
 
         protected void InitILOps()

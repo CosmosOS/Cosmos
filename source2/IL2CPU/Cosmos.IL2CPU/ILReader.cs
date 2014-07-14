@@ -404,7 +404,7 @@ namespace Cosmos.IL2CPU {
           default:
             throw new Exception("Unknown OperandType");
         }
-        //xILOpCode.InitStackAnalysis();
+        //xILOpCode.InitStackAnalysis(aMethod);
         xResult.Add(xILOpCode);
       }
       return xResult;
