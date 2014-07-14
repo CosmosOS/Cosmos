@@ -510,8 +510,8 @@ Global
 		SccProjectEnlistmentChoice61 = 2
 		SccProjectUniqueName62 = XSharp.Compiler\\XSharp.Compiler.csproj
 		SccProjectTopLevelParentUniqueName62 = Cosmos.sln
-		SccProjectName62 = Compiler.XSharp/Cosmos.XSharp
-		SccLocalPath62 = XSharp.Compiler\\XSharp.Compiler
+		SccProjectName62 = XSharp.Compiler
+		SccLocalPath62 = XSharp.Compiler
 		SccProjectUniqueName63 = XSharp.VS\\XSharp.VS.csproj
 		SccProjectTopLevelParentUniqueName63 = Cosmos.sln
 		SccProjectName63 = XSharp.VS
