@@ -44,6 +44,12 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.1.HAL\Cosmos.1.HAL.csproj">
+      <Project>{fec4bf88-8531-440e-b1ba-e2e066b36301}</Project>
+      <Name>Cosmos.1.HAL</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
