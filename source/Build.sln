@@ -86,7 +86,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "..\s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{49A7A478-E046-4B7D-9144-81D359A13719}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Nasm", "..\XSharp\source\XSharp.Nasm\XSharp.Nasm.csproj", "{841A734E-9606-4AAB-9C4A-74E7E303FF5D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Nasm", "XSharp.Nasm\XSharp.Nasm.csproj", "{841A734E-9606-4AAB-9C4A-74E7E303FF5D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MDbg", "MDbg", "{6248DD1D-EAE8-4A54-AFC6-1A2DEC913DE5}"
 EndProject
@@ -201,10 +201,10 @@ Global
 		SccProjectTopLevelParentUniqueName24 = Build.sln
 		SccProjectName24 = ../source2/Cosmos.Deploy.Pixie
 		SccLocalPath24 = ..\\source2\\Cosmos.Deploy.Pixie
-		SccProjectUniqueName25 = ..\\XSharp\\source\\XSharp.Nasm\\XSharp.Nasm.csproj
+		SccProjectUniqueName25 = XSharp.Nasm\\XSharp.Nasm.csproj
 		SccProjectTopLevelParentUniqueName25 = Build.sln
-		SccProjectName25 = ../XSharp/source/XSharp.Nasm
-		SccLocalPath25 = ..\\XSharp\\source\\XSharp.Nasm
+		SccProjectName25 = XSharp.Nasm
+		SccLocalPath25 = XSharp.Nasm
 		SccProjectUniqueName26 = ..\\source2\\MDbg4\\src\\debugger\\raw\\raw.csproj
 		SccProjectTopLevelParentUniqueName26 = Build.sln
 		SccProjectName26 = ../source2/MDbg4/src/debugger/raw

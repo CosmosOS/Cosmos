@@ -312,7 +312,7 @@
     <None Include="x86\Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\XSharp\source\XSharp.Nasm\XSharp.Nasm.csproj">
+    <ProjectReference Include="..\..\source\XSharp.Nasm\XSharp.Nasm.csproj">
       <Project>{841A734E-9606-4AAB-9C4A-74E7E303FF5D}</Project>
       <Name>XSharp.Nasm</Name>
     </ProjectReference>
