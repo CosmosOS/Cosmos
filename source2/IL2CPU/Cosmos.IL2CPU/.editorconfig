@@ -1,0 +1,6 @@
+; 4-column space indentation
+[ILOpCode.cs]
+indent_size = 2
+
+[ILOpCodes/*.cs]
+indent_size = 2

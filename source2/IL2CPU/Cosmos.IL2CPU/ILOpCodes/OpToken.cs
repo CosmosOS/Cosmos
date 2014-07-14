@@ -54,5 +54,58 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       }
 
     }
+
+    public override int NumberOfStackPops
+    {
+      get
+      {
+        switch (OpCode)
+        {
+          case Code.Ldtoken:
+            return 0;
+          default:
+            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
+        }
+      }
+    }
+
+    public override int NumberOfStackPushes
+    {
+      get
+      {
+        switch (OpCode)
+        {
+          case Code.Ldtoken:
+            return 1;
+          default:
+            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
+        }
+      }
+    }
+
+    protected override void DoInitStackAnalysis()
+    {
+      base.DoInitStackAnalysis();
+
+      switch (OpCode)
+      {
+        case Code.Ldtoken:
+          if (ValueIsField)
+          {
+            StackPushTypes[0] = typeof (RuntimeFieldHandle);
+          }
+          else if (ValueIsType)
+          {
+            StackPushTypes[0] = typeof (RuntimeTypeHandle);
+          }
+          else
+          {
+            throw new NotImplementedException();
+          }
+          return;
+        default:
+          break;
+      }
+    }
   }
 }

@@ -11,7 +11,6 @@ namespace Cosmos.IL2CPU {
   //   Include reference to ILOp, the scanner should do that
   //   Include referense to System.Reflection.Emit, this is metadata
   //     only needed by reader and not ILOpCode
-  //[DebuggerDisplay("IL_{Position}{:{OpCode}")]
   public abstract class ILOpCode {
 
     public enum Code : ushort {
@@ -262,7 +261,49 @@ namespace Cosmos.IL2CPU {
 
     public override string ToString()
     {
+        // leave here, makes easier debugging the compiler. Compiler will 
+        // show for example "IL_0001: ldstr" instead of just ILOpCode
         return String.Format("IL_{0}: {1}", Position.ToString("X4"), OpCode);
+    }
+
+    /// <summary>
+    /// Returns the number of items popped from the stack. This is the logical stack, not physical items. 
+    /// So a 100byte struct is 1 pop, even though it might be multiple 32-bit or 64-bit words on the stack.
+    /// </summary>
+    public abstract int NumberOfStackPops
+    {
+      get;
+    }
+
+    /// <summary>
+    /// Returns the number of items pushed to the stack. This is the logical stack, not physical items. 
+    /// So a 100byte struct is 1 pop, even though it might be multiple 32-bit or 64-bit words on the stack.
+    /// </summary>
+    public abstract int NumberOfStackPushes
+    {
+      get;
+    }
+
+    public Type[] StackPopTypes { 
+      get;
+      private set;
+    }
+
+    public Type[] StackPushTypes
+    {
+      get;
+      private set;
+    }
+
+    internal void InitStackAnalysis()
+    {
+      StackPopTypes = new Type[NumberOfStackPops];
+      StackPushTypes = new Type[NumberOfStackPushes];
+      DoInitStackAnalysis();
+    }
+
+    protected virtual void DoInitStackAnalysis()
+    {
     }
   }
 }

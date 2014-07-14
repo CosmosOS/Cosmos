@@ -505,15 +505,15 @@ namespace Cosmos.IL2CPU
         private void AfterEmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
         {
             // do optimizations
-            if (Assembler.Stack.Count > 0)
-            {
-                if (mDebugStackErrors)
-                {
-                    Console.WriteLine("StackCorruption in Analytical stack:");
-                    Console.WriteLine("- Method: {0}", aMethod.MethodBase.GetFullName());
-                    Console.WriteLine("- Last ILOpCode offset: {0}", aCurrentGroup.Last().Position.ToString("X"));
-                }
-            }
+            //if (Assembler.Stack.Count > 0)
+            //{
+            //    if (mDebugStackErrors)
+            //    {
+            //        Console.WriteLine("StackCorruption in Analytical stack:");
+            //        Console.WriteLine("- Method: {0}", aMethod.MethodBase.GetFullName());
+            //        Console.WriteLine("- Last ILOpCode offset: {0}", aCurrentGroup.Last().Position.ToString("X"));
+            //    }
+            //}
         }
 
         private static bool mDebugStackErrors = true;
