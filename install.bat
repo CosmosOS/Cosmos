@@ -7,7 +7,7 @@ del source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.*
 
 @for /f "tokens=4-6 delims=.] " %%i in ('ver') do set VERSION=%%i.%%j.%%k
 
-start source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe -bat %TASK% %1 %2 %3 %4 %5 %6 %7 %8 %9
+start source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe -bat %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 @exit
 

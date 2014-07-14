@@ -63,19 +63,6 @@ begin
 
   __VSNET2013_PATH := ExpandConstant('{reg:HKLM\Software\Microsoft\VisualStudio\12.0,InstallDir|}');
   __VSNET2013 := __VSNET2013_PATH <> '';
-    
-  if not __VSNET2013 then begin
-    __VSNET2013_PATH := ExpandConstant('{reg:HKLM\Software\Microsoft\VNS\12.0,InstallDir|}');
-    __VSNET2013 := __VSNET2013_PATH <> '';
-  end;
-  if not __VSNET2013 then begin
-    __VSNET2013_PATH := ExpandConstant('{reg:HKLM\Software\Microsoft\WinExpress\12.0,InstallDir|}');
-    __VSNET2013 := __VSNET2013_PATH <> '';
-  end;
-  if not __VSNET2013 then begin
-    __VSNET2013_PATH := ExpandConstant('{reg:HKLM\Software\Microsoft\WDExpress\12.0,InstallDir|}');
-    __VSNET2013 := __VSNET2013_PATH <> '';
-  end;
 
   if __VSNET2013 then
     __VSNET2013_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2013_PATH)+'..\..');
@@ -141,25 +128,19 @@ end;
 function Csharp2013_Installed(dummy: string): Boolean;
 begin
   Result := RegKeyExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\12.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}')
-       or RegKeyExists(HKLM,'SOFTWARE\Microsoft\VNS\12.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}')
-       or RegKeyExists(HKLM,'SOFTWARE\Microsoft\WinExpress\12.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}')
-       or RegKeyExists(HKLM,'SOFTWARE\Microsoft\WDExpress\12.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}');
+		or RegKeyExists(HKLM,'SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\Projects\{FAE04EC0-301F-11d3-BF4B-00C04F79EFBC}');
 end;
 
 function Fsharp2013_Installed(dummy: string): Boolean;
 begin
   Result := RegKeyExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\12.0\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}')
-       or RegKeyExists(HKLM,'SOFTWARE\Microsoft\VNS\12.0\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}')
-       or RegKeyExists(HKLM,'SOFTWARE\Microsoft\WinExpress\12.0\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}')
-       or RegKeyExists(HKLM,'SOFTWARE\Microsoft\WDExpress\12.0\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}');
+		or RegKeyExists(HKLM,'SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}');
 end;
 
 function Vb2013_Installed(dummy: string): Boolean;
 begin
   Result := RegKeyExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\12.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}')
-        or RegKeyExists(HKLM,'SOFTWARE\Microsoft\VNS\12.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}')
-        or RegKeyExists(HKLM,'SOFTWARE\Microsoft\WinExpress\12.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}')
-        or RegKeyExists(HKLM,'SOFTWARE\Microsoft\WDExpress\12.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}');
+        or RegKeyExists(HKLM,'SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}');
 end;
 
 function VS2013_REGISTRY_HIVE(dummy: string): string;
@@ -167,12 +148,7 @@ begin
   Result := '12.0';
 end;
 
-function VSNET2013_BASE_PATH(dummy: string): string;
-begin
-  Result := __VSNET2013_BASE_PATH;
-end;
-
-function VS13_BASE_PATH(dummy: string): string;
+function VS2013_BASE_PATH(dummy: string): string;
 begin
   Result := __VSNET2013_BASE_PATH;
 end;
@@ -209,9 +185,7 @@ end;
 
 function IsCSharpExpress2013Installed(dummy: string): Boolean;
 begin
-	Result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VNS\12.0','InstallDir')
-		or RegValueExists(HKLM,'SOFTWARE\Wow6432Node\Microsoft\WinExpress\12.0','InstallDir')
-		or RegValueExists(HKLM,'SOFTWARE\Wow6432Node\Microsoft\WDExpress\12.0','InstallDir');
+	Result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VCExpress\12.0\Setup\VC','ProductDir');
 end;
 
 function GetCSharpExpress2013ProjectTemplatePath(dummy: string): string;
@@ -233,7 +207,7 @@ function InitializeSetup: Boolean;
 begin
   InitializePaths;
   if not VSNET2013 then begin
-    MsgBox(ExpandConstant('Visual Studio 2013 not installed! Please see CodePlex docs for supported editions/versions.'), MbError, MB_OK);
+    MsgBox(ExpandConstant('Visual Studio 2013 is not installed! Please see CodePlex documentation for supported editions/versions of Visual Studio.'), MbError, MB_OK);
     Result := false;
     exit;
   end;
