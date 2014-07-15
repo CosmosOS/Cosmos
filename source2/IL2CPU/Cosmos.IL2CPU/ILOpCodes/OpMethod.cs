@@ -73,6 +73,10 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           if (xMethodInfo != null && xMethodInfo.ReturnType != typeof(void))
           {
             StackPushTypes[0] = xMethodInfo.ReturnType;
+            if (StackPushTypes[0].IsEnum)
+            {
+              StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
+            }
           }
           break;
         //  var xExtraOffset = 0;

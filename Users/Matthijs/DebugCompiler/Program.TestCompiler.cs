@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime;
 using System.Text;
@@ -26,6 +27,8 @@ namespace DebugCompiler
 
         private static void Main(string[] args)
         {
+            Console.SetOut(new StreamWriter("out", false){AutoFlush=true});
+
             var xSW = Stopwatch.StartNew();
             try
             {

@@ -61,6 +61,10 @@ namespace Cosmos.IL2CPU.ILOpCodes
           if (xBody != null)
           {
             StackPushTypes[0] = xBody.LocalVariables[Value].LocalType;
+            if (StackPushTypes[0].IsEnum)
+            {
+              StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
+            }
           }
           return;
         case Code.Ldloca:
@@ -76,12 +80,27 @@ namespace Cosmos.IL2CPU.ILOpCodes
             if (Value == 0)
             {
               StackPushTypes[0] = aMethod.DeclaringType;
+              if (StackPushTypes[0].IsEnum)
+              {
+                StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
+              }
+              else
+              {
+                if (StackPushTypes[0].IsValueType)
+                {
+                  StackPushTypes[0] = typeof (void*);
+                }
+              }
               return;
             }
             xArgIndexCorrection = -1;
           }
           var xParams = aMethod.GetParameters();
           StackPushTypes[0] = xParams[Value + xArgIndexCorrection].ParameterType;
+          if (StackPushTypes[0].IsEnum)
+          {
+            StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
+          }
           return;
         default:
           break;

@@ -82,7 +82,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
     protected override void DoInterpretStackTypes(ref bool aSituationChanged)
     {
       base.DoInterpretStackTypes(ref aSituationChanged);
-
+      // this method is supposed to deduct push types from pop types. Branch ops don't push, but we want to do checks here,
+      // to help verify other code is right
       switch (OpCode)
       {
         case Code.Brtrue:
@@ -99,6 +100,14 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             return;
           }
           if (xPopType == typeof(int))
+          {
+            return;
+          }
+          if (xPopType == typeof(byte))
+          {
+            return;
+          }
+          if (xPopType == typeof(sbyte))
           {
             return;
           }
@@ -122,6 +131,10 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Beq:
         case Code.Bge:
         case Code.Bgt:
+        case Code.Bge_Un:
+        case Code.Blt_Un:
+        case Code.Ble_Un:
+        case Code.Bne_Un:
           var xValue1 = StackPopTypes[0];
           var xValue2 = StackPopTypes[1];
           if (xValue1 == null || xValue2 == null)
@@ -133,6 +146,14 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             return;
           }
           if (xValue1 == typeof(long) && xValue2 == typeof(long))
+          {
+            return;
+          }
+          if (xValue1 == typeof(Single) && xValue2 == typeof(Single))
+          {
+            return;
+          }
+          if (xValue1 == typeof(Double) && xValue2 == typeof(Double))
           {
             return;
           }
@@ -171,12 +192,20 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Bgt_Un:
         case Code.Bge:
         case Code.Bge_Un:
+        case Code.Beq:
+        case Code.Bne_Un:
           base.DoInterpretNextInstructionStackTypes(aOpCodes, new Stack<Type>(aStack), ref aSituationChanged, aMaxRecursionDepth);
-          base.InterpretInstruction(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+          if (Value > Position)
+          {
+            InterpretInstruction(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+          }
           break;
         case Code.Br:
         case Code.Leave:
-          base.InterpretInstruction(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+          if (Value > Position)
+          {
+            InterpretInstruction(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+          }
           break;
         default:
           throw new NotImplementedException("OpCode " + OpCode);

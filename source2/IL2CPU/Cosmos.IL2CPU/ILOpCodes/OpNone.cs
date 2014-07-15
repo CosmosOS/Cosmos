@@ -258,7 +258,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Ldelem_U1:
         case Code.Ldelem_U2:
         case Code.Ldelem_U4:
-          return 2;
+          return 1;
         case Code.Ldnull:
           return 1;
         case Code.Dup:
@@ -508,6 +508,9 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Stelem_I8:
           StackPopTypes[0] = typeof(long);
           return;
+        case Code.Conv_R_Un:
+          StackPushTypes[0] = typeof (Double);
+          return;
       }
     }
 
@@ -524,6 +527,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Rem:
         case Code.Rem_Un:
         case Code.Xor:
+        case Code.And:
+        case Code.Or:
           if (StackPushTypes[0] != null)
           {
             return;
@@ -559,6 +564,27 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               aSituationChanged = true;
               return;
             }
+            if ((StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(byte))
+             || (StackPopTypes[0] == typeof(byte) && StackPopTypes[1] == typeof(int)))
+            {
+              StackPushTypes[0] = typeof(int);
+              aSituationChanged = true;
+              return;
+            }
+            if ((StackPopTypes[0] == typeof(long) && StackPopTypes[1] == typeof(ulong))
+             || (StackPopTypes[0] == typeof(ulong) && StackPopTypes[1] == typeof(long)))
+            {
+              StackPushTypes[0] = typeof(long);
+              aSituationChanged = true;
+              return;
+            }
+            if ((StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(ushort))
+             || (StackPopTypes[0] == typeof(ushort) && StackPopTypes[1] == typeof(int)))
+            {
+              StackPushTypes[0] = typeof(int);
+              aSituationChanged = true;
+              return;
+            }
             if (StackPopTypes[0] == typeof(IntPtr) && StackPopTypes[1] == typeof(IntPtr))
             {
               StackPushTypes[0] = typeof(uint);
@@ -577,6 +603,25 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               aSituationChanged = true;
               return;
             }
+            if (StackPopTypes[0] == typeof(long) && StackPopTypes[1] == typeof(long))
+            {
+              StackPushTypes[0] = typeof(long);
+              aSituationChanged = true;
+              return;
+            }
+            if (StackPopTypes[0] == typeof(Double) && StackPopTypes[1] == typeof(Double))
+            {
+              StackPushTypes[0] = typeof(Double);
+              aSituationChanged = true;
+              return;
+            }
+            if (StackPopTypes[0] == typeof(Single) && StackPopTypes[1] == typeof(Single))
+            {
+              StackPushTypes[0] = typeof(Single);
+              aSituationChanged = true;
+              return;
+            }
+            
             throw new NotImplementedException(string.Format("Add on types '{0}' and '{1}' not yet implemented!", StackPopTypes[0], StackPopTypes[1]));
           }
           break;
@@ -590,11 +635,112 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           if (xTypeValue == typeof (byte) 
             || xTypeValue == typeof (char) 
             || xTypeValue == typeof(short)
+            || xTypeValue == typeof(ushort)
             || xTypeValue == typeof(int))
           {
             return;
           }
           throw new NotImplementedException(String.Format("Stelem_I2 storing type '{0}' is not implemented!", xTypeValue));
+        case Code.Shl:
+        case Code.Shr:
+        case Code.Shr_Un:
+          xTypeValue = StackPopTypes[1];
+          var xTypeShift = StackPopTypes[0];
+          if (xTypeValue == null || xTypeShift == null)
+          {
+            return;
+          }
+          if (xTypeValue == typeof (int) && xTypeShift == typeof (int))
+          {
+            StackPushTypes[0] = typeof (int);
+            aSituationChanged = true;
+            return;
+          }
+          if (xTypeValue == typeof(byte) && xTypeShift == typeof(int))
+          {
+            StackPushTypes[0] = typeof(int);
+            aSituationChanged = true;
+            return;
+          }
+          if (xTypeValue == typeof(long) && xTypeShift == typeof(int))
+          {
+            StackPushTypes[0] = typeof(long);
+            aSituationChanged = true;
+            return;
+          }
+          if (xTypeValue == typeof(IntPtr) && xTypeShift == typeof(int))
+          {
+            StackPushTypes[0] = typeof(int);
+            aSituationChanged = true;
+            return;
+          }
+          if (xTypeValue == typeof(int) && xTypeShift == typeof(IntPtr))
+          {
+            StackPushTypes[0] = typeof(int);
+            aSituationChanged = true;
+            return;
+          }
+          if (xTypeValue == typeof(uint) && xTypeShift == typeof(int))
+          {
+            StackPushTypes[0] = typeof(int);
+            aSituationChanged = true;
+            return;
+          }
+          if (xTypeValue == typeof(long) && xTypeShift == typeof(IntPtr))
+          {
+            StackPushTypes[0] = typeof(long);
+            aSituationChanged = true;
+            return;
+          }
+          if (xTypeValue == typeof(IntPtr) && xTypeShift == typeof(IntPtr))
+          {
+            StackPushTypes[0] = typeof(IntPtr);
+            aSituationChanged = true;
+            return;
+          }
+          throw new NotImplementedException(String.Format("{0} with types {1} and {2} is not implemented!", OpCode, xTypeValue.FullName, xTypeShift.FullName));
+        case Code.Ldelem_Ref:
+          if (StackPushTypes[0] != null)
+          {
+            return;
+          }
+          var xTypeArray = StackPopTypes[1];
+          if (xTypeArray == null)
+          {
+            return;
+          }
+          if (!xTypeArray.IsArray)
+          {
+            throw new Exception("Ldelem Array type is not an array (Actual = " + xTypeArray.FullName + ")");
+          }
+          StackPushTypes[0] = xTypeArray.GetElementType();
+          aSituationChanged = true;
+          break;
+        case Code.Neg:
+          if (StackPushTypes[0] != null)
+          {
+            return;
+          }
+          if (StackPopTypes[0] != null)
+          {
+            StackPushTypes[0] = StackPopTypes[0];
+            aSituationChanged = true;
+            return;
+          }
+          break;
+        case Code.Dup:
+          if (StackPushTypes[0] != null && StackPushTypes[1] != null)
+          {
+            return;
+          }
+          if (StackPopTypes[0] != null)
+          {
+            StackPushTypes[0] = StackPopTypes[0];
+            StackPushTypes[1] = StackPopTypes[0];
+            aSituationChanged = true;
+            return;
+          }
+          return;
       }
     }
   }

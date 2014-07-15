@@ -520,12 +520,8 @@ namespace Cosmos.IL2CPU
         private static bool mDebugStackErrors = true;
         private void EmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup, ref bool emitINT3)
         {
-            if (aMethod.MethodBase.GetFullName() == "SystemBooleanCosmosIL2CPUX86PlugsCustomImplementationsSystemArrayImplTrySZIndexOfSystemUInt32SystemUInt32SystemUInt32SystemUInt32SystemUInt32")
-            {
-                Console.Write("");
-            }
             Console.WriteLine("---- Group");
-            InterpretInstructionsToDetermineStackTypes(aCurrentGroup);
+            //InterpretInstructionsToDetermineStackTypes(aCurrentGroup);
             BeforeEmitInstructions(aMethod, aCurrentGroup);
             var xFirstInstruction = true;
             foreach (var xOpCode in aCurrentGroup)
@@ -641,7 +637,6 @@ namespace Cosmos.IL2CPU
         /// <param name="aCurrentGroup"></param>
         private static void InterpretInstructionsToDetermineStackTypes(List<ILOpCode> aCurrentGroup)
         {
-            return;
             var xNeedsInterpreting = false;
             // see if we need to interpret the instructions at all.
             foreach (var xOp in aCurrentGroup)
@@ -663,13 +658,24 @@ namespace Cosmos.IL2CPU
             while (xNeedsInterpreting)
             {
                 xIteration ++;
-                if (xIteration > 10)
+                if (xIteration > 20)
                 {
-                    throw new Exception("Safety exception. Handled 10 iterations");
+                    // Situation not resolved. Now give error with first offset needing types:
+                    foreach (var xOp in aCurrentGroup)
+                    {
+                        foreach (var xStackEntry in xOp.StackPopTypes.Concat(xOp.StackPushTypes))
+                        {
+                            if (xStackEntry == null)
+                            {
+                                throw new Exception(string.Format("Safety exception. Handled {0} iterations. Instruction needing info: {1}", xIteration, xOp));
+                            }
+                        }
+                    }
+                    
                 }
 
                 var xGroupILByILOffset = aCurrentGroup.ToDictionary(i => i.Position);
-                var xMaxInterpreterRecursionDepth = 50;
+                var xMaxInterpreterRecursionDepth = 250;
                 var xCurStack = new Stack<Type>();
                 var xSituationChanged = false;
                 aCurrentGroup.First().InterpretStackTypes(xGroupILByILOffset, xCurStack, ref xSituationChanged, xMaxInterpreterRecursionDepth);
