@@ -16,43 +16,37 @@ namespace Cosmos.IL2CPU.ILOpCodes
       Value = aValue;
     }
 
-    public override int NumberOfStackPops
+    public override int GetNumberOfStackPops()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          case Code.Ldloc:
-          case Code.Ldloca:
-          case Code.Ldarg:
-          case Code.Ldarga:
-            return 0;
-          case Code.Stloc:
-          case Code.Starg:
-            return 1;
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+        case Code.Ldloc:
+        case Code.Ldloca:
+        case Code.Ldarg:
+        case Code.Ldarga:
+          return 0;
+        case Code.Stloc:
+        case Code.Starg:
+          return 1;
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
 
-    public override int NumberOfStackPushes
+    public override int GetNumberOfStackPushes()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          case Code.Stloc:
-          case Code.Starg:
-            return 0;
-          case Code.Ldloc:
-          case Code.Ldloca:
-          case Code.Ldarg:
-          case Code.Ldarga:
-            return 1;
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+        case Code.Stloc:
+        case Code.Starg:
+          return 0;
+        case Code.Ldloc:
+        case Code.Ldloca:
+        case Code.Ldarg:
+        case Code.Ldarga:
+          return 1;
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
 
@@ -62,6 +56,13 @@ namespace Cosmos.IL2CPU.ILOpCodes
 
       switch (OpCode)
       {
+        case Code.Ldloc:
+          var xBody = aMethod.GetMethodBody();
+          if (xBody != null)
+          {
+            StackPushTypes[0] = xBody.LocalVariables[Value].LocalType;
+          }
+          return;
         case Code.Ldloca:
           StackPushTypes[0] = typeof(void*);
           return;
@@ -75,6 +76,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
             if (Value == 0)
             {
               StackPushTypes[0] = aMethod.DeclaringType;
+              return;
             }
             xArgIndexCorrection = -1;
           }

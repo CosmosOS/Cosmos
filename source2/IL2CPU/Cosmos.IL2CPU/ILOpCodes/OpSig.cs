@@ -12,27 +12,21 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       Value = aValue;
     }
 
-    public override int NumberOfStackPops
+    public override int GetNumberOfStackPops()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
 
-    public override int NumberOfStackPushes
+    public override int GetNumberOfStackPushes()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
   }

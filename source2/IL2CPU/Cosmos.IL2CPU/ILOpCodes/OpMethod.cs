@@ -16,57 +16,51 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       Value = aValue;
     }
 
-    public override int NumberOfStackPops
+    public override int GetNumberOfStackPops()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          case Code.Call:
-          case Code.Callvirt:
-            if (Value.IsStatic)
-            {
-              return Value.GetParameters().Length;
-            }
-            else
-            {
-              return Value.GetParameters().Length + 1;
-            }
-          case Code.Newobj:
+        case Code.Call:
+        case Code.Callvirt:
+          if (Value.IsStatic)
+          {
             return Value.GetParameters().Length;
-          case Code.Ldftn:
-            return 0;
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+          }
+          else
+          {
+            return Value.GetParameters().Length + 1;
+          }
+        case Code.Newobj:
+          return Value.GetParameters().Length;
+        case Code.Ldftn:
+          return 0;
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
 
-    public override int NumberOfStackPushes
+    public override int GetNumberOfStackPushes()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          case Code.Call:
-          case Code.Callvirt:
-            var methodInfo = Value as System.Reflection.MethodInfo;
-            if (methodInfo != null && methodInfo.ReturnType!=typeof(void))
-            {
-              return 1;
-            }
-            return 0;
-          case Code.Newobj:
+        case Code.Call:
+        case Code.Callvirt:
+          var methodInfo = Value as System.Reflection.MethodInfo;
+          if (methodInfo != null && methodInfo.ReturnType != typeof (void))
+          {
             return 1;
-          case Code.Ldftn:
-            return 1;
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+          }
+          return 0;
+        case Code.Newobj:
+          return 1;
+        case Code.Ldftn:
+          return 1;
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
 
-    
+
     protected override void DoInitStackAnalysis(MethodBase aMethod)
     {
       base.DoInitStackAnalysis(aMethod);

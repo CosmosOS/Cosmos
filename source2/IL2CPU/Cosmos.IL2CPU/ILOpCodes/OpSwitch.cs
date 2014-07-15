@@ -13,34 +13,28 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       BranchLocations = aBranchLocations;
     }
 
-    public override int NumberOfStackPops
+    public override int GetNumberOfStackPops()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          case Code.Switch:
-            return 1;
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+        case Code.Switch:
+          return 1;
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
 
-    public override int NumberOfStackPushes
+    public override int GetNumberOfStackPushes()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          case Code.Switch:
-            return 0;
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+        case Code.Switch:
+          return 0;
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
-    
+
     protected override void DoInitStackAnalysis(MethodBase aMethod)
     {
       base.DoInitStackAnalysis(aMethod);

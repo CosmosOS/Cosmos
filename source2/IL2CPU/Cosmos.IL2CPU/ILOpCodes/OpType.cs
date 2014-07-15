@@ -13,63 +13,57 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       Value = aValue;
     }
 
-    public override int NumberOfStackPops
+    public override int GetNumberOfStackPops()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          case Code.Initobj:
-            return 1;
-          case Code.Ldelema:
-            return 2;
-          case Code.Newarr:
-            return 1;
-          case Code.Box:
-            return 1;
-          case Code.Stelem:
-            return 3;
-          case Code.Ldelem:
-            return 2;
-          case Code.Isinst:
-            return 1;
-          case Code.Castclass:
-            return 1;
-          case Code.Constrained:
-            return 0;
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+        case Code.Initobj:
+          return 1;
+        case Code.Ldelema:
+          return 2;
+        case Code.Newarr:
+          return 1;
+        case Code.Box:
+          return 1;
+        case Code.Stelem:
+          return 3;
+        case Code.Ldelem:
+          return 2;
+        case Code.Isinst:
+          return 1;
+        case Code.Castclass:
+          return 1;
+        case Code.Constrained:
+          return 0;
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
 
-    public override int NumberOfStackPushes
+    public override int GetNumberOfStackPushes()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          case Code.Initobj:
-            return 0;
-          case Code.Ldelema:
-            return 1;
-          case Code.Newarr:
-            return 1;
-          case Code.Box:
-            return 1;
-          case Code.Stelem:
-            return 0;
-          case Code.Ldelem:
-            return 1;
-          case Code.Isinst:
-            return 1;
-          case Code.Castclass:
-            return 1;
-          case Code.Constrained:
-            return 0;
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+        case Code.Initobj:
+          return 0;
+        case Code.Ldelema:
+          return 1;
+        case Code.Newarr:
+          return 1;
+        case Code.Box:
+          return 1;
+        case Code.Stelem:
+          return 0;
+        case Code.Ldelem:
+          return 1;
+        case Code.Isinst:
+          return 1;
+        case Code.Castclass:
+          return 1;
+        case Code.Constrained:
+          return 0;
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
 

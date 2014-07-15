@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Cosmos.IL2CPU.ILOpCodes {
@@ -12,31 +13,39 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       Value = aValue;
     }
 
-    public override int NumberOfStackPops
+    public override int GetNumberOfStackPops()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          case Code.Ldc_I4:
-            return 0;
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+        case Code.Ldc_I4:
+          return 0;
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
 
-    public override int NumberOfStackPushes
+    public override int GetNumberOfStackPushes()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          case Code.Ldc_I4:
-            return 1;
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+        case Code.Ldc_I4:
+          return 1;
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
+      }
+    }
+
+    protected override void DoInitStackAnalysis(MethodBase aMethod)
+    {
+      base.DoInitStackAnalysis(aMethod);
+
+      switch (OpCode)
+      {
+        case Code.Ldc_I4:
+          StackPushTypes[0] = typeof (int);
+          return;
+        default:
+          break;
       }
     }
   }

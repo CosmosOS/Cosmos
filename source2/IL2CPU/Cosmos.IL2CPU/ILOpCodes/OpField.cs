@@ -12,49 +12,44 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
       Value = aValue;
     }
-    public override int NumberOfStackPops
+
+    public override int GetNumberOfStackPops()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          case Code.Stsfld:
-            return 1;
-          case Code.Ldsfld:
-            return 0;
-          case Code.Stfld:
-            return 2;
-          case Code.Ldfld:
-            return 1;
-          case Code.Ldflda:
-            return 1;
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+        case Code.Stsfld:
+          return 1;
+        case Code.Ldsfld:
+          return 0;
+        case Code.Stfld:
+          return 2;
+        case Code.Ldfld:
+          return 1;
+        case Code.Ldflda:
+          return 1;
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
 
-    public override int NumberOfStackPushes
+    public override int GetNumberOfStackPushes()
     {
-      get
+      switch (OpCode)
       {
-        switch (OpCode)
-        {
-          case Code.Stsfld:
-            return 0;
-          case Code.Ldsfld:
-            return 1;
-          case Code.Stfld:
-            return 0;
-          case Code.Ldflda:
-          case Code.Ldfld:
-            return 1;
-          default:
-            throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
-        }
+        case Code.Stsfld:
+          return 0;
+        case Code.Ldsfld:
+          return 1;
+        case Code.Stfld:
+          return 0;
+        case Code.Ldflda:
+        case Code.Ldfld:
+          return 1;
+        default:
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
     }
-    
+
     protected override void DoInitStackAnalysis(MethodBase aMethod)
     {
       base.DoInitStackAnalysis(aMethod);

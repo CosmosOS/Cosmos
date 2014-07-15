@@ -270,19 +270,13 @@ namespace Cosmos.IL2CPU {
     /// Returns the number of items popped from the stack. This is the logical stack, not physical items. 
     /// So a 100byte struct is 1 pop, even though it might be multiple 32-bit or 64-bit words on the stack.
     /// </summary>
-    public abstract int NumberOfStackPops
-    {
-      get;
-    }
+    public abstract int GetNumberOfStackPops();
 
     /// <summary>
     /// Returns the number of items pushed to the stack. This is the logical stack, not physical items. 
     /// So a 100byte struct is 1 pop, even though it might be multiple 32-bit or 64-bit words on the stack.
     /// </summary>
-    public abstract int NumberOfStackPushes
-    {
-      get;
-    }
+    public abstract int GetNumberOfStackPushes();
 
     public Type[] StackPopTypes { 
       get;
@@ -297,8 +291,8 @@ namespace Cosmos.IL2CPU {
 
     internal void InitStackAnalysis(SR.MethodBase aMethod)
     {
-      StackPopTypes = new Type[NumberOfStackPops];
-      StackPushTypes = new Type[NumberOfStackPushes];
+      StackPopTypes = new Type[GetNumberOfStackPops()];
+      StackPushTypes = new Type[GetNumberOfStackPushes()];
       DoInitStackAnalysis(aMethod);
     }
 
@@ -306,13 +300,71 @@ namespace Cosmos.IL2CPU {
     {
     }
 
-    public virtual void InterpretStackTypes(IDictionary<int, ILOpCode> aOpCodes, int aMaxRecursionDepth) 
+    public void InterpretStackTypes(IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth) 
     {
+      Console.WriteLine("Interpreting {0}. StackCount = {1}", this, aStack.Count);
       if (aMaxRecursionDepth == 0)
       {
         throw new Exception("Safety Error: MaxRecursionDepth reached!");
       }
-      
+
+      // if current instruction is the first instruction of a catch statement, "push" the exception type now
+      if (CurrentExceptionHandler!=null && CurrentExceptionHandler.HandlerOffset == Position)
+      {
+        aStack.Push(CurrentExceptionHandler.CatchType);
+      }
+
+      if (StackPopTypes.Length > aStack.Count)
+      {
+        throw new Exception(String.Format("OpCode {0} tries to pop more stuff from analytical stack than there is!", this));
+      }
+
+      for (int i = 0; i < StackPopTypes.Length; i++)
+      {
+        var xActualStackItem = aStack.ElementAt(i);
+        if (StackPopTypes[i] == null && xActualStackItem == null)
+        {
+          continue;
+        }
+        if (StackPopTypes[i] == null && xActualStackItem != null)
+        {
+          StackPopTypes[i] = xActualStackItem;
+          aSituationChanged = true;
+        }
+        if (StackPopTypes[i] != xActualStackItem)
+        {
+          throw new Exception(String.Format("OpCode {0} tries to pop item at stack position {1} with type {2}, but actual type is {3}",
+            this, i, StackPopTypes[i], xActualStackItem));
+        }
+      }
+
+      foreach (var xPopItem in StackPopTypes)
+      {
+        aStack.Pop();
+      }
+      DoInterpretStackTypes(ref aSituationChanged);
+      foreach (var xPushItem in StackPushTypes)
+      {
+        aStack.Push(xPushItem);
+      }
+      DoInterpretNextInstructionStackTypes(aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+    }
+
+    /// <summary>
+    /// Based on updated StackPopTypes, try to update 
+    /// </summary>
+    protected virtual void DoInterpretStackTypes(ref bool aSituationChanged)
+    {
+      //
+    }
+
+    protected virtual void DoInterpretNextInstructionStackTypes(IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
+    {
+      ILOpCode xNextOpCode;
+      if (aOpCodes.TryGetValue(NextPosition, out xNextOpCode))
+      {
+        xNextOpCode.InterpretStackTypes(aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth - 1);
+      }
     }
   }
 }

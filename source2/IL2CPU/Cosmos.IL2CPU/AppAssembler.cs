@@ -628,21 +628,76 @@ namespace Cosmos.IL2CPU
             AfterEmitInstructions(aMethod, aCurrentGroup);
         }
 
+        /// <summary>
+        /// This method takes care of "interpreting" the instructions per group (statement). This is necessary to 
+        /// reliably able to tell what sizes are involved in certain actions.
+        /// </summary>
+        /// <param name="aCurrentGroup"></param>
         private static void InterpretInstructionsToDetermineStackTypes(List<ILOpCode> aCurrentGroup)
         {
-            //var xGroupILByILOffset = aCurrentGroup.ToDictionary(i => i.Position);
-            //var xMaxInterpreterRecursionDepth = 10;
-            //aCurrentGroup.First().InterpretStackTypes(xGroupILByILOffset, xMaxInterpreterRecursionDepth);
-            //foreach (var xOp in aCurrentGroup)
-            //{
-            //    foreach (var xStackEntry in xOp.StackPopTypes.Concat(xOp.StackPushTypes))
-            //    {
-            //        if (xStackEntry == null)
-            //        {
-            //            throw new Exception(String.Format("Instruction '{0}' has not been fully analysed yet!", xOp));
-            //        }
-            //    }
-            //}
+            return;
+            var xNeedsInterpreting = false;
+            // see if we need to interpret the instructions at all.
+            foreach (var xOp in aCurrentGroup)
+            {
+                foreach (var xStackEntry in xOp.StackPopTypes.Concat(xOp.StackPushTypes))
+                {
+                    if (xStackEntry == null)
+                    {
+                        xNeedsInterpreting = true;
+                        break;
+                    }
+                }
+                if (xNeedsInterpreting)
+                {
+                    break;
+                }
+            }
+            var xIteration = 0;
+            while (xNeedsInterpreting)
+            {
+                xIteration ++;
+                if (xIteration > 10)
+                {
+                    throw new Exception("Safety exception. Handled 10 iterations");
+                }
+
+                var xGroupILByILOffset = aCurrentGroup.ToDictionary(i => i.Position);
+                var xMaxInterpreterRecursionDepth = 10;
+                var xCurStack = new Stack<Type>();
+                var xSituationChanged = false;
+                aCurrentGroup.First().InterpretStackTypes(xGroupILByILOffset, xCurStack, ref xSituationChanged, xMaxInterpreterRecursionDepth);
+                if (!xSituationChanged)
+                {
+                    throw new Exception("After interpreting stack types, nothing changed!");
+                }
+                xNeedsInterpreting = false;
+                foreach (var xOp in aCurrentGroup)
+                {
+                    foreach (var xStackEntry in xOp.StackPopTypes.Concat(xOp.StackPushTypes))
+                    {
+                        if (xStackEntry == null)
+                        {
+                            xNeedsInterpreting = true;
+                            break;
+                        }
+                    }
+                    if (xNeedsInterpreting)
+                    {
+                        break;
+                    }
+                }
+            }
+            foreach (var xOp in aCurrentGroup)
+            {
+                foreach (var xStackEntry in xOp.StackPopTypes.Concat(xOp.StackPushTypes))
+                {
+                    if (xStackEntry == null)
+                    {
+                        throw new Exception(String.Format("Instruction '{0}' has not been fully analysed yet!", xOp));
+                    }
+                }
+            }
         }
 
         protected void InitILOps()
