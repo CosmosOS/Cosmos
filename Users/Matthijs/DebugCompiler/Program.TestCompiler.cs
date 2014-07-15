@@ -19,8 +19,8 @@ namespace DebugCompiler
         public const string CosmosRoot = @"c:\data\sources\cosmos";
         //public const string CosmosRoot = @"C:\Users\Huge\Documents\Visual Studio 2010\Projects\IL2CPU";
 
-        private const string KernelFile = CosmosRoot + @"\source2\Users\Kudzu\Breakpoints\bin\Debug\Playground.Kudzu.BreakpointsKernel.dll";
-        private const string OutputFile = CosmosRoot + @"\source2\Users\Kudzu\Breakpoints\bin\Debug\Kudzu.Breakpoints.asm";
+        private const string KernelFile = CosmosRoot + @"\Users\Kudzu\Breakpoints\bin\Debug\Playground.Kudzu.BreakpointsKernel.dll";
+        private const string OutputFile = CosmosRoot + @"\Users\Kudzu\Breakpoints\bin\Debug\Kudzu.Breakpoints.asm";
         //private const string KernelFile = CosmosRoot + @"\source2\Users\Matthijs\Playground\bin\Debug\Playground.dll";
         //private const string OutputFile = CosmosRoot + @"\source2\Users\Matthijs\Playground\bin\Debug\Playground.asm";
 

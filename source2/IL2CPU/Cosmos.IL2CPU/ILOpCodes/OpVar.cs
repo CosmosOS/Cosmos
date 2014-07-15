@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
       Value = aValue;
     }
 
-    public override int GetNumberOfStackPops()
+    public override int GetNumberOfStackPops(MethodBase aMethod)
     {
       switch (OpCode)
       {
@@ -33,7 +33,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
       }
     }
 
-    public override int GetNumberOfStackPushes()
+    public override int GetNumberOfStackPushes(MethodBase aMethod)
     {
       switch (OpCode)
       {

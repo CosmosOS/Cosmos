@@ -270,13 +270,15 @@ namespace Cosmos.IL2CPU {
     /// Returns the number of items popped from the stack. This is the logical stack, not physical items. 
     /// So a 100byte struct is 1 pop, even though it might be multiple 32-bit or 64-bit words on the stack.
     /// </summary>
-    public abstract int GetNumberOfStackPops();
+    /// <param name="aMethod"></param>
+    public abstract int GetNumberOfStackPops(SR.MethodBase aMethod);
 
     /// <summary>
     /// Returns the number of items pushed to the stack. This is the logical stack, not physical items. 
     /// So a 100byte struct is 1 pop, even though it might be multiple 32-bit or 64-bit words on the stack.
     /// </summary>
-    public abstract int GetNumberOfStackPushes();
+    /// <param name="aMethod"></param>
+    public abstract int GetNumberOfStackPushes(SR.MethodBase aMethod);
 
     public Type[] StackPopTypes { 
       get;
@@ -291,8 +293,8 @@ namespace Cosmos.IL2CPU {
 
     internal void InitStackAnalysis(SR.MethodBase aMethod)
     {
-      StackPopTypes = new Type[GetNumberOfStackPops()];
-      StackPushTypes = new Type[GetNumberOfStackPushes()];
+      StackPopTypes = new Type[GetNumberOfStackPops(aMethod)];
+      StackPushTypes = new Type[GetNumberOfStackPushes(aMethod)];
       DoInitStackAnalysis(aMethod);
     }
 
@@ -322,16 +324,17 @@ namespace Cosmos.IL2CPU {
       for (int i = 0; i < StackPopTypes.Length; i++)
       {
         var xActualStackItem = aStack.ElementAt(i);
-        if (StackPopTypes[i] == null && xActualStackItem == null)
+        if (xActualStackItem == null)
         {
           continue;
         }
-        if (StackPopTypes[i] == null && xActualStackItem != null)
+        if (StackPopTypes[i] == null)
         {
           StackPopTypes[i] = xActualStackItem;
           aSituationChanged = true;
         }
-        if (StackPopTypes[i] != xActualStackItem)
+        if (StackPopTypes[i] != xActualStackItem
+          && !StackPopTypes[i].IsAssignableFrom(xActualStackItem))
         {
           throw new Exception(String.Format("OpCode {0} tries to pop item at stack position {1} with type {2}, but actual type is {3}",
             this, i, StackPopTypes[i], xActualStackItem));
@@ -360,8 +363,14 @@ namespace Cosmos.IL2CPU {
 
     protected virtual void DoInterpretNextInstructionStackTypes(IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
     {
+      InterpretInstruction(NextPosition, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+    }
+
+    protected void InterpretInstruction(int aPosition, IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
+    {
+
       ILOpCode xNextOpCode;
-      if (aOpCodes.TryGetValue(NextPosition, out xNextOpCode))
+      if (aOpCodes.TryGetValue(aPosition, out xNextOpCode))
       {
         xNextOpCode.InterpretStackTypes(aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth - 1);
       }

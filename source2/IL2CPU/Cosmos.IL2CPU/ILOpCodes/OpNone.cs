@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
     {
     }
 
-    public override int GetNumberOfStackPops()
+    public override int GetNumberOfStackPops(MethodBase aMethod)
     {
       switch (OpCode)
       {
@@ -21,7 +21,15 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Nop:
           return 0;
         case Code.Ret:
-          return 1;
+          var methodInfo = aMethod as System.Reflection.MethodInfo;
+          if (methodInfo != null && methodInfo.ReturnType != typeof (void))
+          {
+            return 1;
+          }
+          else
+          {
+            return 0;
+          }
         case Code.Conv_I:
         case Code.Conv_I1:
         case Code.Conv_I2:
@@ -138,7 +146,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       }
     }
 
-    public override int GetNumberOfStackPushes()
+    public override int GetNumberOfStackPushes(MethodBase aMethod)
     {
       switch (OpCode)
       {
@@ -297,27 +305,22 @@ namespace Cosmos.IL2CPU.ILOpCodes {
 
         case Code.Ldind_U1:
           StackPushTypes[0] = typeof (byte);
-          StackPopTypes[0] = typeof(void*);
           return;
 
         case Code.Ldind_U2:
           StackPushTypes[0] = typeof (ushort);
-          StackPopTypes[0] = typeof(void*);
           return;
 
         case Code.Ldind_U4:
           StackPushTypes[0] = typeof (UInt32);
-          StackPopTypes[0] = typeof (IntPtr);
           return;
 
         case Code.Ldind_R4:
           StackPushTypes[0] = typeof (Single);
-          StackPopTypes[0] = typeof(void*);
           return;
 
         case Code.Ldind_R8:
           StackPushTypes[0] = typeof (Double);
-          StackPopTypes[0] = typeof(void*);
           return;
 
         case Code.Conv_I:
@@ -480,39 +483,22 @@ namespace Cosmos.IL2CPU.ILOpCodes {
 
         case Code.Ldind_I:
           StackPushTypes[0] = typeof(IntPtr);
-          StackPopTypes[0] = typeof(IntPtr);
           return;
 
         case Code.Ldind_I1:
           StackPushTypes[0] = typeof(sbyte);
-          StackPopTypes[0] = typeof(IntPtr);
           return;
 
         case Code.Ldind_I2:
           StackPushTypes[0] = typeof(short);
-          StackPopTypes[0] = typeof(IntPtr);
           return;
 
         case Code.Ldind_I4:
           StackPushTypes[0] = typeof(Int32);
-          StackPopTypes[0] = typeof(IntPtr);
           return;
 
         case Code.Ldind_I8:
           StackPushTypes[0] = typeof(long);
-          StackPopTypes[0] = typeof(IntPtr);
-          return;
-
-        case Code.Stelem_I:
-          StackPopTypes[0] = typeof (IntPtr);
-          return;
-
-        case Code.Stelem_I1:
-          StackPopTypes[0] = typeof(sbyte);
-          return;
-
-        case Code.Stelem_I2:
-          StackPopTypes[0] = typeof(short);
           return;
 
         case Code.Stelem_I4:
@@ -522,6 +508,93 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Stelem_I8:
           StackPopTypes[0] = typeof(long);
           return;
+      }
+    }
+
+    protected override void DoInterpretStackTypes(ref bool aSituationChanged)
+    {
+      base.DoInterpretStackTypes(ref aSituationChanged);
+      switch (OpCode)
+      {
+        case Code.Add:
+        case Code.Mul:
+        case Code.Div:
+        case Code.Div_Un:
+        case Code.Sub:
+        case Code.Rem:
+        case Code.Rem_Un:
+        case Code.Xor:
+          if (StackPushTypes[0] != null)
+          {
+            return;
+          }
+          if (!StackPopTypes.Contains(null))
+          {
+            // PopTypes set, but PushType not yet, so fill it.
+            if ((StackPopTypes[0] == typeof (IntPtr) && StackPopTypes[1] == typeof (UInt32*))
+              || (StackPopTypes[0] == typeof (uint*) && StackPopTypes[1] == typeof (IntPtr)))
+            {
+              StackPushTypes[0] = typeof (uint*);
+              aSituationChanged = true;
+              return;
+            }
+            if ((StackPopTypes[0] == typeof(UIntPtr) && StackPopTypes[1] == typeof(UInt32*))
+              || (StackPopTypes[0] == typeof(uint*) && StackPopTypes[1] == typeof(UIntPtr)))
+            {
+              StackPushTypes[0] = typeof(uint*);
+              aSituationChanged = true;
+              return;
+            }
+            if ((StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(UIntPtr))
+              || (StackPopTypes[0] == typeof(UIntPtr) && StackPopTypes[1] == typeof(int)))
+            {
+              StackPushTypes[0] = typeof(UIntPtr);
+              aSituationChanged = true;
+              return;
+            }
+            if ((StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(uint))
+              || (StackPopTypes[0] == typeof(uint) && StackPopTypes[1] == typeof(int)))
+            {
+              StackPushTypes[0] = typeof(int);
+              aSituationChanged = true;
+              return;
+            }
+            if (StackPopTypes[0] == typeof(IntPtr) && StackPopTypes[1] == typeof(IntPtr))
+            {
+              StackPushTypes[0] = typeof(uint);
+              aSituationChanged = true;
+              return;
+            }
+            if (StackPopTypes[0] == typeof(uint) && StackPopTypes[1] == typeof(uint))
+            {
+              StackPushTypes[0] = typeof(uint);
+              aSituationChanged = true;
+              return;
+            }
+            if (StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(int))
+            {
+              StackPushTypes[0] = typeof(int);
+              aSituationChanged = true;
+              return;
+            }
+            throw new NotImplementedException(string.Format("Add on types '{0}' and '{1}' not yet implemented!", StackPopTypes[0], StackPopTypes[1]));
+          }
+          break;
+        case Code.Stelem_I2:
+          var xTypeValue = StackPopTypes[0];
+          if (xTypeValue == null)
+          {
+            return;
+          }
+
+          if (xTypeValue == typeof (byte) 
+            || xTypeValue == typeof (char) 
+            || xTypeValue == typeof(short)
+            || xTypeValue == typeof(int))
+          {
+            return;
+          }
+          throw new NotImplementedException(String.Format("Stelem_I2 storing type '{0}' is not implemented!", xTypeValue));
       }
     }
   }

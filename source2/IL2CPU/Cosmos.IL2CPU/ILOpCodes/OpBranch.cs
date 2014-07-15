@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       Value = aValue;
     }
 
-    public override int GetNumberOfStackPops()
+    public override int GetNumberOfStackPops(MethodBase aMethod)
     {
       switch (OpCode)
       {
@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       }
     }
 
-    public override int GetNumberOfStackPushes()
+    public override int GetNumberOfStackPushes(MethodBase aMethod)
     {
       switch (OpCode)
       {
@@ -98,6 +98,10 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
+          if (xPopType == typeof(int))
+          {
+            return;
+          }
           if (xPopType.IsClass)
           {
             return;
@@ -110,8 +114,72 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           }
           
           throw new Exception("Invalid type in PopTypes! (Type = '" + xPopType.AssemblyQualifiedName + "')");
+        case Code.Br:
+        case Code.Leave:
+          return;
+        case Code.Blt:
+        case Code.Ble:
+        case Code.Beq:
+        case Code.Bge:
+        case Code.Bgt:
+          var xValue1 = StackPopTypes[0];
+          var xValue2 = StackPopTypes[1];
+          if (xValue1 == null || xValue2 == null)
+          {
+            return;
+          }
+          if (xValue1 == typeof (int) && xValue2 == typeof (int))
+          {
+            return;
+          }
+          if (xValue1 == typeof(long) && xValue2 == typeof(long))
+          {
+            return;
+          }
+          if (xValue1 == typeof(IntPtr) && xValue2 == typeof(IntPtr))
+          {
+            return;
+          }
+          if ((xValue1 == typeof(int) && xValue2 == typeof(IntPtr))
+            ||(xValue1 == typeof(IntPtr) && xValue2 == typeof(int)))
+          {
+            return;
+          }
+
+          if ((xValue1 == typeof(long) && xValue2 == typeof(ulong))
+            || (xValue1 == typeof(ulong) && xValue2 == typeof(long)))
+          {
+            return;
+          }
+          throw new Exception(String.Format("Comparing types '{0}' and '{1}' not supported!", xValue1.AssemblyQualifiedName, xValue2.AssemblyQualifiedName));
         default:
           throw new NotImplementedException("Checks for opcode " + OpCode + " not implemented!");
+      }
+    }
+
+    protected override void DoInterpretNextInstructionStackTypes(IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
+    {
+      switch (OpCode)
+      {
+        case Code.Brtrue:
+        case Code.Brfalse:
+        case Code.Blt:
+        case Code.Blt_Un:
+        case Code.Ble:
+        case Code.Ble_Un:
+        case Code.Bgt:
+        case Code.Bgt_Un:
+        case Code.Bge:
+        case Code.Bge_Un:
+          base.DoInterpretNextInstructionStackTypes(aOpCodes, new Stack<Type>(aStack), ref aSituationChanged, aMaxRecursionDepth);
+          base.InterpretInstruction(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+          break;
+        case Code.Br:
+        case Code.Leave:
+          base.InterpretInstruction(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+          break;
+        default:
+          throw new NotImplementedException("OpCode " + OpCode);
       }
     }
   }

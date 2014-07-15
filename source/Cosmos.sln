@@ -192,9 +192,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{CAF5EB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common", "Cosmos.Common\Cosmos.Common.csproj", "{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu.BreakpointsKernel", "..\Users\Kudzu\Breakpoints\Kudzu.BreakpointsKernel.csproj", "{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}"
+EndProject
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Kudzu.Breakpoints", "..\Users\Kudzu\Breakpoints\Kudzu.Breakpoints.Cosmos", "{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 50
+		SccNumberOfProjects = 52
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
@@ -396,6 +400,14 @@ Global
 		SccProjectTopLevelParentUniqueName49 = Cosmos.sln
 		SccProjectName49 = Cosmos.Common
 		SccLocalPath49 = Cosmos.Common
+		SccProjectUniqueName50 = ..\\Users\\Kudzu\\Breakpoints\\Kudzu.BreakpointsKernel.csproj
+		SccProjectTopLevelParentUniqueName50 = Cosmos.sln
+		SccProjectName50 = ../Users/Kudzu/Breakpoints
+		SccLocalPath50 = ..\\Users\\Kudzu\\Breakpoints
+		SccProjectUniqueName51 = ..\\Users\\Kudzu\\Breakpoints\\Kudzu.Breakpoints.Cosmos
+		SccProjectTopLevelParentUniqueName51 = Cosmos.sln
+		SccProjectName51 = ../Users/Kudzu/Breakpoints
+		SccLocalPath51 = ..\\Users\\Kudzu\\Breakpoints
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -940,6 +952,26 @@ Global
 		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{215BC83B-1B28-4BF4-9A58-7FDB87C6BDA4}.Release|x86.ActiveCfg = Release|Any CPU
+		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Release|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Release|Mixed Platforms.Build.0 = Debug|Any CPU
+		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9}.Release|x86.ActiveCfg = Debug|Any CPU
+		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}.Debug|x86.ActiveCfg = Debug|x86
+		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}.Debug|x86.Build.0 = Debug|x86
+		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}.Release|Any CPU.ActiveCfg = Release|x86
+		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}.Release|Mixed Platforms.Build.0 = Release|x86
+		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}.Release|x86.ActiveCfg = Release|x86
+		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1005,6 +1037,8 @@ Global
 		{CE50FE98-9AC4-4B4D-ADC7-31F6DCD28755} = {0D558E33-78B0-47DB-B5EF-B7C2F3114D75}
 		{A73433E8-3B9D-4131-AB8F-72441F1D89EE} = {8CE8178D-F3CB-44B9-8D5D-8763139DBA30}
 		{A0073D91-D9D3-4A90-9845-10E5CDBA5511} = {8CE8178D-F3CB-44B9-8D5D-8763139DBA30}
+		{91CBD640-C07D-4556-B4CB-6F8CD88C67C9} = {A73433E8-3B9D-4131-AB8F-72441F1D89EE}
+		{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A} = {A73433E8-3B9D-4131-AB8F-72441F1D89EE}
 		{3720749F-1519-4A35-B944-FF05AD01F8DC} = {A0073D91-D9D3-4A90-9845-10E5CDBA5511}
 		{A13D729F-1344-4A18-A0D5-964676175951} = {360A9DE9-F8CF-4A38-9593-3699648DA616}
 		{FEC4BF88-8531-440E-B1BA-E2E066B36301} = {22583FFE-B418-447E-ACE4-615950C5F373}

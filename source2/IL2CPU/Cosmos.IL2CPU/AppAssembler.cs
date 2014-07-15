@@ -472,6 +472,7 @@ namespace Cosmos.IL2CPU
                 bool emitINT3 = true;
                 DebugInfo.SequencePoint xPreviousSequencePoint = null;
                 var xCurrentGroup = new List<ILOpCode>();
+                Console.WriteLine("Method: " + aMethod.MethodBase.GetFullName());
                 foreach (var xRawOpcode in aOpCodes)
                 {
                     var xSP = mSequences.FirstOrDefault(q => q.Offset == xRawOpcode.Position && q.LineStart != 0xFEEFEE);
@@ -519,6 +520,11 @@ namespace Cosmos.IL2CPU
         private static bool mDebugStackErrors = true;
         private void EmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup, ref bool emitINT3)
         {
+            if (aMethod.MethodBase.GetFullName() == "SystemBooleanCosmosIL2CPUX86PlugsCustomImplementationsSystemArrayImplTrySZIndexOfSystemUInt32SystemUInt32SystemUInt32SystemUInt32SystemUInt32")
+            {
+                Console.Write("");
+            }
+            Console.WriteLine("---- Group");
             InterpretInstructionsToDetermineStackTypes(aCurrentGroup);
             BeforeEmitInstructions(aMethod, aCurrentGroup);
             var xFirstInstruction = true;
@@ -663,13 +669,23 @@ namespace Cosmos.IL2CPU
                 }
 
                 var xGroupILByILOffset = aCurrentGroup.ToDictionary(i => i.Position);
-                var xMaxInterpreterRecursionDepth = 10;
+                var xMaxInterpreterRecursionDepth = 50;
                 var xCurStack = new Stack<Type>();
                 var xSituationChanged = false;
                 aCurrentGroup.First().InterpretStackTypes(xGroupILByILOffset, xCurStack, ref xSituationChanged, xMaxInterpreterRecursionDepth);
                 if (!xSituationChanged)
                 {
-                    throw new Exception("After interpreting stack types, nothing changed!");
+                    // nothing changed, now give error with first offset needing types:
+                    foreach (var xOp in aCurrentGroup)
+                    {
+                        foreach (var xStackEntry in xOp.StackPopTypes.Concat(xOp.StackPushTypes))
+                        {
+                            if (xStackEntry == null)
+                            {
+                                throw new Exception("After interpreting stack types, nothing changed! (First instruction needing types = " + xOp + ")");
+                            }
+                        }
+                    }
                 }
                 xNeedsInterpreting = false;
                 foreach (var xOp in aCurrentGroup)
