@@ -185,7 +185,14 @@ namespace Cosmos.Debug.VSDebugEngine
                             ASMWindow_NextAddress1Updated.Set();
                         }
                         break;
-
+                    //cmd used from assembler window
+                    case Windows2Debugger.Continue:
+                        Step(enum_STEPKIND.STEP_OVER);
+                        break;
+                    //cmd used from assembler window
+                    case Windows2Debugger.AsmStepInto:
+                        Step(enum_STEPKIND.STEP_INTO);
+                        break;
                     default:
                         throw new Exception(String.Format("Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived.", aCmd));
                 }
