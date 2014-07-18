@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Cosmos.IL2CPU.X86.IL;
+using FieldInfo = System.Reflection.FieldInfo;
 
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpField : ILOpCode {
@@ -55,34 +57,13 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       base.DoInitStackAnalysis(aMethod);
 
       switch (OpCode)
-      {
-        case Code.Stsfld:
-          StackPopTypes[0] = Value.FieldType;
-          if (StackPopTypes[0].IsEnum)
-          {
-            StackPopTypes[0] = StackPopTypes[0].GetEnumUnderlyingType();
-          }
-          
-          return;
-        case Code.Ldsfld:
+      { case Code.Ldsfld:
           StackPushTypes[0] = Value.FieldType;
           if (StackPushTypes[0].IsEnum)
           {
             StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
           }
-          return;
 
-        case Code.Stfld:
-          //StackPopTypes[0] = Value.FieldType;
-          //if (StackPopTypes[0].IsEnum)
-          //{
-          //  StackPopTypes[0] = StackPopTypes[0].GetEnumUnderlyingType();
-          //}
-          //else if (Value.DeclaringType.IsValueType)
-          //{
-          //  StackPopTypes[0] = typeof(void*);
-          //}
-          //StackPopTypes[1] = Value.DeclaringType;
           return;
         case Code.Ldfld:
           StackPushTypes[0] = Value.FieldType;
@@ -135,6 +116,10 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
+          if (IsIntegralType(expectedType) && IsIntegralType(StackPopTypes[0]))
+          {
+            return;
+          }
           if (expectedType == typeof (bool))
           {
             if (StackPopTypes[0] == typeof (int))
@@ -142,7 +127,53 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               return;
             }
           }
-          throw new Exception("Wrong Poptype encountered! (Type = " + StackPopTypes[0].FullName + ")");
+          if (StackPopTypes[0] == typeof(NullRef))
+          {
+            return;
+          }
+          if (expectedType.IsAssignableFrom(StackPopTypes[0]))
+          {
+            return;
+          }
+          throw new Exception("Wrong Poptype encountered! (Type = " + StackPopTypes[0].FullName + ", expected = " + expectedType.FullName + ")");
+        case Code.Stsfld:
+          if (StackPopTypes[0] == null)
+          {
+            return;
+          }
+          expectedType = Value.FieldType;
+          if (expectedType.IsEnum)
+          {
+            expectedType = expectedType.GetEnumUnderlyingType();
+          }
+          else if (Value.DeclaringType.IsValueType)
+          {
+            expectedType = typeof(void*);
+          }
+          if (StackPopTypes[0] == expectedType || StackPopTypes[0] == Value.FieldType)
+          {
+            return;
+          }
+          if (IsIntegralType(expectedType) && IsIntegralType(StackPopTypes[0]))
+          {
+            return;
+          }
+          if (expectedType == typeof(bool))
+          {
+            if (StackPopTypes[0] == typeof(int))
+            {
+              return;
+            }
+          }
+          if (expectedType.IsAssignableFrom(StackPopTypes[0]))
+          {
+            return;
+          }
+          if (StackPopTypes[0] == typeof(NullRef))
+          {
+            return;
+          }
+          throw new Exception("Wrong Poptype encountered! (Type = " + StackPopTypes[0].FullName + ", expected = " + expectedType.FullName + ")");
       }
     }
   }

@@ -141,11 +141,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-          if (xValue1 == typeof (int) && xValue2 == typeof (int))
-          {
-            return;
-          }
-          if (xValue1 == typeof(long) && xValue2 == typeof(long))
+          if (IsIntegralType(xValue1) && IsIntegralType(xValue2))
           {
             return;
           }
@@ -172,6 +168,12 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
+          if (xValue1.IsClass &&
+              xValue2.IsClass)
+          {
+            return;
+          }
+
           throw new Exception(String.Format("Comparing types '{0}' and '{1}' not supported!", xValue1.AssemblyQualifiedName, xValue2.AssemblyQualifiedName));
         default:
           throw new NotImplementedException("Checks for opcode " + OpCode + " not implemented!");
@@ -194,13 +196,13 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Bge_Un:
         case Code.Beq:
         case Code.Bne_Un:
+        case Code.Br:
           base.DoInterpretNextInstructionStackTypes(aOpCodes, new Stack<Type>(aStack), ref aSituationChanged, aMaxRecursionDepth);
           if (Value > Position)
           {
             InterpretInstruction(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
           }
           break;
-        case Code.Br:
         case Code.Leave:
           if (Value > Position)
           {

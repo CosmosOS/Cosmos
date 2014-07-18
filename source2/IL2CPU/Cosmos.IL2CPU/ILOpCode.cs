@@ -375,5 +375,19 @@ namespace Cosmos.IL2CPU {
         xNextOpCode.InterpretStackTypes(aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth - 1);
       }
     }
+
+    protected bool IsIntegralType(Type type)
+    {
+      return type == typeof(byte)
+             || type == typeof(sbyte)
+             || type == typeof(ushort)
+             || type == typeof(short)
+             || type == typeof(int)
+             || type == typeof(uint)
+             || type == typeof(long)
+             || type == typeof(ulong)
+             || type == typeof(char);
+
+    }
   }
 }

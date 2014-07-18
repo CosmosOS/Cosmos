@@ -17,7 +17,7 @@ namespace DebugCompiler
     internal class Program
     {
         //public const string CosmosRoot = @"e:\Cosmos";
-        public const string CosmosRoot = @"c:\data\sources\cosmos";
+        public const string CosmosRoot = @"e:\OpenSOurce\Cosmos";
         //public const string CosmosRoot = @"C:\Users\Huge\Documents\Visual Studio 2010\Projects\IL2CPU";
 
         private const string KernelFile = CosmosRoot + @"\Users\Kudzu\Breakpoints\bin\Debug\Playground.Kudzu.BreakpointsKernel.dll";
@@ -50,7 +50,7 @@ namespace DebugCompiler
                 xTask.OnLogException = (m) =>
                 {
                     Console.WriteLine("Exception: {0}", m.ToString());
-                    Console.ReadLine();
+                    //Console.ReadLine();
                 };
                 if (xTask.Execute())
                 {
@@ -66,7 +66,7 @@ namespace DebugCompiler
             catch (Exception E)
             {
                 Console.WriteLine(E.ToString());
-                Console.ReadLine();
+                //Console.ReadLine();
                 return;
             }
             Console.WriteLine("Run took {0}", xSW.Elapsed);
