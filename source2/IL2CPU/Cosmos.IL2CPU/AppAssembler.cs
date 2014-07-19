@@ -472,7 +472,7 @@ namespace Cosmos.IL2CPU
                 bool emitINT3 = true;
                 DebugInfo.SequencePoint xPreviousSequencePoint = null;
                 var xCurrentGroup = new List<ILOpCode>();
-                Console.WriteLine("Method: " + aMethod.MethodBase.GetFullName());
+                ILOpCode.ILInterpretationDebugLine("Method: " + aMethod.MethodBase.GetFullName());
                 foreach (var xRawOpcode in aOpCodes)
                 {
                     var xSP = mSequences.FirstOrDefault(q => q.Offset == xRawOpcode.Position && q.LineStart != 0xFEEFEE);
@@ -520,11 +520,7 @@ namespace Cosmos.IL2CPU
         private static bool mDebugStackErrors = true;
         private void EmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup, ref bool emitINT3)
         {
-            Console.WriteLine("---- Group");
-            if (aMethod.MethodBase.GetFullName() == "SystemVoidCosmosCoreINTsHandleInterrupt_35CosmosCoreINTsIRQContext")
-            {
-                Console.Write("");
-            }
+            ILOpCode.ILInterpretationDebugLine("---- Group");
             InterpretInstructionsToDetermineStackTypes(aCurrentGroup);
             BeforeEmitInstructions(aMethod, aCurrentGroup);
             var xFirstInstruction = true;
@@ -662,7 +658,7 @@ namespace Cosmos.IL2CPU
             var xGroupILByILOffset = aCurrentGroup.ToDictionary(i => i.Position);
             while (xNeedsInterpreting)
             {
-                Console.WriteLine("--------- New Interpretation iteration (xIteration = {0})", xIteration);
+                ILOpCode.ILInterpretationDebugLine("--------- New Interpretation iteration (xIteration = {0})", xIteration);
                 xIteration ++;
                 if (xIteration > 20)
                 {

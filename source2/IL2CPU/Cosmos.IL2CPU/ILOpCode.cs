@@ -305,7 +305,7 @@ namespace Cosmos.IL2CPU {
     public void InterpretStackTypes(IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
     {
       Processed = true;
-      Console.WriteLine("Interpreting {0}. StackCount = {1}", this, aStack.Count);
+      ILInterpretationDebugLine("Interpreting {0}. StackCount = {1}", this, aStack.Count);
       if (aMaxRecursionDepth == 0)
       {
         throw new Exception("Safety Error: MaxRecursionDepth reached!");
@@ -373,12 +373,12 @@ namespace Cosmos.IL2CPU {
       {
         if (!xNextOpCode.Processed)
         {
-          Console.WriteLine("- Branching from {0} to {1}", this, xNextOpCode);
+          ILInterpretationDebugLine("- Branching from {0} to {1}", this, xNextOpCode);
           InterpretInstruction(xNextOpCode, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
         }
         else
         {
-          Console.WriteLine("- Branching from {0} to {1} skipped", this, xNextOpCode);
+          ILInterpretationDebugLine("- Branching from {0} to {1} skipped", this, xNextOpCode);
         }
       }
     }
@@ -395,12 +395,12 @@ namespace Cosmos.IL2CPU {
       {
         if (!xNextOpCode.Processed)
         {
-          Console.WriteLine("- Branching from {0} to {1}", this, xNextOpCode);
+          ILInterpretationDebugLine("- Branching from {0} to {1}", this, xNextOpCode);
           InterpretInstruction(xNextOpCode, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
         }
         else
         {
-          Console.WriteLine("- Branching from {0} to {1} skipped", this, xNextOpCode);
+          ILInterpretationDebugLine("- Branching from {0} to {1} skipped", this, xNextOpCode);
         }
       }
     }
@@ -453,5 +453,9 @@ namespace Cosmos.IL2CPU {
     /// </summary>
     internal bool Processed = false;
 
+    public static void ILInterpretationDebugLine(string message, params object[] args)
+    {
+      //Console.WriteLine(String.Format(message, args));
+    }
   }
 }
