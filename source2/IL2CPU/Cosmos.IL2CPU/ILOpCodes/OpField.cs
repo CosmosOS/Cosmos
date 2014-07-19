@@ -71,11 +71,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
           }
-          else if (Value.DeclaringType.IsValueType)
-          {
-            StackPopTypes[0] = typeof (void*);
-          }
-          else
+          if (!Value.DeclaringType.IsValueType)
           {
             StackPopTypes[0] = Value.DeclaringType;
           }
@@ -85,6 +81,11 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           if (StackPopTypes[0].IsEnum)
           {
             StackPopTypes[0] = StackPopTypes[0].GetEnumUnderlyingType();
+          }
+          if (StackPopTypes[0].IsValueType &&
+              !StackPopTypes[0].IsPrimitive)
+          {
+            StackPopTypes[0] = typeof(void*);
           }
           StackPushTypes[0] = typeof (IntPtr);
           return;
@@ -99,7 +100,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       switch (OpCode)
       {
         case Code.Stfld:
-          if (StackPopTypes[0] == null)
+          if (StackPopTypes[1] == null)
           {
             return;
           }
@@ -108,34 +109,67 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             expectedType = expectedType.GetEnumUnderlyingType();
           }
-          else if (Value.DeclaringType.IsValueType)
+          else if (Value.DeclaringType.IsValueType && !Value.DeclaringType.IsPrimitive)
           {
-            expectedType = typeof(void*);
+            expectedType = typeof(void*); 
           }
-          if (StackPopTypes[0] == expectedType || StackPopTypes[0] == Value.FieldType)
+          if (StackPopTypes[1] == expectedType ||
+              StackPopTypes[1] == Value.FieldType)
           {
             return;
           }
-          if (IsIntegralType(expectedType) && IsIntegralType(StackPopTypes[0]))
+          if (IsIntegralType(expectedType) &&
+              IsIntegralType(StackPopTypes[1]))
           {
             return;
           }
-          if (expectedType == typeof (bool))
+          if (expectedType == typeof(bool))
           {
-            if (StackPopTypes[0] == typeof (int))
+            if (StackPopTypes[1] == typeof(int))
             {
               return;
             }
           }
-          if (StackPopTypes[0] == typeof(NullRef))
+          if (StackPopTypes[1] == typeof(NullRef))
           {
             return;
           }
-          if (expectedType.IsAssignableFrom(StackPopTypes[0]))
+          if (expectedType.IsAssignableFrom(StackPopTypes[1]))
           {
             return;
           }
-          throw new Exception("Wrong Poptype encountered! (Type = " + StackPopTypes[0].FullName + ", expected = " + expectedType.FullName + ")");
+          if (StackPopTypes[0] == null)
+          {
+            return;
+          }
+
+          if (Value.FieldType.IsAssignableFrom(StackPopTypes[0]))
+          {
+            return;
+          }
+          if (IsIntegralType(Value.FieldType) &&
+              IsIntegralType(StackPopTypes[0]))
+          {
+            return;
+          }
+          if (Value.FieldType == typeof(bool) &&
+              IsIntegralType(StackPopTypes[0]))
+          {
+            return;
+          }
+          if (Value.FieldType.IsEnum)
+          {
+            if (IsIntegralType(StackPopTypes[0]))
+            {
+              return;
+            }
+          }
+          if (Value.FieldType.IsClass &&
+              StackPopTypes[0] == typeof(NullRef))
+          {
+            return;
+          }
+          throw new Exception("Wrong Poptype encountered!");
         case Code.Stsfld:
           if (StackPopTypes[0] == null)
           {
@@ -150,11 +184,13 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             expectedType = typeof(void*);
           }
-          if (StackPopTypes[0] == expectedType || StackPopTypes[0] == Value.FieldType)
+          if (StackPopTypes[0] == expectedType ||
+              StackPopTypes[0] == Value.FieldType)
           {
             return;
           }
-          if (IsIntegralType(expectedType) && IsIntegralType(StackPopTypes[0]))
+          if (IsIntegralType(expectedType) &&
+              IsIntegralType(StackPopTypes[0]))
           {
             return;
           }
@@ -174,6 +210,23 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             return;
           }
           throw new Exception("Wrong Poptype encountered! (Type = " + StackPopTypes[0].FullName + ", expected = " + expectedType.FullName + ")");
+        case Code.Ldfld:
+          if (StackPopTypes[0] == null)
+          {
+            return;
+          }
+          if (!Value.DeclaringType.IsValueType)
+          {
+            return;
+          }
+          if (StackPopTypes[0] == Value.DeclaringType.MakePointerType() ||
+              StackPopTypes[0] == Value.DeclaringType.MakeByRefType() ||
+            StackPopTypes[0] == typeof(void*))
+          {
+            return;
+          }
+          throw new Exception("Wrong Poptype encountered! (Type = " + StackPopTypes[0].FullName + ")");
+          break;
       }
     }
   }

@@ -530,6 +530,27 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               aSituationChanged = true;
               return;
             }
+            if ((StackPopTypes[0] == typeof(uint) && StackPopTypes[1] == typeof(byte*))
+              || (StackPopTypes[0] == typeof(byte*) && StackPopTypes[1] == typeof(uint)))
+            {
+              StackPushTypes[0] = typeof(byte*);
+              aSituationChanged = true;
+              return;
+            }
+            if ((StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(byte*))
+              || (StackPopTypes[0] == typeof(byte*) && StackPopTypes[1] == typeof(int)))
+            {
+              StackPushTypes[0] = typeof(byte*);
+              aSituationChanged = true;
+              return;
+            }
+            if ((StackPopTypes[0] == typeof(IntPtr) && StackPopTypes[1] == typeof(byte*))
+              || (StackPopTypes[0] == typeof(byte*) && StackPopTypes[1] == typeof(IntPtr)))
+            {
+              StackPushTypes[0] = typeof(byte*);
+              aSituationChanged = true;
+              return;
+            }
             if ((StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(UIntPtr))
               || (StackPopTypes[0] == typeof(UIntPtr) && StackPopTypes[1] == typeof(int)))
             {
@@ -591,9 +612,21 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               aSituationChanged = true;
               return;
             }
+            if (StackPopTypes[0] == typeof(byte) && StackPopTypes[1] == typeof(byte))
+            {
+              StackPushTypes[0] = typeof(byte);
+              aSituationChanged = true;
+              return;
+            }
             if (StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(int))
             {
               StackPushTypes[0] = typeof(int);
+              aSituationChanged = true;
+              return;
+            }
+            if (StackPopTypes[0] == typeof(ushort) && StackPopTypes[1] == typeof(ushort))
+            {
+              StackPushTypes[0] = typeof(ushort);
               aSituationChanged = true;
               return;
             }
@@ -621,6 +654,27 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               aSituationChanged = true;
               return;
             }
+            if (StackPopTypes[0] == StackPopTypes[1] && StackPopTypes[0].IsPointer)
+            {
+              StackPushTypes[0] = StackPopTypes[0];
+              aSituationChanged = true;
+              return;
+            }
+            if (StackPopTypes[0] == typeof(int) &&
+                StackPopTypes[1].IsPointer)
+            {
+              StackPushTypes[0] = StackPopTypes[1];
+              aSituationChanged = true;
+              return;
+            }
+            if ((StackPopTypes[0] == typeof(IntPtr) || StackPopTypes[0] == typeof(UIntPtr)) &&
+                StackPopTypes[1].IsPointer)
+            {
+              StackPushTypes[0] = StackPopTypes[1];
+              aSituationChanged = true;
+              return;
+            }
+
             if (OpCode == Code.Add &&
                 ((StackPopTypes[0] == typeof(IntPtr) && (StackPopTypes[1].IsPointer || StackPopTypes[1].IsByRef))
                  || ((StackPopTypes[0].IsPointer || StackPopTypes[0].IsByRef) && StackPopTypes[1] == typeof(IntPtr))))
@@ -725,6 +779,18 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             aSituationChanged = true;
             return;
           }
+          if (xTypeValue == typeof(IntPtr) && xTypeShift == typeof(IntPtr))
+          {
+            StackPushTypes[0] = typeof(IntPtr);
+            aSituationChanged = true;
+            return;
+          }
+          if (xTypeValue == typeof(ulong) && xTypeShift == typeof(int))
+          {
+            StackPushTypes[0] = typeof(ulong);
+            aSituationChanged = true;
+            return;
+          }
           throw new NotImplementedException(String.Format("{0} with types {1} and {2} is not implemented!", OpCode, xTypeValue.FullName, xTypeShift.FullName));
         case Code.Ldelem_Ref:
           if (StackPushTypes[0] != null)
@@ -773,8 +839,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-          if (StackPopTypes[0] != typeof(sbyte) &&
-              StackPopTypes[0] != typeof(byte))
+          if (!IsIntegralType(StackPopTypes[0]))
           {
             throw new Exception("Wrong value type: " + StackPopTypes[0].FullName);
           }
@@ -788,11 +853,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-          if (StackPopTypes[0] != typeof(short) &&
-              StackPopTypes[0] != typeof(ushort) &&
-              StackPopTypes[0] != typeof(int) &&
-              StackPopTypes[0] != typeof(uint) &&
-            StackPopTypes[0] != typeof(char))
+          if (!IsIntegralType(StackPopTypes[0]))
           {
             throw new Exception("Wrong value type: " + StackPopTypes[0].FullName);
           }
@@ -806,8 +867,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-          if (StackPopTypes[0] != typeof(int) &&
-              StackPopTypes[0] != typeof(uint))
+          if (!IsIntegralType(StackPopTypes[0]))
           {
             throw new Exception("Wrong value type: " + StackPopTypes[0].FullName);
           }
@@ -821,8 +881,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-          if (StackPopTypes[0] != typeof(long) &&
-              StackPopTypes[0] != typeof(ulong))
+          if (!IsIntegralType(StackPopTypes[0]))
           {
             throw new Exception("Wrong value type: " + StackPopTypes[0].FullName);
           }

@@ -302,8 +302,9 @@ namespace Cosmos.IL2CPU {
     {
     }
 
-    public void InterpretStackTypes(IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth) 
+    public void InterpretStackTypes(IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
     {
+      Processed = true;
       Console.WriteLine("Interpreting {0}. StackCount = {1}", this, aStack.Count);
       if (aMaxRecursionDepth == 0)
       {
@@ -311,9 +312,13 @@ namespace Cosmos.IL2CPU {
       }
 
       // if current instruction is the first instruction of a catch statement, "push" the exception type now
-      if (CurrentExceptionHandler!=null && CurrentExceptionHandler.HandlerOffset == Position)
+      if (CurrentExceptionHandler != null &&
+          CurrentExceptionHandler.HandlerOffset == Position)
       {
-        aStack.Push(CurrentExceptionHandler.CatchType);
+        if (CurrentExceptionHandler.Flags != SR.ExceptionHandlingClauseOptions.Finally)
+        {
+          aStack.Push(CurrentExceptionHandler.CatchType);
+        }
       }
 
       if (StackPopTypes.Length > aStack.Count)
@@ -361,19 +366,57 @@ namespace Cosmos.IL2CPU {
       //
     }
 
+    protected virtual void DoInterpretNextInstructionStackTypesIfNotYetProcessed(IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
+    {
+      ILOpCode xNextOpCode;
+      if (aOpCodes.TryGetValue(NextPosition, out xNextOpCode))
+      {
+        if (!xNextOpCode.Processed)
+        {
+          Console.WriteLine("- Branching from {0} to {1}", this, xNextOpCode);
+          InterpretInstruction(xNextOpCode, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+        }
+        else
+        {
+          Console.WriteLine("- Branching from {0} to {1} skipped", this, xNextOpCode);
+        }
+      }
+    }
+
     protected virtual void DoInterpretNextInstructionStackTypes(IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
     {
       InterpretInstruction(NextPosition, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
     }
 
-    protected void InterpretInstruction(int aPosition, IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
+    protected void InterpretInstructionIfNotYetProcessed(int aPosition, IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
     {
-
       ILOpCode xNextOpCode;
       if (aOpCodes.TryGetValue(aPosition, out xNextOpCode))
       {
-        xNextOpCode.InterpretStackTypes(aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth - 1);
+        if (!xNextOpCode.Processed)
+        {
+          Console.WriteLine("- Branching from {0} to {1}", this, xNextOpCode);
+          InterpretInstruction(xNextOpCode, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+        }
+        else
+        {
+          Console.WriteLine("- Branching from {0} to {1} skipped", this, xNextOpCode);
+        }
       }
+    }
+
+    protected void InterpretInstruction(int aPosition, IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
+    {
+      ILOpCode xNextOpCode;
+      if (aOpCodes.TryGetValue(aPosition, out xNextOpCode))
+      {
+        InterpretInstruction(xNextOpCode, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+      }
+    }
+
+    protected void InterpretInstruction(ILOpCode xNextOpCode, IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
+    {
+      xNextOpCode.InterpretStackTypes(aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth - 1);
     }
 
     protected bool IsIntegralType(Type type)
@@ -386,8 +429,22 @@ namespace Cosmos.IL2CPU {
              || type == typeof(uint)
              || type == typeof(long)
              || type == typeof(ulong)
-             || type == typeof(char);
-
+             || type == typeof(char)
+             || type == typeof(IntPtr)
+             || type == typeof(UIntPtr);
     }
+
+    protected bool IsIntegralTypeOrPointer(Type type)
+    {
+      return IsIntegralType(type)
+             || type.IsPointer
+             || type.IsByRef;
+    }
+
+    /// <summary>
+    /// Gets set to true on first interpreter processing. Is used for loop detection
+    /// </summary>
+    internal bool Processed = false;
+
   }
 }

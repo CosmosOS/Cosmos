@@ -94,20 +94,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-
-          if (xPopType == typeof (IntPtr))
-          {
-            return;
-          }
-          if (xPopType == typeof(int))
-          {
-            return;
-          }
-          if (xPopType == typeof(byte))
-          {
-            return;
-          }
-          if (xPopType == typeof(sbyte))
+          if (IsIntegralType(xPopType))
           {
             return;
           }
@@ -135,13 +122,14 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Blt_Un:
         case Code.Ble_Un:
         case Code.Bne_Un:
+        case Code.Bgt_Un:
           var xValue1 = StackPopTypes[0];
           var xValue2 = StackPopTypes[1];
           if (xValue1 == null || xValue2 == null)
           {
             return;
           }
-          if (IsIntegralType(xValue1) && IsIntegralType(xValue2))
+          if (IsIntegralTypeOrPointer(xValue1) && IsIntegralTypeOrPointer(xValue2))
           {
             return;
           }
@@ -159,6 +147,11 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           }
           if ((xValue1 == typeof(int) && xValue2 == typeof(IntPtr))
             ||(xValue1 == typeof(IntPtr) && xValue2 == typeof(int)))
+          {
+            return;
+          }
+          if ((xValue1 == typeof(UIntPtr) && xValue2 == typeof(byte*))
+              || (xValue1 == typeof(byte*) && xValue2 == typeof(UIntPtr)))
           {
             return;
           }
@@ -197,17 +190,14 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Beq:
         case Code.Bne_Un:
         case Code.Br:
-          base.DoInterpretNextInstructionStackTypes(aOpCodes, new Stack<Type>(aStack), ref aSituationChanged, aMaxRecursionDepth);
-          if (Value > Position)
-          {
-            InterpretInstruction(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
-          }
+
+          base.DoInterpretNextInstructionStackTypesIfNotYetProcessed(aOpCodes, new Stack<Type>(aStack), ref aSituationChanged, aMaxRecursionDepth);
+          InterpretInstructionIfNotYetProcessed(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
           break;
         case Code.Leave:
-          if (Value > Position)
-          {
-            InterpretInstruction(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
-          }
+          InterpretInstructionIfNotYetProcessed(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+          base.DoInterpretNextInstructionStackTypesIfNotYetProcessed(aOpCodes, new Stack<Type>(aStack), ref aSituationChanged, aMaxRecursionDepth);
+          
           break;
         default:
           throw new NotImplementedException("OpCode " + OpCode);

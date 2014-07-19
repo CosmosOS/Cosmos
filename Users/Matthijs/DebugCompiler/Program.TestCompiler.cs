@@ -27,7 +27,7 @@ namespace DebugCompiler
 
         private static void Main(string[] args)
         {
-            Console.SetOut(new StreamWriter("out", false){AutoFlush=true});
+            Console.SetOut(new StreamWriter("out", false));
 
             var xSW = Stopwatch.StartNew();
             try
@@ -65,12 +65,14 @@ namespace DebugCompiler
             }
             catch (Exception E)
             {
+                Console.Out.Flush();
                 Console.WriteLine(E.ToString());
                 //Console.ReadLine();
                 return;
             }
             Console.WriteLine("Run took {0}", xSW.Elapsed);
             Console.WriteLine("Generated {0} Guids", DebugInfo.mLastGuid);
+            Console.Out.Flush();
         }
 
         //static void Main()
