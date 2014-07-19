@@ -278,11 +278,6 @@ namespace Cosmos.IL2CPU.ILOpCodes {
 
       switch (OpCode)
       {
-        case Code.Stind_I:
-          StackPopTypes[0] = typeof (IntPtr);
-          StackPopTypes[1] = typeof(void*);
-          return;
-
         case Code.Ldind_U1:
           StackPushTypes[0] = typeof (byte);
           return;
@@ -890,6 +885,20 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             throw new Exception("Wrong Pointer type: " + StackPopTypes[1].FullName);
           }
           break;
+        case Code.Stind_I:
+          if (StackPopTypes[1] == null || StackPopTypes[0] == null)
+          {
+            return;
+          }
+          if (!IsIntegralTypeOrPointer(StackPopTypes[0]))
+          {
+            throw new Exception("Wrong value type: " + StackPopTypes[0].FullName);
+          }
+          if (!IsPointer(StackPopTypes[1]))
+          {
+            throw new Exception("Wrong Pointer type: " + StackPopTypes[1].FullName);
+          }
+          break;
         case Code.Ldind_Ref:
           if (StackPushTypes[0] != null)
           {
@@ -907,11 +916,6 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           aSituationChanged = true;
           break;
       }
-    }
-
-    private bool IsPointer(Type aPointer)
-    {
-      return aPointer.IsPointer || aPointer.IsByRef || aPointer == typeof(IntPtr) || aPointer == typeof(UIntPtr);
     }
   }
 }

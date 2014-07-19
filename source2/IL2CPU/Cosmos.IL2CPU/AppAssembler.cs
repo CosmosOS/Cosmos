@@ -521,7 +521,11 @@ namespace Cosmos.IL2CPU
         private void EmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup, ref bool emitINT3)
         {
             Console.WriteLine("---- Group");
-            //InterpretInstructionsToDetermineStackTypes(aCurrentGroup);
+            if (aMethod.MethodBase.GetFullName() == "SystemVoidCosmosCoreINTsHandleInterrupt_35CosmosCoreINTsIRQContext")
+            {
+                Console.Write("");
+            }
+            InterpretInstructionsToDetermineStackTypes(aCurrentGroup);
             BeforeEmitInstructions(aMethod, aCurrentGroup);
             var xFirstInstruction = true;
             foreach (var xOpCode in aCurrentGroup)
@@ -655,8 +659,10 @@ namespace Cosmos.IL2CPU
                 }
             }
             var xIteration = 0;
+            var xGroupILByILOffset = aCurrentGroup.ToDictionary(i => i.Position);
             while (xNeedsInterpreting)
             {
+                Console.WriteLine("--------- New Interpretation iteration (xIteration = {0})", xIteration);
                 xIteration ++;
                 if (xIteration > 20)
                 {
@@ -671,11 +677,11 @@ namespace Cosmos.IL2CPU
                             }
                         }
                     }
-                    
                 }
 
-                var xGroupILByILOffset = aCurrentGroup.ToDictionary(i => i.Position);
-                var xMaxInterpreterRecursionDepth = 250;
+                aCurrentGroup.ForEach(i => i.Processed = false);
+
+                var xMaxInterpreterRecursionDepth = 25000;
                 var xCurStack = new Stack<Type>();
                 var xSituationChanged = false;
                 aCurrentGroup.First().InterpretStackTypes(xGroupILByILOffset, xCurStack, ref xSituationChanged, xMaxInterpreterRecursionDepth);

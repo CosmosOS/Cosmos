@@ -441,6 +441,13 @@ namespace Cosmos.IL2CPU {
              || type.IsByRef;
     }
 
+
+    protected bool IsPointer(Type aPointer)
+    {
+      return aPointer.IsPointer || aPointer.IsByRef || aPointer == typeof(IntPtr) || aPointer == typeof(UIntPtr);
+    }
+
+
     /// <summary>
     /// Gets set to true on first interpreter processing. Is used for loop detection
     /// </summary>

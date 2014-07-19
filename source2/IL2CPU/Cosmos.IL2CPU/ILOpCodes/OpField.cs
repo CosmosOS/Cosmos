@@ -164,6 +164,11 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               return;
             }
           }
+          if (IsPointer(Value.FieldType) &&
+              IsPointer(StackPopTypes[0]))
+          {
+            return;
+          }
           if (Value.FieldType.IsClass &&
               StackPopTypes[0] == typeof(NullRef))
           {
