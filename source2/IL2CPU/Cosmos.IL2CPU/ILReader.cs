@@ -351,7 +351,7 @@ namespace Cosmos.IL2CPU {
                 xBranchLocations[i] = xNextOpPos + ReadInt32(xIL, xPos + i * 4);
                 CheckBranch(xBranchLocations[i], xIL.Length);
               }
-              xILOpCode = new ILOpCodes.OpSwitch(xOpCodeVal, xOpPos, xPos, xBranchLocations, xCurrentHandler);
+              xILOpCode = new ILOpCodes.OpSwitch(xOpCodeVal, xOpPos, xNextOpPos, xBranchLocations, xCurrentHandler);
               xPos = xNextOpPos;
               break;
             }
