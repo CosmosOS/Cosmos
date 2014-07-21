@@ -16,10 +16,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
-            var xSource = Assembler.Stack.Peek();
-            
-            Assembler.Stack.Pop();
-            switch (xSource.Size)
+            var xSource = aOpCode.StackPopTypes[0];
+            var xSourceIsFloat = TypeIsFloat(xSource);
+            var xSourceSize = SizeOfType(xSource);
+            switch (xSourceSize)
             {
                 case 1:
                 case 2:
@@ -30,9 +30,9 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                 case 4:
                     {
-                        if (!xSource.IsFloat)
+                        if (!xSourceIsFloat)
                         {
-                            if (xSource.IsSigned)
+                            if (IsIntegerSigned(xSource))
                             {
                                 new CPUx86.SSE.ConvertSI2SS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
                                 new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.XMM0 };
@@ -46,14 +46,14 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                 case 8:
                     {
-                        if (xSource.IsFloat)
+                        if (xSourceIsFloat)
                         {
                             new CPUx86.SSE.ConvertSD2SS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
                             new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                         }
                         else
                         {
-                            if (xSource.IsSigned)
+                            if (IsIntegerSigned(xSource))
                             {
                                 new CPUx86.x87.IntLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
                                 new CPUx86.SSE.ConvertSD2SS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
@@ -75,8 +75,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U4: SourceSize " + xStackItem.Size + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException();
             }
-            //Assembler.Stack.Push(4, typeof(uint));
-            Assembler.Stack.Push(4, typeof(float));
         }
     }
 }

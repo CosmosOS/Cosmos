@@ -21,7 +21,6 @@ namespace Cosmos.IL2CPU.X86.IL
       new Comment( Assembler, "String Value: " + xOpString.Value.Replace( "\r", "\\r" ).Replace( "\n", "\\n" ) );
       new Mov { DestinationReg = RegistersEnum.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(xDataName) };
       new Push { DestinationReg = RegistersEnum.EAX };
-      Assembler.Stack.Push(4, typeof(string));
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering. if that changes, we need to change the code below!
       #region Debug verification
       var xFields = GetFieldsInfo(typeof(string));

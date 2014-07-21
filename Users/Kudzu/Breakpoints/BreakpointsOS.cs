@@ -10,13 +10,13 @@ using Cosmos.Debug.Kernel;
 using Cosmos.Common.Extensions;
 using Cosmos.Hardware.BlockDevice;
 
-using TheFatStream = Playground.Kudzu.BreakpointsKernel.FAT.MyFatStream;
-using TheFatFile = Playground.Kudzu.BreakpointsKernel.FAT.Listing.MyFatFile;
-using TheFatFileSystem = Playground.Kudzu.BreakpointsKernel.FAT.MyFatFileSystem;
+//using TheFatStream = Playground.Kudzu.BreakpointsKernel.FAT.MyFatStream;
+//using TheFatFile = Playground.Kudzu.BreakpointsKernel.FAT.Listing.MyFatFile;
+//using TheFatFileSystem = Playground.Kudzu.BreakpointsKernel.FAT.MyFatFileSystem;
 
-//using TheFatStream = Cosmos.System.Filesystem.FAT.FatStream;
-//using TheFatFile = Cosmos.System.Filesystem.FAT.Listing.FatFile;
-//using TheFatFileSystem = Cosmos.System.Filesystem.FAT.FatFileSystem;
+using TheFatStream = Cosmos.System.Filesystem.FAT.FatStream;
+using TheFatFile = Cosmos.System.Filesystem.FAT.Listing.FatFile;
+using TheFatFileSystem = Cosmos.System.Filesystem.FAT.FatFileSystem;
 
 namespace Kudzu.BreakpointsKernel
 {

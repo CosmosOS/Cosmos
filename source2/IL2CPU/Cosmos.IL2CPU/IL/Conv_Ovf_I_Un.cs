@@ -13,11 +13,13 @@ namespace Cosmos.IL2CPU.X86.IL
 
 		public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
 			//TODO: What if the last ILOp in a method was Conv_Ovf_I_Un or an other?
-			var xSource = Assembler.Stack.Pop();
-			if(xSource.IsFloat)
+            var xSource = aOpCode.StackPopTypes[0];
+            var xSourceSize = SizeOfType(xSource);
+            var xSourceIsFloat = TypeIsFloat(xSource);
+			if(xSourceIsFloat)
 				ThrowNotImplementedException("Conv_Ovf_I_Un throws an ArgumentException, because float is not implemented!");
 
-			switch (xSource.Size)
+			switch (xSourceSize)
 			{
 				case 1:
 				case 2:
@@ -42,7 +44,6 @@ namespace Cosmos.IL2CPU.X86.IL
 					ThrowNotImplementedException("Conv_Ovf_I_Un not implemented for this size!");
 					break;
 			}
-			Assembler.Stack.Push(4, typeof(uint));
 		}
     
 		// using System;

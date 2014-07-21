@@ -13,7 +13,6 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             new CPUx86.Push { DestinationValue = 0 };
-            Assembler.Stack.Push(4, typeof( uint ));
         }
 
 

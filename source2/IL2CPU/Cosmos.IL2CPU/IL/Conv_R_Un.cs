@@ -16,17 +16,18 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xValue = Assembler.Stack.Peek();
-            if (xValue.Size > 8)
+            var xValue = aOpCode.StackPopTypes[0];
+            var xValueIsFloat = TypeIsFloat(xValue);
+            var xValueSize = SizeOfType(xValue);
+            if (xValueSize > 8)
             {
                 //EmitNotImplementedException( Assembler, aServiceProvider, "Size '" + xSize.Size + "' not supported (add)", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
                 throw new NotImplementedException();
             }
 			//TODO if on stack a float it is first truncated, http://msdn.microsoft.com/en-us/library/system.reflection.emit.opcodes.conv_r_un.aspx
-            if (!xValue.IsFloat)
+            if (!xValueIsFloat)
             {
-                Assembler.Stack.Pop();
-                switch (xValue.Size)
+                switch (xValueSize)
                 {
                     case 1:
                     case 2:
@@ -47,7 +48,6 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 throw new NotImplementedException();
             }
-            Assembler.Stack.Push(4, typeof(float));
         }
     }
 }

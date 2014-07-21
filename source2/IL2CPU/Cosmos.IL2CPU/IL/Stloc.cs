@@ -27,8 +27,6 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 				new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement =(int)((0 - (xEBPOffset + (i * 4)))), SourceReg = CPUx86.Registers.EAX };
 			}
-			// no need to inc again, items on the transient stack are also counted
-			Assembler.Stack.Pop();
 		}
 
 		// 		private bool mNeedsGC = false;

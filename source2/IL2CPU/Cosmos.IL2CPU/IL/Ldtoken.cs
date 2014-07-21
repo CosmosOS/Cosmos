@@ -38,7 +38,6 @@ namespace Cosmos.IL2CPU.X86.IL
             //}
             //new CPUx86.Push { DestinationValue = xToken.Value };
             new CPU.Push { DestinationRef = Cosmos.Assembler.ElementReference.New( xTokenAddress ) };
-            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
         }
 
 

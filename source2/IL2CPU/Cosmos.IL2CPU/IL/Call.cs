@@ -143,18 +143,10 @@ namespace Cosmos.IL2CPU.X86.IL {
                      }, nextLabel);
 
       }
-      for (int i = 0; i < xParameters.Length; i++) {
-        Assembler.Stack.Pop();
-      }
-      if (!aTargetMethod.IsStatic) {
-        Assembler.Stack.Pop();
-      }
       if (xMethodInfo == null || SizeOfType(xMethodInfo.ReturnType) == 0) {
         return;
 	  }
 
-      Assembler.Stack.Push(ILOp.Align(SizeOfType(xMethodInfo.ReturnType), 4),
-                              xMethodInfo.ReturnType);
     }
 
       public static void DoNullReferenceCheck(Assembler.Assembler assembler, bool debugEnabled, uint stackOffsetToCheck)

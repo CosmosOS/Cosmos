@@ -14,11 +14,14 @@ namespace Cosmos.IL2CPU.X86.IL
 
 		public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
 		{
-			var xStackContent = Assembler.Stack.Pop();
-			var xStackContentSecond = Assembler.Stack.Pop();
-
-			var xSize = Math.Max( xStackContent.Size, xStackContentSecond.Size);
-			if (ILOp.Align(xStackContent.Size, 4u) != ILOp.Align(xStackContentSecond.Size, 4u))
+		    var xStackContent = aOpCode.StackPopTypes[0];
+		    var xStackContentSize = SizeOfType(xStackContent);
+            var xStackContent2 = aOpCode.StackPopTypes[1];
+            var xStackContent2Size = SizeOfType(xStackContent2);
+            
+			
+			var xSize = Math.Max( xStackContentSize, xStackContent2Size);
+			if (ILOp.Align(xStackContentSize, 4u) != ILOp.Align(xStackContent2Size, 4u))
 			{
 				throw new NotSupportedException("Cosmos.IL2CPU.x86->IL->And.cs->Error: Operands have different size!");
 			}
@@ -45,7 +48,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                 new CPUx86.And { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
 			}
-			Assembler.Stack.Push( xStackContent );
 		}
 	}
 }

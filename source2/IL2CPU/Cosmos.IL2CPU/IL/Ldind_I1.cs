@@ -16,8 +16,6 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
             new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, Size = 8, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-            Assembler.Stack.Pop();
-            Assembler.Stack.Push(ILOp.Align(1, 4), typeof( int ) );
         }
     }
 }

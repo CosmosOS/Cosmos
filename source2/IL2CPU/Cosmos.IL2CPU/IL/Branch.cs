@@ -41,14 +41,14 @@ namespace Cosmos.IL2CPU.X86.IL
                 case ILOpCode.Code.Bne_Un:
                 case ILOpCode.Code.Blt:
                 case ILOpCode.Code.Blt_Un:
-                    Assembler.Stack.Pop();
                     xIsSingleCompare = false;
                     break;
             }
 
-            var xStackContent = Assembler.Stack.Pop();
+            var xStackContent = aOpCode.StackPopTypes[0];
+            var xStackContentSize = SizeOfType(xStackContent);
 
-            if (xStackContent.Size > 8)
+            if (xStackContentSize > 8)
             {
                 throw new Exception("Cosmos.IL2CPU.x86->IL->Branch.cs->Error: StackSize > 8 not supported");
             }
@@ -98,7 +98,7 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             if (!xIsSingleCompare)
             {
-                if (xStackContent.Size <= 4)
+                if (xStackContentSize <= 4)
                 {
                     //if (xStackContent.IsFloat)
                     //{
@@ -208,7 +208,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //else
                 //{
                 // todo: improve code clarity
-                if (xStackContent.Size > 4)
+                if (xStackContentSize > 4)
                 {
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Branch.cs->Error: Simple branches are not yet supported on operands > 4 bytes!");
                 }

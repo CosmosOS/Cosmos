@@ -302,13 +302,44 @@ namespace Cosmos.IL2CPU {
     {
     }
 
+
+    /// <summary>
+    /// Gets set to true on first interpreter processing. Is used for loop detection
+    /// </summary>
+    internal bool Processed = false;
+
+    public uint? StackOffsetBeforeExecution = null;
+
     public void InterpretStackTypes(IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
     {
+      if (Processed)
+      {
+        ILInterpretationDebugLine("{0} skipped for reinterpretation", this);
+        return;
+      }
       Processed = true;
-      ILInterpretationDebugLine("Interpreting {0}. StackCount = {1}", this, aStack.Count);
+      ILInterpretationDebugLine(() =>
+                                {
+                                  var sb = new StringBuilder();
+                                  sb.AppendFormat("Interpreting {0}. StackCount = {1}. Contents: ", this, aStack.Count);
+                                  foreach (var item in aStack)
+                                  {
+                                    sb.AppendFormat("{0}, ", item.FullName);
+                                  }
+                                  return sb.ToString().Trim(',', ' ');
+                                });
       if (aMaxRecursionDepth == 0)
       {
         throw new Exception("Safety Error: MaxRecursionDepth reached!");
+      }
+
+      if (StackOffsetBeforeExecution == null)
+      {
+        StackOffsetBeforeExecution = 0;
+        foreach (var item in aStack)
+        {
+          StackOffsetBeforeExecution += ILOp.Align(ILOp.SizeOfType(item), 4);
+        }
       }
 
       // if current instruction is the first instruction of a catch statement, "push" the exception type now
@@ -371,15 +402,8 @@ namespace Cosmos.IL2CPU {
       ILOpCode xNextOpCode;
       if (aOpCodes.TryGetValue(NextPosition, out xNextOpCode))
       {
-        if (!xNextOpCode.Processed)
-        {
-          ILInterpretationDebugLine("- Branching from {0} to {1}", this, xNextOpCode);
-          InterpretInstruction(xNextOpCode, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
-        }
-        else
-        {
-          ILInterpretationDebugLine("- Branching from {0} to {1} skipped", this, xNextOpCode);
-        }
+        ILInterpretationDebugLine("- Branching from {0} to {1}", this, xNextOpCode);
+        InterpretInstruction(xNextOpCode, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
       }
     }
 
@@ -393,15 +417,8 @@ namespace Cosmos.IL2CPU {
       ILOpCode xNextOpCode;
       if (aOpCodes.TryGetValue(aPosition, out xNextOpCode))
       {
-        if (!xNextOpCode.Processed)
-        {
-          ILInterpretationDebugLine("- Branching from {0} to {1}", this, xNextOpCode);
-          InterpretInstruction(xNextOpCode, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
-        }
-        else
-        {
-          ILInterpretationDebugLine("- Branching from {0} to {1} skipped", this, xNextOpCode);
-        }
+        ILInterpretationDebugLine("- Branching from {0} to {1}", this, xNextOpCode);
+        InterpretInstruction(xNextOpCode, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
       }
     }
 
@@ -419,7 +436,7 @@ namespace Cosmos.IL2CPU {
       xNextOpCode.InterpretStackTypes(aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth - 1);
     }
 
-    protected bool IsIntegralType(Type type)
+    protected static bool IsIntegralType(Type type)
     {
       return type == typeof(byte)
              || type == typeof(sbyte)
@@ -434,7 +451,7 @@ namespace Cosmos.IL2CPU {
              || type == typeof(UIntPtr);
     }
 
-    protected bool IsIntegralTypeOrPointer(Type type)
+    protected static bool IsIntegralTypeOrPointer(Type type)
     {
       return IsIntegralType(type)
              || type.IsPointer
@@ -442,20 +459,20 @@ namespace Cosmos.IL2CPU {
     }
 
 
-    protected bool IsPointer(Type aPointer)
+    protected static bool IsPointer(Type aPointer)
     {
       return aPointer.IsPointer || aPointer.IsByRef || aPointer == typeof(IntPtr) || aPointer == typeof(UIntPtr);
     }
 
 
-    /// <summary>
-    /// Gets set to true on first interpreter processing. Is used for loop detection
-    /// </summary>
-    internal bool Processed = false;
+    public static void ILInterpretationDebugLine(Func<string> message)
+    {
+      Console.WriteLine(message());
+    }
 
     public static void ILInterpretationDebugLine(string message, params object[] args)
     {
-      //Console.WriteLine(String.Format(message, args));
+      ILInterpretationDebugLine(() => String.Format(message, args));
     }
   }
 }

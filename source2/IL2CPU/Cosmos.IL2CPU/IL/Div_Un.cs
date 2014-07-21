@@ -14,13 +14,18 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xStackItem = Assembler.Stack.Pop();
-            if( xStackItem.Size == 8 )
+            var xStackItem = aOpCode.StackPopTypes[0];
+            var xStackItemSize = SizeOfType(xStackItem);
+            var xStackItem2 = aOpCode.StackPopTypes[1];
+            var xStackItem2Size = SizeOfType(xStackItem2);
+            if( xStackItemSize == 8 )
             {
 				// there seem to be an error in MS documentation, there is pushed an int32, but IL shows else
-				if (Assembler.Stack.Pop().Size != 8)
-					throw new Exception("Cosmos.IL2CPU.x86->IL->Div.cs->Error: Expected a size of 8 for Div!");
-				if (xStackItem.IsFloat)
+                if (xStackItem2Size != 8)
+                {
+                    throw new Exception("Cosmos.IL2CPU.x86->IL->Div.cs->Error: Expected a size of 8 for Div!");
+                }
+                if (TypeIsFloat(xStackItem))
 				{
 					// TODO add 0/0 infinity/infinity X/infinity
 					// value 1
@@ -31,7 +36,6 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
 					// pop value 2
 					new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
-					Assembler.Stack.Push(8, typeof(Double));
 				}
 				else
 				{
@@ -112,12 +116,11 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 
 					new Label(LabelEnd);
-					Assembler.Stack.Push(8, typeof(ulong));
 				}
             }
             else
             {
-                if (xStackItem.IsFloat)
+                if (TypeIsFloat(xStackItem))
                 {
                     new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
                     new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };

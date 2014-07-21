@@ -17,7 +17,6 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Push { DestinationValue = BitConverter.ToUInt32(BitConverter.GetBytes(xOp.Value), 4) };
 			// push low part
 			new CPUx86.Push { DestinationValue = BitConverter.ToUInt32(BitConverter.GetBytes(xOp.Value), 0) };
-            Assembler.Stack.Push(8, typeof( long ));
         }
     }
 }

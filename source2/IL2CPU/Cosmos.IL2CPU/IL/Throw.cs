@@ -22,9 +22,6 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
             Call.EmitExceptionLogic( Assembler,aMethod, aOpCode, false, null );
           
-            Assembler.Stack.Pop();
-
-
         }
 
         // namespace Cosmos.IL2CPU.IL.X86 {

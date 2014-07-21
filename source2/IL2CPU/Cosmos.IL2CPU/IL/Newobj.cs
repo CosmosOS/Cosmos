@@ -88,12 +88,10 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 // push struct ptr
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP };
-                aAssembler.Stack.Push(4u, typeof(IntPtr));
                 // Shift args
                 foreach (var xParam in xParameterList)
                 {
                     uint xArgSizeForThis = Align(SizeOfType(xParam.ParameterType), 4);
-                    aAssembler.Stack.Push(xArgSizeForThis, xParam.ParameterType);
                     for (int i = 1; i <= xArgSizeForThis / 4; i++)
                     {
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)xStorageSize };
@@ -104,20 +102,14 @@ namespace Cosmos.IL2CPU.X86.IL
                 // Need to put these *after* the call because the Call pops the args from the stack
                 // and we have mucked about on the stack, so this makes it right before the next
                 // op.
-                aAssembler.Stack.Push(xStorageSize, objectType);
             }
             else
             {
                 // If not ValueType, then we need gc
 
                 var xParams = constructor.GetParameters();
-                for (int i = 0; i < xParams.Length; i++)
-                {
-                    aAssembler.Stack.Pop();
-                }
 
                 // array length + 8
-
                 bool xHasCalcSize = false;
                 // try calculating size:
                 if (constructor.DeclaringType == typeof(string))
@@ -214,7 +206,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     PushAlignedParameterSize(constructor);
                     // an exception occurred, we need to cleanup the stack, and jump to the exit
                     new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                    new Comment(aAssembler, "[ Newobj.Execute cleanup start count = " + aAssembler.Stack.Count.ToString() + " ]");
+                    //new Comment(aAssembler, "[ Newobj.Execute cleanup start count = " + aAssembler.Stack.Count.ToString() + " ]");
                     //foreach( var xStackInt in Assembler.Stack )
                     //{
                     //    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )xStackInt.Size };
@@ -246,7 +238,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 PushAlignedParameterSize(constructor);
 
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-                aAssembler.Stack.Push(4, constructor.DeclaringType);
             }
         }
 

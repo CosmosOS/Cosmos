@@ -190,13 +190,12 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Beq:
         case Code.Bne_Un:
         case Code.Br:
-
-          base.DoInterpretNextInstructionStackTypesIfNotYetProcessed(aOpCodes, new Stack<Type>(aStack), ref aSituationChanged, aMaxRecursionDepth);
-          InterpretInstructionIfNotYetProcessed(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
+          InterpretInstructionIfNotYetProcessed(Value, aOpCodes, new Stack<Type>(aStack.Reverse()), ref aSituationChanged, aMaxRecursionDepth);
+          base.DoInterpretNextInstructionStackTypesIfNotYetProcessed(aOpCodes, new Stack<Type>(aStack.Reverse()), ref aSituationChanged, aMaxRecursionDepth);
           break;
         case Code.Leave:
-          InterpretInstructionIfNotYetProcessed(Value, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
-          base.DoInterpretNextInstructionStackTypesIfNotYetProcessed(aOpCodes, new Stack<Type>(aStack), ref aSituationChanged, aMaxRecursionDepth);
+          InterpretInstructionIfNotYetProcessed(Value, aOpCodes, new Stack<Type>(aStack.Reverse()), ref aSituationChanged, aMaxRecursionDepth);
+          base.DoInterpretNextInstructionStackTypesIfNotYetProcessed(aOpCodes, new Stack<Type>(aStack.Reverse()), ref aSituationChanged, aMaxRecursionDepth);
           
           break;
         default:

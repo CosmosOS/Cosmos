@@ -72,11 +72,11 @@ namespace Cosmos.IL2CPU.ILOpCodes {
 
     protected override void DoInterpretNextInstructionStackTypes(IDictionary<int, ILOpCode> aOpCodes, Stack<Type> aStack, ref bool aSituationChanged, int aMaxRecursionDepth)
     {
-      base.DoInterpretNextInstructionStackTypes(aOpCodes, new Stack<Type>(aStack), ref aSituationChanged, aMaxRecursionDepth);
       foreach (var xTarget in BranchLocations)
       {
-        base.InterpretInstruction(xTarget, aOpCodes, new Stack<Type>(aStack), ref aSituationChanged, aMaxRecursionDepth);
+        base.InterpretInstruction(xTarget, aOpCodes, new Stack<Type>(aStack.Reverse()), ref aSituationChanged, aMaxRecursionDepth);
       }
+      base.DoInterpretNextInstructionStackTypes(aOpCodes, new Stack<Type>(aStack.Reverse()), ref aSituationChanged, aMaxRecursionDepth);
     }
   }
 }

@@ -30,23 +30,19 @@ namespace Cosmos.IL2CPU.X86.IL
 
             new Comment( Assembler, "Element Size = " + xSize );
             // element count is on the stack
-            var xElementCountSize = Assembler.Stack.Pop().Size;
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.ESI };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESI };
             //Assembler.StackSizes.Push(xElementCountSize);
             new CPUx86.Push { DestinationValue = xSize };
-            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
             new Mul( Assembler ).Execute( aMethod, aOpCode );
             // the total items size is now on the stack
             new CPUx86.Push { DestinationValue = ( ObjectImpl.FieldDataOffset + 4 ) };
-            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
             new Add( Assembler ).Execute( aMethod, aOpCode );
             // the total array size is now on the stack.
             new CPUx86.Call { DestinationLabel = LabelName.Get( GCImplementationRefs.AllocNewObjectRef ) };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 
-            Assembler.Stack.Push( new StackContents.Item( 4, typeof( Array ) ) );
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New( xTypeID ), SourceIsIndirect = true };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };

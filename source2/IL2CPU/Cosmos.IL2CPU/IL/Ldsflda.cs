@@ -28,7 +28,6 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             string xDataName =DataMember.GetStaticFieldName(xField);
             new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New( xDataName ) };
-            Assembler.Stack.Push( new StackContents.Item(4, typeof(uint) ) );
         }
     }
 }

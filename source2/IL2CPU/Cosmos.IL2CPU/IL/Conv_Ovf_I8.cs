@@ -13,8 +13,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xSource = Assembler.Stack.Pop();
-            switch( xSource.Size )
+            var xSource = aOpCode.StackPopTypes[0];
+            var xSourceSize = SizeOfType(xSource);
+            var xSourceIsFloat = TypeIsFloat(xSource);
+            switch( xSourceSize )
             {
                 case 1:
                 case 2:
@@ -31,7 +33,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_Ovf_I8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException();
             }
-			Assembler.Stack.Push(8, typeof(Int64));
         }
     }
 }

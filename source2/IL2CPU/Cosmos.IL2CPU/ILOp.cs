@@ -161,6 +161,12 @@ namespace Cosmos.IL2CPU {
       return 4;
     }
 
+    public static bool TypeIsFloat(Type type)
+    {
+      return type == typeof(Single)
+             || type == typeof(Double);
+    }
+
     public static uint GetEBPOffsetForLocalForDebugger(MethodInfo aMethod, int localIndex) {
       // because the memory is readed in positiv direction, we need to add additional size if greater than 4
       uint xOffset = GetEBPOffsetForLocal(aMethod, localIndex);

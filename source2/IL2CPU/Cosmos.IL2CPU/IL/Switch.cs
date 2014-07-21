@@ -24,7 +24,6 @@ namespace Cosmos.IL2CPU.X86.IL
                   , DestinationLabel = xDestLabel
                 };
             }
-            Assembler.Stack.Pop();
         }
 
 

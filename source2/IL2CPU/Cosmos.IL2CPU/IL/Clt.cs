@@ -20,29 +20,25 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xStackItem = Assembler.Stack.Pop();
-            Assembler.Stack.Pop();
-            if( xStackItem.Size > 8 )
+            var xStackItem = aOpCode.StackPopTypes[0];
+            var xStackItemSize = SizeOfType(xStackItem);
+            var xStackItemIsFloat = TypeIsFloat(xStackItem);
+            if( xStackItemSize > 8 )
             {
                 //EmitNotImplementedException( Assembler, GetServiceProvider(), "Clt: StackSizes>8 not supported", CurInstructionLabel, mMethodInfo, mCurrentOffset, NextInstructionLabel );
                 throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Clt.cs->Error: StackSizes > 8 not supported");
                 //return;
             }
-#if DOTNETCOMPATIBLE
-            Assembler.Stack.Push( new StackContents.Item( ILOp.Align(1, 4), typeof( bool ) ) );
-#else
-			Assembler.Stack.Push( new StackContents.Item( 1, typeof( bool ) ) );
-#endif
             string BaseLabel = GetLabel( aMethod, aOpCode ) + ".";
             string LabelTrue = BaseLabel + "True";
             string LabelFalse = BaseLabel + "False";
-            if( xStackItem.Size > 4 )
+            if( xStackItemSize > 4 )
             {
 				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
 				// esi = 1
 				new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
 				// edi = 0
-				if (xStackItem.IsFloat)
+				if (xStackItemIsFloat)
 				{
 					// value 2
 					new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
@@ -73,7 +69,7 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             else
             {
-                if (xStackItem.IsFloat)
+                if (xStackItemIsFloat)
                 {
                     new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
                     new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };

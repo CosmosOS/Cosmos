@@ -30,7 +30,6 @@ namespace Cosmos.IL2CPU.X86.IL {
       new CPUx86.Push {
         DestinationReg = CPUx86.Registers.EAX,
       };
-      Assembler.Stack.Push(4, null);
     }
   }
 }

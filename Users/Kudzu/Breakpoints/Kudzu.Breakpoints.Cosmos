@@ -19,7 +19,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <EnableGDB>True</EnableGDB>
+    <EnableGDB>False</EnableGDB>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>PXE</BuildTarget>
@@ -66,7 +66,7 @@
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
-    <VMware_EnableGDB>True</VMware_EnableGDB>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
     <ISO_Launch>None</ISO_Launch>
@@ -126,8 +126,8 @@
     <VMware_ShowLaunchConsole>False</VMware_ShowLaunchConsole>
     <ISO_ShowLaunchConsole>False</ISO_ShowLaunchConsole>
     <ISO_VisualStudioDebugPort>Pipe: Cosmos\Serial</ISO_VisualStudioDebugPort>
-    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
-    <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
+    <StackCorruptionDetectionEnabled>False</StackCorruptionDetectionEnabled>
+    <VMware_StackCorruptionDetectionEnabled>False</VMware_StackCorruptionDetectionEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>
@@ -136,7 +136,7 @@
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
     <DebugMode>Source</DebugMode>
-    <EnableGDB>True</EnableGDB>
+    <EnableGDB>False</EnableGDB>
     <TraceMode>
     </TraceMode>
     <VMWareFlavor>Workstation</VMWareFlavor>
@@ -212,7 +212,7 @@
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
-    <VMware_EnableGDB>True</VMware_EnableGDB>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <User001_Name>PXE with Slave (Kudzu)</User001_Name>
     <User001_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</User001_Description>
@@ -235,8 +235,8 @@
     <ISO_VisualStudioDebugPort>Pipe: Cosmos\Serial</ISO_VisualStudioDebugPort>
     <ISO_TraceAssemblies>All</ISO_TraceAssemblies>
     <USB_TraceAssemblies>All</USB_TraceAssemblies>
-    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
-    <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
+    <StackCorruptionDetectionEnabled>False</StackCorruptionDetectionEnabled>
+    <VMware_StackCorruptionDetectionEnabled>False</VMware_StackCorruptionDetectionEnabled>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Compile last with NASM.bat">

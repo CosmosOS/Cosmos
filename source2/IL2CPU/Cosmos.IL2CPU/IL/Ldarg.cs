@@ -50,14 +50,17 @@ namespace Cosmos.IL2CPU.X86.IL
               {
                   xCurArgSize = Align(SizeOfType(xMethodBase.DeclaringType), 4);
               }
-              var xTotalArgsSize = 0L;
+              uint xArgSize = xCurArgSize;
+              foreach (var xParam in xParams)
+              {
+                xArgSize += Align(SizeOfType(xParam.ParameterType), 4);
+              }
             for (int i = xParams.Length - 1; i >= aParam; i--) {
               var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
-                xTotalArgsSize += xSize;
               xOffset += xSize;
             }
 
-            if (xReturnSize > xTotalArgsSize)
+            if (xReturnSize > xArgSize)
             {
 				uint xExtraSize = xReturnSize - xCurArgSize;
 				xOffset += xExtraSize;
@@ -131,7 +134,6 @@ namespace Cosmos.IL2CPU.X86.IL
 				  };
 			  }
 		  }
-          Assembler.Stack.Push(xArgSize, xArgType);
         }
     }
 }

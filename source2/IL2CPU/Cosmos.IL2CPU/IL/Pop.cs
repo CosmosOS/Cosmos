@@ -14,15 +14,12 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             // todo: implement exception support.
-            if (Assembler.Stack.Count > 0)
+            var xSize = SizeOfType(aOpCode.StackPopTypes[0]);
+            new CPUx86.Add
             {
-                var xItem = Assembler.Stack.Pop();
-                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ILOp.Align((uint)xItem.Size, 4) };
-            }
-            else
-            {
-                throw new Exception("Cosmos.IL2CPU.X86->IL->Pop.cs: Cannot pop from the stack, because there isn't anything on the stack to pop!");
-            }
+                DestinationReg = CPUx86.Registers.ESP,
+                SourceValue = ILOp.Align((uint)xSize, 4)
+            };
         }
 
     }

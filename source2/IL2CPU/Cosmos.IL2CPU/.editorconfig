@@ -4,3 +4,9 @@ indent_size = 2
 
 [ILOpCodes/*.cs]
 indent_size = 2
+
+[ILOp.cs]
+indent_size = 2
+
+[IL/*.cs]
+indent_size = 2

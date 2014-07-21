@@ -17,7 +17,6 @@ namespace Cosmos.IL2CPU.X86.IL
             OpType xType = ( OpType )aOpCode; 
             uint xSize = SizeOfType( xType.Value );
             new CPUx86.Push { DestinationValue = xSize };
-            Assembler.Stack.Push( new StackContents.Item( 4, typeof( int ) ) );
         }
 
 

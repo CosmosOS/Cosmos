@@ -16,9 +16,6 @@ namespace Cosmos.IL2CPU.X86.IL
 			if (aElementSize <= 0 || aElementSize > 8 || (aElementSize > 4 && aElementSize < 8))
 				throw new Exception("Unsupported size for Ldelem_Ref: " + aElementSize);
 
-			aAssembler.Stack.Pop();
-			aAssembler.Stack.Pop();
-
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };
             new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };
@@ -53,11 +50,6 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX, DestinationDisplacement = 4, DestinationIsIndirect = true };
 					break;
 			}
-            
-			if (aElementSize <= 4)
-				aAssembler.Stack.Push(Align(aElementSize, 4), isSigned ? typeof(int) : typeof(uint));
-			else
-				aAssembler.Stack.Push(Align(aElementSize, 4), isSigned ? typeof(long) : typeof(ulong));
         }
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )

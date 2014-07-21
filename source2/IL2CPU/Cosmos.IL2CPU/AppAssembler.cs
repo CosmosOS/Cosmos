@@ -6,6 +6,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Xml.Serialization;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86._486AndUp;
@@ -62,6 +63,10 @@ namespace Cosmos.IL2CPU
 
         protected void MethodBegin(MethodInfo aMethod)
         {
+            if (aMethod.MethodBase.GetFullName() == "SystemUInt64SystemCollectionsGenericList1SystemUInt64get_ItemSystemInt32")
+            {
+                Console.Write("");
+            }
             new Comment("---------------------------------------------------------");
             new Comment("Assembly: " + aMethod.MethodBase.DeclaringType.Assembly.FullName);
             new Comment("Type: " + aMethod.MethodBase.DeclaringType.ToString());
@@ -85,7 +90,7 @@ namespace Cosmos.IL2CPU
                     var xIdxOffset = 0u;
                     if (!aMethod.MethodBase.IsStatic)
                     {
-                        new Comment(String.Format("Argument $this at EBP+{0}", X86.IL.Ldarg.GetArgumentDisplacement(aMethod, 0)));
+                        new Comment(String.Format("Argument $this at EBP+{0}, size = {1}", X86.IL.Ldarg.GetArgumentDisplacement(aMethod, 0), ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4)));
                         xIdxOffset++;
                     }
 
@@ -439,7 +444,6 @@ namespace Cosmos.IL2CPU
             }
 
             MethodBegin(aMethod);
-            Assembler.Stack.Clear();
             mLog.WriteLine("Method '{0}'", aMethod.MethodBase.GetFullName());
             mLog.Flush();
             if (aMethod.MethodAssembler != null)
@@ -536,7 +540,6 @@ namespace Cosmos.IL2CPU
                 {
                     xILOp = mILOpsHi[xOpCodeVal & 0xFF];
                 }
-                mLog.WriteLine("\t{0} {1}", Assembler.Stack.Count, xILOp.GetType().Name);
                 mLog.Flush();
 
                 //Only emit INT3 as per conditions above...
@@ -619,7 +622,6 @@ namespace Cosmos.IL2CPU
                 if (xNeedsExceptionPush)
                 {
                     Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
-                    Assembler.Stack.Push(4, typeof (Exception));
                 }
                 xILOp.DebugEnabled = DebugEnabled;
                 xILOp.Execute(aMethod, xOpCode);
@@ -637,7 +639,7 @@ namespace Cosmos.IL2CPU
         /// <param name="aCurrentGroup"></param>
         private static void InterpretInstructionsToDetermineStackTypes(List<ILOpCode> aCurrentGroup)
         {
-            var xNeedsInterpreting = false;
+            var xNeedsInterpreting = true;
             // see if we need to interpret the instructions at all.
             foreach (var xOp in aCurrentGroup)
             {
@@ -771,12 +773,7 @@ namespace Cosmos.IL2CPU
                 DestinationValue = aValue
             };
         }
-
-        protected void Pop()
-        {
-            new Add { DestinationReg = Registers.ESP, SourceValue = (uint)Assembler.Stack.Pop().Size };
-        }
-
+        
         protected void Push(string aLabelName, bool isIndirect = false)
         {
             new Push
@@ -1318,17 +1315,6 @@ namespace Cosmos.IL2CPU
 
         protected void AfterOp(MethodInfo aMethod, ILOpCode aOpCode)
         {
-            var xContents = "";
-            foreach (var xStackItem in Assembler.Stack)
-            {
-                xContents += ILOp.Align((uint)xStackItem.Size, 4);
-                xContents += ", ";
-            }
-            if (xContents.EndsWith(", "))
-            {
-                xContents = xContents.Substring(0, xContents.Length - 2);
-            }
-            new Comment("Stack contains " + Assembler.Stack.Count + " items: (" + xContents + ")");
         }
 
         protected void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode, bool emitInt3NotNop, out bool INT3Emitted, bool hasSourcePoint)
@@ -1337,14 +1323,15 @@ namespace Cosmos.IL2CPU
             Assembler.CurrentIlLabel = xLabel;
             new Cosmos.Assembler.Label(xLabel);
 
+            uint? xStackDifference = null;
+
             if (mSymbols != null)
             {
                 var xMLSymbol = new MethodIlOp();
                 xMLSymbol.LabelName = xLabel;
 
-                var xStackSize = (from item in Assembler.Stack
-                                  let xSize = (item.Size % 4u == 0u) ? item.Size : (item.Size + (4u - (item.Size % 4u)))
-                                  select xSize).Sum();
+                var xStackSize = aOpCode.StackOffsetBeforeExecution.Value;
+
                 xMLSymbol.StackDiff = -1;
                 if (aMethod.MethodBase != null)
                 {
@@ -1354,6 +1341,7 @@ namespace Cosmos.IL2CPU
                         var xLocalsSize = (from item in xBody.LocalVariables
                                            select ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
                         xMLSymbol.StackDiff = checked((int)(xLocalsSize + xStackSize));
+                        xStackDifference = (uint?)xMLSymbol.StackDiff;
                     }
                 }
                 xMLSymbol.IlOffset = aOpCode.Position;
@@ -1377,37 +1365,39 @@ namespace Cosmos.IL2CPU
                 DebugInfo.AddINT3Labels(mINT3Labels);
             }
 
-            //if (DebugEnabled && StackCorruptionDetection)
-            //{
-            //    // if debugstub is active, emit a stack corruption detection. at this point, the difference between EBP and ESP
-            //    // should be equal to the local variables sizes and the IL stack. 
-            //    // if not, we should break here.
+            if (DebugEnabled && StackCorruptionDetection)
+            {
+                // if debugstub is active, emit a stack corruption detection. at this point, the difference between EBP and ESP
+                // should be equal to the local variables sizes and the IL stack. 
+                // if not, we should break here.
 
-            //    // first, calculate the expected difference
-            //    var expectedDifference = aMethod.LocalVariablesSize;
-            //    foreach (var item in Assembler.Stack)
-            //    {
-            //        expectedDifference += X86.IL.Ldarg.Align(item.Size, 4);
-            //    }
+                // first, calculate the expected difference
+                if (xStackDifference == null)
+                {
+                    xStackDifference = aMethod.LocalVariablesSize;
+                    xStackDifference += aOpCode.StackOffsetBeforeExecution;
+                }
 
-            //    // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value. 
-            //    // if not, we should somehow break here.
-            //    new Mov { DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP };
-            //    new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
-            //    new Add { DestinationReg = Registers.EAX, SourceValue = expectedDifference };
-            //    new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
-            //    new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".StackCorruptionCheck_End" };
-            //    new ClrInterruptFlag();
-            //    // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-            //    new Call { DestinationLabel = xLabel + ".StackCorruptionCheck_GetAddress" };
-            //    new Assembler.Label(xLabel + ".StackCorruptionCheck_GetAddress");
-            //    new Pop { DestinationReg = RegistersEnum.EAX };
-            //    new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
-            //    new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
-            //    new Halt();
-            //    new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
+                new Comment("Stack difference = " + xStackDifference);
 
-            //}
+                // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value. 
+                // if not, we should somehow break here.
+                new Mov { DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP };
+                new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
+                new Add { DestinationReg = Registers.EAX, SourceValue = xStackDifference };
+                new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
+                new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".StackCorruptionCheck_End" };
+                new ClrInterruptFlag();
+                // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+                new Call { DestinationLabel = xLabel + ".StackCorruptionCheck_GetAddress" };
+                new Assembler.Label(xLabel + ".StackCorruptionCheck_GetAddress");
+                new Pop { DestinationReg = RegistersEnum.EAX };
+                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
+                new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
+                new Halt();
+                new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
+
+            }
         }
 
         protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, bool emitInt3NotNop, out bool INT3Emitted, out bool INT3PlaceholderEmitted, bool isNewSourcePoint)

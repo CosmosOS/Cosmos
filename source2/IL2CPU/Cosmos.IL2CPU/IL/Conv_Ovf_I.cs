@@ -13,8 +13,10 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             //TODO: What if the last ILOp in a method was Conv_Ovf_I ?
-            var xSource = Assembler.Stack.Pop();
-            switch (xSource.Size)
+            var xSource = aOpCode.StackPopTypes[0];
+            var xSourceSize = SizeOfType(xSource);
+            var xSourceIsFloat = TypeIsFloat(xSource);
+            switch (xSourceSize)
             {
                 case 8:
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
@@ -24,7 +26,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                     throw new NotImplementedException();
             }
-            Assembler.Stack.Push(4, typeof(uint));
         }
 
         //public override void Execute( MethodInfo aMethod, ILOpCode aOpCode, ILOpCode aNextOpCode )

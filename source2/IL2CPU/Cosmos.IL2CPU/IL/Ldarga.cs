@@ -80,7 +80,6 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Add { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBX };
             new CPUx86.Push { DestinationReg = RegistersEnum.EAX };
 
-            Assembler.Stack.Push(4, typeof(uint));
 //            if (aMethod.MethodBase.DeclaringType.FullName == "Cosmos.Kernel.Plugs.Console"
 //                && aMethod.MethodBase.Name == "Write"
 //                && aMethod.MethodBase.GetParameters()[0].ParameterType == typeof(int))

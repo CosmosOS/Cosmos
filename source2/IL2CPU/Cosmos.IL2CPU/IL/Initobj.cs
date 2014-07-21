@@ -18,7 +18,6 @@ namespace Cosmos.IL2CPU.X86.IL
             Type mType = (( Cosmos.IL2CPU.ILOpCodes.OpType )aOpCode).Value;
             mObjSize = SizeOfType( mType );
 
-            Assembler.Stack.Pop();
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             for( int i = 0; i < ( mObjSize / 4 ); i++ )
             {

@@ -39,8 +39,6 @@ namespace Cosmos.IL2CPU.X86.IL
             var xActualOffset = xFieldInfo.Offset + xExtraOffset;
             var xSize = xFieldInfo.Size;
 
-            Assembler.Stack.Pop();
-            Assembler.Stack.Push(new StackContents.Item(4, xType));
             if (aDerefValue && xFieldInfo.IsExternalValue)
             {
                 new CPUx86.Mov

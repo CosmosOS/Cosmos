@@ -17,11 +17,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xStackItem = Assembler.Stack.Pop();
-            var xSize = Math.Max(xStackItem.Size, Assembler.Stack.Pop().Size);
+            var xStackItem = aOpCode.StackPopTypes[0];
+            var xStackItemSize = SizeOfType(xStackItem);
+            var xSize = Math.Max(xStackItemSize, SizeOfType(aOpCode.StackPopTypes[1]));
             if (xSize > 4)
             {
-                if (xStackItem.IsFloat)
+                if (TypeIsFloat(xStackItem))
                 {
                     new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
                     new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
@@ -112,7 +113,7 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             else
             {
-                if (xStackItem.IsFloat)
+                if (TypeIsFloat(xStackItem))
                 {
                     new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
                     new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
@@ -133,7 +134,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
                 }
             }
-            Assembler.Stack.Push(xStackItem);
         }
     }
 }

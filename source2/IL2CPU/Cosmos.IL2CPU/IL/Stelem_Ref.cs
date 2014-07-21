@@ -9,6 +9,7 @@ namespace Cosmos.IL2CPU.X86.IL {
     public Stelem_Ref(Cosmos.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {
     }
+
     public static void Assemble(Cosmos.Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode) {
       // stack - 3 == the array
       // stack - 2 == the index
@@ -17,35 +18,30 @@ namespace Cosmos.IL2CPU.X86.IL {
       if (xStackSize % 4 != 0) {
         xStackSize += 4 - xStackSize % 4;
       }
-      aAssembler.Stack.Pop();
-      aAssembler.Stack.Pop();
-      aAssembler.Stack.Pop();
       //new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStackSize + 4) };
 
       //new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
 
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xStackSize }; // the index
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xStackSize + 4 }; // the index
+      new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xStackSize + 4 }; // the array
 
       new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(ObjectImpl.FieldDataOffset + 4) };
 
       new CPUx86.Push { DestinationValue = aElementSize };
-	  aAssembler.Stack.Push(4, typeof(int));
       new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
-	  aAssembler.Stack.Push(4, typeof(int));
 
 
       //Multiply( aAssembler, aServiceProvider, aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
-      (new Mul(aAssembler)).Execute(aMethod, aOpCode);
+      string xBaseLabel = GetLabel(aMethod, aOpCode) + ".";
+                    
+      Mul.DoExecute(4, false, xBaseLabel);
 
       new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
-	  aAssembler.Stack.Push(4, typeof(int));
 
       //Add( aAssembler, aServiceProvider, aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
-      (new Add(aAssembler)).Execute(aMethod, aOpCode);
+      Add.DoExecute(4, false);
 
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-      aAssembler.Stack.Pop();
       for (int i = (int)(aElementSize / 4) - 1; i >= 0; i -= 1) {
         new Comment(aAssembler, "Start 1 dword");
         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };

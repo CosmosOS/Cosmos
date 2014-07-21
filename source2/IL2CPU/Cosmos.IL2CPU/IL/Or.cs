@@ -13,16 +13,21 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-			var xStackContent = Assembler.Stack.Pop();
-			var xStackContentSecond = Assembler.Stack.Pop();
+            var xStackContent = aOpCode.StackPopTypes[0];
+            var xStackContentSecond = aOpCode.StackPopTypes[1];
+            var xStackContentSize = SizeOfType(xStackContent);
+            var xStackContentSecondSize = SizeOfType(xStackContentSecond);
+			var xSize = Math.Max(xStackContentSize, xStackContentSecondSize);
+            if (ILOp.Align(xStackContentSize, 4u) != ILOp.Align(xStackContentSecondSize, 4u))
+            {
+                throw new NotSupportedException("Operands have different size!");
+            }
+            if (xSize > 8)
+            {
+                throw new NotImplementedException("StackSize>8 not supported");
+            }
 
-			var xSize = Math.Max(xStackContent.Size, xStackContentSecond.Size);
-			if (ILOp.Align(xStackContent.Size, 4u) != ILOp.Align(xStackContentSecond.Size, 4u))
-				throw new NotSupportedException("Operands have different size!");
-			if (xSize > 8)
-				throw new NotImplementedException("StackSize>8 not supported");
-
-			if (xSize > 4)
+            if (xSize > 4)
 			{
 				// [ESP] is low part
 				// [ESP + 4] is high part
@@ -40,7 +45,6 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
 				new CPUx86.Or { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
 			}
-			Assembler.Stack.Push(xStackContent);
         }
     }
 }

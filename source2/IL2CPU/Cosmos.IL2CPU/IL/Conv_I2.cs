@@ -16,16 +16,18 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
-            var xSource = Assembler.Stack.Pop();
-            if (xSource.IsFloat)
+            var xSource = aOpCode.StackPopTypes[0];
+            var xSourceSize = SizeOfType(xSource);
+            var xSourceIsFloat = TypeIsFloat(xSource);
+            if (xSourceIsFloat)
             {
-                if (xSource.Size == 4)
+                if (xSourceSize == 4)
                 {
                     new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
                     new CPUx86.SSE.ConvertSS2SIAndTruncate { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
                 }
-                else if (xSource.Size == 8)
+                else if (xSourceSize == 8)
                 {
                     new CPUx86.SSE.MoveDoubleAndDupplicate { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
                     new CPUx86.SSE.ConvertSD2SIAndTruncate { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.XMM0, };
@@ -37,7 +39,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
             }
 
-            switch (xSource.Size)
+            switch (xSourceSize)
             {
                 case 1:
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I2.cs->The size 1 could not exist, because always is pushed Int32 or Int64!");
@@ -57,7 +59,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                     throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_I2.cs->SourceSize " + xSource + " not supported!");
             }
-            Assembler.Stack.Push(4, typeof(Int32));
         }
     }
 }

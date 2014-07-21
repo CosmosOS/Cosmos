@@ -26,7 +26,7 @@ namespace Cosmos.Assembler {
     protected UInt16 mGdData;
 
     // Contains info on the current stack structure. What type are on the stack, etc
-    public readonly StackContents Stack = new StackContents();
+    //public readonly StackContents Stack = new StackContents();
 
     // This is a hack, hope to fix it in the future
     // as it will also cause problems when we thread the compiler

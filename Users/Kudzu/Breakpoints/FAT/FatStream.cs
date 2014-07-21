@@ -35,6 +35,10 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
       {
         mFatTable = mFile.GetFatTable();
       }
+      else
+      {
+        Console.WriteLine("No FatTable created, as size = 0");
+      }
     }
 
     public override bool CanSeek
@@ -103,7 +107,7 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
       //  // EOF
       //  return 0;
       //}
-
+      
       // reduce count, so that no out of bound exception occurs if not existing
       // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
       ulong xMaxReadableBytes = mFile.Size - mPosition;
@@ -113,31 +117,36 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
         xCount = xMaxReadableBytes;
       }
 
-      var xCluster = mFS.NewClusterArray();
-      UInt32 xClusterSize = mFS.BytesPerCluster;
+      var xCluster = new byte[4096];// mFS.NewClusterArray();
+      UInt32 xClusterSize = 4096;//mFS.BytesPerCluster;
 
       while (xCount > 0)
       {
         UInt64 xClusterIdx = mPosition / xClusterSize;
-      //  UInt64 xPosInCluster = mPosition % xClusterSize;
+          UInt64 xPosInCluster = mPosition % xClusterSize;
         mFS.ReadCluster((ulong)mFatTable[(int)xClusterIdx], xCluster);
-      //  //  long xReadSize;
-      //  //  if (xPosInCluster + xCount > xClusterSize) {
-      //  //    xReadSize = (long)(xClusterSize - xPosInCluster - 1);
-      //  //  } else {
-      //  //    xReadSize = (long)xCount;
-      //  //  }
-      //  //  // no need for a long version, because internal Array.Copy() does a cast down to int, and a range check,
-      //  //  // or we do a semantic change here
-      //  //  Array.Copy(xCluster, (long)xPosInCluster, aBuffer, aOffset, xReadSize);
+        //Console.WriteLine("Pos: " + pos);
+        //mFS.ReadCluster((ulong)mFatTable[(int)0], xCluster);
+        long xReadSize;
+        if (xPosInCluster + xCount > xClusterSize)
+        {
+          xReadSize = (long)(xClusterSize - xPosInCluster - 1);
+        }
+        else
+        {
+          xReadSize = (long)xCount;
+        }
+      ////  //  // no need for a long version, because internal Array.Copy() does a cast down to int, and a range check,
+      ////  //  // or we do a semantic change here
+        Array.Copy(xCluster, (long)xPosInCluster, aBuffer, aOffset, xReadSize);
 
-      //  //  aOffset += xReadSize;
-      //  //xCount -= (ulong)xReadSize;
-        xCount = 0;
+        ////  //  aOffset += xReadSize;
+        ////  //xCount -= (ulong)xReadSize;
+         xCount = 0;
       }
 
-      mPosition += (ulong)aOffset;
-      return (int)aOffset;
+      //mPosition += (ulong)aOffset;
+      return 0;
     }
 
     public override void Flush()

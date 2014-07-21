@@ -13,10 +13,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
 		public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
 		{
-			var xStackContent = Assembler.Stack.Peek();
-			if (xStackContent.Size > 4)
+			var xStackContent = aOpCode.StackPopTypes[0];
+		    var xStackContentSize = SizeOfType(xStackContent);
+		    var xStackContentIsFloat = TypeIsFloat(xStackContent);
+			if (xStackContentSize > 4)
 			{
-				if (xStackContent.IsFloat)
+				if (xStackContentIsFloat)
 				{
 					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
 					new CPUx86.x87.FloatNegate { };
@@ -35,7 +37,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			}
 			else
 			{
-				if (xStackContent.IsFloat)
+				if (xStackContentIsFloat)
 				{
 					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 32, DestinationIsIndirect = true };
 					new CPUx86.x87.FloatNegate { };

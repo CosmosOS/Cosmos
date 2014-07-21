@@ -16,7 +16,6 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             OpSingle xOp = ( OpSingle )aOpCode; 
             new CPU.Push { DestinationValue = BitConverter.ToUInt32( BitConverter.GetBytes( xOp.Value ), 0 ) };
-            Assembler.Stack.Push( new StackContents.Item( 4, typeof( Single ) ) );
         }
 
 

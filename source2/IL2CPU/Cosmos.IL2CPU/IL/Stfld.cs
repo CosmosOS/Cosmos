@@ -30,8 +30,6 @@ namespace Cosmos.IL2CPU.X86.IL {
       new Comment("Type: " + xFieldInfo.FieldType.ToString());
       new Comment("Size: " + xFieldInfo.Size);
 
-      aAssembler.Stack.Pop();
-
       uint xRoundedSize = Align(xSize, 4);
 
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
@@ -84,7 +82,6 @@ namespace Cosmos.IL2CPU.X86.IL {
           }
 #endif
       new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-      aAssembler.Stack.Pop();
     }
 
     public static void DoExecute(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethod, System.Reflection.FieldInfo aField, bool debugEnabled)

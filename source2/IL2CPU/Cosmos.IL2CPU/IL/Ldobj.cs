@@ -14,7 +14,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xSize = Assembler.Stack.Pop();
             OpType xType = ( OpType )aOpCode;
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             var xObjSize = GetStorageSize(xType.Value);
@@ -46,8 +45,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                         throw new Exception( "Remainder not supported!" );
             }
-            //TODO: Push type not number
-            Assembler.Stack.Push(new StackContents.Item(xObjSize, xType.Value));
         }
     }
 }

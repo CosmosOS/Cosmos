@@ -17,15 +17,16 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-			var xSource = Assembler.Stack.Pop();
-            switch( xSource.Size )
+            var xSource = aOpCode.StackPopTypes[0];
+            var xSourceSize = SizeOfType(xSource);
+            switch( xSourceSize )
             {
                 case 1:
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_U4.cs->The size 1 could not exist, because always is pushed Int32 or Int64!");
                 case 2:
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_U4.cs->The size 2 could not exist, because always is pushed Int32 or Int64!");
 				case 4:
-					if (xSource.IsFloat)
+					if (TypeIsFloat(xSource))
 					{
 						new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
 						new CPUx86.SSE.ConvertSS2SIAndTruncate { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.XMM0, };
@@ -33,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					}
 					break;
                 case 8:
-					if (xSource.IsFloat)
+					if (TypeIsFloat(xSource))
 					{
                         new CPUx86.SSE.MoveDoubleAndDupplicate { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
 						new CPUx86.SSE.ConvertSD2SIAndTruncate { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.XMM0, };
@@ -54,7 +55,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U4: SourceSize " + xStackItem.Size + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_U4.cs->Unknown size of variable on the top of the stack.");
             }
-            Assembler.Stack.Push(Align(4, 4), typeof(Int32));
         }
     }
 }

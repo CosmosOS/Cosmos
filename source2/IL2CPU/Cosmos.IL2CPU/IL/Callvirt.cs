@@ -58,11 +58,6 @@ namespace Cosmos.IL2CPU.X86.IL
           var xParameters = aTargetMethod.GetParameters();
           foreach (var xItem in xParameters) {
             xThisOffset += Align(SizeOfType(xItem.ParameterType), 4);
-            Assembler.Stack.Pop();
-          }
-          if (!aTargetMethod.IsStatic) {
-            //xThisOffset += Align(SizeOfType(aTargetMethod.DeclaringType), 4);
-            Assembler.Stack.Pop();
           }
             
           // This is finding offset to self? It looks like we dont need offsets of other
@@ -221,9 +216,6 @@ namespace Cosmos.IL2CPU.X86.IL
                                   });
           new Label(xCurrentMethodLabel + ".NoExceptionAfterCall");
           new Comment(Assembler, "Argument Count = " + xParameters.Length.ToString());
-          if (xReturnSize > 0) {
-            Assembler.Stack.Push(new StackContents.Item(xReturnSize, typeof(Int32)));
-          }
         }
     }
 }

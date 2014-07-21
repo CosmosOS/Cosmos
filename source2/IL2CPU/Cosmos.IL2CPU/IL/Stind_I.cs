@@ -55,8 +55,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     throw new Exception( "Error, shouldn't occur" );
             }
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )( xStorageSize + 4 ) };
-            aAssembler.Stack.Pop();
-            aAssembler.Stack.Pop();
         }
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )

@@ -11,15 +11,14 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-        var xSource = Assembler.Stack.Peek();
-        
-        Assembler.Stack.Pop();
-        switch (xSource.Size)
+        var xSource = aOpCode.StackPopTypes[0];
+        var xSourceSize = SizeOfType(xSource);
+        switch (xSourceSize)
         {
             case 1:
             case 2:
             case 4:
-				if (xSource.IsFloat)
+				if (TypeIsFloat(xSource))
 				{
 					new CPUx86.SSE.ConvertSS2SD { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
 				}
@@ -33,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				break;
             case 8:
                 {
-					if (!xSource.IsFloat)
+					if (!TypeIsFloat(xSource))
 					{
 						new CPUx86.x87.IntLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
 						new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true};
@@ -44,7 +43,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                 throw new NotImplementedException();
 		}
-		Assembler.Stack.Push(8, typeof(double));
     }
 	}
 }

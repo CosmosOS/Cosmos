@@ -16,20 +16,21 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
 			new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX }; // shift amount
-			var xStackItem_ShiftAmount = Assembler.Stack.Pop();
-			var xStackItem_Value = Assembler.Stack.Peek();
+			var xStackItem_ShiftAmount = aOpCode.StackPopTypes[0];
+			var xStackItem_Value = aOpCode.StackPopTypes[1];
+            var xStackItem_Value_Size = SizeOfType(xStackItem_Value);
 #if DOTNETCOMPATIBLE
 			if (xStackItem_Value.Size == 4)
 #else
-			if (xStackItem_Value.Size <= 4)
+			if (xStackItem_Value_Size <= 4)
 #endif
 			{
 				new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ESP, Size = 32, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.CL };
 			}
 #if DOTNETCOMPATIBLE
-			else if (xStackItem_Value.Size == 8)
+			else if (xStackItem_Value_Size == 8)
 #else
-			else if (xStackItem_Value.Size <= 8)
+			else if (xStackItem_Value_Size <= 8)
 #endif
 			{
 				string BaseLabel = GetLabel(aMethod, aOpCode) + ".";

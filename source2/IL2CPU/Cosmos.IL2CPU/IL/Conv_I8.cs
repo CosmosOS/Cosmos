@@ -16,15 +16,17 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xSource = Assembler.Stack.Pop();
-            switch( xSource.Size )
+            var xSource = aOpCode.StackPopTypes[0];
+            var xSourceSize = SizeOfType(xSource);
+            var xSourceIsFloat = TypeIsFloat(xSource);
+            switch( xSourceSize )
             {
                 case 1:
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I8.cs->The size 1 could not exist, because always is pushed Int32 or Int64!");
                 case 2:
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I8.cs->The size 2 could not exist, because always is pushed Int32 or Int64!");
                 case 4:
-					if (xSource.IsFloat)
+					if (xSourceIsFloat)
 					{
 						new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 32 };
 						new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
@@ -39,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					}
                     break;
                 case 8:
-					if (xSource.IsFloat)
+					if (xSourceIsFloat)
 					{
 						new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
 						new CPUx86.x87.IntStoreWithTrunc { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
@@ -49,7 +51,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     //EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_I8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
                     throw new NotImplementedException();
             }
-            Assembler.Stack.Push(8, typeof(Int64));
         }
     }
 }

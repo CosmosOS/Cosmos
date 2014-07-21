@@ -11,9 +11,9 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
 		public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-			if (Assembler.Stack.Peek().IsFloat) {
-				throw new NotImplementedException("Sub_Ovf: TODO need to call Sub IL");
-			}
+            //if (Assembler.Stack.Peek().IsFloat) {
+            //    throw new NotImplementedException("Sub_Ovf: TODO need to call Sub IL");
+            //}
 			throw new NotImplementedException();
 		}
 	}

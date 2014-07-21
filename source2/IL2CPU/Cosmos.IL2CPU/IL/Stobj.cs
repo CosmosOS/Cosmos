@@ -13,8 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            var xFieldSize = Assembler.Stack.Pop().Size;
-            Assembler.Stack.Pop();
+            var xFieldSize = SizeOfType(aOpCode.StackPopTypes[0]);
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = checked((int)xFieldSize) };
             for( int i = 0; i < ( xFieldSize / 4 ); i++ )
             {

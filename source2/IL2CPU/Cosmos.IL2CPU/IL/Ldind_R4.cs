@@ -12,10 +12,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            Assembler.Stack.Pop();
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, Size = 32 };
-            Assembler.Stack.Push( 4, typeof( Single ) );
         }
 
 

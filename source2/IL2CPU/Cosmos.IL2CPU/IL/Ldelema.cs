@@ -15,10 +15,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  uint aElementSize )
         {
-            
-            aAssembler.Stack.Pop();
-            aAssembler.Stack.Pop();
-            aAssembler.Stack.Push( 4, typeof( uint ) );
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };
             new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };

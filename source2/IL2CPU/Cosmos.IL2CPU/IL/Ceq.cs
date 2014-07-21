@@ -11,10 +11,15 @@ namespace Cosmos.IL2CPU.X86.IL {
       : base(aAsmblr) {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-      var xStackItem = Assembler.Stack.Pop();
-      var xStackItem2 = Assembler.Stack.Pop();
-      var xSize = Math.Max(xStackItem.Size, xStackItem2.Size);
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    {
+        var xStackItem = aOpCode.StackPopTypes[0];
+        var xStackItemSize = SizeOfType(xStackItem);
+        var xStackItemIsFloat = TypeIsFloat(xStackItem);
+        var xStackItem2 = aOpCode.StackPopTypes[1];
+        var xStackItem2Size = SizeOfType(xStackItem2);
+        var xStackItem2IsFloat = TypeIsFloat(xStackItem2);
+      var xSize = Math.Max(xStackItemSize, xStackItem2Size);
 
       var xNextLabel = GetLabel(aMethod, aOpCode.NextPosition);
 
@@ -24,8 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       }
       else if (xSize <= 4) 
       {
-        Assembler.Stack.Push(new StackContents.Item(4, typeof(bool)));
-        if (xStackItem.IsFloat)
+        if (xStackItemIsFloat)
         {
           new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
           new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
@@ -53,9 +57,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       } 
       else if (xSize > 4)
       {
-        Assembler.Stack.Push(new StackContents.Item(4, typeof(bool)));
-
-        if (xStackItem.IsFloat) 
+        if (xStackItemIsFloat) 
         {
           new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
           // esi = 1

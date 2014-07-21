@@ -15,20 +15,23 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             string xBaseLabel = GetLabel( aMethod, aOpCode ) + ".";
-            var xStackItem_ShiftAmount = Assembler.Stack.Pop();
-            var xStackItem_Value = Assembler.Stack.Pop();
-            if( xStackItem_Value.IsFloat ) { throw new NotImplementedException( "Floats not yet supported!" ); }
-            if( xStackItem_Value.Size <= 4 )
+            var xStackItem_ShiftAmount = aOpCode.StackPopTypes[0];
+            var xStackItem_Value = aOpCode.StackPopTypes[1];
+            if (TypeIsFloat(xStackItem_Value))
+            {
+                throw new NotImplementedException("Floats not yet supported!");
+            }
+            var xStackItem_Value_Size = SizeOfType(xStackItem_Value);
+            if( xStackItem_Value_Size <= 4 )
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // shift amount
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX }; // value
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.CL, SourceReg = CPUx86.Registers.AL };
                 new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.CL };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
-                Assembler.Stack.Push( xStackItem_Value );
                 return;
             }
-            if( xStackItem_Value.Size <= 8 )
+            if( xStackItem_Value_Size <= 8 )
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
@@ -45,7 +48,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Jump { DestinationLabel = xBaseLabel + "__StartLoop" };
 
                 new Label( xBaseLabel + "__EndLoop" );
-                Assembler.Stack.Push( xStackItem_Value );
                 return;
             }
         }

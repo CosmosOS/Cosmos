@@ -16,8 +16,10 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
 			// TODO overflow check for float
-            var xSize = Assembler.Stack.Pop();
-            if (xSize.Size > 8)
+            var xType = aOpCode.StackPopTypes[0];
+            var xSize = SizeOfType(xType);
+            var xIsFloat = TypeIsFloat(xType);
+            if (xSize > 8)
             {
                 //EmitNotImplementedException( Assembler, aServiceProvider, "Size '" + xSize.Size + "' not supported (add)", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
                 throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Add_Ovf_Un.cs->Error: StackSize > 8 not supported");
@@ -26,9 +28,9 @@ namespace Cosmos.IL2CPU.X86.IL
             {
 				var xBaseLabel = GetLabel(aMethod, aOpCode) + ".";
 				var xSuccessLabel = xBaseLabel + "Success";
-                if (xSize.Size > 4)
+                if (xSize > 4)
                 {
-                    if (xSize.IsFloat)
+                    if (xIsFloat)
                     {
 						//TODO overflow check
                         new CPUx86.x87.FloatLoad { DestinationReg=Registers.ESP,Size=64, DestinationIsIndirect=true };
@@ -46,7 +48,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else
                 {
-                    if (xSize.IsFloat) //float
+                    if (xIsFloat) //float
                     {
 						//TODO overflow check
                         new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
@@ -61,7 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
                     }
                 }
-				if (false == xSize.IsFloat)
+				if (false == xIsFloat)
 				{
 					new CPUx86.ConditionalJump { Condition = ConditionalTestEnum.NotCarry, DestinationLabel = xSuccessLabel };
 					ThrowOverflowException();

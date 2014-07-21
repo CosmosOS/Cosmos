@@ -51,7 +51,6 @@ namespace Cosmos.IL2CPU.X86.IL
 						}
 				}
 			}
-			Assembler.Stack.Push(ILOp.Align(xSize, 4), xVar.LocalType);
 		}
 	}
 }
