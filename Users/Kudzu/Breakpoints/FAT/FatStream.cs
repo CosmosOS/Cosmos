@@ -85,28 +85,28 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
 
     public int Read(byte[] aBuffer, Int64 aOffset, Int64 aCount)
     {
-      //if (aCount < 0)
-      //{
-      //  throw new ArgumentOutOfRangeException("aCount");
-      //}
-      //if (aOffset < 0)
-      //{
-      //  throw new ArgumentOutOfRangeException("aOffset");
-      //}
-      //if (aBuffer == null || aBuffer.Length - aOffset < aCount)
-      //{
-      //  throw new ArgumentException("Invalid offset length!");
-      //}
-      //if (mFile.FirstClusterNum == 0)
-      //{
-      //  // FirstSector can be 0 for 0 length files
-      //  return 0;
-      //}
-      //if (mPosition == mFile.Size)
-      //{
-      //  // EOF
-      //  return 0;
-      //}
+      if (aCount < 0)
+      {
+        throw new ArgumentOutOfRangeException("aCount");
+      }
+      if (aOffset < 0)
+      {
+        throw new ArgumentOutOfRangeException("aOffset");
+      }
+      if (aBuffer == null || aBuffer.Length - aOffset < aCount)
+      {
+        throw new ArgumentException("Invalid offset length!");
+      }
+      if (mFile.FirstClusterNum == 0)
+      {
+        // FirstSector can be 0 for 0 length files
+        return 0;
+      }
+      if (mPosition == mFile.Size)
+      {
+        // EOF
+        return 0;
+      }
       
       // reduce count, so that no out of bound exception occurs if not existing
       // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
@@ -117,16 +117,14 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
         xCount = xMaxReadableBytes;
       }
 
-      var xCluster = new byte[4096];// mFS.NewClusterArray();
-      UInt32 xClusterSize = 4096;//mFS.BytesPerCluster;
+      var xCluster = mFS.NewClusterArray();
+      UInt32 xClusterSize = mFS.BytesPerCluster;
 
       while (xCount > 0)
       {
         UInt64 xClusterIdx = mPosition / xClusterSize;
-          UInt64 xPosInCluster = mPosition % xClusterSize;
+        UInt64 xPosInCluster = mPosition % xClusterSize;
         mFS.ReadCluster((ulong)mFatTable[(int)xClusterIdx], xCluster);
-        //Console.WriteLine("Pos: " + pos);
-        //mFS.ReadCluster((ulong)mFatTable[(int)0], xCluster);
         long xReadSize;
         if (xPosInCluster + xCount > xClusterSize)
         {
@@ -136,13 +134,13 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
         {
           xReadSize = (long)xCount;
         }
-      ////  //  // no need for a long version, because internal Array.Copy() does a cast down to int, and a range check,
-      ////  //  // or we do a semantic change here
+        // no need for a long version, because internal Array.Copy() does a cast down to int, and a range check,
+        // or we do a semantic change here
+        Console.WriteLine("Readsize: " + xReadSize);
         Array.Copy(xCluster, (long)xPosInCluster, aBuffer, aOffset, xReadSize);
 
-        ////  //  aOffset += xReadSize;
-        ////  //xCount -= (ulong)xReadSize;
-         xCount = 0;
+        aOffset += xReadSize;
+        xCount -= (ulong)xReadSize;
       }
 
       //mPosition += (ulong)aOffset;
