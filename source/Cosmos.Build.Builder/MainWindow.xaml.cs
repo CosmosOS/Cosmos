@@ -150,7 +150,16 @@ namespace Cosmos.Build.Builder {
         xPSI.FileName = Assembly.GetEntryAssembly().GetName().CodeBase.Replace("file:///", "");
         xPSI.Arguments = "-InstallTask";
         xPSI.Verb = "runas";
-        xProcess.Start();
+        try {
+            xProcess.Start();
+        }
+        catch(System.ComponentModel.Win32Exception) {
+            // happens if user press "cancel" on UAC dialog
+            Log_LogSection("Error");
+            Log_LogLine("User pressed \"Cancel\" on UAC dialog for install task!");
+            Log_LogError();
+            return;
+        }
         xProcess.WaitForExit();
       }
     }
@@ -175,6 +184,8 @@ namespace Cosmos.Build.Builder {
           }
         }
       }
+      if (mPreventAutoClose)
+        return true;
 
       var xTask = new CosmosTask(mCosmosDir, mReleaseNo);
       xTask.Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
