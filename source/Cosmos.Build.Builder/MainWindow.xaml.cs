@@ -86,6 +86,7 @@ namespace Cosmos.Build.Builder {
       xTaskDef.RegistrationInfo.Description = "Cosmos DevKit UAC Bypass";
       xTaskDef.RegistrationInfo.Author = "Cosmos Group";
       xTaskDef.Settings.Compatibility = _TASK_COMPATIBILITY.TASK_COMPATIBILITY_V2_1;
+      xTaskDef.Settings.DisallowStartIfOnBatteries = false;
       xTaskDef.Principal.RunLevel = _TASK_RUNLEVEL.TASK_RUNLEVEL_HIGHEST;
 
       IActionCollection xActions = xTaskDef.Actions;
