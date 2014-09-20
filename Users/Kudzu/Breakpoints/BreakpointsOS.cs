@@ -382,7 +382,8 @@ namespace Kudzu.BreakpointsKernel
                 var xData = new byte[xRootFile.Size];
                 var size = (int) xRootFile.Size;
                 Console.WriteLine("Size: " + size);
-                xStream.Read(xData, 0, (int) xRootFile.Size);
+                var sizeInt = (int)xRootFile.Size;
+                xStream.Read(xData, 0, sizeInt);
                 var xText = Encoding.ASCII.GetString(xData);
                 Console.WriteLine(xText);
               }

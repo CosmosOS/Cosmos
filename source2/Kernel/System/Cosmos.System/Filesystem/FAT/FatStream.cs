@@ -96,18 +96,18 @@ namespace Cosmos.System.Filesystem.FAT {
         UInt64 xClusterIdx = mPosition / xClusterSize;
         UInt64 xPosInCluster = mPosition % xClusterSize;
         mFS.ReadCluster((ulong)mFatTable[(int)xClusterIdx], xCluster);
-      //  long xReadSize;
-      //  if (xPosInCluster + xCount > xClusterSize) {
-      //    xReadSize = (long)(xClusterSize - xPosInCluster - 1);
-      //  } else {
-      //    xReadSize = (long)xCount;
-      //  }
-      //  // no need for a long version, because internal Array.Copy() does a cast down to int, and a range check,
-      //  // or we do a semantic change here
-      //  Array.Copy(xCluster, (long)xPosInCluster, aBuffer, aOffset, xReadSize);
+        long xReadSize;
+        if (xPosInCluster + xCount > xClusterSize) {
+          xReadSize = (long)(xClusterSize - xPosInCluster - 1);
+        } else {
+          xReadSize = (long)xCount;
+        }
+        // no need for a long version, because internal Array.Copy() does a cast down to int, and a range check,
+        // or we do a semantic change here
+        Array.Copy(xCluster, (long)xPosInCluster, aBuffer, aOffset, xReadSize);
 
-      //  aOffset += xReadSize;
-        //xCount -= (ulong)xReadSize;
+        aOffset += xReadSize;
+        xCount -= (ulong)xReadSize;
         xCount = 0;
       }
 
