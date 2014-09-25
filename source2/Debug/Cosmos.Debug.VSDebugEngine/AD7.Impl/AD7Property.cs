@@ -22,8 +22,8 @@ namespace Cosmos.Debug.VSDebugEngine
         private AD7Process mProcess;
         private AD7StackFrame mStackFrame;
         private LOCAL_ARGUMENT_INFO mDebugInfo;
-        const uint xArrayLengthOffset = 8;
-        const uint xArrayFirstElementOffset = 16;
+        const uint mArrayLengthOffset = 8;
+        const uint mArrayFirstElementOffset = 16;
         private const string NULL = "null";
 
         protected Int32 OFFSET
@@ -43,13 +43,13 @@ namespace Cosmos.Debug.VSDebugEngine
             {
                 mDebugInfo = mStackFrame.mLocalInfos[m_variableInformation.Index];
             }
-            else if (localInfo.IsArrayElement)
+            else if (localInfo.IsReference)
             {
                 mDebugInfo = new LOCAL_ARGUMENT_INFO()
                 {
-                    TYPENAME = localInfo.ArrayElementType,
+                    TYPENAME = localInfo.Type,
                     NAME = localInfo.Name,
-                    OFFSET = localInfo.ArrayElementLocation
+                    OFFSET = localInfo.Offset
                 };
             }
             else
@@ -62,9 +62,9 @@ namespace Cosmos.Debug.VSDebugEngine
         public void ReadData<T>(ref DEBUG_PROPERTY_INFO propertyInfo, Func<byte[], int, T> ByteToTypeAction)
         {
             byte[] xData;
-            if (m_variableInformation.IsArrayElement)
+            if (m_variableInformation.IsReference)
             {
-                xData = mProcess.mDbgConnector.GetMemoryData((uint)OFFSET, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
+                xData = mProcess.mDbgConnector.GetMemoryData(m_variableInformation.Pointer, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)));
                 if (xData == null)
                 {
                     propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
@@ -99,14 +99,14 @@ namespace Cosmos.Debug.VSDebugEngine
             }
             else
             {
-                uint xArrayPointer = BitConverter.ToUInt32(xData, 0);
-                if (xArrayPointer == 0)
+                uint xPointer = BitConverter.ToUInt32(xData, 0);
+                if (xPointer == 0)
                 {
                     propertyInfo.bstrValue = NULL;
                 }
                 else
                 {
-                    xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
+                    xData = mProcess.mDbgConnector.GetMemoryData(xPointer + mArrayLengthOffset, 4, 4);
                     if (xData == null)
                     {
                         propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
@@ -126,15 +126,16 @@ namespace Cosmos.Debug.VSDebugEngine
                                 for (int i = 0; i < xDataLength; i++)
                                 {
                                     DebugLocalInfo inf = new DebugLocalInfo();
-                                    inf.IsArrayElement = true;
-                                    inf.ArrayElementType = typeof(T).AssemblyQualifiedName;
-                                    inf.ArrayElementLocation = (int)(xArrayPointer + xArrayFirstElementOffset + (System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)) * i));
+                                    inf.IsReference = true;
+                                    inf.Type = typeof(T).AssemblyQualifiedName;
+                                    inf.Offset = (int)(mArrayFirstElementOffset + (System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)) * i));
+                                    inf.Pointer = (uint)(xPointer + mArrayFirstElementOffset + (System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)) * i));
                                     inf.Name = "[" + i.ToString() + "]";
                                     this.m_variableInformation.Children.Add(new AD7Property(inf, this.mProcess, this.mStackFrame));
                                 }
                             }
                         }
-                        propertyInfo.bstrValue = String.Format(typeAsString + "[{0}] at 0x{1} ", xDataLength, xArrayPointer.ToString("X"));
+                        propertyInfo.bstrValue = String.Format(typeAsString + "[{0}] at 0x{1} ", xDataLength, xPointer.ToString("X"));
                     }
                 }
             }
@@ -171,7 +172,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 {
                     byte[] xData;
 
-                    #region String
+                    #region string
                     if (mDebugInfo.TYPENAME == typeof(string).AssemblyQualifiedName)
                     {
                         const uint xStringLengthOffset = 12;
@@ -223,9 +224,11 @@ namespace Cosmos.Debug.VSDebugEngine
                             }
                         }
                     }
-#warning TODO: String[]
                     #endregion
 
+#warning TODO: String[]
+
+                    #region byte
                     // Byte
                     else if (mDebugInfo.TYPENAME == typeof(byte).AssemblyQualifiedName)
                     {
@@ -235,7 +238,9 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<byte>(ref propertyInfo, "byte");
                     }
+                    #endregion
 
+                    #region sbyte
                     // SByte
                     else if (mDebugInfo.TYPENAME == typeof(sbyte).AssemblyQualifiedName)
                     {
@@ -245,8 +250,9 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<sbyte>(ref propertyInfo, "sbyte");
                     }
+                    #endregion
 
-                    #region Char
+                    #region char
                     else if (mDebugInfo.TYPENAME == typeof(char).AssemblyQualifiedName)
                     {
                         xData = mProcess.mDbgConnector.GetStackData(OFFSET, 2);
@@ -276,7 +282,7 @@ namespace Cosmos.Debug.VSDebugEngine
                             }
                             else
                             {
-                                xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayLengthOffset, 4, 4);
+                                xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + mArrayLengthOffset, 4, 4);
                                 if (xData == null)
                                 {
                                     propertyInfo.bstrValue = String.Format("Error! Memory data received was null!");
@@ -293,7 +299,7 @@ namespace Cosmos.Debug.VSDebugEngine
                                     }
                                     if (xDataLength > 0)
                                     {
-                                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + xArrayFirstElementOffset, xDataLength * 2);
+                                        xData = mProcess.mDbgConnector.GetMemoryData(xArrayPointer + mArrayFirstElementOffset, xDataLength * 2);
                                         if (xData == null)
                                         {
                                             xSB.Append(String.Format("Error! Memory data received was null!"));
@@ -334,6 +340,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     }
                     #endregion
 
+                    #region short
                     // Short
                     else if (mDebugInfo.TYPENAME == typeof(short).AssemblyQualifiedName)
                     {
@@ -343,7 +350,9 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<short>(ref propertyInfo, "short");
                     }
+                    #endregion
 
+                    #region ushort
                     // UShort
                     else if (mDebugInfo.TYPENAME == typeof(ushort).AssemblyQualifiedName)
                     {
@@ -353,7 +362,9 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<ushort>(ref propertyInfo, "ushort");
                     }
+                    #endregion
 
+                    #region int
                     // Int32
                     else if (mDebugInfo.TYPENAME == typeof(int).AssemblyQualifiedName)
                     {
@@ -363,7 +374,9 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<int>(ref propertyInfo, "int");
                     }
+                    #endregion
 
+                    #region uint
                     // UInt32
                     else if (mDebugInfo.TYPENAME == typeof(uint).AssemblyQualifiedName)
                     {
@@ -373,7 +386,9 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<uint>(ref propertyInfo, "uint");
                     }
+                    #endregion
 
+                    #region long
                     // Long
                     else if (mDebugInfo.TYPENAME == typeof(long).AssemblyQualifiedName)
                     {
@@ -383,7 +398,9 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<long>(ref propertyInfo, "long");
                     }
+                    #endregion
 
+                    #region ulong
                     // ULong
                     else if (mDebugInfo.TYPENAME == typeof(ulong).AssemblyQualifiedName)
                     {
@@ -393,7 +410,9 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<ulong>(ref propertyInfo, "ulong");
                     }
+                    #endregion
 
+                    #region float
                     // Float
                     else if (mDebugInfo.TYPENAME == typeof(float).AssemblyQualifiedName)
                     {
@@ -403,7 +422,9 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<float>(ref propertyInfo, "float");
                     }
+                    #endregion
 
+                    #region double
                     // Double
                     else if (mDebugInfo.TYPENAME == typeof(double).AssemblyQualifiedName)
                     {
@@ -413,7 +434,9 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<double>(ref propertyInfo, "double");
                     }
+                    #endregion
 
+                    #region bool
                     // Bool
                     else if (mDebugInfo.TYPENAME == typeof(bool).AssemblyQualifiedName)
                     {
@@ -423,9 +446,12 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<bool>(ref propertyInfo, "bool");
                     }
+                    #endregion
+
                     else
                     {
-                        xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
+                        if (m_variableInformation.IsReference) xData = mProcess.mDbgConnector.GetMemoryData(m_variableInformation.Pointer, 4, 4);
+                        else xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
                         if (xData == null)
                         {
                             propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
@@ -446,11 +472,11 @@ namespace Cosmos.Debug.VSDebugEngine
                                     {
                                         Cosmos.Debug.Common.FIELD_INFO xFieldInfo;
                                         xFieldInfo = mProcess.mDebugInfoDb.Connection.Query(new SQLinq<Cosmos.Debug.Common.FIELD_INFO>().Where(q => q.NAME == str)).First();
-
                                         var inf = new DebugLocalInfo();
-                                        inf.IsArrayElement = true;
-                                        inf.ArrayElementType = xFieldInfo.TYPE;
-                                        inf.ArrayElementLocation = (int)(xPointer + xFieldInfo.OFFSET + 12);
+                                        inf.IsReference = true;
+                                        inf.Type = xFieldInfo.TYPE;
+                                        inf.Offset = xFieldInfo.OFFSET;
+                                        inf.Pointer = (uint)(xPointer + xFieldInfo.OFFSET + 12);
                                         inf.Name = GetFieldName(xFieldInfo);
                                         this.m_variableInformation.Children.Add(new AD7Property(inf, this.mProcess, this.mStackFrame));
                                     }

@@ -13,25 +13,31 @@ namespace Cosmos.Debug.VSDebugEngine
             set;
         }
 
-        public bool IsArrayElement
+        public bool IsReference
         {
             get;
             set;
         }
 
-        public string ArrayElementType
-        {
-            get;
-            set;
-        }
-
-        public int ArrayElementLocation
+        public string Type
         {
             get;
             set;
         }
 
         public string Name
+        {
+            get;
+            set;
+        }
+
+        public int Offset
+        {
+            get;
+            set;
+        }
+
+        public uint Pointer
         {
             get;
             set;
