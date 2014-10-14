@@ -46,8 +46,8 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX, DestinationIsIndirect = true };
 					break;
 				case 8:
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX, DestinationDisplacement = 4, DestinationIsIndirect = true };
 					new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX, DestinationIsIndirect = true };
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX, DestinationDisplacement = 4, DestinationIsIndirect = true };
 					break;
 			}
         }

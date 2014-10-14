@@ -450,8 +450,14 @@ namespace Cosmos.Debug.VSDebugEngine
 
                     else
                     {
-                        if (m_variableInformation.IsReference) xData = mProcess.mDbgConnector.GetMemoryData(m_variableInformation.Pointer, 4, 4);
-                        else xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
+                        if (m_variableInformation.IsReference)
+                        {
+                            xData = mProcess.mDbgConnector.GetMemoryData(m_variableInformation.Pointer, 4, 4);
+                        }
+                        else
+                        {
+                            xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
+                        }
                         if (xData == null)
                         {
                             propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
