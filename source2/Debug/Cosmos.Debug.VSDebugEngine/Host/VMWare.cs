@@ -29,6 +29,8 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
         throw new Exception("VMware not found.");
       }
 
+      CheckIfHyperVServiceIsRunning();
+
       string xFlavor = aParams[BuildProperties.VMwareEditionString].ToUpper();
       mEdition = VMwareEdition.Player;
       if (xFlavor == "WORKSTATION") {
@@ -41,6 +43,23 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
       } else if (mEdition == VMwareEdition.Workstation && mWorkstationPath == null) {
         mEdition = VMwareEdition.Player;
       }
+    }
+
+    private static void CheckIfHyperVServiceIsRunning()
+    {
+        using (System.ServiceProcess.ServiceController sc = new System.ServiceProcess.ServiceController("vmms")) {
+            try {
+              if (sc.Status == System.ServiceProcess.ServiceControllerStatus.Running) {
+                if (System.Windows.Forms.DialogResult.Yes == global::System.Windows.Forms.MessageBox.Show("Do you want to stop the Hyper-V Virtual Machine Management Service? This is needed to allow to run VMware.", "Question", System.Windows.Forms.MessageBoxButtons.YesNo))
+                  sc.Stop();
+                else //TODO this lead to crash of VS
+                  throw new Exception("VMware start useless, because of running Hyper-V Virtual Machine Management!");
+              }
+            }
+            catch (InvalidOperationException) {
+                // service not present
+            }
+        }
     }
 
     protected void ConnectToVMWare(VMWareVirtualHost aHost) {

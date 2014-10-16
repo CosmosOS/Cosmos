@@ -207,7 +207,7 @@ function InitializeSetup: Boolean;
 begin
   InitializePaths;
   if not VSNET2013 then begin
-    MsgBox(ExpandConstant('Visual Studio 2013 is not installed! Please see CodePlex documentation for supported editions/versions of Visual Studio.'), MbError, MB_OK);
+    MsgBox(ExpandConstant('Either Visual Studio 2013 or Visual Studio 2013 (integrated shell) is installed! Please see CodePlex documentation for supported editions/versions of Visual Studio.'), MbError, MB_OK);
     Result := false;
     exit;
   end;

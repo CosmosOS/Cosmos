@@ -139,7 +139,7 @@ namespace Cosmos.Build.Builder {
       }
     }
 
-    protected void CheckNet402() {
+    protected void CheckNet403() {
       Echo("Checking for .NET 4.03");
       if (Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\.NETFramework\v4.0.30319\SKUs\.NETFramework,Version=v4.0.3") == null) {
         NotFound(".NET 4.03 Full Install (not client)");
@@ -155,7 +155,9 @@ namespace Cosmos.Build.Builder {
       decimal xVer = decimal.Parse(xOsInfo.Version.Major + "." + xOsInfo.Version.Minor, System.Globalization.CultureInfo.InvariantCulture);
       // 6.0 Vista
       // 6.1 2008
-      // 6.2 Windows 7  
+      // 6.2 Windows 7
+      // 6.3 Windows 8
+      // 6.4 Windows 10
       if (xVer < 6.0m) {
         NotFound("Minimum Supported OS is Vista/2008");
       }
@@ -217,8 +219,8 @@ namespace Cosmos.Build.Builder {
 
       CheckVs2013();
 
-      CheckNet35Sp1(); // Required by VMWareLib
-      CheckNet402();
+      //works also without, only close of VMWare is not working! CheckNet35Sp1(); // Required by VMWareLib
+      CheckNet403();
       CheckForInno();
       CheckForInstall("Microsoft Visual Studio 2013 SDK", true);
       bool vmWareInstalled = true;
@@ -233,7 +235,7 @@ namespace Cosmos.Build.Builder {
       }
       if (!vmWareInstalled && !bochsInstalled) { NotFound("VMWare or Bochs"); }
 
-      // VIX is installed with newer VMware Workstations (8+ for sure). Not sure about player?
+      // VIX is installed with newer VMware Workstations (8+ for sure). VMware player does not install it?
       // We need to just watch this and adjust as needed.
       //CheckForInstall("VMWare VIX", true);
     }
@@ -291,8 +293,6 @@ namespace Cosmos.Build.Builder {
     }
 
     void CheckVs2013() {
-      // If user got this far, we know they have VS 2010. But we need to make sure
-      // that its SP1.
       Echo("Checking for Visual Studio 2013");
       string key = @"SOFTWARE\Microsoft\VisualStudio\12.0";
       if (Environment.Is64BitOperatingSystem)
