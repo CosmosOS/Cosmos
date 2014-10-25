@@ -174,7 +174,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-          throw new Exception("Wrong Poptype encountered!");
+          throw new Exception("Wrong Poptype encountered! (Type = " + StackPopTypes[0].FullName + ", expected = " + expectedType.FullName + ")");
+          // throw new Exception("Wrong Poptype encountered!");
         case Code.Stsfld:
           if (StackPopTypes[0] == null)
           {

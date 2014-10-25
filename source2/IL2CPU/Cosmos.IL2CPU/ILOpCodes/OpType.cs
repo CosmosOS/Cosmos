@@ -105,7 +105,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           return;
         case Code.Isinst:
           StackPopTypes[0] = typeof(object);
-          StackPushTypes[0] = typeof(bool);
+          StackPushTypes[0] = Value;
           return;
         case Code.Castclass:
           if (Value.IsGenericType &&
