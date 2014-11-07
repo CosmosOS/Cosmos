@@ -50,10 +50,10 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
         using (System.ServiceProcess.ServiceController sc = new System.ServiceProcess.ServiceController("vmms")) {
             try {
               if (sc.Status == System.ServiceProcess.ServiceControllerStatus.Running) {
-                if (System.Windows.Forms.DialogResult.Yes == global::System.Windows.Forms.MessageBox.Show("Do you want to stop the Hyper-V Virtual Machine Management Service? This is needed to allow to run VMware.", "Question", System.Windows.Forms.MessageBoxButtons.YesNo))
+                if (System.Windows.Forms.DialogResult.Yes == global::System.Windows.Forms.MessageBox.Show("Do you want to stop the Hyper-V Virtual Machine Management Service? This is needed to allow to run VMware. If you press \"No\" the debug will stop.", "Question", System.Windows.Forms.MessageBoxButtons.YesNo, System.Windows.Forms.MessageBoxIcon.Question))
                   sc.Stop();
-                else //TODO this lead to crash of VS
-                  throw new Exception("VMware start useless, because of running Hyper-V Virtual Machine Management!");
+                else
+                  throw new NotSupportedException("VMware start useless, because of running Hyper-V Virtual Machine Management!");
               }
             }
             catch (InvalidOperationException) {
@@ -207,10 +207,9 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
           if (ex.Message.Contains(Path.GetFileName(mDir))) {
             throw new Exception("The VMware image " + mDir + " is still in use. Please exit current Vmware session with Cosmos and try again.", ex);
           }
-          throw ex;
+          throw;
         }
       }
-    }
-  
+    } 
   }
 }

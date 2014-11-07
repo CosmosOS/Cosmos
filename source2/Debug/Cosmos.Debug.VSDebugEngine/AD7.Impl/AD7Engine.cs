@@ -70,9 +70,9 @@ namespace Cosmos.Debug.VSDebugEngine {
       , uint aStdInputHandle, uint aStdOutputHandle, uint hStdError, IDebugEventCallback2 aAD7Callback
       , out IDebugProcess2 oProcess) {
       // Launches a process by means of the debug engine.
-      // Normally, Visual Studio launches a program using the IDebugPortEx2::LaunchSuspended method and then attaches the debugger 
-      // to the suspended program. However, there are circumstances in which the debug engine may need to launch a program 
-      // (for example, if the debug engine is part of an interpreter and the program being debugged is an interpreted language), 
+      // Normally, Visual Studio launches a program using the IDebugPortEx2::LaunchSuspended method and then attaches the debugger
+      // to the suspended program. However, there are circumstances in which the debug engine may need to launch a program
+      // (for example, if the debug engine is part of an interpreter and the program being debugged is an interpreted language),
       // in which case Visual Studio uses the IDebugEngineLaunch2::LaunchSuspended method
       // The IDebugEngineLaunch2::ResumeProcess method is called to start the process after the process has been successfully launched in a suspended state.
 
@@ -94,6 +94,8 @@ namespace Cosmos.Debug.VSDebugEngine {
         //AD7ThreadCreateEvent.Send(this, xProcess.Thread);
         mModule = new AD7Module();
         mProgNode = new AD7ProgramNode(mProcess.PhysID);
+      } catch (NotSupportedException) {
+        return VSConstants.S_FALSE;
       } catch (Exception e) {
         return EngineUtils.UnexpectedException(e);
       }
