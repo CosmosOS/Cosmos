@@ -24,18 +24,23 @@ namespace Cosmos.Build.Builder {
       mInnoFile = Path.Combine(mCosmosDir, @"Setup\Cosmos.iss");
     }
 
-    void Cleanup() {
-      Section("Cleaning up");
+    void CleanupVSIPFolder() {
       if (Directory.Exists(mOutputDir)) {
+        Section("Cleaning up VSIP Folder");
+
         // Make sure no files are left, else things can be not be rebuilt and when adding
         // new items this can cause issues.
         Echo("Deleting build output directory.");
         Echo("  " + mOutputDir);
         Directory.Delete(mOutputDir, true);
       }
+    }
 
+    void CleanupAlreadyInstalled() {
+      //in case install folder is the same like the last installation, inno setup delete already this path!
+      // mean this is normally not needed, what do you think?
       if (Directory.Exists(mAppDataDir)) {
-        Echo("Deleting user kit directory.");
+        Section("Cleaning up currently installed user kit directory");
         Echo("  " + mAppDataDir);
         Directory.Delete(mAppDataDir, true);
       }
@@ -46,16 +51,16 @@ namespace Cosmos.Build.Builder {
 
       if (!App.TestMode) {
         CheckPrereqs();                                 //Working
-        Cleanup();                                      //Working
+        CleanupVSIPFolder();
 
         CompileCosmos();                                //Working
         CopyTemplates();
-        //if (App.IsUserKit)
-        {
+        if (App.IsUserKit) {
           CreateUserKitScript();
         }
         CreateSetup();                                  //Working
         if (!App.IsUserKit) {
+          CleanupAlreadyInstalled();                      //Working
           RunSetup();                                 //Working - forgot to run as user kit first
           WriteDevKit();                              //Working
           if (!App.DoNotLaunchVS) { LaunchVS(); }     //Working
@@ -203,7 +208,7 @@ namespace Cosmos.Build.Builder {
 
     protected void CheckPrereqs() {
       Section("Checking Prerequisites");
-      Echo("Note: This does not check all prerequisites, please see website for full list.");
+      Echo("Note: This check only prerequisites for building, please see website for full list.");
 
       Echo("Checking for x86 run.");
       if (!AmRunning32Bit()) {
