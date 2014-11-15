@@ -480,7 +480,6 @@ namespace Cosmos.IL2CPU
                 foreach (var xRawOpcode in aOpCodes)
                 {
                     var xSP = mSequences.FirstOrDefault(q => q.Offset == xRawOpcode.Position && q.LineStart != 0xFEEFEE);
-                    var hasNewSP = false;
                     // detect if we're at a new statement.
                     if (xPreviousSequencePoint == null && xSP != null)
                     {
@@ -1159,8 +1158,12 @@ namespace Cosmos.IL2CPU
                         {
                             try
                             {
-                                xData = new byte[xTheSize];
-                                if (xValue.GetType().IsValueType)
+                                Type xTyp = xValue.GetType();
+                                if(xTyp.IsEnum)
+                                {
+                                    xValue = Convert.ChangeType(xValue, Enum.GetUnderlyingType(xTyp));
+                                }
+                                if (xTyp.IsValueType)
                                 {
                                     for (int x = 0; x < xTheSize; x++)
                                     {
