@@ -16,12 +16,13 @@ namespace Cosmos.Build.Builder {
     protected int mReleaseNo;
     protected string mInnoFile;
     protected string mInnoPath;
+    public string InnoSetupFile = "Current.iss";
 
     public CosmosTask(string aCosmosDir, int aReleaseNo) {
       mCosmosDir = aCosmosDir;
       mAppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cosmos User Kit");
       mReleaseNo = aReleaseNo;
-      mInnoFile = Path.Combine(mCosmosDir, @"Setup\Cosmos.iss");
+      mInnoFile = Path.Combine(mCosmosDir, @"Setup\" + InnoSetupFile);
     }
 
     void CleanupVSIPFolder() {
@@ -55,9 +56,9 @@ namespace Cosmos.Build.Builder {
 
         CompileCosmos();                                //Working
         CopyTemplates();
-        if (App.IsUserKit) {
-          CreateUserKitScript();
-        }
+        
+        CreateScriptToUseChangesetWhichTaskIsUse();
+
         CreateSetup();                                  //Working
         if (!App.IsUserKit) {
           CleanupAlreadyInstalled();                      //Working
@@ -190,16 +191,25 @@ namespace Cosmos.Build.Builder {
         return;
       }
 
-      Echo("Checking if Visual Studio is running.");
-      if (IsRunning("devenv")) {
-        Echo("--Visual Studio is running.");
-        Echo("--Waiting " + xSeconds + " seconds to see if Visual Studio exits.");
-        // VS doesnt exit right away and user can try devkit again after VS window has closed but is still running.
-        // So we wait a few seconds first.
-        if (WaitForExit("devenv", xSeconds * 1000)) {
-          throw new Exception("Visual Studio is running. Please close it or kill it in task manager.");
+      if (AreWeNowDebugTheBuilder()) {
+        Echo("Checking if Visual Studio is running is ignored by debugging of Builder.");
+      }
+      else {
+        Echo("Checking if Visual Studio is running.");
+        if (IsRunning("devenv")) {
+          Echo("--Visual Studio is running.");
+          Echo("--Waiting " + xSeconds + " seconds to see if Visual Studio exits.");
+          // VS doesnt exit right away and user can try devkit again after VS window has closed but is still running.
+          // So we wait a few seconds first.
+          if (WaitForExit("devenv", xSeconds * 1000)) {
+            throw new Exception("Visual Studio is running. Please close it or kill it in task manager.");
+          }
         }
       }
+    }
+
+    private bool AreWeNowDebugTheBuilder() {
+        return Process.GetCurrentProcess().ProcessName.EndsWith(".vshost");
     }
 
     protected void NotFound(string aName) {
@@ -324,13 +334,13 @@ namespace Cosmos.Build.Builder {
       }
     }
 
-    void CreateUserKitScript() {
-      Section("Creating User Kit Script");
+    void CreateScriptToUseChangesetWhichTaskIsUse() {
+      Section("Creating Inno Setup Script");
 
-      // Read in Cosmos.iss
+      // Read in iss file
       using (var xSrc = new StreamReader(mInnoFile)) {
-        mInnoFile = Path.Combine(Path.GetDirectoryName(mInnoFile), "UserKit.iss");
-        // Write out UserKit.iss
+        mInnoFile = Path.Combine(Path.GetDirectoryName(mInnoFile), InnoSetupFile);
+        // Write out new iss
         using (var xDest = new StreamWriter(mInnoFile)) {
           string xLine;
           while ((xLine = xSrc.ReadLine()) != null) {
