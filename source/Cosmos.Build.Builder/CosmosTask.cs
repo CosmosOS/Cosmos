@@ -16,13 +16,13 @@ namespace Cosmos.Build.Builder {
     protected int mReleaseNo;
     protected string mInnoFile;
     protected string mInnoPath;
-    public string InnoSetupFile = "Current.iss";
+    public string InnoScriptTargetFile = "Current.iss";
 
     public CosmosTask(string aCosmosDir, int aReleaseNo) {
       mCosmosDir = aCosmosDir;
       mAppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cosmos User Kit");
       mReleaseNo = aReleaseNo;
-      mInnoFile = Path.Combine(mCosmosDir, @"Setup\" + InnoSetupFile);
+      mInnoFile = Path.Combine(mCosmosDir, @"Setup\Cosmos.iss");
     }
 
     void CleanupVSIPFolder() {
@@ -339,7 +339,7 @@ namespace Cosmos.Build.Builder {
 
       // Read in iss file
       using (var xSrc = new StreamReader(mInnoFile)) {
-        mInnoFile = Path.Combine(Path.GetDirectoryName(mInnoFile), InnoSetupFile);
+        mInnoFile = Path.Combine(Path.GetDirectoryName(mInnoFile), InnoScriptTargetFile);
         // Write out new iss
         using (var xDest = new StreamWriter(mInnoFile)) {
           string xLine;
