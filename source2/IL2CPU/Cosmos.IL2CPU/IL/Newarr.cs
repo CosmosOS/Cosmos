@@ -18,14 +18,14 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        private static readonly string mTypeID = GetTypeIDLabel(typeof(Array));
-
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             Cosmos.IL2CPU.ILOpCodes.OpType xType = ( Cosmos.IL2CPU.ILOpCodes.OpType )aOpCode;
 
             uint xSize = SizeOfType( xType.Value );
 
+			//TODO cache it to reduce calculation
+            string xTypeID = GetTypeIDLabel(typeof(Array));
             MethodBase xCtor = typeof( Array ).GetConstructors( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance )[ 0 ];
             string xCtorName = LabelName.Get( xCtor );
 
@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New( mTypeID ), SourceIsIndirect = true };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New( xTypeID ), SourceIsIndirect = true };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceValue = ( uint )InstanceTypeEnum.Array, Size = 32 };
