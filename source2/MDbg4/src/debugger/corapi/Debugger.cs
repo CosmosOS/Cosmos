@@ -549,7 +549,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         ]
         public static extern bool CloseHandle(IntPtr handle);
 
-
+        [CLSCompliant(false)]
         [
          DllImport(ShimLibraryName, CharSet = CharSet.Unicode, PreserveSig = false)
         ]
@@ -605,6 +605,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                                                             StringBuilder lpExeName,
                                                             ref int lpdwSize);
 
+        [CLSCompliant(false)]
         [
          DllImport(Ole32LibraryName, PreserveSig = false)
         ]
@@ -909,6 +910,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             return sb.ToString();
         }
 
+        [CLSCompliant(false)]
         public ICorDebug GetLegacyICorDebugInterface()
         {
             Guid ifaceId = typeof(ICorDebug).GUID;
@@ -988,6 +990,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         /// <param name="flags">Flags which have additional information about the CLR.
         /// See ClrDebuggingProcessFlags for more details</param>
         /// <returns>The CLR's debugging interface</returns>
+        [CLSCompliant(false)]
         public CorProcess OpenVirtualProcess(ulong moduleBaseAddress,
             ICorDebugDataTarget dataTarget,
             ICLRDebuggingLibraryProvider libraryProvider,
@@ -1004,7 +1007,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
         /// <summary>
         /// Version of the above that doesn't throw exceptions on failure
-        /// </summary>        
+        /// </summary>
+        [CLSCompliant(false)]
         public int TryOpenVirtualProcess(ulong moduleBaseAddress,
             ICorDebugDataTarget dataTarget,
             ICLRDebuggingLibraryProvider libraryProvider,
@@ -1088,6 +1092,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
     /// This interface exposes the native pipeline architecture startup APIs
     /// </summary>
     [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("D28F3C5A-9634-4206-A509-477552EEFB10")]
+    [CLSCompliant(false)]
     public interface ICLRDebugging
     {
         /// <summary>

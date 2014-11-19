@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 namespace Microsoft.Samples.Debugging.MetaDataLocator
 {
     [ComImport, InterfaceType(ComInterfaceType.InterfaceIsIUnknown), Guid("7cef8ba9-2ef7-42bf-973f-4171474f87d9")]
+    [CLSCompliant(false)]
     public interface ICorDebugMetaDataLocator //REM straighten this up later : IUnknown
     {
         void GetMetaData(
@@ -36,6 +37,7 @@ namespace Microsoft.Samples.Debugging.MetaDataLocator
             public const uint E_Fail = 0x80004005;
         }
 
+        [CLSCompliant(false)]
         public void GetMetaData(string imagePath,
                             uint dwImageTimeStamp,
                             uint dwImageSize,

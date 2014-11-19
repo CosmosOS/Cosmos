@@ -62,6 +62,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public struct CorBlockingObject
     {
         public CorValue BlockingObject;
+        [CLSCompliant(false)]
         public CorDebugBlockingReason BlockingReason;
         public TimeSpan Timeout;
     }

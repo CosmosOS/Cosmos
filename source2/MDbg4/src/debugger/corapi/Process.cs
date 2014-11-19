@@ -160,6 +160,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /* Get the INativeContext object for the given thread */
+        [CLSCompliant(false)]
         public INativeContext GetThreadContext(int threadId)
         {
             INativeContext context = ContextAllocator.GenerateContext();
@@ -182,6 +183,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /* Set the INativeContext object for the given thread */
+        [CLSCompliant(false)]
         public void SetThreadContext(int threadId, INativeContext context)
         {
             using (IContextDirectAccessor w = context.OpenForDirectAccess())

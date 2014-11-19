@@ -176,6 +176,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         /// Throws if unavailable or if NativeContextAllocator is not set.
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)] // Too expensive to eagerly browse in debugger.
+        [CLSCompliant(false)]
         public INativeContext GetContext
         {
             get

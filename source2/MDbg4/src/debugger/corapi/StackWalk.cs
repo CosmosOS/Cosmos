@@ -100,13 +100,15 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
         #region Get/Set Context
 
+        [CLSCompliant(false)]
         public void GetThreadContext(ContextFlags flags, int contextBufferSize, out int contextSize, IntPtr contextBuffer)
         {
             uint uContextSize = 0;
             m_sw.GetContext((uint)flags, (uint)contextBufferSize, out uContextSize, contextBuffer);
                 contextSize = (int)uContextSize;
-            }
+        }
 
+        [CLSCompliant(false)]
         public INativeContext GetContext()
         {
             INativeContext context = ContextAllocator.GenerateContext();
@@ -117,6 +119,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
         // ClsComplaint version of GetThreadContext.
         // Caller must ensure that the context is valid, and for the right architecture.
+        [CLSCompliant(false)]
         public void GetContext(INativeContext context)
         {
             using (IContextDirectAccessor w = context.OpenForDirectAccess())
@@ -155,6 +158,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
         // ClsComplaint version of SetThreadContext.
         // Caller must ensure that the context is valid, and for the right architecture.
+        [CLSCompliant(false)]
         public void SetContext(CorDebugSetContextFlag flag, INativeContext context)
         {
             using (IContextDirectAccessor w = context.OpenForDirectAccess())
@@ -165,6 +169,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
         #endregion // Get/Set Context
 
+        [CLSCompliant(false)]
         protected ICorDebugStackWalk m_sw;
         protected CorThread m_th;
         protected CorFrame m_frame;

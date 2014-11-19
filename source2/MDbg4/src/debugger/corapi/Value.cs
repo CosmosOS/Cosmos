@@ -17,6 +17,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
     /** A value in the remote process. */
     public class CorValue : WrapperBase
     {
+        [CLSCompliant(false)]
         public CorValue(ICorDebugValue value)
             : base(value)
         {
