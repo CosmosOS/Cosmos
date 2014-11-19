@@ -49,6 +49,8 @@ namespace Cosmos.Core {
         {
             #region consts
             // source: osdev.org
+
+#pragma warning disable 
             const byte ICW1_ICW4 = 0x01; // ICW4 (not) needed
             const byte ICW1_SINGLE = 0x02; // Single (cascade) mode
             const byte ICW1_INTERVAL4 = 0x04; // Call address interval 4 (8)
@@ -60,7 +62,7 @@ namespace Cosmos.Core {
             const byte ICW4_BUF_SLAVE = 0x08; // buffered mode/slave
             const byte ICW4_BUF_MASTER = 0x0C; // buffered mode/master
             const byte ICW4_SFNM = 0x10; // special fully nested (not)
- 
+#pragma warning restore
             #endregion
 
             var xOldMasterMask = Master.Data.Byte;

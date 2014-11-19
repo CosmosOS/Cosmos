@@ -740,7 +740,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 OutputText("Debugger terminated.");
                 return VSConstants.S_OK;
             }
-            catch (ApplicationException ex)
+            catch (ApplicationException)
             {
                 OutputText("Failed to stop debugger!");
                 OutputText("\r\n");

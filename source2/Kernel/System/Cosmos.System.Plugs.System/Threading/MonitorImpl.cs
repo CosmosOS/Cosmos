@@ -11,11 +11,9 @@ namespace Cosmos.System.Plugs.System.Threading {
   [Plug(Target = typeof(global::System.Threading.Monitor))]
   public class MonitorImpl {
     public static void Enter(object aObj) {
-      int i = 0;
     }
     
     public static void Exit(object aObj) {
-      int i = 0;
     }
     
     public static void ReliableEnter(object obj, ref bool tookLock) {
