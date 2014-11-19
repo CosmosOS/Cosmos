@@ -29,14 +29,14 @@ namespace Cosmos.IL2CPU.X86.IL
                 new Label(".AfterCCTorExceptionCheck");
             }
 
-            int aExtraOffset;// = 0;
-            bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
+            //int aExtraOffset;// = 0;
+            //bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
             uint xSize = SizeOfType( xField.FieldType );
-            if( xNeedsGC )
-            {
-                aExtraOffset = 12;
-            }
-            new Comment( Assembler, "Type = '" + xField.FieldType.FullName + "', NeedsGC = " + xNeedsGC );
+            //if( xNeedsGC )
+            //{
+            //    aExtraOffset = 12;
+            //}
+            new Comment( Assembler, "Type = '" + xField.FieldType.FullName /*+ "', NeedsGC = " + xNeedsGC*/ );
 
             uint xOffset = 0;
 

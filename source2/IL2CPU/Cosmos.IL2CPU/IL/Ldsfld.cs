@@ -32,13 +32,13 @@ namespace Cosmos.IL2CPU.X86.IL
             }
 
             //Assembler.Stack.Pop();
-            int aExtraOffset;// = 0;
-            bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
+            //int aExtraOffset;// = 0;
+            //bool xNeedsGC = xField.FieldType.IsClass && !xField.FieldType.IsValueType;
             var xSize = SizeOfType( xField.FieldType );
-            if( xNeedsGC )
-            {
-                aExtraOffset = 12;
-            }
+            //if( xNeedsGC )
+            //{
+            //    aExtraOffset = 12;
+            //}
 
             string xDataName = DataMember.GetStaticFieldName(xField);
             if( xSize >= 4 )

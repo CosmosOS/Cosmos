@@ -96,7 +96,9 @@ namespace Cosmos.Build.Builder {
       string xMsBuild = Path.Combine(Paths.Windows, @"Microsoft.NET\Framework\v4.0.30319\msbuild.exe");
       string xParams = Quoted(aSlnFile) + @" /maxcpucount /verbosity:normal /nologo /p:Configuration=" + aBuildCfg + " /p:Platform=x86 /p:OutputPath=" + Quoted(mOutputDir);
       // Clean then build: http://adrianfoyn.wordpress.com/2011/03/30/wrestling-with-msbuild-the-bane-of-trebuild/
-      StartConsole(xMsBuild, "/t:Clean " + xParams);
+      if (false == App.NoMsBuildClean) {
+        StartConsole(xMsBuild, "/t:Clean " + xParams);
+      }
       StartConsole(xMsBuild, "/t:Build " + xParams);
     }
 

@@ -12,6 +12,7 @@ namespace Cosmos.Build.Builder {
     public static bool ResetHive;
     public static bool StayOpen;
     public static bool UseTask;
+    public static bool NoMsBuildClean;
     public static bool InstallTask;
     public static bool IgnoreVS;
     public static bool TestMode = false;
@@ -28,6 +29,7 @@ namespace Cosmos.Build.Builder {
       ResetHive = xArgs.Contains("-RESETHIVE");
       StayOpen = xArgs.Contains("-STAYOPEN");
       UseTask = !xArgs.Contains("-NOTASK");
+      NoMsBuildClean = xArgs.Contains("-NOCLEAN");
       InstallTask = xArgs.Contains("-INSTALLTASK");
       DoNotLaunchVS = xArgs.Contains("-NOVSLAUNCH");
       // For use during dev of Builder only.
