@@ -60,10 +60,5 @@ namespace Cosmos.Assembler {
     public override void WriteData(Cosmos.Assembler.Assembler aAssembler, Stream aOutput) {
       throw new NotImplementedException("Method not implemented for instruction " + this.GetType().FullName.Substring(typeof(Instruction).Namespace.Length + 1));
     }
-
-    [Obsolete]
-    public override byte[] GetData(Assembler aAssembler) {
-      throw new NotImplementedException("Method not implemented for instruction " + this.GetType().FullName.Substring(typeof(Instruction).Namespace.Length + 1));
-    }
   }
 }

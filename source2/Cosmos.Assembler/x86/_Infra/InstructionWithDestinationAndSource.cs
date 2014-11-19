@@ -91,16 +91,6 @@ namespace Cosmos.Assembler.x86 {
             base.UpdateAddress(aAssembler, ref aAddress);
         }
 
-        public override byte[] GetData(Cosmos.Assembler.Assembler aAssembler) {
-            if (SourceRef != null) {
-                ulong xAddress = 0;
-                if (!SourceRef.Resolve(aAssembler, out xAddress)) {
-                    throw new Exception("Cannot resolve SourceRef!");
-                }
-                SourceValue = (uint)xAddress;
-            }
-            return base.GetData(aAssembler);
-        }
         public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
             aOutput.Write(mMnemonic);

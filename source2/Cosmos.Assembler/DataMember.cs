@@ -223,40 +223,6 @@ namespace Cosmos.Assembler {
       return true;
     }
 
-    public override byte[] GetData(Assembler aAssembler) {
-      if (UntypedDefaultValue != null &&
-          UntypedDefaultValue.LongLength > 0) {
-        var xBuff = (byte[])Array.CreateInstance(typeof(byte), UntypedDefaultValue.LongLength * 4);
-        for (int i = 0; i < UntypedDefaultValue.Length; i++) {
-          var xRef = UntypedDefaultValue[i] as Cosmos.Assembler.ElementReference;
-          byte[] xTemp;
-          if (xRef != null) {
-            var xTheRef = aAssembler.TryResolveReference(xRef);
-            if (xTheRef == null) {
-              throw new Exception("Reference not found!");
-            }
-            if (!xTheRef.ActualAddress.HasValue) {
-              Console.Write("");
-            }
-            xTemp = BitConverter.GetBytes(xTheRef.ActualAddress.Value);
-          } else {
-            if (UntypedDefaultValue[i] is int) {
-              xTemp = BitConverter.GetBytes((int)UntypedDefaultValue[i]);
-            } else {
-              if (UntypedDefaultValue[i] is uint) {
-                xTemp = BitConverter.GetBytes((uint)UntypedDefaultValue[i]);
-              } else {
-                throw new Exception("Invalid value inside UntypedDefaultValue");
-              }
-            }
-          }
-          Array.Copy(xTemp, 0, xBuff, i * 4, 4);
-        }
-        return xBuff;
-      }
-      return RawDefaultValue;
-    }
-
     public override void WriteData(Cosmos.Assembler.Assembler aAssembler, Stream aOutput) {
       if (UntypedDefaultValue != null &&
           UntypedDefaultValue.LongLength > 0) {

@@ -37,10 +37,5 @@ namespace Cosmos.Assembler
         {
             return true;
         }
-
-        public override byte[] GetData( Assembler aAssembler )
-        {
-            return new byte[ 0 ];
-        }
     }
 }
