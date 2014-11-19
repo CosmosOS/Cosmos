@@ -39,7 +39,6 @@ namespace Cosmos.Deploy.Pixie {
       }
     }
     protected bool Connect() {
-      OpType xOp;
       var xReader = Receive(OpType.Read);
       mDataEP = new IPEndPoint(mRecvEP.Address, mRecvEP.Port);
 

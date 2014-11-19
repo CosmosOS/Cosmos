@@ -219,7 +219,7 @@ namespace Cosmos.Core
             }
         }
 
-        private static bool mDebugDisplayInitialized = false;
+        //private static bool mDebugDisplayInitialized = false;
 
         // this method displays the used/total memory of the heap on the first line of the text screen
         private static void UpdateDebugDisplay()

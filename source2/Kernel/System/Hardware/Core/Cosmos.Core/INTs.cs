@@ -477,7 +477,6 @@ namespace Cosmos.Core
           // At this point we are in a very unstable state.
           // Try not to use any Cosmos routines, just
           // report a crash dump.
-            const string SysFault = " *** System Fault ***  ";
             const string xHex = "0123456789ABCDEF";
             uint xPtr = ctx.EIP;
 

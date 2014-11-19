@@ -308,7 +308,6 @@ namespace Cosmos.Hardware
                     break;
                 default:
                     throw new Exception("Unknown screen size");
-                    break;
             }
         }
         //public void SetPixel320x200x4(uint x, uint y, uint c);
@@ -332,11 +331,11 @@ namespace Cosmos.Hardware
 
             if ((x & 1) == 0)
             {
-                xSegment[xOffset] = (byte)((xSegment[xOffset] & 0xf) | (c << 4));
+                xSegment[xOffset] = (byte)((xSegment[xOffset] & 0xf) | (byte)(c << 4));
             }
             else
             {
-                xSegment[xOffset] = (byte)((xSegment[xOffset] & 0xf0) | c);
+                xSegment[xOffset] = (byte)((xSegment[xOffset] & 0xf0) | (byte)c);
             }
         }
         public uint GetPixel640x480x4(uint x, uint y)

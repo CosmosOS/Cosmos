@@ -63,11 +63,11 @@ namespace Cosmos.Debug.VSDebugEngine {
     // Call this one for internal Cosmos dev.
     // Can be turned off and should be turned off by default. Use an IFDEF or something.
     public void OnOutputString(string outputString) {
-      if (false) {
+#if DEV
         //System.Diagnostics.Debug.Assert(Worker.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
         var eventObject = new AD7OutputDebugStringEvent(outputString);
         Send(eventObject, AD7OutputDebugStringEvent.IID, null);
-      }
+#endif
     }
 
     // This is the user version, messages directly from Cosmos user code

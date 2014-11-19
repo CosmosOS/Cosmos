@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Cosmos.System.Filesystem.FAT.Listing {
   public class FatFile : Cosmos.System.Filesystem.Listing.File {
-    public readonly FatFileSystem FileSystem;
+    public new readonly FatFileSystem FileSystem;
     public readonly UInt64 FirstClusterNum;
 
     // Size is UInt32 because FAT doesn't support bigger.

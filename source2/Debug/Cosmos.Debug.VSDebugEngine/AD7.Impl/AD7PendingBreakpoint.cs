@@ -151,7 +151,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                       //}
                   }
               }
-              catch(InvalidOperationException ex)
+              catch(InvalidOperationException)
               { 
                   //No elements in potXMethods sequence!
                   return VSConstants.S_FALSE;
