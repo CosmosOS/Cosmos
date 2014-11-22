@@ -20,7 +20,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     string GetCurrentLocation(bool fIncludeModuleName) {
-      uint ip = 0;// GetThreadContext().eip;
+      uint ip = this.mProcess.mCurrentAddress.HasValue ? this.mProcess.mCurrentAddress.Value : 0u;// GetThreadContext().eip;
       return mEngine.GetAddressDescription(ip);
     }
 

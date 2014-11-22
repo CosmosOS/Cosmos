@@ -48,9 +48,14 @@ namespace Cosmos.Debug.VSDebugEngine {
       return String.Concat(startQuote, exe, afterExe, args);
     }
 
-    public static string GetAddressDescription()//DebuggedModule module, uint ip)
+    public static string GetAddressDescription(/*DebuggedModule module,*/AD7Engine engine, uint ip)
     {
-      string location = ""; // ip.ToString("x8", CultureInfo.InvariantCulture);
+      AD7StackFrame d = new AD7StackFrame(engine, engine.mThread, engine.mProcess);
+      FRAMEINFO info;
+      d.SetFrameInfo(enum_FRAMEINFO_FLAGS.FIF_FUNCNAME | enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_ARGS, out info);
+      return info.m_bstrFuncName;
+
+      //string location = ip.ToString("x8", CultureInfo.InvariantCulture);
 
       //if (module != null)
       {
@@ -58,18 +63,18 @@ namespace Cosmos.Debug.VSDebugEngine {
         //  location = string.Concat(moduleName, "!", location);
       }
 
-      return location;
+      //return location;
     }
 
     public static void CheckOk(int hr) {
       if (hr != 0) {
-        //throw new ComponentException(hr);
+        throw new InvalidOperationException(hr.ToString());
       }
     }
 
     public static void RequireOk(int hr) {
       if (hr != 0) {
-        //throw new InvalidOperationException();
+        throw new InvalidOperationException(hr.ToString());
       }
     }
 
@@ -93,7 +98,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     public static int UnexpectedException(Exception e) {
       System.Diagnostics.Debug.Fail("Unexpected exception during Attach", e.ToString());
-      return 0;// Constants.RPC_E_SERVERFAULT;
+      return VSConstants.RPC_E_SERVERFAULT;
     }
 
     internal static bool IsFlagSet(uint value, int flagValue) {

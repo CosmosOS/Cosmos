@@ -105,9 +105,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
         // Options must come beore the vmx, and cannot use shellexecute
         xPSI.Arguments = "-x -q " + xVmxPath;
       }
-      xPSI.RedirectStandardError = false;
-      xPSI.RedirectStandardOutput = false;
-      xPSI.UseShellExecute = false;
+      xPSI.UseShellExecute = true;  //must be true to allow elevate the process, sometimes needed if vmware only runs with admin rights
       mProcess.EnableRaisingEvents = true;
       mProcess.Exited += delegate(Object aSender, EventArgs e) {
         if (OnShutDown != null) {

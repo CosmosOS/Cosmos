@@ -232,7 +232,7 @@ namespace Cosmos.Debug.Common
             try
             {
                 Incoming xIncoming = (Incoming)result.AsyncState;
-                int xCount = mStream.EndRead(result);
+                int xCount = xIncoming.Stream.EndRead(result);
 
                 System.Diagnostics.Debug.WriteLine(String.Format("DC DR2 - Received: {0}", BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount)));
                 xIncoming.CurrentPos += xCount;

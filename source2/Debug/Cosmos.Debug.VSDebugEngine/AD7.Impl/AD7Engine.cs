@@ -37,7 +37,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     Guid mProgramID;
     public const string ID = "FA1DA3A6-66FF-4c65-B077-E65F7164EF83";
     internal AD7Module mModule;
-    private AD7Thread mThread;
+    internal AD7Thread mThread;
     private AD7ProgramNode mProgNode;
     public IList<IDebugBoundBreakpoint2> Breakpoints = null;
 
@@ -381,7 +381,7 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     public string GetAddressDescription(uint ip) {
       //    DebuggedModule module = m_debuggedProcess.ResolveAddress(ip);
-      return "";// EngineUtils.GetAddressDescription(module, ip);
+      return EngineUtils.GetAddressDescription(/*module,*/this, ip);
     }
 
     // Determines if a debug engine (DE) can detach from the program.
