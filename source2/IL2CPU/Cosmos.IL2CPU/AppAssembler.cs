@@ -520,7 +520,7 @@ namespace Cosmos.IL2CPU
             //}
         }
 
-        private static bool mDebugStackErrors = true;
+        //private static bool mDebugStackErrors = true;
         private void EmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup, ref bool emitINT3)
         {
             ILOpCode.ILInterpretationDebugLine("---- Group");
