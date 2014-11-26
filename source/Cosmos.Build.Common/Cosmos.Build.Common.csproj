@@ -12,7 +12,7 @@
     <AssemblyName>Cosmos.Build.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SccProjectName>%24/IL2CPU/source2/Build/Cosmos.Build.Common</SccProjectName>
+    <SccProjectName>%24/IL2CPU/source/Cosmos.Build.Common</SccProjectName>
     <SccLocalPath>.</SccLocalPath>
     <SccAuxPath>https://tfs.codeplex.com/tfs/TFS04</SccAuxPath>
     <SccProvider>{4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}</SccProvider>
@@ -63,7 +63,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Mosa.Utility.IsoImage">
-      <HintPath>..\..\..\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll</HintPath>
+      <HintPath>..\..\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">

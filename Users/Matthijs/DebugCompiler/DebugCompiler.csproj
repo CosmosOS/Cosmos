@@ -63,7 +63,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source2\Build\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj">
+    <ProjectReference Include="..\..\..\source\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj">
       <Project>{BC6AE974-1F18-4A19-A956-5062E4D3FD53}</Project>
       <Name>Cosmos.Build.MSBuild</Name>
     </ProjectReference>

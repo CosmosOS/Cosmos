@@ -316,7 +316,7 @@
       <Project>{841A734E-9606-4AAB-9C4A-74E7E303FF5D}</Project>
       <Name>XSharp.Nasm</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
+    <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>
     </ProjectReference>

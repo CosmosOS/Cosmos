@@ -176,7 +176,7 @@ Source: ".\Build\VSIP\Cosmos.Common.Extensions.*"; DestDir: "{app}\Kernel"; Flag
 Source: ".\source2\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 
 ; XSharp Source
-Source: ".\source2\Compiler\Cosmos.Compiler.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\source\Cosmos.Debug.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
 
 ; System.Data.SQLite library
 Source: ".\Resources\Dependencies\Dapper\*.*"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly

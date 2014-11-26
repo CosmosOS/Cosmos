@@ -83,11 +83,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+    <ProjectReference Include="..\..\..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{c801f19c-a9d3-42d5-9a57-9ffdf9b4d05e}</Project>
       <Name>Cosmos.IL2CPU.Plugs</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\IL2CPU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
+    <ProjectReference Include="..\..\..\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
       <Project>{239e33a7-f0c3-4801-85ca-4d8f89a31dc0}</Project>
       <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>

@@ -5,9 +5,9 @@ VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Common", "..\source2\Build\Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{0462E82B-8C29-41A9-8265-9C89038ADB29}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Common", "Cosmos.Build.Common\Cosmos.Build.Common.csproj", "{0462E82B-8C29-41A9-8265-9C89038ADB29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.MSBuild", "..\source2\Build\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj", "{BC6AE974-1F18-4A19-A956-5062E4D3FD53}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.MSBuild", "Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj", "{BC6AE974-1F18-4A19-A956-5062E4D3FD53}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{FF5BAFDE-AE9D-438D-935A-86B33EE0A758}"
 EndProject
@@ -22,13 +22,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Visual Studio", "Visual Stu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Package", "..\source2\VSIP\Cosmos.VS.Package\Cosmos.VS.Package.csproj", "{61535AF6-4A1E-4691-B2BC-039851EF4850}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU", "..\source2\IL2CPU\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU", "Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Plugs", "..\source2\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj", "{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Plugs", "Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj", "{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.GDB", "..\source2\Debug\Cosmos.Debug.GDB\Cosmos.Debug.GDB.csproj", "{3370FC04-B669-46A4-A4AA-A89540318F8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.DebugStub", "..\source2\Compiler\Cosmos.Compiler.DebugStub\Cosmos.Debug.DebugStub.csproj", "{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.DebugStub", "Cosmos.Debug.DebugStub\Cosmos.Debug.DebugStub.csproj", "{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler", "..\source2\Cosmos.Assembler\Cosmos.Assembler.csproj", "{1116130E-28E0-428A-A597-F4B3B676C0CA}"
 EndProject
@@ -104,15 +104,15 @@ Global
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
 		SccLocalPath0 = .
-		SccProjectUniqueName1 = ..\\source2\\Build\\Cosmos.Build.Common\\Cosmos.Build.Common.csproj
+		SccProjectUniqueName1 = Cosmos.Build.Common\\Cosmos.Build.Common.csproj
 		SccProjectTopLevelParentUniqueName1 = Build.sln
-		SccProjectName1 = ../source2/Build/Cosmos.Build.Common
+		SccProjectName1 = Cosmos.Build.Common
 		SccAuxPath1 = https://tfs.codeplex.com/tfs/TFS04
-		SccLocalPath1 = ..\\source2\\Build\\Cosmos.Build.Common
-		SccProjectUniqueName2 = ..\\source2\\Build\\Cosmos.Build.MSBuild\\Cosmos.Build.MSBuild.csproj
+		SccLocalPath1 = Cosmos.Build.Common
+		SccProjectUniqueName2 = Cosmos.Build.MSBuild\\Cosmos.Build.MSBuild.csproj
 		SccProjectTopLevelParentUniqueName2 = Build.sln
-		SccProjectName2 = ../source2/Build/Cosmos.Build.MSBuild
-		SccLocalPath2 = ..\\source2\\Build\\Cosmos.Build.MSBuild
+		SccProjectName2 = Cosmos.Build.MSBuild
+		SccLocalPath2 = Cosmos.Build.MSBuild
 		SccProjectUniqueName3 = ..\\source2\\Debug\\Cosmos.Debug.Common\\Cosmos.Debug.Common.csproj
 		SccProjectTopLevelParentUniqueName3 = Build.sln
 		SccProjectName3 = ../source2/Debug/Cosmos.Debug.Common
@@ -125,14 +125,14 @@ Global
 		SccProjectTopLevelParentUniqueName5 = Build.sln
 		SccProjectName5 = ../source2/VSIP/Cosmos.VS.Package
 		SccLocalPath5 = ..\\source2\\VSIP\\Cosmos.VS.Package
-		SccProjectUniqueName6 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU\\Cosmos.IL2CPU.csproj
+		SccProjectUniqueName6 = Cosmos.IL2CPU\\Cosmos.IL2CPU.csproj
 		SccProjectTopLevelParentUniqueName6 = Build.sln
-		SccProjectName6 = ../source2/IL2CPU/Cosmos.IL2CPU
-		SccLocalPath6 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU
-		SccProjectUniqueName7 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Plugs\\Cosmos.IL2CPU.Plugs.csproj
+		SccProjectName6 = Cosmos.IL2CPU
+		SccLocalPath6 = Cosmos.IL2CPU
+		SccProjectUniqueName7 = Cosmos.IL2CPU.Plugs\\Cosmos.IL2CPU.Plugs.csproj
 		SccProjectTopLevelParentUniqueName7 = Build.sln
-		SccProjectName7 = ../source2/IL2CPU/Cosmos.IL2CPU.Plugs
-		SccLocalPath7 = ..\\source2\\IL2CPU\\Cosmos.IL2CPU.Plugs
+		SccProjectName7 = Cosmos.IL2CPU.Plugs
+		SccLocalPath7 = Cosmos.IL2CPU.Plugs
 		SccProjectUniqueName8 = ..\\source2\\Debug\\Cosmos.Debug.GDB\\Cosmos.Debug.GDB.csproj
 		SccProjectTopLevelParentUniqueName8 = Build.sln
 		SccProjectName8 = ../source2/Debug/Cosmos.Debug.GDB
@@ -177,10 +177,10 @@ Global
 		SccProjectTopLevelParentUniqueName18 = Build.sln
 		SccProjectName18 = ../source2/VSIP/Cosmos.VS.Windows
 		SccLocalPath18 = ..\\source2\\VSIP\\Cosmos.VS.Windows
-		SccProjectUniqueName19 = ..\\source2\\Compiler\\Cosmos.Compiler.DebugStub\\Cosmos.Debug.DebugStub.csproj
+		SccProjectUniqueName19 = Cosmos.Debug.DebugStub\\Cosmos.Debug.DebugStub.csproj
 		SccProjectTopLevelParentUniqueName19 = Build.sln
-		SccProjectName19 = ../source2/Compiler/Cosmos.Compiler.DebugStub
-		SccLocalPath19 = ..\\source2\\Compiler\\Cosmos.Compiler.DebugStub
+		SccProjectName19 = Cosmos.Debug.DebugStub
+		SccLocalPath19 = Cosmos.Debug.DebugStub
 		SccProjectUniqueName20 = ..\\source2\\Cosmos.Assembler\\Cosmos.Assembler.csproj
 		SccProjectTopLevelParentUniqueName20 = Build.sln
 		SccProjectName20 = ../source2/Cosmos.Assembler

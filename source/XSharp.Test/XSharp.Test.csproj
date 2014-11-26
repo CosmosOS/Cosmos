@@ -63,7 +63,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\source2\Build\Cosmos.Build.Common\CosmosPaths.cs">
+    <Compile Include="..\..\source\Cosmos.Build.Common\CosmosPaths.cs">
       <Link>CosmosPaths.cs</Link>
     </Compile>
     <Compile Include="MainForm.cs">
