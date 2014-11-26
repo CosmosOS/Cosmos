@@ -68,10 +68,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Dapper">
-      <HintPath>..\..\..\Resources\Dependencies\Dapper\Dapper.dll</HintPath>
+      <HintPath>..\..\Resources\Dependencies\Dapper\Dapper.dll</HintPath>
     </Reference>
     <Reference Include="DapperExtensions">
-      <HintPath>..\..\..\Resources\Dependencies\Dapper\DapperExtensions.dll</HintPath>
+      <HintPath>..\..\Resources\Dependencies\Dapper\DapperExtensions.dll</HintPath>
     </Reference>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -91,7 +91,7 @@
     <Reference Include="Interop.VixCOM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1a2e7e25925ba452, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>False</EmbedInteropTypes>
-      <HintPath>..\..\VMWareLib\Interop.VixCOM.dll</HintPath>
+      <HintPath>..\VMWareLib\Interop.VixCOM.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Debugger.InteropA, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <SpecificVersion>False</SpecificVersion>
@@ -108,10 +108,10 @@
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="SQLinq">
-      <HintPath>..\..\..\Resources\Dependencies\Dapper\SQLinq.dll</HintPath>
+      <HintPath>..\..\Resources\Dependencies\Dapper\SQLinq.dll</HintPath>
     </Reference>
     <Reference Include="SQLinq.Dapper">
-      <HintPath>..\..\..\Resources\Dependencies\Dapper\SQLinq.Dapper.dll</HintPath>
+      <HintPath>..\..\Resources\Dependencies\Dapper\SQLinq.Dapper.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -172,11 +172,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
+    <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\VMWareLib\VMWareLib.csproj">
+    <ProjectReference Include="..\VMWareLib\VMWareLib.csproj">
       <Project>{76CDB55D-55E3-4B53-AE33-12EC31430826}</Project>
       <Name>VMWareLib</Name>
     </ProjectReference>

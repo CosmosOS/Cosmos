@@ -85,7 +85,7 @@
     <Content Include="ReadMe.html" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source2\Cosmos.Assembler\Cosmos.Assembler.csproj">
+    <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
       <Name>Cosmos.Assembler</Name>
     </ProjectReference>

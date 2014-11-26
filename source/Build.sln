@@ -11,26 +11,26 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.MSBuild", "Cos
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{FF5BAFDE-AE9D-438D-935A-86B33EE0A758}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Common", "..\source2\Debug\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj", "{AB24E403-54F3-4F67-B5E0-119A7227AAC1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Common", "Cosmos.Debug.Common\Cosmos.Debug.Common.csproj", "{AB24E403-54F3-4F67-B5E0-119A7227AAC1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.VSDebugEngine", "..\source2\Debug\Cosmos.Debug.VSDebugEngine\Cosmos.Debug.VSDebugEngine.csproj", "{6D2688FE-6FD8-44A8-B96A-6037457F72A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.VSDebugEngine", "Cosmos.Debug.VSDebugEngine\Cosmos.Debug.VSDebugEngine.csproj", "{6D2688FE-6FD8-44A8-B96A-6037457F72A7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Visual Studio", "Visual Studio", "{CD3F5E45-8B24-424F-ADF1-0211712F4CB7}"
 	ProjectSection(SolutionItems) = preProject
 		Cosmos.VS.ReadMe.html = Cosmos.VS.ReadMe.html
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Package", "..\source2\VSIP\Cosmos.VS.Package\Cosmos.VS.Package.csproj", "{61535AF6-4A1E-4691-B2BC-039851EF4850}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Package", "Cosmos.VS.Package\Cosmos.VS.Package.csproj", "{61535AF6-4A1E-4691-B2BC-039851EF4850}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU", "Cosmos.IL2CPU\Cosmos.IL2CPU.csproj", "{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Plugs", "Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj", "{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.GDB", "..\source2\Debug\Cosmos.Debug.GDB\Cosmos.Debug.GDB.csproj", "{3370FC04-B669-46A4-A4AA-A89540318F8D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.GDB", "Cosmos.Debug.GDB\Cosmos.Debug.GDB.csproj", "{3370FC04-B669-46A4-A4AA-A89540318F8D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.DebugStub", "Cosmos.Debug.DebugStub\Cosmos.Debug.DebugStub.csproj", "{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler", "..\source2\Cosmos.Assembler\Cosmos.Assembler.csproj", "{1116130E-28E0-428A-A597-F4B3B676C0CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler", "Cosmos.Assembler\Cosmos.Assembler.csproj", "{1116130E-28E0-428A-A597-F4B3B676C0CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{ADDA07A5-ADA8-4D71-831B-0A421F04A546}"
 EndProject
@@ -48,7 +48,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System", "..\source2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System.Plugs.System", "..\source2\Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System.csproj", "{7C64B97F-516D-4A6D-B9E1-3FE48F561409}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Wizards", "..\source2\VSIP\Cosmos.VS.Wizards\Cosmos.VS.Wizards.csproj", "{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Wizards", "Cosmos.VS.Wizards\Cosmos.VS.Wizards.csproj", "{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core.Plugs", "..\source2\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{D9A87AAD-FCC9-4517-B31D-E904DAD00784}"
 EndProject
@@ -65,7 +65,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{CDF131
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common.Extensions", "..\source2\Kernel\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions.csproj", "{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Windows", "..\source2\VSIP\Cosmos.VS.Windows\Cosmos.VS.Windows.csproj", "{47E8F3DC-FF3F-4CC7-8643-1807260B0B18}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Windows", "Cosmos.VS.Windows\Cosmos.VS.Windows.csproj", "{47E8F3DC-FF3F-4CC7-8643-1807260B0B18}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assembler", "Assembler", "{576C3D3B-A3EA-44FA-8E39-AFD3E6F3FE23}"
 EndProject
@@ -76,13 +76,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compiler", "Compiler", "{6A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Compiler", "XSharp.Compiler\XSharp.Compiler.csproj", "{A281A1B1-C718-4BCB-A7BE-ED840A70449A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VMWareLib", "..\source2\VMWareLib\VMWareLib.csproj", "{76CDB55D-55E3-4B53-AE33-12EC31430826}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VMWareLib", "VMWareLib\VMWareLib.csproj", "{76CDB55D-55E3-4B53-AE33-12EC31430826}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{FD42844B-2767-4DF4-B0AF-EA5F7CB11528}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.USB", "..\source2\Cosmos.Deploy.USB\Cosmos.Deploy.USB.csproj", "{3D84CF8B-C6DF-4D78-8DE1-708582B43711}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.USB", "Cosmos.Deploy.USB\Cosmos.Deploy.USB.csproj", "{3D84CF8B-C6DF-4D78-8DE1-708582B43711}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "..\source2\Cosmos.Deploy.Pixie\Cosmos.Deploy.Pixie.csproj", "{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "Cosmos.Deploy.Pixie\Cosmos.Deploy.Pixie.csproj", "{D4BA64B3-D7F6-4A3A-AF1D-74E41B49D865}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{49A7A478-E046-4B7D-9144-81D359A13719}"
 EndProject
@@ -113,18 +113,18 @@ Global
 		SccProjectTopLevelParentUniqueName2 = Build.sln
 		SccProjectName2 = Cosmos.Build.MSBuild
 		SccLocalPath2 = Cosmos.Build.MSBuild
-		SccProjectUniqueName3 = ..\\source2\\Debug\\Cosmos.Debug.Common\\Cosmos.Debug.Common.csproj
+		SccProjectUniqueName3 = Cosmos.Debug.Common\\Cosmos.Debug.Common.csproj
 		SccProjectTopLevelParentUniqueName3 = Build.sln
-		SccProjectName3 = ../source2/Debug/Cosmos.Debug.Common
-		SccLocalPath3 = ..\\source2\\Debug\\Cosmos.Debug.Common
-		SccProjectUniqueName4 = ..\\source2\\Debug\\Cosmos.Debug.VSDebugEngine\\Cosmos.Debug.VSDebugEngine.csproj
+		SccProjectName3 = Cosmos.Debug.Common
+		SccLocalPath3 = Cosmos.Debug.Common
+		SccProjectUniqueName4 = Cosmos.Debug.VSDebugEngine\\Cosmos.Debug.VSDebugEngine.csproj
 		SccProjectTopLevelParentUniqueName4 = Build.sln
-		SccProjectName4 = ../source2/Debug/Cosmos.Debug.VSDebugEngine
-		SccLocalPath4 = ..\\source2\\Debug\\Cosmos.Debug.VSDebugEngine
-		SccProjectUniqueName5 = ..\\source2\\VSIP\\Cosmos.VS.Package\\Cosmos.VS.Package.csproj
+		SccProjectName4 = Cosmos.Debug.VSDebugEngine
+		SccLocalPath4 = Cosmos.Debug.VSDebugEngine
+		SccProjectUniqueName5 = Cosmos.VS.Package\\Cosmos.VS.Package.csproj
 		SccProjectTopLevelParentUniqueName5 = Build.sln
-		SccProjectName5 = ../source2/VSIP/Cosmos.VS.Package
-		SccLocalPath5 = ..\\source2\\VSIP\\Cosmos.VS.Package
+		SccProjectName5 = Cosmos.VS.Package
+		SccLocalPath5 = Cosmos.VS.Package
 		SccProjectUniqueName6 = Cosmos.IL2CPU\\Cosmos.IL2CPU.csproj
 		SccProjectTopLevelParentUniqueName6 = Build.sln
 		SccProjectName6 = Cosmos.IL2CPU
@@ -133,10 +133,10 @@ Global
 		SccProjectTopLevelParentUniqueName7 = Build.sln
 		SccProjectName7 = Cosmos.IL2CPU.Plugs
 		SccLocalPath7 = Cosmos.IL2CPU.Plugs
-		SccProjectUniqueName8 = ..\\source2\\Debug\\Cosmos.Debug.GDB\\Cosmos.Debug.GDB.csproj
+		SccProjectUniqueName8 = Cosmos.Debug.GDB\\Cosmos.Debug.GDB.csproj
 		SccProjectTopLevelParentUniqueName8 = Build.sln
-		SccProjectName8 = ../source2/Debug/Cosmos.Debug.GDB
-		SccLocalPath8 = ..\\source2\\Debug\\Cosmos.Debug.GDB
+		SccProjectName8 = Cosmos.Debug.GDB
+		SccLocalPath8 = Cosmos.Debug.GDB
 		SccProjectUniqueName9 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core\\Cosmos.Core.csproj
 		SccProjectTopLevelParentUniqueName9 = Build.sln
 		SccProjectName9 = ../source2/Kernel/System/Hardware/Core/Cosmos.Core
@@ -153,10 +153,10 @@ Global
 		SccProjectTopLevelParentUniqueName12 = Build.sln
 		SccProjectName12 = ../source2/Kernel/System/Cosmos.System.Plugs.System
 		SccLocalPath12 = ..\\source2\\Kernel\\System\\Cosmos.System.Plugs.System
-		SccProjectUniqueName13 = ..\\source2\\VSIP\\Cosmos.VS.Wizards\\Cosmos.VS.Wizards.csproj
+		SccProjectUniqueName13 = Cosmos.VS.Wizards\\Cosmos.VS.Wizards.csproj
 		SccProjectTopLevelParentUniqueName13 = Build.sln
-		SccProjectName13 = ../source2/VSIP/Cosmos.VS.Wizards
-		SccLocalPath13 = ..\\source2\\VSIP\\Cosmos.VS.Wizards
+		SccProjectName13 = Cosmos.VS.Wizards
+		SccLocalPath13 = Cosmos.VS.Wizards
 		SccProjectUniqueName14 = ..\\source2\\Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs\\Cosmos.Core.Plugs.csproj
 		SccProjectTopLevelParentUniqueName14 = Build.sln
 		SccProjectName14 = ../source2/Kernel/System/Hardware/Core/Cosmos.Core.Plugs
@@ -173,34 +173,34 @@ Global
 		SccProjectTopLevelParentUniqueName17 = Build.sln
 		SccProjectName17 = ../source2/Kernel/Common/Cosmos.Common.Extensions
 		SccLocalPath17 = ..\\source2\\Kernel\\Common\\Cosmos.Common.Extensions
-		SccProjectUniqueName18 = ..\\source2\\VSIP\\Cosmos.VS.Windows\\Cosmos.VS.Windows.csproj
+		SccProjectUniqueName18 = Cosmos.VS.Windows\\Cosmos.VS.Windows.csproj
 		SccProjectTopLevelParentUniqueName18 = Build.sln
-		SccProjectName18 = ../source2/VSIP/Cosmos.VS.Windows
-		SccLocalPath18 = ..\\source2\\VSIP\\Cosmos.VS.Windows
+		SccProjectName18 = Cosmos.VS.Windows
+		SccLocalPath18 = Cosmos.VS.Windows
 		SccProjectUniqueName19 = Cosmos.Debug.DebugStub\\Cosmos.Debug.DebugStub.csproj
 		SccProjectTopLevelParentUniqueName19 = Build.sln
 		SccProjectName19 = Cosmos.Debug.DebugStub
 		SccLocalPath19 = Cosmos.Debug.DebugStub
-		SccProjectUniqueName20 = ..\\source2\\Cosmos.Assembler\\Cosmos.Assembler.csproj
+		SccProjectUniqueName20 = Cosmos.Assembler\\Cosmos.Assembler.csproj
 		SccProjectTopLevelParentUniqueName20 = Build.sln
-		SccProjectName20 = ../source2/Cosmos.Assembler
-		SccLocalPath20 = ..\\source2\\Cosmos.Assembler
+		SccProjectName20 = Cosmos.Assembler
+		SccLocalPath20 = Cosmos.Assembler
 		SccProjectUniqueName21 = XSharp.Compiler\\XSharp.Compiler.csproj
 		SccProjectTopLevelParentUniqueName21 = Build.sln
 		SccProjectName21 = XSharp.Compiler
 		SccLocalPath21 = XSharp.Compiler
-		SccProjectUniqueName22 = ..\\source2\\VMWareLib\\VMWareLib.csproj
+		SccProjectUniqueName22 = VMWareLib\\VMWareLib.csproj
 		SccProjectTopLevelParentUniqueName22 = Build.sln
-		SccProjectName22 = ../source2/VMWareLib
-		SccLocalPath22 = ..\\source2\\VMWareLib
-		SccProjectUniqueName23 = ..\\source2\\Cosmos.Deploy.USB\\Cosmos.Deploy.USB.csproj
+		SccProjectName22 = VMWareLib
+		SccLocalPath22 = VMWareLib
+		SccProjectUniqueName23 = Cosmos.Deploy.USB\\Cosmos.Deploy.USB.csproj
 		SccProjectTopLevelParentUniqueName23 = Build.sln
-		SccProjectName23 = ../source2/Cosmos.Deploy.USB
-		SccLocalPath23 = ..\\source2\\Cosmos.Deploy.USB
-		SccProjectUniqueName24 = ..\\source2\\Cosmos.Deploy.Pixie\\Cosmos.Deploy.Pixie.csproj
+		SccProjectName23 = Cosmos.Deploy.USB
+		SccLocalPath23 = Cosmos.Deploy.USB
+		SccProjectUniqueName24 = Cosmos.Deploy.Pixie\\Cosmos.Deploy.Pixie.csproj
 		SccProjectTopLevelParentUniqueName24 = Build.sln
-		SccProjectName24 = ../source2/Cosmos.Deploy.Pixie
-		SccLocalPath24 = ..\\source2\\Cosmos.Deploy.Pixie
+		SccProjectName24 = Cosmos.Deploy.Pixie
+		SccLocalPath24 = Cosmos.Deploy.Pixie
 		SccProjectUniqueName25 = XSharp.Nasm\\XSharp.Nasm.csproj
 		SccProjectTopLevelParentUniqueName25 = Build.sln
 		SccProjectName25 = XSharp.Nasm
@@ -217,10 +217,10 @@ Global
 		SccProjectTopLevelParentUniqueName28 = Build.sln
 		SccProjectName28 = ../source2/MDbg4/src/debugger/corapi
 		SccLocalPath28 = ..\\source2\\MDbg4\\src\\debugger\\corapi
-		SccProjectUniqueName29 = ..\\source2\\VSIP\\Cosmos.VS.XSharp\\XSharp.VS.csproj
+		SccProjectUniqueName29 = Cosmos.VS.XSharp\\XSharp.VS.csproj
 		SccProjectTopLevelParentUniqueName29 = Build.sln
-		SccProjectName29 = ../source2/VSIP/Cosmos.VS.XSharp
-		SccLocalPath29 = ..\\source2\\VSIP\\Cosmos.VS.XSharp
+		SccProjectName29 = Cosmos.VS.XSharp
+		SccLocalPath29 = Cosmos.VS.XSharp
 		SccProjectUniqueName30 = XSharp.VS\\XSharp.VS.csproj
 		SccProjectTopLevelParentUniqueName30 = Build.sln
 		SccProjectName30 = XSharp.VS

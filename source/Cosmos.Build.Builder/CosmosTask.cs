@@ -389,7 +389,7 @@ namespace Cosmos.Build.Builder {
       Section("Copying Templates");
 
       CD(mOutputDir);
-      SrcPath = Path.Combine(mCosmosDir, @"source2\VSIP\Cosmos.VS.Package\obj\x86\Debug");
+      SrcPath = Path.Combine(mCosmosDir, @"source\Cosmos.VS.Package\obj\x86\Debug");
       Copy("CosmosProject (C#).zip", true);
       Copy("CosmosKernel (C#).zip", true);
       Copy("CosmosProject (F#).zip", true);
