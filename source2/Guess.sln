@@ -5,25 +5,25 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Guess", "Demos\Guess\Guess.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuessKernel", "Demos\Guess\GuessKernel.csproj", "{73CF15C1-0AB6-4B3A-8142-D326ADA72970}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core.Plugs", "Kernel\System\Hardware\Core\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{D9A87AAD-FCC9-4517-B31D-E904DAD00784}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core.Plugs", "..\soruce\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{D9A87AAD-FCC9-4517-B31D-E904DAD00784}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel.Plugs", "Kernel\Debug\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj", "{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel.Plugs", "..\source\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj", "{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System.Plugs.System", "Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System.csproj", "{7C64B97F-516D-4A6D-B9E1-3FE48F561409}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System.Plugs", "..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj", "{7C64B97F-516D-4A6D-B9E1-3FE48F561409}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common.Extensions", "Kernel\Common\Cosmos.Common.Extensions\Cosmos.Common.Extensions.csproj", "{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common", "..\source\Cosmos.Common\Cosmos.Common.csproj", "{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cosmos", "Cosmos", "{95E33FA8-ECCC-400B-89E3-E1AD04B4C4DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel", "Kernel\Debug\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj", "{61607F1E-58F9-41CF-972F-128384F3E115}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel", "..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj", "{61607F1E-58F9-41CF-972F-128384F3E115}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core", "Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj", "{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core", "..\source\Cosmos.Core\Cosmos.Core.csproj", "{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Plugs", "IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj", "{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Plugs", "..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj", "{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Hardware", "Kernel\System\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj", "{6A991D03-1435-4005-9809-B8BACDF3B021}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.HAL", "..\source\Cosmos.HAL\Cosmos.HAL.csproj", "{6A991D03-1435-4005-9809-B8BACDF3B021}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System", "Kernel\System\Cosmos.System\Cosmos.System.csproj", "{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System", "..\source\Cosmos.System\Cosmos.System.csproj", "{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
@@ -37,42 +37,42 @@ Global
 		SccProjectUniqueName2 = Demos\\Guess\\GuessKernel.csproj
 		SccProjectName2 = Demos/Guess
 		SccLocalPath2 = Demos\\Guess
-		SccProjectUniqueName3 = Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs\\Cosmos.Core.Plugs.csproj
+		SccProjectUniqueName3 = ..\\source\\Cosmos.Core.Plugs\\Cosmos.Core.Plugs.csproj
 		SccProjectTopLevelParentUniqueName3 = Guess.sln
-		SccProjectName3 = Kernel/System/Hardware/Core/Cosmos.Core.Plugs
-		SccLocalPath3 = Kernel\\System\\Hardware\\Core\\Cosmos.Core.Plugs
-		SccProjectUniqueName4 = Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs\\Cosmos.Debug.Kernel.Plugs.csproj
+		SccProjectName3 = ../source/Cosmos.Core.Plugs
+		SccLocalPath3 = ..\\source\\Cosmos.Core.Plugs
+		SccProjectUniqueName4 = ..\\source\\Cosmos.Debug.Kernel.Plugs\\Cosmos.Debug.Kernel.Plugs.csproj
 		SccProjectTopLevelParentUniqueName4 = Guess.sln
-		SccProjectName4 = Kernel/Debug/Cosmos.Debug.Kernel.Plugs
-		SccLocalPath4 = Kernel\\Debug\\Cosmos.Debug.Kernel.Plugs
-		SccProjectUniqueName5 = Kernel\\System\\Cosmos.System.Plugs.System\\Cosmos.System.Plugs.System.csproj
+		SccProjectName4 = ../source/Cosmos.Debug.Kernel.Plugs
+		SccLocalPath4 = ..\\source\\Cosmos.Debug.Kernel.Plugs
+		SccProjectUniqueName5 = ..\source\Cosmos.System.Plugs\\Cosmos.System.Plugs.csproj
 		SccProjectTopLevelParentUniqueName5 = Guess.sln
-		SccProjectName5 = Kernel/System/Cosmos.System.Plugs.System
-		SccLocalPath5 = Kernel\\System\\Cosmos.System.Plugs.System
-		SccProjectUniqueName6 = Kernel\\Common\\Cosmos.Common.Extensions\\Cosmos.Common.Extensions.csproj
+		SccProjectName5 = ../source/Cosmos.System.Plugs
+		SccLocalPath5 = ..\\source\\Cosmos.System.Plugs
+		SccProjectUniqueName6 = ..\\source\\Cosmos.Common\\Cosmos.Common.csproj
 		SccProjectTopLevelParentUniqueName6 = Guess.sln
-		SccProjectName6 = Kernel/Common/Cosmos.Common.Extensions
-		SccLocalPath6 = Kernel\\Common\\Cosmos.Common.Extensions
-		SccProjectUniqueName7 = Kernel\\Debug\\Cosmos.Debug.Kernel\\Cosmos.Debug.Kernel.csproj
+		SccProjectName6 = ../source/Cosmos.Common
+		SccLocalPath6 = ..\\source\\Cosmos.Common
+		SccProjectUniqueName7 = ..\\source\\Cosmos.Debug.Kernel\\Cosmos.Debug.Kernel.csproj
 		SccProjectTopLevelParentUniqueName7 = Guess.sln
-		SccProjectName7 = Kernel/Debug/Cosmos.Debug.Kernel
-		SccLocalPath7 = Kernel\\Debug\\Cosmos.Debug.Kernel
-		SccProjectUniqueName8 = Kernel\\System\\Hardware\\Core\\Cosmos.Core\\Cosmos.Core.csproj
+		SccProjectName7 = ../source/Cosmos.Debug.Kernel
+		SccLocalPath7 = ..\\source\\Cosmos.Debug.Kernel
+		SccProjectUniqueName8 = ..\\source\\Cosmos.Core\\Cosmos.Core.csproj
 		SccProjectTopLevelParentUniqueName8 = Guess.sln
-		SccProjectName8 = Kernel/System/Hardware/Core/Cosmos.Core
-		SccLocalPath8 = Kernel\\System\\Hardware\\Core\\Cosmos.Core
-		SccProjectUniqueName9 = IL2CPU\\Cosmos.IL2CPU.Plugs\\Cosmos.IL2CPU.Plugs.csproj
+		SccProjectName8 = ../souce/Cosmos.Core
+		SccLocalPath8 = ..\\source\\Cosmos.Core
+		SccProjectUniqueName9 = ..\\source\\Cosmos.IL2CPU.Plugs\\Cosmos.IL2CPU.Plugs.csproj
 		SccProjectTopLevelParentUniqueName9 = Guess.sln
-		SccProjectName9 = IL2CPU/Cosmos.IL2CPU.Plugs
-		SccLocalPath9 = IL2CPU\\Cosmos.IL2CPU.Plugs
-		SccProjectUniqueName10 = Kernel\\System\\Hardware\\Cosmos.Hardware\\Cosmos.Hardware.csproj
+		SccProjectName9 = ../source/Cosmos.IL2CPU.Plugs
+		SccLocalPath9 = ..\\source\\Cosmos.IL2CPU.Plugs
+		SccProjectUniqueName10 = ..\\source\\Cosmos.HAL\\Cosmos.HAL.csproj
 		SccProjectTopLevelParentUniqueName10 = Guess.sln
-		SccProjectName10 = Kernel/System/Hardware/Cosmos.Hardware
-		SccLocalPath10 = Kernel\\System\\Hardware\\Cosmos.Hardware
-		SccProjectUniqueName11 = Kernel\\System\\Cosmos.System\\Cosmos.System.csproj
+		SccProjectName10 = ../source/Cosmos.HAL
+		SccLocalPath10 = ..\\source\\Cosmos.HAL
+		SccProjectUniqueName11 = ..\\source\\Cosmos.System\\Cosmos.System.csproj
 		SccProjectTopLevelParentUniqueName11 = Guess.sln
-		SccProjectName11 = Kernel/System/Cosmos.System
-		SccLocalPath11 = Kernel\\System\\Cosmos.System
+		SccProjectName11 = ../source/Cosmos.System
+		SccLocalPath11 = ..\\source\\Cosmos.System
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

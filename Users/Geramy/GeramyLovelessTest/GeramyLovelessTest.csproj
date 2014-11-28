@@ -42,16 +42,16 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Cosmos.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
-      <HintPath>..\..\Kernel\System\Hardware\Core\Cosmos.Core\bin\x86\Debug\Cosmos.Core.dll</HintPath>
+      <HintPath>..\source\Cosmos.Core\bin\x86\Debug\Cosmos.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Cosmos.Hardware, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
-      <HintPath>..\..\Kernel\System\Hardware\Cosmos.Hardware\bin\x86\Debug\Cosmos.Hardware.dll</HintPath>
+    <Reference Include="Cosmos.HAL, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
+      <HintPath>..\source\Cosmos.HAL\bin\x86\Debug\Cosmos.HAL.dll</HintPath>
     </Reference>
     <Reference Include="Cosmos.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
-      <HintPath>..\..\Kernel\System\Cosmos.System\bin\x86\Debug\Cosmos.System.dll</HintPath>
+      <HintPath>..\source\Cosmos.System\bin\x86\Debug\Cosmos.System.dll</HintPath>
     </Reference>
     <Reference Include="Cosmos.Debug.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
-      <HintPath>..\..\Kernel\Debug\Cosmos.Debug.Kernel\bin\x86\Debug\Cosmos.Debug.Kernel.dll</HintPath>
+      <HintPath>..\source\Cosmos.Debug.Kernel\bin\x86\Debug\Cosmos.Debug.Kernel.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Sys = Cosmos.System;
 using Cosmos.Debug.Kernel;
-using Cosmos.Common.Extensions;
+using Cosmos.Common;
 using Cosmos.Hardware.BlockDevice;
 using FAT = Cosmos.System.Filesystem.FAT;
 

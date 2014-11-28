@@ -7,16 +7,16 @@ using Playground.Kudzu.BreakpointsKernel.FAT;
 using Playground.Kudzu.BreakpointsKernel.FAT.Listing;
 using Sys = Cosmos.System;
 using Cosmos.Debug.Kernel;
-using Cosmos.Common.Extensions;
-using Cosmos.Hardware.BlockDevice;
+using Cosmos.Common;
+using Cosmos.HAL.BlockDevice;
 
 //using TheFatStream = Playground.Kudzu.BreakpointsKernel.FAT.MyFatStream;
 //using TheFatFile = Playground.Kudzu.BreakpointsKernel.FAT.Listing.MyFatFile;
 //using TheFatFileSystem = Playground.Kudzu.BreakpointsKernel.FAT.MyFatFileSystem;
 
-using TheFatStream = Cosmos.System.Filesystem.FAT.FatStream;
-using TheFatFile = Cosmos.System.Filesystem.FAT.Listing.FatFile;
-using TheFatFileSystem = Cosmos.System.Filesystem.FAT.FatFileSystem;
+using TheFatStream = Cosmos.System.FileSystem.FAT.FatStream;
+using TheFatFile = Cosmos.System.FileSystem.FAT.Listing.FatFile;
+using TheFatFileSystem = Cosmos.System.FileSystem.FAT.FatFileSystem;
 
 namespace Kudzu.BreakpointsKernel
 {
@@ -31,9 +31,9 @@ namespace Kudzu.BreakpointsKernel
     {
       Test xTest;
 
-      var xATA = new Cosmos.Hardware.BlockDevice.AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1
-        , Cosmos.Hardware.BlockDevice.Ata.ControllerIdEnum.Primary
-        , Cosmos.Hardware.BlockDevice.Ata.BusPositionEnum.Master);
+      var xATA = new Cosmos.HAL.BlockDevice.AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1
+        , Cosmos.HAL.BlockDevice.Ata.ControllerIdEnum.Primary
+        , Cosmos.HAL.BlockDevice.Ata.BusPositionEnum.Master);
       UInt64 xBlockSize = xATA.BlockSize;
 
       Console.WriteLine("Running FieldInitTest");
@@ -334,7 +334,7 @@ namespace Kudzu.BreakpointsKernel
               var xFS = new TheFatFileSystem(xPartition);
 
               Console.WriteLine("Mapping...");
-              Sys.Filesystem.FileSystem.AddMapping("C", xFS);
+              Sys.FileSystem.FileSystem.AddMapping("C", xFS);
 
 
               Console.WriteLine();
@@ -348,12 +348,12 @@ namespace Kudzu.BreakpointsKernel
               for (int j = 0; j < xListing.Count; j++)
               {
                 var xItem = xListing[j];
-                if (xItem is Sys.Filesystem.Listing.Directory)
+                if (xItem is Sys.FileSystem.Listing.Directory)
                 {
                   //Detecting Dir in HDD
                   Console.WriteLine("<DIR> " + xListing[j].Name);
                 }
-                else if (xItem is Sys.Filesystem.Listing.File)
+                else if (xItem is Sys.FileSystem.Listing.File)
                 {
                   //Detecting File in HDD
                   Console.WriteLine("<FILE> " + xListing[j].Name + " (" + xListing[j].Size + ")");

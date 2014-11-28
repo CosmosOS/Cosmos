@@ -59,10 +59,10 @@
       <HintPath>..\..\..\..\..\..\Users\Orvid\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.Core.Plugs.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Cosmos.System.Plugs.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983">
-      <Name>Cosmos.System.Plugs.System</Name>
-      <AssemblyName>Cosmos.System.Plugs.System.dll</AssemblyName>
-      <HintPath>..\..\..\..\..\..\Users\Orvid\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.System.Plugs.System.dll</HintPath>
+    <Reference Include="Cosmos.System.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983">
+      <Name>Cosmos.System.Plugs</Name>
+      <AssemblyName>Cosmos.System.Plugs.dll</AssemblyName>
+      <HintPath>..\..\..\..\..\..\Users\Orvid\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.System.Plugs.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

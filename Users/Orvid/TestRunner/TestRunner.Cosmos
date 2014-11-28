@@ -33,8 +33,8 @@
     <StartCosmosGDB>false</StartCosmosGDB>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System.Plugs.System\Cosmos.System.Plugs.System.csproj">
-      <Name>Cosmos.System.Plugs.System</Name>
+    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
+      <Name>Cosmos.System.Plugs</Name>
       <Project>{7c64b97f-516d-4a6d-b9e1-3fe48f561409}</Project>
       <Private>True</Private>
     </ProjectReference>

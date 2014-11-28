@@ -41,7 +41,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cosmos.Debug.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86">
-      <HintPath>..\..\..\Kernel\System\Hardware\Cosmos.Hardware\bin\x86\Debug\Cosmos.Debug.Kernel.dll</HintPath>
+      <HintPath>..\..\source\Cosmos.Hardware\bin\x86\Debug\Cosmos.Debug.Kernel.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
@@ -51,21 +51,21 @@
     <Compile Include="Map.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\IL2CPU\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+    <ProjectReference Include="..\..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
       <Name>Cosmos.IL2CPU.Plugs</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\System\Cosmos.System\Cosmos.System.csproj">
+    <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
       <Project>{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj">
+    <ProjectReference Include="..\..\source\Cosmos.Core\Cosmos.Core.csproj">
       <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
       <Name>Cosmos.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Kernel\System\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj">
+    <ProjectReference Include="..\..\source\Cosmos.HAL\Cosmos.HAL.csproj">
       <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
-      <Name>Cosmos.Hardware</Name>
+      <Name>Cosmos.HAL</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -61,17 +61,17 @@
     <Compile Include="TestDriver.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Kernel\System\Cosmos.System\Cosmos.System.csproj">
+    <ProjectReference Include="..\..\..\source\Cosmos.System\Cosmos.System.csproj">
       <Project>{DA50B9B2-0E95-4F0D-A3C8-79FC549301B5}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Kernel\System\Hardware\Core\Cosmos.Core\Cosmos.Core.csproj">
+    <ProjectReference Include="..\..\..\source\Cosmos.Core\Cosmos.Core.csproj">
       <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
       <Name>Cosmos.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Kernel\System\Hardware\Cosmos.Hardware\Cosmos.Hardware.csproj">
+    <ProjectReference Include="..\..\..\source\Cosmos.HAL\Cosmos.HAL.csproj">
       <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
-      <Name>Cosmos.Hardware</Name>
+      <Name>Cosmos.HAL</Name>
     </ProjectReference>
     <ProjectReference Include="..\CsTests\CsTests.csproj">
       <Project>{7CEE0541-0107-47F3-B422-70C55E81CE42}</Project>

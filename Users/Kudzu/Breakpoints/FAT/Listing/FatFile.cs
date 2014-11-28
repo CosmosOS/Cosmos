@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Playground.Kudzu.BreakpointsKernel.FAT.Listing
 {
-  public class MyFatFile : Cosmos.System.Filesystem.Listing.File
+    public class MyFatFile : Cosmos.System.FileSystem.Listing.File
   {
     public readonly MyFatFileSystem FileSystem;
     public readonly UInt64 FirstClusterNum;

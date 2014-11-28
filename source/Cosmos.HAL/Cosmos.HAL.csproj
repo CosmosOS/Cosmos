@@ -1,10 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FEC4BF88-8531-440E-B1BA-E2E066B36301}</ProjectGuid>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{6A991D03-1435-4005-9809-B8BACDF3B021}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.HAL</RootNamespace>
@@ -15,6 +16,9 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,6 +28,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,20 +38,115 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
+    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Core" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlockDevice\Ata.cs" />
+    <Compile Include="BlockDevice\BlockDevice.cs" />
+    <Compile Include="BlockDevice\EBR.cs" />
+    <Compile Include="BlockDevice\MBR.cs" />
+    <Compile Include="BlockDevice\Partition.cs" />
+    <Compile Include="Bootstrap.cs" />
+    <Compile Include="Device.cs" />
+    <Compile Include="Drivers\PCI\Audio\ES1370\Components\DACak4531.cs" />
+    <Compile Include="Drivers\PCI\Audio\ES1370\ES1370.cs" />
+    <Compile Include="Drivers\PCI\Audio\ES1370\Managers\AK4531Manager.cs" />
+    <Compile Include="Drivers\PCI\Audio\ES1370\Registers\CommandRegister.cs" />
+    <Compile Include="Drivers\PCI\Audio\ES1370\Registers\ControlRegister.cs" />
+    <Compile Include="Drivers\PCI\Audio\ES1370\Registers\InterruptStatusRegister.cs" />
+    <Compile Include="Drivers\PCI\Audio\ES1370\Registers\MainRegister.cs" />
+    <Compile Include="Drivers\PCI\Audio\ES1370\Registers\SerialInterfaceRegister.cs" />
+    <Compile Include="Drivers\PCI\Audio\ES1370\Registers\UartFIFORegister.cs" />
+    <Compile Include="Drivers\PCI\Audio\ES1370\Registers\UARTInterfaceRegister.cs" />
+    <Compile Include="Drivers\PCI\Audio\Generic\Components\ADCEntity.cs" />
+    <Compile Include="Drivers\PCI\Audio\Generic\Components\DACEntity.cs" />
+    <Compile Include="Drivers\PCI\Audio\Generic\Components\UARTEntity.cs" />
+    <Compile Include="Drivers\PCI\Audio\Generic\GenericSoundCard.cs" />
+    <Compile Include="Drivers\PCI\Audio\Generic\Managers\ADCManager.cs" />
+    <Compile Include="Drivers\PCI\Audio\Generic\Managers\DACManager.cs" />
+    <Compile Include="Drivers\PCI\Audio\Generic\Managers\UARTManager.cs" />
+    <Compile Include="Drivers\PCI\Audio\PCMStream.cs" />
+    <Compile Include="Drivers\PCI\Network\AMDPCNetII.cs" />
+    <Compile Include="Drivers\PCI\Video\VMWareSVGAII.cs" />
+    <Compile Include="Drivers\VGAScreen.cs" />
+    <Compile Include="Global.cs" />
+    <Compile Include="Keyboard.cs" />
+    <Compile Include="BlockDevice\AtaPio.cs" />
+    <Compile Include="Mouse.cs" />
+    <Compile Include="NetworkDevice.cs" />
+    <Compile Include="Drivers\PCI\Network\RTL8139.cs" />
+    <Compile Include="Drivers\PCI\Network\VT6102.cs" />
+    <Compile Include="PciDevice.cs" />
+    <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RTC.cs" />
+    <Compile Include="TextScreen.cs" />
+    <Compile Include="Drivers\USB\USBHost.cs" />
+    <Compile Include="Drivers\USB\USBHostOHCI.cs" />
+    <Compile Include="Drivers\USB\USBHostOHCIRegisters.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+      <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
+      <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
+      <Name>Cosmos.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj">
-      <Project>{a13d729f-1344-4a18-a0d5-964676175951}</Project>
+      <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
       <Name>Cosmos.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BlockDevice\ATA.html" />
+    <Content Include="Drivers\ReadMe.html" />
+    <Content Include="Keyboard.html" />
+    <Content Include="PIT.html" />
+    <Content Include="RTC.html" />
+    <Content Include="TextScreen.html" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

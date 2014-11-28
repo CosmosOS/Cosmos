@@ -1469,11 +1469,11 @@ namespace Cosmos.IL2CPU
                         {
                             return;
                         }
-                        else if (aNamespace.StartsWith("Cosmos.Sys", StringComparison.InvariantCultureIgnoreCase))
+                        else if (aNamespace.StartsWith("Cosmos.System", StringComparison.InvariantCultureIgnoreCase))
                         {
                             return;
                         }
-                        else if (aNamespace.StartsWith("Cosmos.Hardware", StringComparison.InvariantCultureIgnoreCase))
+                        else if (aNamespace.StartsWith("Cosmos.HAL", StringComparison.InvariantCultureIgnoreCase))
                         {
                             return;
                         }

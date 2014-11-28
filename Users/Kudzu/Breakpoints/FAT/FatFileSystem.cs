@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Cosmos.Common.Extensions;
-using Cosmos.System.Filesystem;
+using Cosmos.System.FileSystem;
 
 namespace Playground.Kudzu.BreakpointsKernel.FAT
 {
@@ -44,7 +44,7 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
     public enum FatTypeEnum { Unknown, Fat12, Fat16, Fat32 }
     readonly public FatTypeEnum FatType = FatTypeEnum.Unknown;
 
-    Cosmos.Hardware.BlockDevice.BlockDevice mDevice;
+    Cosmos.HAL.BlockDevice.BlockDevice mDevice;
 
     public void ReadFatTableSector(UInt64 xSectorNum, byte[] aData)
     {
@@ -117,7 +117,7 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
       }
     }
 
-    public MyFatFileSystem(Cosmos.Hardware.BlockDevice.BlockDevice aDevice)
+    public MyFatFileSystem(Cosmos.HAL.BlockDevice.BlockDevice aDevice)
     {
 
       mDevice = aDevice;
@@ -218,9 +218,9 @@ namespace Playground.Kudzu.BreakpointsKernel.FAT
       oOffset = (UInt32)(xOffset % BytesPerSector);
     }
 
-    public List<Cosmos.System.Filesystem.Listing.Base> GetRoot()
+    public List<Cosmos.System.FileSystem.Listing.Base> GetRoot()
     {
-      var xResult = new List<Cosmos.System.Filesystem.Listing.Base>();
+        var xResult = new List<Cosmos.System.FileSystem.Listing.Base>();
 
       byte[] xData;
       if (FatType == FatTypeEnum.Fat32)

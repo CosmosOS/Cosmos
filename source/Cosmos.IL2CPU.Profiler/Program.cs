@@ -60,7 +60,7 @@ namespace Cosmos.IL2CPU.Profiler {
                 //System.Reflection.MethodInfo[] name = typeof(SSchockeTest.Kernel).GetMethods();
                 Type xFoundType = typeof(FakeKernel);
                 var xCtor = xFoundType.GetConstructor(Type.EmptyTypes);
-                typeof(Cosmos.System.Plugs.System.System.ConsoleImpl).IsSubclassOf(typeof(object));
+                typeof(Cosmos.System.Plugs.System.ConsoleImpl).IsSubclassOf(typeof(object));
                 var xEntryPoint = typeof(Kernel).GetMethod("Start", BindingFlags.Public | BindingFlags.Instance);
                 //var xEntryPoint = typeof(Program).GetMethod("ScannerEntryPoint", BindingFlags.NonPublic | BindingFlags.Static);
                 //EnableLogging(pathToLogFile)

@@ -100,10 +100,10 @@ namespace DebugCompiler
             return new ITaskItem[]
             {
                 new TaskItemImpl(KernelFile),
-                new TaskItemImpl(CosmosRoot + @"\source2\Kernel\System\Hardware\Core\Cosmos.Core.Plugs\bin\x86\Debug\Cosmos.Core.Plugs.dll"),
-                new TaskItemImpl(CosmosRoot + @"\source2\Kernel\Debug\Cosmos.Debug.Kernel.Plugs\bin\x86\Debug\Cosmos.Debug.Kernel.Plugs.dll"),
-                new TaskItemImpl(CosmosRoot + @"\source2\Kernel\System\Hardware\Cosmos.Hardware\bin\x86\Debug\Cosmos.Hardware.dll"),
-                new TaskItemImpl(CosmosRoot + @"\source2\Kernel\System\Cosmos.System.Plugs.System\bin\x86\Debug\Cosmos.System.Plugs.System.dll"),
+                new TaskItemImpl(CosmosRoot + @"\source\Cosmos.Core.Plugs\bin\x86\Debug\Cosmos.Core.Plugs.dll"),
+                new TaskItemImpl(CosmosRoot + @"\source\Cosmos.Debug.Kernel.Plugs\bin\x86\Debug\Cosmos.Debug.Kernel.Plugs.dll"),
+                new TaskItemImpl(CosmosRoot + @"\source\Cosmos.HAL\bin\x86\Debug\Cosmos.HAL.dll"),
+                new TaskItemImpl(CosmosRoot + @"\source\Cosmos.System.Plugs\bin\x86\Debug\Cosmos.System.Plugs.dll"),
             };
         }
 
