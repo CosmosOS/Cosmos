@@ -1,141 +1,113 @@
-﻿using Cosmos.System.FileSystem.VFS;
+﻿using Cosmos.HAL.BlockDevice;
+using Cosmos.System;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Console = global::System.Console;
 
-namespace SentinelKernel
+namespace SentinelKernel.System.FileSystem.VFS
 {
+    [Serializable]
+    public struct KVP<TKey, TValue>
+    {
+        private TKey key;
+        private TValue value;
+
+        public KVP(TKey key, TValue value)
+        {
+            this.key = key;
+            this.value = value;
+        }
+
+        public TKey Key
+        {
+            get { return key; }
+        }
+
+        public TValue Value
+        {
+            get { return value; }
+        }
+    }
+
     public class SentinelVFS : VFSBase
     {
-        public override void Initialize()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Cosmos.System.FileSystem.Listing.Directory GetDirectory(string aPath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override List<Cosmos.System.FileSystem.Listing.Base> GetDirectoryListing(string aPath)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override List<Cosmos.System.FileSystem.Listing.Base> GetDirectoryListing(Cosmos.System.FileSystem.Listing.Directory aEntry)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Cosmos.System.FileSystem.Listing.Directory GetVolume(string aVolume)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override List<Cosmos.System.FileSystem.Listing.Directory> GetVolumes()
-        {
-            throw new NotImplementedException();
-        }
-
-        /*
-                private List<Partition> mPartitions;
+        private List<Partition> mPartitions;
 
         private List<KVP<string, FileSystem>> mFileSystems;
 
-        public override void Initialize()
+        protected virtual void InitializePartitions()
         {
-            mPartitions = new List<Partition>();
-            mFileSystems = new List<KVP<string, FileSystem>>();
+            for (int i = 0; i < BlockDevice.Devices.Count; i++)
+            {
+                if (BlockDevice.Devices[i] is Partition)
+                {
+                    mPartitions.Add((Partition)BlockDevice.Devices[i]);
+                }
+            }
 
-            InitializePartitions();
             if (mPartitions.Count > 0)
             {
-                InitializeFileSystems();
+                for (int i = 0; i < mPartitions.Count; i++)
+                {
+                    Console.WriteLine("Partition #: " + (i + 1));
+                    Console.WriteLine("Block Size: " + mPartitions[i].BlockSize + " bytes");
+                    Console.WriteLine("Size: " + mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024 + " MB");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No partitions found!");
             }
         }
 
-        protected void InitializePartitions()
-        {
-            try
-            {
-                for (int i = 0; i < BlockDevice.Devices.Count; i++)
-                {
-                    if (BlockDevice.Devices[i] is Partition)
-                    {
-                        mPartitions.Add((Partition)BlockDevice.Devices[i]);
-                    }
-                }
-
-                if (mPartitions.Count > 0)
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("--------Partitions--------");
-                    for (int i = 0; i < mPartitions.Count; i++)
-                    {
-                        Console.WriteLine();
-                        Console.WriteLine("Partition #: " + (i + 1));
-                        Console.WriteLine("Block Size: " + mPartitions[i].BlockSize + " bytes");
-                        Console.WriteLine("Size: " + mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024 + " MB");
-                    }
-                    Console.WriteLine();
-                    Console.WriteLine("--------------------------");
-                }
-                else
-                {
-                    Console.WriteLine("No partitions found!");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Error: {0}", ex.Message);
-            }
-            Console.WriteLine("Complete...");
-        }
-
-        protected void InitializeFileSystems()
+        protected virtual void InitializeFileSystems()
         {
             for (int i = 0; i < mPartitions.Count; i++)
             {
-                string xRootPath = string.Concat(i, Path.VolumeSeparatorChar, Path.DirectorySeparatorChar);
+                string xRootPath = string.Concat(i, VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
                 switch (FileSystem.GetFileSystemType(mPartitions[i]))
                 {
                     case FileSystemType.FAT:
-                        mFileSystems.Add(new KVP<string, FileSystem>(xRootPath, new FatFileSystem(mPartitions[i])));
+                        mFileSystems.Add(new KVP<string, FileSystem>(xRootPath, new System.FileSystem.FAT.FatFileSystem(mPartitions[i])));
                         break;
                 }
 
-                if (mFileSystems[0] != null)
+                if (mFileSystems[i].Key == xRootPath)
                 {
+                    var xFatFS = mFileSystems[i].Value as System.FileSystem.FAT.FatFileSystem;
                     Console.WriteLine("-------File System--------");
-                    Console.WriteLine("Bytes per Cluster: " + mFileSystems[0].BytesPerCluster);
-                    Console.WriteLine("Bytes per Sector: " + mFileSystems[0].BytesPerSector);
-                    Console.WriteLine("Cluster Count: " + mFileSystem.ClusterCount);
-                    Console.WriteLine("Data Sector: " + mFileSystem.DataSector);
-                    Console.WriteLine("Data Sector Count: " + mFileSystem.DataSectorCount);
-                    Console.WriteLine("FAT Sector Count: " + mFileSystem.FatSectorCount);
-                    Console.WriteLine("FAT Type: " + mFileSystem.FatType);
-                    Console.WriteLine("Number of FATS: " + mFileSystem.NumberOfFATs);
-                    Console.WriteLine("Reserved Sector Count: " + mFileSystem.ReservedSectorCount);
-                    Console.WriteLine("Root Cluster: " + mFileSystem.RootCluster);
-                    Console.WriteLine("Root Entry Count: " + mFileSystem.RootEntryCount);
-                    Console.WriteLine("Root Sector: " + mFileSystem.RootSector);
-                    Console.WriteLine("Root Sector Count: " + mFileSystem.RootSectorCount);
-                    Console.WriteLine("Sectors per Cluster: " + mFileSystem.SectorsPerCluster);
-                    Console.WriteLine("Total Sector Count: " + mFileSystem.TotalSectorCount);
+                    Console.WriteLine("Bytes per Cluster: " + xFatFS.BytesPerCluster);
+                    Console.WriteLine("Bytes per Sector: " + xFatFS.BytesPerSector);
+                    Console.WriteLine("Cluster Count: " + xFatFS.ClusterCount);
+                    Console.WriteLine("Data Sector: " + xFatFS.DataSector);
+                    Console.WriteLine("Data Sector Count: " + xFatFS.DataSectorCount);
+                    Console.WriteLine("FAT Sector Count: " + xFatFS.FatSectorCount);
+                    Console.WriteLine("FAT Type: " + xFatFS.FatType);
+                    Console.WriteLine("Number of FATS: " + xFatFS.NumberOfFATs);
+                    Console.WriteLine("Reserved Sector Count: " + xFatFS.ReservedSectorCount);
+                    Console.WriteLine("Root Cluster: " + xFatFS.RootCluster);
+                    Console.WriteLine("Root Entry Count: " + xFatFS.RootEntryCount);
+                    Console.WriteLine("Root Sector: " + xFatFS.RootSector);
+                    Console.WriteLine("Root Sector Count: " + xFatFS.RootSectorCount);
+                    Console.WriteLine("Sectors per Cluster: " + xFatFS.SectorsPerCluster);
+                    Console.WriteLine("Total Sector Count: " + xFatFS.TotalSectorCount);
 
-                    Console.WriteLine();
-                    Console.WriteLine("Mapping Drive C...");
-                    FatFileSystem.AddMapping("C", mFileSystem);
-                    SentinelKernel.System.Filesystem.FAT.Listing.FatDirectory dir = new Sys.Filesystem.FAT.Listing.FatDirectory(mFileSystem, "Sentinel");
+                    //Console.WriteLine();
+                    //Console.WriteLine("Mapping Drive C...");
+                    //FatFileSystem.AddMapping("C", mFileSystem);
+                    //SentinelKernel.System.Filesystem.FAT.Listing.FatDirectory dir = new Sys.Filesystem.FAT.Listing.FatDirectory(mFileSystem, "Sentinel");
                 }
                 else
                 {
                     Console.WriteLine("No filesystem found.");
                 }
             }
-            
+
+            /*
             Console.WriteLine("Mapping...");
             TheFatFileSystem.AddMapping("C", xFS);
 
@@ -206,6 +178,7 @@ namespace SentinelKernel
 
 
             Console.WriteLine("Complete...");
+            */
         }
 
         protected FileSystem GetFileSystemFromPath(string aPath)
@@ -222,11 +195,22 @@ namespace SentinelKernel
             return null;
         }
 
-        public override SentinelKernel.System.FileSystem.Listing.Directory GetDirectory(string aPath)
+        public override void Initialize()
+        {
+            mPartitions = new List<Partition>();
+            mFileSystems = new List<KVP<string, FileSystem>>();
+
+            InitializePartitions();
+            if (mPartitions.Count > 0)
+            {
+                InitializeFileSystems();
+            }
+        }
+
+        public override System.FileSystem.Listing.Directory GetDirectory(string aPath)
         {
             string[] xPathParts = VFSManager.SplitPath(aPath);
             var xFS = GetFileSystemFromPath(aPath);
-            int a = (int)Path.DirectorySeparatorChar;
 
             if (xFS != null)
             {
@@ -238,11 +222,11 @@ namespace SentinelKernel
                 for (int i = 0; i < xPathParts.Length; i++)
                 {
                     var xListing = GetDirectoryListing(xPathParts[i]);
-                    for (int j = 0; j < xListing.Length; j++)
+                    for (int j = 0; j < xListing.Count; j++)
                     {
                         if (xListing[j].Name == aPath)
                         {
-                            return (SentinelKernel.System.FileSystem.Listing.Directory)xListing[j];
+                            return (System.FileSystem.Listing.Directory)xListing[j];
                         }
                     }
                 }
@@ -250,36 +234,27 @@ namespace SentinelKernel
             return null;
         }
 
-        public override SentinelKernel.System.FileSystem.Listing.Base[] GetDirectoryListing(SentinelKernel.System.FileSystem.Listing.Directory aEntry)
+        public override List<System.FileSystem.Listing.Base> GetDirectoryListing(string aPath)
         {
-            if (!(aEntry is SentinelKernel.System.FileSystem.Listing.Directory))
-            {
-                throw new ArgumentException("Only Directories are allowed");
-            }
-
-            var xFS = ((SentinelKernel.System.FileSystem.Listing.Directory)aEntry).mFileSystem;
-            return xFS.GetDirectoryListing(aEntry.Name);
+            throw new NotImplementedException();
         }
 
-        public override SentinelKernel.System.FileSystem.Listing.Base[] GetDirectoryListing(string aPath)
+        public override List<System.FileSystem.Listing.Base> GetDirectoryListing(System.FileSystem.Listing.Directory aEntry)
         {
-            if (string.IsNullOrEmpty(aPath))
-            {
-                throw new ArgumentNullException("aPath is null in GetDirectoryListing");
-            }
-
-            if (aPath.Length == 1)
-            {
-                return GetVolumes();
-            }
-            else
-            {
-                var xParentItem = GetDirectory(aPath);
-
-                var xResult = xParentItem.mFileSystem.GetDirectoryListing(xParentItem.Name);
-                return xResult;
-            }
+            throw new NotImplementedException();
         }
+
+        public override System.FileSystem.Listing.Directory GetVolume(string aVolume)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override List<System.FileSystem.Listing.Directory> GetVolumes()
+        {
+            throw new NotImplementedException();
+        }
+
+        /*
 
         public override SentinelKernel.System.FileSystem.Listing.Directory GetVolume(string aVolume)
         {
