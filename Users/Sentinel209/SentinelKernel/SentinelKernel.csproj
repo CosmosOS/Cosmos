@@ -37,57 +37,23 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileSystem\FAT\FatFileSystem.cs" />
-    <Compile Include="FileSystem\FAT\FatStream.cs" />
-    <Compile Include="FileSystem\FAT\Listing\FatDirectory.cs" />
-    <Compile Include="FileSystem\FAT\Listing\FatFile.cs" />
-    <Compile Include="FileSystem\FileSystem.cs" />
-    <Compile Include="FileSystem\Listing\Base.cs" />
-    <Compile Include="FileSystem\Listing\Directory.cs" />
-    <Compile Include="FileSystem\Listing\File.cs" />
-    <Compile Include="FileSystem\VFS\VFSBase.cs" />
-    <Compile Include="FileSystem\VFS\VFSManager.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="SentinelVFS.cs" />
-    <Compile Include="System\IO\DirectoryImpl.cs" />
-    <Compile Include="System\IO\DirectoryInfoImpl.cs" />
-    <Compile Include="System\IO\DriveInfoImpl.cs" />
-    <Compile Include="System\IO\FileImpl.cs" />
-    <Compile Include="System\IO\FileInfoImpl.cs" />
-    <Compile Include="System\IO\FileStreamImpl.cs" />
-    <Compile Include="System\IO\FileSystemInfoImpl.cs" />
-    <Compile Include="System\IO\PathImpl.cs" />
-    <Compile Include="System\IO\StreamReaderImpl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Common\Cosmos.Common.csproj">
       <Project>{1fac100c-d732-4ea4-b518-5af4baf64f2e}</Project>
       <Name>Cosmos.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.Core\Cosmos.Core.csproj">
-      <Project>{5ac4773c-cb4e-4cd9-8d50-02e10a07dee6}</Project>
-      <Name>Cosmos.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
-      <Project>{61607f1e-58f9-41cf-972f-128384f3e115}</Project>
-      <Name>Cosmos.Debug.Kernel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
-      <Project>{c801f19c-a9d3-42d5-9a57-9ffdf9b4d05e}</Project>
-      <Name>Cosmos.IL2CPU.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
-      <Project>{239e33a7-f0c3-4801-85ca-4d8f89a31dc0}</Project>
-      <Name>Cosmos.IL2CPU</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\source\Cosmos.System\Cosmos.System.csproj">
       <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
       <Name>Cosmos.System</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SentinelSystemLib\SentinelSystemLib.csproj">
+      <Project>{93D6FF56-6E23-4E80-98F6-730AC533F631}</Project>
+      <Name>SentinelSystemLib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

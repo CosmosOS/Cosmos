@@ -5,12 +5,14 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Cosmos.IL2CPU")]
+using Cosmos.Common;
+
+[assembly: AssemblyTitle("SentinelSYstemLib")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Cosmos")]
-[assembly: AssemblyProduct("Cosmos.IL2CPU")]
-[assembly: AssemblyCopyright("Copyright © 2010")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("SentinelSYstemLib")]
+[assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +22,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("d2ad12be-b20b-4e0a-86a2-a8107ec911b7")]
+[assembly: Guid("1557482d-fc65-4096-91eb-78f30d5d1f6f")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -34,3 +36,5 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+
+[assembly: Ring(Ring.System)]

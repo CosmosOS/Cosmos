@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
@@ -50,7 +50,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Plugs", "Cosm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.GDB", "Cosmos.Debug.GDB\Cosmos.Debug.GDB.csproj", "{3370FC04-B669-46A4-A4AA-A89540318F8D}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs", "{67E7DEF0-1CEE-4ED6-A22D-97E5EA61157A}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "..\Docs\", "{67E7DEF0-1CEE-4ED6-A22D-97E5EA61157A}"
 	ProjectSection(WebsiteProperties) = preProject
 		SccProjectName = "SAK"
 		SccAuxPath = "SAK"
@@ -165,6 +165,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentinelKernel", "..\Users\Sentinel209\SentinelKernel\SentinelKernel.csproj", "{3B0F484C-0A26-4CC2-B44D-DDDA3A3E9381}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "SentinelKernelBoot", "..\Users\Sentinel209\SentinelKernel\SentinelKernelBoot.Cosmos", "{40C3F1E6-2880-4AF4-91FD-DFD41484719D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentinelSystemLib", "..\Users\Sentinel209\SentinelSystemLib\SentinelSystemLib.csproj", "{93D6FF56-6E23-4E80-98F6-730AC533F631}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -739,6 +741,18 @@ Global
 		{40C3F1E6-2880-4AF4-91FD-DFD41484719D}.Release|Mixed Platforms.Build.0 = Debug|x86
 		{40C3F1E6-2880-4AF4-91FD-DFD41484719D}.Release|x86.ActiveCfg = Debug|x86
 		{40C3F1E6-2880-4AF4-91FD-DFD41484719D}.Release|x86.Build.0 = Debug|x86
+		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -796,5 +810,6 @@ Global
 		{45E223F1-F219-4D48-96EC-85E0E0065BE7} = {8CE8178D-F3CB-44B9-8D5D-8763139DBA30}
 		{3B0F484C-0A26-4CC2-B44D-DDDA3A3E9381} = {45E223F1-F219-4D48-96EC-85E0E0065BE7}
 		{40C3F1E6-2880-4AF4-91FD-DFD41484719D} = {45E223F1-F219-4D48-96EC-85E0E0065BE7}
+		{93D6FF56-6E23-4E80-98F6-730AC533F631} = {45E223F1-F219-4D48-96EC-85E0E0065BE7}
 	EndGlobalSection
 EndGlobal

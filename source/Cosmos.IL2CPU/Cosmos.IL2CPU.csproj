@@ -90,6 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppAssembler.cs" />
+    <Compile Include="AppAssemblerRingsCheck.cs" />
     <Compile Include="CustomImplementation\AssemblerImpl.cs" />
     <Compile Include="CustomImplementation\Microsoft\Win32\RegistryKeyImpl.cs" />
     <Compile Include="CustomImplementation\System\ArrayImpl.cs" />

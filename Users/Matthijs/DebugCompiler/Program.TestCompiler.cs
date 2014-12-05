@@ -48,7 +48,7 @@ namespace DebugCompiler
                 xTask.OnLogWarning = (m) => Console.WriteLine("Warning: {0}", m);
                 xTask.OnLogMessage = (m) =>
                                      {
-                                         //Console.WriteLine("Message: {0}", m);
+                                         Console.WriteLine("Message: {0}", m);
                                      };
                 xTask.OnLogException = (m) => Console.WriteLine("Exception: {0}", m.ToString());
 
@@ -104,6 +104,7 @@ namespace DebugCompiler
                 new TaskItemImpl(CosmosRoot + @"\source\Cosmos.Debug.Kernel.Plugs\bin\x86\Debug\Cosmos.Debug.Kernel.Plugs.dll"),
                 new TaskItemImpl(CosmosRoot + @"\source\Cosmos.HAL\bin\x86\Debug\Cosmos.HAL.dll"),
                 new TaskItemImpl(CosmosRoot + @"\source\Cosmos.System.Plugs\bin\x86\Debug\Cosmos.System.Plugs.dll"),
+                new TaskItemImpl(CosmosRoot + @"\Users\Sentinel209\SentinelSystemLib\bin\Debug\SentinelSystemLib.dll"),
             };
         }
 
