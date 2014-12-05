@@ -52,8 +52,8 @@ Articles and Resources
 Publicity
 ---------
 
-[Mary Jo Foley - Cosmos: An open-source .Net-based microkernel OS is born](http://www.zdnet.com/blog/microsoft/cosmos-an-open-source-net-based-microkernel-os-is-born/1162)
-[Scott Hanselman - Tiny Managed Operating System Edition](http://www.hanselman.com/blog/TheWeeklySourceCode15TinyManagedOperatingSystemEdition.aspx)
+* [Mary Jo Foley - Cosmos: An open-source .Net-based microkernel OS is born](http://www.zdnet.com/blog/microsoft/cosmos-an-open-source-net-based-microkernel-os-is-born/1162)
+* [Scott Hanselman - Tiny Managed Operating System Edition](http://www.hanselman.com/blog/TheWeeklySourceCode15TinyManagedOperatingSystemEdition.aspx)
 
 
 Videos
