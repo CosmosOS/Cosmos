@@ -77,9 +77,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BinaryHelper.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="Extensions\ByteConverter.cs" />
     <Compile Include="Extensions\ToHexString.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RingAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
