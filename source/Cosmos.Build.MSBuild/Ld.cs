@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Microsoft.Build.Framework;
@@ -32,10 +33,19 @@ namespace Cosmos.Build.MSBuild
 
         public override bool Execute()
         {
-            return base.ExecuteTool(WorkingDir, 
-                Path.Combine(CosmosBuildDir, @"tools\cygwin\ld.exe"),
-                Arguments.Replace('\\', '/'),
-                "ld");
+            var xSW = Stopwatch.StartNew();
+            try
+            {
+                return base.ExecuteTool(WorkingDir,
+                   Path.Combine(CosmosBuildDir, @"tools\cygwin\ld.exe"),
+                   Arguments.Replace('\\', '/'),
+                   "ld");
+            }
+            finally
+            {
+                xSW.Stop();
+                Log.LogMessage(MessageImportance.High, "Ld task took {0}", xSW.Elapsed);
+            }
         }
     }
 }
