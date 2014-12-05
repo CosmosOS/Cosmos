@@ -6,18 +6,6 @@ EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Kudzu.Breakpoints", "Users\Kudzu\Breakpoints\Kudzu.Breakpoints.Cosmos", "{E5647BFD-1507-4F02-A7D5-E0F9D6AECE3A}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Users\\Kudzu\\Breakpoints\\Kudzu.BreakpointsKernel.csproj
-		SccProjectName1 = Users/Kudzu/Breakpoints
-		SccLocalPath1 = Users\\Kudzu\\Breakpoints
-		SccProjectUniqueName2 = Users\\Kudzu\\Breakpoints\\Kudzu.Breakpoints.Cosmos
-		SccProjectName2 = Users/Kudzu/Breakpoints
-		SccLocalPath2 = Users\\Kudzu\\Breakpoints
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
