@@ -911,6 +911,8 @@ namespace Cosmos.IL2CPU
                         {
                             try
                             {
+                                if (!xIntf.IsGenericType)
+                                {
                                 var xMap = xType.GetInterfaceMap(xIntf);
                                 for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
                                 {
@@ -920,6 +922,7 @@ namespace Cosmos.IL2CPU
                                         break;
                                     }
                                 }
+                            }
                             }
                             catch
                             {
