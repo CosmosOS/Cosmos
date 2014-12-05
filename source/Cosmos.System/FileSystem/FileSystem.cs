@@ -1,25 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿//using Cosmos.HAL.BlockDevice;
+//using Cosmos.System.FileSystem.FAT;
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
 
-namespace Cosmos.System.FileSystem
-{
-    public class FileSystem
-    {
-        // Currently we map to the Windows scheme of single lettter: for drives. Cosmos will 
-        // NOT do this in the future, but it will be able to map paths to things that look like
-        // drive letters for compatibility with Windows code.
-        // For now we use Dictionary for simplicity, but in future this will change.
-        //static protected Dictionary<string, FileSystem> mMappings = new Dictionary<string, FileSystem>();
+//namespace Cosmos.System.FileSystem
+//{
+//    public enum FileSystemType
+//    {
+//        FAT,
+//        Unknown
+//    }
 
-        static protected FileSystem mFS;
+//    public class FileSystem
+//    {
+//        // Currently we map to the Windows scheme of single lettter: for drives. Cosmos will 
+//        // NOT do this in the future, but it will be able to map paths to things that look like
+//        // drive letters for compatibility with Windows code.
+//        // For now we use Dictionary for simplicity, but in future this will change.
+//        //static protected Dictionary<string, FileSystem> mMappings = new Dictionary<string, FileSystem>();
 
-        static public void AddMapping(string aPath, FileSystem aFileSystem)
-        {
-            //mMappings.Add(aPath.ToUpper(), aFileSystem);
-            // Dictionary<> doesnt work yet, so for now we just hack this and support only one FS
-            mFS = aFileSystem;
-        }
-    }
-}
+//        static protected FileSystem mFS;
+
+//        static public void AddMapping(string aPath, FileSystem aFileSystem)
+//        {
+//            //mMappings.Add(aPath.ToUpper(), aFileSystem);
+//            // Dictionary<> doesnt work yet, so for now we just hack this and support only one FS
+//            mFS = aFileSystem;
+//        }
+
+//        public static FileSystemType GetFileSystemType(Partition aDevice)
+//        {
+//            if (FatFileSystem.IsDeviceFAT(aDevice))
+//            {
+//                return FileSystemType.FAT;
+//            }
+
+//            return FileSystemType.Unknown;
+//        }
+//    }
+//}

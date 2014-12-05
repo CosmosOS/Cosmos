@@ -17,11 +17,11 @@ namespace DebugCompiler
     internal class Program
     {
         //public const string CosmosRoot = @"e:\Cosmos";
-        public const string CosmosRoot = @"e:\OpenSOurce\Cosmos";
+        public const string CosmosRoot = @"c:\Development\Cosmos";
         //public const string CosmosRoot = @"C:\Users\Huge\Documents\Visual Studio 2010\Projects\IL2CPU";
 
-        private const string KernelFile = CosmosRoot + @"\Users\Kudzu\Breakpoints\bin\Debug\Playground.Kudzu.BreakpointsKernel.dll";
-        private const string OutputFile = CosmosRoot + @"\Users\Kudzu\Breakpoints\bin\Debug\Kudzu.Breakpoints.asm";
+        private const string KernelFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernel.dll";
+        private const string OutputFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernelBoot.asm";
         //private const string KernelFile = CosmosRoot + @"\source2\Users\Matthijs\Playground\bin\Debug\Playground.dll";
         //private const string OutputFile = CosmosRoot + @"\source2\Users\Matthijs\Playground\bin\Debug\Playground.asm";
 
