@@ -94,13 +94,17 @@
     <Compile Include="System\IO\PathImpl.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
-      <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
-      <Name>Cosmos.IL2CPU.Plugs</Name>
+    <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
+      <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
+      <Name>Cosmos.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.HAL\Cosmos.HAL.csproj">
       <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
       <Name>Cosmos.HAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+      <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.System\Cosmos.System.csproj">
       <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>

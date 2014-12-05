@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Core.Network;
+using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
 
 namespace Cosmos.System.Network.IPv4

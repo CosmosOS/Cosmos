@@ -1,5 +1,5 @@
 ﻿using System;
-using Cosmos.Core.Network;
+using Cosmos.HAL.Network;
 
 namespace Cosmos.System.Network
 {

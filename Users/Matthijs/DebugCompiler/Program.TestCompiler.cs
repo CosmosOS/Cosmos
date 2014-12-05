@@ -16,8 +16,8 @@ namespace DebugCompiler
 {
     internal class Program
     {
-        //public const string CosmosRoot = @"e:\Cosmos";
-        public const string CosmosRoot = @"c:\Development\Cosmos";
+        public const string CosmosRoot = @"e:\OpenSource\Cosmos_Git";
+        //public const string CosmosRoot = @"c:\Development\Cosmos";
         //public const string CosmosRoot = @"C:\Users\Huge\Documents\Visual Studio 2010\Projects\IL2CPU";
 
         private const string KernelFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernel.dll";
@@ -27,7 +27,7 @@ namespace DebugCompiler
 
         private static void Main(string[] args)
         {
-            Console.SetOut(new StreamWriter("out", false));
+            //Console.SetOut(new StreamWriter("out", false));
 
             var xSW = Stopwatch.StartNew();
             try
@@ -46,12 +46,12 @@ namespace DebugCompiler
                 xTask.References = GetReferences();
                 xTask.OnLogError = (m) => Console.WriteLine("Error: {0}", m);
                 xTask.OnLogWarning = (m) => Console.WriteLine("Warning: {0}", m);
-                xTask.OnLogMessage = (m) => Console.WriteLine("Message: {0}", m);
-                xTask.OnLogException = (m) =>
-                {
-                    Console.WriteLine("Exception: {0}", m.ToString());
-                    //Console.ReadLine();
-                };
+                xTask.OnLogMessage = (m) =>
+                                     {
+                                         //Console.WriteLine("Message: {0}", m);
+                                     };
+                xTask.OnLogException = (m) => Console.WriteLine("Exception: {0}", m.ToString());
+
                 if (xTask.Execute())
                 {
                     Console.WriteLine("Executed OK");

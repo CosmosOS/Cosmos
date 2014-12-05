@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -75,10 +76,6 @@
     <ProjectReference Include="..\..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
       <Project>{61607f1e-58f9-41cf-972f-128384f3e115}</Project>
       <Name>Cosmos.Debug.Kernel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.HAL\Cosmos.HAL.csproj">
-      <Project>{6a991d03-1435-4005-9809-b8bacdf3b021}</Project>
-      <Name>Cosmos.HAL</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{c801f19c-a9d3-42d5-9a57-9ffdf9b4d05e}</Project>

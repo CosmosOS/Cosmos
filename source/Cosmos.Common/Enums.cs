@@ -8,9 +8,10 @@ namespace Cosmos.Common
 {
     public enum Ring
     {
-        User = 0,
-        System = 1,
-        HAL = 2,
-        Core = 3,
+        Core = 0,
+        HAL = 1,
+        System = 2,
+        User = 3,
+        
     }
 }

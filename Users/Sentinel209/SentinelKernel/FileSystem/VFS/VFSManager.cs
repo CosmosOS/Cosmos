@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Cosmos.HAL.BlockDevice;
 
 namespace SentinelKernel.System.FileSystem.VFS
 {

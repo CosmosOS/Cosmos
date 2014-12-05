@@ -81,7 +81,6 @@
     <Compile Include="IOGroup\COM.cs" />
     <Compile Include="IOGroup\PCSpeaker.cs" />
     <Compile Include="ManagedMemoryBlock.cs" />
-    <Compile Include="Network\MACAddress.cs" />
     <Compile Include="PCIBaseAddressBar.cs" />
     <Compile Include="PCIDeviceNormal.cs" />
     <Compile Include="PCIDeviceBridge.cs" />

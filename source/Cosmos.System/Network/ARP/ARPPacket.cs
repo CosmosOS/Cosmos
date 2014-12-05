@@ -1,6 +1,6 @@
 ﻿using System;
+using Cosmos.HAL.Network;
 using Sys = System;
-using Cosmos.Core.Network;
 using Cosmos.HAL;
 
 namespace Cosmos.System.Network.ARP

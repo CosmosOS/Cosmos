@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Cosmos.Common;
 using Cosmos.Core;
-using Cosmos.Core.Network;
+using Cosmos.HAL.Network;
 using CompilerPlugs = Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.HAL.Drivers.PCI.Network

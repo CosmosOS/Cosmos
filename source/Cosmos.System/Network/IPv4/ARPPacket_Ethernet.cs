@@ -1,5 +1,5 @@
 ﻿using System;
-using Cosmos.Core.Network;
+using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
 using Sys = System;
 

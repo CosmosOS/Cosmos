@@ -1,4 +1,4 @@
-﻿using Cosmos.HAL.BlockDevice;
+﻿//using Cosmos.HAL.BlockDevice;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,14 +29,14 @@ namespace SentinelKernel.System.FileSystem
             mFS = aFileSystem;
         }
 
-        public static FileSystemType GetFileSystemType(Partition aDevice)
-        {
-            if (FAT.FatFileSystem.IsDeviceFAT(aDevice))
-            {
-                return FileSystemType.FAT;
-            }
+        //public static FileSystemType GetFileSystemType(Partition aDevice)
+        //{
+        //    if (FAT.FatFileSystem.IsDeviceFAT(aDevice))
+        //    {
+        //        return FileSystemType.FAT;
+        //    }
 
-            return FileSystemType.Unknown;
-        }
+        //    return FileSystemType.Unknown;
+        //}
     }
 }

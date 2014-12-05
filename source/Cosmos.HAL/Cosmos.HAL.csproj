@@ -108,6 +108,7 @@
     <Compile Include="NetworkDevice.cs" />
     <Compile Include="Drivers\PCI\Network\RTL8139.cs" />
     <Compile Include="Drivers\PCI\Network\VT6102.cs" />
+    <Compile Include="Network\MACAddress.cs" />
     <Compile Include="PciDevice.cs" />
     <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

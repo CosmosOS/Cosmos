@@ -381,6 +381,14 @@
     <Content Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
+      <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
+      <Name>Cosmos.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{61607f1e-58f9-41cf-972f-128384f3e115}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\XSharp.Nasm\XSharp.Nasm.csproj">
       <Project>{841A734E-9606-4AAB-9C4A-74E7E303FF5D}</Project>
       <Name>XSharp.Nasm</Name>

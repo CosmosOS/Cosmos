@@ -1,6 +1,7 @@
 ﻿using System;
+using System.Linq;
 
-namespace Cosmos.Core.Network
+namespace Cosmos.HAL.Network
 {
     public class MACAddress : IComparable
     {

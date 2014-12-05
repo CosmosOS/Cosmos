@@ -11,6 +11,7 @@ using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86._486AndUp;
 using Cosmos.Build.Common;
+using Cosmos.Common;
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.Plugs;
 using Mono.Cecil;
@@ -913,16 +914,16 @@ namespace Cosmos.IL2CPU
                             {
                                 if (!xIntf.IsGenericType)
                                 {
-                                var xMap = xType.GetInterfaceMap(xIntf);
-                                for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
-                                {
-                                    if (xMap.InterfaceMethods[k] == xMethodIntf)
+                                    var xMap = xType.GetInterfaceMap(xIntf);
+                                    for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
                                     {
-                                        xActualMethod = xMap.TargetMethods[k];
-                                        break;
+                                        if (xMap.InterfaceMethods[k] == xMethodIntf)
+                                        {
+                                            xActualMethod = xMap.TargetMethods[k];
+                                            break;
+                                        }
                                     }
                                 }
-                            }
                             }
                             catch
                             {
@@ -1556,6 +1557,106 @@ namespace Cosmos.IL2CPU
             }
             // todo: cache MethodDefinition ?
             return xModule.LookupToken(xMethodBase.MetadataToken) as MethodDefinition;
+        }
+
+        private static bool IsAssemblySkippedDuringRingCheck(Assembly assembly)
+        {
+            if (assembly.GlobalAssemblyCache)
+            {
+                return true;
+            }
+
+            // Cosmos.Debug.Kernel.Debugger is a "all-rings" assembly
+            if (assembly.GetName().Name == typeof(Cosmos.Debug.Kernel.Debugger).Assembly.GetName().Name)
+            {
+                return true;
+            }
+
+            // Cosmos.Debug.Kernel.Debugger.Plugs is a "all-rings" assembly
+            if (assembly.GetName().Name == typeof(Cosmos.Debug.Kernel.Debugger).Assembly.GetName().Name + ".Plugs")
+            {
+                return true;
+            }
+
+            // Cosmos.Common is a all-rings assembly
+            if (assembly == typeof(RingAttribute).Assembly)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// This method validates rings. Assemblies are specific for a given ring and are able to be dependent on assemblies in
+        /// the same ring or one ring "up" (ie, User can reference System, etc), but not other way around.
+        /// </summary>
+        /// <param name="scanner"></param>
+        public void ValidateRings(ILScanner scanner)
+        {
+            RingsWriteLine("Start check");
+
+
+            foreach (var xAssembly in scanner.mUsedAssemblies)
+            {
+                if (IsAssemblySkippedDuringRingCheck(xAssembly))
+                {
+                    continue;
+                }
+
+                RingsWriteLine("Assembly '{0}'", xAssembly.GetName().Name);
+                var xRing = GetRingFromAssembly(xAssembly);
+                var xRingInt = (int)xRing;
+
+                RingsWriteLine("\t\tRing = {0}", xRing);
+                foreach (var xAsmDepRef in xAssembly.GetReferencedAssemblies())
+                {
+                    var xAsmDep = scanner.mUsedAssemblies.SingleOrDefault(i => i.GetName().Name == xAsmDepRef.Name);
+                    if (xAsmDep == null || IsAssemblySkippedDuringRingCheck(xAsmDep))
+                    {
+                        continue;
+                    }
+                    RingsWriteLine("\tDependency '{0}'", xAsmDepRef.Name);
+                    var xDepRing = GetRingFromAssembly(xAsmDep);
+                    RingsWriteLine("\t\tRing = {0}", xDepRing);
+
+                    var xDepRingInt = (int)xDepRing;
+
+                    if (xDepRingInt == xRingInt)
+                    {
+                        // assembly and its dependency are in the same ring.
+                        continue;
+                    }
+                    if (xDepRingInt > xRingInt)
+                    {
+                        throw new Exception(string.Format("Assembly '{0}' is in ring {1}({2}). It references assembly '{3}' which is in ring {4}({5}), but this is not allowed!", xAssembly.GetName().Name, xRing, xRingInt, xAsmDepRef.Name, xDepRing, xDepRingInt));
+                    }
+
+                    var xRingDiff = xRingInt - xDepRingInt;
+                    if (xRingDiff == 1)
+                    {
+                        // 1 level up is allowed
+                        continue;
+                    }
+                    throw new Exception(string.Format("Assembly '{0}' is in ring {1}({2}). It references assembly '{3}' which is in ring {4}({5}), but this is not allowed!", xAssembly.GetName().Name, xRing, xRingInt, xAsmDepRef.Name, xDepRing, xDepRingInt));
+                }
+            }
+        }
+
+        private static Ring GetRingFromAssembly(Assembly assembly)
+        {
+            var xRingAttrib = assembly.GetCustomAttributes<RingAttribute>().SingleOrDefault();
+            if (xRingAttrib == null)
+            {
+                return Ring.User;
+            }
+
+            return xRingAttrib.Ring;
+        } 
+
+        private static void RingsWriteLine(string line, params object[] args)
+        {
+            Console.WriteLine("Rings: " + String.Format(line.Replace("\t", "    "), args));
         }
     }
 }

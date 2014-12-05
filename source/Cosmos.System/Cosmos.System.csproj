@@ -113,10 +113,6 @@
       <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
       <Name>Cosmos.Debug.Kernel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj">
-      <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
-      <Name>Cosmos.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos.HAL\Cosmos.HAL.csproj">
       <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
       <Name>Cosmos.HAL</Name>
