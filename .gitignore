@@ -34,3 +34,7 @@
 Thumbs.db
 build.force
 
+Build/VSIP/
+Setup/Output/
+Build/VMWare/Workstation/Cosmos.vmsd
+Build/VMWare/Workstation/Cosmos.vmxf
