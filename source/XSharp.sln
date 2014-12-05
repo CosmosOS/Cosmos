@@ -12,24 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Nasm", "XSharp.Nasm\XSharp.Nasm.csproj", "{841A734E-9606-4AAB-9C4A-74E7E303FF5D}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
-		SccProjectUniqueName0 = XSharp.Compiler\\XSharp.Compiler.csproj
-		SccProjectName0 = XSharp.Compiler
-		SccLocalPath0 = XSharp.Compiler
-		SccProjectUniqueName1 = XSharp.Test\\XSharp.Test.csproj
-		SccProjectName1 = XSharp.Test
-		SccLocalPath1 = XSharp.Test
-		SccProjectUniqueName2 = XSharp.Nasm\\XSharp.Nasm.csproj
-		SccProjectName2 = XSharp.Nasm
-		SccLocalPath2 = XSharp.Nasm
-		SccProjectUniqueName3 = XSharp.VS\\XSharp.VS.csproj
-		SccProjectName3 = XSharp.VS
-		SccLocalPath3 = XSharp.VS
-		SccLocalPath4 = .
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
