@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using Mosa.Utility.IsoImage;
+using System.Diagnostics;
 
 namespace Cosmos.Build.Common {
   public class IsoMaker {
@@ -14,25 +14,23 @@ namespace Cosmos.Build.Common {
         File.Delete(aIsoPathname);
       }
       
-      // We copy and rename in the process to Cosmos.bin becaue the .cfg is currently
-      // hardcoded to Cosmos.bin.
-      string xOutputBin = Path.Combine(xPath, "Cosmos.bin");
-      File.Copy(xInputPathname, xOutputBin, true);
+      //// We copy and rename in the process to Cosmos.bin becaue the .cfg is currently
+      //// hardcoded to Cosmos.bin.
+      //string xOutputBin = Path.Combine(xPath, "Cosmos.bin");
+      //File.Copy(xInputPathname, xOutputBin, true);
 
       string xIsoLinux = Path.Combine(xPath, "isolinux.bin");
       File.SetAttributes(xIsoLinux, FileAttributes.Normal);
 
-      var xOptions = new Options() {
-        BootLoadSize = 4,
-        IsoFileName = aIsoPathname,
-        BootFileName = xIsoLinux,
-        BootInfoTable = true
-      };
-      // TODO - Use move or see if we can do this without copying first the Cosmos.bin as they will start to get larger
-      xOptions.IncludeFiles.Add(xPath);
-
-      var xISO = new Iso9660Generator(xOptions);
-      xISO.Generate();
+       var xPSI = new ProcessStartInfo(
+           Path.Combine(CosmosPaths.Tools, "mkisofs.exe"),
+           String.Format("-R -b \"{0}\" -no-emul-boot -boot-load-size 4 -boot-info-table -o \"{1}\" .",
+               xIsoLinux,
+               aIsoPathname)
+       );
+       xPSI.UseShellExecute = false;
+       xPSI.CreateNoWindow = true;
+       Process.Start(xPSI);
     }
   }
 }
