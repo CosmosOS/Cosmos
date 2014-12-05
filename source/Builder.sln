@@ -8,18 +8,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Installer", "Cosmos.Build.Installer\Cosmos.Build.Installer.csproj", "{27D94586-FE88-4203-BE6A-C99013FD5018}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs04
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Cosmos.Build.Builder\\Cosmos.Build.Builder.csproj
-		SccProjectName1 = Cosmos.Build.Builder
-		SccLocalPath1 = Cosmos.Build.Builder
-		SccProjectUniqueName2 = Cosmos.Build.Installer\\Cosmos.Build.Installer.csproj
-		SccProjectName2 = Cosmos.Build.Installer
-		SccLocalPath2 = Cosmos.Build.Installer
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
