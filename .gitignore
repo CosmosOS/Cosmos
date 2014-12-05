@@ -1,0 +1,36 @@
+# User-specific files
+
+*.suo 
+*.user 
+*.userosscache 
+*.sln.docstates 
+
+# Build results
+
+[Oo]bj/
+[Bb]in
+[Dd]ebug*/
+[Rr]elease*/
+
+*.[Oo]bj
+*.suo
+*.ncb
+*.aps
+*.user
+*.ccscc
+*.cache
+*.bak
+*.swp
+*.pidb
+*.userprefs
+*.FileListAbsolute.txt
+*.[Cc]ache
+*.tlog
+*.vs10x
+*.exe.manifest
+*.mdb
+*.docstates
+*.vsp
+Thumbs.db
+build.force
+
