@@ -159,7 +159,6 @@ Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ig
 ;
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Resources\Dependencies\Dapper\*.*"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\System.Data.SQLite.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 ;
