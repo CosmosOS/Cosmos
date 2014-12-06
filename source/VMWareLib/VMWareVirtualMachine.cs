@@ -1,10 +1,9 @@
+using Interop.VixCOM;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using Interop.VixCOM;
-using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
 using System.Drawing;
+using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace Vestris.VMWareLib
 {
@@ -17,9 +16,10 @@ namespace Vestris.VMWareLib
         /// A full, independent clone of the virtual machine.
         /// </summary>
         Full = Constants.VIX_CLONETYPE_FULL,
+
         /// <summary>
-        /// A linked clone is a copy of a virtual machine that shares virtual disks with the parent virtual 
-        /// machine in an ongoing manner. 
+        /// A linked clone is a copy of a virtual machine that shares virtual disks with the parent virtual
+        /// machine in an ongoing manner.
         /// </summary>
         Linked = Constants.VIX_CLONETYPE_LINKED
     }
@@ -175,26 +175,32 @@ namespace Vestris.VMWareLib
             /// Process ID.
             /// </summary>
             public long Id;
+
             /// <summary>
             /// Process name.
             /// </summary>
             public string Name;
+
             /// <summary>
             /// Process owner.
             /// </summary>
             public string Owner;
+
             /// <summary>
             /// Process start date/time.
             /// </summary>
             public DateTime StartDateTime;
+
             /// <summary>
             /// Process command line.
             /// </summary>
             public string Command;
+
             /// <summary>
             /// True if process is being debugged.
             /// </summary>
             public bool IsBeingDebugged = false;
+
             /// <summary>
             /// Process exit code for finished processes.
             /// </summary>
@@ -238,7 +244,7 @@ namespace Vestris.VMWareLib
                 catch (Exception ex)
                 {
                     throw new Exception(
-                        string.Format("Failed to kill process in guest: processId={0}", 
+                        string.Format("Failed to kill process in guest: processId={0}",
                         Id), ex);
                 }
             }
@@ -263,7 +269,6 @@ namespace Vestris.VMWareLib
             _sharedFolders = new VMWareSharedFolderCollection(_handle);
             _snapshots = new VMWareRootSnapshotCollection(_handle);
         }
-
 
         /// <summary>
         /// The path to the virtual machine configuration file.
@@ -321,7 +326,7 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// The memory size of the virtual machine. 
+        /// The memory size of the virtual machine.
         /// </summary>
         public int MemorySize
         {
@@ -385,8 +390,8 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// This function returns when VMware Tools has successfully started in the guest operating system. 
-        /// VMware Tools is a collection of services that run in the guest. 
+        /// This function returns when VMware Tools has successfully started in the guest operating system.
+        /// VMware Tools is a collection of services that run in the guest.
         /// </summary>
         public void WaitForToolsInGuest()
         {
@@ -394,8 +399,8 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// This function returns when VMware Tools has successfully started in the guest operating system. 
-        /// VMware Tools is a collection of services that run in the guest. 
+        /// This function returns when VMware Tools has successfully started in the guest operating system.
+        /// VMware Tools is a collection of services that run in the guest.
         /// </summary>
         /// <param name="timeoutInSeconds">Timeout in seconds.</param>
         public void WaitForToolsInGuest(int timeoutInSeconds)
@@ -413,7 +418,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to wait for tools in guest: timeoutInSeconds={0}", 
+                    string.Format("Failed to wait for tools in guest: timeoutInSeconds={0}",
                     timeoutInSeconds), ex);
             }
         }
@@ -431,7 +436,7 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// This function establishes a guest operating system authentication context. 
+        /// This function establishes a guest operating system authentication context.
         /// </summary>
         /// <param name="username">The name of a user account on the guest operating system.</param>
         /// <param name="password">The password of the account identified by userName.</param>
@@ -457,15 +462,15 @@ namespace Vestris.VMWareLib
         /// <param name="username">The name of a user account on the guest operating system.</param>
         /// <param name="password">The password of the account identified by userName.</param>
         /// <param name="options">
-        ///  Must be 0 or VixCOM.Constants.VIX_LOGIN_IN_GUEST_REQUIRE_INTERACTIVE_ENVIRONMENT, which forces interactive 
-        ///  guest login within a graphical session that is visible to the user. On Linux, interactive environment 
-        ///  requires that the X11 window system be running to start the vmware-user process. Without X11, pass 0 as 
+        ///  Must be 0 or VixCOM.Constants.VIX_LOGIN_IN_GUEST_REQUIRE_INTERACTIVE_ENVIRONMENT, which forces interactive
+        ///  guest login within a graphical session that is visible to the user. On Linux, interactive environment
+        ///  requires that the X11 window system be running to start the vmware-user process. Without X11, pass 0 as
         ///  options to start the vmware-guestd process instead.
         /// </param>
         /// <param name="timeoutInSeconds">Timeout in seconds.</param>
         /// <remarks>
-        /// Logins are supported on Linux and Windows. To log in as a Windows Domain user, specify the "userName" parameter in 
-        /// the form "domain\username". Other guest operating systems are not supported for login, including Solaris, FreeBSD, 
+        /// Logins are supported on Linux and Windows. To log in as a Windows Domain user, specify the "userName" parameter in
+        /// the form "domain\username". Other guest operating systems are not supported for login, including Solaris, FreeBSD,
         /// and Netware.
         /// </remarks>
         public void LoginInGuest(string username, string password, int options, int timeoutInSeconds)
@@ -483,7 +488,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to login in guest: username=\"{0}\" options={1} timeoutInSeconds={2}", 
+                    string.Format("Failed to login in guest: username=\"{0}\" options={1} timeoutInSeconds={2}",
                     username, options, timeoutInSeconds), ex);
             }
         }
@@ -588,7 +593,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to copy file from host to guest: hostPathName=\"{0}\" guestPathName=\"{1}\" timeoutInSeconds={2}", 
+                    string.Format("Failed to copy file from host to guest: hostPathName=\"{0}\" guestPathName=\"{1}\" timeoutInSeconds={2}",
                     hostPathName, guestPathName, timeoutInSeconds), ex);
             }
         }
@@ -674,7 +679,7 @@ namespace Vestris.VMWareLib
         /// <summary>
         /// Copies a file or directory from the guest operating system to the local system (where the Vix client is running).
         /// You must call LoginInGuest() before calling this procedure.
-        /// Only absolute paths should be used for files in the guest; the resolution of relative paths is not specified. 
+        /// Only absolute paths should be used for files in the guest; the resolution of relative paths is not specified.
         /// </summary>
         /// <param name="guestPathName">File location on the guest operating system.</param>
         /// <param name="hostPathName">File location on the host operating system.</param>
@@ -790,8 +795,8 @@ namespace Vestris.VMWareLib
                 VMWareJobCallback callback = new VMWareJobCallback();
                 using (VMWareJob job = new VMWareJob(_handle.GetFileInfoInGuest(guestPathName, callback), callback))
                 {
-                    object[] properties = 
-                    { 
+                    object[] properties =
+                    {
                         Constants.VIX_PROPERTY_JOB_RESULT_FILE_SIZE,
                         Constants.VIX_PROPERTY_JOB_RESULT_FILE_FLAGS,
                         Constants.VIX_PROPERTY_JOB_RESULT_FILE_MOD_TIME
@@ -815,7 +820,7 @@ namespace Vestris.VMWareLib
 
         /// <summary>
         /// Runs a program in the guest operating system.
-        /// </summary>       
+        /// </summary>
         /// <param name="guestProgramName">Program to execute.</param>
         /// <returns>Process information.</returns>
         public Process RunProgramInGuest(string guestProgramName)
@@ -881,7 +886,7 @@ namespace Vestris.VMWareLib
         /// <returns>Process information.</returns>
         public Process RunProgramInGuest(string guestProgramName, string commandLineArgs, int timeoutInSeconds)
         {
-            return RunProgramInGuest(guestProgramName, commandLineArgs, 0, 
+            return RunProgramInGuest(guestProgramName, commandLineArgs, 0,
                 timeoutInSeconds);
         }
 
@@ -902,9 +907,9 @@ namespace Vestris.VMWareLib
                     guestProgramName, commandLineArgs, options, null, callback),
                     callback))
                 {
-                    object[] properties = 
-                    { 
-                        Constants.VIX_PROPERTY_JOB_RESULT_GUEST_PROGRAM_EXIT_CODE, 
+                    object[] properties =
+                    {
+                        Constants.VIX_PROPERTY_JOB_RESULT_GUEST_PROGRAM_EXIT_CODE,
                         Constants.VIX_PROPERTY_JOB_RESULT_PROCESS_ID,
                         // Constants.VIX_PROPERTY_JOB_RESULT_GUEST_PROGRAM_ELAPSED_TIME
                     };
@@ -925,7 +930,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to run program in guest: guestProgramName=\"{0}\" commandLineArgs=\"{1}\"", 
+                    string.Format("Failed to run program in guest: guestProgramName=\"{0}\" commandLineArgs=\"{1}\"",
                     guestProgramName, commandLineArgs), ex);
             }
         }
@@ -950,7 +955,7 @@ namespace Vestris.VMWareLib
         /// <returns>Process information.</returns>
         public Process DetachScriptInGuest(string interpreter, string scriptText)
         {
-            return DetachScriptInGuest(interpreter, scriptText, 
+            return DetachScriptInGuest(interpreter, scriptText,
                 VMWareInterop.Timeouts.RunScriptTimeout);
         }
 
@@ -985,9 +990,9 @@ namespace Vestris.VMWareLib
                     interpreter, scriptText, options, null, callback),
                     callback))
                 {
-                    object[] properties = 
-                { 
-                    Constants.VIX_PROPERTY_JOB_RESULT_GUEST_PROGRAM_EXIT_CODE, 
+                    object[] properties =
+                {
+                    Constants.VIX_PROPERTY_JOB_RESULT_GUEST_PROGRAM_EXIT_CODE,
                     Constants.VIX_PROPERTY_JOB_RESULT_PROCESS_ID,
                     // Constants.VIX_PROPERTY_JOB_RESULT_GUEST_PROGRAM_ELAPSED_TIME
                 };
@@ -1145,8 +1150,8 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// Power off a virtual machine. The virtual machine will be powered off at the hardware level. 
-        /// Any state of the guest that has not been committed to disk will be lost. 
+        /// Power off a virtual machine. The virtual machine will be powered off at the hardware level.
+        /// Any state of the guest that has not been committed to disk will be lost.
         /// </summary>
         public void PowerOff()
         {
@@ -1154,8 +1159,8 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// Power off a virtual machine. The virtual machine will be powered off at the hardware level. 
-        /// Any state of the guest that has not been committed to disk will be lost. 
+        /// Power off a virtual machine. The virtual machine will be powered off at the hardware level.
+        /// Any state of the guest that has not been committed to disk will be lost.
         /// </summary>
         public void ShutdownGuest()
         {
@@ -1163,8 +1168,8 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// Power off a virtual machine. The virtual machine will be powered off at the hardware level. 
-        /// Any state of the guest that has not been committed to disk will be lost. 
+        /// Power off a virtual machine. The virtual machine will be powered off at the hardware level.
+        /// Any state of the guest that has not been committed to disk will be lost.
         /// </summary>
         /// <param name="timeoutInSeconds">Timeout in seconds.</param>
         public void ShutdownGuest(int timeoutInSeconds)
@@ -1174,13 +1179,13 @@ namespace Vestris.VMWareLib
 
         /// <summary>
         /// Power off or shutdown a virtual machine.
-        /// If you call this function while the virtual machine is powered off or suspended, the operation will throw an 
+        /// If you call this function while the virtual machine is powered off or suspended, the operation will throw an
         /// exception with a VIX_E_VM_NOT_RUNNING error.
         /// </summary>
-        /// <param name="powerOffOptions">Power-off options. Passing the VIX_VMPOWEROP_FROM_GUEST flag will cause the function 
-        /// to try to power off the guest OS. This will ensure a clean shutdown of the guest. This option requires that the 
-        /// VMware Tools be installed and running in the guest. If VIX_VMPOWEROP_NORMAL is passed as the "powerOffOptions" parameter, 
-        /// then the virtual machine will be powered off at the hardware level. Any state of the guest that has not been committed 
+        /// <param name="powerOffOptions">Power-off options. Passing the VIX_VMPOWEROP_FROM_GUEST flag will cause the function
+        /// to try to power off the guest OS. This will ensure a clean shutdown of the guest. This option requires that the
+        /// VMware Tools be installed and running in the guest. If VIX_VMPOWEROP_NORMAL is passed as the "powerOffOptions" parameter,
+        /// then the virtual machine will be powered off at the hardware level. Any state of the guest that has not been committed
         /// to disk will be lost.
         /// </param>
         /// <param name="timeoutInSeconds">Timeout in seconds.</param>
@@ -1288,8 +1293,8 @@ namespace Vestris.VMWareLib
 
         /// <summary>
         /// Pause a virtual machine.
-        /// This stops execution of the virtual machine. 
-        /// Call Unpause to continue execution of the virtual machine. 
+        /// This stops execution of the virtual machine.
+        /// Call Unpause to continue execution of the virtual machine.
         /// </summary>
         /// <param name="timeoutInSeconds">Timeout in seconds.</param>
         public void Pause(int timeoutInSeconds)
@@ -1311,7 +1316,7 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// Continue execution of a virtual machine that was stopped using Pause. 
+        /// Continue execution of a virtual machine that was stopped using Pause.
         /// </summary>
         public void Unpause()
         {
@@ -1319,7 +1324,7 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// Continue execution of a virtual machine that was stopped using Pause. 
+        /// Continue execution of a virtual machine that was stopped using Pause.
         /// </summary>
         /// <param name="timeoutInSeconds">Timeout in seconds.</param>
         public void Unpause(int timeoutInSeconds)
@@ -1363,7 +1368,7 @@ namespace Vestris.VMWareLib
         /// <returns>A list of files and directories with full paths.</returns>
         public List<string> ListDirectoryInGuest(string pathName, bool recurse, int timeoutInSeconds)
         {
-            // ListDirectoryInGuest behaves differently on VMWare Workstation (returns empty list) and 
+            // ListDirectoryInGuest behaves differently on VMWare Workstation (returns empty list) and
             // ESX (throws an exception) for directories or files that don't exist.
             if (!DirectoryExistsInGuest(pathName))
                 throw new VMWareException(2);
@@ -1375,10 +1380,9 @@ namespace Vestris.VMWareLib
                 using (VMWareJob job = new VMWareJob(_handle.ListDirectoryInGuest(
                     pathName, 0, callback), callback))
                 {
-
-                    object[] properties = 
-                { 
-                    Constants.VIX_PROPERTY_JOB_RESULT_ITEM_NAME, 
+                    object[] properties =
+                {
+                    Constants.VIX_PROPERTY_JOB_RESULT_ITEM_NAME,
                     Constants.VIX_PROPERTY_JOB_RESULT_FILE_FLAGS
                 };
 
@@ -1412,6 +1416,7 @@ namespace Vestris.VMWareLib
                             case Constants.VIX_E_UNRECOGNIZED_PROPERTY:
                                 // unrecognized property returned by GetNumProperties, the directory exists, but contains no files
                                 break;
+
                             default:
                                 throw;
                         }
@@ -1428,9 +1433,9 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// An environment variable in the guest of the VM. On a Windows NT series guest, writing these 
-        /// values is saved persistently so they are immediately visible to every process. On a Linux or Windows 9X guest, 
-        /// writing these values is not persistent so they are only visible to the VMware tools process. 
+        /// An environment variable in the guest of the VM. On a Windows NT series guest, writing these
+        /// values is saved persistently so they are immediately visible to every process. On a Linux or Windows 9X guest,
+        /// writing these values is not persistent so they are only visible to the VMware tools process.
         /// </summary>
         public VariableIndexer GuestEnvironmentVariables
         {
@@ -1441,9 +1446,9 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// A "Guest Variable". This is a runtime-only value; it is never stored persistently. 
-        /// This is the same guest variable that is exposed through the VMControl APIs, and is a simple 
-        /// way to pass runtime values in and out of the guest. 
+        /// A "Guest Variable". This is a runtime-only value; it is never stored persistently.
+        /// This is the same guest variable that is exposed through the VMControl APIs, and is a simple
+        /// way to pass runtime values in and out of the guest.
         /// VMWare doesn't publish a list of known variables, the following guest variables have been observed.
         /// <list type="bullet">
         /// <item>ip: IP address of the guest operating system.</item>
@@ -1458,9 +1463,9 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// The configuration state of the virtual machine. This is the .vmx file that is stored on the host. 
-        /// You can read this and it will return the persistent data. If you write to this, it will only be a 
-        /// runtime change, so changes will be lost when the VM powers off. 
+        /// The configuration state of the virtual machine. This is the .vmx file that is stored on the host.
+        /// You can read this and it will return the persistent data. If you write to this, it will only be a
+        /// runtime change, so changes will be lost when the VM powers off.
         /// </summary>
         public VariableIndexer RuntimeConfigVariables
         {
@@ -1520,8 +1525,8 @@ namespace Vestris.VMWareLib
                     using (VMWareJob job = new VMWareJob(_handle.ListProcessesInGuest(
                         0, callback), callback))
                     {
-                        object[] properties = 
-                    { 
+                        object[] properties =
+                    {
                         Constants.VIX_PROPERTY_JOB_RESULT_PROCESS_ID,
                         Constants.VIX_PROPERTY_JOB_RESULT_ITEM_NAME,
                         Constants.VIX_PROPERTY_JOB_RESULT_PROCESS_OWNER,
@@ -1619,7 +1624,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to begin recording: name=\"{0}\" description=\"{1}\" timeoutInSeconds={2}", 
+                    string.Format("Failed to begin recording: name=\"{0}\" description=\"{1}\" timeoutInSeconds={2}",
                     name, description, timeoutInSeconds), ex);
             }
         }
@@ -1656,7 +1661,7 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// Upgrades the virtual hardware version of the virtual machine to match the version of the VIX library. 
+        /// Upgrades the virtual hardware version of the virtual machine to match the version of the VIX library.
         /// This has no effect if the virtual machine is already at the same version or at a newer version than the VIX library.
         /// </summary>
         public void UpgradeVirtualHardware()
@@ -1665,7 +1670,7 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// Upgrades the virtual hardware version of the virtual machine to match the version of the VIX library. 
+        /// Upgrades the virtual hardware version of the virtual machine to match the version of the VIX library.
         /// This has no effect if the virtual machine is already at the same version or at a newer version than the VIX library.
         /// </summary>
         /// <param name="timeoutInSeconds">Timeout in seconds.</param>
@@ -1779,10 +1784,10 @@ namespace Vestris.VMWareLib
         /// Prepares to install VMware Tools on the guest operating system.
         /// </summary>
         /// <remarks>
-        /// Prepares an ISO image to install VMware Tools on the guest operating system. 
-        /// If autorun is enabled, as it often is on Windows, installation begins, otherwise 
-        /// you must initiate installation. If VMware Tools is already installed, this function 
-        /// prepares to upgrade it to the version matching the product. 
+        /// Prepares an ISO image to install VMware Tools on the guest operating system.
+        /// If autorun is enabled, as it often is on Windows, installation begins, otherwise
+        /// you must initiate installation. If VMware Tools is already installed, this function
+        /// prepares to upgrade it to the version matching the product.
         /// </remarks>
         public void InstallTools()
         {
@@ -1793,10 +1798,10 @@ namespace Vestris.VMWareLib
         /// Prepares to install VMware Tools on the guest operating system.
         /// </summary>
         /// <remarks>
-        /// Prepares an ISO image to install VMware Tools on the guest operating system. 
-        /// If autorun is enabled, as it often is on Windows, installation begins, otherwise 
-        /// you must initiate installation. If VMware Tools is already installed, this function 
-        /// prepares to upgrade it to the version matching the product. 
+        /// Prepares an ISO image to install VMware Tools on the guest operating system.
+        /// If autorun is enabled, as it often is on Windows, installation begins, otherwise
+        /// you must initiate installation. If VMware Tools is already installed, this function
+        /// prepares to upgrade it to the version matching the product.
         /// </remarks>
         /// <param name="timeoutInSeconds">Timeout in seconds.</param>
         public void InstallTools(int timeoutInSeconds)
@@ -1825,7 +1830,7 @@ namespace Vestris.VMWareLib
             _guestVariables = null;
             _runtimeConfigVariables = null;
             _guestEnvironmentVariables = null;
-            
+
             if (_snapshots != null)
             {
                 _snapshots.Dispose();

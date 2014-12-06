@@ -10,9 +10,6 @@
 
 using System;
 using System.Reflection;
-using System.Resources;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 [assembly: AssemblyCompany("Vestris Inc.")]
 [assembly: AssemblyProduct("VMWareTasks")]
@@ -22,5 +19,3 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDelaySign(false)]
 [assembly: AssemblyVersion("1.6.3950.0")]
 [assembly: AssemblyFileVersion("1.6.3950.0")]
-
-

@@ -1,5 +1,5 @@
-﻿using System;
-using Cosmos.HAL.Network;
+﻿using Cosmos.HAL.Network;
+using System;
 
 namespace Cosmos.System.Network
 {
@@ -57,6 +57,7 @@ namespace Cosmos.System.Network
                 initFields();
             }
         }
+
         internal MACAddress DestinationMAC
         {
             get { return this.destMAC; }
@@ -69,6 +70,7 @@ namespace Cosmos.System.Network
                 initFields();
             }
         }
+
         internal UInt16 EthernetType
         {
             get { return this.aEtherType; }

@@ -1,16 +1,13 @@
-﻿using System;
+﻿using Cosmos.Assembler;
+using Cosmos.IL2CPU.Plugs;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using Cosmos.IL2CPU;
-using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.IL;
-using SR = System.Reflection;
-using Cosmos.Assembler;
-using System.Reflection.Emit;
 using _MemberInfo = System.Runtime.InteropServices._MemberInfo;
+
+using SR = System.Reflection;
 
 namespace Cosmos.IL2CPU
 {
@@ -42,10 +39,12 @@ namespace Cosmos.IL2CPU
 
         protected OurHashSet<_MemberInfo> mItems = new OurHashSet<_MemberInfo>();
         protected List<object> mItemsList = new List<object>();
+
         // Contains items to be scanned, both types and methods
         protected Queue<ScannerQueueItem> mQueue = new Queue<ScannerQueueItem>();
+
         // Virtual methods are nasty and constantly need to be rescanned for
-        // overriding methods in new types, so we keep track of them separately. 
+        // overriding methods in new types, so we keep track of them separately.
         // They are also in the main mItems and mQueue.
         protected HashSet<MethodBase> mVirtuals = new HashSet<MethodBase>();
 
@@ -57,13 +56,16 @@ namespace Cosmos.IL2CPU
         // Logging
         // Only use for debugging and profiling.
         protected bool mLogEnabled = false;
+
         protected string mMapPathname;
         protected TextWriter mLogWriter;
+
         protected struct LogItem
         {
             public string SrcType;
             public object Item;
         }
+
         protected Dictionary<object, List<LogItem>> mLogMap;
 
         public ILScanner(AppAssembler aAsmblr)
@@ -101,10 +103,10 @@ namespace Cosmos.IL2CPU
               && xMemInfo.DeclaringType.FullName == "System.ThrowHelper"
               && xMemInfo.DeclaringType.Assembly.GetName().Name != "mscorlib")
             {
-                // System.ThrowHelper exists in MS .NET twice... 
+                // System.ThrowHelper exists in MS .NET twice...
                 // Its an internal class that exists in both mscorlib and system assemblies.
                 // They are separate types though, so normally the scanner scans both and
-                // then we get conflicting labels. MS included it twice to make exception 
+                // then we get conflicting labels. MS included it twice to make exception
                 // throwing code smaller. They are internal though, so we cannot
                 // reference them directly and only via finding them as they come along.
                 // We find it here, not via QueueType so we only check it here. Later
@@ -134,6 +136,7 @@ namespace Cosmos.IL2CPU
         }
 
         public event Action<string> TempDebug;
+
         private void DoTempDebug(string message)
         {
             if (TempDebug != null)
@@ -157,6 +160,7 @@ namespace Cosmos.IL2CPU
             // http://cciast.codeplex.com/
 
             #region Description
+
             // Methodology
             //
             // Ok - we've done the scanner enough times to know it needs to be
@@ -180,8 +184,8 @@ namespace Cosmos.IL2CPU
             // This why in the past we had repetitive scans.
             //
             // Now we focus on more passes, but simpler execution. In the end it should
-            // be eaiser to optmize and yield overall better performance. Most of the 
-            // passes should be low overhead versus an integrated system which often 
+            // be eaiser to optmize and yield overall better performance. Most of the
+            // passes should be low overhead versus an integrated system which often
             // would need to reiterate over items multiple times. So we do more loops on
             // with less repetitive analysis, instead of fewer loops but more repetition.
             //
@@ -200,7 +204,9 @@ namespace Cosmos.IL2CPU
             //    -Known Types and Methods
             //    -Types and Methods in Queue - to be scanned
             // -Finally, do compilation
-            #endregion
+
+            #endregion Description
+
             mPlugManager.FindPlugImpls();
             // Now that we found all plugs, scan them.
             // We have to scan them after we find all plugs, because
@@ -398,12 +404,14 @@ namespace Cosmos.IL2CPU
             }
 
             // Scan virtuals
+
             #region Virtuals scan
+
             if (!xIsDynamicMethod && aMethod.IsVirtual)
             {
                 // For virtuals we need to climb up the type tree
                 // and find the top base method. We then add that top
-                // node to the mVirtuals list. We don't need to add the 
+                // node to the mVirtuals list. We don't need to add the
                 // types becuase adding DeclaringType will already cause
                 // all ancestor types to be added.
 
@@ -431,11 +439,11 @@ namespace Cosmos.IL2CPU
                             }
                         }
                     }
-                    // We dont bother to add these to Queue, because we have to do a 
+                    // We dont bother to add these to Queue, because we have to do a
                     // full downlevel scan if its a new base virtual anyways.
                     if (xNewVirtMethod == null)
                     {
-                        // If its already in the list, we mark it null 
+                        // If its already in the list, we mark it null
                         // so we dont do a full downlevel scan.
                         if (mVirtuals.Contains(xVirtMethod))
                         {
@@ -477,7 +485,8 @@ namespace Cosmos.IL2CPU
                     }
                 }
             }
-            #endregion
+
+            #endregion Virtuals scan
 
             MethodBase xPlug = null;
             // Plugs may use plugs, but plugs won't be plugged over themself
@@ -580,14 +589,14 @@ namespace Cosmos.IL2CPU
         protected void ScanType(Type aType)
         {
             // Add immediate ancestor type
-            // We dont need to crawl up farther, when the BaseType is scanned 
+            // We dont need to crawl up farther, when the BaseType is scanned
             // it will add its BaseType, and so on.
             if (aType.BaseType != null)
             {
                 Queue(aType.BaseType, aType, "Base Type");
             }
             // Queue static ctors
-            // We always need static ctors, else the type cannot 
+            // We always need static ctors, else the type cannot
             // be created.
             foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
             {
@@ -598,7 +607,7 @@ namespace Cosmos.IL2CPU
             }
 
             // For each new type, we need to scan for possible new virtuals
-            // in our new type if its a descendant of something in 
+            // in our new type if its a descendant of something in
             // mVirtuals.
             foreach (var xVirt in mVirtuals)
             {
@@ -640,7 +649,6 @@ namespace Cosmos.IL2CPU
                         }
                     }
                 }
-
             }
         }
 
@@ -649,7 +657,7 @@ namespace Cosmos.IL2CPU
             while (mQueue.Count > 0)
             {
                 var xItem = mQueue.Dequeue();
-                // Check for MethodBase first, they are more numerous 
+                // Check for MethodBase first, they are more numerous
                 // and will reduce compares
                 if (xItem.Item is MethodBase)
                 {
@@ -818,7 +826,7 @@ namespace Cosmos.IL2CPU
         {
             // It would be nice to keep DebugInfo output into assembler only but
             // there is so much info that is available in scanner that is needed
-            // or can be used in a more efficient manner. So we output in both 
+            // or can be used in a more efficient manner. So we output in both
             // scanner and assembler as needed.
             mAsmblr.DebugInfo.AddAssemblies(mUsedAssemblies);
         }

@@ -1,15 +1,9 @@
-﻿using System;
+﻿using Cosmos.Assembler;
+using Cosmos.IL2CPU.Plugs;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using Cosmos.IL2CPU;
-using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.IL;
-using SR = System.Reflection;
-using Cosmos.Assembler;
-using System.Reflection.Emit;
 using _MemberInfo = System.Runtime.InteropServices._MemberInfo;
 
 namespace Cosmos.IL2CPU
@@ -21,20 +15,25 @@ namespace Cosmos.IL2CPU
         public LogExceptionDelegate LogException = null;
 
         public delegate void ScanMethodDelegate(MethodBase aMethod, bool aIsPlug, string sourceItem);
+
         public ScanMethodDelegate ScanMethod = null;
+
         public delegate void QueueDelegate(_MemberInfo aItem, object aSrc, string aSrcType, string sourceItem = null);
+
         public QueueDelegate Queue = null;
 
         // Contains a list of plug implementor classes
         // Key = Target Class
         // Value = List of Implementors. There may be more than one
         protected Dictionary<Type, List<Type>> mPlugImpls = new Dictionary<Type, List<Type>>();
-        // List of inheritable plugs. Plugs that start at an ancestor and plug all 
+
+        // List of inheritable plugs. Plugs that start at an ancestor and plug all
         // descendants. For example, delegates
         protected Dictionary<Type, List<Type>> mPlugImplsInhrt = new Dictionary<Type, List<Type>>();
+
         // list of field plugs
         protected IDictionary<Type, IDictionary<string, PlugFieldAttribute>> mPlugFields = new Dictionary<Type, IDictionary<string, PlugFieldAttribute>>();
-        
+
         public Dictionary<Type, List<Type>> PlugImpls
         {
             get
@@ -42,6 +41,7 @@ namespace Cosmos.IL2CPU
                 return mPlugImpls;
             }
         }
+
         public Dictionary<Type, List<Type>> PlugImplsInhrt
         {
             get
@@ -49,6 +49,7 @@ namespace Cosmos.IL2CPU
                 return mPlugImplsInhrt;
             }
         }
+
         public IDictionary<Type, IDictionary<string, PlugFieldAttribute>> PlugFields
         {
             get
@@ -58,16 +59,17 @@ namespace Cosmos.IL2CPU
         }
 
         private Orvid.Collections.SkipList ResolvedPlugs = new Orvid.Collections.SkipList();
+
         private static string BuildMethodKeyName(MethodBase m)
         {
             return LabelName.GenerateFullName(m);
         }
-        
 
         public PlugManager(LogExceptionDelegate aLogException)
         {
             LogException = aLogException;
         }
+
         public PlugManager(LogExceptionDelegate aLogException, ScanMethodDelegate aScanMethod, QueueDelegate aQueueMethod)
         {
             LogException = aLogException;
@@ -94,7 +96,7 @@ namespace Cosmos.IL2CPU
                 {
                     //if (xAsm.GetName().Name == "Cosmos.IL2CPU.X86") {
                     //  // skip this assembly for now. at the moment we introduced the AssemblerMethod.AssembleNew method, for allowing those to work
-                    //  // with the Cosmos.IL2CPU* stack, we found we could not use the Cosmos.IL2CPU.X86 plugs, as they contained some AssemblerMethods. 
+                    //  // with the Cosmos.IL2CPU* stack, we found we could not use the Cosmos.IL2CPU.X86 plugs, as they contained some AssemblerMethods.
                     //  // This would result in a circular reference, thus we copied them to a new assembly. While the Cosmos.IL2CPU.X86 assembly is being
                     //  // referenced, we need to skip it here.
                     //  continue;
@@ -148,6 +150,7 @@ namespace Cosmos.IL2CPU
             ScanPlugs(mPlugImpls);
             ScanPlugs(mPlugImplsInhrt);
         }
+
         public void ScanPlugs(Dictionary<Type, List<Type>> aPlugs)
         {
             foreach (var xPlug in aPlugs)
@@ -166,7 +169,7 @@ namespace Cosmos.IL2CPU
                         }
                         if (xAttrib == null)
                         {
-                            //At this point we need to check the plug method actually 
+                            //At this point we need to check the plug method actually
                             //matches a method that might need plugging.
                             // x08 bug
                             // We must check for a number of cases:
@@ -341,8 +344,11 @@ namespace Cosmos.IL2CPU
                             }
                         }
                     }
-                    #endregion
+
+                    #endregion PlugMethods scan
+
                     #region PlugFields scan
+
                     foreach (var xField in xImpl.GetCustomAttributes(typeof(PlugFieldAttribute), true).Cast<PlugFieldAttribute>())
                     {
                         IDictionary<string, PlugFieldAttribute> xFields = null;
@@ -365,11 +371,12 @@ namespace Cosmos.IL2CPU
                         }
                         xFields.Add(xField.FieldId, xField);
                     }
-                    #endregion
+
+                    #endregion PlugFields scan
                 }
             }
         }
-        
+
         public MethodBase ResolvePlug(Type aTargetType, List<Type> aImpls, MethodBase aMethod, Type[] aParamTypes)
         {
             //TODO: This method is "reversed" from old - remember that when porting
@@ -449,13 +456,12 @@ namespace Cosmos.IL2CPU
                         }
                         else
                         {
-
                             var xParams = xSigMethod.GetParameters();
-                            //TODO: Static method plugs dont seem to be separated 
+                            //TODO: Static method plugs dont seem to be separated
                             // from instance ones, so the only way seems to be to try
                             // to match instance first, and if no match try static.
                             // I really don't like this and feel we need to find
-                            // an explicit way to determine or mark the method 
+                            // an explicit way to determine or mark the method
                             // implementations.
                             //
                             // Plug implementations take "this" as first argument
@@ -523,7 +529,7 @@ namespace Cosmos.IL2CPU
                             // ctor by name, or use a new attrib
                             //TODO: Document all the plug stuff in a document on website
                             //TODO: To make inclusion of plugs easy, we can make a plugs master
-                            // that references the other default plugs so user exes only 
+                            // that references the other default plugs so user exes only
                             // need to reference that one.
                             // TODO: Skip FieldAccessAttribute if in impl
                             if (xTypesInst != null)
@@ -602,9 +608,9 @@ namespace Cosmos.IL2CPU
             if (xResult == null)
                 return null;
 
-            // If we found a matching method, check for attributes 
+            // If we found a matching method, check for attributes
             // that might disable it.
-            //TODO: For signature ones, we could cache the attrib. Thats 
+            //TODO: For signature ones, we could cache the attrib. Thats
             // why we check for null here
             if (xAttrib == null)
             {
@@ -647,7 +653,7 @@ namespace Cosmos.IL2CPU
                 xInlineAttrib = inli;
             }
 
-            if (xInlineAttrib == null)   
+            if (xInlineAttrib == null)
             {
                 if (Queue != null)
                 {
@@ -685,6 +691,7 @@ namespace Cosmos.IL2CPU
             //}
             return xResult;
         }
+
         public MethodBase ResolvePlug(MethodBase aMethod, Type[] aParamTypes)
         {
             MethodBase xResult = null;

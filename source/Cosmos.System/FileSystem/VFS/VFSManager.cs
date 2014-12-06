@@ -68,7 +68,7 @@
 //            }
 
 //            return null;
-//            */ 
+//            */
 //        }
 
 //        public static List<Cosmos.System.FileSystem.Listing.File> GetFiles(string aPath)
@@ -93,7 +93,7 @@
 //            }
 
 //            return xFiles.ToArray();
-//            */ 
+//            */
 //        }
 
 //        public static Cosmos.System.FileSystem.Listing.Directory GetDirectory(string aPath)
@@ -141,7 +141,7 @@
 //                xDrives.Add(entry.Name + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar);
 
 //            return xDrives.ToArray();
-//            */ 
+//            */
 //        }
 
 //        public static List<string> InternalGetFileDirectoryNames(string path, string userPathOriginal, string searchPattern, bool includeFiles, bool includeDirs, SearchOption searchOption)
@@ -175,8 +175,8 @@
 //            }
 
 //            return xFileAndDirectoryNames.ToArray();
-            
-//             */ 
+
+//             */
 //        }
 
 //        public static bool FileExists(string aPath)

@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Sys = System;
 
 namespace Cosmos.System.Network.IPv4
@@ -18,6 +19,7 @@ namespace Cosmos.System.Network.IPv4
                     ICMPEchoReply recvd_reply = new ICMPEchoReply(packetData);
                     Sys.Console.WriteLine("Received ICMP Echo reply from " + recvd_reply.SourceIP.ToString());
                     break;
+
                 case 8:
                     ICMPEchoRequest request = new ICMPEchoRequest(packetData);
                     Sys.Console.WriteLine("Received " + request.ToString());
@@ -81,14 +83,17 @@ namespace Cosmos.System.Network.IPv4
         {
             get { return this.icmpType; }
         }
+
         internal byte ICMP_Code
         {
             get { return this.icmpCode; }
         }
+
         internal UInt16 ICMP_CRC
         {
             get { return this.icmpCRC; }
         }
+
         internal UInt16 ICMP_DataLength
         {
             get { return (UInt16)(this.DataLength - 8); }
@@ -161,6 +166,7 @@ namespace Cosmos.System.Network.IPv4
         {
             get { return this.icmpID; }
         }
+
         internal UInt16 ICMP_Sequence
         {
             get { return this.icmpSequence; }
@@ -171,6 +177,7 @@ namespace Cosmos.System.Network.IPv4
             return "ICMP Echo Request Src=" + sourceIP + ", Dest=" + destIP + ", ID=" + icmpID + ", Sequence=" + icmpSequence;
         }
     }
+
     internal class ICMPEchoReply : ICMPPacket
     {
         protected UInt16 icmpID;
@@ -221,6 +228,7 @@ namespace Cosmos.System.Network.IPv4
         {
             get { return this.icmpID; }
         }
+
         internal UInt16 ICMP_Sequence
         {
             get { return this.icmpSequence; }

@@ -1,8 +1,6 @@
-﻿using System;
+﻿using Cosmos.Common.Extensions;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.Common.Extensions;
 
 namespace Cosmos.HAL.BlockDevice
 {
@@ -24,7 +22,8 @@ namespace Cosmos.HAL.BlockDevice
             }
         }
 
-        public EBR(byte[] aEBR) {
+        public EBR(byte[] aEBR)
+        {
             ParsePartition(aEBR, 446);
             ParsePartition(aEBR, 462);
         }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Assembler.x86.SSE
+﻿namespace Cosmos.Assembler.x86.SSE
 {
     public abstract class InstructionWithDestinationAndSourceAndPseudoOpcodes : InstructionWithDestinationAndSource
     {
@@ -12,6 +7,7 @@ namespace Cosmos.Assembler.x86.SSE
             get;
             set;
         }
+
         public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
         {
             aOutput.Write(mMnemonic);

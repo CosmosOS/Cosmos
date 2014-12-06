@@ -1,21 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
 
 namespace Microsoft.Samples.Debugging.Native
 {
-
     /// <summary>
     /// A very basic PE reader that can extract a few useful pieces of information
     /// </summary>
     public class PEReader
     {
         // PE file
-        FileStream m_peStream; 
+        private FileStream m_peStream;
 
         // cached information from the PE file
-        int peHeaderOffset = 0;
+        private int peHeaderOffset = 0;
 
         public PEReader(FileStream peFileStream)
         {
@@ -38,7 +35,7 @@ namespace Microsoft.Samples.Debugging.Native
             }
         }
 
-        int PEHeaderOffset
+        private int PEHeaderOffset
         {
             get
             {
@@ -50,14 +47,14 @@ namespace Microsoft.Samples.Debugging.Native
             }
         }
 
-        int ReadDwordAtFileOffset(int fileOffset)
+        private int ReadDwordAtFileOffset(int fileOffset)
         {
             byte[] dword = new byte[4];
             ReadBytesAtFileOffset(dword, fileOffset);
             return BitConverter.ToInt32(dword, 0);
         }
 
-        void ReadBytesAtFileOffset(byte[] bytes, int fileOffset)
+        private void ReadBytesAtFileOffset(byte[] bytes, int fileOffset)
         {
             m_peStream.Seek(fileOffset, SeekOrigin.Begin);
             int bytesReadTotal = 0;

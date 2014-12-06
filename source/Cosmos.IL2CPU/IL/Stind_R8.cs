@@ -1,27 +1,24 @@
-using System;
-
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stind_R8 )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stind_R8)]
     public class Stind_R8 : ILOp
     {
-        public Stind_R8( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Stind_R8(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
-            Stind_I.Assemble( Assembler, 8 );
+            Stind_I.Assemble(Assembler, 8);
         }
-
 
         // using System;
         // using System.IO;
-        // 
-        // 
+        //
+        //
         // using CPU = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stind_R8)]
         // 	public class Stind_R8: Op {
@@ -33,6 +30,5 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 	}
         // }
-
     }
 }

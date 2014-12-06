@@ -1,9 +1,6 @@
+using Interop.VixCOM;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Runtime.InteropServices;
-using Interop.VixCOM;
 
 namespace Vestris.VMWareLib
 {
@@ -51,11 +48,11 @@ namespace Vestris.VMWareLib
         /// Restores the virtual machine to the state when the specified snapshot was created.
         /// </summary>
         /// <param name="powerOnOptions">
-        ///  Any applicable VixVMPowerOpOptions. If the virtual machine was powered on when the snapshot was created, 
-        ///  then this will determine how the virtual machine is powered back on. To prevent the virtual machine from being 
-        ///  powered on regardless of the power state when the snapshot was created, use the 
-        ///  VIX_VMPOWEROP_SUPPRESS_SNAPSHOT_POWERON flag. VIX_VMPOWEROP_SUPPRESS_SNAPSHOT_POWERON is mutually exclusive to 
-        ///  all other VixVMPowerOpOptions. 
+        ///  Any applicable VixVMPowerOpOptions. If the virtual machine was powered on when the snapshot was created,
+        ///  then this will determine how the virtual machine is powered back on. To prevent the virtual machine from being
+        ///  powered on regardless of the power state when the snapshot was created, use the
+        ///  VIX_VMPOWEROP_SUPPRESS_SNAPSHOT_POWERON flag. VIX_VMPOWEROP_SUPPRESS_SNAPSHOT_POWERON is mutually exclusive to
+        ///  all other VixVMPowerOpOptions.
         /// </param>
         /// <param name="timeoutInSeconds">Timeout in seconds.</param>
         public void RevertToSnapshot(int powerOnOptions, int timeoutInSeconds)
@@ -72,7 +69,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to revert to snapshot: powerOnOptions={0} timeoutInSeconds={1}", 
+                    string.Format("Failed to revert to snapshot: powerOnOptions={0} timeoutInSeconds={1}",
                     powerOnOptions, timeoutInSeconds), ex);
             }
         }
@@ -136,7 +133,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to remove snapshot: timeoutInSeconds={0}", 
+                    string.Format("Failed to remove snapshot: timeoutInSeconds={0}",
                     timeoutInSeconds), ex);
             }
         }
@@ -199,13 +196,16 @@ namespace Vestris.VMWareLib
                 switch ((ulError = _handle.GetParent(out parentSnapshot)))
                 {
                     case Constants.VIX_OK:
-                        return parentSnapshot == null 
-                            ? DisplayName 
+                        return parentSnapshot == null
+                            ? DisplayName
                             : System.IO.Path.Combine(new VMWareSnapshot(_vm, parentSnapshot, null).Path, DisplayName);
+
                     case Constants.VIX_E_SNAPSHOT_NOTFOUND: // no parent
                         return DisplayName;
+
                     case Constants.VIX_E_INVALID_ARG: // root snapshot
                         return string.Empty;
+
                     default:
                         throw new VMWareException(ulError);
                 }
@@ -235,16 +235,16 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// Replay a recording of a virtual machine. 
+        /// Replay a recording of a virtual machine.
         /// </summary>
         public void BeginReplay()
         {
-            BeginReplay(Constants.VIX_VMPOWEROP_NORMAL, 
+            BeginReplay(Constants.VIX_VMPOWEROP_NORMAL,
                 VMWareInterop.Timeouts.ReplayTimeout);
         }
 
         /// <summary>
-        /// Replay a recording of a virtual machine. 
+        /// Replay a recording of a virtual machine.
         /// </summary>
         /// <param name="powerOnOptions">One of VIX_VMPOWEROP_NORMAL or VIX_VMPOWEROP_LAUNCH_GUI.</param>
         /// <param name="timeoutInSeconds">Timeout in seconds.</param>
@@ -262,7 +262,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to begin replay: powerOnOptions={0} timeoutInSeconds={1}", 
+                    string.Format("Failed to begin replay: powerOnOptions={0} timeoutInSeconds={1}",
                     powerOnOptions, timeoutInSeconds), ex);
             }
         }
@@ -293,7 +293,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to end replay: timeoutInSeconds={0}", 
+                    string.Format("Failed to end replay: timeoutInSeconds={0}",
                     timeoutInSeconds), ex);
             }
         }
@@ -345,7 +345,7 @@ namespace Vestris.VMWareLib
                 _childSnapshots = null;
             }
 
-            base.Dispose();            
+            base.Dispose();
         }
     }
 }

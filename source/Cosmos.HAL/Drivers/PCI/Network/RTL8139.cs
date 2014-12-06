@@ -136,6 +136,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         //}
 
         #region Register Access
+
         protected UInt32 RBStartRegister
         {
             get { return io.Read32(0x30); }
@@ -231,7 +232,8 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             get { return io.Read32(0x1C); }
             set { io.Write32(0x1C, value); }
         }
-        #endregion
+
+        #endregion Register Access
 
         protected bool CmdBufferEmpty
         {
@@ -239,6 +241,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         }
 
         #region Network Device Implementation
+
         public override MACAddress MACAddress
         {
             get { return this.mac; }
@@ -319,9 +322,11 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             get { return "Realtek 8139 Chipset NIC"; }
         }
-        #endregion
+
+        #endregion Network Device Implementation
 
         #region Helper Functions
+
         private void ReadRawData(UInt16 packetLen)
         {
             int recv_size = packetLen - 4;
@@ -385,18 +390,22 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                     TransmitAddress1Register = txBuffer.Offset;
                     TransmitDescriptor1Register = txBuffer.Size;
                     break;
+
                 case 1:
                     TransmitAddress2Register = txBuffer.Offset;
                     TransmitDescriptor2Register = txBuffer.Size;
                     break;
+
                 case 2:
                     TransmitAddress3Register = txBuffer.Offset;
                     TransmitDescriptor3Register = txBuffer.Size;
                     break;
+
                 case 3:
                     TransmitAddress4Register = txBuffer.Offset;
                     TransmitDescriptor4Register = txBuffer.Size;
                     break;
+
                 default:
                     return false;
             }
@@ -404,7 +413,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             return true;
         }
 
-        #endregion
+        #endregion Helper Functions
     }
 }
 */

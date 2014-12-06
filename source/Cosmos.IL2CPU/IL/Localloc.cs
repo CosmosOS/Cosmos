@@ -1,25 +1,16 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using CPU = Cosmos.Assembler.x86;
-using CPUx86 = Cosmos.Assembler.x86;
-using System.Reflection;
-using Cosmos.IL2CPU.X86;
-using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler;
-
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Localloc )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Localloc)]
     public class Localloc : ILOp
     {
-        public Localloc( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Localloc(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             //var xId = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.AllocNewObjectRef);
             //new CPUx86.Call { DestinationLabel = xId };
@@ -34,7 +25,6 @@ namespace Cosmos.IL2CPU.X86.IL
             throw new NotImplementedException("Localloc is not yet implemented!");
         }
 
-
         // using System;
         // using System.Collections.Generic;
         // using System.IO;
@@ -42,13 +32,13 @@ namespace Cosmos.IL2CPU.X86.IL
         // using Cosmos.IL2CPU.Compiler;
         // using CPU = Cosmos.Assembler.x86;
         // using CPUx86 = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Localloc)]
         // 	public class Localloc: Op {
         //         public const string LocAllocCountMethodDataEntry = "LocAllocCount";
         //         public const string LocAllicItemMethodDataEntryTemplate = "LocAllocItem_L{0}";
-        // 
+        //
         //         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData, IServiceProvider aServiceProvider) {
         //             // xCurrentMethodLocallocCount contains the number of LocAlloc occurrences
         //             int xCurrentMethodLocallocCount = 0;
@@ -68,7 +58,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // #endif
         //             aMethodData.Add(xCurrentItem, xCurrentMethodLocallocCount);
         //         }
-        // 
+        //
         // 	    private readonly int mLocallocOffset = 0;
         // 		public Localloc(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {
@@ -76,7 +66,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		                                                                aReader.Position)];
         // 		    mLocallocOffset *= 4;
         // 		    mLocallocOffset += aMethodInfo.LocalsSize;
-        // 
+        //
         // 		}
         //         public override void DoAssemble() {
         //             var xId = GetService<IMetaDataInfoService>().GetMethodInfo(RuntimeEngineRefs.Heap_AllocNewObjectRef, false);
@@ -91,6 +81,5 @@ namespace Cosmos.IL2CPU.X86.IL
         //         }
         // 	}
         // }
-
     }
 }

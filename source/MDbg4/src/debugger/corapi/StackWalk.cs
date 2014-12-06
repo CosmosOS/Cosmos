@@ -1,32 +1,32 @@
-//---------------------------------------------------------------------
-//  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
-//  Copyright (C) Microsoft Corporation.  All rights reserved.
-//---------------------------------------------------------------------
-using System;
-//using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-
 using Microsoft.Samples.Debugging.CorDebug.NativeApi;
 using Microsoft.Samples.Debugging.Native;
 
+//---------------------------------------------------------------------
+//  This file is part of the CLR Managed Debugger (mdbg) Sample.
+//
+//  Copyright (C) Microsoft Corporation.  All rights reserved.
+//---------------------------------------------------------------------
+using System;
+
+//using System.Collections;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+
 namespace Microsoft.Samples.Debugging.CorDebug
-{ 
+{
     // This class is a thin managed wrapper over the V3 stackwalking API (ICorDebugStackWalk).
-    // It does not expose ICorDebugInternalFrame.  Use the derived class CorStackWalkEx if you want 
+    // It does not expose ICorDebugInternalFrame.  Use the derived class CorStackWalkEx if you want
     // ICorDebugInternalFrame.
     public class CorStackWalk : WrapperBase
     {
-        internal CorStackWalk (ICorDebugStackWalk stackwalk, CorThread thread)
-            :base(stackwalk)
+        internal CorStackWalk(ICorDebugStackWalk stackwalk, CorThread thread)
+            : base(stackwalk)
         {
             m_th = thread;
             m_sw = stackwalk;
         }
 
-        internal ICorDebugStackWalk GetInterface ()
+        internal ICorDebugStackWalk GetInterface()
         {
             return m_sw;
         }
@@ -34,8 +34,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
         [CLSCompliant(false)]
         public ICorDebugStackWalk Raw
         {
-            get 
-            { 
+            get
+            {
                 return m_sw;
             }
         }
@@ -105,7 +105,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         {
             uint uContextSize = 0;
             m_sw.GetContext((uint)flags, (uint)contextBufferSize, out uContextSize, contextBuffer);
-                contextSize = (int)uContextSize;
+            contextSize = (int)uContextSize;
         }
 
         [CLSCompliant(false)]
@@ -113,7 +113,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         {
             INativeContext context = ContextAllocator.GenerateContext();
             this.GetContext(context);
-        
+
             return context;
         }
 
@@ -123,22 +123,21 @@ namespace Microsoft.Samples.Debugging.CorDebug
         public void GetContext(INativeContext context)
         {
             using (IContextDirectAccessor w = context.OpenForDirectAccess())
-            { // context buffer is now locked        
-
+            { // context buffer is now locked
                 // We initialize to a HUGE number so that we make sure GetThreadContext is updating the size variable.  If it doesn't,
                 // then we will hit the assert statement below.
                 int size = Int32.MaxValue;
-                this.GetThreadContext((ContextFlags)context.Flags,w.Size, out size, w.RawBuffer);
+                this.GetThreadContext((ContextFlags)context.Flags, w.Size, out size, w.RawBuffer);
 
                 // We should only assert when the buffer is insufficient.  Since the runtime only keeps track of CONTEXT_CONTROL and CONTEXT_INTEGER
                 // we will expect to create a larger buffer than absolutely necessary.  The context buffer will be the size of a FULL machine
                 // context.
-                Debug.Assert(size <= w.Size, String.Format("Insufficient Buffer:  Expected {0} bytes, but received {1}",w.Size, size));
+                Debug.Assert(size <= w.Size, String.Format("Insufficient Buffer:  Expected {0} bytes, but received {1}", w.Size, size));
             }
         }
 
         [CLSCompliant(false)]
-        public void SetThreadContext ( CorDebugSetContextFlag flag, int contextSize, IntPtr contextBuffer)
+        public void SetThreadContext(CorDebugSetContextFlag flag, int contextSize, IntPtr contextBuffer)
         {
             m_sw.SetContext(flag, (uint)contextSize, contextBuffer);
 
@@ -167,24 +166,25 @@ namespace Microsoft.Samples.Debugging.CorDebug
             }
         }
 
-        #endregion // Get/Set Context
+        #endregion Get/Set Context
 
         [CLSCompliant(false)]
         protected ICorDebugStackWalk m_sw;
+
         protected CorThread m_th;
         protected CorFrame m_frame;
 
         // This is an artificat of managed enumerator semantics.  We must call MoveNext() once before the enumerator becomes "valid".
         // Once this occurs, m_init becomes true, but it is false at creation time
-        protected bool m_init; // = false (at creation time)      
+        protected bool m_init; // = false (at creation time)
     } /* class CorStackWalk */
 
     // Unlike CorStackWalk, this class exposes ICorDebugInternalFrame.  It interleaves ICorDebugInternalFrames
     // with real stack frames strictly according to the frame address and the SP of the stack frames.
     public sealed class CorStackWalkEx : CorStackWalk
     {
-        internal CorStackWalkEx (ICorDebugStackWalk stackwalk, CorThread thread)
-            :base(stackwalk, thread)
+        internal CorStackWalkEx(ICorDebugStackWalk stackwalk, CorThread thread)
+            : base(stackwalk, thread)
         {
             m_internalFrameIndex = 0;
             m_internalFrames = thread.GetActiveInternalFrames();
@@ -212,7 +212,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                         childFrame = prevFrame;
                     }
                 }
-                
+
                 bMoreToWalk = MoveNextWorker();
                 if (!bMoreToWalk)
                 {
@@ -230,7 +230,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                     CorFrame currentFrame = this.Current;
                     if ((currentFrame != null) && childFrame.IsMatchingParentFrame(currentFrame))
                     {
-                        // We have reached the parent frame.  We should skip the parent frame as well, so clear 
+                        // We have reached the parent frame.  We should skip the parent frame as well, so clear
                         // childFrame and unwind to the caller of the parent frame.  We will break out of the
                         // loop on the next iteration.
                         childFrame = null;
@@ -268,7 +268,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                     }
 
                     fIsFuncEvalFrame = (m_frame.InternalFrameType == CorDebugInternalFrameType.STUBFRAME_FUNC_EVAL);
-                    
+
                     hr = (int)HResult.S_OK;
                 }
                 else
@@ -335,7 +335,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
                         INativeContext ctx = this.GetContext();
                         CorStackWalk tStack = m_th.CreateStackWalk(CorStackWalkType.PureV3StackWalk);
-                        CorDebugSetContextFlag flag = ((fIsFuncEvalFrame || fIsLeafFrame) ? 
+                        CorDebugSetContextFlag flag = ((fIsFuncEvalFrame || fIsLeafFrame) ?
                             CorDebugSetContextFlag.SET_CONTEXT_FLAG_ACTIVE_FRAME :
                             CorDebugSetContextFlag.SET_CONTEXT_FLAG_UNWIND_FRAME);
                         tStack.SetContext(flag, ctx);
@@ -375,15 +375,12 @@ namespace Microsoft.Samples.Debugging.CorDebug
                             currentFrame = internalFrame;
                         }
                     }
-                    
+
                     break;
                 }
 
                 m_frame = currentFrame;
                 return true;
-
-
-               
             }
             else
             {
@@ -439,5 +436,4 @@ namespace Microsoft.Samples.Debugging.CorDebug
         private uint m_internalFrameIndex;
         private bool m_bEndOfStackFrame;
     } /* class StackWalk Thread */
-
 } /* namespace */

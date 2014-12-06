@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.IL2CPU.Plugs;
+using System;
 
 namespace Cosmos.IL2CPU.IL.CustomImplementations.System
 {
-    [Plug(Target=typeof(GC))]
+    [Plug(Target = typeof(GC))]
     public static class GCImpl
     {
-        public static void _SuppressFinalize(object o) { 
-        // not implemented yet
+        public static void _SuppressFinalize(object o)
+        {
+            // not implemented yet
         }
     }
 }

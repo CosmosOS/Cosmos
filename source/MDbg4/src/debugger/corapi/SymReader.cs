@@ -1,21 +1,20 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
 namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
-    using System.Diagnostics.SymbolStore;
     using Microsoft.Samples.Debugging.CorDebug;
 
     // Interface does not need to be marked with the serializable attribute
     using System;
-    using System.Text;
+    using System.Diagnostics.SymbolStore;
     using System.Runtime.InteropServices;
     using System.Runtime.InteropServices.ComTypes;
+    using System.Text;
 
     [
         ComImport,
@@ -34,7 +33,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         void GetDocuments(int cDocs,
                                out int pcDocs,
                                [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedDocument[] pDocs);
-
 
         // These methods will often return error HRs in common cases.
         // Using PreserveSig and manually handling error cases provides a big performance win.
@@ -60,7 +58,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         void GetGlobalVariables(int cVars,
                                     out int pcVars,
                                     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedVariable[] vars);
-
 
         void GetMethodFromDocumentPosition(ISymUnmanagedDocument document,
                                               int line,
@@ -115,7 +112,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
     ]
     internal interface ISymUnmanagedEncUpdate
     {
-
         void UpdateSymbolStore2(IStream stream,
                                       [MarshalAs(UnmanagedType.LPArray)] SymbolLineDelta[] iSymbolLineDeltas,
                                       int cDeltaLines);
@@ -128,7 +124,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                                   [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] ISymUnmanagedVariable[] rgLocals,
                                   out int pceltFetched);
     }
-
 
     [
         ComImport,
@@ -145,7 +140,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                                     [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedSymbolSearchInfo[] searchInfo);
     }
 
-
     [
         ComImport,
         Guid("969708D2-05E5-4861-A3B0-96E473CDF63F"),
@@ -157,10 +151,8 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         void Destroy();
     }
 
-
     internal class SymReader : ISymbolReader, ISymbolReader2, ISymbolReaderSymbolSearchInfo, ISymbolEncUpdate, IDisposable
     {
-
         private ISymUnmanagedReader m_reader; // Unmanaged Reader pointer
 
         internal SymReader(ISymUnmanagedReader reader)
@@ -368,14 +360,13 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             m_reader.ReplaceSymbolStore(fileName, stream);
         }
 
-
         public String GetSymbolStoreFileName()
         {
             StringBuilder fileName;
             int count = 0;
 
             // there's a known issue in Diasymreader where we can't query the size of the pdb filename.
-            // So we'll just estimate large as a workaround. 
+            // So we'll just estimate large as a workaround.
             count = 300;
             fileName = new StringBuilder(count);
             m_reader.GetSymbolStoreFileName(count, out count, fileName);
@@ -416,7 +407,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             return version;
         }
 
-
         public void UpdateSymbolStore(IStream stream,
                                      SymbolLineDelta[] iSymbolLineDeltas)
         {
@@ -446,7 +436,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             return variables;
         }
 
-
         public int GetSymbolSearchInfoCount()
         {
             int count = 0;
@@ -469,7 +458,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                 searchInfo[i] = new SymSymbolSearchInfo(unmanagedSearchInfo[i]);
             }
             return searchInfo;
-
         }
     }
 }

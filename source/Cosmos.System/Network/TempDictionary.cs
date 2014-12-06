@@ -11,8 +11,9 @@ namespace Cosmos.System.Network
         public int Count { get; private set; }
 
         public TempDictionary()
-            :this(2)
+            : this(2)
         { }
+
         public TempDictionary(int initialSize)
         {
             this.mKeys = new List<UInt32>(initialSize);
@@ -26,6 +27,7 @@ namespace Cosmos.System.Network
                 return this.mKeys.ToArray();
             }
         }
+
         public TValue[] Values
         {
             get
@@ -95,6 +97,7 @@ namespace Cosmos.System.Network
                 this.Remove(idx);
             }
         }
+
         public void Remove(int index)
         {
             if (index > mKeys.Count - 1)

@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading;
 using Interop.VixCOM;
+using System;
+using System.Threading;
 
 namespace Vestris.VMWareLib
 {
@@ -23,7 +21,7 @@ namespace Vestris.VMWareLib
         /// <param name="moreEventInfo">Additional event info.</param>
         public void OnVixEvent(IJob job, int eventType, IVixHandle moreEventInfo)
         {
-            using(VMWareVixHandle<IJob> jobHandle = new VMWareVixHandle<IJob>(job))
+            using (VMWareVixHandle<IJob> jobHandle = new VMWareVixHandle<IJob>(job))
             {
                 using (VMWareVixHandle<IVixHandle> moreEventInfoHandle = new VMWareVixHandle<IVixHandle>(moreEventInfo))
                 {
@@ -72,6 +70,6 @@ namespace Vestris.VMWareLib
             }
         }
 
-        #endregion
+        #endregion ICallback Members
     }
 }

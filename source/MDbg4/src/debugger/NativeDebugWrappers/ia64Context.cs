@@ -1,15 +1,12 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
-using Microsoft.Samples.Debugging.Native;
-using Microsoft.Samples.Debugging.Native.Private;
 
 namespace Microsoft.Samples.Debugging.Native
 {
@@ -60,14 +57,14 @@ namespace Microsoft.Samples.Debugging.Native
         public IA64Context(ContextFlags flags)
         {
             InitializeContext();
-            WriteContextFlagsToBuffer(flags); 
+            WriteContextFlagsToBuffer(flags);
         }
 
         private void InitializeContext()
         {
             this.m_size = (int)ContextSize.IA64;
             this.m_platform = Platform.IA64;
-            this.m_imageFileMachine = (int) Native.ImageFileMachine.IA64;
+            this.m_imageFileMachine = (int)Native.ImageFileMachine.IA64;
             this.m_rawPtr = Marshal.AllocHGlobal(this.Size);
 
             return;
@@ -103,7 +100,7 @@ namespace Microsoft.Samples.Debugging.Native
             // We know that we need an ia64 context
             this.m_platform = Platform.IA64;
             ContextFlags cFlags = ContextFlags.IA64Context;
-           
+
             if ((flags & AgnosticContextFlags.ContextInteger) == AgnosticContextFlags.ContextInteger)
             {
                 // ContextInteger is the same for all platforms, so we can do a blanket |=
@@ -376,7 +373,7 @@ namespace Microsoft.Samples.Debugging.Native
         {
             List<String> list = new List<String>();
 
-            // This includes the most commonly used flags. 
+            // This includes the most commonly used flags.
             if (HasFlags(ContextFlags.IA64ContextControl))
             {
                 list.Add("ApUNAT");
@@ -545,7 +542,6 @@ namespace Microsoft.Samples.Debugging.Native
                 if (name == "BRS4") return Marshal.ReadInt64(this.RawPtr, (int)IA64Offsets.BrS4);
                 if (name == "BRT0") return Marshal.ReadInt64(this.RawPtr, (int)IA64Offsets.BrT0);
                 if (name == "BRT1") return Marshal.ReadInt64(this.RawPtr, (int)IA64Offsets.BrT1);
-
             }
             if (HasFlags(ContextFlags.IA64ContextDebug))
             {
@@ -581,37 +577,37 @@ namespace Microsoft.Samples.Debugging.Native
 
             if (HasFlags(ContextFlags.IA64ContextControl))
             {
-                if (name == "APUNAT") 
+                if (name == "APUNAT")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.ApUNAT, (Int64)value);
                     return;
                 }
-                if (name == "APLC") 
+                if (name == "APLC")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.ApLC, (Int64)value);
                     return;
                 }
-                if (name == "APEC") 
+                if (name == "APEC")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.ApEC, (Int64)value);
                     return;
                 }
-                if (name == "APCCV") 
+                if (name == "APCCV")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.ApCCV, (Int64)value);
                     return;
                 }
-                if (name == "APDCR") 
+                if (name == "APDCR")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.ApDCR, (Int64)value);
                     return;
                 }
-                if (name == "RSPFS") 
+                if (name == "RSPFS")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.RsPFS, (Int64)value);
                     return;
                 }
-                if (name == "RSBSP") 
+                if (name == "RSBSP")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.RsBSP, (Int64)value);
                     return;
@@ -621,67 +617,67 @@ namespace Microsoft.Samples.Debugging.Native
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.RsBSPSTORE, (Int64)value);
                     return;
                 }
-                if (name == "RSRSC") 
+                if (name == "RSRSC")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.RsRSC, (Int64)value);
                     return;
                 }
-                if (name == "RSRNAT") 
+                if (name == "RSRNAT")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.RsRNAT, (Int64)value);
                     return;
                 }
-                if (name == "STIPSR") 
+                if (name == "STIPSR")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.StIPSR, (Int64)value);
                     return;
                 }
-                if (name == "STIIP") 
+                if (name == "STIIP")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.StIIP, (Int64)value);
                     return;
                 }
-                if (name == "STIFS") 
+                if (name == "STIFS")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.StIFS, (Int64)value);
                     return;
                 }
-                if (name == "STFCR") 
+                if (name == "STFCR")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.StFCR, (Int64)value);
                     return;
                 }
-                if (name == "EFLAG") 
+                if (name == "EFLAG")
                 {
                     Marshal.WriteInt32(this.RawPtr, (int)IA64Offsets.Eflag, (Int32)value);
                     return;
                 }
-                if (name == "SEGCSD") 
+                if (name == "SEGCSD")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.SegCSD, (Int64)value);
                     return;
                 }
-                if (name == "SEGSSD") 
+                if (name == "SEGSSD")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.SegSSD, (Int64)value);
                     return;
                 }
-                if (name == "CFLAG") 
+                if (name == "CFLAG")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.Cflag, (Int64)value);
                     return;
                 }
-                if (name == "STFSR") 
+                if (name == "STFSR")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.StFSR, (Int64)value);
                     return;
                 }
-                if (name == "STFIR") 
+                if (name == "STFIR")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.StFIR, (Int64)value);
                     return;
                 }
-                if (name == "STFDR") 
+                if (name == "STFDR")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.StFDR, (Int64)value);
                     return;
@@ -689,207 +685,207 @@ namespace Microsoft.Samples.Debugging.Native
             }
             if (HasFlags(ContextFlags.IA64ContextInteger))
             {
-                if (name == "INTGP") 
+                if (name == "INTGP")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntGp, (Int64)value);
                     return;
                 }
-                if (name == "INTT0") 
+                if (name == "INTT0")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT0, (Int64)value);
                     return;
                 }
-                if (name == "INTT1") 
+                if (name == "INTT1")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT1, (Int64)value);
                     return;
                 }
-                if (name == "INTS0") 
+                if (name == "INTS0")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntS0, (Int64)value);
                     return;
                 }
-                if (name == "INTS1") 
+                if (name == "INTS1")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntS1, (Int64)value);
                     return;
                 }
-                if (name == "INTS2") 
+                if (name == "INTS2")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntS2, (Int64)value);
                     return;
                 }
-                if (name == "INTS3") 
+                if (name == "INTS3")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntS3, (Int64)value);
                     return;
                 }
-                if (name == "INTV0") 
+                if (name == "INTV0")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntV0, (Int64)value);
                     return;
                 }
-                if (name == "INTT2") 
+                if (name == "INTT2")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT2, (Int64)value);
                     return;
                 }
-                if (name == "INTT3") 
+                if (name == "INTT3")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT3, (Int64)value);
                     return;
                 }
-                if (name == "INTT4") 
+                if (name == "INTT4")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT4, (Int64)value);
                     return;
                 }
-                if (name == "INTSP") 
+                if (name == "INTSP")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntSp, (Int64)value);
                     return;
                 }
-                if (name == "INTTEB") 
+                if (name == "INTTEB")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntTeb, (Int64)value);
                     return;
                 }
-                if (name == "INTT5") 
+                if (name == "INTT5")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT5, (Int64)value);
                     return;
                 }
-                if (name == "INTT6") 
+                if (name == "INTT6")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT6, (Int64)value);
                     return;
                 }
-                if (name == "INTT7") 
+                if (name == "INTT7")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT7, (Int64)value);
                     return;
                 }
-                if (name == "INTT8") 
+                if (name == "INTT8")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT8, (Int64)value);
                     return;
                 }
-                if (name == "INTT9") 
+                if (name == "INTT9")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT9, (Int64)value);
                     return;
                 }
-                if (name == "INTT10") 
+                if (name == "INTT10")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT10, (Int64)value);
                     return;
                 }
-                if (name == "INTT11") 
+                if (name == "INTT11")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT11, (Int64)value);
                     return;
                 }
-                if (name == "INTT12") 
+                if (name == "INTT12")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT11, (Int64)value);
                     return;
                 }
-                if (name == "INTT13") 
+                if (name == "INTT13")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT13, (Int64)value);
                     return;
                 }
-                if (name == "INTT14") 
+                if (name == "INTT14")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT14, (Int64)value);
                     return;
                 }
-                if (name == "INTT15") 
+                if (name == "INTT15")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT15, (Int64)value);
                     return;
                 }
-                if (name == "INTT16") 
+                if (name == "INTT16")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT16, (Int64)value);
                     return;
                 }
-                if (name == "INTT17") 
+                if (name == "INTT17")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT17, (Int64)value);
                     return;
                 }
-                if (name == "INTT18") 
+                if (name == "INTT18")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT18, (Int64)value);
                     return;
                 }
-                if (name == "INTT19") 
+                if (name == "INTT19")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT19, (Int64)value);
                     return;
                 }
-                if (name == "INTT20") 
+                if (name == "INTT20")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT20, (Int64)value);
                     return;
                 }
-                if (name == "INTT21") 
+                if (name == "INTT21")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT21, (Int64)value);
                     return;
                 }
-                if (name == "INTT22") 
+                if (name == "INTT22")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntT22, (Int64)value);
                     return;
                 }
-                if (name == "INTNATS") 
+                if (name == "INTNATS")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.IntNats, (Int64)value);
                     return;
                 }
-                if (name == "PREDS") 
+                if (name == "PREDS")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.Preds, (Int64)value);
                     return;
                 }
-                if (name == "BRRp") 
+                if (name == "BRRp")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.BrRp, (Int64)value);
                     return;
                 }
-                if (name == "BRS0") 
+                if (name == "BRS0")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.BrS0, (Int64)value);
                     return;
                 }
-                if (name == "BRS1") 
+                if (name == "BRS1")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.BrS1, (Int64)value);
                     return;
                 }
-                if (name == "BRS2") 
+                if (name == "BRS2")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.BrS2, (Int64)value);
                     return;
                 }
-                if (name == "BRS3") 
+                if (name == "BRS3")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.BrS3, (Int64)value);
                     return;
                 }
-                if (name == "BRS4") 
+                if (name == "BRS4")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.BrS4, (Int64)value);
                     return;
                 }
-                if (name == "BRT0") 
+                if (name == "BRT0")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.BrT0, (Int64)value);
                     return;
                 }
-                if (name == "BRT1") 
+                if (name == "BRT1")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.BrT1, (Int64)value);
                     return;
@@ -902,12 +898,12 @@ namespace Microsoft.Samples.Debugging.Native
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbI0, (Int64)value);
                     return;
                 }
-                if (name == "DBI1") 
+                if (name == "DBI1")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbI1, (Int64)value);
                     return;
                 }
-                if (name == "DBI2") 
+                if (name == "DBI2")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbI2, (Int64)value);
                     return;
@@ -917,62 +913,62 @@ namespace Microsoft.Samples.Debugging.Native
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbI3, (Int64)value);
                     return;
                 }
-                if (name == "DBI4") 
+                if (name == "DBI4")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbI4, (Int64)value);
                     return;
                 }
-                if (name == "DBI5") 
+                if (name == "DBI5")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbI5, (Int64)value);
                     return;
                 }
-                if (name == "DBI6") 
+                if (name == "DBI6")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbI6, (Int64)value);
                     return;
                 }
-                if (name == "DBI7") 
+                if (name == "DBI7")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbI7, (Int64)value);
                     return;
                 }
-                if (name == "DBD0") 
+                if (name == "DBD0")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbD0, (Int64)value);
                     return;
                 }
-                if (name == "DBD1") 
+                if (name == "DBD1")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbD1, (Int64)value);
                     return;
                 }
-                if (name == "DBD2") 
+                if (name == "DBD2")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbD2, (Int64)value);
                     return;
                 }
-                if (name == "DBD3") 
+                if (name == "DBD3")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbD3, (Int64)value);
                     return;
                 }
-                if (name == "DBD4") 
+                if (name == "DBD4")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbD4, (Int64)value);
                     return;
                 }
-                if (name == "DBD5") 
+                if (name == "DBD5")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbD5, (Int64)value);
                     return;
                 }
-                if (name == "DBD6") 
+                if (name == "DBD6")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbD6, (Int64)value);
                     return;
                 }
-                if (name == "DBD7") 
+                if (name == "DBD7")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)IA64Offsets.DbD7, (Int64)value);
                     return;
@@ -1004,6 +1000,6 @@ namespace Microsoft.Samples.Debugging.Native
             }
         }
 
-        #endregion
+        #endregion IDisposable Members
     }
 }

@@ -1,36 +1,29 @@
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+using Microsoft.Samples.Debugging.MetaDataLocator;
+using Microsoft.Samples.Debugging.Native;
+using Microsoft.Win32.SafeHandles;
+
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
-using System.Threading;
-using System.Diagnostics;
-using System.Collections;
-using System.Security.Permissions;
-
-using Microsoft.Samples.Debugging.CorDebug;
-using Microsoft.Samples.Debugging.CorDebug.NativeApi;
-using Microsoft.Samples.Debugging.CorMetadata;
 using System.Runtime.InteropServices;
-using System.Runtime.ConstrainedExecution;
-using Microsoft.Samples.Debugging.CorDebug.Utility;
-using Microsoft.Samples.Debugging.Native;
-using Microsoft.Win32.SafeHandles;
-using Microsoft.Samples.Debugging.MetaDataLocator;
-
+using System.Security.Permissions;
 
 namespace Microsoft.Samples.Debugging.CorDebug.Utility
 {
     #region Dump Data Target
+
     /// <summary>
     /// Data target implementation for a dump file
     /// </summary>
     [CLSCompliant(false)]
     public sealed class DumpDataTarget : ICorDebugDataTarget, ICorDebugMetaDataLocator, IDisposable
     {
-        Microsoft.Samples.Debugging.Native.DumpReader m_reader;
-        Microsoft.Samples.Debugging.MetaDataLocator.CorDebugMetaDataLocator m_metaDataLocator;
+        private Microsoft.Samples.Debugging.Native.DumpReader m_reader;
+        private Microsoft.Samples.Debugging.MetaDataLocator.CorDebugMetaDataLocator m_metaDataLocator;
 
         /// <summary>
         /// Constructor a Dump Target around an existing DumpReader.
@@ -95,8 +88,10 @@ namespace Microsoft.Samples.Debugging.CorDebug.Utility
                 case ProcessorArchitecture.PROCESSOR_ARCHITECTURE_IA32_ON_WIN64:
                 case ProcessorArchitecture.PROCESSOR_ARCHITECTURE_INTEL:
                     return CorDebugPlatform.CORDB_PLATFORM_WINDOWS_X86;
+
                 case ProcessorArchitecture.PROCESSOR_ARCHITECTURE_IA64:
                     return CorDebugPlatform.CORDB_PLATFORM_WINDOWS_IA64;
+
                 case ProcessorArchitecture.PROCESSOR_ARCHITECTURE_AMD64:
                     return CorDebugPlatform.CORDB_PLATFORM_WINDOWS_AMD64;
             }
@@ -109,7 +104,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.Utility
         {
             uint bytesRead = m_reader.ReadPartialMemory(address, buffer, bytesRequested);
 
-            if(bytesRead == 0)
+            if (bytesRead == 0)
                 throw new System.Runtime.InteropServices.COMException("Could not read memory requested at address " + address + ".");
 
             return bytesRead;
@@ -118,11 +113,11 @@ namespace Microsoft.Samples.Debugging.CorDebug.Utility
         // Implementation of ICorDebugDataTarget.GetThreadContext
         public void GetThreadContext(uint threadId, uint contextFlags, uint contextSize, IntPtr context)
         {
-            // Ignore contextFlags because this will retrieve everything. 
-            m_reader.GetThread((int) threadId).GetThreadContext(context, (int) contextSize);
+            // Ignore contextFlags because this will retrieve everything.
+            m_reader.GetThread((int)threadId).GetThreadContext(context, (int)contextSize);
         }
 
-        #endregion
+        #endregion ICorDebugDataTarget Members
 
         #region ICorDebugMetaDataLocator Members
 
@@ -137,10 +132,10 @@ namespace Microsoft.Samples.Debugging.CorDebug.Utility
             m_metaDataLocator.GetMetaData(imagePath, dwImageTimeStamp, dwImageSize, cchPathBuffer, out pcchPathBuffer, wszPathBuffer);
         }
 
-        #endregion
+        #endregion ICorDebugMetaDataLocator Members
     }
-    #endregion
 
+    #endregion Dump Data Target
 
     /// <summary>
     /// Utility class to wrap an unmanaged DLL and be responsible for freeing it.
@@ -153,16 +148,20 @@ namespace Microsoft.Samples.Debugging.CorDebug.Utility
     /// <item>It uses SafeHandles for the unmanaged resources</item>
     /// </list>
     /// You must be very careful to not call FreeLibrary (Dispose) until you are done with the
-    /// library. If you call GetProcAddress after the library is freed, it will crash. 
+    /// library. If you call GetProcAddress after the library is freed, it will crash.
     /// </remarks>
     public sealed class UnmanagedLibraryLeak
     {
         #region Safe Handles and Native imports
+
         // See http://msdn.microsoft.com/msdnmag/issues/05/10/Reliability/ for more about safe handles.
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]        
-        sealed class SafeLibraryHandle : SafeHandleZeroOrMinusOneIsInvalid
+        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+        private sealed class SafeLibraryHandle : SafeHandleZeroOrMinusOneIsInvalid
         {
-            private SafeLibraryHandle() : base(true) { }
+            private SafeLibraryHandle()
+                : base(true)
+            {
+            }
 
             protected override bool ReleaseHandle()
             {
@@ -172,9 +171,10 @@ namespace Microsoft.Samples.Debugging.CorDebug.Utility
             }
         }
 
-        static class NativeMethods
+        private static class NativeMethods
         {
-            const string s_kernel = "kernel32";
+            private const string s_kernel = "kernel32";
+
             [DllImport(s_kernel, CharSet = CharSet.Auto, BestFitMapping = false, SetLastError = true)]
             public static extern SafeLibraryHandle LoadLibrary(string fileName);
 
@@ -186,7 +186,8 @@ namespace Microsoft.Samples.Debugging.CorDebug.Utility
             [DllImport(s_kernel)]
             public static extern IntPtr GetProcAddress(SafeLibraryHandle hModule, String procname);
         }
-        #endregion // Safe Handles and Native imports
+
+        #endregion Safe Handles and Native imports
 
         /// <summary>
         /// Constructor to load a dll and be responible for freeing it.
@@ -237,8 +238,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.Utility
         }
 
         // Unmanaged resource.
-        SafeLibraryHandle m_hLibrary;
-
+        private SafeLibraryHandle m_hLibrary;
     } // UnmanagedLibrary
-
 } // Microsoft.Samples.Debugging.CorDebug.Utility

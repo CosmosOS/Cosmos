@@ -1,20 +1,20 @@
+using Microsoft.Samples.Debugging.CorDebug;
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+using Microsoft.Samples.Debugging.CorMetadata.NativeApi;
+
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
-using System.Reflection;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Globalization;
 using System.Collections;
-using System.Diagnostics;
-
-using Microsoft.Samples.Debugging.CorDebug;
-using Microsoft.Samples.Debugging.CorMetadata.NativeApi;
-using Microsoft.Samples.Debugging.CorDebug.NativeApi;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Microsoft.Samples.Debugging.CorMetadata
 {
@@ -37,6 +37,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         {
             return new MetadataMethodInfo(m_importer, token.Value);
         }
+
         public MethodInfo GetMethodInfo(int methodToken)
         {
             return new MetadataMethodInfo(m_importer, methodToken);
@@ -46,7 +47,6 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         {
             return new MetadataType(m_importer, typeToken);
         }
-
 
         // Get number of generic parameters on a given type.
         // Eg, for 'Foo<t, u>', returns 2.
@@ -165,7 +165,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         }
 
         /// <summary>
-        /// Given a type ref token, get the name. 
+        /// Given a type ref token, get the name.
         /// </summary>
         /// <param name="token">mdTypeRef token</param>
         /// <returns>name of typeref</returns>
@@ -193,7 +193,6 @@ namespace Microsoft.Samples.Debugging.CorMetadata
                                        out pdwTypeDefFlags, out extendsToken);
             return sb.ToString();
         }
-
 
         public string GetMemberRefName(int token)
         {
@@ -230,9 +229,11 @@ namespace Microsoft.Samples.Debugging.CorMetadata
                 default:
                     Debug.Assert(false);
                     break;
+
                 case CorTokenType.mdtTypeRef:
                     className = GetTypeNameFromRef(classToken);
                     break;
+
                 case CorTokenType.mdtTypeDef:
                     {
                         int parentToken;
@@ -248,7 +249,6 @@ namespace Microsoft.Samples.Debugging.CorMetadata
             return className + "." + member.ToString();
         }
 
-
         /// <summary>
         /// Enumerate all the types in the module
         /// </summary>
@@ -261,7 +261,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         }
 
         // helper to get number of rows in MethodDef table.
-        int GetTokenRows(MetadataTokenType tableIndex)
+        private int GetTokenRows(MetadataTokenType tableIndex)
         {
             IMetadataTables table = (IMetadataTables)this.m_importer;
             uint tbl = (uint)tableIndex >> 24;
@@ -276,7 +276,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata
 
         /// <summary>
         /// Enumerate all methodDef tokens in the importer.
-        /// </summary>        
+        /// </summary>
         /// <seealso cref="CorMetadataImport.EnumerateAllMethods"/>
         public IEnumerable<MetadataToken> EnumerateAllMethodTokens()
         {
@@ -296,7 +296,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         {
             // This is easier than enumerating all types and then enumerating methods in the types.
             // And it catches corner cases (like globals).
-            // And it can be significantly faster. 
+            // And it can be significantly faster.
             int maxRows = GetTokenRows(MetadataTokenType.MethodDef);
             for (int i = 1; i <= maxRows; i++)
             {
@@ -313,7 +313,6 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         }
 
         // properties
-
 
         //////////////////////////////////////////////////////////////////////////////////
         //
@@ -509,7 +508,6 @@ namespace Microsoft.Samples.Debugging.CorMetadata
             return MetadataHelperFunctions.GetGenericArgumentNames(m_importer, m_methodToken);
         }
 
-
         /// <summary>
         /// Does the function have the custom attribute on it.
         /// </summary>
@@ -527,7 +525,6 @@ namespace Microsoft.Samples.Debugging.CorMetadata
             // Returns S_OK (0) if attribute is found, else S_FALSE if attribute is not found.
             int val = m_importer.GetCustomAttributeByName(m_methodToken, fullName, out ppData, out pcbData);
             return (val == 0);
-
         }
 
         private IMetadataImport m_importer;
@@ -581,12 +578,11 @@ namespace Microsoft.Samples.Debugging.CorMetadata
 
         // The high bits of the calling convention convey additional info
         Mask = 0x0f,  // Calling convention is bottom 4 bits
+
         HasThis = 0x20,  // Top bit indicates a 'this' parameter
         ExplicitThis = 0x40,  // This parameter is explicitly in the signature
         Generic = 0x10,  // Generic method sig with explicit number of type arguments (precedes ordinary parameter count)
     };
-
-
 
     public struct MetadataToken
     {
@@ -594,6 +590,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         {
             this.value = value;
         }
+
         public MetadataToken(MetadataTokenType mdType, int rid)
         {
             this.value = (int)((uint)mdType + (uint)rid);
@@ -624,7 +621,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         }
 
         /// <summary>
-        /// Get the index (RID, bottom 6 nibbles) of the token. 
+        /// Get the index (RID, bottom 6 nibbles) of the token.
         /// </summary>
         public int Index
         {
@@ -634,9 +631,20 @@ namespace Microsoft.Samples.Debugging.CorMetadata
             }
         }
 
-        public static implicit operator int(MetadataToken token) { return token.value; }
-        public static bool operator ==(MetadataToken v1, MetadataToken v2) { return (v1.value == v2.value); }
-        public static bool operator !=(MetadataToken v1, MetadataToken v2) { return !(v1 == v2); }
+        public static implicit operator int(MetadataToken token)
+        {
+            return token.value;
+        }
+
+        public static bool operator ==(MetadataToken v1, MetadataToken v2)
+        {
+            return (v1.value == v2.value);
+        }
+
+        public static bool operator !=(MetadataToken v1, MetadataToken v2)
+        {
+            return !(v1 == v2);
+        }
 
         public static bool IsTokenOfType(int token, params MetadataTokenType[] types)
         {
@@ -664,7 +672,10 @@ namespace Microsoft.Samples.Debugging.CorMetadata
             return false;
         }
 
-        public override int GetHashCode() { return value.GetHashCode(); }
+        public override int GetHashCode()
+        {
+            return value.GetHashCode();
+        }
 
         private int value;
 
@@ -675,29 +686,32 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         }
     }
 
-    static class MetadataHelperFunctions
+    internal static class MetadataHelperFunctions
     {
-        private static uint TokenFromRid(uint rid, uint tktype) { return (rid) | (tktype); }
+        private static uint TokenFromRid(uint rid, uint tktype)
+        {
+            return (rid) | (tktype);
+        }
 
-        // The below have been translated manually from the inline C++ helpers in cor.h            
+        // The below have been translated manually from the inline C++ helpers in cor.h
         internal static uint CorSigUncompressBigData(
-            ref IntPtr pData)             // [IN,OUT] compressed data 
+            ref IntPtr pData)             // [IN,OUT] compressed data
         {
             unsafe
             {
                 byte* pBytes = (byte*)pData;
                 uint res;
 
-                // 1 byte data is handled in CorSigUncompressData   
-                //  Debug.Assert(*pBytes & 0x80);    
+                // 1 byte data is handled in CorSigUncompressData
+                //  Debug.Assert(*pBytes & 0x80);
 
-                // Medium.  
-                if ((*pBytes & 0xC0) == 0x80)  // 10?? ????  
+                // Medium.
+                if ((*pBytes & 0xC0) == 0x80)  // 10?? ????
                 {
                     res = (uint)((*pBytes++ & 0x3f) << 8);
                     res |= *pBytes++;
                 }
-                else // 110? ???? 
+                else // 110? ????
                 {
                     res = (uint)(*pBytes++ & 0x1f) << 24;
                     res |= (uint)(*pBytes++) << 16;
@@ -711,14 +725,14 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         }
 
         internal static uint CorSigUncompressData(
-            ref IntPtr pData)             // [IN,OUT] compressed data 
+            ref IntPtr pData)             // [IN,OUT] compressed data
         {
             unsafe
             {
                 byte* pBytes = (byte*)pData;
 
-                // Handle smallest data inline. 
-                if ((*pBytes & 0x80) == 0x00)        // 0??? ????    
+                // Handle smallest data inline.
+                if ((*pBytes & 0x80) == 0x00)        // 0??? ????
                 {
                     uint retval = (uint)(*pBytes++);
                     pData = (IntPtr)pBytes;
@@ -729,42 +743,42 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         }
 
         // Function translated directly from cor.h but never tested; included here in case someone wants to use it in future
-        /*        internal static uint CorSigUncompressData(      // return number of bytes of that compressed data occupied in pData 
-                    IntPtr pData,              // [IN] compressed data 
-                    out uint pDataOut)              // [OUT] the expanded *pData    
-                {   
+        /*        internal static uint CorSigUncompressData(      // return number of bytes of that compressed data occupied in pData
+                    IntPtr pData,              // [IN] compressed data
+                    out uint pDataOut)              // [OUT] the expanded *pData
+                {
                     unsafe
                     {
-                        uint       cb = 0xffffffff;    
-                        byte *pBytes = (byte*)(pData); 
+                        uint       cb = 0xffffffff;
+                        byte *pBytes = (byte*)(pData);
                         pDataOut = 0;
 
-                        // Smallest.    
-                        if ((*pBytes & 0x80) == 0x00)       // 0??? ????    
-                        {   
-                            pDataOut = *pBytes;    
-                            cb = 1; 
-                        }   
-                        // Medium.  
-                        else if ((*pBytes & 0xC0) == 0x80)  // 10?? ????    
-                        {   
-                            pDataOut = (uint)(((*pBytes & 0x3f) << 8 | *(pBytes+1)));  
-                            cb = 2; 
-                        }   
-                        else if ((*pBytes & 0xE0) == 0xC0)      // 110? ????    
-                        {   
-                            pDataOut = (uint)(((*pBytes & 0x1f) << 24 | *(pBytes+1) << 16 | *(pBytes+2) << 8 | *(pBytes+3)));  
-                            cb = 4; 
-                        }   
-                        return cb;  
+                        // Smallest.
+                        if ((*pBytes & 0x80) == 0x00)       // 0??? ????
+                        {
+                            pDataOut = *pBytes;
+                            cb = 1;
+                        }
+                        // Medium.
+                        else if ((*pBytes & 0xC0) == 0x80)  // 10?? ????
+                        {
+                            pDataOut = (uint)(((*pBytes & 0x3f) << 8 | *(pBytes+1)));
+                            cb = 2;
+                        }
+                        else if ((*pBytes & 0xE0) == 0xC0)      // 110? ????
+                        {
+                            pDataOut = (uint)(((*pBytes & 0x1f) << 24 | *(pBytes+1) << 16 | *(pBytes+2) << 8 | *(pBytes+3)));
+                            cb = 4;
+                        }
+                        return cb;
                     }
                 }*/
 
-        static uint[] g_tkCorEncodeToken = { (uint)MetadataTokenType.TypeDef, (uint)MetadataTokenType.TypeRef, (uint)MetadataTokenType.TypeSpec, (uint)MetadataTokenType.BaseType };
+        private static uint[] g_tkCorEncodeToken = { (uint)MetadataTokenType.TypeDef, (uint)MetadataTokenType.TypeRef, (uint)MetadataTokenType.TypeSpec, (uint)MetadataTokenType.BaseType };
 
         // uncompress a token
-        internal static uint CorSigUncompressToken(   // return the token.    
-            ref IntPtr pData)             // [IN,OUT] compressed data 
+        internal static uint CorSigUncompressToken(   // return the token.
+            ref IntPtr pData)             // [IN,OUT] compressed data
         {
             uint tk;
             uint tkType;
@@ -775,25 +789,24 @@ namespace Microsoft.Samples.Debugging.CorMetadata
             return tk;
         }
 
-
         // Function translated directly from cor.h but never tested; included here in case someone wants to use it in future
-        /*        internal static uint CorSigUncompressToken(     // return number of bytes of that compressed data occupied in pData 
-                    IntPtr pData,              // [IN] compressed data 
-                    out uint     pToken)                // [OUT] the expanded *pData    
+        /*        internal static uint CorSigUncompressToken(     // return number of bytes of that compressed data occupied in pData
+                    IntPtr pData,              // [IN] compressed data
+                    out uint     pToken)                // [OUT] the expanded *pData
                 {
-                    uint       cb; 
-                    uint     tk; 
-                    uint     tkType; 
+                    uint       cb;
+                    uint     tk;
+                    uint     tkType;
 
-                    cb = CorSigUncompressData(pData, out tk); 
-                    tkType = g_tkCorEncodeToken[tk & 0x3];  
-                    tk = TokenFromRid(tk >> 2, tkType); 
-                    pToken = tk;   
-                    return cb;  
+                    cb = CorSigUncompressData(pData, out tk);
+                    tkType = g_tkCorEncodeToken[tk & 0x3];
+                    tk = TokenFromRid(tk >> 2, tkType);
+                    pToken = tk;
+                    return cb;
                 }*/
 
         internal static CorCallingConvention CorSigUncompressCallingConv(
-            ref IntPtr pData)             // [IN,OUT] compressed data 
+            ref IntPtr pData)             // [IN,OUT] compressed data
         {
             unsafe
             {
@@ -806,48 +819,47 @@ namespace Microsoft.Samples.Debugging.CorMetadata
 
         // Function translated directly from cor.h but never tested; included here in case someone wants to use it in future
         /*        private enum SignMasks : uint {
-                    ONEBYTE  = 0xffffffc0,        // Mask the same size as the missing bits.  
-                    TWOBYTE  = 0xffffe000,        // Mask the same size as the missing bits.  
-                    FOURBYTE = 0xf0000000,        // Mask the same size as the missing bits.  
+                    ONEBYTE  = 0xffffffc0,        // Mask the same size as the missing bits.
+                    TWOBYTE  = 0xffffe000,        // Mask the same size as the missing bits.
+                    FOURBYTE = 0xf0000000,        // Mask the same size as the missing bits.
                 };
 
                 // uncompress a signed integer
                 internal static uint CorSigUncompressSignedInt( // return number of bytes of that compressed data occupied in pData
-                    IntPtr pData,              // [IN] compressed data 
-                    out int         pInt)                  // [OUT] the expanded *pInt 
+                    IntPtr pData,              // [IN] compressed data
+                    out int         pInt)                  // [OUT] the expanded *pInt
                 {
-                    uint       cb; 
-                    uint       ulSigned;   
-                    uint       iData;  
+                    uint       cb;
+                    uint       ulSigned;
+                    uint       iData;
 
                     cb = CorSigUncompressData(pData, out iData);
                     pInt = 0;
                     if (cb == 0xffffffff) return cb;
-                    ulSigned = iData & 0x1; 
-                    iData = iData >> 1; 
-                    if (ulSigned != 0)   
-                    {   
-                        if (cb == 1)    
-                        {   
-                            iData |= (uint)SignMasks.ONEBYTE; 
-                        }   
-                        else if (cb == 2)   
-                        {   
-                            iData |= (uint)SignMasks.TWOBYTE; 
-                        }   
-                        else    
-                        {   
-                            iData |= (uint)SignMasks.FOURBYTE;    
-                        }   
-                    }   
-                    pInt = (int)iData;  
-                    return cb;  
+                    ulSigned = iData & 0x1;
+                    iData = iData >> 1;
+                    if (ulSigned != 0)
+                    {
+                        if (cb == 1)
+                        {
+                            iData |= (uint)SignMasks.ONEBYTE;
+                        }
+                        else if (cb == 2)
+                        {
+                            iData |= (uint)SignMasks.TWOBYTE;
+                        }
+                        else
+                        {
+                            iData |= (uint)SignMasks.FOURBYTE;
+                        }
+                    }
+                    pInt = (int)iData;
+                    return cb;
                 }*/
-
 
         // uncompress encoded element type
         internal static CorElementType CorSigUncompressElementType(//Element type
-            ref IntPtr pData)             // [IN,OUT] compressed data 
+            ref IntPtr pData)             // [IN,OUT] compressed data
         {
             unsafe
             {
@@ -861,14 +873,14 @@ namespace Microsoft.Samples.Debugging.CorMetadata
 
         // Function translated directly from cor.h but never tested; included here in case someone wants to use it in future
         /*        internal static uint CorSigUncompressElementType(// return number of bytes of that compressed data occupied in pData
-                    IntPtr pData,              // [IN] compressed data 
-                    out CorElementType pElementType)       // [OUT] the expanded *pData    
-                {  
+                    IntPtr pData,              // [IN] compressed data
+                    out CorElementType pElementType)       // [OUT] the expanded *pData
+                {
                     unsafe
                     {
                         byte *pBytes = (byte*)pData;
-                        pElementType = (CorElementType)(*pBytes & 0x7f);    
-                        return 1;   
+                        pElementType = (CorElementType)(*pBytes & 0x7f);
+                        return 1;
                     }
                 }*/
 
@@ -940,5 +952,4 @@ namespace Microsoft.Samples.Debugging.CorMetadata
             return genargs;
         }
     }
-
 } // namspace Microsoft.Debugger.MetadataWrapper

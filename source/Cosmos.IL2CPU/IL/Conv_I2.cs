@@ -50,12 +50,14 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AX, Size = 16 };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     break;
+
                 case 8:
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
                     new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AX, Size = 16 };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     break;
+
                 default:
                     throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_I2.cs->SourceSize " + xSource + " not supported!");
             }

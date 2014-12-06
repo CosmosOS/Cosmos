@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Reflection;
 
 namespace Cosmos.IL2CPU
@@ -9,11 +6,13 @@ namespace Cosmos.IL2CPU
     public class MethodBaseComparer : IComparer<MethodBase>, IEqualityComparer<MethodBase>
     {
         #region IComparer<MethodBase> Members
+
         public int Compare(MethodBase x, MethodBase y)
         {
             return x.GetFullName().CompareTo(y.GetFullName());
         }
-        #endregion
+
+        #endregion IComparer<MethodBase> Members
 
         public bool Equals(MethodBase x, MethodBase y)
         {
@@ -25,5 +24,4 @@ namespace Cosmos.IL2CPU
             return obj.GetFullName().GetHashCode();
         }
     }
-
 }

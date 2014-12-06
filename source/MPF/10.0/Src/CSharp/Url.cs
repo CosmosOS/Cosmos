@@ -26,7 +26,7 @@ using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 
 namespace Microsoft.VisualStudio.Package
-{	
+{
 	/// <summary>
 	/// This class wraps the Uri class and provides an unescaped "LocalPath" for file URL's
 	/// and an unescaped AbsoluteUri for other schemes, plus it also returned an un-hex-escaped
@@ -37,24 +37,22 @@ namespace Microsoft.VisualStudio.Package
 		private Uri uri = null;
 		private bool isFile;
 
-		
 		public Url(string path)
 		{
 			Init(path);
 		}
-		
+
 		void Init(string path)
 		{
 			// Must try absolute first, then fall back on relative, otherwise it
 			// makes some absolute UNC paths like (\\lingw11\Web_test\) relative!
 			if (path != null)
 			{
-
 				if (!Uri.TryCreate(path, UriKind.Absolute, out this.uri))
 				{
 					Uri.TryCreate(path, UriKind.Relative, out this.uri);
-				} 
-				
+				}
+
 				this.CheckIsFile();
 			}
 		}
@@ -81,7 +79,7 @@ namespace Microsoft.VisualStudio.Package
 		}
 
 		// allows relpath to be null, in which case it just returns the baseUrl.
-		
+
 		public Url(Url baseUrl, string relpath)
 		{
 			if (baseUrl.uri == null)
@@ -98,8 +96,7 @@ namespace Microsoft.VisualStudio.Package
 			}
 			CheckIsFile();
 		}
-		
-		
+
 		public string AbsoluteUrl
 		{
 			get
@@ -125,8 +122,7 @@ namespace Microsoft.VisualStudio.Package
 			}
 		}
 
-		
-		/// <summary>Returns the AbsoluteUrl for the parent directory containing the file 
+		/// <summary>Returns the AbsoluteUrl for the parent directory containing the file
 		/// referenced by this URL object, where the Directory string is also unescaped.</summary>
 		public string Directory
 		{
@@ -140,13 +136,11 @@ namespace Microsoft.VisualStudio.Package
 			}
 		}
 
-		
 		public bool IsFile
 		{
 			get { return this.isFile; }
 		}
 
-		
 		public Url Move(Url oldBase, Url newBase)
 		{
 			if (this.uri == null || oldBase.uri == null) return null;
@@ -155,7 +149,7 @@ namespace Microsoft.VisualStudio.Package
 		}
 
 		// return an un-escaped relative path
-		
+
 		public string MakeRelative(Url url)
 		{
 			if (this.uri == null || url.uri == null) return null;
@@ -210,7 +204,6 @@ namespace Microsoft.VisualStudio.Package
 			return (char)(res);
 		}
 
-		
 		public static string Unescape(string escaped, bool isFile)
 		{
 			if (String.IsNullOrEmpty(escaped))
@@ -273,7 +266,6 @@ namespace Microsoft.VisualStudio.Package
 
 					if (byteCount != 0)
 					{
-
 						int charCount = Encoding.UTF8.GetCharCount(bytes, 0, byteCount);
 						if (charCount != 0)
 						{
@@ -298,7 +290,6 @@ namespace Microsoft.VisualStudio.Package
 			return new string(dest, 0, j);
 		}
 
-		
 		public Uri Uri
 		{
 			get { return this.uri; }
@@ -307,9 +298,9 @@ namespace Microsoft.VisualStudio.Package
 		// <include file='doc\Utilities.uex' path='docs/doc[@for="Url.Segments"]/*' />
 		// Unlike the Uri class, this ALWAYS succeeds, even on relative paths, and it
 		// strips out the path separator characters
-		
+
 		public string[] GetSegments()
-		{		
+		{
 			if (this.uri == null) return null;
 			string path = this.AbsoluteUrl;
 			if (this.isFile || !this.uri.IsAbsoluteUri)
@@ -325,10 +316,9 @@ namespace Microsoft.VisualStudio.Package
 				if (path.EndsWith("/"))
 					path = path.Substring(0, path.Length - 1);
 				return path.Split('/');
-			}	
+			}
 		}
 
-		
 		/// Return unescaped path up to (but not including) segment i.
 		public string GetPartial(int i)
 		{
@@ -341,14 +331,12 @@ namespace Microsoft.VisualStudio.Package
 			return path;
 		}
 
-		
 		/// Return unescaped relative path starting segment i.
 		public string GetRemainder(int i)
 		{
 			return JoinSegments(i, -1);
 		}
 
-		
 		public string JoinSegments(int i, int j)
 		{
 			if (i < 0)

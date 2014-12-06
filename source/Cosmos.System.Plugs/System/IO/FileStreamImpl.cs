@@ -8,7 +8,6 @@
 //namespace Cosmos.System.Plugs.System.IO {
 //  [Plug(Target = typeof(IO::FileStream))]
 //  public class FileStreamImpl {
-
 //            //[PlugField(FieldId = "$$Storage$$", FieldType = typeof(char[]))]
 //            //[PlugField(FieldId = "System.Char System.String.m_firstChar", IsExternalValue = true)]
 //            //public static class StringImpl {

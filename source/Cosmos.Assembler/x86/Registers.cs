@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace Cosmos.Assembler.x86 {
-    public enum RegistersEnum: byte
+namespace Cosmos.Assembler.x86
+{
+    public enum RegistersEnum : byte
     {
         EAX,
         AX,
@@ -15,7 +15,7 @@ namespace Cosmos.Assembler.x86 {
         BH,
         BL,
         ECX,
-        CX, 
+        CX,
         CH,
         CL,
         EDX,
@@ -59,7 +59,9 @@ namespace Cosmos.Assembler.x86 {
         ST7,
         EIP,
     }
-    public static class Registers {
+
+    public static class Registers
+    {
         public const RegistersEnum EAX = RegistersEnum.EAX;
         public const RegistersEnum AX = RegistersEnum.AX;
         public const RegistersEnum AH = RegistersEnum.AH;
@@ -111,21 +113,25 @@ namespace Cosmos.Assembler.x86 {
         public const RegistersEnum ST5 = RegistersEnum.ST5;
         public const RegistersEnum ST6 = RegistersEnum.ST6;
         public const RegistersEnum ST7 = RegistersEnum.ST7;
+
         /// <summary>
         /// Key = 32bit (eg EAX), value = 16 bit (eg AX)
         /// </summary>
         private static Dictionary<RegistersEnum, RegistersEnum> m32BitTo16BitMapping = new Dictionary<RegistersEnum, RegistersEnum>();
+
         /// <summary>
-        /// Key = 32bit (eg EAX), value = 16 bit (eg AL). 
-        /// 
+        /// Key = 32bit (eg EAX), value = 16 bit (eg AL).
+        ///
         /// </summary>
         private static Dictionary<RegistersEnum, RegistersEnum> m32BitTo8BitMapping = new Dictionary<RegistersEnum, RegistersEnum>();
+
         private static Dictionary<RegistersEnum, RegistersEnum> m16BitTo8BitMapping = new Dictionary<RegistersEnum, RegistersEnum>();
 
-        private static Dictionary<RegistersEnum, string> mRegToName=new Dictionary<RegistersEnum, string>();
-        private static Dictionary<string, RegistersEnum> mNameToReg=new Dictionary<string, RegistersEnum>();
+        private static Dictionary<RegistersEnum, string> mRegToName = new Dictionary<RegistersEnum, string>();
+        private static Dictionary<string, RegistersEnum> mNameToReg = new Dictionary<string, RegistersEnum>();
 
-        static Registers() {
+        static Registers()
+        {
             m32BitTo16BitMapping.Add(EAX, AX);
             m32BitTo16BitMapping.Add(EBX, BX);
             m32BitTo16BitMapping.Add(ECX, CX);
@@ -135,10 +141,10 @@ namespace Cosmos.Assembler.x86 {
             m32BitTo16BitMapping.Add(EBP, BP);
             m32BitTo16BitMapping.Add(ESP, SP);
 
-            m32BitTo8BitMapping.Add(EAX, AL );
-            m32BitTo8BitMapping.Add(EBX, BL );
-            m32BitTo8BitMapping.Add(ECX, CL );
-            m32BitTo8BitMapping.Add(EDX, DL );
+            m32BitTo8BitMapping.Add(EAX, AL);
+            m32BitTo8BitMapping.Add(EBX, BL);
+            m32BitTo8BitMapping.Add(ECX, CL);
+            m32BitTo8BitMapping.Add(EDX, DL);
 
             m16BitTo8BitMapping.Add(AX, AL);
             m16BitTo8BitMapping.Add(BX, BL);
@@ -253,19 +259,24 @@ namespace Cosmos.Assembler.x86 {
 
         public static RegistersEnum? Get8BitRegistersForRegister(RegistersEnum aReg)
         {
-            if(Is32Bit(aReg)) {
-                if(m32BitTo8BitMapping.ContainsKey(aReg)) {
+            if (Is32Bit(aReg))
+            {
+                if (m32BitTo8BitMapping.ContainsKey(aReg))
+                {
                     return m32BitTo8BitMapping[aReg];
                 }
                 return null;
             }
-            if(Is16Bit(aReg)) {
-                if (m16BitTo8BitMapping.ContainsKey(aReg)) {
+            if (Is16Bit(aReg))
+            {
+                if (m16BitTo8BitMapping.ContainsKey(aReg))
+                {
                     return m16BitTo8BitMapping[aReg];
                 }
                 return null;
             }
-            if(Is128Bit(aReg)) {
+            if (Is128Bit(aReg))
+            {
                 throw new Exception("128bit registers don't have 8bit variants!");
             }
             return aReg;
@@ -273,24 +284,29 @@ namespace Cosmos.Assembler.x86 {
 
         public static bool IsCR(RegistersEnum aReg)
         {
-            return aReg == CR0 ||aReg == CR1 ||aReg == CR2 ||aReg == CR3 ||aReg == CR4;
+            return aReg == CR0 || aReg == CR1 || aReg == CR2 || aReg == CR3 || aReg == CR4;
         }
 
         public static RegistersEnum? Get16BitRegisterForRegister(RegistersEnum aReg)
         {
-            if (Is32Bit(aReg)) {
-                if (m32BitTo16BitMapping.ContainsKey(aReg)) {
+            if (Is32Bit(aReg))
+            {
+                if (m32BitTo16BitMapping.ContainsKey(aReg))
+                {
                     return m32BitTo16BitMapping[aReg];
                 }
                 return null;
             }
-            if (Is128Bit(aReg)) {
+            if (Is128Bit(aReg))
+            {
                 throw new Exception("128bit registers don't have 8bit variants!");
             }
-            if (Is16Bit(aReg)) {
+            if (Is16Bit(aReg))
+            {
                 return aReg;
             }
-            if (m16BitTo8BitMapping.ContainsKey(aReg)) {
+            if (m16BitTo8BitMapping.ContainsKey(aReg))
+            {
                 return m16BitTo8BitMapping[aReg];
             }
             return aReg;
@@ -298,21 +314,26 @@ namespace Cosmos.Assembler.x86 {
 
         public static RegistersEnum? Get32BitRegisterForRegister(RegistersEnum aReg)
         {
-            if(Is32Bit(aReg)) {
+            if (Is32Bit(aReg))
+            {
                 return aReg;
             }
-            if(Is128Bit(aReg)) {
+            if (Is128Bit(aReg))
+            {
                 throw new Exception("128bit registers don't have 32bit variants!");
             }
-            if(Is16Bit(aReg)) {
-                if(m32BitTo16BitMapping.ContainsValue(aReg)) {
+            if (Is16Bit(aReg))
+            {
+                if (m32BitTo16BitMapping.ContainsValue(aReg))
+                {
                     return (from item in m32BitTo16BitMapping
                             where item.Value == aReg
                             select item.Key).Single();
                 }
                 return null;
             }
-            if (m32BitTo8BitMapping.ContainsValue(aReg)) {
+            if (m32BitTo8BitMapping.ContainsValue(aReg))
+            {
                 return (from item in m32BitTo8BitMapping
                         where item.Value == aReg
                         select item.Key).Single();
@@ -330,15 +351,17 @@ namespace Cosmos.Assembler.x86 {
             if (mNameToReg.ContainsKey(aName))
             {
                 return mNameToReg[aName];
-            }else
+            }
+            else
             {
                 return null;
             }
         }
 
-        public static byte GetSize(RegistersEnum aRegister) {
+        public static byte GetSize(RegistersEnum aRegister)
+        {
             if (Is128Bit(aRegister)) { return 128; }
-			if (Is80Bit(aRegister)) { return 80; }
+            if (Is80Bit(aRegister)) { return 80; }
             if (Is32Bit(aRegister)) { return 32; }
             if (Is16Bit(aRegister)) { return 16; }
             if (Is8Bit(aRegister)) { return 8; }
@@ -347,7 +370,7 @@ namespace Cosmos.Assembler.x86 {
 
         public static bool Is8Bit(RegistersEnum aRegister)
         {
-            return 
+            return
                 aRegister == AL ||
                 aRegister == AH ||
                 aRegister == BL ||
@@ -358,20 +381,20 @@ namespace Cosmos.Assembler.x86 {
                 aRegister == DH;
         }
 
-        //public static Guid Get 
+        //public static Guid Get
 
-		public static bool Is80Bit(RegistersEnum aRegister)
-		{
-			return
-				aRegister == ST0 ||
-				aRegister == ST1 ||
-				aRegister == ST2 ||
-				aRegister == ST3 ||
-				aRegister == ST4 ||
-				aRegister == ST5 ||
-				aRegister == ST6 ||
-				aRegister == ST7;
-		}
+        public static bool Is80Bit(RegistersEnum aRegister)
+        {
+            return
+                aRegister == ST0 ||
+                aRegister == ST1 ||
+                aRegister == ST2 ||
+                aRegister == ST3 ||
+                aRegister == ST4 ||
+                aRegister == ST5 ||
+                aRegister == ST6 ||
+                aRegister == ST7;
+        }
 
         public static bool Is128Bit(RegistersEnum aRegister)
         {
@@ -408,8 +431,10 @@ namespace Cosmos.Assembler.x86 {
         public static List<RegistersEnum> Get8BitRegisters()
         {
             var xResult = new List<RegistersEnum>();
-            foreach(var xItem in GetRegisters()) {
-                if(Is8Bit(xItem)) {
+            foreach (var xItem in GetRegisters())
+            {
+                if (Is8Bit(xItem))
+                {
                     xResult.Add(xItem);
                 }
             }
@@ -419,8 +444,10 @@ namespace Cosmos.Assembler.x86 {
         public static List<RegistersEnum> Get16BitRegisters()
         {
             var xResult = new List<RegistersEnum>();
-            foreach (var xItem in GetRegisters()) {
-                if (Is16Bit(xItem)) {
+            foreach (var xItem in GetRegisters())
+            {
+                if (Is16Bit(xItem))
+                {
                     xResult.Add(xItem);
                 }
             }
@@ -430,8 +457,10 @@ namespace Cosmos.Assembler.x86 {
         public static List<RegistersEnum> Get32BitRegisters()
         {
             var xResult = new List<RegistersEnum>();
-            foreach (var xItem in GetRegisters()) {
-                if (Is32Bit(xItem)) {
+            foreach (var xItem in GetRegisters())
+            {
+                if (Is32Bit(xItem))
+                {
                     xResult.Add(xItem);
                 }
             }
@@ -448,6 +477,7 @@ namespace Cosmos.Assembler.x86 {
             registers.Add(CR4);
             return registers;
         }
+
         public static List<RegistersEnum> getXMMs()
         {
             var registers = new List<RegistersEnum>();

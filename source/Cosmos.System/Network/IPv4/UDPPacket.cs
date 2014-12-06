@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Sys = System;
 
 namespace Cosmos.System.Network.IPv4
@@ -19,11 +20,11 @@ namespace Cosmos.System.Network.IPv4
             {
                 Sys.Console.WriteLine("UDP Packet is for registered client");
                 receiver.receiveData(udp_packet);
-            //    DataReceived dlgt = udpClients[udp_packet.DestinationPort];
-            //    if (dlgt != null)
-            //    {
-            //        dlgt(new IPv4EndPoint(udp_packet.SourceIP, udp_packet.SourcePort), udp_packet.UDP_Data);
-            //    }
+                //    DataReceived dlgt = udpClients[udp_packet.DestinationPort];
+                //    if (dlgt != null)
+                //    {
+                //        dlgt(new IPv4EndPoint(udp_packet.SourceIP, udp_packet.SourcePort), udp_packet.UDP_Data);
+                //    }
             }
         }
 
@@ -41,7 +42,7 @@ namespace Cosmos.System.Network.IPv4
 
         internal UDPPacket(byte[] rawData)
             : base(rawData)
-        {}
+        { }
 
         internal UDPPacket(Address source, Address dest, UInt16 srcPort, UInt16 destPort, byte[] data)
             : base((UInt16)(data.Length + 8), 17, source, dest)
@@ -76,18 +77,22 @@ namespace Cosmos.System.Network.IPv4
         {
             get { return this.destPort; }
         }
+
         internal UInt16 SourcePort
         {
             get { return this.sourcePort; }
         }
+
         internal UInt16 UDP_Length
         {
             get { return this.udpLen; }
         }
+
         internal UInt16 UDP_DataLength
         {
             get { return (UInt16)(this.udpLen - 8); }
         }
+
         internal byte[] UDP_Data
         {
             get

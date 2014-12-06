@@ -102,6 +102,7 @@ namespace Cosmos.System.Network.IPv4
         }
 
         private UInt32 hash;
+
         /// <summary>
         /// Hash value for this IP. Used to uniquely identify each IP
         /// </summary>
@@ -141,6 +142,6 @@ namespace Cosmos.System.Network.IPv4
                 throw new ArgumentException("obj is not a IPv4Address", "obj");
         }
 
-        #endregion
+        #endregion IComparable Members
     }
 }

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.VisualStudio.Debugger.Interop;
+﻿using Microsoft.VisualStudio.Debugger.Interop;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Cosmos.Debug.VSDebugEngine
@@ -11,7 +8,6 @@ namespace Cosmos.Debug.VSDebugEngine
     [Guid("2BB39582-4B39-4211-ACCF-ECDABFFBE061")]
     public class AD7PortSupplier : IDebugPortSupplier2
     {
-
         int IDebugPortSupplier2.AddPort(IDebugPortRequest2 pRequest, out IDebugPort2 ppPort)
         {
             throw new NotImplementedException();
@@ -46,6 +42,5 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             throw new NotImplementedException();
         }
-
     }
 }

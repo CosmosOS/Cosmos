@@ -1,27 +1,28 @@
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
 using System.Collections;
 
-using Microsoft.Samples.Debugging.CorDebug.NativeApi;
-
 namespace Microsoft.Samples.Debugging.CorDebug
 {
-    /** 
-     * Exposes an enumerator for ErrorInfo objects. 
+    /**
+     * Exposes an enumerator for ErrorInfo objects.
      *
      * This is horribly broken at this point, as ErrorInfo isn't implemented yet.
      */
+
     internal class CorErrorInfoEnumerator : IEnumerable, IEnumerator, ICloneable
     {
         private ICorDebugErrorInfoEnum m_enum;
 
         private Object m_einfo;
 
-        internal CorErrorInfoEnumerator (ICorDebugErrorInfoEnum erroInfoEnumerator)
+        internal CorErrorInfoEnumerator(ICorDebugErrorInfoEnum erroInfoEnumerator)
         {
             m_enum = erroInfoEnumerator;
         }
@@ -29,17 +30,17 @@ namespace Microsoft.Samples.Debugging.CorDebug
         //
         // ICloneable interface
         //
-        public Object Clone ()
+        public Object Clone()
         {
             ICorDebugEnum clone = null;
-            m_enum.Clone (out clone);
-            return new CorErrorInfoEnumerator ((ICorDebugErrorInfoEnum)clone);
+            m_enum.Clone(out clone);
+            return new CorErrorInfoEnumerator((ICorDebugErrorInfoEnum)clone);
         }
 
         //
         // IEnumerable interface
         //
-        public IEnumerator GetEnumerator ()
+        public IEnumerator GetEnumerator()
         {
             return this;
         }
@@ -47,20 +48,20 @@ namespace Microsoft.Samples.Debugging.CorDebug
         //
         // IEnumerator interface
         //
-        public bool MoveNext ()
+        public bool MoveNext()
         {
             return false;
         }
 
-        public void Reset ()
+        public void Reset()
         {
-            m_enum.Reset ();
+            m_enum.Reset();
             m_einfo = null;
         }
 
         public Object Current
         {
-            get 
+            get
             {
                 return m_einfo;
             }

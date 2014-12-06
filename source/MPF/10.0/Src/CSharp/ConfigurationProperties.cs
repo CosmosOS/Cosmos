@@ -14,48 +14,52 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.VisualStudio.Project
 {
-	/// <summary>
-	/// Defines the config dependent properties exposed through automation
-	/// </summary>
-	[ComVisible(true)]
-	[Guid("21f73a8f-91d7-4085-9d4f-c48ee235ee5b")]
-	public interface IProjectConfigProperties
-	{
-		string OutputPath { get; set; }
-	}
+    /// <summary>
+    /// Defines the config dependent properties exposed through automation
+    /// </summary>
+    [ComVisible(true)]
+    [Guid("21f73a8f-91d7-4085-9d4f-c48ee235ee5b")]
+    public interface IProjectConfigProperties
+    {
+        string OutputPath { get; set; }
+    }
 
-	/// <summary>
-	/// Implements the configuration dependent properties interface
-	/// </summary>
-	[CLSCompliant(false), ComVisible(true)]
-	[ClassInterface(ClassInterfaceType.None)]
-	public class ProjectConfigProperties : IProjectConfigProperties
-	{
-		#region fields
-		private ProjectConfig projectConfig;
-		#endregion
+    /// <summary>
+    /// Implements the configuration dependent properties interface
+    /// </summary>
+    [CLSCompliant(false), ComVisible(true)]
+    [ClassInterface(ClassInterfaceType.None)]
+    public class ProjectConfigProperties : IProjectConfigProperties
+    {
+        #region fields
 
-		#region ctors
-		public ProjectConfigProperties(ProjectConfig projectConfig)
-		{
-			this.projectConfig = projectConfig;
-		}
-		#endregion
+        private ProjectConfig projectConfig;
 
-		#region IProjectConfigProperties Members
+        #endregion fields
 
-		public virtual string OutputPath
-		{
-			get
-			{
-				return this.projectConfig.GetConfigurationProperty(BuildPropertyPageTag.OutputPath.ToString(), true);
-			}
-			set
-			{
-				this.projectConfig.SetConfigurationProperty(BuildPropertyPageTag.OutputPath.ToString(), value);
-			}
-		}
+        #region ctors
 
-		#endregion
-	}
+        public ProjectConfigProperties(ProjectConfig projectConfig)
+        {
+            this.projectConfig = projectConfig;
+        }
+
+        #endregion ctors
+
+        #region IProjectConfigProperties Members
+
+        public virtual string OutputPath
+        {
+            get
+            {
+                return this.projectConfig.GetConfigurationProperty(BuildPropertyPageTag.OutputPath.ToString(), true);
+            }
+            set
+            {
+                this.projectConfig.SetConfigurationProperty(BuildPropertyPageTag.OutputPath.ToString(), value);
+            }
+        }
+
+        #endregion IProjectConfigProperties Members
+    }
 }

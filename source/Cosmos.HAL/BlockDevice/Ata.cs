@@ -1,28 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿namespace Cosmos.HAL.BlockDevice
+{
+    public abstract class Ata : BlockDevice
+    {
+        protected Ata()
+        {
+            mBlockSize = 512;
+        }
 
-namespace Cosmos.HAL.BlockDevice {
-  public abstract class Ata : BlockDevice {
+        // In future may need to add a None for PCI ATA controllers.
+        // Or maybe they all have Primary and Secondary on them as well.
+        public enum ControllerIdEnum { Primary, Secondary }
 
-    protected Ata() {
-      mBlockSize = 512;
+        protected ControllerIdEnum mControllerID;
+
+        public ControllerIdEnum ControllerID
+        {
+            get { return mControllerID; }
+        }
+
+        public enum BusPositionEnum { Master, Slave }
+
+        protected BusPositionEnum mBusPosition;
+
+        public BusPositionEnum BusPosition
+        {
+            get { return mBusPosition; }
+        }
     }
-
-    // In future may need to add a None for PCI ATA controllers. 
-    // Or maybe they all have Primary and Secondary on them as well.
-    public enum ControllerIdEnum { Primary, Secondary }
-    protected ControllerIdEnum mControllerID;
-    public ControllerIdEnum ControllerID {
-      get { return mControllerID; }
-    }
-
-    public enum BusPositionEnum { Master, Slave }
-    protected BusPositionEnum mBusPosition;
-    public BusPositionEnum BusPosition {
-      get { return mBusPosition; }
-    }
-
-  }
 }

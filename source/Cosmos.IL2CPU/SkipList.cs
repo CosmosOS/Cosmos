@@ -5,13 +5,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Collections;
 
 namespace Orvid.Collections
 {
     public class SkipList
     {
         protected Node _head = new Node(new byte[] { }, null, 33);
+
         /// <summary>
         /// The main node that the rest of the list is based on.
         /// </summary>
@@ -22,7 +22,9 @@ namespace Orvid.Collections
                 return _head;
             }
         }
+
         protected Random _rand = new Random();
+
         public Random Random
         {
             get
@@ -30,7 +32,9 @@ namespace Orvid.Collections
                 return _rand;
             }
         }
+
         protected int _levels = 1;
+
         /// <summary>
         /// An Int32 representing how deep the list is.
         /// </summary>
@@ -215,10 +219,10 @@ namespace Orvid.Collections
             }
         }
 
-
         public class Node
         {
             private Node[] next;
+
             public Node[] Next
             {
                 get
@@ -230,7 +234,9 @@ namespace Orvid.Collections
                     this.next = value;
                 }
             }
+
             private byte[] key;
+
             public byte[] Key
             {
                 get
@@ -242,7 +248,9 @@ namespace Orvid.Collections
                     this.key = value;
                 }
             }
+
             private System.Reflection.MethodBase value;
+
             public System.Reflection.MethodBase Value
             {
                 get
@@ -262,6 +270,5 @@ namespace Orvid.Collections
                 this.next = new Node[level];
             }
         }
-
     }
 }

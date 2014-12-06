@@ -16,93 +16,94 @@ using System.Runtime.InteropServices;
 
 namespace Microsoft.VisualStudio.Project
 {
-	/// <summary>
-	/// Enables a managed object to expose properties and attributes for COM objects.
-	/// </summary>
-	[ComVisible(true)]
-	public class LocalizableProperties : ICustomTypeDescriptor
-	{
-		#region ICustomTypeDescriptor
-		public virtual AttributeCollection GetAttributes()
-		{
-			AttributeCollection col = TypeDescriptor.GetAttributes(this, true);
-			return col;
-		}
+    /// <summary>
+    /// Enables a managed object to expose properties and attributes for COM objects.
+    /// </summary>
+    [ComVisible(true)]
+    public class LocalizableProperties : ICustomTypeDescriptor
+    {
+        #region ICustomTypeDescriptor
 
-		public virtual EventDescriptor GetDefaultEvent()
-		{
-			EventDescriptor ed = TypeDescriptor.GetDefaultEvent(this, true);
-			return ed;
-		}
+        public virtual AttributeCollection GetAttributes()
+        {
+            AttributeCollection col = TypeDescriptor.GetAttributes(this, true);
+            return col;
+        }
 
-		public virtual PropertyDescriptor GetDefaultProperty()
-		{
-			PropertyDescriptor pd = TypeDescriptor.GetDefaultProperty(this, true);
-			return pd;
-		}
+        public virtual EventDescriptor GetDefaultEvent()
+        {
+            EventDescriptor ed = TypeDescriptor.GetDefaultEvent(this, true);
+            return ed;
+        }
 
-		public virtual object GetEditor(Type editorBaseType)
-		{
-			object o = TypeDescriptor.GetEditor(this, editorBaseType, true);
-			return o;
-		}
+        public virtual PropertyDescriptor GetDefaultProperty()
+        {
+            PropertyDescriptor pd = TypeDescriptor.GetDefaultProperty(this, true);
+            return pd;
+        }
 
-		public virtual EventDescriptorCollection GetEvents()
-		{
-			EventDescriptorCollection edc = TypeDescriptor.GetEvents(this, true);
-			return edc;
-		}
+        public virtual object GetEditor(Type editorBaseType)
+        {
+            object o = TypeDescriptor.GetEditor(this, editorBaseType, true);
+            return o;
+        }
 
-		public virtual EventDescriptorCollection GetEvents(System.Attribute[] attributes)
-		{
-			EventDescriptorCollection edc = TypeDescriptor.GetEvents(this, attributes, true);
-			return edc;
-		}
+        public virtual EventDescriptorCollection GetEvents()
+        {
+            EventDescriptorCollection edc = TypeDescriptor.GetEvents(this, true);
+            return edc;
+        }
 
-		public virtual object GetPropertyOwner(PropertyDescriptor pd)
-		{
-			return this;
-		}
+        public virtual EventDescriptorCollection GetEvents(System.Attribute[] attributes)
+        {
+            EventDescriptorCollection edc = TypeDescriptor.GetEvents(this, attributes, true);
+            return edc;
+        }
 
-		public virtual PropertyDescriptorCollection GetProperties()
-		{
-			PropertyDescriptorCollection pcol = GetProperties(null);
-			return pcol;
-		}
+        public virtual object GetPropertyOwner(PropertyDescriptor pd)
+        {
+            return this;
+        }
 
-		public virtual PropertyDescriptorCollection GetProperties(System.Attribute[] attributes)
-		{
-			ArrayList newList = new ArrayList();
-			PropertyDescriptorCollection props = TypeDescriptor.GetProperties(this, attributes, true);
+        public virtual PropertyDescriptorCollection GetProperties()
+        {
+            PropertyDescriptorCollection pcol = GetProperties(null);
+            return pcol;
+        }
 
-			for(int i = 0; i < props.Count; i++)
-				newList.Add(CreateDesignPropertyDescriptor(props[i]));
+        public virtual PropertyDescriptorCollection GetProperties(System.Attribute[] attributes)
+        {
+            ArrayList newList = new ArrayList();
+            PropertyDescriptorCollection props = TypeDescriptor.GetProperties(this, attributes, true);
 
-			return new PropertyDescriptorCollection((PropertyDescriptor[])newList.ToArray(typeof(PropertyDescriptor))); ;
-		}
+            for (int i = 0; i < props.Count; i++)
+                newList.Add(CreateDesignPropertyDescriptor(props[i]));
 
-		public virtual DesignPropertyDescriptor CreateDesignPropertyDescriptor(PropertyDescriptor propertyDescriptor)
-		{
-			return new DesignPropertyDescriptor(propertyDescriptor);
-		}
+            return new PropertyDescriptorCollection((PropertyDescriptor[])newList.ToArray(typeof(PropertyDescriptor))); ;
+        }
 
-		public virtual string GetComponentName()
-		{
-			string name = TypeDescriptor.GetComponentName(this, true);
-			return name;
-		}
+        public virtual DesignPropertyDescriptor CreateDesignPropertyDescriptor(PropertyDescriptor propertyDescriptor)
+        {
+            return new DesignPropertyDescriptor(propertyDescriptor);
+        }
 
-		public virtual TypeConverter GetConverter()
-		{
-			TypeConverter tc = TypeDescriptor.GetConverter(this, true);
-			return tc;
-		}
+        public virtual string GetComponentName()
+        {
+            string name = TypeDescriptor.GetComponentName(this, true);
+            return name;
+        }
 
-		public virtual string GetClassName()
-		{
-			return this.GetType().FullName;
-		}
+        public virtual TypeConverter GetConverter()
+        {
+            TypeConverter tc = TypeDescriptor.GetConverter(this, true);
+            return tc;
+        }
 
-		#endregion ICustomTypeDescriptor
-	}
+        public virtual string GetClassName()
+        {
+            return this.GetType().FullName;
+        }
+
+        #endregion ICustomTypeDescriptor
+    }
 }

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Cosmos.IL2CPU
 {
@@ -20,11 +17,11 @@ namespace Cosmos.IL2CPU
         public MethodInfo PluggedMethod;
         public uint LocalVariablesSize;
 
-        public MethodInfo(MethodBase aMethodBase, UInt32 aUID, TypeEnum aType, MethodInfo aPlugMethod, Type aMethodAssembler) : this(aMethodBase, aUID, aType, aPlugMethod, false)
+        public MethodInfo(MethodBase aMethodBase, UInt32 aUID, TypeEnum aType, MethodInfo aPlugMethod, Type aMethodAssembler)
+            : this(aMethodBase, aUID, aType, aPlugMethod, false)
         {
             MethodAssembler = aMethodAssembler;
         }
-
 
         public MethodInfo(MethodBase aMethodBase, UInt32 aUID, TypeEnum aType, MethodInfo aPlugMethod)
             : this(aMethodBase, aUID, aType, aPlugMethod, false)
@@ -50,6 +47,5 @@ namespace Cosmos.IL2CPU
                 DebugStubOff = attrib.Off;
             }
         }
-
     }
 }

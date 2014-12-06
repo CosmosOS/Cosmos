@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -51,13 +49,13 @@ namespace Cosmos.Debug.VSDebugEngine
                         {
                             // ASM label
                             xCode.AppendLine(xLine);
-                            lineCount ++;
+                            lineCount++;
                         }
                         else if (aLabels.Contains(xParts[0]))
-                        { 
+                        {
                             // Normal label
                             xCode.AppendLine(xLine);
-                            lineCount ++;
+                            lineCount++;
                         }
                         else
                         {

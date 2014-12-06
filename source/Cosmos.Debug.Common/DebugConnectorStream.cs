@@ -5,9 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading;
 
 namespace Cosmos.Debug.Common
 {
@@ -27,10 +25,13 @@ namespace Cosmos.Debug.Common
         protected class Incoming
         {
             public Stream Stream;
+
             // Buffer to hold incoming message
             public byte[] Packet;
+
             // Current # of bytes in mPacket
             public int CurrentPos = 0;
+
             public Action<byte[]> Completed;
         }
 
@@ -100,6 +101,7 @@ namespace Cosmos.Debug.Common
         }
 
         protected Action<byte[]> mCompletedAfterSize; // Action to call after size received
+
         protected void SizePacket(byte[] aPacket)
         {
             int xSize = aPacket[0] + (aPacket[1] << 8);
@@ -148,56 +150,56 @@ namespace Cosmos.Debug.Common
 #endif
         }
 
-//        protected void DoRead(IAsyncResult aResult)
-//        {
-//            try
-//            {
-//                var xIncoming = (Incoming)aResult.AsyncState;
-//                int xCount = xIncoming.Stream.EndRead(aResult);
+        //        protected void DoRead(IAsyncResult aResult)
+        //        {
+        //            try
+        //            {
+        //                var xIncoming = (Incoming)aResult.AsyncState;
+        //                int xCount = xIncoming.Stream.EndRead(aResult);
 
-//                System.Diagnostics.Debug.WriteLine(String.Format("DC - Received: {0}", BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount)));
-//                xIncoming.CurrentPos += xCount;
-//                if (xCount == 0)
-//                {
-//                    // If 0, end of stream then just exit without calling BeginRead again
-//                    return;
-//                }
-//                else if (xIncoming.CurrentPos < xIncoming.Packet.Length)
-//                {
-//                    // Packet is not full yet, read more data
-//#if TRACK_PENDING
-//          try {
-//            Interlocked.Increment(ref _pendingReadsCount);
-//#endif
-//                    xIncoming.Stream.BeginRead(xIncoming.Packet, xIncoming.CurrentPos
-//                          , xIncoming.Packet.Length - xIncoming.CurrentPos
-//                          , new AsyncCallback(DoRead), xIncoming);
-//#if TRACK_PENDING
-//          }
-//          catch (Exception e) {
-//            Interlocked.Decrement(ref _pendingReadsCount);
-//            throw;
-//          }
-//#endif
-//                }
-//                else
-//                {
-//                    System.Diagnostics.Debug.WriteLine(String.Format("DC - Full packet received - Received: {0}", BytesToString(xIncoming.Packet, 0, xIncoming.Packet.Length)));
+        //                System.Diagnostics.Debug.WriteLine(String.Format("DC - Received: {0}", BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount)));
+        //                xIncoming.CurrentPos += xCount;
+        //                if (xCount == 0)
+        //                {
+        //                    // If 0, end of stream then just exit without calling BeginRead again
+        //                    return;
+        //                }
+        //                else if (xIncoming.CurrentPos < xIncoming.Packet.Length)
+        //                {
+        //                    // Packet is not full yet, read more data
+        //#if TRACK_PENDING
+        //          try {
+        //            Interlocked.Increment(ref _pendingReadsCount);
+        //#endif
+        //                    xIncoming.Stream.BeginRead(xIncoming.Packet, xIncoming.CurrentPos
+        //                          , xIncoming.Packet.Length - xIncoming.CurrentPos
+        //                          , new AsyncCallback(DoRead), xIncoming);
+        //#if TRACK_PENDING
+        //          }
+        //          catch (Exception e) {
+        //            Interlocked.Decrement(ref _pendingReadsCount);
+        //            throw;
+        //          }
+        //#endif
+        //                }
+        //                else
+        //                {
+        //                    System.Diagnostics.Debug.WriteLine(String.Format("DC - Full packet received - Received: {0}", BytesToString(xIncoming.Packet, 0, xIncoming.Packet.Length)));
 
-//                    // Full packet received, process it
-//                    xIncoming.Completed(xIncoming.Packet);
-//                }
-//            }
-//            catch (System.IO.IOException ex)
-//            {
-//                ConnectionLost(ex);
-//            }
-//#if TRACK_PENDING
-//      finally {
-//        Interlocked.Decrement(ref _pendingReadsCount);
-//      }
-//#endif
-//        }
+        //                    // Full packet received, process it
+        //                    xIncoming.Completed(xIncoming.Packet);
+        //                }
+        //            }
+        //            catch (System.IO.IOException ex)
+        //            {
+        //                ConnectionLost(ex);
+        //            }
+        //#if TRACK_PENDING
+        //      finally {
+        //        Interlocked.Decrement(ref _pendingReadsCount);
+        //      }
+        //#endif
+        //        }
 
         private List<Incoming> ReadQueue = new List<Incoming>();
         private bool reading = false;
@@ -210,9 +212,10 @@ namespace Cosmos.Debug.Common
             }
             ContinueRead();
         }
+
         private void ContinueRead()
         {
-            if(ReadQueue.Count > 0 && !reading)
+            if (ReadQueue.Count > 0 && !reading)
             {
                 reading = true;
 
@@ -227,6 +230,7 @@ namespace Cosmos.Debug.Common
                 }
             }
         }
+
         private void DoRead(IAsyncResult result)
         {
             try
@@ -241,7 +245,7 @@ namespace Cosmos.Debug.Common
                     // If 0, end of stream then just exit without calling BeginRead again
                     reading = false;
 
-                   // lock (ReadQueue)
+                    // lock (ReadQueue)
                     {
                         ReadQueue.Remove(xIncoming);
                     }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Core.IOGroup
+﻿namespace Cosmos.Core.IOGroup
 {
     public class PCSpeaker : IOGroup
     {

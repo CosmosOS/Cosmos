@@ -1,24 +1,14 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //
 // Part of managed wrappers for native debugging APIs.
 // Context.cs: defines INativeContext interfaces.
 //---------------------------------------------------------------------
 
-
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
-using System.Runtime.Serialization;
-
-using Microsoft.Samples.Debugging.Native;
-using Microsoft.Samples.Debugging.Native.Private;
-
-
 
 namespace Microsoft.Samples.Debugging.Native
 {
@@ -127,8 +117,8 @@ namespace Microsoft.Samples.Debugging.Native
         int Size { get; }
 
         /// <summary>
-        /// A pointer to the raw buffer. The memory is pinned until this object is disposed. Check the context Flags 
-        /// to know which raw bytes are valid to be read. 
+        /// A pointer to the raw buffer. The memory is pinned until this object is disposed. Check the context Flags
+        /// to know which raw bytes are valid to be read.
         /// </summary>
         IntPtr RawBuffer { get; }
     }
@@ -156,8 +146,8 @@ namespace Microsoft.Samples.Debugging.Native
         }
 
         /// <summary>
-        /// A pointer to the raw buffer. The memory is pinned until this object is disposed. Check the context Flags 
-        /// to know which raw bytes are valid to be read. 
+        /// A pointer to the raw buffer. The memory is pinned until this object is disposed. Check the context Flags
+        /// to know which raw bytes are valid to be read.
         /// </summary>
         public IntPtr RawBuffer
         {
@@ -185,7 +175,7 @@ namespace Microsoft.Samples.Debugging.Native
             }
         }
 
-        #endregion
+        #endregion IDisposable Members
     }
 
     /// <summary>
@@ -196,9 +186,10 @@ namespace Microsoft.Samples.Debugging.Native
         IDisposable
     {
         #region Writing
+
         /// <summary>
-        /// Used to lock the buffer and get a raw pointer to it. 
-        /// This is the only way to change the entire context at once. 
+        /// Used to lock the buffer and get a raw pointer to it.
+        /// This is the only way to change the entire context at once.
         /// This is useful for pinvoking to native functions.
         /// </summary>
         /// <returns>context writer object</returns>
@@ -212,16 +203,18 @@ namespace Microsoft.Samples.Debugging.Native
         /// </example>
         /// </remarks>
         IContextDirectAccessor OpenForDirectAccess();
-        #endregion
+
+        #endregion Writing
 
         #region Geometry and writing
+
         /// <summary>
         /// Get Size in bytes. Size could change depending on the flags.
         /// </summary>
         int Size { get; }
 
         /// <summary>
-        /// Get the flags associated with the context. 
+        /// Get the flags associated with the context.
         /// </summary>
         /// <remarks>Flags are platform specific and generally indicate which parts of the context are valid.
         /// Flags will affect which registers are available (EnumerateRegisters), potentially the Size of the context,
@@ -231,7 +224,6 @@ namespace Microsoft.Samples.Debugging.Native
         /// SetRegisterByName on each regsister
         /// </remarks>
         ContextFlags Flags { get; set; }
-
 
         /// <summary>
         /// This will return the context specific flags for the given AgnosticContextFlags
@@ -244,9 +236,10 @@ namespace Microsoft.Samples.Debugging.Native
         /// </summary>
         void ClearContext();
 
-        #endregion
+        #endregion Geometry and writing
 
         #region Standard operations
+
         /// <summary>
         /// Get or Set the instruction pointer
         /// </summary>
@@ -258,7 +251,7 @@ namespace Microsoft.Samples.Debugging.Native
         IntPtr StackPointer { get; }
 
         /// <summary>
-        /// Enable or disable the single-step flag in the context. 
+        /// Enable or disable the single-step flag in the context.
         /// </summary>
         /// <param name="enable">true to enable single-stepping, false to disable it</param>
         /// <exception cref="System.InvalidOperationException">Throws if the architecture doesn't support single-stepping.</exception>
@@ -270,15 +263,15 @@ namespace Microsoft.Samples.Debugging.Native
         bool IsSingleStepFlagEnabled { get; }
 
         /// <summary>
-        /// Create a new deep copy of this context. 
+        /// Create a new deep copy of this context.
         /// The copies are independent and can be modified without interfering with each other.
         /// </summary>
         /// <returns>copy of this context</returns>
         /// <remarks>Contexts can be large, so copying excessively would be expensive.</remarks>
-        /// <example> 
+        /// <example>
         /// INativeContext c1 = ...
         /// INativeContext c2 = c1.Clone();
-        ///   
+        ///
         /// Assert(c1 != c2); // true, Clone gives different instances
         /// Assert(c1.Equals(c2)); // true
         /// Assert(c2.Equals(c1)); // true
@@ -286,21 +279,20 @@ namespace Microsoft.Samples.Debugging.Native
         INativeContext Clone();
 
         // <summary>
-        // Implement IEquatable<T> to do value comparison of two contexts. 
+        // Implement IEquatable<T> to do value comparison of two contexts.
         // </summary>
         // <param name="other">non-null context to compare too</param>
         // <returns>true if equal, else false</returns>
-        // <remarks>Comparison can't just do a bitwise comparison of the buffer. It needs to be aware of the <see cref="Flags"/> 
-        // property for each context, because if a portion of the context is missing, it could be random garbage. 
+        // <remarks>Comparison can't just do a bitwise comparison of the buffer. It needs to be aware of the <see cref="Flags"/>
+        // property for each context, because if a portion of the context is missing, it could be random garbage.
         // Comparison does not modify either context object.</remarks>
 
         // bool IEquatable<T>.Equals(object other)  // inheritted from IEquatable<T>
 
         #endregion Standard operations
 
-
-
         #region Self Describing
+
         /// <summary>
         /// Get a simple string description of the CPU the context is for. A implementation may also provide a ToString()
         /// override to give more detail (eg, which flags are active)
@@ -339,10 +331,7 @@ namespace Microsoft.Samples.Debugging.Native
         void SetRegisterByName(string name, object value);
 
         #endregion Self Describing
-
-
     } // IContext
-
 
     /// <summary>
     /// Describes the ProcessorArchitecture in a SYSTEM_INFO field.

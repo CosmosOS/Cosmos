@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio;
+﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Diagnostics;
+using System;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
-    // This class represents a document context to the debugger. A document context represents a location within a source file. 
+    // This class represents a document context to the debugger. A document context represents a location within a source file.
     public class AD7DocumentContext : IDebugDocumentContext2
     {
-        string m_fileName;
-        TEXT_POSITION m_begPos;
-        TEXT_POSITION m_endPos;
-        AD7MemoryAddress m_codeContext;
+        private string m_fileName;
+        private TEXT_POSITION m_begPos;
+        private TEXT_POSITION m_endPos;
+        private AD7MemoryAddress m_codeContext;
 
         public AD7DocumentContext(string fileName, TEXT_POSITION begPos, TEXT_POSITION endPos, AD7MemoryAddress codeContext)
         {
@@ -33,7 +30,7 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // Retrieves a list of all code contexts associated with this document context.
-        // The engine sample only supports one code context per document context and 
+        // The engine sample only supports one code context per document context and
         // the code contexts are always memory addresses.
         int IDebugDocumentContext2.EnumCodeContexts(out IEnumDebugCodeContexts2 ppEnumCodeCxts)
         {
@@ -47,7 +44,7 @@ namespace Cosmos.Debug.VSDebugEngine
             }
             //catch (ComponentException e)
             //{
-              //  return e.HResult;
+            //  return e.HResult;
             //}
             catch (Exception e)
             {
@@ -59,7 +56,7 @@ namespace Cosmos.Debug.VSDebugEngine
         // This method is for those debug engines that supply documents directly to the IDE. Since the sample engine
         // does not do this, this method returns E_NOTIMPL.
         int IDebugDocumentContext2.GetDocument(out IDebugDocument2 ppDocument)
-        {           
+        {
             ppDocument = null;
             return VSConstants.E_FAIL;
         }
@@ -82,7 +79,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         // Gets the source code range of this document context.
         // A source range is the entire range of source code, from the current statement back to just after the previous s
-        // statement that contributed code. The source range is typically used for mixing source statements, including 
+        // statement that contributed code. The source range is typically used for mixing source statements, including
         // comments, with code in the disassembly window.
         // Sincethis engine does not support the disassembly window, this is not implemented.
         int IDebugDocumentContext2.GetSourceRange(TEXT_POSITION[] pBegPosition, TEXT_POSITION[] pEndPosition)
@@ -115,13 +112,12 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // Moves the document context by a given number of statements or lines.
-        // This is used primarily to support the Autos window in discovering the proximity statements around 
-        // this document context. 
+        // This is used primarily to support the Autos window in discovering the proximity statements around
+        // this document context.
         int IDebugDocumentContext2.Seek(int nCount, out IDebugDocumentContext2 ppDocContext)
         {
             ppDocContext = null;
             return VSConstants.E_NOTIMPL;
         }
-
     }
 }

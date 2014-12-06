@@ -1,79 +1,72 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using CPU = Cosmos.Assembler.x86;
-using CPUx86 = Cosmos.Assembler.x86;
-using System.Reflection;
-using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler;
+using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Starg )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Starg)]
     public class Starg : ILOp
     {
-        public Starg( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Starg(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             //throw new NotImplementedException();
-          
-            OpVar xOpVar = ( OpVar )aOpCode;
+
+            OpVar xOpVar = (OpVar)aOpCode;
             //mAddresses = aMethodInfo.Arguments[ xOpVar.Value ].VirtualAddresses;
 
             var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
             uint xReturnSize = 0;
-            if( xMethodInfo != null )
+            if (xMethodInfo != null)
             {
-                xReturnSize = Align( SizeOfType( xMethodInfo.ReturnType ), 4 );
+                xReturnSize = Align(SizeOfType(xMethodInfo.ReturnType), 4);
             }
             uint xOffset = 8;
             var xCorrectedOpValValue = xOpVar.Value;
-            if( !aMethod.MethodBase.IsStatic && xOpVar.Value > 0 )
+            if (!aMethod.MethodBase.IsStatic && xOpVar.Value > 0)
             {
                 // if the method has a $this, the OpCode value includes the this at index 0, but GetParameters() doesnt include the this
                 xCorrectedOpValValue -= 1;
             }
             var xParams = aMethod.MethodBase.GetParameters();
 
-            for( int i = xParams.Length - 1; i > xCorrectedOpValValue; i-- )
+            for (int i = xParams.Length - 1; i > xCorrectedOpValValue; i--)
             {
-                var xSize = Align( SizeOfType( xParams[ i ].ParameterType ), 4 );
+                var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
                 xOffset += xSize;
             }
-            var xCurArgSize = Align( SizeOfType( xParams[ xCorrectedOpValValue ].ParameterType ), 4 );
+            var xCurArgSize = Align(SizeOfType(xParams[xCorrectedOpValValue].ParameterType), 4);
             uint xArgSize = 0;
-            foreach( var xParam in xParams )
+            foreach (var xParam in xParams)
             {
-                xArgSize += Align( SizeOfType( xParam.ParameterType ), 4 );
+                xArgSize += Align(SizeOfType(xParam.ParameterType), 4);
             }
             //for (int i = xParams.Length - 1; i >= xOpVar.Value; i--) {
             //  var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
             //  xOffset += xSize;
             //}
-            for (int i = 0; i < (xCurArgSize / 4); i++) {
-              new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-              new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + /*xCurArgSize -*/ ((i/* + 1*/) * 4)), SourceReg = CPUx86.Registers.EAX };
+            for (int i = 0; i < (xCurArgSize / 4); i++)
+            {
+                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + /*xCurArgSize -*/ ((i/* + 1*/) * 4)), SourceReg = CPUx86.Registers.EAX };
             }
         }
 
-
         // using System;
-        // 
-        // 
+        //
+        //
         // using CPUx86 = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Starg)]
         // 	public class Starg: Op {
         // 		private int[] mAddresses;
         // 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
         // 			mAddresses = aMethodInfo.Arguments[aIndex].VirtualAddresses;
-        // 
+        //
         // 		}
         // 		public Starg(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {
@@ -91,6 +84,5 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 	}
         // }
-
     }
 }

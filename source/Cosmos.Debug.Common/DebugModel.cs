@@ -1,20 +1,15 @@
-﻿using System;
-using System.ComponentModel;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Xml.Serialization;
-using System.Collections.Generic;
+﻿using SQLinq;
+using System;
 using System.ComponentModel.DataAnnotations;
-using SQLinq;
+using System.Runtime.Serialization;
 
 namespace Cosmos.Debug.Common
 {
     [Serializable()]
-    [DataContractAttribute(IsReference=true)]
+    [DataContractAttribute(IsReference = true)]
     [SQLinqTable("AssemblyFiles")]
     public partial class AssemblyFile
     {
-        
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -22,9 +17,10 @@ namespace Cosmos.Debug.Common
         [SQLinqColumn("ID")]
         public global::System.Guid ID
         {
-            get;set;
+            get;
+            set;
         }
-        
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -32,17 +28,18 @@ namespace Cosmos.Debug.Common
         [SQLinqColumn("PATHNAME")]
         public global::System.String Pathname
         {
-          get;set;
+            get;
+            set;
         }
     }
-    
+
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
     [Serializable()]
-    [DataContractAttribute(IsReference=true)]
+    [DataContractAttribute(IsReference = true)]
     [SQLinqTable("DOCUMENTS")]
-    public partial class Document 
+    public partial class Document
     {
         [Key]
         [DataMemberAttribute()]
@@ -52,8 +49,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
-        
+
         [DataMemberAttribute()]
         [SQLinqColumn("PATHNAME")]
         public global::System.String Pathname
@@ -62,12 +58,12 @@ namespace Cosmos.Debug.Common
             set;
         }
     }
-    
+
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
     [Serializable()]
-    [DataContractAttribute(IsReference=true)]
+    [DataContractAttribute(IsReference = true)]
     [SQLinqTable("FIELD_INFOS")]
     public partial class FIELD_INFO
     {
@@ -81,7 +77,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -92,7 +88,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -100,10 +96,10 @@ namespace Cosmos.Debug.Common
         [DataMemberAttribute()]
         public global::System.String NAME
         {
-           get;
+            get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -115,14 +111,13 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-            
     }
-    
+
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
     [Serializable()]
-    [DataContractAttribute(IsReference=true)]
+    [DataContractAttribute(IsReference = true)]
     [SQLinqTable("FIELD_MAPPINGS")]
     public partial class FIELD_MAPPING
     {
@@ -136,7 +131,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -147,7 +142,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -160,14 +155,14 @@ namespace Cosmos.Debug.Common
             set;
         }
     }
-    
+
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
     [Serializable()]
-    [DataContractAttribute(IsReference=true)]
+    [DataContractAttribute(IsReference = true)]
     [SQLinqTable("LABELS")]
-    public partial class Label 
+    public partial class Label
     {
         /// <summary>
         /// No Metadata Documentation available.
@@ -179,7 +174,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -190,7 +185,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -202,12 +197,12 @@ namespace Cosmos.Debug.Common
             set;
         }
     }
-    
+
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
     [Serializable()]
-    [DataContractAttribute(IsReference=true)]
+    [DataContractAttribute(IsReference = true)]
     [SQLinqTable("LOCAL_ARGUMENT_INFOS")]
     public partial class LOCAL_ARGUMENT_INFO
     {
@@ -221,7 +216,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -232,7 +227,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -243,7 +238,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -254,7 +249,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -265,7 +260,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -276,7 +271,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -289,12 +284,12 @@ namespace Cosmos.Debug.Common
             set;
         }
     }
-    
+
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
     [Serializable()]
-    [DataContractAttribute(IsReference=true)]
+    [DataContractAttribute(IsReference = true)]
     [SQLinqTable("METHODS")]
     public partial class Method
     {
@@ -309,7 +304,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -320,7 +315,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -331,7 +326,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -342,7 +337,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -353,7 +348,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -364,7 +359,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -375,7 +370,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -386,7 +381,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -397,7 +392,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -409,12 +404,12 @@ namespace Cosmos.Debug.Common
             set;
         }
     }
-    
+
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
     [Serializable()]
-    [DataContractAttribute(IsReference=true)]
+    [DataContractAttribute(IsReference = true)]
     [SQLinqTable("METHODILOPs")]
     public partial class MethodIlOp
     {
@@ -429,7 +424,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -440,7 +435,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -451,7 +446,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -462,7 +457,7 @@ namespace Cosmos.Debug.Common
             get;
             set;
         }
-    
+
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
@@ -474,7 +469,7 @@ namespace Cosmos.Debug.Common
             set;
         }
     }
-    
+
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>

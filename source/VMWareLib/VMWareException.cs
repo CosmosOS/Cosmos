@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Interop.VixCOM;
+using System;
 
 namespace Vestris.VMWareLib
 {
     /// <summary>
-    /// A VMWare exception. Every VMWare operational failure is translated into 
+    /// A VMWare exception. Every VMWare operational failure is translated into
     /// a <see cref="Vestris.VMWareLib.VMWareException" />.
     /// </summary>
     public class VMWareException : Exception
@@ -18,9 +16,9 @@ namespace Vestris.VMWareLib
         /// </summary>
         public ulong ErrorCode
         {
-            get 
-            { 
-                return _errorCode; 
+            get
+            {
+                return _errorCode;
             }
         }
 

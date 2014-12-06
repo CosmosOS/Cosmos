@@ -1,9 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 using Interop.VixCOM;
-using System.IO;
+using System;
+using System.Collections.Generic;
 
 namespace Vestris.VMWareLib
 {
@@ -11,7 +8,7 @@ namespace Vestris.VMWareLib
     /// A collection of root snapshots.
     /// </summary>
     /// <remarks>
-    /// Shared snapshots will only be accessible inside the guest operating system if snapshots are 
+    /// Shared snapshots will only be accessible inside the guest operating system if snapshots are
     /// enabled for the virtual machine.
     /// </remarks>
     public class VMWareRootSnapshotCollection : VMWareSnapshotCollection
@@ -23,7 +20,6 @@ namespace Vestris.VMWareLib
         public VMWareRootSnapshotCollection(IVM2 vm)
             : base(vm, null)
         {
-
         }
 
         /// <summary>
@@ -57,7 +53,7 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// Get a snapshot by its exact name. 
+        /// Get a snapshot by its exact name.
         /// </summary>
         /// <param name="name">Snapshot name.</param>
         /// <returns>A snapshot.</returns>
@@ -70,6 +66,7 @@ namespace Vestris.VMWareLib
             {
                 case Constants.VIX_OK:
                     return new VMWareSnapshot(_vm, snapshot, null);
+
                 default:
                     VMWareInterop.Check(rc);
                     break;
@@ -144,7 +141,7 @@ namespace Vestris.VMWareLib
         /// </summary>
         /// <param name="name">Snapshot name.</param>
         /// <param name="description">Snapshot description.</param>
-        /// <param name="flags">Flags, one of 
+        /// <param name="flags">Flags, one of
         /// <list type="bullet">
         ///  <item>VIX_SNAPSHOT_INCLUDE_MEMORY: Captures the full state of a running virtual machine, including the memory</item>
         /// </list>
@@ -171,7 +168,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to create snapshot: name=\"{0}\" description=\"{1}\" flags={2} timeoutInSeconds={3}", 
+                    string.Format("Failed to create snapshot: name=\"{0}\" description=\"{1}\" flags={2} timeoutInSeconds={3}",
                     name, description, flags, timeoutInSeconds), ex);
             }
         }

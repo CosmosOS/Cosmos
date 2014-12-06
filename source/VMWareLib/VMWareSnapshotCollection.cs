@@ -1,9 +1,7 @@
+using Interop.VixCOM;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using Interop.VixCOM;
-using System.IO;
 
 namespace Vestris.VMWareLib
 {
@@ -16,10 +14,12 @@ namespace Vestris.VMWareLib
         /// Virtual machine handle.
         /// </summary>
         protected IVM2 _vm = null;
+
         /// <summary>
         /// Internal list of snapshots.
         /// </summary>
         protected List<VMWareSnapshot> _snapshots = null;
+
         private VMWareSnapshot _parent = null;
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// Find a snapshot by name. Unlike GetSnapshotByName this function 
+        /// Find a snapshot by name. Unlike GetSnapshotByName this function
         /// doesn't throw an exception when there're two snapshots of the same name, it returns
         /// the first snapshot found.
         /// </summary>

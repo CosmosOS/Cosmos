@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Core
+﻿namespace Cosmos.Core
 {
     public class PCIBaseAddressBar
     {
@@ -29,13 +24,15 @@ namespace Cosmos.Core
                     case 0x00:
                         baseAddress = raw & 0xFFFFFFF0;
                         break;
+
                     case 0x01:
                         baseAddress = raw & 0xFFFFFFF0;
                         break;
                 }
             }
         }
-        private static int pci_size(int b, int mask) 
+
+        private static int pci_size(int b, int mask)
         {
             int size = mask & b;
             size = size & ~(size - 1);

@@ -2,26 +2,25 @@ using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Calli )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Calli)]
     public class Calli : ILOp
     {
-        public Calli( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Calli(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Calli.cs->Error: The Calli op-code has not been implemented yet!");
         }
 
-
         // using System;
         // using System.IO;
-        // 
-        // 
+        //
+        //
         // using CPU = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Calli)]
         // 	public class Calli: Op {
@@ -33,6 +32,5 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 	}
         // }
-
     }
 }

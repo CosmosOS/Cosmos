@@ -1,15 +1,12 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
-using Microsoft.Samples.Debugging.Native;
-using Microsoft.Samples.Debugging.Native.Private;
 
 namespace Microsoft.Samples.Debugging.Native
 {
@@ -55,13 +52,12 @@ namespace Microsoft.Samples.Debugging.Native
         {
             InitializeContext();
             WriteContextFlagsToBuffer(GetPSFlags(aFlags));
-            
         }
 
         public AMD64Context(ContextFlags flags)
         {
             InitializeContext();
-            WriteContextFlagsToBuffer(flags);  
+            WriteContextFlagsToBuffer(flags);
         }
 
         private void InitializeContext()
@@ -101,11 +97,9 @@ namespace Microsoft.Samples.Debugging.Native
         // returns the platform-specific Context Flags
         public ContextFlags GetPSFlags(AgnosticContextFlags flags)
         {
-            
             // We know that we need an amd64 context
             this.m_platform = Platform.AMD64;
             ContextFlags cFlags = ContextFlags.AMD64Context;
-               
 
             if ((flags & AgnosticContextFlags.ContextInteger) == AgnosticContextFlags.ContextInteger)
             {
@@ -118,7 +112,6 @@ namespace Microsoft.Samples.Debugging.Native
             }
             if ((flags & AgnosticContextFlags.ContextFloatingPoint) == AgnosticContextFlags.ContextFloatingPoint)
             {
-             
                 cFlags |= (ContextFlags)AgnosticContextFlags.ContextFloatingPoint;
             }
             if ((flags & AgnosticContextFlags.ContextAll) == AgnosticContextFlags.ContextAll)
@@ -132,7 +125,7 @@ namespace Microsoft.Samples.Debugging.Native
 
         // Sets m_platform the the platform represented by the context flags
         private Platform GetPlatform(ContextFlags flags)
-        { 
+        {
             return Platform.AMD64;
         }
 
@@ -182,8 +175,8 @@ namespace Microsoft.Samples.Debugging.Native
             get
             {
                 Debug.Assert(this.m_rawPtr != IntPtr.Zero, "The context has an invalid context pointer");
-                
-                return (IntPtr)Marshal.ReadInt64(this.m_rawPtr, (int)AMD64Offsets.Rsp); 
+
+                return (IntPtr)Marshal.ReadInt64(this.m_rawPtr, (int)AMD64Offsets.Rsp);
             }
         }
 
@@ -204,7 +197,7 @@ namespace Microsoft.Samples.Debugging.Native
                 IntPtr ip = IntPtr.Zero;
                 using (IContextDirectAccessor w = this.OpenForDirectAccess())
                 {
-                    ip = (IntPtr)Marshal.ReadInt64(w.RawBuffer, (int)AMD64Offsets.Rip);         
+                    ip = (IntPtr)Marshal.ReadInt64(w.RawBuffer, (int)AMD64Offsets.Rip);
                 }
 
                 return ip;
@@ -304,7 +297,6 @@ namespace Microsoft.Samples.Debugging.Native
             //CONTEXT_CONTROL contains: SegCs, SegSs, EFlags, Rsp, Rip
             if ((a1.Flags & ContextFlags.AMD64ContextControl) == ContextFlags.AMD64ContextControl)
             {
-
                 if (!CheckContextChunk(a1, a2, (int)AMD64Offsets.SegCs, (int)AMD64Offsets.SegDs) ||
                     !CheckContextChunk(a1, a2, (int)AMD64Offsets.SegSs, (int)AMD64Offsets.Dr0) ||
                     !CheckContextChunk(a1, a2, (int)AMD64Offsets.Rsp, (int)AMD64Offsets.Rbp) ||
@@ -367,7 +359,7 @@ namespace Microsoft.Samples.Debugging.Native
         {
             List<String> list = new List<String>();
 
-            // This includes the most commonly used flags. 
+            // This includes the most commonly used flags.
             if (HasFlags(ContextFlags.AMD64ContextControl))
             {
                 list.Add("Rsp");
@@ -463,7 +455,6 @@ namespace Microsoft.Samples.Debugging.Native
                 if (name == "RSI") return Marshal.ReadInt64(this.RawPtr, (int)AMD64Offsets.Rsi);
                 if (name == "RDI") return Marshal.ReadInt64(this.RawPtr, (int)AMD64Offsets.Rdi);
                 if (name == "RBP") return Marshal.ReadInt64(this.RawPtr, (int)AMD64Offsets.Rbp);
-
             }
             if (HasFlags(ContextFlags.AMD64ContextSegments))
             {
@@ -487,13 +478,13 @@ namespace Microsoft.Samples.Debugging.Native
 
             if (HasFlags(ContextFlags.AMD64ContextControl))
             {
-                if (name == "RSP") 
+                if (name == "RSP")
                 {
                     Marshal.WriteInt64(this.RawPtr, (int)AMD64Offsets.Rsp, (Int64)value);
                     return;
                 }
-                if (name == "RIP") 
-                {   
+                if (name == "RIP")
+                {
                     Marshal.WriteInt64(this.RawPtr, (int)AMD64Offsets.Rip, (Int64)value);
                     return;
                 }
@@ -590,6 +581,6 @@ namespace Microsoft.Samples.Debugging.Native
             }
         }
 
-        #endregion
+        #endregion IDisposable Members
     }
 }

@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Assembler.x86
+﻿namespace Cosmos.Assembler.x86
 {
-    public class ExternalLabel: Instruction
+    public class ExternalLabel : Instruction
     {
-        public ExternalLabel(string aName):base()
+        public ExternalLabel(string aName)
+            : base()
         {
             Name = aName;
         }
@@ -18,7 +14,7 @@ namespace Cosmos.Assembler.x86
             set;
         }
 
-        public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
         {
             aOutput.Write("extern ");
             aOutput.Write(Name);

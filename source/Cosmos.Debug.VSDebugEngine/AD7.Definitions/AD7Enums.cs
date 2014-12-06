@@ -1,7 +1,6 @@
-﻿
-namespace Cosmos.Debug.VSDebugEngine
+﻿namespace Cosmos.Debug.VSDebugEngine
 {
-    //// Flags passed by the debugger to the engine to describe the desired format and execution options for properties 
+    //// Flags passed by the debugger to the engine to describe the desired format and execution options for properties
     //// (locals, arguments, etc...)
     //public enum DEBUGPROP_INFO_FLAGS
     //{
@@ -81,4 +80,4 @@ namespace Cosmos.Debug.VSDebugEngine
     //    public static readonly ulong DBG_ATTRIB_CHILD_ALL = 0x0000ff0000000000;
 
     //}
-}   
+}

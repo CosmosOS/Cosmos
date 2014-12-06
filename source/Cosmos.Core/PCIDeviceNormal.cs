@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Core
+﻿namespace Cosmos.Core
 {
     public class PCIDeviceNormal : PCIDevice
     {
@@ -12,6 +7,7 @@ namespace Cosmos.Core
         public uint CardbusCISPointer { get; private set; }
 
         public ushort SubsystemVendorID { get; private set; }
+
         public ushort SubsystemID { get; private set; }
 
         public uint ExpansionROMBaseAddress { get; private set; }
@@ -19,6 +15,7 @@ namespace Cosmos.Core
         public byte CapabilitiesPointer { get; private set; }
 
         public byte MinGrant { get; private set; }
+
         public byte MaxLatency { get; private set; }
 
         public PCIDeviceNormal(uint bus, uint slot, uint function)

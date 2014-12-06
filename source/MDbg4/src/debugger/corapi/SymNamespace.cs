@@ -1,21 +1,18 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 
-
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-namespace Microsoft.Samples.Debugging.CorSymbolStore 
+namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
-    using System.Diagnostics.SymbolStore;
-
     using System;
-	using System.Text;
+    using System.Diagnostics.SymbolStore;
     using System.Runtime.InteropServices;
-    using System.Runtime.InteropServices.ComTypes;
-	
-	// Interface does not need to be marked with the serializable attribute
+    using System.Text;
+
+    // Interface does not need to be marked with the serializable attribute
     /// <include file='doc\ISymNamespace.uex' path='docs/doc[@for="ISymbolNamespace"]/*' />
     [
         ComImport,
@@ -28,22 +25,20 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         void GetName(int cchName,
                         out int pcchName,
                         [MarshalAs(UnmanagedType.LPWStr)] StringBuilder szName);
-    
+
         void GetNamespaces(int cNameSpaces,
                                 out int pcNameSpaces,
-                                [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] ISymUnmanagedNamespace[] namespaces);
-    
+                                [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedNamespace[] namespaces);
+
         void GetVariables(int cVars,
                              out int pcVars,
-                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] ISymUnmanagedVariable[] pVars);
+                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedVariable[] pVars);
     }
-
-
 
     internal class SymNamespace : ISymbolNamespace
     {
-        ISymUnmanagedNamespace m_unmanagedNamespace;
-        
+        private ISymUnmanagedNamespace m_unmanagedNamespace;
+
         internal SymNamespace(ISymUnmanagedNamespace nameSpace)
         {
             // We should not wrap null instances
@@ -52,9 +47,9 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
 
             m_unmanagedNamespace = nameSpace;
         }
-        
-        public String Name 
-        { 
+
+        public String Name
+        {
             get
             {
                 StringBuilder Name;
@@ -73,7 +68,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             m_unmanagedNamespace.GetNamespaces(0, out cNamespaces, null);
             ISymUnmanagedNamespace[] unmamagedNamespaces = new ISymUnmanagedNamespace[cNamespaces];
             m_unmanagedNamespace.GetNamespaces(cNamespaces, out cNamespaces, unmamagedNamespaces);
-            
+
             ISymbolNamespace[] Namespaces = new ISymbolNamespace[cNamespaces];
             for (i = 0; i < cNamespaces; i++)
             {

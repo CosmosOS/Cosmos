@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
-using Assembler = Cosmos.Assembler.Assembler;
+﻿using Cosmos.IL2CPU.Plugs;
+using System;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.Core.Plugs
@@ -11,8 +7,8 @@ namespace Cosmos.Core.Plugs
     [Plug(Target = typeof(Cosmos.Core.IOPortBase))]
     public class IOPortImpl
     {
-
         #region Write8
+
         private class Write8Assembler : AssemblerMethod
         {
             public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
@@ -25,11 +21,14 @@ namespace Cosmos.Core.Plugs
                 new CPUx86.Out { DestinationReg = CPUx86.Registers.AL };
             }
         }
-        [PlugMethod(Assembler=typeof(Write8Assembler))]
+
+        [PlugMethod(Assembler = typeof(Write8Assembler))]
         public static void Write8(UInt16 aPort, byte aData) { }
-        #endregion
+
+        #endregion Write8
 
         #region Write16
+
         private class Write16Assembler : AssemblerMethod
         {
             public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
@@ -39,11 +38,14 @@ namespace Cosmos.Core.Plugs
                 new CPUx86.Out { DestinationReg = CPUx86.Registers.AX };
             }
         }
+
         [PlugMethod(Assembler = typeof(Write16Assembler))]
         public static void Write16(UInt16 aPort, UInt16 aData) { }
-        #endregion
+
+        #endregion Write16
 
         #region Write32
+
         private class Write32Assembler : AssemblerMethod
         {
             public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
@@ -53,11 +55,14 @@ namespace Cosmos.Core.Plugs
                 new CPUx86.Out { DestinationReg = CPUx86.Registers.EAX };
             }
         }
+
         [PlugMethod(Assembler = typeof(Write32Assembler))]
         public static void Write32(UInt16 aPort, UInt32 aData) { }
-        #endregion
+
+        #endregion Write32
 
         #region Read8
+
         private class Read8Assembler : AssemblerMethod
         {
             public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
@@ -70,11 +75,14 @@ namespace Cosmos.Core.Plugs
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             }
         }
+
         [PlugMethod(Assembler = typeof(Read8Assembler))]
         public static byte Read8(UInt16 aPort) { return 0; }
-        #endregion
+
+        #endregion Read8
 
         #region Read16
+
         private class Read16Assembler : AssemblerMethod
         {
             public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
@@ -85,11 +93,14 @@ namespace Cosmos.Core.Plugs
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             }
         }
+
         [PlugMethod(Assembler = typeof(Read16Assembler))]
         public static UInt16 Read16(UInt16 aPort) { return 0; }
-        #endregion
+
+        #endregion Read16
 
         #region Read32
+
         private class Read32Assembler : AssemblerMethod
         {
             public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
@@ -99,9 +110,10 @@ namespace Cosmos.Core.Plugs
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             }
         }
+
         [PlugMethod(Assembler = typeof(Read32Assembler))]
         public static UInt32 Read32(UInt16 aPort) { return 0; }
-        #endregion
 
+        #endregion Read32
     }
 }

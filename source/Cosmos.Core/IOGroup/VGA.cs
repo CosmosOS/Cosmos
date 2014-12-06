@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Cosmos.Core.IOGroup
+﻿namespace Cosmos.Core.IOGroup
 {
-    public class VGA: IOGroup
+    public class VGA : IOGroup
     {
         public readonly IOPortWrite AttributeController_Index = new IOPortWrite(0x3C0);
         public readonly IOPortWrite AttributeController_Write = new IOPortWrite(0x3C0);
@@ -20,7 +16,7 @@ namespace Cosmos.Core.IOGroup
         public readonly IOPortWrite CRTController_Index = new IOPortWrite(0x3D4);
         public readonly IOPort CRTController_Data = new IOPort(0x3D5);
         public readonly IOPortRead Instat_Read = new IOPortRead(0x3DA);
-                                                                      
+
         /// <summary>
         /// 64KB at 0xA0000
         /// </summary>

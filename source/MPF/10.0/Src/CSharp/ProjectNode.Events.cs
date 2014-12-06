@@ -13,30 +13,35 @@ using System;
 
 namespace Microsoft.VisualStudio.Project
 {
-	public partial class ProjectNode
-	{
-		#region fields
-		private EventHandler<ProjectPropertyChangedArgs> projectPropertiesListeners;
-		#endregion
+    public partial class ProjectNode
+    {
+        #region fields
 
-		#region events
-		public event EventHandler<ProjectPropertyChangedArgs> OnProjectPropertyChanged
-		{
-			add { projectPropertiesListeners += value; }
-			remove { projectPropertiesListeners -= value; }
-		}
-		#endregion
+        private EventHandler<ProjectPropertyChangedArgs> projectPropertiesListeners;
 
-		#region methods
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate")]
-		protected void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue)
-		{
-			if(null != projectPropertiesListeners)
-			{
-				projectPropertiesListeners(this, new ProjectPropertyChangedArgs(propertyName, oldValue, newValue));
-			}
-		}
-		#endregion
-	}
+        #endregion fields
 
+        #region events
+
+        public event EventHandler<ProjectPropertyChangedArgs> OnProjectPropertyChanged
+        {
+            add { projectPropertiesListeners += value; }
+            remove { projectPropertiesListeners -= value; }
+        }
+
+        #endregion events
+
+        #region methods
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1030:UseEventsWhereAppropriate")]
+        protected void RaiseProjectPropertyChanged(string propertyName, string oldValue, string newValue)
+        {
+            if (null != projectPropertiesListeners)
+            {
+                projectPropertiesListeners(this, new ProjectPropertyChangedArgs(propertyName, oldValue, newValue));
+            }
+        }
+
+        #endregion methods
+    }
 }

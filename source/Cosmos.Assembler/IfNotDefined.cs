@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Assembler
+﻿namespace Cosmos.Assembler
 {
-    public class IfNotDefined: Instruction, IIfNotDefined {
-        public string Symbol {
+    public class IfNotDefined : Instruction, IIfNotDefined
+    {
+        public string Symbol
+        {
             get;
             set;
         }

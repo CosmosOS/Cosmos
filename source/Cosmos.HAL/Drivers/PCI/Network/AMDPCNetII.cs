@@ -1,8 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Cosmos.Common;
+﻿using Cosmos.Common;
 using Cosmos.Core;
 using Cosmos.HAL.Network;
+using System;
+using System.Collections.Generic;
 using CompilerPlugs = Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.HAL.Drivers.PCI.Network
@@ -16,6 +16,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             public readonly IOPort BusData;
             public readonly IOPortRead MAC1;
             public readonly IOPortRead MAC2;
+
             public IOGroup(PCIDeviceNormal device)
             {
                 RegisterAddress = new IOPort((ushort)device.BaseAddresses[0].BaseAddress(), 0x14);
@@ -162,6 +163,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         }
 
         #region Register Access Properties
+
         protected UInt32 StatusRegister
         {
             get
@@ -175,6 +177,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 io.RegisterData.DWord = value;
             }
         }
+
         protected UInt32 InitializationBlockAddress
         {
             get
@@ -196,6 +199,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 io.RegisterData.DWord = (value >> 16);
             }
         }
+
         protected UInt32 SoftwareStyleRegister
         {
             get
@@ -209,9 +213,11 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 io.BusData.DWord = value;
             }
         }
-        #endregion
+
+        #endregion Register Access Properties
 
         #region Network Device Implementation
+
         public override MACAddress MACAddress
         {
             get { return mac; }
@@ -281,9 +287,11 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         {
             return false;
         }
-        #endregion
+
+        #endregion Network Device Implementation
 
         #region Helper Functions
+
         [CompilerPlugs.DebugStub(Off = true)]
         protected bool SendBytes(ref byte[] aData)
         {
@@ -313,6 +321,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 
             return false;
         }
+
         [CompilerPlugs.DebugStub(Off = true)]
         private void ReadRawData()
         {
@@ -346,6 +355,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 }
             }
         }
-        #endregion
+
+        #endregion Helper Functions
     }
 }

@@ -1,29 +1,28 @@
+using Cosmos.Debug.Common;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Debugger.Interop;
+using SQLinq;
+using SQLinq.Dapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Debugger.Interop;
-using Cosmos.Debug.Common;
-using Dapper;
-using SQLinq.Dapper;
-using SQLinq;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
     // An implementation of IDebugProperty2
-    // This interface represents a stack frame property, a program document property, or some other property. 
-    // The property is usually the result of an expression evaluation. 
+    // This interface represents a stack frame property, a program document property, or some other property.
+    // The property is usually the result of an expression evaluation.
     //
     // The sample engine only supports locals and parameters for functions that have symbols loaded.
-    class AD7Property : IDebugProperty2
+    internal class AD7Property : IDebugProperty2
     {
         private DebugLocalInfo m_variableInformation;
         private AD7Process mProcess;
         private AD7StackFrame mStackFrame;
         private LOCAL_ARGUMENT_INFO mDebugInfo;
-        const uint mArrayLengthOffset = 8;
-        const uint mArrayFirstElementOffset = 16;
+        private const uint mArrayLengthOffset = 8;
+        private const uint mArrayFirstElementOffset = 16;
         private const string NULL = "null";
 
         protected Int32 OFFSET
@@ -56,7 +55,6 @@ namespace Cosmos.Debug.VSDebugEngine
             {
                 mDebugInfo = mStackFrame.mArgumentInfos[m_variableInformation.Index];
             }
-
         }
 
         public void ReadData<T>(ref DEBUG_PROPERTY_INFO propertyInfo, Func<byte[], int, T> ByteToTypeAction)
@@ -139,8 +137,6 @@ namespace Cosmos.Debug.VSDebugEngine
                     }
                 }
             }
-
-
         }
 
         // Construct a DEBUG_PROPERTY_INFO representing this local or parameter.
@@ -173,6 +169,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     byte[] xData;
 
                     #region string
+
                     if (mDebugInfo.TYPENAME == typeof(string).AssemblyQualifiedName)
                     {
                         const uint xStringLengthOffset = 12;
@@ -224,11 +221,13 @@ namespace Cosmos.Debug.VSDebugEngine
                             }
                         }
                     }
-                    #endregion
+
+                    #endregion string
 
 #warning TODO: String[]
 
                     #region byte
+
                     // Byte
                     else if (mDebugInfo.TYPENAME == typeof(byte).AssemblyQualifiedName)
                     {
@@ -238,9 +237,11 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<byte>(ref propertyInfo, "byte");
                     }
-                    #endregion
+
+                    #endregion byte
 
                     #region sbyte
+
                     // SByte
                     else if (mDebugInfo.TYPENAME == typeof(sbyte).AssemblyQualifiedName)
                     {
@@ -250,9 +251,11 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<sbyte>(ref propertyInfo, "sbyte");
                     }
-                    #endregion
+
+                    #endregion sbyte
 
                     #region char
+
                     else if (mDebugInfo.TYPENAME == typeof(char).AssemblyQualifiedName)
                     {
                         xData = mProcess.mDbgConnector.GetStackData(OFFSET, 2);
@@ -338,9 +341,11 @@ namespace Cosmos.Debug.VSDebugEngine
                             }
                         }
                     }
-                    #endregion
+
+                    #endregion char
 
                     #region short
+
                     // Short
                     else if (mDebugInfo.TYPENAME == typeof(short).AssemblyQualifiedName)
                     {
@@ -350,9 +355,11 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<short>(ref propertyInfo, "short");
                     }
-                    #endregion
+
+                    #endregion short
 
                     #region ushort
+
                     // UShort
                     else if (mDebugInfo.TYPENAME == typeof(ushort).AssemblyQualifiedName)
                     {
@@ -362,9 +369,11 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<ushort>(ref propertyInfo, "ushort");
                     }
-                    #endregion
+
+                    #endregion ushort
 
                     #region int
+
                     // Int32
                     else if (mDebugInfo.TYPENAME == typeof(int).AssemblyQualifiedName)
                     {
@@ -374,9 +383,11 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<int>(ref propertyInfo, "int");
                     }
-                    #endregion
+
+                    #endregion int
 
                     #region uint
+
                     // UInt32
                     else if (mDebugInfo.TYPENAME == typeof(uint).AssemblyQualifiedName)
                     {
@@ -386,9 +397,11 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<uint>(ref propertyInfo, "uint");
                     }
-                    #endregion
+
+                    #endregion uint
 
                     #region long
+
                     // Long
                     else if (mDebugInfo.TYPENAME == typeof(long).AssemblyQualifiedName)
                     {
@@ -398,9 +411,11 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<long>(ref propertyInfo, "long");
                     }
-                    #endregion
+
+                    #endregion long
 
                     #region ulong
+
                     // ULong
                     else if (mDebugInfo.TYPENAME == typeof(ulong).AssemblyQualifiedName)
                     {
@@ -410,9 +425,11 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<ulong>(ref propertyInfo, "ulong");
                     }
-                    #endregion
+
+                    #endregion ulong
 
                     #region float
+
                     // Float
                     else if (mDebugInfo.TYPENAME == typeof(float).AssemblyQualifiedName)
                     {
@@ -422,9 +439,11 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<float>(ref propertyInfo, "float");
                     }
-                    #endregion
+
+                    #endregion float
 
                     #region double
+
                     // Double
                     else if (mDebugInfo.TYPENAME == typeof(double).AssemblyQualifiedName)
                     {
@@ -434,9 +453,11 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<double>(ref propertyInfo, "double");
                     }
-                    #endregion
+
+                    #endregion double
 
                     #region bool
+
                     // Bool
                     else if (mDebugInfo.TYPENAME == typeof(bool).AssemblyQualifiedName)
                     {
@@ -446,7 +467,8 @@ namespace Cosmos.Debug.VSDebugEngine
                     {
                         ReadDataArray<bool>(ref propertyInfo, "bool");
                     }
-                    #endregion
+
+                    #endregion bool
 
                     else
                     {
@@ -521,7 +543,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 propertyInfo.dwFields |= (enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
                 // If the debugger has asked for the property, or the property has children (meaning it is a pointer in the sample)
                 // then set the pProperty field so the debugger can call back when the children are enumerated.
-                //if (((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0) 
+                //if (((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0)
                 //|| (this.m_variableInformation.child != null))
                 //{
                 //    propertyInfo.pProperty = (IDebugProperty2)this;
@@ -577,14 +599,14 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // Returns the property that describes the most-derived property of a property
-        // This is called to support object oriented languages. It allows the debug engine to return an IDebugProperty2 for the most-derived 
+        // This is called to support object oriented languages. It allows the debug engine to return an IDebugProperty2 for the most-derived
         // object in a hierarchy. This engine does not support this.
         public int GetDerivedMostProperty(out IDebugProperty2 ppDerivedMost)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        // This method exists for the purpose of retrieving information that does not lend itself to being retrieved by calling the IDebugProperty2::GetPropertyInfo 
+        // This method exists for the purpose of retrieving information that does not lend itself to being retrieved by calling the IDebugProperty2::GetPropertyInfo
         // method. This includes information about custom viewers, managed type slots and other information.
         // The sample engine does not support this.
         public int GetExtendedInfo(ref System.Guid guidExtendedInfo, out object pExtendedInfo)
@@ -646,7 +668,6 @@ namespace Cosmos.Debug.VSDebugEngine
             throw new Exception("The method or operation is not implemented.");
         }
 
-        #endregion
-
+        #endregion IDebugProperty2 Members
     }
 }

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
-using System.Resources;
-using System.Globalization;
+﻿using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU.IL.CustomImplementations.System.Resources
 {
-    [Plug(TargetName="System.Resources.ResourceManager, mscorlib")]
+    [Plug(TargetName = "System.Resources.ResourceManager, mscorlib")]
     public static class ResourceManagerImpl
     {
         //public static ResourceSet
@@ -18,6 +12,5 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System.Resources
         //{
         //    throw new Exception("System.Resources.ResourceManager.InternalGetResourceSet need pluging properly");
         //}
-
     }
 }

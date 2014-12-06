@@ -1,16 +1,10 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
-using Interop.VixCOM;
-
 namespace Vestris.VMWareLib
 {
     /// <summary>
     /// A VMWare Shared Folder.
     /// A shared folder is a local mount point in the guest file system which mounts a shared folder exported by the host.
-    /// Shared folders are not supported for the following guest operating systems: 
-    /// Windows ME, Windows 98, Windows 95, Windows 3.x, and DOS. 
+    /// Shared folders are not supported for the following guest operating systems:
+    /// Windows ME, Windows 98, Windows 95, Windows 3.x, and DOS.
     /// </summary>
     public class VMWareSharedFolder
     {
@@ -26,7 +20,6 @@ namespace Vestris.VMWareLib
         public VMWareSharedFolder(string shareName, string hostPath)
             : this(shareName, hostPath, 0)
         {
-
         }
 
         /// <summary>
@@ -55,7 +48,7 @@ namespace Vestris.VMWareLib
 
         /// <summary>
         /// Host path this folder is mounted from.
-        /// Only absolute paths should be used for files in the guest; the resolution of relative paths is not specified. 
+        /// Only absolute paths should be used for files in the guest; the resolution of relative paths is not specified.
         /// </summary>
         public string HostPath
         {
@@ -89,7 +82,7 @@ namespace Vestris.VMWareLib
             if (obj is VMWareSharedFolder)
             {
                 VMWareSharedFolder sharedFolder = (VMWareSharedFolder)obj;
-                return sharedFolder._hostPath == _hostPath 
+                return sharedFolder._hostPath == _hostPath
                     && sharedFolder._shareName == _shareName;
             }
 

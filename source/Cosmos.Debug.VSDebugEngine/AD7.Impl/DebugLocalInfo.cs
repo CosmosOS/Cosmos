@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.Debugger.Interop;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -50,6 +48,7 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         private List<IDebugProperty2> m_children = new List<IDebugProperty2>();
+
         public List<IDebugProperty2> Children
         {
             get { return m_children; }

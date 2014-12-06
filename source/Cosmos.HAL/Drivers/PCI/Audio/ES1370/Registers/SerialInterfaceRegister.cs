@@ -18,7 +18,7 @@ namespace Cosmos.Hardware2.Audio.Devices.ES1370.Registers
         {
             xMem = aMem;
         }
-        
+
         #region Bits
 
         [Flags]
@@ -46,7 +46,8 @@ namespace Cosmos.Hardware2.Audio.Devices.ES1370.Registers
             DAC1ForceReloadCnt = BinaryHelper.BitPos.BIT7,
             DAC2OnStopMode = BinaryHelper.BitPos.BIT6
         }
-        #endregion
+
+        #endregion Bits
 
         public byte SERIAL
         {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -53,6 +52,7 @@ namespace XSharp.Test
                         if (1 == scannedArgument.Length) { goto default; }
                         scannedArgument = scannedArgument.Substring(1);
                         break;
+
                     default:
                         MessageBox.Show(string.Format("Unrecognized command line argument '{0}'.", scannedArgument));
                         result = false;
@@ -63,6 +63,7 @@ namespace XSharp.Test
                     case "a":
                         _launchNasm = true;
                         break;
+
                     case "d":
                         if (++index >= args.Length)
                         {
@@ -87,9 +88,11 @@ namespace XSharp.Test
                             }
                         }
                         break;
+
                     case "h":
                         _displayUsage = true;
                         break;
+
                     default:
                         // Must reinitialize scannedArgument to its original value.
                         scannedArgument = args[index];

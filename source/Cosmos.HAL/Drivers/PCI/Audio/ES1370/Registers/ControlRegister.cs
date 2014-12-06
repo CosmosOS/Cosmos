@@ -36,7 +36,7 @@ namespace Cosmos.Hardware2.Audio.Devices.ES1370.Registers
             }
         }
 
-        #endregion
+        #endregion Constructor
 
         #region Register Data
 
@@ -146,7 +146,8 @@ namespace Cosmos.Hardware2.Audio.Devices.ES1370.Registers
                     SetBit(BitValue.MSFMTSEL, false);
             }
         }
-        #endregion
+
+        #endregion Register Data
 
         #region Accessors
 
@@ -168,9 +169,9 @@ namespace Cosmos.Hardware2.Audio.Devices.ES1370.Registers
             return this.CONTROL.ToBinary(8);
         }
 
-        #endregion
-
+        #endregion Accessors
     }
+
     #region Bits
 
     [Flags]
@@ -210,6 +211,7 @@ namespace Cosmos.Hardware2.Audio.Devices.ES1370.Registers
         SONY = 0,
         I2S = 1
     }
-    #endregion
+
+    #endregion Bits
 }
 */

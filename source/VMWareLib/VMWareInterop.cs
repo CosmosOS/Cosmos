@@ -1,6 +1,5 @@
-using System;
-using System.Collections.Generic;
 using Interop.VixCOM;
+using System;
 
 namespace Vestris.VMWareLib
 {

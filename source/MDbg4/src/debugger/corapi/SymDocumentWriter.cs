@@ -1,22 +1,17 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 
-
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-namespace Microsoft.Samples.Debugging.CorSymbolStore 
+namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
-    using System.Diagnostics.SymbolStore;
-
-    
     using System;
-	using System.Text;
+    using System.Diagnostics.SymbolStore;
     using System.Runtime.InteropServices;
-    using System.Runtime.InteropServices.ComTypes;
-	
-	// Interface does not need to be marked with the serializable attribute
+
+    // Interface does not need to be marked with the serializable attribute
     /// <include file='doc\ISymDocumentWriter.uex' path='docs/doc[@for="ISymbolDocumentWriter"]/*' />
     [
         ComImport,
@@ -27,18 +22,17 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
     internal interface ISymUnmanagedDocumentWriter
     {
         void SetSource(int sourceSize,
-                          [MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] byte[] source);
-    
+                          [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] byte[] source);
+
         void SetCheckSum(Guid algorithmId,
                               int checkSumSize,
-                              [MarshalAs(UnmanagedType.LPArray, SizeParamIndex=1)] byte[] checkSum);
+                              [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] checkSum);
     };
-        
-    
-    internal class SymDocumentWriter: ISymbolDocumentWriter
+
+    internal class SymDocumentWriter : ISymbolDocumentWriter
     {
-        ISymUnmanagedDocumentWriter m_unmanagedDocumentWriter;
-        
+        private ISymUnmanagedDocumentWriter m_unmanagedDocumentWriter;
+
         public SymDocumentWriter(ISymUnmanagedDocumentWriter unmanagedDocumentWriter)
         {
             // We should not wrap null instances
@@ -47,7 +41,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
 
             m_unmanagedDocumentWriter = unmanagedDocumentWriter;
         }
-        
+
         public void SetSource(byte[] source)
         {
             m_unmanagedDocumentWriter.SetSource(source.Length, source);
@@ -66,7 +60,5 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                 return m_unmanagedDocumentWriter;
             }
         }
-                                      
- 
     }
 }

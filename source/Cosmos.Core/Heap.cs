@@ -11,12 +11,11 @@ namespace Cosmos.Core {
     // This class must be static, as for creating objects, we needd the hea
     public static class Heap
     {
-        public static bool EnableDebug = true;  
+        public static bool EnableDebug = true;
         //GC variables
 
-        public static bool SkipRalloc = true;      
+        public static bool SkipRalloc = true;
         public static uint LastMallocAddr;
-        
 
         private static uint mStartAddress;
         private static uint mEndOfRam;
@@ -30,7 +29,6 @@ namespace Cosmos.Core {
 
         public static void DecreaseMemoryUse(uint aSize)
         {
-
             mStartAddress -= aSize;
             if (mStartAddress < HMI.ProtectArea)
             {
@@ -41,7 +39,6 @@ namespace Cosmos.Core {
                 LastMallocAddr = mStartAddress;
             }
         }
-
 
         internal static void Initialize()
         {
@@ -67,12 +64,11 @@ namespace Cosmos.Core {
             if (xAddr == 0)
             {
                 xAddr = mStartAddress;
-             
+
                 if (mStartAddress >= mEndOfRam)
                 {
                     HMI.HeapOutOfMemory();
                 }
-
                 else
                 {
                     mStartAddress += aLength;
@@ -85,12 +81,10 @@ namespace Cosmos.Core {
                     {
                         LastMallocAddr = xAddr;//Update this when we allocate a new block not extend an old block
                     }
-                    SkipRalloc = false; 
-                   
+                    SkipRalloc = false;
                 }
-          
             }
-            
+
             return xAddr;
         }
 
@@ -98,14 +92,11 @@ namespace Cosmos.Core {
         {
             HMI.HeapExcessUseFault();
         }
-
     }
 }
 #else
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Cosmos.Core
 {
@@ -117,14 +108,14 @@ namespace Cosmos.Core
         private static uint mStartAddress;
         private static uint mLength;
         private static uint mEndOfRam;
-        
+
         private static void DoInitialize(uint aStartAddress, uint aEndOfRam)
         {
             mStart = mStartAddress = aStartAddress + (4 - (aStartAddress % 4));
             mLength = aEndOfRam - aStartAddress;
             mLength = (mLength / 4) * 4;
             ClearMemory(aStartAddress, mLength);
-           
+
             mStartAddress += 1024;
             mEndOfRam = aEndOfRam;
             mStartAddress = (mStartAddress / 4) * 4;
@@ -133,6 +124,7 @@ namespace Cosmos.Core
         }
 
         private static bool mInitialized = false;
+
         internal static void Initialize()
         {
             if (!mInitialized)
@@ -280,4 +272,5 @@ namespace Cosmos.Core
         }
     }
 }
+
 #endif

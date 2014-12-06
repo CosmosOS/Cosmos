@@ -1,36 +1,34 @@
-using System;
-using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
+using System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stelem )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stelem)]
     public class Stelem : ILOp
     {
-        public Stelem( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Stelem(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             if (aMethod.MethodBase.GetFullName() == "SystemVoidSystemCollectionsGenericList1SystemUInt64AddSystemUInt64")
             {
                 Console.Write("");
             }
-          var xOpType = (OpType)aOpCode;
-          var xSize = SizeOfType(xOpType.Value);
+            var xOpType = (OpType)aOpCode;
+            var xSize = SizeOfType(xOpType.Value);
 
-            Stelem_Ref.Assemble( Assembler, ( uint )xSize, aMethod, aOpCode );
+            Stelem_Ref.Assemble(Assembler, (uint)xSize, aMethod, aOpCode);
         }
-
 
         // using System;
         // using System.Collections.Generic;
         // using System.Linq;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.Compiler;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stelem)]
         // 	public class Stelem: Op {
@@ -39,7 +37,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 	    private string mCurLabel;
         // 	    private uint mCurOffset;
         // 	    private MethodInformation mMethodInformation;
-        //         
+        //
         //         public Stelem(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {
         // 			mType = aReader.OperandValueType;
@@ -50,7 +48,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		    mCurLabel = IL.Op.GetInstructionLabel(aReader);
         //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
         // 		}
-        // 
+        //
         // 		public override void DoAssemble() {
         //             var xElementSize = GetService<IMetaDataInfoService>().SizeOfType(mType);
         // 		    new Comment("Element size: " + xElementSize);
@@ -58,6 +56,5 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 	}
         // }
-
     }
 }

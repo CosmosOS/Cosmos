@@ -1,26 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Data;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
-using Cosmos.Debug.Common;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Cosmos.VS.Windows
 {
@@ -42,12 +23,10 @@ namespace Cosmos.VS.Windows
     {
         protected byte[] stackData = new byte[0];
 
-
         public StackUC()
         {
             InitializeComponent();
         }
-
 
         public override void Update(string aTag, byte[] aData)
         {
@@ -143,6 +122,7 @@ namespace Cosmos.VS.Windows
             byte[] aStackData = stackData == null ? new byte[0] : stackData;
             return BitConverter.GetBytes(aFrameData.Length).Concat(aFrameData.Concat(aStackData)).ToArray();
         }
+
         public override void SetCurrentState(byte[] aData)
         {
             if (aData == null)

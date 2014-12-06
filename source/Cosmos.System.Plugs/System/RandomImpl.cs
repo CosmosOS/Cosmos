@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Cosmos.HAL;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.HAL;
+using System;
 
 namespace Cosmos.System.Plugs.System
 {
@@ -50,7 +48,7 @@ namespace Cosmos.System.Plugs.System
             return GetUniform();
         }
 
-        static double GetUniform()
+        private static double GetUniform()
         {
             uint seed = (uint)RTC.Second;
             uint m_w = (uint)(seed >> 16);

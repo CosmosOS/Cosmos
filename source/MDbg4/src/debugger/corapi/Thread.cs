@@ -1,15 +1,15 @@
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
 using System.Collections;
 using System.Diagnostics;
-
-using Microsoft.Samples.Debugging.CorDebug.NativeApi;
-using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 
 namespace Microsoft.Samples.Debugging.CorDebug
 {
@@ -22,6 +22,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 return m_ilOffset;
             }
         }
+
         private int m_ilOffset;
 
         public CorFunction Function
@@ -31,6 +32,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 return m_function;
             }
         }
+
         private CorFunction m_function;
 
         public CorModule Module
@@ -40,6 +42,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 return m_module;
             }
         }
+
         private CorModule m_module;
 
         internal CorActiveFunction(int ilOffset, CorFunction managedFunction, CorModule managedModule)
@@ -62,12 +65,15 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public struct CorBlockingObject
     {
         public CorValue BlockingObject;
+
         [CLSCompliant(false)]
         public CorDebugBlockingReason BlockingReason;
+
         public TimeSpan Timeout;
     }
 
     /** A thread in the debugged process. */
+
     public sealed class CorThread : WrapperBase
     {
         internal CorThread(ICorDebugThread thread)
@@ -84,13 +90,14 @@ namespace Microsoft.Samples.Debugging.CorDebug
         [CLSCompliant(false)]
         public ICorDebugThread Raw
         {
-            get 
-            { 
+            get
+            {
                 return m_th;
             }
         }
 
         /** The process that this thread is in. */
+
         public CorProcess Process
         {
             get
@@ -102,6 +109,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** the OS id of the thread. */
+
         public int Id
         {
             get
@@ -113,6 +121,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** The handle of the active part of the thread. */
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IntPtr Handle
         {
@@ -125,6 +134,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** The AppDomain that owns the thread. */
+
         public CorAppDomain AppDomain
         {
             get
@@ -136,6 +146,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Set the current debug state of the thread. */
+
         [CLSCompliant(false)]
         public CorDebugThreadState DebugState
         {
@@ -152,6 +163,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** the user state. */
+
         [CLSCompliant(false)]
         public CorDebugUserState UserState
         {
@@ -164,6 +176,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** the exception object which is currently being thrown by the thread. */
+
         public CorValue CurrentException
         {
             get
@@ -177,6 +190,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         /** gets the current custom notification object on the thread or null if
          * no such object exists.
          * */
+
         public CorValue CurrentNotification
         {
             get
@@ -215,26 +229,29 @@ namespace Microsoft.Samples.Debugging.CorDebug
             }
         }
 
-        /** 
+        /**
          * Clear the current exception object, preventing it from being thrown.
          */
+
         public void ClearCurrentException()
         {
             m_th.ClearCurrentException();
         }
 
-        /** 
+        /**
          * Intercept the current exception.
          */
+
         public void InterceptCurrentException(CorFrame frame)
         {
             ICorDebugThread2 m_th2 = (ICorDebugThread2)m_th;
             m_th2.InterceptCurrentException(frame.m_frame);
         }
 
-        /** 
+        /**
          * create a stepper object relative to the active frame in this thread.
          */
+
         public CorStepper CreateStepper()
         {
             ICorDebugStepper s = null;
@@ -243,6 +260,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** All stack chains in the thread. */
+
         public IEnumerable Chains
         {
             get
@@ -254,6 +272,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** The most recent chain in the thread, if any. */
+
         public CorChain ActiveChain
         {
             get
@@ -265,6 +284,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Get the active frame. */
+
         public CorFrame ActiveFrame
         {
             get
@@ -276,6 +296,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Get the register set for the active part of the thread. */
+
         public CorRegisterSet RegisterSet
         {
             get
@@ -287,6 +308,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Creates an evaluation object. */
+
         public CorEval CreateEval()
         {
             ICorDebugEval e = null;
@@ -295,6 +317,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Get the runtime thread object. */
+
         public CorValue ThreadVariable
         {
             get
@@ -322,7 +345,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             }
             return caf;
         }
-     
+
         public bool IsV3
         {
             get
@@ -339,12 +362,13 @@ namespace Microsoft.Samples.Debugging.CorDebug
             }
         }
 
-        /** 
+        /**
          * If PureV3StackWalk is specified, then this method returns a CorStackWalk, which does not expose
-         * ICorDebugInternalFrames.  If ExtendedV3StackWalk is specified, then this method returns a 
+         * ICorDebugInternalFrames.  If ExtendedV3StackWalk is specified, then this method returns a
          * CorStackWalkEx, which derives from CorStackWalk and interleaves ICorDebugInternalFrames.
          */
-        public CorStackWalk CreateStackWalk (CorStackWalkType type)
+
+        public CorStackWalk CreateStackWalk(CorStackWalkType type)
         {
             ICorDebugThread3 th3 = m_th as ICorDebugThread3;
             if (th3 == null)
@@ -353,7 +377,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             }
 
             ICorDebugStackWalk s = null;
-            th3.CreateStackWalk (out s);
+            th3.CreateStackWalk(out s);
             if (type == CorStackWalkType.PureV3StackWalk)
             {
                 return new CorStackWalk(s, this);
@@ -363,6 +387,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 return new CorStackWalkEx(s, this);
             }
         }
+
         public CorStackWalk CreateStackWalk()
         {
             return CreateStackWalk(CorStackWalkType.PureV3StackWalk);
@@ -403,10 +428,10 @@ namespace Microsoft.Samples.Debugging.CorDebug
             blockingObjectEnumerator.Next(countBlockingObjects, rawBlockingObjects, out countFetched);
             Debug.Assert(countFetched == countBlockingObjects);
             CorBlockingObject[] blockingObjects = new CorBlockingObject[countBlockingObjects];
-            for(int i = 0; i < countBlockingObjects; i++)
+            for (int i = 0; i < countBlockingObjects; i++)
             {
                 blockingObjects[i].BlockingObject = new CorValue(rawBlockingObjects[i].BlockingObject);
-                if(rawBlockingObjects[i].Timeout == uint.MaxValue)
+                if (rawBlockingObjects[i].Timeout == uint.MaxValue)
                 {
                     blockingObjects[i].Timeout = TimeSpan.MaxValue;
                 }
@@ -420,17 +445,13 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         private ICorDebugThread m_th;
-
     } /* class Thread */
-
-
 
     public enum CorFrameType
     {
-        ILFrame, NativeFrame, InternalFrame,          
-            RuntimeUnwindableFrame
+        ILFrame, NativeFrame, InternalFrame,
+        RuntimeUnwindableFrame
     }
-
 
     public sealed class CorFrame : WrapperBase
     {
@@ -443,8 +464,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
         [CLSCompliant(false)]
         public ICorDebugFrame Raw
         {
-            get 
-            { 
+            get
+            {
                 return m_frame;
             }
         }
@@ -569,7 +590,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         [CLSCompliant(false)]
         public ulong Address
         {
-            get 
+            get
             {
                 ICorDebugInternalFrame iframe = GetInternalFrame();
                 if (iframe == null)
@@ -651,6 +672,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             Debug.Assert(nativeFrame != null);
             nativeFrame.GetIP(out offset);
         }
+
         public bool IsChild
         {
             get
@@ -748,7 +770,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
             if (ilframe == null)
                 return null;
 
-
             ICorDebugValue value;
             ilframe.GetArgument((uint)index, out value);
             return (value == null) ? null : new CorValue(value);
@@ -782,7 +803,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
             {
                 m_ilFrameCached = true;
                 m_ilFrame = m_frame as ICorDebugILFrame;
-
             }
             return m_ilFrame;
         }
@@ -800,19 +820,20 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
         private ICorDebugRuntimeUnwindableFrame GetRuntimeUnwindableFrame()
         {
-            if(!m_ruFrameCached) 
+            if (!m_ruFrameCached)
             {
                 m_ruFrameCached = true;
-                
+
                 m_ruFrame = m_frame as ICorDebugRuntimeUnwindableFrame;
             }
             return m_ruFrame;
         }
+
         // 'TypeParameters' returns an enumerator that goes yields generic args from
-        // both the class and the method. To enumerate just the generic args on the 
+        // both the class and the method. To enumerate just the generic args on the
         // method, we need to skip past the class args. We have to get that skip value
         // from the metadata. This is a helper function to efficiently get an enumerator that skips
-        // to a given spot (likely past the class generic args). 
+        // to a given spot (likely past the class generic args).
         public IEnumerable GetTypeParamEnumWithSkip(int skip)
         {
             if (skip < 0)
@@ -845,8 +866,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
             }
         }
 
-
-
         private ICorDebugILFrame m_ilFrame = null;
         private bool m_ilFrameCached = false;
 
@@ -869,8 +888,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
         [CLSCompliant(false)]
         public ICorDebugChain Raw
         {
-            get 
-            { 
+            get
+            {
                 return m_chain;
             }
         }
@@ -1056,7 +1075,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
         private CorFrame m_frame;
     }
 
-
     public struct IL2NativeMap
     {
         public int IlOffset
@@ -1066,6 +1084,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 return m_ilOffset;
             }
         }
+
         private int m_ilOffset;
 
         public int NativeStartOffset
@@ -1075,6 +1094,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 return m_nativeStartOffset;
             }
         }
+
         private int m_nativeStartOffset;
 
         public int NativeEndOffset
@@ -1084,6 +1104,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 return m_nativeEndOffset;
             }
         }
+
         private int m_nativeEndOffset;
 
         internal IL2NativeMap(int ilOffset, int nativeStartOffset, int nativeEndOffset)
@@ -1093,7 +1114,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
             m_nativeEndOffset = nativeEndOffset;
         }
     }
-
 
     public sealed class CorCode : WrapperBase
     {
@@ -1106,8 +1126,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
         [CLSCompliant(false)]
         public ICorDebugCode Raw
         {
-            get 
-            { 
+            get
+            {
                 return m_code;
             }
         }
@@ -1227,6 +1247,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
     }
 
     /** Exposes an enumerator for CodeEnum. */
+
     internal class CorCodeEnumerator : IEnumerable, IEnumerator, ICloneable
     {
         private ICorDebugCodeEnum m_enum;
@@ -1302,8 +1323,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
         [CLSCompliant(false)]
         public ICorDebugFunction Raw
         {
-            get 
-            { 
+            get
+            {
                 return m_function;
             }
         }
@@ -1344,7 +1365,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 return (icode == null ? null : new CorCode(icode));
             }
         }
-
 
         public CorModule Module
         {
@@ -1389,6 +1409,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 (m_function as ICorDebugFunction2).SetJMCStatus(value ? 1 : 0);
             }
         }
+
         internal ICorDebugFunction m_function;
     }
 
@@ -1403,8 +1424,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
         [CLSCompliant(false)]
         public ICorDebugContext Raw
         {
-            get 
-            { 
+            get
+            {
                 return m_context;
             }
         }
@@ -1442,7 +1463,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /// <summary>
-        /// Initializes a new instance of the CorException class with serialized data. 
+        /// Initializes a new instance of the CorException class with serialized data.
         /// </summary>
         /// <param name="info">The SerializationInfo that holds the serialized object data about the exception being thrown.</param>
         /// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
@@ -1451,5 +1472,4 @@ namespace Microsoft.Samples.Debugging.CorDebug
         {
         }
     }
-
 } /* namespace */

@@ -1,7 +1,8 @@
-using System;
-using Cosmos.IL2CPU.X86;
-using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
+using System;
+
+using CPU = Cosmos.Assembler.x86;
+
 using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -20,7 +21,6 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Brtrue)]
     public class Branch : ILOp
     {
-
         public Branch(Cosmos.Assembler.Assembler aAsmblr)
             : base(aAsmblr)
         {
@@ -60,39 +60,51 @@ namespace Cosmos.IL2CPU.X86.IL
                 case ILOpCode.Code.Beq:
                     xTestOp = CPU.ConditionalTestEnum.Zero;
                     break;
+
                 case ILOpCode.Code.Bge:
                     xTestOp = CPU.ConditionalTestEnum.GreaterThanOrEqualTo;
                     break;
+
                 case ILOpCode.Code.Bgt:
                     xTestOp = CPU.ConditionalTestEnum.GreaterThan;
                     break;
+
                 case ILOpCode.Code.Ble:
                     xTestOp = CPU.ConditionalTestEnum.LessThanOrEqualTo;
                     break;
+
                 case ILOpCode.Code.Blt:
                     xTestOp = CPU.ConditionalTestEnum.LessThan;
                     break;
+
                 case ILOpCode.Code.Bne_Un:
                     xTestOp = CPU.ConditionalTestEnum.NotEqual;
                     break;
+
                 case ILOpCode.Code.Bge_Un:
                     xTestOp = CPU.ConditionalTestEnum.AboveOrEqual;
                     break;
+
                 case ILOpCode.Code.Bgt_Un:
                     xTestOp = CPU.ConditionalTestEnum.Above;
                     break;
+
                 case ILOpCode.Code.Ble_Un:
                     xTestOp = CPU.ConditionalTestEnum.BelowOrEqual;
                     break;
+
                 case ILOpCode.Code.Blt_Un:
                     xTestOp = CPU.ConditionalTestEnum.Below;
                     break;
+
                 case ILOpCode.Code.Brfalse:
                     xTestOp = CPU.ConditionalTestEnum.Zero;
                     break;
+
                 case ILOpCode.Code.Brtrue:
                     xTestOp = CPU.ConditionalTestEnum.NotZero;
                     break;
+
                 default:
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Branch.cs->Error: Unknown OpCode for conditional branch.");
             }
@@ -137,6 +149,7 @@ namespace Cosmos.IL2CPU.X86.IL
                             new CPU.Xor { DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EDX };
                             new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             break;
+
                         case ConditionalTestEnum.GreaterThanOrEqualTo:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = xNoJump };
@@ -144,6 +157,7 @@ namespace Cosmos.IL2CPU.X86.IL
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = xNoJump };
                             break;
+
                         case ConditionalTestEnum.GreaterThan:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = xNoJump };
@@ -151,6 +165,7 @@ namespace Cosmos.IL2CPU.X86.IL
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.BelowOrEqual, DestinationLabel = xNoJump };
                             break;
+
                         case ConditionalTestEnum.LessThanOrEqualTo:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
@@ -158,6 +173,7 @@ namespace Cosmos.IL2CPU.X86.IL
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.BelowOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             break;
+
                         case ConditionalTestEnum.LessThan:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
@@ -172,12 +188,14 @@ namespace Cosmos.IL2CPU.X86.IL
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = xNoJump };
                             break;
+
                         case ConditionalTestEnum.Above:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.BelowOrEqual, DestinationLabel = xNoJump };
                             break;
+
                         case ConditionalTestEnum.BelowOrEqual:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
@@ -185,6 +203,7 @@ namespace Cosmos.IL2CPU.X86.IL
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             break;
+
                         case ConditionalTestEnum.Below:
                             new CPU.Compare { DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
@@ -192,6 +211,7 @@ namespace Cosmos.IL2CPU.X86.IL
                             new CPU.Compare { DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX };
                             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.AboveOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             break;
+
                         default:
                             throw new Exception("Unknown OpCode for conditional branch in 64-bit.");
                     }

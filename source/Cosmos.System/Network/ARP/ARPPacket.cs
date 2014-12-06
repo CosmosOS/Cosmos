@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Cosmos.HAL;
 using Cosmos.HAL.Network;
-using Sys = System;
-using Cosmos.HAL;
+using System;
 
 namespace Cosmos.System.Network.ARP
 {
@@ -98,10 +97,12 @@ namespace Cosmos.System.Network.ARP
         {
             get { return this.aOperation; }
         }
+
         internal UInt16 HardwareType
         {
             get { return this.aHardwareType; }
         }
+
         internal UInt16 ProtocolType
         {
             get { return this.aProtocolType; }

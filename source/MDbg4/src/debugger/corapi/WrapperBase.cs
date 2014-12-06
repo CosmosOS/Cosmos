@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
@@ -48,39 +48,38 @@ namespace Microsoft.Samples.Debugging.CorDebug
     {
         protected WrapperBase(Object value)
         {
-            Debug.Assert(value!=null);
+            Debug.Assert(value != null);
             m_comObject = value;
         }
 
-        public override bool Equals(Object value) 
+        public override bool Equals(Object value)
         {
-            if(!(value is WrapperBase))
+            if (!(value is WrapperBase))
                 return false;
             return ((value as WrapperBase).m_comObject == this.m_comObject);
         }
-            
-        public override int GetHashCode() 
+
+        public override int GetHashCode()
         {
             return m_comObject.GetHashCode();
         }
 
-        public static bool operator ==( WrapperBase operand,WrapperBase operand2)
+        public static bool operator ==(WrapperBase operand, WrapperBase operand2)
         {
-            if(Object.ReferenceEquals(operand,operand2))
+            if (Object.ReferenceEquals(operand, operand2))
                 return true;
 
-            if(Object.ReferenceEquals(operand, null))               // this means that operand==null && operand2 is not null 
+            if (Object.ReferenceEquals(operand, null))               // this means that operand==null && operand2 is not null
                 return false;
 
             return operand.Equals(operand2);
         }
-        
-        public static bool operator !=( WrapperBase operand,WrapperBase operand2)
+
+        public static bool operator !=(WrapperBase operand, WrapperBase operand2)
         {
-            return !(operand==operand2);
+            return !(operand == operand2);
         }
 
         private Object m_comObject;
     }
-    
 } /* namespace */

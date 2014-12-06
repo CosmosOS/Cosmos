@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.VisualStudio;
+﻿using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using Cosmos.Debug.Common;
+using System;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
-    // This class represents a succesfully parsed expression to the debugger. 
+    // This class represents a succesfully parsed expression to the debugger.
     // It is returned as a result of a successful call to IDebugExpressionContext2.ParseText
-    // It allows the debugger to obtain the values of an expression in the debuggee. 
+    // It allows the debugger to obtain the values of an expression in the debuggee.
     // For the purposes of this sample, this means obtaining the values of locals and parameters from a stack frame.
     public class AD7Expression : IDebugExpression2
     {
@@ -31,8 +28,8 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // This method evaluates the expression asynchronously.
-        // This method should return immediately after it has started the expression evaluation. 
-        // When the expression is successfully evaluated, an IDebugExpressionEvaluationCompleteEvent2 
+        // This method should return immediately after it has started the expression evaluation.
+        // When the expression is successfully evaluated, an IDebugExpressionEvaluationCompleteEvent2
         // must be sent to the IDebugEventCallback2 event callback
         //
         // This is primarily used for the immediate window which this engine does not currently support.
@@ -47,6 +44,5 @@ namespace Cosmos.Debug.VSDebugEngine
             ppResult = new AD7Property(m_var, Process, StackFrame);
             return VSConstants.S_OK;
         }
-
     }
 }

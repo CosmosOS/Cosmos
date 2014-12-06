@@ -9,8 +9,6 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
-using System.Diagnostics.CodeAnalysis;
-
 // This file is used by Code Analysis to maintain SuppressMessage
 // attributes that are applied to this project. Project-level
 // suppressions either have no target or are given a specific target
@@ -22,8 +20,8 @@ using System.Diagnostics.CodeAnalysis;
 // file manually.
 
 // The below contains suppressions from LinkDemand occurring from calls to the Marshal type's methods.
-// Calls to these methods are absolute necessary to do successful VS integration. 
-// All these methods are called from the VS Kernel, through interface calls that are expanded in the below methods. 
+// Calls to these methods are absolute necessary to do successful VS integration.
+// All these methods are called from the VS Kernel, through interface calls that are expanded in the below methods.
 // Some of the below methods are non public but their caller's then are methods that are VS Integration interface implementations.
 // The methods in which the LinkDemands were suppressed should be revisited though if adding further LinkDemands or directly Demanding UnmanagedCode Permission is a better choice.
 

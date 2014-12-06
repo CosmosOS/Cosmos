@@ -1,9 +1,5 @@
-﻿using System;
+﻿using Cosmos.HAL.Network;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.HAL;
-using Cosmos.HAL.Network;
 
 namespace Cosmos.HAL
 {
@@ -46,6 +42,7 @@ namespace Cosmos.HAL
         public abstract bool QueueBytes(byte[] buffer, int offset, int length);
 
         public abstract bool ReceiveBytes(byte[] buffer, int offset, int max);
+
         public abstract byte[] ReceivePacket();
 
         public abstract int BytesAvailable();
@@ -53,6 +50,7 @@ namespace Cosmos.HAL
         public abstract bool Enable();
 
         public abstract bool IsSendBufferFull();
+
         public abstract bool IsReceiveBufferFull();
     }
 }

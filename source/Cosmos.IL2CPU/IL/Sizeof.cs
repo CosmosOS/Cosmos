@@ -1,39 +1,37 @@
-using System;
-using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler;
+using CPUx86 = Cosmos.Assembler.x86;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Sizeof )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Sizeof)]
     public class Sizeof : ILOp
     {
-        public Sizeof( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Sizeof(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
-            OpType xType = ( OpType )aOpCode; 
-            uint xSize = SizeOfType( xType.Value );
+            OpType xType = (OpType)aOpCode;
+            uint xSize = SizeOfType(xType.Value);
             new CPUx86.Push { DestinationValue = xSize };
         }
-
 
         // using System;
         // using System.Collections.Generic;
         // using System.IO;
-        // 
-        // 
+        //
+        //
         // using CPU = Cosmos.Assembler.x86;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.Compiler;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Sizeof)]
         // 	public class Sizeof: Op {
         //         private Type mType;
-        // 
+        //
         //         //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
         //         //    Type xTypeRef = aReader.OperandValueType;
         //         //    if (xTypeRef == null)
@@ -42,7 +40,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //         //    }
         //         //    Engine.RegisterType(xTypeRef);
         //         //}
-        // 
+        //
         // 		public Sizeof(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {
         // 			mType = aReader.OperandValueType;
@@ -57,6 +55,5 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 	}
         // }
-
     }
 }

@@ -38,7 +38,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_U1.cs->Unknown size of floating point value.");
                 }
             }
-            else { 
+            else
+            {
                 switch (xSourceSize)
                 {
                     case 1:

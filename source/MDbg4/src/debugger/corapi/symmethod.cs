@@ -1,59 +1,66 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 
-
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-namespace Microsoft.Samples.Debugging.CorSymbolStore 
+namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
+    using System;
     using System.Diagnostics.SymbolStore;
+    using System.Runtime.InteropServices;
+    using System.Text;
 
-	using System.Runtime.InteropServices;
-	using System;
-	using System.Text;
-    
     [
         ComImport,
         Guid("B62B923C-B500-3158-A543-24F307A8B7E1"),
         InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
         ComVisible(false)
     ]
-    interface ISymUnmanagedMethod
+    internal interface ISymUnmanagedMethod
     {
         void GetToken(out SymbolToken pToken);
+
         void GetSequencePointCount(out int retVal);
+
         void GetRootScope([MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedScope retVal);
+
         void GetScopeFromOffset(int offset, [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedScope retVal);
+
         void GetOffset(ISymUnmanagedDocument document,
                          int line,
                          int column,
                          out int retVal);
+
         void GetRanges(ISymUnmanagedDocument document,
                           int line,
                           int column,
                           int cRanges,
                           out int pcRanges,
-                          [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=3)] int[] ranges);
+                          [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] int[] ranges);
+
         void GetParameters(int cParams,
                               out int pcParams,
-                              [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] ISymUnmanagedVariable[] parms);
+                              [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedVariable[] parms);
+
         void GetNamespace([MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedNamespace retVal);
+
         void GetSourceStartEnd(ISymUnmanagedDocument[] docs,
                                   [In, Out, MarshalAs(UnmanagedType.LPArray)] int[] lines,
                                   [In, Out, MarshalAs(UnmanagedType.LPArray)] int[] columns,
                                   out Boolean retVal);
+
         void GetSequencePoints(int cPoints,
                                   out int pcPoints,
-                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] int[] offsets,
-                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] ISymUnmanagedDocument[] documents,
-                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] int[] lines,
-                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] int[] columns,
-                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] int[] endLines,
-                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] int[] endColumns);
+                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] int[] offsets,
+                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedDocument[] documents,
+                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] int[] lines,
+                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] int[] columns,
+                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] int[] endLines,
+                                  [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] int[] endColumns);
     }
-    
+
     [
         ComImport,
         Guid("85E891DA-A631-4c76-ACA2-A44A39C46B8C"),
@@ -66,7 +73,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                                          int cchName,
                                          out int pcchName,
                                          [MarshalAs(UnmanagedType.LPWStr)] StringBuilder name);
-    
+
         void GetLineFromOffset(int dwOffset,
                                    out int pline,
                                    out int pcolumn,
@@ -74,11 +81,10 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                                    out int pendColumn,
                                    out int pdwStartOffset);
     }
-    
 
     internal class SymMethod : ISymbolMethod, ISymbolEnCMethod
     {
-        ISymUnmanagedMethod m_unmanagedMethod;
+        private ISymUnmanagedMethod m_unmanagedMethod;
 
         public SymMethod(ISymUnmanagedMethod unmanagedMethod)
         {
@@ -88,22 +94,22 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
 
             m_unmanagedMethod = unmanagedMethod;
         }
-        
-        public SymbolToken Token 
-        { 
+
+        public SymbolToken Token
+        {
             get
             {
-                SymbolToken token;                
+                SymbolToken token;
                 m_unmanagedMethod.GetToken(out token);
                 return token;
             }
         }
 
         public int SequencePointCount
-        { 
+        {
             get
             {
-                int retval = 0;                
+                int retval = 0;
                 m_unmanagedMethod.GetSequencePointCount(out retval);
                 return retval;
             }
@@ -165,14 +171,13 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             }
 
             return;
-  
         }
 
         public ISymbolScope RootScope
-        { 
+        {
             get
             {
-                ISymUnmanagedScope retval = null;                
+                ISymUnmanagedScope retval = null;
                 m_unmanagedMethod.GetRootScope(out retval);
                 return new SymScope(retval);
             }
@@ -197,14 +202,13 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         public int[] GetRanges(ISymbolDocument document,
                                int line,
                                int column)
-        {                              
+        {
             int cRanges = 0;
             m_unmanagedMethod.GetRanges(((SymbolDocument)document).InternalDocument, line, column, 0, out cRanges, null);
             int[] Ranges = new int[cRanges];
             m_unmanagedMethod.GetRanges(((SymbolDocument)document).InternalDocument, line, column, cRanges, out cRanges, Ranges);
             return Ranges;
         }
-                                
 
         public ISymbolVariable[] GetParameters()
         {
@@ -262,24 +266,23 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             m_unmanagedMethod.GetSourceStartEnd(unmanagedDocuments, lines, columns, out pRetVal);
             if (pRetVal)
             {
-                for (i = 0; i < docs.Length;i++)
+                for (i = 0; i < docs.Length; i++)
                 {
                     docs[i] = new SymbolDocument(unmanagedDocuments[i]);
                 }
             }
             return pRetVal;
-            
         }
 
         public String GetFileNameFromOffset(int dwOffset)
         {
-             int cchName = 0;
-             ((ISymENCUnmanagedMethod)m_unmanagedMethod).GetFileNameFromOffset(dwOffset, 0, out cchName, null);
-             StringBuilder Name = new StringBuilder(cchName);
-             ((ISymENCUnmanagedMethod)m_unmanagedMethod).GetFileNameFromOffset(dwOffset, cchName, out cchName, Name);
-             return Name.ToString();
+            int cchName = 0;
+            ((ISymENCUnmanagedMethod)m_unmanagedMethod).GetFileNameFromOffset(dwOffset, 0, out cchName, null);
+            StringBuilder Name = new StringBuilder(cchName);
+            ((ISymENCUnmanagedMethod)m_unmanagedMethod).GetFileNameFromOffset(dwOffset, cchName, out cchName, Name);
+            return Name.ToString();
         }
-    
+
         public int GetLineFromOffset(int dwOffset,
                                   out int pcolumn,
                                   out int pendLine,
@@ -294,11 +297,10 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
 
         public ISymUnmanagedMethod InternalMethod
         {
-            get 
+            get
             {
                 return m_unmanagedMethod;
             }
         }
     }
-       
 }

@@ -1,17 +1,14 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
 namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
-    using System.Diagnostics.SymbolStore;
-
-
     using System;
+    using System.Diagnostics.SymbolStore;
     using System.Reflection;
     using System.Runtime.InteropServices;
     using System.Runtime.InteropServices.ComTypes;
@@ -136,9 +133,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                                [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)] byte[] signature);
 
         void Abort();
-
     }
-
 
     [
         ComImport,
@@ -280,7 +275,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                                        int addr1,
                                        int addr2,
                                        int addr3);
-
 
         void DefineConstant2([MarshalAs(UnmanagedType.LPWStr)] String name,
                                  Object value,
@@ -428,7 +422,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                                        int addr2,
                                        int addr3);
 
-
         new void DefineConstant2([MarshalAs(UnmanagedType.LPWStr)] String name,
                                  Object value,
                                  SymbolToken sigToken);
@@ -437,13 +430,14 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         void OpenMethod2(SymbolToken method,
                               int isect,
                               int offset);
+
         void Commit();
     }
 
     /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter"]/*' />
     internal class SymbolWriter : ISymbolWriter2, IDisposable
     {
-        ISymUnmanagedWriter m_target;
+        private ISymUnmanagedWriter m_target;
 
         protected static readonly Guid CLSID_CorSymWriter = new Guid("0AE2DEB0-F901-478b-BB9F-881EE8066788");
 
@@ -720,14 +714,12 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             return data;
         }
 
-
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.RemapToken"]/*' />
         public void RemapToken(SymbolToken oldToken,
                             SymbolToken newToken)
         {
             m_target.RemapToken(oldToken, newToken);
         }
-
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.DefineConstant"]/*' />
         public void DefineConstant([MarshalAs(UnmanagedType.LPWStr)] String name,
@@ -770,8 +762,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             ((ISymUnmanagedWriter2)m_target).DefineGlobalVariable2(name, attributes, sigToken,
                                                                   addressKind, addr1, addr2, addr3);
         }
-
-
 
         /// <include file='doc\SymWriter.uex' path='docs/doc[@for="SymbolWriter.DefineConstant1"]/*' />
         public void DefineConstant([MarshalAs(UnmanagedType.LPWStr)] String name,

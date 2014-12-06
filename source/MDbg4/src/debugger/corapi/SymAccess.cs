@@ -1,6 +1,6 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 
@@ -10,9 +10,9 @@
 
 namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
+    using System;
     using System.Diagnostics;
     using System.Diagnostics.SymbolStore;
-    using System;
     using System.Runtime.InteropServices;
 
     // Definition of the different underlying symbol formats that are supported
@@ -25,16 +25,18 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
     /*
      * This class includes methods for getting top-level access to symbol objects for reading and writing to PDB files
      */
+
     public static class SymbolAccess
     {
         // Guids for imported metadata interfaces.
         private static Guid dispenserClassID = new Guid(0xe5cb7a31, 0x7512, 0x11d2, 0x89, 0xce, 0x00, 0x80, 0xc7, 0x92, 0xe5, 0xd8);    // CLSID_CorMetaDataDispenser
+
         private static Guid dispenserIID = new Guid(0x809c652e, 0x7396, 0x11d2, 0x97, 0x71, 0x00, 0xa0, 0xc9, 0xb4, 0xd5, 0x0c);        // IID_IMetaDataDispenser
         private static Guid importerIID = new Guid(0x7dac8207, 0xd3ae, 0x4c75, 0x9b, 0x67, 0x92, 0x80, 0x1a, 0x49, 0x7d, 0x44);         // IID_IMetaDataImport
         private static Guid emitterIID = new Guid(0xba3fee4c, 0xecb9, 0x4e41, 0x83, 0xb7, 0x18, 0x3f, 0xa4, 0x1c, 0xd8, 0x59);     // IID_IMetaDataEmit
 
-        const int OPEN_READ = 0;
-        const int OPEN_WRITE = 1;
+        private const int OPEN_READ = 0;
+        private const int OPEN_WRITE = 1;
 
         internal static class NativeMethods
         {
@@ -94,23 +96,28 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         /*
          * If you want a SymbolReader for a given exe, just use this function.
          */
+
         public static ISymbolReader GetReaderForFile(string pathModule)
         {
             return GetReaderForFile(pathModule, null);
         }
+
         /*
          * If you know the name of the exe and a searchPath where the file may exist, use this one.
          */
+
         public static ISymbolReader GetReaderForFile(string pathModule, string searchPath)
         {
             return GetReaderForFile(SymbolFormat.PDB, pathModule, searchPath);
         }
+
         /*
          * Implementation which allows customization of the SymbolBinder to use.
          * searchPath is a simicolon-delimited list of paths on which to search for pathModule.
          * If searchPath is null, pathModule must be a full path to the assembly.
          */
-         public static ISymbolReader GetReaderForFile(SymbolFormat symFormat, string pathModule, string searchPath)
+
+        public static ISymbolReader GetReaderForFile(SymbolFormat symFormat, string pathModule, string searchPath)
         {
             // First create the Metadata dispenser.
             // Create the appropriate symbol binder
@@ -171,6 +178,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
 
         // There are more methods in this interface, but we don't need them.
     }
+
     // Since we're just blindly passing this interface through managed code to the Symbinder, we don't care about actually
     // importing the specific methods.
     // This needs to be public so that we can call Marshal.GetComInterfaceForObject() on it to get the

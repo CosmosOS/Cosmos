@@ -1,33 +1,37 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using System;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.Debug.VSDebugEngine {
+namespace Cosmos.Debug.VSDebugEngine
+{
     // This class represents the information that describes a bound breakpoint.
-    public class AD7BreakpointResolution : IDebugBreakpointResolution2 {
+    public class AD7BreakpointResolution : IDebugBreakpointResolution2
+    {
         private AD7Engine m_engine;
         private uint m_address;
         private AD7DocumentContext m_documentContext;
 
-        public AD7BreakpointResolution(AD7Engine engine, uint address, AD7DocumentContext documentContext) {
+        public AD7BreakpointResolution(AD7Engine engine, uint address, AD7DocumentContext documentContext)
+        {
             m_engine = engine;
             m_address = address;
             m_documentContext = documentContext;
         }
 
-        // Gets the type of the breakpoint represented by this resolution. 
-        int IDebugBreakpointResolution2.GetBreakpointType(enum_BP_TYPE[] pBPType) {
+        // Gets the type of the breakpoint represented by this resolution.
+        int IDebugBreakpointResolution2.GetBreakpointType(enum_BP_TYPE[] pBPType)
+        {
             // The sample engine only supports code breakpoints.
             pBPType[0] = enum_BP_TYPE.BPT_CODE;
             return VSConstants.S_OK;
         }
 
         // Gets the breakpoint resolution information that describes this breakpoint.
-        int IDebugBreakpointResolution2.GetResolutionInfo(enum_BPRESI_FIELDS dwFields, BP_RESOLUTION_INFO[] pBPResolutionInfo) {
-	        if ((dwFields & enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION) != enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION) { 
+        int IDebugBreakpointResolution2.GetResolutionInfo(enum_BPRESI_FIELDS dwFields, BP_RESOLUTION_INFO[] pBPResolutionInfo)
+        {
+            if ((dwFields & enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION) != enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION)
+            {
                 // The sample engine only supports code breakpoints.
                 BP_RESOLUTION_LOCATION location = new BP_RESOLUTION_LOCATION();
                 location.bpType = (uint)enum_BP_TYPE.BPT_CODE;
@@ -40,20 +44,21 @@ namespace Cosmos.Debug.VSDebugEngine {
                 pBPResolutionInfo[0].bpResLocation = location;
                 pBPResolutionInfo[0].dwFields |= enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION;
             }
-	        
-            if (dwFields.HasFlag(enum_BPRESI_FIELDS.BPRESI_PROGRAM)) {
+
+            if (dwFields.HasFlag(enum_BPRESI_FIELDS.BPRESI_PROGRAM))
+            {
                 pBPResolutionInfo[0].pProgram = (IDebugProgram2)m_engine;
                 pBPResolutionInfo[0].dwFields |= enum_BPRESI_FIELDS.BPRESI_PROGRAM;
             }
-	       
+
             return VSConstants.S_OK;
         }
-
     }
 
-    class AD7ErrorBreakpointResolution : IDebugErrorBreakpointResolution2 {
-
-        int IDebugErrorBreakpointResolution2.GetBreakpointType(enum_BP_TYPE[] pBPType) {
+    internal class AD7ErrorBreakpointResolution : IDebugErrorBreakpointResolution2
+    {
+        int IDebugErrorBreakpointResolution2.GetBreakpointType(enum_BP_TYPE[] pBPType)
+        {
             throw new Exception("The method or operation is not implemented.");
         }
 
@@ -67,7 +72,5 @@ namespace Cosmos.Debug.VSDebugEngine {
 
             throw new Exception("The method or operation is not implemented.");
         }
-
     }
-
 }

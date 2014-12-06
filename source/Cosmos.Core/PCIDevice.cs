@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Cosmos.Core
 {
@@ -66,24 +63,33 @@ namespace Cosmos.Core
         }
 
         public ushort VendorID { get; private set; }
+
         public ushort DeviceID { get; private set; }
 
         //public PCICommand Command { get; private set; }
         //public PCIStatus Status { get; private set; }
         public PCICommand Command { get { return (PCICommand)ReadRegister16(0x04); } set { WriteRegister16(0x04, (ushort)value); } }
+
         public PCIStatus Status { get { return (PCIStatus)ReadRegister16(0x06); } set { WriteRegister16(0x06, (ushort)value); } }
 
         public byte RevisionID { get; private set; }
+
         public byte ProgIF { get; private set; }
+
         public byte Subclass { get; private set; }
+
         public byte ClassCode { get; private set; }
 
         public byte CacheLineSize { get; private set; }
+
         public byte LatencyTimer { get; private set; }
+
         public PCIHeaderType HeaderType { get; private set; }
+
         public PCIBist BIST { get; private set; }
 
         public byte InterruptLine { get; private set; }
+
         public PCIInterruptPIN InterruptPIN { get; private set; }
 
         public bool DeviceExists { get; private set; }
@@ -98,6 +104,7 @@ namespace Cosmos.Core
         public uint function = 0;
 
         protected IOGroup.PCI IO = new IOGroup.PCI();
+
         public PCIDevice(uint bus, uint slot, uint function)
         {
             this.bus = bus;
@@ -128,7 +135,7 @@ namespace Cosmos.Core
         protected UInt32 GetAddressBase(uint aBus, uint aSlot, uint aFunction)
         {
             // 31 	        30 - 24    23 - 16      15 - 11 	    10 - 8 	          7 - 2 	        1 - 0
-            // Enable Bit 	Reserved   Bus Number 	Device Number 	Function Number   Register Number 	00 
+            // Enable Bit 	Reserved   Bus Number 	Device Number 	Function Number   Register Number 	00
             return (UInt32)(
                 // Enable bit - must be set
                 0x80000000
@@ -155,6 +162,7 @@ namespace Cosmos.Core
         }
 
         #region IOReadWrite
+
         protected byte ReadRegister8(byte aRegister)
         {
             UInt32 xAddr = GetAddressBase(bus, slot, function) | ((UInt32)(aRegister & 0xFC));
@@ -196,7 +204,8 @@ namespace Cosmos.Core
             IO.ConfigAddressPort.DWord = xAddr;
             IO.ConfigDataPort.DWord = value;
         }
-        #endregion
+
+        #endregion IOReadWrite
 
         public class DeviceClass
         {
@@ -211,6 +220,7 @@ namespace Cosmos.Core
                                 return "AMD PCnet LANCE PCI Ethernet Controller";
                         }
                         break;
+
                     case "0x104B"://Sony
                         switch (ToHex(device.DeviceID, 16))
                         {
@@ -218,6 +228,7 @@ namespace Cosmos.Core
                                 return "Mylex BT958 SCSI Host Adaptor";
                         }
                         break;
+
                     case "0x1274"://Ensoniq
                         switch (ToHex(device.DeviceID, 16))
                         {
@@ -225,28 +236,36 @@ namespace Cosmos.Core
                                 return "Ensoniq AudioPCI";
                         }
                         break;
+
                     case "0x15AD"://VMware
                         switch (ToHex(device.DeviceID, 16))
                         {
                             case "0x0405":
                                 return "VMware NVIDIA 9500MGS";
+
                             case "0x0770":
                                 return "VMware Standard Enhanced PCI to USB Host Controller";
+
                             case "0x0790":
                                 return "VMware 6.0 Virtual USB 2.0 Host Controller";
+
                             case "0x07A0":
                                 return "VMware PCI Express Root Port";
                         }
                         break;
+
                     case "0x8086"://Intel
                         switch (ToHex(device.DeviceID, 16))
                         {
                             case "0x7190":
                                 return "Intel 440BX/ZX AGPset Host Bridge";
+
                             case "0x7191":
                                 return "Intel 440BX/ZX AGPset PCI-to-PCI bridge";
+
                             case "0x7110":
                                 return "Intel PIIX4/4E/4M ISA Bridge";
+
                             case "0x7112":
                                 return "Intel PIIX4/4E/4M USB Interface";
                         }
@@ -259,36 +278,52 @@ namespace Cosmos.Core
                     //    return "Any device";
                     case 0x01:
                         return "Mass Storage Controller";
+
                     case 0x02:
                         return "Network Controller";
+
                     case 0x03:
                         return "Display Controller";
+
                     case 0x04:
                         return "Multimedia Controller";
+
                     case 0x05:
                         return "Memory Controller";
+
                     case 0x06:
                         return "Bridge Device";
+
                     case 0x07:
                         return "Simple Communication Controller";
+
                     case 0x08:
                         return "Base System Peripheral";
+
                     case 0x09:
                         return "Input Device";
+
                     case 0x0A:
                         return "Docking Station";
+
                     case 0x0B:
                         return "Processor";
+
                     case 0x0C:
                         return "Serial Bus Controller";
+
                     case 0x0D:
                         return "Wireless Controller";
+
                     case 0x0E:
                         return "Intelligent I/O Controller";
+
                     case 0x0F:
                         return "Satellite Communication Controller";
+
                     case 0x10:
                         return "Encryption/Decryption Controller";
+
                     case 0x11:
                         return "Data Acquisition and Signal Processing Controller";
                     //case 0xFF:

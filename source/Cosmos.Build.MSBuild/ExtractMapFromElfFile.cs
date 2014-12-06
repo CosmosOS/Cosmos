@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using Globalization = System.Globalization;
-using System.Linq;
-using System.Text;
+﻿using Cosmos.Debug.Common;
 using Microsoft.Build.Framework;
-using System.IO;
-using Microsoft.Build.Utilities;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Data;
-using System.Configuration;
-using System.Data.Common;
-using System.Data.SQLite;
-using Cosmos.Debug.Common;
+using System.IO;
+using Globalization = System.Globalization;
 
-namespace Cosmos.Build.MSBuild {
-    public class ExtractMapFromElfFile : BaseToolTask {
+namespace Cosmos.Build.MSBuild
+{
+    public class ExtractMapFromElfFile : BaseToolTask
+    {
         [Required]
         public string InputFile { get; set; }
 
@@ -28,6 +23,7 @@ namespace Cosmos.Build.MSBuild {
         public string CosmosBuildDir { get; set; }
 
         #region Old NASM Map parser
+
         //public static List<Label> ParseMapFile(String buildPath) {
         //  var xSourceStrings = File.ReadAllLines(Path.Combine(buildPath, "main.map"));
         //  var xSource = new List<Label>();
@@ -58,7 +54,8 @@ namespace Cosmos.Build.MSBuild {
         //  }
         //  return xSource;
         //}
-        #endregion
+
+        #endregion Old NASM Map parser
 
         public override bool Execute()
         {
@@ -72,7 +69,7 @@ namespace Cosmos.Build.MSBuild {
                 using (var xDebugInfo = new DebugInfo(DebugInfoFile))
                 {
                     // In future instead of loading all labels, save indexes to major labels but not IL.ASM labels.
-                    // Then code can find major lables, and use position markers into the map file to parse in between 
+                    // Then code can find major lables, and use position markers into the map file to parse in between
                     // as needed.
                     using (var xMapReader = new StreamReader(xFile))
                     {
@@ -155,26 +152,32 @@ namespace Cosmos.Build.MSBuild {
             }
         }
 
-        private string RunObjDump() {
+        private string RunObjDump()
+        {
             var xMapFile = Path.ChangeExtension(InputFile, "map");
             File.Delete(xMapFile);
-            if (File.Exists(xMapFile)) {
+            if (File.Exists(xMapFile))
+            {
                 throw new Exception("Could not delete " + xMapFile);
             }
 
             var xTempBatFile = Path.Combine(WorkingDir, "ExtractElfMap.bat");
             File.WriteAllText(xTempBatFile, "@ECHO OFF\r\n\"" + Path.Combine(CosmosBuildDir, @"tools\cygwin\objdump.exe") + "\" --wide --syms \"" + InputFile + "\" > \"" + Path.GetFileName(xMapFile) + "\"");
 
-            if (!ExecuteTool(WorkingDir, xTempBatFile, "", "objdump")) {
+            if (!ExecuteTool(WorkingDir, xTempBatFile, "", "objdump"))
+            {
                 throw new Exception("Error extracting map from " + InputFile);
             }
             File.Delete(xTempBatFile);
 
             return xMapFile;
         }
+
         private static UInt64 mLastGuid = 0;
-        private static Guid Guid_NewGuid() {
-            // Old code: 
+
+        private static Guid Guid_NewGuid()
+        {
+            // Old code:
             //return Guid.NewGuid();
             // Do NOT use Guid.NewGuid(). During compilation we're generating
             // about 60 milion guids. Guid.NewGuid slows down compilation significantly (about half the time!)

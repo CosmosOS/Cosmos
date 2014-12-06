@@ -1,6 +1,8 @@
-using System;
-using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
+using System;
+
+using CPUx86 = Cosmos.Assembler.x86;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     /// <summary>

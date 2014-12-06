@@ -1,20 +1,20 @@
+using Cosmos.IL2CPU.ILOpCodes;
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldobj )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldobj)]
     public class Ldobj : ILOp
     {
-        public Ldobj( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Ldobj(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
-            OpType xType = ( OpType )aOpCode;
+            OpType xType = (OpType)aOpCode;
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             var xObjSize = GetStorageSize(xType.Value);
             for (int i = 1; i <= (xObjSize / 4); i++)
@@ -43,7 +43,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         break;
                     }
                 default:
-                        throw new Exception( "Remainder not supported!" );
+                    throw new Exception("Remainder not supported!");
             }
         }
     }

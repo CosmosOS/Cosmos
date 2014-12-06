@@ -9,18 +9,16 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
+using Microsoft.Build.Evaluation;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.Win32;
-using System.Collections.Generic;
-using Microsoft.Build.Evaluation;
-using Microsoft.Build.Execution;
 
 namespace Microsoft.VisualStudio.Project
 {
@@ -32,6 +30,7 @@ namespace Microsoft.VisualStudio.Project
     public class ComReferenceNode : ReferenceNode
     {
         #region fields
+
         private string typeName;
         private Guid typeGuid;
         private string projectRelativeFilePath;
@@ -39,9 +38,11 @@ namespace Microsoft.VisualStudio.Project
         private string minorVersionNumber;
         private string majorVersionNumber;
         private string lcid;
-        #endregion
+
+        #endregion fields
 
         #region properties
+
         public override string Caption
         {
             get { return this.typeName; }
@@ -81,7 +82,7 @@ namespace Microsoft.VisualStudio.Project
         {
             get
             {
-                if(string.IsNullOrEmpty(majorVersionNumber))
+                if (string.IsNullOrEmpty(majorVersionNumber))
                 {
                     return 0;
                 }
@@ -114,37 +115,41 @@ namespace Microsoft.VisualStudio.Project
         {
             get
             {
-                if(string.IsNullOrEmpty(minorVersionNumber))
+                if (string.IsNullOrEmpty(minorVersionNumber))
                 {
                     return 0;
                 }
                 return int.Parse(minorVersionNumber, CultureInfo.CurrentCulture);
             }
         }
+
         private Automation.OAComReference comReference;
+
         internal override object Object
         {
             get
             {
-                if(null == comReference)
+                if (null == comReference)
                 {
                     comReference = new Automation.OAComReference(this);
                 }
                 return comReference;
             }
         }
-        #endregion
+
+        #endregion properties
 
         #region ctors
+
         /// <summary>
-        /// Constructor for the ComReferenceNode. 
+        /// Constructor for the ComReferenceNode.
         /// </summary>
         public ComReferenceNode(ProjectNode root, ProjectElement element)
             : base(root, element)
         {
             this.typeName = this.ItemNode.GetMetadata(ProjectFileConstants.Include);
             string typeGuidAsString = this.ItemNode.GetMetadata(ProjectFileConstants.Guid);
-            if(typeGuidAsString != null)
+            if (typeGuidAsString != null)
             {
                 this.typeGuid = new Guid(typeGuidAsString);
             }
@@ -165,11 +170,11 @@ namespace Microsoft.VisualStudio.Project
         public ComReferenceNode(ProjectNode root, VSCOMPONENTSELECTORDATA selectorData, string wrapperTool = null)
             : base(root)
         {
-            if(root == null)
+            if (root == null)
             {
                 throw new ArgumentNullException("root");
             }
-            if(selectorData.type == VSCOMPONENTTYPE.VSCOMPONENTTYPE_Project
+            if (selectorData.type == VSCOMPONENTTYPE.VSCOMPONENTTYPE_Project
                 || selectorData.type == VSCOMPONENTTYPE.VSCOMPONENTTYPE_ComPlus)
             {
                 throw new ArgumentException("SelectorData cannot be of type VSCOMPONENTTYPE.VSCOMPONENTTYPE_Project or VSCOMPONENTTYPE.VSCOMPONENTTYPE_ComPlus", "selectorData");
@@ -186,19 +191,21 @@ namespace Microsoft.VisualStudio.Project
             // Check to see if the COM object actually exists.
             this.SetInstalledFilePath();
             // If the value cannot be set throw.
-            if(String.IsNullOrEmpty(this.installedFilePath))
+            if (String.IsNullOrEmpty(this.installedFilePath))
             {
                 throw new InvalidOperationException();
             }
         }
-        #endregion
+
+        #endregion ctors
 
         #region methods
+
         protected override NodeProperties CreatePropertiesObject()
         {
             return new ComReferenceProperties(this);
         }
-        
+
         /// <summary>
         /// Links a reference node to the project and hierarchy.
         /// </summary>
@@ -207,11 +214,11 @@ namespace Microsoft.VisualStudio.Project
             Debug.Assert(this.ItemNode != null, "The AssemblyName field has not been initialized");
 
             // We need to create the project element at this point if it has not been created.
-            // We cannot do that from the ctor if input comes from a component selector data, since had we been doing that we would have added a project element to the project file.  
+            // We cannot do that from the ctor if input comes from a component selector data, since had we been doing that we would have added a project element to the project file.
             // The problem with that approach is that we would need to remove the project element if the item cannot be added to the hierachy (E.g. It already exists).
             // It is just safer to update the project file now. This is the intent of this method.
             // Call MSBuild to build the target ResolveComReferences
-            if(this.ItemNode == null || this.ItemNode.Item == null)
+            if (this.ItemNode == null || this.ItemNode.Item == null)
             {
                 this.ItemNode = this.GetProjectElementBasedOnInputFromComponentSelectorData();
             }
@@ -223,27 +230,27 @@ namespace Microsoft.VisualStudio.Project
         /// Checks if a reference is already added. The method parses all references and compares the the FinalItemSpec and the Guid.
         /// </summary>
         /// <returns>true if the assembly has already been added.</returns>
-		protected internal override bool IsAlreadyAdded(out ReferenceNode existingReference)
+        protected internal override bool IsAlreadyAdded(out ReferenceNode existingReference)
         {
             ReferenceContainerNode referencesFolder = this.ProjectMgr.FindChild(ReferenceContainerNode.ReferencesNodeVirtualName) as ReferenceContainerNode;
             Debug.Assert(referencesFolder != null, "Could not find the References node");
 
-            for(HierarchyNode n = referencesFolder.FirstChild; n != null; n = n.NextSibling)
+            for (HierarchyNode n = referencesFolder.FirstChild; n != null; n = n.NextSibling)
             {
                 ComReferenceNode referenceNode = n as ComReferenceNode;
 
-                if(referenceNode != null)
+                if (referenceNode != null)
                 {
                     // We check if the name and guids are the same
-                    if(referenceNode.TypeGuid == this.TypeGuid && String.Compare(referenceNode.Caption, this.Caption, StringComparison.OrdinalIgnoreCase) == 0)
+                    if (referenceNode.TypeGuid == this.TypeGuid && String.Compare(referenceNode.Caption, this.Caption, StringComparison.OrdinalIgnoreCase) == 0)
                     {
-						existingReference = referenceNode;
+                        existingReference = referenceNode;
                         return true;
                     }
                 }
             }
 
-			existingReference = null;
+            existingReference = null;
             return false;
         }
 
@@ -266,7 +273,6 @@ namespace Microsoft.VisualStudio.Project
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
         private ProjectElement GetProjectElementBasedOnInputFromComponentSelectorData()
         {
-
             ProjectElement element = new ProjectElement(this.ProjectMgr, this.typeName, ProjectFileConstants.COMReference);
 
             // Set the basic information regarding this COM component
@@ -280,7 +286,7 @@ namespace Microsoft.VisualStudio.Project
             TypeLibConverter typelib = new TypeLibConverter();
             string assemblyName;
             string assemblyCodeBase;
-            if(typelib.GetPrimaryInteropAssembly(this.typeGuid, Int32.Parse(this.majorVersionNumber, CultureInfo.InvariantCulture), Int32.Parse(this.minorVersionNumber, CultureInfo.InvariantCulture), Int32.Parse(this.lcid, CultureInfo.InvariantCulture), out assemblyName, out assemblyCodeBase))
+            if (typelib.GetPrimaryInteropAssembly(this.typeGuid, Int32.Parse(this.majorVersionNumber, CultureInfo.InvariantCulture), Int32.Parse(this.minorVersionNumber, CultureInfo.InvariantCulture), Int32.Parse(this.lcid, CultureInfo.InvariantCulture), out assemblyName, out assemblyCodeBase))
             {
                 element.SetMetadata(ProjectFileConstants.WrapperTool, WrapperToolAttributeValue.Primary.ToString().ToLowerInvariant());
             }
@@ -299,20 +305,20 @@ namespace Microsoft.VisualStudio.Project
             // Call MSBuild to build the target ResolveComReferences
             bool success;
             ErrorHandler.ThrowOnFailure(this.ProjectMgr.BuildTarget(MsBuildTarget.ResolveComReferences, out success));
-            if(!success)
+            if (!success)
                 throw new InvalidOperationException();
 
             // Now loop through the generated COM References to find the corresponding one
             IEnumerable<ProjectItem> comReferences = this.ProjectMgr.BuildProject.GetItems(MsBuildGeneratedItemType.ComReferenceWrappers);
             foreach (ProjectItem reference in comReferences)
             {
-                if(String.Compare(reference.GetMetadataValue(ProjectFileConstants.Guid), this.typeGuid.ToString("B"), StringComparison.OrdinalIgnoreCase) == 0
+                if (String.Compare(reference.GetMetadataValue(ProjectFileConstants.Guid), this.typeGuid.ToString("B"), StringComparison.OrdinalIgnoreCase) == 0
                     && String.Compare(reference.GetMetadataValue(ProjectFileConstants.VersionMajor), this.majorVersionNumber, StringComparison.OrdinalIgnoreCase) == 0
                     && String.Compare(reference.GetMetadataValue(ProjectFileConstants.VersionMinor), this.minorVersionNumber, StringComparison.OrdinalIgnoreCase) == 0
                     && String.Compare(reference.GetMetadataValue(ProjectFileConstants.Lcid), this.lcid, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     string name = reference.EvaluatedInclude;
-                    if(Path.IsPathRooted(name))
+                    if (Path.IsPathRooted(name))
                     {
                         this.projectRelativeFilePath = name;
                     }
@@ -321,7 +327,7 @@ namespace Microsoft.VisualStudio.Project
                         this.projectRelativeFilePath = Path.Combine(this.ProjectMgr.ProjectFolder, name);
                     }
 
-                    if(renameItemNode)
+                    if (renameItemNode)
                     {
                         this.ItemNode.Rename(Path.GetFileNameWithoutExtension(name));
                     }
@@ -337,17 +343,17 @@ namespace Microsoft.VisualStudio.Project
         private void SetInstalledFilePath()
         {
             string registryPath = string.Format(CultureInfo.InvariantCulture, @"TYPELIB\{0:B}\{1:x}.{2:x}", this.typeGuid, this.MajorVersionNumber, this.MinorVersionNumber);
-            using(RegistryKey typeLib = Registry.ClassesRoot.OpenSubKey(registryPath))
+            using (RegistryKey typeLib = Registry.ClassesRoot.OpenSubKey(registryPath))
             {
-                if(typeLib != null)
+                if (typeLib != null)
                 {
                     // Check if we need to set the name for this type.
-                    if(string.IsNullOrEmpty(this.typeName))
+                    if (string.IsNullOrEmpty(this.typeName))
                     {
                         this.typeName = typeLib.GetValue(string.Empty) as string;
                     }
                     // Now get the path to the file that contains this type library.
-                    using(RegistryKey installKey = typeLib.OpenSubKey(string.Format(CultureInfo.InvariantCulture, @"{0}\win32", this.LCID)))
+                    using (RegistryKey installKey = typeLib.OpenSubKey(string.Format(CultureInfo.InvariantCulture, @"{0}\win32", this.LCID)))
                     {
                         this.installedFilePath = installKey.GetValue(String.Empty) as String;
                     }
@@ -355,6 +361,6 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-        #endregion
+        #endregion methods
     }
 }

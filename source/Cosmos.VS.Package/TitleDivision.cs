@@ -1,92 +1,88 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.Project;
+using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
-using Microsoft.VisualStudio.Project;
-using Microsoft.VisualStudio;
 
 namespace Cosmos.VS.Package
 {
-	public partial class TitleDivision : UserControl
-	{
-		public TitleDivision()
-		{
-			InitializeComponent();
+    public partial class TitleDivision : UserControl
+    {
+        public TitleDivision()
+        {
+            InitializeComponent();
 
-			this.Resize += new EventHandler(TitleDivision_Resize);
-			this.Paint += new PaintEventHandler(TitleDivision_Paint);
-			this.labelTitle.Resize += new EventHandler(Title_Resize);
-			this.FontChanged += new EventHandler(TitleDivision_FontChanged);
-			
-			this.LineColor = SystemColors.ControlDark;
-		}
+            this.Resize += new EventHandler(TitleDivision_Resize);
+            this.Paint += new PaintEventHandler(TitleDivision_Paint);
+            this.labelTitle.Resize += new EventHandler(Title_Resize);
+            this.FontChanged += new EventHandler(TitleDivision_FontChanged);
 
-		void TitleDivision_FontChanged(object sender, EventArgs e)
-		{
-			this.labelTitle.Font = this.Font;
-		}
+            this.LineColor = SystemColors.ControlDark;
+        }
 
-		void TitleDivision_Resize(object sender, EventArgs e)
-		{
-			Single halfHeight;
-			halfHeight = this.Size.Height * 0.5f;
-			halfHeight = halfHeight - (this.labelTitle.Size.Height * 0.5f);
+        private void TitleDivision_FontChanged(object sender, EventArgs e)
+        {
+            this.labelTitle.Font = this.Font;
+        }
 
-			this.labelTitle.Location = new Point(0, (Int32)halfHeight);
-			this.Invalidate();
-		}
+        private void TitleDivision_Resize(object sender, EventArgs e)
+        {
+            Single halfHeight;
+            halfHeight = this.Size.Height * 0.5f;
+            halfHeight = halfHeight - (this.labelTitle.Size.Height * 0.5f);
 
-		void TitleDivision_Paint(object sender, PaintEventArgs e)
-		{
-			Pen linePen;
-			Single halfHeight;
-			Single start;
-			Single end;
+            this.labelTitle.Location = new Point(0, (Int32)halfHeight);
+            this.Invalidate();
+        }
 
-			halfHeight = (this.Size.Height * 0.5f) + 1.0f;
-			start = (Single)this.labelTitle.Right;
+        private void TitleDivision_Paint(object sender, PaintEventArgs e)
+        {
+            Pen linePen;
+            Single halfHeight;
+            Single start;
+            Single end;
 
-			if (String.IsNullOrEmpty(this.labelTitle.Text) == false)
-			{
-				start += (Single)this.labelTitle.Margin.Right;
-			}else{
-				start += (Single)this.Padding.Left;
-			}
+            halfHeight = (this.Size.Height * 0.5f) + 1.0f;
+            start = (Single)this.labelTitle.Right;
 
-			end = this.Size.Width - (Single)this.Padding.Right;
+            if (String.IsNullOrEmpty(this.labelTitle.Text) == false)
+            {
+                start += (Single)this.labelTitle.Margin.Right;
+            }
+            else
+            {
+                start += (Single)this.Padding.Left;
+            }
 
-			linePen = new Pen(this.LineColor);
+            end = this.Size.Width - (Single)this.Padding.Right;
 
-			e.Graphics.DrawLine(linePen, start, halfHeight, end, halfHeight);
+            linePen = new Pen(this.LineColor);
 
-			linePen.Dispose();
-			linePen = null;
-		}
+            e.Graphics.DrawLine(linePen, start, halfHeight, end, halfHeight);
 
-		void  Title_Resize(object sender, EventArgs e)
-		{
-			this.Size = new Size(this.Size.Width, this.labelTitle.Size.Height);
-			this.Invalidate();
-		}
+            linePen.Dispose();
+            linePen = null;
+        }
 
-		[SRCategoryAttribute("Category")]
-		[DisplayName("Line Color")]
-		[SRDescriptionAttribute("Description")]
-		public Color LineColor
-		{ get; set; }
+        private void Title_Resize(object sender, EventArgs e)
+        {
+            this.Size = new Size(this.Size.Width, this.labelTitle.Size.Height);
+            this.Invalidate();
+        }
 
-		[SRCategoryAttribute("Category")]
-		[DisplayName("Title")]
-		[SRDescriptionAttribute("Description")]
-		public String Title
-		{
-			get{ return this.labelTitle.Text; }
-			set{ this.labelTitle.Text = value; }
-		}
+        [SRCategoryAttribute("Category")]
+        [DisplayName("Line Color")]
+        [SRDescriptionAttribute("Description")]
+        public Color LineColor
+        { get; set; }
 
-	}
+        [SRCategoryAttribute("Category")]
+        [DisplayName("Title")]
+        [SRDescriptionAttribute("Description")]
+        public String Title
+        {
+            get { return this.labelTitle.Text; }
+            set { this.labelTitle.Text = value; }
+        }
+    }
 }

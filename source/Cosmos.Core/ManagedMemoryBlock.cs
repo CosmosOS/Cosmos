@@ -69,6 +69,7 @@ namespace Cosmos.Core
                 (*(byte*)(this.Offset + offset)) = value;
             }
         }
+
         public UInt16 Read16(uint offset)
         {
             if (offset > Size)
@@ -82,12 +83,14 @@ namespace Cosmos.Core
                 throw new ArgumentOutOfRangeException("offset");
             (*(UInt16*)(this.Offset + offset)) = value;
         }
+
         public UInt32 Read32(uint offset)
         {
             if (offset > Size)
                 throw new ArgumentOutOfRangeException("offset");
             return *(UInt32*)(this.Offset + offset);
         }
+
         public void Write32(uint offset, UInt32 value)
         {
             if (offset < 0 || offset > Size)

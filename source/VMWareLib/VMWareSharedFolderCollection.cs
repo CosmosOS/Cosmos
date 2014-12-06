@@ -1,14 +1,13 @@
+using Interop.VixCOM;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using Interop.VixCOM;
 
 namespace Vestris.VMWareLib
 {
     /// <summary>
     /// A collection of shared folders.
-    /// Shared folders will only be accessible inside the guest operating system if shared folders are 
+    /// Shared folders will only be accessible inside the guest operating system if shared folders are
     /// enabled for the virtual machine.
     /// </summary>
     public class VMWareSharedFolderCollection :
@@ -46,7 +45,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to add shared folder: shareName=\"{0}\" hostPath=\"{1}\" flags={2}", 
+                    string.Format("Failed to add shared folder: shareName=\"{0}\" hostPath=\"{1}\" flags={2}",
                     sharedFolder.ShareName, sharedFolder.HostPath, sharedFolder.Flags), ex);
             }
         }
@@ -78,8 +77,7 @@ namespace Vestris.VMWareLib
                                     _vm.GetSharedFolderState(i, getSharedfolderCallback),
                                     getSharedfolderCallback))
                                 {
-
-                                    object[] sharedFolderProperties = { 
+                                    object[] sharedFolderProperties = {
                                     Constants.VIX_PROPERTY_JOB_RESULT_ITEM_NAME,
                                     Constants.VIX_PROPERTY_JOB_RESULT_SHARED_FOLDER_HOST,
                                     Constants.VIX_PROPERTY_JOB_RESULT_SHARED_FOLDER_FLAGS
@@ -112,7 +110,7 @@ namespace Vestris.VMWareLib
         /// <summary>
         /// Delete all shared folders.
         /// </summary>
-        public void Clear() 
+        public void Clear()
         {
             while (SharedFolders.Count > 0)
             {
@@ -126,9 +124,9 @@ namespace Vestris.VMWareLib
         /// </summary>
         /// <param name="array">Target array.</param>
         /// <param name="arrayIndex">Array index.</param>
-        public void CopyTo(VMWareSharedFolder[] array, int arrayIndex) 
-        { 
-            SharedFolders.CopyTo(array, arrayIndex); 
+        public void CopyTo(VMWareSharedFolder[] array, int arrayIndex)
+        {
+            SharedFolders.CopyTo(array, arrayIndex);
         }
 
         /// <summary>
@@ -146,7 +144,7 @@ namespace Vestris.VMWareLib
         /// </summary>
         /// <param name="item">Shared folder to delete.</param>
         /// <returns>True if the folder was deleted.</returns>
-        public bool Remove(VMWareSharedFolder item) 
+        public bool Remove(VMWareSharedFolder item)
         {
             try
             {
@@ -162,7 +160,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to remove shared folder: shareName=\"{0}\"", 
+                    string.Format("Failed to remove shared folder: shareName=\"{0}\"",
                     item.ShareName), ex);
             }
         }
@@ -170,12 +168,12 @@ namespace Vestris.VMWareLib
         /// <summary>
         /// Number of shared folders.
         /// </summary>
-        public int Count 
-        { 
-            get 
-            { 
-                return SharedFolders.Count; 
-            } 
+        public int Count
+        {
+            get
+            {
+                return SharedFolders.Count;
+            }
         }
 
         /// <summary>
@@ -194,9 +192,9 @@ namespace Vestris.VMWareLib
         /// A shared folder enumerator.
         /// </summary>
         /// <returns>Shared folders enumerator.</returns>
-        IEnumerator<VMWareSharedFolder> IEnumerable<VMWareSharedFolder>.GetEnumerator() 
-        { 
-            return SharedFolders.GetEnumerator(); 
+        IEnumerator<VMWareSharedFolder> IEnumerable<VMWareSharedFolder>.GetEnumerator()
+        {
+            return SharedFolders.GetEnumerator();
         }
 
         /// <summary>
@@ -209,7 +207,7 @@ namespace Vestris.VMWareLib
         }
 
         /// <summary>
-        /// Enable/disable all shared folders as a feature on a virtual machine. 
+        /// Enable/disable all shared folders as a feature on a virtual machine.
         /// </summary>
         public bool Enabled
         {
@@ -227,7 +225,7 @@ namespace Vestris.VMWareLib
                 catch (Exception ex)
                 {
                     throw new Exception(
-                        string.Format("Failed to {0} shared folders", 
+                        string.Format("Failed to {0} shared folders",
                         (value == true) ? "enable" : "disable"), ex);
                 }
             }

@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Security.Cryptography;
 
 namespace Cosmos.IL2CPU
 {
-
-
     public class Elf32 : HashAlgorithm
     {
         private UInt32 hash;
@@ -71,8 +66,6 @@ namespace Cosmos.IL2CPU
         }
     }
 
-
-
     public class Elf64 : HashAlgorithm
     {
         private UInt64 hash;
@@ -128,7 +121,7 @@ namespace Cosmos.IL2CPU
 
         private byte[] UInt64ToBigEndianBytes(UInt64 x)
         {
-            return new byte[] 
+            return new byte[]
             {
             (byte)((x >> 56) & 0xff),
             (byte)((x >> 48) & 0xff),
@@ -141,5 +134,4 @@ namespace Cosmos.IL2CPU
 		};
         }
     }
-
 }

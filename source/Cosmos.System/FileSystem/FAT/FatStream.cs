@@ -12,7 +12,7 @@
 //        protected readonly FatFileSystem mFS = null;
 //        protected byte[] mReadBuffer;
 //        //TODO: In future we might read this in as needed rather than
-//        // all at once. This structure will also consume 2% of file size in RAM 
+//        // all at once. This structure will also consume 2% of file size in RAM
 //        // (for default cluster size of 2kb, ie 4 bytes per cluster)
 //        // so we might consider a way to flush it and only keep parts.
 //        // Example, a 100 MB file will require 2MB for this structure. That is

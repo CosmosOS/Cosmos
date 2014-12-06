@@ -1,38 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.Utilities;
+﻿using Cosmos.Build.Common;
 using Microsoft.Build.Framework;
-using System.IO;
-using Cosmos.Build.Common;
 
-namespace Cosmos.Build.MSBuild {
-  public class MakeISO : BaseToolTask {
+namespace Cosmos.Build.MSBuild
+{
+    public class MakeISO : BaseToolTask
+    {
+        #region Properties
 
-    #region Properties
-    [Required]
-    public string InputFile {
-      get;
-      set;
+        [Required]
+        public string InputFile
+        {
+            get;
+            set;
+        }
+
+        [Required]
+        public string OutputFile
+        {
+            get;
+            set;
+        }
+
+        [Required]
+        public string CosmosBuildDir
+        {
+            get;
+            set;
+        }
+
+        #endregion Properties
+
+        public override bool Execute()
+        {
+            IsoMaker.Generate(CosmosBuildDir, InputFile, OutputFile);
+            return true;
+        }
     }
-
-    [Required]
-    public string OutputFile {
-      get;
-      set;
-    }
-
-    [Required]
-    public string CosmosBuildDir {
-      get;
-      set;
-    }
-    #endregion
-
-    public override bool Execute() {
-      IsoMaker.Generate(CosmosBuildDir, InputFile, OutputFile);
-      return true;
-    }
-  }
 }

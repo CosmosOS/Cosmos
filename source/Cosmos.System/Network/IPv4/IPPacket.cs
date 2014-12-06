@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.HAL.Network;
+﻿using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
+using System;
 
 namespace Cosmos.System.Network.IPv4
 {
@@ -147,50 +144,62 @@ namespace Cosmos.System.Network.IPv4
         {
             get { return this.ipVersion; }
         }
+
         internal UInt16 HeaderLength
         {
             get { return (UInt16)(this.ipHeaderLength * 4); }
         }
+
         internal byte TypeOfService
         {
             get { return this.tos; }
         }
+
         internal UInt16 IPLength
         {
             get { return this.ipLength; }
         }
+
         internal UInt16 FragmentID
         {
             get { return this.fragmentID; }
         }
+
         internal UInt16 FragmentOffset
         {
             get { return this.fragmentOffset; }
         }
+
         internal byte Flags
         {
             get { return this.flags; }
         }
+
         internal byte TTL
         {
             get { return this.ttl; }
         }
+
         internal byte Protocol
         {
             get { return this.proto; }
         }
+
         internal UInt16 IPCRC
         {
             get { return this.ipCRC; }
         }
+
         internal Address SourceIP
         {
             get { return this.sourceIP; }
         }
+
         internal Address DestinationIP
         {
             get { return this.destIP; }
         }
+
         internal UInt16 DataLength
         {
             get { return (UInt16)(this.ipLength - this.HeaderLength); }

@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.IL2CPU.Plugs;
+using System;
 
-namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
+namespace Cosmos.IL2CPU.IL.CustomImplementations.System
+{
     [Plug(Target = typeof(Single))]
     public static class SingleImpl
     {
@@ -56,7 +54,7 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
             {
                 return result;
             }
-			result += ".";
+            result += ".";
 
             if (used_digits >= 7)
             {
@@ -102,5 +100,4 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
             return result;
         }
     }
-
 }

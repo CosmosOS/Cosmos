@@ -68,7 +68,7 @@
 //            cr.PowerEnabled=true;
 //            return cr.PowerEnabled;
 //        }
-        
+
 //        public override bool Disable()
 //        {
 //            cr.PowerEnabled = false;
@@ -88,8 +88,6 @@
 //            get { return "Generic ES1370 Audio device"; }
 //        }
 
-
-        
 //        #region Interrupt (IRQ)
 //        /// <summary>
 //        /// (Should be) Called when the PCI audio card raises an Interrupt.
@@ -190,16 +188,14 @@
 //        private void preparePlayBackOnDac(AK4531Manager dacManager)
 //        {
 //            //dacManager.setDACStateEnabled(true);
-            
+
 //        }
 //        public override void playStream(PCMStream pcmStream)
 //        {
 //            for (int count = 0; count < pcmStream.getData().Length; count++)
 //            {
-
 //            }
 //        }
-
 
 //    }
 //}

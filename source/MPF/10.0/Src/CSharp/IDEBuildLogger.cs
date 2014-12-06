@@ -9,23 +9,20 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
-using System;
-using System.Windows.Forms.Design;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Globalization;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using System.Windows.Threading;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.Win32;
+using System;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms.Design;
+using System.Windows.Threading;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace Microsoft.VisualStudio.Project
@@ -40,6 +37,7 @@ namespace Microsoft.VisualStudio.Project
 
         // TODO: Remove these constants when we have a version that suppoerts getting the verbosity using automation.
         private string buildVerbosityRegistryRoot = @"Software\Microsoft\VisualStudio\10.0";
+
         private const string buildVerbosityRegistrySubKey = @"General";
         private const string buildVerbosityRegistryKey = "MSBuildLoggerVerbosity";
 
@@ -55,9 +53,10 @@ namespace Microsoft.VisualStudio.Project
 
         // Queues to manage Tasks and Error output plus message logging
         private ConcurrentQueue<Func<ErrorTask>> taskQueue;
+
         private ConcurrentQueue<string> outputQueue;
 
-        #endregion
+        #endregion fields
 
         #region properties
 
@@ -97,7 +96,7 @@ namespace Microsoft.VisualStudio.Project
         internal string BuildVerbosityRegistryRoot
         {
             get { return this.buildVerbosityRegistryRoot; }
-            set 
+            set
             {
                 this.buildVerbosityRegistryRoot = value;
             }
@@ -112,7 +111,7 @@ namespace Microsoft.VisualStudio.Project
             set { this.outputWindowPane = value; }
         }
 
-        #endregion
+        #endregion properties
 
         #region ctors
 
@@ -138,7 +137,7 @@ namespace Microsoft.VisualStudio.Project
             this.dispatcher = Dispatcher.CurrentDispatcher;
         }
 
-        #endregion
+        #endregion ctors
 
         #region overridden methods
 
@@ -169,7 +168,7 @@ namespace Microsoft.VisualStudio.Project
             eventSource.MessageRaised += new BuildMessageEventHandler(MessageHandler);
         }
 
-        #endregion
+        #endregion overridden methods
 
         #region event delegates
 
@@ -294,16 +293,16 @@ namespace Microsoft.VisualStudio.Project
 
         /// <summary>
         /// This is the delegate for Message event types
-        /// </summary>		
+        /// </summary>
         protected virtual void MessageHandler(object sender, BuildMessageEventArgs messageEvent)
         {
             // NOTE: This may run on a background thread!
             QueueOutputEvent(messageEvent.Importance, messageEvent);
-			if(messageEvent.Importance == MessageImportance.High)
-				QueueTaskEvent(messageEvent);
+            if (messageEvent.Importance == MessageImportance.High)
+                QueueTaskEvent(messageEvent);
         }
 
-        #endregion
+        #endregion event delegates
 
         #region output queue
 
@@ -414,12 +413,12 @@ namespace Microsoft.VisualStudio.Project
                     task.Column = warningArgs.ColumnNumber;
                     task.Priority = TaskPriority.Normal;
                 }
-				else if (errorEvent is BuildMessageEventArgs)
-				{
-					BuildMessageEventArgs messageArgs = (BuildMessageEventArgs)errorEvent;
-					task.ErrorCategory = TaskErrorCategory.Message;
-					task.Priority = TaskPriority.Normal;
-				}
+                else if (errorEvent is BuildMessageEventArgs)
+                {
+                    BuildMessageEventArgs messageArgs = (BuildMessageEventArgs)errorEvent;
+                    task.ErrorCategory = TaskErrorCategory.Message;
+                    task.Priority = TaskPriority.Normal;
+                }
 
                 task.Text = errorEvent.Message;
                 task.Category = TaskCategory.BuildCompile;
@@ -494,17 +493,21 @@ namespace Microsoft.VisualStudio.Project
                 case LoggerVerbosity.Quiet:
                     logIt = false;
                     break;
+
                 case LoggerVerbosity.Minimal:
                     logIt = (importance == MessageImportance.High);
                     break;
+
                 case LoggerVerbosity.Normal:
                 // Falling through...
                 case LoggerVerbosity.Detailed:
                     logIt = (importance != MessageImportance.Low);
                     break;
+
                 case LoggerVerbosity.Diagnostic:
                     logIt = true;
                     break;
+
                 default:
                     Debug.Fail("Unknown Verbosity level. Ignoring will cause everything to be logged");
                     break;
