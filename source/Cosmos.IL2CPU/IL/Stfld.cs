@@ -31,12 +31,12 @@ namespace Cosmos.IL2CPU.X86.IL {
       new Comment("Size: " + xFieldInfo.Size);
 
       uint xRoundedSize = Align(xSize, 4);
-
+      DoNullReferenceCheck(aAssembler, debugEnabled, xRoundedSize);
+      
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
         if (debugEnabled)
         {
             new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.ECX};
-            Call.DoNullReferenceCheck(aAssembler, debugEnabled, 0);
             new CPUx86.Pop {DestinationReg = CPUx86.RegistersEnum.ECX};
         }
       new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xActualOffset) };

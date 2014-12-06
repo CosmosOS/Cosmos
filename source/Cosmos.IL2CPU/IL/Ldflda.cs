@@ -16,10 +16,10 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xOpCode = (ILOpCodes.OpField) aOpCode;
-            DoExecute(Assembler, aMethod, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true);
+            DoExecute(Assembler, aMethod, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true, DebugEnabled);
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField, bool aDerefValue)
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField, bool aDerefValue, bool aDebugEnabled)
         {
 
             var xFields = GetFieldsInfo(aDeclaringType);
@@ -38,6 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             var xActualOffset = xFieldInfo.Offset + xExtraOffset;
             var xSize = xFieldInfo.Size;
+            DoNullReferenceCheck(Assembler, aDebugEnabled, 0);
 
             if (aDerefValue && xFieldInfo.IsExternalValue)
             {

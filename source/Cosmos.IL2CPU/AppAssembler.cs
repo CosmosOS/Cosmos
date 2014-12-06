@@ -816,7 +816,7 @@ namespace Cosmos.IL2CPU
 
         protected void Ldflda(MethodInfo aMethod, string aFieldId)
         {
-            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false);
+            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false, false);
         }
 
         protected int GetVTableEntrySize()

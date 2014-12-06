@@ -10,6 +10,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.X86.IL;
 using System.Runtime.InteropServices;
+using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU {
   public abstract class ILOp {
@@ -359,6 +360,24 @@ namespace Cosmos.IL2CPU {
           return true;
       }
       return false;
+    }
+
+    public static void DoNullReferenceCheck(Assembler.Assembler assembler, bool debugEnabled, uint stackOffsetToCheck)
+    {
+      if (debugEnabled)
+      {
+        new CPU.Compare {DestinationReg = CPU.RegistersEnum.ESP, DestinationDisplacement = (int) stackOffsetToCheck, DestinationIsIndirect = true, SourceValue = 0};
+        new CPU.ConditionalJump {DestinationLabel = ".AfterNullCheck", Condition = CPU.ConditionalTestEnum.NotEqual};
+        new CPU.ClrInterruptFlag();
+        // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+        new CPU.Call {DestinationLabel = ".NullCheck_GetCurrAddress"};
+        new Assembler.Label(".NullCheck_GetCurrAddress");
+        new CPU.Pop {DestinationReg = CPU.RegistersEnum.EAX};
+        new CPU.Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = CPU.RegistersEnum.EAX};
+        new CPU.Call {DestinationLabel = "DebugStub_SendNullReferenceOccurred"};
+        new CPU.Halt();
+        new Label(".AfterNullCheck");
+      }
     }
   }
 }

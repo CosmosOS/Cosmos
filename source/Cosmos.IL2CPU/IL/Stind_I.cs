@@ -11,8 +11,9 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  int aSize )
+        public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  int aSize, bool debugEnabled)
         {
+            DoNullReferenceCheck(aAssembler, debugEnabled, Align((uint)aSize, 4));
             new Comment(aAssembler,  "address at: [esp + " + aSize + "]" );
             int xStorageSize = aSize;
             if( xStorageSize < 4 )
@@ -57,9 +58,9 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )( xStorageSize + 4 ) };
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+      public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            Assemble( Assembler, 4 );
+            Assemble(Assembler, 4, DebugEnabled);
         }
 
 

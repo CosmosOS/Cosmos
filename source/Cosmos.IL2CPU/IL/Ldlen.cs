@@ -12,6 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
+            DoNullReferenceCheck(Assembler, DebugEnabled, 0);
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };

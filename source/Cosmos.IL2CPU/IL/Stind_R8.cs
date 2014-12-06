@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            Stind_I.Assemble( Assembler, 8 );
+            Stind_I.Assemble(Assembler, 8, DebugEnabled);
         }
 
 

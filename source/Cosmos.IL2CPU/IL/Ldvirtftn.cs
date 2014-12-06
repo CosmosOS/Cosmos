@@ -10,6 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
+        DoNullReferenceCheck(Assembler, DebugEnabled, 0);
         throw new NotImplementedException();
     }
 

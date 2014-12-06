@@ -68,7 +68,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
           
           new Comment(Assembler, "ThisOffset = " + xThisOffset);
-            Call.DoNullReferenceCheck(Assembler, debugEnabled, xThisOffset);
+          Call.DoNullReferenceCheck(Assembler, debugEnabled, xThisOffset);
 
           //             Action xEmitCleanup = delegate() {
           //                                       foreach (MethodInformation.Argument xArg in mTargetMethodInfo.Arguments) {

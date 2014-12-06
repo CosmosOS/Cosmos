@@ -34,7 +34,7 @@ namespace DebugCompiler
             {
                 var xTask = new IL2CPUTask();
                 xTask.DebugEnabled = true;
-                xTask.StackCorruptionDetectionEnabled = false;
+                xTask.StackCorruptionDetectionEnabled = true;
                 xTask.DebugMode = "Source";
                 xTask.TraceAssemblies = "User";
                 xTask.DebugCom = 1;

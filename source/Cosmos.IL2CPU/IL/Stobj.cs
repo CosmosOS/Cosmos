@@ -14,7 +14,10 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xFieldSize = SizeOfType(aOpCode.StackPopTypes[0]);
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = checked((int)xFieldSize) };
+            var xRoundedSize = Align(xFieldSize, 4);
+            DoNullReferenceCheck(Assembler, DebugEnabled, xRoundedSize);
+            
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = checked((int)xRoundedSize) };
             for( int i = 0; i < ( xFieldSize / 4 ); i++ )
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

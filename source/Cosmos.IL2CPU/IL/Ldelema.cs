@@ -13,8 +13,9 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  uint aElementSize )
+        public static void Assemble(Cosmos.Assembler.Assembler aAssembler, uint aElementSize, bool debugEnabled)
         {
+            DoNullReferenceCheck(aAssembler, debugEnabled, 4);
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };
             new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };
@@ -28,7 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
           var xOpType = (OpType)aOpCode;
           var xSize = SizeOfType(xOpType.Value);
-            Assemble( Assembler, ( uint )xSize );
+          Assemble(Assembler, (uint)xSize, DebugEnabled);
         }
 
 

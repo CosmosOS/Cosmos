@@ -11,8 +11,9 @@ namespace Cosmos.IL2CPU.X86.IL
             : base( aAsmblr )
         {
         }
-        public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  uint aElementSize,bool isSigned )
+        public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  uint aElementSize,bool isSigned , bool debugEnabled)
         {
+          DoNullReferenceCheck(aAssembler, debugEnabled, 4);
 			if (aElementSize <= 0 || aElementSize > 8 || (aElementSize > 4 && aElementSize < 8))
 				throw new Exception("Unsupported size for Ldelem_Ref: " + aElementSize);
 
@@ -54,7 +55,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            Assemble( Assembler, 4, false);
+            Assemble( Assembler, 4, false, DebugEnabled);
         }
     }
 }

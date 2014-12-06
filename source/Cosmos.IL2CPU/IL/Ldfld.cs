@@ -70,7 +70,7 @@ namespace Cosmos.IL2CPU.X86.IL
                             select item).Single();
           new Comment("Field = '" + xFieldId + "'");
 
-            Call.DoNullReferenceCheck(Assembler, debugEnabled, 0);
+            DoNullReferenceCheck(Assembler, debugEnabled, 0);
           
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 
