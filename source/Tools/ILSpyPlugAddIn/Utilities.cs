@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ICSharpCode.ILSpy;
 using Mono.Cecil;
 
 namespace Cosmos.ILSpyPlugs.Plugin
@@ -11,7 +12,25 @@ namespace Cosmos.ILSpyPlugs.Plugin
     {
         public static string GetCSharpTypeName(TypeReference reference)
         {
-            return reference.FullName;
+            var xCSharp = Languages.GetLanguage("C#");
+
+            return xCSharp.TypeToString(reference, true);
+        }
+
+        public static string GetMethodName(MethodDefinition method)
+        {
+            if (method.IsConstructor)
+            {
+                if (method.IsStatic)
+                {
+                    return "CCtor";
+                }
+                else
+                {
+                    return "Ctor";
+                }
+            }
+            return method.Name;
         }
     }
 }
