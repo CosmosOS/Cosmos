@@ -148,7 +148,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
 
         public VMWareSVGAII()
         {
-            device = (PCIDeviceNormal)Cosmos.Core.PCI.GetDevice(0x15AD, 0x0405);
+            device = (PCIDeviceNormal)Cosmos.HAL.PCI.GetDevice(0x15AD, 0x0405);
             device.EnableMemory(true);
             uint basePort = device.BaseAddresses[0].BaseAddress();
             IndexPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Index));

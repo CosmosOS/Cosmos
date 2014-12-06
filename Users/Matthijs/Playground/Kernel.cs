@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cosmos.Hardware;
-using Cosmos.Hardware.Drivers.PCI.Network;
-using Cosmos.System.Network;
+using PlaygroundSystem;
 using Sys = Cosmos.System;
 
 namespace Playground
@@ -18,6 +14,8 @@ namespace Playground
         protected override void Run()
         {
             Console.WriteLine("Started");
+
+            Class1.Execute();
 
             
             Console.WriteLine("Done");

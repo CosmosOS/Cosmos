@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Core.IOGroup;
 
 namespace Cosmos.Core {
     static public class Global {
@@ -13,18 +14,11 @@ namespace Cosmos.Core {
         // later user
         static public PIC PIC;
         static public CPU CPU;
-        static public PCI PCI;
-
+        
         static public void Init() {
             // See note in Bootstrap about these
             CPU = Bootstrap.CPU;
             PIC = Bootstrap.PIC;
-
-            //TODO: Since this is FCL, its "common". Otherwise it should be
-            // system level and not accessible from Core. Need to think about this
-            // for the future.
-            Console.WriteLine("Finding PCI Devices");
-            PCI.Setup();
         }
     }
 }

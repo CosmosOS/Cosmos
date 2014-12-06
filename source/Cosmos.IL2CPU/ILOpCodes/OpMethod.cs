@@ -34,6 +34,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           return Value.GetParameters().Length;
         case Code.Ldftn:
           return 0;
+        case Code.Ldvirtftn:
+          return 1;
         default:
           throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
@@ -54,6 +56,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Newobj:
           return 1;
         case Code.Ldftn:
+          return 1;
+        case Code.Ldvirtftn:
           return 1;
         default:
           throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");

@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Debug.Kernel;
 
-namespace Cosmos.Core
+namespace Cosmos.HAL
 {
     public class PCI
     {
         private static List<PCIDevice> devices;
+        private static Debugger mDebugger;
 
         public static void Setup()
         {
+            mDebugger = Global.Dbg;
             EnumerateDevices();
         }
 
@@ -63,7 +66,9 @@ namespace Cosmos.Core
             string str = "";
             for (int i = 0; i < step; i++)
                 str += "     ";
-            Console.WriteLine(str + device.bus + ":" + device.slot + ":" + device.function + "   " + PCIDevice.DeviceClass.GetString(device));
+            var xText = str + device.bus + ":" + device.slot + ":" + device.function + "   " + PCIDevice.DeviceClass.GetString(device);
+            mDebugger.Send(xText);
+            Console.WriteLine(xText);
             devices.Add(device);
             if (device is PCIDeviceBridge)
                 EnumerateBus(((PCIDeviceBridge)device).SecondaryBusNumber, step + 1);

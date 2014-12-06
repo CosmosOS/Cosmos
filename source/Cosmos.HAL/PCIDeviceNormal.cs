@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Cosmos.Core
+namespace Cosmos.HAL
 {
     public class PCIDeviceNormal : PCIDevice
     {
