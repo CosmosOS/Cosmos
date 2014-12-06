@@ -168,6 +168,8 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "SentinelKernelBoot", "..\Us
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentinelSystemLib", "..\Users\Sentinel209\SentinelSystemLib\SentinelSystemLib.csproj", "{93D6FF56-6E23-4E80-98F6-730AC533F631}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILSpyPlugAddIn", "Tools\ILSpyPlugAddIn\ILSpyPlugAddIn.csproj", "{8840988C-0D5B-4761-96BF-7241FAC38199}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -753,6 +755,18 @@ Global
 		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{93D6FF56-6E23-4E80-98F6-730AC533F631}.Release|x86.ActiveCfg = Release|Any CPU
+		{8840988C-0D5B-4761-96BF-7241FAC38199}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8840988C-0D5B-4761-96BF-7241FAC38199}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8840988C-0D5B-4761-96BF-7241FAC38199}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{8840988C-0D5B-4761-96BF-7241FAC38199}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8840988C-0D5B-4761-96BF-7241FAC38199}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8840988C-0D5B-4761-96BF-7241FAC38199}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8840988C-0D5B-4761-96BF-7241FAC38199}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8840988C-0D5B-4761-96BF-7241FAC38199}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8840988C-0D5B-4761-96BF-7241FAC38199}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{8840988C-0D5B-4761-96BF-7241FAC38199}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8840988C-0D5B-4761-96BF-7241FAC38199}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8840988C-0D5B-4761-96BF-7241FAC38199}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -811,5 +825,6 @@ Global
 		{3B0F484C-0A26-4CC2-B44D-DDDA3A3E9381} = {45E223F1-F219-4D48-96EC-85E0E0065BE7}
 		{40C3F1E6-2880-4AF4-91FD-DFD41484719D} = {45E223F1-F219-4D48-96EC-85E0E0065BE7}
 		{93D6FF56-6E23-4E80-98F6-730AC533F631} = {45E223F1-F219-4D48-96EC-85E0E0065BE7}
+		{8840988C-0D5B-4761-96BF-7241FAC38199} = {B521E2A2-81E4-4B2D-A471-7AB550E9551E}
 	EndGlobalSection
 EndGlobal
