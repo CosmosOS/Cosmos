@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cosmos.Common;
 using Cosmos.Core;
+using Cosmos.Core.IOGroup.Network;
 using Cosmos.HAL.Network;
 using CompilerPlugs = Cosmos.IL2CPU.Plugs;
 
@@ -9,25 +10,8 @@ namespace Cosmos.HAL.Drivers.PCI.Network
 {
     public class AMDPCNetII : NetworkDevice
     {
-        protected class IOGroup : Cosmos.Core.IOGroup.IOGroup
-        {
-            public readonly IOPort RegisterAddress;
-            public readonly IOPort RegisterData;
-            public readonly IOPort BusData;
-            public readonly IOPortRead MAC1;
-            public readonly IOPortRead MAC2;
-            public IOGroup(PCIDeviceNormal device)
-            {
-                RegisterAddress = new IOPort((ushort)device.BaseAddresses[0].BaseAddress(), 0x14);
-                RegisterData = new IOPort((ushort)device.BaseAddresses[0].BaseAddress(), 0x10);
-                BusData = new IOPort((ushort)device.BaseAddresses[0].BaseAddress(), 0x1C);
-                MAC1 = new IOPortRead((ushort)device.BaseAddresses[0].BaseAddress(), 0x00);
-                MAC2 = new IOPortRead((ushort)device.BaseAddresses[0].BaseAddress(), 0x04);
-            }
-        }
-
         protected PCIDeviceNormal pciCard;
-        protected IOGroup io;
+        protected AMDPCNetIIIOGroup io;
         protected MACAddress mac;
         protected bool mInitDone;
 
@@ -52,7 +36,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             this.pciCard.Claimed = true;
             this.pciCard.EnableDevice();
 
-            this.io = new IOGroup(this.pciCard);
+            this.io = new AMDPCNetIIIOGroup((ushort)this.pciCard.BaseAddresses[0].BaseAddress());
             this.io.RegisterData.DWord = 0;
 
             // Get the EEPROM MAC Address and set it as the devices MAC

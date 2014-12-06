@@ -79,6 +79,7 @@
     <Compile Include="Bootstrap.cs" />
     <Compile Include="HMI.cs" />
     <Compile Include="IOGroup\COM.cs" />
+    <Compile Include="IOGroup\Network\AMDPCNetIIIOGroup.cs" />
     <Compile Include="IOGroup\PCSpeaker.cs" />
     <Compile Include="ManagedMemoryBlock.cs" />
     <Compile Include="CPU.cs" />

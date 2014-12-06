@@ -16,7 +16,7 @@ namespace Cosmos.System.Network
         /// <summary>
         /// Initialize the Network Stack to prepare it for operation
         /// </summary>
-        internal static void Init()
+        public static void Init()
         {
             AddressMap = new TempDictionary<NetworkDevice>();
 
