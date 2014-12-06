@@ -9,17 +9,15 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
+using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using ErrorHandler = Microsoft.VisualStudio.ErrorHandler;
 using ShellConstants = Microsoft.VisualStudio.Shell.Interop.Constants;
 
 namespace Microsoft.VisualStudio.Project
@@ -28,9 +26,10 @@ namespace Microsoft.VisualStudio.Project
     public class NestedProjectNode : HierarchyNode, IPropertyNotifySink
     {
         #region fields
+
         private IVsHierarchy nestedHierarchy;
 
-        Guid projectInstanceGuid = Guid.Empty;
+        private Guid projectInstanceGuid = Guid.Empty;
 
         private string projectName = String.Empty;
 
@@ -50,9 +49,11 @@ namespace Microsoft.VisualStudio.Project
 
         // A cooike retrieved when advising on property chnanged events.
         private uint projectPropertyNotifySinkCookie;
-        #endregion
+
+        #endregion fields
 
         #region properties
+
         internal IVsHierarchy NestedHierarchy
         {
             get
@@ -60,9 +61,11 @@ namespace Microsoft.VisualStudio.Project
                 return this.nestedHierarchy;
             }
         }
-        #endregion
+
+        #endregion properties
 
         #region virtual properties
+
         /// <summary>
         /// Returns the __VSADDVPFLAGS that will be passed in when calling AddVirtualProjectEx
         /// </summary>
@@ -70,9 +73,11 @@ namespace Microsoft.VisualStudio.Project
         {
             get { return 0; }
         }
-        #endregion
+
+        #endregion virtual properties
 
         #region overridden properties
+
         /// <summary>
         /// The path of the nested project.
         /// </summary>
@@ -126,9 +131,7 @@ namespace Microsoft.VisualStudio.Project
             set { this.isDisposed = value; }
         }
 
-
-
-        #endregion
+        #endregion overridden properties
 
         #region ctor
 
@@ -141,12 +144,14 @@ namespace Microsoft.VisualStudio.Project
         {
             this.IsExpanded = true;
         }
-        #endregion
+
+        #endregion ctor
 
         #region IPropertyNotifySink Members
+
         /// <summary>
-        /// Notifies a sink that the [bindable] property specified by dispID has changed. 
-        /// If dispID is DISPID_UNKNOWN, then multiple properties have changed together. 
+        /// Notifies a sink that the [bindable] property specified by dispID has changed.
+        /// If dispID is DISPID_UNKNOWN, then multiple properties have changed together.
         /// The client (owner of the sink) should then retrieve the current value of each property of interest from the object that generated the notification.
         /// In our case we will care about the  VSLangProj80.VsProjPropId.VBPROJPROPID_FileName and update the changes in the parent project file.
         /// </summary>
@@ -176,13 +181,11 @@ namespace Microsoft.VisualStudio.Project
         /// <param name="dispid">Dispatch identifier of the property that is about to change or DISPID_UNKNOWN if multiple properties are about to change.</param>
         public virtual void OnRequestEdit(int dispid)
         {
-
         }
 
-        #endregion
+        #endregion IPropertyNotifySink Members
 
-        #region public methods
-        #endregion
+
 
         #region overridden methods
 
@@ -223,7 +226,6 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-
         /// <summary>
         /// Gets properties whose values are GUIDs.
         /// </summary>
@@ -252,7 +254,6 @@ namespace Microsoft.VisualStudio.Project
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Determines whether the hierarchy item changed.
         /// </summary>
@@ -265,7 +266,7 @@ namespace Microsoft.VisualStudio.Project
             Debug.Assert(this.nestedHierarchy != null, "The nested hierarchy object must be created before calling this method");
             Debug.Assert(punkDocData != IntPtr.Zero, "docData intptr was zero");
 
-            // Get an IPersistFileFormat object from docData object 
+            // Get an IPersistFileFormat object from docData object
             IPersistFileFormat persistFileFormat = Marshal.GetTypedObjectForIUnknown(punkDocData, typeof(IPersistFileFormat)) as IPersistFileFormat;
             Debug.Assert(persistFileFormat != null, "The docData object does not implement the IPersistFileFormat interface");
 
@@ -286,7 +287,7 @@ namespace Microsoft.VisualStudio.Project
         /// <returns>If the method succeeds, it returns S_OK. If it fails, it returns an error code.</returns>
         public override int SaveItem(VSSAVEFLAGS dwSave, string silentSaveAsName, uint itemid, IntPtr punkDocData, out int pfCancelled)
         {
-            // Don't ignore/unignore file changes 
+            // Don't ignore/unignore file changes
             // Use Advise/Unadvise to work around rename situations
             try
             {
@@ -302,12 +303,12 @@ namespace Microsoft.VisualStudio.Project
                 string newName;
                 ErrorHandler.ThrowOnFailure(uiShell.SaveDocDataToFile(dwSave, persistFileFormat, silentSaveAsName, out newName, out pfCancelled));
 
-                // When supported do a rename of the nested project here 
+                // When supported do a rename of the nested project here
             }
             finally
             {
                 // Succeeded or not we must hook to the file change events
-                // Don't ignore/unignore file changes 
+                // Don't ignore/unignore file changes
                 // Use Advise/Unadvise to work around rename situations
                 this.ObserveNestedProjectFile();
             }
@@ -366,7 +367,6 @@ namespace Microsoft.VisualStudio.Project
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Returns the moniker of the nested project.
         /// </summary>
@@ -422,13 +422,15 @@ namespace Microsoft.VisualStudio.Project
         protected internal override void ReloadItem(uint reserved)
         {
             #region precondition
+
             if (this.isDisposed || this.ProjectMgr == null || this.ProjectMgr.IsClosed)
             {
                 throw new InvalidOperationException();
             }
 
             Debug.Assert(this.nestedHierarchy != null, "The nested hierarchy object must be created before calling this method");
-            #endregion
+
+            #endregion precondition
 
             IVsPersistHierarchyItem2 persistHierachyItem = this.nestedHierarchy as IVsPersistHierarchyItem2;
 
@@ -443,19 +445,21 @@ namespace Microsoft.VisualStudio.Project
         }
 
         /// <summary>
-        /// Flag indicating that changes to a file can be ignored when item is saved or reloaded. 
+        /// Flag indicating that changes to a file can be ignored when item is saved or reloaded.
         /// </summary>
         /// <param name="ignoreFlag">Flag indicating whether or not to ignore changes (1 to ignore, 0 to stop ignoring).</param>
         protected internal override void IgnoreItemFileChanges(bool ignoreFlag)
         {
             #region precondition
+
             if (this.isDisposed || this.ProjectMgr == null || this.ProjectMgr.IsClosed)
             {
                 throw new InvalidOperationException();
             }
 
             Debug.Assert(this.nestedHierarchy != null, "The nested hierarchy object must be created before calling this method");
-            #endregion
+
+            #endregion precondition
 
             this.IgnoreNestedProjectFile(ignoreFlag);
 
@@ -557,9 +561,11 @@ namespace Microsoft.VisualStudio.Project
 
             return queryRemoveFileFlags;
         }
-        #endregion
+
+        #endregion overridden methods
 
         #region virtual methods
+
         /// <summary>
         /// Initialize the nested hierarhy node.
         /// </summary>
@@ -591,7 +597,7 @@ namespace Microsoft.VisualStudio.Project
                 throw new InvalidOperationException();
             }
 
-            // Get the project type guid from project element				
+            // Get the project type guid from project element
             string typeGuidString = this.ItemNode.GetMetadataAndThrow(ProjectFileConstants.TypeGuid, new InvalidOperationException());
             Guid projectFactoryGuid = Guid.Empty;
             if (!String.IsNullOrEmpty(typeGuidString))
@@ -651,13 +657,17 @@ namespace Microsoft.VisualStudio.Project
         protected internal virtual void AddVirtualProject()
         {
             // This is the second step in creating and adding a nested project. The inner hierarchy must have been
-            // already initialized at this point. 
+            // already initialized at this point.
+
             #region precondition
+
             if (this.nestedHierarchy == null)
             {
                 throw new InvalidOperationException();
             }
-            #endregion
+
+            #endregion precondition
+
             // get the IVsSolution interface from the global service provider
             IVsSolution solution = this.GetService(typeof(IVsSolution)) as IVsSolution;
             Debug.Assert(solution != null, "Could not get the IVsSolution object from the services exposed by this project");
@@ -724,7 +734,6 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-
         /// <summary>
         /// Lock the RDT Entry for the nested project.
         /// By default this document is marked as "Dont Save as". That means the menu File->SaveAs is disabled for the
@@ -765,7 +774,6 @@ namespace Microsoft.VisualStudio.Project
                 }
                 else
                 {
-
                     // get inptr for hierarchy
                     projectPtr = Marshal.GetIUnknownForObject(this.nestedHierarchy);
                     Debug.Assert(projectPtr != IntPtr.Zero, " Project pointer for the nested hierarchy has not been initialized");
@@ -790,7 +798,6 @@ namespace Microsoft.VisualStudio.Project
                     Marshal.Release(projectPtr);
                 }
             }
-
         }
 
         /// <summary>
@@ -842,7 +849,6 @@ namespace Microsoft.VisualStudio.Project
                     throw Marshal.GetExceptionForHR(VSConstants.OLE_E_PROMPTSAVECANCELLED);
                 }
 
-
                 string newFileName = label + Path.GetExtension(oldFileName);
                 this.SaveNestedProjectItemInProjectFile(newFileName);
 
@@ -865,6 +871,7 @@ namespace Microsoft.VisualStudio.Project
                 this.ProjectMgr.ResumeMSBuild(this.ProjectMgr.ReEvaluateProjectFileTargetName);
             }
         }
+
         /// <summary>
         /// Saves the nested project information in the project file.
         /// </summary>
@@ -876,9 +883,11 @@ namespace Microsoft.VisualStudio.Project
             string newRelativePath = Path.Combine(existingRelativePath, newFileName);
             this.ItemNode.Rename(newRelativePath);
         }
-        #endregion
+
+        #endregion virtual methods
 
         #region helper methods
+
         /// <summary>
         /// Closes a nested project and releases the nested hierrachy pointer.
         /// </summary>
@@ -899,7 +908,6 @@ namespace Microsoft.VisualStudio.Project
                 IVsWindowFrame windowFrame;
                 VsShellUtilities.IsDocumentOpen(this.ProjectMgr.Site, this.projectPath, Guid.Empty, out hier, out itemid, out windowFrame);
 
-
                 if (itemid == VSConstants.VSITEMID_NIL)
                 {
                     this.UnlockRDTEntry();
@@ -912,7 +920,6 @@ namespace Microsoft.VisualStudio.Project
                 }
 
                 ErrorHandler.ThrowOnFailure(solution.RemoveVirtualProject(this.nestedHierarchy, 0));
-
             }
             finally
             {
@@ -1091,7 +1098,7 @@ namespace Microsoft.VisualStudio.Project
 
         /// <summary>
         /// We need to advise property notify sink on project properties so that
-        /// we know when the project file is renamed through a property. 
+        /// we know when the project file is renamed through a property.
         /// </summary>
         private void ConnectPropertyNotifySink()
         {
@@ -1143,6 +1150,7 @@ namespace Microsoft.VisualStudio.Project
 
             return connectionPoint;
         }
-        #endregion
+
+        #endregion helper methods
     }
 }

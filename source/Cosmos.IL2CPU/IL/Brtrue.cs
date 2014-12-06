@@ -5,23 +5,22 @@ namespace Cosmos.IL2CPU.X86.IL
     //[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Brtrue)]
     public class Brtrue : ILOp
     {
-        public Brtrue( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Brtrue(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             throw new NotImplementedException();
         }
 
-
         // using System;
         // using System.IO;
-        // 
-        // 
+        //
+        //
         // using CPUx86 = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Brtrue)]
         // 	public class Brtrue: Op {
@@ -30,7 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			: base(aReader, aMethodInfo) {
         // 			TargetLabel = GetInstructionLabel(aReader.OperandValueBranchPosition);
         // 		}
-        // 
+        //
         // 		public override void DoAssemble() {
         // 			int xSize = Assembler.Stack.Pop().Size;
         // 			if (xSize > 8) {
@@ -53,6 +52,5 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 	}
         // }
-
     }
 }

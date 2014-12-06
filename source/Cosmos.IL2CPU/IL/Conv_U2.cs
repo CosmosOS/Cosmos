@@ -3,18 +3,18 @@ using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	/// <summary>
-	/// Convert top Stack element to UInt16 and extends it to Int32.
-	/// </summary>
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Conv_U2 )]
+    /// <summary>
+    /// Convert top Stack element to UInt16 and extends it to Int32.
+    /// </summary>
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_U2)]
     public class Conv_U2 : ILOp
     {
-        public Conv_U2( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Conv_U2(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xSource = aOpCode.StackPopTypes[0];
             var xSourceSize = SizeOfType(xSource);
@@ -37,17 +37,20 @@ namespace Cosmos.IL2CPU.X86.IL
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_U2.cs->Unknown size of floating point value.");
                 }
             }
-            else { 
-                switch( xSourceSize )
+            else
+            {
+                switch (xSourceSize)
                 {
                     case 2:
                         break;
+
                     case 1:
                     case 4:
-						    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-						    new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AX, Size = 16 };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-						    break;
+                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                        new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AX, Size = 16 };
+                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                        break;
+
                     case 8:
                         {
                             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

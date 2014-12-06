@@ -1,20 +1,18 @@
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
-using System.Text;
 using System.Diagnostics;
-
-using Microsoft.Samples.Debugging.CorDebug.NativeApi;
-using System.Collections.Generic;
+using System.Text;
 
 namespace Microsoft.Samples.Debugging.CorDebug
 {
-
-
     /** A value in the remote process. */
+
     public class CorValue : WrapperBase
     {
         [CLSCompliant(false)]
@@ -27,13 +25,14 @@ namespace Microsoft.Samples.Debugging.CorDebug
         [CLSCompliant(false)]
         public ICorDebugValue Raw
         {
-            get 
-            { 
+            get
+            {
                 return m_val;
             }
         }
 
         /** The simple type of the value. */
+
         public CorElementType Type
         {
             get
@@ -45,6 +44,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Full runtime type of the object . */
+
         public CorType ExactType
         {
             get
@@ -57,6 +57,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** size of the value (in bytes). */
+
         public int Size
         {
             get
@@ -68,6 +69,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Address of the value in the debuggee process. */
+
         public long Address
         {
             get
@@ -79,6 +81,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Breakpoint triggered when the value is modified. */
+
         public CorValueBreakpoint CreateBreakpoint()
         {
             ICorDebugValueBreakpoint bp = null;
@@ -146,13 +149,10 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         internal ICorDebugValue m_val = null;
-
     } /* class Value */
-
 
     public class CorReferenceValue : CorValue
     {
-
         internal CorReferenceValue(ICorDebugReferenceValue referenceValue)
             : base(referenceValue)
         {
@@ -194,10 +194,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
         private ICorDebugReferenceValue m_refVal = null;
     }
 
-
     public sealed class CorHandleValue : CorReferenceValue, System.IDisposable
     {
-
         internal CorHandleValue(ICorDebugHandleValue handleValue)
             : base(handleValue)
         {
@@ -233,12 +231,12 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 return ht;
             }
         }
+
         private ICorDebugHandleValue m_handleVal = null;
     }
 
     public sealed class CorStringValue : CorValue
     {
-
         internal CorStringValue(ICorDebugStringValue stringValue)
             : base(stringValue)
         {
@@ -279,7 +277,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
         private ICorDebugStringValue m_strVal = null;
     }
 
-
     public sealed class CorObjectValue : CorValue
     {
         internal CorObjectValue(ICorDebugObjectValue objectValue)
@@ -316,7 +313,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 managedFunction = new CorFunction(pfunc);
             return dt == null ? null : new CorType(dt);
         }
-
 
         public bool IsValueClass
         {
@@ -654,7 +650,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
                     }
                     return (object)r8Value;
 
-
                 case CorElementType.ELEMENT_TYPE_VALUETYPE:
                     byte[] buffer = new byte[this.Size];
                     unsafe
@@ -672,7 +667,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
                     throw new NotSupportedException();
             }
         }
-
 
         private void SetValueInternal(IntPtr valPtr)
         {
@@ -725,7 +719,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 return (int)pnCount;
             }
         }
-
 
         public CorElementType ElementType
         {
@@ -791,6 +784,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             m_arrayVal.GetElementAtPosition((uint)position, out ppValue);
             return ppValue == null ? null : new CorValue(ppValue);
         }
+
         private ICorDebugArrayValue m_arrayVal = null;
     }
 
@@ -883,5 +877,4 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
         private ICorDebugHeapValue m_heapVal = null;
     }
-
 } /* namespace  */

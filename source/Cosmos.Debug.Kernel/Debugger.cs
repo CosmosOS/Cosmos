@@ -1,33 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Debug.Kernel {
-    public class Debugger {
-        public Debugger(string aRing, string aSection) {
+﻿namespace Cosmos.Debug.Kernel
+{
+    public class Debugger
+    {
+        public Debugger(string aRing, string aSection)
+        {
         }
 
-        public void Break() { } // Plugged
-        public unsafe void Send(int aLength, char* aText) { } // Plugged
+        public void Break()
+        {
+        } // Plugged
+
+        public unsafe void Send(int aLength, char* aText)
+        {
+        } // Plugged
+
         //public void TraceOff() { } // Plugged
         //public void TraceOn() { } // Plugged
-        public void SendPtr(object aObject) { } // plugged
+        public void SendPtr(object aObject)
+        {
+        } // plugged
 
-        public unsafe void Send(string aText) {
-          // TODO: Need to fix this so it can send empty strings.
-          // Sending empty strings locks it up right now
-          if (aText.Length == 0) {
-            return;
-          }
+        public unsafe void Send(string aText)
+        {
+            // TODO: Need to fix this so it can send empty strings.
+            // Sending empty strings locks it up right now
+            if (aText.Length == 0)
+            {
+                return;
+            }
 
             var xChars = aText.ToCharArray();
-            fixed (char* xPtr = &xChars[0]) {
+            fixed (char* xPtr = &xChars[0])
+            {
                 Send(xChars.Length, xPtr);
             }
         }
 
-        public unsafe void SendMessageBox(int aLength, char* aText) { } // Plugged
+        public unsafe void SendMessageBox(int aLength, char* aText)
+        {
+        } // Plugged
+
         public unsafe void SendMessageBox(string aText)
         {
             // TODO: Need to fix this so it can send empty strings.
@@ -45,40 +57,47 @@ namespace Cosmos.Debug.Kernel {
         }
 
         // TODO: Kudzu repacement methods for Cosmos.HAL.DebugUtil
-        public unsafe void SendMessage(string aModule, string aData) {
+        public unsafe void SendMessage(string aModule, string aData)
+        {
             //string xSingleString;
             //xSingleString = "Message Module: \"" + aModule + "\"";
             //xSingleString += " Data: \"" + aData + "\"";
             //Send(xSingleString);
         }
 
-        public unsafe void SendError(string aModule, string aData) {
+        public unsafe void SendError(string aModule, string aData)
+        {
             //string xSingleString;
             //xSingleString = "Error Module: \"" + aModule + "\"";
             //xSingleString += " Data: \"" + aData + "\"";
             //Send(xSingleString);
         }
 
-        public unsafe void SendNumber(string aModule, string aDescription, uint aNumber, byte aBits) {
+        public unsafe void SendNumber(string aModule, string aDescription, uint aNumber, byte aBits)
+        {
             //string xSingleString;
             //xSingleString = "Number Module: \"" + aModule + "\"";
             //xSingleString += " Description: \"" + aDescription + "\"";
             //xSingleString += " Number: \"" + CreateNumber(aNumber, aBits) + "\"";
         }
 
-        public unsafe void WriteNumber(uint aNumber, byte aBits) {
+        public unsafe void WriteNumber(uint aNumber, byte aBits)
+        {
             WriteNumber(aNumber, aBits, true);
         }
 
-        public unsafe void WriteNumber(uint aNumber, byte aBits, bool aWritePrefix) {
+        public unsafe void WriteNumber(uint aNumber, byte aBits, bool aWritePrefix)
+        {
             Send(CreateNumber(aNumber, aBits, aWritePrefix));
         }
 
-        public unsafe string CreateNumber(uint aNumber, byte aBits) {
+        public unsafe string CreateNumber(uint aNumber, byte aBits)
+        {
             return CreateNumber(aNumber, aBits, true);
         }
 
-        public unsafe string CreateNumber(uint aNumber, byte aBits, bool aWritePrefix) {
+        public unsafe string CreateNumber(uint aNumber, byte aBits, bool aWritePrefix)
+        {
             return "Cosmos.Debug.Debugger.CreateNumber(aNumber, aBits, aWritePrefix) not implemented";
             //string xNumberString = null;
             //uint xValue = aNumber;
@@ -150,11 +169,13 @@ namespace Cosmos.Debug.Kernel {
             //return xNumberString;
         }
 
-        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue) {
+        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue)
+        {
             WriteBinary(aModule, aMessage, aValue, 0, aValue.Length);
         }
 
-        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue, int aIndex, int aLength) {
+        public unsafe void WriteBinary(string aModule, string aMessage, byte[] aValue, int aIndex, int aLength)
+        {
             //string xSingleString;
             //xSingleString = "Binary Module = \"" + aModule + "\"";
             //xSingleString += " Message = " + aMessage + "\"";
@@ -167,7 +188,8 @@ namespace Cosmos.Debug.Kernel {
             //Send(xSingleString);
         }
 
-        public unsafe void WriteBinary(string aModule, string aMessage, byte* aValue, int aIndex, int aLength) {
+        public unsafe void WriteBinary(string aModule, string aMessage, byte* aValue, int aIndex, int aLength)
+        {
             //string xSingleString;
             //xSingleString = "Binary Module = \"" + aModule + "\"";
             //xSingleString += " Message = " + aMessage + "\"";
@@ -180,11 +202,13 @@ namespace Cosmos.Debug.Kernel {
             //Send(xSingleString);
         }
 
-        public unsafe void ViewMemory() {
+        public unsafe void ViewMemory()
+        {
             ViewMemory(0);
         }
 
-        public unsafe void ViewMemory(int addr) {
+        public unsafe void ViewMemory(int addr)
+        {
             //while (true) {
             //    Console.Clear();
             //    Console.WriteLine();
@@ -223,17 +247,18 @@ namespace Cosmos.Debug.Kernel {
             //}
         }
 
-        private int FromHex(string p) {
+        private int FromHex(string p)
+        {
             p = p.ToLower();
             string hex = "0123456789abcdef";
 
             int ret = 0;
 
-            for (int i = 0; i < p.Length; i++) {
+            for (int i = 0; i < p.Length; i++)
+            {
                 ret = ret * 16 + hex.IndexOf(p[i]);
             }
             return ret;
-
         }
     }
 }

@@ -1,18 +1,14 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
-using System.Reflection;
-using System.Text;
 using System.Runtime.InteropServices;
-using System.Globalization;
-using System.Diagnostics;
+using System.Text;
 
 namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
 {
-
     // GUID Copied from Cor.h
     [Guid("7DAC8207-D3AE-4c75-9B67-92801A497D44"),
      InterfaceType(ComInterfaceType.InterfaceIsIUnknown)
@@ -35,7 +31,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         void ResetEnum(IntPtr hEnum, int ulPos);
 
         //STDMETHOD(EnumTypeDefs)(HCORENUM *phEnum, mdTypeDef rTypeDefs[],ULONG cMax, ULONG *pcTypeDefs) PURE;
-        //void EnumTypeDefs(out IntPtr phEnum,int[] rTypeDefs,uint cMax, out uint pcTypeDefs);  
+        //void EnumTypeDefs(out IntPtr phEnum,int[] rTypeDefs,uint cMax, out uint pcTypeDefs);
         void EnumTypeDefs(
                             ref IntPtr phEnum,
                             [ComAliasName("mdTypeDef*")] out int rTypeDefs,
@@ -113,29 +109,29 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         //     STDMETHOD(ResolveTypeRef)(mdTypeRef tr, REFIID riid, IUnknown **ppIScope, mdTypeDef *ptd) PURE;
         void ResolveTypeRef(int tr, ref Guid riid, [MarshalAs(UnmanagedType.IUnknown)] out object scope, out int typeDef);
 
-        //     STDMETHOD(EnumMembers)(                 // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.   
-        //         mdToken     rMembers[],             // [OUT] Put MemberDefs here.   
-        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.  
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumMembers)(                 // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.
+        //         mdToken     rMembers[],             // [OUT] Put MemberDefs here.
+        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         void EnumMembers_();
 
-        //     STDMETHOD(EnumMembersWithName)(         // S_OK, S_FALSE, or error.             
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.                
-        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.   
-        //         LPCWSTR     szName,                 // [IN] Limit results to those with this name.              
-        //         mdToken     rMembers[],             // [OUT] Put MemberDefs here.                   
-        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.              
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumMembersWithName)(         // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.
+        //         LPCWSTR     szName,                 // [IN] Limit results to those with this name.
+        //         mdToken     rMembers[],             // [OUT] Put MemberDefs here.
+        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         void EnumMembersWithName_();
 
-        //     STDMETHOD(EnumMethods)(                 // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.   
-        //         mdMethodDef rMethods[],             // [OUT] Put MethodDefs here.   
-        //         ULONG       cMax,                   // [IN] Max MethodDefs to put.  
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumMethods)(                 // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.
+        //         mdMethodDef rMethods[],             // [OUT] Put MethodDefs here.
+        //         ULONG       cMax,                   // [IN] Max MethodDefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         void EnumMethods(ref IntPtr phEnum,
                          int cl,
                          [ComAliasName("mdMethodDef*")] out int mdMethodDef,
@@ -143,44 +139,44 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
                          [ComAliasName("ULONG*")] out int pcTokens
                          );
 
-        //     STDMETHOD(EnumMethodsWithName)(         // S_OK, S_FALSE, or error.             
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.                
-        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.   
-        //         LPCWSTR     szName,                 // [IN] Limit results to those with this name.              
-        //         mdMethodDef rMethods[],             // [OU] Put MethodDefs here.    
-        //         ULONG       cMax,                   // [IN] Max MethodDefs to put.              
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumMethodsWithName)(         // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.
+        //         LPCWSTR     szName,                 // [IN] Limit results to those with this name.
+        //         mdMethodDef rMethods[],             // [OU] Put MethodDefs here.
+        //         ULONG       cMax,                   // [IN] Max MethodDefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         void EnumMethodsWithName_();
 
-        //     STDMETHOD(EnumFields)(                 // S_OK, S_FALSE, or error.  
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.   
-        //         mdFieldDef  rFields[],              // [OUT] Put FieldDefs here.    
-        //         ULONG       cMax,                   // [IN] Max FieldDefs to put.   
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumFields)(                 // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.
+        //         mdFieldDef  rFields[],              // [OUT] Put FieldDefs here.
+        //         ULONG       cMax,                   // [IN] Max FieldDefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         //void EnumFields_();
         /*[PreserveSig]*/
+
         void EnumFields(ref IntPtr phEnum,
                         int cl,
                         [ComAliasName("mdFieldDef*")] out int mdFieldDef,
                         int cMax /*must be 1*/,
                         [ComAliasName("ULONG*")] out uint pcTokens);
 
-
-        //     STDMETHOD(EnumFieldsWithName)(         // S_OK, S_FALSE, or error.              
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.                
-        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.   
-        //         LPCWSTR     szName,                 // [IN] Limit results to those with this name.              
-        //         mdFieldDef  rFields[],              // [OUT] Put MemberDefs here.                   
-        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.              
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumFieldsWithName)(         // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.
+        //         LPCWSTR     szName,                 // [IN] Limit results to those with this name.
+        //         mdFieldDef  rFields[],              // [OUT] Put MemberDefs here.
+        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         void EnumFieldsWithName_();
 
-        //     STDMETHOD(EnumParams)(                  // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdMethodDef mb,                     // [IN] MethodDef to scope the enumeration. 
-        //         mdParamDef  rParams[],              // [OUT] Put ParamDefs here.    
-        //         ULONG       cMax,                   // [IN] Max ParamDefs to put.   
+        //     STDMETHOD(EnumParams)(                  // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdMethodDef mb,                     // [IN] MethodDef to scope the enumeration.
+        //         mdParamDef  rParams[],              // [OUT] Put ParamDefs here.
+        //         ULONG       cMax,                   // [IN] Max ParamDefs to put.
         //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         void EnumParams(ref IntPtr phEnum,
                         int mdMethodDef,
@@ -188,75 +184,75 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
                         int cMax /*must be 1*/,
                         [ComAliasName("ULONG*")] out uint pcTokens);
 
-        //     STDMETHOD(EnumMemberRefs)(              // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdToken     tkParent,               // [IN] Parent token to scope the enumeration.  
-        //         mdMemberRef rMemberRefs[],          // [OUT] Put MemberRefs here.   
-        //         ULONG       cMax,                   // [IN] Max MemberRefs to put.  
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumMemberRefs)(              // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdToken     tkParent,               // [IN] Parent token to scope the enumeration.
+        //         mdMemberRef rMemberRefs[],          // [OUT] Put MemberRefs here.
+        //         ULONG       cMax,                   // [IN] Max MemberRefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         void EnumMemberRefs_();
 
-        //     STDMETHOD(EnumMethodImpls)(             // S_OK, S_FALSE, or error  
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdTypeDef   td,                     // [IN] TypeDef to scope the enumeration.   
-        //         mdToken     rMethodBody[],          // [OUT] Put Method Body tokens here.   
+        //     STDMETHOD(EnumMethodImpls)(             // S_OK, S_FALSE, or error
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   td,                     // [IN] TypeDef to scope the enumeration.
+        //         mdToken     rMethodBody[],          // [OUT] Put Method Body tokens here.
         //         mdToken     rMethodDecl[],          // [OUT] Put Method Declaration tokens here.
-        //         ULONG       cMax,                   // [IN] Max tokens to put.  
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //         ULONG       cMax,                   // [IN] Max tokens to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         void EnumMethodImpls_();
 
-        //     STDMETHOD(EnumPermissionSets)(          // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdToken     tk,                     // [IN] if !NIL, token to scope the enumeration.    
-        //         DWORD       dwActions,              // [IN] if !0, return only these actions.   
-        //         mdPermission rPermission[],         // [OUT] Put Permissions here.  
-        //         ULONG       cMax,                   // [IN] Max Permissions to put. 
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumPermissionSets)(          // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdToken     tk,                     // [IN] if !NIL, token to scope the enumeration.
+        //         DWORD       dwActions,              // [IN] if !0, return only these actions.
+        //         mdPermission rPermission[],         // [OUT] Put Permissions here.
+        //         ULONG       cMax,                   // [IN] Max Permissions to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         void EnumPermissionSets_();
 
-        //     STDMETHOD(FindMember)(  
-        //         mdTypeDef   td,                     // [IN] given typedef   
-        //         LPCWSTR     szName,                 // [IN] member name 
-        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature 
-        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob    
-        //         mdToken     *pmb) PURE;             // [OUT] matching memberdef 
+        //     STDMETHOD(FindMember)(
+        //         mdTypeDef   td,                     // [IN] given typedef
+        //         LPCWSTR     szName,                 // [IN] member name
+        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature
+        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob
+        //         mdToken     *pmb) PURE;             // [OUT] matching memberdef
         void FindMember_();
 
-        //     STDMETHOD(FindMethod)(  
-        //         mdTypeDef   td,                     // [IN] given typedef   
-        //         LPCWSTR     szName,                 // [IN] member name 
-        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature 
-        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob    
-        //         mdMethodDef *pmb) PURE;             // [OUT] matching memberdef 
+        //     STDMETHOD(FindMethod)(
+        //         mdTypeDef   td,                     // [IN] given typedef
+        //         LPCWSTR     szName,                 // [IN] member name
+        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature
+        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob
+        //         mdMethodDef *pmb) PURE;             // [OUT] matching memberdef
         void FindMethod_();
 
-        //     STDMETHOD(FindField)(   
-        //         mdTypeDef   td,                     // [IN] given typedef   
-        //         LPCWSTR     szName,                 // [IN] member name 
-        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature 
-        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob    
-        //         mdFieldDef  *pmb) PURE;             // [OUT] matching memberdef 
+        //     STDMETHOD(FindField)(
+        //         mdTypeDef   td,                     // [IN] given typedef
+        //         LPCWSTR     szName,                 // [IN] member name
+        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature
+        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob
+        //         mdFieldDef  *pmb) PURE;             // [OUT] matching memberdef
         void FindField_();
 
-        //     STDMETHOD(FindMemberRef)(   
-        //         mdTypeRef   td,                     // [IN] given typeRef   
-        //         LPCWSTR     szName,                 // [IN] member name 
-        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature 
-        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob    
-        //         mdMemberRef *pmr) PURE;             // [OUT] matching memberref 
+        //     STDMETHOD(FindMemberRef)(
+        //         mdTypeRef   td,                     // [IN] given typeRef
+        //         LPCWSTR     szName,                 // [IN] member name
+        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature
+        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob
+        //         mdMemberRef *pmr) PURE;             // [OUT] matching memberref
         void FindMemberRef_();
 
-        //     STDMETHOD (GetMethodProps)( 
-        //         mdMethodDef mb,                     // The method for which to get props.   
-        //         mdTypeDef   *pClass,                // Put method's class here. 
-        //         LPWSTR      szMethod,               // Put method's name here.  
-        //         ULONG       cchMethod,              // Size of szMethod buffer in wide chars.   
-        //         ULONG       *pchMethod,             // Put actual size here 
-        //         DWORD       *pdwAttr,               // Put flags here.  
-        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data   
-        //         ULONG       *pcbSigBlob,            // [OUT] actual size of signature blob  
-        //         ULONG       *pulCodeRVA,            // [OUT] codeRVA    
-        //         DWORD       *pdwImplFlags) PURE;    // [OUT] Impl. Flags    
+        //     STDMETHOD (GetMethodProps)(
+        //         mdMethodDef mb,                     // The method for which to get props.
+        //         mdTypeDef   *pClass,                // Put method's class here.
+        //         LPWSTR      szMethod,               // Put method's name here.
+        //         ULONG       cchMethod,              // Size of szMethod buffer in wide chars.
+        //         ULONG       *pchMethod,             // Put actual size here
+        //         DWORD       *pdwAttr,               // Put flags here.
+        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data
+        //         ULONG       *pcbSigBlob,            // [OUT] actual size of signature blob
+        //         ULONG       *pulCodeRVA,            // [OUT] codeRVA
+        //         DWORD       *pdwImplFlags) PURE;    // [OUT] Impl. Flags
         void GetMethodProps([In] uint md,
                             [ComAliasName("mdTypeDef*")] [Out] out int pClass,
                             [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szMethod,
@@ -269,14 +265,14 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
                             [ComAliasName("DWORD*")] [Out] out uint pdwImplFlags
                             );
 
-        //     STDMETHOD(GetMemberRefProps)(           // S_OK or error.   
-        //         mdMemberRef mr,                     // [IN] given memberref 
-        //         mdToken     *ptk,                   // [OUT] Put classref or classdef here. 
-        //         LPWSTR      szMember,               // [OUT] buffer to fill for member's name   
-        //         ULONG       cchMember,              // [IN] the count of char of szMember   
-        //         ULONG       *pchMember,             // [OUT] actual count of char in member name    
-        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to meta data blob value  
-        //         ULONG       *pbSig) PURE;           // [OUT] actual size of signature blob  
+        //     STDMETHOD(GetMemberRefProps)(           // S_OK or error.
+        //         mdMemberRef mr,                     // [IN] given memberref
+        //         mdToken     *ptk,                   // [OUT] Put classref or classdef here.
+        //         LPWSTR      szMember,               // [OUT] buffer to fill for member's name
+        //         ULONG       cchMember,              // [IN] the count of char of szMember
+        //         ULONG       *pchMember,             // [OUT] actual count of char in member name
+        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to meta data blob value
+        //         ULONG       *pbSig) PURE;           // [OUT] actual size of signature blob
         void GetMemberRefProps([In] uint mr,
                                [ComAliasName("mdMemberRef*")] [Out] out int ptk,
                                [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szMember,
@@ -286,108 +282,108 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
                                [ComAliasName("ULONG*")] [Out] out int pbSig
                                );
 
-        //     STDMETHOD(EnumProperties)(              // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdTypeDef   td,                     // [IN] TypeDef to scope the enumeration.   
-        //         mdProperty  rProperties[],          // [OUT] Put Properties here.   
-        //         ULONG       cMax,                   // [IN] Max properties to put.  
-        //         ULONG       *pcProperties) PURE;    // [OUT] Put # put here.    
+        //     STDMETHOD(EnumProperties)(              // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   td,                     // [IN] TypeDef to scope the enumeration.
+        //         mdProperty  rProperties[],          // [OUT] Put Properties here.
+        //         ULONG       cMax,                   // [IN] Max properties to put.
+        //         ULONG       *pcProperties) PURE;    // [OUT] Put # put here.
         void EnumProperties(ref IntPtr phEnum,
                             int mdTypeDef,
                             [ComAliasName("mdPropertyDef*")] out int mdPropertyDef,
                             int countMax /*must be 1*/,
                             [ComAliasName("ULONG*")] out uint pcTokens);
 
-        //     STDMETHOD(EnumEvents)(                  // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdTypeDef   td,                     // [IN] TypeDef to scope the enumeration.   
-        //         mdEvent     rEvents[],              // [OUT] Put events here.   
-        //         ULONG       cMax,                   // [IN] Max events to put.  
-        //         ULONG       *pcEvents) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumEvents)(                  // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   td,                     // [IN] TypeDef to scope the enumeration.
+        //         mdEvent     rEvents[],              // [OUT] Put events here.
+        //         ULONG       cMax,                   // [IN] Max events to put.
+        //         ULONG       *pcEvents) PURE;        // [OUT] Put # put here.
         void EnumEvents_();
 
-        //     STDMETHOD(GetEventProps)(               // S_OK, S_FALSE, or error. 
-        //         mdEvent     ev,                     // [IN] event token 
-        //         mdTypeDef   *pClass,                // [OUT] typedef containing the event declarion.    
-        //         LPCWSTR     szEvent,                // [OUT] Event name 
-        //         ULONG       cchEvent,               // [IN] the count of wchar of szEvent   
-        //         ULONG       *pchEvent,              // [OUT] actual count of wchar for event's name 
-        //         DWORD       *pdwEventFlags,         // [OUT] Event flags.   
-        //         mdToken     *ptkEventType,          // [OUT] EventType class    
-        //         mdMethodDef *pmdAddOn,              // [OUT] AddOn method of the event  
-        //         mdMethodDef *pmdRemoveOn,           // [OUT] RemoveOn method of the event   
-        //         mdMethodDef *pmdFire,               // [OUT] Fire method of the event   
-        //         mdMethodDef rmdOtherMethod[],       // [OUT] other method of the event  
-        //         ULONG       cMax,                   // [IN] size of rmdOtherMethod  
-        //         ULONG       *pcOtherMethod) PURE;   // [OUT] total number of other method of this event 
+        //     STDMETHOD(GetEventProps)(               // S_OK, S_FALSE, or error.
+        //         mdEvent     ev,                     // [IN] event token
+        //         mdTypeDef   *pClass,                // [OUT] typedef containing the event declarion.
+        //         LPCWSTR     szEvent,                // [OUT] Event name
+        //         ULONG       cchEvent,               // [IN] the count of wchar of szEvent
+        //         ULONG       *pchEvent,              // [OUT] actual count of wchar for event's name
+        //         DWORD       *pdwEventFlags,         // [OUT] Event flags.
+        //         mdToken     *ptkEventType,          // [OUT] EventType class
+        //         mdMethodDef *pmdAddOn,              // [OUT] AddOn method of the event
+        //         mdMethodDef *pmdRemoveOn,           // [OUT] RemoveOn method of the event
+        //         mdMethodDef *pmdFire,               // [OUT] Fire method of the event
+        //         mdMethodDef rmdOtherMethod[],       // [OUT] other method of the event
+        //         ULONG       cMax,                   // [IN] size of rmdOtherMethod
+        //         ULONG       *pcOtherMethod) PURE;   // [OUT] total number of other method of this event
         void GetEventProps_();
 
-        //     STDMETHOD(EnumMethodSemantics)(         // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdMethodDef mb,                     // [IN] MethodDef to scope the enumeration. 
-        //         mdToken     rEventProp[],           // [OUT] Put Event/Property here.   
-        //         ULONG       cMax,                   // [IN] Max properties to put.  
-        //         ULONG       *pcEventProp) PURE;     // [OUT] Put # put here.    
+        //     STDMETHOD(EnumMethodSemantics)(         // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdMethodDef mb,                     // [IN] MethodDef to scope the enumeration.
+        //         mdToken     rEventProp[],           // [OUT] Put Event/Property here.
+        //         ULONG       cMax,                   // [IN] Max properties to put.
+        //         ULONG       *pcEventProp) PURE;     // [OUT] Put # put here.
         void EnumMethodSemantics_();
 
-        //     STDMETHOD(GetMethodSemantics)(          // S_OK, S_FALSE, or error. 
-        //         mdMethodDef mb,                     // [IN] method token    
-        //         mdToken     tkEventProp,            // [IN] event/property token.   
-        //         DWORD       *pdwSemanticsFlags) PURE; // [OUT] the role flags for the method/propevent pair 
+        //     STDMETHOD(GetMethodSemantics)(          // S_OK, S_FALSE, or error.
+        //         mdMethodDef mb,                     // [IN] method token
+        //         mdToken     tkEventProp,            // [IN] event/property token.
+        //         DWORD       *pdwSemanticsFlags) PURE; // [OUT] the role flags for the method/propevent pair
         void GetMethodSemantics_();
 
-        //     STDMETHOD(GetClassLayout) ( 
-        //         mdTypeDef   td,                     // [IN] give typedef    
-        //         DWORD       *pdwPackSize,           // [OUT] 1, 2, 4, 8, or 16  
-        //         COR_FIELD_OFFSET rFieldOffset[],    // [OUT] field offset array 
-        //         ULONG       cMax,                   // [IN] size of the array   
-        //         ULONG       *pcFieldOffset,         // [OUT] needed array size  
-        //         ULONG       *pulClassSize) PURE;        // [OUT] the size of the class  
+        //     STDMETHOD(GetClassLayout) (
+        //         mdTypeDef   td,                     // [IN] give typedef
+        //         DWORD       *pdwPackSize,           // [OUT] 1, 2, 4, 8, or 16
+        //         COR_FIELD_OFFSET rFieldOffset[],    // [OUT] field offset array
+        //         ULONG       cMax,                   // [IN] size of the array
+        //         ULONG       *pcFieldOffset,         // [OUT] needed array size
+        //         ULONG       *pulClassSize) PURE;        // [OUT] the size of the class
         void GetClassLayout_();
 
-        //     STDMETHOD(GetFieldMarshal) (    
-        //         mdToken     tk,                     // [IN] given a field's memberdef   
-        //         PCCOR_SIGNATURE *ppvNativeType,     // [OUT] native type of this field  
-        //         ULONG       *pcbNativeType) PURE;   // [OUT] the count of bytes of *ppvNativeType   
+        //     STDMETHOD(GetFieldMarshal) (
+        //         mdToken     tk,                     // [IN] given a field's memberdef
+        //         PCCOR_SIGNATURE *ppvNativeType,     // [OUT] native type of this field
+        //         ULONG       *pcbNativeType) PURE;   // [OUT] the count of bytes of *ppvNativeType
         void GetFieldMarshal_();
 
-        //     STDMETHOD(GetRVA)(                      // S_OK or error.   
-        //         mdToken     tk,                     // Member for which to set offset   
-        //         ULONG       *pulCodeRVA,            // The offset   
-        //         DWORD       *pdwImplFlags) PURE;    // the implementation flags 
+        //     STDMETHOD(GetRVA)(                      // S_OK or error.
+        //         mdToken     tk,                     // Member for which to set offset
+        //         ULONG       *pulCodeRVA,            // The offset
+        //         DWORD       *pdwImplFlags) PURE;    // the implementation flags
         void GetRVA_();
 
-        //     STDMETHOD(GetPermissionSetProps) (  
-        //         mdPermission pm,                    // [IN] the permission token.   
-        //         DWORD       *pdwAction,             // [OUT] CorDeclSecurity.   
-        //         void const  **ppvPermission,        // [OUT] permission blob.   
-        //         ULONG       *pcbPermission) PURE;   // [OUT] count of bytes of pvPermission.    
+        //     STDMETHOD(GetPermissionSetProps) (
+        //         mdPermission pm,                    // [IN] the permission token.
+        //         DWORD       *pdwAction,             // [OUT] CorDeclSecurity.
+        //         void const  **ppvPermission,        // [OUT] permission blob.
+        //         ULONG       *pcbPermission) PURE;   // [OUT] count of bytes of pvPermission.
         void GetPermissionSetProps_();
 
-        //     STDMETHOD(GetSigFromToken)(             // S_OK or error.   
-        //         mdSignature mdSig,                  // [IN] Signature token.    
-        //         PCCOR_SIGNATURE *ppvSig,            // [OUT] return pointer to token.   
-        //         ULONG       *pcbSig) PURE;          // [OUT] return size of signature.  
+        //     STDMETHOD(GetSigFromToken)(             // S_OK or error.
+        //         mdSignature mdSig,                  // [IN] Signature token.
+        //         PCCOR_SIGNATURE *ppvSig,            // [OUT] return pointer to token.
+        //         ULONG       *pcbSig) PURE;          // [OUT] return size of signature.
         void GetSigFromToken_();
 
-        //     STDMETHOD(GetModuleRefProps)(           // S_OK or error.   
-        //         mdModuleRef mur,                    // [IN] moduleref token.    
-        //         LPWSTR      szName,                 // [OUT] buffer to fill with the moduleref name.    
-        //         ULONG       cchName,                // [IN] size of szName in wide characters.  
-        //         ULONG       *pchName) PURE;         // [OUT] actual count of characters in the name.    
+        //     STDMETHOD(GetModuleRefProps)(           // S_OK or error.
+        //         mdModuleRef mur,                    // [IN] moduleref token.
+        //         LPWSTR      szName,                 // [OUT] buffer to fill with the moduleref name.
+        //         ULONG       cchName,                // [IN] size of szName in wide characters.
+        //         ULONG       *pchName) PURE;         // [OUT] actual count of characters in the name.
         void GetModuleRefProps_();
 
-        //     STDMETHOD(EnumModuleRefs)(              // S_OK or error.   
-        //         HCORENUM    *phEnum,                // [IN|OUT] pointer to the enum.    
-        //         mdModuleRef rModuleRefs[],          // [OUT] put modulerefs here.   
-        //         ULONG       cmax,                   // [IN] max memberrefs to put.  
-        //         ULONG       *pcModuleRefs) PURE;    // [OUT] put # put here.    
+        //     STDMETHOD(EnumModuleRefs)(              // S_OK or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] pointer to the enum.
+        //         mdModuleRef rModuleRefs[],          // [OUT] put modulerefs here.
+        //         ULONG       cmax,                   // [IN] max memberrefs to put.
+        //         ULONG       *pcModuleRefs) PURE;    // [OUT] put # put here.
         void EnumModuleRefs_();
 
-        //     STDMETHOD(GetTypeSpecFromToken)(        // S_OK or error.   
-        //         mdTypeSpec typespec,                // [IN] TypeSpec token.    
-        //         PCCOR_SIGNATURE *ppvSig,            // [OUT] return pointer to TypeSpec signature  
-        //         ULONG       *pcbSig) PURE;          // [OUT] return size of signature.  
+        //     STDMETHOD(GetTypeSpecFromToken)(        // S_OK or error.
+        //         mdTypeSpec typespec,                // [IN] TypeSpec token.
+        //         PCCOR_SIGNATURE *ppvSig,            // [OUT] return pointer to TypeSpec signature
+        //         ULONG       *pcbSig) PURE;          // [OUT] return size of signature.
         void GetTypeSpecFromToken_();
 
         //     STDMETHOD(GetNameFromToken)(            // Not Recommended! May be removed!
@@ -395,11 +391,10 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         //         MDUTF8CSTR  *pszUtf8NamePtr) PURE;  // [OUT] Return pointer to UTF8 name in heap.
         void GetNameFromToken_();
 
-
-        //     STDMETHOD(EnumUnresolvedMethods)(       // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdToken     rMethods[],             // [OUT] Put MemberDefs here.   
-        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.  
+        //     STDMETHOD(EnumUnresolvedMethods)(       // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdToken     rMethods[],             // [OUT] Put MemberDefs here.
+        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.
         //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         void EnumUnresolvedMethods_();
 
@@ -424,16 +419,16 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         void GetPinvokeMap_();
 
         //     STDMETHOD(EnumSignatures)(              // S_OK or error.
-        //         HCORENUM    *phEnum,                // [IN|OUT] pointer to the enum.    
-        //         mdSignature rSignatures[],          // [OUT] put signatures here.   
-        //         ULONG       cmax,                   // [IN] max signatures to put.  
+        //         HCORENUM    *phEnum,                // [IN|OUT] pointer to the enum.
+        //         mdSignature rSignatures[],          // [OUT] put signatures here.
+        //         ULONG       cmax,                   // [IN] max signatures to put.
         //         ULONG       *pcSignatures) PURE;    // [OUT] put # put here.
         void EnumSignatures_();
 
         //     STDMETHOD(EnumTypeSpecs)(               // S_OK or error.
-        //         HCORENUM    *phEnum,                // [IN|OUT] pointer to the enum.    
-        //         mdTypeSpec  rTypeSpecs[],           // [OUT] put TypeSpecs here.   
-        //         ULONG       cmax,                   // [IN] max TypeSpecs to put.  
+        //         HCORENUM    *phEnum,                // [IN|OUT] pointer to the enum.
+        //         mdTypeSpec  rTypeSpecs[],           // [OUT] put TypeSpecs here.
+        //         ULONG       cmax,                   // [IN] max TypeSpecs to put.
         //         ULONG       *pcTypeSpecs) PURE;     // [OUT] put # put here.
         void EnumTypeSpecs_();
 
@@ -473,39 +468,39 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         //         ULONG       *pcbSize) PURE;         // [OUT, OPTIONAL] Put size of date here.
         void GetCustomAttributeProps_();
 
-        //     STDMETHOD(FindTypeRef)(   
+        //     STDMETHOD(FindTypeRef)(
         //         mdToken     tkResolutionScope,      // [IN] ModuleRef, AssemblyRef or TypeRef.
         //         LPCWSTR     szName,                 // [IN] TypeRef Name.
         //         mdTypeRef   *ptr) PURE;             // [OUT] matching TypeRef.
         void FindTypeRef_();
 
-        //     STDMETHOD(GetMemberProps)(  
-        //         mdToken     mb,                     // The member for which to get props.   
-        //         mdTypeDef   *pClass,                // Put member's class here. 
-        //         LPWSTR      szMember,               // Put member's name here.  
-        //         ULONG       cchMember,              // Size of szMember buffer in wide chars.   
-        //         ULONG       *pchMember,             // Put actual size here 
-        //         DWORD       *pdwAttr,               // Put flags here.  
-        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data   
-        //         ULONG       *pcbSigBlob,            // [OUT] actual size of signature blob  
-        //         ULONG       *pulCodeRVA,            // [OUT] codeRVA    
-        //         DWORD       *pdwImplFlags,          // [OUT] Impl. Flags    
-        //         DWORD       *pdwCPlusTypeFlag,      // [OUT] flag for value type. selected ELEMENT_TYPE_*   
-        //         void const  **ppValue,              // [OUT] constant value 
+        //     STDMETHOD(GetMemberProps)(
+        //         mdToken     mb,                     // The member for which to get props.
+        //         mdTypeDef   *pClass,                // Put member's class here.
+        //         LPWSTR      szMember,               // Put member's name here.
+        //         ULONG       cchMember,              // Size of szMember buffer in wide chars.
+        //         ULONG       *pchMember,             // Put actual size here
+        //         DWORD       *pdwAttr,               // Put flags here.
+        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data
+        //         ULONG       *pcbSigBlob,            // [OUT] actual size of signature blob
+        //         ULONG       *pulCodeRVA,            // [OUT] codeRVA
+        //         DWORD       *pdwImplFlags,          // [OUT] Impl. Flags
+        //         DWORD       *pdwCPlusTypeFlag,      // [OUT] flag for value type. selected ELEMENT_TYPE_*
+        //         void const  **ppValue,              // [OUT] constant value
         //         ULONG       *pcchValue) PURE;       // [OUT] size of constant string in chars, 0 for non-strings.
         void GetMemberProps_();
 
-        //     STDMETHOD(GetFieldProps)(  
-        //         mdFieldDef  mb,                     // The field for which to get props.    
-        //         mdTypeDef   *pClass,                // Put field's class here.  
-        //         LPWSTR      szField,                // Put field's name here.   
-        //         ULONG       cchField,               // Size of szField buffer in wide chars.    
-        //         ULONG       *pchField,              // Put actual size here 
-        //         DWORD       *pdwAttr,               // Put flags here.  
-        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data   
-        //         ULONG       *pcbSigBlob,            // [OUT] actual size of signature blob  
-        //         DWORD       *pdwCPlusTypeFlag,      // [OUT] flag for value type. selected ELEMENT_TYPE_*   
-        //         void const  **ppValue,              // [OUT] constant value 
+        //     STDMETHOD(GetFieldProps)(
+        //         mdFieldDef  mb,                     // The field for which to get props.
+        //         mdTypeDef   *pClass,                // Put field's class here.
+        //         LPWSTR      szField,                // Put field's name here.
+        //         ULONG       cchField,               // Size of szField buffer in wide chars.
+        //         ULONG       *pchField,              // Put actual size here
+        //         DWORD       *pdwAttr,               // Put flags here.
+        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data
+        //         ULONG       *pcbSigBlob,            // [OUT] actual size of signature blob
+        //         DWORD       *pdwCPlusTypeFlag,      // [OUT] flag for value type. selected ELEMENT_TYPE_*
+        //         void const  **ppValue,              // [OUT] constant value
         //         ULONG       *pcchValue) PURE;       // [OUT] size of constant string in chars, 0 for non-strings.
         void GetFieldProps(int mb,
                            [ComAliasName("mdTypeDef*")] out int mdTypeDef,
@@ -520,22 +515,22 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
                            [ComAliasName("ULONG*")] out int pcchValue
                            );
 
-        //     STDMETHOD(GetPropertyProps)(            // S_OK, S_FALSE, or error. 
-        //         mdProperty  prop,                   // [IN] property token  
-        //         mdTypeDef   *pClass,                // [OUT] typedef containing the property declarion. 
-        //         LPCWSTR     szProperty,             // [OUT] Property name  
-        //         ULONG       cchProperty,            // [IN] the count of wchar of szProperty    
-        //         ULONG       *pchProperty,           // [OUT] actual count of wchar for property name    
-        //         DWORD       *pdwPropFlags,          // [OUT] property flags.    
-        //         PCCOR_SIGNATURE *ppvSig,            // [OUT] property type. pointing to meta data internal blob 
-        //         ULONG       *pbSig,                 // [OUT] count of bytes in *ppvSig  
-        //         DWORD       *pdwCPlusTypeFlag,      // [OUT] flag for value type. selected ELEMENT_TYPE_*   
-        //         void const  **ppDefaultValue,       // [OUT] constant value 
+        //     STDMETHOD(GetPropertyProps)(            // S_OK, S_FALSE, or error.
+        //         mdProperty  prop,                   // [IN] property token
+        //         mdTypeDef   *pClass,                // [OUT] typedef containing the property declarion.
+        //         LPCWSTR     szProperty,             // [OUT] Property name
+        //         ULONG       cchProperty,            // [IN] the count of wchar of szProperty
+        //         ULONG       *pchProperty,           // [OUT] actual count of wchar for property name
+        //         DWORD       *pdwPropFlags,          // [OUT] property flags.
+        //         PCCOR_SIGNATURE *ppvSig,            // [OUT] property type. pointing to meta data internal blob
+        //         ULONG       *pbSig,                 // [OUT] count of bytes in *ppvSig
+        //         DWORD       *pdwCPlusTypeFlag,      // [OUT] flag for value type. selected ELEMENT_TYPE_*
+        //         void const  **ppDefaultValue,       // [OUT] constant value
         //         ULONG       *pcchDefaultValue,      // [OUT] size of constant string in chars, 0 for non-strings.
-        //         mdMethodDef *pmdSetter,             // [OUT] setter method of the property  
-        //         mdMethodDef *pmdGetter,             // [OUT] getter method of the property  
-        //         mdMethodDef rmdOtherMethod[],       // [OUT] other method of the property   
-        //         ULONG       cMax,                   // [IN] size of rmdOtherMethod  
+        //         mdMethodDef *pmdSetter,             // [OUT] setter method of the property
+        //         mdMethodDef *pmdGetter,             // [OUT] getter method of the property
+        //         mdMethodDef rmdOtherMethod[],       // [OUT] other method of the property
+        //         ULONG       cMax,                   // [IN] size of rmdOtherMethod
         //         ULONG       *pcOtherMethod) PURE;   // [OUT] total number of other method of this property
         void GetPropertyProps_();
 
@@ -594,10 +589,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         //         mdToken     pd,                     // [IN] Type, Field, or Method token.
         //         int         *pbGlobal) PURE;        // [OUT] Put 1 if global, 0 otherwise.
         void IsGlobal_();
-
     }      // IMetadataImport
-
-
 
     // IMetaDataImport2
     [Guid("FCE5EFA0-8BBA-4f8e-A036-8F2022B08466"),
@@ -607,6 +599,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
     public interface IMetadataImport2 : IMetadataImport
     {
         #region inheritted methods from IMetadataImport
+
         // Need imports from IMetaDataImport to adjust IM2 vtable slots.
 
         //STDMETHOD_(void, CloseEnum)(HCORENUM hEnum) PURE;
@@ -620,7 +613,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         new void ResetEnum(IntPtr hEnum, int ulPos);
 
         //STDMETHOD(EnumTypeDefs)(HCORENUM *phEnum, mdTypeDef rTypeDefs[],ULONG cMax, ULONG *pcTypeDefs) PURE;
-        //void EnumTypeDefs(out IntPtr phEnum,int[] rTypeDefs,uint cMax, out uint pcTypeDefs);  
+        //void EnumTypeDefs(out IntPtr phEnum,int[] rTypeDefs,uint cMax, out uint pcTypeDefs);
         new void EnumTypeDefs(
                             ref IntPtr phEnum,
                             [ComAliasName("mdTypeDef*")] out int rTypeDefs,
@@ -698,29 +691,29 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         //     STDMETHOD(ResolveTypeRef)(mdTypeRef tr, REFIID riid, IUnknown **ppIScope, mdTypeDef *ptd) PURE;
         new void ResolveTypeRef(int tr, ref Guid riid, [MarshalAs(UnmanagedType.IUnknown)] out object scope, out int typeDef);
 
-        //     STDMETHOD(EnumMembers)(                 // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.   
-        //         mdToken     rMembers[],             // [OUT] Put MemberDefs here.   
-        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.  
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumMembers)(                 // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.
+        //         mdToken     rMembers[],             // [OUT] Put MemberDefs here.
+        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         new void EnumMembers_();
 
-        //     STDMETHOD(EnumMembersWithName)(         // S_OK, S_FALSE, or error.             
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.                
-        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.   
-        //         LPCWSTR     szName,                 // [IN] Limit results to those with this name.              
-        //         mdToken     rMembers[],             // [OUT] Put MemberDefs here.                   
-        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.              
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumMembersWithName)(         // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.
+        //         LPCWSTR     szName,                 // [IN] Limit results to those with this name.
+        //         mdToken     rMembers[],             // [OUT] Put MemberDefs here.
+        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         new void EnumMembersWithName_();
 
-        //     STDMETHOD(EnumMethods)(                 // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.   
-        //         mdMethodDef rMethods[],             // [OUT] Put MethodDefs here.   
-        //         ULONG       cMax,                   // [IN] Max MethodDefs to put.  
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumMethods)(                 // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.
+        //         mdMethodDef rMethods[],             // [OUT] Put MethodDefs here.
+        //         ULONG       cMax,                   // [IN] Max MethodDefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         new void EnumMethods(ref IntPtr phEnum,
                          int cl,
                          [ComAliasName("mdMethodDef*")] out int mdMethodDef,
@@ -728,42 +721,43 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
                          [ComAliasName("ULONG*")] out int pcTokens
                          );
 
-        //     STDMETHOD(EnumMethodsWithName)(         // S_OK, S_FALSE, or error.             
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.                
-        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.   
-        //         LPCWSTR     szName,                 // [IN] Limit results to those with this name.              
-        //         mdMethodDef rMethods[],             // [OU] Put MethodDefs here.    
-        //         ULONG       cMax,                   // [IN] Max MethodDefs to put.              
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumMethodsWithName)(         // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.
+        //         LPCWSTR     szName,                 // [IN] Limit results to those with this name.
+        //         mdMethodDef rMethods[],             // [OU] Put MethodDefs here.
+        //         ULONG       cMax,                   // [IN] Max MethodDefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         new void EnumMethodsWithName_();
 
-        //     STDMETHOD(EnumFields)(                 // S_OK, S_FALSE, or error.  
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.   
-        //         mdFieldDef  rFields[],              // [OUT] Put FieldDefs here.    
-        //         ULONG       cMax,                   // [IN] Max FieldDefs to put.   
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumFields)(                 // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.
+        //         mdFieldDef  rFields[],              // [OUT] Put FieldDefs here.
+        //         ULONG       cMax,                   // [IN] Max FieldDefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         /*[PreserveSig]*/
+
         new void EnumFields(ref IntPtr phEnum,
                         int cl,
                         [ComAliasName("mdFieldDef*")] out int mdFieldDef,
                         int cMax /*must be 1*/,
                         [ComAliasName("ULONG*")] out uint pcTokens);
 
-        //     STDMETHOD(EnumFieldsWithName)(         // S_OK, S_FALSE, or error.              
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.                
-        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.   
-        //         LPCWSTR     szName,                 // [IN] Limit results to those with this name.              
-        //         mdFieldDef  rFields[],              // [OUT] Put MemberDefs here.                   
-        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.              
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumFieldsWithName)(         // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   cl,                     // [IN] TypeDef to scope the enumeration.
+        //         LPCWSTR     szName,                 // [IN] Limit results to those with this name.
+        //         mdFieldDef  rFields[],              // [OUT] Put MemberDefs here.
+        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         new void EnumFieldsWithName_();
 
-        //     STDMETHOD(EnumParams)(                  // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdMethodDef mb,                     // [IN] MethodDef to scope the enumeration. 
-        //         mdParamDef  rParams[],              // [OUT] Put ParamDefs here.    
-        //         ULONG       cMax,                   // [IN] Max ParamDefs to put.   
+        //     STDMETHOD(EnumParams)(                  // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdMethodDef mb,                     // [IN] MethodDef to scope the enumeration.
+        //         mdParamDef  rParams[],              // [OUT] Put ParamDefs here.
+        //         ULONG       cMax,                   // [IN] Max ParamDefs to put.
         //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         new void EnumParams(ref IntPtr phEnum,
                         int mdMethodDef,
@@ -771,75 +765,75 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
                         int cMax /*must be 1*/,
                         [ComAliasName("ULONG*")] out uint pcTokens);
 
-        //     STDMETHOD(EnumMemberRefs)(              // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdToken     tkParent,               // [IN] Parent token to scope the enumeration.  
-        //         mdMemberRef rMemberRefs[],          // [OUT] Put MemberRefs here.   
-        //         ULONG       cMax,                   // [IN] Max MemberRefs to put.  
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumMemberRefs)(              // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdToken     tkParent,               // [IN] Parent token to scope the enumeration.
+        //         mdMemberRef rMemberRefs[],          // [OUT] Put MemberRefs here.
+        //         ULONG       cMax,                   // [IN] Max MemberRefs to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         new void EnumMemberRefs_();
 
-        //     STDMETHOD(EnumMethodImpls)(             // S_OK, S_FALSE, or error  
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdTypeDef   td,                     // [IN] TypeDef to scope the enumeration.   
-        //         mdToken     rMethodBody[],          // [OUT] Put Method Body tokens here.   
+        //     STDMETHOD(EnumMethodImpls)(             // S_OK, S_FALSE, or error
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   td,                     // [IN] TypeDef to scope the enumeration.
+        //         mdToken     rMethodBody[],          // [OUT] Put Method Body tokens here.
         //         mdToken     rMethodDecl[],          // [OUT] Put Method Declaration tokens here.
-        //         ULONG       cMax,                   // [IN] Max tokens to put.  
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //         ULONG       cMax,                   // [IN] Max tokens to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         new void EnumMethodImpls_();
 
-        //     STDMETHOD(EnumPermissionSets)(          // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdToken     tk,                     // [IN] if !NIL, token to scope the enumeration.    
-        //         DWORD       dwActions,              // [IN] if !0, return only these actions.   
-        //         mdPermission rPermission[],         // [OUT] Put Permissions here.  
-        //         ULONG       cMax,                   // [IN] Max Permissions to put. 
-        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumPermissionSets)(          // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdToken     tk,                     // [IN] if !NIL, token to scope the enumeration.
+        //         DWORD       dwActions,              // [IN] if !0, return only these actions.
+        //         mdPermission rPermission[],         // [OUT] Put Permissions here.
+        //         ULONG       cMax,                   // [IN] Max Permissions to put.
+        //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         new void EnumPermissionSets_();
 
-        //     STDMETHOD(FindMember)(  
-        //         mdTypeDef   td,                     // [IN] given typedef   
-        //         LPCWSTR     szName,                 // [IN] member name 
-        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature 
-        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob    
-        //         mdToken     *pmb) PURE;             // [OUT] matching memberdef 
+        //     STDMETHOD(FindMember)(
+        //         mdTypeDef   td,                     // [IN] given typedef
+        //         LPCWSTR     szName,                 // [IN] member name
+        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature
+        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob
+        //         mdToken     *pmb) PURE;             // [OUT] matching memberdef
         new void FindMember_();
 
-        //     STDMETHOD(FindMethod)(  
-        //         mdTypeDef   td,                     // [IN] given typedef   
-        //         LPCWSTR     szName,                 // [IN] member name 
-        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature 
-        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob    
-        //         mdMethodDef *pmb) PURE;             // [OUT] matching memberdef 
+        //     STDMETHOD(FindMethod)(
+        //         mdTypeDef   td,                     // [IN] given typedef
+        //         LPCWSTR     szName,                 // [IN] member name
+        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature
+        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob
+        //         mdMethodDef *pmb) PURE;             // [OUT] matching memberdef
         new void FindMethod_();
 
-        //     STDMETHOD(FindField)(   
-        //         mdTypeDef   td,                     // [IN] given typedef   
-        //         LPCWSTR     szName,                 // [IN] member name 
-        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature 
-        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob    
-        //         mdFieldDef  *pmb) PURE;             // [OUT] matching memberdef 
+        //     STDMETHOD(FindField)(
+        //         mdTypeDef   td,                     // [IN] given typedef
+        //         LPCWSTR     szName,                 // [IN] member name
+        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature
+        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob
+        //         mdFieldDef  *pmb) PURE;             // [OUT] matching memberdef
         new void FindField_();
 
-        //     STDMETHOD(FindMemberRef)(   
-        //         mdTypeRef   td,                     // [IN] given typeRef   
-        //         LPCWSTR     szName,                 // [IN] member name 
-        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature 
-        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob    
-        //         mdMemberRef *pmr) PURE;             // [OUT] matching memberref 
+        //     STDMETHOD(FindMemberRef)(
+        //         mdTypeRef   td,                     // [IN] given typeRef
+        //         LPCWSTR     szName,                 // [IN] member name
+        //         PCCOR_SIGNATURE pvSigBlob,          // [IN] point to a blob value of CLR signature
+        //         ULONG       cbSigBlob,              // [IN] count of bytes in the signature blob
+        //         mdMemberRef *pmr) PURE;             // [OUT] matching memberref
         new void FindMemberRef_();
 
-        //     STDMETHOD (GetMethodProps)( 
-        //         mdMethodDef mb,                     // The method for which to get props.   
-        //         mdTypeDef   *pClass,                // Put method's class here. 
-        //         LPWSTR      szMethod,               // Put method's name here.  
-        //         ULONG       cchMethod,              // Size of szMethod buffer in wide chars.   
-        //         ULONG       *pchMethod,             // Put actual size here 
-        //         DWORD       *pdwAttr,               // Put flags here.  
-        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data   
-        //         ULONG       *pcbSigBlob,            // [OUT] actual size of signature blob  
-        //         ULONG       *pulCodeRVA,            // [OUT] codeRVA    
-        //         DWORD       *pdwImplFlags) PURE;    // [OUT] Impl. Flags    
+        //     STDMETHOD (GetMethodProps)(
+        //         mdMethodDef mb,                     // The method for which to get props.
+        //         mdTypeDef   *pClass,                // Put method's class here.
+        //         LPWSTR      szMethod,               // Put method's name here.
+        //         ULONG       cchMethod,              // Size of szMethod buffer in wide chars.
+        //         ULONG       *pchMethod,             // Put actual size here
+        //         DWORD       *pdwAttr,               // Put flags here.
+        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data
+        //         ULONG       *pcbSigBlob,            // [OUT] actual size of signature blob
+        //         ULONG       *pulCodeRVA,            // [OUT] codeRVA
+        //         DWORD       *pdwImplFlags) PURE;    // [OUT] Impl. Flags
         new void GetMethodProps([In] uint md,
                             [ComAliasName("mdTypeDef*")] [Out] out int pClass,
                             [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szMethod,
@@ -852,14 +846,14 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
                             [ComAliasName("DWORD*")] [Out] out uint pdwImplFlags
                             );
 
-        //     STDMETHOD(GetMemberRefProps)(           // S_OK or error.   
-        //         mdMemberRef mr,                     // [IN] given memberref 
-        //         mdToken     *ptk,                   // [OUT] Put classref or classdef here. 
-        //         LPWSTR      szMember,               // [OUT] buffer to fill for member's name   
-        //         ULONG       cchMember,              // [IN] the count of char of szMember   
-        //         ULONG       *pchMember,             // [OUT] actual count of char in member name    
-        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to meta data blob value  
-        //         ULONG       *pbSig) PURE;           // [OUT] actual size of signature blob  
+        //     STDMETHOD(GetMemberRefProps)(           // S_OK or error.
+        //         mdMemberRef mr,                     // [IN] given memberref
+        //         mdToken     *ptk,                   // [OUT] Put classref or classdef here.
+        //         LPWSTR      szMember,               // [OUT] buffer to fill for member's name
+        //         ULONG       cchMember,              // [IN] the count of char of szMember
+        //         ULONG       *pchMember,             // [OUT] actual count of char in member name
+        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to meta data blob value
+        //         ULONG       *pbSig) PURE;           // [OUT] actual size of signature blob
         new void GetMemberRefProps([In] uint mr,
                                [ComAliasName("mdMemberRef*")] [Out] out int ptk,
                                [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szMember,
@@ -869,108 +863,108 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
                                [ComAliasName("ULONG*")] [Out] out int pbSig
                                );
 
-        //     STDMETHOD(EnumProperties)(              // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdTypeDef   td,                     // [IN] TypeDef to scope the enumeration.   
-        //         mdProperty  rProperties[],          // [OUT] Put Properties here.   
-        //         ULONG       cMax,                   // [IN] Max properties to put.  
-        //         ULONG       *pcProperties) PURE;    // [OUT] Put # put here.    
+        //     STDMETHOD(EnumProperties)(              // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   td,                     // [IN] TypeDef to scope the enumeration.
+        //         mdProperty  rProperties[],          // [OUT] Put Properties here.
+        //         ULONG       cMax,                   // [IN] Max properties to put.
+        //         ULONG       *pcProperties) PURE;    // [OUT] Put # put here.
         new void EnumProperties(ref IntPtr phEnum,
                                 int mdTypeDef,
                                 [ComAliasName("mdPropertyDef*")] out int mdPropertyDef,
                                 int countMax /*must be 1*/,
                                 [ComAliasName("ULONG*")] out uint pcTokens);
 
-        //     STDMETHOD(EnumEvents)(                  // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdTypeDef   td,                     // [IN] TypeDef to scope the enumeration.   
-        //         mdEvent     rEvents[],              // [OUT] Put events here.   
-        //         ULONG       cMax,                   // [IN] Max events to put.  
-        //         ULONG       *pcEvents) PURE;        // [OUT] Put # put here.    
+        //     STDMETHOD(EnumEvents)(                  // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdTypeDef   td,                     // [IN] TypeDef to scope the enumeration.
+        //         mdEvent     rEvents[],              // [OUT] Put events here.
+        //         ULONG       cMax,                   // [IN] Max events to put.
+        //         ULONG       *pcEvents) PURE;        // [OUT] Put # put here.
         new void EnumEvents_();
 
-        //     STDMETHOD(GetEventProps)(               // S_OK, S_FALSE, or error. 
-        //         mdEvent     ev,                     // [IN] event token 
-        //         mdTypeDef   *pClass,                // [OUT] typedef containing the event declarion.    
-        //         LPCWSTR     szEvent,                // [OUT] Event name 
-        //         ULONG       cchEvent,               // [IN] the count of wchar of szEvent   
-        //         ULONG       *pchEvent,              // [OUT] actual count of wchar for event's name 
-        //         DWORD       *pdwEventFlags,         // [OUT] Event flags.   
-        //         mdToken     *ptkEventType,          // [OUT] EventType class    
-        //         mdMethodDef *pmdAddOn,              // [OUT] AddOn method of the event  
-        //         mdMethodDef *pmdRemoveOn,           // [OUT] RemoveOn method of the event   
-        //         mdMethodDef *pmdFire,               // [OUT] Fire method of the event   
-        //         mdMethodDef rmdOtherMethod[],       // [OUT] other method of the event  
-        //         ULONG       cMax,                   // [IN] size of rmdOtherMethod  
-        //         ULONG       *pcOtherMethod) PURE;   // [OUT] total number of other method of this event 
+        //     STDMETHOD(GetEventProps)(               // S_OK, S_FALSE, or error.
+        //         mdEvent     ev,                     // [IN] event token
+        //         mdTypeDef   *pClass,                // [OUT] typedef containing the event declarion.
+        //         LPCWSTR     szEvent,                // [OUT] Event name
+        //         ULONG       cchEvent,               // [IN] the count of wchar of szEvent
+        //         ULONG       *pchEvent,              // [OUT] actual count of wchar for event's name
+        //         DWORD       *pdwEventFlags,         // [OUT] Event flags.
+        //         mdToken     *ptkEventType,          // [OUT] EventType class
+        //         mdMethodDef *pmdAddOn,              // [OUT] AddOn method of the event
+        //         mdMethodDef *pmdRemoveOn,           // [OUT] RemoveOn method of the event
+        //         mdMethodDef *pmdFire,               // [OUT] Fire method of the event
+        //         mdMethodDef rmdOtherMethod[],       // [OUT] other method of the event
+        //         ULONG       cMax,                   // [IN] size of rmdOtherMethod
+        //         ULONG       *pcOtherMethod) PURE;   // [OUT] total number of other method of this event
         new void GetEventProps_();
 
-        //     STDMETHOD(EnumMethodSemantics)(         // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdMethodDef mb,                     // [IN] MethodDef to scope the enumeration. 
-        //         mdToken     rEventProp[],           // [OUT] Put Event/Property here.   
-        //         ULONG       cMax,                   // [IN] Max properties to put.  
-        //         ULONG       *pcEventProp) PURE;     // [OUT] Put # put here.    
+        //     STDMETHOD(EnumMethodSemantics)(         // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdMethodDef mb,                     // [IN] MethodDef to scope the enumeration.
+        //         mdToken     rEventProp[],           // [OUT] Put Event/Property here.
+        //         ULONG       cMax,                   // [IN] Max properties to put.
+        //         ULONG       *pcEventProp) PURE;     // [OUT] Put # put here.
         new void EnumMethodSemantics_();
 
-        //     STDMETHOD(GetMethodSemantics)(          // S_OK, S_FALSE, or error. 
-        //         mdMethodDef mb,                     // [IN] method token    
-        //         mdToken     tkEventProp,            // [IN] event/property token.   
-        //         DWORD       *pdwSemanticsFlags) PURE; // [OUT] the role flags for the method/propevent pair 
+        //     STDMETHOD(GetMethodSemantics)(          // S_OK, S_FALSE, or error.
+        //         mdMethodDef mb,                     // [IN] method token
+        //         mdToken     tkEventProp,            // [IN] event/property token.
+        //         DWORD       *pdwSemanticsFlags) PURE; // [OUT] the role flags for the method/propevent pair
         new void GetMethodSemantics_();
 
-        //     STDMETHOD(GetClassLayout) ( 
-        //         mdTypeDef   td,                     // [IN] give typedef    
-        //         DWORD       *pdwPackSize,           // [OUT] 1, 2, 4, 8, or 16  
-        //         COR_FIELD_OFFSET rFieldOffset[],    // [OUT] field offset array 
-        //         ULONG       cMax,                   // [IN] size of the array   
-        //         ULONG       *pcFieldOffset,         // [OUT] needed array size  
-        //         ULONG       *pulClassSize) PURE;        // [OUT] the size of the class  
+        //     STDMETHOD(GetClassLayout) (
+        //         mdTypeDef   td,                     // [IN] give typedef
+        //         DWORD       *pdwPackSize,           // [OUT] 1, 2, 4, 8, or 16
+        //         COR_FIELD_OFFSET rFieldOffset[],    // [OUT] field offset array
+        //         ULONG       cMax,                   // [IN] size of the array
+        //         ULONG       *pcFieldOffset,         // [OUT] needed array size
+        //         ULONG       *pulClassSize) PURE;        // [OUT] the size of the class
         new void GetClassLayout_();
 
-        //     STDMETHOD(GetFieldMarshal) (    
-        //         mdToken     tk,                     // [IN] given a field's memberdef   
-        //         PCCOR_SIGNATURE *ppvNativeType,     // [OUT] native type of this field  
-        //         ULONG       *pcbNativeType) PURE;   // [OUT] the count of bytes of *ppvNativeType   
+        //     STDMETHOD(GetFieldMarshal) (
+        //         mdToken     tk,                     // [IN] given a field's memberdef
+        //         PCCOR_SIGNATURE *ppvNativeType,     // [OUT] native type of this field
+        //         ULONG       *pcbNativeType) PURE;   // [OUT] the count of bytes of *ppvNativeType
         new void GetFieldMarshal_();
 
-        //     STDMETHOD(GetRVA)(                      // S_OK or error.   
-        //         mdToken     tk,                     // Member for which to set offset   
-        //         ULONG       *pulCodeRVA,            // The offset   
-        //         DWORD       *pdwImplFlags) PURE;    // the implementation flags 
+        //     STDMETHOD(GetRVA)(                      // S_OK or error.
+        //         mdToken     tk,                     // Member for which to set offset
+        //         ULONG       *pulCodeRVA,            // The offset
+        //         DWORD       *pdwImplFlags) PURE;    // the implementation flags
         new void GetRVA_();
 
-        //     STDMETHOD(GetPermissionSetProps) (  
-        //         mdPermission pm,                    // [IN] the permission token.   
-        //         DWORD       *pdwAction,             // [OUT] CorDeclSecurity.   
-        //         void const  **ppvPermission,        // [OUT] permission blob.   
-        //         ULONG       *pcbPermission) PURE;   // [OUT] count of bytes of pvPermission.    
+        //     STDMETHOD(GetPermissionSetProps) (
+        //         mdPermission pm,                    // [IN] the permission token.
+        //         DWORD       *pdwAction,             // [OUT] CorDeclSecurity.
+        //         void const  **ppvPermission,        // [OUT] permission blob.
+        //         ULONG       *pcbPermission) PURE;   // [OUT] count of bytes of pvPermission.
         new void GetPermissionSetProps_();
 
-        //     STDMETHOD(GetSigFromToken)(             // S_OK or error.   
-        //         mdSignature mdSig,                  // [IN] Signature token.    
-        //         PCCOR_SIGNATURE *ppvSig,            // [OUT] return pointer to token.   
-        //         ULONG       *pcbSig) PURE;          // [OUT] return size of signature.  
+        //     STDMETHOD(GetSigFromToken)(             // S_OK or error.
+        //         mdSignature mdSig,                  // [IN] Signature token.
+        //         PCCOR_SIGNATURE *ppvSig,            // [OUT] return pointer to token.
+        //         ULONG       *pcbSig) PURE;          // [OUT] return size of signature.
         new void GetSigFromToken_();
 
-        //     STDMETHOD(GetModuleRefProps)(           // S_OK or error.   
-        //         mdModuleRef mur,                    // [IN] moduleref token.    
-        //         LPWSTR      szName,                 // [OUT] buffer to fill with the moduleref name.    
-        //         ULONG       cchName,                // [IN] size of szName in wide characters.  
-        //         ULONG       *pchName) PURE;         // [OUT] actual count of characters in the name.    
+        //     STDMETHOD(GetModuleRefProps)(           // S_OK or error.
+        //         mdModuleRef mur,                    // [IN] moduleref token.
+        //         LPWSTR      szName,                 // [OUT] buffer to fill with the moduleref name.
+        //         ULONG       cchName,                // [IN] size of szName in wide characters.
+        //         ULONG       *pchName) PURE;         // [OUT] actual count of characters in the name.
         new void GetModuleRefProps_();
 
-        //     STDMETHOD(EnumModuleRefs)(              // S_OK or error.   
-        //         HCORENUM    *phEnum,                // [IN|OUT] pointer to the enum.    
-        //         mdModuleRef rModuleRefs[],          // [OUT] put modulerefs here.   
-        //         ULONG       cmax,                   // [IN] max memberrefs to put.  
-        //         ULONG       *pcModuleRefs) PURE;    // [OUT] put # put here.    
+        //     STDMETHOD(EnumModuleRefs)(              // S_OK or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] pointer to the enum.
+        //         mdModuleRef rModuleRefs[],          // [OUT] put modulerefs here.
+        //         ULONG       cmax,                   // [IN] max memberrefs to put.
+        //         ULONG       *pcModuleRefs) PURE;    // [OUT] put # put here.
         new void EnumModuleRefs_();
 
-        //     STDMETHOD(GetTypeSpecFromToken)(        // S_OK or error.   
-        //         mdTypeSpec typespec,                // [IN] TypeSpec token.    
-        //         PCCOR_SIGNATURE *ppvSig,            // [OUT] return pointer to TypeSpec signature  
-        //         ULONG       *pcbSig) PURE;          // [OUT] return size of signature.  
+        //     STDMETHOD(GetTypeSpecFromToken)(        // S_OK or error.
+        //         mdTypeSpec typespec,                // [IN] TypeSpec token.
+        //         PCCOR_SIGNATURE *ppvSig,            // [OUT] return pointer to TypeSpec signature
+        //         ULONG       *pcbSig) PURE;          // [OUT] return size of signature.
         new void GetTypeSpecFromToken_();
 
         //     STDMETHOD(GetNameFromToken)(            // Not Recommended! May be removed!
@@ -978,11 +972,10 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         //         MDUTF8CSTR  *pszUtf8NamePtr) PURE;  // [OUT] Return pointer to UTF8 name in heap.
         new void GetNameFromToken_();
 
-
-        //     STDMETHOD(EnumUnresolvedMethods)(       // S_OK, S_FALSE, or error. 
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
-        //         mdToken     rMethods[],             // [OUT] Put MemberDefs here.   
-        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.  
+        //     STDMETHOD(EnumUnresolvedMethods)(       // S_OK, S_FALSE, or error.
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
+        //         mdToken     rMethods[],             // [OUT] Put MemberDefs here.
+        //         ULONG       cMax,                   // [IN] Max MemberDefs to put.
         //         ULONG       *pcTokens) PURE;        // [OUT] Put # put here.
         new void EnumUnresolvedMethods_();
 
@@ -1007,16 +1000,16 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         new void GetPinvokeMap_();
 
         //     STDMETHOD(EnumSignatures)(              // S_OK or error.
-        //         HCORENUM    *phEnum,                // [IN|OUT] pointer to the enum.    
-        //         mdSignature rSignatures[],          // [OUT] put signatures here.   
-        //         ULONG       cmax,                   // [IN] max signatures to put.  
+        //         HCORENUM    *phEnum,                // [IN|OUT] pointer to the enum.
+        //         mdSignature rSignatures[],          // [OUT] put signatures here.
+        //         ULONG       cmax,                   // [IN] max signatures to put.
         //         ULONG       *pcSignatures) PURE;    // [OUT] put # put here.
         new void EnumSignatures_();
 
         //     STDMETHOD(EnumTypeSpecs)(               // S_OK or error.
-        //         HCORENUM    *phEnum,                // [IN|OUT] pointer to the enum.    
-        //         mdTypeSpec  rTypeSpecs[],           // [OUT] put TypeSpecs here.   
-        //         ULONG       cmax,                   // [IN] max TypeSpecs to put.  
+        //         HCORENUM    *phEnum,                // [IN|OUT] pointer to the enum.
+        //         mdTypeSpec  rTypeSpecs[],           // [OUT] put TypeSpecs here.
+        //         ULONG       cmax,                   // [IN] max TypeSpecs to put.
         //         ULONG       *pcTypeSpecs) PURE;     // [OUT] put # put here.
         new void EnumTypeSpecs_();
 
@@ -1056,39 +1049,39 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         //         ULONG       *pcbSize) PURE;         // [OUT, OPTIONAL] Put size of date here.
         new void GetCustomAttributeProps_();
 
-        //     STDMETHOD(FindTypeRef)(   
+        //     STDMETHOD(FindTypeRef)(
         //         mdToken     tkResolutionScope,      // [IN] ModuleRef, AssemblyRef or TypeRef.
         //         LPCWSTR     szName,                 // [IN] TypeRef Name.
         //         mdTypeRef   *ptr) PURE;             // [OUT] matching TypeRef.
         new void FindTypeRef_();
 
-        //     STDMETHOD(GetMemberProps)(  
-        //         mdToken     mb,                     // The member for which to get props.   
-        //         mdTypeDef   *pClass,                // Put member's class here. 
-        //         LPWSTR      szMember,               // Put member's name here.  
-        //         ULONG       cchMember,              // Size of szMember buffer in wide chars.   
-        //         ULONG       *pchMember,             // Put actual size here 
-        //         DWORD       *pdwAttr,               // Put flags here.  
-        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data   
-        //         ULONG       *pcbSigBlob,            // [OUT] actual size of signature blob  
-        //         ULONG       *pulCodeRVA,            // [OUT] codeRVA    
-        //         DWORD       *pdwImplFlags,          // [OUT] Impl. Flags    
-        //         DWORD       *pdwCPlusTypeFlag,      // [OUT] flag for value type. selected ELEMENT_TYPE_*   
-        //         void const  **ppValue,              // [OUT] constant value 
+        //     STDMETHOD(GetMemberProps)(
+        //         mdToken     mb,                     // The member for which to get props.
+        //         mdTypeDef   *pClass,                // Put member's class here.
+        //         LPWSTR      szMember,               // Put member's name here.
+        //         ULONG       cchMember,              // Size of szMember buffer in wide chars.
+        //         ULONG       *pchMember,             // Put actual size here
+        //         DWORD       *pdwAttr,               // Put flags here.
+        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data
+        //         ULONG       *pcbSigBlob,            // [OUT] actual size of signature blob
+        //         ULONG       *pulCodeRVA,            // [OUT] codeRVA
+        //         DWORD       *pdwImplFlags,          // [OUT] Impl. Flags
+        //         DWORD       *pdwCPlusTypeFlag,      // [OUT] flag for value type. selected ELEMENT_TYPE_*
+        //         void const  **ppValue,              // [OUT] constant value
         //         ULONG       *pcchValue) PURE;       // [OUT] size of constant string in chars, 0 for non-strings.
         new void GetMemberProps_();
 
-        //     STDMETHOD(GetFieldProps)(  
-        //         mdFieldDef  mb,                     // The field for which to get props.    
-        //         mdTypeDef   *pClass,                // Put field's class here.  
-        //         LPWSTR      szField,                // Put field's name here.   
-        //         ULONG       cchField,               // Size of szField buffer in wide chars.    
-        //         ULONG       *pchField,              // Put actual size here 
-        //         DWORD       *pdwAttr,               // Put flags here.  
-        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data   
-        //         ULONG       *pcbSigBlob,            // [OUT] actual size of signature blob  
-        //         DWORD       *pdwCPlusTypeFlag,      // [OUT] flag for value type. selected ELEMENT_TYPE_*   
-        //         void const  **ppValue,              // [OUT] constant value 
+        //     STDMETHOD(GetFieldProps)(
+        //         mdFieldDef  mb,                     // The field for which to get props.
+        //         mdTypeDef   *pClass,                // Put field's class here.
+        //         LPWSTR      szField,                // Put field's name here.
+        //         ULONG       cchField,               // Size of szField buffer in wide chars.
+        //         ULONG       *pchField,              // Put actual size here
+        //         DWORD       *pdwAttr,               // Put flags here.
+        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data
+        //         ULONG       *pcbSigBlob,            // [OUT] actual size of signature blob
+        //         DWORD       *pdwCPlusTypeFlag,      // [OUT] flag for value type. selected ELEMENT_TYPE_*
+        //         void const  **ppValue,              // [OUT] constant value
         //         ULONG       *pcchValue) PURE;       // [OUT] size of constant string in chars, 0 for non-strings.
         new void GetFieldProps(int mb,
                            [ComAliasName("mdTypeDef*")] out int mdTypeDef,
@@ -1103,22 +1096,22 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
                            [ComAliasName("ULONG*")] out int pcchValue
                            );
 
-        //     STDMETHOD(GetPropertyProps)(            // S_OK, S_FALSE, or error. 
-        //         mdProperty  prop,                   // [IN] property token  
-        //         mdTypeDef   *pClass,                // [OUT] typedef containing the property declarion. 
-        //         LPCWSTR     szProperty,             // [OUT] Property name  
-        //         ULONG       cchProperty,            // [IN] the count of wchar of szProperty    
-        //         ULONG       *pchProperty,           // [OUT] actual count of wchar for property name    
-        //         DWORD       *pdwPropFlags,          // [OUT] property flags.    
-        //         PCCOR_SIGNATURE *ppvSig,            // [OUT] property type. pointing to meta data internal blob 
-        //         ULONG       *pbSig,                 // [OUT] count of bytes in *ppvSig  
-        //         DWORD       *pdwCPlusTypeFlag,      // [OUT] flag for value type. selected ELEMENT_TYPE_*   
-        //         void const  **ppDefaultValue,       // [OUT] constant value 
+        //     STDMETHOD(GetPropertyProps)(            // S_OK, S_FALSE, or error.
+        //         mdProperty  prop,                   // [IN] property token
+        //         mdTypeDef   *pClass,                // [OUT] typedef containing the property declarion.
+        //         LPCWSTR     szProperty,             // [OUT] Property name
+        //         ULONG       cchProperty,            // [IN] the count of wchar of szProperty
+        //         ULONG       *pchProperty,           // [OUT] actual count of wchar for property name
+        //         DWORD       *pdwPropFlags,          // [OUT] property flags.
+        //         PCCOR_SIGNATURE *ppvSig,            // [OUT] property type. pointing to meta data internal blob
+        //         ULONG       *pbSig,                 // [OUT] count of bytes in *ppvSig
+        //         DWORD       *pdwCPlusTypeFlag,      // [OUT] flag for value type. selected ELEMENT_TYPE_*
+        //         void const  **ppDefaultValue,       // [OUT] constant value
         //         ULONG       *pcchDefaultValue,      // [OUT] size of constant string in chars, 0 for non-strings.
-        //         mdMethodDef *pmdSetter,             // [OUT] setter method of the property  
-        //         mdMethodDef *pmdGetter,             // [OUT] getter method of the property  
-        //         mdMethodDef rmdOtherMethod[],       // [OUT] other method of the property   
-        //         ULONG       cMax,                   // [IN] size of rmdOtherMethod  
+        //         mdMethodDef *pmdSetter,             // [OUT] setter method of the property
+        //         mdMethodDef *pmdGetter,             // [OUT] getter method of the property
+        //         mdMethodDef rmdOtherMethod[],       // [OUT] other method of the property
+        //         ULONG       cMax,                   // [IN] size of rmdOtherMethod
         //         ULONG       *pcOtherMethod) PURE;   // [OUT] total number of other method of this property
         new void GetPropertyProps_();
 
@@ -1173,13 +1166,12 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         //         ULONG       *pCallConv) PURE;       // [OUT] Put calling conv here (see CorPinvokemap).
         new void GetNativeCallConvFromSig_();
 
-
         //     STDMETHOD(IsGlobal)(                    // S_OK or error.
         //         mdToken     pd,                     // [IN] Type, Field, or Method token.
         //         int         *pbGlobal) PURE;        // [OUT] Put 1 if global, 0 otherwise.
         new void IsGlobal_();
 
-        #endregion // inheritted methods from IMetadataImport
+        #endregion inheritted methods from IMetadataImport
 
         //-----------------------------------------------------------------------------
         // Begin IMetaDataImport2
@@ -1187,12 +1179,13 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
 
         /*
           STDMETHOD(EnumGenericParams)(
-          HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
+          HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
           mdToken      tk,                    // [IN] TypeDef or MethodDef whose generic parameters are requested
-          mdGenericParam rGenericParams[],    // [OUT] Put GenericParams here.   
-          ULONG       cMax,                   // [IN] Max GenericParams to put.  
-          ULONG       *pcGenericParams) PURE; // [OUT] Put # put here.    
+          mdGenericParam rGenericParams[],    // [OUT] Put GenericParams here.
+          ULONG       cMax,                   // [IN] Max GenericParams to put.
+          ULONG       *pcGenericParams) PURE; // [OUT] Put # put here.
         */
+
         void EnumGenericParams(
                                 ref IntPtr hEnum,
                                 int tk,
@@ -1223,8 +1216,8 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         //         STDMETHOD(GetMethodSpecProps)(
         //         mdMethodSpec mi,                    // [IN] The method instantiation
         //         mdToken *tkParent,                  // [OUT] MethodDef or MemberRef
-        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data   
-        //         ULONG       *pcbSigBlob) PURE;      // [OUT] actual size of signature blob  
+        //         PCCOR_SIGNATURE *ppvSigBlob,        // [OUT] point to the blob value of meta data
+        //         ULONG       *pcbSigBlob) PURE;      // [OUT] actual size of signature blob
 
         void GetMethodSpecProps([ComAliasName("mdMethodSpec")] int mi,
                                 [ComAliasName("mdToken*")] out int tkParent,
@@ -1233,10 +1226,10 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
                                 );
 
         //         STDMETHOD(EnumGenericParamConstraints)(
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
         //         mdGenericParam tk,                  // [IN] GenericParam whose constraints are requested
-        //         mdGenericParamConstraint rGenericParamConstraints[],    // [OUT] Put GenericParamConstraints here.   
-        //         ULONG       cMax,                   // [IN] Max GenericParamConstraints to put.  
+        //         mdGenericParamConstraint rGenericParamConstraints[],    // [OUT] Put GenericParamConstraints here.
+        //         ULONG       cMax,                   // [IN] Max GenericParamConstraints to put.
         //         ULONG       *pcGenericParamConstraints) PURE; // [OUT] Put # put here.
         void EnumGenericParamConstraints_();
 
@@ -1258,10 +1251,10 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         void GetVersionString_();
 
         //         STDMETHOD(EnumMethodSpecs)(
-        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.    
+        //         HCORENUM    *phEnum,                // [IN|OUT] Pointer to the enum.
         //         mdToken      tk,                    // [IN] MethodDef or MemberRef whose MethodSpecs are requested
-        //         mdMethodSpec rMethodSpecs[],        // [OUT] Put MethodSpecs here.   
-        //         ULONG       cMax,                   // [IN] Max tokens to put.  
+        //         mdMethodSpec rMethodSpecs[],        // [OUT] Put MethodSpecs here.
+        //         ULONG       cMax,                   // [IN] Max tokens to put.
         //         ULONG       *pcMethodSpecs) PURE;   // [OUT] Put actual count here.
         void EnumMethodSpecs_();
     }
@@ -1376,41 +1369,38 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
         // };  // IMetaDataAssemblyImport
     }
 
-
     // Get the geometry of the tables. This is useful for GetTableInfo, which can tell how
     // many rows a table has, which can then be used for quick enumeration of tokens.
     [Guid("D8F579AB-402D-4b8e-82D9-5D63B1065C68"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     [CLSCompliant(false)]
     public interface IMetadataTables
     {
-        //STDMETHOD (GetStringHeapSize) (    
+        //STDMETHOD (GetStringHeapSize) (
         //    ULONG   *pcbStrings) PURE;          // [OUT] Size of the string heap.
         void GetStringHeapSize(out uint countBytesStrings);
 
-        //STDMETHOD (GetBlobHeapSize) (    
+        //STDMETHOD (GetBlobHeapSize) (
         //    ULONG   *pcbBlobs) PURE;            // [OUT] Size of the Blob heap.
         void GetBlobHeapSize(out uint countBytesBlobs);
 
-        //STDMETHOD (GetGuidHeapSize) (    
+        //STDMETHOD (GetGuidHeapSize) (
         //    ULONG   *pcbGuids) PURE;            // [OUT] Size of the Guid heap.
         void GetGuidHeapSize(out uint countBytesGuids);
 
-        //STDMETHOD (GetUserStringHeapSize) (  
+        //STDMETHOD (GetUserStringHeapSize) (
         //    ULONG   *pcbBlobs) PURE;            // [OUT] Size of the User String heap.
         void GetUserStringHeapSize(out uint countByteBlobs);
 
-        //STDMETHOD (GetNumTables) (    
+        //STDMETHOD (GetNumTables) (
         //    ULONG   *pcTables) PURE;            // [OUT] Count of tables.
         void GetNumTables(out uint countTables);
 
-
-        //STDMETHOD (GetTableIndex) (   
+        //STDMETHOD (GetTableIndex) (
         //    ULONG   token,                      // [IN] Token for which to get table index.
         //    ULONG   *pixTbl) PURE;              // [OUT] Put table index here.
         void GetTableIndex(uint token, out uint tableIndex);
 
-
-        //STDMETHOD (GetTableInfo) (    
+        //STDMETHOD (GetTableInfo) (
         //    ULONG   ixTbl,                      // [IN] Which table.
         //    ULONG   *pcbRow,                    // [OUT] Size of a row, bytes.
         //    ULONG   *pcRows,                    // [OUT] Number of rows.
@@ -1424,7 +1414,6 @@ namespace Microsoft.Samples.Debugging.CorMetadata.NativeApi
             out uint countColumns,
             out uint columnPrimaryKey,
             [Out, MarshalAs(UnmanagedType.LPStr)] out String name);
-
 
         // Other methods are not yet imported...
     }

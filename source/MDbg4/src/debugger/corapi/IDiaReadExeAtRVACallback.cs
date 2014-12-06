@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.Samples.Debugging.CorSymbolStore 
+namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
     [
         ComImport,
@@ -34,6 +34,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             uint relativeVirtualAddress,
             uint cbData,
             ref uint pcbData,
-            [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=1)] byte[] data);
+            [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] byte[] data);
     }
 }

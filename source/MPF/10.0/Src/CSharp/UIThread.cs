@@ -21,14 +21,16 @@ namespace Microsoft.VisualStudio.Project
     {
         private WindowsFormsSynchronizationContext synchronizationContext;
 #if DEBUG
+
         /// <summary>
         /// Stack trace when synchronizationContext was captured
         /// </summary>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         private StackTrace captureStackTrace;
+
 #endif
 
-		private Thread uithread; 
+        private Thread uithread;
 
         /// <summary>
         /// RunSync puts orignal exception stacktrace to Exception.Data by this key if action throws on UI thread
@@ -71,6 +73,7 @@ namespace Microsoft.VisualStudio.Project
         internal static bool IsUnitTest { get; set; }
 
         #region IDisposable Members
+
         /// <summary>
         /// Dispose implementation.
         /// </summary>
@@ -82,7 +85,7 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-        #endregion
+        #endregion IDisposable Members
 
         /// <summary>
         /// Initializes unit testing mode for this object
@@ -136,7 +139,6 @@ namespace Microsoft.VisualStudio.Project
                 }
 #endif
             }, null);
-
         }
 
         /// <summary>
@@ -153,7 +155,7 @@ namespace Microsoft.VisualStudio.Project
             }
             Exception exn = null; ;
             Debug.Assert(this.synchronizationContext != null, "The SynchronizationContext must be captured before calling this method");
-            
+
             // Send on UI thread will execute immediately.
             this.synchronizationContext.Send(ignore =>
             {
@@ -187,26 +189,26 @@ namespace Microsoft.VisualStudio.Project
             if (this.synchronizationContext == null)
             {
 #if DEBUG
-                 // This is a handy place to do this, since the product and all interesting unit tests
-                 // must go through this code path.
-                 AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(delegate(object sender, UnhandledExceptionEventArgs args)
-                 {
-                     if (args.IsTerminating)
-                     {
-                         string s = String.Format(CultureInfo.InvariantCulture, "An unhandled exception is about to terminate the process.  Exception info:\n{0}", args.ExceptionObject.ToString());
-                         Debug.Assert(false, s);
-                     }
-                 });
+                // This is a handy place to do this, since the product and all interesting unit tests
+                // must go through this code path.
+                AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(delegate(object sender, UnhandledExceptionEventArgs args)
+                {
+                    if (args.IsTerminating)
+                    {
+                        string s = String.Format(CultureInfo.InvariantCulture, "An unhandled exception is about to terminate the process.  Exception info:\n{0}", args.ExceptionObject.ToString());
+                        Debug.Assert(false, s);
+                    }
+                });
 
-                 this.captureStackTrace = new StackTrace(true);
+                this.captureStackTrace = new StackTrace(true);
 #endif
                 this.synchronizationContext = new WindowsFormsSynchronizationContext();
             }
             else
             {
-                 // Make sure we are always capturing the same thread.
-                 Debug.Assert(this.uithread == Thread.CurrentThread);
+                // Make sure we are always capturing the same thread.
+                Debug.Assert(this.uithread == Thread.CurrentThread);
             }
-        }       
+        }
     }
 }

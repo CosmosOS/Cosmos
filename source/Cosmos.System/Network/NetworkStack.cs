@@ -1,8 +1,6 @@
-﻿using System;
-using Sys = System;
-using System.Collections.Generic;
-using Cosmos.HAL;
+﻿using Cosmos.HAL;
 using Cosmos.System.Network.ARP;
+using System;
 
 namespace Cosmos.System.Network
 {
@@ -57,6 +55,7 @@ namespace Cosmos.System.Network
                 case 0x0806:
                     ARPPacket.ARPHandler(packetData);
                     break;
+
                 case 0x0800:
                     IPv4.IPPacket.IPv4Handler(packetData);
                     break;

@@ -1,19 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Diagnostics;
-using System.Threading;
+using System;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
-    // this class represents a module loaded in the debuggee process to the debugger. 
-    public class AD7Module : IDebugModule2, IDebugModule3 {
+    // this class represents a module loaded in the debuggee process to the debugger.
+    public class AD7Module : IDebugModule2, IDebugModule3
+    {
         //public readonly DebuggedModule DebuggedModule;
 
-        public AD7Module() { //DebuggedModule debuggedModule) 
+        public AD7Module()
+        { //DebuggedModule debuggedModule)
             //this.DebuggedModule = debuggedModule;
         }
 
@@ -44,8 +41,8 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
                 if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_PREFFEREDADDRESS))
                 {
-                    // A debugger that actually supports showing the preferred base should crack the PE header and get 
-                    // that field. This debugger does not do that, so assume the module loaded where it was suppose to.                   
+                    // A debugger that actually supports showing the preferred base should crack the PE header and get
+                    // that field. This debugger does not do that, so assume the module loaded where it was suppose to.
                     //info.m_addrPreferredLoadAddress = (ulong)this.DebuggedModule.BaseAddress;
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_PREFFEREDADDRESS;
                 }
@@ -76,8 +73,7 @@ namespace Cosmos.Debug.VSDebugEngine
                     }
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_FLAGS;
                 }
-                
-                
+
                 infoArray[0] = info;
 
                 return VSConstants.S_OK;
@@ -93,20 +89,24 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         #region Deprecated interface methods
+
         // These methods are not called by the Visual Studio debugger, so they don't need to be implemented
-        int IDebugModule2.ReloadSymbols_Deprecated(string urlToSymbols, out string debugMessage) {
+        int IDebugModule2.ReloadSymbols_Deprecated(string urlToSymbols, out string debugMessage)
+        {
             debugMessage = null;
             System.Diagnostics.Debug.Fail("This function is not called by the debugger.");
             return VSConstants.E_NOTIMPL;
         }
 
-        int IDebugModule3.ReloadSymbols_Deprecated(string pszUrlToSymbols, out string pbstrDebugMessage) {
+        int IDebugModule3.ReloadSymbols_Deprecated(string pszUrlToSymbols, out string pbstrDebugMessage)
+        {
             throw new NotImplementedException();
         }
-        #endregion
+
+        #endregion Deprecated interface methods
 
         // IDebugModule3 represents a module that supports alternate locations of symbols and JustMyCode states.
-        // The sample does not support alternate symbol locations or JustMyCode, but it does not display symbol load information 
+        // The sample does not support alternate symbol locations or JustMyCode, but it does not display symbol load information
 
         // Gets the MODULE_INFO that describes this module.
         // This is how the debugger obtains most of the information about the module.
@@ -143,7 +143,7 @@ namespace Cosmos.Debug.VSDebugEngine
         int IDebugModule3.IsUserCode(out int pfUser)
         {
             pfUser = 1;
-            return VSConstants.S_OK;           
+            return VSConstants.S_OK;
         }
 
         // Loads and initializes symbols for the current module when the user explicitly asks for them to load.
@@ -160,6 +160,5 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             throw new NotImplementedException();
         }
-
     }
 }

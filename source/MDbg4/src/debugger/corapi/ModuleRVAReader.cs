@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Microsoft.Samples.Debugging.CorSymbolStore;
+using System;
 using System.Diagnostics;
-using Microsoft.Samples.Debugging.CorSymbolStore;
 
 namespace Microsoft.Samples.Debugging.CorDebug
 {
@@ -18,18 +16,16 @@ namespace Microsoft.Samples.Debugging.CorDebug
     [CLSCompliant(false)]
     public class ModuleRVAReader : IDiaReadExeAtRVACallback
     {
-        CorModule m_module;
+        private CorModule m_module;
 
         public ModuleRVAReader(CorModule moduleToRead)
         {
-            if(moduleToRead == null)
+            if (moduleToRead == null)
                 throw new ArgumentNullException("moduleToRead");
             m_module = moduleToRead;
         }
-    
+
         #region IDiaReadExeAtRVACallback Members
-
-
 
         /// <summary>
         /// Reads module data at the specified relative virtual address
@@ -49,19 +45,19 @@ namespace Microsoft.Samples.Debugging.CorDebug
             pcbData = 0;
 
             // validate RVA
- 	        if(relativeVirtualAddress > m_module.Size)
+            if (relativeVirtualAddress > m_module.Size)
                 throw new ArgumentOutOfRangeException("relativeVirtualAddress");
             // validate data
-            if(data == null)
+            if (data == null)
                 throw new ArgumentNullException("data");
-            if(data.Length < cbData)
+            if (data.Length < cbData)
                 throw new ArgumentException("data");
 
             // truncate read if it would otherwise extend into invalid RVA range
             uint bytesToRead = cbData;
             checked
             {
-                if(cbData + relativeVirtualAddress > m_module.Size)
+                if (cbData + relativeVirtualAddress > m_module.Size)
                 {
                     // we know bytesToRead is >= 0 because of the first check above
                     bytesToRead = (uint)m_module.Size - relativeVirtualAddress;
@@ -69,10 +65,10 @@ namespace Microsoft.Samples.Debugging.CorDebug
             }
 
             // early bail out if not reading any bytes
-            if(bytesToRead == 0)
+            if (bytesToRead == 0)
             {
                 // if we read nothing because of clipping the range then throw otherwise return normally
-                if(bytesToRead != cbData)
+                if (bytesToRead != cbData)
                     throw new ArgumentOutOfRangeException("cbData");
                 else
                     return;
@@ -93,7 +89,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                     bytesLastRead = m_module.Process.ReadMemory(relativeVirtualAddress + m_module.BaseAddress, buffer);
                     Array.Copy(buffer, 0, data, bytesRead, bytesLastRead);
                     bytesRead += (uint)bytesLastRead;
-                } while( bytesRead < bytesToRead && bytesLastRead != 0);
+                } while (bytesRead < bytesToRead && bytesLastRead != 0);
             }
             finally
             {
@@ -101,10 +97,10 @@ namespace Microsoft.Samples.Debugging.CorDebug
             }
 
             // if we did not read everything because of clipping the range then throw
-            if(pcbData != cbData)
+            if (pcbData != cbData)
                 throw new ArgumentOutOfRangeException("cbData");
         }
 
-        #endregion
+        #endregion IDiaReadExeAtRVACallback Members
     }
 }

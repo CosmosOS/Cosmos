@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Build.Framework;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.Framework;
 using System.IO;
 
 namespace Cosmos.Build.MSBuild
 {
-    public class Ld: BaseToolTask
+    public class Ld : BaseToolTask
     {
         [Required]
         public string CosmosBuildDir

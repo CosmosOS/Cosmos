@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Windows.Threading;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 
 namespace Cosmos.VS.Windows
 {
@@ -12,6 +7,7 @@ namespace Cosmos.VS.Windows
         protected byte[] mData = new byte[0];
 
         protected Cosmos_VS_WindowsPackage mPackage;
+
         public Cosmos_VS_WindowsPackage Package
         {
             get
@@ -38,6 +34,7 @@ namespace Cosmos.VS.Windows
         {
             return mData;
         }
+
         public virtual void SetCurrentState(byte[] aData)
         {
             Update(null, aData);

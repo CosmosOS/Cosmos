@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Cosmos.Common;
+using Cosmos.IL2CPU.Plugs;
+using System;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using Cosmos.Common;
-using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU
 {
@@ -103,15 +100,19 @@ namespace Cosmos.IL2CPU
                     case Ring.User:
                         ValidateUserAssembly(xAssembly);
                         break;
+
                     case Ring.Core:
                         ValidateCoreAssembly(xAssembly);
                         break;
+
                     case Ring.HAL:
                         ValidateHALAssembly(xAssembly);
                         break;
+
                     case Ring.System:
                         ValidateSystemAssembly(xAssembly);
                         break;
+
                     default:
                         throw new NotImplementedException(String.Format("Ring {0} not implemented", xRing));
                 }

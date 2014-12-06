@@ -1,40 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.HAL;
+﻿using Cosmos.HAL;
 
-namespace Cosmos.System {
-    public class Console {
+namespace Cosmos.System
+{
+    public class Console
+    {
         protected int mX = 0;
-        public int X {
+
+        public int X
+        {
             get { return mX; }
-            set { 
+            set
+            {
                 mX = value;
                 UpdateCursor();
             }
         }
 
         protected int mY = 0;
-        public int Y {
+
+        public int Y
+        {
             get { return mY; }
-            set { 
+            set
+            {
                 mY = value;
                 UpdateCursor();
             }
         }
 
-        public int Cols {
+        public int Cols
+        {
             get { return mText.Cols; }
         }
 
-        public int Rows {
+        public int Rows
+        {
             get { return mText.Rows; }
         }
 
         protected HAL.TextScreen mText = new TextScreen();
 
-        public void Clear() {
+        public void Clear()
+        {
             mText.Clear();
             mX = 0;
             mY = 0;
@@ -42,14 +49,17 @@ namespace Cosmos.System {
         }
 
         //TODO: This is slow, batch it and only do it at end of updates
-        protected void UpdateCursor() {
+        protected void UpdateCursor()
+        {
             mText.SetCursorPos(mX, mY);
         }
 
-        public void NewLine() {
+        public void NewLine()
+        {
             mY++;
             mX = 0;
-            if (mY == mText.Rows) {
+            if (mY == mText.Rows)
+            {
                 mText.ScrollUp();
                 mY = mText.Rows - 1;
                 mX = 0;
@@ -57,33 +67,44 @@ namespace Cosmos.System {
             UpdateCursor();
         }
 
-        public void WriteChar(char aChar) {
+        public void WriteChar(char aChar)
+        {
             mText[mX, mY] = aChar;
             mX++;
-            if (mX == mText.Cols) {
+            if (mX == mText.Cols)
+            {
                 NewLine();
             }
             UpdateCursor();
         }
 
-        public void WriteLine(string aText) {
+        public void WriteLine(string aText)
+        {
             Write(aText);
             NewLine();
         }
 
         //TODO: Optimize this
-        public void Write(string aText) {
-            for (int i = 0; i < aText.Length; i++) {
-                if (aText[i] == '\n') {
+        public void Write(string aText)
+        {
+            for (int i = 0; i < aText.Length; i++)
+            {
+                if (aText[i] == '\n')
+                {
                     NewLine();
-                } else if (aText[i] == '\r') {
-                } else if (aText[i] == '\t') {
+                }
+                else if (aText[i] == '\r')
+                {
+                }
+                else if (aText[i] == '\t')
+                {
                     Write("    ");
-                } else {
+                }
+                else
+                {
                     WriteChar(aText[i]);
                 }
             }
         }
-
     }
 }

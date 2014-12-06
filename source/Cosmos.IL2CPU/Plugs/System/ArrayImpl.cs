@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.IL2CPU.Plugs;
+using System;
 
 namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System
 {
     [Plug(Target = typeof(Array))]
     public class ArrayImpl
     {
-
         [PlugMethod(Signature = "System_Void__System_Array_Clear_System_Array__System_Int32__System_Int32_")]
         public static unsafe void Clear(uint* aArray, uint aIndex, uint aLength)
         {
@@ -113,10 +109,13 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System
             {
                 case 1:
                     return *((byte*)aThis);
+
                 case 2:
                     return *((ushort*)aThis);
+
                 case 3:
                     return (*((uint*)aThis)) & 0x0FFFFFFF;
+
                 case 4:
                     return *((uint*)aThis);
             }
@@ -140,12 +139,15 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System
                 case 1:
                     *((byte*)aThis) = (byte)aValue;
                     return;
+
                 case 2:
                     *((ushort*)aThis) = (ushort)aValue;
                     return;
+
                 case 3:
                     *((uint*)aThis) = (uint)aValue;
                     return;
+
                 case 4:
                     *((uint*)aThis) = (uint)aValue;
                     return;

@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Cosmos.Assembler.x86
 {
     [Cosmos.Assembler.OpCode("scas")]
-    public class Scas: InstructionWithSize, IInstructionWithPrefix
+    public class Scas : InstructionWithSize, IInstructionWithPrefix
     {
         public InstructionPrefixes Prefixes
         {
@@ -25,12 +22,15 @@ namespace Cosmos.Assembler.x86
                 case 32:
                     aOutput.Write("scasd");
                     return;
+
                 case 16:
                     aOutput.Write("scasw");
                     return;
+
                 case 8:
                     aOutput.Write("scasb");
                     return;
+
                 default: throw new Exception("Size not supported!");
             }
         }

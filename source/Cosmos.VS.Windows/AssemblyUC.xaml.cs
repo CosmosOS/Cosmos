@@ -1,24 +1,22 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using Cosmos.Debug.Common;
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
-using System.Collections.Generic;
-using Cosmos.Debug.Common;
-using System.Windows.Threading;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Cosmos.VS.Windows
 {
     /// This class implements the tool window exposed by this package and hosts a user control.
     ///
-    /// In Visual Studio tool windows are composed of a frame (implemented by the shell) and a pane, 
+    /// In Visual Studio tool windows are composed of a frame (implemented by the shell) and a pane,
     /// usually implemented by the package implementer.
     ///
-    /// This class derives from the ToolWindowPane class provided from the MPF in order to use its 
+    /// This class derives from the ToolWindowPane class provided from the MPF in order to use its
     /// implementation of the IVsUIElementPane interface.
 
     [Guid("f019fb29-c2c2-4d27-9abf-739533c939be")]
@@ -38,7 +36,7 @@ namespace Cosmos.VS.Windows
             BitmapIndex = 1;
 
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
-            // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
+            // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
             // the object returned by the Content property.
             mUserControl = new AssemblyUC();
             Content = mUserControl;
@@ -51,8 +49,10 @@ namespace Cosmos.VS.Windows
         protected Dictionary<Run, AsmLine> mRunsToLines = new Dictionary<Run, AsmLine>();
         protected Dictionary<Rectangle, Run> mGutterRectsToRun = new Dictionary<Rectangle, Run>();
         protected Dictionary<Rectangle, AsmCode> mGutterRectsToCode = new Dictionary<Rectangle, AsmCode>();
+
         // Text of code as rendered. Used for clipboard etc.
         protected StringBuilder mCode = new StringBuilder();
+
         protected bool mFilter = true;
         protected string mCurrentLabel;
         protected string[] mParams;
@@ -69,13 +69,13 @@ namespace Cosmos.VS.Windows
             butnStepOver.Click += new RoutedEventHandler(butnStepOver_Click);
             butnStepInto.Click += new RoutedEventHandler(butnStepInto_Click);
             butnStepMode.Click += new RoutedEventHandler(butnStepMode_Click);
-            
+
             Update(null, mData);
         }
 
-        void butnStepMode_Click(object sender, RoutedEventArgs e)
+        private void butnStepMode_Click(object sender, RoutedEventArgs e)
         {
-            if(butnStepMode.BorderBrush == Brushes.Black)
+            if (butnStepMode.BorderBrush == Brushes.Black)
             {
                 butnStepMode.BorderBrush = Brushes.LightBlue;
                 Global.PipeUp.SendCommand(Windows2Debugger.SetStepModeSource);
@@ -89,7 +89,7 @@ namespace Cosmos.VS.Windows
             }
         }
 
-        void butnStepInto_Click(object sender, RoutedEventArgs e)
+        private void butnStepInto_Click(object sender, RoutedEventArgs e)
         {
             // Disable until step is done to prevent user concurrently clicking.
             //butnStepOver.IsEnabled = false;
@@ -97,7 +97,8 @@ namespace Cosmos.VS.Windows
             Global.PipeUp.SendCommand(Windows2Debugger.AsmStepInto);
             Display(mFilter);
         }
-        void butnStepOver_Click(object sender, RoutedEventArgs e)
+
+        private void butnStepOver_Click(object sender, RoutedEventArgs e)
         {
             // Disable until step is done to prevent user concurrently clicking.
             //butnStepOver.IsEnabled = false;
@@ -106,19 +107,20 @@ namespace Cosmos.VS.Windows
         }
 
         protected bool canStepOver = false;
-        
-        void butnFilter_Click(object sender, RoutedEventArgs e)
+
+        private void butnFilter_Click(object sender, RoutedEventArgs e)
         {
             mFilter = !mFilter;
             Display(mFilter);
         }
 
-        void mitmCopy_Click(object sender, RoutedEventArgs e)
+        private void mitmCopy_Click(object sender, RoutedEventArgs e)
         {
             Clipboard.SetText(mCode.ToString());
         }
 
         protected Run mSelectedCodeRun = null;
+
         protected void Display(bool aFilter)
         {
             Log("Display({0})", aFilter);
@@ -168,7 +170,7 @@ namespace Cosmos.VS.Windows
                             xLabelPrefixes.Add(xLabelParts[0] + ".");
                             foundMETHOD_Prefix = true;
                         }
-                        else if(!foundMethodName && !xAsmLabel.Label.StartsWith("METHOD_") 
+                        else if (!foundMethodName && !xAsmLabel.Label.StartsWith("METHOD_")
                                                  && !xAsmLabel.Label.StartsWith("GUID_"))
                         {
                             var xLabelParts = xAsmLabel.Label.Split(':');
@@ -182,7 +184,7 @@ namespace Cosmos.VS.Windows
                     }
 
                     // Replace all and not just labels so we get jumps, calls etc
-                    foreach(string xLabelPrefix in xLabelPrefixes)
+                    foreach (string xLabelPrefix in xLabelPrefixes)
                     {
                         xDisplayLine = xDisplayLine.Replace(xLabelPrefix, "");
                     }
@@ -260,11 +262,11 @@ namespace Cosmos.VS.Windows
                             nextCodeDistFromCurrent++;
                         }
 
-                        if(mASMBPs.Contains(GetLineId(xAsmCode)))
+                        if (mASMBPs.Contains(GetLineId(xAsmCode)))
                         {
                             xRun.Background = Brushes.MediumVioletRed;
                         }
-                        else if(Package.StateStorer.ContainsStatesForLine(GetLineId(xAsmCode)))
+                        else if (Package.StateStorer.ContainsStatesForLine(GetLineId(xAsmCode)))
                         {
                             xRun.Background = Brushes.LightYellow;
                         }
@@ -273,7 +275,6 @@ namespace Cosmos.VS.Windows
                     }
 
                     xRun.MouseUp += OnASMCodeTextMouseUp;
-
                 }
                 else
                 { // Unknown type
@@ -290,7 +291,7 @@ namespace Cosmos.VS.Windows
                 mCode.AppendLine(xDisplayLine);
             }
             Log("Display - Done processing lines");
-            //EdMan196: This line of code was worked out by trial and error. 
+            //EdMan196: This line of code was worked out by trial and error.
             double offset = mCurrentLineNumber * 13.1;
             Log("Display - Scroll to offset");
             ASMScrollViewer.ScrollToVerticalOffset(offset);
@@ -339,7 +340,7 @@ namespace Cosmos.VS.Windows
                 mASMBPs.Add(lineId);
             }
         }
-        
+
         protected void OnASMCodeTextMouseUp(object aSender, System.Windows.Input.MouseButtonEventArgs aArgs)
         {
             try
@@ -379,13 +380,13 @@ namespace Cosmos.VS.Windows
                     xRun.Foreground = Brushes.WhiteSmoke;
                     xRun.Background = Brushes.Blue;
                 }
-                
+
                 //Show state for that line
                 //IL Labels should be unique for any given section
                 var asmLine = mRunsToLines[xRun];
                 if (Package != null)
                 {
-                    if(Package.StateStorer.ContainsStatesForLine(GetLineId((AsmCode)asmLine)))
+                    if (Package.StateStorer.ContainsStatesForLine(GetLineId((AsmCode)asmLine)))
                     {
                         Package.StoreAllStates();
                         Package.StateStorer.CurrLineId = GetLineId((AsmCode)asmLine);
@@ -593,13 +594,11 @@ namespace Cosmos.VS.Windows
                         }
                     }
                     mLines.Add(xAsmLabel);
-
                 }
                 else if (xTestLine.StartsWith(";"))
                 { // Comment
                     string xComment = xLine.Trim().Substring(1).Trim();
                     mLines.Add(new AsmComment(xComment));
-
                 }
                 else
                 { // Code
@@ -668,7 +667,7 @@ namespace Cosmos.VS.Windows
                         Log("DoUpdate - Done");
                     }
 
-                    if (mParams != null && mParams.Length > 1) 
+                    if (mParams != null && mParams.Length > 1)
                     {
                         if (mParams[1] == "AsmStepMode")
                         {

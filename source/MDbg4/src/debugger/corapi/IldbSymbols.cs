@@ -1,9 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Runtime.InteropServices;
 
-namespace Microsoft.Samples.Debugging.CorSymbolStore 
+namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
     /// <summary>
     /// A specialization of SymbolBinder to using ildbsymbols.dll (ILDB symbol format)
@@ -11,7 +9,8 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
     /// </summary>
     internal class IldbSymbolBinder : SymbolBinder
     {
-        public IldbSymbolBinder() : base(GetIldbBinderObject())
+        public IldbSymbolBinder()
+            : base(GetIldbBinderObject())
         {
         }
 
@@ -23,7 +22,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         {
             return (ISymUnmanagedBinder)IldbNativeMethods.IldbCoCreateInstance(CLSID_CorSymBinder, typeof(ISymUnmanagedBinder).GUID);
         }
-
     }
 
     /// <summary>
@@ -44,7 +42,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         {
             return (ISymUnmanagedWriter)IldbNativeMethods.IldbCoCreateInstance(CLSID_CorSymWriter, typeof(ISymUnmanagedWriter).GUID);
         }
-
     }
 
     internal class IldbNativeMethods
@@ -54,7 +51,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         private interface IClassFactory
         {
-            [return:MarshalAs(UnmanagedType.Interface)]
+            [return: MarshalAs(UnmanagedType.Interface)]
             object CreateInstance(
                 [MarshalAs(UnmanagedType.IUnknown)] object punkOuter,
                 [In, MarshalAs(UnmanagedType.LPStruct)] Guid iid);
@@ -77,7 +74,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         [DllImport("ildbsymbols.dll", PreserveSig = false)]
         [return: MarshalAs(UnmanagedType.Interface)]
         public static extern object DllGetClassObject(
-            [In, MarshalAs(UnmanagedType.LPStruct)] Guid clsid, 
+            [In, MarshalAs(UnmanagedType.LPStruct)] Guid clsid,
             [In, MarshalAs(UnmanagedType.LPStruct)] Guid iid);
     }
 }

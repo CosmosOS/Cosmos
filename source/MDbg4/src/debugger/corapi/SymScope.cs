@@ -1,20 +1,16 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
 namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
-    using System.Diagnostics.SymbolStore;
-
     // Interface does not need to be marked with the serializable attribute
     using System;
-    using System.Text;
+    using System.Diagnostics.SymbolStore;
     using System.Runtime.InteropServices;
-    using System.Runtime.InteropServices.ComTypes;
 
     [
         ComImport,
@@ -86,10 +82,9 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                              [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ISymUnmanagedConstant[] constants);
     }
 
-
     internal class SymScope : ISymbolScope, ISymbolScope2
     {
-        ISymUnmanagedScope m_target;
+        private ISymUnmanagedScope m_target;
 
         internal SymScope(ISymUnmanagedScope target)
         {
@@ -149,7 +144,6 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                 return offset;
             }
         }
-
 
         public int EndOffset
         {
@@ -228,7 +222,5 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             }
             return Constants;
         }
-
-
     }
 }

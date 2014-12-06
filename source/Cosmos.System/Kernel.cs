@@ -14,22 +14,27 @@ namespace Cosmos.System
 
         // Set after initial start. Can be started and stopped at same time
         protected bool mStarted = false;
+
         // Set to signal stopped
         protected bool mStopped = false;
 
         /// <summary>
         /// Start the system up using the properties for configuration.
         /// </summary>
-        public void Start() {
-            try {
+        public void Start()
+        {
+            try
+            {
                 Global.Dbg.Send("Starting kernel");
-                if (mStarted) {
+                if (mStarted)
+                {
                     Global.Dbg.Send("ERROR: Kernel Already Started");
                     throw new Exception("Kernel has already been started. A kernel cannot be started twice.");
                 }
                 mStarted = true;
 
-                if (String.Empty == null) {
+                if (String.Empty == null)
+                {
                     throw new Exception("Compiler didn't initialize System.String.Empty!");
                 }
 
@@ -40,7 +45,8 @@ namespace Cosmos.System
                 Global.Init();
 
                 // Provide the user with a clear screen if they requested it
-                if (ClearScreen) {
+                if (ClearScreen)
+                {
                     Global.Dbg.Send("Cls");
                     Global.Console.Clear();
                 }
@@ -49,7 +55,8 @@ namespace Cosmos.System
                 BeforeRun();
 
                 Global.Dbg.Send("Run");
-                while (!mStopped) {
+                while (!mStopped)
+                {
                     //Network.NetworkStack.Update();
                     Run();
                 }
@@ -59,7 +66,8 @@ namespace Cosmos.System
                 //while (xTest) {
                 //}
             }
-            catch (Exception E) {
+            catch (Exception E)
+            {
                 // todo: better ways to handle?
                 global::System.Console.WriteLine("Exception occurred while running kernel:");
                 global::System.Console.WriteLine(E.ToString());
@@ -69,7 +77,9 @@ namespace Cosmos.System
         /// <summary>
         /// Pre-run events
         /// </summary>
-        protected virtual void BeforeRun() { }
+        protected virtual void BeforeRun()
+        {
+        }
 
         /// <summary>
         /// Main kernel loop
@@ -79,19 +89,25 @@ namespace Cosmos.System
         /// <summary>
         /// After the Run() method is exited (?)
         /// </summary>
-        protected virtual void AfterRun() { }
+        protected virtual void AfterRun()
+        {
+        }
 
         /// <summary>
         /// Shut down the system and power off
         /// </summary>
-        public void Stop() {
+        public void Stop()
+        {
             mStopped = true;
         }
 
-        public Kernel() { }
+        public Kernel()
+        {
+        }
 
         // Shutdown and restart
-        public void Restart() {
+        public void Restart()
+        {
         }
 
         public static void PrintDebug(string message)

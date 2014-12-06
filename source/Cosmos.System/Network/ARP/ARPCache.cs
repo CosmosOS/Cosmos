@@ -1,5 +1,5 @@
-﻿using System;
-using Cosmos.HAL.Network;
+﻿using Cosmos.HAL.Network;
+using System;
 
 namespace Cosmos.System.Network.ARP
 {

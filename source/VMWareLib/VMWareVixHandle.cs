@@ -1,12 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Interop.VixCOM;
+using System;
 
 namespace Vestris.VMWareLib
 {
     /// <summary>
-    /// A wrapper for a VixCOM handle. 
+    /// A wrapper for a VixCOM handle.
     /// </summary>
     /// <typeparam name="T">Type of VixCOM handle.</typeparam>
     /// <remarks>
@@ -49,7 +47,6 @@ namespace Vestris.VMWareLib
         /// </summary>
         public VMWareVixHandle()
         {
-
         }
 
         /// <summary>
@@ -104,9 +101,9 @@ namespace Vestris.VMWareLib
         /// </summary>
         public virtual void Dispose()
         {
-            Close();            
+            Close();
         }
 
-        #endregion
+        #endregion IDisposable Members
     }
 }

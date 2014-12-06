@@ -1,20 +1,19 @@
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+using Microsoft.Samples.Debugging.CorMetadata.NativeApi;
+
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
-using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Globalization;
 using System.Diagnostics;
-
-using Microsoft.Samples.Debugging.CorDebug;
-using Microsoft.Samples.Debugging.CorMetadata.NativeApi;
-using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+using System.Globalization;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Microsoft.Samples.Debugging.CorMetadata
 {
@@ -260,7 +259,6 @@ namespace Microsoft.Samples.Debugging.CorMetadata
             }
         }
 
-
         public override Guid GUID
         {
             get
@@ -268,7 +266,6 @@ namespace Microsoft.Samples.Debugging.CorMetadata
                 throw new NotImplementedException();
             }
         }
-
 
         // methods
 
@@ -557,8 +554,8 @@ namespace Microsoft.Samples.Debugging.CorMetadata
                 MetadataType mt = new MetadataType(importer, enclosingClass);
 
                 // Karthik Kailash -- 08/04/07
-                // Changed this from using a ‘.’ instead of  a ‘+’ to prefix a nested class (e.g. Foo.Nested instead of 
-                // Foo+Nested, where Nested is a class defined inside Foo). Since MDbg is implementing reflection 
+                // Changed this from using a ‘.’ instead of  a ‘+’ to prefix a nested class (e.g. Foo.Nested instead of
+                // Foo+Nested, where Nested is a class defined inside Foo). Since MDbg is implementing reflection
                 // interfaces, it should be using reflection syntax, not syntax specific to C#.
                 return mt.Name + "+";
             }
@@ -568,6 +565,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata
 
         // member variables
         private string m_name;
+
         private IMetadataImport m_importer;
         private int m_typeToken;
         private bool m_isEnum;
@@ -577,7 +575,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata
     }
 
     // Sorts KeyValuePair<string,ulong>'s in increasing order by the value
-    class AscendingValueComparer<K, V> : IComparer<KeyValuePair<K, V>> where V : IComparable
+    internal class AscendingValueComparer<K, V> : IComparer<KeyValuePair<K, V>> where V : IComparable
     {
         public int Compare(KeyValuePair<K, V> p1, KeyValuePair<K, V> p2)
         {
@@ -595,14 +593,13 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         }
     }
 
-
     //////////////////////////////////////////////////////////////////////////////////
     //
     // TypeDefEnum
     //
     //////////////////////////////////////////////////////////////////////////////////
 
-    class TypeDefEnum : IEnumerable, IEnumerator, IDisposable
+    internal class TypeDefEnum : IEnumerable, IEnumerator, IDisposable
     {
         public TypeDefEnum(CorMetadataImport corMeta)
         {
@@ -669,4 +666,3 @@ namespace Microsoft.Samples.Debugging.CorMetadata
         private Type m_type;
     }
 }
-

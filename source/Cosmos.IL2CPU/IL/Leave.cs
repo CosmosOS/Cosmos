@@ -1,27 +1,26 @@
-using System;
 using CPUx86 = Cosmos.Assembler.x86;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Leave )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Leave)]
     public class Leave : ILOp
     {
-        public Leave( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Leave(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
-            new CPUx86.Jump { DestinationLabel = AppAssembler.TmpBranchLabel( aMethod, aOpCode ) };
+            new CPUx86.Jump { DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
         }
-
 
         // using System;
         // using System.IO;
-        // 
-        // 
+        //
+        //
         // using CPU = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Leave)]
         // 	public class Leave: Op {public readonly string TargetLabel;
@@ -34,6 +33,5 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 	}
         // }
-
     }
 }

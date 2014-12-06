@@ -1,7 +1,6 @@
-﻿using System;
-using Cosmos.HAL.Network;
+﻿using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
-using Sys = System;
+using System;
 
 namespace Cosmos.System.Network.IPv4
 {
@@ -52,14 +51,17 @@ namespace Cosmos.System.Network.IPv4
         {
             get { return this.mSenderMAC; }
         }
+
         internal MACAddress TargetMAC
         {
             get { return this.mTargetMAC; }
         }
+
         internal Address SenderIP
         {
             get { return this.mSenderIP; }
         }
+
         internal Address TargetIP
         {
             get { return this.mTargetIP; }
@@ -99,6 +101,7 @@ namespace Cosmos.System.Network.IPv4
             return "ARP Reply Src=" + srcMAC + ", Dest=" + destMAC + ", Sender=" + mSenderIP + ", Target=" + mTargetIP;
         }
     }
+
     internal class ARPRequest_Ethernet : ARPPacket_Ethernet
     {
         /// <summary>

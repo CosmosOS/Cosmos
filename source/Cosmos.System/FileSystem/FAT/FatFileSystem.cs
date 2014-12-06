@@ -85,7 +85,7 @@
 //                }
 //                // We now access the FAT entry as a WORD just as we do for FAT16, but if the cluster number is
 //                // EVEN, we only want the low 12-bits of the 16-bits we fetch. If the cluster number is ODD
-//                // we want the high 12-bits of the 16-bits we fetch. 
+//                // we want the high 12-bits of the 16-bits we fetch.
 //                UInt32 xResult = aSector.ToUInt16(aOffset);
 //                if ((aClusterNum & 0x01) == 0)
 //                { // Even
@@ -108,7 +108,6 @@
 
 //        public FatFileSystem(Cosmos.HAL.BlockDevice.BlockDevice aDevice)
 //        {
-
 //            mDevice = aDevice;
 //            byte[] xBPB = mDevice.NewBlockArray(1);
 
@@ -143,12 +142,12 @@
 
 //            DataSectorCount = TotalSectorCount - (ReservedSectorCount + (NumberOfFATs * FatSectorCount) + ReservedSectorCount);
 
-//            // Computation rounds down. 
+//            // Computation rounds down.
 //            ClusterCount = DataSectorCount / SectorsPerCluster;
 //            // Determine the FAT type. Do not use another method - this IS the official and
 //            // proper way to determine FAT type.
 //            // Comparisons are purposefully < and not <=
-//            // FAT16 starts at 4085, FAT32 starts at 65525 
+//            // FAT16 starts at 4085, FAT32 starts at 65525
 //            if (ClusterCount < 4085)
 //            {
 //                FatType = FatTypeEnum.Fat12;
@@ -253,7 +252,7 @@
 //                            }
 //                        }
 //                        xLongName = xLongPart + xLongName;
-//                        //TODO: LDIR_Chksum 
+//                        //TODO: LDIR_Chksum
 //                    }
 //                }
 //                else
@@ -278,7 +277,7 @@
 //                        if (xLongName.Length > 0)
 //                        {
 //                            // Leading and trailing spaces are to be ignored according to spec.
-//                            // Many programs (including Windows) pad trailing spaces although it 
+//                            // Many programs (including Windows) pad trailing spaces although it
 //                            // it is not required for long names.
 //                            // As per spec, ignore trailing periods
 //                            xName = xLongName.Trim();

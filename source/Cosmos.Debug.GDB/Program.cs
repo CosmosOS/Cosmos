@@ -1,17 +1,22 @@
-﻿using Environment = System.Environment;
+﻿using Application = System.Windows.Forms.Application;
+using Environment = System.Environment;
 using STAThread = System.STAThreadAttribute;
-using Application = System.Windows.Forms.Application;
 
-namespace Cosmos.Debug.GDB {
-    static class Program {
+namespace Cosmos.Debug.GDB
+{
+    internal static class Program
+    {
         [STAThread]
-        static void Main() {
+        private static void Main()
+        {
             var xArgs = Environment.GetCommandLineArgs();
-            if (xArgs.Length > 1) {
-				if (false == Settings.Load(xArgs[1]))
-					return;
+            if (xArgs.Length > 1)
+            {
+                if (false == Settings.Load(xArgs[1]))
+                    return;
             }
-            if (xArgs.Length > 2) {
+            if (xArgs.Length > 2)
+            {
                 Settings.AutoConnect = string.Compare(xArgs[2], "/Connect", true) == 0;
             }
 

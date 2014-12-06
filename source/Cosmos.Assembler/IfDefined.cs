@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Assembler
+﻿namespace Cosmos.Assembler
 {
     [Cosmos.Assembler.OpCode("%ifdef")]
-    public class IfDefined: Instruction, IIfDefined {
-        public string Symbol {
+    public class IfDefined : Instruction, IIfDefined
+    {
+        public string Symbol
+        {
             get;
             set;
         }
 
-        public IfDefined(string aSymbol) {
+        public IfDefined(string aSymbol)
+        {
             Symbol = aSymbol;
         }
 

@@ -9,14 +9,12 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
-using MSBuild = Microsoft.Build.Evaluation;
 using MSBuildExecution = Microsoft.Build.Execution;
 
 namespace Microsoft.VisualStudio.Project
@@ -28,6 +26,7 @@ namespace Microsoft.VisualStudio.Project
     public class OutputGroup : IVsOutputGroup2
     {
         #region fields
+
         private ProjectConfig projectCfg;
         private ProjectNode project;
 
@@ -35,9 +34,11 @@ namespace Microsoft.VisualStudio.Project
         private Output keyOutput;
         private string name;
         private string targetName;
-        #endregion
+
+        #endregion fields
 
         #region properties
+
         /// <summary>
         /// Get the project configuration object associated with this output group
         /// </summary>
@@ -63,7 +64,8 @@ namespace Microsoft.VisualStudio.Project
         {
             get { return targetName; }
         }
-        #endregion
+
+        #endregion properties
 
         #region ctors
 
@@ -76,13 +78,13 @@ namespace Microsoft.VisualStudio.Project
         /// <param name="configuration">Configuration that produce this output</param>
         public OutputGroup(string outputName, string msBuildTargetName, ProjectNode projectManager, ProjectConfig configuration)
         {
-            if(outputName == null)
+            if (outputName == null)
                 throw new ArgumentNullException("outputName");
-            if(msBuildTargetName == null)
+            if (msBuildTargetName == null)
                 throw new ArgumentNullException("outputName");
-            if(projectManager == null)
+            if (projectManager == null)
                 throw new ArgumentNullException("projectManager");
-            if(configuration == null)
+            if (configuration == null)
                 throw new ArgumentNullException("configuration");
 
             name = outputName;
@@ -90,9 +92,11 @@ namespace Microsoft.VisualStudio.Project
             project = projectManager;
             projectCfg = configuration;
         }
-        #endregion
+
+        #endregion ctors
 
         #region virtual methods
+
         protected virtual void Refresh()
         {
             // Let MSBuild know which configuration we are working with
@@ -100,7 +104,7 @@ namespace Microsoft.VisualStudio.Project
 
             // Generate dependencies if such a task exist
             const string generateDependencyList = "AllProjectOutputGroups";
-            if(project.BuildProject.Targets.ContainsKey(generateDependencyList))
+            if (project.BuildProject.Targets.ContainsKey(generateDependencyList))
             {
                 bool succeeded = false;
                 project.BuildTarget(generateDependencyList, out succeeded);
@@ -116,7 +120,7 @@ namespace Microsoft.VisualStudio.Project
                 this.outputs.Add(output);
 
                 // See if it is our key output
-                if(String.Compare(assembly.GetMetadataValue("IsKeyOutput"), true.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
+                if (String.Compare(assembly.GetMetadataValue("IsKeyOutput"), true.ToString(), StringComparison.OrdinalIgnoreCase) == 0)
                     keyOutput = output;
             }
 
@@ -131,23 +135,26 @@ namespace Microsoft.VisualStudio.Project
         {
             // Set keyOutput to null so that a refresh will be performed the next time
             // a property getter is called.
-            if(null != keyOutput)
+            if (null != keyOutput)
             {
                 // Once the group is invalidated there is no more reason to listen for events.
                 project.OnProjectPropertyChanged -= new EventHandler<ProjectPropertyChangedArgs>(OnProjectPropertyChanged);
             }
             keyOutput = null;
         }
-        #endregion
+
+        #endregion virtual methods
 
         #region event handlers
+
         private void OnProjectPropertyChanged(object sender, ProjectPropertyChangedArgs args)
         {
             // In theory here we should decide if we have to invalidate the group according with the kind of property
             // that is changed.
             InvalidateGroup();
         }
-        #endregion
+
+        #endregion event handlers
 
         #region IVsOutputGroup2 Members
 
@@ -168,7 +175,7 @@ namespace Microsoft.VisualStudio.Project
 
             string description;
             int hr = this.get_CanonicalName(out description);
-            if(ErrorHandler.Succeeded(hr))
+            if (ErrorHandler.Succeeded(hr))
                 pbstrDescription = this.Project.GetOutputGroupDescription(description);
             return hr;
         }
@@ -179,7 +186,7 @@ namespace Microsoft.VisualStudio.Project
 
             string displayName;
             int hr = this.get_CanonicalName(out displayName);
-            if(ErrorHandler.Succeeded(hr))
+            if (ErrorHandler.Succeeded(hr))
                 pbstrDisplayName = this.Project.GetOutputGroupDisplayName(displayName);
             return hr;
         }
@@ -187,9 +194,9 @@ namespace Microsoft.VisualStudio.Project
         public virtual int get_KeyOutput(out string pbstrCanonicalName)
         {
             pbstrCanonicalName = null;
-            if(keyOutput == null)
+            if (keyOutput == null)
                 Refresh();
-            if(keyOutput == null)
+            if (keyOutput == null)
             {
                 pbstrCanonicalName = String.Empty;
                 return VSConstants.S_FALSE;
@@ -199,10 +206,10 @@ namespace Microsoft.VisualStudio.Project
 
         public virtual int get_KeyOutputObject(out IVsOutput2 ppKeyOutput)
         {
-            if(keyOutput == null)
+            if (keyOutput == null)
                 Refresh();
             ppKeyOutput = keyOutput;
-            if(ppKeyOutput == null)
+            if (ppKeyOutput == null)
                 return VSConstants.S_FALSE;
             return VSConstants.S_OK;
         }
@@ -223,25 +230,25 @@ namespace Microsoft.VisualStudio.Project
             Refresh();
 
             // See if only the caller only wants to know the count
-            if(celt == 0 || rgpcfg == null)
+            if (celt == 0 || rgpcfg == null)
             {
-                if(pcActual != null && pcActual.Length > 0)
+                if (pcActual != null && pcActual.Length > 0)
                     pcActual[0] = (uint)outputs.Count;
                 return VSConstants.S_OK;
             }
 
             // Fill the array with our outputs
             uint count = 0;
-            foreach(Output output in outputs)
+            foreach (Output output in outputs)
             {
-                if(rgpcfg.Length > count && celt > count && output != null)
+                if (rgpcfg.Length > count && celt > count && output != null)
                 {
                     rgpcfg[count] = output;
                     ++count;
                 }
             }
 
-            if(pcActual != null && pcActual.Length > 0)
+            if (pcActual != null && pcActual.Length > 0)
                 pcActual[0] = count;
 
             // If the number asked for does not match the number returned, return S_FALSE
@@ -260,6 +267,6 @@ namespace Microsoft.VisualStudio.Project
             return VSConstants.S_OK;
         }
 
-        #endregion
+        #endregion IVsOutputGroup2 Members
     }
 }

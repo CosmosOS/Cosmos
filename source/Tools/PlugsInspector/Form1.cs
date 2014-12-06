@@ -1,22 +1,17 @@
-﻿using System;
+﻿using Cosmos.IL2CPU;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
-using Cosmos.IL2CPU;
-using System.Reflection;
 
 namespace PlugsInspector
 {
     public partial class Form1 : Form
     {
-        PlugManager plugManager;
-        bool LoadingPlugs = false;
+        private PlugManager plugManager;
+        private bool LoadingPlugs = false;
 
         public NetClassPlugInfo SelectedNetClassInfo
         {
@@ -29,6 +24,7 @@ namespace PlugsInspector
                 return null;
             }
         }
+
         public CosmosClassPlugInfo SelectedCosmosClassInfo
         {
             get
@@ -40,6 +36,7 @@ namespace PlugsInspector
                 return null;
             }
         }
+
         public MethodPlugInfo SelectedPluggedMethodInfo
         {
             get
@@ -51,6 +48,7 @@ namespace PlugsInspector
                 return null;
             }
         }
+
         public MethodPlugInfo SelectedUnPluggedMethodInfo
         {
             get
@@ -70,9 +68,9 @@ namespace PlugsInspector
             //Force it to load/include all plugs assemblies so all types are correctly found
             //Otherwise the CLR's delay loading techniques block us...
             AssembliesPreloader.LoadAllAssemblies();
-            
 
-            plugManager = new PlugManager((Exception ex) => {
+            plugManager = new PlugManager((Exception ex) =>
+            {
                 AddExceptionEntry(ex.Message);
             }, this.ScanMethod, null);
             plugManager.ThrowExceptions = false;
@@ -91,6 +89,7 @@ namespace PlugsInspector
                 new Task(LoadPlugs).Start();
             }
         }
+
         private void LoadPlugs()
         {
             if (LoadingPlugs)
@@ -117,7 +116,7 @@ namespace PlugsInspector
                     AddPlugEntry(new NetClassPlugInfo(pluggedFieldType), NetPlugClassesListBox);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 AddExceptionEntry("Error loading plugs: " + ex.Message);
             }
@@ -126,14 +125,16 @@ namespace PlugsInspector
                 LoadingPlugs = false;
             }
         }
+
         private void ScanMethod(MethodBase aMethod, bool aIsPlug, object sourceItem)
         {
             //Hmm...
         }
 
-
         private delegate void VoidDelegate();
+
         private delegate void AddPlugEntryCallback(PlugInfo anInfo, ListBox aBox);
+
         private void AddPlugEntry(PlugInfo anInfo, ListBox aBox)
         {
             if (this.InvokeRequired)
@@ -145,7 +146,9 @@ namespace PlugsInspector
                 aBox.Items.Add(anInfo);
             }
         }
+
         private delegate void AddExceptionEntryCallback(string text);
+
         private void AddExceptionEntry(string text)
         {
             if (this.InvokeRequired)
@@ -158,7 +161,6 @@ namespace PlugsInspector
             }
         }
 
-
         private void NetPlugCalssesListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
             CosmosPlugClassesListBox.Items.Clear();
@@ -166,10 +168,10 @@ namespace PlugsInspector
             UnPluggedMethodsListBox.Items.Clear();
 
             NetClassPlugInfo plugInfo = SelectedNetClassInfo;
-            if(SelectedNetClassInfo != null)
+            if (SelectedNetClassInfo != null)
             {
                 List<Type> cosmosPlugClassTypes = plugManager.PlugImpls[plugInfo.NetClassType];
-                foreach(Type aCosmosPlugClassType in cosmosPlugClassTypes)
+                foreach (Type aCosmosPlugClassType in cosmosPlugClassTypes)
                 {
                     AddPlugEntry(new CosmosClassPlugInfo(aCosmosPlugClassType), CosmosPlugClassesListBox);
                 }
@@ -230,7 +232,6 @@ namespace PlugsInspector
                 }
             }
         }
-
     }
 
     public abstract class PlugInfo
@@ -239,9 +240,11 @@ namespace PlugsInspector
         {
         }
     }
+
     public class NetClassPlugInfo : PlugInfo
     {
         public Type NetClassType;
+
         public NetClassPlugInfo(Type aNetClassType)
         {
             NetClassType = aNetClassType;
@@ -252,9 +255,11 @@ namespace PlugsInspector
             return NetClassType.Namespace + "." + NetClassType.Name;
         }
     }
+
     public class CosmosClassPlugInfo : PlugInfo
     {
         public Type CosmosClassType;
+
         public CosmosClassPlugInfo(Type aCosmosClassType)
         {
             CosmosClassType = aCosmosClassType;
@@ -265,10 +270,12 @@ namespace PlugsInspector
             return CosmosClassType.Namespace + "." + CosmosClassType.Name;
         }
     }
+
     public class MethodPlugInfo : PlugInfo
     {
         public MethodBase NetMethodInfo;
         public MethodBase CosmosMethodInfo;
+
         public MethodPlugInfo(MethodBase aNetMethodInfo, MethodBase aCosmosMethodInfo)
         {
             NetMethodInfo = aNetMethodInfo;
@@ -278,14 +285,14 @@ namespace PlugsInspector
         public override string ToString()
         {
             string name = NetMethodInfo.Name;
-            
+
             name += "(";
             var netParams = NetMethodInfo.GetParameters();
             var netParamTypes = netParams.Select(q => q.ParameterType).ToArray();
             bool first = true;
             foreach (Type aType in netParamTypes)
             {
-                if(!first)
+                if (!first)
                 {
                     name += ", ";
                 }

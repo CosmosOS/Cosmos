@@ -1,15 +1,12 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-
-using Microsoft.Samples.Debugging.Native;
-using Microsoft.Samples.Debugging.Native.Private;
 
 namespace Microsoft.Samples.Debugging.Native
 {
@@ -60,7 +57,7 @@ namespace Microsoft.Samples.Debugging.Native
         public X86Context(ContextFlags flags)
         {
             InitializeContext();
-            WriteContextFlagsToBuffer(flags);  
+            WriteContextFlagsToBuffer(flags);
         }
 
         private void InitializeContext()
@@ -104,14 +101,14 @@ namespace Microsoft.Samples.Debugging.Native
         {
             // We know that we need an x86 context
             ContextFlags cFlags = ContextFlags.X86Context;
-   
+
             if ((flags & AgnosticContextFlags.ContextInteger) == AgnosticContextFlags.ContextInteger)
             {
                 // ContextInteger is the same for all platforms, so we can do a blanket |=
                 cFlags |= (ContextFlags)AgnosticContextFlags.ContextInteger;
             }
             if ((flags & AgnosticContextFlags.ContextControl) == AgnosticContextFlags.ContextControl)
-            {  
+            {
                 cFlags |= (ContextFlags)AgnosticContextFlags.ContextControl;
             }
             if ((flags & AgnosticContextFlags.ContextFloatingPoint) == AgnosticContextFlags.ContextFloatingPoint)
@@ -167,8 +164,6 @@ namespace Microsoft.Samples.Debugging.Native
             }
         }
 
-        
-
         // returns the StackPointer for the Context
         public IntPtr StackPointer
         {
@@ -176,7 +171,7 @@ namespace Microsoft.Samples.Debugging.Native
             {
                 Debug.Assert(this.m_rawPtr != IntPtr.Zero, "The context has an invalid context pointer");
 
-                return (IntPtr)Marshal.ReadInt32(this.m_rawPtr, (int)X86Offsets.Esp);    
+                return (IntPtr)Marshal.ReadInt32(this.m_rawPtr, (int)X86Offsets.Esp);
             }
         }
 
@@ -199,7 +194,7 @@ namespace Microsoft.Samples.Debugging.Native
                 {
                     ip = (IntPtr)Marshal.ReadInt32(w.RawBuffer, (int)X86Offsets.Eip);
                 }
-                
+
                 return ip;
             }
             set
@@ -229,7 +224,6 @@ namespace Microsoft.Samples.Debugging.Native
             }
             else
             {
-                
                 int eflags = Marshal.ReadInt32(this.RawPtr, (int)X86Offsets.EFlags) & ~((int)X86Flags.SINGLE_STEP_FLAG);
                 Marshal.WriteInt32(this.RawPtr, (int)X86Offsets.EFlags, eflags);
             }
@@ -239,7 +233,7 @@ namespace Microsoft.Samples.Debugging.Native
         {
             get
             {
-                return ((Marshal.ReadInt32(this.RawPtr, (int)X86Offsets.EFlags) & (int)X86Flags.SINGLE_STEP_FLAG) != 0);  
+                return ((Marshal.ReadInt32(this.RawPtr, (int)X86Offsets.EFlags) & (int)X86Flags.SINGLE_STEP_FLAG) != 0);
             }
         }
 
@@ -317,7 +311,6 @@ namespace Microsoft.Samples.Debugging.Native
                 {
                     return retVal;
                 }
-
             }
 
             if ((a1.Flags & ContextFlags.X86ContextInteger) == ContextFlags.X86ContextInteger)
@@ -332,7 +325,6 @@ namespace Microsoft.Samples.Debugging.Native
             }
             if ((a1.Flags & ContextFlags.X86ContextFloatingPoint) == ContextFlags.X86ContextFloatingPoint)
             {
-
                 // check range FLOAT_SAVE
                 retVal = CheckContextChunk(a1, a2, (int)X86Offsets.FloatSave, (int)X86Offsets.SegGs);
 
@@ -358,7 +350,7 @@ namespace Microsoft.Samples.Debugging.Native
         {
             List<String> list = new List<String>();
 
-            // This includes the most commonly used flags. 
+            // This includes the most commonly used flags.
             if (HasFlags(ContextFlags.X86ContextDebugRegisters))
             {
                 list.Add("Dr0");
@@ -441,7 +433,6 @@ namespace Microsoft.Samples.Debugging.Native
                 if (name == "SEGES") return Marshal.ReadInt32(this.RawPtr, (int)X86Offsets.SegEs);
                 if (name == "SEGFS") return Marshal.ReadInt32(this.RawPtr, (int)X86Offsets.SegFs);
                 if (name == "SEGGS") return Marshal.ReadInt32(this.RawPtr, (int)X86Offsets.SegGs);
-                
             }
 
             throw new InvalidOperationException(String.Format("Register '{0}' is not in the context", name));
@@ -496,22 +487,22 @@ namespace Microsoft.Samples.Debugging.Native
                     Marshal.WriteInt32(this.RawPtr, (int)X86Offsets.Ebx, (Int32)value);
                     return;
                 }
-                if (name == "ECX") 
+                if (name == "ECX")
                 {
                     Marshal.WriteInt32(this.RawPtr, (int)X86Offsets.Ecx, (Int32)value);
                     return;
                 }
-                if (name == "EDX") 
+                if (name == "EDX")
                 {
                     Marshal.WriteInt32(this.RawPtr, (int)X86Offsets.Edx, (Int32)value);
                     return;
                 }
-                if (name == "ESI") 
+                if (name == "ESI")
                 {
                     Marshal.WriteInt32(this.RawPtr, (int)X86Offsets.Esi, (Int32)value);
                     return;
                 }
-                if (name == "EDI") 
+                if (name == "EDI")
                 {
                     Marshal.WriteInt32(this.RawPtr, (int)X86Offsets.Edi, (Int32)value);
                     return;
@@ -519,17 +510,17 @@ namespace Microsoft.Samples.Debugging.Native
             }
             if (HasFlags(ContextFlags.X86ContextSegments))
             {
-                if (name == "SEGDS") 
+                if (name == "SEGDS")
                 {
                     Marshal.WriteInt32(this.RawPtr, (int)X86Offsets.SegDs, (Int32)value);
                     return;
                 }
-                if (name == "SEGES") 
+                if (name == "SEGES")
                 {
                     Marshal.WriteInt32(this.RawPtr, (int)X86Offsets.SegEs, (Int32)value);
                     return;
                 }
-                if (name == "SEGFS") 
+                if (name == "SEGFS")
                 {
                     Marshal.WriteInt32(this.RawPtr, (int)X86Offsets.SegFs, (Int32)value);
                     return;
@@ -566,6 +557,6 @@ namespace Microsoft.Samples.Debugging.Native
             }
         }
 
-        #endregion
+        #endregion IDisposable Members
     }
 }

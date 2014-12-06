@@ -1,10 +1,10 @@
+using Cosmos.Assembler;
+using Cosmos.IL2CPU.IL.CustomImplementations.System;
+using Cosmos.IL2CPU.ILOpCodes;
 using System;
 using System.Linq;
-using Cosmos.Assembler;
-using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU.IL.CustomImplementations.System;
 using System.Reflection;
+using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
             Assemble(Assembler, aMethod, xMethod, xCurrentLabel, xType, xMethod.Value);
         }
 
-        public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  MethodInfo aMethod, OpMethod xMethod, string currentLabel, Type objectType, MethodBase constructor)
+        public static void Assemble(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethod, OpMethod xMethod, string currentLabel, Type objectType, MethodBase constructor)
         {
             // call cctor:
             if (aMethod != null)
@@ -46,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
                  * Current sitation on stack:
                  *   $ESP       Arg
                  *   $ESP+..    other items
-                 *   
+                 *
                  * What should happen:
                  *  + The stack should be increased to allow space to contain:
                  *         + .ctor arguments
@@ -164,7 +164,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //select item ).Count();
                 int xGCFieldCount = objectType.GetFields().Count(x => x.FieldType.IsValueType);
 
-                // todo: use a cleaner approach here. this class shouldnt assemble the string          
+                // todo: use a cleaner approach here. this class shouldnt assemble the string
                 string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

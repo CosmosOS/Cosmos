@@ -2,15 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Cosmos.Debug.Common;
-using System.IO;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace Cosmos.Debug.Common
 {
     /// <summary>Handles the dialog between the Debug Stub embedded in a debugged Cosmos Kernel and
-    /// our Debug Engine hosted in Visual Studio. This abstract class is communication protocol 
+    /// our Debug Engine hosted in Visual Studio. This abstract class is communication protocol
     /// independent. Sub-classes exist that manage the wire level details of the communications.
     /// </summary>
     public abstract class DebugConnector : IDisposable
@@ -73,6 +70,7 @@ namespace Cosmos.Debug.Common
         }
 
         protected bool mSigReceived = false;
+
         public bool SigReceived
         {
             get { return mSigReceived; }
@@ -119,7 +117,7 @@ namespace Cosmos.Debug.Common
                     if (aCmd == Vs2Ds.Noop)
                     {
                         // Noops dont have any data.
-                        // This is becuase Noops are used to clear out the 
+                        // This is becuase Noops are used to clear out the
                         // channel and are often not received. Sending noop + data
                         // usually causes the data to be interpreted as a command
                         // as its often the first byte received.
@@ -162,7 +160,7 @@ namespace Cosmos.Debug.Common
                                 // DebugStub.
 
                                 //Sometimes we get out of sync or recieve something we aren't expecting
-                                //So this forces us to only return when we are back in-sync or after we think we've frozen the system for 
+                                //So this forces us to only return when we are back in-sync or after we think we've frozen the system for
                                 //too long
                                 //If we haven't gone past the command already!
                                 if ((!resetID && lastCmdCompletedID < mCommandID) || (resetID && lastCmdCompletedID > 5))
@@ -175,7 +173,7 @@ namespace Cosmos.Debug.Common
                                     while ((
                                             (!resetID && lastCmdCompletedID < mCommandID) ||
                                             (resetID && lastCmdCompletedID > 5)
-                                           ) && 
+                                           ) &&
                                            ++attempts < 10);
                                 }
                             }
@@ -188,6 +186,7 @@ namespace Cosmos.Debug.Common
         }
 
         protected abstract bool SendRawData(byte[] aBytes);
+
         protected abstract void Next(int aPacketSize, Action<byte[]> aCompleted);
 
         protected byte mCommandID = 0;
@@ -197,6 +196,7 @@ namespace Cosmos.Debug.Common
         // The debugger is user driven so should not happen, but maybe could
         // happen while a previous command is waiting on a reply msg.
         protected object mSendCmdLock = new object();
+
         public void SendCmd(byte aCmd)
         {
             SendCmd(aCmd, new byte[0], true);
@@ -250,6 +250,7 @@ namespace Cosmos.Debug.Common
             var xData = BitConverter.GetBytes(aAddress);
             SendCmd(Vs2Ds.SetINT3, xData);
         }
+
         public void ClearINT3(uint aAddress)
         {
             var xData = BitConverter.GetBytes(aAddress);
@@ -322,7 +323,7 @@ namespace Cosmos.Debug.Common
             Array.Copy(BitConverter.GetBytes(offsetToEBP), 0, xData, 0, 4);
             Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
             SendCmd(Vs2Ds.SendMethodContext, xData);
-            
+
             // todo: make "crossplatform". this code assumes stack space of 32bit per "item"
 
             byte[] xResult;
@@ -470,7 +471,7 @@ namespace Cosmos.Debug.Common
             //{
             //    mDebugWriter.Dispose();
             //    mDebugWriter = null;
-            //    
+            //
             //}
             GC.SuppressFinalize(this);
         }
@@ -478,6 +479,7 @@ namespace Cosmos.Debug.Common
         // Signature is sent after garbage emitted during init of serial port.
         // For more info see note in DebugStub where signature is transmitted.
         protected byte[] mSigCheck = new byte[4] { 0, 0, 0, 0 };
+
         protected void WaitForSignature(byte[] aPacket)
         {
             mSigCheck[0] = mSigCheck[1];
@@ -581,6 +583,7 @@ namespace Cosmos.Debug.Common
         }
 
         private int lastCmdCompletedID = -1;
+
         protected void PacketCmdCompleted(byte[] aPacket)
         {
             byte xCmdID = aPacket[0];

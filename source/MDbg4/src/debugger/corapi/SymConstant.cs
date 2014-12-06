@@ -1,21 +1,16 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 
-
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-namespace Microsoft.Samples.Debugging.CorSymbolStore 
+namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
-    using System.Diagnostics.SymbolStore;
-
-
     // Interface does not need to be marked with the serializable attribute
     using System;
-	using System.Text;
     using System.Runtime.InteropServices;
-    using System.Runtime.InteropServices.ComTypes;
+    using System.Text;
 
     [
         ComImport,
@@ -25,21 +20,21 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
     ]
     internal interface ISymUnmanagedConstant
     {
-         void GetName(int cchName,
-                         out int pcchName,
-                         [MarshalAs(UnmanagedType.LPWStr)] StringBuilder name);
-        
-         void GetValue(out Object pValue);
-         
-         void GetSignature(int cSig,
-                              out int pcSig,
-                              [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] byte[] sig);
+        void GetName(int cchName,
+                        out int pcchName,
+                        [MarshalAs(UnmanagedType.LPWStr)] StringBuilder name);
+
+        void GetValue(out Object pValue);
+
+        void GetSignature(int cSig,
+                             out int pcSig,
+                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] byte[] sig);
     }
 
     internal class SymConstant : ISymbolConstant
     {
-        ISymUnmanagedConstant m_target;
-        
+        private ISymUnmanagedConstant m_target;
+
         public SymConstant(ISymUnmanagedConstant target)
         {
             // We should not wrap null instances
@@ -48,7 +43,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
 
             m_target = target;
         }
-        
+
         public String GetName()
         {
             int count;
@@ -57,14 +52,14 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             m_target.GetName(count, out count, name);
             return name.ToString();
         }
-        
+
         public Object GetValue()
         {
             Object value = null;
             m_target.GetValue(out value);
             return value;
         }
-         
+
         public byte[] GetSignature()
         {
             int count = 0;

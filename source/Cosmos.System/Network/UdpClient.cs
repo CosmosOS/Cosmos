@@ -1,6 +1,7 @@
 ﻿using System;
-using Sys = System;
 using System.Collections.Generic;
+
+using Sys = System;
 
 namespace Cosmos.System.Network
 {
@@ -44,7 +45,7 @@ namespace Cosmos.System.Network
         }
 
         public UdpClient()
-            :this(0)
+            : this(0)
         { }
 
         public UdpClient(Int32 localPort)

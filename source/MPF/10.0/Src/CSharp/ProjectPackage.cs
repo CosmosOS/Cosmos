@@ -11,83 +11,83 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.VisualStudio.Project
 {
-	/// <summary>
-	/// Defines abstract package.
-	/// </summary>
-	[ComVisible(true)]
-	[CLSCompliant(false)]
-	public abstract class ProjectPackage : Microsoft.VisualStudio.Shell.Package
-	{
-		#region fields
-		/// <summary>
-		/// This is the place to register all the solution listeners.
-		/// </summary>
-		private List<SolutionListener> solutionListeners = new List<SolutionListener>();
-		#endregion
+    /// <summary>
+    /// Defines abstract package.
+    /// </summary>
+    [ComVisible(true)]
+    [CLSCompliant(false)]
+    public abstract class ProjectPackage : Microsoft.VisualStudio.Shell.Package
+    {
+        #region fields
 
-		#region properties
-		/// <summary>
-		/// Add your listener to this list. They should be added in the overridden Initialize befaore calling the base.
-		/// </summary>
-		protected internal IList<SolutionListener> SolutionListeners
-		{
-			get
-			{
-				return this.solutionListeners;
-			}
-		}
+        /// <summary>
+        /// This is the place to register all the solution listeners.
+        /// </summary>
+        private List<SolutionListener> solutionListeners = new List<SolutionListener>();
 
-		public abstract string ProductUserContext { get; }
+        #endregion fields
 
-		#endregion
+        #region properties
 
-		#region methods
-		protected override void Initialize()
-		{
-			base.Initialize();
+        /// <summary>
+        /// Add your listener to this list. They should be added in the overridden Initialize befaore calling the base.
+        /// </summary>
+        protected internal IList<SolutionListener> SolutionListeners
+        {
+            get
+            {
+                return this.solutionListeners;
+            }
+        }
 
-			// Subscribe to the solution events
-			this.solutionListeners.Add(new SolutionListenerForProjectReferenceUpdate(this));
-			this.solutionListeners.Add(new SolutionListenerForProjectOpen(this));
-			this.solutionListeners.Add(new SolutionListenerForBuildDependencyUpdate(this));
-			this.solutionListeners.Add(new SolutionListenerForProjectEvents(this));
+        public abstract string ProductUserContext { get; }
 
-			foreach(SolutionListener solutionListener in this.solutionListeners)
-			{
-				solutionListener.Init();
-			}
-		}
+        #endregion properties
 
-		protected override void Dispose(bool disposing)
-		{
-			// Unadvise solution listeners.
-			try
-			{
-				if(disposing)
-				{
-					foreach(SolutionListener solutionListener in this.solutionListeners)
-					{
-						solutionListener.Dispose();
-					}
+        #region methods
+
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            // Subscribe to the solution events
+            this.solutionListeners.Add(new SolutionListenerForProjectReferenceUpdate(this));
+            this.solutionListeners.Add(new SolutionListenerForProjectOpen(this));
+            this.solutionListeners.Add(new SolutionListenerForBuildDependencyUpdate(this));
+            this.solutionListeners.Add(new SolutionListenerForProjectEvents(this));
+
+            foreach (SolutionListener solutionListener in this.solutionListeners)
+            {
+                solutionListener.Init();
+            }
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            // Unadvise solution listeners.
+            try
+            {
+                if (disposing)
+                {
+                    foreach (SolutionListener solutionListener in this.solutionListeners)
+                    {
+                        solutionListener.Dispose();
+                    }
 
                     // Dispose the UIThread singleton.
-                    UIThread.Instance.Dispose();                   
-				}
-			}
-			finally
-			{
+                    UIThread.Instance.Dispose();
+                }
+            }
+            finally
+            {
+                base.Dispose(disposing);
+            }
+        }
 
-				base.Dispose(disposing);
-			}
-		}
-		#endregion
-	}
+        #endregion methods
+    }
 }

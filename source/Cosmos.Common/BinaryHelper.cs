@@ -58,7 +58,6 @@ namespace Cosmos.Common
                 return (UInt32)(data | mask);
         }
 
-
         /// <summary>
         /// Retrieves a byte of data from somewhere inside a 32 bit number. An offset is used to indicate where in
         /// the 32 bit number to start extracting 8 bits.

@@ -1,17 +1,13 @@
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
-
 
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
 namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
-    using System.Diagnostics.SymbolStore;
-
-
     using System;
-    using System.Text;
+    using System.Diagnostics.SymbolStore;
     using System.Runtime.InteropServices;
     using System.Runtime.InteropServices.ComTypes;
 
@@ -62,7 +58,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                                         IStream stream,
                                         [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader retVal);
 
-        // ISymUnmanagedBinder2 methods 
+        // ISymUnmanagedBinder2 methods
         [PreserveSig]
         int GetReaderForFile2(IntPtr importer,
                                   [MarshalAs(UnmanagedType.LPWStr)] String fileName,
@@ -99,7 +95,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                    int searchPolicy,
                    [MarshalAs(UnmanagedType.Interface)] out ISymUnmanagedReader pRetVal);
 
-        // ISymUnmanagedBinder3 methods 
+        // ISymUnmanagedBinder3 methods
         [PreserveSig]
         int GetReaderFromCallback(IntPtr importer,
                                    [MarshalAs(UnmanagedType.LPWStr)] String fileName,
@@ -113,7 +109,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
 
     public class SymbolBinder : ISymbolBinder1, ISymbolBinder2
     {
-        ISymUnmanagedBinder m_binder;
+        private ISymUnmanagedBinder m_binder;
 
         protected static readonly Guid CLSID_CorSymBinder = new Guid("0A29FF9E-7F9C-4437-8B11-F424491E3931");
 
@@ -129,7 +125,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         /// Create a SymbolBinder given the underling COM object for ISymUnmanagedBinder
         /// </summary>
         /// <param name="comBinderObject"></param>
-        /// <remarks>Note that this could be protected, but C# doesn't have a way to express "internal AND 
+        /// <remarks>Note that this could be protected, but C# doesn't have a way to express "internal AND
         /// protected", just "internal OR protected"</remarks>
         internal SymbolBinder(ISymUnmanagedBinder comBinderObject)
         {
@@ -275,7 +271,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             // this from the programmer.
             // You may get 0x806D0014 if the pdb is there, but just old (mismatched)
             // Or if you ask for the symbol information on something that's not an assembly.
-            // If that may happen for your application, wrap calls to GetReaderForFile in 
+            // If that may happen for your application, wrap calls to GetReaderForFile in
             // try-catch(COMException) blocks and use the error code in the COMException to report error.
             return false;
         }

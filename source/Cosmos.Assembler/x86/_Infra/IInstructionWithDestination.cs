@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Assembler.x86 {
-    public interface IInstructionWithDestination {
-        Cosmos.Assembler.ElementReference DestinationRef {
+﻿namespace Cosmos.Assembler.x86
+{
+    public interface IInstructionWithDestination
+    {
+        Cosmos.Assembler.ElementReference DestinationRef
+        {
             get;
             set;
         }
@@ -22,12 +20,14 @@ namespace Cosmos.Assembler.x86 {
             set;
         }
 
-        bool DestinationIsIndirect {
+        bool DestinationIsIndirect
+        {
             get;
             set;
         }
 
-        int DestinationDisplacement {
+        int DestinationDisplacement
+        {
             get;
             set;
         }

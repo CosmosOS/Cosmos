@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.IL2CPU.Plugs;
+using System;
 
 namespace Cosmos.IL2CPU.IL.CustomImplementations.System
 {
-    [Plug(Target=typeof(Environment))]
+    [Plug(Target = typeof(Environment))]
     public static class EnvironmentImpl
     {
         [PlugMethod(Signature = "System_Environment_OSName__System_Environment_get_OSInfo__")]
@@ -43,7 +40,5 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System
         {
             return GetResourceFromDefault(aResource);
         }
-
     }
-
 }

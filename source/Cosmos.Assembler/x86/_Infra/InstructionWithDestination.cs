@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace Cosmos.Assembler.x86 {
-    public abstract class InstructionWithDestination : Instruction, IInstructionWithDestination{
+namespace Cosmos.Assembler.x86
+{
+    public abstract class InstructionWithDestination : Instruction, IInstructionWithDestination
+    {
         public InstructionWithDestination()
         {
-            
         }
 
-        public InstructionWithDestination(string mnemonic):base(mnemonic)
+        public InstructionWithDestination(string mnemonic)
+            : base(mnemonic)
         {
-
         }
 
-        public Cosmos.Assembler.ElementReference DestinationRef {
+        public Cosmos.Assembler.ElementReference DestinationRef
+        {
             get;
             set;
         }
@@ -32,12 +31,14 @@ namespace Cosmos.Assembler.x86 {
             set;
         }
 
-        public bool DestinationIsIndirect {
+        public bool DestinationIsIndirect
+        {
             get;
             set;
         }
 
-        public int DestinationDisplacement {
+        public int DestinationDisplacement
+        {
             get;
             set;
         }
@@ -48,24 +49,26 @@ namespace Cosmos.Assembler.x86 {
             set;
         }
 
-        public override bool IsComplete( Cosmos.Assembler.Assembler aAssembler )
+        public override bool IsComplete(Cosmos.Assembler.Assembler aAssembler)
         {
-            if (DestinationRef != null) {
+            if (DestinationRef != null)
+            {
                 ulong xAddress;
                 return base.IsComplete(aAssembler) && DestinationRef.Resolve(aAssembler, out xAddress);
             }
             return base.IsComplete(aAssembler);
         }
 
-        public override void UpdateAddress( Cosmos.Assembler.Assembler aAssembler, ref ulong aAddresss )
+        public override void UpdateAddress(Cosmos.Assembler.Assembler aAssembler, ref ulong aAddresss)
         {
-            if (DestinationRef != null) {
+            if (DestinationRef != null)
+            {
                 DestinationValue = 0xFFFFFFFF;
             }
             base.UpdateAddress(aAssembler, ref aAddresss);
         }
 
-        public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
+        public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
         {
             aOutput.Write(mMnemonic);
             String destination = this.GetDestinationAsString();

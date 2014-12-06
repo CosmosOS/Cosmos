@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using Cosmos.HAL;
-using System;
+﻿using Cosmos.HAL;
+using System.Collections.Generic;
 
 namespace Cosmos.System.Network.IPv4
 {
@@ -103,10 +102,12 @@ namespace Cosmos.System.Network.IPv4
         {
             get { return this.address; }
         }
+
         public Address SubnetMask
         {
             get { return this.subnetMask; }
         }
+
         public Address DefaultGateway
         {
             get { return this.defaultGateway; }

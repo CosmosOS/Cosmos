@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace Cosmos.HAL.Network
 {
@@ -41,7 +40,6 @@ namespace Cosmos.HAL.Network
             bytes[3] = address[3];
             bytes[4] = address[4];
             bytes[5] = address[5];
-
         }
 
         /// <summary>
@@ -66,7 +64,6 @@ namespace Cosmos.HAL.Network
             : this(m.bytes)
         {
         }
-
 
         public bool IsValid()
         {

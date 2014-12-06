@@ -21,6 +21,7 @@ namespace Cosmos.Core
         {
             Port = aPort;
         }
+
         protected IOPortBase(UInt16 aBase, UInt16 aOffset)
         {
             // C# math promotes things to integers, so we have this constructor
@@ -29,13 +30,32 @@ namespace Cosmos.Core
         }
 
         //TODO: Reads and writes can use this to get port instead of argument
-        static protected void Write8(UInt16 aPort, byte aData) { } // Plugged
-        static protected void Write16(UInt16 aPort, UInt16 aData) { } // Plugged
-        static protected void Write32(UInt16 aPort, UInt32 aData) { } // Plugged
+        static protected void Write8(UInt16 aPort, byte aData)
+        {
+        } // Plugged
 
-        static protected byte Read8(UInt16 aPort) { return 0; } // Plugged
-        static protected UInt16 Read16(UInt16 aPort) { return 0; } // Plugged
-        static protected UInt32 Read32(UInt16 aPort) { return 0; } // Plugged
+        static protected void Write16(UInt16 aPort, UInt16 aData)
+        {
+        } // Plugged
+
+        static protected void Write32(UInt16 aPort, UInt32 aData)
+        {
+        } // Plugged
+
+        static protected byte Read8(UInt16 aPort)
+        {
+            return 0;
+        } // Plugged
+
+        static protected UInt16 Read16(UInt16 aPort)
+        {
+            return 0;
+        } // Plugged
+
+        static protected UInt32 Read32(UInt16 aPort)
+        {
+            return 0;
+        } // Plugged
 
         //TODO: Plug these Reads with asm to read directly to RAM
         // REP INSW
@@ -49,6 +69,7 @@ namespace Cosmos.Core
                 aData[i * 2 + 1] = (byte)(xValue >> 8);
             }
         }
+
         public void Read16(UInt16[] aData)
         {
             for (int i = 0; i < aData.Length; i++)
@@ -56,6 +77,7 @@ namespace Cosmos.Core
                 aData[i] = Read16(Port);
             }
         }
+
         public void Read32(UInt32[] aData)
         {
             for (int i = 0; i < aData.Length; i++)
@@ -67,8 +89,15 @@ namespace Cosmos.Core
 
     public class IOPort : IOPortBase
     {
-        public IOPort(UInt16 aPort) : base(aPort) { }
-        public IOPort(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }
+        public IOPort(UInt16 aPort)
+            : base(aPort)
+        {
+        }
+
+        public IOPort(UInt16 aBase, UInt16 aOffset)
+            : base(aBase, aOffset)
+        {
+        }
 
         static public void Wait()
         {
@@ -105,8 +134,15 @@ namespace Cosmos.Core
     // than checking at runtime.
     public class IOPortRead : IOPortBase
     {
-        public IOPortRead(UInt16 aPort) : base(aPort) { }
-        public IOPortRead(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }
+        public IOPortRead(UInt16 aPort)
+            : base(aPort)
+        {
+        }
+
+        public IOPortRead(UInt16 aBase, UInt16 aOffset)
+            : base(aBase, aOffset)
+        {
+        }
 
         public byte Byte
         {
@@ -126,8 +162,15 @@ namespace Cosmos.Core
 
     public class IOPortWrite : IOPortBase
     {
-        public IOPortWrite(UInt16 aPort) : base(aPort) { }
-        public IOPortWrite(UInt16 aBase, UInt16 aOffset) : base(aBase, aOffset) { }
+        public IOPortWrite(UInt16 aPort)
+            : base(aPort)
+        {
+        }
+
+        public IOPortWrite(UInt16 aBase, UInt16 aOffset)
+            : base(aBase, aOffset)
+        {
+        }
 
         public byte Byte
         {
@@ -144,5 +187,4 @@ namespace Cosmos.Core
             set { IOPortBase.Write32(Port, value); }
         }
     }
-
 }

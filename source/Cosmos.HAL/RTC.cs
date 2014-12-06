@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.HAL
+﻿namespace Cosmos.HAL
 {
     /// <summary>
     /// This class represents the Real-Time Clock.
@@ -24,6 +19,7 @@ namespace Cosmos.HAL
             StatusByteB = rtc.Data.Byte;
 
             #region Check 24-Hour Mode
+
             if ((StatusByteB & 0x02) == 0x02)
             {
                 is24HourMode = true;
@@ -32,9 +28,11 @@ namespace Cosmos.HAL
             {
                 is24HourMode = false;
             }
-            #endregion
+
+            #endregion Check 24-Hour Mode
 
             #region Check Binary Mode
+
             if ((StatusByteB & 0x04) == 0x04)
             {
                 // Binary mode.
@@ -44,19 +42,20 @@ namespace Cosmos.HAL
             {
                 isBCDMode = true;
             }
-            #endregion
 
-
+            #endregion Check Binary Mode
         }
 
         /// <summary>
         /// True if the RTC is using BCD mode.
         /// </summary>
         private static bool isBCDMode;
+
         /// <summary>
         /// True if the RTC is using the 24-hour format.
         /// </summary>
         private static bool is24HourMode;
+
         /// <summary>
         /// The value of Status Register B that was read on startup.
         /// </summary>
@@ -103,7 +102,7 @@ namespace Cosmos.HAL
         }
 
         /// <summary>
-        /// The current hour. Please note, this is 
+        /// The current hour. Please note, this is
         /// always in 24-hour format.
         /// </summary>
         public static byte Hour
@@ -252,7 +251,7 @@ namespace Cosmos.HAL
         }
 
         /// <summary>
-        /// The current century. Beware, this may cause issues 
+        /// The current century. Beware, this may cause issues
         /// on computers from before 1995.
         /// </summary>
         public static byte Century
@@ -273,7 +272,7 @@ namespace Cosmos.HAL
         }
 
         /// <summary>
-        /// Converts a BCD coded value to hex coded 
+        /// Converts a BCD coded value to hex coded
         /// </summary>
         /// <param name="value">BCD coded</param>
         /// <returns>Hex coded</returns>

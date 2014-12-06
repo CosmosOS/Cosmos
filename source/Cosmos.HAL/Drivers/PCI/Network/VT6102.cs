@@ -67,7 +67,7 @@
 //            mTxDescriptors = new ManagedMemorySpace(256, 16);
 
 //            /* Initialize the RX and TX buffers, and set up the RX  descriptors to point
-//               to the buffers. Also, mark the RX descriptors as being owned by the card so data 
+//               to the buffers. Also, mark the RX descriptors as being owned by the card so data
 //               can be received in them */
 //            mRxBuffers = new List<ManagedMemorySpace>();
 //            for (uint rxd = 0; rxd < 16; rxd++)

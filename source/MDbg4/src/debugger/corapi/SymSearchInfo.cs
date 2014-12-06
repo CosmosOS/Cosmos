@@ -1,20 +1,16 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 
-
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-namespace Microsoft.Samples.Debugging.CorSymbolStore 
+namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
-    using System.Diagnostics.SymbolStore;
-
     // Interface does not need to be marked with the serializable attribute
     using System;
-    using System.Text;
     using System.Runtime.InteropServices;
-    using System.Runtime.InteropServices.ComTypes;
+    using System.Text;
 
     [
         ComImport,
@@ -22,7 +18,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
         ComVisible(false)
     ]
-    internal interface ISymUnmanagedSymbolSearchInfo 
+    internal interface ISymUnmanagedSymbolSearchInfo
     {
         void GetSearchPathLength(out int pcchPath);
 
@@ -35,16 +31,16 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
 
     internal class SymSymbolSearchInfo : ISymbolSearchInfo
     {
-        ISymUnmanagedSymbolSearchInfo m_target;
+        private ISymUnmanagedSymbolSearchInfo m_target;
 
         public SymSymbolSearchInfo(ISymUnmanagedSymbolSearchInfo target)
         {
             m_target = target;
         }
-        
+
         public int SearchPathLength
         {
-            get 
+            get
             {
                 int length;
                 m_target.GetSearchPathLength(out length);
@@ -54,7 +50,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
 
         public String SearchPath
         {
-            get 
+            get
             {
                 int length;
                 m_target.GetSearchPath(0, out length, null);
@@ -66,13 +62,12 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
 
         public int HResult
         {
-            get 
+            get
             {
                 int hr;
                 m_target.GetHRESULT(out hr);
                 return hr;
             }
-         }
-      }
-
+        }
+    }
 }

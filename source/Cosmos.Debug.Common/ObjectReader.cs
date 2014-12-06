@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Data;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Data;
 using System.Reflection.Emit;
 
 namespace Cosmos.Debug.Common
 {
-    public class ObjectReader<T>: IDataReader
+    public class ObjectReader<T> : IDataReader
     {
         private static readonly ConcurrentDictionary<string, Tuple<string[], Func<object, object>[]>> mInfo = new ConcurrentDictionary<string, Tuple<string[], Func<object, object>[]>>();
-        
+
         private readonly T[] mItems;
         private int mCurrentIndex = -1;
+
         // -1 is before first read, -2 is closed
         public ObjectReader(T[] items)
         {

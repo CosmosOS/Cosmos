@@ -58,7 +58,7 @@ namespace Cosmos.IL2CPU.X86.IL
                                 new CPUx86.x87.IntLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
                                 new CPUx86.SSE.ConvertSD2SS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
                                 new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 32, DestinationIsIndirect = true };
-                                
+
                                 //throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_R4.cs->Conversion of Int64 to Float is not yet implemented!");
                             }
                             else

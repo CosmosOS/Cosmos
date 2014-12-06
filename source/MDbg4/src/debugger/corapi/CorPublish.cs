@@ -1,13 +1,13 @@
+using Microsoft.Samples.Debugging.CorPublish.NativeApi;
+
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
 using System.Collections;
 using System.Text;
-
-using Microsoft.Samples.Debugging.CorPublish.NativeApi;
 
 namespace Microsoft.Samples.Debugging.CorPublish
 {
@@ -21,17 +21,16 @@ namespace Microsoft.Samples.Debugging.CorPublish
         public IEnumerable EnumProcesses()
         {
             ICorPublishProcessEnum pIEnum;
-            m_publish.EnumProcesses(COR_PUB_ENUMPROCESS.COR_PUB_MANAGEDONLY,out pIEnum);
-            return (pIEnum==null)?null:new CorPublishProcessEnumerator(pIEnum);
+            m_publish.EnumProcesses(COR_PUB_ENUMPROCESS.COR_PUB_MANAGEDONLY, out pIEnum);
+            return (pIEnum == null) ? null : new CorPublishProcessEnumerator(pIEnum);
         }
 
         public CorPublishProcess GetProcess(int pid)
         {
             ICorPublishProcess proc;
-            m_publish.GetProcess((uint)pid,out proc);
-            return (proc==null)?null:new CorPublishProcess(proc);
+            m_publish.GetProcess((uint)pid, out proc);
+            return (proc == null) ? null : new CorPublishProcess(proc);
         }
-        
 
         private ICorPublish m_publish;
     }
@@ -47,7 +46,7 @@ namespace Microsoft.Samples.Debugging.CorPublish
         {
             ICorPublishAppDomainEnum pIEnum;
             m_process.EnumAppDomains(out pIEnum);
-            return (pIEnum==null)?null:new CorPublishAppDomainEnumerator(pIEnum);
+            return (pIEnum == null) ? null : new CorPublishAppDomainEnumerator(pIEnum);
         }
 
         public string DisplayName
@@ -61,7 +60,7 @@ namespace Microsoft.Samples.Debugging.CorPublish
                 return szName.ToString();
             }
         }
-        
+
         public int ProcessId
         {
             get
@@ -78,14 +77,14 @@ namespace Microsoft.Samples.Debugging.CorPublish
             {
                 int bManaged;
                 m_process.IsManaged(out bManaged);
-                return (bManaged!=0);
+                return (bManaged != 0);
             }
         }
 
         private ICorPublishProcess m_process;
     }
-    
-    internal class CorPublishProcessEnumerator : 
+
+    internal class CorPublishProcessEnumerator :
         IEnumerable, IEnumerator, ICloneable
     {
         internal CorPublishProcessEnumerator(ICorPublishProcessEnum e)
@@ -96,17 +95,17 @@ namespace Microsoft.Samples.Debugging.CorPublish
         //
         // ICloneable interface
         //
-        public Object Clone ()
+        public Object Clone()
         {
             ICorPublishEnum clone = null;
-            m_enum.Clone (out clone);
+            m_enum.Clone(out clone);
             return new CorPublishProcessEnumerator((ICorPublishProcessEnum)clone);
         }
 
         //
         // IEnumerable interface
         //
-        public IEnumerator GetEnumerator ()
+        public IEnumerator GetEnumerator()
         {
             return this;
         }
@@ -114,19 +113,19 @@ namespace Microsoft.Samples.Debugging.CorPublish
         //
         // IEnumerator interface
         //
-        public bool MoveNext ()
+        public bool MoveNext()
         {
             ICorPublishProcess a;
             uint c = 0;
-            int r = m_enum.Next ((uint) 1,out a, out c);
-            if (r==0 && c==1) // S_OK && we got 1 new element
+            int r = m_enum.Next((uint)1, out a, out c);
+            if (r == 0 && c == 1) // S_OK && we got 1 new element
                 m_proc = new CorPublishProcess(a);
             else
                 m_proc = null;
             return m_proc != null;
         }
 
-        public void Reset ()
+        public void Reset()
         {
             m_enum.Reset();
             m_proc = null;
@@ -166,9 +165,9 @@ namespace Microsoft.Samples.Debugging.CorPublish
             get
             {
                 uint size;
-                m_appDomain.GetName(0,out size, null);
+                m_appDomain.GetName(0, out size, null);
                 StringBuilder szName = new StringBuilder((int)size);
-                m_appDomain.GetName((uint)szName.Capacity,out size, szName);
+                m_appDomain.GetName((uint)szName.Capacity, out size, szName);
                 return szName.ToString();
             }
         }
@@ -176,8 +175,7 @@ namespace Microsoft.Samples.Debugging.CorPublish
         private ICorPublishAppDomain m_appDomain;
     }
 
-
-    internal class CorPublishAppDomainEnumerator : 
+    internal class CorPublishAppDomainEnumerator :
         IEnumerable, IEnumerator, ICloneable
     {
         internal CorPublishAppDomainEnumerator(ICorPublishAppDomainEnum appDomainEnumerator)
@@ -188,17 +186,17 @@ namespace Microsoft.Samples.Debugging.CorPublish
         //
         // ICloneable interface
         //
-        public Object Clone ()
+        public Object Clone()
         {
             ICorPublishEnum clone = null;
-            m_enum.Clone (out clone);
+            m_enum.Clone(out clone);
             return new CorPublishAppDomainEnumerator((ICorPublishAppDomainEnum)clone);
         }
 
         //
         // IEnumerable interface
         //
-        public IEnumerator GetEnumerator ()
+        public IEnumerator GetEnumerator()
         {
             return this;
         }
@@ -206,19 +204,19 @@ namespace Microsoft.Samples.Debugging.CorPublish
         //
         // IEnumerator interface
         //
-        public bool MoveNext ()
+        public bool MoveNext()
         {
             ICorPublishAppDomain a;
             uint c = 0;
-            int r = m_enum.Next ((uint) 1, out a, out c);
-            if (r==0 && c==1) // S_OK && we got 1 new element
+            int r = m_enum.Next((uint)1, out a, out c);
+            if (r == 0 && c == 1) // S_OK && we got 1 new element
                 m_appDomain = new CorPublishAppDomain(a);
             else
                 m_appDomain = null;
             return m_appDomain != null;
         }
 
-        public void Reset ()
+        public void Reset()
         {
             m_enum.Reset();
             m_appDomain = null;

@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.IL2CPU.Plugs;
+using System;
 
 namespace Cosmos.IL2CPU.CustomImplementation.System
 {
     [Plug(Target = typeof(String))]
     public static class StringImpl
     {
-
         public static string Format(IFormatProvider aFormatProvider, string aFormat, object[] aArgs)
         {
             string[] xStrings = new string[1 + 2 + (aArgs.Length * 7) - 1];
@@ -38,36 +33,44 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
             Console.WriteLine("String.StartsWith not working!");
             throw new NotImplementedException();
         }
+
         //String concatenation plugs
         public static string Concat(string str0, string str1, string str2)
         {
             return ConcatArray(new string[] { str0, str1, str2 }, str0.Length + str1.Length + str2.Length);
         }
+
         public static string Concat(string str0, string str1)
         {
             return ConcatArray(new string[] { str0, str1 }, str0.Length + str1.Length);
         }
+
         public static string Concat(string str0, string str1, string str2, string str3)
         {
             return ConcatArray(new string[] { str0, str1, str2, str3 }, str0.Length + str1.Length + str2.Length + str3.Length);
         }
+
         //Object concatenation plugs
         public static string Concat(object obj0)
         {
             return obj0.ToString();
         }
+
         public static string Concat(object obj0, object obj1)
         {
             return Concat(obj0.ToString(), obj1.ToString());
         }
+
         public static string Concat(object obj0, object obj1, object obj2)
         {
             return Concat(obj0.ToString(), obj1.ToString(), obj2.ToString());
         }
+
         public static string Concat(object obj0, object obj1, object obj2, object obj3)
         {
             return Concat(obj0.ToString(), obj1.ToString(), obj2.ToString(), obj3.ToString());
         }
+
         //Array concatenation plugs
         public static string Concat(params string[] values)
         {
@@ -78,6 +81,7 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
             }
             return ConcatArray(values, len);
         }
+
         public static string Concat(params object[] args)
         {
             string[] values = new string[args.Length];
@@ -87,9 +91,9 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
             }
             return Concat(values);
         }
+
         public static string ConcatArray(string[] values, int totalLength)
         {
-
             char[] xResult = new char[totalLength];
             int xCurPos = 0;
             for (int i = 0; i < values.Length; i++)
@@ -241,6 +245,7 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
             }
             return badShift;
         }
+
         private static int boyerMooreHorsepool(String pattern, String text)
         {
             char[] needle = pattern.ToCharArray();
@@ -342,6 +347,5 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
         //        }
         //    }
         //}
-
     }
 }

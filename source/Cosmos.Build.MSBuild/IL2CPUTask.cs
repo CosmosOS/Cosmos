@@ -1,29 +1,20 @@
 ﻿using Cosmos.Build.Common;
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
-using Cosmos.IL2CPU.X86;
+using Cosmos.Debug.Common;
 using Cosmos.IL2CPU;
-using Microsoft.Win32;
-using Microsoft.Build.Utilities;
 using Microsoft.Build.Framework;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Data;
-using System.Configuration;
-using System.Data.SQLite;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Text;
-using Cosmos.Debug.Common;
 
 namespace Cosmos.Build.MSBuild
 {
     // http://blogs.msdn.com/b/visualstudio/archive/2010/07/06/debugging-msbuild-script-with-visual-studio.aspx
     public class IL2CPUTask
     {
-        const string FULLASSEMBLYNAME_KERNEL = "Cosmos.System.Kernel";
+        private const string FULLASSEMBLYNAME_KERNEL = "Cosmos.System.Kernel";
 
         public Action<string> OnLogMessage;
         public Action<string> OnLogError;
@@ -32,13 +23,21 @@ namespace Cosmos.Build.MSBuild
         protected static Action<string> mStaticLog = null;
 
         public string DebugMode { get; set; }
+
         public string TraceAssemblies { get; set; }
+
         public byte DebugCom { get; set; }
+
         public bool UseNAsm { get; set; }
+
         public ITaskItem[] References { get; set; }
+
         public string OutputFilename { get; set; }
+
         public bool EnableLogging { get; set; }
+
         public bool EmitDebugSymbols { get; set; }
+
         public bool IgnoreDebugStubAttribute { get; set; }
 
         protected void LogMessage(string aMsg)
@@ -74,7 +73,8 @@ namespace Cosmos.Build.MSBuild
         }
 
         protected static List<string> mSearchDirs = new List<string>();
-        static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+
+        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             var xShortName = args.Name;
             if (xShortName.Contains(','))
@@ -136,13 +136,13 @@ namespace Cosmos.Build.MSBuild
             mSearchDirs.Add(CosmosPaths.Kernel);
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
 
-            // This seems to be to try to load plugs on demand from their own dirs, but 
-            // it often just causes load conflicts, and weird errors like "implementation not found" 
+            // This seems to be to try to load plugs on demand from their own dirs, but
+            // it often just causes load conflicts, and weird errors like "implementation not found"
             // for a method, even when both the output user kit dir and local bin dir have up to date
-            // and same assemblies. 
-            // So its removed for now and we should find a better way to dynamically load plugs in 
+            // and same assemblies.
+            // So its removed for now and we should find a better way to dynamically load plugs in
             // future.
-            // Furthermore, it only scanned plugs/asms reffed from the boot proj, not the kernel proj 
+            // Furthermore, it only scanned plugs/asms reffed from the boot proj, not the kernel proj
             // so it was bugged there too.
             //if (References != null) {
             //  foreach (var xRef in References) {
@@ -243,7 +243,7 @@ namespace Cosmos.Build.MSBuild
 
                             AppAssemblerRingsCheck.Execute(xScanner);
 
-                            using (var xOut = new StreamWriter(OutputFilename, false, Encoding.ASCII , 128*1024))
+                            using (var xOut = new StreamWriter(OutputFilename, false, Encoding.ASCII, 128 * 1024))
                             {
                                 //if (EmitDebugSymbols) {
                                 xAsm.Assembler.FlushText(xOut);

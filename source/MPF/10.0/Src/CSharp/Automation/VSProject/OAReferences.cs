@@ -9,249 +9,256 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio.Shell.Interop;
 using VSLangProj;
-using ErrorHandler = Microsoft.VisualStudio.ErrorHandler;
 
 namespace Microsoft.VisualStudio.Project.Automation
 {
-	/// <summary>
-	/// Represents the automation object for the equivalent ReferenceContainerNode object
-	/// </summary>
-	[SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
-	[ComVisible(true)]
-	public class OAReferences : ConnectionPointContainer,
-								IEventSource<_dispReferencesEvents>,
-								References,
-								ReferencesEvents
-	{
-		private ReferenceContainerNode container;
-		public OAReferences(ReferenceContainerNode containerNode)
-		{
-			container = containerNode;
-			AddEventSource<_dispReferencesEvents>(this as IEventSource<_dispReferencesEvents>);
-			container.OnChildAdded += new EventHandler<HierarchyNodeEventArgs>(OnReferenceAdded);
-			container.OnChildRemoved += new EventHandler<HierarchyNodeEventArgs>(OnReferenceRemoved);
-		}
+    /// <summary>
+    /// Represents the automation object for the equivalent ReferenceContainerNode object
+    /// </summary>
+    [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix")]
+    [ComVisible(true)]
+    public class OAReferences : ConnectionPointContainer,
+                                IEventSource<_dispReferencesEvents>,
+                                References,
+                                ReferencesEvents
+    {
+        private ReferenceContainerNode container;
 
-		#region Private Members
-		private Reference AddFromSelectorData(VSCOMPONENTSELECTORDATA selector, string wrapperTool = null)
-		{
-			ReferenceNode refNode = container.AddReferenceFromSelectorData(selector, wrapperTool);
-			if(null == refNode)
-			{
-				return null;
-			}
+        public OAReferences(ReferenceContainerNode containerNode)
+        {
+            container = containerNode;
+            AddEventSource<_dispReferencesEvents>(this as IEventSource<_dispReferencesEvents>);
+            container.OnChildAdded += new EventHandler<HierarchyNodeEventArgs>(OnReferenceAdded);
+            container.OnChildRemoved += new EventHandler<HierarchyNodeEventArgs>(OnReferenceRemoved);
+        }
 
-			return refNode.Object as Reference;
-		}
+        #region Private Members
 
-		private Reference FindByName(string stringIndex)
-		{
-			foreach(Reference refNode in this)
-			{
-				if(0 == string.Compare(refNode.Name, stringIndex, StringComparison.Ordinal))
-				{
-					return refNode;
-				}
-			}
-			return null;
-		}
-		#endregion
+        private Reference AddFromSelectorData(VSCOMPONENTSELECTORDATA selector, string wrapperTool = null)
+        {
+            ReferenceNode refNode = container.AddReferenceFromSelectorData(selector, wrapperTool);
+            if (null == refNode)
+            {
+                return null;
+            }
 
-		#region References Members
+            return refNode.Object as Reference;
+        }
 
-		public Reference Add(string bstrPath)
-		{
-			if(string.IsNullOrEmpty(bstrPath))
-			{
-				return null;
-			}
-			VSCOMPONENTSELECTORDATA selector = new VSCOMPONENTSELECTORDATA();
-			selector.type = VSCOMPONENTTYPE.VSCOMPONENTTYPE_File;
-			selector.bstrFile = bstrPath;
+        private Reference FindByName(string stringIndex)
+        {
+            foreach (Reference refNode in this)
+            {
+                if (0 == string.Compare(refNode.Name, stringIndex, StringComparison.Ordinal))
+                {
+                    return refNode;
+                }
+            }
+            return null;
+        }
 
-			return AddFromSelectorData(selector);
-		}
+        #endregion Private Members
 
-		public Reference AddActiveX(string bstrTypeLibGuid, int lMajorVer, int lMinorVer, int lLocaleId, string bstrWrapperTool)
-		{
-			VSCOMPONENTSELECTORDATA selector = new VSCOMPONENTSELECTORDATA();
-			selector.type = VSCOMPONENTTYPE.VSCOMPONENTTYPE_Com2;
-			selector.guidTypeLibrary = new Guid(bstrTypeLibGuid);
-			selector.lcidTypeLibrary = (uint)lLocaleId;
-			selector.wTypeLibraryMajorVersion = (ushort)lMajorVer;
-			selector.wTypeLibraryMinorVersion = (ushort)lMinorVer;
+        #region References Members
 
-			return AddFromSelectorData(selector, bstrWrapperTool);
-		}
+        public Reference Add(string bstrPath)
+        {
+            if (string.IsNullOrEmpty(bstrPath))
+            {
+                return null;
+            }
+            VSCOMPONENTSELECTORDATA selector = new VSCOMPONENTSELECTORDATA();
+            selector.type = VSCOMPONENTTYPE.VSCOMPONENTTYPE_File;
+            selector.bstrFile = bstrPath;
 
-		public Reference AddProject(EnvDTE.Project project)
-		{
-			if(null == project)
-			{
-				return null;
-			}
-			// Get the soulution.
-			IVsSolution solution = container.ProjectMgr.Site.GetService(typeof(SVsSolution)) as IVsSolution;
-			if(null == solution)
-			{
-				return null;
-			}
+            return AddFromSelectorData(selector);
+        }
 
-			// Get the hierarchy for this project.
-			IVsHierarchy projectHierarchy;
-			ErrorHandler.ThrowOnFailure(solution.GetProjectOfUniqueName(project.UniqueName, out projectHierarchy));
+        public Reference AddActiveX(string bstrTypeLibGuid, int lMajorVer, int lMinorVer, int lLocaleId, string bstrWrapperTool)
+        {
+            VSCOMPONENTSELECTORDATA selector = new VSCOMPONENTSELECTORDATA();
+            selector.type = VSCOMPONENTTYPE.VSCOMPONENTTYPE_Com2;
+            selector.guidTypeLibrary = new Guid(bstrTypeLibGuid);
+            selector.lcidTypeLibrary = (uint)lLocaleId;
+            selector.wTypeLibraryMajorVersion = (ushort)lMajorVer;
+            selector.wTypeLibraryMinorVersion = (ushort)lMinorVer;
 
-			// Create the selector data.
-			VSCOMPONENTSELECTORDATA selector = new VSCOMPONENTSELECTORDATA();
-			selector.type = VSCOMPONENTTYPE.VSCOMPONENTTYPE_Project;
+            return AddFromSelectorData(selector, bstrWrapperTool);
+        }
 
-			// Get the project reference string.
-			ErrorHandler.ThrowOnFailure(solution.GetProjrefOfProject(projectHierarchy, out selector.bstrProjRef));
+        public Reference AddProject(EnvDTE.Project project)
+        {
+            if (null == project)
+            {
+                return null;
+            }
+            // Get the soulution.
+            IVsSolution solution = container.ProjectMgr.Site.GetService(typeof(SVsSolution)) as IVsSolution;
+            if (null == solution)
+            {
+                return null;
+            }
 
-			selector.bstrTitle = project.Name;
-			selector.bstrFile = System.IO.Path.GetDirectoryName(project.FullName);
+            // Get the hierarchy for this project.
+            IVsHierarchy projectHierarchy;
+            ErrorHandler.ThrowOnFailure(solution.GetProjectOfUniqueName(project.UniqueName, out projectHierarchy));
 
-			return AddFromSelectorData(selector);
-		}
+            // Create the selector data.
+            VSCOMPONENTSELECTORDATA selector = new VSCOMPONENTSELECTORDATA();
+            selector.type = VSCOMPONENTTYPE.VSCOMPONENTTYPE_Project;
 
-		public EnvDTE.Project ContainingProject
-		{
-			get
-			{
-				return container.ProjectMgr.GetAutomationObject() as EnvDTE.Project;
-			}
-		}
+            // Get the project reference string.
+            ErrorHandler.ThrowOnFailure(solution.GetProjrefOfProject(projectHierarchy, out selector.bstrProjRef));
 
-		public int Count
-		{
-			get
-			{
-				return container.EnumReferences().Count;
-			}
-		}
+            selector.bstrTitle = project.Name;
+            selector.bstrFile = System.IO.Path.GetDirectoryName(project.FullName);
 
-		public EnvDTE.DTE DTE
-		{
-			get
-			{
-				return container.ProjectMgr.Site.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
-			}
-		}
+            return AddFromSelectorData(selector);
+        }
 
-		public Reference Find(string bstrIdentity)
-		{
-			if(string.IsNullOrEmpty(bstrIdentity))
-			{
-				return null;
-			}
-			foreach(Reference refNode in this)
-			{
-				if(null != refNode)
-				{
-					if(0 == string.Compare(bstrIdentity, refNode.Identity, StringComparison.Ordinal))
-					{
-						return refNode;
-					}
-				}
-			}
-			return null;
-		}
+        public EnvDTE.Project ContainingProject
+        {
+            get
+            {
+                return container.ProjectMgr.GetAutomationObject() as EnvDTE.Project;
+            }
+        }
 
-		public IEnumerator GetEnumerator()
-		{
-			List<Reference> references = new List<Reference>();
-			IEnumerator baseEnum = container.EnumReferences().GetEnumerator();
-			if(null == baseEnum)
-			{
-				return references.GetEnumerator();
-			}
-			while(baseEnum.MoveNext())
-			{
-				ReferenceNode refNode = baseEnum.Current as ReferenceNode;
-				if(null == refNode)
-				{
-					continue;
-				}
-				Reference reference = refNode.Object as Reference;
-				if(null != reference)
-				{
-					references.Add(reference);
-				}
-			}
-			return references.GetEnumerator();
-		}
+        public int Count
+        {
+            get
+            {
+                return container.EnumReferences().Count;
+            }
+        }
 
-		public Reference Item(object index)
-		{
-			string stringIndex = index as string;
-			if(null != stringIndex)
-			{
-				return FindByName(stringIndex);
-			}
-			// Note that this cast will throw if the index is not convertible to int.
-			int intIndex = (int)index;
-			IList<ReferenceNode> refs = container.EnumReferences();
-			if(null == refs)
-			{
-				throw new ArgumentOutOfRangeException("index");
-			}
-			if((intIndex <= 0) || (intIndex > refs.Count))
-			{
-				throw new ArgumentOutOfRangeException("index");
-			}
-			// Let the implementation of IList<> throw in case of index not correct.
-			return refs[intIndex - 1].Object as Reference;
-		}
+        public EnvDTE.DTE DTE
+        {
+            get
+            {
+                return container.ProjectMgr.Site.GetService(typeof(EnvDTE.DTE)) as EnvDTE.DTE;
+            }
+        }
 
-		public object Parent
-		{
-			get
-			{
-				return container.Parent.Object;
-			}
-		}
+        public Reference Find(string bstrIdentity)
+        {
+            if (string.IsNullOrEmpty(bstrIdentity))
+            {
+                return null;
+            }
+            foreach (Reference refNode in this)
+            {
+                if (null != refNode)
+                {
+                    if (0 == string.Compare(bstrIdentity, refNode.Identity, StringComparison.Ordinal))
+                    {
+                        return refNode;
+                    }
+                }
+            }
+            return null;
+        }
 
-		#endregion
+        public IEnumerator GetEnumerator()
+        {
+            List<Reference> references = new List<Reference>();
+            IEnumerator baseEnum = container.EnumReferences().GetEnumerator();
+            if (null == baseEnum)
+            {
+                return references.GetEnumerator();
+            }
+            while (baseEnum.MoveNext())
+            {
+                ReferenceNode refNode = baseEnum.Current as ReferenceNode;
+                if (null == refNode)
+                {
+                    continue;
+                }
+                Reference reference = refNode.Object as Reference;
+                if (null != reference)
+                {
+                    references.Add(reference);
+                }
+            }
+            return references.GetEnumerator();
+        }
 
-		#region _dispReferencesEvents_Event Members
-		public event _dispReferencesEvents_ReferenceAddedEventHandler ReferenceAdded;
-		public event _dispReferencesEvents_ReferenceChangedEventHandler ReferenceChanged;
-		public event _dispReferencesEvents_ReferenceRemovedEventHandler ReferenceRemoved;
-		#endregion
+        public Reference Item(object index)
+        {
+            string stringIndex = index as string;
+            if (null != stringIndex)
+            {
+                return FindByName(stringIndex);
+            }
+            // Note that this cast will throw if the index is not convertible to int.
+            int intIndex = (int)index;
+            IList<ReferenceNode> refs = container.EnumReferences();
+            if (null == refs)
+            {
+                throw new ArgumentOutOfRangeException("index");
+            }
+            if ((intIndex <= 0) || (intIndex > refs.Count))
+            {
+                throw new ArgumentOutOfRangeException("index");
+            }
+            // Let the implementation of IList<> throw in case of index not correct.
+            return refs[intIndex - 1].Object as Reference;
+        }
 
-		#region Callbacks for the HierarchyNode events
-		private void OnReferenceAdded(object sender, HierarchyNodeEventArgs args)
-		{
-			// Validate the parameters.
-			if((container != sender as ReferenceContainerNode) ||
-				(null == args) || (null == args.Child))
-			{
-				return;
-			}
+        public object Parent
+        {
+            get
+            {
+                return container.Parent.Object;
+            }
+        }
 
-			// Check if there is any sink for this event.
-			if(null == ReferenceAdded)
-			{
-				return;
-			}
+        #endregion References Members
 
-			// Check that the removed item implements the Reference interface.
-			Reference reference = args.Child.Object as Reference;
-			if(null != reference)
-			{
-				ReferenceAdded(reference);
-			}
-		}
+        #region _dispReferencesEvents_Event Members
+
+        public event _dispReferencesEvents_ReferenceAddedEventHandler ReferenceAdded;
+
+        public event _dispReferencesEvents_ReferenceChangedEventHandler ReferenceChanged;
+
+        public event _dispReferencesEvents_ReferenceRemovedEventHandler ReferenceRemoved;
+
+        #endregion _dispReferencesEvents_Event Members
+
+        #region Callbacks for the HierarchyNode events
+
+        private void OnReferenceAdded(object sender, HierarchyNodeEventArgs args)
+        {
+            // Validate the parameters.
+            if ((container != sender as ReferenceContainerNode) ||
+                (null == args) || (null == args.Child))
+            {
+                return;
+            }
+
+            // Check if there is any sink for this event.
+            if (null == ReferenceAdded)
+            {
+                return;
+            }
+
+            // Check that the removed item implements the Reference interface.
+            Reference reference = args.Child.Object as Reference;
+            if (null != reference)
+            {
+                ReferenceAdded(reference);
+            }
+        }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode",
-            Justification="Support for this has not yet been added")]
+            Justification = "Support for this has not yet been added")]
         private void OnReferenceChanged(object sender, HierarchyNodeEventArgs args)
         {
             // Validate the parameters.
@@ -274,45 +281,48 @@ namespace Microsoft.VisualStudio.Project.Automation
                 ReferenceChanged(reference);
             }
         }
-        
+
         private void OnReferenceRemoved(object sender, HierarchyNodeEventArgs args)
-		{
-			// Validate the parameters.
-			if((container != sender as ReferenceContainerNode) ||
-				(null == args) || (null == args.Child))
-			{
-				return;
-			}
+        {
+            // Validate the parameters.
+            if ((container != sender as ReferenceContainerNode) ||
+                (null == args) || (null == args.Child))
+            {
+                return;
+            }
 
-			// Check if there is any sink for this event.
-			if(null == ReferenceRemoved)
-			{
-				return;
-			}
+            // Check if there is any sink for this event.
+            if (null == ReferenceRemoved)
+            {
+                return;
+            }
 
-			// Check that the removed item implements the Reference interface.
-			Reference reference = args.Child.Object as Reference;
-			if(null != reference)
-			{
-				ReferenceRemoved(reference);
-			}
-		}
-		#endregion
+            // Check that the removed item implements the Reference interface.
+            Reference reference = args.Child.Object as Reference;
+            if (null != reference)
+            {
+                ReferenceRemoved(reference);
+            }
+        }
 
-		#region IEventSource<_dispReferencesEvents> Members
-		void IEventSource<_dispReferencesEvents>.OnSinkAdded(_dispReferencesEvents sink)
-		{
-			ReferenceAdded += new _dispReferencesEvents_ReferenceAddedEventHandler(sink.ReferenceAdded);
-			ReferenceChanged += new _dispReferencesEvents_ReferenceChangedEventHandler(sink.ReferenceChanged);
-			ReferenceRemoved += new _dispReferencesEvents_ReferenceRemovedEventHandler(sink.ReferenceRemoved);
-		}
+        #endregion Callbacks for the HierarchyNode events
 
-		void IEventSource<_dispReferencesEvents>.OnSinkRemoved(_dispReferencesEvents sink)
-		{
-			ReferenceAdded -= new _dispReferencesEvents_ReferenceAddedEventHandler(sink.ReferenceAdded);
-			ReferenceChanged -= new _dispReferencesEvents_ReferenceChangedEventHandler(sink.ReferenceChanged);
-			ReferenceRemoved -= new _dispReferencesEvents_ReferenceRemovedEventHandler(sink.ReferenceRemoved);
-		}
-		#endregion
-	}
+        #region IEventSource<_dispReferencesEvents> Members
+
+        void IEventSource<_dispReferencesEvents>.OnSinkAdded(_dispReferencesEvents sink)
+        {
+            ReferenceAdded += new _dispReferencesEvents_ReferenceAddedEventHandler(sink.ReferenceAdded);
+            ReferenceChanged += new _dispReferencesEvents_ReferenceChangedEventHandler(sink.ReferenceChanged);
+            ReferenceRemoved += new _dispReferencesEvents_ReferenceRemovedEventHandler(sink.ReferenceRemoved);
+        }
+
+        void IEventSource<_dispReferencesEvents>.OnSinkRemoved(_dispReferencesEvents sink)
+        {
+            ReferenceAdded -= new _dispReferencesEvents_ReferenceAddedEventHandler(sink.ReferenceAdded);
+            ReferenceChanged -= new _dispReferencesEvents_ReferenceChangedEventHandler(sink.ReferenceChanged);
+            ReferenceRemoved -= new _dispReferencesEvents_ReferenceRemovedEventHandler(sink.ReferenceRemoved);
+        }
+
+        #endregion IEventSource<_dispReferencesEvents> Members
+    }
 }

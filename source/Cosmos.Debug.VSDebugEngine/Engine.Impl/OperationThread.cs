@@ -1,31 +1,29 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
     public delegate void Operation();
 
-    // This object represents the debugger poll thread to the managed portion of the engine. It allows the engine to perform 
+    // This object represents the debugger poll thread to the managed portion of the engine. It allows the engine to perform
     // operations on the poll thread. This is required because the Win32 debugging API requires thread affinity for several operations.
     public class WorkerThread : IDisposable
     {
-        readonly ManualResetEvent m_opSet;
-        readonly ManualResetEvent m_opComplete;
-        readonly Operation m_quitOperation;
+        private readonly ManualResetEvent m_opSet;
+        private readonly ManualResetEvent m_opComplete;
+        private readonly Operation m_quitOperation;
 
-        Operation m_op;
-        bool m_fSyncOp;
-        Exception m_opException;
+        private Operation m_op;
+        private bool m_fSyncOp;
+        private Exception m_opException;
         //DebuggedProcess m_debuggedProcess;
-        
+
         public WorkerThread()
         {
             m_opSet = new ManualResetEvent(false);
             m_opComplete = new ManualResetEvent(true);
             m_quitOperation = new Operation(delegate() { });
-            
+
             Thread thread = new Thread(new ThreadStart(ThreadFunc));
             thread.Start();
         }
@@ -70,9 +68,9 @@ namespace Cosmos.Debug.VSDebugEngine
             }
         }
 
-        bool TrySetOperationInternal(Operation op, bool fSyncOp)
+        private bool TrySetOperationInternal(Operation op, bool fSyncOp)
         {
-            lock(this)
+            lock (this)
             {
                 if (m_op == null)
                 {
@@ -108,8 +106,8 @@ namespace Cosmos.Debug.VSDebugEngine
             }
 
             return false;
-        }          
-        
+        }
+
         // Thread routine for the poll loop. It handles calls coming in from the debug engine as well as polling for debug events.
         private void ThreadFunc()
         {

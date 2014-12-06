@@ -9,8 +9,6 @@
 //namespace Cosmos.System.Plugs.System.IO {
 //    [Plug(Target=typeof(Path))]
 //    public static class PathImpl {
-
-
 //        /// <summary>
 //        /// Get the directory part of a path to a file. No trailing slash in returned string.
 //        /// </summary>
@@ -31,12 +29,11 @@
 //                return aPath;
 //            }
 //            return aPath.Substring(0, xIndex);
-//            */ 
+//            */
 //        }
 
 //        public static void Cctor()
 //        {
-            
 //        }
 
 //        //public static string GetFileName(string aPath)
@@ -82,7 +79,7 @@
 //        {
 //            if (aPath.IsRelativePath())
 //                return Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + aPath;
-//            else 
+//            else
 //                return aPath.TrimEnd(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
 //        }
 

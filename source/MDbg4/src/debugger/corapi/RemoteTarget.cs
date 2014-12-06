@@ -1,20 +1,19 @@
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
-using System.Text;
 using System.Runtime.InteropServices;
-
-using Microsoft.Samples.Debugging.CorDebug.NativeApi;
 
 namespace Microsoft.Samples.Debugging.CorDebug
 {
     public sealed class CorRemoteTarget : ICorDebugRemoteTarget
     {
         private string m_hostName;
-        
+
         public CorRemoteTarget(string hostName)
         {
             m_hostName = hostName;
@@ -28,7 +27,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 throw new ArgumentException();
             }
 
-            // This function is expected to be called by a native caller, which expects the number of 
+            // This function is expected to be called by a native caller, which expects the number of
             // characters to include the null character.
             pcchHostName = (uint)m_hostName.Length + 1;
 

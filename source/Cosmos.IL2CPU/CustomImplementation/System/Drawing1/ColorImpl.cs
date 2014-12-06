@@ -1,13 +1,13 @@
-﻿using System;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.IL2CPU.Plugs;
 using System.Drawing;
 
-namespace Cosmos.IL2CPU.IL.CustomImplementations.System.Drawing {
+namespace Cosmos.IL2CPU.IL.CustomImplementations.System.Drawing
+{
     [Plug(Target = typeof(Color))]
-	public static class ColorImpl {       
-		public static string ToString(ref Color aThis) {
-
+    public static class ColorImpl
+    {
+        public static string ToString(ref Color aThis)
+        {
             return "System.Drawing.Color.ToString()";
             /*
             StringBuilder builder = new StringBuilder(0x20);
@@ -45,6 +45,5 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System.Drawing {
         {
             return 0;
         }
-
-	}
+    }
 }

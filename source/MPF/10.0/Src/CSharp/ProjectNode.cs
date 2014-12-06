@@ -9,6 +9,12 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
+using EnvDTE;
+using Microsoft.Build.Evaluation;
+using Microsoft.Build.Execution;
+using Microsoft.VisualStudio.OLE.Interop;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
@@ -22,18 +28,15 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
 using System.Xml;
-using EnvDTE;
-using Microsoft.Build.BackEnd;
-using Microsoft.Build.Evaluation;
-using Microsoft.Build.Execution;
-using Microsoft.VisualStudio.OLE.Interop;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using IServiceProvider = System.IServiceProvider;
+
 using MSBuild = Microsoft.Build.Evaluation;
+
 using MSBuildConstruction = Microsoft.Build.Construction;
+
 using MSBuildExecution = Microsoft.Build.Execution;
+
 using OleConstants = Microsoft.VisualStudio.OLE.Interop.Constants;
 using VsCommands = Microsoft.VisualStudio.VSConstants.VSStd97CmdID;
 using VsCommands2K = Microsoft.VisualStudio.VSConstants.VSStd2KCmdID;
@@ -61,9 +64,9 @@ namespace Microsoft.VisualStudio.Project
         IProjectEventsProvider,
         IReferenceContainerProvider,
         IVsProjectSpecialFiles,
-		IVsProjectUpgrade,
-		IVsDesignTimeAssemblyResolution,
-		IVsSetTargetFrameworkWorkerCallback
+        IVsProjectUpgrade,
+        IVsDesignTimeAssemblyResolution,
+        IVsSetTargetFrameworkWorkerCallback
     {
         #region nested types
 
@@ -74,10 +77,13 @@ namespace Microsoft.VisualStudio.Project
             OpenReferenceFolder = 2,
             ReferenceFolder = 3,
             Reference = 4,
+
             [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "SDL")]
             SDLWebReference = 5,
+
             [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "DISCO")]
             DISCOWebReference = 6,
+
             Folder = 7,
             OpenFolder = 8,
             ExcludedFolder = 9,
@@ -88,20 +94,27 @@ namespace Microsoft.VisualStudio.Project
             WindowsForm = 14,
             WindowsUserControl = 15,
             WindowsComponent = 16,
+
             [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "XML")]
             XMLSchema = 17,
+
             [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "XML")]
             XMLFile = 18,
+
             WebForm = 19,
             WebService = 20,
             WebUserControl = 21,
             WebCustomUserControl = 22,
+
             [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "ASP")]
             ASPPage = 23,
+
             GlobalApplicationClass = 24,
             WebConfig = 25,
+
             [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "HTML")]
             HTMLPage = 26,
+
             StyleSheet = 27,
             ScriptFile = 28,
             TextFile = 29,
@@ -114,22 +127,29 @@ namespace Microsoft.VisualStudio.Project
             XWorld = 36,
             Audio = 37,
             Video = 38,
+
             [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "CAB")]
             CAB = 39,
+
             [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "JAR")]
             JAR = 40,
+
             DataEnvironment = 41,
             PreviewFile = 42,
             DanglingReference = 43,
+
             [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "XSLT")]
             XSLTFile = 44,
+
             Cursor = 45,
             AppDesignerFolder = 46,
             Data = 47,
             Application = 48,
             DataSet = 49,
+
             [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "PFX")]
             PFX = 50,
+
             [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "SNK")]
             SNK = 51,
 
@@ -147,34 +167,35 @@ namespace Microsoft.VisualStudio.Project
             DoNotTriggerTrackerEvents = 2
         }
 
-        #endregion
+        #endregion nested types
 
         #region constants
+
         /// <summary>
         /// The user file extension.
         /// </summary>
         internal const string PerUserFileExtension = ".user";
-     
-		private Guid GUID_MruPage = new Guid("{19B97F03-9594-4c1c-BE28-25FF030113B3}");
+
+        private Guid GUID_MruPage = new Guid("{19B97F03-9594-4c1c-BE28-25FF030113B3}");
 
         /// <summary>
         /// The VS command that allows projects to open Windows Explorer to the project directory.
         /// </summary>
         private const VsCommands2K ExploreFolderInWindowsCommand = (VsCommands2K)1635;
-		
-		#endregion
+
+        #endregion constants
 
         #region fields
 
         private static readonly FrameworkName DefaultTargetFrameworkMoniker = new FrameworkName(".NETFramework", new Version(4, 0));
 
-		private static Guid addComponentLastActiveTab = VSConstants.GUID_SolutionPage;
+        private static Guid addComponentLastActiveTab = VSConstants.GUID_SolutionPage;
 
-		private static uint addComponentDialogSizeX = 0;
+        private static uint addComponentDialogSizeX = 0;
 
-		private static uint addComponentDialogSizeY = 0;
+        private static uint addComponentDialogSizeY = 0;
 
-		/// <summary>
+        /// <summary>
         /// List of output groups names and their associated target
         /// </summary>
         private static KeyValuePair<string, string>[] outputGroupNames =
@@ -209,13 +230,13 @@ namespace Microsoft.VisualStudio.Project
         /// <summary>
         /// This property returns the time of the last change made to this project.
         /// It is not the time of the last change on the project file, but actually of
-        /// the in memory project settings.  In other words, it is the last time that 
+        /// the in memory project settings.  In other words, it is the last time that
         /// SetProjectDirty was called.
         /// </summary>
         private DateTime lastModifiedTime;
 
         /// <summary>
-        /// MSBuild engine we are going to use 
+        /// MSBuild engine we are going to use
         /// </summary>
         private MSBuild.ProjectCollection buildEngine;
 
@@ -266,7 +287,7 @@ namespace Microsoft.VisualStudio.Project
         private bool isProjectEventsListener = true;
 
         /// <summary>
-        /// The build dependency list passed to IVsDependencyProvider::EnumDependencies 
+        /// The build dependency list passed to IVsDependencyProvider::EnumDependencies
         /// </summary>
         private List<IVsBuildDependency> buildDependencyList = new List<IVsBuildDependency>();
 
@@ -340,13 +361,15 @@ namespace Microsoft.VisualStudio.Project
 
         // Has the object been disposed.
         private bool isDisposed;
-        #endregion
+
+        #endregion fields
 
         #region abstract properties
+
         /// <summary>
         /// This Guid must match the Guid you registered under
         /// HKLM\Software\Microsoft\VisualStudio\%version%\Projects.
-        /// Among other things, the Project framework uses this 
+        /// Among other things, the Project framework uses this
         /// guid to find your project and item templates.
         /// </summary>
         public abstract Guid ProjectGuid
@@ -362,9 +385,11 @@ namespace Microsoft.VisualStudio.Project
         {
             get;
         }
-        #endregion
+
+        #endregion abstract properties
 
         #region virtual properties
+
         /// <summary>
         /// This is the project instance guid that is peristed in the project file
         /// </summary>
@@ -388,11 +413,13 @@ namespace Microsoft.VisualStudio.Project
                 }
             }
         }
-        #endregion
+
+        #endregion virtual properties
 
         #region properties
 
         #region overridden properties
+
         public override int MenuCommandId
         {
             get
@@ -451,8 +478,7 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-
-        #endregion
+        #endregion overridden properties
 
         #region virtual properties
 
@@ -484,8 +510,8 @@ namespace Microsoft.VisualStudio.Project
 
         /// <summary>
         /// The target name that will be used for evaluating the project file (i.e., pseudo-builds).
-        /// This target is used to trigger a build with when the project system changes. 
-        /// Example: The language projrcts are triggering a build with the Compile target whenever 
+        /// This target is used to trigger a build with when the project system changes.
+        /// Example: The language projrcts are triggering a build with the Compile target whenever
         /// the project system changes.
         /// </summary>
         [SuppressMessage("Microsoft.Naming", "CA1702:CompoundWordsShouldBeCasedCorrectly", MessageId = "ReEvaluate")]
@@ -540,7 +566,6 @@ namespace Microsoft.VisualStudio.Project
             {
                 this.supportsProjectDesigner = value;
             }
-
         }
 
         protected virtual Guid ProjectDesignerEditor
@@ -566,7 +591,7 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-        #endregion
+        #endregion virtual properties
 
         /// <summary>
         /// Gets or sets the ability of a project filenode to have child nodes (sub items).
@@ -631,7 +656,7 @@ namespace Microsoft.VisualStudio.Project
         /// <summary>
         /// This property returns the time of the last change made to this project.
         /// It is not the time of the last change on the project file, but actually of
-        /// the in memory project settings.  In other words, it is the last time that 
+        /// the in memory project settings.  In other words, it is the last time that
         /// SetProjectDirty was called.
         /// </summary>
         public DateTime LastModifiedTime
@@ -724,7 +749,7 @@ namespace Microsoft.VisualStudio.Project
         }
 
         /// <summary>
-        /// Gets or set the relative path to the folder containing the project ouput. 
+        /// Gets or set the relative path to the folder containing the project ouput.
         /// </summary>
         public virtual string OutputBaseRelativePath
         {
@@ -747,10 +772,10 @@ namespace Microsoft.VisualStudio.Project
         {
             get
             {
-				if (this.options == null)
-				{
-					GetProjectOptions();
-				}
+                if (this.options == null)
+                {
+                    GetProjectOptions();
+                }
                 if (this.options != null)
                 {
                     return this.options.TargetFrameworkMoniker ?? DefaultTargetFrameworkMoniker;
@@ -763,14 +788,14 @@ namespace Microsoft.VisualStudio.Project
 
             set
             {
-				if (this.options == null)
-				{
-					GetProjectOptions();
-				}
-
-				if (value == null)
+                if (this.options == null)
                 {
-					value = DefaultTargetFrameworkMoniker;
+                    GetProjectOptions();
+                }
+
+                if (value == null)
+                {
+                    value = DefaultTargetFrameworkMoniker;
                 }
 
                 if (this.options.TargetFrameworkMoniker != value)
@@ -855,21 +880,21 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-		protected bool IsIdeInCommandLineMode
-		{
-			get
-			{
-				bool cmdline = false;
-				var shell = this.site.GetService(typeof(SVsShell)) as IVsShell;
-				if (shell != null)
-				{
-					object obj;
-					Marshal.ThrowExceptionForHR(shell.GetProperty((int)__VSSPROPID.VSSPROPID_IsInCommandLineMode, out obj));
-					cmdline = (bool)obj;
-				}
-				return cmdline;
-			}
-		}
+        protected bool IsIdeInCommandLineMode
+        {
+            get
+            {
+                bool cmdline = false;
+                var shell = this.site.GetService(typeof(SVsShell)) as IVsShell;
+                if (shell != null)
+                {
+                    object obj;
+                    Marshal.ThrowExceptionForHR(shell.GetProperty((int)__VSSPROPID.VSSPROPID_IsInCommandLineMode, out obj));
+                    cmdline = (bool)obj;
+                }
+                return cmdline;
+            }
+        }
 
         /// <summary>
         /// Gets the configuration provider.
@@ -999,7 +1024,8 @@ namespace Microsoft.VisualStudio.Project
                 this.package = value;
             }
         }
-        #endregion
+
+        #endregion properties
 
         #region ctor
 
@@ -1007,9 +1033,11 @@ namespace Microsoft.VisualStudio.Project
         {
             this.Initialize();
         }
-        #endregion
+
+        #endregion ctor
 
         #region overridden methods
+
         protected override NodeProperties CreatePropertiesObject()
         {
             return new ProjectNodeProperties(this);
@@ -1042,7 +1070,7 @@ namespace Microsoft.VisualStudio.Project
         /// <returns>A success or failure value.</returns>
         public override int SetEditLabel(string label)
         {
-            // Validate the filename. 
+            // Validate the filename.
             if (String.IsNullOrEmpty(label))
             {
                 throw new InvalidOperationException(SR.GetString(SR.ErrorInvalidFileName, CultureInfo.CurrentUICulture));
@@ -1110,7 +1138,7 @@ namespace Microsoft.VisualStudio.Project
             try
             {
                 // Walk the tree and close all nodes.
-                // This has to be done before the project closes, since we want still state available for the ProjectMgr on the nodes 
+                // This has to be done before the project closes, since we want still state available for the ProjectMgr on the nodes
                 // when nodes are closing.
                 try
                 {
@@ -1136,7 +1164,7 @@ namespace Microsoft.VisualStudio.Project
         }
 
         /// <summary>
-        /// Sets the service provider from which to access the services. 
+        /// Sets the service provider from which to access the services.
         /// </summary>
         /// <param name="site">An instance to an Microsoft.VisualStudio.OLE.Interop object</param>
         /// <returns>A success or failure value.</returns>
@@ -1144,7 +1172,7 @@ namespace Microsoft.VisualStudio.Project
         {
             CCITracing.TraceCall();
             this.site = new ServiceProvider(site);
-			ServiceProvider = this.site;
+            ServiceProvider = this.site;
 
             if (taskProvider != null)
             {
@@ -1156,7 +1184,7 @@ namespace Microsoft.VisualStudio.Project
         }
 
         /// <summary>
-        /// Gets the properties of the project node. 
+        /// Gets the properties of the project node.
         /// </summary>
         /// <param name="propId">The __VSHPROPID of the property.</param>
         /// <returns>A property dependent value. See: <see cref="__VSHPROPID"/> for details.</returns>
@@ -1203,6 +1231,7 @@ namespace Microsoft.VisualStudio.Project
 
                 case __VSHPROPID2.VSHPROPID_Container:
                     return true;
+
                 default:
                     break;
             }
@@ -1211,7 +1240,7 @@ namespace Microsoft.VisualStudio.Project
         }
 
         /// <summary>
-        /// Gets the GUID value of the node. 
+        /// Gets the GUID value of the node.
         /// </summary>
         /// <param name="propid">A __VSHPROPID or __VSHPROPID2 value of the guid property</param>
         /// <param name="guid">The guid to return for the property.</param>
@@ -1263,12 +1292,12 @@ namespace Microsoft.VisualStudio.Project
         }
 
         /// <summary>
-        /// Removes items from the hierarchy. 
+        /// Removes items from the hierarchy.
         /// </summary>
         /// <devdoc>Project overwrites this.</devdoc>
         public override void Remove(bool removeFromStorage)
         {
-            // the project will not be deleted from disk, just removed      
+            // the project will not be deleted from disk, just removed
             if (removeFromStorage)
             {
                 return;
@@ -1421,7 +1450,6 @@ namespace Microsoft.VisualStudio.Project
             }
             else if (cmdGroup == VsMenus.guidStandardCommandSet2K)
             {
-
                 switch ((VsCommands2K)cmd)
                 {
                     case VsCommands2K.ADDREFERENCE:
@@ -1460,9 +1488,9 @@ namespace Microsoft.VisualStudio.Project
             {
                 switch ((VsCommands)cmd)
                 {
-
                     case VsCommands.UnloadProject:
                         return this.UnloadProject();
+
                     case VsCommands.CleanSel:
                     case VsCommands.CleanCtx:
                         return this.CleanProject();
@@ -1516,7 +1544,7 @@ namespace Microsoft.VisualStudio.Project
             return null;
         }
 
-        #endregion
+        #endregion overridden methods
 
         #region virtual methods
 
@@ -1562,7 +1590,6 @@ namespace Microsoft.VisualStudio.Project
                     throw new InvalidOperationException(errorMessage);
                 }
             }
-
 
             // Build up the ContextParams safearray
             //  [0] = Wizard type guid  (bstr)
@@ -1649,8 +1676,10 @@ namespace Microsoft.VisualStudio.Project
             {
                 default:
                     return VSADDRESULT.ADDRESULT_Cancel;
+
                 case wizardResult.wizardResultSuccess:
                     return VSADDRESULT.ADDRESULT_Success;
+
                 case wizardResult.wizardResultFailure:
                     return VSADDRESULT.ADDRESULT_Failure;
             }
@@ -1667,7 +1696,7 @@ namespace Microsoft.VisualStudio.Project
 
             IVsComponentSelectorDlg4 componentDialog;
             string strBrowseLocations = Path.GetDirectoryName(this.BaseURI.Uri.LocalPath);
-			var tabInitList = new List<VSCOMPONENTSELECTORTABINIT>()
+            var tabInitList = new List<VSCOMPONENTSELECTORTABINIT>()
 			{
 				new VSCOMPONENTSELECTORTABINIT {
 					guidTab = VSConstants.GUID_COMPlusPage,
@@ -1682,7 +1711,7 @@ namespace Microsoft.VisualStudio.Project
 					varTabInitInfo = (int)__VSHPROPID.VSHPROPID_ShowProjInSolutionPage,
 					guidTab = VSConstants.GUID_SolutionPage,
 				},
-	            // Add the Browse for file page            
+	            // Add the Browse for file page
 				new VSCOMPONENTSELECTORTABINIT {
 					varTabInitInfo = 0,
 					guidTab = VSConstants.GUID_BrowseFilePage,
@@ -1691,7 +1720,7 @@ namespace Microsoft.VisualStudio.Project
 				    guidTab = GUID_MruPage,
 				},
 			};
-			tabInitList.ForEach(tab => tab.dwSize = (uint)Marshal.SizeOf(typeof(VSCOMPONENTSELECTORTABINIT)));
+            tabInitList.ForEach(tab => tab.dwSize = (uint)Marshal.SizeOf(typeof(VSCOMPONENTSELECTORTABINIT)));
 
             componentDialog = this.GetService(typeof(IVsComponentSelectorDlg)) as IVsComponentSelectorDlg4;
             try
@@ -1707,17 +1736,17 @@ namespace Microsoft.VisualStudio.Project
                         (System.UInt32)(__VSCOMPSELFLAGS.VSCOMSEL_MultiSelectMode | __VSCOMPSELFLAGS.VSCOMSEL_IgnoreMachineName),
                         (IVsComponentUser)this,
                         0,
-						null,
-						SR.GetString(SR.AddReferenceDialogTitle, CultureInfo.CurrentUICulture),   // Title
+                        null,
+                        SR.GetString(SR.AddReferenceDialogTitle, CultureInfo.CurrentUICulture),   // Title
                         "VS.AddReference",                          // Help topic
                         addComponentDialogSizeX,
                         addComponentDialogSizeY,
                         (uint)tabInitList.Count,
                         tabInitList.ToArray(),
                         ref addComponentLastActiveTab,
-						browseFilters,
+                        browseFilters,
                         ref strBrowseLocations,
-						this.TargetFrameworkMoniker.FullName));
+                        this.TargetFrameworkMoniker.FullName));
                 }
             }
             catch (COMException e)
@@ -1734,12 +1763,11 @@ namespace Microsoft.VisualStudio.Project
         }
 
         /// <summary>
-        /// Returns the Compiler associated to the project 
+        /// Returns the Compiler associated to the project
         /// </summary>
         /// <returns>Null</returns>
         public virtual ICodeCompiler GetCompiler()
         {
-
             return null;
         }
 
@@ -1790,7 +1818,7 @@ namespace Microsoft.VisualStudio.Project
 
                 // based on the passed in flags, this either reloads/loads a project, or tries to create a new one
                 // now we create a new project... we do that by loading the template and then saving under a new name
-                // we also need to copy all the associated files with it.					
+                // we also need to copy all the associated files with it.
                 if ((flags & (uint)__VSCREATEPROJFLAGS.CPF_CLONEFILE) == (uint)__VSCREATEPROJFLAGS.CPF_CLONEFILE)
                 {
                     Debug.Assert(!String.IsNullOrEmpty(fileName) && File.Exists(fileName), "Invalid filename passed to load the project. A valid filename is expected");
@@ -1801,7 +1829,7 @@ namespace Microsoft.VisualStudio.Project
                     SetBuildProject(Utilities.ReinitializeMsBuildProject(this.buildEngine, fileName, this.buildProject));
 
                     // Compute the file name
-                    // We try to solve two problems here. When input comes from a wizzard in case of zipped based projects 
+                    // We try to solve two problems here. When input comes from a wizzard in case of zipped based projects
                     // the parameters are different.
                     // In that case the filename has the new filename in a temporay path.
 
@@ -1945,7 +1973,7 @@ namespace Microsoft.VisualStudio.Project
         /// <summary>
         /// This add methos adds the "key" item to the hierarchy, potentially adding other subitems in the process
         /// This method may recurse if the parent is an other subitem
-        /// 
+        ///
         /// </summary>
         /// <param name="subitems">List of subitems not yet added to the hierarchy</param>
         /// <param name="key">Key to retrieve the target item from the subitems list</param>
@@ -2051,7 +2079,6 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-
         /// <summary>
         /// Do the build by invoking msbuild
         /// </summary>
@@ -2123,9 +2150,9 @@ namespace Microsoft.VisualStudio.Project
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
         public virtual ProjectOptions GetProjectOptions(string config = null)
         {
-			if (string.IsNullOrEmpty(config))
-			{
-				EnvDTE.Project automationObject = this.GetAutomationObject() as EnvDTE.Project;
+            if (string.IsNullOrEmpty(config))
+            {
+                EnvDTE.Project automationObject = this.GetAutomationObject() as EnvDTE.Project;
                 try
                 {
                     config = Utilities.GetActiveConfigurationName(automationObject);
@@ -2134,37 +2161,37 @@ namespace Microsoft.VisualStudio.Project
                 {
                     // Can't figure out the active configuration.  Perhaps during solution load, or in a unit test.
                 }
-				catch (COMException)
-				{
-					// We may be in solution load and don't have an active config yet.
-				}
-			}
+                catch (COMException)
+                {
+                    // We may be in solution load and don't have an active config yet.
+                }
+            }
 
-			if (this.options != null && String.Equals(this.options.Config, config, StringComparison.OrdinalIgnoreCase))
-				return this.options;
+            if (this.options != null && String.Equals(this.options.Config, config, StringComparison.OrdinalIgnoreCase))
+                return this.options;
 
             ProjectOptions options = CreateProjectOptions();
-			options.Config = config;
+            options.Config = config;
 
-			string targetFrameworkMoniker = GetProjectProperty("TargetFrameworkMoniker", false);
+            string targetFrameworkMoniker = GetProjectProperty("TargetFrameworkMoniker", false);
 
-			if (!string.IsNullOrEmpty(targetFrameworkMoniker))
-			{
-				try
-				{
-					options.TargetFrameworkMoniker = new FrameworkName(targetFrameworkMoniker);
-				}
-				catch (ArgumentException e)
-				{
-					Trace.WriteLine("Exception : " + e.Message);
-				}
-			}
+            if (!string.IsNullOrEmpty(targetFrameworkMoniker))
+            {
+                try
+                {
+                    options.TargetFrameworkMoniker = new FrameworkName(targetFrameworkMoniker);
+                }
+                catch (ArgumentException e)
+                {
+                    Trace.WriteLine("Exception : " + e.Message);
+                }
+            }
 
-			if (config == null)
-			{
-				this.options = options;
-				return options;
-			}
+            if (config == null)
+            {
+                this.options = options;
+                return options;
+            }
 
             options.GenerateExecutable = true;
 
@@ -2340,22 +2367,22 @@ namespace Microsoft.VisualStudio.Project
                 }
             }
 
-			this.options = options; // do this AFTER setting configuration so it doesn't clear it.
-			return options;
+            this.options = options; // do this AFTER setting configuration so it doesn't clear it.
+            return options;
         }
 
         public virtual void OnTargetFrameworkMonikerChanged(ProjectOptions options, FrameworkName currentTargetFramework, FrameworkName newTargetFramework)
         {
-			if (currentTargetFramework == null)
-			{
-				throw new ArgumentNullException("currentTargetFramework");
-			}
-			if (newTargetFramework == null)
-			{
-				throw new ArgumentNullException("newTargetFramework");
-			}
+            if (currentTargetFramework == null)
+            {
+                throw new ArgumentNullException("currentTargetFramework");
+            }
+            if (newTargetFramework == null)
+            {
+                throw new ArgumentNullException("newTargetFramework");
+            }
 
-			var retargetingService = this.site.GetService(typeof(SVsTrackProjectRetargeting)) as IVsTrackProjectRetargeting;
+            var retargetingService = this.site.GetService(typeof(SVsTrackProjectRetargeting)) as IVsTrackProjectRetargeting;
             if (retargetingService == null)
             {
                 // Probably in a unit test.
@@ -2366,7 +2393,7 @@ namespace Microsoft.VisualStudio.Project
             {
                 Marshal.ThrowExceptionForHR(retargetingService.OnSetTargetFramework(this, currentTargetFramework.FullName, newTargetFramework.FullName, this, true));
             }
-		}
+        }
 
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Attr")]
         [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId = "bool")]
@@ -2698,7 +2725,6 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-
         /// <summary>
         /// Handles the shows all objects command.
         /// </summary>
@@ -2918,7 +2944,7 @@ namespace Microsoft.VisualStudio.Project
                 // Create the logger
                 this.BuildLogger = new IDEBuildLogger(output, this.TaskProvider, hierarchy);
 
-                // To retrive the verbosity level, the build logger depends on the registry root 
+                // To retrive the verbosity level, the build logger depends on the registry root
                 // (otherwise it will used an hardcoded default)
                 ILocalRegistry2 registry = this.GetService(typeof(SLocalRegistry)) as ILocalRegistry2;
                 if (null != registry)
@@ -3257,7 +3283,6 @@ namespace Microsoft.VisualStudio.Project
 
                 this.SetProjectFileDirty(false);
 
-
                 // TODO: If source control is enabled check out the project file.
 
                 //Redraw.
@@ -3283,7 +3308,7 @@ namespace Microsoft.VisualStudio.Project
 
         /// <summary>
         /// Saves project file related information to the new file name. It also calls msbuild API to save the project file.
-        /// It is called by the SaveAs method and the SetEditLabel before the project file rename related events are triggered. 
+        /// It is called by the SaveAs method and the SetEditLabel before the project file rename related events are triggered.
         /// An implementer can override this method to provide specialized semantics on how the project file is renamed in the msbuild file.
         /// </summary>
         /// <param name="newFileName">The new full path of the project file</param>
@@ -3302,7 +3327,6 @@ namespace Microsoft.VisualStudio.Project
 
             // Saves the project file on disk.
             this.buildProject.Save(newFileName);
-
         }
 
         /// <summary>
@@ -3389,7 +3413,6 @@ namespace Microsoft.VisualStudio.Project
                 return VSConstants.E_ABORT;
             }
 
-
             // File already exists in project... message box
             message = SR.GetString(SR.FileAlreadyInProject, CultureInfo.CurrentUICulture);
             icon = OLEMSGICON.OLEMSGICON_QUERY;
@@ -3409,7 +3432,6 @@ namespace Microsoft.VisualStudio.Project
         /// <param name="existingNode">The node that exists.</param>
         protected virtual void OverwriteExistingItem(HierarchyNode existingNode)
         {
-
         }
 
         /// <summary>
@@ -3469,18 +3491,16 @@ namespace Microsoft.VisualStudio.Project
             }
 
             return false;
-
         }
-
 
         /// <summary>
         /// This is the list of output groups that the configuration object should
         /// provide.
         /// The first string is the name of the group.
         /// The second string is the target name (MSBuild) for that group.
-        /// 
+        ///
         /// To add/remove OutputGroups, simply override this method and edit the list.
-        /// 
+        ///
         /// To get nice display names and description for your groups, override:
         ///        - GetOutputGroupDisplayName
         ///        - GetOutputGroupDescription
@@ -3577,15 +3597,15 @@ namespace Microsoft.VisualStudio.Project
                 this.currentConfig = this.buildProject.CreateProjectInstance();
             }
 
-			if (propertiesChanged || this.designTimeAssemblyResolution == null)
-			{
-				if (this.designTimeAssemblyResolution == null)
-				{
-					this.designTimeAssemblyResolution = new DesignTimeAssemblyResolution();
-				}
+            if (propertiesChanged || this.designTimeAssemblyResolution == null)
+            {
+                if (this.designTimeAssemblyResolution == null)
+                {
+                    this.designTimeAssemblyResolution = new DesignTimeAssemblyResolution();
+                }
 
-				this.designTimeAssemblyResolution.Initialize(this);
-			}
+                this.designTimeAssemblyResolution.Initialize(this);
+            }
 
             this.options = null;
         }
@@ -3684,7 +3704,6 @@ namespace Microsoft.VisualStudio.Project
             {
                 ProcessDependentFileNodes(subitemsKeys, subitems);
             }
-
         }
 
         /// <summary>
@@ -3793,7 +3812,8 @@ namespace Microsoft.VisualStudio.Project
         protected virtual void FlushBuildLoggerContent()
         {
         }
-        #endregion
+
+        #endregion virtual methods
 
         #region non-virtual methods
 
@@ -3935,15 +3955,15 @@ namespace Microsoft.VisualStudio.Project
             return this.GetProjectProperty(propertyName, true);
         }
 
-		/// <summary>
-		/// Gets the unevaluated value of a project property.
-		/// </summary>
-		/// <param name="propertyName">The name of the property to retrieve.</param>
-		/// <returns>Unevaluated value of the property.</returns>
-		public string GetProjectPropertyUnevaluated(string propertyName)
-		{
-			return this.buildProject.GetProperty(propertyName).UnevaluatedValue;
-		}
+        /// <summary>
+        /// Gets the unevaluated value of a project property.
+        /// </summary>
+        /// <param name="propertyName">The name of the property to retrieve.</param>
+        /// <returns>Unevaluated value of the property.</returns>
+        public string GetProjectPropertyUnevaluated(string propertyName)
+        {
+            return this.buildProject.GetProperty(propertyName).UnevaluatedValue;
+        }
 
         /// <summary>
         /// Set dirty state of project
@@ -4058,7 +4078,7 @@ namespace Microsoft.VisualStudio.Project
                     if (suppressUI)
                         qef |= tagVSQueryEditFlags.QEF_SilentMode;
 
-                    // If we are debugging, we want to prevent our project from being reloaded. To 
+                    // If we are debugging, we want to prevent our project from being reloaded. To
                     // do this, we pass the QEF_NoReload flag
                     if (!Utilities.IsVisualStudioInDesignMode(this.Site))
                         qef |= tagVSQueryEditFlags.QEF_NoReload;
@@ -4224,7 +4244,6 @@ namespace Microsoft.VisualStudio.Project
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Scc")]
         protected void RegisterSccProject()
         {
-
             if (this.IsSccDisabled || this.isRegisteredWithScc || String.IsNullOrEmpty(this.sccProjectName))
             {
                 return;
@@ -4445,9 +4464,10 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-        #endregion
+        #endregion non-virtual methods
 
         #region IVsGetCfgProvider Members
+
         //=================================================================================
 
         public virtual int GetCfgProvider(out IVsCfgProvider p)
@@ -4457,7 +4477,8 @@ namespace Microsoft.VisualStudio.Project
             p = this.ConfigProvider;
             return (p == null ? VSConstants.E_NOTIMPL : VSConstants.S_OK);
         }
-        #endregion
+
+        #endregion IVsGetCfgProvider Members
 
         #region IPersist Members
 
@@ -4466,7 +4487,8 @@ namespace Microsoft.VisualStudio.Project
             clsid = this.ProjectGuid;
             return VSConstants.S_OK;
         }
-        #endregion
+
+        #endregion IPersist Members
 
         #region IPersistFileFormat Members
 
@@ -4553,7 +4575,6 @@ namespace Microsoft.VisualStudio.Project
 
         public virtual int Save(string fileToBeSaved, int remember, uint formatIndex)
         {
-
             // The file name can be null. Then try to use the Url.
             string tempFileToBeSaved = fileToBeSaved;
             if (String.IsNullOrEmpty(tempFileToBeSaved) && !String.IsNullOrEmpty(this.Url))
@@ -4607,7 +4628,6 @@ namespace Microsoft.VisualStudio.Project
                 {
                     ErrorHandler.ThrowOnFailure(result);
                 }
-
             }
 
             if (setProjectFileDirtyAfterSave)
@@ -4623,7 +4643,8 @@ namespace Microsoft.VisualStudio.Project
             // TODO: turn file watcher back on.
             return VSConstants.S_OK;
         }
-        #endregion
+
+        #endregion IPersistFileFormat Members
 
         #region IVsProject3 Members
 
@@ -4654,7 +4675,6 @@ namespace Microsoft.VisualStudio.Project
             return VSConstants.S_OK;
         }
 
-
         public virtual int AddItem(uint itemIdLoc, VSADDITEMOPERATION op, string itemName, uint filesToOpen, string[] files, IntPtr dlgOwner, VSADDRESULT[] result)
         {
             Guid empty = Guid.Empty;
@@ -4669,10 +4689,10 @@ namespace Microsoft.VisualStudio.Project
         /// <param name="op"></param>
         /// <param name="itemName"></param>
         /// <param name="filesToOpen"></param>
-        /// <param name="files">Array of file names. 
-        /// If dwAddItemOperation is VSADDITEMOP_CLONEFILE the first item in the array is the name of the file to clone. 
-        /// If dwAddItemOperation is VSADDITEMOP_OPENDIRECTORY, the first item in the array is the directory to open. 
-        /// If dwAddItemOperation is VSADDITEMOP_RUNWIZARD, the first item is the name of the wizard to run, 
+        /// <param name="files">Array of file names.
+        /// If dwAddItemOperation is VSADDITEMOP_CLONEFILE the first item in the array is the name of the file to clone.
+        /// If dwAddItemOperation is VSADDITEMOP_OPENDIRECTORY, the first item in the array is the directory to open.
+        /// If dwAddItemOperation is VSADDITEMOP_RUNWIZARD, the first item is the name of the wizard to run,
         /// and the second item is the file name the user supplied (same as itemName).</param>
         /// <param name="dlgOwner"></param>
         /// <param name="editorFlags"></param>
@@ -4719,7 +4739,6 @@ namespace Microsoft.VisualStudio.Project
 
             string[] actualFiles = new string[files.Length];
 
-
             VSQUERYADDFILEFLAGS[] flags = this.GetQueryAddFileFlags(files);
 
             string baseDir = this.GetBaseDirectoryForAddingFiles(n);
@@ -4745,6 +4764,7 @@ namespace Microsoft.VisualStudio.Project
                             newFileName = Path.Combine(baseDir, fileName);
                         }
                         break;
+
                     case VSADDITEMOPERATION.VSADDITEMOP_OPENFILE:
                         {
                             string fileName = Path.GetFileName(file);
@@ -4824,7 +4844,7 @@ namespace Microsoft.VisualStudio.Project
                     }
 
                     // Copy the file to the correct location.
-                    // We will suppress the file change events to be triggered to this item, since we are going to copy over the existing file and thus we will trigger a file change event. 
+                    // We will suppress the file change events to be triggered to this item, since we are going to copy over the existing file and thus we will trigger a file change event.
                     // We do not want the filechange event to ocur in this case, similar that we do not want a file change event to occur when saving a file.
                     IVsFileChangeEx fileChange = this.site.GetService(typeof(SVsFileChangeEx)) as IVsFileChangeEx;
                     if (fileChange == null)
@@ -4934,7 +4954,7 @@ namespace Microsoft.VisualStudio.Project
 
             if (suggestedRoot == null || suggestedRoot.Length == 0)
             {
-                // foldercase, we assume... 
+                // foldercase, we assume...
                 suggestedRoot = "NewFolder";
                 fFolderCase = true;
             }
@@ -4990,7 +5010,6 @@ namespace Microsoft.VisualStudio.Project
             return VSConstants.S_OK;
         }
 
-
         public virtual int GetItemContext(uint itemId, out Microsoft.VisualStudio.OLE.Interop.IServiceProvider psp)
         {
             CCITracing.TraceCall();
@@ -5002,7 +5021,6 @@ namespace Microsoft.VisualStudio.Project
             }
             return VSConstants.S_OK;
         }
-
 
         public virtual int IsDocumentInProject(string mkDoc, out int found, VSDOCUMENTPRIORITY[] pri, out uint itemId)
         {
@@ -5039,9 +5057,7 @@ namespace Microsoft.VisualStudio.Project
             }
 
             return VSConstants.S_OK;
-
         }
-
 
         public virtual int OpenItem(uint itemId, ref Guid logicalView, IntPtr punkDocDataExisting, out IVsWindowFrame frame)
         {
@@ -5065,7 +5081,6 @@ namespace Microsoft.VisualStudio.Project
             return VSConstants.E_FAIL;
         }
 
-
         public virtual int OpenItemWithSpecific(uint itemId, uint editorFlags, ref Guid editorType, string physicalView, ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame frame)
         {
             // Init output params
@@ -5088,7 +5103,6 @@ namespace Microsoft.VisualStudio.Project
             return VSConstants.E_FAIL;
         }
 
-
         public virtual int RemoveItem(uint reserved, uint itemId, out int result)
         {
             HierarchyNode n = this.NodeFromItemId(itemId);
@@ -5100,7 +5114,6 @@ namespace Microsoft.VisualStudio.Project
             result = 1;
             return VSConstants.S_OK;
         }
-
 
         public virtual int ReopenItem(uint itemId, ref Guid editorType, string physicalView, ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame frame)
         {
@@ -5123,7 +5136,6 @@ namespace Microsoft.VisualStudio.Project
             // This node does not have an associated document manager and we must fail
             return VSConstants.E_FAIL;
         }
-
 
         /// <summary>
         /// Implements IVsProject3::TransferItem
@@ -5210,9 +5222,10 @@ namespace Microsoft.VisualStudio.Project
             return hr;
         }
 
-        #endregion
+        #endregion IVsProject3 Members
 
         #region IVsProjectBuidSystem Members
+
         public virtual int SetHostObject(string targetName, string taskName, object hostObject)
         {
             Debug.Assert(targetName != null && taskName != null && this.buildProject != null && this.buildProject.Targets != null);
@@ -5257,7 +5270,7 @@ namespace Microsoft.VisualStudio.Project
         }
 
         /// <summary>
-        /// Used to determine the kind of build system, in VS 2005 there's only one defined kind: MSBuild 
+        /// Used to determine the kind of build system, in VS 2005 there's only one defined kind: MSBuild
         /// </summary>
         /// <param name="kind"></param>
         /// <returns></returns>
@@ -5267,13 +5280,13 @@ namespace Microsoft.VisualStudio.Project
             return VSConstants.S_OK;
         }
 
-        #endregion
+        #endregion IVsProjectBuidSystem Members
 
         #region IVsComponentUser methods
 
         /// <summary>
         /// Add Components to the Project.
-        /// Used by the environment to add components specified by the user in the Component Selector dialog 
+        /// Used by the environment to add components specified by the user in the Component Selector dialog
         /// to the specified project
         /// </summary>
         /// <param name="dwAddCompOperation">The component operation to be performed.</param>
@@ -5312,9 +5325,11 @@ namespace Microsoft.VisualStudio.Project
             }
             return VSConstants.S_OK;
         }
-        #endregion
+
+        #endregion IVsComponentUser methods
 
         #region IVsDependencyProvider Members
+
         public int EnumDependencies(out IVsEnumDependencies enumDependencies)
         {
             enumDependencies = new EnumDependencies(this.buildDependencyList);
@@ -5327,9 +5342,10 @@ namespace Microsoft.VisualStudio.Project
             return VSConstants.S_OK;
         }
 
-        #endregion
+        #endregion IVsDependencyProvider Members
 
         #region IVsSccProject2 Members
+
         /// <summary>
         /// This method is called to determine which files should be placed under source control for a given VSITEMID within this hierarchy.
         /// </summary>
@@ -5369,7 +5385,7 @@ namespace Microsoft.VisualStudio.Project
         }
 
         /// <summary>
-        /// This method is called to discover special (hidden files) associated with a given VSITEMID within this hierarchy. 
+        /// This method is called to discover special (hidden files) associated with a given VSITEMID within this hierarchy.
         /// </summary>
         /// <param name="itemid">Identifier for the VSITEMID being queried.</param>
         /// <param name="sccFile">One of the files associated with the node</param>
@@ -5407,11 +5423,10 @@ namespace Microsoft.VisualStudio.Project
             }
 
             return VSConstants.S_OK;
-
         }
 
         /// <summary>
-        /// This method is called by the source control portion of the environment to inform the project of changes to the source control glyph on various nodes. 
+        /// This method is called by the source control portion of the environment to inform the project of changes to the source control glyph on various nodes.
         /// </summary>
         /// <param name="affectedNodes">Count of changed nodes.</param>
         /// <param name="itemidAffectedNodes">An array of VSITEMID identifiers of the changed nodes.</param>
@@ -5497,11 +5512,13 @@ namespace Microsoft.VisualStudio.Project
 
             return VSConstants.S_OK;
         }
-        #endregion
+
+        #endregion IVsSccProject2 Members
 
         #region IVsProjectSpecialFiles Members
+
         /// <summary>
-        /// Allows you to query the project for special files and optionally create them. 
+        /// Allows you to query the project for special files and optionally create them.
         /// </summary>
         /// <param name="fileId">__PSFFILEID of the file</param>
         /// <param name="flags">__PSFFLAGS flags for the file</param>
@@ -5516,7 +5533,8 @@ namespace Microsoft.VisualStudio.Project
             // We need to return S_OK, otherwise the property page tabs will not be shown.
             return VSConstants.E_NOTIMPL;
         }
-        #endregion
+
+        #endregion IVsProjectSpecialFiles Members
 
         #region IAggregatedHierarchy Members
 
@@ -5529,7 +5547,7 @@ namespace Microsoft.VisualStudio.Project
             return this;
         }
 
-        #endregion
+        #endregion IAggregatedHierarchy Members
 
         #region IBuildDependencyUpdate Members
 
@@ -5567,9 +5585,10 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-        #endregion
+        #endregion IBuildDependencyUpdate Members
 
         #region IReferenceDataProvider Members
+
         /// <summary>
         /// Returns the reference container node.
         /// </summary>
@@ -5579,15 +5598,17 @@ namespace Microsoft.VisualStudio.Project
             return this.FindChild(ReferenceContainerNode.ReferencesNodeVirtualName) as IReferenceContainer;
         }
 
-        #endregion
+        #endregion IReferenceDataProvider Members
 
         #region IProjectEventsListener Members
+
         public bool IsProjectEventsListener
         {
             get { return this.isProjectEventsListener; }
             set { this.isProjectEventsListener = value; }
         }
-        #endregion
+
+        #endregion IProjectEventsListener Members
 
         #region IProjectEventsProvider Members
 
@@ -5614,7 +5635,7 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-        #endregion
+        #endregion IProjectEventsProvider Members
 
         #region IVsAggregatableProject Members
 
@@ -5681,7 +5702,7 @@ namespace Microsoft.VisualStudio.Project
             return VSConstants.E_NOTIMPL;
         }
 
-        #endregion
+        #endregion IVsAggregatableProject Members
 
         #region IVsProjectFlavorCfgProvider Members
 
@@ -5693,7 +5714,7 @@ namespace Microsoft.VisualStudio.Project
             return VSConstants.S_OK;
         }
 
-        #endregion
+        #endregion IVsProjectFlavorCfgProvider Members
 
         #region IVsBuildPropertyStorage Members
 
@@ -5798,42 +5819,42 @@ namespace Microsoft.VisualStudio.Project
             return VSConstants.S_OK;
         }
 
-        #endregion
+        #endregion IVsBuildPropertyStorage Members
 
-		#region IVsDesignTimeAssemblyResolution methods
+        #region IVsDesignTimeAssemblyResolution methods
 
-		public int GetTargetFramework(out string ppTargetFramework)
-		{
-			ppTargetFramework = this.ProjectMgr.TargetFrameworkMoniker.FullName;
-			return VSConstants.S_OK;
-		}
+        public int GetTargetFramework(out string ppTargetFramework)
+        {
+            ppTargetFramework = this.ProjectMgr.TargetFrameworkMoniker.FullName;
+            return VSConstants.S_OK;
+        }
 
-		public int ResolveAssemblyPathInTargetFx(string[] prgAssemblySpecs, uint cAssembliesToResolve, VsResolvedAssemblyPath[] prgResolvedAssemblyPaths, out uint pcResolvedAssemblyPaths)
-		{
-			if (prgAssemblySpecs == null || cAssembliesToResolve == 0 || prgResolvedAssemblyPaths == null)
-			{
-				throw new ArgumentException("One or more of the arguments are invalid.");
-			}
+        public int ResolveAssemblyPathInTargetFx(string[] prgAssemblySpecs, uint cAssembliesToResolve, VsResolvedAssemblyPath[] prgResolvedAssemblyPaths, out uint pcResolvedAssemblyPaths)
+        {
+            if (prgAssemblySpecs == null || cAssembliesToResolve == 0 || prgResolvedAssemblyPaths == null)
+            {
+                throw new ArgumentException("One or more of the arguments are invalid.");
+            }
 
-			pcResolvedAssemblyPaths = 0;
+            pcResolvedAssemblyPaths = 0;
 
-			try
-			{
-				var results = designTimeAssemblyResolution.Resolve(prgAssemblySpecs.Take((int)cAssembliesToResolve));
-				results.CopyTo(prgResolvedAssemblyPaths, 0);
-				pcResolvedAssemblyPaths = (uint)results.Length;
-			}
-			catch (Exception ex)
-			{
-				return Marshal.GetHRForException(ex);
-			}
+            try
+            {
+                var results = designTimeAssemblyResolution.Resolve(prgAssemblySpecs.Take((int)cAssembliesToResolve));
+                results.CopyTo(prgResolvedAssemblyPaths, 0);
+                pcResolvedAssemblyPaths = (uint)results.Length;
+            }
+            catch (Exception ex)
+            {
+                return Marshal.GetHRForException(ex);
+            }
 
-			return VSConstants.S_OK;
-		}
+            return VSConstants.S_OK;
+        }
 
-		#endregion
+        #endregion IVsDesignTimeAssemblyResolution methods
 
-		#region private helper methods
+        #region private helper methods
 
         /// <summary>
         /// Initialize projectNode
@@ -5972,7 +5993,7 @@ namespace Microsoft.VisualStudio.Project
         }
 
         /// <summary>
-        /// Updates our scc project settings. 
+        /// Updates our scc project settings.
         /// </summary>
         /// <param name="sccProjectName">String, opaque to the project, that identifies the project location on the server. Persist this string in the project file. </param>
         /// <param name="sccLocalPath">String, opaque to the project, that identifies the path to the server. Persist this string in the project file.</param>
@@ -5994,7 +6015,6 @@ namespace Microsoft.VisualStudio.Project
                 this.sccAuxPath = sccAuxPath;
                 this.sccProvider = sccProvider;
             }
-
 
             return changed;
         }
@@ -6313,7 +6333,6 @@ namespace Microsoft.VisualStudio.Project
                     Trace.TraceError(ex.ToString());
                 }
 
-
                 try
                 {
                     if (requiresUIThread)
@@ -6339,179 +6358,181 @@ namespace Microsoft.VisualStudio.Project
             this.buildInProcess = false;
         }
 
-		private string GetComponentPickerDirectories()
-		{
-			IVsComponentEnumeratorFactory4 enumFactory = this.site.GetService(typeof(SCompEnumService)) as IVsComponentEnumeratorFactory4;
-			if (enumFactory == null)
-			{
-				throw new InvalidOperationException("Missing the SCompEnumService service.");
-			}
+        private string GetComponentPickerDirectories()
+        {
+            IVsComponentEnumeratorFactory4 enumFactory = this.site.GetService(typeof(SCompEnumService)) as IVsComponentEnumeratorFactory4;
+            if (enumFactory == null)
+            {
+                throw new InvalidOperationException("Missing the SCompEnumService service.");
+            }
 
-			IEnumComponents enumerator;
-			Marshal.ThrowExceptionForHR(enumFactory.GetReferencePathsForTargetFramework(this.TargetFrameworkMoniker.FullName, out enumerator));
-			if (enumerator == null)
-			{
-				throw new ApplicationException("IVsComponentEnumeratorFactory4.GetReferencePathsForTargetFramework returned null.");
-			}
+            IEnumComponents enumerator;
+            Marshal.ThrowExceptionForHR(enumFactory.GetReferencePathsForTargetFramework(this.TargetFrameworkMoniker.FullName, out enumerator));
+            if (enumerator == null)
+            {
+                throw new ApplicationException("IVsComponentEnumeratorFactory4.GetReferencePathsForTargetFramework returned null.");
+            }
 
-			StringBuilder paths = new StringBuilder();
-			VSCOMPONENTSELECTORDATA[] data = new VSCOMPONENTSELECTORDATA[1];
-			uint fetchedCount;
-			while (enumerator.Next(1, data, out fetchedCount) == VSConstants.S_OK && fetchedCount == 1)
-			{
-				Debug.Assert(data[0].type == VSCOMPONENTTYPE.VSCOMPONENTTYPE_Path);
-				paths.Append(data[0].bstrFile);
-				paths.Append(";");
-			}
+            StringBuilder paths = new StringBuilder();
+            VSCOMPONENTSELECTORDATA[] data = new VSCOMPONENTSELECTORDATA[1];
+            uint fetchedCount;
+            while (enumerator.Next(1, data, out fetchedCount) == VSConstants.S_OK && fetchedCount == 1)
+            {
+                Debug.Assert(data[0].type == VSCOMPONENTTYPE.VSCOMPONENTTYPE_Path);
+                paths.Append(data[0].bstrFile);
+                paths.Append(";");
+            }
 
-			// Trim off the last semicolon.
-			if (paths.Length > 0)
-			{
-				paths.Length -= 1;
-			}
+            // Trim off the last semicolon.
+            if (paths.Length > 0)
+            {
+                paths.Length -= 1;
+            }
 
-			return paths.ToString();
-		}
+            return paths.ToString();
+        }
 
-		#endregion
+        #endregion private helper methods
 
-		public int UpdateTargetFramework(IVsHierarchy pHier, string currentTargetFramework, string newTargetFramework)
-		{
-			FrameworkName moniker = new FrameworkName(newTargetFramework);
-			SetProjectProperty("TargetFrameworkIdentifier", moniker.Identifier);
-			SetProjectProperty("TargetFrameworkVersion", "v" + moniker.Version);
-			SetProjectProperty("TargetFrameworkProfile", moniker.Profile);
-			return VSConstants.S_OK;
-		}
+        public int UpdateTargetFramework(IVsHierarchy pHier, string currentTargetFramework, string newTargetFramework)
+        {
+            FrameworkName moniker = new FrameworkName(newTargetFramework);
+            SetProjectProperty("TargetFrameworkIdentifier", moniker.Identifier);
+            SetProjectProperty("TargetFrameworkVersion", "v" + moniker.Version);
+            SetProjectProperty("TargetFrameworkProfile", moniker.Profile);
+            return VSConstants.S_OK;
+        }
 
-		public int UpgradeProject(uint grfUpgradeFlags)
-		{
-			int hr = VSConstants.S_OK;
+        public int UpgradeProject(uint grfUpgradeFlags)
+        {
+            int hr = VSConstants.S_OK;
 
-			if (!PerformTargetFrameworkCheck())
-			{
-				// Just return OLE_E_PROMPTSAVECANCELLED here which will cause the shell
-				// to leave the project in an unloaded state.
-				hr = VSConstants.OLE_E_PROMPTSAVECANCELLED;
-			}
+            if (!PerformTargetFrameworkCheck())
+            {
+                // Just return OLE_E_PROMPTSAVECANCELLED here which will cause the shell
+                // to leave the project in an unloaded state.
+                hr = VSConstants.OLE_E_PROMPTSAVECANCELLED;
+            }
 
-			return hr;
-		}
+            return hr;
+        }
 
-		private bool PerformTargetFrameworkCheck()
-		{
-			if (this.IsFrameworkOnMachine())
-			{
-				// Nothing to do since the framework is present.
-				return true;
-			}
+        private bool PerformTargetFrameworkCheck()
+        {
+            if (this.IsFrameworkOnMachine())
+            {
+                // Nothing to do since the framework is present.
+                return true;
+            }
 
-			return ShowRetargetingDialog();
-		}
+            return ShowRetargetingDialog();
+        }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns>
-		/// <c>true</c> if the project will be retargeted.  <c>false</c> to load project in unloaded state.
-		/// </returns>
-		private bool ShowRetargetingDialog()
-		{
-			var retargetDialog = this.site.GetService(typeof(SVsFrameworkRetargetingDlg)) as IVsFrameworkRetargetingDlg;
-			if (retargetDialog == null)
-			{
-				throw new InvalidOperationException("Missing SVsFrameworkRetargetingDlg service.");
-			}
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if the project will be retargeted.  <c>false</c> to load project in unloaded state.
+        /// </returns>
+        private bool ShowRetargetingDialog()
+        {
+            var retargetDialog = this.site.GetService(typeof(SVsFrameworkRetargetingDlg)) as IVsFrameworkRetargetingDlg;
+            if (retargetDialog == null)
+            {
+                throw new InvalidOperationException("Missing SVsFrameworkRetargetingDlg service.");
+            }
 
-			// We can only display the retargeting dialog if the IDE is not in command-line mode.
-			if (IsIdeInCommandLineMode)
-			{
-				string message = SR.GetString(SR.CannotLoadUnknownTargetFrameworkProject, this.FileName, this.TargetFrameworkMoniker);
-				var outputWindow = this.site.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
-				if (outputWindow != null)
-				{
-					IVsOutputWindowPane outputPane;
-					Guid outputPaneGuid = VSConstants.GUID_BuildOutputWindowPane;
-					if (outputWindow.GetPane(ref outputPaneGuid, out outputPane) >= 0 && outputPane != null)
-					{
-						Marshal.ThrowExceptionForHR(outputPane.OutputString(message));
-					}
-				}
+            // We can only display the retargeting dialog if the IDE is not in command-line mode.
+            if (IsIdeInCommandLineMode)
+            {
+                string message = SR.GetString(SR.CannotLoadUnknownTargetFrameworkProject, this.FileName, this.TargetFrameworkMoniker);
+                var outputWindow = this.site.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+                if (outputWindow != null)
+                {
+                    IVsOutputWindowPane outputPane;
+                    Guid outputPaneGuid = VSConstants.GUID_BuildOutputWindowPane;
+                    if (outputWindow.GetPane(ref outputPaneGuid, out outputPane) >= 0 && outputPane != null)
+                    {
+                        Marshal.ThrowExceptionForHR(outputPane.OutputString(message));
+                    }
+                }
 
-				throw new InvalidOperationException(message);
-			}
-			else
-			{
-				uint outcome;
-				int dontShowAgain;
-				Marshal.ThrowExceptionForHR(retargetDialog.ShowFrameworkRetargetingDlg(
-					this.Package.ProductUserContext,
-					this.FileName,
-					this.TargetFrameworkMoniker.FullName,
-					(uint)__FRD_FLAGS.FRDF_DEFAULT,
-					out outcome,
-					out dontShowAgain));
-				switch ((__FRD_OUTCOME)outcome)
-				{
-					case __FRD_OUTCOME.FRDO_GOTO_DOWNLOAD_SITE:
-						Marshal.ThrowExceptionForHR(retargetDialog.NavigateToFrameworkDownloadUrl());
-						return false;
-					case __FRD_OUTCOME.FRDO_LEAVE_UNLOADED:
-						return false;
-					case __FRD_OUTCOME.FRDO_RETARGET_TO_40:
-						// If we are retargeting to 4.0, then set the flag to set the appropriate Target Framework.
-						// This will dirty the project file, so we check it out of source control now -- so that
-						// the user can associate getting the checkout prompt with the "No Framework" dialog.
-						if (QueryEditProjectFile(false /* bSuppressUI */))
-						{
-							var retargetingService = this.site.GetService(typeof(SVsTrackProjectRetargeting)) as IVsTrackProjectRetargeting;
-							if (retargetingService != null)
-							{
-								// We surround our batch retargeting request with begin/end because in individual project load
-								// scenarios the solution load context hasn't done it for us.
-								Marshal.ThrowExceptionForHR(retargetingService.BeginRetargetingBatch());
-								Marshal.ThrowExceptionForHR(retargetingService.BatchRetargetProject(this, DefaultTargetFrameworkMoniker.FullName, true));
-								Marshal.ThrowExceptionForHR(retargetingService.EndRetargetingBatch());
-							}
-							else
-							{
-								// Just setting the moniker to null will allow the default framework (.NETFX 4.0) to assert itself.
-								this.TargetFrameworkMoniker = null;
-							}
+                throw new InvalidOperationException(message);
+            }
+            else
+            {
+                uint outcome;
+                int dontShowAgain;
+                Marshal.ThrowExceptionForHR(retargetDialog.ShowFrameworkRetargetingDlg(
+                    this.Package.ProductUserContext,
+                    this.FileName,
+                    this.TargetFrameworkMoniker.FullName,
+                    (uint)__FRD_FLAGS.FRDF_DEFAULT,
+                    out outcome,
+                    out dontShowAgain));
+                switch ((__FRD_OUTCOME)outcome)
+                {
+                    case __FRD_OUTCOME.FRDO_GOTO_DOWNLOAD_SITE:
+                        Marshal.ThrowExceptionForHR(retargetDialog.NavigateToFrameworkDownloadUrl());
+                        return false;
 
-							return true;
-						}
-						else
-						{
-							return false;
-						}
-					default:
-						throw new ArgumentException("Unexpected outcome from retargeting dialog.");
-				}
-			}
-		}
+                    case __FRD_OUTCOME.FRDO_LEAVE_UNLOADED:
+                        return false;
 
-		private bool IsFrameworkOnMachine()
-		{
-			var multiTargeting = this.site.GetService(typeof(SVsFrameworkMultiTargeting)) as IVsFrameworkMultiTargeting;
-			Array frameworks;
-			Marshal.ThrowExceptionForHR(multiTargeting.GetSupportedFrameworks(out frameworks));
-			foreach (string fx in frameworks)
-			{
-				uint compat;
-				int hr = multiTargeting.CheckFrameworkCompatibility(this.TargetFrameworkMoniker.FullName, fx, out compat);
-				if (hr < 0)
-				{
-					break;
-				}
+                    case __FRD_OUTCOME.FRDO_RETARGET_TO_40:
+                        // If we are retargeting to 4.0, then set the flag to set the appropriate Target Framework.
+                        // This will dirty the project file, so we check it out of source control now -- so that
+                        // the user can associate getting the checkout prompt with the "No Framework" dialog.
+                        if (QueryEditProjectFile(false /* bSuppressUI */))
+                        {
+                            var retargetingService = this.site.GetService(typeof(SVsTrackProjectRetargeting)) as IVsTrackProjectRetargeting;
+                            if (retargetingService != null)
+                            {
+                                // We surround our batch retargeting request with begin/end because in individual project load
+                                // scenarios the solution load context hasn't done it for us.
+                                Marshal.ThrowExceptionForHR(retargetingService.BeginRetargetingBatch());
+                                Marshal.ThrowExceptionForHR(retargetingService.BatchRetargetProject(this, DefaultTargetFrameworkMoniker.FullName, true));
+                                Marshal.ThrowExceptionForHR(retargetingService.EndRetargetingBatch());
+                            }
+                            else
+                            {
+                                // Just setting the moniker to null will allow the default framework (.NETFX 4.0) to assert itself.
+                                this.TargetFrameworkMoniker = null;
+                            }
 
-				if ((__VSFRAMEWORKCOMPATIBILITY)compat == __VSFRAMEWORKCOMPATIBILITY.VSFRAMEWORKCOMPATIBILITY_COMPATIBLE)
-				{
-					return true;
-				}
-			}
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    default:
+                        throw new ArgumentException("Unexpected outcome from retargeting dialog.");
+                }
+            }
+        }
 
-			return false;
-		}
-	}
+        private bool IsFrameworkOnMachine()
+        {
+            var multiTargeting = this.site.GetService(typeof(SVsFrameworkMultiTargeting)) as IVsFrameworkMultiTargeting;
+            Array frameworks;
+            Marshal.ThrowExceptionForHR(multiTargeting.GetSupportedFrameworks(out frameworks));
+            foreach (string fx in frameworks)
+            {
+                uint compat;
+                int hr = multiTargeting.CheckFrameworkCompatibility(this.TargetFrameworkMoniker.FullName, fx, out compat);
+                if (hr < 0)
+                {
+                    break;
+                }
+
+                if ((__VSFRAMEWORKCOMPATIBILITY)compat == __VSFRAMEWORKCOMPATIBILITY.VSFRAMEWORKCOMPATIBILITY_COMPATIBLE)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
 }

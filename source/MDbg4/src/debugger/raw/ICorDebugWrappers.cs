@@ -1,20 +1,17 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //
 // Imports ICorDebug interface from CorDebug.idl into managed code.
 //---------------------------------------------------------------------
 
-
+using Microsoft.Samples.Debugging.CorMetadata.NativeApi;
 using System;
-using System.Text;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
+using System.Text;
 using IStream = System.Runtime.InteropServices.ComTypes.IStream;
-using Microsoft.Samples.Debugging.CorMetadata.NativeApi;
-using Microsoft.Win32.SafeHandles;
 
 namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
 {
@@ -64,6 +61,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     {
         // Fields
         DEBUG_EXCEPTION_CATCH_HANDLER_FOUND = 3,
+
         DEBUG_EXCEPTION_FIRST_CHANCE = 1,
         DEBUG_EXCEPTION_UNHANDLED = 4,
         DEBUG_EXCEPTION_USER_FIRST_CHANCE = 2
@@ -73,14 +71,15 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     {
         // Fields
         DEBUG_EXCEPTION_INTERCEPTED = 2,
+
         DEBUG_EXCEPTION_UNWIND_BEGIN = 1
     }
-
 
     public enum CorDebugRegister
     {
         // Fields
         REGISTER_AMD64_R10 = 11,
+
         REGISTER_AMD64_R11 = 12,
         REGISTER_AMD64_R12 = 13,
         REGISTER_AMD64_R13 = 14,
@@ -138,15 +137,12 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         REGISTER_X86_FPSTACK_7 = 0x10
     }
 
-
-
-
-
     [Flags]
     public enum CorDebugUserState
     {
         // Fields
         USER_NONE = 0x00,
+
         USER_STOP_REQUESTED = 0x01,
         USER_SUSPEND_REQUESTED = 0x02,
         USER_BACKGROUND = 0x04,
@@ -214,25 +210,34 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     }
 
     #region Top-level interfaces
+
     [ComImport, Guid("3D6F5F61-7538-11D3-8D5B-00104B35E7EF"), InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown)]
     public interface ICorDebug
     {
         //
         void Initialize();
+
         //
         void Terminate();
+
         //
         void SetManagedHandler([In, MarshalAs(UnmanagedType.Interface)] ICorDebugManagedCallback pCallback);
+
         //
         void SetUnmanagedHandler([In, MarshalAs(UnmanagedType.Interface)] ICorDebugUnmanagedCallback pCallback);
+
         //
         void CreateProcess([In, MarshalAs(UnmanagedType.LPWStr)] string lpApplicationName, [In, MarshalAs(UnmanagedType.LPWStr)] string lpCommandLine, [In] SECURITY_ATTRIBUTES lpProcessAttributes, [In] SECURITY_ATTRIBUTES lpThreadAttributes, [In] int bInheritHandles, [In] uint dwCreationFlags, [In] IntPtr lpEnvironment, [In, MarshalAs(UnmanagedType.LPWStr)] string lpCurrentDirectory, [In] STARTUPINFO lpStartupInfo, [In] PROCESS_INFORMATION lpProcessInformation, [In] CorDebugCreateProcessFlags debuggingFlags, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugProcess ppProcess);
+
         //
         void DebugActiveProcess([In] uint id, [In] int win32Attach, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugProcess ppProcess);
+
         //
         void EnumerateProcesses([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugProcessEnum ppProcess);
+
         //
         void GetProcess([In] uint dwProcessId, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugProcess ppProcess);
+
         //
         void CanLaunchOrAttach([In] uint dwProcessId, [In] int win32DebuggingEnabled);
     }
@@ -249,6 +254,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     {
         //
         void CreateProcessEx([In, MarshalAs(UnmanagedType.Interface)] ICorDebugRemoteTarget pRemoteTarget, [In, MarshalAs(UnmanagedType.LPWStr)] string lpApplicationName, [In, MarshalAs(UnmanagedType.LPWStr)] string lpCommandLine, [In] SECURITY_ATTRIBUTES lpProcessAttributes, [In] SECURITY_ATTRIBUTES lpThreadAttributes, [In] int bInheritHandles, [In] uint dwCreationFlags, [In] IntPtr lpEnvironment, [In, MarshalAs(UnmanagedType.LPWStr)] string lpCurrentDirectory, [In] STARTUPINFO lpStartupInfo, [In] PROCESS_INFORMATION lpProcessInformation, [In] CorDebugCreateProcessFlags debuggingFlags, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugProcess ppProcess);
+
         //
         void DebugActiveProcessEx([In, MarshalAs(UnmanagedType.Interface)] ICorDebugRemoteTarget pRemoteTarget, [In] uint id, [In] int win32Attach, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugProcess ppProcess);
     }
@@ -257,8 +263,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     public interface CorDebug : ICorDebug
     {
     }
-
-
 
     [ComImport, ClassInterface((short)0), Guid("6fef44d0-39e7-4c77-be8e-c9f8cf988630"), TypeLibType((short)2)]
     public class CorDebugClass : ICorDebug, CorDebug
@@ -368,9 +372,11 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         public virtual extern void Terminate();
     }
-    #endregion // Top-level interfaces
+
+    #endregion Top-level interfaces
 
     #region AppDomain, Process
+
     public enum CorDebugThreadState
     {
         THREAD_RUN,
@@ -380,7 +386,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("3D6F5F62-7538-11D3-8D5B-00104B35E7EF"), InterfaceType(1)]
     public interface ICorDebugController
     {
-
         void Stop([In] uint dwTimeout);
 
         void Continue([In] int fIsOutOfBand);
@@ -405,7 +410,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, ComConversionLoss, InterfaceType(1), Guid("3D6F5F64-7538-11D3-8D5B-00104B35E7EF")]
     public interface ICorDebugProcess : ICorDebugController
     {
-
         new void Stop([In] uint dwTimeout);
 
         new void Continue([In] int fIsOutOfBand);
@@ -425,8 +429,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void CanCommitChanges([In] uint cSnapshots, [In, MarshalAs(UnmanagedType.Interface)] ref ICorDebugEditAndContinueSnapshot pSnapshots, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugErrorInfoEnum pError);
 
         new void CommitChanges([In] uint cSnapshots, [In, MarshalAs(UnmanagedType.Interface)] ref ICorDebugEditAndContinueSnapshot pSnapshots, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugErrorInfoEnum pError);
-
-
 
         void GetID([Out] out uint pdwProcessId);
 
@@ -466,7 +468,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("AD1B3588-0EF0-4744-A496-AA09A9F80371"), InterfaceType(1), ComConversionLoss]
     public interface ICorDebugProcess2
     {
-
         void GetThreadForTaskID([In] ulong taskid, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugThread2 ppThread);
 
         void GetVersion([Out] out _COR_VERSION version);
@@ -486,13 +487,11 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     public interface ICorDebugProcess3
     {
         void SetEnableCustomNotification([In, MarshalAs(UnmanagedType.Interface)] ICorDebugClass pClass, [In] int fOnOff);
-
     }
 
     [ComImport, ComConversionLoss, InterfaceType(1), Guid("CC7BCB05-8A68-11D2-983C-0000F808342D")]
     public interface ICorDebugProcessEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -500,17 +499,14 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ICorDebugProcess[] processes, [Out] out uint pceltFetched);
     }
 
-
-
-
     [ComImport, ComConversionLoss, InterfaceType(1), Guid("3D6F5F63-7538-11D3-8D5B-00104B35E7EF")]
     public interface ICorDebugAppDomain : ICorDebugController
     {
-
         new void Stop([In] uint dwTimeout);
 
         new void Continue([In] int fIsOutOfBand);
@@ -530,8 +526,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void CanCommitChanges([In] uint cSnapshots, [In, MarshalAs(UnmanagedType.Interface)] ref ICorDebugEditAndContinueSnapshot pSnapshots, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugErrorInfoEnum pError);
 
         new void CommitChanges([In] uint cSnapshots, [In, MarshalAs(UnmanagedType.Interface)] ref ICorDebugEditAndContinueSnapshot pSnapshots, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugErrorInfoEnum pError);
-
-
 
         void GetProcess([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugProcess ppProcess);
 
@@ -557,7 +551,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), Guid("096E81D5-ECDA-4202-83F5-C65980A9EF75")]
     public interface ICorDebugAppDomain2
     {
-
         void GetArrayOrPointerType([In] CorElementType elementType, [In] uint nRank, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugType pTypeArg, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugType ppType);
 
         void GetFunctionPointerType([In] uint nTypeArgs, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] ICorDebugType[] ppTypeArgs, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugType ppType);
@@ -566,7 +559,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), Guid("63CA1B24-4359-4883-BD57-13F815F58744"), ComConversionLoss]
     public interface ICorDebugAppDomainEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -574,19 +566,18 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ICorDebugAppDomain[] values, [Out] out uint pceltFetched);
     }
 
-    #endregion // AppDomain, Process
-
+    #endregion AppDomain, Process
 
     #region Assembly
 
     [ComImport, ComConversionLoss, Guid("DF59507C-D47A-459E-BCE2-6427EAC8FD06"), InterfaceType(1)]
     public interface ICorDebugAssembly
     {
-
         void GetProcess([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugProcess ppProcess);
 
         void GetAppDomain([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugAppDomain ppAppDomain);
@@ -601,14 +592,12 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), Guid("426D1F9E-6DD4-44C8-AEC7-26CDBAF4E398")]
     public interface ICorDebugAssembly2
     {
-
         void IsFullyTrusted([Out] out int pbFullyTrusted);
     }
 
     [ComImport, Guid("4A2A1EC9-85EC-4BFB-9F15-A89FDFE0FE83"), ComConversionLoss, InterfaceType(1)]
     public interface ICorDebugAssemblyEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -616,19 +605,20 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ICorDebugAssembly[] values, [Out] out uint pceltFetched);
     }
-    #endregion Assembly
 
+    #endregion Assembly
 
     #region Execution Control
 
     #region Breakpoints
+
     [ComImport, InterfaceType(1), Guid("CC7BCAE8-8A68-11D2-983C-0000F808342D")]
     public interface ICorDebugBreakpoint
     {
-
         void Activate([In] int bActive);
 
         void IsActive([Out] out int pbActive);
@@ -637,7 +627,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("CC7BCB03-8A68-11D2-983C-0000F808342D"), ComConversionLoss, InterfaceType(1)]
     public interface ICorDebugBreakpointEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -645,6 +634,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ICorDebugBreakpoint[] breakpoints, [Out] out uint pceltFetched);
     }
@@ -652,11 +642,9 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("CC7BCAE9-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugFunctionBreakpoint : ICorDebugBreakpoint
     {
-
         new void Activate([In] int bActive);
 
         new void IsActive([Out] out int pbActive);
-
 
         void GetFunction([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugFunction ppFunction);
 
@@ -666,11 +654,13 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     #endregion Breakpoints
 
     #region Stepping
+
     [Flags]
     public enum CorDebugUnmappedStop
     {
         // Fields
         STOP_ALL = 0xffff,
+
         STOP_NONE = 0,
         STOP_PROLOG = 1,
         STOP_EPILOG = 2,
@@ -689,11 +679,13 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         STEP_INTERCEPT,
         STEP_EXIT
     }
+
     [Flags]
     public enum CorDebugIntercept
     {
         // Fields
         INTERCEPT_NONE = 0,
+
         INTERCEPT_ALL = 0xffff,
         INTERCEPT_CLASS_INIT = 1,
         INTERCEPT_EXCEPTION_FILTER = 2,
@@ -712,7 +704,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("CC7BCAEC-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugStepper
     {
-
         void IsActive([Out] out int pbActive);
 
         void Deactivate();
@@ -733,14 +724,12 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("C5B6E9C3-E7D1-4A8E-873B-7F047F0706F7"), InterfaceType(1)]
     public interface ICorDebugStepper2
     {
-
         void SetJMC([In] int fIsJMCStepper);
     }
 
     [ComImport, ComConversionLoss, Guid("CC7BCB04-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugStepperEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -748,21 +737,20 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ICorDebugStepper[] steppers, [Out] out uint pceltFetched);
     }
 
-    #endregion
+    #endregion Stepping
 
     #endregion Execution Control
-
 
     #region Class, Type
 
     [ComImport, Guid("CC7BCAF5-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugClass
     {
-
         void GetModule([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugModule pModule);
 
         void GetToken([Out] out uint pTypeDef);
@@ -773,7 +761,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("B008EA8D-7AB1-43F7-BB20-FBB5A04038AE"), InterfaceType(1)]
     public interface ICorDebugClass2
     {
-
         void GetParameterizedType([In] CorElementType elementType, [In] uint nTypeArgs, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] ICorDebugType[] ppTypeArgs, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugType ppType);
 
         void SetJMCStatus([In] int bIsJustMyCode);
@@ -782,12 +769,9 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("D613F0BB-ACE1-4C19-BD72-E4C08D5DA7F5"), InterfaceType(1)]
     public interface ICorDebugType
     {
-
         void GetType([Out] out CorElementType ty);
 
-
         void GetClass([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugClass ppClass);
-
 
         void EnumerateTypeParameters([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugTypeEnum ppTyParEnum);
 
@@ -803,7 +787,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("10F27499-9DF2-43CE-8333-A321D7C99CB4"), InterfaceType(1), ComConversionLoss]
     public interface ICorDebugTypeEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -811,15 +794,15 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ICorDebugType[] values, [Out] out uint pceltFetched);
     }
 
-
-    #endregion // Class, Type
-
+    #endregion Class, Type
 
     #region Code and Function
+
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
     public struct COR_DEBUG_IL_TO_NATIVE_MAP
     {
@@ -831,7 +814,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), Guid("CC7BCAF4-8A68-11D2-983C-0000F808342D"), ComConversionLoss]
     public interface ICorDebugCode
     {
-
         void IsIL([Out] out int pbIL);
 
         void GetFunction([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugFunction ppFunction);
@@ -841,7 +823,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         void GetSize([Out] out uint pcBytes);
 
         void CreateBreakpoint([In] uint offset, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugFunctionBreakpoint ppBreakpoint);
-
 
         void GetCode([In] uint startOffset, [In] uint endOffset, [In] uint cBufferAlloc, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)] byte[] buffer, [Out] out uint pcBufferSize);
 
@@ -862,7 +843,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, ComConversionLoss, Guid("5F696509-452F-4436-A3FE-4D11FE7E2347"), InterfaceType(1)]
     public interface ICorDebugCode2
     {
-
         void GetCodeChunks([In] uint cbufSize, [Out] out uint pcnumChunks, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] _CodeChunkInfo[] chunks);
 
         void GetCompilerFlags([Out] out uint pdwFlags);
@@ -871,7 +851,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("55E96461-9645-45E4-A2FF-0367877ABCDE"), InterfaceType(1), ComConversionLoss]
     public interface ICorDebugCodeEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -879,6 +858,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ICorDebugCode[] values, [Out] out uint pceltFetched);
     }
@@ -886,7 +866,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("CC7BCAF3-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugFunction
     {
-
         void GetModule([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugModule ppModule);
 
         void GetClass([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugClass ppClass);
@@ -907,7 +886,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), Guid("EF0C490B-94C3-4E4D-B629-DDC134C532D8")]
     public interface ICorDebugFunction2
     {
-
         void SetJMCStatus([In] int bIsJustMyCode);
 
         void GetJMCStatus([Out] out int pbIsJustMyCode);
@@ -917,11 +895,10 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         void GetVersionNumber([Out] out uint pnVersion);
     }
 
-
     #endregion Code and Function
 
-
     #region Deprecated
+
     //
     // These interfaces are not used
     //
@@ -929,7 +906,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), Guid("CC7BCB00-8A68-11D2-983C-0000F808342D")]
     public interface ICorDebugContext : ICorDebugObjectValue
     {
-
         new void GetType([Out] out CorElementType pType);
 
         new void GetSize([Out] out uint pSize);
@@ -937,7 +913,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void GetAddress([Out] out ulong pAddress);
 
         new void CreateBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
-
 
         new void GetClass([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugClass ppClass);
 
@@ -957,7 +932,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), Guid("6DC3FA01-D7CB-11D2-8A95-0080C792E5D8")]
     public interface ICorDebugEditAndContinueSnapshot
     {
-
         void CopyMetaData([In, MarshalAs(UnmanagedType.Interface)] IStream pIStream, [Out] out Guid pMvid);
 
         void GetMvid([Out] out Guid pMvid);
@@ -976,7 +950,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, ComConversionLoss, InterfaceType(1), Guid("F0E18809-72B5-11D2-976F-00A0C9B4D50C")]
     public interface ICorDebugErrorInfoEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -984,17 +957,16 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, ComAliasName("ICorDebugEditAndContinueErrorInfo**")] IntPtr errors, [Out] out uint pceltFetched);
     }
+
     #endregion Deprecated
-
-
 
     [ComImport, InterfaceType(1), Guid("CC7BCB01-8A68-11D2-983C-0000F808342D")]
     public interface ICorDebugEnum
     {
-
         void Skip([In] uint celt);
 
         void Reset();
@@ -1004,13 +976,11 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         void GetCount([Out] out uint pcelt);
     }
 
-
-
     #region Function Evaluation
+
     [ComImport, InterfaceType(1), Guid("CC7BCAF6-8A68-11D2-983C-0000F808342D")]
     public interface ICorDebugEval
     {
-
         void CallFunction([In, MarshalAs(UnmanagedType.Interface)] ICorDebugFunction pFunction, [In] uint nArgs, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] ICorDebugValue[] ppArgs);
 
         void NewObject([In, MarshalAs(UnmanagedType.Interface)] ICorDebugFunction pConstructor, [In] uint nArgs, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] ICorDebugValue[] ppArgs);
@@ -1035,7 +1005,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("FB0D9CE7-BE66-4683-9D32-A42A04E2FD91"), InterfaceType(1)]
     public interface ICorDebugEval2
     {
-
         void CallParameterizedFunction([In, MarshalAs(UnmanagedType.Interface)] ICorDebugFunction pFunction, [In] uint nTypeArgs, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] ICorDebugType[] ppTypeArgs, [In] uint nArgs, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 3)] ICorDebugValue[] ppArgs);
 
         void CreateValueForType([In, MarshalAs(UnmanagedType.Interface)] ICorDebugType pType, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValue ppValue);
@@ -1050,16 +1019,14 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
 
         void RudeAbort();
     }
+
     #endregion Function Evaluation
-
-
 
     #region ICorDebugValue
 
     [ComImport, Guid("CC7BCAF7-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugValue
     {
-
         void GetType([Out] out CorElementType pType);
 
         void GetSize([Out] out uint pSize);
@@ -1072,14 +1039,12 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("5E0B54E7-D88A-4626-9420-A691E0A78B49"), InterfaceType(1)]
     public interface ICorDebugValue2
     {
-
         void GetExactType([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugType ppType);
     }
 
     [ComImport, InterfaceType(1), Guid("CC7BCAF8-8A68-11D2-983C-0000F808342D")]
     public interface ICorDebugGenericValue : ICorDebugValue
     {
-
         new void GetType([Out] out CorElementType pType);
 
         new void GetSize([Out] out uint pSize);
@@ -1087,7 +1052,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void GetAddress([Out] out ulong pAddress);
 
         new void CreateBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
-
 
         void GetValue([Out] IntPtr pTo);
 
@@ -1097,7 +1061,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), Guid("CC7BCAF9-8A68-11D2-983C-0000F808342D")]
     public interface ICorDebugReferenceValue : ICorDebugValue
     {
-
         new void GetType([Out] out CorElementType pType);
 
         new void GetSize([Out] out uint pSize);
@@ -1105,7 +1068,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void GetAddress([Out] out ulong pAddress);
 
         new void CreateBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
-
 
         void IsNull([Out] out int pbNull);
 
@@ -1118,18 +1080,17 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         void DereferenceStrong([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValue ppValue);
     }
 
-
     public enum CorDebugHandleType
     {
         // Fields
         HANDLE_STRONG = 1,
+
         HANDLE_WEAK_TRACK_RESURRECTION = 2
     }
 
     [ComImport, Guid("029596E8-276B-46A1-9821-732E96BBB00B"), InterfaceType(1)]
     public interface ICorDebugHandleValue : ICorDebugReferenceValue
     {
-
         new void GetType([Out] out CorElementType pType);
 
         new void GetSize([Out] out uint pSize);
@@ -1137,7 +1098,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void GetAddress([Out] out ulong pAddress);
 
         new void CreateBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
-
 
         new void IsNull([Out] out int pbNull);
 
@@ -1149,7 +1109,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
 
         new void DereferenceStrong([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValue ppValue);
 
-
         void GetHandleType([Out] out CorDebugHandleType pType);
 
         void Dispose();
@@ -1158,7 +1117,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("CC7BCAFA-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugHeapValue : ICorDebugValue
     {
-
         new void GetType([Out] out CorElementType pType);
 
         new void GetSize([Out] out uint pSize);
@@ -1167,18 +1125,14 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
 
         new void CreateBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
 
-
-
         void IsValid([Out] out int pbValid);
 
         void CreateRelocBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
-
     }
 
     [ComImport, InterfaceType(1), Guid("E3AC4D6C-9CB7-43E6-96CC-B21540E5083C")]
     public interface ICorDebugHeapValue2
     {
-
         void CreateHandle([In] CorDebugHandleType type, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugHandleValue ppHandle);
     }
 
@@ -1189,13 +1143,13 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     {
         void GetThreadOwningMonitorLock([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugThread thread,
                                        [Out] out int acquisitionCount);
+
         void GetMonitorEventWaitList([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugThreadEnum threadEnum);
     }
 
     [ComImport, InterfaceType(1), Guid("CC7BCAFC-8A68-11D2-983C-0000F808342D")]
     public interface ICorDebugBoxValue : ICorDebugHeapValue
     {
-
         new void GetType([Out] out CorElementType pType);
 
         new void GetSize([Out] out uint pSize);
@@ -1204,12 +1158,9 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
 
         new void CreateBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
 
-
         new void IsValid([Out] out int pbValid);
 
-
         new void CreateRelocBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
-
 
         void GetObject([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugObjectValue ppObject);
     }
@@ -1217,7 +1168,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, ComConversionLoss, Guid("0405B0DF-A660-11D2-BD02-0000F80849BD"), InterfaceType(1)]
     public interface ICorDebugArrayValue : ICorDebugHeapValue
     {
-
         new void GetType([Out] out CorElementType pType);
 
         new void GetSize([Out] out uint pSize);
@@ -1226,12 +1176,9 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
 
         new void CreateBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
 
-
         new void IsValid([Out] out int pbValid);
 
-
         new void CreateRelocBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
-
 
         void GetElementType([Out] out CorElementType pType);
 
@@ -1250,17 +1197,12 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         void GetElementAtPosition([In] uint nPosition, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValue ppValue);
     }
 
-
-
-
     [ComImport, InterfaceType(1), Guid("CC7BCAEB-8A68-11D2-983C-0000F808342D")]
     public interface ICorDebugValueBreakpoint : ICorDebugBreakpoint
     {
-
         new void Activate([In] int bActive);
 
         new void IsActive([Out] out int pbActive);
-
 
         void GetValue([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValue ppValue);
     }
@@ -1268,7 +1210,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, ComConversionLoss, Guid("CC7BCB0A-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugValueEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -1276,15 +1217,14 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ICorDebugValue[] values, [Out] out uint pceltFetched);
     }
 
-
     [ComImport, Guid("CC7BCAFD-8A68-11D2-983C-0000F808342D"), ComConversionLoss, InterfaceType(1)]
     public interface ICorDebugStringValue : ICorDebugHeapValue
     {
-
         new void GetType([Out] out CorElementType pType);
 
         new void GetSize([Out] out uint pSize);
@@ -1293,23 +1233,18 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
 
         new void CreateBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
 
-
         new void IsValid([Out] out int pbValid);
 
         new void CreateRelocBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
-
 
         void GetLength([Out] out uint pcchString);
 
         void GetString([In] uint cchString, [Out] out uint pcchString, [Out, MarshalAs(UnmanagedType.LPWStr)] StringBuilder szString);
     }
 
-
-
     [ComImport, InterfaceType(1), Guid("18AD3D6E-B7D2-11D2-BD04-0000F80849BD")]
     public interface ICorDebugObjectValue : ICorDebugValue
     {
-
         new void GetType([Out] out CorElementType pType);
 
         new void GetSize([Out] out uint pSize);
@@ -1317,7 +1252,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void GetAddress([Out] out ulong pAddress);
 
         new void CreateBreakpoint([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValueBreakpoint ppBreakpoint);
-
 
         void GetClass([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugClass ppClass);
 
@@ -1337,14 +1271,12 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("49E4A320-4A9B-4ECA-B105-229FB7D5009F"), InterfaceType(1)]
     public interface ICorDebugObjectValue2
     {
-
         void GetVirtualMethodAndType([In] uint memberRef, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugFunction ppFunction, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugType ppType);
     }
 
     [ComImport, ComConversionLoss, Guid("CC7BCB02-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugObjectEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -1352,19 +1284,22 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ulong[] objects, [Out] out uint pceltFetched);
     }
 
-    #endregion // ICorDebugValue
+    #endregion ICorDebugValue
 
     #region Frames and Chains
 
     #region Chains
+
     public enum CorDebugChainReason
     {
         // Fields
         CHAIN_CLASS_INIT = 1,
+
         CHAIN_CONTEXT_POLICY = 8,
         CHAIN_CONTEXT_SWITCH = 0x400,
         CHAIN_DEBUGGER_EVAL = 0x200,
@@ -1382,7 +1317,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("CC7BCAEE-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugChain
     {
-
         void GetThread([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugThread ppThread);
 
         void GetStackRange([Out] out ulong pStart, [Out] out ulong pEnd);
@@ -1411,7 +1345,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), ComConversionLoss, Guid("CC7BCB08-8A68-11D2-983C-0000F808342D")]
     public interface ICorDebugChainEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -1419,18 +1352,16 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ICorDebugChain[] chains, [Out] out uint pceltFetched);
     }
-    #endregion // end Chains
 
-
-
+    #endregion Chains
 
     [ComImport, Guid("CC7BCAEF-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugFrame
     {
-
         void GetChain([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugChain ppChain);
 
         void GetCode([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugCode ppCode);
@@ -1451,7 +1382,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, ComConversionLoss, Guid("CC7BCB07-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugFrameEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -1459,15 +1389,14 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ICorDebugFrame[] frames, [Out] out uint pceltFetched);
     }
 
-
     [ComImport, InterfaceType(1), Guid("03E26314-4F76-11D3-88C6-006097945418")]
     public interface ICorDebugNativeFrame : ICorDebugFrame
     {
-
         new void GetChain([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugChain ppChain);
 
         new void GetCode([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugCode ppCode);
@@ -1484,8 +1413,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
 
         new void CreateStepper([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugStepper ppStepper);
 
-
-
         void GetIP([Out] out uint pnOffset);
 
         void SetIP([In] uint nOffset);
@@ -1501,6 +1428,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         void GetLocalRegisterMemoryValue([In] CorDebugRegister highWordReg, [In] ulong lowWordAddress, [In] uint cbSigBlob, [In, ComAliasName("Microsoft.Debugging.CorDebug.NativeApi.ULONG_PTR")] uint pvSigBlob, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValue ppValue);
 
         void GetLocalMemoryRegisterValue([In] ulong highWordAddress, [In] CorDebugRegister lowWordRegister, [In] uint cbSigBlob, [In, ComAliasName("Microsoft.Debugging.CorDebug.NativeApi.ULONG_PTR")] uint pvSigBlob, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValue ppValue);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int CanSetIP([In] uint nOffset);
     }
@@ -1519,6 +1447,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     {
         // Fields
         MAPPING_APPROXIMATE = 0x20,
+
         MAPPING_EPILOG = 2,
         MAPPING_EXACT = 0x10,
         MAPPING_NO_INFO = 4,
@@ -1526,11 +1455,9 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         MAPPING_UNMAPPED_ADDRESS = 8
     }
 
-
     [ComImport, InterfaceType(1), Guid("03E26311-4F76-11D3-88C6-006097945418")]
     public interface ICorDebugILFrame : ICorDebugFrame
     {
-
         new void GetChain([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugChain ppChain);
 
         new void GetCode([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugCode ppCode);
@@ -1545,9 +1472,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
 
         new void GetCallee([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugFrame ppFrame);
 
-
         new void CreateStepper([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugStepper ppStepper);
-
 
         void GetIP([Out] out uint pnOffset, [Out] out CorDebugMappingResult pMappingResult);
 
@@ -1564,6 +1489,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         void GetStackDepth([Out] out uint pDepth);
 
         void GetStackValue([In] uint dwIndex, [Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValue ppValue);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int CanSetIP([In] uint nOffset);
     }
@@ -1571,7 +1497,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), Guid("5D88A994-6C30-479B-890F-BCEF88B129A5")]
     public interface ICorDebugILFrame2
     {
-
         void RemapFunction([In] uint newILOffset);
 
         void EnumerateTypeParameters([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugTypeEnum ppTyParEnum);
@@ -1595,7 +1520,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), Guid("B92CC7F7-9D2D-45C4-BC2B-621FCC9DFBF4")]
     public interface ICorDebugInternalFrame : ICorDebugFrame
     {
-
         new void GetChain([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugChain ppChain);
 
         new void GetCode([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugCode ppCode);
@@ -1615,7 +1539,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         void GetFrameType([Out] out CorDebugInternalFrameType pType);
     }
 
-
     [ComImport, InterfaceType(1), Guid("C0815BDC-CFAB-447e-A779-C116B454EB5B")]
     public interface ICorDebugInternalFrame2
     {
@@ -1630,7 +1553,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     {
     }
 
-    #endregion // Frames
+    #endregion Frames and Chains
 
     #region Callbacks
 
@@ -1638,88 +1561,61 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("5263E909-8CB5-11D3-BD2F-0000F80849BD"), InterfaceType(1)]
     public interface ICorDebugUnmanagedCallback
     {
-
         void DebugEvent(IntPtr debugEvent, [In] int fOutOfBand);
     }
 
     [ComImport, Guid("3D6F5F60-7538-11D3-8D5B-00104B35E7EF"), InterfaceType(1)]
     public interface ICorDebugManagedCallback
     {
-
         void Breakpoint([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugBreakpoint pBreakpoint);
-
 
         void StepComplete([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugStepper pStepper, [In] CorDebugStepReason reason);
 
-
         void Break([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread thread);
-
 
         void Exception([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In] int unhandled);
 
-
         void EvalComplete([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugEval pEval);
-
 
         void EvalException([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugEval pEval);
 
-
         void CreateProcess([In, MarshalAs(UnmanagedType.Interface)] ICorDebugProcess pProcess);
-
 
         void ExitProcess([In, MarshalAs(UnmanagedType.Interface)] ICorDebugProcess pProcess);
 
-
         void CreateThread([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread thread);
-
 
         void ExitThread([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread thread);
 
-
         void LoadModule([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugModule pModule);
-
 
         void UnloadModule([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugModule pModule);
 
-
         void LoadClass([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugClass c);
-
 
         void UnloadClass([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugClass c);
 
-
         void DebuggerError([In, MarshalAs(UnmanagedType.Interface)] ICorDebugProcess pProcess, [In, MarshalAs(UnmanagedType.Error)] int errorHR, [In] uint errorCode);
-
 
         void LogMessage([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In] int lLevel, [In, MarshalAs(UnmanagedType.LPWStr)] string pLogSwitchName, [In, MarshalAs(UnmanagedType.LPWStr)] string pMessage);
 
-
         void LogSwitch([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In] int lLevel, [In] uint ulReason, [In, MarshalAs(UnmanagedType.LPWStr)] string pLogSwitchName, [In, MarshalAs(UnmanagedType.LPWStr)] string pParentName);
-
 
         void CreateAppDomain([In, MarshalAs(UnmanagedType.Interface)] ICorDebugProcess pProcess, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain);
 
-
         void ExitAppDomain([In, MarshalAs(UnmanagedType.Interface)] ICorDebugProcess pProcess, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain);
-
 
         void LoadAssembly([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugAssembly pAssembly);
 
-
         void UnloadAssembly([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugAssembly pAssembly);
-
 
         void ControlCTrap([In, MarshalAs(UnmanagedType.Interface)] ICorDebugProcess pProcess);
 
-
         void NameChange([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread);
-
 
         void UpdateModuleSymbols([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugModule pModule, [In, MarshalAs(UnmanagedType.Interface)] IStream pSymbolStream);
 
-
         void EditAndContinueRemap([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugFunction pFunction, [In] int fAccurate);
-
 
         void BreakpointSetError([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugBreakpoint pBreakpoint, [In] uint dwError);
     }
@@ -1727,27 +1623,19 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("250E5EEA-DB5C-4C76-B6F3-8C46F12E3203"), InterfaceType(1)]
     public interface ICorDebugManagedCallback2
     {
-
         void FunctionRemapOpportunity([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugFunction pOldFunction, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugFunction pNewFunction, [In] uint oldILOffset);
-
 
         void CreateConnection([In, MarshalAs(UnmanagedType.Interface)] ICorDebugProcess pProcess, [In] uint dwConnectionId, [In] ref ushort pConnName);
 
-
         void ChangeConnection([In, MarshalAs(UnmanagedType.Interface)] ICorDebugProcess pProcess, [In] uint dwConnectionId);
-
 
         void DestroyConnection([In, MarshalAs(UnmanagedType.Interface)] ICorDebugProcess pProcess, [In] uint dwConnectionId);
 
-
         void Exception([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugFrame pFrame, [In] uint nOffset, [In] CorDebugExceptionCallbackType dwEventType, [In] uint dwFlags);
-
 
         void ExceptionUnwind([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In] CorDebugExceptionUnwindCallbackType dwEventType, [In] uint dwFlags);
 
-
         void FunctionRemapComplete([In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugFunction pFunction);
-
 
         void MDANotification([In, MarshalAs(UnmanagedType.Interface)] ICorDebugController pController, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugThread pThread, [In, MarshalAs(UnmanagedType.Interface)] ICorDebugMDA pMDA);
     }
@@ -1759,14 +1647,13 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
                                 [In, MarshalAs(UnmanagedType.Interface)] ICorDebugAppDomain pAppDomain);
     }
 
-
-    #endregion // Callbacks
+    #endregion Callbacks
 
     #region Module
+
     [ComImport, ComConversionLoss, InterfaceType(1), Guid("DBA2D8C1-E5C5-4069-8C13-10A7C6ABF43D")]
     public interface ICorDebugModule
     {
-
         void GetProcess([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugProcess ppProcess);
 
         void GetBaseAddress([Out] out ulong pAddress);
@@ -1805,10 +1692,10 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), Guid("7FCC5FB5-49C0-41DE-9938-3B88B5B9ADD7")]
     public interface ICorDebugModule2
     {
-
         void SetJMCStatus([In] int bIsJustMyCode, [In] uint cTokens, [In] ref uint pTokens);
 
         void ApplyChanges([In] uint cbMetadata, [In, MarshalAs(UnmanagedType.LPArray)] byte[] pbMetadata, [In] uint cbIL, [In, MarshalAs(UnmanagedType.LPArray)] byte[] pbIL);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int SetJITCompilerFlags([In] uint dwFlags);
 
@@ -1826,11 +1713,9 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, Guid("CC7BCAEA-8A68-11D2-983C-0000F808342D"), InterfaceType(1)]
     public interface ICorDebugModuleBreakpoint : ICorDebugBreakpoint
     {
-
         new void Activate([In] int bActive);
 
         new void IsActive([Out] out int pbActive);
-
 
         void GetModule([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugModule ppModule);
     }
@@ -1838,7 +1723,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), ComConversionLoss, Guid("CC7BCB09-8A68-11D2-983C-0000F808342D")]
     public interface ICorDebugModuleEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -1846,70 +1730,60 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ICorDebugModule[] modules, [Out] out uint pceltFetched);
     }
 
-
     #endregion Module
 
-
-
-
     #region MDA
+
     [CLSCompliant(true)]
     [Flags]
     public enum CorDebugMDAFlags
     {
         // Fields
         None = 0,
+
         MDA_FLAG_SLIP = 2
     }
 
     [ComImport, Guid("CC726F2F-1DB7-459B-B0EC-05F01D841B42"), InterfaceType(1)]
     public interface ICorDebugMDA
     {
-
         void GetName([In] uint cchName, [Out] out uint pcchName, [MarshalAs(UnmanagedType.LPArray)] char[] szName);
-
 
         void GetDescription([In] uint cchName, [Out] out uint pcchName, [MarshalAs(UnmanagedType.LPArray)] char[] szName);
 
-
         void GetXML([In] uint cchName, [Out] out uint pcchName, [MarshalAs(UnmanagedType.LPArray)] char[] szName);
-
 
         void GetFlags([Out] out CorDebugMDAFlags pFlags);
 
-
         void GetOSThreadId([Out] out uint pOsTid);
     }
-    #endregion // MDA
+
+    #endregion MDA
 
     [ComImport, Guid("CC7BCB0B-8A68-11D2-983C-0000F808342D"), ComConversionLoss, InterfaceType(1)]
     public interface ICorDebugRegisterSet
     {
-
         void GetRegistersAvailable([Out] out ulong pAvailable);
-
 
         void GetRegisters([In] ulong mask, [In] uint regCount, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] ulong[] regBuffer);
 
-
         void SetRegisters([In] ulong mask, [In] uint regCount, [In, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] ulong[] regBuffer);
 
-
         void GetThreadContext([In] uint contextSize, [In, ComAliasName("BYTE*")] IntPtr context);
-
 
         void SetThreadContext([In] uint contextSize, [In, ComAliasName("BYTE*")] IntPtr context);
     }
 
     #region Threads
+
     [ComImport, Guid("938C6D66-7FB6-4F69-B389-425B8987329B"), InterfaceType(1)]
     public interface ICorDebugThread
     {
-
         void GetProcess([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugProcess ppProcess);
 
         void GetID([Out] out uint pdwThreadId);
@@ -1953,11 +1827,9 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         public uint Flags;
     }
 
-
     [ComImport, Guid("2BD956D9-7B07-4BEF-8A98-12AA862417C5"), ComConversionLoss, InterfaceType(1)]
     public interface ICorDebugThread2
     {
-
         void GetActiveFunctions([In] uint cFunctions, [Out] out uint pcFunctions, [Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] COR_ACTIVE_FUNCTION[] pFunctions);
 
         void GetConnectionID([Out] out uint pdwConnectionId);
@@ -1981,7 +1853,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         void GetCurrentCustomDebuggerNotification([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugValue ppNotificationObject);
     }
 
-
     [ComImport, Guid("F8544EC3-5E4E-46c7-8D3E-A52B8405B1F5"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
     public interface ICorDebugThread3
     {
@@ -1996,6 +1867,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     {
         // Fields
         SET_CONTEXT_FLAG_ACTIVE_FRAME = 0x1,
+
         SET_CONTEXT_FLAG_UNWIND_FRAME = 0x2
     }
 
@@ -2035,9 +1907,13 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     public interface ICorDebugEnumBlockingObject : ICorDebugEnum
     {
         new void Skip([In] uint countElements);
+
         new void Reset();
+
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum enumerator);
+
         new void GetCount([Out] out uint countElements);
+
         [PreserveSig]
         int Next([In] uint countElements,
                  [Out, MarshalAs(UnmanagedType.LPArray)] CorDebugBlockingObject[] blockingObjects,
@@ -2047,7 +1923,6 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     [ComImport, InterfaceType(1), ComConversionLoss, Guid("CC7BCB06-8A68-11D2-983C-0000F808342D")]
     public interface ICorDebugThreadEnum : ICorDebugEnum
     {
-
         new void Skip([In] uint celt);
 
         new void Reset();
@@ -2055,6 +1930,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
         new void Clone([Out, MarshalAs(UnmanagedType.Interface)] out ICorDebugEnum ppEnum);
 
         new void GetCount([Out] out uint pcelt);
+
         [PreserveSig, MethodImpl(MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
         int Next([In] uint celt, [Out, MarshalAs(UnmanagedType.LPArray)] ICorDebugThread[] threads, [Out] out uint pceltFetched);
     }
@@ -2062,7 +1938,7 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
     #endregion Threads
 
     /// <summary>
-    /// Constants to return from GetPlatform 
+    /// Constants to return from GetPlatform
     /// </summary>
     public enum CorDebugPlatform : int
     {
@@ -2087,5 +1963,4 @@ namespace Microsoft.Samples.Debugging.CorDebug.NativeApi
                                  uint contextSize,
                                  IntPtr context);
     }
-
 }

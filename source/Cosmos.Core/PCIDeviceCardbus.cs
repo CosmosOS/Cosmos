@@ -1,35 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Core
+﻿namespace Cosmos.Core
 {
     public class PCIDeviceCardbus : PCIDevice
     {
         public uint CardbusBaseAddress { get; private set; }
 
         public byte OffsetOfCapabilityList { get; private set; }
+
         public ushort SecondaryStatus { get; private set; }
 
         public byte PCIBusNumber { get; private set; }
+
         public byte CardbusBusNumber { get; private set; }
+
         public byte SubordinateBusNumber { get; private set; }
+
         public byte CardbusLatencyTimer { get; private set; }
 
         public uint MemoryBaseAddress0 { get; private set; }
+
         public uint MemoryLimit0 { get; private set; }
+
         public uint MemoryBaseAddress1 { get; private set; }
+
         public uint MemoryLimit1 { get; private set; }
 
         public uint IOBaseAddress0 { get; private set; }
+
         public uint IOLimit0 { get; private set; }
+
         public uint IOBaseAddress1 { get; private set; }
+
         public uint IOLimit1 { get; private set; }
 
         public ushort BridgeControl { get; private set; }
 
         public ushort SubsystemDeviceID { get; private set; }
+
         public ushort SubsystemVendorID { get; private set; }
 
         public uint PCCardBaseAddress { get; private set; }

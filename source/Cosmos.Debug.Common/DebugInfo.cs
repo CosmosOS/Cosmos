@@ -1,40 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Data;
-using System.Data.Common;
-using System.Reflection;
-using System.Text;
-using Microsoft.Win32;
-using Microsoft.Samples.Debugging.CorSymbolStore;
-using System.Diagnostics.SymbolStore;
-using System.Configuration;
-using System.Threading;
-using System.Data.SQLite;
-using Dapper;
-using SQLinq;
-using SQLinq.Dapper;
+﻿using Dapper;
 using DapperExtensions;
 using DapperExtensions.Mapper;
 using DapperExtensions.Sql;
+using Microsoft.Samples.Debugging.CorSymbolStore;
+using SQLinq;
+using SQLinq.Dapper;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SQLite;
+using System.Diagnostics.SymbolStore;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace Cosmos.Debug.Common
 {
     public class DebugInfo : IDisposable
     {
-
         // Please beware this field, it may cause issues if used incorrectly.
         public static DebugInfo CurrentInstance { get; private set; }
 
         public class Field_Map
         {
             public string TypeName { get; set; }
+
             public List<string> FieldNames = new List<string>();
         }
 
         protected SQLiteConnection mConnection;
         protected string mDbName;
+
         // Dont use DbConnectionStringBuilder class, it doesnt work with LocalDB properly.
         //protected mDataSouce = @".\SQLEXPRESS";
         protected string mConnStr;
@@ -59,7 +55,7 @@ namespace Cosmos.Debug.Common
             // Use the SQLiteConnectionFactory as the default database connection
             // Do not open mConnection before mEntities.CreateDatabase
             mConnection = new SQLiteConnection(mConnStr);
-            
+
             DapperExtensions.DapperExtensions.DefaultMapper = typeof(PluralizedAutoClassMapper<>);
             DapperExtensions.DapperExtensions.SqlDialect = new SqliteDialect();
             if (aCreate)
@@ -71,7 +67,7 @@ namespace Cosmos.Debug.Common
                     var xSQL = new SQL(mConnection);
                     xSQL.CreateDB();
 
-                    // Be careful with indexes, they slow down inserts. So on tables that we have a 
+                    // Be careful with indexes, they slow down inserts. So on tables that we have a
                     // lot of inserts, but limited look ups, dont add them.
                     //
                     xSQL.MakeIndex("Labels", "Address", false);
@@ -121,6 +117,7 @@ namespace Cosmos.Debug.Common
         }
 
         protected List<string> local_MappingTypeNames = new List<string>();
+
         public void WriteFieldMappingToFile(IEnumerable<Field_Map> aMapping)
         {
             var xMaps = aMapping.Where(delegate(Field_Map mp)
@@ -185,6 +182,7 @@ namespace Cosmos.Debug.Common
         }
 
         protected List<string> mLocalFieldInfoNames = new List<string>();
+
         public void WriteFieldInfoToFile(IList<FIELD_INFO> aFields)
         {
             var itemsToAdd = new List<FIELD_INFO>(aFields.Count);
@@ -206,12 +204,15 @@ namespace Cosmos.Debug.Common
             public string Document;
             public int LineStart;
             public int ColStart;
+
             public Int64 LineColStart
             {
                 get { return ((Int64)LineStart << 32) + ColStart; }
             }
+
             public int LineEnd;
             public int ColEnd;
+
             public Int64 LineColEnd
             {
                 get { return ((Int64)LineEnd << 32) + ColEnd; }
@@ -271,6 +272,7 @@ namespace Cosmos.Debug.Common
         }
 
         protected List<Method> mMethods = new List<Method>();
+
         public void AddMethod(Method aMethod, bool aFlush = false)
         {
             if (aMethod != null)
@@ -283,12 +285,13 @@ namespace Cosmos.Debug.Common
         // Quick look up of assemblies so we dont have to go to the database and compare by fullname.
         // This and other GUID lists contain only a few members, and save us from issuing a lot of selects to SQL.
         public Dictionary<Assembly, Guid> AssemblyGUIDs = new Dictionary<Assembly, Guid>();
-        List<Cosmos.Debug.Common.AssemblyFile> xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
+
+        private List<Cosmos.Debug.Common.AssemblyFile> xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
+
         public void AddAssemblies(List<Assembly> aAssemblies, bool aFlush = false)
         {
             if (aAssemblies != null)
             {
-
                 foreach (var xAsm in aAssemblies)
                 {
                     var xRow = new Cosmos.Debug.Common.AssemblyFile()
@@ -305,7 +308,8 @@ namespace Cosmos.Debug.Common
         }
 
         public Dictionary<string, Guid> DocumentGUIDs = new Dictionary<string, Guid>();
-        List<Document> xDocuments = new List<Document>(1);
+        private List<Document> xDocuments = new List<Document>(1);
+
         public void AddDocument(string aPathname, bool aFlush = false)
         {
             if (aPathname != null)
@@ -356,7 +360,7 @@ namespace Cosmos.Debug.Common
         // and EntityDataReader to bridge the gap to SqlBulk.
         //
         // We dont want to issue individual inserts to SQL as this is very slow.
-        // But accumulating too many records in RAM also is a problem. For example 
+        // But accumulating too many records in RAM also is a problem. For example
         // at time of writing the full structure would take up 11 MB of RAM just for this structure.
         // This is not a huge amount, but as we compile in more and more this figure will grow.
         // So as a compromise, we collect 2500 records then bulk insert.
@@ -369,7 +373,9 @@ namespace Cosmos.Debug.Common
                     using (var xBulkCopy = new SqliteBulkCopy(mConnection))
                     {
                         xBulkCopy.DestinationTableName = aTableName;
+
                         #region debug
+
                         // for now dump to disk:
                         //using (var reader = aList.AsDataReader())
                         //{
@@ -406,7 +412,9 @@ namespace Cosmos.Debug.Common
                         //    }
                         //  }
                         //}
-                        #endregion region debug
+
+                        #endregion debug
+
                         //using (var db = DB())
                         //{
                         //    db.Set(typeof(T)).AddRange(aList);
@@ -466,7 +474,7 @@ namespace Cosmos.Debug.Common
         {
             var xAddress = (long)aAddress;
             var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address <= xAddress).OrderByDescending(i => i.Address)).ToArray();
-            
+
             Label methodHeaderLabel = null;
             //The first label we find searching upwards with "GUID_" at the start will be the very start of the method header
             foreach (var xLabel in xLabels)
@@ -479,7 +487,7 @@ namespace Cosmos.Debug.Common
             }
             return methodHeaderLabel;
         }
-        
+
         public Label[] GetMethodLabels(uint address)
         {
             var method = GetMethod(address);
@@ -514,7 +522,7 @@ namespace Cosmos.Debug.Common
                 "where LStart.Address <= @Address and LEnd.Address > @Address;", new { Address = aAddress }).Single();
             return method;
         }
-        
+
         // Gets MLSymbols for a method, given an address within the method.
         public MethodIlOp[] GetSymbols(Method aMethod)
         {
@@ -563,7 +571,7 @@ namespace Cosmos.Debug.Common
                             var xRow = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == xSymbol.LabelName)).FirstOrDefault();
                             if (xRow != null)
                             {
-                                UInt32 xAddress = (UInt32) xRow.Address;
+                                UInt32 xAddress = (UInt32)xRow.Address;
                                 // Each address could have mult labels, but this wont matter for SourceInfo, its not tied to label.
                                 // So we just ignore duplicate addresses.
                                 if (!xResult.ContainsKey(xAddress))
@@ -600,6 +608,7 @@ namespace Cosmos.Debug.Common
             }
             return INT3Labels.Select(x => new KeyValuePair<uint, string>(AddressOfLabel(x.LabelName), x.LabelName)).ToList();
         }
+
         public UInt32 GetClosestCSharpBPAddress(UInt32 aAddress)
         {
             // Get the method this address belongs to
@@ -612,7 +621,7 @@ namespace Cosmos.Debug.Common
             // Get the IL Offsets for these sequence points
             var xSPOffsets = xSPs.Select(x => x.Offset);
 
-            // Get all the MethodILOps for this method 
+            // Get all the MethodILOps for this method
             // Then filter to get only the MethodILOps that also have sequence points
             // Then get the MethodILOp with the highest address <= to aAddress
 
@@ -643,9 +652,10 @@ namespace Cosmos.Debug.Common
         }
 
         public static UInt64 mLastGuid = 0;
+
         public static Guid Guid_NewGuid()
         {
-            // Old code: 
+            // Old code:
             //return Guid.NewGuid();
             // Do NOT use Guid.NewGuid(). During compilation we're generating
             // about 60 milion guids. Guid.NewGuid slows down compilation significantly (about half the time!)
@@ -665,5 +675,4 @@ namespace Cosmos.Debug.Common
             return r;
         }
     }
-
 }

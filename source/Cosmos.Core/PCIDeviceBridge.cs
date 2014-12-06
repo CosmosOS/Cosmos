@@ -1,27 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Core
+﻿namespace Cosmos.Core
 {
     public class PCIDeviceBridge : PCIDevice
     {
         public PCIBaseAddressBar[] BaseAddresses { get; private set; }
 
         public byte PrimaryBusNumber { get; private set; }
+
         public byte SecondaryBusNumber { get; private set; }
+
         public byte SubordinateBusNumber { get; private set; }
+
         public byte SecondaryLatencyTimer { get; private set; }
 
         public byte IOBase { get; private set; }
+
         public byte IOLimit { get; private set; }
+
         public ushort SecondaryStatus { get; private set; }
 
         public ushort MemoryBase { get; private set; }
+
         public ushort MemoryLimit { get; private set; }
 
         public ushort PrefatchableMemoryBase { get; private set; }
+
         public ushort PrefatchableMemoryLimit { get; private set; }
 
         public uint PrefatchableBaseUpper32 { get; private set; }
@@ -29,8 +31,9 @@ namespace Cosmos.Core
         public uint PrefatchableLimitUpper32 { get; private set; }
 
         public ushort IOBaseUpper16 { get; private set; }
+
         public ushort IOLimitUpper16 { get; private set; }
-        
+
         public byte CapabilityPointer { get; private set; }
 
         public uint ExpansionROMBaseAddress { get; private set; }

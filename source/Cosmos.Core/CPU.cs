@@ -1,22 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Core {
+﻿namespace Cosmos.Core
+{
     // Non hardware class, only used by core and hardware drivers for ports etc.
-    public class CPU {
+    public class CPU
+    {
         // Amount of RAM in MB's.
         // needs to be static, as Heap needs it before we can instantiate objects
-        public static uint GetAmountOfRAM() { return 0; } // Plugged
-        // needs to be static, as Heap needs it before we can instantiate objects
-        public static uint GetEndOfKernel() { return 0; } // Plugged
-        public void UpdateIDT(bool aEnableInterruptsImmediately) { } // Plugged
-        public void InitFloat() { } // Plugged
-        public static void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged
-        public void Halt() { } // Plugged
+        public static uint GetAmountOfRAM()
+        {
+            return 0;
+        } // Plugged
 
-        public void Reboot() {
+        // needs to be static, as Heap needs it before we can instantiate objects
+        public static uint GetEndOfKernel()
+        {
+            return 0;
+        } // Plugged
+
+        public void UpdateIDT(bool aEnableInterruptsImmediately)
+        {
+        } // Plugged
+
+        public void InitFloat()
+        {
+        } // Plugged
+
+        public static void ZeroFill(uint aStartAddress, uint aLength)
+        {
+        } // Plugged
+
+        public void Halt()
+        {
+        } // Plugged
+
+        public void Reboot()
+        {
             // Disable all interrupts
             //DisableInterrupts();
 

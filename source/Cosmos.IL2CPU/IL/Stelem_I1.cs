@@ -1,28 +1,24 @@
-using System;
-using CPUx86 = Cosmos.Assembler.x86;
-
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stelem_I1 )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stelem_I1)]
     public class Stelem_I1 : ILOp
     {
-        public Stelem_I1( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Stelem_I1(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
-            Stelem_Ref.Assemble( Assembler, 1, aMethod, aOpCode );
+            Stelem_Ref.Assemble(Assembler, 1, aMethod, aOpCode);
         }
-
 
         // using System;
         // using System.IO;
-        // 
-        // 
+        //
+        //
         // using CPU = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stelem_I1)]
         // 	public class Stelem_I1: Op {
@@ -30,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 	    private string mCurLabel;
         // 	    private uint mCurOffset;
         // 	    private MethodInformation mMethodInformation;
-        // 
+        //
         // 		public Stelem_I1(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {
         //              mMethodInformation = aMethodInfo;
@@ -43,6 +39,5 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 	}
         // }
-
     }
 }

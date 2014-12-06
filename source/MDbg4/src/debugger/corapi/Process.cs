@@ -1,6 +1,9 @@
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+using Microsoft.Samples.Debugging.Native;
+
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
@@ -8,12 +11,11 @@ using System.Collections;
 using System.Diagnostics;
 using System.Threading;
 
-using Microsoft.Samples.Debugging.CorDebug.NativeApi;
-using Microsoft.Samples.Debugging.Native;
 namespace Microsoft.Samples.Debugging.CorDebug
 {
     /** A process running some managed code. */
-    public sealed class CorProcess : CorController, IDisposable      
+
+    public sealed class CorProcess : CorController, IDisposable
         , IMemoryReader
     {
         [CLSCompliant(false)]
@@ -65,8 +67,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
         [CLSCompliant(false)]
         public ICorDebugProcess Raw
         {
-            get 
-            { 
+            get
+            {
                 return _p();
             }
         }
@@ -74,6 +76,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         #region ICorDebug Wrappers
 
         /** The OS ID of the process. */
+
         public int Id
         {
             get
@@ -85,6 +88,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Returns a handle to the process. */
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IntPtr Handle
         {
@@ -107,6 +111,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** All managed objects in the process. */
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IEnumerable Objects
         {
@@ -119,6 +124,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Is the address inside a transition stub? */
+
         public bool IsTransitionStub(long address)
         {
             int y = 0;
@@ -127,6 +133,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Has the thread been suspended? */
+
         public bool IsOSSuspended(int tid)
         {
             int y = 0;
@@ -134,9 +141,10 @@ namespace Microsoft.Samples.Debugging.CorDebug
             return !(y == 0);
         }
 
-        /** Gets managed thread for threadId. 
+        /** Gets managed thread for threadId.
          * Returns NULL if tid is not a managed thread. That's very common in interop-debugging cases.
          */
+
         public CorThread GetThread(int threadId)
         {
             ICorDebugThread thread = null;
@@ -151,23 +159,23 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /* Get the context for the given thread. */
+
         // See WIN32_CONTEXT structure declared in context.il
         public void GetThreadContext(int threadId, IntPtr contextPtr, int context_size)
         {
-
             _p().GetThreadContext((uint)threadId, (uint)context_size, contextPtr);
             return;
         }
 
         /* Get the INativeContext object for the given thread */
+
         [CLSCompliant(false)]
         public INativeContext GetThreadContext(int threadId)
         {
             INativeContext context = ContextAllocator.GenerateContext();
 
             using (IContextDirectAccessor w = context.OpenForDirectAccess())
-            { // context buffer is now locked        
-
+            { // context buffer is now locked
                 // We initialize to a HUGE number so that we make sure GetThreadContext is updating the size variable.  If it doesn't,
                 // then we will hit the assert statement below.
                 this.GetThreadContext(threadId, w.RawBuffer, w.Size);
@@ -177,23 +185,26 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /* Set the context for a given thread. */
+
         public void SetThreadContext(int threadId, IntPtr contextPtr, int context_size)
         {
             _p().SetThreadContext((uint)threadId, (uint)context_size, contextPtr);
         }
 
         /* Set the INativeContext object for the given thread */
+
         [CLSCompliant(false)]
         public void SetThreadContext(int threadId, INativeContext context)
         {
             using (IContextDirectAccessor w = context.OpenForDirectAccess())
             {
-                // context buffer is now locked        
+                // context buffer is now locked
                 SetThreadContext(threadId, w.RawBuffer, w.Size);
             }
         }
 
         /** Read memory from the process. */
+
         public long ReadMemory(long address, byte[] buffer)
         {
             Debug.Assert(buffer != null);
@@ -212,6 +223,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Write memory in the process. */
+
         public long WriteMemory(long address, byte[] buffer)
         {
             IntPtr written = IntPtr.Zero;
@@ -220,18 +232,21 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Clear the current unmanaged exception on the given thread. */
+
         public void ClearCurrentException(int threadId)
         {
             _p().ClearCurrentException((uint)threadId);
         }
 
         /** enable/disable sending of log messages to the debugger for logging. */
+
         public void EnableLogMessages(bool value)
         {
             _p().EnableLogMessages(value ? 1 : 0);
         }
 
         /** Modify the specified switches severity level */
+
         public void ModifyLogSwitch(String name, int level)
         {
             _p().ModifyLogSwitch(name, level);
@@ -248,6 +263,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** All appdomains in the process. */
+
         public IEnumerable AppDomains
         {
             get
@@ -259,6 +275,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Get the runtime proces object. */
+
         public CorValue ProcessVariable
         {
             get
@@ -271,6 +288,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
         /** These flags set things like TrackJitInfo, PreventOptimization, IgnorePDBs, and EnableEnC */
         /**  Any combination of bits in this DWORD flag enum is ok, but if its not a valid set, you may get an error */
+
         public CorDebugJITCompilerFlags DesiredNGENCompilerFlags
         {
             get
@@ -294,6 +312,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** get the thread for a cookie. */
+
         public CorThread ThreadForFiberCookie(int cookie)
         {
             ICorDebugThread thread = null;
@@ -302,6 +321,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** set a BP in native code */
+
         public byte[] SetUnmanagedBreakpoint(long address)
         {
             UInt32 outLen;
@@ -313,6 +333,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** clear a previously set BP in native code */
+
         public void ClearUnmanagedBreakpoint(long address)
         {
             ICorDebugProcess2 p2 = (ICorDebugProcess2)_p();
@@ -340,6 +361,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             else
                 base.Continue(outOfBand);
         }
+
         #endregion ICorDebug Wrappers
 
         // when process is first created wait till callbacks are enabled.
@@ -347,7 +369,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
         private Delegate[] m_callbacksArray = new Delegate[(int)ManagedCallbackTypeCount.Last + 1];
 
-     
         /// <summary>
         /// Expose direct dispatch logic so that other event dispatchers can
         /// use CorProcess's event handlers.
@@ -364,16 +385,15 @@ namespace Microsoft.Samples.Debugging.CorDebug
             DispatchEvent(callback, e);
         }
 
-
         internal void DispatchEvent(ManagedCallbackType callback, CorEventArgs e)
         {
             try
             {
-                // CorProcess.Continue has an extra abstraction layer. 
+                // CorProcess.Continue has an extra abstraction layer.
                 // - The fist call just sets m_callbackAttachedEvent
                 // - future calls go to ICorDebugProcess::Continue.
                 // This ensures that we don't dispatch any callbacks until
-                // after CorProcess.Continue() is called. 
+                // after CorProcess.Continue() is called.
                 if (m_callbackAttachedEvent != null)
                 {
                     m_callbackAttachedEvent.WaitOne(); // waits till callbacks are enabled
@@ -410,6 +430,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         #region Event handlers
+
         public event BreakpointEventHandler OnBreakpoint
         {
             add
@@ -662,8 +683,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
             }
         }
 
-
-
         public event LogSwitchEventHandler OnLogSwitch
         {
             add
@@ -860,6 +879,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 m_callbacksArray[i] = (CorExceptionInCallbackEventHandler)m_callbacksArray[i] - value;
             }
         }
+
         #endregion Event handlers
     } /* class Process */
 } /* namespace */

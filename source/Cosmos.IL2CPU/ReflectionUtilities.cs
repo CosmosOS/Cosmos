@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Reflection;
 
 namespace Cosmos.IL2CPU
@@ -37,6 +34,7 @@ namespace Cosmos.IL2CPU
             }
             throw new Exception("Type '" + aType + "' not found in assembly '" + aAssembly + "'!");
         }
+
         public static MethodBase GetMethodBase(Type aType,
                                                string aMethod,
                                                params string[] aParamTypes)

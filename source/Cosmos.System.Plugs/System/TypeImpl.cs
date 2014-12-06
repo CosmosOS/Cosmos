@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.IL2CPU.Plugs;
+using System;
 
 namespace Cosmos.System.Plugs.System
 {
@@ -24,7 +22,7 @@ namespace Cosmos.System.Plugs.System
             return "<type>";
         }
 
-        [PlugMethod(Signature="System_Boolean__System_Type_op_Equality_System_Type__System_Type_")]
+        [PlugMethod(Signature = "System_Boolean__System_Type_op_Equality_System_Type__System_Type_")]
         public static bool op_Equality(uint left, uint right)
         {
             // for now, type info is the type id.

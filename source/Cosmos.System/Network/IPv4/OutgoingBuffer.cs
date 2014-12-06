@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Cosmos.HAL;
+﻿using Cosmos.HAL;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
+using System.Collections.Generic;
 
 namespace Cosmos.System.Network.IPv4
 {

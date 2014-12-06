@@ -1,30 +1,25 @@
+using Microsoft.Samples.Debugging.CorMetadata.NativeApi;
+
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
 using System.Reflection;
-using System.Collections;
-using System.Text;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using System.Globalization;
-using System.Diagnostics;
-
-using Microsoft.Samples.Debugging.CorDebug; 
-using Microsoft.Samples.Debugging.CorMetadata.NativeApi; 
+using System.Text;
 
 namespace Microsoft.Samples.Debugging.CorMetadata
 {
     public sealed class MetadataParameterInfo : ParameterInfo
     {
-        internal MetadataParameterInfo(IMetadataImport importer,int paramToken,
-                                       MemberInfo memberImpl,Type typeImpl)
+        internal MetadataParameterInfo(IMetadataImport importer, int paramToken,
+                                       MemberInfo memberImpl, Type typeImpl)
         {
             int parentToken;
-            uint pulSequence,pdwAttr,pdwCPlusTypeFlag,pcchValue,size;
-            
+            uint pulSequence, pdwAttr, pdwCPlusTypeFlag, pcchValue, size;
+
             IntPtr ppValue;
             importer.GetParamProps(paramToken,
                                    out parentToken,
@@ -37,7 +32,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata
                                    out ppValue,
                                    out pcchValue
                                    );
-            StringBuilder szName = new StringBuilder((int)size);        
+            StringBuilder szName = new StringBuilder((int)size);
             importer.GetParamProps(paramToken,
                                    out parentToken,
                                    out pulSequence,
@@ -53,28 +48,27 @@ namespace Microsoft.Samples.Debugging.CorMetadata
             ClassImpl = typeImpl;
             PositionImpl = (int)pulSequence;
             AttrsImpl = (ParameterAttributes)pdwAttr;
-            
-            MemberImpl=memberImpl;
+
+            MemberImpl = memberImpl;
         }
 
         private MetadataParameterInfo(SerializationInfo info, StreamingContext context)
         {
-            
         }
 
         public override String Name
         {
-            get 
+            get
             {
                 return NameImpl;
             }
         }
 
         public override int Position
-        { 
-            get 
-            { 
-                return PositionImpl; 
+        {
+            get
+            {
+                return PositionImpl;
             }
         }
     }

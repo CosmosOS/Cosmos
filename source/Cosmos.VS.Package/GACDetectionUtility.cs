@@ -1,8 +1,6 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Win32;
 using System.IO;
 
 namespace Cosmos.VS.Package
@@ -18,13 +16,15 @@ namespace Cosmos.VS.Package
 
         public static bool IsAssemblyFileFromGAC(string filename)
         {
-            if (String.IsNullOrEmpty(filename)) {
+            if (String.IsNullOrEmpty(filename))
+            {
                 // if filename is empty, assume gac as well
                 return true;
             }
             if (mGACDirs == null)
             {
                 #region initialize
+
                 mGACDirs = new List<string>();
                 using (var xRegKey = Registry.LocalMachine.OpenSubKey(@"Software\Microsoft\.NETFramework\v2.0.50727\AssemblyFoldersEx", false))
                 {
@@ -44,7 +44,8 @@ namespace Cosmos.VS.Package
                         }
                     }
                 }
-                #endregion
+
+                #endregion initialize
             }
             var xDirPart = Path.GetDirectoryName(filename);
             if (!xDirPart.EndsWith("\\"))

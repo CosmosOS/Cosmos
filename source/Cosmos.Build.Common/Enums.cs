@@ -1,82 +1,101 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Reflection;
 
-namespace Cosmos.Build.Common {
+namespace Cosmos.Build.Common
+{
+    public enum DeploymentType
+    {
+        [Description("ISO Image")]
+        ISO,
 
-  public enum DeploymentType {
-    [Description("ISO Image")]
-    ISO,
-    [Description("USB Device")]
-    USB,
-    [Description("PXE Network Boot")]
-    PXE
-  }
+        [Description("USB Device")]
+        USB,
 
-  public enum LaunchType {
-    [Description("None")]
-    None,
-    [Description("VMware")]
-    VMware,
-    [Description("Attached Slave (CanaKit)")]
-    Slave,
-    [Description("Bochs")]
-    Bochs
-  }
+        [Description("PXE Network Boot")]
+        PXE
+    }
 
-  public enum VMwareEdition {
-    Workstation,
-    Player
-  }
+    public enum LaunchType
+    {
+        [Description("None")]
+        None,
 
-  public enum Architecture {
-    x86 //, x64 
-  }
+        [Description("VMware")]
+        VMware,
 
-  public enum Framework {
-    [Description("Microsoft .NET")]
-    MicrosoftNET,
-    Mono
-  }
+        [Description("Attached Slave (CanaKit)")]
+        Slave,
 
-  public enum LogSeverityEnum : byte {
-    Warning = 0, Error = 1, Informational = 2, Performance = 3
-  }
-  public enum TraceAssemblies { All, Cosmos, User };
-  public enum DebugMode { IL, Source }
+        [Description("Bochs")]
+        Bochs
+    }
 
-  public sealed class DescriptionAttribute : Attribute {
-    public static String GetDescription(object value) {
-      Type valueType = value.GetType();
-      MemberInfo[] valueMemberInfo;
-      Object[] valueMemberAttribute;
+    public enum VMwareEdition
+    {
+        Workstation,
+        Player
+    }
 
-      if (valueType.IsEnum) {
-        valueMemberInfo = valueType.GetMember(value.ToString());
+    public enum Architecture
+    {
+        x86 //, x64
+    }
 
-        if ((valueMemberInfo != null) && (valueMemberInfo.Length > 0)) {
-          valueMemberAttribute = valueMemberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
-          if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0)) {
-            return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
-          }
+    public enum Framework
+    {
+        [Description("Microsoft .NET")]
+        MicrosoftNET,
+
+        Mono
+    }
+
+    public enum LogSeverityEnum : byte
+    {
+        Warning = 0, Error = 1, Informational = 2, Performance = 3
+    }
+
+    public enum TraceAssemblies { All, Cosmos, User };
+
+    public enum DebugMode { IL, Source }
+
+    public sealed class DescriptionAttribute : Attribute
+    {
+        public static String GetDescription(object value)
+        {
+            Type valueType = value.GetType();
+            MemberInfo[] valueMemberInfo;
+            Object[] valueMemberAttribute;
+
+            if (valueType.IsEnum)
+            {
+                valueMemberInfo = valueType.GetMember(value.ToString());
+
+                if ((valueMemberInfo != null) && (valueMemberInfo.Length > 0))
+                {
+                    valueMemberAttribute = valueMemberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
+                    if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0))
+                    {
+                        return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
+                    }
+                }
+            }
+
+            valueMemberAttribute = valueType.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0))
+            {
+                return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
+            }
+
+            return value.ToString();
         }
-      }
 
-      valueMemberAttribute = valueType.GetCustomAttributes(typeof(DescriptionAttribute), false);
-      if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0)) {
-        return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
-      }
+        private string emDescription;
 
-      return value.ToString();
+        public DescriptionAttribute(String description)
+        {
+            emDescription = description;
+        }
+
+        public String Description { get { return emDescription; } }
     }
-
-    private string emDescription;
-    public DescriptionAttribute(String description) {
-      emDescription = description;
-    }
-
-    public String Description { get { return emDescription; } }
-  }
 }

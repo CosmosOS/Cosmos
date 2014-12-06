@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.IL2CPU.Plugs;
 using Indy.IL2CPU.X86.Plugs.NEW_PLUGS;
+using System;
 
 namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS
 {
-    [Plug(Target=typeof(Delegate))]
+    [Plug(Target = typeof(Delegate))]
     public static class NormalDelegateImpl
     {
         [PlugMethod(Assembler = typeof(GetMulticastInvokeAssembler))]

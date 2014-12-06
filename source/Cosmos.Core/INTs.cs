@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Cosmos.Core
 {
     public class INTs
     {
         #region Enums
+
         // TODO: Protect IRQs like memory and ports are
         // TODO: Make IRQs so they are not hookable, and instead release high priority threads like FreeBSD (When we get threading)
         public enum EFlagsEnum : uint
@@ -35,54 +33,79 @@ namespace Cosmos.Core
         {
             [FieldOffset(0)]
             public ushort Link;
+
             [FieldOffset(4)]
             public uint ESP0;
+
             [FieldOffset(8)]
             public ushort SS0;
+
             [FieldOffset(12)]
             public uint ESP1;
+
             [FieldOffset(16)]
             public ushort SS1;
+
             [FieldOffset(20)]
             public uint ESP2;
+
             [FieldOffset(24)]
             public ushort SS2;
+
             [FieldOffset(28)]
             public uint CR3;
+
             [FieldOffset(32)]
             public uint EIP;
+
             [FieldOffset(36)]
             public EFlagsEnum EFlags;
+
             [FieldOffset(40)]
             public uint EAX;
+
             [FieldOffset(44)]
             public uint ECX;
+
             [FieldOffset(48)]
             public uint EDX;
+
             [FieldOffset(52)]
             public uint EBX;
+
             [FieldOffset(56)]
             public uint ESP;
+
             [FieldOffset(60)]
             public uint EBP;
+
             [FieldOffset(64)]
             public uint ESI;
+
             [FieldOffset(68)]
             public uint EDI;
+
             [FieldOffset(72)]
             public ushort ES;
+
             [FieldOffset(76)]
             public ushort CS;
+
             [FieldOffset(80)]
             public ushort SS;
+
             [FieldOffset(84)]
             public ushort DS;
+
             [FieldOffset(88)]
             public ushort FS;
+
             [FieldOffset(92)]
             public ushort GS;
+
             [FieldOffset(96)]
             public ushort LDTR;
+
             [FieldOffset(102)]
             public ushort IOPBOffset;
         }
@@ -140,8 +163,9 @@ namespace Cosmos.Core
             [FieldOffset(56)]
             public uint UserESP;
         }
-        #endregion
-        
+
+        #endregion Enums
+
         private static IRQDelegate[] mIRQ_Handlers = new IRQDelegate[256];
 
         // We used to use:
@@ -152,6 +176,7 @@ namespace Cosmos.Core
         {
             mIRQ_Handlers[aIntNo] = aHandler;
         }
+
         public static void SetIrqHandler(byte aIrqNo, IRQDelegate aHandler)
         {
             SetIntHandler((byte)(0x20 + aIrqNo), aHandler);
@@ -184,6 +209,7 @@ namespace Cosmos.Core
         }
 
         public delegate void IRQDelegate(ref IRQContext aContext);
+
         public delegate void ExceptionInterruptDelegate(ref IRQContext aContext, ref bool aHandled);
 
         #region Default Interrupt Handlers
@@ -191,7 +217,7 @@ namespace Cosmos.Core
         //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
         public static void HandleInterrupt_20(ref IRQContext aContext)
         {
-            IRQ(0x20, ref aContext);  
+            IRQ(0x20, ref aContext);
             Global.PIC.EoiMaster();
         }
 
@@ -199,52 +225,52 @@ namespace Cosmos.Core
         //IRQ 1 - Keyboard. Reserved for the system. Cannot be altered even if no keyboard is present or needed.
         public static void HandleInterrupt_21(ref IRQContext aContext)
         {
-
             IRQ(0x21, ref aContext);
             Global.PIC.EoiMaster();
         }
+
         public static void HandleInterrupt_22(ref IRQContext aContext)
         {
-
             IRQ(0x22, ref aContext);
             Global.PIC.EoiMaster();
         }
+
         public static void HandleInterrupt_23(ref IRQContext aContext)
         {
-
             IRQ(0x23, ref aContext);
             Global.PIC.EoiMaster();
         }
+
         public static void HandleInterrupt_24(ref IRQContext aContext)
         {
-
             IRQ(0x24, ref aContext);
             Global.PIC.EoiMaster();
         }
+
         public static void HandleInterrupt_25(ref IRQContext aContext)
         {
             IRQ(0x25, ref aContext);
             Global.PIC.EoiMaster();
         }
+
         public static void HandleInterrupt_26(ref IRQContext aContext)
         {
-
             IRQ(0x26, ref aContext);
             Global.PIC.EoiMaster();
         }
+
         public static void HandleInterrupt_27(ref IRQContext aContext)
         {
-
             IRQ(0x27, ref aContext);
             Global.PIC.EoiMaster();
         }
 
         public static void HandleInterrupt_28(ref IRQContext aContext)
         {
-
             IRQ(0x28, ref aContext);
             Global.PIC.EoiSlave();
         }
+
         //IRQ 09 - (Added for AMD PCNet network card)
         //public static IRQDelegate IRQ09;
 
@@ -274,23 +300,23 @@ namespace Cosmos.Core
 
         public static void HandleInterrupt_2C(ref IRQContext aContext)
         {
-
             IRQ(0x2C, ref aContext);
             Global.PIC.EoiSlave();
         }
-
 
         public static void HandleInterrupt_2D(ref IRQContext aContext)
         {
             IRQ(0x2D, ref aContext);
             Global.PIC.EoiSlave();
         }
+
         //IRQ 14 - Primary IDE. If no Primary IDE this can be changed
         public static void HandleInterrupt_2E(ref IRQContext aContext)
         {
             IRQ(0x2E, ref aContext);
             Global.PIC.EoiSlave();
         }
+
         //IRQ 15 - Secondary IDE
         public static void HandleInterrupt_2F(ref IRQContext aContext)
         {
@@ -299,6 +325,7 @@ namespace Cosmos.Core
         }
 
         public static event IRQDelegate Interrupt30;
+
         // Interrupt 0x30, enter VMM
         public static void HandleInterrupt_30(ref IRQContext aContext)
         {
@@ -321,44 +348,53 @@ namespace Cosmos.Core
         {
             IRQ(0x40, ref aContext);
         }
+
         public static void HandleInterrupt_41(ref IRQContext aContext)
         {
             IRQ(0x41, ref aContext);
         }
+
         public static void HandleInterrupt_42(ref IRQContext aContext)
         {
             IRQ(0x42, ref aContext);
         }
+
         public static void HandleInterrupt_43(ref IRQContext aContext)
         {
             IRQ(0x43, ref aContext);
         }
+
         public static void HandleInterrupt_44(ref IRQContext aContext)
         {
             IRQ(0x44, ref aContext);
         }
+
         public static void HandleInterrupt_45(ref IRQContext aContext)
         {
             IRQ(0x45, ref aContext);
         }
+
         public static void HandleInterrupt_46(ref IRQContext aContext)
         {
             IRQ(0x46, ref aContext);
         }
+
         public static void HandleInterrupt_47(ref IRQContext aContext)
         {
             IRQ(0x47, ref aContext);
         }
+
         public static void HandleInterrupt_48(ref IRQContext aContext)
         {
             IRQ(0x48, ref aContext);
         }
+
         public static void HandleInterrupt_49(ref IRQContext aContext)
         {
             IRQ(0x49, ref aContext);
         }
 
-        #endregion
+        #endregion Default Interrupt Handlers
 
         #region CPU Exceptions
 
@@ -428,6 +464,7 @@ namespace Cosmos.Core
         {
             HandleException(aContext.EIP, "Stack Fault Exception", "Stack Fault Exception", ref aContext);
         }
+
         public static void HandleInterrupt_0D(ref IRQContext aContext)
         {
             if (GeneralProtectionFault != null)
@@ -449,7 +486,7 @@ namespace Cosmos.Core
         {
             HandleException(aContext.EIP, "Unknown Interrupt Exception", "Unknown Interrupt Exception", ref aContext);
         }
-   
+
         public static void HandleInterrupt_10(ref IRQContext aContext)
         {
             HandleException(aContext.EIP, "x87 Floating Point Exception", "Coprocessor Fault Exception", ref aContext);
@@ -464,19 +501,19 @@ namespace Cosmos.Core
         {
             HandleException(aContext.EIP, "Machine Check Exception", "Machine Check Exception", ref aContext);
         }
+
         public static void HandleInterrupt_13(ref IRQContext aContext)
         {
             HandleException(aContext.EIP, "SIMD Floating Point Exception", "SIMD Floating Point Exception", ref aContext);
         }
 
-
-        #endregion
+        #endregion CPU Exceptions
 
         private static void HandleException(uint aEIP, string aDescription, string aName, ref IRQContext ctx)
         {
-          // At this point we are in a very unstable state.
-          // Try not to use any Cosmos routines, just
-          // report a crash dump.
+            // At this point we are in a very unstable state.
+            // Try not to use any Cosmos routines, just
+            // report a crash dump.
             const string xHex = "0123456789ABCDEF";
             uint xPtr = ctx.EIP;
 
@@ -542,7 +579,7 @@ namespace Cosmos.Core
                 xAddress[53] = 0x0C;
             }
 
-          // lock up
+            // lock up
             while (true)
             {
             }
@@ -612,6 +649,5 @@ namespace Cosmos.Core
                 }
             }
         }
-
     }
 }

@@ -9,76 +9,78 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
-using System;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
+using System;
 
 namespace Microsoft.VisualStudio.Project
 {
-	/// <summary>
-	/// Used for adding a build dependency to nested project (not a real project reference)
-	/// </summary>
-	public class NestedProjectBuildDependency : IVsBuildDependency
-	{
-		IVsHierarchy dependentHierarchy = null;
+    /// <summary>
+    /// Used for adding a build dependency to nested project (not a real project reference)
+    /// </summary>
+    public class NestedProjectBuildDependency : IVsBuildDependency
+    {
+        private IVsHierarchy dependentHierarchy = null;
 
-		#region ctors
-		[CLSCompliant(false)]
-		public NestedProjectBuildDependency(IVsHierarchy dependentHierarchy)
-		{
-			this.dependentHierarchy = dependentHierarchy;
-		}
-		#endregion
+        #region ctors
 
-		#region IVsBuildDependency methods
-		public int get_CanonicalName(out string canonicalName)
-		{
-			canonicalName = null;
-			return VSConstants.S_OK;
-		}
+        [CLSCompliant(false)]
+        public NestedProjectBuildDependency(IVsHierarchy dependentHierarchy)
+        {
+            this.dependentHierarchy = dependentHierarchy;
+        }
 
-		public int get_Type(out System.Guid guidType)
-		{
-			// All our dependencies are build projects
-			guidType = VSConstants.GUID_VS_DEPTYPE_BUILD_PROJECT;
+        #endregion ctors
 
-			return VSConstants.S_OK;
-		}
+        #region IVsBuildDependency methods
+
+        public int get_CanonicalName(out string canonicalName)
+        {
+            canonicalName = null;
+            return VSConstants.S_OK;
+        }
+
+        public int get_Type(out System.Guid guidType)
+        {
+            // All our dependencies are build projects
+            guidType = VSConstants.GUID_VS_DEPTYPE_BUILD_PROJECT;
+
+            return VSConstants.S_OK;
+        }
 
         public int get_Description(out string description)
-		{
-			description = null;
-			return VSConstants.S_OK;
-		}
+        {
+            description = null;
+            return VSConstants.S_OK;
+        }
 
-		[CLSCompliant(false)]
-		public int get_HelpContext(out uint helpContext)
-		{
-			helpContext = 0;
-			return VSConstants.E_NOTIMPL;
-		}
+        [CLSCompliant(false)]
+        public int get_HelpContext(out uint helpContext)
+        {
+            helpContext = 0;
+            return VSConstants.E_NOTIMPL;
+        }
 
-		public int get_HelpFile(out string helpFile)
-		{
-			helpFile = null;
-			return VSConstants.E_NOTIMPL;
-		}
+        public int get_HelpFile(out string helpFile)
+        {
+            helpFile = null;
+            return VSConstants.E_NOTIMPL;
+        }
 
-		public int get_MustUpdateBefore(out int mustUpdateBefore)
-		{
-			// Must always update dependencies
-			mustUpdateBefore = 1;
+        public int get_MustUpdateBefore(out int mustUpdateBefore)
+        {
+            // Must always update dependencies
+            mustUpdateBefore = 1;
 
-			return VSConstants.S_OK;
-		}
+            return VSConstants.S_OK;
+        }
 
-		public int get_ReferredProject(out object unknownProject)
-		{
-			unknownProject = this.dependentHierarchy;
+        public int get_ReferredProject(out object unknownProject)
+        {
+            unknownProject = this.dependentHierarchy;
 
-			return (unknownProject == null) ? VSConstants.E_FAIL : VSConstants.S_OK;
-		}
-		#endregion
+            return (unknownProject == null) ? VSConstants.E_FAIL : VSConstants.S_OK;
+        }
 
-	}
+        #endregion IVsBuildDependency methods
+    }
 }

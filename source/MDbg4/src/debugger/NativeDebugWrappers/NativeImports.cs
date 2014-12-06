@@ -1,27 +1,20 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //
 // Part of managed wrappers for native debugging APIs.
-// NativeImports.cs: raw definitions of native methods and structures 
+// NativeImports.cs: raw definitions of native methods and structures
 //  for native debugging API.
 //  Also includes some useful utility methods.
 //---------------------------------------------------------------------
 
-
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-using System.Runtime.Serialization;
-
-using Microsoft.Samples.Debugging.Native;
 using Microsoft.Samples.Debugging.Native.Private;
 using Microsoft.Win32.SafeHandles;
+using System;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using System.Security.Permissions;
-using System.IO;
 
 namespace Microsoft.Samples.Debugging.Native.Private
 {
@@ -34,11 +27,12 @@ namespace Microsoft.Samples.Debugging.Native.Private
             // Initialize size field.
             this.cb = Marshal.SizeOf(this);
 
-            // initialize safe handles 
+            // initialize safe handles
             this.hStdInput = new Microsoft.Win32.SafeHandles.SafeFileHandle(new IntPtr(0), false);
             this.hStdOutput = new Microsoft.Win32.SafeHandles.SafeFileHandle(new IntPtr(0), false);
             this.hStdError = new Microsoft.Win32.SafeHandles.SafeFileHandle(new IntPtr(0), false);
         }
+
         public Int32 cb;
         public string lpReserved;
         public string lpDesktop;
@@ -96,12 +90,13 @@ namespace Microsoft.Samples.Debugging.Native
         }
 
         // Internal helper to get the message string for the ctor.
-        static string MessageHelper(IntPtr address, int countBytes)
+        private static string MessageHelper(IntPtr address, int countBytes)
         {
             return String.Format("Failed to read memory at 0x" + address.ToString("x") + " of " + countBytes + " bytes.");
         }
 
         #region Standard Ctors
+
         /// <summary>
         /// Initializes a new instance of the ReadMemoryFailureException.
         /// </summary>
@@ -137,7 +132,8 @@ namespace Microsoft.Samples.Debugging.Native
             : base(info, context)
         {
         }
-        #endregion
+
+        #endregion Standard Ctors
     }
 
     /// <summary>
@@ -153,8 +149,8 @@ namespace Microsoft.Samples.Debugging.Native
         /// <exception cref="ReadMemoryFailureException">Throws if can't read all the memory</exception>
         void ReadMemory(IntPtr address, byte[] buffer);
     }
-    #endregion
 
+    #endregion Interfaces
 
     #region Native Structures
 
@@ -167,6 +163,7 @@ namespace Microsoft.Samples.Debugging.Native
         //using a seperate bit for each flag will allow logical operations of flags
         // i.e  ContextControl | ContextInteger | ContextSegments, etc
         ContextControl = 0x1,
+
         ContextInteger = 0x2,
         ContextFloatingPoint = 0x4,
         ContextDebugRegisters = 0x10,  //on IA64, this will be equivalent to ContextDebug
@@ -186,6 +183,7 @@ namespace Microsoft.Samples.Debugging.Native
         X86ContextDebugRegisters = X86Context | 0x10,
         X86ContextExtendedRegisters = X86Context | 0x20,
         X86ContextFull = X86Context | X86ContextControl | X86ContextInteger | X86ContextSegments,
+
         X86ContextAll = X86Context | X86ContextControl | X86ContextInteger | X86ContextSegments | X86ContextFloatingPoint |
                           X86ContextDebugRegisters | X86ContextExtendedRegisters,
 
@@ -196,6 +194,7 @@ namespace Microsoft.Samples.Debugging.Native
         AMD64ContextFloatingPoint = AMD64Context | 0x8,
         AMD64ContextDebugRegisters = AMD64Context | 0x10,
         AMD64ContextFull = AMD64Context | AMD64ContextControl | AMD64ContextInteger | AMD64ContextFloatingPoint,
+
         AMD64ContextAll = AMD64Context | AMD64ContextControl | AMD64ContextInteger | AMD64ContextSegments |
                             AMD64ContextFloatingPoint | AMD64ContextDebugRegisters,
 
@@ -208,6 +207,7 @@ namespace Microsoft.Samples.Debugging.Native
         IA64ContextIA32Control = IA64Context | 0x20,
         IA64ContextFloatingPoint = IA64Context | IA64ContextLowerFloatingPoint | IA64ContextHigherFloatingPoint,
         IA64ContextFull = IA64Context | IA64ContextControl | IA64ContextFloatingPoint | IA64ContextInteger | IA64ContextIA32Control,
+
         IA64ContextAll = IA64Context | IA64ContextControl | IA64ContextFloatingPoint | IA64ContextInteger |
                            IA64ContextDebug | IA64ContextIA32Control,
     }
@@ -229,6 +229,7 @@ namespace Microsoft.Samples.Debugging.Native
         // set in ContextFlags.  Note that CONTEXT_DEBUG_REGISTERS is NOT
         // included in CONTEXT_FULL.
         Dr0 = 0x4,
+
         Dr1 = 0x8,
         Dr2 = 0xC,
         Dr3 = 0x10,
@@ -242,6 +243,7 @@ namespace Microsoft.Samples.Debugging.Native
         // This section is specified/returned if the
         // ContextFlags word contians the flag CONTEXT_SEGMENTS.
         SegGs = 0x8C,
+
         SegFs = 0x90,
         SegEs = 0x94,
         SegDs = 0x98,
@@ -249,6 +251,7 @@ namespace Microsoft.Samples.Debugging.Native
         // This section is specified/returned if the
         // ContextFlags word contians the flag CONTEXT_INTEGER.
         Edi = 0x9C,
+
         Esi = 0xA0,
         Ebx = 0xA4,
         Edx = 0xA8,
@@ -258,6 +261,7 @@ namespace Microsoft.Samples.Debugging.Native
         // This section is specified/returned if the
         // ContextFlags word contians the flag CONTEXT_CONTROL.
         Ebp = 0xB4,
+
         Eip = 0xB8,
         SegCs = 0xBC,
         EFlags = 0xC0,
@@ -281,6 +285,7 @@ namespace Microsoft.Samples.Debugging.Native
     {
         // Register Parameter Home Addresses
         P1Home = 0x000,
+
         P2Home = 0x008,
         P3Home = 0x010,
         P4Home = 0x018,
@@ -289,10 +294,12 @@ namespace Microsoft.Samples.Debugging.Native
 
         // Control Flags
         ContextFlags = 0x030,
+
         MxCsr = 0x034,
 
         // Segment Registers and Processor Flags
         SegCs = 0x038,
+
         SegDs = 0x03a,
         SegEs = 0x03c,
         SegFs = 0x03e,
@@ -302,6 +309,7 @@ namespace Microsoft.Samples.Debugging.Native
 
         // Debug Registers
         Dr0 = 0x048,
+
         Dr1 = 0x050,
         Dr2 = 0x058,
         Dr3 = 0x060,
@@ -310,6 +318,7 @@ namespace Microsoft.Samples.Debugging.Native
 
         // Integer Registers
         Rax = 0x078,
+
         Rcx = 0x080,
         Rdx = 0x088,
         Rbx = 0x090,
@@ -331,6 +340,7 @@ namespace Microsoft.Samples.Debugging.Native
 
         // Floating Point State
         FltSave = 0x100,
+
         Legacy = 0x120,
         Xmm0 = 0x1a0,
         Xmm1 = 0x1b0,
@@ -351,10 +361,12 @@ namespace Microsoft.Samples.Debugging.Native
 
         // Vector Registers
         VectorRegister = 0x300,
+
         VectorControl = 0x4a0,
 
         // Special Debug Control Registers
         DebugControl = 0x4a8,
+
         LastBranchToRip = 0x4b0,
         LastBranchFromRip = 0x4b8,
         LastExceptionToRip = 0x4c0,
@@ -375,6 +387,7 @@ namespace Microsoft.Samples.Debugging.Native
         // This section is specified/returned if the ContextFlags word contains
         // the flag CONTEXT_DEBUG.
         DbI0 = 0x010,
+
         DbI1 = 0x018,
         DbI2 = 0x020,
         DbI3 = 0x028,
@@ -395,6 +408,7 @@ namespace Microsoft.Samples.Debugging.Native
         // This section is specified/returned if the ContextFlags word contains
         // the flag CONTEXT_LOWER_FLOATING_POINT.
         FltS0 = 0x090,
+
         FltS1 = 0x0a0,
         FltS2 = 0x0b0,
         FltS3 = 0x0c0,
@@ -412,6 +426,7 @@ namespace Microsoft.Samples.Debugging.Native
         // This section is specified/returned if the ContextFlags word contains
         // the flag CONTEXT_HIGHER_FLOATING_POINT.
         FltS4 = 0x170,
+
         FltS5 = 0x180,
         FltS6 = 0x190,
         FltS7 = 0x1a0,
@@ -541,6 +556,7 @@ namespace Microsoft.Samples.Debugging.Native
         // This section is specified/returned if the ContextFlags word contains
         // the flag CONTEXT_INTEGER.
         IntGp = 0x878,      //  r1 = 0x, volatile
+
         IntT0 = 0x880,      //  r2-r3 = 0x, volatile
         IntT1 = 0x888,      //
         IntS0 = 0x890,      //  r4-r7 = 0x, preserved
@@ -572,6 +588,7 @@ namespace Microsoft.Samples.Debugging.Native
         IntT21 = 0x960,
         IntT22 = 0x968,
         IntNats = 0x970,    //  Nat bits for r1-r31
+
         //  r1-r31 in bits 1 thru 31.
         Preds = 0x978,      //  predicates = 0x, preserved
 
@@ -589,6 +606,7 @@ namespace Microsoft.Samples.Debugging.Native
 
         // Other application registers
         ApUNAT = 0x9c0,     //  User Nat collection register = 0x, preserved
+
         ApLC = 0x9c8,       //  Loop counter register = 0x, preserved
         ApEC = 0x9d0,       //  Epilog counter register = 0x, preserved
         ApCCV = 0x9d8,      //  CMPXCHG value register = 0x, volatile
@@ -596,6 +614,7 @@ namespace Microsoft.Samples.Debugging.Native
 
         // Register stack info
         RsPFS = 0x9e8,      //  Previous function state = 0x, preserved
+
         RsBSP = 0x9f0,      //  Backing store pointer = 0x, preserved
         RsBSPSTORE = 0x9f8,
         RsRSC = 0xa00,      //  RSE configuration = 0x, volatile
@@ -603,11 +622,13 @@ namespace Microsoft.Samples.Debugging.Native
 
         // Trap Status Information
         StIPSR = 0xa10,     //  Interruption Processor Status
+
         StIIP = 0xa18,      //  Interruption IP
         StIFS = 0xa20,      //  Interruption Function State
 
         // iA32 related control registers
         StFCR = 0xa28,      //  copy of Ar21
+
         Eflag = 0xa30,      //  Eflag copy of Ar24
         SegCSD = 0xa38,     //  iA32 CSDescriptor (Ar25)
         SegSSD = 0xa40,     //  iA32 SSDescriptor (Ar26)
@@ -616,7 +637,6 @@ namespace Microsoft.Samples.Debugging.Native
         StFIR = 0xa58,      //  x86 FP status (copy of AR29)
         StFDR = 0xa60,      //  x86 FP status (copy of AR30)
         UNUSEDPACK = 0xa68, // alignment padding
-
     }
 
     [Flags]
@@ -642,7 +662,6 @@ namespace Microsoft.Samples.Debugging.Native
         AMD64 = 2,
         IA64 = 3,
     }
-
 
     /// <summary>
     /// Native debug event Codes that are returned through NativeStop event
@@ -685,14 +704,14 @@ namespace Microsoft.Samples.Debugging.Native
         THREAD_SET_THREAD_TOKEN = (0x0080),
         THREAD_SUSPEND_RESUME = (0x0002),
         THREAD_TERMINATE = (0x0001),
-
     }
 
     #region Exception events
+
     /// <summary>
     /// Common Exception codes
     /// </summary>
-    /// <remarks>Users can define their own exception codes, so the code could be any value. 
+    /// <remarks>Users can define their own exception codes, so the code could be any value.
     /// The OS reserves bit 28 and may clear that for its own purposes</remarks>
     public enum ExceptionCode : uint
     {
@@ -703,7 +722,7 @@ namespace Microsoft.Samples.Debugging.Native
         EXCEPTION_INT_DIVIDE_BY_ZERO = 0xC0000094,
 
         /// <summary>
-        /// Fired when debuggee gets a Control-C. 
+        /// Fired when debuggee gets a Control-C.
         /// </summary>
         DBG_CONTROL_C = 0x40010005,
 
@@ -719,7 +738,7 @@ namespace Microsoft.Samples.Debugging.Native
     public enum ExceptionRecordFlags : uint
     {
         /// <summary>
-        /// No flags. 
+        /// No flags.
         /// </summary>
         None = 0x0,
 
@@ -731,7 +750,7 @@ namespace Microsoft.Samples.Debugging.Native
 
     /// <summary>
     /// Information about an exception
-    /// </summary>    
+    /// </summary>
     /// <remarks>This will default to the correct caller's platform</remarks>
     [StructLayout(LayoutKind.Sequential)]
     public struct EXCEPTION_RECORD
@@ -762,14 +781,15 @@ namespace Microsoft.Samples.Debugging.Native
         /// </summary>
         public UInt32 NumberParameters;
 
-        const int EXCEPTION_MAXIMUM_PARAMETERS = 15;
+        private const int EXCEPTION_MAXIMUM_PARAMETERS = 15;
         // We'd like to marshal this as a ByValArray, but that's not supported yet.
         // We get an alignment error  / TypeLoadException for DebugEventUnion
         //[MarshalAs(UnmanagedType.ByValArray, SizeConst = EXCEPTION_MAXIMUM_PARAMETERS)]
-        //public IntPtr [] ExceptionInformation;  
+        //public IntPtr [] ExceptionInformation;
 
         // Instead, mashal manually.
         public IntPtr ExceptionInformation0;
+
         public IntPtr ExceptionInformation1;
         public IntPtr ExceptionInformation2;
         public IntPtr ExceptionInformation3;
@@ -796,7 +816,7 @@ namespace Microsoft.Samples.Debugging.Native
         public UInt32 dwFirstChance;
     } // end of class EXCEPTION_DEBUG_INFO
 
-    #endregion // Exception events
+    #endregion Exception events
 
     // MODULEINFO declared in psapi.h
     [StructLayout(LayoutKind.Sequential)]
@@ -852,9 +872,8 @@ namespace Microsoft.Samples.Debugging.Native
         public IntPtr lpImageName;
         public UInt16 fUnicode;
 
-
         // Helper to read an IntPtr from the target
-        IntPtr ReadIntPtrFromTarget(IMemoryReader reader, IntPtr ptr)
+        private IntPtr ReadIntPtrFromTarget(IMemoryReader reader, IntPtr ptr)
         {
             // This is not cross-platform: it assumes host and target are the same size.
             byte[] buffer = new byte[IntPtr.Size];
@@ -871,7 +890,6 @@ namespace Microsoft.Samples.Debugging.Native
 
             return newptr;
         }
-
 
         /// <summary>
         /// Read the image name from the target.
@@ -945,8 +963,6 @@ namespace Microsoft.Samples.Debugging.Native
 
             return moduleName;
         }
-
-
     } // end of class LOAD_DLL_DEBUG_INFO
 
     [StructLayout(LayoutKind.Sequential)]
@@ -962,9 +978,9 @@ namespace Microsoft.Samples.Debugging.Native
         public UInt16 fUnicode;
         public UInt16 nDebugStringLength;
 
-        // 
+        //
         /// <summary>
-        /// Read the log message from the target. 
+        /// Read the log message from the target.
         /// </summary>
         /// <param name="reader">interface to access debuggee memory</param>
         /// <returns>string containing message or null if not available</returns>
@@ -999,7 +1015,6 @@ namespace Microsoft.Samples.Debugging.Native
                 return null;
             }
         }
-
     } // end of class OUTPUT_DEBUG_STRING_INFO
 
     [StructLayout(LayoutKind.Explicit)]
@@ -1030,7 +1045,7 @@ namespace Microsoft.Samples.Debugging.Native
         public OUTPUT_DEBUG_STRING_INFO OutputDebugString;
     }
 
-    // 32-bit and 64-bit have sufficiently different alignment that we need 
+    // 32-bit and 64-bit have sufficiently different alignment that we need
     // two different debug event structures.
 
     /// <summary>
@@ -1061,19 +1076,20 @@ namespace Microsoft.Samples.Debugging.Native
 
     #endregion Native Structures
 
-
     // SafeHandle to call CloseHandle
     [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
     public sealed class SafeWin32Handle : SafeHandleZeroOrMinusOneIsInvalid
     {
-        public SafeWin32Handle() : base(true) { }
+        public SafeWin32Handle()
+            : base(true)
+        {
+        }
 
         public SafeWin32Handle(IntPtr handle)
             : base(true)
         {
             SetHandle(handle);
         }
-
 
         protected override bool ReleaseHandle()
         {
@@ -1117,7 +1133,7 @@ namespace Microsoft.Samples.Debugging.Native
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetThreadContext(IntPtr hThread, IntPtr lpContext);
 
-        // This gets the raw OS thread ID. This is not fiber aware. 
+        // This gets the raw OS thread ID. This is not fiber aware.
         [DllImport(Kernel32LibraryName)]
         public static extern int GetCurrentThreadId();
 
@@ -1155,7 +1171,10 @@ namespace Microsoft.Samples.Debugging.Native
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public sealed class SafeMapViewHandle : SafeHandleZeroOrMinusOneIsInvalid
         {
-            private SafeMapViewHandle() : base(true) { }
+            private SafeMapViewHandle()
+                : base(true)
+            {
+            }
 
             protected override bool ReleaseHandle()
             {
@@ -1175,7 +1194,7 @@ namespace Microsoft.Samples.Debugging.Native
             }
         }
 
-        // Call BOOL UnmapViewOfFile(void*) to clean up. 
+        // Call BOOL UnmapViewOfFile(void*) to clean up.
         [DllImport(Kernel32LibraryName, SetLastError = true)]
         public static extern SafeMapViewHandle MapViewOfFile(SafeWin32Handle hFileMappingObject, uint
            dwDesiredAccess, uint dwFileOffsetHigh, uint dwFileOffsetLow,
@@ -1197,7 +1216,11 @@ namespace Microsoft.Samples.Debugging.Native
         [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         public sealed class SafeLoadLibraryHandle : SafeHandleZeroOrMinusOneIsInvalid
         {
-            private SafeLoadLibraryHandle() : base(true) { }
+            private SafeLoadLibraryHandle()
+                : base(true)
+            {
+            }
+
             public SafeLoadLibraryHandle(IntPtr handle)
                 : base(true)
             {
@@ -1234,20 +1257,17 @@ namespace Microsoft.Samples.Debugging.Native
         public static extern bool GetFileSizeEx(IntPtr hFile, out System.Int64 lpFileSize);
 
         // Get the module's size.
-        // This can not be called during the actual dll-load debug event. 
+        // This can not be called during the actual dll-load debug event.
         // (The debug event is sent before the information is initialized)
         [DllImport(PsapiLibraryName, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool GetModuleInformation(IntPtr hProcess, IntPtr hModule, out ModuleInfo lpmodinfo, uint countBytes);
-
 
         // Read memory from live, local process.
         [DllImport(Kernel32LibraryName, SetLastError = true, PreserveSig = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ReadProcessMemory(IntPtr hProcess, IntPtr lpBaseAddress,
           byte[] lpBuffer, UIntPtr nSize, out int lpNumberOfBytesRead);
-
-
 
         // Requires Windows XP / Win2k03
         [DllImport(Kernel32LibraryName, SetLastError = true, PreserveSig = true)]
@@ -1266,8 +1286,8 @@ namespace Microsoft.Samples.Debugging.Native
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool SetEvent(SafeWin32Handle eventHandle);
 
-
         #region Attach / Detach APIS
+
         // constants used in CreateProcess functions
         public enum CreateProcessFlags
         {
@@ -1296,7 +1316,6 @@ namespace Microsoft.Samples.Debugging.Native
             PROCESS_INFORMATION lpProcessInformation // class
         );
 
-
         // Attach to a process
         [DllImport(Kernel32LibraryName, SetLastError = true, PreserveSig = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -1312,11 +1331,10 @@ namespace Microsoft.Samples.Debugging.Native
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool TerminateProcess(IntPtr hProcess, uint uExitCode);
 
-
-        #endregion // Attach / Detach APIS
-
+        #endregion Attach / Detach APIS
 
         #region Stop-Go APIs
+
         // We have two separate versions of kernel32!WaitForDebugEvent to cope with different structure
         // layout on each platform.
         [DllImport(Kernel32LibraryName, EntryPoint = "WaitForDebugEvent", SetLastError = true, PreserveSig = true)]
@@ -1353,11 +1371,10 @@ namespace Microsoft.Samples.Debugging.Native
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool ContinueDebugEvent(uint dwProcessId, uint dwThreadId, ContinueStatus dwContinueStatus);
 
-        #endregion // Stop-Go
+        #endregion Stop-Go APIs
 
         [DllImport("kernel32.dll")]
         public static extern void GetSystemInfo([MarshalAs(UnmanagedType.Struct)] out SYSTEM_INFO lpSystemInfo);
-
 
         [StructLayout(LayoutKind.Sequential)]
         public struct SYSTEM_INFO
@@ -1365,6 +1382,7 @@ namespace Microsoft.Samples.Debugging.Native
             // Don't marshal dwOemId since that's obsolete and lets
             // us avoid marshalling a union.
             internal ProcessorArchitecture wProcessorArchitecture;
+
             internal ushort wReserved;
 
             public uint dwPageSize;
@@ -1377,7 +1395,5 @@ namespace Microsoft.Samples.Debugging.Native
             public ushort dwProcessorLevel;
             public ushort dwProcessorRevision;
         }
-
     } // NativeMethods
-
 }

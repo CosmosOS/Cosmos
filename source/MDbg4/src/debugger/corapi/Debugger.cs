@@ -1,22 +1,19 @@
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Text;
 using System.Security.Permissions;
-using System.Globalization;
-
-using Microsoft.Samples.Debugging.CorDebug.NativeApi;
-
+using System.Text;
 
 namespace Microsoft.Samples.Debugging.CorDebug
 {
@@ -25,6 +22,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
      * Note that we don't derive the class from WrapperBase, becuase this
      * class will never be returned in any callback.
      */
+
     public sealed class CorDebugger : MarshalByRefObject
     {
         private const int MaxVersionStringLength = 256; // == MAX_PATH
@@ -63,7 +61,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
             return RuntimeEnvironment.GetSystemVersion();
         }
 
-
         /// <summary>Creates a debugger wrapper from Guid.</summary>
         public CorDebugger(Guid debuggerGuid)
         {
@@ -95,8 +92,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
         [CLSCompliant(false)]
         public ICorDebug Raw
         {
-            get 
-            { 
+            get
+            {
                 return m_debugger;
             }
         }
@@ -105,6 +102,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
          * Closes the debugger.  After this method is called, it is an error
          * to call any other methods on this object.
          */
+
         public void Terminate()
         {
             Debug.Assert(m_debugger != null);
@@ -116,6 +114,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         /**
          * Specify the callback object to use for managed events.
          */
+
         internal void SetManagedHandler(ICorDebugManagedCallback managedCallback)
         {
             m_debugger.SetManagedHandler(managedCallback);
@@ -124,6 +123,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         /**
          * Specify the callback object to use for unmanaged events.
          */
+
         internal void SetUnmanagedHandler(ICorDebugUnmanagedCallback nativeCallback)
         {
             m_debugger.SetUnmanagedHandler(nativeCallback);
@@ -134,6 +134,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
          *
          * Parameters are the same as the Win32 CreateProcess call.
          */
+
         public CorProcess CreateProcess(
                                          String applicationName,
                                          String commandLine
@@ -147,6 +148,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
          *
          * Parameters are the same as the Win32 CreateProcess call.
          */
+
         public CorProcess CreateProcess(
                                          String applicationName,
                                          String commandLine,
@@ -161,6 +163,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
          *
          * Parameters are the same as the Win32 CreateProcess call.
          */
+
         public CorProcess CreateProcess(
                                          String applicationName,
                                          String commandLine,
@@ -182,7 +185,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             STARTUPINFO si = new STARTUPINFO();
             si.cb = Marshal.SizeOf(si);
 
-            // initialize safe handles 
+            // initialize safe handles
             si.hStdInput = new Microsoft.Win32.SafeHandles.SafeFileHandle(new IntPtr(0), false);
             si.hStdOutput = new Microsoft.Win32.SafeHandles.SafeFileHandle(new IntPtr(0), false);
             si.hStdError = new Microsoft.Win32.SafeHandles.SafeFileHandle(new IntPtr(0), false);
@@ -227,6 +230,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
          *
          * after CreateProcess returns.
          */
+
         [CLSCompliant(false)]
         public CorProcess CreateProcess(
                                          String applicationName,
@@ -270,9 +274,9 @@ namespace Microsoft.Samples.Debugging.CorDebug
                                          CorDebugCreateProcessFlags debuggingFlags)
         {
             /*
-             * If commandLine is: <c:\a b\a arg1 arg2> and c:\a.exe does not exist, 
+             * If commandLine is: <c:\a b\a arg1 arg2> and c:\a.exe does not exist,
              *    then without this logic, "c:\a b\a.exe" would be tried next.
-             * To prevent this ambiguity, this forces the user to quote if the path 
+             * To prevent this ambiguity, this forces the user to quote if the path
              *    has spaces in it: <"c:\a b\a" arg1 arg2>
              */
             if (null == applicationName && !commandLine.StartsWith("\""))
@@ -315,15 +319,15 @@ namespace Microsoft.Samples.Debugging.CorDebug
                                                  processInformation,
                                                  debuggingFlags,
                                                  out proc);
-
             }
 
             return CorProcess.GetCorProcess(proc);
         }
 
-        /** 
+        /**
          * Attach to an active process
          */
+
         public CorProcess DebugActiveProcess(int processId, bool win32Attach)
         {
             return DebugActiveProcess(processId, win32Attach, null);
@@ -346,6 +350,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         /**
          * Enumerate all processes currently being debugged.
          */
+
         public IEnumerable Processes
         {
             get
@@ -359,6 +364,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         /**
          * Get the Process object for the given PID.
          */
+
         public CorProcess GetProcess(int processId)
         {
             ICorDebugProcess proc = null;
@@ -367,10 +373,11 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /**
-         * Warn us of potentional problems in using debugging (eg. whether a kernel debugger is 
+         * Warn us of potentional problems in using debugging (eg. whether a kernel debugger is
          * attached).  This API should probably be renamed or the warnings turned into errors
          * in CreateProcess/DebugActiveProcess
          */
+
         public void CanLaunchOrAttach(int processId, bool win32DebuggingEnabled)
         {
             m_debugger.CanLaunchOrAttach((uint)processId,
@@ -422,10 +429,10 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 catch (ArgumentException)
                 {
                     // This can commonly happen if:
-                    // 1) the debuggee is missing a config file 
+                    // 1) the debuggee is missing a config file
                     // 2) the debuggee has a config file for a not-installed CLR.
-                    // 
-                    // Give a more descriptive error. 
+                    //
+                    // Give a more descriptive error.
                     // We explicitly don't pass the inner exception because:
                     // - it's uninteresting. It's really just from a pinvoke and so there are no
                     //    extra managed frames.
@@ -465,7 +472,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
          * the process is continued automatically.
          */
 
-        void InternalFireEvent(ManagedCallbackType callbackType, CorEventArgs e)
+        private void InternalFireEvent(ManagedCallbackType callbackType, CorEventArgs e)
         {
             CorProcess owner = e.Process;
 
@@ -496,23 +503,25 @@ namespace Microsoft.Samples.Debugging.CorDebug
          * the event arguments into a more approprate form and forwards
          * the call to the appropriate function.
          */
+
         private class ManagedCallback : ManagedCallbackBase
         {
             public ManagedCallback(CorDebugger outer)
             {
                 m_outer = outer;
             }
+
             protected override void HandleEvent(ManagedCallbackType eventId, CorEventArgs args)
             {
                 m_outer.InternalFireEvent(eventId, args);
             }
+
             private CorDebugger m_outer;
         }
 
         private ICorDebug m_debugger = null;
         private ICorDebugRemote m_remoteDebugger = null;
     } /* class Debugger */
-
 
     public class ProcessSafeHandle : Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
     {
@@ -527,7 +536,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             SetHandle(handle);
         }
 
-        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode=true)]
+        [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
         override protected bool ReleaseHandle()
         {
             return NativeMethods.CloseHandle(handle);
@@ -656,7 +665,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
         public static extern void SHCreateStreamOnFile(string file,
                                                         Stgm dwMode,
                                                         [MarshalAs(UnmanagedType.Interface)]out IStream openedStream);
-
     }
 
     // Wrapper for ICLRMetaHost.  Used to find information about runtimes.
@@ -760,7 +768,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
     }
 
-
     // You're expected to get this interface from mscoree!GetCLRMetaHost.
     // Details for APIs are in metahost.idl.
     [ComImport, InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown), Guid("D332DB9E-B9B3-4125-8207-A14884F53216")]
@@ -783,7 +790,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
         IEnumUnknown EnumerateLoadedRuntimes(
             [In] ProcessSafeHandle hndProcess);
     }
-
 
     // Wrapper for ICLRMetaHostPolicy.
     public sealed class CLRMetaHostPolicy
@@ -843,7 +849,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
             imageVersion.EnsureCapacity(MaxVersionStringLength);
             uint imageVersionCapacity = System.Convert.ToUInt32(imageVersion.Capacity);
 
-
             Guid ifaceId = typeof(ICLRRuntimeInfo).GUID;
             uint configFlags;
             object o = m_MHPolicy.GetRequestedRuntime(flags,
@@ -858,7 +863,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
             return new CLRRuntimeInfo(o);
         }
-
     }
 
     // You're expected to get this interface from mscoree!CLRCreateInstance.
@@ -881,7 +885,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
     // Wrapper for ICLRRuntimeInfo.  Represents information about a CLR install instance.
     public sealed class CLRRuntimeInfo
     {
-
         private static Guid m_ClsIdClrDebuggingLegacy = new Guid("DF8395B5-A4BA-450b-A77C-A9A47762C520");
         private ICLRRuntimeInfo m_runtimeInfo;
 
@@ -917,9 +920,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             Guid clsId = m_ClsIdClrDebuggingLegacy;
             return (ICorDebug)m_runtimeInfo.GetInterface(ref clsId, ref ifaceId);
         }
-
     }
-
 
     // Details about this interface are in metahost.idl.
     [ComImport, InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown), Guid("BD39D1D2-BA2F-486A-89B0-B4B0CB466891")]
@@ -949,9 +950,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
         [return: MarshalAs(UnmanagedType.IUnknown)]
         System.Object GetInterface([In] ref Guid rclsid, [In] ref Guid riid);
-
     }
-
 
     /// <summary>
     /// Wrapper for the ICLRDebugging shim interface. This interface exposes the native pipeline
@@ -959,7 +958,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
     /// </summary>
     public sealed class CLRDebugging
     {
-
         private static readonly Guid clsidCLRDebugging = new Guid("BACC578D-FBDD-48a4-969F-02D932B74634");
         private ICLRDebugging m_CLRDebugging;
 
@@ -1160,7 +1158,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
     [ComImport, InterfaceTypeAttribute(ComInterfaceType.InterfaceIsIUnknown), Guid("00000100-0000-0000-C000-000000000046")]
     internal interface IEnumUnknown
     {
-
         [PreserveSig]
         int Next(
             [In, MarshalAs(UnmanagedType.U4)]
@@ -1177,11 +1174,9 @@ namespace Microsoft.Samples.Debugging.CorDebug
         void Reset();
 
         void Clone(
-            [Out] 
+            [Out]
             out IEnumUnknown ppenum);
     }
-
-
 
     ////////////////////////////////////////////////////////////////////////////////
     //
@@ -1224,6 +1219,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** The Controller of the current event. */
+
         public CorController Controller
         {
             get
@@ -1232,11 +1228,12 @@ namespace Microsoft.Samples.Debugging.CorDebug
             }
         }
 
-        /** 
+        /**
          * The default behavior after an event is to Continue processing
          * after the event has been handled.  This can be changed by
          * setting this property to false.
          */
+
         public virtual bool Continue
         {
             get
@@ -1295,14 +1292,13 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 }
             }
         }
-
     }
 
-
     /**
-     * This class is used for all events that only have access to the 
+     * This class is used for all events that only have access to the
      * CorProcess that is generating the event.
      */
+
     public class CorProcessEventArgs : CorEventArgs
     {
         public CorProcessEventArgs(CorProcess process)
@@ -1321,8 +1317,10 @@ namespace Microsoft.Samples.Debugging.CorDebug
             {
                 case ManagedCallbackType.OnCreateProcess:
                     return "Process Created";
+
                 case ManagedCallbackType.OnProcessExit:
                     return "Process Exited";
+
                 case ManagedCallbackType.OnControlCTrap:
                     break;
             }
@@ -1333,11 +1331,11 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void CorProcessEventHandler(Object sender,
                                                  CorProcessEventArgs e);
 
-
     /**
      * The event arguments for events that contain both a CorProcess
      * and an CorAppDomain.
      */
+
     public class CorAppDomainEventArgs : CorProcessEventArgs
     {
         private CorAppDomain m_ad;
@@ -1356,6 +1354,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** The AppDomain that generated the event. */
+
         public CorAppDomain AppDomain
         {
             get
@@ -1370,6 +1369,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             {
                 case ManagedCallbackType.OnCreateAppDomain:
                     return "AppDomain Created: " + m_ad.Name;
+
                 case ManagedCallbackType.OnAppDomainExit:
                     return "AppDomain Exited: " + m_ad.Name;
             }
@@ -1380,11 +1380,11 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void CorAppDomainEventHandler(Object sender,
                                                    CorAppDomainEventArgs e);
 
-
     /**
      * The base class for events which take an CorAppDomain as their
      * source, but not a CorProcess.
      */
+
     public class CorAppDomainBaseEventArgs : CorEventArgs
     {
         public CorAppDomainBaseEventArgs(CorAppDomain ad)
@@ -1406,10 +1406,10 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
     }
 
-
     /**
      * Arguments for events dealing with threads.
      */
+
     public class CorThreadEventArgs : CorAppDomainBaseEventArgs
     {
         public CorThreadEventArgs(CorAppDomain appDomain, CorThread thread)
@@ -1431,10 +1431,13 @@ namespace Microsoft.Samples.Debugging.CorDebug
             {
                 case ManagedCallbackType.OnBreak:
                     return "Break";
+
                 case ManagedCallbackType.OnCreateThread:
                     return "Thread Created";
+
                 case ManagedCallbackType.OnThreadExit:
                     return "Thread Exited";
+
                 case ManagedCallbackType.OnNameChange:
                     return "Name Changed";
             }
@@ -1445,10 +1448,10 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void CorThreadEventHandler(Object sender,
                                                 CorThreadEventArgs e);
 
-
     /**
      * Arguments for events involving breakpoints.
      */
+
     public class CorBreakpointEventArgs : CorThreadEventArgs
     {
         private CorBreakpoint m_break;
@@ -1471,6 +1474,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** The breakpoint involved. */
+
         public CorBreakpoint Breakpoint
         {
             get
@@ -1492,10 +1496,10 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void BreakpointEventHandler(Object sender,
                                                  CorBreakpointEventArgs e);
 
-
     /**
      * Arguments for when a Step operation has completed.
      */
+
     public class CorStepCompleteEventArgs : CorThreadEventArgs
     {
         private CorStepper m_stepper;
@@ -1550,13 +1554,13 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void StepCompleteEventHandler(Object sender,
                                                    CorStepCompleteEventArgs e);
 
-
     /**
      * For events dealing with exceptions.
      */
+
     public class CorExceptionEventArgs : CorThreadEventArgs
     {
-        bool m_unhandled;
+        private bool m_unhandled;
 
         public CorExceptionEventArgs(CorAppDomain appDomain,
                                       CorThread thread,
@@ -1576,6 +1580,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** Has the exception been handled yet? */
+
         public bool Unhandled
         {
             get
@@ -1588,13 +1593,13 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void CorExceptionEventHandler(Object sender,
                                                    CorExceptionEventArgs e);
 
-
     /**
      * For events dealing the evaluation of something...
      */
+
     public class CorEvalEventArgs : CorThreadEventArgs
     {
-        CorEval m_eval;
+        private CorEval m_eval;
 
         public CorEvalEventArgs(CorAppDomain appDomain, CorThread thread,
                                  CorEval eval)
@@ -1611,6 +1616,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** The object being evaluated. */
+
         public CorEval Eval
         {
             get
@@ -1625,6 +1631,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             {
                 case ManagedCallbackType.OnEvalComplete:
                     return "Eval Complete";
+
                 case ManagedCallbackType.OnEvalException:
                     return "Eval Exception";
             }
@@ -1634,13 +1641,13 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
     public delegate void EvalEventHandler(Object sender, CorEvalEventArgs e);
 
-
     /**
      * For events dealing with module loading/unloading.
      */
+
     public class CorModuleEventArgs : CorAppDomainBaseEventArgs
     {
-        CorModule m_managedModule;
+        private CorModule m_managedModule;
 
         public CorModuleEventArgs(CorAppDomain appDomain, CorModule managedModule)
             : base(appDomain)
@@ -1669,6 +1676,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             {
                 case ManagedCallbackType.OnModuleLoad:
                     return "Module loaded: " + m_managedModule.Name;
+
                 case ManagedCallbackType.OnModuleUnload:
                     return "Module unloaded: " + m_managedModule.Name;
             }
@@ -1679,13 +1687,13 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void CorModuleEventHandler(Object sender,
                                                 CorModuleEventArgs e);
 
-
     /**
      * For events dealing with class loading/unloading.
      */
+
     public class CorClassEventArgs : CorAppDomainBaseEventArgs
     {
-        CorClass m_class;
+        private CorClass m_class;
 
         public CorClassEventArgs(CorAppDomain appDomain, CorClass managedClass)
             : base(appDomain)
@@ -1710,8 +1718,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
         public override string ToString()
         {
-            // I'd like to get the actual class name here, but we don't have 
-            // access to the metadata inside the corapi layer. 
+            // I'd like to get the actual class name here, but we don't have
+            // access to the metadata inside the corapi layer.
             string className = string.Format("{0} typedef={1:X}",
                 m_class.Module.Name,
                 m_class.Token);
@@ -1720,6 +1728,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             {
                 case ManagedCallbackType.OnClassLoad:
                     return "Class loaded: " + className;
+
                 case ManagedCallbackType.OnClassUnload:
                     return "Class unloaded: " + className;
             }
@@ -1730,14 +1739,14 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void CorClassEventHandler(Object sender,
                                                CorClassEventArgs e);
 
-
     /**
      * For events dealing with debugger errors.
      */
+
     public class CorDebuggerErrorEventArgs : CorProcessEventArgs
     {
-        int m_hresult;
-        int m_errorCode;
+        private int m_hresult;
+        private int m_errorCode;
 
         public CorDebuggerErrorEventArgs(CorProcess process, int hresult,
                                           int errorCode)
@@ -1784,13 +1793,14 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void DebuggerErrorEventHandler(Object sender,
                                                     CorDebuggerErrorEventArgs e);
 
-
     /**
      * For events dealing with Assemblies.
      */
+
     public class CorAssemblyEventArgs : CorAppDomainBaseEventArgs
     {
         private CorAssembly m_assembly;
+
         public CorAssemblyEventArgs(CorAppDomain appDomain,
                                      CorAssembly assembly)
             : base(appDomain)
@@ -1806,6 +1816,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         }
 
         /** The Assembly of interest. */
+
         public CorAssembly Assembly
         {
             get
@@ -1820,6 +1831,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             {
                 case ManagedCallbackType.OnAssemblyLoad:
                     return "Assembly loaded: " + m_assembly.Name;
+
                 case ManagedCallbackType.OnAssemblyUnload:
                     return "Assembly unloaded: " + m_assembly.Name;
             }
@@ -1830,15 +1842,15 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void CorAssemblyEventHandler(Object sender,
                                                   CorAssemblyEventArgs e);
 
-
     /**
      * For events dealing with logged messages.
      */
+
     public class CorLogMessageEventArgs : CorThreadEventArgs
     {
-        int m_level;
-        string m_logSwitchName;
-        string m_message;
+        private int m_level;
+        private string m_logSwitchName;
+        private string m_message;
 
         public CorLogMessageEventArgs(CorAppDomain appDomain, CorThread thread,
                                        int level, string logSwitchName, string message)
@@ -1896,19 +1908,19 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void LogMessageEventHandler(Object sender,
                                                  CorLogMessageEventArgs e);
 
-
     /**
      * For events dealing with logged messages.
      */
+
     public class CorLogSwitchEventArgs : CorThreadEventArgs
     {
-        int m_level;
+        private int m_level;
 
-        int m_reason;
+        private int m_reason;
 
-        string m_logSwitchName;
+        private string m_logSwitchName;
 
-        string m_parentName;
+        private string m_parentName;
 
         public CorLogSwitchEventArgs(CorAppDomain appDomain, CorThread thread,
                                       int level, int reason, string logSwitchName, string parentName)
@@ -1981,10 +1993,11 @@ namespace Microsoft.Samples.Debugging.CorDebug
     /**
       * For events dealing with custom notifications.
       */
+
     public class CorCustomNotificationEventArgs : CorThreadEventArgs
     {
         // thread on which the notification occurred
-        CorThread m_thread;
+        private CorThread m_thread;
 
         // constructor
         // Arguments: thread: thread on which the notification occurred
@@ -2019,6 +2032,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
     /**
      * For events dealing with MDA messages.
      */
+
     public class CorMDAEventArgs : CorProcessEventArgs
     {
         // Thread may be null.
@@ -2039,7 +2053,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
             //m_proc = proc;
         }
 
-        CorMDA m_mda;
+        private CorMDA m_mda;
+
         public CorMDA MDA { get { return m_mda; } }
 
         public override string ToString()
@@ -2059,14 +2074,13 @@ namespace Microsoft.Samples.Debugging.CorDebug
 
     public delegate void MDANotificationEventHandler(Object sender, CorMDAEventArgs e);
 
-
-
     /**
      * For events dealing module symbol updates.
      */
+
     public class CorUpdateModuleSymbolsEventArgs : CorModuleEventArgs
     {
-        IStream m_stream;
+        private IStream m_stream;
 
         [CLSCompliant(false)]
         public CorUpdateModuleSymbolsEventArgs(CorAppDomain appDomain,
@@ -2147,10 +2161,10 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void CorExceptionInCallbackEventHandler(Object sender,
                                              CorExceptionInCallbackEventArgs e);
 
-
     /**
      * Edit and Continue callbacks
      */
+
     public class CorEditAndContinueRemapEventArgs : CorThreadEventArgs
     {
         public CorEditAndContinueRemapEventArgs(CorAppDomain appDomain,
@@ -2193,9 +2207,9 @@ namespace Microsoft.Samples.Debugging.CorDebug
         private CorFunction m_managedFunction;
         private int m_accurate;
     }
+
     public delegate void CorEditAndContinueRemapEventHandler(Object sender,
                                                               CorEditAndContinueRemapEventArgs e);
-
 
     public class CorBreakpointSetErrorEventArgs : CorThreadEventArgs
     {
@@ -2248,9 +2262,9 @@ namespace Microsoft.Samples.Debugging.CorDebug
         private CorBreakpoint m_breakpoint;
         private int m_errorCode;
     }
+
     public delegate void CorBreakpointSetErrorEventHandler(Object sender,
                                                            CorBreakpointSetErrorEventArgs e);
-
 
     public sealed class CorFunctionRemapOpportunityEventArgs : CorThreadEventArgs
     {
@@ -2356,10 +2370,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
     public delegate void CorFunctionRemapCompleteEventHandler(Object sender,
                                                               CorFunctionRemapCompleteEventArgs e);
 
-
     public class CorExceptionUnwind2EventArgs : CorThreadEventArgs
     {
-
         [CLSCompliant(false)]
         public CorExceptionUnwind2EventArgs(CorAppDomain appDomain, CorThread thread,
                                             CorDebugExceptionUnwindCallbackType eventType,
@@ -2408,17 +2420,15 @@ namespace Microsoft.Samples.Debugging.CorDebug
             return base.ToString();
         }
 
-        CorDebugExceptionUnwindCallbackType m_eventType;
-        int m_flags;
+        private CorDebugExceptionUnwindCallbackType m_eventType;
+        private int m_flags;
     }
 
     public delegate void CorExceptionUnwind2EventHandler(Object sender,
                                                    CorExceptionUnwind2EventArgs e);
 
-
     public class CorException2EventArgs : CorThreadEventArgs
     {
-
         [CLSCompliant(false)]
         public CorException2EventArgs(CorAppDomain appDomain,
                                       CorThread thread,
@@ -2492,14 +2502,15 @@ namespace Microsoft.Samples.Debugging.CorDebug
             return base.ToString();
         }
 
-        CorFrame m_frame;
-        int m_offset;
-        CorDebugExceptionCallbackType m_eventType;
-        int m_flags;
+        private CorFrame m_frame;
+        private int m_offset;
+        private CorDebugExceptionCallbackType m_eventType;
+        private int m_flags;
     }
 
     public delegate void CorException2EventHandler(Object sender,
                                                    CorException2EventArgs e);
+
     public class CorNativeStopEventArgs : CorProcessEventArgs
     {
         [CLSCompliant(false)]
@@ -2618,6 +2629,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
         OnExceptionInCallback,
         OnCustomNotification
     }
+
     internal enum ManagedCallbackTypeCount
     {
         Last = ManagedCallbackType.OnCustomNotification,
@@ -2627,7 +2639,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
     // Derived classes can overide the HandleEvent method to define the handling.
     abstract public class ManagedCallbackBase : ICorDebugManagedCallback, ICorDebugManagedCallback2, ICorDebugManagedCallback3
     {
-        // Derived class overrides this methdos 
+        // Derived class overrides this methdos
         protected abstract void HandleEvent(ManagedCallbackType eventId, CorEventArgs args);
 
         void ICorDebugManagedCallback.Breakpoint(ICorDebugAppDomain appDomain,
@@ -2676,6 +2688,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                                                          !(unhandled == 0),
                                                          ManagedCallbackType.OnException));
         }
+
         /* pass false if ``unhandled'' is 0 -- mapping TRUE to true, etc. */
 
         void ICorDebugManagedCallback.EvalComplete(
@@ -2876,7 +2889,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
                                                       ManagedCallbackType.OnNameChange));
         }
 
-        
         void ICorDebugManagedCallback.UpdateModuleSymbols(
                                          ICorDebugAppDomain appDomain,
                                          ICorDebugModule managedModule,
@@ -2897,7 +2909,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
         {
             Debug.Assert(false); //OBSOLETE callback
         }
-
 
         void ICorDebugManagedCallback.BreakpointSetError(
                                        ICorDebugAppDomain appDomain,
@@ -2988,7 +2999,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                                                                   ManagedCallbackType.OnCustomNotification));
         }
 
-        // Get process from controller 
+        // Get process from controller
         static private CorProcess GetProcessFromController(ICorDebugController pController)
         {
             CorProcess p;
@@ -3014,14 +3025,10 @@ namespace Microsoft.Samples.Debugging.CorDebug
             CorDebugMDAFlags f = c.Flags;
             CorProcess p = GetProcessFromController(pController);
 
-
             HandleEvent(ManagedCallbackType.OnMDANotification,
                                       new CorMDAEventArgs(c,
                                                            thread == null ? null : new CorThread(thread),
                                                            p, ManagedCallbackType.OnMDANotification));
         }
-
-
     }
-
 } /* namespace */

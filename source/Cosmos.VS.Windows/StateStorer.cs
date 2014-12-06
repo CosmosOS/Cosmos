@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Cosmos.VS.Windows
 {
@@ -10,6 +6,7 @@ namespace Cosmos.VS.Windows
     {
         protected object mCurrLineId_Lock = new object();
         protected string mCurrLineId = null;
+
         public string CurrLineId
         {
             get
@@ -22,7 +19,7 @@ namespace Cosmos.VS.Windows
                 {
                     mCurrLineId = value;
 
-                    if(mCurrLineId != null && !mStates.ContainsKey(mCurrLineId))
+                    if (mCurrLineId != null && !mStates.ContainsKey(mCurrLineId))
                     {
                         mStates.Add(mCurrLineId, new Dictionary<string, byte[]>());
                     }
@@ -35,7 +32,6 @@ namespace Cosmos.VS.Windows
 
         public StateStorer()
         {
-
         }
 
         public void StoreState(string stateId, byte[] data)
@@ -52,18 +48,20 @@ namespace Cosmos.VS.Windows
 
             currLineStates.Add(stateId, data);
         }
+
         public byte[] RetrieveState(string lineId, string stateId)
         {
             if (mStates.ContainsKey(lineId))
             {
                 Dictionary<string, byte[]> currLineStates = mStates[lineId];
-                if(currLineStates.ContainsKey(stateId))
+                if (currLineStates.ContainsKey(stateId))
                 {
                     return currLineStates[stateId];
                 }
             }
             return null;
         }
+
         public bool ContainsStatesForLine(string lineId)
         {
             return mStates.ContainsKey(lineId);

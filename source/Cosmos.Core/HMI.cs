@@ -20,7 +20,7 @@ namespace Cosmos.Core
         public static uint UsedMemory = 0;
         public static uint FreeMemory = 0;
         public static uint TotalMemory = 0;
-        public static uint BlockReused = 0;  
+        public static uint BlockReused = 0;
         public static uint MemUsed = 0;
 
         internal static int BlockID = 0;
@@ -41,7 +41,6 @@ namespace Cosmos.Core
         internal static uint[] MemHeaders = new uint[256];
         //Resizable Variables stops here
 
-
         internal static bool IsInitalised = false;
         internal static bool Monitor = false;
         internal static bool GCEnable = false;
@@ -51,8 +50,6 @@ namespace Cosmos.Core
         internal static uint JediReallocAddr = 0;
         internal static uint MaxSize = 0;
         internal static uint MemoryPointer = 0;
-
-     
 
         public unsafe static void HandleGPF(ref Cosmos.Core.INTs.IRQContext aContext)
         {
@@ -112,11 +109,8 @@ namespace Cosmos.Core
                 Console.WriteLine(Err.ToHex());
             }
 
-
             while (true) ;
         }
-
-
 
         public static bool Init()
         {
@@ -137,7 +131,6 @@ namespace Cosmos.Core
                 GCObjIDs[i] = 0x0000000;
             }
             return IsInitalised;
-
         }
         //Update Memory Consumption variables
         public static void PrintMemoryUsed()
@@ -185,7 +178,6 @@ namespace Cosmos.Core
             BlockReused = GCSavedAddr;
             Monitor = true;
             MemoryPointer = Heap.LastMallocAddr;
-
         }
 
         //Free All Objects in the GC List.
@@ -199,7 +191,6 @@ namespace Cosmos.Core
                 MemHeaders[GCIndex] = 0x10000000;
             }
             GCEnable = true;
-
         }
 
         //
@@ -223,7 +214,6 @@ namespace Cosmos.Core
             return MallocAddr;
         }
 
-
         //Reallocates And/Or Resizes Memory
 
         public static uint ReAlloc(uint aSize)
@@ -237,8 +227,6 @@ namespace Cosmos.Core
             }
             return JediReallocAddr;
         }
-
-
 
         //Jedi Reallocator only
         //It is only used by Garbage Collector
@@ -265,7 +253,7 @@ namespace Cosmos.Core
                 {
                     LeftOver = aSize - MemSizes[GCIndex];
                     Heap.SkipRalloc = true;//Skip Realloc for one inertia
-                    Heap.MemAlloc(LeftOver);//Allocate the missing size 
+                    Heap.MemAlloc(LeftOver);//Allocate the missing size
                     MemSizes[GCIndex] += LeftOver;
                     MaxSize += LeftOver;
                 }
@@ -274,7 +262,6 @@ namespace Cosmos.Core
                 GCRefObjID++;
             }
         }
-
 
         //Reallocate Data that is freed by FreeMem(uint aSize) function
 
@@ -328,12 +315,10 @@ namespace Cosmos.Core
                     }
                 }
             }
-
         }
 
         public static void CheckForErrors(uint aSize)
         {
-
             //Check if address is Zero
             if (JediReallocAddr == 0 & GCEnable == true & GCObjCount > 0)
             {
@@ -366,7 +351,6 @@ namespace Cosmos.Core
             //Cause a Heap Fault if an object illegally accesses Kernel Memory Area
             else if (JediReallocAddr != 0 & JediReallocAddr < ProtectArea & GCEnable == true)
             {
-
                 HMI.CauseProgramFault("[ HMI Error: Kernel Memory Access Violation ]");
                 while (true) ;
             }
@@ -386,13 +370,13 @@ namespace Cosmos.Core
             BlockID = BlockID + 1;
         }
 
-        //Split a memory block in two 
+        //Split a memory block in two
         public static void SplitBlock(uint id, uint usedsize)
         {
             uint newblocksize = 0;
             newblocksize = MemSizes[id] - usedsize;
 
-            //Split the block into the required size for whatever requested it 
+            //Split the block into the required size for whatever requested it
             MemSizes[id] = MemSizes[id] - newblocksize;
 
             //Register the remaider of the block as a new unused block
@@ -403,7 +387,7 @@ namespace Cosmos.Core
         }
 
         //Free memory
-        //Jedi Reallocate doesn't use it. 
+        //Jedi Reallocate doesn't use it.
         public static bool FreeMem(uint addr)
         {
             bool Status = false;
@@ -421,19 +405,9 @@ namespace Cosmos.Core
             }
             return Status;
         }
-
-
-    
-
     }
 }
 #else
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
-using Cosmos.Common;
 
 namespace Cosmos.Core
 {
@@ -446,12 +420,10 @@ namespace Cosmos.Core
         // dummy implementation
         public static void GCMonitor()
         {
-
         }
 
         public static void GCFreeAll()
         {
-
         }
     }
 }

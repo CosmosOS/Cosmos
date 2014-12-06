@@ -1,17 +1,19 @@
-﻿namespace Cosmos.Assembler.x86 {
-    public enum ConditionalTestEnum:byte {
+﻿namespace Cosmos.Assembler.x86
+{
+    public enum ConditionalTestEnum : byte
+    {
         Overflow = 0,
         NoOverflow = 1,
         Below = 2,
-		Carry = 2,
+        Carry = 2,
         NotAboveOrEqual = 2,
         NotBelow = 3,
-		NotCarry = 3,
+        NotCarry = 3,
         AboveOrEqual = 3,
         Equal = 4,
         Zero = 4,
         NotEqual = 5,
-        NotZero =5,
+        NotZero = 5,
         BelowOrEqual = 6,
         NotAbove = 6,
         NotBelowOrEqual = 7,
@@ -26,11 +28,11 @@
         NotGreaterThanOrEqualTo = 12,
         NotLessThan = 13,
         GreaterThanOrEqualTo = 13,
-        LessThanOrEqualTo = 14, 
+        LessThanOrEqualTo = 14,
         NotGreaterThan = 14,
         NotLessThanOrEqualTo = 15,
         GreaterThan = 15,
-		CXRegisterEqualOrZeroTo = 16,
-		ECXRegisterEqualOrZeroTo = 17
+        CXRegisterEqualOrZeroTo = 16,
+        ECXRegisterEqualOrZeroTo = 17
     }
 }

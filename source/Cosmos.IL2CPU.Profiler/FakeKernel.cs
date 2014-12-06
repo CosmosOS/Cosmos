@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Cosmos.IL2CPU.Profiler
 {
-    public class FakeKernel: Cosmos.System.Kernel
+    public class FakeKernel : Cosmos.System.Kernel
     {
         protected override void BeforeRun()
         {

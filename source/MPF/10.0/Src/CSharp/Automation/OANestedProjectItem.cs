@@ -9,66 +9,70 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 
 namespace Microsoft.VisualStudio.Project.Automation
 {
-	[SuppressMessage("Microsoft.Interoperability", "CA1405:ComVisibleTypeBaseTypesShouldBeComVisible")]
-	[ComVisible(true), CLSCompliant(false)]
-	public class OANestedProjectItem : OAProjectItem<NestedProjectNode>
-	{
-		#region fields
-		EnvDTE.Project nestedProject;
-		#endregion
+    [SuppressMessage("Microsoft.Interoperability", "CA1405:ComVisibleTypeBaseTypesShouldBeComVisible")]
+    [ComVisible(true), CLSCompliant(false)]
+    public class OANestedProjectItem : OAProjectItem<NestedProjectNode>
+    {
+        #region fields
 
-		#region ctors
-		public OANestedProjectItem(OAProject project, NestedProjectNode node)
-			: base(project, node)
-		{
+        private EnvDTE.Project nestedProject;
+
+        #endregion fields
+
+        #region ctors
+
+        public OANestedProjectItem(OAProject project, NestedProjectNode node)
+            : base(project, node)
+        {
             if (node == null)
             {
                 throw new ArgumentNullException("node");
             }
 
-			object nestedproject;
-			if(ErrorHandler.Succeeded(node.NestedHierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out nestedproject)))
-			{
-				this.nestedProject = nestedproject as EnvDTE.Project;
-			}
-		}
+            object nestedproject;
+            if (ErrorHandler.Succeeded(node.NestedHierarchy.GetProperty(VSConstants.VSITEMID_ROOT, (int)__VSHPROPID.VSHPROPID_ExtObject, out nestedproject)))
+            {
+                this.nestedProject = nestedproject as EnvDTE.Project;
+            }
+        }
 
-		#endregion
+        #endregion ctors
 
-		#region overridden methods
-		/// <summary>
-		/// Returns the collection of project items defined in the nested project
-		/// </summary>
-		public override EnvDTE.ProjectItems ProjectItems
-		{
-			get
-			{
-				if(this.nestedProject != null)
-				{
-					return this.nestedProject.ProjectItems;
-				}
-				return null;
-			}
-		}
+        #region overridden methods
 
-		/// <summary>
-		/// Returns the nested project.
-		/// </summary>
-		public override EnvDTE.Project SubProject
-		{
-			get
-			{
-				return this.nestedProject;
-			}
-		}
-		#endregion
-	}
+        /// <summary>
+        /// Returns the collection of project items defined in the nested project
+        /// </summary>
+        public override EnvDTE.ProjectItems ProjectItems
+        {
+            get
+            {
+                if (this.nestedProject != null)
+                {
+                    return this.nestedProject.ProjectItems;
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Returns the nested project.
+        /// </summary>
+        public override EnvDTE.Project SubProject
+        {
+            get
+            {
+                return this.nestedProject;
+            }
+        }
+
+        #endregion overridden methods
+    }
 }

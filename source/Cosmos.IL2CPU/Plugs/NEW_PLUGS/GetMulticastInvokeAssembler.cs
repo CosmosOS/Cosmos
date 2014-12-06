@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.X86.IL;
-using Cosmos.Assembler;
-using System.Reflection;
-using MethodInfo = Cosmos.IL2CPU.MethodInfo;
-
-using CPUx86 = Cosmos.Assembler.x86;
+﻿using Cosmos.Assembler;
 using Cosmos.IL2CPU;
+using Cosmos.IL2CPU.Plugs;
+using System;
+using System.Reflection;
+using CPUx86 = Cosmos.Assembler.x86;
+using MethodInfo = Cosmos.IL2CPU.MethodInfo;
 
 namespace Indy.IL2CPU.X86.Plugs.NEW_PLUGS
 {
-    public class GetMulticastInvokeAssembler: AssemblerMethod
+    public class GetMulticastInvokeAssembler : AssemblerMethod
     {
         public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
         {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cosmos.Core;
+﻿using Cosmos.Core;
 
 namespace Cosmos.HAL
 {
@@ -14,10 +11,12 @@ namespace Cosmos.HAL
         /// The X location of the mouse.
         /// </summary>
         public int X;
+
         /// <summary>
         /// The Y location of the mouse.
         /// </summary>
         public int Y;
+
         /// <summary>
         /// The state the mouse is currently in.
         /// </summary>
@@ -27,6 +26,7 @@ namespace Cosmos.HAL
         /// The screen width (i.e. max value of X)
         /// </summary>
         public uint ScreenWidth;
+
         /// <summary>
         /// The screen height (i.e. max value of Y)
         /// </summary>
@@ -56,7 +56,7 @@ namespace Cosmos.HAL
             WaitSignal();
             BaseIOGroups.Mouse.p60.Byte = (byte)status;
 
-            ////default 
+            ////default
             Write(0xF6);
             Read();  //Acknowledge
 
@@ -103,20 +103,22 @@ namespace Cosmos.HAL
             /// No button is pressed.
             /// </summary>
             None = 0,
+
             /// <summary>
             /// The left mouse button is pressed.
             /// </summary>
             Left = 1,
+
             /// <summary>
             /// The right mouse button is pressed.
             /// </summary>
             Right = 2,
+
             /// <summary>
             /// The middle mouse button is pressed.
             /// </summary>
             Middle = 4
         }
-
 
         private byte[] mouse_byte = new byte[4];
         private static byte mouse_cycle = 0;
@@ -133,10 +135,12 @@ namespace Cosmos.HAL
                         mouse_cycle++;
 
                     break;
+
                 case 1:
                     mouse_byte[1] = Read();
                     mouse_cycle++;
                     break;
+
                 case 2:
                     mouse_byte[2] = Read();
                     mouse_cycle = 0;
@@ -165,7 +169,6 @@ namespace Cosmos.HAL
 
                     break;
             }
-
         }
     }
 }

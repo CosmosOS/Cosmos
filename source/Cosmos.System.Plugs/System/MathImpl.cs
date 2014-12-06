@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
-using Cosmos.System;
+﻿using Cosmos.IL2CPU.Plugs;
+using System;
 
 namespace Cosmos.System.Plugs.System
 {
     [Plug(Target = typeof(global::System.Math))]
     public class MathImpl
     {
-
         #region Internal Constants
+
         private const double sq2p1 = 2.414213562373095048802e0F;
         private const double sq2m1 = .414213562373095048802e0F;
         private const double pio2 = 1.570796326794896619231e0F;
@@ -28,12 +25,14 @@ namespace Cosmos.System.Plugs.System
         private const double atan_q2 = .16667838148816337184521798e4F;
         private const double atan_q1 = .207933497444540981287275926e4F;
         private const double atan_q0 = .89678597403663861962481162e3F;
-        #endregion
+
+        #endregion Internal Constants
 
         public const double PI = 3.1415926535897932384626433832795;
         public const double E = 2.71828182845904523536;
 
         #region Abs
+
         public static double Abs(double value)
         {
             if (value < 0)
@@ -57,18 +56,22 @@ namespace Cosmos.System.Plugs.System
                 return value;
             }
         }
-        #endregion
+
+        #endregion Abs
 
         #region Acos
+
         public static double Acos(double x)
         {
             if ((x > 1.0) || (x < -1.0))
                 throw new ArgumentOutOfRangeException("Domain error");
             return (pio2 - Asin(x));
         }
-        #endregion
+
+        #endregion Acos
 
         #region Asin
+
         public static double Asin(double x)
         {
             if (x > 1.0F)
@@ -92,16 +95,20 @@ namespace Cosmos.System.Plugs.System
             }
             return (sign * temp);
         }
-        #endregion
+
+        #endregion Asin
 
         #region Atan
+
         public static double Atan(double x)
         {
             return ((x > 0F) ? atans(x) : (-atans(-x)));
         }
-        #endregion
+
+        #endregion Atan
 
         #region Atan2
+
         public static double Atan2(double x, double y)
         {
             if ((x + y) == x)
@@ -126,9 +133,11 @@ namespace Cosmos.System.Plugs.System
 
             //return (((x + y) == x) ? (((x == 0F) & (y == 0F)) ? 0F : ((x >= 0F) ? pio2 : (-pio2))) : ((y < 0F) ? ((x >= 0F) ? ((pio2 * 2) - atans((-x) / y)) : (((-pio2) * 2) + atans(x / y))) : ((x > 0F) ? atans(x / y) : -atans((-x) / y))));
         }
-        #endregion
+
+        #endregion Atan2
 
         #region Ceiling
+
         public static double Ceiling(double a)
         {
             // should be using assembler for bigger values than int or long max
@@ -137,9 +146,11 @@ namespace Cosmos.System.Plugs.System
             int i = (a - (int)a > 0) ? (int)(a + 1) : (int)a;
             return i;
         }
-        #endregion
+
+        #endregion Ceiling
 
         #region Cos
+
         public static double Cos(double x)
         {
             // First we need to anchor it to a valid range.
@@ -187,18 +198,22 @@ namespace Cosmos.System.Plugs.System
                 return -(c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * (c5 + (x2 * (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + (x2 * (c10 + (x2 * c11))))))))))))))))))));
             }
         }
-        #endregion
+
+        #endregion Cos
 
         #region Cosh
+
         public static double Cosh(double x)
         {
             if (x < 0.0F)
                 x = -x;
             return ((x == 0F) ? 1F : ((x <= (ln2 / 2)) ? (1 + (_power((Exp(x) - 1), 2) / (2 * Exp(x)))) : ((x <= 22F) ? ((Exp(x) + (1 / Exp(x))) / 2) : (0.5F * (Exp(x) + Exp(-x))))));
         }
-        #endregion
+
+        #endregion Cosh
 
         #region Exp
+
         public static double Exp(double x)
         {
             double c;
@@ -233,9 +248,11 @@ namespace Cosmos.System.Plugs.System
             }
             return ex * m;
         }
-        #endregion
+
+        #endregion Exp
 
         #region Floor
+
         public static double Floor(double a)
         {
             // should be using assembler for bigger values than int or long max
@@ -244,16 +261,20 @@ namespace Cosmos.System.Plugs.System
             int i = (a - (int)a < 0) ? (int)(a - 1) : (int)a;
             return i;
         }
-        #endregion
+
+        #endregion Floor
 
         #region Log (base e)
+
         public static double Log(double x)
         {
             return Log(x, E);
         }
-        #endregion
+
+        #endregion Log (base e)
 
         #region Log (base specified)
+
         public static double Log(double x, double newBase)
         {
             if (x == 0.0F)
@@ -296,16 +317,20 @@ namespace Cosmos.System.Plugs.System
 
             return (integer + fractional);
         }
-        #endregion
+
+        #endregion Log (base specified)
 
         #region Log10
+
         public static double Log10(double x)
         {
             return Log(x, 10F);
         }
-        #endregion
+
+        #endregion Log10
 
         #region Pow
+
         public static double Pow(double x, double y)
         {
             if (x <= 0.0F)
@@ -345,16 +370,20 @@ namespace Cosmos.System.Plugs.System
             //    return xResult;
             //}
         }
-        #endregion
+
+        #endregion Pow
 
         #region Round
+
         public static double Round(double d)
         {
             return ((Math.Floor(d) % 2 == 0) ? Math.Floor(d) : Math.Ceiling(d));
         }
-        #endregion
+
+        #endregion Round
 
         #region Sin
+
         public static double Sin(double x)
         {
             // First we need to anchor it to a valid range.
@@ -365,9 +394,11 @@ namespace Cosmos.System.Plugs.System
 
             return Cos((PI / 2.0F) - x);
         }
-        #endregion
+
+        #endregion Sin
 
         #region Sinh
+
         public static double Sinh(double x)
         {
             if (x < 0F)
@@ -383,9 +414,11 @@ namespace Cosmos.System.Plugs.System
                 return (Exp(x) / 2);
             }
         }
-        #endregion
+
+        #endregion Sinh
 
         #region Sqrt
+
         public static double Sqrt(double x)
         {
             double i = 0;
@@ -401,7 +434,7 @@ namespace Cosmos.System.Plugs.System
             }
 
             x1 = i;
-            // this originally used another variable here, 
+            // this originally used another variable here,
             // but the use of i was done, thus it's faster
             // to re-use the variable.
             for (i = 0; i < 10; i++)
@@ -414,9 +447,11 @@ namespace Cosmos.System.Plugs.System
             }
             return x2;
         }
-        #endregion
+
+        #endregion Sqrt
 
         #region Tan
+
         public static double Tan(double x)
         {
             // First we need to anchor it to a valid range.
@@ -431,39 +466,45 @@ namespace Cosmos.System.Plugs.System
                 case 0:
                     x = x * (4 / PI);
                     break;
+
                 case 1:
                     x = ((PI / 2) - x) * (4 / PI);
                     break;
+
                 case 2:
                     x = (x - (PI / 2)) * (4 / PI);
                     break;
+
                 case 3:
                     x = (PI - x) * (4 / PI);
                     break;
+
                 case 4:
                     x = (x - PI) * (4 / PI);
                     break;
+
                 case 5:
                     x = ((3.5 * PI) - x) * (4 / PI);
                     break;
+
                 case 6:
                     x = (x - (3.5 * PI)) * (4 / PI);
                     break;
+
                 case 7:
                     x = ((2 * PI) - x) * (4 / PI);
                     break;
             }
 
-
-            const double c1 =  4130240.588996024013440146267;
-            const double c2 =-  349781.8562517381616631012487;
-            const double c3 =     6170.317758142494245331944348;
-            const double c4 =-      27.94920941380194872760036319;
-            const double c5 =        0.0175143807040383602666563058;
-            const double c6 =  5258785.647179987798541780825;
-            const double c7 =- 1526650.549072940686776259893;
-            const double c8 =    54962.51616062905361152230566;
-            const double c9 =-     497.495460280917265024506937;
+            const double c1 = 4130240.588996024013440146267;
+            const double c2 = -349781.8562517381616631012487;
+            const double c3 = 6170.317758142494245331944348;
+            const double c4 = -27.94920941380194872760036319;
+            const double c5 = 0.0175143807040383602666563058;
+            const double c6 = 5258785.647179987798541780825;
+            const double c7 = -1526650.549072940686776259893;
+            const double c8 = 54962.51616062905361152230566;
+            const double c9 = -497.495460280917265024506937;
             double x2 = x * x;
             if (octant == 0 || octant == 4)
             {
@@ -482,21 +523,26 @@ namespace Cosmos.System.Plugs.System
                 return -((x * (c1 + (x2 * (c2 + (x2 * (c3 + (x2 * (c4 + (x2 * c5))))))))) / (c6 + (x2 * (c7 + (x2 * (c8 + (x2 * (c9 + x2))))))));
             }
         }
-        #endregion
+
+        #endregion Tan
 
         #region Tanh
+
         public static double Tanh(double x)
         {
             return (expm1(2F * x) / (expm1(2F * x) + 2F));
         }
-        #endregion
+
+        #endregion Tanh
 
         #region Truncate
+
         public static double Truncate(double x)
         {
             return ((x == 0) ? 0F : ((x > 0F) ? Floor(x) : Ceiling(x)));
         }
-        #endregion
+
+        #endregion Truncate
 
         //#region Factorial (only used in Sin(), not plug )
         //public static int Factorial(int n)
@@ -511,14 +557,17 @@ namespace Cosmos.System.Plugs.System
         #region Internaly used functions
 
         #region expm1
+
         private static double expm1(double x)
         {
             double u = Exp(x);
             return ((u == 1.0F) ? x : ((u - 1.0F == -1.0F) ? -1.0F : ((u - 1.0F) * x / Log(u))));
         }
-        #endregion
+
+        #endregion expm1
 
         #region _power
+
         private static double _power(double x, int c)
         {
             if (c == 0)
@@ -540,9 +589,11 @@ namespace Cosmos.System.Plugs.System
 
             return ret;
         }
-        #endregion
+
+        #endregion _power
 
         #region atans
+
         private static double atans(double x)
         {
             if (x < sq2m1)
@@ -558,9 +609,11 @@ namespace Cosmos.System.Plugs.System
                 return (pio4 + atanx((x - 1.0F) / (x + 1.0F)));
             }
         }
-        #endregion
+
+        #endregion atans
 
         #region atanx
+
         private static double atanx(double x)
         {
             double argsq, value;
@@ -587,10 +640,9 @@ namespace Cosmos.System.Plugs.System
             //    /
             //    (((((ArgSquared + atan_q4) * ArgSquared + atan_q3) * ArgSquared + atan_q2) * ArgSquared + atan_q1) * ArgSquared + atan_q0) * x);
         }
-        #endregion
 
-        #endregion
+        #endregion atanx
 
-
+        #endregion Internaly used functions
     }
 }

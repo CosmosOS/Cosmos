@@ -1,14 +1,13 @@
+using Microsoft.Samples.Debugging.CorDebug.NativeApi;
+using Microsoft.Samples.Debugging.Native;
+
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 using System;
-using System.Collections;
 using System.Diagnostics;
-
-using Microsoft.Samples.Debugging.CorDebug.NativeApi;
-using Microsoft.Samples.Debugging.Native;
 
 namespace Microsoft.Samples.Debugging.CorDebug
 {
@@ -39,7 +38,6 @@ namespace Microsoft.Samples.Debugging.CorDebug
         RegisterMax // this needs to be last enum!
     };
 
-
     public sealed class CorRegisterSet : WrapperBase
     {
         internal CorRegisterSet(ICorDebugRegisterSet registerSet)
@@ -51,8 +49,8 @@ namespace Microsoft.Samples.Debugging.CorDebug
         [CLSCompliant(false)]
         public ICorDebugRegisterSet Raw
         {
-            get 
-            { 
+            get
+            {
                 return m_rs;
             }
         }
@@ -77,7 +75,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             }
         }
 
-        /* 
+        /*
          * GetRegisters returns an array of register values corresponding
          * to the given mask.  The registers which have their bit set in
          * the mask will be packed into the resulting array.  (No room is
@@ -96,7 +94,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
          * unmodified.  */
 
         //HRESULT GetRegisters([in] ULONG64 mask, [in] ULONG32 regCount,
-        //                [out, size_is(regCount), length_is(regCount)] 
+        //                [out, size_is(regCount), length_is(regCount)]
         //                 CORDB_REGISTER regBuffer[]);
         [CLSCompliant(false)]
         public UInt64[] GetRegisters(UInt64 mask)
@@ -121,7 +119,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             return regs[0];
         }
 
-        /* 
+        /*
          * SetRegisters sets the value of the set registers corresponding
          * to the given mask.  For each bit set in the mask, the
          * corresponding register will be set from the corresponding
@@ -144,13 +142,13 @@ namespace Microsoft.Samples.Debugging.CorDebug
          * CorDebug makes no attempt to ensure that the runtime remains in
          * a valid state when register values are changed. (For example,
          * if the IP were set to point to non-managed code, who knows what
-         * would happen.)  
+         * would happen.)
          *
          * Not Implemented In-Proc
          */
 
-        //     HRESULT SetRegisters([in] ULONG64 mask, 
-        //                          [in] ULONG32 regCount, 
+        //     HRESULT SetRegisters([in] ULONG64 mask,
+        //                          [in] ULONG32 regCount,
         //                          [in, size_is(regCount)] CORDB_REGISTER regBuffer[]);
         [CLSCompliant(false)]
         public void SetRegisters(UInt64 mask, UInt64[] registerValues)
@@ -165,7 +163,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
             mask <<= (int)register;
             SetRegisters(mask, new UInt64[] { value });
         }
-   
+
         public void GetThreadContext(IntPtr contextPtr, int contextSize)
         {
             m_rs.GetThreadContext((uint)contextSize, contextPtr);
@@ -191,6 +189,7 @@ namespace Microsoft.Samples.Debugging.CorDebug
                 return c;
             }
         }
+
         public void SetThreadContext(IntPtr contextPtr, int contextSize)
         {
             m_rs.SetThreadContext((uint)contextSize, contextPtr);
@@ -199,5 +198,3 @@ namespace Microsoft.Samples.Debugging.CorDebug
         private ICorDebugRegisterSet m_rs;
     }
 }
-
-

@@ -1,20 +1,17 @@
 //---------------------------------------------------------------------
 //  This file is part of the CLR Managed Debugger (mdbg) Sample.
-// 
+//
 //  Copyright (C) Microsoft Corporation.  All rights reserved.
 //---------------------------------------------------------------------
 
-
 // These interfaces serve as an extension to the BCL's SymbolStore interfaces.
-namespace Microsoft.Samples.Debugging.CorSymbolStore 
+namespace Microsoft.Samples.Debugging.CorSymbolStore
 {
-    using System.Diagnostics.SymbolStore;
-
     // Interface does not need to be marked with the serializable attribute
     using System;
-	using System.Text;
+    using System.Diagnostics.SymbolStore;
     using System.Runtime.InteropServices;
-    using System.Runtime.InteropServices.ComTypes;
+    using System.Text;
 
     [
         ComImport,
@@ -22,7 +19,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
         InterfaceType(ComInterfaceType.InterfaceIsIUnknown),
         ComVisible(false)
     ]
-    internal interface ISymUnmanagedVariable 
+    internal interface ISymUnmanagedVariable
     {
         void GetName(int cchName,
                         out int pcchName,
@@ -32,26 +29,26 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
 
         void GetSignature(int cSig,
                              out int pcSig,
-                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex=0)] byte[] sig);
+                             [In, Out, MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 0)] byte[] sig);
 
-        void GetAddressKind(out int  pRetVal);
+        void GetAddressKind(out int pRetVal);
 
-        void GetAddressField1(out int  pRetVal);
+        void GetAddressField1(out int pRetVal);
 
-        void GetAddressField2(out int  pRetVal);
+        void GetAddressField2(out int pRetVal);
 
-        void GetAddressField3(out int  pRetVal);
+        void GetAddressField3(out int pRetVal);
 
-        void GetStartOffset(out int  pRetVal);
+        void GetStartOffset(out int pRetVal);
 
-        void GetEndOffset(out int  pRetVal);
-    }    
+        void GetEndOffset(out int pRetVal);
+    }
 
     /// <include file='doc\ISymVariable.uex' path='docs/doc[@for="ISymbolVariable"]/*' />
 
     internal class SymVariable : ISymbolVariable
     {
-        ISymUnmanagedVariable m_unmanagedVariable;
+        private ISymUnmanagedVariable m_unmanagedVariable;
 
         internal SymVariable(ISymUnmanagedVariable variable)
         {
@@ -61,8 +58,8 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
 
             m_unmanagedVariable = variable;
         }
-        
-        public String Name 
+
+        public String Name
         {
             get
             {
@@ -73,10 +70,10 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
                 m_unmanagedVariable.GetName(cchName, out cchName, Name);
                 return Name.ToString();
             }
-          }
+        }
 
-        public Object Attributes 
-        { 
+        public Object Attributes
+        {
             get
             {
                 int RetVal;
@@ -94,18 +91,18 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             m_unmanagedVariable.GetSignature(cData, out cData, Data);
             return Data;
         }
-    
-        public SymAddressKind AddressKind 
+
+        public SymAddressKind AddressKind
         {
-           get
-           {
+            get
+            {
                 int RetVal;
                 m_unmanagedVariable.GetAddressKind(out RetVal);
                 return (SymAddressKind)RetVal;
-           }
+            }
         }
 
-        public int AddressField1 
+        public int AddressField1
         {
             get
             {
@@ -115,7 +112,7 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             }
         }
 
-        public int AddressField2 
+        public int AddressField2
         {
             get
             {
@@ -125,8 +122,8 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             }
         }
 
-        public int AddressField3 
-        { 
+        public int AddressField3
+        {
             get
             {
                 int RetVal;
@@ -135,8 +132,8 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             }
         }
 
-        public int StartOffset 
-        { 
+        public int StartOffset
+        {
             get
             {
                 int RetVal;
@@ -145,8 +142,8 @@ namespace Microsoft.Samples.Debugging.CorSymbolStore
             }
         }
 
-        public int EndOffset 
-        { 
+        public int EndOffset
+        {
             get
             {
                 int RetVal;

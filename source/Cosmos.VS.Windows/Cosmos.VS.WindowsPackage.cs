@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO.Pipes;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Windows.Threading;
-using Cosmos.Debug.Common;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.OLE.Interop;
+﻿using Cosmos.Debug.Common;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Windows.Threading;
 
 namespace Cosmos.VS.Windows
 {
@@ -22,10 +15,10 @@ namespace Cosmos.VS.Windows
     /// The minimum requirement for a class to be considered a valid package for Visual Studio
     /// is to implement the IVsPackage interface and register itself with the shell.
     /// This package uses the helper classes defined inside the Managed Package Framework (MPF)
-    /// to do it: it derives from the Package class that provides the implementation of the 
-    /// IVsPackage interface and uses the registration attributes defined in the framework to 
+    /// to do it: it derives from the Package class that provides the implementation of the
+    /// IVsPackage interface and uses the registration attributes defined in the framework to
     /// register itself and its components with the shell.
-    /// 
+    ///
     // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
     // a package.
     [PackageRegistration(UseManagedResourcesOnly = true)]
@@ -42,17 +35,18 @@ namespace Cosmos.VS.Windows
     [ProvideToolWindow(typeof(RegistersTW))]
     [ProvideToolWindow(typeof(StackTW))]
     [ProvideToolWindow(typeof(InternalTW))]
-
     [Guid(GuidList.guidCosmos_VS_WindowsPkgString)]
     public sealed class Cosmos_VS_WindowsPackage : Package
     {
-        Queue<byte> mCommand;
-        Queue<byte[]> mMessage;
-        System.Timers.Timer mTimer = new System.Timers.Timer(100);
+        private Queue<byte> mCommand;
+        private Queue<byte[]> mMessage;
+        private System.Timers.Timer mTimer = new System.Timers.Timer(100);
+
         /// <summary>A pipe server that will receive responses from the AD7Process</summary>
-        Cosmos.Debug.Common.PipeServer mPipeDown;
+        private Cosmos.Debug.Common.PipeServer mPipeDown;
 
         private StateStorer mStateStorer;
+
         public StateStorer StateStorer
         {
             get
@@ -62,9 +56,9 @@ namespace Cosmos.VS.Windows
         }
 
         /// Default constructor of the package.
-        /// Inside this method you can place any initialization code that does not require 
-        /// any Visual Studio service because at this point the package object is created but 
-        /// not sited yet inside Visual Studio environment. The place to do all the other 
+        /// Inside this method you can place any initialization code that does not require
+        /// any Visual Studio service because at this point the package object is created but
+        /// not sited yet inside Visual Studio environment. The place to do all the other
         /// initialization is the Initialize method.
         public Cosmos_VS_WindowsPackage()
         {
@@ -176,7 +170,7 @@ namespace Cosmos.VS.Windows
             Global.OutputPane.OutputString("Debugger windows loaded.\r\n");
         }
 
-        void ProcessMessage(object sender, EventArgs e)
+        private void ProcessMessage(object sender, EventArgs e)
         {
             byte xCmd;
             byte[] xMsg;
@@ -247,7 +241,7 @@ namespace Cosmos.VS.Windows
             }
         }
 
-        void PipeThread_DataPacketReceived(byte aCmd, byte[] aMsg)
+        private void PipeThread_DataPacketReceived(byte aCmd, byte[] aMsg)
         {
             lock (mCommand)
             {
@@ -255,7 +249,6 @@ namespace Cosmos.VS.Windows
                 mMessage.Enqueue(aMsg);
             }
         }
-
 
         public void StoreAllStates()
         {
@@ -267,12 +260,13 @@ namespace Cosmos.VS.Windows
             aData = cWindow.UserControl.GetCurrentState();
             StateStorer.StoreState("RegistersTW", aData == null ? null : (byte[])aData.Clone());
         }
+
         public void RestoreAllStates()
         {
             var cWindow = FindWindow(typeof(StackTW));
             byte[] aData = StateStorer.RetrieveState(StateStorer.CurrLineId, "StackTW");
             cWindow.UserControl.SetCurrentState(aData == null ? null : (byte[])aData.Clone());
-            
+
             cWindow = FindWindow(typeof(RegistersTW));
             aData = StateStorer.RetrieveState(StateStorer.CurrLineId, "RegistersTW");
             cWindow.UserControl.SetCurrentState(aData == null ? null : (byte[])aData.Clone());

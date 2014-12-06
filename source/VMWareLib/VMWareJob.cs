@@ -1,7 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
 using Interop.VixCOM;
+using System.Collections.Generic;
 
 namespace Vestris.VMWareLib
 {
@@ -102,7 +100,7 @@ namespace Vestris.VMWareLib
         {
             object result = null;
             VMWareInterop.Check(_handle.Wait(properties, ref result));
-            return (T) result;
+            return (T)result;
         }
 
         /// <summary>

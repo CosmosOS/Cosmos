@@ -1,21 +1,18 @@
-﻿using System;
+﻿using Microsoft.Build.Utilities;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.Utilities;
 using System.Diagnostics;
 using MessageImportance = Microsoft.Build.Framework.MessageImportance;
-using Microsoft.Build.Framework;
 
 namespace Cosmos.Build.MSBuild
 {
-	public enum WriteType
-	{
-		Warning,
-		Error,
-		Message, // only issued on console
-		Info
-	}
+    public enum WriteType
+    {
+        Warning,
+        Error,
+        Message, // only issued on console
+        Info
+    }
 
     public class LogInfo
     {
@@ -28,7 +25,7 @@ namespace Cosmos.Build.MSBuild
         /// Description of the type (can be null).
         /// </summary>
         public string subcategory;
-        
+
         /// <summary>
         /// Message, Warning or Error code (can be null)
         /// </summary>
@@ -80,109 +77,118 @@ namespace Cosmos.Build.MSBuild
         public object[] messageArgs;//TODO check if null is allowed, if yes document it here
     }
 
-
-	public abstract class BaseToolTask : AppDomainIsolatedTask
-	{
-		protected bool ExecuteTool(string workingDir, string filename, string arguments, string name)
-		{
-			var xProcessStartInfo = new ProcessStartInfo();
-			xProcessStartInfo.WorkingDirectory = workingDir;
-			xProcessStartInfo.FileName = filename;
-			xProcessStartInfo.Arguments = arguments;
-			xProcessStartInfo.UseShellExecute = false;
-			xProcessStartInfo.RedirectStandardOutput = true;
-			xProcessStartInfo.RedirectStandardError = true;
-			xProcessStartInfo.CreateNoWindow = true;
-			using (var xProcess = new Process())
-			{
-				xProcess.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)
-				{
-					if (e.Data != null)
-						mErrors.Add(e.Data);
-				};
-				xProcess.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e)
-				{
-					if (e.Data != null)
-						mOutput.Add(e.Data);
-				};
-				xProcess.StartInfo = xProcessStartInfo;
-				mErrors = new List<string>();
-				mOutput = new List<string>();
-				xProcess.Start();
-				xProcess.BeginErrorReadLine();
-				xProcess.BeginOutputReadLine();
-				xProcess.WaitForExit(15 * 60 * 1000); // wait 15 minutes
-				if (xProcess.ExitCode != 0) {
-					if (!xProcess.HasExited) {
-						xProcess.Kill();
-						LogError("{0} timed out.", name);
-					}
-					else {
-						LogError("Error occurred while invoking {0}.", name);
-					}
-				}
-				LogInfo logContent;
-				foreach (var xError in mErrors) {
-					if(ExtendLineError(xProcess.ExitCode, xError, out logContent)) {
+    public abstract class BaseToolTask : AppDomainIsolatedTask
+    {
+        protected bool ExecuteTool(string workingDir, string filename, string arguments, string name)
+        {
+            var xProcessStartInfo = new ProcessStartInfo();
+            xProcessStartInfo.WorkingDirectory = workingDir;
+            xProcessStartInfo.FileName = filename;
+            xProcessStartInfo.Arguments = arguments;
+            xProcessStartInfo.UseShellExecute = false;
+            xProcessStartInfo.RedirectStandardOutput = true;
+            xProcessStartInfo.RedirectStandardError = true;
+            xProcessStartInfo.CreateNoWindow = true;
+            using (var xProcess = new Process())
+            {
+                xProcess.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)
+                {
+                    if (e.Data != null)
+                        mErrors.Add(e.Data);
+                };
+                xProcess.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e)
+                {
+                    if (e.Data != null)
+                        mOutput.Add(e.Data);
+                };
+                xProcess.StartInfo = xProcessStartInfo;
+                mErrors = new List<string>();
+                mOutput = new List<string>();
+                xProcess.Start();
+                xProcess.BeginErrorReadLine();
+                xProcess.BeginOutputReadLine();
+                xProcess.WaitForExit(15 * 60 * 1000); // wait 15 minutes
+                if (xProcess.ExitCode != 0)
+                {
+                    if (!xProcess.HasExited)
+                    {
+                        xProcess.Kill();
+                        LogError("{0} timed out.", name);
+                    }
+                    else
+                    {
+                        LogError("Error occurred while invoking {0}.", name);
+                    }
+                }
+                LogInfo logContent;
+                foreach (var xError in mErrors)
+                {
+                    if (ExtendLineError(xProcess.ExitCode, xError, out logContent))
+                    {
                         Logs(logContent);
-					}
-				}
-				foreach (var xOutput in mOutput) {
-					if (ExtendLineError(xProcess.ExitCode, xOutput, out logContent)) {
-						Logs(logContent);
-					}
-				}
-				return xProcess.ExitCode == 0;
-			}
-		}
+                    }
+                }
+                foreach (var xOutput in mOutput)
+                {
+                    if (ExtendLineError(xProcess.ExitCode, xOutput, out logContent))
+                    {
+                        Logs(logContent);
+                    }
+                }
+                return xProcess.ExitCode == 0;
+            }
+        }
 
-		private List<string> mErrors;
-		private List<string> mOutput;
+        private List<string> mErrors;
+        private List<string> mOutput;
 
-		public virtual bool ExtendLineError(int exitCode, string errorMessage, out LogInfo log)
-		{
+        public virtual bool ExtendLineError(int exitCode, string errorMessage, out LogInfo log)
+        {
             log = new LogInfo();
-			log.logType = WriteType.Error;
-			if (exitCode == 0)
-				return false;
-			return true;
-		}
+            log.logType = WriteType.Error;
+            if (exitCode == 0)
+                return false;
+            return true;
+        }
 
-		public virtual bool ExtendLineOutput(int exitCode, ref string errorMessage, out LogInfo log)
-		{
+        public virtual bool ExtendLineOutput(int exitCode, ref string errorMessage, out LogInfo log)
+        {
             log = new LogInfo();
             log.logType = WriteType.Info;
-			return true;
-		}
+            return true;
+        }
 
         public void Logs(LogInfo logInfo)// string message, string category, string filename, string lineNumber = 0, string columnNumber = 0)
-		{
+        {
             switch (logInfo.logType)
-			{
-				case WriteType.Warning:
+            {
+                case WriteType.Warning:
                     //Log.LogWarning(category, string.Empty, string.Empty, filename, lineNumber, columnNumber, lineNumber, columnNumber, message);
                     Log.LogWarning(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message, logInfo.messageArgs);
-					break;
-				case WriteType.Message:
+                    break;
+
+                case WriteType.Message:
                     Log.LogMessage(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message, logInfo.messageArgs);
-					break;
-				case WriteType.Info:
-					// changed IDEBuildLogger.cs for this behavior of add to ErrorList Messages
+                    break;
+
+                case WriteType.Info:
+                    // changed IDEBuildLogger.cs for this behavior of add to ErrorList Messages
                     Log.LogMessage(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.importance, logInfo.message, logInfo.messageArgs);
-					break;
+                    break;
+
                 case WriteType.Error:
-				default:
-			        if (UseConsoleForLog)
-			        {
-			            LogError(logInfo.message, logInfo.messageArgs);
-			        }
-			        else
-			        {
-			            Log.LogError(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message, logInfo.messageArgs);
-			        }
-			        break;
-			}
-		}
+                default:
+                    if (UseConsoleForLog)
+                    {
+                        LogError(logInfo.message, logInfo.messageArgs);
+                    }
+                    else
+                    {
+                        Log.LogError(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message, logInfo.messageArgs);
+                    }
+                    break;
+            }
+        }
 
         protected void LogError(string message, params object[] args)
         {
@@ -201,5 +207,5 @@ namespace Cosmos.Build.MSBuild
         }
 
         public bool UseConsoleForLog { get; set; }
-	}
+    }
 }

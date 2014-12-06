@@ -1,21 +1,19 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using System;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
-    // And implementation of IDebugCodeContext2 and IDebugMemoryContext2. 
+    // And implementation of IDebugCodeContext2 and IDebugMemoryContext2.
     // IDebugMemoryContext2 represents a position in the address space of the machine running the program being debugged.
-    // IDebugCodeContext2 represents the starting position of a code instruction. 
+    // IDebugCodeContext2 represents the starting position of a code instruction.
     // For most run-time architectures today, a code context can be thought of as an address in a program's execution stream.
     public class AD7MemoryAddress : IDebugCodeContext2
     {
-        readonly AD7Engine m_engine;
-        readonly uint m_address;
-        IDebugDocumentContext2 m_documentContext;
-        
+        private readonly AD7Engine m_engine;
+        private readonly uint m_address;
+        private IDebugDocumentContext2 m_documentContext;
+
         public AD7MemoryAddress(AD7Engine engine, uint address)
         {
             m_engine = engine;
@@ -34,7 +32,7 @@ namespace Cosmos.Debug.VSDebugEngine
             return VSConstants.S_OK;
         }
 
-        // Compares the memory context to each context in the given array in the manner indicated by compare flags, 
+        // Compares the memory context to each context in the given array in the manner indicated by compare flags,
         // returning an index of the first context that matches.
         public int Compare(enum_CONTEXT_COMPARE uContextCompare, IDebugMemoryContext2[] compareToItems, uint compareToLength, out uint foundIndex)
         {
@@ -131,7 +129,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         // Gets information that describes this context.
         public int GetInfo(enum_CONTEXT_INFO_FIELDS dwFields, CONTEXT_INFO[] pinfo)
-        {           
+        {
             try
             {
                 pinfo[0].dwFields = 0;
@@ -195,6 +193,5 @@ namespace Cosmos.Debug.VSDebugEngine
                 return VSConstants.S_FALSE;
             }
         }
-
     }
 }

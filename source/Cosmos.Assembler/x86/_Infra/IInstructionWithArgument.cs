@@ -1,41 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Assembler.x86 {
-    public interface IInstructionWithArgument {
-		Cosmos.Assembler.ElementReference ArgumentRef
-		{
-            get;
-            set;
-        }
-
-		RegistersEnum? ArgumentReg
+﻿namespace Cosmos.Assembler.x86
+{
+    public interface IInstructionWithArgument
+    {
+        Cosmos.Assembler.ElementReference ArgumentRef
         {
             get;
             set;
         }
 
-		uint? ArgumentValue
+        RegistersEnum? ArgumentReg
         {
             get;
             set;
         }
 
-		bool ArgumentIsIndirect
-		{
+        uint? ArgumentValue
+        {
             get;
             set;
         }
 
-		int ArgumentDisplacement
-		{
+        bool ArgumentIsIndirect
+        {
             get;
             set;
         }
 
-		bool ArgumentEmpty
+        int ArgumentDisplacement
+        {
+            get;
+            set;
+        }
+
+        bool ArgumentEmpty
         {
             get;
             set;

@@ -9,68 +9,68 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 ***************************************************************************/
 
+using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Diagnostics;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace Microsoft.VisualStudio.Project
 {
-	class ProjectDesignerDocumentManager : DocumentManager
-	{
-		#region ctors
-		public ProjectDesignerDocumentManager(ProjectNode node)
-			: base(node)
-		{
-		}
-		#endregion
+    internal class ProjectDesignerDocumentManager : DocumentManager
+    {
+        #region ctors
 
-		#region overriden methods
+        public ProjectDesignerDocumentManager(ProjectNode node)
+            : base(node)
+        {
+        }
 
-		public override int Open(ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame windowFrame, WindowFrameShowAction windowFrameAction)
-		{
-			Guid editorGuid = VSConstants.GUID_ProjectDesignerEditor;
-			return this.OpenWithSpecific(0, ref editorGuid, String.Empty, ref logicalView, docDataExisting, out windowFrame, windowFrameAction);
-		}
+        #endregion ctors
 
-		public override int OpenWithSpecific(uint editorFlags, ref Guid editorType, string physicalView, ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame frame, WindowFrameShowAction windowFrameAction)
-		{
-			frame = null;
-			Debug.Assert(editorType == VSConstants.GUID_ProjectDesignerEditor, "Cannot open project designer with guid " + editorType.ToString());
+        #region overriden methods
 
+        public override int Open(ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame windowFrame, WindowFrameShowAction windowFrameAction)
+        {
+            Guid editorGuid = VSConstants.GUID_ProjectDesignerEditor;
+            return this.OpenWithSpecific(0, ref editorGuid, String.Empty, ref logicalView, docDataExisting, out windowFrame, windowFrameAction);
+        }
 
-			if(this.Node == null || this.Node.ProjectMgr == null || this.Node.ProjectMgr.IsClosed)
-			{
-				return VSConstants.E_FAIL;
-			}
+        public override int OpenWithSpecific(uint editorFlags, ref Guid editorType, string physicalView, ref Guid logicalView, IntPtr docDataExisting, out IVsWindowFrame frame, WindowFrameShowAction windowFrameAction)
+        {
+            frame = null;
+            Debug.Assert(editorType == VSConstants.GUID_ProjectDesignerEditor, "Cannot open project designer with guid " + editorType.ToString());
 
-			IVsUIShellOpenDocument uiShellOpenDocument = this.Node.ProjectMgr.Site.GetService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
-			IOleServiceProvider serviceProvider = this.Node.ProjectMgr.Site.GetService(typeof(IOleServiceProvider)) as IOleServiceProvider;
+            if (this.Node == null || this.Node.ProjectMgr == null || this.Node.ProjectMgr.IsClosed)
+            {
+                return VSConstants.E_FAIL;
+            }
 
-			if(serviceProvider != null && uiShellOpenDocument != null)
-			{
-				string fullPath = this.GetFullPathForDocument();
-				string caption = this.GetOwnerCaption();
+            IVsUIShellOpenDocument uiShellOpenDocument = this.Node.ProjectMgr.Site.GetService(typeof(SVsUIShellOpenDocument)) as IVsUIShellOpenDocument;
+            IOleServiceProvider serviceProvider = this.Node.ProjectMgr.Site.GetService(typeof(IOleServiceProvider)) as IOleServiceProvider;
 
-				IVsUIHierarchy parentHierarchy = this.Node.ProjectMgr.GetProperty((int)__VSHPROPID.VSHPROPID_ParentHierarchy) as IVsUIHierarchy;
+            if (serviceProvider != null && uiShellOpenDocument != null)
+            {
+                string fullPath = this.GetFullPathForDocument();
+                string caption = this.GetOwnerCaption();
+
+                IVsUIHierarchy parentHierarchy = this.Node.ProjectMgr.GetProperty((int)__VSHPROPID.VSHPROPID_ParentHierarchy) as IVsUIHierarchy;
 
                 int parentHierarchyItemId = (int)this.Node.ProjectMgr.GetProperty((int)__VSHPROPID.VSHPROPID_ParentHierarchyItemid);
 
                 ErrorHandler.ThrowOnFailure(uiShellOpenDocument.OpenSpecificEditor(editorFlags, fullPath, ref editorType, physicalView, ref logicalView, caption, parentHierarchy, (uint)parentHierarchyItemId, docDataExisting, serviceProvider, out frame));
 
-				if(frame != null)
-				{
-					if(windowFrameAction == WindowFrameShowAction.Show)
-					{
-						ErrorHandler.ThrowOnFailure(frame.Show());
-					}
-				}
-			}
+                if (frame != null)
+                {
+                    if (windowFrameAction == WindowFrameShowAction.Show)
+                    {
+                        ErrorHandler.ThrowOnFailure(frame.Show());
+                    }
+                }
+            }
 
-			return VSConstants.S_OK;
-		}
-		#endregion
+            return VSConstants.S_OK;
+        }
 
-	}
+        #endregion overriden methods
+    }
 }

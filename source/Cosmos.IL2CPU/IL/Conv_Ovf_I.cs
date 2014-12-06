@@ -1,12 +1,13 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Conv_Ovf_I )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_Ovf_I)]
     public class Conv_Ovf_I : ILOp
     {
-        public Conv_Ovf_I( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Conv_Ovf_I(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
@@ -23,6 +24,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     break;
+
                 default:
                     throw new NotImplementedException();
             }
@@ -56,18 +58,17 @@ namespace Cosmos.IL2CPU.X86.IL
         //            }
         //        default:
         //            //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_Ovf_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-        //            throw new NotImplementedException(); 
+        //            throw new NotImplementedException();
         //    }
         //    Assembler.Stack.Push( new StackContent( 4, true, false, false ) );
         //}
-
 
         // using System;
         // using System.IO;
         // using CPU = Cosmos.Assembler.x86;
         // using Cosmos.IL2CPU.X86;
         // using CPUx86 = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Conv_Ovf_I)]
         // 	public class Conv_Ovf_I: Op {
@@ -107,7 +108,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 					//equals
         // 					new CPUx86.Interrupt{DestinationValue=4};
         // 					break;
-        // 
+        //
         // 				}
         // 			default:
         //                 EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_Ovf_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
@@ -117,6 +118,5 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 	}
         // }
-
     }
 }

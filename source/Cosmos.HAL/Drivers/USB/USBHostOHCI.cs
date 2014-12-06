@@ -14,7 +14,7 @@
 //            {
 //                if (pci.ClassCode == 0x0c && //bus
 //                    pci.SubClass == 0x03 && //usb
-//                    pci.ProgIF == 0x10) //ohci :D 
+//                    pci.ProgIF == 0x10) //ohci :D
 //                {
 //                    //(as this is an open standard, vendor/device specific implementations should all work the same)
 //                    Device.Add(new USBHostOHCI(pci));
@@ -29,7 +29,6 @@
 //            mydevice = pcidev as PCIDeviceNormal;
 //            regs = new USBHostOHCIRegisters(pcidev.GetAddressSpace(0) as MemoryAddressSpace);
 //        }
-
 
 //        public override string Name
 //        {

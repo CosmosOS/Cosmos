@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.VisualStudio.Debugger.Interop;
+﻿using Microsoft.VisualStudio.Debugger.Interop;
+using System;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
-    public class AD7Port: IDebugPort2
+    public class AD7Port : IDebugPort2
     {
         int IDebugPort2.EnumProcesses(out IEnumDebugProcesses2 ppEnum)
         {
@@ -37,6 +34,5 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             throw new NotImplementedException();
         }
-
     }
 }

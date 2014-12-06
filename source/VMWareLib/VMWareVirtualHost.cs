@@ -1,7 +1,7 @@
-using System;
-using System.Collections.Generic;
 using Interop.VixCOM;
 using Microsoft.Win32;
+using System;
+using System.Collections.Generic;
 
 namespace Vestris.VMWareLib
 {
@@ -19,18 +19,22 @@ namespace Vestris.VMWareLib
             /// No service provider type, not connected.
             /// </summary>
             None = 0,
+
             /// <summary>
             /// VMWare Server.
             /// </summary>
             Server = Constants.VIX_SERVICEPROVIDER_VMWARE_SERVER,
+
             /// <summary>
             /// VMWare Workstation.
             /// </summary>
             Workstation = Constants.VIX_SERVICEPROVIDER_VMWARE_WORKSTATION,
+
             /// <summary>
             /// Virtual Infrastructure Server, eg. ESX.
             /// </summary>
             VirtualInfrastructureServer = Constants.VIX_SERVICEPROVIDER_VMWARE_VI_SERVER,
+
             /// <summary>
             /// VMWare Player.
             /// </summary>
@@ -55,7 +59,6 @@ namespace Vestris.VMWareLib
         /// </summary>
         public VMWareVirtualHost()
         {
-
         }
 
         /// <summary>
@@ -77,7 +80,7 @@ namespace Vestris.VMWareLib
         /// using System;
         /// using System.Collections.Generic;
         /// using Vestris.VMWareLib;
-        /// 
+        ///
         /// VMWareVirtualHost virtualHost = new VMWareVirtualHost();
         /// virtualHost.ConnectToVMWarePlayer();
         /// VMWareVirtualMachine virtualMachine = virtualHost.Open("C:\Virtual Machines\xp\xp.vmx");
@@ -106,7 +109,7 @@ namespace Vestris.VMWareLib
         /// using System;
         /// using System.Collections.Generic;
         /// using Vestris.VMWareLib;
-        /// 
+        ///
         /// VMWareVirtualHost virtualHost = new VMWareVirtualHost();
         /// virtualHost.ConnectToVMWareWorkstation();
         /// VMWareVirtualMachine virtualMachine = virtualHost.Open("C:\Virtual Machines\xp\xp.vmx");
@@ -138,7 +141,7 @@ namespace Vestris.VMWareLib
         /// using System;
         /// using System.Collections.Generic;
         /// using Vestris.VMWareLib;
-        /// 
+        ///
         /// VMWareVirtualHost virtualHost = new VMWareVirtualHost();
         /// virtualHost.ConnectToVMWareVIServer("esx.mycompany.com", "vmuser", "password");
         /// VMWareVirtualMachine virtualMachine = virtualHost.Open("[storage] testvm/testvm.vmx");
@@ -150,7 +153,7 @@ namespace Vestris.VMWareLib
         /// using System;
         /// using System.Collections.Generic;
         /// using Vestris.VMWareLib;
-        /// 
+        ///
         /// VMWareVirtualHost virtualHost = new VMWareVirtualHost();
         /// virtualHost.ConnectToVMWareVIServer("localhost:8333", "vmuser", "password");
         /// VMWareVirtualMachine virtualMachine = virtualHost.Open("[standard] testvm/testvm.vmx");
@@ -174,7 +177,7 @@ namespace Vestris.VMWareLib
         /// using System;
         /// using System.Collections.Generic;
         /// using Vestris.VMWareLib;
-        /// 
+        ///
         /// VMWareVirtualHost virtualHost = new VMWareVirtualHost();
         /// virtualHost.ConnectToVMWareVIServer("esx.mycompany.com", "vmuser", "password");
         /// VMWareVirtualMachine virtualMachine = virtualHost.Open("[storage] testvm/testvm.vmx");
@@ -186,7 +189,7 @@ namespace Vestris.VMWareLib
         /// using System;
         /// using System.Collections.Generic;
         /// using Vestris.VMWareLib;
-        /// 
+        ///
         /// VMWareVirtualHost virtualHost = new VMWareVirtualHost();
         /// virtualHost.ConnectToVMWareVIServer("localhost:8333", "vmuser", "password");
         /// VMWareVirtualMachine virtualMachine = virtualHost.Open("[standard] testvm/testvm.vmx");
@@ -256,12 +259,15 @@ namespace Vestris.VMWareLib
             {
                 // check if VmWare COM object could be loaded
                 // if we try to load a COM object which does not exist, an RCW exception will occure on exit of Visual Studio 2013
-                using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, RegistryView.Registry32)) {
-                  using (var xReg = baseKey.OpenSubKey(@"CLSID\{6874E949-7186-4308-A1B9-D55A91F60728}", false)) {
-                    if (xReg == null) {
-                      throw new ApplicationException("No Vmware Library installed!");
+                using (RegistryKey baseKey = RegistryKey.OpenBaseKey(RegistryHive.ClassesRoot, RegistryView.Registry32))
+                {
+                    using (var xReg = baseKey.OpenSubKey(@"CLSID\{6874E949-7186-4308-A1B9-D55A91F60728}", false))
+                    {
+                        if (xReg == null)
+                        {
+                            throw new ApplicationException("No Vmware Library installed!");
+                        }
                     }
-                  }
                 }
 
                 int serviceProvider = (int)serviceProviderType;
@@ -281,7 +287,7 @@ namespace Vestris.VMWareLib
             catch (Exception ex)
             {
                 throw new Exception(
-                    string.Format("Failed to connect: serviceProviderType=\"{0}\" hostName=\"{1}\" hostPort={2} username=\"{3}\" timeout={4}", 
+                    string.Format("Failed to connect: serviceProviderType=\"{0}\" hostName=\"{1}\" hostPort={2} username=\"{3}\" timeout={4}",
                     Enum.GetName(serviceProviderType.GetType(), serviceProviderType), hostName, hostPort, username, timeout), ex);
             }
         }
@@ -353,6 +359,7 @@ namespace Vestris.VMWareLib
                 case ServiceProviderType.VirtualInfrastructureServer:
                 case ServiceProviderType.Server:
                     break;
+
                 default:
                     throw new NotSupportedException(string.Format("Register is not supported on {0}",
                         ConnectionType));
@@ -400,6 +407,7 @@ namespace Vestris.VMWareLib
                 case ServiceProviderType.VirtualInfrastructureServer:
                 case ServiceProviderType.Server:
                     break;
+
                 default:
                     throw new NotSupportedException(string.Format("Unregister is not supported on {0}",
                         ConnectionType));
@@ -522,6 +530,7 @@ namespace Vestris.VMWareLib
                     case ServiceProviderType.VirtualInfrastructureServer:
                     case ServiceProviderType.Server:
                         break;
+
                     default:
                         throw new NotSupportedException(string.Format("RegisteredVirtualMachines is not supported on {0}",
                             ConnectionType));

@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Cosmos.Common;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.IL2CPU.Plugs;
+using System;
 
 namespace Cosmos.Core
 {
@@ -57,7 +53,7 @@ namespace Cosmos.Core
         [DebugStub(Off = true)]
         public unsafe void Fill(UInt32 aStart, UInt32 aCount, UInt32 aData)
         {
-            //TODO: before next step can at least check bounds here and do the addition just once to 
+            //TODO: before next step can at least check bounds here and do the addition just once to
             //start the loop.
             //TODO - When asm can check count against size just one time and use a native fill asm op
             UInt32* xDest = (UInt32*)(this.Base + aStart);
@@ -67,6 +63,7 @@ namespace Cosmos.Core
                 xDest++;
             }
         }
+
         public void Fill(byte aData)
         {
             Fill(0, Size, aData);
@@ -75,7 +72,7 @@ namespace Cosmos.Core
         [DebugStub(Off = true)]
         public unsafe void Fill(UInt32 aStart, UInt32 aCount, byte aData)
         {
-            //TODO: before next step can at least check bounds here and do the addition just once to 
+            //TODO: before next step can at least check bounds here and do the addition just once to
             //start the loop.
             //TODO - When asm can check count against size just one time and use a native fill asm op
             byte* xDest = (byte*)(this.Base + aStart);
@@ -168,7 +165,6 @@ namespace Cosmos.Core
                 (*(UInt16*)(Base + aByteOffset)) = value;
             }
         }
-
     }
 
     public class MemoryBlock32
@@ -201,6 +197,5 @@ namespace Cosmos.Core
                 (*(UInt32*)(Base + aByteOffset)) = value;
             }
         }
-
     }
 }
