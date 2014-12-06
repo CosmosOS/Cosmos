@@ -347,6 +347,10 @@ namespace Cosmos.HAL {
             char xResult = '\0';
             while (mBuffer.Count == 0 || !GetCharValue(mBuffer.Dequeue(), out xResult)) {
                 //Global.Sleep(10); //ToDo optimize value 
+                if (Core.Global.CPU == null)
+                {
+                    return '\0';
+                }
                 Core.Global.CPU.Halt();
             }
             return xResult;

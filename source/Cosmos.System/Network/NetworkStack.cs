@@ -66,7 +66,7 @@ namespace Cosmos.System.Network
         /// <summary>
         /// Called continously to keep the Network Stack going.
         /// </summary>
-        internal static void Update()
+        public static void Update()
         {
             IPv4.OutgoingBuffer.Send();
         }

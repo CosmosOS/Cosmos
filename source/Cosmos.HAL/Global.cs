@@ -99,6 +99,8 @@ namespace Cosmos.HAL {
     }
 
     static public void Init() {
+      Core.Bootstrap.Init();
+      Core.Global.Init();
       Global.Dbg.Send("Static Devices");
       InitStaticDevices();
       Global.Dbg.Send("PCI Devices");

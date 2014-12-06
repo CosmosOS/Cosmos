@@ -123,6 +123,7 @@ namespace Cosmos.System.Network.IPv4
                     i++;
                 }
             }
+           Global.Dbg.Send("Number of packages in queue: " + i.ToString());
         }
 
         internal static void ARPCache_Update(ARPReply_Ethernet arp_reply)

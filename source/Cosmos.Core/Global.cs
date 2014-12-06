@@ -12,13 +12,26 @@ namespace Cosmos.Core {
         // These are used by Bootstrap.. but also called to signal end of interrupt etc...
         // Need to chagne this.. I dont like how this is.. maybe isolate or split into to classes... one for boostrap one for 
         // later user
-        static public PIC PIC;
-        static public CPU CPU;
+        static public PIC PIC
+        {
+            get
+            {
+                return Bootstrap.PIC;
+            }
+        }
+
+        static public CPU CPU
+        {
+            get
+            {
+                return Bootstrap.CPU;
+            }
+        }
         
         static public void Init() {
             // See note in Bootstrap about these
-            CPU = Bootstrap.CPU;
-            PIC = Bootstrap.PIC;
+            
+            // DONT transform the properties in fields, as then they remain null somehow.
         }
     }
 }
