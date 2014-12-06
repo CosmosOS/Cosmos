@@ -396,7 +396,7 @@ namespace Cosmos.Core
 
         public static void HandleInterrupt_06(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP, "Invalid Opcode", "EInvalidOpcode", ref aContext);
+            HandleException(aContext.EIP, "Invalid Opcode", "EInvalidOpcode", ref aContext, true);
         }
 
         public static void HandleInterrupt_07(ref IRQContext aContext)
@@ -472,7 +472,7 @@ namespace Cosmos.Core
 
         #endregion
 
-        private static void HandleException(uint aEIP, string aDescription, string aName, ref IRQContext ctx)
+        private static void HandleException(uint aEIP, string aDescription, string aName, ref IRQContext ctx, bool printOriginalEIP = false)
         {
           // At this point we are in a very unstable state.
           // Try not to use any Cosmos routines, just
@@ -486,65 +486,74 @@ namespace Cosmos.Core
             unsafe
             {
                 byte* xAddress = (byte*)0xB8000;
-                xAddress[0] = (byte)' ';
-                xAddress[1] = 0x0C;
-                xAddress[2] = (byte)'*';
-                xAddress[3] = 0x0C;
-                xAddress[4] = (byte)'*';
-                xAddress[5] = 0x0C;
-                xAddress[6] = (byte)'*';
-                xAddress[7] = 0x0C;
-                xAddress[8] = (byte)' ';
-                xAddress[9] = 0x0C;
-                xAddress[10] = (byte)'C';
-                xAddress[11] = 0x0C;
-                xAddress[12] = (byte)'P';
-                xAddress[13] = 0x0C;
-                xAddress[14] = (byte)'U';
-                xAddress[15] = 0x0C;
-                xAddress[16] = (byte)' ';
-                xAddress[17] = 0x0C;
-                xAddress[18] = (byte)'E';
-                xAddress[19] = 0x0C;
-                xAddress[20] = (byte)'x';
-                xAddress[21] = 0x0C;
-                xAddress[22] = (byte)'c';
-                xAddress[23] = 0x0C;
-                xAddress[24] = (byte)'e';
-                xAddress[25] = 0x0C;
-                xAddress[26] = (byte)'p';
-                xAddress[27] = 0x0C;
-                xAddress[28] = (byte)'t';
-                xAddress[29] = 0x0C;
-                xAddress[30] = (byte)'i';
-                xAddress[31] = 0x0C;
-                xAddress[32] = (byte)'o';
-                xAddress[33] = 0x0C;
-                xAddress[34] = (byte)'n';
-                xAddress[35] = 0x0C;
-                xAddress[36] = (byte)' ';
-                xAddress[37] = 0x0C;
-                xAddress[38] = (byte)'x';
-                xAddress[39] = 0x0C;
-                xAddress[40] = (byte)xHex[(int)((ctx.Interrupt >> 4) & 0xF)];
-                xAddress[41] = 0x0C;
-                xAddress[42] = (byte)xHex[(int)(ctx.Interrupt & 0xF)];
-                xAddress[43] = 0x0C;
-                xAddress[44] = (byte)' ';
-                xAddress[45] = 0x0C;
-                xAddress[46] = (byte)'*';
-                xAddress[47] = 0x0C;
-                xAddress[48] = (byte)'*';
-                xAddress[49] = 0x0C;
-                xAddress[50] = (byte)'*';
-                xAddress[51] = 0x0C;
-                xAddress[52] = (byte)' ';
-                xAddress[53] = 0x0C;
+                PutErrorChar(0, 00, ' ');
+                PutErrorChar(0, 01, '*');
+                PutErrorChar(0, 02, '*');
+                PutErrorChar(0, 03, '*');
+                PutErrorChar(0, 04, ' ');
+                PutErrorChar(0, 05, 'C');
+                PutErrorChar(0, 06, 'P');
+                PutErrorChar(0, 07, 'U');
+                PutErrorChar(0, 08, ' ');
+                PutErrorChar(0, 09, 'E');
+                PutErrorChar(0, 10, 'x');
+                PutErrorChar(0, 11, 'c');
+                PutErrorChar(0, 12, 'e');
+                PutErrorChar(0, 13,'p');
+                PutErrorChar(0, 14,'t');
+                PutErrorChar(0, 15,'i');
+                PutErrorChar(0, 16,'o');
+                PutErrorChar(0, 17,'n');
+                PutErrorChar(0, 18,' ');
+                PutErrorChar(0, 19,'x');
+                PutErrorChar(0, 20,xHex[(int)((ctx.Interrupt >> 4) & 0xF)]);
+                PutErrorChar(0, 21,xHex[(int)(ctx.Interrupt & 0xF)]);
+                PutErrorChar(0, 22,' ');
+                PutErrorChar(0, 23,'*');
+                PutErrorChar(0, 24,'*');
+                PutErrorChar(0, 25,'*');
+                PutErrorChar(0, 26,' ');
+
+                if (printOriginalEIP)
+                {
+                    PutErrorString(1, 0, "Original EIP: 0x");
+                    // start eip at 16
+                    PutErrorChar(1, 16, xHex[(int)((aEIP >> 28) & 0xF)]);
+                    PutErrorChar(1, 17, xHex[(int)((aEIP >> 24) & 0xF)]);
+                    PutErrorChar(1, 18, xHex[(int)((aEIP >> 20) & 0xF)]);
+                    PutErrorChar(1, 19, xHex[(int)((aEIP >> 16) & 0xF)]);
+                    PutErrorChar(1, 20, xHex[(int)((aEIP >> 12) & 0xF)]);
+                    PutErrorChar(1, 21, xHex[(int)((aEIP >> 8) & 0xF)]);
+                    PutErrorChar(1, 22, xHex[(int)((aEIP >> 4) & 0xF)]);
+                    PutErrorChar(1, 23, xHex[(int)(aEIP & 0xF)]);
+                }
+
             }
 
           // lock up
             while (true)
             {
+            }
+        }
+
+        private static void PutErrorChar(int line, int col, char c)
+        {
+            unsafe
+            {
+                byte* xAddress = (byte*)0xB8000;
+
+                xAddress += ((line * 80) + col) * 2;
+                
+                xAddress[0] = (byte)c;
+                xAddress[1] = 0x0C;
+            }
+        }
+
+        private static void PutErrorString(int line, int startCol, string error)
+        {
+            for (int i = 0; i < error.Length; i++)
+            {
+                PutErrorChar(line, startCol + i, error[i]);
             }
         }
 
