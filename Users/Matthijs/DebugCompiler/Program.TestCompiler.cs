@@ -20,10 +20,10 @@ namespace DebugCompiler
         //public const string CosmosRoot = @"c:\Development\Cosmos";
         //public const string CosmosRoot = @"C:\Users\Huge\Documents\Visual Studio 2010\Projects\IL2CPU";
 
-        private const string KernelFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernel.dll";
-        private const string OutputFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernelBoot.asm";
-        //private const string KernelFile = CosmosRoot + @"\source2\Users\Matthijs\Playground\bin\Debug\Playground.dll";
-        //private const string OutputFile = CosmosRoot + @"\source2\Users\Matthijs\Playground\bin\Debug\Playground.asm";
+        //private const string KernelFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernel.dll";
+        //private const string OutputFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernelBoot.asm";
+        private const string KernelFile = CosmosRoot + @"\Users\Matthijs\Playground\bin\Debug\Playground.dll";
+        private const string OutputFile = CosmosRoot + @"\Users\Matthijs\Playground\bin\Debug\Playground.asm";
 
         private static void Main(string[] args)
         {
@@ -104,7 +104,7 @@ namespace DebugCompiler
                 new TaskItemImpl(CosmosRoot + @"\source\Cosmos.Debug.Kernel.Plugs\bin\x86\Debug\Cosmos.Debug.Kernel.Plugs.dll"),
                 new TaskItemImpl(CosmosRoot + @"\source\Cosmos.HAL\bin\x86\Debug\Cosmos.HAL.dll"),
                 new TaskItemImpl(CosmosRoot + @"\source\Cosmos.System.Plugs\bin\x86\Debug\Cosmos.System.Plugs.dll"),
-                new TaskItemImpl(CosmosRoot + @"\Users\Sentinel209\SentinelSystemLib\bin\Debug\SentinelSystemLib.dll"),
+                //new TaskItemImpl(CosmosRoot + @"\Users\Sentinel209\SentinelSystemLib\bin\Debug\SentinelSystemLib.dll"),
             };
         }
 

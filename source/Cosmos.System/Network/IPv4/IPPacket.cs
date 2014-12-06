@@ -7,7 +7,7 @@ using Cosmos.System.Network.ARP;
 
 namespace Cosmos.System.Network.IPv4
 {
-    internal class IPPacket : EthernetPacket
+    public class IPPacket : EthernetPacket
     {
         protected byte ipVersion;
         protected byte ipHeaderLength;

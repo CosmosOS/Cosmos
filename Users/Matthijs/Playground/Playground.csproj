@@ -8,8 +8,8 @@
     <ProjectGuid>{8E3537CB-D0F9-4CFB-AE6F-72B465CA03F6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Playground.Kudzu.BreakpointsKernel</RootNamespace>
-    <AssemblyName>Playground.Kudzu.BreakpointsKernel</AssemblyName>
+    <RootNamespace>Playground</RootNamespace>
+    <AssemblyName>Playground</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>

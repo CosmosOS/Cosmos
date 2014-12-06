@@ -3,7 +3,7 @@ using Cosmos.HAL.Network;
 
 namespace Cosmos.System.Network
 {
-    internal class EthernetPacket
+    public class EthernetPacket
     {
         protected byte[] mRawData;
         protected MACAddress srcMAC;
@@ -74,7 +74,7 @@ namespace Cosmos.System.Network
             get { return this.aEtherType; }
         }
 
-        internal byte[] GetBytes()
+        public byte[] GetBytes()
         {
             return this.mRawData;
         }

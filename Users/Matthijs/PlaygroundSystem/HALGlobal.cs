@@ -28,9 +28,33 @@ namespace PlaygroundSystem
                 Console.WriteLine("  Unable to cast as PCIDeviceNormal!");
                 return;
             }
-            //var xNic = new AMDPCNetII(xNicDevNormal);
-            //NetworkStack.ConfigIP(xNic, new Config(new Address(), ));
-            //xNic.Enable()
+            var xNic = new AMDPCNetII(xNicDevNormal);
+            NetworkStack.Init();
+            xNic.Enable();
+            NetworkStack.ConfigIP(xNic, new Config(new Address(192, 168, 17, 100), new Address(255, 255, 255, 0)));
+
+            var xU = new UDPPacket(new Address(192, 168, 17, 100), new Address(192, 168, 17, 101), 15, 25, new byte[]
+                                                                                                           {
+                                                                                                               1,
+                                                                                                               2,
+                                                                                                               3,
+                                                                                                               4,
+                                                                                                               5,
+                                                                                                               6,
+                                                                                                               7,
+                                                                                                               8,
+                                                                                                               9,
+                                                                                                               0xAA,
+                                                                                                               0xBB,
+                                                                                                               0xCC,
+                                                                                                               0xDD,
+                                                                                                               0xEE,
+                                                                                                               0xFF
+                                                                                                           });
+
+            xNic.QueueBytes(xU.GetBytes());
+            Console.WriteLine("Done");
+            Console.ReadLine();
         }
     }
 }
