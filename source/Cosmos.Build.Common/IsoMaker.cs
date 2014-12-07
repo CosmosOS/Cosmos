@@ -42,7 +42,6 @@ namespace Cosmos.Build.Common
                 true
             );
 
-            File.WriteAllText(Path.ChangeExtension(isoFilename, ".log"), output);
         }
 
         protected static string Quote(string location)
