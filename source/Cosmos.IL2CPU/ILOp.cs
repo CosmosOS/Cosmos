@@ -10,6 +10,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.X86.IL;
 using System.Runtime.InteropServices;
+using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
 using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU {
@@ -205,12 +206,24 @@ namespace Cosmos.IL2CPU {
           continue;
         }
 
-        var xId = xField.GetFullName();
+        string xId;
+        if (!xField.IsStatic)
+        {
+          xId = xField.GetFullName();
+        }
+        else
+        {
+          xId = DataMember.GetStaticFieldName(xField);
+        }
+
         var xInfo = new X86.IL.FieldInfo(xId, SizeOfType(xField.FieldType), aType, xField.FieldType);
+        xInfo.IsStatic = xField.IsStatic;
+        
         var xFieldOffsetAttrib = xField.GetCustomAttributes(typeof(FieldOffsetAttribute), true).FirstOrDefault() as FieldOffsetAttribute;
         if (xFieldOffsetAttrib != null) {
           xInfo.Offset = (uint)xFieldOffsetAttrib.Value;
         }
+
         aFields.Add(xInfo);
         xCurList.Add(xId, xInfo);
       }
@@ -241,7 +254,7 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    protected static List<X86.IL.FieldInfo> GetFieldsInfo(Type aType) {
+    public static List<X86.IL.FieldInfo> GetFieldsInfo(Type aType) {
       var xResult = new List<X86.IL.FieldInfo>();
       DoGetFieldsInfo(aType, xResult);
       xResult.Reverse();
@@ -383,5 +396,16 @@ namespace Cosmos.IL2CPU {
         new Label(".AfterNullCheck");
       }
     }
+
+    public static FieldInfo ResolveField(Type aDeclaringType, string aField)
+    {
+      var xFields = GetFieldsInfo(aDeclaringType);
+      var xFieldInfo = (from item in xFields
+                        where item.Id == aField
+                        select item).Single();
+      return xFieldInfo;
+    }
+
+        
   }
 }

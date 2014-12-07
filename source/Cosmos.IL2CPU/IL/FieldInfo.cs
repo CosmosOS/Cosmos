@@ -34,6 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL {
     public Type FieldType;
     public uint Size;
     public bool IsExternalValue;
+    public bool IsStatic;
 
     public FieldInfo(string aId, uint aSize, Type aDeclaringType, Type aFieldType) {
       Id = aId;
