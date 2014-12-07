@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     public static void Assemble(Cosmos.Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
     {
-      DoNullReferenceCheck(aAssembler, debugEnabled, 4 + aElementSize);
+      DoNullReferenceCheck(aAssembler, debugEnabled, 4 + Align(aElementSize, 4));
       // stack - 3 == the array
       // stack - 2 == the index
       // stack - 1 == the new value

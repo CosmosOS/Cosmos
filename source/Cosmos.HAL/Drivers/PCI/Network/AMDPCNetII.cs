@@ -285,13 +285,15 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 {
                     mTxBuffers[txd][b] = aData[b];
                 }
-                UInt16 buffer_len = (UInt16)(aData.Length < 64 ? 64 : aData.Length);
+                //UInt16 buffer_len = (UInt16)(aData.Length < 64 ? 64 : aData.Length);
+                UInt16 buffer_len = (UInt16)aData.Length;
                 buffer_len = (UInt16)(~buffer_len);
                 buffer_len++;
 
-                UInt32 flags = (UInt32)(buffer_len & 0x0FFF) | 0x0300F000 | 0x80000000;
+                UInt32 flags = (UInt32)((buffer_len) & 0x0FFF) | 0x0300F000 | 0x80000000;
 
                 mTxDescriptor.Write32(xOffset + 4, flags);
+                
                 return true;
             }
 

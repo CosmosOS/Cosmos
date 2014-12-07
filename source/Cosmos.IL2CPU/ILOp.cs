@@ -364,6 +364,10 @@ namespace Cosmos.IL2CPU {
 
     public static void DoNullReferenceCheck(Assembler.Assembler assembler, bool debugEnabled, uint stackOffsetToCheck)
     {
+      if (stackOffsetToCheck != Align(stackOffsetToCheck, 4))
+      {
+        throw new Exception("Stack offset not aligned!");
+      }
       if (debugEnabled)
       {
         new CPU.Compare {DestinationReg = CPU.RegistersEnum.ESP, DestinationDisplacement = (int) stackOffsetToCheck, DestinationIsIndirect = true, SourceValue = 0};

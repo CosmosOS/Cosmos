@@ -30,6 +30,10 @@ namespace Cosmos.System.Network.IPv4
             IPPacket ip_packet = new IPPacket(packetData);
             //Sys.Console.WriteLine("Received IP Packet");
             //Sys.Console.WriteLine(ip_packet.ToString());
+            if (ip_packet.SourceIP == null)
+            {
+                global::System.Console.WriteLine("SourceIP null in IPv4Handler!");
+            }
             ARPCache.Update(ip_packet.SourceIP, ip_packet.SourceMAC);
 
             if ((NetworkStack.AddressMap.ContainsKey(ip_packet.DestinationIP.Hash) == true) ||

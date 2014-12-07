@@ -19,12 +19,12 @@ namespace Cosmos.HAL.Network
             xBroadcastArray[5] = 0xFF;
             Broadcast = new MACAddress(xBroadcastArray);
             var xNoneArray = new byte[6];
-            xNoneArray[0] = 0xFF;
-            xNoneArray[1] = 0xFF;
-            xNoneArray[2] = 0xFF;
-            xNoneArray[3] = 0xFF;
-            xNoneArray[4] = 0xFF;
-            xNoneArray[5] = 0xFF;
+            xNoneArray[0] = 0x00;
+            xNoneArray[1] = 0x00;
+            xNoneArray[2] = 0x00;
+            xNoneArray[3] = 0x00;
+            xNoneArray[4] = 0x00;
+            xNoneArray[5] = 0x00;
             None = new MACAddress(xNoneArray);
         }
 

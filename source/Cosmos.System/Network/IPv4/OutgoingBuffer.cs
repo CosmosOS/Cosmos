@@ -76,7 +76,7 @@ namespace Cosmos.System.Network.IPv4
                         else
                         {
                             ARPRequest_Ethernet arp_request = new ARPRequest_Ethernet(entry.NIC.MACAddress, entry.Packet.SourceIP,
-                                MACAddress.Broadcast, entry.nextHop);
+                                MACAddress.Broadcast, entry.nextHop, MACAddress.None);
 
                             entry.NIC.QueueBytes(arp_request.RawData);
 
@@ -96,7 +96,7 @@ namespace Cosmos.System.Network.IPv4
                     else
                     {
                         ARPRequest_Ethernet arp_request = new ARPRequest_Ethernet(entry.NIC.MACAddress, entry.Packet.SourceIP,
-                            MACAddress.Broadcast, entry.Packet.DestinationIP);
+                            MACAddress.Broadcast, entry.Packet.DestinationIP, MACAddress.None);
 
                         entry.NIC.QueueBytes(arp_request.RawData);
 

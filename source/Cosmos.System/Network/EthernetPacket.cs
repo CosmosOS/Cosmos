@@ -3,6 +3,7 @@ using Cosmos.HAL.Network;
 
 namespace Cosmos.System.Network
 {
+    // for more info, http://standards.ieee.org/about/get/802/802.3.html
     public class EthernetPacket
     {
         protected byte[] mRawData;
@@ -21,6 +22,7 @@ namespace Cosmos.System.Network
 
         protected virtual void initFields()
         {
+            global::System.Console.WriteLine("EthernetPacket.InitFields called");
             destMAC = new MACAddress(mRawData, 0);
             srcMAC = new MACAddress(mRawData, 6);
             aEtherType = (UInt16)((mRawData[12] << 8) | mRawData[13]);
@@ -82,6 +84,15 @@ namespace Cosmos.System.Network
         internal byte[] RawData
         {
             get { return this.mRawData; }
+        }
+
+        /// <summary>
+        /// Calculate any checksums
+        /// </summary>
+        public virtual void PrepareForSending()
+        {
+
+            
         }
 
         public override string ToString()

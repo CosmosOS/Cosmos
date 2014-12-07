@@ -23,6 +23,12 @@ namespace Cosmos.System.Network.ARP
                 if ((arp_packet.HardwareType == 1) && (arp_packet.ProtocolType == 0x0800))
                 {
                     IPv4.ARPRequest_Ethernet arp_request = new IPv4.ARPRequest_Ethernet(packetData);
+                    if (arp_request.SenderIP == null)
+                    {
+                        global::System.Console.WriteLine("SenderIP null in ARPHandler!");
+                    }
+                    arp_request = new IPv4.ARPRequest_Ethernet(packetData);
+                    
                     ARPCache.Update(arp_request.SenderIP, arp_request.SenderMAC);
 
                     if (NetworkStack.AddressMap.ContainsKey(arp_request.TargetIP.Hash) == true)
@@ -70,6 +76,7 @@ namespace Cosmos.System.Network.ARP
 
         protected override void initFields()
         {
+            Sys.Console.WriteLine("ARPPacket.initFields called");
             base.initFields();
             aHardwareType = (UInt16)((mRawData[14] << 8) | mRawData[15]);
             aProtocolType = (UInt16)((mRawData[16] << 8) | mRawData[17]);
