@@ -30,7 +30,7 @@
     <Deployment>ISO</Deployment>
     <Launch>VMware</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-    <TraceAssemblies>User</TraceAssemblies>
+    <TraceAssemblies>All</TraceAssemblies>
     <VMware_Name>PlaygroundBoot</VMware_Name>
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
     <VMware_Deployment>ISO</VMware_Deployment>
@@ -40,7 +40,7 @@
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
     <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
-    <VMware_TraceAssemblies>User</VMware_TraceAssemblies>
+    <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
