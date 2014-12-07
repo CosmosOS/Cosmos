@@ -31,6 +31,7 @@
 *.mdb
 *.docstates
 *.vsp
+*.pdb
 Thumbs.db
 build.force
 
