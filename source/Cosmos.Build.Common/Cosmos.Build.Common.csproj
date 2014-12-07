@@ -81,6 +81,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="EnumValue.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="ProcessExtension.cs" />
     <Compile Include="IsoMaker.cs" />
     <Compile Include="PropertiesBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

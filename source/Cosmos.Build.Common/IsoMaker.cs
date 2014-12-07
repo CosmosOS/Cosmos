@@ -1,30 +1,54 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using System.Diagnostics;
+using System.Text;
 
-namespace Cosmos.Build.Common {
-  public class IsoMaker {
+namespace Cosmos.Build.Common
+{
+    public class IsoMaker
+    {
+        static public void Generate(string imageFile, string isoFilename)
+        {
+            var destinationDirectory = Path.GetDirectoryName(imageFile);
 
-    static public void Generate(string aBuildPath, string xInputPathname, string aIsoPathname) {
-      string xPath = Path.Combine(aBuildPath, @"ISO");
-      if (File.Exists(aIsoPathname)) {
-        File.Delete(aIsoPathname);
-      }
-      
-      string xIsoLinux = Path.Combine(xPath, "isolinux.bin");
-      File.SetAttributes(xIsoLinux, FileAttributes.Normal);
+            string isoDirectory = Path.Combine(destinationDirectory, "iso");
 
-       var xPSI = new ProcessStartInfo(
-           Path.Combine(CosmosPaths.Tools, "mkisofs.exe"),
-           String.Format("-R -b \"{0}\" -no-emul-boot -boot-load-size 4 -boot-info-table -o \"{1}\" \"{2}\"",
-               xIsoLinux,               aIsoPathname, xPath)
-       );
-       xPSI.UseShellExecute = false;
-       xPSI.CreateNoWindow = true;
-       Process.Start(xPSI);
+            if (Directory.Exists(isoDirectory))
+            {
+                Directory.Delete(isoDirectory, true);
+            }
+
+            Directory.CreateDirectory(isoDirectory);
+
+            var buildISO = Path.Combine(CosmosPaths.Build, "ISO");
+
+            File.Copy(Path.Combine(buildISO, "isolinux.bin"), Path.Combine(isoDirectory, "isolinux.bin"));
+            File.Copy(Path.Combine(buildISO, "mboot.c32"), Path.Combine(isoDirectory, "mboot.c32"));
+            File.Copy(Path.Combine(buildISO, "syslinux.cfg"), Path.Combine(isoDirectory, "syslinux.cfg"));
+            File.Copy(imageFile, Path.Combine(isoDirectory, "Cosmos.bin"));
+
+            string arg =
+                "-relaxed-filenames" +
+                " -J -R" +
+                " -o " + Quote(isoFilename) +
+                " -b isolinux.bin" +
+                " -no-emul-boot" +
+                " -boot-load-size 4" +
+                " -boot-info-table " +
+                Quote(isoDirectory);
+
+            var output = ProcessExtension.LaunchApplication(
+                Path.Combine(Path.Combine(CosmosPaths.Tools, "mkisofs"), "mkisofs.exe"),
+                arg,
+                true
+            );
+
+            File.WriteAllText(Path.ChangeExtension(isoFilename, ".log"), output);
+        }
+
+        protected static string Quote(string location)
+        {
+            return '"' + location + '"';
+        }
+
     }
-  }
 }
