@@ -31,7 +31,7 @@ namespace Cosmos.Build.MSBuild {
     #endregion
 
     public override bool Execute() {
-      IsoMaker.Generate(CosmosBuildDir, InputFile, OutputFile);
+      IsoMaker.Generate(InputFile, OutputFile);
       return true;
     }
   }
