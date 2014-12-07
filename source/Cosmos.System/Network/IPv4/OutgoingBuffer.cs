@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Cosmos.Core.Network;
 using Cosmos.HAL;
+using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
 
 namespace Cosmos.System.Network.IPv4
@@ -76,7 +76,7 @@ namespace Cosmos.System.Network.IPv4
                         else
                         {
                             ARPRequest_Ethernet arp_request = new ARPRequest_Ethernet(entry.NIC.MACAddress, entry.Packet.SourceIP,
-                                MACAddress.Broadcast, entry.nextHop);
+                                MACAddress.Broadcast, entry.nextHop, MACAddress.None);
 
                             entry.NIC.QueueBytes(arp_request.RawData);
 
@@ -96,7 +96,7 @@ namespace Cosmos.System.Network.IPv4
                     else
                     {
                         ARPRequest_Ethernet arp_request = new ARPRequest_Ethernet(entry.NIC.MACAddress, entry.Packet.SourceIP,
-                            MACAddress.Broadcast, entry.Packet.DestinationIP);
+                            MACAddress.Broadcast, entry.Packet.DestinationIP, MACAddress.None);
 
                         entry.NIC.QueueBytes(arp_request.RawData);
 
@@ -123,6 +123,7 @@ namespace Cosmos.System.Network.IPv4
                     i++;
                 }
             }
+           Global.Dbg.Send("Number of packages in queue: " + i.ToString());
         }
 
         internal static void ARPCache_Update(ARPReply_Ethernet arp_reply)
@@ -134,11 +135,13 @@ namespace Cosmos.System.Network.IPv4
                 BufferEntry entry = queue[e];
                 if (entry.Status == BufferEntry.EntryStatus.ARP_SENT)
                 {
+                    var xDestIP = entry.Packet.DestinationIP.Hash;
+                    var xSenderIP = arp_reply.SenderIP.Hash;
                     if (entry.Packet.DestinationIP.CompareTo(arp_reply.SenderIP) == 0)
                     {
                         entry.Packet.DestinationMAC = arp_reply.SenderMAC;
 
-                        entry.Status = BufferEntry.EntryStatus.JUST_SEND;
+                        entry.Status = BufferEntry.EntryStatus.DONE;
                     }
                 }
                 else if (entry.Status == BufferEntry.EntryStatus.ROUTE_ARP_SENT)

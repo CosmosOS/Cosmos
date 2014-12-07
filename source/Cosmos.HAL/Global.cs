@@ -12,6 +12,8 @@ namespace Cosmos.HAL {
     // Must be static init, other static inits rely on it not being null
     static public TextScreen TextScreen = new TextScreen();
 
+      public static PCI Pci;
+
     static void InitAta(BlockDevice.Ata.ControllerIdEnum aControllerID, BlockDevice.Ata.BusPositionEnum aBusPosition) {
       var xIO = aControllerID == BlockDevice.Ata.ControllerIdEnum.Primary ? Cosmos.Core.Global.BaseIOGroups.ATA1 : Cosmos.Core.Global.BaseIOGroups.ATA2;
       var xATA = new BlockDevice.AtaPio(xIO, aControllerID, aBusPosition);
@@ -87,10 +89,18 @@ namespace Cosmos.HAL {
       // If we let hardware do it, we need to protect it from being used by System.
       // Probably belongs in hardware, and core is more specific stuff like CPU, memory, etc.
       //Core.PCI.OnPCIDeviceFound = PCIDeviceFound;
-      Cosmos.Core.Global.Init();
+
+      //TODO: Since this is FCL, its "common". Otherwise it should be
+      // system level and not accessible from Core. Need to think about this
+      // for the future.
+      Console.WriteLine("Finding PCI Devices");
+      PCI.Setup();
+
     }
 
     static public void Init() {
+      Core.Bootstrap.Init();
+      Core.Global.Init();
       Global.Dbg.Send("Static Devices");
       InitStaticDevices();
       Global.Dbg.Send("PCI Devices");

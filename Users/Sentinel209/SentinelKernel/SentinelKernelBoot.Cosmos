@@ -82,6 +82,11 @@
       <Project>{3b0f484c-0a26-4cc2-b44d-ddda3a3e9381}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\SentinelSystemLib\SentinelSystemLib.csproj">
+      <Name>SentinelSystemLib</Name>
+      <Project>{93d6ff56-6e23-4e80-98f6-730ac533f631}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <!--<ItemGroup>
     <Content Include="Cosmos.bxrc">

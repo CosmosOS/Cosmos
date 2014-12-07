@@ -1,6 +1,6 @@
 ﻿using System;
+using Cosmos.HAL.Network;
 using Sys = System;
-using Cosmos.Core.Network;
 using Cosmos.HAL;
 
 namespace Cosmos.System.Network.ARP
@@ -23,6 +23,12 @@ namespace Cosmos.System.Network.ARP
                 if ((arp_packet.HardwareType == 1) && (arp_packet.ProtocolType == 0x0800))
                 {
                     IPv4.ARPRequest_Ethernet arp_request = new IPv4.ARPRequest_Ethernet(packetData);
+                    if (arp_request.SenderIP == null)
+                    {
+                        global::System.Console.WriteLine("SenderIP null in ARPHandler!");
+                    }
+                    arp_request = new IPv4.ARPRequest_Ethernet(packetData);
+                    
                     ARPCache.Update(arp_request.SenderIP, arp_request.SenderMAC);
 
                     if (NetworkStack.AddressMap.ContainsKey(arp_request.TargetIP.Hash) == true)
@@ -45,7 +51,7 @@ namespace Cosmos.System.Network.ARP
                     //Sys.Console.WriteLine("Received ARP Reply");
                     //Sys.Console.WriteLine(arp_reply.ToString());
                     //Sys.Console.WriteLine("ARP Reply Recvd from " + arp_reply.SenderIP.ToString());
-                    ARP.ARPCache.Update(arp_reply.SenderIP, arp_reply.SenderMAC);
+                    ARPCache.Update(arp_reply.SenderIP, arp_reply.SenderMAC);
 
                     IPv4.OutgoingBuffer.ARPCache_Update(arp_reply);
                 }

@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Constrained:
           return 0;
         default:
-          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
+          throw new NotImplementedException("OpCode '" + OpCode + "' not implemented! Encountered in method " + aMethod.ToString());
       }
     }
 

@@ -11,6 +11,7 @@ using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86._486AndUp;
 using Cosmos.Build.Common;
+using Cosmos.Common;
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.Plugs;
 using Mono.Cecil;
@@ -798,6 +799,11 @@ namespace Cosmos.IL2CPU
             };
         }
 
+        protected X86.IL.FieldInfo ResolveField(MethodInfo method, string fieldId)
+        {
+            return X86.IL.Ldflda.ResolveField(method.MethodBase.DeclaringType, fieldId);
+        }
+
         protected void Ldarg(MethodInfo aMethod, int aIndex)
         {
             X86.IL.Ldarg.DoExecute(Assembler, aMethod, (ushort)aIndex);
@@ -815,7 +821,17 @@ namespace Cosmos.IL2CPU
 
         protected void Ldflda(MethodInfo aMethod, string aFieldId)
         {
-            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false);
+            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false, false);
+        }
+
+        protected void Ldflda(MethodInfo aMethod, X86.IL.FieldInfo aFieldInfo)
+        {
+          X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldInfo, false, false);
+        }
+
+        protected void Ldsflda(MethodInfo aMethod, X86.IL.FieldInfo aFieldInfo)
+        {
+          X86.IL.Ldsflda.DoExecute(Assembler, aMethod, aFieldInfo, aMethod.PluggedMethod.MethodBase.DeclaringType, null);
         }
 
         protected int GetVTableEntrySize()
@@ -911,13 +927,16 @@ namespace Cosmos.IL2CPU
                         {
                             try
                             {
-                                var xMap = xType.GetInterfaceMap(xIntf);
-                                for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
+                                if (!xIntf.IsGenericType)
                                 {
-                                    if (xMap.InterfaceMethods[k] == xMethodIntf)
+                                    var xMap = xType.GetInterfaceMap(xIntf);
+                                    for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
                                     {
-                                        xActualMethod = xMap.TargetMethods[k];
-                                        break;
+                                        if (xMap.InterfaceMethods[k] == xMethodIntf)
+                                        {
+                                            xActualMethod = xMap.TargetMethods[k];
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -1202,11 +1221,6 @@ namespace Cosmos.IL2CPU
                     xParams = aFrom.MethodBase.GetParameters();
                 }
 
-                //if (aFrom.MethodBase.GetParameters().Length > 0 || !aFrom.MethodBase.IsStatic) {
-                //  Ldarg(aFrom, 0);
-                //  Pop();
-                //}
-
                 int xCurParamIdx = 0;
                 if (!aFrom.MethodBase.IsStatic)
                 {
@@ -1227,10 +1241,18 @@ namespace Cosmos.IL2CPU
 
                     if (xFieldAccessAttrib != null)
                     {
-                        // field access                                                                                        
+                        // field access              
                         new Comment("Loading address of field '" + xFieldAccessAttrib.Name + "'");
-                        Ldarg(aFrom, 0);
-                        Ldflda(aFrom, xFieldAccessAttrib.Name);
+                        var xFieldInfo = ResolveField(aFrom, xFieldAccessAttrib.Name);
+                        if (xFieldInfo.IsStatic)
+                        {
+                            Ldsflda(aFrom, xFieldInfo);
+                        }
+                        else
+                        {
+                            Ldarg(aFrom, 0);
+                            Ldflda(aFrom, xFieldInfo);
+                        }
                     }
                     else
                     {

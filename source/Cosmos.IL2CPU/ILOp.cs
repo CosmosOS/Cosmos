@@ -10,6 +10,8 @@ using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.X86.IL;
 using System.Runtime.InteropServices;
+using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
+using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU {
   public abstract class ILOp {
@@ -204,12 +206,24 @@ namespace Cosmos.IL2CPU {
           continue;
         }
 
-        var xId = xField.GetFullName();
+        string xId;
+        if (!xField.IsStatic)
+        {
+          xId = xField.GetFullName();
+        }
+        else
+        {
+          xId = DataMember.GetStaticFieldName(xField);
+        }
+
         var xInfo = new X86.IL.FieldInfo(xId, SizeOfType(xField.FieldType), aType, xField.FieldType);
+        xInfo.IsStatic = xField.IsStatic;
+        
         var xFieldOffsetAttrib = xField.GetCustomAttributes(typeof(FieldOffsetAttribute), true).FirstOrDefault() as FieldOffsetAttribute;
         if (xFieldOffsetAttrib != null) {
           xInfo.Offset = (uint)xFieldOffsetAttrib.Value;
         }
+
         aFields.Add(xInfo);
         xCurList.Add(xId, xInfo);
       }
@@ -240,7 +254,7 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    protected static List<X86.IL.FieldInfo> GetFieldsInfo(Type aType) {
+    public static List<X86.IL.FieldInfo> GetFieldsInfo(Type aType) {
       var xResult = new List<X86.IL.FieldInfo>();
       DoGetFieldsInfo(aType, xResult);
       xResult.Reverse();
@@ -360,5 +374,38 @@ namespace Cosmos.IL2CPU {
       }
       return false;
     }
+
+    public static void DoNullReferenceCheck(Assembler.Assembler assembler, bool debugEnabled, uint stackOffsetToCheck)
+    {
+      if (stackOffsetToCheck != Align(stackOffsetToCheck, 4))
+      {
+        throw new Exception("Stack offset not aligned!");
+      }
+      if (debugEnabled)
+      {
+        new CPU.Compare {DestinationReg = CPU.RegistersEnum.ESP, DestinationDisplacement = (int) stackOffsetToCheck, DestinationIsIndirect = true, SourceValue = 0};
+        new CPU.ConditionalJump {DestinationLabel = ".AfterNullCheck", Condition = CPU.ConditionalTestEnum.NotEqual};
+        new CPU.ClrInterruptFlag();
+        // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+        new CPU.Call {DestinationLabel = ".NullCheck_GetCurrAddress"};
+        new Assembler.Label(".NullCheck_GetCurrAddress");
+        new CPU.Pop {DestinationReg = CPU.RegistersEnum.EAX};
+        new CPU.Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = CPU.RegistersEnum.EAX};
+        new CPU.Call {DestinationLabel = "DebugStub_SendNullReferenceOccurred"};
+        new CPU.Halt();
+        new Label(".AfterNullCheck");
+      }
+    }
+
+    public static FieldInfo ResolveField(Type aDeclaringType, string aField)
+    {
+      var xFields = GetFieldsInfo(aDeclaringType);
+      var xFieldInfo = (from item in xFields
+                        where item.Id == aField
+                        select item).Single();
+      return xFieldInfo;
+    }
+
+        
   }
 }

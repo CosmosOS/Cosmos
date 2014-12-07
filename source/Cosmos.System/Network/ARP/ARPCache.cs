@@ -1,5 +1,5 @@
 ﻿using System;
-using Cosmos.Core.Network;
+using Cosmos.HAL.Network;
 
 namespace Cosmos.System.Network.ARP
 {
@@ -24,6 +24,10 @@ namespace Cosmos.System.Network.ARP
         internal static void Update(IPv4.Address ipAddress, MACAddress macAddress)
         {
             ensureCacheExists();
+            if (ipAddress == null)
+            {
+              global::System.Console.Write("");
+            }
             UInt32 ip_hash = ipAddress.Hash;
             if (ip_hash == 0)
             {

@@ -14,6 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
+            DoNullReferenceCheck(Assembler, DebugEnabled, 0);
             OpType xType = ( OpType )aOpCode;
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             var xObjSize = GetStorageSize(xType.Value);

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.HAL;
-using Cosmos.Core.Network;
+using Cosmos.HAL.Network;
 
 namespace Cosmos.HAL
 {

@@ -1,5 +1,5 @@
 ﻿using System;
-using Cosmos.Core.Network;
+using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
 using Sys = System;
 
@@ -22,22 +22,27 @@ namespace Cosmos.System.Network.IPv4
 
         protected override void initFields()
         {
-            //Sys.Console.WriteLine("ARPPacket_Ethernet.initFields() called");
+            Sys.Console.WriteLine("ARPPacket_Ethernet.initFields() called");
             base.initFields();
             mSenderMAC = new MACAddress(mRawData, 22);
             mSenderIP = new Address(mRawData, 28);
+            global::System.Console.WriteLine("SenderIP created");
+            if (SenderIP == null)
+            {
+                global::System.Console.WriteLine("But its already null again");
+            }
             mTargetMAC = new MACAddress(mRawData, 32);
             mTargetIP = new Address(mRawData, 38);
         }
 
         protected ARPPacket_Ethernet(UInt16 operation, MACAddress senderMAC, Address senderIP,
-            MACAddress targetMAC, Address targetIP, int packet_size)
+            MACAddress targetMAC, Address targetIP, int packet_size, MACAddress arpTargetMAC)
             : base(targetMAC, senderMAC, 1, 0x0800, 6, 4, operation, packet_size)
         {
             for (int i = 0; i < 6; i++)
             {
                 mRawData[22 + i] = senderMAC.bytes[i];
-                mRawData[32 + i] = targetMAC.bytes[i];
+                mRawData[32 + i] = arpTargetMAC.bytes[i];
             }
             for (int i = 0; i < 4; i++)
             {
@@ -91,7 +96,7 @@ namespace Cosmos.System.Network.IPv4
         { }
 
         internal ARPReply_Ethernet(MACAddress ourMAC, Address ourIP, MACAddress targetMAC, Address targetIP)
-            : base(2, ourMAC, ourIP, targetMAC, targetIP, 42)
+            : base(2, ourMAC, ourIP, targetMAC, targetIP, 42, MACAddress.None)
         { }
 
         public override string ToString()
@@ -115,10 +120,15 @@ namespace Cosmos.System.Network.IPv4
 
         internal ARPRequest_Ethernet(byte[] rawData)
             : base(rawData)
-        { }
+        {
+            if (SenderIP == null)
+            {
+                global::System.Console.WriteLine("In ARPRequest_Ethernet, SenderIP is null!");
+            }
+        }
 
-        internal ARPRequest_Ethernet(MACAddress ourMAC, Address ourIP, MACAddress targetMAC, Address targetIP)
-            : base(1, ourMAC, ourIP, targetMAC, targetIP, 42)
+        internal ARPRequest_Ethernet(MACAddress ourMAC, Address ourIP, MACAddress targetMAC, Address targetIP, MACAddress arpTargetMAC)
+            : base(1, ourMAC, ourIP, targetMAC, targetIP, 42, arpTargetMAC)
         { }
 
         public override string ToString()

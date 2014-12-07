@@ -74,8 +74,9 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, bool debugEnabled)
     {
-        DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, ILOp.GetLabel(aCurrentMethod, aCurrent.NextPosition), debugEnabled);
+      DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, ILOp.GetLabel(aCurrentMethod, aCurrent.NextPosition), debugEnabled);
     }
+
     public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel, bool debugEnabled) {
       //if (aTargetMethod.IsVirtual) {
       //  Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
@@ -148,23 +149,5 @@ namespace Cosmos.IL2CPU.X86.IL {
 	  }
 
     }
-
-      public static void DoNullReferenceCheck(Assembler.Assembler assembler, bool debugEnabled, uint stackOffsetToCheck)
-      {
-          if (debugEnabled)
-          {
-              new CPUx86.Compare {DestinationReg = CPU.RegistersEnum.ESP, DestinationDisplacement = (int) stackOffsetToCheck, DestinationIsIndirect = true, SourceValue = 0};
-              new CPUx86.ConditionalJump {DestinationLabel = ".AfterNullCheck", Condition = CPU.ConditionalTestEnum.NotEqual};
-              new CPUx86.ClrInterruptFlag();
-              // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-              new CPUx86.Call {DestinationLabel = ".NullCheck_GetCurrAddress"};
-              new Assembler.Label(".NullCheck_GetCurrAddress");
-              new CPUx86.Pop {DestinationReg = CPU.RegistersEnum.EAX};
-              new CPUx86.Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = CPU.RegistersEnum.EAX};
-              new CPUx86.Call {DestinationLabel = "DebugStub_SendNullReferenceOccurred"};
-              new CPUx86.Halt();
-              new Label(".AfterNullCheck");
-          }
-      }
   }
 }

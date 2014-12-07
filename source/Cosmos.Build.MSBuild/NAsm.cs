@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using Microsoft.Build.Framework;
 using System.IO;
 
@@ -30,7 +31,7 @@ namespace Cosmos.Build.MSBuild {
 
     #endregion
 
-    public override bool Execute() {
+    private bool DoExecute() {
       if (File.Exists(OutputFile)) {
         File.Delete(OutputFile);
       }
@@ -51,6 +52,20 @@ namespace Cosmos.Build.MSBuild {
         Log.LogMessage("{0} -> {1}", InputFile, OutputFile);
       }
       return xResult;
+    }
+
+    public override bool Execute()
+    {
+      var xSW = Stopwatch.StartNew();
+      try
+      {
+        return DoExecute();
+      }
+      finally
+      {
+        xSW.Stop();
+        Log.LogMessage(MessageImportance.High, "NAsm task took {0}", xSW.Elapsed);
+      }
     }
 
     public override bool ExtendLineError(int exitCode, string errorMessage, out LogInfo log) {

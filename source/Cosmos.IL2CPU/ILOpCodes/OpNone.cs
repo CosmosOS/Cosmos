@@ -107,6 +107,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Or:
         case Code.And:
           return 2;
+        case Code.Not:
+          return 1;
         case Code.Stelem_Ref:
         case Code.Stelem_I:
         case Code.Stelem_I1:
@@ -232,6 +234,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           return 0;
         case Code.Or:
         case Code.And:
+        case Code.Not:
           return 1;
         case Code.Stelem_I:
         case Code.Stelem_I1:
@@ -574,6 +577,13 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               aSituationChanged = true;
               return;
             }
+            if ((StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(short))
+             || (StackPopTypes[0] == typeof(short) && StackPopTypes[1] == typeof(int)))
+            {
+              StackPushTypes[0] = typeof(int);
+              aSituationChanged = true;
+              return;
+            }
             if ((StackPopTypes[0] == typeof(long) && StackPopTypes[1] == typeof(ulong))
              || (StackPopTypes[0] == typeof(ulong) && StackPopTypes[1] == typeof(long)))
             {
@@ -585,6 +595,20 @@ namespace Cosmos.IL2CPU.ILOpCodes {
              || (StackPopTypes[0] == typeof(ushort) && StackPopTypes[1] == typeof(int)))
             {
               StackPushTypes[0] = typeof(int);
+              aSituationChanged = true;
+              return;
+            }
+            if ((StackPopTypes[0] == typeof(byte) && StackPopTypes[1] == typeof(uint))
+             || (StackPopTypes[0] == typeof(uint) && StackPopTypes[1] == typeof(byte)))
+            {
+              StackPushTypes[0] = typeof(int);
+              aSituationChanged = true;
+              return;
+            }
+            if ((StackPopTypes[0] == typeof(ushort) && StackPopTypes[1] == typeof(uint))
+            || (StackPopTypes[0] == typeof(uint) && StackPopTypes[1] == typeof(ushort)))
+            {
+              StackPushTypes[0] = typeof(uint);
               aSituationChanged = true;
               return;
             }
@@ -804,6 +828,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           StackPushTypes[0] = xTypeArray.GetElementType();
           aSituationChanged = true;
           break;
+        case Code.Not:
         case Code.Neg:
           if (StackPushTypes[0] != null)
           {

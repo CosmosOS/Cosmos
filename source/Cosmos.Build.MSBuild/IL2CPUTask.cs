@@ -241,6 +241,8 @@ namespace Cosmos.Build.MSBuild
                             xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
                             xScanner.Execute(xInitMethod);
 
+                            AppAssemblerRingsCheck.Execute(xScanner);
+
                             using (var xOut = new StreamWriter(OutputFilename, false, Encoding.ASCII , 128*1024))
                             {
                                 //if (EmitDebugSymbols) {

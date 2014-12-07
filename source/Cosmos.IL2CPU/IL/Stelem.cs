@@ -14,14 +14,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            if (aMethod.MethodBase.GetFullName() == "SystemVoidSystemCollectionsGenericList1SystemUInt64AddSystemUInt64")
-            {
-                Console.Write("");
-            }
           var xOpType = (OpType)aOpCode;
           var xSize = SizeOfType(xOpType.Value);
 
-            Stelem_Ref.Assemble( Assembler, ( uint )xSize, aMethod, aOpCode );
+          Stelem_Ref.Assemble(Assembler, (uint)xSize, aMethod, aOpCode, DebugEnabled);
         }
 
 

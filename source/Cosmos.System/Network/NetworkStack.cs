@@ -16,7 +16,7 @@ namespace Cosmos.System.Network
         /// <summary>
         /// Initialize the Network Stack to prepare it for operation
         /// </summary>
-        internal static void Init()
+        public static void Init()
         {
             AddressMap = new TempDictionary<NetworkDevice>();
 
@@ -47,8 +47,13 @@ namespace Cosmos.System.Network
 
         internal static void HandlePacket(byte[] packetData)
         {
-            //Sys.Console.Write("Received Packet Length=");
-            //Sys.Console.WriteLine(packetData.Length);
+            Sys.Console.Write("Received Packet Length=");
+            if (packetData == null)
+            {
+                Sys.Console.WriteLine("**NULL**");
+                return;
+            }
+            Sys.Console.WriteLine(packetData.Length);
             //Sys.Console.WriteLine(BitConverter.ToString(packetData));
 
             UInt16 etherType = (UInt16)((packetData[12] << 8) | packetData[13]);
@@ -66,7 +71,7 @@ namespace Cosmos.System.Network
         /// <summary>
         /// Called continously to keep the Network Stack going.
         /// </summary>
-        internal static void Update()
+        public static void Update()
         {
             IPv4.OutgoingBuffer.Send();
         }

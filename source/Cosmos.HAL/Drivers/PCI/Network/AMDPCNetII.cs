@@ -2,32 +2,16 @@
 using System.Collections.Generic;
 using Cosmos.Common;
 using Cosmos.Core;
-using Cosmos.Core.Network;
+using Cosmos.Core.IOGroup.Network;
+using Cosmos.HAL.Network;
 using CompilerPlugs = Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.HAL.Drivers.PCI.Network
 {
     public class AMDPCNetII : NetworkDevice
     {
-        protected class IOGroup : Cosmos.Core.IOGroup.IOGroup
-        {
-            public readonly IOPort RegisterAddress;
-            public readonly IOPort RegisterData;
-            public readonly IOPort BusData;
-            public readonly IOPortRead MAC1;
-            public readonly IOPortRead MAC2;
-            public IOGroup(PCIDeviceNormal device)
-            {
-                RegisterAddress = new IOPort((ushort)device.BaseAddresses[0].BaseAddress(), 0x14);
-                RegisterData = new IOPort((ushort)device.BaseAddresses[0].BaseAddress(), 0x10);
-                BusData = new IOPort((ushort)device.BaseAddresses[0].BaseAddress(), 0x1C);
-                MAC1 = new IOPortRead((ushort)device.BaseAddresses[0].BaseAddress(), 0x00);
-                MAC2 = new IOPortRead((ushort)device.BaseAddresses[0].BaseAddress(), 0x04);
-            }
-        }
-
         protected PCIDeviceNormal pciCard;
-        protected IOGroup io;
+        protected AMDPCNetIIIOGroup io;
         protected MACAddress mac;
         protected bool mInitDone;
 
@@ -52,7 +36,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
             this.pciCard.Claimed = true;
             this.pciCard.EnableDevice();
 
-            this.io = new IOGroup(this.pciCard);
+            this.io = new AMDPCNetIIIOGroup((ushort)this.pciCard.BaseAddresses[0].BaseAddress());
             this.io.RegisterData.DWord = 0;
 
             // Get the EEPROM MAC Address and set it as the devices MAC
@@ -150,7 +134,7 @@ namespace Cosmos.HAL.Drivers.PCI.Network
         public static void FindAll()
         {
             Console.WriteLine("Scanning for AMD PCNetII cards...");
-            PCIDevice device = Cosmos.Core.PCI.GetDevice(0x1022, 0x2000);
+            PCIDevice device = Cosmos.HAL.PCI.GetDevice(0x1022, 0x2000);
             if (device != null)
             {
                 AMDPCNetII nic = new AMDPCNetII((PCIDeviceNormal)device);
@@ -301,13 +285,15 @@ namespace Cosmos.HAL.Drivers.PCI.Network
                 {
                     mTxBuffers[txd][b] = aData[b];
                 }
-                UInt16 buffer_len = (UInt16)(aData.Length < 64 ? 64 : aData.Length);
+                //UInt16 buffer_len = (UInt16)(aData.Length < 64 ? 64 : aData.Length);
+                UInt16 buffer_len = (UInt16)aData.Length;
                 buffer_len = (UInt16)(~buffer_len);
                 buffer_len++;
 
-                UInt32 flags = (UInt32)(buffer_len & 0x0FFF) | 0x0300F000 | 0x80000000;
+                UInt32 flags = (UInt32)((buffer_len) & 0x0FFF) | 0x0300F000 | 0x80000000;
 
                 mTxDescriptor.Write32(xOffset + 4, flags);
+                
                 return true;
             }
 

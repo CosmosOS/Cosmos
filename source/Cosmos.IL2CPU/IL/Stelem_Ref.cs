@@ -10,7 +10,9 @@ namespace Cosmos.IL2CPU.X86.IL {
       : base(aAsmblr) {
     }
 
-    public static void Assemble(Cosmos.Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode) {
+    public static void Assemble(Cosmos.Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
+    {
+      DoNullReferenceCheck(aAssembler, debugEnabled, 4 + Align(aElementSize, 4));
       // stack - 3 == the array
       // stack - 2 == the index
       // stack - 1 == the new value
@@ -71,7 +73,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 0x8 };
     }
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-      Assemble(Assembler, 4, aMethod, aOpCode);
+      Assemble(Assembler, 4, aMethod, aOpCode, DebugEnabled);
     }
   }
 }

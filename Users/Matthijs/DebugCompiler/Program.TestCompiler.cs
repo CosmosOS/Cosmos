@@ -16,25 +16,25 @@ namespace DebugCompiler
 {
     internal class Program
     {
-        //public const string CosmosRoot = @"e:\Cosmos";
-        public const string CosmosRoot = @"c:\Development\Cosmos";
+        public const string CosmosRoot = @"e:\OpenSource\Cosmos";
+        //public const string CosmosRoot = @"c:\Development\Cosmos";
         //public const string CosmosRoot = @"C:\Users\Huge\Documents\Visual Studio 2010\Projects\IL2CPU";
 
-        private const string KernelFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernel.dll";
-        private const string OutputFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernelBoot.asm";
-        //private const string KernelFile = CosmosRoot + @"\source2\Users\Matthijs\Playground\bin\Debug\Playground.dll";
-        //private const string OutputFile = CosmosRoot + @"\source2\Users\Matthijs\Playground\bin\Debug\Playground.asm";
+        //private const string KernelFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernel.dll";
+        //private const string OutputFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernelBoot.asm";
+        private const string KernelFile = CosmosRoot + @"\Users\Matthijs\Playground\bin\Debug\Playground.dll";
+        private const string OutputFile = CosmosRoot + @"\Users\Matthijs\Playground\bin\Debug\PlaygroundBoot.asm";
 
         private static void Main(string[] args)
         {
-            Console.SetOut(new StreamWriter("out", false));
+            //Console.SetOut(new StreamWriter("out", false));
 
             var xSW = Stopwatch.StartNew();
             try
             {
                 var xTask = new IL2CPUTask();
                 xTask.DebugEnabled = true;
-                xTask.StackCorruptionDetectionEnabled = false;
+                xTask.StackCorruptionDetectionEnabled = true;
                 xTask.DebugMode = "Source";
                 xTask.TraceAssemblies = "User";
                 xTask.DebugCom = 1;
@@ -46,12 +46,12 @@ namespace DebugCompiler
                 xTask.References = GetReferences();
                 xTask.OnLogError = (m) => Console.WriteLine("Error: {0}", m);
                 xTask.OnLogWarning = (m) => Console.WriteLine("Warning: {0}", m);
-                xTask.OnLogMessage = (m) => Console.WriteLine("Message: {0}", m);
-                xTask.OnLogException = (m) =>
-                {
-                    Console.WriteLine("Exception: {0}", m.ToString());
-                    //Console.ReadLine();
-                };
+                xTask.OnLogMessage = (m) =>
+                                     {
+                                         Console.WriteLine("Message: {0}", m);
+                                     };
+                xTask.OnLogException = (m) => Console.WriteLine("Exception: {0}", m.ToString());
+
                 if (xTask.Execute())
                 {
                     Console.WriteLine("Executed OK");
@@ -104,6 +104,7 @@ namespace DebugCompiler
                 new TaskItemImpl(CosmosRoot + @"\source\Cosmos.Debug.Kernel.Plugs\bin\x86\Debug\Cosmos.Debug.Kernel.Plugs.dll"),
                 new TaskItemImpl(CosmosRoot + @"\source\Cosmos.HAL\bin\x86\Debug\Cosmos.HAL.dll"),
                 new TaskItemImpl(CosmosRoot + @"\source\Cosmos.System.Plugs\bin\x86\Debug\Cosmos.System.Plugs.dll"),
+                //new TaskItemImpl(CosmosRoot + @"\Users\Sentinel209\SentinelSystemLib\bin\Debug\SentinelSystemLib.dll"),
             };
         }
 

@@ -1,9 +1,10 @@
 ﻿using System;
-using Cosmos.Core.Network;
+using Cosmos.HAL.Network;
 
 namespace Cosmos.System.Network
 {
-    internal class EthernetPacket
+    // for more info, http://standards.ieee.org/about/get/802/802.3.html
+    public class EthernetPacket
     {
         protected byte[] mRawData;
         protected MACAddress srcMAC;
@@ -74,7 +75,7 @@ namespace Cosmos.System.Network
             get { return this.aEtherType; }
         }
 
-        internal byte[] GetBytes()
+        public byte[] GetBytes()
         {
             return this.mRawData;
         }
@@ -82,6 +83,15 @@ namespace Cosmos.System.Network
         internal byte[] RawData
         {
             get { return this.mRawData; }
+        }
+
+        /// <summary>
+        /// Calculate any checksums
+        /// </summary>
+        public virtual void PrepareForSending()
+        {
+
+            
         }
 
         public override string ToString()

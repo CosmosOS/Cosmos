@@ -41,10 +41,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
             switch (xSourceSize)
             {
-                case 1:
-                    throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I2.cs->The size 1 could not exist, because always is pushed Int32 or Int64!");
+                  
                 case 2:
-                    throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I2.cs->The size 2 could not exist, because always is pushed Int32 or Int64!");
+                    //throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I2.cs->The size 2 could not exist, because always is pushed Int32 or Int64!");
+                  break;
+                case 1:
+                //throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I2.cs->The size 1 could not exist, because always is pushed Int32 or Int64!");
                 case 4:
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AX, Size = 16 };

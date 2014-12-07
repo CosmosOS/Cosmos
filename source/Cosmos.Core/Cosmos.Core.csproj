@@ -79,13 +79,9 @@
     <Compile Include="Bootstrap.cs" />
     <Compile Include="HMI.cs" />
     <Compile Include="IOGroup\COM.cs" />
+    <Compile Include="IOGroup\Network\AMDPCNetIIIOGroup.cs" />
     <Compile Include="IOGroup\PCSpeaker.cs" />
     <Compile Include="ManagedMemoryBlock.cs" />
-    <Compile Include="Network\MACAddress.cs" />
-    <Compile Include="PCIBaseAddressBar.cs" />
-    <Compile Include="PCIDeviceNormal.cs" />
-    <Compile Include="PCIDeviceBridge.cs" />
-    <Compile Include="PCIDeviceCardbus.cs" />
     <Compile Include="CPU.cs" />
     <Compile Include="DeviceIDAttribute.cs" />
     <Compile Include="Global.cs" />
@@ -103,8 +99,6 @@
     <Compile Include="IOGroup\VGA.cs" />
     <Compile Include="IOPort.cs" />
     <Compile Include="MemoryBlock.cs" />
-    <Compile Include="PCI.cs" />
-    <Compile Include="PCIDevice.cs" />
     <Compile Include="PIC.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -129,7 +123,6 @@
     <Content Include="IOPort.html" />
     <Content Include="INTs.html" />
     <Content Include="MemoryBlock.html" />
-    <Content Include="PCI.html" />
     <Content Include="PIC.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

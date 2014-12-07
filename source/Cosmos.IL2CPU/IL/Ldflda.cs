@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 
@@ -16,17 +17,17 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xOpCode = (ILOpCodes.OpField) aOpCode;
-            DoExecute(Assembler, aMethod, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true);
+            DoExecute(Assembler, aMethod, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true, DebugEnabled);
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField, bool aDerefValue)
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField, bool aDerefValue, bool aDebugEnabled)
         {
+          var xFieldInfo = ResolveField(aDeclaringType, aField);
+          DoExecute(Assembler, aMethod, aDeclaringType, xFieldInfo, aDerefValue, aDebugEnabled);
+        }
 
-            var xFields = GetFieldsInfo(aDeclaringType);
-            var xFieldInfo = (from item in xFields
-                where item.Id == aField
-                select item).Single();
-
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, FieldInfo aField, bool aDerefValue, bool aDebugEnabled)
+        {
             int xExtraOffset = 0;
             var xType = aMethod.MethodBase.DeclaringType;
             bool xNeedsGC = aDeclaringType.IsClass && !aDeclaringType.IsValueType;
@@ -36,10 +37,11 @@ namespace Cosmos.IL2CPU.X86.IL
                 xExtraOffset = 12;
             }
 
-            var xActualOffset = xFieldInfo.Offset + xExtraOffset;
-            var xSize = xFieldInfo.Size;
+            var xActualOffset = aField.Offset + xExtraOffset;
+            var xSize = aField.Size;
+            DoNullReferenceCheck(Assembler, aDebugEnabled, 0);
 
-            if (aDerefValue && xFieldInfo.IsExternalValue)
+            if (aDerefValue && aField.IsExternalValue)
             {
                 new CPUx86.Mov
                 {

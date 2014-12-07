@@ -108,7 +108,13 @@
     <Compile Include="NetworkDevice.cs" />
     <Compile Include="Drivers\PCI\Network\RTL8139.cs" />
     <Compile Include="Drivers\PCI\Network\VT6102.cs" />
+    <Compile Include="Network\MACAddress.cs" />
+    <Compile Include="PCI.cs" />
+    <Compile Include="PCIBaseAddressBar.cs" />
     <Compile Include="PciDevice.cs" />
+    <Compile Include="PCIDeviceBridge.cs" />
+    <Compile Include="PCIDeviceCardbus.cs" />
+    <Compile Include="PCIDeviceNormal.cs" />
     <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RTC.cs" />
@@ -142,6 +148,7 @@
     <Content Include="BlockDevice\ATA.html" />
     <Content Include="Drivers\ReadMe.html" />
     <Content Include="Keyboard.html" />
+    <Content Include="PCI.html" />
     <Content Include="PIT.html" />
     <Content Include="RTC.html" />
     <Content Include="TextScreen.html" />

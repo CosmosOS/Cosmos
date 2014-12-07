@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU
         // List of asssemblies found during scan. We cannot use the list of loaded
         // assemblies because the loaded list includes compilers, etc, and also possibly
         // other unused assemblies. So instead we collect a list of assemblies as we scan.
-        protected List<Assembly> mUsedAssemblies = new List<Assembly>();
+        internal List<Assembly> mUsedAssemblies = new List<Assembly>();
 
         protected OurHashSet<_MemberInfo> mItems = new OurHashSet<_MemberInfo>();
         protected List<object> mItemsList = new List<object>();

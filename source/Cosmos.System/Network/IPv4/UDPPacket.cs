@@ -3,7 +3,7 @@ using Sys = System;
 
 namespace Cosmos.System.Network.IPv4
 {
-    internal class UDPPacket : IPPacket
+    public class UDPPacket : IPPacket
     {
         protected UInt16 sourcePort;
         protected UInt16 destPort;
@@ -39,11 +39,11 @@ namespace Cosmos.System.Network.IPv4
             : base()
         { }
 
-        internal UDPPacket(byte[] rawData)
+        public UDPPacket(byte[] rawData)
             : base(rawData)
         {}
 
-        internal UDPPacket(Address source, Address dest, UInt16 srcPort, UInt16 destPort, byte[] data)
+        public UDPPacket(Address source, Address dest, UInt16 srcPort, UInt16 destPort, byte[] data)
             : base((UInt16)(data.Length + 8), 17, source, dest)
         {
             mRawData[this.dataOffset + 0] = (byte)((srcPort >> 8) & 0xFF);
