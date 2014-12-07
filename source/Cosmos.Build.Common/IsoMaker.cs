@@ -14,19 +14,13 @@ namespace Cosmos.Build.Common {
         File.Delete(aIsoPathname);
       }
       
-      //// We copy and rename in the process to Cosmos.bin becaue the .cfg is currently
-      //// hardcoded to Cosmos.bin.
-      //string xOutputBin = Path.Combine(xPath, "Cosmos.bin");
-      //File.Copy(xInputPathname, xOutputBin, true);
-
       string xIsoLinux = Path.Combine(xPath, "isolinux.bin");
       File.SetAttributes(xIsoLinux, FileAttributes.Normal);
 
        var xPSI = new ProcessStartInfo(
            Path.Combine(CosmosPaths.Tools, "mkisofs.exe"),
-           String.Format("-R -b \"{0}\" -no-emul-boot -boot-load-size 4 -boot-info-table -o \"{1}\" .",
-               xIsoLinux,
-               aIsoPathname)
+           String.Format("-R -b \"{0}\" -no-emul-boot -boot-load-size 4 -boot-info-table -o \"{1}\" \"{2}\"",
+               xIsoLinux,               aIsoPathname, xPath)
        );
        xPSI.UseShellExecute = false;
        xPSI.CreateNoWindow = true;
