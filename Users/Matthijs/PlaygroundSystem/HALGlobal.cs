@@ -34,7 +34,7 @@ namespace PlaygroundSystem
             NetworkStack.ConfigIP(xNic, new Config(new Address(192, 168, 17, 100), new Address(255, 255, 255, 0)));
 
             var xClient = new UdpClient(15);
-            xClient.Connect(new Address(192, 168, 17, 101), 25);
+            xClient.Connect(new Address(192, 168, 17, 1), 25);
             xClient.Send(new byte[]
                          {
                              1,

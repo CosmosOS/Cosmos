@@ -135,11 +135,13 @@ namespace Cosmos.System.Network.IPv4
                 BufferEntry entry = queue[e];
                 if (entry.Status == BufferEntry.EntryStatus.ARP_SENT)
                 {
+                    var xDestIP = entry.Packet.DestinationIP.Hash;
+                    var xSenderIP = arp_reply.SenderIP.Hash;
                     if (entry.Packet.DestinationIP.CompareTo(arp_reply.SenderIP) == 0)
                     {
                         entry.Packet.DestinationMAC = arp_reply.SenderMAC;
 
-                        entry.Status = BufferEntry.EntryStatus.JUST_SEND;
+                        entry.Status = BufferEntry.EntryStatus.DONE;
                     }
                 }
                 else if (entry.Status == BufferEntry.EntryStatus.ROUTE_ARP_SENT)

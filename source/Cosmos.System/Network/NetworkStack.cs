@@ -47,8 +47,13 @@ namespace Cosmos.System.Network
 
         internal static void HandlePacket(byte[] packetData)
         {
-            //Sys.Console.Write("Received Packet Length=");
-            //Sys.Console.WriteLine(packetData.Length);
+            Sys.Console.Write("Received Packet Length=");
+            if (packetData == null)
+            {
+                Sys.Console.WriteLine("**NULL**");
+                return;
+            }
+            Sys.Console.WriteLine(packetData.Length);
             //Sys.Console.WriteLine(BitConverter.ToString(packetData));
 
             UInt16 etherType = (UInt16)((packetData[12] << 8) | packetData[13]);

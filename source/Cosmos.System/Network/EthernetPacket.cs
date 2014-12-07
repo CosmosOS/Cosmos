@@ -22,7 +22,6 @@ namespace Cosmos.System.Network
 
         protected virtual void initFields()
         {
-            global::System.Console.WriteLine("EthernetPacket.InitFields called");
             destMAC = new MACAddress(mRawData, 0);
             srcMAC = new MACAddress(mRawData, 6);
             aEtherType = (UInt16)((mRawData[12] << 8) | mRawData[13]);

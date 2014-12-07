@@ -76,7 +76,6 @@ namespace Cosmos.System.Network.ARP
 
         protected override void initFields()
         {
-            Sys.Console.WriteLine("ARPPacket.initFields called");
             base.initFields();
             aHardwareType = (UInt16)((mRawData[14] << 8) | mRawData[15]);
             aProtocolType = (UInt16)((mRawData[16] << 8) | mRawData[17]);
