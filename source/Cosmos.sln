@@ -178,6 +178,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlaygroundSystem", "..\User
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System.VSTests", "Cosmos.System.VSTests\Cosmos.System.VSTests.csproj", "{AAA0328F-60E1-442D-B949-A13DD34BD0AD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlaygroundHAL", "..\Users\Matthijs\PlaygroundHAL\PlaygroundHAL.csproj", "{E978986A-8160-4979-919E-F099A43EF146}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -823,6 +825,18 @@ Global
 		{AAA0328F-60E1-442D-B949-A13DD34BD0AD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{AAA0328F-60E1-442D-B949-A13DD34BD0AD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{AAA0328F-60E1-442D-B949-A13DD34BD0AD}.Release|x86.ActiveCfg = Release|Any CPU
+		{E978986A-8160-4979-919E-F099A43EF146}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E978986A-8160-4979-919E-F099A43EF146}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E978986A-8160-4979-919E-F099A43EF146}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{E978986A-8160-4979-919E-F099A43EF146}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E978986A-8160-4979-919E-F099A43EF146}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E978986A-8160-4979-919E-F099A43EF146}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E978986A-8160-4979-919E-F099A43EF146}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E978986A-8160-4979-919E-F099A43EF146}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E978986A-8160-4979-919E-F099A43EF146}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{E978986A-8160-4979-919E-F099A43EF146}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E978986A-8160-4979-919E-F099A43EF146}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E978986A-8160-4979-919E-F099A43EF146}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -886,5 +900,6 @@ Global
 		{8E3537CB-D0F9-4CFB-AE6F-72B465CA03F6} = {A0073D91-D9D3-4A90-9845-10E5CDBA5511}
 		{82F6DDA3-E45D-4E7A-AA09-85FC2EDE2F76} = {A0073D91-D9D3-4A90-9845-10E5CDBA5511}
 		{AAA0328F-60E1-442D-B949-A13DD34BD0AD} = {056A94C1-6C75-4730-B62A-675779CD07FB}
+		{E978986A-8160-4979-919E-F099A43EF146} = {A0073D91-D9D3-4A90-9845-10E5CDBA5511}
 	EndGlobalSection
 EndGlobal

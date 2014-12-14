@@ -35,7 +35,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HALGlobal.cs" />
+    <Compile Include="SystemGlobal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -50,6 +50,10 @@
     <ProjectReference Include="..\..\..\source\Cosmos.System\Cosmos.System.csproj">
       <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
       <Name>Cosmos.System</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PlaygroundHAL\PlaygroundHAL.csproj">
+      <Project>{E978986A-8160-4979-919E-F099A43EF146}</Project>
+      <Name>PlaygroundHAL</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
