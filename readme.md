@@ -12,7 +12,7 @@ Download
 
 Cosmos is available in two forms:
 * **User Kit** - User Kit allows you to develop your own custom operating system in Visual Studio. 
-  If you are new to Cosmos, start here. Latest Release
+  If you are new to Cosmos, start here. [Latest Release](http://cosmos.codeplex.com/releases)
 * **Dev Kit** - Dev Kit is the full Cosmos source with build tools. 
   If you need to modify core Cosmos functions or modify built in drivers, boot, compiler, etc then you will need to use Dev Kit.
   Building Dev Kit - Building from source is easy with our automated builder.
