@@ -141,7 +141,9 @@ namespace Cosmos.Core
             public uint UserESP;
         }
         #endregion
-        
+
+        private static uint mLastKnownAddress;
+
         private static IRQDelegate[] mIRQ_Handlers = new IRQDelegate[256];
 
         // We used to use:
@@ -396,7 +398,9 @@ namespace Cosmos.Core
 
         public static void HandleInterrupt_06(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP, "Invalid Opcode", "EInvalidOpcode", ref aContext, true);
+            // although mLastKnownAddress is a static, we need to get it here, any subsequent calls will change the value!!!
+            var xLastKnownAddress = mLastKnownAddress;
+            HandleException(aContext.EIP, "Invalid Opcode", "EInvalidOpcode", ref aContext, xLastKnownAddress);
         }
 
         public static void HandleInterrupt_07(ref IRQContext aContext)
@@ -472,7 +476,7 @@ namespace Cosmos.Core
 
         #endregion
 
-        private static void HandleException(uint aEIP, string aDescription, string aName, ref IRQContext ctx, bool printOriginalEIP = false)
+        private static void HandleException(uint aEIP, string aDescription, string aName, ref IRQContext ctx, uint lastKnownAddressValue = 0)
         {
           // At this point we are in a very unstable state.
           // Try not to use any Cosmos routines, just
@@ -514,18 +518,18 @@ namespace Cosmos.Core
                 PutErrorChar(0, 25,'*');
                 PutErrorChar(0, 26,' ');
 
-                if (printOriginalEIP)
+                if (lastKnownAddressValue != 0)
                 {
-                    PutErrorString(1, 0, "Original EIP: 0x");
+                    PutErrorString(1, 0, "Last known address: 0x");
                     // start eip at 16
-                    PutErrorChar(1, 16, xHex[(int)((aEIP >> 28) & 0xF)]);
-                    PutErrorChar(1, 17, xHex[(int)((aEIP >> 24) & 0xF)]);
-                    PutErrorChar(1, 18, xHex[(int)((aEIP >> 20) & 0xF)]);
-                    PutErrorChar(1, 19, xHex[(int)((aEIP >> 16) & 0xF)]);
-                    PutErrorChar(1, 20, xHex[(int)((aEIP >> 12) & 0xF)]);
-                    PutErrorChar(1, 21, xHex[(int)((aEIP >> 8) & 0xF)]);
-                    PutErrorChar(1, 22, xHex[(int)((aEIP >> 4) & 0xF)]);
-                    PutErrorChar(1, 23, xHex[(int)(aEIP & 0xF)]);
+                    PutErrorChar(1, 16, xHex[(int)((lastKnownAddressValue >> 28) & 0xF)]);
+                    PutErrorChar(1, 17, xHex[(int)((lastKnownAddressValue >> 24) & 0xF)]);
+                    PutErrorChar(1, 18, xHex[(int)((lastKnownAddressValue >> 20) & 0xF)]);
+                    PutErrorChar(1, 19, xHex[(int)((lastKnownAddressValue >> 16) & 0xF)]);
+                    PutErrorChar(1, 20, xHex[(int)((lastKnownAddressValue >> 12) & 0xF)]);
+                    PutErrorChar(1, 21, xHex[(int)((lastKnownAddressValue >> 8) & 0xF)]);
+                    PutErrorChar(1, 22, xHex[(int)((lastKnownAddressValue >> 4) & 0xF)]);
+                    PutErrorChar(1, 23, xHex[(int)(lastKnownAddressValue & 0xF)]);
                 }
 
             }

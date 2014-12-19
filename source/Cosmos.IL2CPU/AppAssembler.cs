@@ -64,10 +64,6 @@ namespace Cosmos.IL2CPU
 
         protected void MethodBegin(MethodInfo aMethod)
         {
-            if (aMethod.MethodBase.GetFullName() == "SystemUInt64SystemCollectionsGenericList1SystemUInt64get_ItemSystemInt32")
-            {
-                Console.Write("");
-            }
             new Comment("---------------------------------------------------------");
             new Comment("Assembly: " + aMethod.MethodBase.DeclaringType.Assembly.FullName);
             new Comment("Type: " + aMethod.MethodBase.DeclaringType.ToString());
@@ -285,11 +281,22 @@ namespace Cosmos.IL2CPU
             {
                 xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
             }
-            if (aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
+            var xMethodLabel = ILOp.GetMethodLabel(aMethod);
+            if (aMethod.PlugMethod == null
+                && !aMethod.IsInlineAssembler)
             {
-                new Cosmos.Assembler.Label(ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameNormal);
+                new Cosmos.Assembler.Label(xMethodLabel + EndOfMethodLabelNameNormal);
+
+                new Comment("Following code is for debugging. Adjust accordingly!");
+                new Mov
+                {
+                  DestinationRef = ElementReference.New("static_field__Cosmos_Core_INTs_mLastKnownAddress"),
+                  DestinationIsIndirect = true,
+                  SourceRef = ElementReference.New(xMethodLabel + EndOfMethodLabelNameNormal)
+                };
             }
-            new Mov { DestinationReg = Registers.ECX, SourceValue = 0 };
+
+          new Mov { DestinationReg = Registers.ECX, SourceValue = 0 };
             var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
                                   select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
             if (!aMethod.MethodBase.IsStatic)
@@ -343,7 +350,7 @@ namespace Cosmos.IL2CPU
                 }
                 // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
             }
-            var xLabelExc = ILOp.GetMethodLabel(aMethod) + EndOfMethodLabelNameException;
+            var xLabelExc = xMethodLabel + EndOfMethodLabelNameException;
             new Cosmos.Assembler.Label(xLabelExc);
             if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
             {
