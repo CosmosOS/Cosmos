@@ -223,6 +223,7 @@ namespace XSharp.Compiler {
       if (mInIntHandler) {
         aAsm += "IRet";
       } else {
+        aAsm += "mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], " + GetNamespace() + "_" + mFuncName + "_Exit";
         aAsm += "Ret";
       }
       mFuncName = null;

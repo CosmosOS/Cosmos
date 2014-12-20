@@ -44221,7 +44221,7 @@ Kernel_Start:
 		SystemVoidCosmosCoreINTsHandleExceptionSystemUInt32SystemStringSystemStringCosmosCoreINTsIRQContextSystemUInt32.IL_016D:
 			NOP
 			push dword 0x1
-			push dword 0x10
+			push dword 0x16
 			mov dword EAX, StringLiteral00F8
 			push dword EAX
 			push dword [EBP + 8]
@@ -44249,7 +44249,7 @@ Kernel_Start:
 		SystemVoidCosmosCoreINTsHandleExceptionSystemUInt32SystemStringSystemStringCosmosCoreINTsIRQContextSystemUInt32.IL_0188:
 			NOP
 			push dword 0x1
-			push dword 0x11
+			push dword 0x17
 			mov dword EAX, StringLiteral00F9
 			push dword EAX
 			push dword [EBP + 8]
@@ -44277,7 +44277,7 @@ Kernel_Start:
 		SystemVoidCosmosCoreINTsHandleExceptionSystemUInt32SystemStringSystemStringCosmosCoreINTsIRQContextSystemUInt32.IL_01A3:
 			NOP
 			push dword 0x1
-			push dword 0x12
+			push dword 0x18
 			mov dword EAX, StringLiteral00FA
 			push dword EAX
 			push dword [EBP + 8]
@@ -44305,7 +44305,7 @@ Kernel_Start:
 		SystemVoidCosmosCoreINTsHandleExceptionSystemUInt32SystemStringSystemStringCosmosCoreINTsIRQContextSystemUInt32.IL_01BE:
 			NOP
 			push dword 0x1
-			push dword 0x13
+			push dword 0x19
 			mov dword EAX, StringLiteral00FB
 			push dword EAX
 			push dword [EBP + 8]
@@ -44333,7 +44333,7 @@ Kernel_Start:
 		SystemVoidCosmosCoreINTsHandleExceptionSystemUInt32SystemStringSystemStringCosmosCoreINTsIRQContextSystemUInt32.IL_01D9:
 			NOP
 			push dword 0x1
-			push dword 0x14
+			push dword 0x1A
 			mov dword EAX, StringLiteral00FC
 			push dword EAX
 			push dword [EBP + 8]
@@ -44361,7 +44361,7 @@ Kernel_Start:
 		SystemVoidCosmosCoreINTsHandleExceptionSystemUInt32SystemStringSystemStringCosmosCoreINTsIRQContextSystemUInt32.IL_01F4:
 			NOP
 			push dword 0x1
-			push dword 0x15
+			push dword 0x1B
 			mov dword EAX, StringLiteral00FD
 			push dword EAX
 			push dword [EBP + 8]
@@ -44389,7 +44389,7 @@ Kernel_Start:
 		SystemVoidCosmosCoreINTsHandleExceptionSystemUInt32SystemStringSystemStringCosmosCoreINTsIRQContextSystemUInt32.IL_020E:
 			NOP
 			push dword 0x1
-			push dword 0x16
+			push dword 0x1C
 			mov dword EAX, StringLiteral00FE
 			push dword EAX
 			push dword [EBP + 8]
@@ -44417,7 +44417,7 @@ Kernel_Start:
 		SystemVoidCosmosCoreINTsHandleExceptionSystemUInt32SystemStringSystemStringCosmosCoreINTsIRQContextSystemUInt32.IL_0228:
 			NOP
 			push dword 0x1
-			push dword 0x17
+			push dword 0x1D
 			mov dword EAX, StringLiteral00FF
 			push dword EAX
 			push dword [EBP + 8]
