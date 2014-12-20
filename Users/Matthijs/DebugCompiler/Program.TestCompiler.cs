@@ -16,14 +16,14 @@ namespace DebugCompiler
 {
     internal class Program
     {
-        public const string CosmosRoot = @"e:\OpenSource\Cosmos";
+        public const string CosmosRoot = @"C:\Users\Emile\Source\Repos\Cosmos";
         //public const string CosmosRoot = @"c:\Development\Cosmos";
         //public const string CosmosRoot = @"C:\Users\Huge\Documents\Visual Studio 2010\Projects\IL2CPU";
 
         //private const string KernelFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernel.dll";
         //private const string OutputFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernelBoot.asm";
-        private const string KernelFile = CosmosRoot + @"\Users\Matthijs\Playground\bin\Debug\Playground.dll";
-        private const string OutputFile = CosmosRoot + @"\Users\Matthijs\Playground\bin\Debug\PlaygroundBoot.asm";
+        private const string KernelFile = CosmosRoot + @"\Users\Emile\TestBed\TestBed\bin\Debug\TestBed.dll";
+        private const string OutputFile = CosmosRoot + @"\Users\Emile\TestBed\TestBed\bin\Debug\TestBedBoot.asm";
 
         private static void Main(string[] args)
         {
@@ -73,6 +73,7 @@ namespace DebugCompiler
             Console.WriteLine("Run took {0}", xSW.Elapsed);
             Console.WriteLine("Generated {0} Guids", DebugInfo.mLastGuid);
             Console.Out.Flush();
+            Console.ReadKey();
         }
 
         //static void Main()
