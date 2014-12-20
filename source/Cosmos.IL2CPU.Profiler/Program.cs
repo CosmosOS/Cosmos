@@ -40,7 +40,7 @@ namespace Cosmos.IL2CPU.Profiler {
         if (File.Exists(logFile))
             File.Delete(logFile);
 
-        var xAsmblr = new AppAssembler(1);
+        var xAsmblr = new AppAssembler(1, "Cosmos.Assembler.Log");
         using (var xScanner = new ILScanner(xAsmblr))
         {
             xScanner.LogException = (Exception e) =>

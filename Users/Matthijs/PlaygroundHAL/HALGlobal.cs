@@ -11,14 +11,14 @@ namespace PlaygroundHAL
     {
         public static void Test()
         {
-            Heap.SendStatsToDebugger();
-            Heap.SendStatsToDebugger();
+            //Heap.SendStatsToDebugger();
+            //Heap.SendStatsToDebugger();
             new object();
             new object();
             new object();
             new object();
             new object();
-            Heap.SendStatsToDebugger();
+            //Heap.SendStatsToDebugger();
             
         }
     }
