@@ -521,15 +521,15 @@ namespace Cosmos.Core
                 if (lastKnownAddressValue != 0)
                 {
                     PutErrorString(1, 0, "Last known address: 0x");
-                    // start eip at 16
-                    PutErrorChar(1, 16, xHex[(int)((lastKnownAddressValue >> 28) & 0xF)]);
-                    PutErrorChar(1, 17, xHex[(int)((lastKnownAddressValue >> 24) & 0xF)]);
-                    PutErrorChar(1, 18, xHex[(int)((lastKnownAddressValue >> 20) & 0xF)]);
-                    PutErrorChar(1, 19, xHex[(int)((lastKnownAddressValue >> 16) & 0xF)]);
-                    PutErrorChar(1, 20, xHex[(int)((lastKnownAddressValue >> 12) & 0xF)]);
-                    PutErrorChar(1, 21, xHex[(int)((lastKnownAddressValue >> 8) & 0xF)]);
-                    PutErrorChar(1, 22, xHex[(int)((lastKnownAddressValue >> 4) & 0xF)]);
-                    PutErrorChar(1, 23, xHex[(int)(lastKnownAddressValue & 0xF)]);
+                    
+                    PutErrorChar(1, 22, xHex[(int)((lastKnownAddressValue >> 28) & 0xF)]);
+                    PutErrorChar(1, 23, xHex[(int)((lastKnownAddressValue >> 24) & 0xF)]);
+                    PutErrorChar(1, 24, xHex[(int)((lastKnownAddressValue >> 20) & 0xF)]);
+                    PutErrorChar(1, 25, xHex[(int)((lastKnownAddressValue >> 16) & 0xF)]);
+                    PutErrorChar(1, 26, xHex[(int)((lastKnownAddressValue >> 12) & 0xF)]);
+                    PutErrorChar(1, 27, xHex[(int)((lastKnownAddressValue >> 8) & 0xF)]);
+                    PutErrorChar(1, 28, xHex[(int)((lastKnownAddressValue >> 4) & 0xF)]);
+                    PutErrorChar(1, 29, xHex[(int)(lastKnownAddressValue & 0xF)]);
                 }
 
             }
