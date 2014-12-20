@@ -23274,13 +23274,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemArgumentNullExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemVoidSystemThrowHelperThrowArgumentNullExceptionSystemExceptionArgument.IL_0006.NoError8787
+			je near SystemVoidSystemThrowHelperThrowArgumentNullExceptionSystemExceptionArgument.IL_0006.NoError8786
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidSystemThrowHelperThrowArgumentNullExceptionSystemExceptionArgument.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemThrowHelperThrowArgumentNullExceptionSystemExceptionArgument.IL_0006.NoError8787:
+		SystemVoidSystemThrowHelperThrowArgumentNullExceptionSystemExceptionArgument.IL_0006.NoError8786:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -23327,13 +23327,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemArgumentExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemVoidSystemThrowHelperThrowArgumentExceptionSystemExceptionResource.IL_000B.NoError8810
+			je near SystemVoidSystemThrowHelperThrowArgumentExceptionSystemExceptionResource.IL_000B.NoError8809
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidSystemThrowHelperThrowArgumentExceptionSystemExceptionResource.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemThrowHelperThrowArgumentExceptionSystemExceptionResource.IL_000B.NoError8810:
+		SystemVoidSystemThrowHelperThrowArgumentExceptionSystemExceptionResource.IL_000B.NoError8809:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -23651,12 +23651,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidSystemObjectctor
 			test dword ECX, 0x2
-			je near SystemVoidSystemExceptioncctor.IL_0000.NoError8929
+			je near SystemVoidSystemExceptioncctor.IL_0000.NoError8927
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidSystemExceptioncctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemExceptioncctor.IL_0000.NoError8929:
+		SystemVoidSystemExceptioncctor.IL_0000.NoError8927:
 			pop dword EAX
 			push dword EAX
 			call SystemVoidSystemExceptioncctor
@@ -24943,14 +24943,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosDebugKernelDebuggerctorSystemStringSystemString
 			test dword ECX, 0x2
-			je near SystemVoidCosmosSystemKernelctor.IL_000B.NoError9582
+			je near SystemVoidCosmosSystemKernelctor.IL_000B.NoError9580
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosSystemKernelctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosSystemKernelctor.IL_000B.NoError9582:
+		SystemVoidCosmosSystemKernelctor.IL_000B.NoError9580:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -25047,14 +25047,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosDebugKernelDebuggerctorSystemStringSystemString
 			test dword ECX, 0x2
-			je near SystemVoidCosmosSystemGlobalcctor.IL_000A.NoError9622
+			je near SystemVoidCosmosSystemGlobalcctor.IL_000A.NoError9620
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosSystemGlobalcctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosSystemGlobalcctor.IL_000A.NoError9622:
+		SystemVoidCosmosSystemGlobalcctor.IL_000A.NoError9620:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -25075,12 +25075,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosSystemConsolector
 			test dword ECX, 0x2
-			je near SystemVoidCosmosSystemGlobalcctor.IL_0014.NoError9630
+			je near SystemVoidCosmosSystemGlobalcctor.IL_0014.NoError9628
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosSystemGlobalcctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosSystemGlobalcctor.IL_0014.NoError9630:
+		SystemVoidCosmosSystemGlobalcctor.IL_0014.NoError9628:
 			pop dword EAX
 			push dword EAX
 			call SystemVoidCosmosSystemGlobalcctor
@@ -25131,12 +25131,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosCorePICctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreBootstrapInit.IL_0007.NoError9654
+			je near SystemVoidCosmosCoreBootstrapInit.IL_0007.NoError9652
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosCoreBootstrapInit.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreBootstrapInit.IL_0007.NoError9654:
+		SystemVoidCosmosCoreBootstrapInit.IL_0007.NoError9652:
 			pop dword EAX
 			push dword EAX
 			call SystemVoidCosmosCoreBootstrapcctor
@@ -25584,12 +25584,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosHALTextScreenctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosSystemConsolector.IL_000F.NoError9909
+			je near SystemVoidCosmosSystemConsolector.IL_000F.NoError9907
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosSystemConsolector.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosSystemConsolector.IL_000F.NoError9909:
+		SystemVoidCosmosSystemConsolector.IL_000F.NoError9907:
 			pop dword EAX
 			push dword EAX
 			mov dword ECX, [ESP + 4]
@@ -25679,12 +25679,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosCoreIOGroupTextScreenctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALTextScreenctor.IL_0011.NoError9956
+			je near SystemVoidCosmosHALTextScreenctor.IL_0011.NoError9954
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosHALTextScreenctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALTextScreenctor.IL_0011.NoError9956:
+		SystemVoidCosmosHALTextScreenctor.IL_0011.NoError9954:
 			pop dword EAX
 			push dword EAX
 			mov dword ECX, [ESP + 4]
@@ -26931,13 +26931,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreMemoryBlock08set_ItemSystemUInt32SystemByte.IL_0014.NoError10575
+			je near SystemVoidCosmosCoreMemoryBlock08set_ItemSystemUInt32SystemByte.IL_0014.NoError10572
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreMemoryBlock08set_ItemSystemUInt32SystemByte.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreMemoryBlock08set_ItemSystemUInt32SystemByte.IL_0014.NoError10575:
+		SystemVoidCosmosCoreMemoryBlock08set_ItemSystemUInt32SystemByte.IL_0014.NoError10572:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -27502,14 +27502,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidSystemTextUnicodeEncodingctorSystemBooleanSystemBoolean
 			test dword ECX, 0x2
-			je near SystemVoidSystemConsolecctor.IL_0002.NoError10844
+			je near SystemVoidSystemConsolecctor.IL_0002.NoError10841
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidSystemConsolecctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemConsolecctor.IL_0002.NoError10844:
+		SystemVoidSystemConsolecctor.IL_0002.NoError10841:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -28530,13 +28530,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOGroupPICctorSystemBoolean
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCorePICctor.IL_0002.NoError11434
+			je near SystemVoidCosmosCorePICctor.IL_0002.NoError11430
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCorePICctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCorePICctor.IL_0002.NoError11434:
+		SystemVoidCosmosCorePICctor.IL_0002.NoError11430:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -28563,13 +28563,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOGroupPICctorSystemBoolean
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCorePICctor.IL_000E.NoError11444
+			je near SystemVoidCosmosCorePICctor.IL_000E.NoError11440
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCorePICctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCorePICctor.IL_000E.NoError11444:
+		SystemVoidCosmosCorePICctor.IL_000E.NoError11440:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -28698,12 +28698,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosHALKeyboardctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALGlobalInitStaticDevices.IL_002C.NoError11521
+			je near SystemVoidCosmosHALGlobalInitStaticDevices.IL_002C.NoError11517
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosHALGlobalInitStaticDevices.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALGlobalInitStaticDevices.IL_002C.NoError11521:
+		SystemVoidCosmosHALGlobalInitStaticDevices.IL_002C.NoError11517:
 			pop dword EAX
 			push dword EAX
 			call SystemVoidCosmosHALGlobalcctor
@@ -28831,12 +28831,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosCoreIOGroupRTCctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALRTCcctor.IL_0000.NoError11594
+			je near SystemVoidCosmosHALRTCcctor.IL_0000.NoError11590
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosHALRTCcctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALRTCcctor.IL_0000.NoError11594:
+		SystemVoidCosmosHALRTCcctor.IL_0000.NoError11590:
 			pop dword EAX
 			push dword EAX
 			call SystemVoidCosmosHALRTCcctor
@@ -29085,14 +29085,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_000B.NoError11706
+			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_000B.NoError11702
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreIOGroupTextScreenctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_000B.NoError11706:
+		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_000B.NoError11702:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -29120,13 +29120,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_001B.NoError11716
+			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_001B.NoError11712
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupTextScreenctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_001B.NoError11716:
+		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_001B.NoError11712:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -29153,13 +29153,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_002B.NoError11726
+			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_002B.NoError11722
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupTextScreenctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_002B.NoError11726:
+		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_002B.NoError11722:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -29186,13 +29186,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_003B.NoError11736
+			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_003B.NoError11732
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupTextScreenctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_003B.NoError11736:
+		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_003B.NoError11732:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -29219,13 +29219,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_004B.NoError11746
+			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_004B.NoError11742
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupTextScreenctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_004B.NoError11746:
+		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_004B.NoError11742:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -29252,13 +29252,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_005B.NoError11756
+			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_005B.NoError11752
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupTextScreenctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_005B.NoError11756:
+		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_005B.NoError11752:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -29285,13 +29285,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_006B.NoError11766
+			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_006B.NoError11762
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupTextScreenctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_006B.NoError11766:
+		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_006B.NoError11762:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -29318,13 +29318,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_007B.NoError11776
+			je near SystemVoidCosmosCoreIOGroupTextScreenctor.IL_007B.NoError11772
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupTextScreenctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_007B.NoError11776:
+		SystemVoidCosmosCoreIOGroupTextScreenctor.IL_007B.NoError11772:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -29402,12 +29402,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosCoreBaseIOGroupsctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreGlobalcctor.IL_0000.NoError11811
+			je near SystemVoidCosmosCoreGlobalcctor.IL_0000.NoError11807
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosCoreGlobalcctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreGlobalcctor.IL_0000.NoError11811:
+		SystemVoidCosmosCoreGlobalcctor.IL_0000.NoError11807:
 			pop dword EAX
 			push dword EAX
 			call SystemVoidCosmosCoreGlobalcctor
@@ -29432,14 +29432,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosDebugKernelDebuggerctorSystemStringSystemString
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreGlobalcctor.IL_0014.NoError11821
+			je near SystemVoidCosmosCoreGlobalcctor.IL_0014.NoError11817
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreGlobalcctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreGlobalcctor.IL_0014.NoError11821:
+		SystemVoidCosmosCoreGlobalcctor.IL_0014.NoError11817:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -29483,12 +29483,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosCoreCPUctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreBootstrapcctor.IL_0000.NoError11835
+			je near SystemVoidCosmosCoreBootstrapcctor.IL_0000.NoError11831
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosCoreBootstrapcctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreBootstrapcctor.IL_0000.NoError11835:
+		SystemVoidCosmosCoreBootstrapcctor.IL_0000.NoError11831:
 			pop dword EAX
 			push dword EAX
 			call SystemVoidCosmosCoreBootstrapcctor
@@ -31636,13 +31636,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0003.NoError13048
+			je near SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0003.NoError13039
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0003.NoError13048:
+		SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0003.NoError13039:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -31669,13 +31669,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0010.NoError13058
+			je near SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0010.NoError13049
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0010.NoError13058:
+		SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0010.NoError13049:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -31730,13 +31730,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0033.NoError13086
+			je near SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0033.NoError13077
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0033.NoError13086:
+		SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0033.NoError13077:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -31770,13 +31770,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0042.NoError13099
+			je near SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0042.NoError13090
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0042.NoError13099:
+		SystemVoidCosmosCoreIOGroupPICctorSystemBoolean.IL_0042.NoError13090:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -40589,13 +40589,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemCollectionsGenericQueue1SystemUInt32ctorSystemInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALKeyboardctor.IL_0022.NoError13572
+			je near SystemVoidCosmosHALKeyboardctor.IL_0022.NoError13561
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALKeyboardctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALKeyboardctor.IL_0022.NoError13572:
+		SystemVoidCosmosHALKeyboardctor.IL_0022.NoError13561:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -40624,14 +40624,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosHALHandleKeyboardDelegatectorSystemObjectSystemIntPtr
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALKeyboardctor.IL_0034.NoError13584
+			je near SystemVoidCosmosHALKeyboardctor.IL_0034.NoError13573
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosHALKeyboardctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALKeyboardctor.IL_0034.NoError13584:
+		SystemVoidCosmosHALKeyboardctor.IL_0034.NoError13573:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -40659,14 +40659,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreINTsIRQDelegatectorSystemObjectSystemIntPtr
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALKeyboardctor.IL_0047.NoError13599
+			je near SystemVoidCosmosHALKeyboardctor.IL_0047.NoError13588
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosHALKeyboardctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALKeyboardctor.IL_0047.NoError13599:
+		SystemVoidCosmosHALKeyboardctor.IL_0047.NoError13588:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -40807,7 +40807,7 @@ Kernel_Start:
 			push dword [ESP + 16]
 			call SystemVoidCosmosHALBlockDeviceAtaPioctorCosmosCoreIOGroupATACosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_001F.NoError13657
+			je near SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_001F.NoError13646
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -40815,7 +40815,7 @@ Kernel_Start:
 			add dword ESP, 0xC
 			jmp SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_001F.NoError13657:
+		SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_001F.NoError13646:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -40931,13 +40931,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosHALBlockDeviceMBRctorSystemBytearray
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_005C.NoError13706
+			je near SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_005C.NoError13695
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_005C.NoError13706:
+		SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_005C.NoError13695:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -41039,13 +41039,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosHALBlockDeviceEBRctorSystemBytearray
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_0092.NoError13742
+			je near SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_0092.NoError13731
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_0092.NoError13742:
+		SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_0092.NoError13731:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -41273,7 +41273,7 @@ Kernel_Start:
 			push dword [ESP + 24]
 			call SystemVoidCosmosHALBlockDevicePartitionctorCosmosHALBlockDeviceBlockDeviceSystemUInt64SystemUInt64
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_012D.NoError13847
+			je near SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_012D.NoError13836
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			add dword ESP, 0x8
@@ -41281,7 +41281,7 @@ Kernel_Start:
 			add dword ESP, 0x14
 			jmp SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_012D.NoError13847:
+		SystemVoidCosmosHALGlobalInitAtaCosmosHALBlockDeviceAtaControllerIdEnumCosmosHALBlockDeviceAtaBusPositionEnum.IL_012D.NoError13836:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x8
@@ -41446,13 +41446,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemCollectionsGenericList1SystemCharctorSystemInt32
 			test dword ECX, 0x2
-			je near SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.IL_0003.NoError13927
+			je near SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.IL_0003.NoError13916
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.END__OF__METHOD_EXCEPTION
 
-		SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.IL_0003.NoError13927:
+		SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.IL_0003.NoError13916:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -42099,12 +42099,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidSystemCollectionsGenericList1SystemCharctor
 			test dword ECX, 0x2
-			je near SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.IL_0161.NoError14231
+			je near SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.IL_0161.NoError14220
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.END__OF__METHOD_EXCEPTION
 
-		SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.IL_0161.NoError14231:
+		SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.IL_0161.NoError14220:
 			pop dword EAX
 			push dword EAX
 			pop dword EAX
@@ -42448,13 +42448,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemStringctorSystemChararray
 			test dword ECX, 0x2
-			je near SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.IL_022A.NoError14403
+			je near SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.IL_022A.NoError14392
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.END__OF__METHOD_EXCEPTION
 
-		SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.IL_022A.NoError14403:
+		SystemStringCosmosSystemPlugsSystemConsoleImplReadLine.IL_022A.NoError14392:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -42494,13 +42494,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupRTCctor.IL_0003.NoError14420
+			je near SystemVoidCosmosCoreIOGroupRTCctor.IL_0003.NoError14409
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupRTCctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupRTCctor.IL_0003.NoError14420:
+		SystemVoidCosmosCoreIOGroupRTCctor.IL_0003.NoError14409:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -42527,13 +42527,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupRTCctor.IL_0010.NoError14430
+			je near SystemVoidCosmosCoreIOGroupRTCctor.IL_0010.NoError14419
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupRTCctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupRTCctor.IL_0010.NoError14430:
+		SystemVoidCosmosCoreIOGroupRTCctor.IL_0010.NoError14419:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -42643,14 +42643,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreMemoryBlock08ctorSystemUInt32SystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.IL_0019.NoError14480
+			je near SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.IL_0019.NoError14467
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.IL_0019.NoError14480:
+		SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.IL_0019.NoError14467:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -42680,14 +42680,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreMemoryBlock16ctorSystemUInt32SystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.IL_0026.NoError14491
+			je near SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.IL_0026.NoError14478
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.IL_0026.NoError14491:
+		SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.IL_0026.NoError14478:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -42717,14 +42717,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreMemoryBlock32ctorSystemUInt32SystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.IL_0033.NoError14502
+			je near SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.IL_0033.NoError14489
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.IL_0033.NoError14502:
+		SystemVoidCosmosCoreMemoryBlockctorSystemUInt32SystemUInt32.IL_0033.NoError14489:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -42809,12 +42809,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosCoreIOGroupKeyboardctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreBaseIOGroupsctor.IL_0001.NoError14546
+			je near SystemVoidCosmosCoreBaseIOGroupsctor.IL_0001.NoError14533
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosCoreBaseIOGroupsctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreBaseIOGroupsctor.IL_0001.NoError14546:
+		SystemVoidCosmosCoreBaseIOGroupsctor.IL_0001.NoError14533:
 			pop dword EAX
 			push dword EAX
 			mov dword ECX, [ESP + 4]
@@ -42838,12 +42838,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosCoreIOGroupPITctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreBaseIOGroupsctor.IL_000C.NoError14555
+			je near SystemVoidCosmosCoreBaseIOGroupsctor.IL_000C.NoError14542
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosCoreBaseIOGroupsctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreBaseIOGroupsctor.IL_000C.NoError14555:
+		SystemVoidCosmosCoreBaseIOGroupsctor.IL_000C.NoError14542:
 			pop dword EAX
 			push dword EAX
 			mov dword ECX, [ESP + 4]
@@ -42867,12 +42867,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosCoreIOGroupTextScreenctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreBaseIOGroupsctor.IL_0017.NoError14564
+			je near SystemVoidCosmosCoreBaseIOGroupsctor.IL_0017.NoError14551
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosCoreBaseIOGroupsctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreBaseIOGroupsctor.IL_0017.NoError14564:
+		SystemVoidCosmosCoreBaseIOGroupsctor.IL_0017.NoError14551:
 			pop dword EAX
 			push dword EAX
 			mov dword ECX, [ESP + 4]
@@ -42898,13 +42898,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOGroupATActorSystemBoolean
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreBaseIOGroupsctor.IL_0023.NoError14574
+			je near SystemVoidCosmosCoreBaseIOGroupsctor.IL_0023.NoError14561
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreBaseIOGroupsctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreBaseIOGroupsctor.IL_0023.NoError14574:
+		SystemVoidCosmosCoreBaseIOGroupsctor.IL_0023.NoError14561:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -42931,13 +42931,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOGroupATActorSystemBoolean
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreBaseIOGroupsctor.IL_002F.NoError14584
+			je near SystemVoidCosmosCoreBaseIOGroupsctor.IL_002F.NoError14571
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreBaseIOGroupsctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreBaseIOGroupsctor.IL_002F.NoError14584:
+		SystemVoidCosmosCoreBaseIOGroupsctor.IL_002F.NoError14571:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -42962,12 +42962,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosCoreIOGroupRTCctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreBaseIOGroupsctor.IL_003A.NoError14593
+			je near SystemVoidCosmosCoreBaseIOGroupsctor.IL_003A.NoError14580
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosCoreBaseIOGroupsctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreBaseIOGroupsctor.IL_003A.NoError14593:
+		SystemVoidCosmosCoreBaseIOGroupsctor.IL_003A.NoError14580:
 			pop dword EAX
 			push dword EAX
 			mov dword ECX, [ESP + 4]
@@ -45560,13 +45560,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemCollectionsGenericList1CosmosHALKeyboardKeyMappingctorSystemInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALKeyboardCreateDefaultKeymap.IL_0007.NoError15850
+			je near SystemVoidCosmosHALKeyboardCreateDefaultKeymap.IL_0007.NoError15834
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALKeyboardCreateDefaultKeymap.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALKeyboardCreateDefaultKeymap.IL_0007.NoError15850:
+		SystemVoidCosmosHALKeyboardCreateDefaultKeymap.IL_0007.NoError15834:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -47285,12 +47285,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidSystemCollectionsGenericList1CosmosHALBlockDeviceMBRPartInfoctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALBlockDeviceMBRctorSystemBytearray.IL_0001.NoError17268
+			je near SystemVoidCosmosHALBlockDeviceMBRctorSystemBytearray.IL_0001.NoError17252
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosHALBlockDeviceMBRctorSystemBytearray.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALBlockDeviceMBRctorSystemBytearray.IL_0001.NoError17268:
+		SystemVoidCosmosHALBlockDeviceMBRctorSystemBytearray.IL_0001.NoError17252:
 			pop dword EAX
 			push dword EAX
 			mov dword ECX, [ESP + 4]
@@ -47391,12 +47391,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidSystemCollectionsGenericList1CosmosHALBlockDeviceEBRPartInfoctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALBlockDeviceEBRctorSystemBytearray.IL_0001.NoError17335
+			je near SystemVoidCosmosHALBlockDeviceEBRctorSystemBytearray.IL_0001.NoError17319
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosHALBlockDeviceEBRctorSystemBytearray.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALBlockDeviceEBRctorSystemBytearray.IL_0001.NoError17335:
+		SystemVoidCosmosHALBlockDeviceEBRctorSystemBytearray.IL_0001.NoError17319:
 			pop dword EAX
 			push dword EAX
 			mov dword ECX, [ESP + 4]
@@ -47630,12 +47630,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidSystemCollectionsGenericList1CosmosHALPCIDevicector
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIEnumerateDevices.IL_0001.NoError17455
+			je near SystemVoidCosmosHALPCIEnumerateDevices.IL_0001.NoError17439
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosHALPCIEnumerateDevices.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIEnumerateDevices.IL_0001.NoError17455:
+		SystemVoidCosmosHALPCIEnumerateDevices.IL_0001.NoError17439:
 			pop dword EAX
 			push dword EAX
 			pop dword EAX
@@ -47846,13 +47846,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupKeyboardctor.IL_0003.NoError17572
+			je near SystemVoidCosmosCoreIOGroupKeyboardctor.IL_0003.NoError17556
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupKeyboardctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupKeyboardctor.IL_0003.NoError17572:
+		SystemVoidCosmosCoreIOGroupKeyboardctor.IL_0003.NoError17556:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -47900,13 +47900,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPITctor.IL_0003.NoError17595
+			je near SystemVoidCosmosCoreIOGroupPITctor.IL_0003.NoError17579
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPITctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPITctor.IL_0003.NoError17595:
+		SystemVoidCosmosCoreIOGroupPITctor.IL_0003.NoError17579:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -47933,13 +47933,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPITctor.IL_0010.NoError17605
+			je near SystemVoidCosmosCoreIOGroupPITctor.IL_0010.NoError17589
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPITctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPITctor.IL_0010.NoError17605:
+		SystemVoidCosmosCoreIOGroupPITctor.IL_0010.NoError17589:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -47966,13 +47966,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPITctor.IL_001D.NoError17615
+			je near SystemVoidCosmosCoreIOGroupPITctor.IL_001D.NoError17599
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPITctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPITctor.IL_001D.NoError17615:
+		SystemVoidCosmosCoreIOGroupPITctor.IL_001D.NoError17599:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -47999,13 +47999,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortWritectorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPITctor.IL_002A.NoError17625
+			je near SystemVoidCosmosCoreIOGroupPITctor.IL_002A.NoError17609
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPITctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPITctor.IL_002A.NoError17625:
+		SystemVoidCosmosCoreIOGroupPITctor.IL_002A.NoError17609:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -48096,13 +48096,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0023.NoError17677
+			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0023.NoError17661
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupATActorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0023.NoError17677:
+		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0023.NoError17661:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -48132,14 +48132,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreIOPortWritectorSystemUInt16SystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0030.NoError17688
+			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0030.NoError17672
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreIOGroupATActorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0030.NoError17688:
+		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0030.NoError17672:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -48170,14 +48170,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16SystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_003D.NoError17699
+			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_003D.NoError17683
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreIOGroupATActorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_003D.NoError17699:
+		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_003D.NoError17683:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -48208,14 +48208,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16SystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_004A.NoError17710
+			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_004A.NoError17694
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreIOGroupATActorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_004A.NoError17710:
+		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_004A.NoError17694:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -48246,14 +48246,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16SystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0057.NoError17721
+			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0057.NoError17705
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreIOGroupATActorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0057.NoError17721:
+		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0057.NoError17705:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -48284,14 +48284,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreIOPortWritectorSystemUInt16SystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0064.NoError17732
+			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0064.NoError17716
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreIOGroupATActorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0064.NoError17732:
+		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0064.NoError17716:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -48322,14 +48322,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreIOPortReadctorSystemUInt16SystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0071.NoError17743
+			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0071.NoError17727
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreIOGroupATActorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0071.NoError17743:
+		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_0071.NoError17727:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -48360,14 +48360,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreIOPortWritectorSystemUInt16SystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_007E.NoError17754
+			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_007E.NoError17738
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreIOGroupATActorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_007E.NoError17754:
+		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_007E.NoError17738:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -48398,14 +48398,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidCosmosCoreIOPortWritectorSystemUInt16SystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_008B.NoError17765
+			je near SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_008B.NoError17749
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidCosmosCoreIOGroupATActorSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_008B.NoError17765:
+		SystemVoidCosmosCoreIOGroupATActorSystemBoolean.IL_008B.NoError17749:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -48472,13 +48472,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemArgumentOutOfRangeExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemVoidSystemTextEncodingctorSystemInt32.IL_0016.NoError17796
+			je near SystemVoidSystemTextEncodingctorSystemInt32.IL_0016.NoError17780
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidSystemTextEncodingctorSystemInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemTextEncodingctorSystemInt32.IL_0016.NoError17796:
+		SystemVoidSystemTextEncodingctorSystemInt32.IL_0016.NoError17780:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -48538,13 +48538,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemTextInternalEncoderBestFitFallbackctorSystemTextEncoding
 			test dword ECX, 0x2
-			je near SystemVoidSystemTextEncodingSetDefaultFallbacks.IL_0002.NoError17823
+			je near SystemVoidSystemTextEncodingSetDefaultFallbacks.IL_0002.NoError17807
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidSystemTextEncodingSetDefaultFallbacks.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemTextEncodingSetDefaultFallbacks.IL_0002.NoError17823:
+		SystemVoidSystemTextEncodingSetDefaultFallbacks.IL_0002.NoError17807:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -48571,13 +48571,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemTextInternalDecoderBestFitFallbackctorSystemTextEncoding
 			test dword ECX, 0x2
-			je near SystemVoidSystemTextEncodingSetDefaultFallbacks.IL_000E.NoError17833
+			je near SystemVoidSystemTextEncodingSetDefaultFallbacks.IL_000E.NoError17817
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidSystemTextEncodingSetDefaultFallbacks.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemTextEncodingSetDefaultFallbacks.IL_000E.NoError17833:
+		SystemVoidSystemTextEncodingSetDefaultFallbacks.IL_000E.NoError17817:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -48792,12 +48792,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosCoreIOGroupMousector
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreBaseIOGroupscctor.IL_0000.NoError17944
+			je near SystemVoidCosmosCoreBaseIOGroupscctor.IL_0000.NoError17928
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosCoreBaseIOGroupscctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreBaseIOGroupscctor.IL_0000.NoError17944:
+		SystemVoidCosmosCoreBaseIOGroupscctor.IL_0000.NoError17928:
 			pop dword EAX
 			push dword EAX
 			call SystemVoidCosmosCoreBaseIOGroupscctor
@@ -48816,12 +48816,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosCoreIOGroupPCSpeakerctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreBaseIOGroupscctor.IL_000A.NoError17952
+			je near SystemVoidCosmosCoreBaseIOGroupscctor.IL_000A.NoError17936
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosCoreBaseIOGroupscctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreBaseIOGroupscctor.IL_000A.NoError17952:
+		SystemVoidCosmosCoreBaseIOGroupscctor.IL_000A.NoError17936:
 			pop dword EAX
 			push dword EAX
 			call SystemVoidCosmosCoreBaseIOGroupscctor
@@ -49344,7 +49344,7 @@ Kernel_Start:
 			push dword [ESP + 16]
 			call SystemVoidCosmosHALKeyboardKeyMappingctorSystemUInt32SystemCharSystemConsoleKey
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALKeyboardAddKeySystemUInt32SystemCharSystemConsoleKey.IL_000A.NoError18140
+			je near SystemVoidCosmosHALKeyboardAddKeySystemUInt32SystemCharSystemConsoleKey.IL_000A.NoError18123
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -49352,7 +49352,7 @@ Kernel_Start:
 			add dword ESP, 0xC
 			jmp SystemVoidCosmosHALKeyboardAddKeySystemUInt32SystemCharSystemConsoleKey.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALKeyboardAddKeySystemUInt32SystemCharSystemConsoleKey.IL_000A.NoError18140:
+		SystemVoidCosmosHALKeyboardAddKeySystemUInt32SystemCharSystemConsoleKey.IL_000A.NoError18123:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -50285,12 +50285,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidSystemCollectionsGenericList1CosmosHALBlockDeviceBlockDevicector
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALBlockDeviceBlockDevicecctor.IL_0000.NoError18540
+			je near SystemVoidCosmosHALBlockDeviceBlockDevicecctor.IL_0000.NoError18523
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosHALBlockDeviceBlockDevicecctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALBlockDeviceBlockDevicecctor.IL_0000.NoError18540:
+		SystemVoidCosmosHALBlockDeviceBlockDevicecctor.IL_0000.NoError18523:
 			pop dword EAX
 			push dword EAX
 			call SystemVoidCosmosHALBlockDeviceBlockDevicecctor
@@ -50709,7 +50709,7 @@ Kernel_Start:
 			push dword [ESP + 16]
 			call SystemVoidCosmosHALBlockDeviceMBRPartInfoctorSystemByteSystemUInt32SystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALBlockDeviceMBRParsePartitionSystemBytearraySystemUInt32.IL_005F.NoError18756
+			je near SystemVoidCosmosHALBlockDeviceMBRParsePartitionSystemBytearraySystemUInt32.IL_005F.NoError18739
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -50717,7 +50717,7 @@ Kernel_Start:
 			add dword ESP, 0xC
 			jmp SystemVoidCosmosHALBlockDeviceMBRParsePartitionSystemBytearraySystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALBlockDeviceMBRParsePartitionSystemBytearraySystemUInt32.IL_005F.NoError18756:
+		SystemVoidCosmosHALBlockDeviceMBRParsePartitionSystemBytearraySystemUInt32.IL_005F.NoError18739:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -50958,7 +50958,7 @@ Kernel_Start:
 			push dword [ESP + 16]
 			call SystemVoidCosmosHALBlockDeviceEBRPartInfoctorSystemByteSystemUInt32SystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALBlockDeviceEBRParsePartitionSystemBytearraySystemUInt32.IL_004F.NoError18866
+			je near SystemVoidCosmosHALBlockDeviceEBRParsePartitionSystemBytearraySystemUInt32.IL_004F.NoError18849
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -50966,7 +50966,7 @@ Kernel_Start:
 			add dword ESP, 0xC
 			jmp SystemVoidCosmosHALBlockDeviceEBRParsePartitionSystemBytearraySystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALBlockDeviceEBRParsePartitionSystemBytearraySystemUInt32.IL_004F.NoError18866:
+		SystemVoidCosmosHALBlockDeviceEBRParsePartitionSystemBytearraySystemUInt32.IL_004F.NoError18849:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -51159,7 +51159,7 @@ Kernel_Start:
 			push dword [ESP + 16]
 			call SystemVoidCosmosHALPCIDevicectorSystemUInt32SystemUInt32SystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_000C.NoError18954
+			je near SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_000C.NoError18937
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -51167,7 +51167,7 @@ Kernel_Start:
 			add dword ESP, 0xC
 			jmp SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_000C.NoError18954:
+		SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_000C.NoError18937:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -51282,7 +51282,7 @@ Kernel_Start:
 			push dword [ESP + 16]
 			call SystemVoidCosmosHALPCIDevicectorSystemUInt32SystemUInt32SystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_003C.NoError18999
+			je near SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_003C.NoError18982
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -51290,7 +51290,7 @@ Kernel_Start:
 			add dword ESP, 0xC
 			jmp SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_003C.NoError18999:
+		SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_003C.NoError18982:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -51347,7 +51347,7 @@ Kernel_Start:
 			push dword [ESP + 16]
 			call SystemVoidCosmosHALPCIDeviceBridgectorSystemUInt32SystemUInt32SystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_0052.NoError19021
+			je near SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_0052.NoError19004
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -51355,7 +51355,7 @@ Kernel_Start:
 			add dword ESP, 0xC
 			jmp SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_0052.NoError19021:
+		SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_0052.NoError19004:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -51477,7 +51477,7 @@ Kernel_Start:
 			push dword [ESP + 16]
 			call SystemVoidCosmosHALPCIDeviceCardbusctorSystemUInt32SystemUInt32SystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_0082.NoError19070
+			je near SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_0082.NoError19053
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -51485,7 +51485,7 @@ Kernel_Start:
 			add dword ESP, 0xC
 			jmp SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_0082.NoError19070:
+		SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_0082.NoError19053:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -51521,7 +51521,7 @@ Kernel_Start:
 			push dword [ESP + 16]
 			call SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_0095.NoError19089
+			je near SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_0095.NoError19072
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -51529,7 +51529,7 @@ Kernel_Start:
 			add dword ESP, 0xC
 			jmp SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_0095.NoError19089:
+		SystemVoidCosmosHALPCIEnumerateBusSystemUInt32SystemUInt32.IL_0095.NoError19072:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -51855,13 +51855,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemTextEncoderReplacementFallbackctorSystemString
 			test dword ECX, 0x2
-			je near SystemVoidSystemTextUnicodeEncodingSetDefaultFallbacks.IL_0025.NoError19260
+			je near SystemVoidSystemTextUnicodeEncodingSetDefaultFallbacks.IL_0025.NoError19243
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidSystemTextUnicodeEncodingSetDefaultFallbacks.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemTextUnicodeEncodingSetDefaultFallbacks.IL_0025.NoError19260:
+		SystemVoidSystemTextUnicodeEncodingSetDefaultFallbacks.IL_0025.NoError19243:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -51889,13 +51889,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemTextDecoderReplacementFallbackctorSystemString
 			test dword ECX, 0x2
-			je near SystemVoidSystemTextUnicodeEncodingSetDefaultFallbacks.IL_0035.NoError19270
+			je near SystemVoidSystemTextUnicodeEncodingSetDefaultFallbacks.IL_0035.NoError19253
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidSystemTextUnicodeEncodingSetDefaultFallbacks.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemTextUnicodeEncodingSetDefaultFallbacks.IL_0035.NoError19270:
+		SystemVoidSystemTextUnicodeEncodingSetDefaultFallbacks.IL_0035.NoError19253:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -52030,13 +52030,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupMousector.IL_0003.NoError19335
+			je near SystemVoidCosmosCoreIOGroupMousector.IL_0003.NoError19318
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupMousector.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupMousector.IL_0003.NoError19335:
+		SystemVoidCosmosCoreIOGroupMousector.IL_0003.NoError19318:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -52063,13 +52063,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupMousector.IL_0010.NoError19345
+			je near SystemVoidCosmosCoreIOGroupMousector.IL_0010.NoError19328
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupMousector.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupMousector.IL_0010.NoError19345:
+		SystemVoidCosmosCoreIOGroupMousector.IL_0010.NoError19328:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -52117,13 +52117,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPCSpeakerctor.IL_0003.NoError19368
+			je near SystemVoidCosmosCoreIOGroupPCSpeakerctor.IL_0003.NoError19351
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPCSpeakerctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPCSpeakerctor.IL_0003.NoError19368:
+		SystemVoidCosmosCoreIOGroupPCSpeakerctor.IL_0003.NoError19351:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -52150,13 +52150,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPCSpeakerctor.IL_0010.NoError19378
+			je near SystemVoidCosmosCoreIOGroupPCSpeakerctor.IL_0010.NoError19361
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPCSpeakerctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPCSpeakerctor.IL_0010.NoError19378:
+		SystemVoidCosmosCoreIOGroupPCSpeakerctor.IL_0010.NoError19361:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -52183,13 +52183,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPCSpeakerctor.IL_001D.NoError19388
+			je near SystemVoidCosmosCoreIOGroupPCSpeakerctor.IL_001D.NoError19371
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPCSpeakerctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPCSpeakerctor.IL_001D.NoError19388:
+		SystemVoidCosmosCoreIOGroupPCSpeakerctor.IL_001D.NoError19371:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -52854,13 +52854,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemExceptionctorSystemString
 			test dword ECX, 0x2
-			je near CosmosHALBlockDeviceAtaPioStatusCosmosHALBlockDeviceAtaPioSendCmdCosmosHALBlockDeviceAtaPioCmdSystemBoolean.IL_0057.NoError19697
+			je near CosmosHALBlockDeviceAtaPioStatusCosmosHALBlockDeviceAtaPioSendCmdCosmosHALBlockDeviceAtaPioCmdSystemBoolean.IL_0057.NoError19680
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp CosmosHALBlockDeviceAtaPioStatusCosmosHALBlockDeviceAtaPioSendCmdCosmosHALBlockDeviceAtaPioCmdSystemBoolean.END__OF__METHOD_EXCEPTION
 
-		CosmosHALBlockDeviceAtaPioStatusCosmosHALBlockDeviceAtaPioSendCmdCosmosHALBlockDeviceAtaPioCmdSystemBoolean.IL_0057.NoError19697:
+		CosmosHALBlockDeviceAtaPioStatusCosmosHALBlockDeviceAtaPioSendCmdCosmosHALBlockDeviceAtaPioCmdSystemBoolean.IL_0057.NoError19680:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -53198,13 +53198,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemStringctorSystemChararray
 			test dword ECX, 0x2
-			je near SystemStringCosmosHALBlockDeviceAtaPioGetStringSystemUInt16arraySystemInt32SystemInt32.IL_0036.NoError19830
+			je near SystemStringCosmosHALBlockDeviceAtaPioGetStringSystemUInt16arraySystemInt32SystemInt32.IL_0036.NoError19813
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemStringCosmosHALBlockDeviceAtaPioGetStringSystemUInt16arraySystemInt32SystemInt32.END__OF__METHOD_EXCEPTION
 
-		SystemStringCosmosHALBlockDeviceAtaPioGetStringSystemUInt16arraySystemInt32SystemInt32.IL_0036.NoError19830:
+		SystemStringCosmosHALBlockDeviceAtaPioGetStringSystemUInt16arraySystemInt32SystemInt32.IL_0036.NoError19813:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -53537,13 +53537,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALBlockDeviceBlockDeviceCheckDataSizeSystemBytearraySystemUInt64.IL_0019.NoError19964
+			je near SystemVoidCosmosHALBlockDeviceBlockDeviceCheckDataSizeSystemBytearraySystemUInt64.IL_0019.NoError19947
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALBlockDeviceBlockDeviceCheckDataSizeSystemBytearraySystemUInt64.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALBlockDeviceBlockDeviceCheckDataSizeSystemBytearraySystemUInt64.IL_0019.NoError19964:
+		SystemVoidCosmosHALBlockDeviceBlockDeviceCheckDataSizeSystemBytearraySystemUInt64.IL_0019.NoError19947:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -54871,12 +54871,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidCosmosCoreIOGroupPCIctor
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIDevicectorSystemUInt32SystemUInt32SystemUInt32.IL_0016.NoError20508
+			je near SystemVoidCosmosHALPCIDevicectorSystemUInt32SystemUInt32SystemUInt32.IL_0016.NoError20491
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemVoidCosmosHALPCIDevicectorSystemUInt32SystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIDevicectorSystemUInt32SystemUInt32SystemUInt32.IL_0016.NoError20508:
+		SystemVoidCosmosHALPCIDevicectorSystemUInt32SystemUInt32SystemUInt32.IL_0016.NoError20491:
 			pop dword EAX
 			push dword EAX
 			mov dword ECX, [ESP + 4]
@@ -55348,13 +55348,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosHALPCIBaseAddressBarctorSystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIDeviceBridgectorSystemUInt32SystemUInt32SystemUInt32.IL_0027.NoError20807
+			je near SystemVoidCosmosHALPCIDeviceBridgectorSystemUInt32SystemUInt32SystemUInt32.IL_0027.NoError20790
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALPCIDeviceBridgectorSystemUInt32SystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIDeviceBridgectorSystemUInt32SystemUInt32SystemUInt32.IL_0027.NoError20807:
+		SystemVoidCosmosHALPCIDeviceBridgectorSystemUInt32SystemUInt32SystemUInt32.IL_0027.NoError20790:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -55405,13 +55405,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosHALPCIBaseAddressBarctorSystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIDeviceBridgectorSystemUInt32SystemUInt32SystemUInt32.IL_003C.NoError20828
+			je near SystemVoidCosmosHALPCIDeviceBridgectorSystemUInt32SystemUInt32SystemUInt32.IL_003C.NoError20811
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALPCIDeviceBridgectorSystemUInt32SystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIDeviceBridgectorSystemUInt32SystemUInt32SystemUInt32.IL_003C.NoError20828:
+		SystemVoidCosmosHALPCIDeviceBridgectorSystemUInt32SystemUInt32SystemUInt32.IL_003C.NoError20811:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -56627,13 +56627,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosHALPCIBaseAddressBarctorSystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0027.NoError21581
+			je near SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0027.NoError21564
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0027.NoError21581:
+		SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0027.NoError21564:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -56684,13 +56684,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosHALPCIBaseAddressBarctorSystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_003C.NoError21602
+			je near SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_003C.NoError21585
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_003C.NoError21602:
+		SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_003C.NoError21585:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -56741,13 +56741,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosHALPCIBaseAddressBarctorSystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0051.NoError21623
+			je near SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0051.NoError21606
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0051.NoError21623:
+		SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0051.NoError21606:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -56798,13 +56798,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosHALPCIBaseAddressBarctorSystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0066.NoError21644
+			je near SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0066.NoError21627
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0066.NoError21644:
+		SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0066.NoError21627:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -56855,13 +56855,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosHALPCIBaseAddressBarctorSystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_007B.NoError21665
+			je near SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_007B.NoError21648
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_007B.NoError21665:
+		SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_007B.NoError21648:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -56912,13 +56912,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosHALPCIBaseAddressBarctorSystemUInt32
 			test dword ECX, 0x2
-			je near SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0090.NoError21686
+			je near SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0090.NoError21669
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0090.NoError21686:
+		SystemVoidCosmosHALPCIDeviceNormalctorSystemUInt32SystemUInt32SystemUInt32.IL_0090.NoError21669:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -57155,12 +57155,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidSystemTextEncoderExceptionFallbackctor
 			test dword ECX, 0x2
-			je near SystemTextEncoderFallbackSystemTextEncoderFallbackget_ExceptionFallback.IL_0022.NoError21844
+			je near SystemTextEncoderFallbackSystemTextEncoderFallbackget_ExceptionFallback.IL_0022.NoError21827
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemTextEncoderFallbackSystemTextEncoderFallbackget_ExceptionFallback.END__OF__METHOD_EXCEPTION
 
-		SystemTextEncoderFallbackSystemTextEncoderFallbackget_ExceptionFallback.IL_0022.NoError21844:
+		SystemTextEncoderFallbackSystemTextEncoderFallbackget_ExceptionFallback.IL_0022.NoError21827:
 			pop dword EAX
 			push dword EAX
 			pop dword EAX
@@ -57245,12 +57245,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidSystemTextDecoderExceptionFallbackctor
 			test dword ECX, 0x2
-			je near SystemTextDecoderFallbackSystemTextDecoderFallbackget_ExceptionFallback.IL_0022.NoError21894
+			je near SystemTextDecoderFallbackSystemTextDecoderFallbackget_ExceptionFallback.IL_0022.NoError21877
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemTextDecoderFallbackSystemTextDecoderFallbackget_ExceptionFallback.END__OF__METHOD_EXCEPTION
 
-		SystemTextDecoderFallbackSystemTextDecoderFallbackget_ExceptionFallback.IL_0022.NoError21894:
+		SystemTextDecoderFallbackSystemTextDecoderFallbackget_ExceptionFallback.IL_0022.NoError21877:
 			pop dword EAX
 			push dword EAX
 			pop dword EAX
@@ -57319,13 +57319,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemArgumentNullExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemVoidSystemTextEncoderReplacementFallbackctorSystemString.IL_000E.NoError21931
+			je near SystemVoidSystemTextEncoderReplacementFallbackctorSystemString.IL_000E.NoError21914
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidSystemTextEncoderReplacementFallbackctorSystemString.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemTextEncoderReplacementFallbackctorSystemString.IL_000E.NoError21931:
+		SystemVoidSystemTextEncoderReplacementFallbackctorSystemString.IL_000E.NoError21914:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -57500,13 +57500,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemArgumentExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemVoidSystemTextEncoderReplacementFallbackctorSystemString.IL_006B.NoError22018
+			je near SystemVoidSystemTextEncoderReplacementFallbackctorSystemString.IL_006B.NoError22001
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidSystemTextEncoderReplacementFallbackctorSystemString.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemTextEncoderReplacementFallbackctorSystemString.IL_006B.NoError22018:
+		SystemVoidSystemTextEncoderReplacementFallbackctorSystemString.IL_006B.NoError22001:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -57569,13 +57569,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemArgumentNullExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemVoidSystemTextDecoderReplacementFallbackctorSystemString.IL_000E.NoError22047
+			je near SystemVoidSystemTextDecoderReplacementFallbackctorSystemString.IL_000E.NoError22030
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidSystemTextDecoderReplacementFallbackctorSystemString.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemTextDecoderReplacementFallbackctorSystemString.IL_000E.NoError22047:
+		SystemVoidSystemTextDecoderReplacementFallbackctorSystemString.IL_000E.NoError22030:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -57750,13 +57750,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemArgumentExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemVoidSystemTextDecoderReplacementFallbackctorSystemString.IL_006B.NoError22134
+			je near SystemVoidSystemTextDecoderReplacementFallbackctorSystemString.IL_006B.NoError22117
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidSystemTextDecoderReplacementFallbackctorSystemString.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemTextDecoderReplacementFallbackctorSystemString.IL_006B.NoError22134:
+		SystemVoidSystemTextDecoderReplacementFallbackctorSystemString.IL_006B.NoError22117:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -58384,13 +58384,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPCIctor.IL_0006.NoError22440
+			je near SystemVoidCosmosCoreIOGroupPCIctor.IL_0006.NoError22423
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPCIctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPCIctor.IL_0006.NoError22440:
+		SystemVoidCosmosCoreIOGroupPCIctor.IL_0006.NoError22423:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -58417,13 +58417,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidCosmosCoreIOPortctorSystemUInt16
 			test dword ECX, 0x2
-			je near SystemVoidCosmosCoreIOGroupPCIctor.IL_0016.NoError22450
+			je near SystemVoidCosmosCoreIOGroupPCIctor.IL_0016.NoError22433
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemVoidCosmosCoreIOGroupPCIctor.END__OF__METHOD_EXCEPTION
 
-		SystemVoidCosmosCoreIOGroupPCIctor.IL_0016.NoError22450:
+		SystemVoidCosmosCoreIOGroupPCIctor.IL_0016.NoError22433:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -61611,13 +61611,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemArgumentNullExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemBooleanSystemCharIsSurrogateSystemStringSystemInt32.IL_0008.NoError24048
+			je near SystemBooleanSystemCharIsSurrogateSystemStringSystemInt32.IL_0008.NoError24031
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemBooleanSystemCharIsSurrogateSystemStringSystemInt32.END__OF__METHOD_EXCEPTION
 
-		SystemBooleanSystemCharIsSurrogateSystemStringSystemInt32.IL_0008.NoError24048:
+		SystemBooleanSystemCharIsSurrogateSystemStringSystemInt32.IL_0008.NoError24031:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -61654,13 +61654,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemArgumentOutOfRangeExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemBooleanSystemCharIsSurrogateSystemStringSystemInt32.IL_001C.NoError24066
+			je near SystemBooleanSystemCharIsSurrogateSystemStringSystemInt32.IL_001C.NoError24049
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemBooleanSystemCharIsSurrogateSystemStringSystemInt32.END__OF__METHOD_EXCEPTION
 
-		SystemBooleanSystemCharIsSurrogateSystemStringSystemInt32.IL_001C.NoError24066:
+		SystemBooleanSystemCharIsSurrogateSystemStringSystemInt32.IL_001C.NoError24049:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -61719,13 +61719,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemArgumentNullExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemBooleanSystemCharIsHighSurrogateSystemStringSystemInt32.IL_0008.NoError24096
+			je near SystemBooleanSystemCharIsHighSurrogateSystemStringSystemInt32.IL_0008.NoError24079
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemBooleanSystemCharIsHighSurrogateSystemStringSystemInt32.END__OF__METHOD_EXCEPTION
 
-		SystemBooleanSystemCharIsHighSurrogateSystemStringSystemInt32.IL_0008.NoError24096:
+		SystemBooleanSystemCharIsHighSurrogateSystemStringSystemInt32.IL_0008.NoError24079:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -61770,13 +61770,13 @@ Kernel_Start:
 			push dword [ESP + 8]
 			call SystemVoidSystemArgumentOutOfRangeExceptionctorSystemString
 			test dword ECX, 0x2
-			je near SystemBooleanSystemCharIsHighSurrogateSystemStringSystemInt32.IL_0020.NoError24118
+			je near SystemBooleanSystemCharIsHighSurrogateSystemStringSystemInt32.IL_0020.NoError24101
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			jmp SystemBooleanSystemCharIsHighSurrogateSystemStringSystemInt32.END__OF__METHOD_EXCEPTION
 
-		SystemBooleanSystemCharIsHighSurrogateSystemStringSystemInt32.IL_0020.NoError24118:
+		SystemBooleanSystemCharIsHighSurrogateSystemStringSystemInt32.IL_0020.NoError24101:
 			pop dword EAX
 			add dword ESP, 0x4
 			push dword EAX
@@ -63034,12 +63034,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidSystemObjectctor
 			test dword ECX, 0x2
-			je near SystemObjectCosmosSystemPlugsSystemTextEncoderFallbackImplget_InternalSyncObject.IL_0001.NoError24713
+			je near SystemObjectCosmosSystemPlugsSystemTextEncoderFallbackImplget_InternalSyncObject.IL_0001.NoError24695
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemObjectCosmosSystemPlugsSystemTextEncoderFallbackImplget_InternalSyncObject.END__OF__METHOD_EXCEPTION
 
-		SystemObjectCosmosSystemPlugsSystemTextEncoderFallbackImplget_InternalSyncObject.IL_0001.NoError24713:
+		SystemObjectCosmosSystemPlugsSystemTextEncoderFallbackImplget_InternalSyncObject.IL_0001.NoError24695:
 			pop dword EAX
 			push dword EAX
 			pop dword EAX
@@ -63088,14 +63088,14 @@ Kernel_Start:
 			push dword [ESP + 12]
 			call SystemVoidSystemArgumentExceptionctorSystemStringSystemString
 			test dword ECX, 0x2
-			je near SystemVoidSystemThreadingMonitorThrowLockTakenException.IL_000F.NoError24735
+			je near SystemVoidSystemThreadingMonitorThrowLockTakenException.IL_000F.NoError24717
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x4
 			add dword ESP, 0x8
 			jmp SystemVoidSystemThreadingMonitorThrowLockTakenException.END__OF__METHOD_EXCEPTION
 
-		SystemVoidSystemThreadingMonitorThrowLockTakenException.IL_000F.NoError24735:
+		SystemVoidSystemThreadingMonitorThrowLockTakenException.IL_000F.NoError24717:
 			pop dword EAX
 			add dword ESP, 0x4
 			add dword ESP, 0x4
@@ -63151,12 +63151,12 @@ Kernel_Start:
 			mov dword [EAX + 8], 0x0
 			call SystemVoidSystemObjectctor
 			test dword ECX, 0x2
-			je near SystemObjectCosmosSystemPlugsSystemTextDecoderFallbackImplget_InternalSyncObject.IL_0001.NoError24758
+			je near SystemObjectCosmosSystemPlugsSystemTextDecoderFallbackImplget_InternalSyncObject.IL_0001.NoError24740
 			add dword ESP, 0x4
 			add dword ESP, 0x0
 			jmp SystemObjectCosmosSystemPlugsSystemTextDecoderFallbackImplget_InternalSyncObject.END__OF__METHOD_EXCEPTION
 
-		SystemObjectCosmosSystemPlugsSystemTextDecoderFallbackImplget_InternalSyncObject.IL_0001.NoError24758:
+		SystemObjectCosmosSystemPlugsSystemTextDecoderFallbackImplget_InternalSyncObject.IL_0001.NoError24740:
 			pop dword EAX
 			push dword EAX
 			pop dword EAX

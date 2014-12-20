@@ -8,7 +8,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Cosmos.Compiler.Tests.SimpleWriteLine.Tests
 {
     [TestClass]
-    //[UseReporter(typeof(VisualStudioReporter))]
+    [UseReporter(typeof(VisualStudioReporter))]
     public class DoTest: BaseTest
     {
         [TestMethod]

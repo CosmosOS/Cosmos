@@ -456,15 +456,11 @@ namespace Cosmos.IL2CPU
             mLog.Flush();
             if (aMethod.MethodAssembler != null)
             {
-                mLog.WriteLine("Emitted using MethodAssembler", aMethod.MethodBase.GetFullName());
-                mLog.Flush();
                 var xAssembler = (AssemblerMethod)Activator.CreateInstance(aMethod.MethodAssembler);
                 xAssembler.AssembleNew(Assembler, aMethod.PluggedMethod);
             }
             else if (aMethod.IsInlineAssembler)
             {
-                mLog.WriteLine("Emitted using Inline MethodAssembler", aMethod.MethodBase.GetFullName());
-                mLog.Flush();
                 aMethod.MethodBase.Invoke("", new object[aMethod.MethodBase.GetParameters().Length]);
             }
             else
