@@ -45,10 +45,10 @@ namespace Cosmos.IL2CPU
         protected Guid mCurrentMethodLabelEndGuid;
         protected Guid mCurrentMethodGuid;
 
-        public AppAssembler(int aComPort)
+        public AppAssembler(int aComPort, string assemblerLogFile)
         {
             Assembler = new Cosmos.Assembler.Assembler(aComPort);
-            mLog = new System.IO.StreamWriter("Cosmos.Assembler.Log", false);
+            mLog = new System.IO.StreamWriter(assemblerLogFile, false);
             InitILOps();
         }
 

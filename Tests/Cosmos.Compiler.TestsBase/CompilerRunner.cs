@@ -27,6 +27,12 @@ namespace Cosmos.Compiler.TestsBase
             set;
         }
 
+        public string AssemblerLogFile
+        {
+            get;
+            set;
+        }
+
         public void Execute()
         {
             if (String.IsNullOrWhiteSpace(OutputFile))
@@ -38,9 +44,10 @@ namespace Cosmos.Compiler.TestsBase
                 throw new InvalidOperationException("No References specified!");
             }
             DebugInfo.mLastGuid = 0;
+            Console.WriteLine("Compiling to '{0}'", OutputFile);
             var xTask = new IL2CPUTask();
-            xTask.DebugEnabled = true;
-            xTask.StackCorruptionDetectionEnabled = true;
+            xTask.DebugEnabled = false;
+            xTask.StackCorruptionDetectionEnabled = false;
             xTask.DebugMode = "Source";
             xTask.TraceAssemblies = "User";
             xTask.DebugCom = 1;
@@ -50,6 +57,7 @@ namespace Cosmos.Compiler.TestsBase
             xTask.EmitDebugSymbols = true;
             xTask.IgnoreDebugStubAttribute = false;
             xTask.References = GetReferences();
+            xTask.AssemblerLog = AssemblerLogFile;
             xTask.OnLogError = m =>
                                {
                                    throw new Exception("Error during compilation: " + m);
