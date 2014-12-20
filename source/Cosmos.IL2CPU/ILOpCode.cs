@@ -314,7 +314,7 @@ namespace Cosmos.IL2CPU {
     {
       if (Processed)
       {
-        ILInterpretationDebugLine("{0} skipped for reinterpretation", this);
+        ILInterpretationDebugLine(() => String.Format("{0} skipped for reinterpretation", this));
         return;
       }
       Processed = true;
@@ -402,7 +402,7 @@ namespace Cosmos.IL2CPU {
       ILOpCode xNextOpCode;
       if (aOpCodes.TryGetValue(NextPosition, out xNextOpCode))
       {
-        ILInterpretationDebugLine("- Branching from {0} to {1}", this, xNextOpCode);
+        ILInterpretationDebugLine(() => String.Format("- Branching from {0} to {1}", this, xNextOpCode));
         InterpretInstruction(xNextOpCode, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
       }
     }
@@ -417,7 +417,7 @@ namespace Cosmos.IL2CPU {
       ILOpCode xNextOpCode;
       if (aOpCodes.TryGetValue(aPosition, out xNextOpCode))
       {
-        ILInterpretationDebugLine("- Branching from {0} to {1}", this, xNextOpCode);
+        ILInterpretationDebugLine(() => String.Format("- Branching from {0} to {1}", this, xNextOpCode));
         InterpretInstruction(xNextOpCode, aOpCodes, aStack, ref aSituationChanged, aMaxRecursionDepth);
       }
     }
@@ -464,15 +464,10 @@ namespace Cosmos.IL2CPU {
       return aPointer.IsPointer || aPointer.IsByRef || aPointer == typeof(IntPtr) || aPointer == typeof(UIntPtr);
     }
 
-
+  [Conditional("DISABLED")]
     public static void ILInterpretationDebugLine(Func<string> message)
     {
       //Console.WriteLine(message());
-    }
-
-    public static void ILInterpretationDebugLine(string message, params object[] args)
-    {
-      ILInterpretationDebugLine(() => String.Format(message, args));
     }
   }
 }
