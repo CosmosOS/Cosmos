@@ -255,7 +255,7 @@ namespace Cosmos.IL2CPU {
     }
 
     public static List<X86.IL.FieldInfo> GetFieldsInfo(Type aType) {
-      var xResult = new List<X86.IL.FieldInfo>();
+      var xResult = new List<X86.IL.FieldInfo>(16);
       DoGetFieldsInfo(aType, xResult);
       xResult.Reverse();
       uint xOffset = 0;
