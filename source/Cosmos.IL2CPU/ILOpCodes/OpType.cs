@@ -100,7 +100,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           }
           return;
         case Code.Unbox_Any:
-           
+          StackPushTypes[0] = Value;
           return;
         case Code.Newarr:
           StackPushTypes[0] = Value.MakeArrayType();
