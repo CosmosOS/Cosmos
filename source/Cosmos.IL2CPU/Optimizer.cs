@@ -7,7 +7,9 @@ using x86 = Cosmos.Assembler.x86;
 namespace Orvid {
   public static class Optimizer {
 
-    public static Assembler Optimize(Assembler asmb) {
+    public static Assembler Optimize(Assembler asmb)
+    {
+      return asmb;
       Assembler asmblr = asmb;
       List<Instruction> instr = asmb.Instructions;
       //List<DataMember> dmbrs = asmb.DataMembers;
