@@ -627,7 +627,11 @@ namespace Cosmos.IL2CPU
                 }
                 if (!aType.IsGenericParameter && xVirt.DeclaringType.IsInterface)
                 {
+<<<<<<< HEAD
+                    if (aType.GetInterfaces().Contains(xVirt.DeclaringType))
+=======
                     if ((!aType.IsInterface) && (aType.GetInterfaces().Contains(xVirt.DeclaringType)))
+>>>>>>> 3a3ac8bf79b6f7e0bf41b19463683686a3fea073
                     {
                         var xIntfMapping = aType.GetInterfaceMap(xVirt.DeclaringType);
                         if (xIntfMapping.InterfaceMethods != null && xIntfMapping.TargetMethods != null)

@@ -58,8 +58,8 @@
     <Bochs_StartCosmosGDB>false</Bochs_StartCosmosGDB>
     <Bochs_EnableBochsDebug>True</Bochs_EnableBochsDebug>
     <VMware_EnableBochsDebug>True</VMware_EnableBochsDebug>
-    <TraceAssemblies>User</TraceAssemblies>
-    <VMware_TraceAssemblies>User</VMware_TraceAssemblies>
+    <TraceAssemblies>All</TraceAssemblies>
+    <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">

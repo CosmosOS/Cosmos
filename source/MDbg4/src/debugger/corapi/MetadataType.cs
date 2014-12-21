@@ -410,7 +410,7 @@ namespace Microsoft.Samples.Debugging.CorMetadata
 
         public override FieldInfo[] GetFields(BindingFlags bindingAttr)
         {
-            List<FieldInfo> al = new List<FieldInfo>();
+            List<FieldInfo> al = new List<FieldInfo>(16);
             IntPtr hEnum = new IntPtr();
 
             int fieldToken;

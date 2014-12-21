@@ -480,7 +480,7 @@ namespace Cosmos.IL2CPU
                 bool emitINT3 = true;
                 DebugInfo.SequencePoint xPreviousSequencePoint = null;
                 var xCurrentGroup = new List<ILOpCode>();
-                ILOpCode.ILInterpretationDebugLine("Method: " + aMethod.MethodBase.GetFullName());
+                ILOpCode.ILInterpretationDebugLine(() => String.Format("Method: {0}", aMethod.MethodBase.GetFullName()));
                 foreach (var xRawOpcode in aOpCodes)
                 {
                     var xSP = mSequences.FirstOrDefault(q => q.Offset == xRawOpcode.Position && q.LineStart != 0xFEEFEE);
@@ -527,7 +527,7 @@ namespace Cosmos.IL2CPU
         //private static bool mDebugStackErrors = true;
         private void EmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup, ref bool emitINT3)
         {
-            ILOpCode.ILInterpretationDebugLine("---- Group");
+            ILOpCode.ILInterpretationDebugLine(() => "---- Group");
             InterpretInstructionsToDetermineStackTypes(aCurrentGroup);
             BeforeEmitInstructions(aMethod, aCurrentGroup);
             var xFirstInstruction = true;
@@ -663,7 +663,7 @@ namespace Cosmos.IL2CPU
             var xGroupILByILOffset = aCurrentGroup.ToDictionary(i => i.Position);
             while (xNeedsInterpreting)
             {
-                ILOpCode.ILInterpretationDebugLine("--------- New Interpretation iteration (xIteration = {0})", xIteration);
+                ILOpCode.ILInterpretationDebugLine(() => String.Format("--------- New Interpretation iteration (xIteration = {0})", xIteration));
                 xIteration ++;
                 if (xIteration > 20)
                 {
