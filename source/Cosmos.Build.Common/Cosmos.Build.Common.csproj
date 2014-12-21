@@ -62,9 +62,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mosa.Utility.IsoImage">
-      <HintPath>..\..\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -84,6 +81,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="EnumValue.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="ProcessExtension.cs" />
     <Compile Include="IsoMaker.cs" />
     <Compile Include="PropertiesBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

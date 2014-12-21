@@ -40,7 +40,7 @@ namespace Cosmos.VS.Package {
         string xBinFile = Path.ChangeExtension(xOutputAsm, ".bin");
 
         if (xDeployment == DeploymentType.ISO) {
-          IsoMaker.Generate(CosmosPaths.Build, xBinFile, xIsoFile);
+          IsoMaker.Generate(xBinFile, xIsoFile);
 
         } else if (xDeployment == DeploymentType.USB) {
           Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.USB.exe"), "\"" + xBinFile + "\"");
