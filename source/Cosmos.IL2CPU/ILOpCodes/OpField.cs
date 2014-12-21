@@ -27,6 +27,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           return 2;
         case Code.Ldfld:
           return 1;
+        case Code.Ldsflda:
+          return 0;
         case Code.Ldflda:
           return 1;
         default:
@@ -44,8 +46,11 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           return 1;
         case Code.Stfld:
           return 0;
-        case Code.Ldflda:
         case Code.Ldfld:
+          return 1;
+        case Code.Ldsflda:
+          return 1;
+        case Code.Ldflda:
           return 1;
         default:
           throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
@@ -63,7 +68,9 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
           }
-
+          return;
+        case Code.Ldsflda:
+          StackPushTypes[0] = typeof (IntPtr);
           return;
         case Code.Ldfld:
           StackPushTypes[0] = Value.FieldType;
