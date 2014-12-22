@@ -18,11 +18,11 @@ namespace Cosmos.IL2CPU.X86.IL
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
       var xOpCode = (ILOpCodes.OpField) aOpCode;
-      var xField = ResolveField(aMethod.MethodBase.DeclaringType, xOpCode.Value.GetFullName());
-      DoExecute(Assembler, aMethod, xField, xOpCode.Value.DeclaringType, aOpCode);
+      var xFieldName = DataMember.GetStaticFieldName(xOpCode.Value);
+      DoExecute(Assembler, aMethod, xFieldName, xOpCode.Value.DeclaringType, aOpCode);
     }
 
-    public static void DoExecute(Cosmos.Assembler.Assembler assembler, MethodInfo aMethod, FieldInfo field, Type declaringType, ILOpCode aCurrentOpCode)
+    public static void DoExecute(Cosmos.Assembler.Assembler assembler, MethodInfo aMethod, string field, Type declaringType, ILOpCode aCurrentOpCode)
     {
       // call cctor:
       var xCctor = (declaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
           new Label(".AfterCCTorExceptionCheck");
         }
       }
-      string xDataName = field.Id;
+      string xDataName = field;
       new CPUx86.Push
       {
         DestinationRef = Cosmos.Assembler.ElementReference.New(xDataName)

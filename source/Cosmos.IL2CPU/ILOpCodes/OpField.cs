@@ -234,7 +234,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           }
           if (StackPopTypes[0] == Value.DeclaringType.MakePointerType() ||
               StackPopTypes[0] == Value.DeclaringType.MakeByRefType() ||
-            StackPopTypes[0] == typeof(void*))
+              StackPopTypes[0] == typeof(void*) ||
+              StackPopTypes[0] == typeof(IntPtr))
           {
             return;
           }
