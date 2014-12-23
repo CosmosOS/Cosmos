@@ -6,8 +6,8 @@
     <ProjectGuid>{220BFCDD-0747-4A3D-B022-51D4CFB373BE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Compiler.Tests.SimpleWriteLine.Tests</RootNamespace>
-    <AssemblyName>Cosmos.Compiler.Tests.SimpleWriteLine.Tests</AssemblyName>
+    <RootNamespace>Cosmos.Compiler.Tests</RootNamespace>
+    <AssemblyName>Cosmos.Compiler.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -79,6 +79,10 @@
     <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
       <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
       <Name>Cosmos.System</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.Kernel.csproj">
+      <Project>{bdc011be-6041-4a58-a6e7-0f592e78cb27}</Project>
+      <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.csproj">
       <Project>{57045fe8-b0fe-4fc1-810f-7c3914aef1de}</Project>
