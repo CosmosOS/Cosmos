@@ -20,7 +20,7 @@ namespace Cosmos.System
         /// <summary>
         /// Start the system up using the properties for configuration.
         /// </summary>
-        public void Start() {
+        public virtual void Start() {
             try {
                 Global.Dbg.Send("Starting kernel");
                 if (mStarted) {
