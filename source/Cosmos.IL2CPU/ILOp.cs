@@ -206,15 +206,7 @@ namespace Cosmos.IL2CPU {
           continue;
         }
 
-        string xId;
-        if (!xField.IsStatic)
-        {
-          xId = xField.GetFullName();
-        }
-        else
-        {
-          xId = DataMember.GetStaticFieldName(xField);
-        }
+        string xId = xField.GetFullName();
 
         var xInfo = new X86.IL.FieldInfo(xId, SizeOfType(xField.FieldType), aType, xField.FieldType);
         xInfo.IsStatic = xField.IsStatic;
@@ -255,7 +247,7 @@ namespace Cosmos.IL2CPU {
     }
 
     public static List<X86.IL.FieldInfo> GetFieldsInfo(Type aType) {
-      var xResult = new List<X86.IL.FieldInfo>();
+      var xResult = new List<X86.IL.FieldInfo>(16);
       DoGetFieldsInfo(aType, xResult);
       xResult.Reverse();
       uint xOffset = 0;

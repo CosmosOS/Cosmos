@@ -351,6 +351,8 @@ namespace Cosmos.Debug.Common
             BulkInsert("LOCAL_ARGUMENT_INFOS", aInfos, aFlush: true);
         }
 
+      private static int DataDumpIndex;
+
         // EF is slow on bulk operations. But we want to retain explicit bindings to the model to avoid unbound mistakes.
         // SqlBulk operations are on average 15x faster. So we use a hybrid approach by using the entities as containers
         // and EntityDataReader to bridge the gap to SqlBulk.
@@ -371,13 +373,13 @@ namespace Cosmos.Debug.Common
                         xBulkCopy.DestinationTableName = aTableName;
                         #region debug
                         // for now dump to disk:
-                        //using (var reader = aList.AsDataReader())
+                        //using (var reader = new ObjectReader<T>(aList.ToArray()))
                         //{
                         //  var dumpIdx = Interlocked.Increment(ref DataDumpIndex);
-                        //  using (var writer = new StreamWriter(@"c:\temp\dataout\" + dumpIdx + ".dmp"))
+                        //  using (var writer = new StreamWriter(@"e:\Temp\sqls\" + dumpIdx.ToString("D8") + ".dmp"))
                         //  {
                         //    writer.WriteLine(typeof(T).FullName);
-                        //    writer.WriteLine("Flush = {0}", aFlush);
+                        //    writer.WriteLine("Flush = {0}, flush-size = {1}", aFlush, aFlushSize);
                         //    bool first = true;
                         //    while (reader.Read())
                         //    {
@@ -424,7 +426,7 @@ namespace Cosmos.Debug.Common
                         //        trans.Rollback();
                         //    }
                         //}
-                        using (var reader = new ObjectReader<T>(aList.ToArray()))
+                        using (var reader = new ObjectReader<T>(aList))
                         {
                             xBulkCopy.WriteToServer(reader);
                         }

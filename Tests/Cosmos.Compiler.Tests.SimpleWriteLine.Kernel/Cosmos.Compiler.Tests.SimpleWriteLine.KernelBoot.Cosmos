@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{73d29a51-072a-4310-b3d1-539aa92094aa}</ProjectGuid>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</Name>
+    <BinFormat>elf</BinFormat>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <Profile>VMware</Profile>
+    <!-- Looks like this was a mispelled attribute. Replaced by DebugEnabled below.
+    <DebugEnable>true</DebugEnable>
+    -->
+    <DebugEnabled>True</DebugEnabled>
+    <DebugMode>Source</DebugMode>
+    <TraceMode>User</TraceMode>
+    <EnableGDB>False</EnableGDB>
+    <StartCosmosGDB>false</StartCosmosGDB>
+    <VMWareEdition>Player</VMWareEdition>
+    <OutputPath>bin\Debug\</OutputPath>
+    <Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</Name>
+    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
+    <Deployment>ISO</Deployment>
+    <Launch>VMware</Launch>
+    <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
+    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <TraceAssemblies>All</TraceAssemblies>
+    <VMware_Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</VMware_Name>
+    <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
+    <VMware_Deployment>ISO</VMware_Deployment>
+    <VMware_Launch>VMware</VMware_Launch>
+    <VMware_DebugEnabled>True</VMware_DebugEnabled>
+    <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
+    <VMware_DebugMode>Source</VMware_DebugMode>
+    <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
+    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
+    <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
+    <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.System.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.csproj">
+      <Name>Cosmos.Compiler.Tests.SimpleWriteLine.Kernel</Name>
+      <Project>{57045fe8-b0fe-4fc1-810f-7c3914aef1de}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <!--<ItemGroup>
+    <Content Include="Cosmos.bxrc">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>-->
+  <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
+</Project>

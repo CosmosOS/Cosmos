@@ -17,14 +17,15 @@ namespace DebugCompiler
     internal class Program
     {
         public const string CosmosRoot = @"e:\OpenSource\Cosmos";
+        //public const string CosmosRoot = @"C:\Users\Emile\Source\Repos\Cosmos";
         //public const string CosmosRoot = @"c:\Development\Cosmos";
         //public const string CosmosRoot = @"C:\Users\Huge\Documents\Visual Studio 2010\Projects\IL2CPU";
 
-        //private const string KernelFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernel.dll";
-        //private const string OutputFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernelBoot.asm";
-        private const string KernelFile = CosmosRoot + @"\Users\Matthijs\Playground\bin\Debug\Playground.dll";
-        private const string OutputFile = CosmosRoot + @"\Users\Matthijs\Playground\bin\Debug\PlaygroundBoot.asm";
-
+        private const string KernelFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernel.dll";
+        private const string OutputFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernelBoot.asm";
+        //private const string KernelFile = CosmosRoot + @"\Users\Emile\TestBed\TestBed\bin\Debug\TestBed.dll";
+        //private const string OutputFile = CosmosRoot + @"\Users\Emile\TestBed\TestBed\bin\Debug\TestBedBoot.asm";
+        
         private static void Main(string[] args)
         {
             //Console.SetOut(new StreamWriter("out", false));
@@ -36,7 +37,7 @@ namespace DebugCompiler
                 xTask.DebugEnabled = true;
                 xTask.StackCorruptionDetectionEnabled = true;
                 xTask.DebugMode = "Source";
-                xTask.TraceAssemblies = "User";
+                xTask.TraceAssemblies = "All";
                 xTask.DebugCom = 1;
                 xTask.UseNAsm = true;
                 xTask.OutputFilename = OutputFile;
@@ -73,6 +74,7 @@ namespace DebugCompiler
             Console.WriteLine("Run took {0}", xSW.Elapsed);
             Console.WriteLine("Generated {0} Guids", DebugInfo.mLastGuid);
             Console.Out.Flush();
+            Console.ReadKey();
         }
 
         //static void Main()
@@ -104,7 +106,7 @@ namespace DebugCompiler
                 new TaskItemImpl(CosmosRoot + @"\source\Cosmos.Debug.Kernel.Plugs\bin\x86\Debug\Cosmos.Debug.Kernel.Plugs.dll"),
                 new TaskItemImpl(CosmosRoot + @"\source\Cosmos.HAL\bin\x86\Debug\Cosmos.HAL.dll"),
                 new TaskItemImpl(CosmosRoot + @"\source\Cosmos.System.Plugs\bin\x86\Debug\Cosmos.System.Plugs.dll"),
-                //new TaskItemImpl(CosmosRoot + @"\Users\Sentinel209\SentinelSystemLib\bin\Debug\SentinelSystemLib.dll"),
+                new TaskItemImpl(CosmosRoot + @"\Users\Sentinel209\SentinelSystemLib\bin\Debug\SentinelSystemLib.dll"),
             };
         }
 

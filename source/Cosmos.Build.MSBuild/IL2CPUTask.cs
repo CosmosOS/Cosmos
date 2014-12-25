@@ -179,6 +179,8 @@ namespace Cosmos.Build.MSBuild
         protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.Source;
         protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
 
+        public string AssemblerLog = "Cosmos.Assembler.log";
+
         protected void LogTime(string message)
         {
         }
@@ -208,7 +210,7 @@ namespace Cosmos.Build.MSBuild
                     DebugCom = 0;
                 }
 
-                using (var xAsm = new AppAssembler(DebugCom))
+                using (var xAsm = new AppAssembler(DebugCom, AssemblerLog))
                 {
                     using (var xDebugInfo = new DebugInfo(xOutputFilename + ".cdb", true))
                     {

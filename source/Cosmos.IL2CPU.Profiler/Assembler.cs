@@ -7,8 +7,8 @@ namespace Cosmos.IL2CPU.Profiler {
     public class Assembler : Cosmos.IL2CPU.AppAssembler
     {
 
-        public Assembler()
-            : base(0)
+        public Assembler(string assemblerLogFile)
+            : base(0, assemblerLogFile)
         {
         }
 

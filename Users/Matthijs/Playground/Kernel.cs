@@ -15,7 +15,8 @@ namespace Playground
         {
             Console.WriteLine("Started");
 
-            HALGlobal.Execute();
+            SystemGlobal.Execute();
+            
             
             Console.WriteLine("Done");
             Console.ReadLine();

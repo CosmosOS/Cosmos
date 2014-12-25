@@ -11,18 +11,22 @@ namespace Cosmos.Debug.Common
     public class ObjectReader<T>: IDataReader
     {
         private static readonly ConcurrentDictionary<string, Tuple<string[], Func<object, object>[]>> mInfo = new ConcurrentDictionary<string, Tuple<string[], Func<object, object>[]>>();
-        
-        private readonly T[] mItems;
+
+        private readonly IEnumerable<T> mItems;
+        private readonly IEnumerator<T> mItemsEnumerator; 
         private int mCurrentIndex = -1;
+
         // -1 is before first read, -2 is closed
-        public ObjectReader(T[] items)
+        public ObjectReader(IEnumerable<T> items)
         {
             if (items == null)
             {
                 throw new ArgumentNullException("items");
             }
             mItems = items;
+            mItemsEnumerator = items.GetEnumerator();
 
+            // initialize
             Tuple<string[], Func<object, object>[]> xInfo;
             if (mInfo.TryGetValue(typeof(T).FullName, out xInfo))
             {
@@ -57,8 +61,8 @@ namespace Cosmos.Debug.Common
             }
         }
 
-        private readonly string[] mFieldNames;
-        private readonly Func<object, object>[] mFieldGetters;
+        private static string[] mFieldNames;
+        private static Func<object, object>[] mFieldGetters;
 
         public void Close()
         {
@@ -88,17 +92,29 @@ namespace Cosmos.Debug.Common
             throw new NotImplementedException();
         }
 
+        private T mCurrentItem;
+
         public bool Read()
         {
             mCurrentIndex++;
-            return mCurrentIndex < mItems.Length;
+            var xResult = mItemsEnumerator.MoveNext();
+            if (xResult)
+            {
+                mCurrentItem = mItemsEnumerator.Current;
+            }
+            else
+            {
+                mCurrentItem = default(T);
+            }
+            return xResult;
         }
 
         public int RecordsAffected
         {
             get
             {
-                return mItems.Length;
+                //return mItems.Length;
+                throw new InvalidOperationException();
             }
         }
 
@@ -212,7 +228,7 @@ namespace Cosmos.Debug.Common
 
         public object GetValue(int i)
         {
-            return mFieldGetters[i](mItems[mCurrentIndex]);
+            return mFieldGetters[i](mCurrentItem);
         }
 
         public int GetValues(object[] values)
