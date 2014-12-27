@@ -9,7 +9,7 @@ namespace Cosmos.System.Plugs.System {
 		private static ConsoleColor mForeground = ConsoleColor.White;
 		private static ConsoleColor mBackground = ConsoleColor.Black;
         
-	    private static readonly Console mFallbackConsole = new Console();
+	    private static readonly Console mFallbackConsole = new Console(null);
 
 	    private static Console GetConsole()
 	    {
@@ -23,7 +23,7 @@ namespace Cosmos.System.Plugs.System {
 
 		public static void set_BackgroundColor(ConsoleColor value) {
 			mBackground = value;
-			Cosmos.HAL.Global.TextScreen.SetColors(mForeground, mBackground);
+            Cosmos.HAL.Global.TextScreen.SetColors(mForeground, mBackground);
 		}
 
 		public static int get_BufferHeight() {

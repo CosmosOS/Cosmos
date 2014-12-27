@@ -3,6 +3,7 @@ using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU;
+using Cosmos.System;
 using Microsoft.Win32;
 using Microsoft.Build.Utilities;
 using Microsoft.Build.Framework;
@@ -330,7 +331,7 @@ namespace Cosmos.Build.MSBuild
                         {
                             if (!xType.IsGenericTypeDefinition && !xType.IsAbstract)
                             {
-                                if (xType.BaseType.FullName == FULLASSEMBLYNAME_KERNEL)
+                                if (xType.IsSubclassOf(typeof(Kernel)))
                                 {
                                     // found kernel?
                                     if (xKernelType != null)

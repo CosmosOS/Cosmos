@@ -1302,6 +1302,8 @@ namespace Cosmos.IL2CPU
             new Mov { DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect = true };
             new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(X86.IL.LdStr.GetContentsArrayName("")) };
 
+            var xMemberId = 0;
+
             foreach (var xDataMember in Assembler.DataMembers)
             {
                 if (!xDataMember.Name.StartsWith("StringLiteral"))
@@ -1312,8 +1314,14 @@ namespace Cosmos.IL2CPU
                 {
                     continue;
                 }
+                if (xMemberId % 100 == 0)
+                {
+                    Cosmos.Assembler.Assembler.WriteDebugVideo(".");
+                }
+                xMemberId ++;
                 new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = Registers.EAX };
             }
+            Cosmos.Assembler.Assembler.WriteDebugVideo("Done");
             new Pop { DestinationReg = Registers.EBP };
             new Return();
 
@@ -1323,10 +1331,11 @@ namespace Cosmos.IL2CPU
             new Call { DestinationLabel = InitVMTCodeLabel };
             Cosmos.Assembler.Assembler.WriteDebugVideo("Initializing string IDs.");
             new Call { DestinationLabel = InitStringIDsLabel };
-
+            Cosmos.Assembler.Assembler.WriteDebugVideo("Done initializing string IDs");
             // we now need to do "newobj" on the entry point, and after that, call .Start on it
             var xCurLabel = Cosmos.Assembler.Assembler.EntryPointName + ".CreateEntrypoint";
             new Cosmos.Assembler.Label(xCurLabel);
+            Cosmos.Assembler.Assembler.WriteDebugVideo("Now create kernel class");
             X86.IL.Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
             xCurLabel = Cosmos.Assembler.Assembler.EntryPointName + ".CallStart";
             new Cosmos.Assembler.Label(xCurLabel);
