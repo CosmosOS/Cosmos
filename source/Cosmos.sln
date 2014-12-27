@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
@@ -201,6 +201,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.Interfaces.Kernel", "..\Tests\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.Kernel.csproj", "{BDC011BE-6041-4A58-A6E7-0F592E78CB27}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.Interfaces.KernelBoot", "..\Tests\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.KernelBoot.Cosmos", "{7E059184-F2C5-4CC6-B86D-FA12590C3C40}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IL2CPU", "Tools\IL2CPU\IL2CPU.csproj", "{6128DEEB-D30F-4859-B60F-C36D5452F3E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -963,6 +965,18 @@ Global
 		{7E059184-F2C5-4CC6-B86D-FA12590C3C40}.Release|Mixed Platforms.Build.0 = Debug|x86
 		{7E059184-F2C5-4CC6-B86D-FA12590C3C40}.Release|x86.ActiveCfg = Debug|x86
 		{7E059184-F2C5-4CC6-B86D-FA12590C3C40}.Release|x86.Build.0 = Debug|x86
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1037,5 +1051,6 @@ Global
 		{220BFCDD-0747-4A3D-B022-51D4CFB373BE} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 		{BDC011BE-6041-4A58-A6E7-0F592E78CB27} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 		{7E059184-F2C5-4CC6-B86D-FA12590C3C40} = {F104F6BC-EF8E-4408-A786-D570D7565231}
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9} = {B521E2A2-81E4-4B2D-A471-7AB550E9551E}
 	EndGlobalSection
 EndGlobal
