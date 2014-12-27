@@ -193,6 +193,8 @@ namespace Cosmos.Build.MSBuild {
          string.Format("IL2CPU invoked with DebugMode='{0}', DebugEnabled='{1}', TraceAssemblies='{2}', IgnoreDebugStub='{3}'",
            DebugMode, DebugEnabled, TraceAssemblies ?? "{NULL}", IgnoreDebugStubAttribute
          ));
+
+        Log.LogMessage(MessageImportance.High, "IL2CPU task took {0}", xSW.Elapsed);
       }
     }
   }
