@@ -13,11 +13,11 @@ namespace Cosmos.Debug.Common {
   static public class Ds2Vs {
     public const byte Noop = 0;
     public const byte TracePoint = 1;
-    public const byte Message = 2;
+    public const byte Message = 192;
     public const byte BreakPoint = 3;
     public const byte Error = 4;
     public const byte Pointer = 5;
-    // This is sent once on start up. The first call to debug stub sends this. 
+    // This is sent once on start up. The first call to debug stub sends this.
     // Host can then respond with a series of set breakpoints etc, ie ones that were set before running.
     public const byte Started = 6;
     public const byte MethodContext = 7;

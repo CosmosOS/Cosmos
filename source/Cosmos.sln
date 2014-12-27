@@ -1,14 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Debug", "Debug", "{FF5BAFDE-AE9D-438D-935A-86B33EE0A758}"
-	ProjectSection(SolutionItems) = preProject
-		Cosmos.Debug.ReadMe.html = Cosmos.Debug.ReadMe.html
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{1698DD83-72A3-44CD-B088-4320A4014A95}"
 EndProject

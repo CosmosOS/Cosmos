@@ -13,7 +13,7 @@ const StepTrigger_None = 0
 const StepTrigger_Into = 1
 const StepTrigger_Over = 2
 const StepTrigger_Out = 3
-	
+
 const Vs2Ds_Noop = 0
 const Vs2Ds_TraceOff = 1
 const Vs2Ds_TraceOn = 2
@@ -34,15 +34,15 @@ const Vs2Ds_SendStack = 15
 // Only one can be active at a time. BreakOnAddress can have multiple.
 // User must call continue after.
 const Vs2Ds_SetAsmBreak = 16
-const Vs2Ds_Ping = 17 
-const Vs2Ds_AsmStepInto = 18 
-const Vs2Ds_SetINT3 = 19 
-const Vs2Ds_ClearINT3 = 20 
-const Vs2Ds_Max = 21 
+const Vs2Ds_Ping = 17
+const Vs2Ds_AsmStepInto = 18
+const Vs2Ds_SetINT3 = 19
+const Vs2Ds_ClearINT3 = 20
+const Vs2Ds_Max = 21
 
 const Ds2Vs_Noop = 0
 const Ds2Vs_TracePoint = 1
-const Ds2Vs_Message = 2
+const Ds2Vs_Message = 192
 const Ds2Vs_BreakPoint = 3
 const Ds2Vs_Error = 4
 const Ds2Vs_Pointer = 5
