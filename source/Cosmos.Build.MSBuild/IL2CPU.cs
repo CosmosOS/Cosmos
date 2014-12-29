@@ -176,7 +176,7 @@ namespace Cosmos.Build.MSBuild {
         }
                   return base.ExecuteTool(WorkingDir,
                   Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe"),
-                  Arguments.TrimEnd(' '),
+                  Arguments,
                   "IL2CPU");
       
        // return mTask.Execute();

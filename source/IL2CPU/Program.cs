@@ -23,10 +23,12 @@ namespace IL2CPU
     private static void Main(string[] args)
     {
 
-   
 
+      var tmp = "";
       foreach (var s in args)
       {
+
+        tmp += s;
         string[] s1 = s.Split(':');
         string argID = s1[0].ToLower();
         if (argID != "References".ToLower())
@@ -40,7 +42,7 @@ namespace IL2CPU
         }
 
       }
-      
+      File.WriteAllText("C:\\Users\\Emile\\Desktop\\dump.txt",tmp);
       try
       {
         var xTask = new IL2CPUTask();
