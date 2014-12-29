@@ -168,18 +168,11 @@ namespace Cosmos.Build.MSBuild {
         string Arguments = "";
         foreach (var arg in args)
         {
-          if (arg.Value != null)
-          {
-            Arguments += arg.Key + "~" + arg.Value.Replace(" ", "{space}").Replace("\\", "{backslash}") + " ";
-          }
-          else
-          {
-            Arguments += arg.Key + "~" + arg.Value + " ";
-          }
+          Arguments += "\"" + arg.Key + ":" + arg.Value + "\" ";
         }
         foreach (var Ref in refs)
         {
-          Arguments += "References~" + Ref.Replace(" ", "{space}").Replace("\\", "{backslash}") + " ";
+          Arguments += "\"References:" + Ref + "\" ";
         }
                   return base.ExecuteTool(WorkingDir,
                   Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe"),

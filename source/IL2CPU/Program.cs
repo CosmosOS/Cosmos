@@ -27,17 +27,16 @@ namespace IL2CPU
 
       foreach (var s in args)
       {
-        string[] s1 = s.Split('~');
+        string[] s1 = s.Split(':');
         string argID = s1[0].ToLower();
-        string argValue = s1[1];
         if (argID != "References".ToLower())
         {
-          CmdOptions.Add(argID, argValue.Replace("{backslash}", "\\").Replace("{space}", " "));
+          CmdOptions.Add(argID, s.Replace(s1[0] + ":",""));
         }
         else
         {
-          var val = argValue.Replace("{space}", " ").Replace("{backslash}", "\\");
-          References.Add(new TaskItemImpl(val));
+          
+          References.Add(new TaskItemImpl(s.Replace(s1[0] + ":","")));
         }
 
       }
