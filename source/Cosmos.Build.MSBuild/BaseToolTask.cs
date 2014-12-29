@@ -92,7 +92,8 @@ namespace Cosmos.Build.MSBuild
 			xProcessStartInfo.UseShellExecute = false;
 			xProcessStartInfo.RedirectStandardOutput = true;
 			xProcessStartInfo.RedirectStandardError = true;
-			xProcessStartInfo.CreateNoWindow = true;
+      xProcessStartInfo.CreateNoWindow = true;
+
 			using (var xProcess = new Process())
 			{
 				xProcess.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)

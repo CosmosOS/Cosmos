@@ -50,11 +50,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj">
+    <ProjectReference Include="..\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj">
       <Project>{bc6ae974-1f18-4a19-a956-5062e4d3fd53}</Project>
       <Name>Cosmos.Build.MSBuild</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj">
+    <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj">
       <Project>{ab24e403-54f3-4f67-b5e0-119a7227aac1}</Project>
       <Name>Cosmos.Debug.Common</Name>
     </ProjectReference>
