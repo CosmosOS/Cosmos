@@ -15,6 +15,23 @@ namespace Cosmos.Debug.Common {
       mPipeName = aPipeName;
     }
 
+    public bool IsConnected
+    {
+      get
+      {
+        lock (this)
+        {
+          return mPipe != null;
+        }
+      }
+    }
+
+    public int Read(byte[] buffer, int offset, int count)
+    {
+      mPipe.ReadTimeout = 25;
+      return mPipe.Read(buffer, offset, count);
+    }
+
     public void SendCommand(byte aCmd) {
       // Necessary to do it this way else C# using a literal null
       // cant determine which of the overloads to call.
@@ -23,7 +40,7 @@ namespace Cosmos.Debug.Common {
     }
 
     public void SendCommand(byte aCmd, string aData) {
-      SendCommand(aCmd, Encoding.UTF8.GetBytes(aData)); 
+      SendCommand(aCmd, Encoding.UTF8.GetBytes(aData));
     }
 
     public void SendCommand(byte aCmd, byte[] aData) {
@@ -37,7 +54,7 @@ namespace Cosmos.Debug.Common {
         if (mPipe == null) {
           var xPipe = new NamedPipeClientStream(".", mPipeName, PipeDirection.Out);
           try {
-              
+
             // For now we assume its there or not from the first call.
             // If we don't find the server, we disable it to avoid causing lag.
             // TODO: In future - try this instead:

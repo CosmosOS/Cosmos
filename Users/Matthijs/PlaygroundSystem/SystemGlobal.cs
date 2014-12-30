@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 using Cosmos.HAL.Drivers.PCI.Network;
 using Cosmos.System.Network;
@@ -15,6 +16,8 @@ namespace PlaygroundSystem
     {
         public static void Execute()
         {
+            new Debugger("test", "test").Break();
+            new Debugger("test", "test").SendMessageBox("");
             HALGlobal.Test();
             //Console.WriteLine("Finding PCI device");
             //var xNicDev = PCI.GetDevice(0x1022, 0x2000);

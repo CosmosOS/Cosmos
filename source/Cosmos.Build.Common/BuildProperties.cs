@@ -68,6 +68,12 @@ namespace Cosmos.Build.Common {
         Deployment = DeploymentType.ISO;
         Launch = LaunchType.Bochs;
       }
+      else if (aName == "IntelEdison")
+      {
+        Description = "Connect to Intel Edison device to deploy and debug.";
+        Deployment = DeploymentType.BinaryImage;
+        Launch = LaunchType.IntelEdison;
+      }
     }
 
     public void DeleteProfile(string aPrefix) {

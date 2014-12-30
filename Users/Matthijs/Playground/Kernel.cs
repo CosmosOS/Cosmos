@@ -16,8 +16,7 @@ namespace Playground
             Console.WriteLine("Started");
 
             SystemGlobal.Execute();
-            
-            
+
             Console.WriteLine("Done");
             Console.ReadLine();
             Stop();

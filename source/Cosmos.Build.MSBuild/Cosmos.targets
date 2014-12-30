@@ -14,7 +14,7 @@
   <UsingTask TaskName="Cosmos.Build.MSBuild.NAsm" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
   <UsingTask TaskName="Cosmos.Build.MSBuild.MakeISO" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
   <UsingTask TaskName="Cosmos.Build.MSBuild.Ld" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
-  <UsingTask TaskName="Cosmos.Build.MSBuild.ReadNAsmMapToCosmosMap" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.ReadNAsmMapToDebugInfo" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
   <UsingTask TaskName="Cosmos.Build.MSBuild.ExtractMapFromElfFile" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
 
   <Target Name="CoreCompile">
@@ -67,14 +67,18 @@
     <!--End of ELF only-->
 
     <!--binary only-->
-    <ReadNAsmMapToCosmosMap InputBaseDir="$(TargetDir)"
+    <ReadNAsmMapToDebugInfo InputBaseDir="$(TargetDir)"
                             DebugInfoFile="$(TargetDir)$(MSBuildProjectName).cdb"
                             Condition="$(IsELF) == 'false'"/>
+
+    <Move SourceFiles="$(TargetDir)$(MSBuildProjectName).obj" DestinationFiles="$(TargetDir)$(MSBuildProjectName).bin"
+          Condition="$(IsELF) == 'false'"/>
+
     <!--end of binary only-->
 
 
     <!--todo: update cxdb to cxdbg-->
-    
+
     <!-- We dont build ISO in MSBuild any more because not all targets need it and it takes time.
     But we do delete it, so we dont have out of date outputs. -->
     <!-- <MakeISO InputFile="$(TargetDir)$(MSBuildProjectName).bin"

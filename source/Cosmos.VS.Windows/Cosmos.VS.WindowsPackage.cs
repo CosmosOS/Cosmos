@@ -22,10 +22,10 @@ namespace Cosmos.VS.Windows
     /// The minimum requirement for a class to be considered a valid package for Visual Studio
     /// is to implement the IVsPackage interface and register itself with the shell.
     /// This package uses the helper classes defined inside the Managed Package Framework (MPF)
-    /// to do it: it derives from the Package class that provides the implementation of the 
-    /// IVsPackage interface and uses the registration attributes defined in the framework to 
+    /// to do it: it derives from the Package class that provides the implementation of the
+    /// IVsPackage interface and uses the registration attributes defined in the framework to
     /// register itself and its components with the shell.
-    /// 
+    ///
     // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
     // a package.
     [PackageRegistration(UseManagedResourcesOnly = true)]
@@ -42,7 +42,7 @@ namespace Cosmos.VS.Windows
     [ProvideToolWindow(typeof(RegistersTW))]
     [ProvideToolWindow(typeof(StackTW))]
     [ProvideToolWindow(typeof(InternalTW))]
-
+    [ProvideToolWindow(typeof(ConsoleTW))]
     [Guid(GuidList.guidCosmos_VS_WindowsPkgString)]
     public sealed class Cosmos_VS_WindowsPackage : Package
     {
@@ -62,9 +62,9 @@ namespace Cosmos.VS.Windows
         }
 
         /// Default constructor of the package.
-        /// Inside this method you can place any initialization code that does not require 
-        /// any Visual Studio service because at this point the package object is created but 
-        /// not sited yet inside Visual Studio environment. The place to do all the other 
+        /// Inside this method you can place any initialization code that does not require
+        /// any Visual Studio service because at this point the package object is created but
+        /// not sited yet inside Visual Studio environment. The place to do all the other
         /// initialization is the Initialize method.
         public Cosmos_VS_WindowsPackage()
         {
@@ -136,11 +136,17 @@ namespace Cosmos.VS.Windows
             ShowWindow(typeof(StackTW));
         }
 
+        private void ShowWindowConsole(object aCommand, EventArgs e)
+        {
+          ShowWindow(typeof(ConsoleTW));
+        }
+
         private void ShowWindowAll(object aCommand, EventArgs e)
         {
             ShowWindowAssembly(aCommand, e);
             ShowWindowRegisters(aCommand, e);
             ShowWindowStack(aCommand, e);
+            ShowWindowConsole(aCommand, e);
             // Dont show Internal Window, most Cosmos users wont use it.
         }
 
@@ -272,7 +278,7 @@ namespace Cosmos.VS.Windows
             var cWindow = FindWindow(typeof(StackTW));
             byte[] aData = StateStorer.RetrieveState(StateStorer.CurrLineId, "StackTW");
             cWindow.UserControl.SetCurrentState(aData == null ? null : (byte[])aData.Clone());
-            
+
             cWindow = FindWindow(typeof(RegistersTW));
             aData = StateStorer.RetrieveState(StateStorer.CurrLineId, "RegistersTW");
             cWindow.UserControl.SetCurrentState(aData == null ? null : (byte[])aData.Clone());

@@ -10,7 +10,7 @@ using System.Windows.Forms;
 namespace Cosmos.Debug.Common
 {
     /// <summary>Handles the dialog between the Debug Stub embedded in a debugged Cosmos Kernel and
-    /// our Debug Engine hosted in Visual Studio. This abstract class is communication protocol 
+    /// our Debug Engine hosted in Visual Studio. This abstract class is communication protocol
     /// independent. Sub-classes exist that manage the wire level details of the communications.
     /// </summary>
     public abstract class DebugConnector : IDisposable
@@ -27,13 +27,14 @@ namespace Cosmos.Debug.Common
         public Action<byte[]> CmdFrame;
         public Action<byte[]> CmdStack;
         public Action<byte[]> CmdPong;
+        public Action<byte[]> CmdConsole;
         public Action<UInt32> CmdStackCorruptionOccurred;
         public Action<UInt32> CmdNullReferenceOccurred;
 
         protected byte mCurrentMsgType;
         protected AutoResetEvent mCmdWait = new AutoResetEvent(false);
 
-        // private StreamWriter mDebugWriter = new StreamWriter(@"c:\dsdebug.txt", false) { AutoFlush = true };
+        private StreamWriter mDebugWriter = new StreamWriter(@"e:\dcdebug.txt", false) { AutoFlush = true };
 
         // This member used to be public. The SetConnectionHandler has been added.
         private Action Connected;
@@ -57,6 +58,8 @@ namespace Cosmos.Debug.Common
 
         protected void DoDebugMsg(string aMsg)
         {
+            mDebugWriter.WriteLine(aMsg);
+            mDebugWriter.Flush();
             DoDebugMsg(aMsg, true);
         }
 
@@ -119,11 +122,14 @@ namespace Cosmos.Debug.Common
                     if (aCmd == Vs2Ds.Noop)
                     {
                         // Noops dont have any data.
-                        // This is becuase Noops are used to clear out the 
+                        // This is becuase Noops are used to clear out the
                         // channel and are often not received. Sending noop + data
                         // usually causes the data to be interpreted as a command
                         // as its often the first byte received.
-                        SendRawData(new byte[1] { Vs2Ds.Noop });
+                        SendRawData(new byte[1]
+                                    {
+                                        Vs2Ds.Noop
+                                    });
                     }
                     else
                     {
@@ -162,21 +168,22 @@ namespace Cosmos.Debug.Common
                                 // DebugStub.
 
                                 //Sometimes we get out of sync or recieve something we aren't expecting
-                                //So this forces us to only return when we are back in-sync or after we think we've frozen the system for 
+                                //So this forces us to only return when we are back in-sync or after we think we've frozen the system for
                                 //too long
                                 //If we haven't gone past the command already!
-                                if ((!resetID && lastCmdCompletedID < mCommandID) || (resetID && lastCmdCompletedID > 5))
+                                if ((!resetID && lastCmdCompletedID < mCommandID)
+                                    || (resetID && lastCmdCompletedID > 5))
                                 {
                                     int attempts = 0;
                                     do
                                     {
-                                        mCmdWait.WaitOne(2000/*60000*/);
-                                    }
-                                    while ((
-                                            (!resetID && lastCmdCompletedID < mCommandID) ||
-                                            (resetID && lastCmdCompletedID > 5)
-                                           ) && 
-                                           ++attempts < 10);
+                                        mCmdWait.WaitOne(2000 /*60000*/);
+                                    } while ((
+                                                 (!resetID && lastCmdCompletedID < mCommandID) ||
+                                                 (resetID && lastCmdCompletedID > 5)
+                                             )
+                                             &&
+                                             ++attempts < 10);
                                 }
                             }
                         }
@@ -184,6 +191,10 @@ namespace Cosmos.Debug.Common
                 }
 
                 DoDebugMsg("Send unlocked.");
+            }
+            else
+            {
+                DoDebugMsg("Tried to send command " + aCmd + ", but signature was not yet received!");
             }
         }
 
@@ -322,7 +333,7 @@ namespace Cosmos.Debug.Common
             Array.Copy(BitConverter.GetBytes(offsetToEBP), 0, xData, 0, 4);
             Array.Copy(BitConverter.GetBytes(size), 0, xData, 4, 4);
             SendCmd(Vs2Ds.SendMethodContext, xData);
-            
+
             // todo: make "crossplatform". this code assumes stack space of 32bit per "item"
 
             byte[] xResult;
@@ -358,7 +369,8 @@ namespace Cosmos.Debug.Common
 
             System.Diagnostics.Debug.WriteLine(String.Format("DC - PacketMsg: {0}", DebugConnectorStream.BytesToString(aPacket, 0, aPacket.Length)));
             System.Diagnostics.Debug.WriteLine("DC - " + mCurrentMsgType);
-
+            DoDebugMsg(String.Format("DC - PacketMsg: {0}", DebugConnectorStream.BytesToString(aPacket, 0, aPacket.Length)));
+            DoDebugMsg("DC - " + mCurrentMsgType);
             // Could change to an array, but really not much benefit
             switch (mCurrentMsgType)
             {
@@ -453,7 +465,12 @@ namespace Cosmos.Debug.Common
                     DoDebugMsg("DC Recv: NullReferenceOccurred");
                     Next(4, PacketNullReferenceOccurred);
                     break;
-
+                case 193:
+                    // console channel.
+                    // todo: implement complete channel handling
+                    DoDebugMsg("DC Recv: Console");
+                    Next(2, PacketConsoleSize);
+                    break;
                 default:
                     // Exceptions crash VS so use MsgBox instead
                     DoDebugMsg("Unknown debug command: " + mCurrentMsgType);
@@ -466,12 +483,11 @@ namespace Cosmos.Debug.Common
 
         public virtual void Dispose()
         {
-            //if (mDebugWriter != null)
-            //{
-            //    mDebugWriter.Dispose();
-            //    mDebugWriter = null;
-            //    
-            //}
+            if (mDebugWriter != null)
+            {
+                mDebugWriter.Dispose();
+                mDebugWriter = null;
+            }
             GC.SuppressFinalize(this);
         }
 
@@ -494,8 +510,10 @@ namespace Cosmos.Debug.Common
             }
             else
             {
+                PacketConsoleNoWaitForMessage(aPacket);
                 // Sig not found, keep looking
                 Next(1, WaitForSignature);
+
             }
         }
 
@@ -507,6 +525,11 @@ namespace Cosmos.Debug.Common
         protected void PacketTextSize(byte[] aPacket)
         {
             Next(GetUInt16(aPacket, 0), PacketText);
+        }
+
+        protected void PacketConsoleSize(byte[] aPacket)
+        {
+            Next(GetUInt16(aPacket, 0), PacketConsole);
         }
 
         protected void PacketMessageBoxTextSize(byte[] aPacket)
@@ -550,6 +573,20 @@ namespace Cosmos.Debug.Common
             {
                 CmdPong(aPacket.ToArray());
             }
+            WaitForMessage();
+        }
+
+        protected void PacketConsoleNoWaitForMessage(byte[] aPacket)
+        {
+            if (CmdConsole != null)
+            {
+                CmdConsole(aPacket);
+            }
+        }
+
+        protected void PacketConsole(byte[] aPacket)
+        {
+            PacketConsoleNoWaitForMessage(aPacket);
             WaitForMessage();
         }
 

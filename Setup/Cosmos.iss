@@ -359,6 +359,9 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\ToolWindows\{{ce2a2d0f-
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\ToolWindows\{{a64d0fcc-8dcc-439a-9b16-3c43128aad51}; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\ToolWindows\{{a64d0fcc-8dcc-439a-9b16-3c43128aad51}; ValueType: string; ValueData: {{a82b45e9-2a89-43bd-925d-c7f0edd212aa}
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\ToolWindows\{{a64d0fcc-8dcc-439a-9b16-3c43128aad51}; ValueName: Name; ValueType: string; ValueData: Cosmos.VS.Windows.StackTW
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\ToolWindows\{{681a4da7-ba11-4c26-80a9-b39734a95b1c}; ValueType: none; Flags: uninsdeletekey
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\ToolWindows\{{681a4da7-ba11-4c26-80a9-b39734a95b1c}; ValueType: string; ValueData: {{a82b45e9-2a89-43bd-925d-c7f0edd212aa}
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\ToolWindows\{{681a4da7-ba11-4c26-80a9-b39734a95b1c}; ValueName: Name; ValueType: string; ValueData: Cosmos.VS.Windows.ConsoleTW
 
 ; mark our msbuild file as safe
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\MSBuild\SafeImports; ValueType: string; ValueName: Cosmos1; ValueData: {pf32}\MSBuild\Cosmos\Cosmos.targets; Flags: uninsdeletevalue

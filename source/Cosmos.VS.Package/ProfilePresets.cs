@@ -13,6 +13,7 @@ namespace Cosmos.VS.Package {
       Add("PXE", "PXE Network Boot");
       Add("VMware", "VMware");
       if (BochsSupport.BochsEnabled) { Add("Bochs", "Bochs"); }
+      Add("IntelEdison", "Intel Edison Serial boot");
     }
   }
 }
