@@ -319,12 +319,12 @@ namespace Cosmos.Debug.VSDebugEngine
             mDbgConnector.CmdStackCorruptionOccurred += DbgCmdStackCorruptionOccurred;
             mDbgConnector.CmdNullReferenceOccurred += DbgCmdNullReferenceOccurred;
             mDbgConnector.CmdMessageBox += DbgCmdMessageBox;
-            mDbgConnector.CmdConsole += DbgCmdConsole;
+            mDbgConnector.CmdChannel += DbgCmdChannel;
         }
 
-        private void DbgCmdConsole(byte[] obj)
+        private void DbgCmdChannel(byte channel, byte[] obj)
         {
-            mDebugDownPipe.SendCommand(Debugger2Windows.Cmd_Console, obj);
+            mDebugDownPipe.SendRawToChannel(channel, obj);
         }
 
         private void DbgCmdStackCorruptionOccurred(uint lastEIPAddress)
@@ -789,7 +789,14 @@ namespace Cosmos.Debug.VSDebugEngine
             // VS to stop debugging.
             if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0)
             {
-                mCallback.OnProcessExit(0);
+                try
+                {
+                    mCallback.OnProcessExit(0);
+                }
+                catch
+                {
+                    // swallow exceptions here?
+                }
             }
 
             if (mDbgConnector != null)

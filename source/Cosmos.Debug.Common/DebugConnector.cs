@@ -27,7 +27,7 @@ namespace Cosmos.Debug.Common
         public Action<byte[]> CmdFrame;
         public Action<byte[]> CmdStack;
         public Action<byte[]> CmdPong;
-        public Action<byte[]> CmdConsole;
+        public Action<byte, byte[]> CmdChannel;
         public Action<UInt32> CmdStackCorruptionOccurred;
         public Action<UInt32> CmdNullReferenceOccurred;
 
@@ -465,13 +465,16 @@ namespace Cosmos.Debug.Common
                     DoDebugMsg("DC Recv: NullReferenceOccurred");
                     Next(4, PacketNullReferenceOccurred);
                     break;
-                case 193:
-                    // console channel.
-                    // todo: implement complete channel handling
-                    DoDebugMsg("DC Recv: Console");
-                    Next(2, PacketConsoleSize);
-                    break;
                 default:
+                    if (mCurrentMsgType > 128)
+                    {
+                        // other channels than debugstub
+                        DoDebugMsg("DC Recv: Console");
+                        // copy to local variable, so the anonymous method will get the correct value!
+                        var xChannel = mCurrentMsgType;
+                        Next(2, data => PacketOtherChannelSize(xChannel, data));
+                        break;
+                    }
                     // Exceptions crash VS so use MsgBox instead
                     DoDebugMsg("Unknown debug command: " + mCurrentMsgType);
                     // Despite it being unkonwn, we try again. Normally this will
@@ -483,6 +486,7 @@ namespace Cosmos.Debug.Common
 
         public virtual void Dispose()
         {
+
             if (mDebugWriter != null)
             {
                 mDebugWriter.Dispose();
@@ -510,7 +514,7 @@ namespace Cosmos.Debug.Common
             }
             else
             {
-                PacketConsoleNoWaitForMessage(aPacket);
+                CmdChannel(129, aPacket);
                 // Sig not found, keep looking
                 Next(1, WaitForSignature);
 
@@ -527,9 +531,9 @@ namespace Cosmos.Debug.Common
             Next(GetUInt16(aPacket, 0), PacketText);
         }
 
-        protected void PacketConsoleSize(byte[] aPacket)
+        protected void PacketOtherChannelSize(byte channel, byte[] aPacket)
         {
-            Next(GetUInt16(aPacket, 0), PacketConsole);
+            Next(GetUInt16(aPacket, 0), data => PacketChannel(channel, data));
         }
 
         protected void PacketMessageBoxTextSize(byte[] aPacket)
@@ -576,17 +580,12 @@ namespace Cosmos.Debug.Common
             WaitForMessage();
         }
 
-        protected void PacketConsoleNoWaitForMessage(byte[] aPacket)
+        protected void PacketChannel(byte channel, byte[] aPacket)
         {
-            if (CmdConsole != null)
+            if (CmdChannel != null)
             {
-                CmdConsole(aPacket);
+                CmdChannel(channel, aPacket);
             }
-        }
-
-        protected void PacketConsole(byte[] aPacket)
-        {
-            PacketConsoleNoWaitForMessage(aPacket);
             WaitForMessage();
         }
 
@@ -650,7 +649,7 @@ namespace Cosmos.Debug.Common
         {
             WaitForMessage();
             CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
-            CmdConsole(aPacket);
+            CmdChannel(29, aPacket);
         }
 
         protected void PacketMessageBoxText(byte[] aPacket)
