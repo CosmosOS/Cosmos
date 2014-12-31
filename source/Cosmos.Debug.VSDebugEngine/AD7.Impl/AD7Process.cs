@@ -322,9 +322,9 @@ namespace Cosmos.Debug.VSDebugEngine
             mDbgConnector.CmdChannel += DbgCmdChannel;
         }
 
-        private void DbgCmdChannel(byte channel, byte[] obj)
+        private void DbgCmdChannel(byte aChannel, byte aCommand, byte[] aData)
         {
-            mDebugDownPipe.SendRawToChannel(channel, obj);
+            mDebugDownPipe.SendRawToChannel(aChannel, aCommand, aData);
         }
 
         private void DbgCmdStackCorruptionOccurred(uint lastEIPAddress)

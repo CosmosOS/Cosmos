@@ -174,7 +174,7 @@ namespace Cosmos.IL2CPU
                         AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
                         DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document.ToLower()],
 
-                        // Storing Line + Col as one item makes comparisons MUCH easier, otherwise we have to 
+                        // Storing Line + Col as one item makes comparisons MUCH easier, otherwise we have to
                         // check for things like col < start col but line > start line.
                         //
                         // () around << are VERY important.. + has precedence over <<
@@ -384,7 +384,7 @@ namespace Cosmos.IL2CPU
             }
             if (DebugEnabled && StackCorruptionDetection)
             {
-                // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value. 
+                // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
                 // if not, we should somehow break here.
               new Mov {DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP};
               new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
@@ -398,7 +398,7 @@ namespace Cosmos.IL2CPU
                 new Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX};
                 new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
                 new Halt();
-            } 
+            }
             new Cosmos.Assembler.Label(xLabelExc + "__2");
             new Pop { DestinationReg = Registers.EBP };
             var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);
@@ -466,7 +466,7 @@ namespace Cosmos.IL2CPU
             else
             {
                 // now emit the actual assembler code for this method.
-                
+
                 //Conditions under which we should emit an INT3 instead of a plceholder NOP:
                 /* - First instruction in a Method / Loop / If / Else etc.
                  *   -- In essence, whenever there is a opening {
@@ -487,7 +487,7 @@ namespace Cosmos.IL2CPU
                     // detect if we're at a new statement.
                     if (xPreviousSequencePoint == null && xSP != null)
                     {
-                        
+
                     }
                     if (xSP != null && xCurrentGroup.Count > 0)
                     {
@@ -495,7 +495,7 @@ namespace Cosmos.IL2CPU
                         xCurrentGroup.Clear();
                         xPreviousSequencePoint = xSP;
                     }
-                    xCurrentGroup.Add(xRawOpcode);                    
+                    xCurrentGroup.Add(xRawOpcode);
                 }
                 if (xCurrentGroup.Count > 0)
                 {
@@ -636,7 +636,7 @@ namespace Cosmos.IL2CPU
         }
 
         /// <summary>
-        /// This method takes care of "interpreting" the instructions per group (statement). This is necessary to 
+        /// This method takes care of "interpreting" the instructions per group (statement). This is necessary to
         /// reliably able to tell what sizes are involved in certain actions.
         /// </summary>
         /// <param name="aCurrentGroup"></param>
@@ -776,7 +776,7 @@ namespace Cosmos.IL2CPU
                 DestinationValue = aValue
             };
         }
-        
+
         protected void Push(string aLabelName, bool isIndirect = false)
         {
             new Push
@@ -1244,7 +1244,7 @@ namespace Cosmos.IL2CPU
 
                     if (xFieldAccessAttrib != null)
                     {
-                        // field access              
+                        // field access
                         new Comment("Loading address of field '" + xFieldAccessAttrib.Name + "'");
                         var xFieldInfo = ResolveField(aFrom, xFieldAccessAttrib.Name);
                         if (xFieldInfo.IsStatic)
@@ -1294,7 +1294,7 @@ namespace Cosmos.IL2CPU
 
         public void EmitEntrypoint(MethodBase aEntrypoint)
         {
-            // at the time the datamembers for literal strings are created, the type id for string is not yet determined. 
+            // at the time the datamembers for literal strings are created, the type id for string is not yet determined.
             // for now, we fix this at runtime.
             new Cosmos.Assembler.Label(InitStringIDsLabel);
             new Push { DestinationReg = Registers.EBP };
@@ -1405,7 +1405,7 @@ namespace Cosmos.IL2CPU
             if (DebugEnabled && StackCorruptionDetection)
             {
                 // if debugstub is active, emit a stack corruption detection. at this point, the difference between EBP and ESP
-                // should be equal to the local variables sizes and the IL stack. 
+                // should be equal to the local variables sizes and the IL stack.
                 // if not, we should break here.
 
                 // first, calculate the expected difference
@@ -1417,7 +1417,7 @@ namespace Cosmos.IL2CPU
 
                 new Comment("Stack difference = " + xStackDifference);
 
-                // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value. 
+                // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
                 // if not, we should somehow break here.
                 new Mov { DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP };
                 new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
@@ -1497,7 +1497,7 @@ namespace Cosmos.IL2CPU
                     if (TraceAssemblies == TraceAssemblies.User)
                     {
                         //TODO: Maybe an attribute that could be used to turn tracing on and off
-                        //TODO: This doesnt match Cosmos.Kernel exact vs Cosmos.Kernel., so a user 
+                        //TODO: This doesnt match Cosmos.Kernel exact vs Cosmos.Kernel., so a user
                         // could do Cosmos.KernelMine and it will fail. Need to fix this
                         if (aNamespace.StartsWith("Cosmos.Kernel", StringComparison.InvariantCultureIgnoreCase))
                         {

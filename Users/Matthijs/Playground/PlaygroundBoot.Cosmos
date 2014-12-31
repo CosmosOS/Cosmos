@@ -97,6 +97,7 @@
     <IntelEdison_StartCosmosGDB>False</IntelEdison_StartCosmosGDB>
     <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
     <VMware_CosmosDebugPort>Serial: COM1</VMware_CosmosDebugPort>
+    <USB_CosmosDebugPort>Serial: COM1</USB_CosmosDebugPort>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">

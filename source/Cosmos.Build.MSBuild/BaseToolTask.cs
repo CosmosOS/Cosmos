@@ -9,13 +9,13 @@ using Microsoft.Build.Framework;
 
 namespace Cosmos.Build.MSBuild
 {
-	public enum WriteType
-	{
-		Warning,
-		Error,
-		Message, // only issued on console
-		Info
-	}
+	  public enum WriteType
+	  {
+		    Warning,
+		    Error,
+		    Message, // only issued on console
+		    Info
+	  }
 
     public class LogInfo
     {
@@ -116,22 +116,19 @@ namespace Cosmos.Build.MSBuild
 				if (xProcess.ExitCode != 0) {
 					if (!xProcess.HasExited) {
 						xProcess.Kill();
-						LogError("{0} timed out.", name);
+						Log.LogError("{0} timed out.", name);
 					}
 					else {
-						LogError("Error occurred while invoking {0}.", name);
+            Log.LogError("Error occurred while invoking {0}.", name);
 					}
 				}
-				LogInfo logContent;
-				foreach (var xError in mErrors) {
-					if(ExtendLineError(xProcess.ExitCode, xError, out logContent)) {
-                        Logs(logContent);
-					}
+				foreach (var xError in mErrors)
+        {
+          Log.LogError(xError);
 				}
-				foreach (var xOutput in mOutput) {
-					if (ExtendLineError(xProcess.ExitCode, xOutput, out logContent)) {
-						Logs(logContent);
-					}
+				foreach (var xOutput in mOutput)
+				{
+				  Log.LogError(xOutput);
 				}
 				return xProcess.ExitCode == 0;
 			}
@@ -140,23 +137,25 @@ namespace Cosmos.Build.MSBuild
 		private List<string> mErrors;
 		private List<string> mOutput;
 
-		public virtual bool ExtendLineError(int exitCode, string errorMessage, out LogInfo log)
-		{
-            log = new LogInfo();
-			log.logType = WriteType.Error;
-			if (exitCode == 0)
-				return false;
-			return true;
-		}
+	  public virtual bool ExtendLineError(int exitCode, string errorMessage, out LogInfo log)
+	  {
+	    log = new LogInfo();
+	    log.logType = WriteType.Error;
+	    log.message = errorMessage;
+	    if (exitCode == 0)
+	      return false;
+	    return true;
+	  }
 
-		public virtual bool ExtendLineOutput(int exitCode, ref string errorMessage, out LogInfo log)
-		{
-            log = new LogInfo();
-            log.logType = WriteType.Info;
-			return true;
-		}
+	  public virtual bool ExtendLineOutput(int exitCode, ref string errorMessage, out LogInfo log)
+	  {
+	    log = new LogInfo();
+	    log.logType = WriteType.Info;
+	    log.message = errorMessage;
+	    return true;
+	  }
 
-        public void Logs(LogInfo logInfo)// string message, string category, string filename, string lineNumber = 0, string columnNumber = 0)
+	  public void Logs(LogInfo logInfo)// string message, string category, string filename, string lineNumber = 0, string columnNumber = 0)
 		{
             switch (logInfo.logType)
 			{
@@ -201,6 +200,6 @@ namespace Cosmos.Build.MSBuild
             }
         }
 
-        public bool UseConsoleForLog { get; set; }
+    public bool UseConsoleForLog { get; set; }
 	}
 }

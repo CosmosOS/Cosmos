@@ -37,35 +37,9 @@ namespace Cosmos.Debug.Common {
       return mPipe.Read(buffer, offset, count);
     }
 
-    public void SendRawToChannel(byte aChannel, byte[] aData)
+    public void SendRawToChannel(byte aChannel, byte aCommand, byte[] aData)
     {
-      if (!TryConnect())
-      {
-        return;
-      }
-      if (aData.Length == 0)
-      {
-        throw new InvalidOperationException("SendRawToChannel needs at least 1 data byte (command)!");
-      }
-      try
-      {
-        mPipe.WriteByte(aChannel);
-
-        //int xLength = Math.Min(xData.Length, 32768);
-        int xLength = aData.Length;
-        mPipe.WriteByte((byte)(xLength >> 24));
-        mPipe.WriteByte((byte)(xLength >> 16));
-        mPipe.WriteByte((byte)(xLength >> 8));
-        mPipe.WriteByte((byte)(xLength & 0xFF));
-        if (xLength > 0)
-        {
-          mPipe.Write(aData, 0, xLength);
-        }
-        mPipe.Flush();
-      }
-      catch
-      {
-      }
+      SendCommand((ushort)((aChannel << 8) | aCommand), aData);
     }
 
     public void SendCommand(ushort aCmd, string aData)

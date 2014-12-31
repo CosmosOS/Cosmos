@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E978986A-8160-4979-919E-F099A43EF146}</ProjectGuid>
+    <ProjectGuid>{AB869246-4887-4117-851D-766EB9FF1E29}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PlaygroundHAL</RootNamespace>
-    <AssemblyName>PlaygroundHAL</AssemblyName>
+    <RootNamespace>PlaygroundCore</RootNamespace>
+    <AssemblyName>PlaygroundCore</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -20,7 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,26 +34,12 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HALGlobal.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestTextScreen.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Common\Cosmos.Common.csproj">
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.Core\Cosmos.Core.csproj">
-      <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
-      <Name>Cosmos.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
-      <Project>{61607f1e-58f9-41cf-972f-128384f3e115}</Project>
-      <Name>Cosmos.Debug.Kernel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PlaygroundCore\PlaygroundCore.csproj">
-      <Project>{AB869246-4887-4117-851D-766EB9FF1E29}</Project>
-      <Name>PlaygroundCore</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

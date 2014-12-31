@@ -34,8 +34,17 @@ namespace Cosmos.VS.Windows
 
         protected override void HandleChannelMessage(byte aChannel, byte aCommand, byte[] aData)
         {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+                                                                             {
+                                                                                 textBox.Text += "\r\nThreading problem\r\n";
+                                                                             }));
+
+            }
             if (aChannel != ConsoleConsts.Channel)
             {
+                textBox.Text += "\r\n" + String.Format("Received command {0} on channel {1}, with {2} databytes!\r\n", aCommand, aChannel, aData.Length);
                 return;
             }
 
@@ -51,11 +60,11 @@ namespace Cosmos.VS.Windows
 
             if (aCommand == ConsoleConsts.Command_WriteText)
             {
-                textBox.AppendText(Encoding.ASCII.GetString(aData) + "\r\n");
+                textBox.Text += "\r\n'" + (Encoding.ASCII.GetString(aData) + "'\r\n");
             }
             else
             {
-                textBox.AppendText("Command '" + aCommand + "' not recognized!\r\n");
+                textBox.Text += "\r\n" + ("Command '" + aCommand + "' not recognized!\r\n");
             }
         }
 
