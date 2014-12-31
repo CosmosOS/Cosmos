@@ -16,9 +16,24 @@ using System.Reflection.Emit;
 using System.Diagnostics;
 
 namespace Cosmos.Build.MSBuild {
-  public class IL2CPU : AppDomainIsolatedTask {
-    protected IL2CPUTask mTask = new IL2CPUTask();
+  public class IL2CPU : BaseToolTask
+  {
+   // protected IL2CPUTask mTask = new IL2CPUTask();
 
+    [Required]
+    public string CosmosBuildDir
+    {
+      get;
+      set;
+    }
+
+    [Required]
+    public string WorkingDir
+    {
+      get;
+      set;
+    }
+   
     [Required]
     public string DebugMode {
       get;
@@ -103,7 +118,7 @@ namespace Cosmos.Build.MSBuild {
       var xSW = Stopwatch.StartNew();
 
       try {
-        mTask.OnLogMessage = LogMessage;
+     /*   mTask.OnLogMessage = LogMessage;
         mTask.OnLogError = LogError;
         mTask.OnLogWarning = LogWarning;
         mTask.OnLogException = LogException;
@@ -119,13 +134,59 @@ namespace Cosmos.Build.MSBuild {
         mTask.EnableLogging = EnableLogging;
         mTask.EmitDebugSymbols = EmitDebugSymbols;
         mTask.IgnoreDebugStubAttribute = IgnoreDebugStubAttribute;
-        Log.LogMessage(MessageImportance.High,
-          string.Format("IL2CPU invoked with DebugMode='{0}', DebugEnabled='{1}', TraceAssemblies='{2}', IgnoreDebugStub='{3}'",
-            DebugMode, DebugEnabled, TraceAssemblies ?? "{NULL}", IgnoreDebugStubAttribute
-          ));
-        return mTask.Execute();
+
+        */
+
+        Dictionary<string,string> args = new Dictionary<string, string>();
+        args.Add("DebugEnabled", Convert.ToString(DebugEnabled));
+        args.Add("StackCorruptionDetectionEnabled", Convert.ToString(StackCorruptionDetectionEnabled));
+        args.Add("DebugMode", Convert.ToString(DebugMode));
+        args.Add("TraceAssemblies", Convert.ToString(TraceAssemblies));
+        args.Add("DebugCom", Convert.ToString(DebugCom));
+        args.Add("UseNAsm", Convert.ToString(UseNAsm));
+
+        List<string> refs = new List<string>();
+        foreach (var reference in References)
+        {
+          
+            if (reference.MetadataNames.OfType<string>().Contains("FullPath"))
+            {
+              string xFile = reference.GetMetadata("FullPath");
+              refs.Add(Convert.ToString(xFile));
+            }
+        
+
+
+        }
+      //  refs.RemoveAt(refs.Count - 1);
+
+        args.Add("OutputFilename", Convert.ToString(OutputFilename));
+        args.Add("EnableLogging", Convert.ToString(EnableLogging));
+        args.Add("EmitDebugSymbols", Convert.ToString(EmitDebugSymbols));
+        args.Add("IgnoreDebugStubAttribute", Convert.ToString(IgnoreDebugStubAttribute));
+
+        string Arguments = "";
+        foreach (var arg in args)
+        {
+          Arguments += "\"" + arg.Key + ":" + arg.Value + "\" ";
+        }
+        foreach (var Ref in refs)
+        {
+          Arguments += "\"References:" + Ref + "\" ";
+        }
+                  return base.ExecuteTool(WorkingDir,
+                  Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe"),
+                  Arguments,
+                  "IL2CPU");
+      
+       // return mTask.Execute();
       } finally {
         xSW.Stop();
+        Log.LogMessage(MessageImportance.High,
+         string.Format("IL2CPU invoked with DebugMode='{0}', DebugEnabled='{1}', TraceAssemblies='{2}', IgnoreDebugStub='{3}'",
+           DebugMode, DebugEnabled, TraceAssemblies ?? "{NULL}", IgnoreDebugStubAttribute
+         ));
+
         Log.LogMessage(MessageImportance.High, "IL2CPU task took {0}", xSW.Elapsed);
       }
     }

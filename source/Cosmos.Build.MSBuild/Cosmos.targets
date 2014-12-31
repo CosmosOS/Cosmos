@@ -38,7 +38,9 @@
              References="@(ReferencePath)"
              OutputFilename="$(TargetDir)$(MSBuildProjectName).asm"
              EnableLogging="true"
-             EmitDebugSymbols="$(DebugSymbols)"/>
+             EmitDebugSymbols="$(DebugSymbols)"
+             CosmosBuildDir="$(CosmosDir)\Build"
+             WorkingDir="$(TargetDir)"/>
 
     <NAsm    InputFile="$(TargetDir)$(MSBuildProjectName).asm"
              OutputFile="$(TargetDir)$(MSBuildProjectName).obj"
