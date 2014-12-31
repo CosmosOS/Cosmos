@@ -34,7 +34,7 @@ namespace Cosmos.Debug.Common
         protected byte mCurrentMsgType;
         protected AutoResetEvent mCmdWait = new AutoResetEvent(false);
 
-        private StreamWriter mDebugWriter = new StreamWriter(@"e:\dcdebug.txt", false) { AutoFlush = true };
+        private StreamWriter mDebugWriter = StreamWriter.Null; //new StreamWriter(@"e:\dcdebug.txt", false) { AutoFlush = true };
 
         // This member used to be public. The SetConnectionHandler has been added.
         private Action Connected;

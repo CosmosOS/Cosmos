@@ -20,31 +20,29 @@ namespace IL2CPU
     private static  Dictionary<string, string> CmdOptions = new Dictionary<string, string>();
     private static List<ITaskItem>  References = new List<ITaskItem>();
 
-    private static void Main(string[] args)
+    private static int Main(string[] args)
     {
-
-
-      var tmp = "";
-      foreach (var s in args)
-      {
-
-        tmp += s;
-        string[] s1 = s.Split(':');
-        string argID = s1[0].ToLower();
-        if (argID != "References".ToLower())
+      try {
+        var tmp = "";
+        foreach (var s in args)
         {
-          CmdOptions.Add(argID, s.Replace(s1[0] + ":",""));
-        }
-        else
-        {
-          
-          References.Add(new TaskItemImpl(s.Replace(s1[0] + ":","")));
-        }
 
-      }
-      File.WriteAllText("C:\\Users\\Emile\\Desktop\\dump.txt",tmp);
-      try
-      {
+          tmp += s;
+          string[] s1 = s.Split(':');
+          string argID = s1[0].ToLower();
+          if (argID != "References".ToLower())
+          {
+            CmdOptions.Add(argID, s.Replace(s1[0] + ":",""));
+          }
+          else
+          {
+
+            References.Add(new TaskItemImpl(s.Replace(s1[0] + ":","")));
+          }
+
+        }
+        //File.WriteAllText("C:\\Users\\Emile\\Desktop\\dump.txt",tmp);
+
         var xTask = new IL2CPUTask();
         xTask.DebugEnabled = Convert.ToBoolean(CmdOptions["DebugEnabled".ToLower()]);
         Console.WriteLine("Loaded : DebugEnabled");
@@ -81,10 +79,12 @@ namespace IL2CPU
         if (xTask.Execute())
         {
           Console.WriteLine("Executed OK");
+          return 0;
         }
         else
         {
           Console.WriteLine("Errorred");
+          return 2;
         }
 
 
@@ -93,26 +93,9 @@ namespace IL2CPU
       {
        // Console.Out.Flush();
       // File.WriteAllText("./ErrorDump.txt",E.ToString()  + " " + E.Source);
-
-        return;
+        Console.WriteLine("Error occurred: " + E.ToString());
+        return 1;
       }
-
-      //Console.Out.Flush();
-     // File.WriteAllText("./ErrorDump.txt", Console.Out.ToString());
-    //  Console.ReadKey();
-    }
-
-    private static ITaskItem[] GetReferences()
-    {
-      return new ITaskItem[]
-      {
-        new TaskItemImpl(KernelFile),
-        new TaskItemImpl(CosmosRoot + @"\source\Cosmos.Core.Plugs\bin\x86\Debug\Cosmos.Core.Plugs.dll"),
-        new TaskItemImpl(CosmosRoot + @"\source\Cosmos.Debug.Kernel.Plugs\bin\x86\Debug\Cosmos.Debug.Kernel.Plugs.dll"),
-        new TaskItemImpl(CosmosRoot + @"\source\Cosmos.HAL\bin\x86\Debug\Cosmos.HAL.dll"),
-        new TaskItemImpl(CosmosRoot + @"\source\Cosmos.System.Plugs\bin\x86\Debug\Cosmos.System.Plugs.dll"),
-        new TaskItemImpl(CosmosRoot + @"\Users\Sentinel209\SentinelSystemLib\bin\Debug\SentinelSystemLib.dll"),
-      };
     }
 
     private class TaskItemImpl : ITaskItem

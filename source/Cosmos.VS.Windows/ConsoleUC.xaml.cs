@@ -39,15 +39,15 @@ namespace Cosmos.VS.Windows
                 return;
             }
 
-            using (var xFS = new FileStream(@"e:\OpenSource\Edison\Serial\Console.in", FileMode.OpenOrCreate))
-            {
-                xFS.Position = xFS.Length;
-                xFS.WriteByte(aCommand);
-                if (aData.Length > 0)
-                {
-                    xFS.Write(aData, 0, aData.Length);
-                }
-            }
+            //using (var xFS = new FileStream(@"e:\OpenSource\Edison\Serial\Console.in", FileMode.OpenOrCreate))
+            //{
+            //    xFS.Position = xFS.Length;
+            //    xFS.WriteByte(aCommand);
+            //    if (aData.Length > 0)
+            //    {
+            //        xFS.Write(aData, 0, aData.Length);
+            //    }
+            //}
 
             if (aCommand == ConsoleConsts.Command_WriteText)
             {

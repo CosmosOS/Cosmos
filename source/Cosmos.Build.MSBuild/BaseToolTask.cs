@@ -28,7 +28,7 @@ namespace Cosmos.Build.MSBuild
         /// Description of the type (can be null).
         /// </summary>
         public string subcategory;
-        
+
         /// <summary>
         /// Message, Warning or Error code (can be null)
         /// </summary>
@@ -179,7 +179,7 @@ namespace Cosmos.Build.MSBuild
 			        }
 			        else
 			        {
-			            Log.LogError(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message, logInfo.messageArgs);
+			            Log.LogError(logInfo.subcategory, logInfo.code, logInfo.helpKeyword, logInfo.file, logInfo.lineNumber, logInfo.columnNumber, logInfo.endLineNumber, logInfo.endColumnNumber, logInfo.message??"", logInfo.messageArgs);
 			        }
 			        break;
 			}
