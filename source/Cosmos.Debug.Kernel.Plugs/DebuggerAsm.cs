@@ -52,7 +52,7 @@ namespace Cosmos.Debug.Kernel.Plugs {
   public class DebugBreak : AssemblerMethod {
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
       aAssembler.Add(new LiteralAssemblerCode("%ifdef DEBUGSTUB"));
-      aAssembler.Add(new LiteralAssemblerCode("mov dword [DebugBreakOnNextTrace], 1"));
+      aAssembler.Add(new LiteralAssemblerCode("mov dword [DebugStub_DebugBreakOnNextTrace], 1"));
       aAssembler.Add(new LiteralAssemblerCode("%endif"));
     }
   }
