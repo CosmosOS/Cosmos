@@ -104,34 +104,36 @@ namespace Cosmos.Debug.VSDebugEngine
             mDebugDownPipe.SendCommand(Debugger2Windows.Stack, aData);
         }
 
-        private void mDebugUpPipe_DataPacketReceived(byte aCmd, byte[] aData)
+        private void mDebugUpPipe_DataPacketReceived(ushort aCmd, byte[] aData)
         {
             try
             {
-                switch (aCmd)
+                if (aCmd <= 127)
                 {
-                    case Windows2Debugger.Noop:
-                        // do nothing
-                        break;
+                    switch (aCmd)
+                    {
+                        case Windows2Debugger.Noop:
+                            // do nothing
+                            break;
 
-                    case Windows2Debugger.PingVSIP:
-                        mDebugDownPipe.SendCommand(Debugger2Windows.PongVSIP);
-                        break;
+                        case Windows2Debugger.PingVSIP:
+                            mDebugDownPipe.SendCommand(Debugger2Windows.PongVSIP);
+                            break;
 
-                    case Windows2Debugger.PingDebugStub:
-                        mDbgConnector.Ping();
-                        break;
+                        case Windows2Debugger.PingDebugStub:
+                            mDbgConnector.Ping();
+                            break;
 
-                    case Windows2Debugger.SetAsmBreak:
+                        case Windows2Debugger.SetAsmBreak:
                         {
                             string xLabel = Encoding.UTF8.GetString(aData);
                             UInt32 xAddress = mDebugInfoDb.AddressOfLabel(xLabel);
                             mDbgConnector.SetAsmBreakpoint(xAddress);
                             mDbgConnector.Continue();
                         }
-                        break;
+                            break;
 
-                    case Windows2Debugger.ToggleAsmBreak2:
+                        case Windows2Debugger.ToggleAsmBreak2:
                         {
                             string xLabel = Encoding.UTF8.GetString(aData);
                             UInt32 xAddress = mDebugInfoDb.AddressOfLabel(xLabel);
@@ -143,28 +145,27 @@ namespace Cosmos.Debug.VSDebugEngine
                             {
                                 ClearASMBreakpoint(xAddress);
                             }
+                            break;
                         }
-                        break;
+                        case Windows2Debugger.ToggleStepMode:
+                            ASMSteppingMode = !ASMSteppingMode;
+                            break;
 
-                    case Windows2Debugger.ToggleStepMode:
-                        ASMSteppingMode = !ASMSteppingMode;
-                        break;
+                        case Windows2Debugger.SetStepModeAssembler:
+                            ASMSteppingMode = true;
+                            break;
 
-                    case Windows2Debugger.SetStepModeAssembler:
-                        ASMSteppingMode = true;
-                        break;
+                        case Windows2Debugger.SetStepModeSource:
+                            ASMSteppingMode = false;
+                            break;
 
-                    case Windows2Debugger.SetStepModeSource:
-                        ASMSteppingMode = false;
-                        break;
-
-                    case Windows2Debugger.CurrentASMLine:
+                        case Windows2Debugger.CurrentASMLine:
                         {
                             mCurrentASMLine = Encoding.UTF8.GetString(aData);
                             ASMWindow_CurrentLineUpdated.Set();
+                            break;
                         }
-                        break;
-                    case Windows2Debugger.NextASMLine1:
+                        case Windows2Debugger.NextASMLine1:
                         {
                             if (aData.Length == 0)
                             {
@@ -176,31 +177,37 @@ namespace Cosmos.Debug.VSDebugEngine
                                 mNextASMLine1 = Encoding.UTF8.GetString(aData);
                                 ASMWindow_NextLine1Updated.Set();
                             }
+                            break;
                         }
-                        break;
-                    case Windows2Debugger.NextLabel1:
+                        case Windows2Debugger.NextLabel1:
                         {
                             string nextLabel = Encoding.UTF8.GetString(aData);
                             mNextAddress1 = mDebugInfoDb.AddressOfLabel(nextLabel);
                             ASMWindow_NextAddress1Updated.Set();
+                            break;
                         }
-                        break;
-                    //cmd used from assembler window
-                    case Windows2Debugger.Continue:
-                        Step(enum_STEPKIND.STEP_OVER);
-                        break;
-                    //cmd used from assembler window
-                    case Windows2Debugger.AsmStepInto:
-                        Step(enum_STEPKIND.STEP_INTO);
-                        break;
-                    default:
-                        throw new Exception(String.Format("Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived.", aCmd));
+                            //cmd used from assembler window
+                        case Windows2Debugger.Continue:
+                            Step(enum_STEPKIND.STEP_OVER);
+                            break;
+                            //cmd used from assembler window
+                        case Windows2Debugger.AsmStepInto:
+                            Step(enum_STEPKIND.STEP_INTO);
+                            break;
+                        default:
+                            throw new Exception(String.Format("Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived.", aCmd));
+                    }
+                }
+                else
+                {
+                    throw new NotImplementedException("Sending other channels not yet supported!");
                 }
             }
             catch(Exception ex)
             {
                 //We cannot afford to silently break the pipe!
                 OutputText("AD7Process UpPipe receive error! " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("AD7Process UpPipe receive error! " + ex.ToString());
             }
         }
 
@@ -317,11 +324,10 @@ namespace Cosmos.Debug.VSDebugEngine
 
         private void DbgCmdConsole(byte[] obj)
         {
-
-          throw new NotImplementedException();
+            mDebugDownPipe.SendCommand(Debugger2Windows.Cmd_Console, obj);
         }
 
-      private void DbgCmdStackCorruptionOccurred(uint lastEIPAddress)
+        private void DbgCmdStackCorruptionOccurred(uint lastEIPAddress)
         {
             MessageBox.Show(String.Format("Stack corruption occurred at address 0x{0:X8}! Halting now.", lastEIPAddress));
         }
@@ -348,14 +354,15 @@ namespace Cosmos.Debug.VSDebugEngine
                 mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Pipes.DownName);
 
                 mDebugUpPipe = new Cosmos.Debug.Common.PipeServer(Pipes.UpName);
-                mDebugUpPipe.DataPacketReceived += new Action<byte, byte[]>(mDebugUpPipe_DataPacketReceived);
+                mDebugUpPipe.DataPacketReceived += mDebugUpPipe_DataPacketReceived;
                 mDebugUpPipe.Start();
             }
             else
             {
                 mDebugUpPipe.CleanHandlers();
-                mDebugUpPipe.DataPacketReceived += new Action<byte, byte[]>(mDebugUpPipe_DataPacketReceived);
+                mDebugUpPipe.DataPacketReceived += mDebugUpPipe_DataPacketReceived;
             }
+
             // Must be after mDebugDownPipe is initialized
             OutputClear();
             OutputText("Debugger process initialized.");
@@ -913,6 +920,7 @@ namespace Cosmos.Debug.VSDebugEngine
             ChangeINT3sOnCurrentMethod(true);
         }
         public List<KeyValuePair<UInt32, string>> INT3sSet = new List<KeyValuePair<UInt32, string>>();
+
         internal void ChangeINT3sOnCurrentMethod(bool clear)
         {
             if (mCurrentAddress.HasValue)

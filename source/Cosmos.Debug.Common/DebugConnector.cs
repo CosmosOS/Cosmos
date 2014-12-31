@@ -650,6 +650,7 @@ namespace Cosmos.Debug.Common
         {
             WaitForMessage();
             CmdText(ASCIIEncoding.ASCII.GetString(aPacket));
+            CmdConsole(aPacket);
         }
 
         protected void PacketMessageBoxText(byte[] aPacket)

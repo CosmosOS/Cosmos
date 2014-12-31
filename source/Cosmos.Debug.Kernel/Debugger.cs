@@ -46,10 +46,10 @@ namespace Cosmos.Debug.Kernel {
 
         // TODO: Kudzu repacement methods for Cosmos.HAL.DebugUtil
         public unsafe void SendMessage(string aModule, string aData) {
-            //string xSingleString;
-            //xSingleString = "Message Module: \"" + aModule + "\"";
-            //xSingleString += " Data: \"" + aData + "\"";
-            //Send(xSingleString);
+            string xSingleString;
+            xSingleString = "Message Module: \"" + aModule + "\"";
+            xSingleString += " Data: \"" + aData + "\"";
+            Send(xSingleString);
         }
 
         public unsafe void SendError(string aModule, string aData) {

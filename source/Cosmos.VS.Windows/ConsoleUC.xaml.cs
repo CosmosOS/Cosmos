@@ -15,64 +15,87 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Cosmos.Debug.Common;
 using Microsoft.VisualStudio.Shell;
 
 namespace Cosmos.VS.Windows
 {
-  /// <summary>
-  /// Interaction logic for ConsoleUC.xaml
-  /// </summary>
-  public partial class ConsoleUC
-  {
-    private DispatcherTimer mTimer;
-
-    public ConsoleUC()
+    /// <summary>
+    /// Interaction logic for ConsoleUC.xaml
+    /// </summary>
+    public partial class ConsoleUC
     {
-      InitializeComponent();
+        private DispatcherTimer mTimer;
 
-      mTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(200), DispatcherPriority.Normal, OnTimer, Dispatcher);
-    }
-
-    private void OnTimer(object sender, EventArgs e)
-    {
-      mTimer.Stop();
-      try
-      {
-        var xBuff = new byte[16384];
-        if (!Global.ConsoleTextChannel.IsConnected)
+        public ConsoleUC()
         {
-          return;
+            InitializeComponent();
         }
-        var xReadBytes = Global.ConsoleTextChannel.Read(xBuff, 0, xBuff.Length);
-        if (xReadBytes > 0)
+
+        protected override void HandleChannelMessage(byte aChannel, byte aCommand, byte[] aData)
         {
-          using (var xFS = new FileStream(@"e:\OpenSource\Edison\Serial\Console.in", FileMode.OpenOrCreate))
-          {
-            xFS.Position = xFS.Length;
-            xFS.Write(xBuff, 0, xReadBytes);
-          }
-          textBox.AppendText(Encoding.UTF8.GetString(xBuff, 0, xReadBytes));
+            if (aChannel != ConsoleConsts.Channel)
+            {
+                return;
+            }
+
+            using (var xFS = new FileStream(@"e:\OpenSource\Edison\Serial\Console.in", FileMode.OpenOrCreate))
+            {
+                xFS.Position = xFS.Length;
+                xFS.WriteByte(aCommand);
+                if (aData.Length > 0)
+                {
+                    xFS.Write(aData, 0, aData.Length);
+                }
+            }
+
+            if (aCommand == ConsoleConsts.Command_WriteText)
+            {
+                textBox.AppendText(Encoding.ASCII.GetString(aData) + "\r\n");
+            }
+            else
+            {
+                textBox.AppendText("Command '" + aCommand + "' not recognized!\r\n");
+            }
         }
-      }
-      finally
-      {
-        mTimer.Start();
-      }
-    }
-  }
 
-  [Guid("681a4da7-ba11-4c26-80a9-b39734a95b1c")]
-  public class ConsoleTW : ToolWindowPane2
-  {
-    public ConsoleTW()
+        //public override void Update(string aTag, byte[] aData)
+        //{
+        //    base.Update(aTag, aData);
+
+        //    if (aData.Length > 0)
+        //    {
+        //        using (var xFS = new FileStream(@"e:\OpenSource\Edison\Serial\Console.in", FileMode.OpenOrCreate))
+        //        {
+        //            xFS.Position = xFS.Length;
+        //            xFS.Write(aData, 0, aData.Length);
+        //        }
+        //    }
+        //    var xTxt = aData.Aggregate("0x", (s, b) => s + b.ToString("X2"));
+
+        //    if (Dispatcher.CheckAccess())
+        //    {
+        //        textBox.AppendText(xTxt + "\r\n");
+        //    }
+        //    else
+        //    {
+        //        Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => textBox.AppendText(xTxt + "\r\n")));
+        //    }
+        //}
+    }
+
+    [Guid("681a4da7-ba11-4c26-80a9-b39734a95b1c")]
+    public class ConsoleTW : ToolWindowPaneChannel
     {
-      Caption = "Cosmos Console";
-      BitmapResourceID = 301;
-      BitmapIndex = 1;
+        public ConsoleTW()
+        {
+            Caption = "Cosmos Console";
+            BitmapResourceID = 301;
+            BitmapIndex = 1;
 
-      var xUserControl = new ConsoleUC();
-      Content = xUserControl;
-      this.OnClose();
+            var xUserControl = new ConsoleUC();
+            Content = xUserControl;
+            mUserControl = xUserControl;
+        }
     }
-  }
 }

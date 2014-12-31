@@ -46,13 +46,15 @@ namespace Cosmos.VS.Windows
     [Guid(GuidList.guidCosmos_VS_WindowsPkgString)]
     public sealed class Cosmos_VS_WindowsPackage : Package
     {
-        Queue<byte> mCommand;
+        Queue<ushort> mCommand;
         Queue<byte[]> mMessage;
         System.Timers.Timer mTimer = new System.Timers.Timer(100);
         /// <summary>A pipe server that will receive responses from the AD7Process</summary>
         Cosmos.Debug.Common.PipeServer mPipeDown;
 
         private StateStorer mStateStorer;
+        private PipeServer mConsoleDown;
+
         public StateStorer StateStorer
         {
             get
@@ -68,7 +70,7 @@ namespace Cosmos.VS.Windows
         /// initialization is the Initialize method.
         public Cosmos_VS_WindowsPackage()
         {
-            mCommand = new Queue<byte>();
+            mCommand = new Queue<ushort>();
             mMessage = new Queue<byte[]>();
 
             // There are a lot of threading issues in VSIP, and the WPF dispatchers do not work.
@@ -78,7 +80,7 @@ namespace Cosmos.VS.Windows
             mTimer.Start();
 
             mPipeDown = new Cosmos.Debug.Common.PipeServer(Pipes.DownName);
-            mPipeDown.DataPacketReceived += new Action<byte, byte[]>(PipeThread_DataPacketReceived);
+            mPipeDown.DataPacketReceived += PipeThread_DataPacketReceived;
             mPipeDown.Start();
 
             mStateStorer = new StateStorer();
@@ -97,11 +99,50 @@ namespace Cosmos.VS.Windows
             return xWindow as ToolWindowPane2;
         }
 
+        private ToolWindowPaneChannel FindChannelWindow(Type aWindowType)
+        {
+            // Get the instance number 0 of this tool window.
+            // Our windows are single instance so this instance will be the only one.
+            // The last flag is set to true so that if the tool window does not exists it will be created.
+            var xWindow = FindToolWindow(aWindowType, 0, true);
+            if ((xWindow == null) || (xWindow.Frame == null))
+            {
+                throw new NotSupportedException(Resources.CanNotCreateWindow);
+            }
+            return xWindow as ToolWindowPaneChannel;
+        }
+
+        private void ShowChannelWindow(Type aWindowType)
+        {
+            var xWindow = FindChannelWindow(aWindowType);
+            var xFrame = (IVsWindowFrame)xWindow.Frame;
+            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(xFrame.Show());
+        }
+
         private void ShowWindow(Type aWindowType)
         {
             var xWindow = FindWindow(aWindowType);
             var xFrame = (IVsWindowFrame)xWindow.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(xFrame.Show());
+        }
+
+        private Type[] mAllChannelWindowTypes = {
+                                                    typeof(ConsoleTW)
+                                                };
+
+        private void UpdateChannelWindows(ushort aChannelAndCommand, byte[] aData)
+        {
+            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
+                (Action)delegate()
+                {
+                    foreach (var xType in mAllChannelWindowTypes)
+                    {
+                        var xWindow = FindChannelWindow(xType);
+                        xWindow.UserControl.Package = this;
+                        xWindow.UserControl.HandleChannelMessage(aChannelAndCommand, aData);
+                    }
+                }
+            );
         }
 
         private void UpdateWindow(Type aWindowType, string aTag, byte[] aData)
@@ -138,7 +179,7 @@ namespace Cosmos.VS.Windows
 
         private void ShowWindowConsole(object aCommand, EventArgs e)
         {
-          ShowWindow(typeof(ConsoleTW));
+            ShowChannelWindow(typeof(ConsoleTW));
         }
 
         private void ShowWindowAll(object aCommand, EventArgs e)
@@ -184,7 +225,7 @@ namespace Cosmos.VS.Windows
 
         void ProcessMessage(object sender, EventArgs e)
         {
-            byte xCmd;
+            ushort xCmd;
             byte[] xMsg;
             while (true)
             {
@@ -197,63 +238,69 @@ namespace Cosmos.VS.Windows
                     xCmd = mCommand.Dequeue();
                     xMsg = mMessage.Dequeue();
                 }
-
-                switch (xCmd)
+                if (xCmd <= 127)
                 {
-                    case Debugger2Windows.Noop:
-                        break;
+                    // debug channel
+                    switch (xCmd)
+                    {
+                        case Debugger2Windows.Noop:
+                            break;
 
-                    case Debugger2Windows.Stack:
-                        UpdateWindow(typeof(StackTW), "STACK", xMsg);
-                        break;
+                        case Debugger2Windows.Stack:
+                            UpdateWindow(typeof(StackTW), "STACK", xMsg);
+                            break;
 
-                    case Debugger2Windows.Frame:
-                        UpdateWindow(typeof(StackTW), "FRAME", xMsg);
-                        break;
+                        case Debugger2Windows.Frame:
+                            UpdateWindow(typeof(StackTW), "FRAME", xMsg);
+                            break;
 
-                    case Debugger2Windows.Registers:
-                        UpdateWindow(typeof(RegistersTW), null, xMsg);
-                        break;
+                        case Debugger2Windows.Registers:
+                            UpdateWindow(typeof(RegistersTW), null, xMsg);
+                            break;
 
-                    case Debugger2Windows.Quit:
-                        //Close();
-                        break;
+                        case Debugger2Windows.Quit:
+                            //Close();
+                            break;
 
-                    case Debugger2Windows.AssemblySource:
-                        UpdateWindow(typeof(AssemblyTW), null, xMsg);
-                        break;
+                        case Debugger2Windows.AssemblySource:
+                            UpdateWindow(typeof(AssemblyTW), null, xMsg);
+                            break;
 
-                    case Debugger2Windows.PongVSIP:
-                        UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from VSIP"));
-                        break;
+                        case Debugger2Windows.PongVSIP:
+                            UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from VSIP"));
+                            break;
 
-                    case Debugger2Windows.PongDebugStub:
-                        UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from DebugStub"));
-                        break;
+                        case Debugger2Windows.PongDebugStub:
+                            UpdateWindow(typeof(InternalTW), null, Encoding.UTF8.GetBytes("Pong from DebugStub"));
+                            break;
 
-                    case Debugger2Windows.OutputPane:
-                        System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
-                          (Action)delegate()
-                        {
-                            Global.OutputPane.OutputString(System.Text.Encoding.UTF8.GetString(xMsg));
-                        }
-                        );
-                        break;
+                        case Debugger2Windows.OutputPane:
+                            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
+                                                                                 (Action)delegate()
+                                                                                         {
+                                                                                             Global.OutputPane.OutputString(System.Text.Encoding.UTF8.GetString(xMsg));
+                                                                                         }
+                                );
+                            break;
 
-                    case Debugger2Windows.OutputClear:
-                        System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
-                          (Action)delegate()
-                        {
-                            Global.OutputPane.Clear();
-                            StateStorer.ClearState();
-                        }
-                        );
-                        break;
+                        case Debugger2Windows.OutputClear:
+                            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
+                                                                                 (Action)delegate()
+                                                                                         {
+                                                                                             Global.OutputPane.Clear();
+                                                                                             StateStorer.ClearState();
+                                                                                         });
+                            break;
+                    }
+                }
+                else
+                {
+                    UpdateChannelWindows(xCmd, xMsg);
                 }
             }
         }
 
-        void PipeThread_DataPacketReceived(byte aCmd, byte[] aMsg)
+        void PipeThread_DataPacketReceived(ushort aCmd, byte[] aMsg)
         {
             lock (mCommand)
             {
