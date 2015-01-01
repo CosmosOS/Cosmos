@@ -11,9 +11,13 @@ namespace PlaygroundSystem
 {
     public abstract class OurKernel: Kernel
     {
+        protected override TextScreenBase GetTextScreen()
+        {
+            return new DebugTextScreen();
+        }
+
         public void DoIt()
         {
-            TestTextScreen.DoIt();
         }
     }
 }

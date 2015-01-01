@@ -153,14 +153,15 @@ namespace Cosmos.Assembler {
     }
 
     public void Add(Instruction aReader) {
-        if (aReader is Label || aReader is Comment)
+        if (EmitAsmLabels)
         {
-        }
-        else if (EmitAsmLabels)
-        {
+          if (!(aReader is Label)
+              && !(aReader is Comment))
+          {
             // Only issue label if its executable code.
             new Label("." + AsmIlIdx.ToString("X2"), "Asm");
             mAsmIlIdx++;
+          }
         }
         mInstructions.Add(aReader);
     }
@@ -252,6 +253,7 @@ namespace Cosmos.Assembler {
         }
      }
       aOutput.WriteLine("global Kernel_Start");
+      aOutput.Flush();
     }
 
     static public void WriteDebugVideo(string aText) {

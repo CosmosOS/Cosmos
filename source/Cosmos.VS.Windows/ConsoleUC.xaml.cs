@@ -34,63 +34,20 @@ namespace Cosmos.VS.Windows
 
         protected override void HandleChannelMessage(byte aChannel, byte aCommand, byte[] aData)
         {
-            if (!Dispatcher.CheckAccess())
-            {
-                Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
-                                                                             {
-                                                                                 textBox.Text += "\r\nThreading problem\r\n";
-                                                                             }));
-
-            }
             if (aChannel != ConsoleConsts.Channel)
             {
-                textBox.Text += "\r\n" + String.Format("Received command {0} on channel {1}, with {2} databytes!\r\n", aCommand, aChannel, aData.Length);
                 return;
             }
 
-            //using (var xFS = new FileStream(@"e:\OpenSource\Edison\Serial\Console.in", FileMode.OpenOrCreate))
-            //{
-            //    xFS.Position = xFS.Length;
-            //    xFS.WriteByte(aCommand);
-            //    if (aData.Length > 0)
-            //    {
-            //        xFS.Write(aData, 0, aData.Length);
-            //    }
-            //}
-
             if (aCommand == ConsoleConsts.Command_WriteText)
             {
-                textBox.Text += "\r\n'" + (Encoding.ASCII.GetString(aData) + "'\r\n");
+                textBox.Text += Encoding.ASCII.GetString(aData);
             }
             else
             {
-                textBox.Text += "\r\n" + ("Command '" + aCommand + "' not recognized!\r\n");
+                textBox.Text += ("Command '" + aCommand + "' not recognized!\r\n");
             }
         }
-
-        //public override void Update(string aTag, byte[] aData)
-        //{
-        //    base.Update(aTag, aData);
-
-        //    if (aData.Length > 0)
-        //    {
-        //        using (var xFS = new FileStream(@"e:\OpenSource\Edison\Serial\Console.in", FileMode.OpenOrCreate))
-        //        {
-        //            xFS.Position = xFS.Length;
-        //            xFS.Write(aData, 0, aData.Length);
-        //        }
-        //    }
-        //    var xTxt = aData.Aggregate("0x", (s, b) => s + b.ToString("X2"));
-
-        //    if (Dispatcher.CheckAccess())
-        //    {
-        //        textBox.AppendText(xTxt + "\r\n");
-        //    }
-        //    else
-        //    {
-        //        Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() => textBox.AppendText(xTxt + "\r\n")));
-        //    }
-        //}
     }
 
     [Guid("681a4da7-ba11-4c26-80a9-b39734a95b1c")]

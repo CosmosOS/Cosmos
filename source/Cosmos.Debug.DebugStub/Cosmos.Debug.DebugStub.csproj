@@ -104,6 +104,10 @@
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>Screen.asm</LastGenOutput>
     </None>
+    <None Include="SerialHelpers.xs">
+      <Generator>CosmosXSharpGenerator</Generator>
+      <LastGenOutput>SerialHelpers.asm</LastGenOutput>
+    </None>
     <None Include="Serial.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>Serial.asm</LastGenOutput>
@@ -157,6 +161,11 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Screen.xs</DependentUpon>
+    </Content>
+    <Content Include="SerialHelpers.asm">
+      <DependentUpon>SerialHelpers.xs</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
     </Content>
     <Content Include="Serial.asm">
       <AutoGen>True</AutoGen>
