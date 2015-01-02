@@ -157,8 +157,6 @@ Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversio
 Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\Tools\mkisofs\*"; DestDir: "{app}\Build\Tools\mkisofs"; Flags: ignoreversion uninsremovereadonly overwritereadonly
-Source: ".\source\Tools\IL2CPU\bin\Debug\*.exe"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly overwritereadonly
-Source: ".\source\Tools\IL2CPU\bin\Debug\*.dll"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 
 ;
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
@@ -242,7 +240,8 @@ Source: ".\Build\VSIP\Cosmos.zip"; DestDir: "{code:VSNET2013_PATH}\ProjectTempla
 Source: ".\Build\VSIP\CosmosKernel (C#).zip"; DestDir: "{code:GetCSharpExpress2013ProjectTemplatePath}"; DestName: "CosmosKernel (C#).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2013Installed('dummy')
 ; Install templates into VB Express
 Source: ".\Build\VSIP\CosmosKernel (VB).zip"; DestDir: "{code:GetVBExpress2013ProjectTemplatePath}"; DestName: "CosmosKernel (VB).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsVBExpress2013Installed('dummy')
-
+;Compiler
+Source: ".\source\IL2CPU\bin\Debug\*"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 [Registry]
 
 ; Regiter .xs Extension
@@ -396,6 +395,7 @@ Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Languages\Language Serv
 
 Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Services\{{3fb852ed-3562-3da4-98dc-55759744328c}; ValueType: string; ValueData: {{e2ce86d3-fb0b-43ad-938a-5bcdd087ea2d}
 Root: HKLM; Subkey: Software\Microsoft\VisualStudio\12.0\Services\{{3fb852ed-3562-3da4-98dc-55759744328c}; ValueName: Name; ValueType: string; ValueData: X# Language Service
+
 
 [Run]
 ; Forces VS to merge the resource metadata that describes menus, toolbars, and command groups from all VSPackages available.
