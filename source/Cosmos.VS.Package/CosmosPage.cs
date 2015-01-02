@@ -19,14 +19,14 @@ namespace Cosmos.VS.Package {
   // and add new ones.
 
   // We use our own profiles instead of Project Configrations because:
-  // -Couldnt find a proper way to tell VS there are no configuration independent pages. The MPF way (as well as 
+  // -Couldnt find a proper way to tell VS there are no configuration independent pages. The MPF way (as well as
   //  0 sized array) both don't work.
-  // -When we assign our own project configuration types and the solution configurations refer to now non existent 
+  // -When we assign our own project configuration types and the solution configurations refer to now non existent
   //  project configurations, there are errors.
   //
   // BOTH of the above probably could be solved with some digging. BUT in the end we learned that project configs
   // really wont do what we want. For the user to change the active config for a *single* project they would need
-  // to change it manually in the solution config, or maintain on solution config for every project config type. 
+  // to change it manually in the solution config, or maintain on solution config for every project config type.
   // Maintaining so many solution configs is not only impractical but causes a whole bunch of other issues.
   //
   // So instead we keep our own list of profiles, and when the user selects them we write out a copy of its values
@@ -153,7 +153,12 @@ namespace Cosmos.VS.Package {
           cmboCosmosDebugPort.Enabled = false;
           cmboVisualStudioDebugPort.Enabled = false;
           cmboVisualStudioDebugPort.SelectedIndex = mVMwareAndBochsDebugPipe;
-
+      }
+      else if (mProps.Profile == "IntelEdison")
+      {
+        mShowTabBochs = false;
+        mShowTabVMware = false;
+        cmboVisualStudioDebugPort.Enabled = false;
       }
     }
 
@@ -171,7 +176,7 @@ namespace Cosmos.VS.Package {
       lablCurrentProfile.Text = xProfile.Name;
       lablDeployText.Text = mProps.Description;
       lboxDeployment.SelectedItem = mProps.Deployment;
-      
+
       // Launch
       lboxLaunch.SelectedItem = mProps.Launch;
 
@@ -569,7 +574,7 @@ namespace Cosmos.VS.Package {
 
       #region Debug
       cmboCosmosDebugPort.Items.Clear();
-      cmboCosmosDebugPort.Items.Add("Serial: COM1");
+      FillComPorts(cmboCosmosDebugPort.Items);
 
       cmboVisualStudioDebugPort.Items.Clear();
       FillComPorts(cmboVisualStudioDebugPort.Items);

@@ -1,4 +1,8 @@
 ﻿namespace DebugStub
+// optionally exclude this serial version
+
+! %ifndef Exclude_IOPort_Based_Serial
+
 
 // mComPortAddresses = 0x3F8, 0x2F8, 0x3E8, 0x2E8;
 // Currently hardcoded to COM1.
@@ -24,13 +28,13 @@ var ComAddr = $03F8
 // anyways the way it is written and there are compatibility issues on some
 // hardware above this rate.
 //
-// We assume a minimum level of a 16550A, which should be no problem on any 
+// We assume a minimum level of a 16550A, which should be no problem on any
 // common hardware today. VMWare emulates the 16550A
 //
 // We do not handle flow control for outbound data (DS --> DC).
 // The DebugConnector (DC, the code in the Visual Studio side) however is threaded
 // and easily should be able to receive data faster than we can send it.
-// Most things are transactional with data being sent only when asked for, but 
+// Most things are transactional with data being sent only when asked for, but
 // with tracing we do send a data directly.
 //
 // Currently there is no inbound flow control either (DC --> DS)
@@ -109,67 +113,6 @@ Wait:
 	DX = .ComAddr
     AL = Port[DX]
 }
-function ComReadEAX {
-	repeat 4 times {
-		ComReadAL()
-		EAX ~> 8
-	}
-}
-
-// Input: EDI
-// Output: [EDI]
-// Modified: AL, DX, EDI (+1)
-//
-// Reads a byte into [EDI] and does EDI + 1
-function ComRead8  {
-    ComReadAL()
-    EDI[0] = AL
-    EDI + 1
-}
-function ComRead16 {
-	repeat 2 times {
-		ComRead8()
-	}
-}
-function ComRead32 {
-	repeat 4 times {
-		ComRead8()
-	}
-}
-
-// Input: AL
-// Output: None
-// Modifies: EDX, ESI
-function ComWriteAL {
-	+EAX
-    ESI = ESP
-    ComWrite8()
-    // Is a local var, cant use Return(4). X// issues the return.
-    // This also allows the function to preserve EAX.
-    -EAX
-}
-function ComWriteAX {
-    // Input: AX
-    // Output: None
-    // Modifies: EDX, ESI
-    +EAX
-    ESI = ESP
-    ComWrite16()
-    // Is a local var, cant use Return(4). X// issues the return.
-    // This also allow the function to preserve EAX.
-    -EAX
-}
-function ComWriteEAX {
-    // Input: EAX
-    // Output: None
-    // Modifies: EDX, ESI
-    +EAX
-    ESI = ESP
-    ComWrite32()
-    // Is a local var, cant use Return(4). X// issues the return.
-    // This also allow the function to preserve EAX.
-    -EAX
-}
 
 function ComWrite8 {
 	// Input: ESI
@@ -208,19 +151,5 @@ Wait:
 
 	ESI++
 }
-function ComWrite16 {
-	ComWrite8()
-	ComWrite8()
-}
-function ComWrite32 {
-	ComWrite8()
-	ComWrite8()
-	ComWrite8()
-	ComWrite8()
-}
-function ComWriteX {
-More:
-	ComWrite8()
-	ECX--
-	if !0 goto More
-}
+
+! %endif

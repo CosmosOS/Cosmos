@@ -117,6 +117,7 @@
     <Compile Include="BochsSupport.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="DebugConnector.cs" />
+    <Compile Include="DebugConnectorEdison.cs" />
     <Compile Include="DebugConnectorPipeServer.cs" />
     <Compile Include="DebugConnectorSerial.cs" />
     <Compile Include="DebugConnectorStream.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="SqliteBulkCopy.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="App.config" />
     <None Include="Cosmos.snk" />
     <None Include="Entities2.datasource" />

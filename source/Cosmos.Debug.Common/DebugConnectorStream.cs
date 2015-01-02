@@ -36,7 +36,7 @@ namespace Cosmos.Debug.Common
 
         internal static string BytesToString(byte[] bytes, int index, int count)
         {
-            if (count > 100)
+            if (count > 100 || count <= 0 || bytes.Length == 0)
             {
                 return String.Empty;
             }
@@ -126,6 +126,10 @@ namespace Cosmos.Debug.Common
             else
             {
                 xIncoming.Completed = aCompleted;
+            }
+            if (aPacketSize > (1024 * 1024))
+            {
+              throw new Exception("Safety exception. Receiving " + aPacketSize + " bytes!");
             }
             xIncoming.Packet = new byte[aPacketSize];
             xIncoming.Stream = mStream;
@@ -233,8 +237,8 @@ namespace Cosmos.Debug.Common
             {
                 Incoming xIncoming = (Incoming)result.AsyncState;
                 int xCount = xIncoming.Stream.EndRead(result);
-
-                System.Diagnostics.Debug.WriteLine(String.Format("DC DR2 - Received: {0}", BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount)));
+                System.Diagnostics.Debug.Write(string.Format("DC DR2 - Received ({0}): ", xCount));
+                System.Diagnostics.Debug.WriteLine(BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount));
                 xIncoming.CurrentPos += xCount;
                 if (xCount == 0)
                 {

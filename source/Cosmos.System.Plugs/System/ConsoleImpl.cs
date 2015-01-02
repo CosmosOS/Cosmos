@@ -8,8 +8,8 @@ namespace Cosmos.System.Plugs.System {
 	public static class ConsoleImpl {
 		private static ConsoleColor mForeground = ConsoleColor.White;
 		private static ConsoleColor mBackground = ConsoleColor.Black;
-        
-	    private static readonly Console mFallbackConsole = new Console();
+
+	    private static readonly Console mFallbackConsole = new Console(null);
 
 	    private static Console GetConsole()
 	    {
@@ -23,7 +23,7 @@ namespace Cosmos.System.Plugs.System {
 
 		public static void set_BackgroundColor(ConsoleColor value) {
 			mBackground = value;
-			Cosmos.HAL.Global.TextScreen.SetColors(mForeground, mBackground);
+            Cosmos.HAL.Global.TextScreen.SetColors(mForeground, mBackground);
 		}
 
 		public static int get_BufferHeight() {
@@ -261,7 +261,7 @@ namespace Cosmos.System.Plugs.System {
 			// TODO special cases, if needed, that returns -1
 			return HAL.Global.Keyboard.ReadChar();
 		}
-		
+
 		// ReadKey() pure CIL
 
 		public static ConsoleKeyInfo ReadKey(Boolean intercept) {
@@ -288,7 +288,7 @@ namespace Cosmos.System.Plugs.System {
 			while ((current = HAL.Global.Keyboard.ReadChar()) != '\n')
 			{
 				//Check for "special" keys
-				if (current == '\u0968') // Backspace   
+				if (current == '\u0968') // Backspace
 				{
 					if (currentCount > 0)
 					{
@@ -555,18 +555,18 @@ namespace Cosmos.System.Plugs.System {
 		}
 
 		public static void WriteLine(string aText) {
-            GetConsole().Write(aText);
-            GetConsole().NewLine();
+      GetConsole().Write(aText);
+      GetConsole().NewLine();
 		}
 
 		public static void WriteLine(uint aInt) {
 			Write(aInt.ToString());
-            GetConsole().NewLine();
+      GetConsole().NewLine();
 		}
 
 		public static void WriteLine(ulong aLong) {
 			Write(aLong.ToString());
-            GetConsole().NewLine();
+      GetConsole().NewLine();
 		}
 
 		public static void WriteLine(string format, object arg0) {

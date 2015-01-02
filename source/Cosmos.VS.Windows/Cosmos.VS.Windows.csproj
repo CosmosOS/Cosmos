@@ -162,9 +162,14 @@
     <Compile Include="AssemblyUC.xaml.cs">
       <DependentUpon>AssemblyUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ConsoleConsts.cs" />
+    <Compile Include="ConsoleUC.xaml.cs">
+      <DependentUpon>ConsoleUC.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DataBytesUC.xaml.cs">
       <DependentUpon>DataBytesUC.xaml</DependentUpon>
     </Compile>
+    <Compile Include="DebuggerChannelUC.cs" />
     <Compile Include="DebuggerUC.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="InternalUC.xaml.cs">
@@ -191,6 +196,7 @@
     </Compile>
     <Compile Include="StateStorer.cs" />
     <Compile Include="ToolWindowPane2.cs" />
+    <Compile Include="ToolWindowPaneChannel.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources.resx">
@@ -205,6 +211,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="App.config" />
     <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
@@ -236,6 +243,10 @@
       <Generator>MSBuild:Compile</Generator>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ConsoleUC.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DataBytesUC.xaml">
       <SubType>Designer</SubType>

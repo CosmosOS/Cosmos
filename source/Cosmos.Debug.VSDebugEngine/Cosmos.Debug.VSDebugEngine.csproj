@@ -152,6 +152,7 @@
     <Compile Include="AD7.Impl\AD7Engine.cs" />
     <Compile Include="Engine.Impl\EngineCallback.cs" />
     <Compile Include="Host\Bochs.cs" />
+    <Compile Include="Host\IntelEdison.cs" />
     <Compile Include="Host\Slave.cs" />
     <Compile Include="Host\VMware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -186,6 +187,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="App.config" />
     <None Include="Cosmos.snk" />
   </ItemGroup>

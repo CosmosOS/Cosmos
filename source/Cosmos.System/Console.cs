@@ -32,7 +32,19 @@ namespace Cosmos.System {
             get { return mText.Rows; }
         }
 
-        protected HAL.TextScreen mText = new TextScreen();
+        protected HAL.TextScreenBase mText;
+
+        public Console(TextScreenBase textScreen)
+        {
+            if (textScreen == null)
+            {
+                mText = new TextScreen();
+            }
+            else
+            {
+                mText = textScreen;
+            }
+        }
 
         public void Clear() {
             mText.Clear();

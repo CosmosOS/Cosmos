@@ -13,5 +13,7 @@ namespace Cosmos.VS.Windows {
     static Global() {
       PipeUp = new Cosmos.Debug.Common.PipeClient(Pipes.UpName);
     }
+
+    static public Cosmos.Debug.Common.PipeClient ConsoleTextChannel;
   }
 }

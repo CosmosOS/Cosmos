@@ -7,7 +7,7 @@ using Cosmos.Core;
 namespace Cosmos.HAL {
   // Dont hold state here. This is a raw to hardware class. Virtual screens should be done
   // by memory moves
-  public class TextScreen : Device {
+  public class TextScreen : TextScreenBase {
     protected byte Color = 0x0F; // White
     // Empty + White
     protected UInt16 mClearCellValue = 0x000F;
@@ -16,7 +16,7 @@ namespace Cosmos.HAL {
     protected UInt32 mScrollSize;
     protected UInt32 mRowSize32;
 
-      protected Core.IOGroup.TextScreen IO = new Cosmos.Core.IOGroup.TextScreen();
+    protected Core.IOGroup.TextScreen IO = new Cosmos.Core.IOGroup.TextScreen();
     protected readonly MemoryBlock08 mRAM;
 
     public TextScreen() {
@@ -27,19 +27,21 @@ namespace Cosmos.HAL {
       mRowSize32 = (UInt32)Cols * 2 / 4;
     }
 
-    public UInt16 Rows { get { return 25; } }
-    public UInt16 Cols { get { return 80; } }
+    public override UInt16 Rows { get { return 25; } }
+    public override UInt16 Cols { get { return 80; } }
 
-    public void Clear() {
+    public override void Clear() {
       IO.Memory.Fill(mClearCellValue32);
     }
 
-    public void ScrollUp() {
+    public override void ScrollUp()
+    {
       IO.Memory.MoveDown(0, mRow2Addr, mScrollSize);
       IO.Memory.Fill(mScrollSize, mRowSize32, mClearCellValue32);
     }
 
-    public char this[int aX, int aY] {
+    public override char this[int aX, int aY]
+    {
       get {
         var xScreenOffset = (UInt32)((aX + aY * Cols) * 2);
         return (char)mRAM[xScreenOffset];
@@ -51,11 +53,12 @@ namespace Cosmos.HAL {
       }
     }
 
-    public void SetColors(ConsoleColor aForeground, ConsoleColor aBackground) {
+    public override void SetColors(ConsoleColor aForeground, ConsoleColor aBackground) {
       Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
     }
 
-    public void SetCursorPos(int aX, int aY) {
+    public override void SetCursorPos(int aX, int aY)
+    {
       char xPos = (char)((aY * Cols) + aX);
       // Cursor low byte to VGA index register
       IO.Idx3.Byte = 0x0F;

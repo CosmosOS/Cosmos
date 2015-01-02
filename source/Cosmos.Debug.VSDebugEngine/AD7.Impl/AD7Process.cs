@@ -68,7 +68,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
         public string mISO;
         public string mProjectFile;
-        
+
         protected void DbgCmdRegisters(byte[] aData)
         {
             mDebugDownPipe.SendCommand(Debugger2Windows.Registers, aData);
@@ -104,34 +104,36 @@ namespace Cosmos.Debug.VSDebugEngine
             mDebugDownPipe.SendCommand(Debugger2Windows.Stack, aData);
         }
 
-        private void mDebugUpPipe_DataPacketReceived(byte aCmd, byte[] aData)
+        private void mDebugUpPipe_DataPacketReceived(ushort aCmd, byte[] aData)
         {
             try
             {
-                switch (aCmd)
+                if (aCmd <= 127)
                 {
-                    case Windows2Debugger.Noop:
-                        // do nothing
-                        break;
+                    switch (aCmd)
+                    {
+                        case Windows2Debugger.Noop:
+                            // do nothing
+                            break;
 
-                    case Windows2Debugger.PingVSIP:
-                        mDebugDownPipe.SendCommand(Debugger2Windows.PongVSIP);
-                        break;
+                        case Windows2Debugger.PingVSIP:
+                            mDebugDownPipe.SendCommand(Debugger2Windows.PongVSIP);
+                            break;
 
-                    case Windows2Debugger.PingDebugStub:
-                        mDbgConnector.Ping();
-                        break;
+                        case Windows2Debugger.PingDebugStub:
+                            mDbgConnector.Ping();
+                            break;
 
-                    case Windows2Debugger.SetAsmBreak:
+                        case Windows2Debugger.SetAsmBreak:
                         {
                             string xLabel = Encoding.UTF8.GetString(aData);
                             UInt32 xAddress = mDebugInfoDb.AddressOfLabel(xLabel);
                             mDbgConnector.SetAsmBreakpoint(xAddress);
                             mDbgConnector.Continue();
                         }
-                        break;
+                            break;
 
-                    case Windows2Debugger.ToggleAsmBreak2:
+                        case Windows2Debugger.ToggleAsmBreak2:
                         {
                             string xLabel = Encoding.UTF8.GetString(aData);
                             UInt32 xAddress = mDebugInfoDb.AddressOfLabel(xLabel);
@@ -143,28 +145,27 @@ namespace Cosmos.Debug.VSDebugEngine
                             {
                                 ClearASMBreakpoint(xAddress);
                             }
+                            break;
                         }
-                        break;
+                        case Windows2Debugger.ToggleStepMode:
+                            ASMSteppingMode = !ASMSteppingMode;
+                            break;
 
-                    case Windows2Debugger.ToggleStepMode:
-                        ASMSteppingMode = !ASMSteppingMode;
-                        break;
-                    
-                    case Windows2Debugger.SetStepModeAssembler:
-                        ASMSteppingMode = true;
-                        break;
+                        case Windows2Debugger.SetStepModeAssembler:
+                            ASMSteppingMode = true;
+                            break;
 
-                    case Windows2Debugger.SetStepModeSource:
-                        ASMSteppingMode = false;
-                        break;
+                        case Windows2Debugger.SetStepModeSource:
+                            ASMSteppingMode = false;
+                            break;
 
-                    case Windows2Debugger.CurrentASMLine:
+                        case Windows2Debugger.CurrentASMLine:
                         {
                             mCurrentASMLine = Encoding.UTF8.GetString(aData);
                             ASMWindow_CurrentLineUpdated.Set();
+                            break;
                         }
-                        break;
-                    case Windows2Debugger.NextASMLine1:
+                        case Windows2Debugger.NextASMLine1:
                         {
                             if (aData.Length == 0)
                             {
@@ -176,31 +177,37 @@ namespace Cosmos.Debug.VSDebugEngine
                                 mNextASMLine1 = Encoding.UTF8.GetString(aData);
                                 ASMWindow_NextLine1Updated.Set();
                             }
+                            break;
                         }
-                        break;
-                    case Windows2Debugger.NextLabel1:
+                        case Windows2Debugger.NextLabel1:
                         {
                             string nextLabel = Encoding.UTF8.GetString(aData);
                             mNextAddress1 = mDebugInfoDb.AddressOfLabel(nextLabel);
                             ASMWindow_NextAddress1Updated.Set();
+                            break;
                         }
-                        break;
-                    //cmd used from assembler window
-                    case Windows2Debugger.Continue:
-                        Step(enum_STEPKIND.STEP_OVER);
-                        break;
-                    //cmd used from assembler window
-                    case Windows2Debugger.AsmStepInto:
-                        Step(enum_STEPKIND.STEP_INTO);
-                        break;
-                    default:
-                        throw new Exception(String.Format("Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived.", aCmd));
+                            //cmd used from assembler window
+                        case Windows2Debugger.Continue:
+                            Step(enum_STEPKIND.STEP_OVER);
+                            break;
+                            //cmd used from assembler window
+                        case Windows2Debugger.AsmStepInto:
+                            Step(enum_STEPKIND.STEP_INTO);
+                            break;
+                        default:
+                            throw new Exception(String.Format("Command value '{0}' not supported in method AD7Process.mDebugUpPipe_DataPacketReceived.", aCmd));
+                    }
+                }
+                else
+                {
+                    throw new NotImplementedException("Sending other channels not yet supported!");
                 }
             }
             catch(Exception ex)
             {
                 //We cannot afford to silently break the pipe!
                 OutputText("AD7Process UpPipe receive error! " + ex.Message);
+                System.Diagnostics.Debug.WriteLine("AD7Process UpPipe receive error! " + ex.ToString());
             }
         }
 
@@ -286,18 +293,17 @@ namespace Cosmos.Debug.VSDebugEngine
             string xPortParam = xParts[1].ToLower();
 
             OutputText("Starting debug connector.");
-            if (xPortType == "pipe:")
+            switch (xPortType)
             {
+              case "pipe:":
                 mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer(xPortParam);
-            }
-            else if (xPortType == "serial:")
-            {
+                break;
+              case "serial:":
                 mDbgConnector = new Cosmos.Debug.Common.DebugConnectorSerial(xPortParam);
-            }
+                break;
+              default:
+                throw new Exception("No debug connector found for port type '" + xPortType + "'");
 
-            if (mDbgConnector == null)
-            {
-                throw new Exception("No debug connector found.");
             }
             mDbgConnector.SetConnectionHandler(DebugConnectorConnected);
             mDbgConnector.CmdBreak += new Action<UInt32>(DbgCmdBreak);
@@ -313,6 +319,12 @@ namespace Cosmos.Debug.VSDebugEngine
             mDbgConnector.CmdStackCorruptionOccurred += DbgCmdStackCorruptionOccurred;
             mDbgConnector.CmdNullReferenceOccurred += DbgCmdNullReferenceOccurred;
             mDbgConnector.CmdMessageBox += DbgCmdMessageBox;
+            mDbgConnector.CmdChannel += DbgCmdChannel;
+        }
+
+        private void DbgCmdChannel(byte aChannel, byte aCommand, byte[] aData)
+        {
+            mDebugDownPipe.SendRawToChannel(aChannel, aCommand, aData);
         }
 
         private void DbgCmdStackCorruptionOccurred(uint lastEIPAddress)
@@ -342,14 +354,15 @@ namespace Cosmos.Debug.VSDebugEngine
                 mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Pipes.DownName);
 
                 mDebugUpPipe = new Cosmos.Debug.Common.PipeServer(Pipes.UpName);
-                mDebugUpPipe.DataPacketReceived += new Action<byte, byte[]>(mDebugUpPipe_DataPacketReceived);
+                mDebugUpPipe.DataPacketReceived += mDebugUpPipe_DataPacketReceived;
                 mDebugUpPipe.Start();
             }
             else
             {
                 mDebugUpPipe.CleanHandlers();
-                mDebugUpPipe.DataPacketReceived += new Action<byte, byte[]>(mDebugUpPipe_DataPacketReceived);
+                mDebugUpPipe.DataPacketReceived += mDebugUpPipe_DataPacketReceived;
             }
+
             // Must be after mDebugDownPipe is initialized
             OutputClear();
             OutputText("Debugger process initialized.");
@@ -391,8 +404,10 @@ namespace Cosmos.Debug.VSDebugEngine
                     // TODO : What if the configuration file doesn't exist ? This will throw a FileNotFoundException in
                     // the Bochs class constructor. Is this appropriate behavior ?
                     mHost = new Host.Bochs(mDebugInfo, xUseGDB, bochsConfigurationFile);
-                    ((Host.Bochs)mHost).FixBochsConfiguration(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("IsoFileName", mISO) }
-                    );
+                    ((Host.Bochs)mHost).FixBochsConfiguration(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("IsoFileName", mISO) });
+                    break;
+                case LaunchType.IntelEdison:
+                    mHost = new Host.IntelEdison(mDebugInfo, false);
                     break;
                 default:
                     throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
@@ -456,7 +471,7 @@ namespace Cosmos.Debug.VSDebugEngine
             }
         }
 
-        // Shows a message in the output window of VS. Needs special treatment, 
+        // Shows a message in the output window of VS. Needs special treatment,
         // because normally VS only shows msgs from debugged process, not internal
         // stuff like us.
         public void DebugMsg(string aMsg)
@@ -774,7 +789,14 @@ namespace Cosmos.Debug.VSDebugEngine
             // VS to stop debugging.
             if (Interlocked.CompareExchange(ref mProcessExitEventSent, 1, 0) == 0)
             {
-                mCallback.OnProcessExit(0);
+                try
+                {
+                    mCallback.OnProcessExit(0);
+                }
+                catch
+                {
+                    // swallow exceptions here?
+                }
             }
 
             if (mDbgConnector != null)
@@ -794,9 +816,9 @@ namespace Cosmos.Debug.VSDebugEngine
         internal void Continue()
         { // F5
             ClearINT3sOnCurrentMethod();
-            
+
             //Check for a future asm BP on current line
-            //If there is, don't do continue, do AsmStepOver 
+            //If there is, don't do continue, do AsmStepOver
 
             // The current address may or may not be a C# line due to asm stepping
             //So get the C# INT3 address
@@ -818,7 +840,7 @@ namespace Cosmos.Debug.VSDebugEngine
             {
                 mCurrentAddress = null;
                 mCurrentASMLine = null;
-                
+
                 mDbgConnector.Continue();
             }
         }
@@ -905,6 +927,7 @@ namespace Cosmos.Debug.VSDebugEngine
             ChangeINT3sOnCurrentMethod(true);
         }
         public List<KeyValuePair<UInt32, string>> INT3sSet = new List<KeyValuePair<UInt32, string>>();
+
         internal void ChangeINT3sOnCurrentMethod(bool clear)
         {
             if (mCurrentAddress.HasValue)
@@ -930,7 +953,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 foreach (var addressInfo in tpAdresses)
                 {
                     var address = addressInfo.Key;
-                    
+
                     //Don't set/clear actual BPs
                     if (!bpAddressessUnified.Contains(address))
                     {
@@ -1011,12 +1034,12 @@ namespace Cosmos.Debug.VSDebugEngine
                 //We should be able to display the asesembler source for any address regardless of whether a C#
                 //line is associated with it.
                 //However, we do not store all labels in the debug database because that would make the compile
-                //time insane. 
+                //time insane.
                 //So:
                 // - We take the current address amd find the method it is part of
                 // - We use the method header label as a start point and find all asm labels till the method footer label
                 // - We then find all the asm for these labels and display it.
-                
+
                 Label[] xLabels = mDebugInfoDb.GetMethodLabels(xAddress);
                 AD7Util.Log("SendAssembly - MethodLabels retrieved");
                 // get the label of our current position, or the closest one before

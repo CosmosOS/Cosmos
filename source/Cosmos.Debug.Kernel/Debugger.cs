@@ -14,12 +14,25 @@ namespace Cosmos.Debug.Kernel {
         //public void TraceOn() { } // Plugged
         public void SendPtr(object aObject) { } // plugged
 
+        public unsafe void SendChannelCommand(byte aChannel, byte aCommand, byte[] aData)
+        {
+            fixed (byte* xPtr = &aData[0])
+            {
+                SendChannelCommand(aChannel, aCommand, aData.Length, xPtr);
+            }
+        }
+
+        public unsafe void SendChannelCommand(byte aChannel, byte aCommand, int aByteCount, byte* aData)
+        {
+            //
+        }
+
         public unsafe void Send(string aText) {
-          // TODO: Need to fix this so it can send empty strings.
-          // Sending empty strings locks it up right now
-          if (aText.Length == 0) {
-            return;
-          }
+            // TODO: Need to fix this so it can send empty strings.
+            // Sending empty strings locks it up right now
+            if (aText.Length == 0) {
+              return;
+            }
 
             var xChars = aText.ToCharArray();
             fixed (char* xPtr = &xChars[0]) {
@@ -46,10 +59,10 @@ namespace Cosmos.Debug.Kernel {
 
         // TODO: Kudzu repacement methods for Cosmos.HAL.DebugUtil
         public unsafe void SendMessage(string aModule, string aData) {
-            //string xSingleString;
-            //xSingleString = "Message Module: \"" + aModule + "\"";
-            //xSingleString += " Data: \"" + aData + "\"";
-            //Send(xSingleString);
+            string xSingleString;
+            xSingleString = "Message Module: \"" + aModule + "\"";
+            xSingleString += " Data: \"" + aData + "\"";
+            Send(xSingleString);
         }
 
         public unsafe void SendError(string aModule, string aData) {

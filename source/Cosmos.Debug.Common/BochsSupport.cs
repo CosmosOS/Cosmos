@@ -19,7 +19,11 @@ namespace Cosmos.Debug.Common
         /// <summary>Get a flag that tell whether Bochs is enabled on this system.</summary>
         public static bool BochsEnabled
         {
-            get { return (null != BochsExe); }
+          get
+          {
+            //return (null != BochsExe);
+            return false;
+          }
         }
 
         /// <summary>Get a descriptor for the Bochs emulator with debugger support program. The return value

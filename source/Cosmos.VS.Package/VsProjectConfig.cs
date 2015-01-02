@@ -33,6 +33,7 @@ namespace Cosmos.VS.Package {
         // This is the program that gest launched after build
         var xDeployment = (DeploymentType)Enum.Parse(typeof(DeploymentType), GetConfigurationProperty(BuildProperties.DeploymentString, true));
         var xLaunch = (LaunchType)Enum.Parse(typeof(LaunchType), GetConfigurationProperty(BuildProperties.LaunchString, false));
+        var xVSDebugPort = GetConfigurationProperty(BuildProperties.VisualStudioDebugPortString, false);
 
         string xOutputAsm = ProjectMgr.GetOutputAssembly(ConfigName);
         string xOutputPath = Path.GetDirectoryName(xOutputAsm);
@@ -45,20 +46,22 @@ namespace Cosmos.VS.Package {
         } else if (xDeployment == DeploymentType.USB) {
           Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.USB.exe"), "\"" + xBinFile + "\"");
 
-        } else if (xDeployment == DeploymentType.PXE) {
+        } else if (xDeployment == DeploymentType.PXE)
+        {
           string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
           string xPxeIntf = GetConfigurationProperty(BuildProperties.PxeInterfaceString, false);
           File.Copy(xBinFile, Path.Combine(xPxePath, "Cosmos.bin"), true);
           Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.exe"), xPxeIntf + " \"" + xPxePath + "\"");
-
+        }else if (xDeployment == DeploymentType.BinaryImage)
+        {
+          // prepare?
         } else {
           throw new Exception("Unknown deployment type.");
         }
 
-        if (xLaunch == LaunchType.None) {
-          if (xDeployment == DeploymentType.ISO) {
+        if (xLaunch == LaunchType.None
+           && xDeployment == DeploymentType.ISO) {
             Process.Start(xOutputPath);
-          }
         }
         else {
           // http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.shell.interop.vsdebugtargetinfo_members.aspx

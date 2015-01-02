@@ -18,7 +18,7 @@ using System.Diagnostics;
 namespace Cosmos.Build.MSBuild {
   public class IL2CPU : BaseToolTask
   {
-   // protected IL2CPUTask mTask = new IL2CPUTask();
+    // protected IL2CPUTask mTask = new IL2CPUTask();
 
     [Required]
     public string CosmosBuildDir
@@ -33,7 +33,7 @@ namespace Cosmos.Build.MSBuild {
       get;
       set;
     }
-   
+
     [Required]
     public string DebugMode {
       get;
@@ -47,7 +47,7 @@ namespace Cosmos.Build.MSBuild {
 
     public bool StackCorruptionDetectionEnabled
     {
-      get; 
+      get;
       set;
     }
 
@@ -118,25 +118,6 @@ namespace Cosmos.Build.MSBuild {
       var xSW = Stopwatch.StartNew();
 
       try {
-     /*   mTask.OnLogMessage = LogMessage;
-        mTask.OnLogError = LogError;
-        mTask.OnLogWarning = LogWarning;
-        mTask.OnLogException = LogException;
-
-        mTask.DebugEnabled = DebugEnabled;
-        mTask.StackCorruptionDetectionEnabled = StackCorruptionDetectionEnabled;
-        mTask.DebugMode = DebugMode;
-        mTask.TraceAssemblies = TraceAssemblies;
-        mTask.DebugCom = DebugCom;
-        mTask.UseNAsm = UseNAsm;
-        mTask.References = References;
-        mTask.OutputFilename = OutputFilename;
-        mTask.EnableLogging = EnableLogging;
-        mTask.EmitDebugSymbols = EmitDebugSymbols;
-        mTask.IgnoreDebugStubAttribute = IgnoreDebugStubAttribute;
-
-        */
-
         Dictionary<string,string> args = new Dictionary<string, string>();
         args.Add("DebugEnabled", Convert.ToString(DebugEnabled));
         args.Add("StackCorruptionDetectionEnabled", Convert.ToString(StackCorruptionDetectionEnabled));
@@ -148,17 +129,12 @@ namespace Cosmos.Build.MSBuild {
         List<string> refs = new List<string>();
         foreach (var reference in References)
         {
-          
-            if (reference.MetadataNames.OfType<string>().Contains("FullPath"))
-            {
-              string xFile = reference.GetMetadata("FullPath");
-              refs.Add(Convert.ToString(xFile));
-            }
-        
-
-
+          if (reference.MetadataNames.OfType<string>().Contains("FullPath"))
+          {
+            string xFile = reference.GetMetadata("FullPath");
+            refs.Add(Convert.ToString(xFile));
+          }
         }
-      //  refs.RemoveAt(refs.Count - 1);
 
         args.Add("OutputFilename", Convert.ToString(OutputFilename));
         args.Add("EnableLogging", Convert.ToString(EnableLogging));
@@ -174,12 +150,10 @@ namespace Cosmos.Build.MSBuild {
         {
           Arguments += "\"References:" + Ref + "\" ";
         }
-                  return base.ExecuteTool(WorkingDir,
+        return base.ExecuteTool(WorkingDir,
                   Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe"),
                   Arguments,
                   "IL2CPU");
-      
-       // return mTask.Execute();
       } finally {
         xSW.Stop();
         Log.LogMessage(MessageImportance.High,

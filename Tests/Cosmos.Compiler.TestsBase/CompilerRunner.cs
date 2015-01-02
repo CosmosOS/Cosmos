@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Cosmos.Build.MSBuild;
 using Cosmos.Debug.Common;
-using Microsoft.Build.Framework;
 
 namespace Cosmos.Compiler.TestsBase
 {
@@ -75,82 +74,14 @@ namespace Cosmos.Compiler.TestsBase
             }
         }
 
-        private ITaskItem[] GetReferences()
+        private string[] GetReferences()
         {
-            var xResult = new List<ITaskItem>(References.Count);
+            var xResult = new List<string>(References.Count);
             foreach (var xRefFile in References)
             {
-                xResult.Add(new TaskItemImpl(xRefFile));
+                xResult.Add(xRefFile);
             }
             return xResult.ToArray();
         }
-
-        private class TaskItemImpl : ITaskItem
-        {
-            private string path;
-
-            public TaskItemImpl(string path)
-            {
-                this.path = path;
-            }
-
-            public System.Collections.IDictionary CloneCustomMetadata()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void CopyMetadataTo(ITaskItem destinationItem)
-            {
-                throw new NotImplementedException();
-            }
-
-            public string GetMetadata(string metadataName)
-            {
-                if (metadataName == "FullPath")
-                {
-                    return path;
-                }
-                throw new NotImplementedException();
-            }
-
-            public string ItemSpec
-            {
-                get
-                {
-                    throw new NotImplementedException();
-                }
-                set
-                {
-                    throw new NotImplementedException();
-                }
-            }
-
-            public int MetadataCount
-            {
-                get
-                {
-                    return MetadataNames.Count;
-                }
-            }
-
-            public System.Collections.ICollection MetadataNames
-            {
-                get
-                {
-                    return new String[] { "FullPath" };
-                }
-            }
-
-            public void RemoveMetadata(string metadataName)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void SetMetadata(string metadataName, string metadataValue)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
     }
 }

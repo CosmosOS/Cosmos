@@ -12,7 +12,7 @@ namespace Cosmos.Build.Common {
     public static readonly string GdbClientExe;
     //
     public static readonly string DevKit = null;
-    public static readonly string DebugStubSrc;
+    public static string DebugStubSrc;
 
     static string CheckPath(string aPath1, string aPath2) {
       return CheckPath(Path.Combine(aPath1, aPath2));

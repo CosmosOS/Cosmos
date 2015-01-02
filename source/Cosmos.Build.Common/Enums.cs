@@ -12,7 +12,8 @@ namespace Cosmos.Build.Common {
     [Description("USB Device")]
     USB,
     [Description("PXE Network Boot")]
-    PXE
+    PXE,
+    BinaryImage
   }
 
   public enum LaunchType {
@@ -23,7 +24,8 @@ namespace Cosmos.Build.Common {
     [Description("Attached Slave (CanaKit)")]
     Slave,
     [Description("Bochs")]
-    Bochs
+    Bochs,
+    IntelEdison,
   }
 
   public enum VMwareEdition {
@@ -32,7 +34,7 @@ namespace Cosmos.Build.Common {
   }
 
   public enum Architecture {
-    x86 //, x64 
+    x86 //, x64
   }
 
   public enum Framework {
