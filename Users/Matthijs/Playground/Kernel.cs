@@ -4,7 +4,7 @@ using Sys = Cosmos.System;
 
 namespace Playground
 {
-    public class Kernel : Sys.Kernel
+    public class Kernel : OurKernel
     {
         protected override void BeforeRun()
         {
@@ -14,13 +14,11 @@ namespace Playground
         protected override void Run()
         {
             Console.WriteLine("Started");
-
-            SystemGlobal.Execute();
-            
-            
-            Console.WriteLine("Done");
             Console.ReadLine();
-            Stop();
+            Console.WriteLine("Done");
+
+            base.DoIt();
+
         }
     }
 }

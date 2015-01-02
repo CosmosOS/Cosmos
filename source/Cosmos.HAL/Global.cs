@@ -10,7 +10,7 @@ namespace Cosmos.HAL {
     static public Keyboard Keyboard;
     //static public PIT PIT = new PIT();
     // Must be static init, other static inits rely on it not being null
-    static public TextScreen TextScreen = new TextScreen();
+      static public TextScreenBase TextScreen = new TextScreen();
 
       public static PCI Pci;
 
@@ -64,6 +64,7 @@ namespace Cosmos.HAL {
     static internal void InitStaticDevices() {
       //TextScreen = new TextScreen();
       Global.Dbg.Send("CLS");
+        
       TextScreen.Clear();
 
       Global.Dbg.Send("Keyboard");
@@ -98,7 +99,12 @@ namespace Cosmos.HAL {
 
     }
 
-    static public void Init() {
+    static public void Init(TextScreenBase textScreen)
+    {
+      if (textScreen != null)
+      {
+        TextScreen = textScreen;
+      }
       Core.Bootstrap.Init();
       Core.Global.Init();
       Global.Dbg.Send("Static Devices");

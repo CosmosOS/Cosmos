@@ -39,7 +39,7 @@ namespace Cosmos.Assembler {
 
     protected byte[] GdtDescriptor(UInt32 aBase, UInt32 aSize, bool aCode) {
       // Limit is a confusing word. Is it the max physical address or size?
-      // In fact it is the size, and 286 docs actually refer to it as size 
+      // In fact it is the size, and 286 docs actually refer to it as size
       // rather than limit.
       // It is also size - 1, else there would be no way to specify
       // all of RAM, and a limit of 0 is invalid.
@@ -52,12 +52,12 @@ namespace Cosmos.Assembler {
         throw new Exception("Invalid size in GDT descriptor.");
       }
       // Flags nibble
-      // 7: Granularity 
+      // 7: Granularity
       //    0 = bytes
       //    1 = 4kb pages
       // 6: 1 = 32 bit mode
       // 5: 0 - Reserved
-      // 4: 0 - Reserved 
+      // 4: 0 - Reserved
       xResult[6] = 0x40;
       if (aSize > 65536) {
         // Set page sizing instead of byte sizing
@@ -87,7 +87,7 @@ namespace Cosmos.Assembler {
         0x00 |
         // Bit 1: R/W  Data (1=Writeable, 0=Read only) Code (1=Readable, 0=Not readable)
         0x02 |
-        // Bit 0: Accessed - Set to 0. Updated by CPU later.       
+        // Bit 0: Accessed - Set to 0. Updated by CPU later.
         0x00
         );
 
@@ -153,14 +153,15 @@ namespace Cosmos.Assembler {
     }
 
     public void Add(Instruction aReader) {
-        if (aReader is Label || aReader is Comment)
+        if (EmitAsmLabels)
         {
-        }
-        else if (EmitAsmLabels)
-        {
+          if (!(aReader is Label)
+              && !(aReader is Comment))
+          {
             // Only issue label if its executable code.
             new Label("." + AsmIlIdx.ToString("X2"), "Asm");
             mAsmIlIdx++;
+          }
         }
         mInstructions.Add(aReader);
     }
@@ -215,6 +216,12 @@ namespace Cosmos.Assembler {
     public virtual void FlushText(TextWriter aOutput) {
       BeforeFlush();
 
+      aOutput.WriteLine("%ifndef ELF_COMPILATION");
+      aOutput.WriteLine("use32");
+      aOutput.WriteLine("org 0x200000");
+      aOutput.WriteLine("[map all main.map]");
+      aOutput.WriteLine("%endif");
+
       // Write out data declarations
       aOutput.WriteLine();
       foreach (DataMember xMember in mDataMembers) {
@@ -244,14 +251,9 @@ namespace Cosmos.Assembler {
           xOp.WriteText(this, aOutput);
           aOutput.WriteLine();
         }
-      }
-
-      aOutput.WriteLine("%ifndef ELF_COMPILATION");
-      aOutput.WriteLine("use32");
-      aOutput.WriteLine("org 0x200000");
-      aOutput.WriteLine("[map all main.map]");
-      aOutput.WriteLine("%endif");
+     }
       aOutput.WriteLine("global Kernel_Start");
+      aOutput.Flush();
     }
 
     static public void WriteDebugVideo(string aText) {
@@ -387,7 +389,7 @@ namespace Cosmos.Assembler {
       DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + xSig))));
       DataMembers.Add(new DataEndIfDefined());
 
-      // graphics info fields 
+      // graphics info fields
       DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeModeInfoAddr", Int32.MaxValue));
       DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeControlInfoAddr", Int32.MaxValue));
       DataMembers.Add(new DataMember("MultibootGraphicsRuntime_VbeMode", Int32.MaxValue));

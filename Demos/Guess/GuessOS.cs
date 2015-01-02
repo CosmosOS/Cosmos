@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Debug.Kernel;
 using Sys = Cosmos.System;
 
 namespace GuessKernel {
@@ -21,8 +22,11 @@ namespace GuessKernel {
       Console.WriteLine("Please guess a number from 1 to 100.");
     }
 
+    private Debugger mDebugger = new Debugger("User", "Guess");
+
     protected override void Run() {
       mCount++;
+      mDebugger.SendMessage("Kernel", "New iteration");
       Console.WriteLine();
       Console.WriteLine("Guess #" + mCount);
       Console.Write("Please enter a guess: ");

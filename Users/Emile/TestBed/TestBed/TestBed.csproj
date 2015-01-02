@@ -41,6 +41,7 @@
     <Reference Include="Cosmos.Debug.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="C.cs" />
     <Compile Include="IA.cs" />
     <Compile Include="IB.cs" />
     <Compile Include="Kernel.cs" />

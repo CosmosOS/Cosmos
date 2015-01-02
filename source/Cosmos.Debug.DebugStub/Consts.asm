@@ -1,3 +1,5 @@
+; Generated at 27-12-2014 16:48:55
+
 
 
 DebugStub_Const_Signature equ 0x19740807
@@ -38,7 +40,7 @@ DebugStub_Const_Vs2Ds_Max equ 21
 
 DebugStub_Const_Ds2Vs_Noop equ 0
 DebugStub_Const_Ds2Vs_TracePoint equ 1
-DebugStub_Const_Ds2Vs_Message equ 2
+DebugStub_Const_Ds2Vs_Message equ 192
 DebugStub_Const_Ds2Vs_BreakPoint equ 3
 DebugStub_Const_Ds2Vs_Error equ 4
 DebugStub_Const_Ds2Vs_Pointer equ 5

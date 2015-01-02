@@ -13,11 +13,11 @@ namespace Cosmos.Debug.Common {
   static public class Ds2Vs {
     public const byte Noop = 0;
     public const byte TracePoint = 1;
-    public const byte Message = 2;
+    public const byte Message = 192;
     public const byte BreakPoint = 3;
     public const byte Error = 4;
     public const byte Pointer = 5;
-    // This is sent once on start up. The first call to debug stub sends this. 
+    // This is sent once on start up. The first call to debug stub sends this.
     // Host can then respond with a series of set breakpoints etc, ie ones that were set before running.
     public const byte Started = 6;
     public const byte MethodContext = 7;
@@ -90,33 +90,36 @@ namespace Cosmos.Debug.Common {
 
   // Commands from VS Debug Engine to VS Debug Window
   static public class Debugger2Windows {
-    public const byte Noop = 0;
-    public const byte Registers = 1;
-    public const byte AssemblySource = 3;
-    public const byte Quit = 4;
-    public const byte Frame = 5;
-    public const byte Stack = 6;
-    public const byte PongVSIP = 7;
-    public const byte PongDebugStub = 8;
-    public const byte OutputPane = 9;
-    public const byte OutputClear = 10;
+    public const ushort Noop = 0;
+    public const ushort Registers = 1;
+    public const ushort AssemblySource = 3;
+    public const ushort Quit = 4;
+    public const ushort Frame = 5;
+    public const ushort Stack = 6;
+    public const ushort PongVSIP = 7;
+    public const ushort PongDebugStub = 8;
+    public const ushort OutputPane = 9;
+    public const ushort OutputClear = 10;
+
+    public const byte Channel_Console = 129;
+    public static readonly ushort Cmd_Console = ((129 << 8) + 0);
   }
 
   // Commands from VS Debug Window to VS Debug Engine
   static public class Windows2Debugger {
-    public const byte Noop = 0;
-    public const byte PingVSIP = 1;
-    public const byte PingDebugStub = 2;
-    public const byte SetAsmBreak = 3;
-    public const byte Continue = 4;
-    public const byte AsmStepInto = 5;
-    public const byte ToggleStepMode = 6;
-    public const byte CurrentASMLine = 7;
-    public const byte NextASMLine1 = 8;
-    public const byte NextLabel1 = 9;
-    public const byte SetStepModeSource = 10;
-    public const byte SetStepModeAssembler = 11;
-    public const byte ToggleAsmBreak2 = 12;
+    public const ushort Noop = 0;
+    public const ushort PingVSIP = 1;
+    public const ushort PingDebugStub = 2;
+    public const ushort SetAsmBreak = 3;
+    public const ushort Continue = 4;
+    public const ushort AsmStepInto = 5;
+    public const ushort ToggleStepMode = 6;
+    public const ushort CurrentASMLine = 7;
+    public const ushort NextASMLine1 = 8;
+    public const ushort NextLabel1 = 9;
+    public const ushort SetStepModeSource = 10;
+    public const ushort SetStepModeAssembler = 11;
+    public const ushort ToggleAsmBreak2 = 12;
   }
 
 }

@@ -6,7 +6,7 @@
     <ProjectGuid>{5b2c0369-7a84-4113-892c-f71b50e1da12}</ProjectGuid>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <Name>Guess</Name>
-    <BinFormat>elf</BinFormat>
+    <BinFormat>bin</BinFormat>
     <RootNamespace>Guess</RootNamespace>
     <SccProjectName>SAK</SccProjectName>
     <SccProvider>SAK</SccProvider>
@@ -26,13 +26,13 @@
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
     <StartCosmosGDB>False</StartCosmosGDB>
-    <VMwareEdition>Player</VMwareEdition>
+    <VMwareEdition>Workstation</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
     <Deployment>ISO</Deployment>
     <Launch>VMware</Launch>
     <DebugEnabled>True</DebugEnabled>
-    <TraceAssemblies>User</TraceAssemblies>
+    <TraceAssemblies>All</TraceAssemblies>
     <PXE_Deployment>PXE</PXE_Deployment>
     <PXE_Launch>None</PXE_Launch>
     <PXE_DebugEnabled>False</PXE_DebugEnabled>
@@ -62,11 +62,11 @@
     <VMware_DebugEnabled>True</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute>False</VMware_IgnoreDebugStubAttribute>
-    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
+    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
-    <VMware_TraceAssemblies>User</VMware_TraceAssemblies>
+    <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
@@ -129,6 +129,8 @@
     <ISO_VisualStudioDebugPort>Pipe: Cosmos\Serial</ISO_VisualStudioDebugPort>
     <PXE_ShowLaunchConsole>False</PXE_ShowLaunchConsole>
     <PXE_VisualStudioDebugPort>Pipe: Cosmos\Serial</PXE_VisualStudioDebugPort>
+    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Profile>VMware</Profile>
@@ -142,13 +144,13 @@
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
     <StartCosmosGDB>False</StartCosmosGDB>
-    <VMwareEdition>Player</VMwareEdition>
+    <VMwareEdition>Workstation</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
     <Deployment>ISO</Deployment>
     <Launch>VMware</Launch>
     <DebugEnabled>True</DebugEnabled>
-    <TraceAssemblies>User</TraceAssemblies>
+    <TraceAssemblies>All</TraceAssemblies>
     <PXE_Deployment>PXE</PXE_Deployment>
     <PXE_Launch>None</PXE_Launch>
     <PXE_DebugEnabled>False</PXE_DebugEnabled>
@@ -178,11 +180,11 @@
     <VMware_DebugEnabled>True</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute>False</VMware_IgnoreDebugStubAttribute>
-    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
+    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
-    <VMware_TraceAssemblies>User</VMware_TraceAssemblies>
+    <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
@@ -251,6 +253,8 @@
     <VMware_ShowLaunchConsole>False</VMware_ShowLaunchConsole>
     <ISO_ShowLaunchConsole>False</ISO_ShowLaunchConsole>
     <PXE_ShowLaunchConsole>False</PXE_ShowLaunchConsole>
+    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Cosmos.bxrc">

@@ -2,16 +2,16 @@
 
 function SendRegisters {
 	// Send the actual started signal
-    AL = #Ds2Vs_Registers 
+    AL = #Ds2Vs_Registers
 	ComWriteAL()
 
     ESI = .PushAllPtr
     ECX = 32
     ComWriteX()
-    
+
 	ESI = @.CallerESP
     ComWrite32()
-    
+
 	ESI = @.CallerEIP
     ComWrite32()
 }
@@ -28,6 +28,34 @@ function SendFrame {
     ESI + 8
     ECX = 32
     ComWriteX()
+}
+
+// AL contains channel
+// BL contains command
+// ESI contains data start pointer
+// ECX contains number of bytes to send as command data
+function SendCommandOnChannel{
+  +All
+    ComWriteAL()
+  -All
+
+  AL = BL
+
+  +All
+    ComWriteAL()
+  -All
+
+  +All
+    EAX = ECX
+    ComWriteEAX()
+  -All
+
+  // now ECX contains size of data (count)
+    // ESI contains address
+	while ECX != 0 {
+		ComWrite8()
+		ECX--
+	}
 }
 
 function SendStack {
@@ -60,7 +88,7 @@ function SendMethodContext {
     ComWriteAL()
 
     ESI = .CallerEBP
-    
+
 	// offset relative to ebp
     // size of data to send
     ComReadEAX()
@@ -70,7 +98,7 @@ function SendMethodContext {
 
     // now ECX contains size of data (count)
     // ESI contains relative to EBP
-    
+
 	while ECX != 0 {
 		ComWrite8()
 		ECX--
@@ -93,7 +121,7 @@ function SendMemory {
 
 	AL = #Ds2Vs_MemoryData
     ComWriteAL()
-	
+
     ComReadEAX()
     ESI = EAX
     ComReadEAX()
@@ -149,6 +177,15 @@ WriteChar:
     // So we inc again to skip the 0
     ESI++
     goto WriteChar
+
+    ////test
+    // Write Length
+    ESI = EBP
+    ESI + 12
+    ECX = ESI[0]
+
+    // Address of string
+    ESI = EBP[8]
 }
 
 // Input: Stack

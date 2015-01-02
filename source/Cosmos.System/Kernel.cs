@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmos.HAL;
 
 namespace Cosmos.System
 {
@@ -16,6 +17,12 @@ namespace Cosmos.System
         protected bool mStarted = false;
         // Set to signal stopped
         protected bool mStopped = false;
+
+        protected virtual TextScreenBase GetTextScreen()
+        {
+            // null means use default
+            return null;
+        }
 
         /// <summary>
         /// Start the system up using the properties for configuration.
@@ -37,7 +44,7 @@ namespace Cosmos.System
                 HAL.Bootstrap.Init();
 
                 Global.Dbg.Send("Global Init");
-                Global.Init();
+                Global.Init(GetTextScreen());
 
                 // Provide the user with a clear screen if they requested it
                 if (ClearScreen) {

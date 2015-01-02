@@ -1,3 +1,5 @@
+; Generated at 31-12-2014 17:48:28
+
 
 
 DebugStub_SendRegisters:
@@ -14,6 +16,7 @@ Call DebugStub_ComWrite32
 Mov ESI, DebugStub_CallerEIP
 Call DebugStub_ComWrite32
 DebugStub_SendRegisters_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendRegisters_Exit
 Ret
 
 DebugStub_SendFrame:
@@ -28,6 +31,34 @@ Add ESI, 8
 Mov ECX, 32
 Call DebugStub_ComWriteX
 DebugStub_SendFrame_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendFrame_Exit
+Ret
+
+DebugStub_SendCommandOnChannel:
+Pushad
+Call DebugStub_ComWriteAL
+Popad
+
+Mov AL, BL
+
+Pushad
+Call DebugStub_ComWriteAL
+Popad
+
+Pushad
+Mov EAX, ECX
+Call DebugStub_ComWriteEAX
+Popad
+
+DebugStub_SendCommandOnChannel_Block1_Begin:
+Cmp ECX, 0
+JE DebugStub_SendCommandOnChannel_Block1_End
+Call DebugStub_ComWrite8
+Dec ECX
+jmp DebugStub_SendCommandOnChannel_Block1_Begin
+DebugStub_SendCommandOnChannel_Block1_End:
+DebugStub_SendCommandOnChannel_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendCommandOnChannel_Exit
 Ret
 
 DebugStub_SendStack:
@@ -48,6 +79,7 @@ Call DebugStub_ComWrite8
 jmp DebugStub_SendStack_Block1_Begin
 DebugStub_SendStack_Block1_End:
 DebugStub_SendStack_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendStack_Exit
 Ret
 
 DebugStub_SendMethodContext:
@@ -74,6 +106,7 @@ DebugStub_SendMethodContext_Block1_End:
 
 DebugStub_SendMethodContext_Exit:
 Popad
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendMethodContext_Exit
 Ret
 
 
@@ -98,6 +131,7 @@ DebugStub_SendMemory_Block1_End:
 
 DebugStub_SendMemory_Exit:
 Popad
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendMemory_Exit
 Ret
 
 DebugStub_SendTrace:
@@ -111,6 +145,7 @@ Call DebugStub_ComWriteAL
 Mov ESI, DebugStub_CallerEIP
 Call DebugStub_ComWrite32
 DebugStub_SendTrace_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendTrace_Exit
 Ret
 
 DebugStub_SendText:
@@ -130,7 +165,14 @@ Call DebugStub_ComWrite8
 Dec ECX
 Inc ESI
 Jmp DebugStub_SendText_WriteChar
+
+Mov ESI, EBP
+Add ESI, 12
+Mov ECX, [ESI + 0]
+
+Mov ESI, [EBP + 8]
 DebugStub_SendText_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendText_Exit
 Ret
 
 DebugStub_SendPtr:
@@ -140,6 +182,7 @@ Call DebugStub_ComWriteAL
 Mov ESI, [EBP + 8]
 Call DebugStub_ComWrite32
 DebugStub_SendPtr_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendPtr_Exit
 Ret
 
 DebugStub_SendStackCorruptionOccurred:
@@ -149,6 +192,7 @@ Call DebugStub_ComWriteAL
 Mov ESI, DebugStub_CallerEIP
 Call DebugStub_ComWrite32
 DebugStub_SendStackCorruptionOccurred_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendStackCorruptionOccurred_Exit
 Ret
 
 DebugStub_SendNullReferenceOccurred:
@@ -158,6 +202,7 @@ Call DebugStub_ComWriteAL
 Mov ESI, DebugStub_CallerEIP
 Call DebugStub_ComWrite32
 DebugStub_SendNullReferenceOccurred_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendNullReferenceOccurred_Exit
 Ret
 
 DebugStub_SendMessageBox:
@@ -178,5 +223,6 @@ Dec ECX
 Inc ESI
 Jmp DebugStub_SendMessageBox_WriteChar
 DebugStub_SendMessageBox_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendMessageBox_Exit
 Ret
 
