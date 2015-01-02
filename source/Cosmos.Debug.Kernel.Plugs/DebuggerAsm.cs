@@ -31,39 +31,39 @@ namespace Cosmos.Debug.Kernel.Plugs {
   // Maybe could merge this into the same unit as the plug
   public class DebugTraceOff : AssemblerMethod {
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-      aAssembler.Add(new LiteralAssemblerCode("%ifdef DEBUGSTUB"));
-      aAssembler.Add(new LiteralAssemblerCode("pushad"));
-      aAssembler.Add(new LiteralAssemblerCode("Call DebugStub_TraceOff"));
-      aAssembler.Add(new LiteralAssemblerCode("popad"));
-      aAssembler.Add(new LiteralAssemblerCode("%endif"));
+     new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+     new LiteralAssemblerCode("pushad");
+     new LiteralAssemblerCode("Call DebugStub_TraceOff");
+     new LiteralAssemblerCode("popad");
+     new LiteralAssemblerCode("%endif");
     }
   }
 
   public class DebugTraceOn : AssemblerMethod {
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-      aAssembler.Add(new LiteralAssemblerCode("%ifdef DEBUGSTUB"));
-      aAssembler.Add(new LiteralAssemblerCode("pushad"));
-      aAssembler.Add(new LiteralAssemblerCode("Call DebugStub_TraceOn"));
-      aAssembler.Add(new LiteralAssemblerCode("popad"));
-      aAssembler.Add(new LiteralAssemblerCode("%endif"));
+     new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+     new LiteralAssemblerCode("pushad");
+     new LiteralAssemblerCode("Call DebugStub_TraceOn");
+     new LiteralAssemblerCode("popad");
+     new LiteralAssemblerCode("%endif");
     }
   }
 
   public class DebugBreak : AssemblerMethod {
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-      aAssembler.Add(new LiteralAssemblerCode("%ifdef DEBUGSTUB"));
-      aAssembler.Add(new LiteralAssemblerCode("mov dword [DebugBreakOnNextTrace], 1"));
-      aAssembler.Add(new LiteralAssemblerCode("%endif"));
+     new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+     new LiteralAssemblerCode("mov dword [DebugBreakOnNextTrace], 1");
+     new LiteralAssemblerCode("%endif");
     }
   }
 
   public class DebugSend : AssemblerMethod {
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-      aAssembler.Add(new LiteralAssemblerCode("%ifdef DEBUGSTUB"));
-      aAssembler.Add(new LiteralAssemblerCode("pushad"));
-      aAssembler.Add(new LiteralAssemblerCode("Call DebugStub_SendText"));
-      aAssembler.Add(new LiteralAssemblerCode("popad"));
-      aAssembler.Add(new LiteralAssemblerCode("%endif"));
+     new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+     new LiteralAssemblerCode("pushad");
+     new LiteralAssemblerCode("Call DebugStub_SendText");
+     new LiteralAssemblerCode("popad");
+     new LiteralAssemblerCode("%endif");
     }
   }
 
@@ -71,21 +71,21 @@ namespace Cosmos.Debug.Kernel.Plugs {
   {
       public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
       {
-          aAssembler.Add(new LiteralAssemblerCode("%ifdef DEBUGSTUB"));
-          aAssembler.Add(new LiteralAssemblerCode("pushad"));
-          aAssembler.Add(new LiteralAssemblerCode("Call DebugStub_SendMessageBox"));
-          aAssembler.Add(new LiteralAssemblerCode("popad"));
-          aAssembler.Add(new LiteralAssemblerCode("%endif"));
+         new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+         new LiteralAssemblerCode("pushad");
+         new LiteralAssemblerCode("Call DebugStub_SendMessageBox");
+         new LiteralAssemblerCode("popad");
+         new LiteralAssemblerCode("%endif");
       }
   }
 
   public class DebugSendPtr : AssemblerMethod {
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-      aAssembler.Add(new LiteralAssemblerCode("%ifdef DEBUGSTUB"));
-      aAssembler.Add(new LiteralAssemblerCode("pushad"));
-      aAssembler.Add(new LiteralAssemblerCode("Call DebugStub_SendPtr"));
-      aAssembler.Add(new LiteralAssemblerCode("popad"));
-      aAssembler.Add(new LiteralAssemblerCode("%endif"));
+     new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+     new LiteralAssemblerCode("pushad");
+     new LiteralAssemblerCode("Call DebugStub_SendPtr");
+     new LiteralAssemblerCode("popad");
+     new LiteralAssemblerCode("%endif");
     }
   }
 }
