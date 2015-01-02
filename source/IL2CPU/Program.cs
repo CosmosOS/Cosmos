@@ -18,7 +18,7 @@ namespace IL2CPU
     private const string KernelFile = CosmosRoot + "";// @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernel.dll";
     private const string OutputFile = CosmosRoot + "";//@"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernelBoot.asm";
     private static  Dictionary<string, string> CmdOptions = new Dictionary<string, string>();
-    private static List<ITaskItem>  References = new List<ITaskItem>();
+    private static List<string> References = new List<string>();
 
     private static int Main(string[] args)
     {
@@ -37,7 +37,7 @@ namespace IL2CPU
           else
           {
 
-            References.Add(new TaskItemImpl(s.Replace(s1[0] + ":","")));
+            References.Add(s.Replace(s1[0] + ":",""));
           }
 
         }
@@ -72,7 +72,7 @@ namespace IL2CPU
         xTask.OnLogWarning = (m) => Console.WriteLine("Warning: {0}", m);
         xTask.OnLogMessage = (m) =>
         {
-          Console.WriteLine("Message: {0}", m);
+          //Console.WriteLine("Message: {0}", m);
         };
         xTask.OnLogException = (m) => Console.WriteLine("Exception: {0}", m.ToString());
 

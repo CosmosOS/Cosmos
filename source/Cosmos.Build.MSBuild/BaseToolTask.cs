@@ -128,7 +128,7 @@ namespace Cosmos.Build.MSBuild
 				}
 				foreach (var xOutput in mOutput)
 				{
-				  Log.LogError(xOutput);
+				  Log.LogMessage(xOutput);
 				}
 				return xProcess.ExitCode == 0;
 			}
