@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using Cosmos.Build.Common;
 using Cosmos.Build.MSBuild;
+using Cosmos.IL2CPU;
 using Microsoft.Build.Framework;
 using System.Diagnostics;
 using System.Data.SQLite;
@@ -39,7 +40,7 @@ namespace DebugCompiler
             try
             {
                 CosmosPaths.DebugStubSrc = Path.Combine(CosmosRoot, "source", "Cosmos.Debug.DebugStub");
-                var xTask = new IL2CPUTask();
+                var xTask = new CompilerEngine();
                 xTask.DebugEnabled = true;
                 xTask.StackCorruptionDetectionEnabled = true;
                 xTask.DebugMode = "Source";
@@ -57,6 +58,8 @@ namespace DebugCompiler
                                      {
                                          Console.WriteLine("Message: {0}", m);
                                      };
+                xTask.Extensions = new List<Tuple<string, string>>();
+                xTask.Extensions.Add(Tuple.Create("", typeof(TestCompilerExtension).AssemblyQualifiedName));
                 xTask.OnLogException = (m) => Console.WriteLine("Exception: {0}", m.ToString());
 
                 if (xTask.Execute())

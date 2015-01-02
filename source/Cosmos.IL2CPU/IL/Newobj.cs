@@ -5,6 +5,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 using System.Reflection;
+using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -46,7 +47,7 @@ namespace Cosmos.IL2CPU.X86.IL
                  * Current sitation on stack:
                  *   $ESP       Arg
                  *   $ESP+..    other items
-                 *   
+                 *
                  * What should happen:
                  *  + The stack should be increased to allow space to contain:
                  *         + .ctor arguments
@@ -164,7 +165,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //select item ).Count();
                 int xGCFieldCount = objectType.GetFields().Count(x => x.FieldType.IsValueType);
 
-                // todo: use a cleaner approach here. this class shouldnt assemble the string          
+                // todo: use a cleaner approach here. this class shouldnt assemble the string
                 string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
@@ -241,9 +242,9 @@ namespace Cosmos.IL2CPU.X86.IL
             }
         }
 
-        private static void PushAlignedParameterSize(System.Reflection.MethodBase aMethod)
+        private static void PushAlignedParameterSize(SysReflection.MethodBase aMethod)
         {
-            System.Reflection.ParameterInfo[] xParams = aMethod.GetParameters();
+            SysReflection.ParameterInfo[] xParams = aMethod.GetParameters();
 
             uint xSize;
             new Comment("[ Newobj.PushAlignedParameterSize start count = " + xParams.Length.ToString() + " ]");

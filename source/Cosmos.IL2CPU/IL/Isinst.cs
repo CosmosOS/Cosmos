@@ -3,6 +3,8 @@ using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Assembler.x86;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using SysReflection = System.Reflection;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     /// <summary>
@@ -28,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
             new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New( xTypeID ), DestinationIsIndirect = true };
 
-            System.Reflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.Int32", "System.Int32" );
+            SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.Int32", "System.Int32" );
 //, new OpMethod( ILOpCode.Code.Call, aOpCode.Position, aOpCode.NextPosition, xMethodIsInstance, aOpCode.CurrentExceptionHandler));
             Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, GetLabel(aMethod, aOpCode), GetLabel(aMethod, aOpCode) + "_After_IsInstance_Call", DebugEnabled);
 
@@ -52,7 +54,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.Reflection;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.Compiler;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         //     [Cosmos.Assembler.OpCode(OpCodeEnum.Isinst)]
         //     public class Isinst : Op {
@@ -61,7 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //         private string mNextOpLabel;
         //         private int mCurrentILOffset;
         //         private bool mDebugMode;
-        // 
+        //
         //         //public static void ScanOp(ILReader aReader,
         //         //                          MethodInformation aMethodInfo,
         //         //                          SortedList<string, object> aMethodData) {
@@ -76,7 +78,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //         //                                     "System.Int32"));
         //         //    Newobj.ScanOp(typeof(InvalidCastException).GetConstructor(new Type[0]));
         //         //}
-        // 
+        //
         //         public Isinst(ILReader aReader,
         //                       MethodInformation aMethodInfo)
         //             : base(aReader,

@@ -1,6 +1,5 @@
 ﻿using Cosmos.Build.Common;
 using Cosmos.IL2CPU;
-using Cosmos.System;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,11 +7,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Cosmos.Debug.Common;
+using Cosmos.System;
 
-namespace Cosmos.Build.MSBuild
+namespace Cosmos.IL2CPU
 {
     // http://blogs.msdn.com/b/visualstudio/archive/2010/07/06/debugging-msbuild-script-with-visual-studio.aspx
-    public class IL2CPUTask
+    public class CompilerEngine
     {
         const string FULLASSEMBLYNAME_KERNEL = "Cosmos.System.Kernel";
 
@@ -118,11 +118,52 @@ namespace Cosmos.Build.MSBuild
             }
         }
 
+        public List<Tuple<string, string>> Extensions;
+
+        private List<CompilerExtensionBase> mLoadedExtensions;
+
+        private void LoadExtensions()
+        {
+            return;
+            if (Extensions == null)
+            {
+                throw new Exception("No list of extensions passed!");
+            }
+
+            mLoadedExtensions = new List<CompilerExtensionBase>(Extensions.Count);
+            foreach (var xItem in Extensions)
+            {
+                Assembly xAssembly = null;
+                Type xExtensionType;
+                if (!String.IsNullOrWhiteSpace(xItem.Item1))
+                {
+                    AppDomain.CurrentDomain.AppendPrivatePath(Path.GetDirectoryName(xItem.Item1));
+                    xAssembly = Assembly.LoadFrom(xItem.Item1);
+
+                    xExtensionType = xAssembly.GetType(xItem.Item2, true, true);
+                }
+                else
+                {
+                    xExtensionType = Type.GetType(xItem.Item2, true, true);
+                }
+
+                if (xExtensionType == null)
+                {
+                    throw new Exception("Unable to find extension type '" + xItem.Item2 + "'!");
+                }
+
+                mLoadedExtensions.Add((CompilerExtensionBase)Activator.CreateInstance(xExtensionType));
+            }
+        }
+
         protected bool Initialize()
         {
             // Add UserKit dirs for asms to load from.
-            mSearchDirs.Add(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
-            if (!EnsureCosmosPathsInitialization()) { return false; }
+            mSearchDirs.Add(Path.GetDirectoryName(typeof(CompilerEngine).Assembly.Location));
+            if (!EnsureCosmosPathsInitialization())
+            {
+              return false;
+            }
             mSearchDirs.Add(CosmosPaths.UserKit);
             mSearchDirs.Add(CosmosPaths.Kernel);
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
@@ -161,6 +202,8 @@ namespace Cosmos.Build.MSBuild
                 }
                 mTraceAssemblies = (TraceAssemblies)Enum.Parse(typeof(TraceAssemblies), TraceAssemblies);
             }
+
+            LoadExtensions();
 
             return true;
         }
@@ -201,7 +244,7 @@ namespace Cosmos.Build.MSBuild
                     DebugCom = 0;
                 }
 
-                using (var xAsm = new AppAssembler(DebugCom, AssemblerLog))
+                using (var xAsm = GetAppAssembler())
                 {
                     using (var xDebugInfo = new DebugInfo(xOutputFilename + ".cdb", true))
                     {
@@ -289,6 +332,20 @@ namespace Cosmos.Build.MSBuild
                 }
                 return false;
             }
+        }
+
+        private AppAssembler GetAppAssembler()
+        {
+            foreach (var xExt in mLoadedExtensions)
+            {
+                AppAssembler xResult;
+                if (xExt.TryCreateAppAssembler(DebugCom, AssemblerLog, out xResult))
+                {
+                    return xResult;
+                }
+            }
+
+            return new AppAssembler(DebugCom, AssemblerLog);
         }
 
         /// <summary>Load every refernced assemblies that have an associated FullPath property and seek for

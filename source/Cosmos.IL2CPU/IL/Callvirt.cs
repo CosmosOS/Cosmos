@@ -6,9 +6,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
 using System.Reflection;
-// using System.Reflection;
-// using Cosmos.IL2CPU.X86;
-// using Cosmos.IL2CPU.Compiler;
+using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -27,9 +25,9 @@ namespace Cosmos.IL2CPU.X86.IL
         }
 
         public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp, bool debugEnabled) {
-                       
+
           string xCurrentMethodLabel = GetLabel(aMethod, aOp.Position);
-          
+
           // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
           //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
           string xNormalAddress = "";
@@ -40,7 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
           int xArgCount = aTargetMethod.GetParameters().Length;
           uint xReturnSize = 0;
-          var xMethodInfo = aTargetMethod as System.Reflection.MethodInfo;
+          var xMethodInfo = aTargetMethod as SysReflection.MethodInfo;
           if (xMethodInfo != null) {
             xReturnSize = Align(SizeOfType(xMethodInfo.ReturnType), 4);
           }
@@ -59,14 +57,14 @@ namespace Cosmos.IL2CPU.X86.IL
           foreach (var xItem in xParameters) {
             xThisOffset += Align(SizeOfType(xItem.ParameterType), 4);
           }
-            
+
           // This is finding offset to self? It looks like we dont need offsets of other
           // arguments, but only self. If so can calculate without calculating all fields
           // Might have to go to old data structure for the offset...
           // Can we add this method info somehow to the data passed in?
           // mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
 
-          
+
           new Comment(Assembler, "ThisOffset = " + xThisOffset);
           Call.DoNullReferenceCheck(Assembler, debugEnabled, xThisOffset);
 
@@ -122,7 +120,7 @@ namespace Cosmos.IL2CPU.X86.IL
             /*
              * On the stack now:
              * $esp                 Params
-             * $esp + mThisOffset   This            
+             * $esp + mThisOffset   This
              */
 
             //Call.EmitExceptionLogic( Assembler,
@@ -151,7 +149,7 @@ namespace Cosmos.IL2CPU.X86.IL
                * On the stack now:
                * $esp                 Params
                * $esp + mThisOffset   This
-               * 
+               *
                * EAX contains the method to call
                */
               new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = xCurrentMethodLabel + ".NotBoxedThis" };
@@ -160,7 +158,7 @@ namespace Cosmos.IL2CPU.X86.IL
                * On the stack now:
                * $esp                 Params
                * $esp + mThisOffset   This
-               * 
+               *
                * ECX contains the method to call
                */
               new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xThisOffset };
@@ -168,7 +166,7 @@ namespace Cosmos.IL2CPU.X86.IL
                * On the stack now:
                * $esp                 Params
                * $esp + mThisOffset   This
-               * 
+               *
                * ECX contains the method to call
                * EAX contains $This, but boxed
                */
@@ -182,7 +180,7 @@ namespace Cosmos.IL2CPU.X86.IL
                * On the stack now:
                * $esp                 Params
                * $esp + mThisOffset   Pointer to address inside box
-               * 
+               *
                * ECX contains the method to call
                */
               new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
@@ -201,7 +199,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Call { DestinationReg = CPUx86.Registers.EAX };
             new Label(xCurrentMethodLabel + ".AfterNotBoxedThis");
           }
-          ILOp.EmitExceptionLogic(Assembler, aMethod, aOp, true, 
+          ILOp.EmitExceptionLogic(Assembler, aMethod, aOp, true,
                                   delegate()
                                   {
                                       var xResultSize = xReturnSize;

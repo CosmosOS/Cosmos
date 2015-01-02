@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+
+using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpNone : ILOpCode {
 
-    public OpNone(Code aOpCode, int aPos, int aNextPos, System.Reflection.ExceptionHandlingClause aCurrentExceptionHandler)
+    public OpNone(Code aOpCode, int aPos, int aNextPos, ExceptionHandlingClause aCurrentExceptionHandler)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler)
     {
     }
@@ -21,7 +21,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Nop:
           return 0;
         case Code.Ret:
-          var methodInfo = aMethod as System.Reflection.MethodInfo;
+          var methodInfo = aMethod as SysReflection.MethodInfo;
           if (methodInfo != null && methodInfo.ReturnType != typeof (void))
           {
             return 1;
@@ -720,8 +720,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             return;
           }
 
-          if (xTypeValue == typeof (byte) 
-            || xTypeValue == typeof (char) 
+          if (xTypeValue == typeof (byte)
+            || xTypeValue == typeof (char)
             || xTypeValue == typeof(short)
             || xTypeValue == typeof(ushort)
             || xTypeValue == typeof(int))

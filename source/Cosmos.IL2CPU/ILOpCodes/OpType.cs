@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   {
     public readonly Type Value;
 
-    public OpType(Code aOpCode, int aPos, int aNextPos, Type aValue, System.Reflection.ExceptionHandlingClause aCurrentExceptionHandler)
+    public OpType(Code aOpCode, int aPos, int aNextPos, Type aValue, ExceptionHandlingClause aCurrentExceptionHandler)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler)
     {
       Value = aValue;
@@ -145,7 +145,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
     }
 
     /// <summary>
-    /// Based on updated StackPopTypes, try to update 
+    /// Based on updated StackPopTypes, try to update
     /// </summary>
     protected override void DoInterpretStackTypes(ref bool aSituationChanged)
     {

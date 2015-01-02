@@ -8,7 +8,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpString : ILOpCode {
     public readonly string Value;
 
-    public OpString(Code aOpCode, int aPos, int aNextPos, string aValue, System.Reflection.ExceptionHandlingClause aCurrentExceptionHandler)
+    public OpString(Code aOpCode, int aPos, int aNextPos, string aValue, ExceptionHandlingClause aCurrentExceptionHandler)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
       Value = aValue;
     }

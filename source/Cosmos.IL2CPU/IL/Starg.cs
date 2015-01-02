@@ -1,12 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using CPU = Cosmos.Assembler.x86;
 using CPUx86 = Cosmos.Assembler.x86;
-using System.Reflection;
-using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler;
+using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -21,11 +17,11 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             //throw new NotImplementedException();
-          
+
             OpVar xOpVar = ( OpVar )aOpCode;
             //mAddresses = aMethodInfo.Arguments[ xOpVar.Value ].VirtualAddresses;
 
-            var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
+            var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
             uint xReturnSize = 0;
             if( xMethodInfo != null )
             {
@@ -63,17 +59,17 @@ namespace Cosmos.IL2CPU.X86.IL
 
 
         // using System;
-        // 
-        // 
+        //
+        //
         // using CPUx86 = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Starg)]
         // 	public class Starg: Op {
         // 		private int[] mAddresses;
         // 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
         // 			mAddresses = aMethodInfo.Arguments[aIndex].VirtualAddresses;
-        // 
+        //
         // 		}
         // 		public Starg(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {

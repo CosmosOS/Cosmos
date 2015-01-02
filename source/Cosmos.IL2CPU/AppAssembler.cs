@@ -16,6 +16,9 @@ using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.Plugs;
 using Mono.Cecil;
 
+using SysReflection = System.Reflection;
+
+
 namespace Cosmos.IL2CPU
 {
     public class AppAssembler : IDisposable
@@ -28,7 +31,7 @@ namespace Cosmos.IL2CPU
         protected ILOp[] mILOpsHi = new ILOp[256];
         public bool ShouldOptimize = false;
         public DebugInfo DebugInfo { get; set; }
-        protected System.IO.TextWriter mLog;
+        protected TextWriter mLog;
         protected Dictionary<string, ModuleDefinition> mLoadedModules = new Dictionary<string, ModuleDefinition>();
         protected DebugInfo.SequencePoint[] mSequences = new DebugInfo.SequencePoint[0];
         public TraceAssemblies TraceAssemblies;
@@ -48,7 +51,7 @@ namespace Cosmos.IL2CPU
         public AppAssembler(int aComPort, string assemblerLogFile)
         {
             Assembler = new Cosmos.Assembler.Assembler(aComPort);
-            mLog = new System.IO.StreamWriter(assemblerLogFile, false);
+            mLog = new StreamWriter(assemblerLogFile, false);
             InitILOps();
         }
 
@@ -276,7 +279,7 @@ namespace Cosmos.IL2CPU
             new Comment("End Method: " + aMethod.MethodBase.Name);
 
             uint xReturnSize = 0;
-            var xMethInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
+            var xMethInfo = aMethod.MethodBase as SysReflection.MethodInfo;
             if (xMethInfo != null)
             {
                 xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
@@ -314,7 +317,7 @@ namespace Cosmos.IL2CPU
             if (aMethod.PluggedMethod != null)
             {
                 xReturnSize = 0;
-                xMethInfo = aMethod.PluggedMethod.MethodBase as System.Reflection.MethodInfo;
+                xMethInfo = aMethod.PluggedMethod.MethodBase as SysReflection.MethodInfo;
                 if (xMethInfo != null)
                 {
                     xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
@@ -1541,7 +1544,7 @@ namespace Cosmos.IL2CPU
             var xMethodBase = methodBase;
             if (xMethodBase.IsGenericMethod)
             {
-                var xMethodInfo = (System.Reflection.MethodInfo)xMethodBase;
+                var xMethodInfo = (SysReflection.MethodInfo)xMethodBase;
                 xMethodBase = xMethodInfo.GetGenericMethodDefinition();
                 if (xMethodBase.IsGenericMethod)
                 {

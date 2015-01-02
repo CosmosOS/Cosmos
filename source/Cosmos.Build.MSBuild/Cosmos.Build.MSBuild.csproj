@@ -81,7 +81,6 @@
     <Compile Include="BaseToolTask.cs" />
     <Compile Include="ExtractMapFromElfFile.cs" />
     <Compile Include="IL2CPU.cs" />
-    <Compile Include="IL2CPUTask.cs" />
     <Compile Include="Ld.cs" />
     <Compile Include="MakeISO.cs" />
     <Compile Include="NAsm.cs" />
@@ -116,6 +115,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="App.config" />
     <None Include="Cosmos.snk" />
     <None Include="Cosmos.targets">

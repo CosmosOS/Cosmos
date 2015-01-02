@@ -7,6 +7,7 @@ using System.Reflection;
 using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
+using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -32,7 +33,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
             new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New( xTypeID ), DestinationIsIndirect = true };
-            System.Reflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.Int32", "System.Int32" );
+            SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.Int32", "System.Int32" );
             // new OpMethod( ILOpCode.Code.Call, 0, 0, xMethodIsInstance, aOpCode.CurrentExceptionHandler ) );
             IL.Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, xCurrentMethodLabel, xCurrentMethodLabel + "_After_IsInstance_Call", DebugEnabled);
             new Label( xCurrentMethodLabel + "_After_IsInstance_Call" );
@@ -46,7 +47,7 @@ namespace Cosmos.IL2CPU.X86.IL
             string xAllocInfoLabelName = LabelName.Get( GCImplementationRefs.AllocNewObjectRef );
 #warning TODO: Emit new exceptions
             //new Newobj( Assembler ).Execute( aMethod, aOpCode );
-   
+
             //Newobj.Assemble( Assembler,
             //                typeof( InvalidCastException ).GetConstructor( new Type[ 0 ] ),
             //                GetService<IMetaDataInfoService>().GetTypeIdLabel( typeof( InvalidCastException ) ),
@@ -66,14 +67,14 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System;
         // using System.Collections.Generic;
         // using System.IO;
-        // 
-        // 
+        //
+        //
         // using CPU = Cosmos.Assembler.x86;
         // using CPUx86 = Cosmos.Assembler.x86;
         // using System.Reflection;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.Compiler;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Castclass)]
         // 	public class Castclass: Op {
@@ -83,7 +84,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		private Type mCastAsType;
         // 		private int mCurrentILOffset;
         // 		private MethodInformation mMethodInfo;
-        // 
+        //
         //         public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData, IServiceProvider aProvider)
         //         {
         //             Type xType = aReader.OperandValueType;
@@ -98,7 +99,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                                              "System.Int32"), aProvider);
         //             Newobj.ScanOp(typeof(InvalidCastException).GetConstructor(new Type[0]), aProvider);
         //         }
-        // 
+        //
         // 		public Castclass(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {
         // 			Type xType = aReader.OperandValueType;
@@ -111,7 +112,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			mCurrentILOffset = (int)aReader.Position;
         // 			mMethodInfo = aMethodInfo;
         // 		}
-        // 
+        //
         // 		public override void DoAssemble() {
         //             mTypeId = GetService<IMetaDataInfoService>().GetTypeIdLabel(mCastAsType);
         // 			// todo: throw an exception when the class does not support the cast!
@@ -137,12 +138,12 @@ namespace Cosmos.IL2CPU.X86.IL
         //             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
         //             var xAllocInfo = GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.AllocNewObjectRef,
         //                                                                               false);
-        //             Newobj.Assemble(Assembler, 
-        //                             typeof(InvalidCastException).GetConstructor(new Type[0]), 
-        //                             GetService<IMetaDataInfoService>().GetTypeIdLabel(typeof(InvalidCastException)), 
-        //                             mThisLabel, 
-        //                             mMethodInfo, 
-        //                             mCurrentILOffset, 
+        //             Newobj.Assemble(Assembler,
+        //                             typeof(InvalidCastException).GetConstructor(new Type[0]),
+        //                             GetService<IMetaDataInfoService>().GetTypeIdLabel(typeof(InvalidCastException)),
+        //                             mThisLabel,
+        //                             mMethodInfo,
+        //                             mCurrentILOffset,
         //                             mThisLabel + "_After_NewException",
         //                             GetService<IMetaDataInfoService>().GetTypeInfo(typeof(InvalidCastException)),
         //                             GetService<IMetaDataInfoService>().GetMethodInfo(typeof(InvalidCastException).GetConstructor(new Type[0]), false),

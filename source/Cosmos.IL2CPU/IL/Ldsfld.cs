@@ -4,6 +4,8 @@ using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Assembler.x86;
 using System.Reflection;
 using System.Linq;
+using SysReflection = System.Reflection;
+
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -20,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             var xType = aMethod.MethodBase.DeclaringType;
             var xOpCode = ( ILOpCodes.OpField )aOpCode;
-            System.Reflection.FieldInfo xField = xOpCode.Value;
+            SysReflection.FieldInfo xField = xOpCode.Value;
 
             // call cctor:
 			var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();

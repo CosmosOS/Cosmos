@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpField : ILOpCode {
     public readonly FieldInfo Value;
 
-    public OpField(Code aOpCode, int aPos, int aNextPos, FieldInfo aValue, System.Reflection.ExceptionHandlingClause aCurrentExceptionHandler)
+    public OpField(Code aOpCode, int aPos, int aNextPos, FieldInfo aValue, ExceptionHandlingClause aCurrentExceptionHandler)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
       Value = aValue;
     }
@@ -118,7 +118,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           }
           else if (Value.DeclaringType.IsValueType && !Value.DeclaringType.IsPrimitive)
           {
-            expectedType = typeof(void*); 
+            expectedType = typeof(void*);
           }
           if (StackPopTypes[1] == expectedType ||
               StackPopTypes[1] == Value.FieldType)

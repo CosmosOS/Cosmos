@@ -9,7 +9,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpBranch : ILOpCode {
     public readonly int Value;
 
-    public OpBranch(Code aOpCode, int aPos, int aNextPos, int aValue, System.Reflection.ExceptionHandlingClause aCurrentExceptionHandler)
+    public OpBranch(Code aOpCode, int aPos, int aNextPos, int aValue, ExceptionHandlingClause aCurrentExceptionHandler)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
       Value = aValue;
     }
@@ -108,7 +108,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-          
+
           throw new Exception("Invalid type in PopTypes! (Type = '" + xPopType.AssemblyQualifiedName + "')");
         case Code.Br:
         case Code.Leave:
@@ -196,7 +196,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Leave:
           InterpretInstructionIfNotYetProcessed(Value, aOpCodes, new Stack<Type>(aStack.Reverse()), ref aSituationChanged, aMaxRecursionDepth);
           base.DoInterpretNextInstructionStackTypesIfNotYetProcessed(aOpCodes, new Stack<Type>(aStack.Reverse()), ref aSituationChanged, aMaxRecursionDepth);
-          
+
           break;
         default:
           throw new NotImplementedException("OpCode " + OpCode);

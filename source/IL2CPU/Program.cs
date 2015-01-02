@@ -4,10 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Cosmos.Build.MSBuild;
 using Cosmos.Debug.Common;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
+using Cosmos.IL2CPU;
 
 namespace IL2CPU
 {
@@ -43,7 +41,7 @@ namespace IL2CPU
         }
         //File.WriteAllText("C:\\Users\\Emile\\Desktop\\dump.txt",tmp);
 
-        var xTask = new IL2CPUTask();
+        var xTask = new CompilerEngine();
         xTask.DebugEnabled = Convert.ToBoolean(CmdOptions["DebugEnabled".ToLower()]);
         Console.WriteLine("Loaded : DebugEnabled");
         xTask.StackCorruptionDetectionEnabled = Convert.ToBoolean(CmdOptions["StackCorruptionDetectionEnabled".ToLower()]);
@@ -95,61 +93,6 @@ namespace IL2CPU
       // File.WriteAllText("./ErrorDump.txt",E.ToString()  + " " + E.Source);
         Console.WriteLine("Error occurred: " + E.ToString());
         return 1;
-      }
-    }
-
-    private class TaskItemImpl : ITaskItem
-    {
-      private string path;
-
-      public TaskItemImpl(string path)
-      {
-        this.path = path;
-      }
-
-      public System.Collections.IDictionary CloneCustomMetadata()
-      {
-        throw new NotImplementedException();
-      }
-
-      public void CopyMetadataTo(ITaskItem destinationItem)
-      {
-        throw new NotImplementedException();
-      }
-
-      public string GetMetadata(string metadataName)
-      {
-        if (metadataName == "FullPath")
-        {
-          return path;
-        }
-        throw new NotImplementedException();
-      }
-
-      public string ItemSpec
-      {
-        get { throw new NotImplementedException(); }
-        set { throw new NotImplementedException(); }
-      }
-
-      public int MetadataCount
-      {
-        get { return MetadataNames.Count; }
-      }
-
-      public System.Collections.ICollection MetadataNames
-      {
-        get { return new String[] {"FullPath"}; }
-      }
-
-      public void RemoveMetadata(string metadataName)
-      {
-        throw new NotImplementedException();
-      }
-
-      public void SetMetadata(string metadataName, string metadataValue)
-      {
-        throw new NotImplementedException();
       }
     }
   }

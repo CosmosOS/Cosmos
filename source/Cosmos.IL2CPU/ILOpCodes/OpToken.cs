@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         }
     }
 
-    public OpToken(Code aOpCode, int aPos, int aNextPos, Int32 aValue, Module aModule, Type[] aTypeGenericArgs, Type[] aMethodGenericArgs, System.Reflection.ExceptionHandlingClause aCurrentExceptionHandler)
+    public OpToken(Code aOpCode, int aPos, int aNextPos, Int32 aValue, Module aModule, Type[] aTypeGenericArgs, Type[] aMethodGenericArgs, ExceptionHandlingClause aCurrentExceptionHandler)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
       Value = aValue;
       if (ValueIsField)
