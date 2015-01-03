@@ -237,8 +237,8 @@ namespace Cosmos.Debug.Common
             {
                 Incoming xIncoming = (Incoming)result.AsyncState;
                 int xCount = xIncoming.Stream.EndRead(result);
-                System.Diagnostics.Debug.Write(string.Format("DC DR2 - Received ({0}): ", xCount));
-                System.Diagnostics.Debug.WriteLine(BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount));
+                //System.Diagnostics.Debug.Write(string.Format("DC DR2 - Received ({0}): ", xCount));
+                //System.Diagnostics.Debug.WriteLine(BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount));
                 xIncoming.CurrentPos += xCount;
                 if (xCount == 0)
                 {
