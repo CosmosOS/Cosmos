@@ -8,10 +8,6 @@ namespace Cosmos.IL2CPU
 {
   public abstract class CompilerExtensionBase
   {
-    public virtual void Initialize(CompilerEngine task)
-    {
-    }
-
     public virtual bool TryCreateAppAssembler(byte debugCom, string assemblerLog, out AppAssembler result)
     {
       result = null;

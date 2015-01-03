@@ -58,8 +58,6 @@ namespace DebugCompiler
                                      {
                                          Console.WriteLine("Message: {0}", m);
                                      };
-                xTask.Extensions = new List<Tuple<string, string>>();
-                xTask.Extensions.Add(Tuple.Create("", typeof(TestCompilerExtension).AssemblyQualifiedName));
                 xTask.OnLogException = (m) => Console.WriteLine("Exception: {0}", m.ToString());
 
                 if (xTask.Execute())

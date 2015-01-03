@@ -96,23 +96,25 @@ namespace Cosmos.Build.MSBuild
 
 			using (var xProcess = new Process())
 			{
-				xProcess.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)
-				{
-					if (e.Data != null)
-						mErrors.Add(e.Data);
-				};
-				xProcess.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e)
-				{
-					if (e.Data != null)
-						mOutput.Add(e.Data);
-				};
+        //xProcess.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)
+        //{
+        //  if (e.Data != null)
+        //    mErrors.Add(e.Data);
+        //  xProcess.BeginErrorReadLine();
+        //};
+        //xProcess.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e)
+        //{
+        //  if (e.Data != null)
+        //    mOutput.Add(e.Data);
+        //  xProcess.BeginOutputReadLine();
+        //};
+			  xProcessStartInfo.RedirectStandardError = true;
+        xProcessStartInfo.RedirectStandardOutput = true;
 				xProcess.StartInfo = xProcessStartInfo;
 				mErrors = new List<string>();
 				mOutput = new List<string>();
-				xProcess.Start();
-				xProcess.BeginErrorReadLine();
-				xProcess.BeginOutputReadLine();
-				xProcess.WaitForExit(15 * 60 * 1000); // wait 15 minutes
+			  xProcess.Start();
+        xProcess.WaitForExit(15 * 60 * 1000); // wait 15 minutes
 				if (xProcess.ExitCode != 0) {
 					if (!xProcess.HasExited) {
 						xProcess.Kill();
@@ -120,16 +122,36 @@ namespace Cosmos.Build.MSBuild
 					}
 					else {
             Log.LogError("Error occurred while invoking {0}.", name);
+					  Debugger.Launch();
 					}
 				}
-				foreach (var xError in mErrors)
+        foreach (var xError in mErrors)
         {
           Log.LogError(xError);
-				}
-				foreach (var xOutput in mOutput)
-				{
-				  Log.LogMessage(xOutput);
-				}
+        }
+        foreach (var xOutput in mOutput)
+        {
+          Log.LogMessage(xOutput);
+        }
+
+        while (!xProcess.StandardOutput.EndOfStream)
+        {
+          var xLine = xProcess.StandardOutput.ReadLine();
+          if (xLine != null)
+          {
+            Log.LogMessage(xLine);
+          }
+        }
+
+        while (!xProcess.StandardError.EndOfStream)
+        {
+          var xLine = xProcess.StandardError.ReadLine();
+          if (xLine != null)
+          {
+            Log.LogError(xLine);
+          }
+        }
+
 				return xProcess.ExitCode == 0;
 			}
 		}

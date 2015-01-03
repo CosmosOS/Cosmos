@@ -118,44 +118,6 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        public List<Tuple<string, string>> Extensions;
-
-        private List<CompilerExtensionBase> mLoadedExtensions;
-
-        private void LoadExtensions()
-        {
-            return;
-            if (Extensions == null)
-            {
-                throw new Exception("No list of extensions passed!");
-            }
-
-            mLoadedExtensions = new List<CompilerExtensionBase>(Extensions.Count);
-            foreach (var xItem in Extensions)
-            {
-                Assembly xAssembly = null;
-                Type xExtensionType;
-                if (!String.IsNullOrWhiteSpace(xItem.Item1))
-                {
-                    AppDomain.CurrentDomain.AppendPrivatePath(Path.GetDirectoryName(xItem.Item1));
-                    xAssembly = Assembly.LoadFrom(xItem.Item1);
-
-                    xExtensionType = xAssembly.GetType(xItem.Item2, true, true);
-                }
-                else
-                {
-                    xExtensionType = Type.GetType(xItem.Item2, true, true);
-                }
-
-                if (xExtensionType == null)
-                {
-                    throw new Exception("Unable to find extension type '" + xItem.Item2 + "'!");
-                }
-
-                mLoadedExtensions.Add((CompilerExtensionBase)Activator.CreateInstance(xExtensionType));
-            }
-        }
-
         protected bool Initialize()
         {
             // Add UserKit dirs for asms to load from.
@@ -202,8 +164,6 @@ namespace Cosmos.IL2CPU
                 }
                 mTraceAssemblies = (TraceAssemblies)Enum.Parse(typeof(TraceAssemblies), TraceAssemblies);
             }
-
-            LoadExtensions();
 
             return true;
         }
@@ -389,6 +349,12 @@ namespace Cosmos.IL2CPU
                     }
                   }
                 }
+
+                var xCompilerExtensionsMetas = xAssembly.GetCustomAttributes<CompilerExtensionAttribute>();
+                foreach (var xMeta in xCompilerExtensionsMetas)
+                {
+                  mLoadedExtensions.Add((CompilerExtensionBase)Activator.CreateInstance(xMeta.Type));
+                }
               }
             }
             if (xKernelType == null)
@@ -404,5 +370,7 @@ namespace Cosmos.IL2CPU
             }
             return xCtor;
         }
+
+        private List<CompilerExtensionBase> mLoadedExtensions;
     }
 }
