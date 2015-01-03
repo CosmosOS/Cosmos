@@ -296,6 +296,10 @@ namespace Cosmos.IL2CPU
 
         private AppAssembler GetAppAssembler()
         {
+            if (mLoadedExtensions == null)
+            {
+                throw new InvalidOperationException("Extensions have not been loaded!");
+            }
             foreach (var xExt in mLoadedExtensions)
             {
                 AppAssembler xResult;
@@ -326,6 +330,7 @@ namespace Cosmos.IL2CPU
             // and we have to do it manually (Probably better for us anyways)
 
             Type xKernelType = null;
+            mLoadedExtensions = new List<CompilerExtensionBase>();
             foreach (var xRef in References)
             {
               if (File.Exists(xRef))
