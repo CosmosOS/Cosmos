@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Cosmos.Build.MSBuild;
 using Cosmos.Debug.Common;
+using Cosmos.IL2CPU;
 
 namespace Cosmos.Compiler.TestsBase
 {
@@ -44,7 +45,7 @@ namespace Cosmos.Compiler.TestsBase
             }
             DebugInfo.mLastGuid = 0;
             Console.WriteLine("Compiling to '{0}'", OutputFile);
-            var xTask = new IL2CPUTask();
+            var xTask = new CompilerEngine();
             xTask.DebugEnabled = false;
             xTask.StackCorruptionDetectionEnabled = false;
             xTask.DebugMode = "Source";

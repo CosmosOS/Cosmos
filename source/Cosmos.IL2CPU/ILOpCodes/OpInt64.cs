@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
   {
     public readonly UInt64 Value;
 
-    public OpInt64(Code aOpCode, int aPos, int aNextPos, UInt64 aValue, System.Reflection.ExceptionHandlingClause aCurrentExceptionHandler)
+    public OpInt64(Code aOpCode, int aPos, int aNextPos, UInt64 aValue, ExceptionHandlingClause aCurrentExceptionHandler)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler)
     {
       Value = aValue;

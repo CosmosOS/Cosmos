@@ -3,6 +3,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using System.Reflection;
 using System.Linq;
+using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -19,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             var xType = aMethod.MethodBase.DeclaringType;
             var xOpCode = ( ILOpCodes.OpField )aOpCode;
-            System.Reflection.FieldInfo xField = xOpCode.Value;
+            SysReflection.FieldInfo xField = xOpCode.Value;
             // call cctor:
             var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
             if (xCctor != null)
@@ -42,7 +43,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             var xFields = xField.DeclaringType.GetFields();
 
-            foreach( System.Reflection.FieldInfo xInfo in xFields )
+            foreach( SysReflection.FieldInfo xInfo in xFields )
             {
                 if( xInfo == xField )
                     break;
@@ -86,12 +87,12 @@ namespace Cosmos.IL2CPU.X86.IL
     // using System;
     // using System.Collections.Generic;
     // using Cosmos.IL2CPU.X86;
-    // 
-    // 
+    //
+    //
     // using CPUx86 = Cosmos.Assembler.x86;
     // using System.Reflection;
     // using Cosmos.IL2CPU.Compiler;
-    // 
+    //
     // namespace Cosmos.IL2CPU.IL.X86 {
     // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stsfld)]
     // 	public class Stsfld: Op {
@@ -103,7 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
     // 	    private string mCurLabel;
     // 	    private uint mCurOffset;
     // 	    private MethodInformation mMethodInformation;
-    // 
+    //
     //         //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
     //         //    FieldInfo xField = aReader.OperandValueField;
     //         //    Engine.QueueStaticField(xField);
@@ -121,13 +122,13 @@ namespace Cosmos.IL2CPU.X86.IL
     // 		    mCurLabel = IL.Op.GetInstructionLabel(aReader);
     //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
     // 		}
-    // 
+    //
     // 		public override void DoAssemble() {
     //             var xSize = GetService<IMetaDataInfoService>().SizeOfType(mField.FieldType);
     // 		    var xDecRefMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.DecRefCountRef,
     // 		                                                                             false);
-    // 
-    // 
+    //
+    //
     // 			if (mNeedsGC) {
     //                 new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New(mDataName), DestinationIsIndirect = true };
     //                 new CPUx86.Call { DestinationLabel = xDecRefMethodInfo.LabelName};
@@ -155,7 +156,7 @@ namespace Cosmos.IL2CPU.X86.IL
     // 				default:
     //                     EmitNotImplementedException(Assembler, GetServiceProvider(), "Ldsfld: Remainder size " + (xSize % 4) + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
     //                     break;
-    // 
+    //
     // 			}
     // 			Assembler.Stack.Pop();
     // 		}

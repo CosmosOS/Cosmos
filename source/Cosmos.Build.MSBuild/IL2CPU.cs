@@ -18,7 +18,7 @@ using System.Diagnostics;
 namespace Cosmos.Build.MSBuild {
   public class IL2CPU : BaseToolTask
   {
-    // protected IL2CPUTask mTask = new IL2CPUTask();
+    // protected CompilerEngine mTask = new CompilerEngine();
 
     [Required]
     public string CosmosBuildDir

@@ -498,7 +498,7 @@ namespace Cosmos.Debug.Common
         // Signature is sent after garbage emitted during init of serial port.
         // For more info see note in DebugStub where signature is transmitted.
         protected byte[] mSigCheck = new byte[4] { 0, 0, 0, 0 };
-        protected void WaitForSignature(byte[] aPacket)
+        protected virtual void WaitForSignature(byte[] aPacket)
         {
             mSigCheck[0] = mSigCheck[1];
             mSigCheck[1] = mSigCheck[2];

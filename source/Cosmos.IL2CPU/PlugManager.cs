@@ -11,6 +11,7 @@ using SR = System.Reflection;
 using Cosmos.Assembler;
 using System.Reflection.Emit;
 using _MemberInfo = System.Runtime.InteropServices._MemberInfo;
+using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU
 {
@@ -29,12 +30,12 @@ namespace Cosmos.IL2CPU
         // Key = Target Class
         // Value = List of Implementors. There may be more than one
         protected Dictionary<Type, List<Type>> mPlugImpls = new Dictionary<Type, List<Type>>();
-        // List of inheritable plugs. Plugs that start at an ancestor and plug all 
+        // List of inheritable plugs. Plugs that start at an ancestor and plug all
         // descendants. For example, delegates
         protected Dictionary<Type, List<Type>> mPlugImplsInhrt = new Dictionary<Type, List<Type>>();
         // list of field plugs
         protected IDictionary<Type, IDictionary<string, PlugFieldAttribute>> mPlugFields = new Dictionary<Type, IDictionary<string, PlugFieldAttribute>>();
-        
+
         public Dictionary<Type, List<Type>> PlugImpls
         {
             get
@@ -62,7 +63,6 @@ namespace Cosmos.IL2CPU
         {
             return LabelName.GenerateFullName(m);
         }
-        
 
         public PlugManager(LogExceptionDelegate aLogException)
         {
@@ -94,7 +94,7 @@ namespace Cosmos.IL2CPU
                 {
                     //if (xAsm.GetName().Name == "Cosmos.IL2CPU.X86") {
                     //  // skip this assembly for now. at the moment we introduced the AssemblerMethod.AssembleNew method, for allowing those to work
-                    //  // with the Cosmos.IL2CPU* stack, we found we could not use the Cosmos.IL2CPU.X86 plugs, as they contained some AssemblerMethods. 
+                    //  // with the Cosmos.IL2CPU* stack, we found we could not use the Cosmos.IL2CPU.X86 plugs, as they contained some AssemblerMethods.
                     //  // This would result in a circular reference, thus we copied them to a new assembly. While the Cosmos.IL2CPU.X86 assembly is being
                     //  // referenced, we need to skip it here.
                     //  continue;
@@ -166,7 +166,7 @@ namespace Cosmos.IL2CPU
                         }
                         if (xAttrib == null)
                         {
-                            //At this point we need to check the plug method actually 
+                            //At this point we need to check the plug method actually
                             //matches a method that might need plugging.
                             // x08 bug
                             // We must check for a number of cases:
@@ -208,7 +208,7 @@ namespace Cosmos.IL2CPU
                                     var posMethods = xPlug.Key.GetMethods(BindingFlags.Instance | BindingFlags.Static |
                                                                           BindingFlags.NonPublic | BindingFlags.Public)
                                                                           .Where(x => x.Name == xMethod.Name);
-                                    foreach (System.Reflection.MethodInfo posInf in posMethods)
+                                    foreach (SysReflection.MethodInfo posInf in posMethods)
                                     {
                                         // If static, no this param
                                         // Otherwise, take into account first param is this param
@@ -369,7 +369,7 @@ namespace Cosmos.IL2CPU
                 }
             }
         }
-        
+
         public MethodBase ResolvePlug(Type aTargetType, List<Type> aImpls, MethodBase aMethod, Type[] aParamTypes)
         {
             //TODO: This method is "reversed" from old - remember that when porting
@@ -451,11 +451,11 @@ namespace Cosmos.IL2CPU
                         {
 
                             var xParams = xSigMethod.GetParameters();
-                            //TODO: Static method plugs dont seem to be separated 
+                            //TODO: Static method plugs dont seem to be separated
                             // from instance ones, so the only way seems to be to try
                             // to match instance first, and if no match try static.
                             // I really don't like this and feel we need to find
-                            // an explicit way to determine or mark the method 
+                            // an explicit way to determine or mark the method
                             // implementations.
                             //
                             // Plug implementations take "this" as first argument
@@ -518,12 +518,12 @@ namespace Cosmos.IL2CPU
                                     xCurIdx++;
                                 }
                             }
-                            System.Reflection.MethodBase xTargetMethod = null;
+                            SysReflection.MethodBase xTargetMethod = null;
                             // TODO: In future make rule that all ctor plugs are called
                             // ctor by name, or use a new attrib
                             //TODO: Document all the plug stuff in a document on website
                             //TODO: To make inclusion of plugs easy, we can make a plugs master
-                            // that references the other default plugs so user exes only 
+                            // that references the other default plugs so user exes only
                             // need to reference that one.
                             // TODO: Skip FieldAccessAttribute if in impl
                             if (xTypesInst != null)
@@ -602,9 +602,9 @@ namespace Cosmos.IL2CPU
             if (xResult == null)
                 return null;
 
-            // If we found a matching method, check for attributes 
+            // If we found a matching method, check for attributes
             // that might disable it.
-            //TODO: For signature ones, we could cache the attrib. Thats 
+            //TODO: For signature ones, we could cache the attrib. Thats
             // why we check for null here
             if (xAttrib == null)
             {
@@ -647,7 +647,7 @@ namespace Cosmos.IL2CPU
                 xInlineAttrib = inli;
             }
 
-            if (xInlineAttrib == null)   
+            if (xInlineAttrib == null)
             {
                 if (Queue != null)
                 {

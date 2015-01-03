@@ -3,6 +3,9 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler.x86;
+using SysReflection = System.Reflection;
+
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldarga )]
@@ -20,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 xMethodBase = aMethod.PluggedMethod.MethodBase;
             }
-            var xMethodInfo = xMethodBase as System.Reflection.MethodInfo;
+            var xMethodInfo = xMethodBase as SysReflection.MethodInfo;
             uint xReturnSize = 0;
             if (xMethodInfo != null)
             {
@@ -147,11 +150,11 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // using System.Linq;
-        // 
-        // 
+        //
+        //
         // using CPU = Cosmos.Assembler.x86;
         // using Cosmos.IL2CPU.X86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Ldarga)]
         // 	public class Ldarga: Op {
@@ -166,13 +169,13 @@ namespace Cosmos.IL2CPU.X86.IL
         //         public Ldarga(MethodInformation aMethodInfo, int aIndex, string aCurrentLabel, uint aCurrentOffset, string aNextLabel)
         // 			: base(null, aMethodInfo) {
         // 			SetArgIndex(aIndex, aMethodInfo);
-        // 
+        //
         //             mMethodInformation = aMethodInfo;
         // 		    mCurOffset = aCurrentOffset;
         // 		    mCurLabel = aCurrentLabel;
         //             mNextLabel = aNextLabel;
         // 		}
-        // 
+        //
         // 		public Ldarga(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {
         // 			if (aReader != null) {

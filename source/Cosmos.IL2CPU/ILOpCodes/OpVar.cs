@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
   {
     public readonly UInt16 Value;
 
-    public OpVar(Code aOpCode, int aPos, int aNextPos, UInt16 aValue, System.Reflection.ExceptionHandlingClause aCurrentExceptionHandler)
+    public OpVar(Code aOpCode, int aPos, int aNextPos, UInt16 aValue, ExceptionHandlingClause aCurrentExceptionHandler)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler)
     {
       Value = aValue;

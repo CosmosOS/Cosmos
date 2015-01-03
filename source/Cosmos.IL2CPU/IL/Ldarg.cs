@@ -4,6 +4,7 @@ using Cosmos.IL2CPU.X86;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using CPUx86 = Cosmos.Assembler.x86;
+using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -26,7 +27,7 @@ namespace Cosmos.IL2CPU.X86.IL
           if (aMethod.PluggedMethod != null) {
             xMethodBase = aMethod.PluggedMethod.MethodBase;
           }
-          var xMethodInfo = xMethodBase as System.Reflection.MethodInfo;
+          var xMethodInfo = xMethodBase as SysReflection.MethodInfo;
           uint xReturnSize = 0;
           if (xMethodInfo != null) {
             xReturnSize = Align(SizeOfType(xMethodInfo.ReturnType), 4);

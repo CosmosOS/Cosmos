@@ -197,7 +197,7 @@ namespace Cosmos.VS.Package {
       checkStartCosmosGDB.Checked = mProps.StartCosmosGDB;
       checkEnableBochsDebug.Checked = mProps.EnableBochsDebug;
       // Locked to COM1 for now.
-      cmboCosmosDebugPort.SelectedIndex = 0;
+      //cmboCosmosDebugPort.SelectedIndex = 0;
 
       #region PXE
       textPxeInterface.Text = mProps.PxeInterface;

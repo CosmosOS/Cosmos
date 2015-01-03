@@ -1,6 +1,5 @@
 ﻿using Cosmos.Build.Common;
 using Cosmos.IL2CPU;
-using Cosmos.System;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,11 +7,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Cosmos.Debug.Common;
+using Cosmos.System;
 
-namespace Cosmos.Build.MSBuild
+namespace Cosmos.IL2CPU
 {
     // http://blogs.msdn.com/b/visualstudio/archive/2010/07/06/debugging-msbuild-script-with-visual-studio.aspx
-    public class IL2CPUTask
+    public class CompilerEngine
     {
         const string FULLASSEMBLYNAME_KERNEL = "Cosmos.System.Kernel";
 
@@ -121,8 +121,11 @@ namespace Cosmos.Build.MSBuild
         protected bool Initialize()
         {
             // Add UserKit dirs for asms to load from.
-            mSearchDirs.Add(Path.GetDirectoryName(typeof(IL2CPU).Assembly.Location));
-            if (!EnsureCosmosPathsInitialization()) { return false; }
+            mSearchDirs.Add(Path.GetDirectoryName(typeof(CompilerEngine).Assembly.Location));
+            if (!EnsureCosmosPathsInitialization())
+            {
+              return false;
+            }
             mSearchDirs.Add(CosmosPaths.UserKit);
             mSearchDirs.Add(CosmosPaths.Kernel);
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
@@ -201,7 +204,7 @@ namespace Cosmos.Build.MSBuild
                     DebugCom = 0;
                 }
 
-                using (var xAsm = new AppAssembler(DebugCom, AssemblerLog))
+                using (var xAsm = GetAppAssembler())
                 {
                     using (var xDebugInfo = new DebugInfo(xOutputFilename + ".cdb", true))
                     {
@@ -291,6 +294,24 @@ namespace Cosmos.Build.MSBuild
             }
         }
 
+        private AppAssembler GetAppAssembler()
+        {
+            if (mLoadedExtensions == null)
+            {
+                throw new InvalidOperationException("Extensions have not been loaded!");
+            }
+            foreach (var xExt in mLoadedExtensions)
+            {
+                AppAssembler xResult;
+                if (xExt.TryCreateAppAssembler(DebugCom, AssemblerLog, out xResult))
+                {
+                    return xResult;
+                }
+            }
+
+            return new AppAssembler(DebugCom, AssemblerLog);
+        }
+
         /// <summary>Load every refernced assemblies that have an associated FullPath property and seek for
         /// the kernel default constructor.</summary>
         /// <returns>The kernel default constructor or a null reference if either none or several such
@@ -309,6 +330,7 @@ namespace Cosmos.Build.MSBuild
             // and we have to do it manually (Probably better for us anyways)
 
             Type xKernelType = null;
+            mLoadedExtensions = new List<CompilerExtensionBase>();
             foreach (var xRef in References)
             {
               if (File.Exists(xRef))
@@ -332,6 +354,12 @@ namespace Cosmos.Build.MSBuild
                     }
                   }
                 }
+
+                var xCompilerExtensionsMetas = xAssembly.GetCustomAttributes<CompilerExtensionAttribute>();
+                foreach (var xMeta in xCompilerExtensionsMetas)
+                {
+                  mLoadedExtensions.Add((CompilerExtensionBase)Activator.CreateInstance(xMeta.Type));
+                }
               }
             }
             if (xKernelType == null)
@@ -347,5 +375,7 @@ namespace Cosmos.Build.MSBuild
             }
             return xCtor;
         }
+
+        private List<CompilerExtensionBase> mLoadedExtensions;
     }
 }

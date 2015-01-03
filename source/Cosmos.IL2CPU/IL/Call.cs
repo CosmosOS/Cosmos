@@ -3,7 +3,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 // using System.Collections.Generic;
 // using System.IO;
 // using System.Linq;
-// 
+//
 // using IL2CPU=Cosmos.IL2CPU;
 using CPU = Cosmos.Assembler.x86;
 using CPUx86 = Cosmos.Assembler.x86;
@@ -12,9 +12,9 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using Cosmos.Assembler;
-// using System.Reflection;
-// using Cosmos.IL2CPU.X86;
-// using Cosmos.IL2CPU.Compiler;
+
+using SysReflection = System.Reflection;
+
 
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Call)]
@@ -35,8 +35,8 @@ namespace Cosmos.IL2CPU.X86.IL {
     }
 
     public static uint GetStackSizeToReservate(MethodBase aMethod) {
-      
-      var xMethodInfo = aMethod as System.Reflection.MethodInfo;
+
+      var xMethodInfo = aMethod as SysReflection.MethodInfo;
       uint xReturnSize = 0;
       if (xMethodInfo != null) {
         xReturnSize = SizeOfType(xMethodInfo.ReturnType);
@@ -59,7 +59,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       return 0;
     }
 
-	private static int GetNativePointerSize(System.Reflection.MethodInfo xMethodInfo)
+	private static int GetNativePointerSize(SysReflection.MethodInfo xMethodInfo)
 	{
 		// old code, which goof up everything for structs
 		//return (int)Align(SizeOfType(xMethodInfo.DeclaringType), 4);
@@ -82,7 +82,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       //  Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
       //  return;
       //}
-      var xMethodInfo = aTargetMethod as System.Reflection.MethodInfo;
+      var xMethodInfo = aTargetMethod as SysReflection.MethodInfo;
 
       // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
       //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
