@@ -201,6 +201,22 @@ namespace Cosmos.Debug.Common
         protected abstract bool SendRawData(byte[] aBytes);
         protected abstract void Next(int aPacketSize, Action<byte[]> aCompleted);
 
+        protected bool SendRawData(string aData, Encoding aEncoding = null)
+        {
+            if (aEncoding == null)
+            {
+                aEncoding = Encoding.UTF8;
+            }
+
+            if (aData == null)
+            {
+                return true;
+            }
+
+            var xBytes = aEncoding.GetBytes(aData);
+            return SendRawData(xBytes);
+        }
+
         protected byte mCommandID = 0;
         protected byte mCurrCmdID;
 
@@ -514,11 +530,20 @@ namespace Cosmos.Debug.Common
             }
             else
             {
-                CmdChannel(129, 0, aPacket);
+                SendPacketToConsole(aPacket);
                 // Sig not found, keep looking
                 Next(1, WaitForSignature);
-
             }
+        }
+
+        protected void SendPacketToConsole(byte[] aPacket)
+        {
+            CmdChannel(129, 0, aPacket);
+        }
+
+        protected void SendTextToConsole(string aText)
+        {
+            SendPacketToConsole(Encoding.UTF8.GetBytes(aText));
         }
 
         protected void WaitForMessage()

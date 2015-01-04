@@ -282,27 +282,52 @@ namespace Cosmos.Debug.VSDebugEngine
             mDbgConnector = null;
 
             string xPort = mDebugInfo[BuildProperties.VisualStudioDebugPortString];
+
+            using (var xDebug = new StreamWriter(@"e:\debug.info", false))
+            {
+                foreach (var xItem in mDebugInfo.AllKeys)
+                {
+                    xDebug.WriteLine("{0}: '{1}'", xItem, mDebugInfo[xItem]);
+                }
+                xDebug.Flush();
+            }
+
+            if (String.IsNullOrWhiteSpace(xPort))
+            {
+                xPort = mDebugInfo[BuildProperties.CosmosDebugPortString];
+            }
+
             var xParts = (null == xPort) ? null : xPort.Split(' ');
             if ((null == xParts) || (2 > xParts.Length))
             {
-                throw new Exception(string.Format(
-                    "The '{0}' Cosmos project file property is either ill-formed or missing.",
-                    BuildProperties.VisualStudioDebugPortString));
+                throw new Exception(string.Format("Unable to parse VS debug port: '{0}'", xPort));
+                //throw new Exception(string.Format(
+                //    "The '{0}' Cosmos project file property is either ill-formed or missing.",
+                //    BuildProperties.VisualStudioDebugPortString));
             }
             string xPortType = xParts[0].ToLower();
             string xPortParam = xParts[1].ToLower();
 
+            var xLaunch = mDebugInfo[BuildProperties.LaunchString];
+
             OutputText("Starting debug connector.");
             switch (xPortType)
             {
-              case "pipe:":
-                mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer(xPortParam);
-                break;
-              case "serial:":
-                mDbgConnector = new Cosmos.Debug.Common.DebugConnectorSerial(xPortParam);
-                break;
-              default:
-                throw new Exception("No debug connector found for port type '" + xPortType + "'");
+                case "pipe:":
+                    mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer(xPortParam);
+                    break;
+                case "serial:":
+                    if (xLaunch == "IntelEdison")
+                    {
+                        mDbgConnector = new Cosmos.Debug.Common.DebugConnectorEdison(xPortParam, Path.ChangeExtension(mDebugInfo["ISOFile"], ".bin"));
+                    }
+                    else
+                    {
+                        mDbgConnector = new Cosmos.Debug.Common.DebugConnectorSerial(xPortParam);
+                    }
+                    break;
+                default:
+                    throw new Exception("No debug connector found for port type '" + xPortType + "'");
 
             }
             mDbgConnector.SetConnectionHandler(DebugConnectorConnected);

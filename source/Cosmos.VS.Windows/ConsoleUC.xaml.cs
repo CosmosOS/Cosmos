@@ -41,12 +41,13 @@ namespace Cosmos.VS.Windows
 
             if (aCommand == ConsoleConsts.Command_WriteText)
             {
-                textBox.Text += Encoding.ASCII.GetString(aData);
+                textBox.Text += Encoding.ASCII.GetString(aData).Replace("\t", "    ");
             }
             else
             {
                 textBox.Text += ("Command '" + aCommand + "' not recognized!\r\n");
             }
+            textBox.ScrollToEnd();
         }
     }
 
