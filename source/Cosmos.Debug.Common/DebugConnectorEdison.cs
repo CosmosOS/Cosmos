@@ -104,8 +104,11 @@ namespace Cosmos.Debug.Common
 
         private FileStream mKernelFileStream;
 
+        private bool mKernelSent = false;
+
         private bool HandleFileSending(byte[] aPacket)
         {
+
             if (mKernelFileStream == null)
             {
                 // wait for packet with C (67)
@@ -164,7 +167,7 @@ namespace Cosmos.Debug.Common
                     SendTextToConsole("R");
                     return false;
                 }
-                if (aPacket[0] == 67)
+                //if (aPacket[0] == 67)
                 {
                     // send null item
                     SendRawData(ConstructNullPacket());
@@ -172,6 +175,7 @@ namespace Cosmos.Debug.Common
                     mLastPacket = null;
                     return false;
                 }
+
                 // weird character, just retransmit for now
                 SendTextToConsole("Character value " + aPacket[0] + " found!\r\n");
                 SendRawData(new[] { YModem_EOT });

@@ -18,7 +18,7 @@ indent_size = 4
 indent_size = 4
 
 [CompilerEngine.cs]
-ident_size = 4
+indent_size = 4
 
 [CompilerExtensionAttribute.cs]
-ident_size = 4
+indent_size = 4

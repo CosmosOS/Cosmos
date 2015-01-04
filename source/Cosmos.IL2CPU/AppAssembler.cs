@@ -50,9 +50,14 @@ namespace Cosmos.IL2CPU
 
         public AppAssembler(int aComPort, string assemblerLogFile)
         {
-            Assembler = new Cosmos.Assembler.Assembler(aComPort);
+            Assembler = CreateAssembler(aComPort);
             mLog = new StreamWriter(assemblerLogFile, false);
             InitILOps();
+        }
+
+        protected virtual Assembler.Assembler CreateAssembler(int aComPort)
+        {
+            return new Cosmos.Assembler.Assembler(aComPort);
         }
 
         public void Dispose()
@@ -1319,12 +1324,12 @@ namespace Cosmos.IL2CPU
                 }
                 if (xMemberId % 100 == 0)
                 {
-                    Cosmos.Assembler.Assembler.WriteDebugVideo(".");
+                    Assembler.WriteDebugVideo(".");
                 }
                 xMemberId ++;
                 new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = Registers.EAX };
             }
-            Cosmos.Assembler.Assembler.WriteDebugVideo("Done");
+            Assembler.WriteDebugVideo("Done");
             new Pop { DestinationReg = Registers.EBP };
             new Return();
 
@@ -1332,13 +1337,13 @@ namespace Cosmos.IL2CPU
             new Push { DestinationReg = Registers.EBP };
             new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
             new Call { DestinationLabel = InitVMTCodeLabel };
-            Cosmos.Assembler.Assembler.WriteDebugVideo("Initializing string IDs.");
+            Assembler.WriteDebugVideo("Initializing string IDs.");
             new Call { DestinationLabel = InitStringIDsLabel };
-            Cosmos.Assembler.Assembler.WriteDebugVideo("Done initializing string IDs");
+            Assembler.WriteDebugVideo("Done initializing string IDs");
             // we now need to do "newobj" on the entry point, and after that, call .Start on it
             var xCurLabel = Cosmos.Assembler.Assembler.EntryPointName + ".CreateEntrypoint";
             new Cosmos.Assembler.Label(xCurLabel);
-            Cosmos.Assembler.Assembler.WriteDebugVideo("Now create kernel class");
+            Assembler.WriteDebugVideo("Now create kernel class");
             X86.IL.Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
             xCurLabel = Cosmos.Assembler.Assembler.EntryPointName + ".CallStart";
             new Cosmos.Assembler.Label(xCurLabel);
