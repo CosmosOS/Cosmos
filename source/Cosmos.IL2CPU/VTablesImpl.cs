@@ -113,9 +113,32 @@ namespace Cosmos.IL2CPU {
 
 		public static int GetMethodAddressForType(int aType, int aMethodIndex) {
             	do {
+            		if (mTypes[aType].MethodIndexes == null) {
+							Console.Write("Type ");
+					        WriteNumber((uint)aType, 32);
+					        Console.WriteLine(", MethodIndexes is null!");
+					        while(true) ;
+					}
 					for (int i = 0; i < mTypes[aType].MethodIndexes.Length; i++) {
+						if (mTypes[aType].MethodAddresses == null) {
+							Console.Write("Type ");
+					        WriteNumber((uint)aType, 32);
+					        Console.WriteLine(", MethodAddresses is null!");
+					        while(true) ;
+						}
 						if (mTypes[aType].MethodIndexes[i] == aMethodIndex) {
-							return mTypes[aType].MethodAddresses[i];
+							var xResult = mTypes[aType].MethodAddresses[i];
+							if (xResult < 1048576) // if pointer is under 1MB, some issue exists!
+							{
+								Console.Write("Type ");
+						        WriteNumber((uint)aType, 32);
+						        Console.Write(", MethodIndex = ");
+						        WriteNumber((uint)aMethodIndex, 32);
+						        Console.WriteLine("");
+						        Console.WriteLine("Method found, but address invalid!");
+						        while(true) ;
+							}
+							return xResult;
 						}
 					}
                     if (aType == mTypes[aType].BaseTypeIdentifier)
