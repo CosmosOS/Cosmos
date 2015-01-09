@@ -283,14 +283,14 @@ namespace Cosmos.Debug.VSDebugEngine
 
             string xPort = mDebugInfo[BuildProperties.VisualStudioDebugPortString];
 
-            using (var xDebug = new StreamWriter(@"e:\debug.info", false))
-            {
-                foreach (var xItem in mDebugInfo.AllKeys)
-                {
-                    xDebug.WriteLine("{0}: '{1}'", xItem, mDebugInfo[xItem]);
-                }
-                xDebug.Flush();
-            }
+            // using (var xDebug = new StreamWriter(@"e:\debug.info", false))
+            // {
+            //     foreach (var xItem in mDebugInfo.AllKeys)
+            //     {
+            //         xDebug.WriteLine("{0}: '{1}'", xItem, mDebugInfo[xItem]);
+            //     }
+            //     xDebug.Flush();
+            // }
 
             if (String.IsNullOrWhiteSpace(xPort))
             {
