@@ -229,6 +229,6 @@
   <Target Name="BeforeBuild">
   </Target>-->
   <Target Name="AfterBuild" Condition="$(InstallPath) != ''">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$([System.IO.Path]::Combine($(InstallPath), Build\VSIP))" />
+    <!--<Copy SourceFiles="$(TargetPath)" DestinationFolder="$([System.IO.Path]::Combine($(InstallPath), Build\VSIP))" />-->
   </Target>
 </Project>

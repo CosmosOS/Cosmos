@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30723.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
@@ -94,6 +94,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 System", "2 System", "{04CECC6E-BD09-4732-8408-ADCBC23DC2FF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System", "Cosmos.System\Cosmos.System.csproj", "{3DEF0461-08AB-471A-8F03-A9C556652A0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IL2CPU", "IL2CPU\IL2CPU.csproj", "{6128DEEB-D30F-4859-B60F-C36D5452F3E9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -505,6 +507,19 @@ Global
 		{3DEF0461-08AB-471A-8F03-A9C556652A0F}.Release|Mixed Platforms.Build.0 = Release|x86
 		{3DEF0461-08AB-471A-8F03-A9C556652A0F}.Release|x86.ActiveCfg = Release|x86
 		{3DEF0461-08AB-471A-8F03-A9C556652A0F}.Release|x86.Build.0 = Release|x86
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Debug|x86.Build.0 = Debug|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -545,5 +560,6 @@ Global
 		{68875292-4A34-4A07-9BAA-06AA7DB26124} = {426E77A5-80AA-48DC-97F9-037071345778}
 		{04CECC6E-BD09-4732-8408-ADCBC23DC2FF} = {426E77A5-80AA-48DC-97F9-037071345778}
 		{3DEF0461-08AB-471A-8F03-A9C556652A0F} = {04CECC6E-BD09-4732-8408-ADCBC23DC2FF}
+		{6128DEEB-D30F-4859-B60F-C36D5452F3E9} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 	EndGlobalSection
 EndGlobal
