@@ -164,5 +164,13 @@ namespace Cosmos.Build.MSBuild {
         Log.LogMessage(MessageImportance.High, "IL2CPU task took {0}", xSW.Elapsed);
       }
     }
+
+		public override bool ExtendLineError(int exitCode, string errorMessage, out LogInfo log)
+		{
+			log = new LogInfo();
+			log.logType = WriteType.Error;
+			log.message = errorMessage;
+			return true;
+		}
   }
 }
