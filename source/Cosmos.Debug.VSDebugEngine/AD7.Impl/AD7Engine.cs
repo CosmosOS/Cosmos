@@ -28,7 +28,7 @@ namespace Cosmos.Debug.VSDebugEngine {
   // IDebugEngineProgram2: This interface provides simultanious debugging of multiple threads in a debuggee.
 
   [ComVisible(true)]
-  [Guid("8355452D-6D2F-41b0-89B8-BB2AA2529E94")]
+	[Guid("DC8503AB-7EE6-456C-A209-66C690D9F6F4")]
   public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2 {
     internal IDebugProgram2 mProgram;
     // We only support one process, so we just keep a ref to it and save a lot of accounting.
