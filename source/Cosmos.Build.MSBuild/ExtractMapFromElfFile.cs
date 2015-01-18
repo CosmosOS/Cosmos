@@ -68,7 +68,8 @@ namespace Cosmos.Build.MSBuild {
                 // Important! A given address can have more than one label.
                 // Do NOT filter by duplicate addresses as this causes serious lookup problems.
                 string xFile = RunObjDump();
-
+                
+                DebugInfo.SetRange(DebugInfo.ElfFileMapExtractionRange);
                 using (var xDebugInfo = new DebugInfo(DebugInfoFile))
                 {
                     // In future instead of loading all labels, save indexes to major labels but not IL.ASM labels.
@@ -118,15 +119,15 @@ namespace Cosmos.Build.MSBuild {
                                 continue;
                             }
 
-                            Guid xGuid;
+														UInt64 xGuid;
                             // See if label has an embedded GUID. If so, use it.
                             if (xLabel.StartsWith("GUID_"))
                             {
-                                xGuid = new Guid(xLabel.Substring(5));
+                                xGuid = ulong.Parse(xLabel.Substring(5));
                             }
                             else
                             {
-                                xGuid = Guid_NewGuid();
+                                xGuid = DebugInfo.CreateId();
                             }
 
                             xLabels.Add(new Label()
@@ -171,30 +172,6 @@ namespace Cosmos.Build.MSBuild {
             File.Delete(xTempBatFile);
 
             return xMapFile;
-        }
-        private static UInt64 mLastGuid = 0;
-        private static Guid Guid_NewGuid() {
-            // Old code: 
-            //return Guid.NewGuid();
-            // Do NOT use Guid.NewGuid(). During compilation we're generating
-            // about 60 milion guids. Guid.NewGuid slows down compilation significantly (about half the time!)
-
-            mLastGuid++;
-            var bytes = new byte[16];
-            bytes[0] = (byte)(mLastGuid >> 56);
-            bytes[1] = (byte)(mLastGuid >> 48);
-            bytes[2] = (byte)(mLastGuid >> 40);
-            bytes[3] = (byte)(mLastGuid >> 32);
-            bytes[4] = (byte)(mLastGuid >> 24);
-            bytes[5] = (byte)(mLastGuid >> 16);
-            bytes[6] = (byte)(mLastGuid >> 8);
-            bytes[7] = (byte)(mLastGuid);
-            //Adds an additional element to help prevent collisions between this function and it's equivelant in
-            //Cosmos.Debug.Common.DebugInfo
-            bytes[15] = (byte)(1);
-
-            var r = new Guid(bytes);
-            return r;
         }
     }
 }
