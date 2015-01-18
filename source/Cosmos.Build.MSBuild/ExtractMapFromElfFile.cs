@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using Globalization = System.Globalization;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.Framework;
-using System.IO;
-using Microsoft.Build.Utilities;
 using System.Diagnostics;
-using System.Data;
-using System.Configuration;
-using System.Data.Common;
-using System.Data.SQLite;
+using System.IO;
 using Cosmos.Debug.Common;
+using Microsoft.Build.Framework;
 
 namespace Cosmos.Build.MSBuild {
     public class ExtractMapFromElfFile : BaseToolTask {
@@ -27,38 +18,6 @@ namespace Cosmos.Build.MSBuild {
         [Required]
         public string CosmosBuildDir { get; set; }
 
-        #region Old NASM Map parser
-        //public static List<Label> ParseMapFile(String buildPath) {
-        //  var xSourceStrings = File.ReadAllLines(Path.Combine(buildPath, "main.map"));
-        //  var xSource = new List<Label>();
-        //  uint xIndex = 0;
-        //  for (xIndex = 0; xIndex < xSourceStrings.Length; xIndex++) {
-        //    if (xSourceStrings[xIndex].StartsWith("Real ")) {
-        //      // further check it:
-        //      //Virtual   Name"))
-        //      if (!xSourceStrings[xIndex].Substring(4).TrimStart().StartsWith("Virtual ")
-        //          || !xSourceStrings[xIndex].EndsWith(" Name")) {
-        //        continue;
-        //      }
-        //      xIndex++;
-        //      break;
-        //    }
-        //  }
-        //  for (; xIndex < xSourceStrings.Length; xIndex++) {
-        //    string xLine = xSourceStrings[xIndex];
-        //    var xLineParts = xLine.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-        //    if (xLineParts.Length == 3) {
-        //      uint xAddress = UInt32.Parse(xLineParts[0], System.Globalization.NumberStyles.HexNumber);
-        //      xSource.Add(new Label() {
-        //        LABELNAME = xLineParts[2],
-        //        ADDRESS = xAddress
-        //      });
-        //    }
-        //  }
-        //  return xSource;
-        //}
-        #endregion
 
         public override bool Execute()
         {
@@ -69,78 +28,7 @@ namespace Cosmos.Build.MSBuild {
                 // Do NOT filter by duplicate addresses as this causes serious lookup problems.
                 string xFile = RunObjDump();
                 
-                DebugInfo.SetRange(DebugInfo.ElfFileMapExtractionRange);
-                using (var xDebugInfo = new DebugInfo(DebugInfoFile))
-                {
-                    // In future instead of loading all labels, save indexes to major labels but not IL.ASM labels.
-                    // Then code can find major lables, and use position markers into the map file to parse in between 
-                    // as needed.
-                    using (var xMapReader = new StreamReader(xFile))
-                    {
-                        var xLabels = new List<Label>();
-                        bool xListStarted = false;
-                        string xLine;
-                        while ((xLine = xMapReader.ReadLine()) != null)
-                        {
-                            if (String.IsNullOrEmpty(xLine))
-                            {
-                                continue;
-                            }
-                            else if (!xListStarted)
-                            {
-                                // Find start of the data
-                                if (xLine == "SYMBOL TABLE:")
-                                {
-                                    xListStarted = true;
-                                }
-                                continue;
-                            }
-
-                            uint xAddress;
-                            try
-                            {
-                                xAddress = UInt32.Parse(xLine.Substring(0, 8), Globalization.NumberStyles.HexNumber);
-                            }
-                            catch (Exception ex)
-                            {
-                                LogError("Error processing line '" + xLine + "' " + ex.Message);
-                                throw;
-                            }
-
-                            string xSection = xLine.Substring(17, 5);
-                            if (xSection != ".text" && xSection != ".data")
-                            {
-                                continue;
-                            }
-                            string xLabel = xLine.Substring(32);
-                            if (xLabel == xSection)
-                            {
-                                // Non label, skip
-                                continue;
-                            }
-
-														UInt64 xGuid;
-                            // See if label has an embedded GUID. If so, use it.
-                            if (xLabel.StartsWith("GUID_"))
-                            {
-                                xGuid = ulong.Parse(xLabel.Substring(5));
-                            }
-                            else
-                            {
-                                xGuid = DebugInfo.CreateId();
-                            }
-
-                            xLabels.Add(new Label()
-                            {
-                                ID = xGuid,
-                                Name = xLabel,
-                                Address = xAddress
-                            });
-                            xDebugInfo.AddLabels(xLabels);
-                        }
-                        xDebugInfo.AddLabels(xLabels, true);
-                    }
-                }
+                ObjDump.ExtractMapSymbolsForElfFile(DebugInfoFile, xFile);
 
                 return true;
             }
