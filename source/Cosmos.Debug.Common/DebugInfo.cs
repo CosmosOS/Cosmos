@@ -490,7 +490,7 @@ namespace Cosmos.Debug.Common
 
         public Label GetMethodHeaderLabel(UInt32 aAddress)
         {
-            var xAddress = (long)aAddress;
+            var xAddress = (ulong)aAddress;
             var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address <= xAddress).OrderByDescending(i => i.Address)).ToArray();
             
             Label methodHeaderLabel = null;

@@ -196,7 +196,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [SQLinqColumn("ADDRESS")]
-        public global::System.Int64 Address
+        public global::System.UInt64 Address
         {
             get;
             set;
