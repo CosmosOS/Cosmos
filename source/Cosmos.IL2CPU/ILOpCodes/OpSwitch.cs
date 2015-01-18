@@ -63,6 +63,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       }
 
       if (StackPopTypes[0] == typeof(int) ||
+          StackPopTypes[0] == typeof(uint) ||
           StackPopTypes[0] == typeof(byte))
       {
         return;
