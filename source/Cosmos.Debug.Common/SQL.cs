@@ -55,17 +55,26 @@ namespace Cosmos.Debug.Common {
 
     internal void CreateDB()
     {
-      using (var strm = typeof(SQL).Assembly.GetManifestResourceStream(typeof(SQL), "SQLite.sql"))
-      {
-        if (strm == null)
+        ExecuteAssemblyResource("SQLite.sql");          
+    }
+
+    /// <summary>
+    /// Exceutes SQL file stored inside assembly.
+    /// </summary>
+    /// <param name="resourceName">Name of the assembly resource to execute.</param>
+    internal void ExecuteAssemblyResource(string resourceName)
+    {
+        using (var strm = typeof(SQL).Assembly.GetManifestResourceStream(typeof(SQL), resourceName))
         {
-          throw new Exception("Sql resource not found!");
+            if (strm == null)
+            {
+                throw new Exception("Sql resource not found!");
+            }
+            using (var reader = new StreamReader(strm))
+            {
+                Exec(reader.ReadToEnd());
+            }
         }
-        using (var reader = new StreamReader(strm))
-        {
-          Exec(reader.ReadToEnd());
-        }
-      }          
     }
   }
 }
