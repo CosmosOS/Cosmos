@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Cosmos.Assembler {
   public static class LabelName {
+      /// <summary>
+      /// Cache for label names.
+      /// </summary>
+      private static Dictionary<MethodBase, string> labelNamesCache = new Dictionary<MethodBase, string>();
 
     // All label naming code should be changed to use this class.
 
@@ -28,7 +33,15 @@ namespace Cosmos.Assembler {
     const int MaxLengthWithoutSuffix = 200;
 
     public static string Get(MethodBase aMethod) {
-      return Final(GenerateFullName(aMethod));
+        string result;
+        if (labelNamesCache.TryGetValue(aMethod, out result))
+        {
+            return result;
+        }
+        
+        result = Final(GenerateFullName(aMethod));
+        labelNamesCache.Add(aMethod, result);
+        return result;
     }
 
     public static string Get(string aMethodLabel, int aIlPos) {
