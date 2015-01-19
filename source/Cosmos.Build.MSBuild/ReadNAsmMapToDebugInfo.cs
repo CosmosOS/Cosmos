@@ -33,6 +33,7 @@ namespace Cosmos.Build.MSBuild {
         using (var xDebugInfo = new DebugInfo(DebugInfoFile))
         {
           xDebugInfo.AddLabels(xSourceInfos);
+          xDebugInfo.CreateIndexes();
         }
         return true;
       }

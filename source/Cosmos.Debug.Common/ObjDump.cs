@@ -125,6 +125,7 @@ namespace Cosmos.Debug.Common {
                 }
 
                 xDebugInfo.AddLabels(xLabels, true);
+                xDebugInfo.CreateIndexes();
             }
         }
 	}

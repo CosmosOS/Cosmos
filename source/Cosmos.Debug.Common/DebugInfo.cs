@@ -1,23 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.IO;
 using System.Data;
-using System.Data.Common;
-using System.Reflection;
-using System.Text;
-using Microsoft.Win32;
-using Microsoft.Samples.Debugging.CorSymbolStore;
-using System.Diagnostics.SymbolStore;
-using System.Configuration;
-using System.Threading;
 using System.Data.SQLite;
+using System.Diagnostics.SymbolStore;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using Dapper;
-using SQLinq;
-using SQLinq.Dapper;
 using DapperExtensions;
 using DapperExtensions.Mapper;
 using DapperExtensions.Sql;
+using Microsoft.Samples.Debugging.CorSymbolStore;
+using SQLinq;
+using SQLinq.Dapper;
 
 namespace Cosmos.Debug.Common
 {
@@ -68,7 +63,7 @@ namespace Cosmos.Debug.Common
             File.Delete(aDbName);
         }
 
-        public DebugInfo(string aPathname, bool aCreate = false)
+        public DebugInfo(string aPathname, bool aCreate = false, bool aCreateIndexes = false)
         {
             CurrentInstance = this;
 
@@ -98,9 +93,10 @@ namespace Cosmos.Debug.Common
                     // Be careful with indexes, they slow down inserts. So on tables that we have a 
                     // lot of inserts, but limited look ups, dont add them.
                     //
-                    xSQL.MakeIndex("Labels", "Address", false);
-                    xSQL.MakeIndex("Labels", "Name", true);
-                    xSQL.MakeIndex("Methods", "DocumentID", false);
+                    if (aCreateIndexes)
+                    {
+                        this.CreateIndexes();
+                    }
                 }
             }
             if (mConnection.State == ConnectionState.Closed)
@@ -115,6 +111,20 @@ namespace Cosmos.Debug.Common
             {
                 return mConnection;
             }
+        }
+
+        /// <summary>
+        /// Create indexes inside the database.
+        /// </summary>
+        public void CreateIndexes()
+        {
+            var xSQL = new SQL(mConnection);
+
+            xSQL.MakeIndex("Labels", "Address", false);
+            xSQL.MakeIndex("Labels", "Name", true);
+            xSQL.MakeIndex("Methods", "DocumentID", false);
+
+            xSQL.ExecuteAssemblyResource("SQLiteIndexes.sql");
         }
 
         // The GUIDs etc are populated by the MSBuild task, so they wont be loaded when the debugger runs.

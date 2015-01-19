@@ -47,7 +47,7 @@ namespace Cosmos.IL2CPU.Profiler {
             {
                 Console.WriteLine("ILScanner exception : " + e.Message);
             };
-            using (var xDebugInfo = new DebugInfo(MDFFile, true))
+            using (var xDebugInfo = new DebugInfo(MDFFile, true, true))
             {
                 xAsmblr.DebugInfo = xDebugInfo;
                 xAsmblr.DebugEnabled = true;
