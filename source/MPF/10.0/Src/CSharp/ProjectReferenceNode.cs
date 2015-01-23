@@ -137,61 +137,8 @@ namespace Microsoft.VisualStudio.Project
                     {
                         return null;
                     }
-                    foreach (EnvDTE.Project prj in dte.Solution.Projects)
-                    {
-                        //Skip this project if it is an umodeled project (unloaded)
-                        if (string.Compare(EnvDTE.Constants.vsProjectKindUnmodeled, prj.Kind, StringComparison.OrdinalIgnoreCase) == 0)
-                        {
-                            continue;
-                        }
 
-                        // Get the full path of the current project.
-                        EnvDTE.Property pathProperty = null;
-                        try
-                        {
-                            if (prj.Properties == null)
-                            {
-                                continue;
-                            }
-
-                            pathProperty = prj.Properties.Item("FullPath");
-                            if (null == pathProperty)
-                            {
-                                // The full path should alway be availabe, but if this is not the
-                                // case then we have to skip it.
-                                continue;
-                            }
-                        }
-                        catch (ArgumentException)
-                        {
-                            continue;
-                        }
-                        string prjPath = pathProperty.Value.ToString();
-                        EnvDTE.Property fileNameProperty = null;
-                        // Get the name of the project file.
-                        try
-                        {
-                            fileNameProperty = prj.Properties.Item("FileName");
-                            if (null == fileNameProperty)
-                            {
-                                // Again, this should never be the case, but we handle it anyway.
-                                continue;
-                            }
-                        }
-                        catch (ArgumentException)
-                        {
-                            continue;
-                        }
-                        prjPath = System.IO.Path.Combine(prjPath, fileNameProperty.Value.ToString());
-
-                        // If the full path of this project is the same as the one of this
-                        // reference, then we have found the right project.
-                        if (NativeMethods.IsSamePath(prjPath, referencedProjectFullPath))
-                        {
-                            this.referencedProject = prj;
-                            break;
-                        }
-                    }
+                    this.referencedProject = this.FindReferencedProject(dte.Solution.Projects);
                 }
 
                 return this.referencedProject;
@@ -517,6 +464,97 @@ namespace Microsoft.VisualStudio.Project
 
 			return circular != 0;
 		}
+
+        private EnvDTE.Project FindReferencedProject(System.Collections.IEnumerable projects)
+        {
+            EnvDTE.Project refProject = null;
+
+            // Search for the project in the collection of the projects in the current solution.
+            foreach (EnvDTE.Project prj in projects)
+            {
+                //Skip this project if it is an umodeled project (unloaded)
+                if (string.Compare(EnvDTE.Constants.vsProjectKindUnmodeled, prj.Kind, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    continue;
+                }
+
+                // Recursively iterate solution folder for the project.
+                if (string.Compare(EnvDTE.Constants.vsProjectKindSolutionItems, prj.Kind, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    var containedProjects = GetContainerProjects(prj);
+
+                    refProject = FindReferencedProject(containedProjects);
+                    if (refProject != null)
+                        return refProject;
+                }
+
+                // Get the full path of the current project.
+                EnvDTE.Property pathProperty = null;
+                try
+                {
+                    if (prj.Properties == null)
+                    {
+                        continue;
+                    }
+
+                    pathProperty = prj.Properties.Item("FullPath");
+                    if (null == pathProperty)
+                    {
+                        // The full path should alway be availabe, but if this is not the
+                        // case then we have to skip it.
+                        continue;
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    continue;
+                }
+                string prjPath = pathProperty.Value.ToString();
+                EnvDTE.Property fileNameProperty = null;
+                // Get the name of the project file.
+                try
+                {
+                    fileNameProperty = prj.Properties.Item("FileName");
+                    if (null == fileNameProperty)
+                    {
+                        // Again, this should never be the case, but we handle it anyway.
+                        continue;
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    continue;
+                }
+                prjPath = System.IO.Path.Combine(prjPath, fileNameProperty.Value.ToString());
+
+                // If the full path of this project is the same as the one of this
+                // reference, then we have found the right project.
+                if (NativeMethods.IsSamePath(prjPath, referencedProjectFullPath))
+                {
+                    refProject = prj;
+                    break;
+                }
+            }
+            return refProject;
+        }
+
+        private static System.Collections.IEnumerable GetContainerProjects(EnvDTE.Project prj)
+        {
+            foreach (var obj in prj.ProjectItems)
+            {
+                var pi = obj as EnvDTE.ProjectItem;
+                if (pi == null)
+                {
+                    continue;
+                }
+
+                var nestedPrj = pi.Object as EnvDTE.Project;
+                if (nestedPrj != null)
+                {
+                    yield return nestedPrj;
+                }
+            }
+        }
 		#endregion
 	}
 
