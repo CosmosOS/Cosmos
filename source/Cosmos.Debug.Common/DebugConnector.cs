@@ -56,12 +56,19 @@ namespace Cosmos.Debug.Common
             Connected = handler;
         }
 
-        protected void DoDebugMsg(string aMsg)
+        protected virtual void DoDebugMsg(string aMsg)
         {
             mDebugWriter.WriteLine(aMsg);
             mDebugWriter.Flush();
+            mOut.WriteLine(aMsg);
+            mOut.Flush();
             DoDebugMsg(aMsg, true);
         }
+
+        private static StreamWriter mOut = new StreamWriter(@"c:\data\sources\dcoutput.txt", false)
+                                    {
+                                        AutoFlush = true
+                                    };
 
         protected void DoDebugMsg(string aMsg, bool aOnlyIfConnected)
         {
@@ -92,6 +99,11 @@ namespace Cosmos.Debug.Common
             SendCmd(aCmd, aData, true);
         }
 
+        protected virtual void BeforeSendCmd()
+        {
+            
+        }
+
         protected void SendCmd(byte aCmd, byte[] aData, bool aWait)
         {
             //System.Windows.Forms.MessageBox.Show(xSB.ToString());
@@ -115,9 +127,11 @@ namespace Cosmos.Debug.Common
                     //    xSB.AppendLine(x.ToString("X2"));
                     //}
                     //System.Windows.Forms.MessageBox.Show(xSB.ToString());
-                    DoDebugMsg("DC Send: " + aCmd.ToString());
+                    DoDebugMsg("DC Send: " + aCmd.ToString() + ", data.Length = " + aData.Length + ", aWait = " + aWait);
 
                     DoDebugMsg("Send locked...");
+
+                    BeforeSendCmd();
 
                     if (aCmd == Vs2Ds.Noop)
                     {
@@ -526,6 +540,7 @@ namespace Cosmos.Debug.Common
             {
                 // Sig found, wait for messages
                 mSigReceived = true;
+                SendTextToConsole("SigReceived!");
                 WaitForMessage();
             }
             else

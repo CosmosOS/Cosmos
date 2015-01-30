@@ -32,6 +32,11 @@ namespace Cosmos.VS.Windows
             InitializeComponent();
         }
 
+        private StreamWriter mOut = new StreamWriter(@"c:\data\sources\output.txt", false)
+                                    {
+                                        AutoFlush = true
+                                    };
+
         protected override void HandleChannelMessage(byte aChannel, byte aCommand, byte[] aData)
         {
             if (aChannel != ConsoleConsts.Channel)
@@ -41,13 +46,16 @@ namespace Cosmos.VS.Windows
 
             if (aCommand == ConsoleConsts.Command_WriteText)
             {
-                textBox.Text += Encoding.ASCII.GetString(aData).Replace("\t", "    ");
+                mOut.Write(Encoding.ASCII.GetString(aData).Replace("\t", "    "));
+            //    textBox.Text += Encoding.ASCII.GetString(aData).Replace("\t", "    ");
             }
             else
             {
-                textBox.Text += ("Command '" + aCommand + "' not recognized!\r\n");
+                mOut.WriteLine("Command '" + aCommand + "' not recognized");
+                //    textBox.Text += ("Command '" + aCommand + "' not recognized!\r\n");
             }
-            textBox.ScrollToEnd();
+            //textBox.ScrollToEnd();
+            
         }
     }
 

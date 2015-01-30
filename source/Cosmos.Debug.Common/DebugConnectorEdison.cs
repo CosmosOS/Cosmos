@@ -14,11 +14,28 @@ namespace Cosmos.Debug.Common
         public DebugConnectorEdison(string aPort, string kernelFile) : base(aPort)
         {
             mKernelFile = kernelFile;
+//			mKernelFile = @"c:\Data\Sources\OpenSource\Edison\CosmosEdison\TestKernel\WriteLineViaUBootApi\kernel";
         }
 
         // "boot > "
         private byte[] mBootPrompt = new byte[7] { 98, 111, 111, 116, 32, 62, 32 };
         private byte[] mBootPromptCheck = new byte[7];
+
+        protected override void BeforeSendCmd()
+        {
+            SendRawData(new byte[1]
+                  {
+                    Vs2Ds.Noop
+                  });
+            SendRawData(new byte[1]
+                  {
+                    Vs2Ds.Noop
+                  });
+            SendRawData(new byte[1]
+                  {
+                    Vs2Ds.Noop
+                  });
+        }
 
 
         private int mBootStage = 0;
@@ -65,6 +82,10 @@ namespace Cosmos.Debug.Common
                     }
                     break;
                 case 4:
+                    //if (WaitForBootPrompt(aPacket))
+                    //{
+                    //    SendRawData("\0A");
+                    //}
                     base.WaitForSignature(aPacket);
                     return;
             }
@@ -73,6 +94,12 @@ namespace Cosmos.Debug.Common
             SendPacketToConsole(aPacket);
             // keep processing
             Next(1, WaitForSignature);
+        }
+
+        protected override void DoDebugMsg(string aMsg)
+        {
+            base.DoDebugMsg(aMsg);
+
         }
 
         private bool WaitForBootPrompt(byte[] aPacket)

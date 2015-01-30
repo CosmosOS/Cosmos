@@ -135,6 +135,7 @@ namespace Cosmos.Debug.Common
             xIncoming.Stream = mStream;
 
             System.Diagnostics.Debug.WriteLine(String.Format("DC - Next: Expecting: {0}", aPacketSize));
+            DoDebugMsg(String.Format("DC - Next: Expecting: {0}", aPacketSize) + "\r\n");
 
             Read(xIncoming);
 
