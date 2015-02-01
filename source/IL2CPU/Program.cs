@@ -73,7 +73,7 @@ namespace IL2CPU
           Console.WriteLine("Message: {0}", m);
         };
         xTask.OnLogException = (m) => Console.Error.WriteLine("Exception: {0}", m.ToString());
-
+        xTask.AssemblerLog = "Cosmos.Assembler.log";
         if (xTask.Execute())
         {
           Console.WriteLine("Executed OK");
