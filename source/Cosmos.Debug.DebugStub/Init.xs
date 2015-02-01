@@ -54,8 +54,8 @@ function WaitForDbgHandshake {
     ComWriteAL()
 
     WaitForSignature()
-	Hook_OnHandshakeCompleted()
     ProcessCommandBatch()
+	Hook_OnHandshakeCompleted()
 }
 
 ! %ifndef Exclude_Dummy_Hooks

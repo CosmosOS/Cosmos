@@ -21,22 +21,21 @@ namespace Cosmos.Debug.Common
         private byte[] mBootPrompt = new byte[7] { 98, 111, 111, 116, 32, 62, 32 };
         private byte[] mBootPromptCheck = new byte[7];
 
-        protected override void BeforeSendCmd()
-        {
-            SendRawData(new byte[1]
-                  {
-                    Vs2Ds.Noop
-                  });
-            SendRawData(new byte[1]
-                  {
-                    Vs2Ds.Noop
-                  });
-            SendRawData(new byte[1]
-                  {
-                    Vs2Ds.Noop
-                  });
-        }
-
+        //protected override void BeforeSendCmd()
+        //{
+        //    SendRawData(new byte[1]
+        //          {
+        //            Vs2Ds.Noop
+        //          });
+        //    SendRawData(new byte[1]
+        //          {
+        //            Vs2Ds.Noop
+        //          });
+        //    SendRawData(new byte[1]
+        //          {
+        //            Vs2Ds.Noop
+        //          });
+        //}
 
         private int mBootStage = 0;
 
@@ -75,13 +74,29 @@ namespace Cosmos.Debug.Common
                 case 3:
                     if (WaitForBootPrompt(aPacket))
                     {
-                        // now at boot prompt.
-                        SendTextToConsole("Now starting kernel\r\n");
+                        SendTextToConsole("mw.l 0xFF009000 0x11F8 1\r\n");
+                        SendRawData("mw.l 0xFF009000 0x11F8 1\r\n");
                         mBootStage = 4;
-                        SendRawData("\0go 0x200000\r\n");
                     }
                     break;
                 case 4:
+                    if (WaitForBootPrompt(aPacket))
+                    {
+                        SendTextToConsole("mw.l 0xFF009000 0x10F8 1\r\n");
+                        SendRawData("mw.l 0xFF009000 0x10F8 1\r\n");
+                        mBootStage = 5;
+                    }
+                    break;
+                case 5:
+                    if (WaitForBootPrompt(aPacket))
+                    {
+                        // now at boot prompt.
+                        SendTextToConsole("Now starting kernel\r\n");
+                        mBootStage = 6;
+                        SendRawData("go 0x1000000\r\n");
+                    }
+                    break;
+                case 6:
                     //if (WaitForBootPrompt(aPacket))
                     //{
                     //    SendRawData("\0A");

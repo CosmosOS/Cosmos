@@ -1,4 +1,4 @@
-; Generated at 13-1-2015 19:09:16
+; Generated at 1-2-2015 13:56:15
 
 DebugStub_DebugBPs TIMES 256 dd 0
 DebugStub_MaxBPId dd 0
@@ -49,8 +49,8 @@ Mov AL, DebugStub_Const_Ds2Vs_Started
 Call DebugStub_ComWriteAL
 
 Call DebugStub_WaitForSignature
-Call DebugStub_Hook_OnHandshakeCompleted
 Call DebugStub_ProcessCommandBatch
+Call DebugStub_Hook_OnHandshakeCompleted
 DebugStub_WaitForDbgHandshake_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_WaitForDbgHandshake_Exit
 Ret

@@ -51,7 +51,7 @@ namespace Cosmos.VS.Windows
             }
             else
             {
-                mOut.WriteLine("Command '" + aCommand + "' not recognized");
+                mOut.WriteLine("Command '{0}' not recognized. Data = '{1}'", aCommand, Encoding.ASCII.GetString(aData).Replace("\t", "    "));
                 //    textBox.Text += ("Command '" + aCommand + "' not recognized!\r\n");
             }
             //textBox.ScrollToEnd();

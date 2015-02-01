@@ -125,7 +125,11 @@ namespace Cosmos.Debug.Common
             }
             else
             {
-                xIncoming.Completed = aCompleted;
+                xIncoming.Completed = bytes =>
+                                      {
+                                          DoDebugMsg(String.Format("DC - Received: 0x{0}", BytesToString(bytes, 0, bytes.Length)));
+                                          aCompleted(bytes);
+                                      };
             }
             if (aPacketSize > (1024 * 1024))
             {

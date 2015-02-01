@@ -123,6 +123,7 @@ namespace Cosmos.IL2CPU
                 xMethodLabel = LabelName.Get(aMethod.MethodBase);
             }
             new Cosmos.Assembler.Label(xMethodLabel);
+            //Assembler.WriteDebugVideo("Method " + xMethodLabel);
 
             // We could use same GUID as MethodLabelStart, but its better to keep GUIDs unique globaly for items
             // so during debugging they can never be confused as to what they point to.
@@ -460,7 +461,7 @@ namespace Cosmos.IL2CPU
             }
 
             MethodBegin(aMethod);
-            mLog.WriteLine("Method '{0}'", aMethod.MethodBase.GetFullName());
+            mLog.WriteLine("Method '{0}', ID = '{1}'", aMethod.MethodBase.GetFullName(), aMethod.UID);
             mLog.Flush();
             if (aMethod.MethodAssembler != null)
             {
@@ -636,7 +637,7 @@ namespace Cosmos.IL2CPU
                 }
                 xILOp.DebugEnabled = DebugEnabled;
                 xILOp.Execute(aMethod, xOpCode);
-
+                
                 AfterOp(aMethod, xOpCode);
                 //mLog.WriteLine( " end: " + Stack.Count.ToString() );
             }
@@ -1367,6 +1368,19 @@ namespace Cosmos.IL2CPU
             string xLabel = TmpPosLabel(aMethod, aOpCode);
             Assembler.CurrentIlLabel = xLabel;
             new Cosmos.Assembler.Label(xLabel);
+            if (aMethod.MethodBase.DeclaringType != typeof(VTablesImpl))
+            {
+                Assembler.EmitAsmLabels = false;
+                try
+                {
+                    Assembler.WriteDebugVideo(String.Format("Method {0}:{1}.", aMethod.UID, aOpCode.Position));
+                    //Assembler.WriteDebugVideo(xLabel);
+                }
+                finally
+                {
+                    Assembler.EmitAsmLabels = true;
+                }
+            }
 
             uint? xStackDifference = null;
 
@@ -1398,6 +1412,8 @@ namespace Cosmos.IL2CPU
             DebugInfo.AddSymbols(mSymbols, false);
 
             bool INT3PlaceholderEmitted = false;
+            // for now, don't emit int3's
+            emitInt3NotNop = false;
             EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace, emitInt3NotNop, out INT3Emitted, out INT3PlaceholderEmitted, hasSourcePoint);
 
             if (INT3Emitted || INT3PlaceholderEmitted)
@@ -1442,6 +1458,11 @@ namespace Cosmos.IL2CPU
                 new Halt();
                 new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
 
+            }
+
+            if (xLabel == "SystemUInt32CosmosCorePlugsGCImplementionImplAllocNewObjectSystemUInt32.IL_0001")
+            {
+                //
             }
         }
 

@@ -185,24 +185,24 @@ namespace Cosmos.Debug.Common
                                 //So this forces us to only return when we are back in-sync or after we think we've frozen the system for
                                 //too long
                                 //If we haven't gone past the command already!
-                                if ((!resetID && lastCmdCompletedID < mCommandID)
-                                    || (resetID && lastCmdCompletedID > 5))
-                                {
-                                    int attempts = 0;
-                                    do
+                                    if ((!resetID && lastCmdCompletedID < mCommandID)
+                                        || (resetID && lastCmdCompletedID > 5))
                                     {
-                                        mCmdWait.WaitOne(2000 /*60000*/);
-                                    } while ((
-                                                 (!resetID && lastCmdCompletedID < mCommandID) ||
-                                                 (resetID && lastCmdCompletedID > 5)
-                                             )
-                                             &&
-                                             ++attempts < 10);
+                                        int attempts = 0;
+                                        do
+                                        {
+                                            mCmdWait.WaitOne(2000 /*60000*/);
+                                        } while ((
+                                                     (!resetID && lastCmdCompletedID < mCommandID) ||
+                                                     (resetID && lastCmdCompletedID > 5)
+                                                 )
+                                                 &&
+                                                 ++attempts < 10);
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
                 DoDebugMsg("Send unlocked.");
             }
@@ -578,7 +578,9 @@ namespace Cosmos.Debug.Common
 
         protected void PacketOtherChannelSize(byte aChannel, byte aCommand, byte[] aPacket)
         {
-            Next((int)GetUInt32(aPacket, 0), data => PacketChannel(aChannel, aCommand, data));
+            var xPacketSize = (int)GetUInt32(aPacket, 0);
+            xPacketSize &= 0xFFF;
+            Next(xPacketSize, data => PacketChannel(aChannel, aCommand, data));
         }
 
         protected void PacketMessageBoxTextSize(byte[] aPacket)
