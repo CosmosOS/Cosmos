@@ -218,7 +218,7 @@ namespace Cosmos.Assembler {
 
       aOutput.WriteLine("%ifndef ELF_COMPILATION");
       aOutput.WriteLine("use32");
-      aOutput.WriteLine("org 0x200000");
+      aOutput.WriteLine("org 0x1000000");
       aOutput.WriteLine("[map all main.map]");
       aOutput.WriteLine("%endif");
 
@@ -451,7 +451,6 @@ namespace Cosmos.Assembler {
 
       WriteDebugVideo("Creating IDT.");
       CreateIDT();
-
 #if LFB_1024_8
             new Comment("Set graphics fields");
             new Move { DestinationReg = Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Structure"), SourceIsIndirect = true };
@@ -463,24 +462,24 @@ namespace Cosmos.Assembler {
             new Move { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeMode"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
 #endif
 
-      WriteDebugVideo("Initializing SSE.");
-      new Comment(this, "BEGIN - SSE Init");
-      // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
-      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-      new Or { DestinationReg = Registers.EAX, SourceValue = 0x100 };
-      new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
-      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-      new Or { DestinationReg = Registers.EAX, SourceValue = 0x200 };
-      new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
-      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
+      //WriteDebugVideo("Initializing SSE.");
+      //new Comment(this, "BEGIN - SSE Init");
+      //// CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
+      //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
+      //new Or { DestinationReg = Registers.EAX, SourceValue = 0x100 };
+      //new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
+      //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
+      //new Or { DestinationReg = Registers.EAX, SourceValue = 0x200 };
+      //new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
+      //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
-      new And { DestinationReg = Registers.EAX, SourceValue = 0xfffffffd };
-      new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
-      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
+      //new And { DestinationReg = Registers.EAX, SourceValue = 0xfffffffd };
+      //new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
+      //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
-      new And { DestinationReg = Registers.EAX, SourceValue = 1 };
-      new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
-      new Comment(this, "END - SSE Init");
+      //new And { DestinationReg = Registers.EAX, SourceValue = 1 };
+      //new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
+      //new Comment(this, "END - SSE Init");
 
       if (mComPort > 0) {
         WriteDebugVideo("Initializing DebugStub.");

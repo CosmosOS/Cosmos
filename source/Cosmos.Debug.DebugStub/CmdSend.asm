@@ -1,4 +1,4 @@
-; Generated at 31-12-2014 17:48:28
+; Generated at 3-2-2015 19:33:21
 
 
 
@@ -149,6 +149,7 @@ mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendTrac
 Ret
 
 DebugStub_SendText:
+Pushad
 Mov AL, DebugStub_Const_Ds2Vs_Message
 Call DebugStub_ComWriteAL
 
@@ -166,11 +167,8 @@ Dec ECX
 Inc ESI
 Jmp DebugStub_SendText_WriteChar
 
-Mov ESI, EBP
-Add ESI, 12
-Mov ECX, [ESI + 0]
 
-Mov ESI, [EBP + 8]
+Popad
 DebugStub_SendText_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendText_Exit
 Ret

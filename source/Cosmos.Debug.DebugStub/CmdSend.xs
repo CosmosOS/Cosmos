@@ -157,11 +157,12 @@ function SendTrace {
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
 function SendText {
+	+All
 	// Write the type
     AL = #Ds2Vs_Message
     ComWriteAL()
 
-    // Write Length
+	// Write Length
     ESI = EBP
     ESI + 12
     ECX = ESI[0]
@@ -176,16 +177,17 @@ WriteChar:
     // We are storing as 16 bits, but for now I will transmit 8 bits
     // So we inc again to skip the 0
     ESI++
-    goto WriteChar
+	goto WriteChar
 
     ////test
     // Write Length
-    ESI = EBP
-    ESI + 12
-    ECX = ESI[0]
-
-    // Address of string
-    ESI = EBP[8]
+    //ESI = EBP
+    //ESI + 12
+    //ECX = ESI[0]
+	//
+    //// Address of string
+    //ESI = EBP[8]
+	-All
 }
 
 // Input: Stack

@@ -1,3 +1,5 @@
+; Generated at 3-2-2015 19:17:42
+
 
 
 
@@ -27,7 +29,6 @@ Mov EAX, EBX
 
 Mov [DebugStub_CallerEIP], EAX
 
-Call DebugStub_Executing
 
 Popad
 

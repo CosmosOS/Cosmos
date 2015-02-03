@@ -17,46 +17,46 @@
 namespace DebugStub
 
 Interrupt TracerEntry {
-	// This code is temporarily disabled as IRQs are not enabled right now.
-	// LockOrExit
+// This code is temporarily disabled as IRQs are not enabled right now.
+// LockOrExit
 
 	+All
-	// Save current ESP so we can look at the results of PushAll later
-	.PushAllPtr = ESP
-	.CallerEBP = EBP
+// Save current ESP so we can look at the results of PushAll later
+.PushAllPtr = ESP
+.CallerEBP = EBP
 
-	// Get current ESP and add 32. This will skip over the PushAll and point
-	// us at the call data from Int3.
-	EBP = ESP
-	EBP + 32
-	// Caller EIP
-	EAX = EBP[0]
+// Get current ESP and add 32. This will skip over the PushAll and point
+// us at the call data from Int3.
+EBP = ESP
+EBP + 32
+// Caller EIP
+EAX = EBP[0]
 
-	// 12 bytes for EFLAGS, CS, EIP
-	EBP + 12
-	.CallerESP = EBP
+// 12 bytes for EFLAGS, CS, EIP
+EBP + 12
+.CallerESP = EBP
 
-	// EIP is pointer to op after our call. Int3 is 1 byte so we subtract 1.
-	// Note - when we used call it was 5 (size of our call + address)
-	// so we get the EIP as IL2CPU records it. Its also useful for when we
-	// wil be changing ops that call this stub.
-	
-	//Check whether this call is result of (i.e. after) INT1. If so, don't subtract 1!
-	EBX = EAX
-	! MOV EAX, DR6
-	EAX & $4000
-	if EAX != $4000 {
-		EBX--
-	}
-	EAX = EBX
+// EIP is pointer to op after our call. Int3 is 1 byte so we subtract 1.
+// Note - when we used call it was 5 (size of our call + address)
+// so we get the EIP as IL2CPU records it. Its also useful for when we
+// wil be changing ops that call this stub.
 
-	// Store it for later use.
-	.CallerEIP = EAX
-	
-	Executing()
+//Check whether this call is result of (i.e. after) INT1. If so, don't subtract 1!
+EBX = EAX
+! MOV EAX, DR6
+EAX & $4000
+if EAX != $4000 {
+	EBX--
+}
+EAX = EBX
 
-	-All
+// Store it for later use.
+.CallerEIP = EAX
 
-	// Temp disabled, see comment on LockOrExit above
-	// Unlock
+//	Executing()
+
+-All
+
+// Temp disabled, see comment on LockOrExit above
+// Unlock
 }

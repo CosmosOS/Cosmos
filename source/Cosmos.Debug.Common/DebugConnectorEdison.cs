@@ -60,7 +60,7 @@ namespace Cosmos.Debug.Common
                     {
                         SendTextToConsole("Sending kernel now\r\n");
                         SendTextToConsole("Filename = '" + mKernelFile + "'\r\n");
-                        SendRawData("\0loady 0x200000\r\n");
+                        SendRawData("\0loady 0x1000000\r\n");
                         mBootStage = 2;
                     }
                     break;
@@ -68,17 +68,17 @@ namespace Cosmos.Debug.Common
                     if (HandleFileSending(aPacket))
                     {
                         SendTextToConsole("Done sending kernel file\r\n");
-                        mBootStage = 3;
-                    }
-                    break;
-                case 3:
-                    if (WaitForBootPrompt(aPacket))
-                    {
-                        SendTextToConsole("mw.l 0xFF009000 0x11F8 1\r\n");
-                        SendRawData("mw.l 0xFF009000 0x11F8 1\r\n");
                         mBootStage = 4;
                     }
                     break;
+                //case 3:
+                //    if (WaitForBootPrompt(aPacket))
+                //    {
+                //        SendTextToConsole("mw.l 0xFF009000 0x11F8 1\r\n");
+                //        SendRawData("mw.l 0xFF009000 0x11F8 1\r\n");
+                //        mBootStage = 4;
+                //    }
+                //    break;
                 case 4:
                     if (WaitForBootPrompt(aPacket))
                     {
@@ -109,12 +109,6 @@ namespace Cosmos.Debug.Common
             SendPacketToConsole(aPacket);
             // keep processing
             Next(1, WaitForSignature);
-        }
-
-        protected override void DoDebugMsg(string aMsg)
-        {
-            base.DoDebugMsg(aMsg);
-
         }
 
         private bool WaitForBootPrompt(byte[] aPacket)

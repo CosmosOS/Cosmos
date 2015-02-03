@@ -129,7 +129,7 @@ namespace Cosmos.Core
             mEndOfRam = aEndOfRam;
             mStartAddress = (mStartAddress / 4) * 4;
             mLength -= 1024;
-            UpdateDebugDisplay();
+            //UpdateDebugDisplay();
         }
 
         private static bool mInitialized = false;
@@ -138,7 +138,8 @@ namespace Cosmos.Core
             if (!mInitialized)
             {
                 mInitialized = true;
-                DoInitialize(CPU.GetEndOfKernel(), (CPU.GetAmountOfRAM() - 1) * 1024 * 1024);
+                //DoInitialize(CPU.GetEndOfKernel(), (CPU.GetAmountOfRAM() - 1) * 1024 * 1024);
+                DoInitialize(0x8000000, 0x20000000);
             }
         }
 
