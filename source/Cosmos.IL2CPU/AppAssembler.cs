@@ -1412,8 +1412,6 @@ namespace Cosmos.IL2CPU
             DebugInfo.AddSymbols(mSymbols, false);
 
             bool INT3PlaceholderEmitted = false;
-            // for now, don't emit int3's
-            emitInt3NotNop = false;
             EmitTracer(aMethod, aOpCode, aMethod.MethodBase.DeclaringType.Namespace, emitInt3NotNop, out INT3Emitted, out INT3PlaceholderEmitted, hasSourcePoint);
 
             if (INT3Emitted || INT3PlaceholderEmitted)
