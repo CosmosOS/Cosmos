@@ -131,6 +131,11 @@ begin
 		or RegKeyExists(HKLM,'SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\Projects\{FAE04EC0-301F-11d3-BF4B-00C04F79EFBC}');
 end;
 
+function PythonTools2013_Installed: Boolean;
+begin
+  Result := RegKeyExists(HKLM,'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{7AD18985-A5E6-443D-B0AB-A9ECFBB389A0}');
+end;
+
 function Fsharp2013_Installed(dummy: string): Boolean;
 begin
   Result := RegKeyExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\12.0\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}')
