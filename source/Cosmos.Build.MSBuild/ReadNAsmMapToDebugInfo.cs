@@ -79,10 +79,10 @@ namespace Cosmos.Build.MSBuild {
         {
           uint xAddress = UInt32.Parse(xLineParts[0], NumberStyles.HexNumber);
 
-          ulong xId;
+          long xId;
           if (xLineParts[2].StartsWith("GUID_"))
           {
-            xId = ulong.Parse(xLineParts[2].Substring(5));
+              xId = long.Parse(xLineParts[2].Substring(5));
           }
           else
           {

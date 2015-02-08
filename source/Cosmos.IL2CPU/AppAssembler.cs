@@ -45,8 +45,8 @@ namespace Cosmos.IL2CPU
         public readonly Cosmos.Assembler.Assembler Assembler;
         //
         protected string mCurrentMethodLabel;
-		protected UInt64 mCurrentMethodLabelEndGuid;
-		protected UInt64 mCurrentMethodGuid;
+        protected long mCurrentMethodLabelEndGuid;
+        protected long mCurrentMethodGuid;
 
         public AppAssembler(int aComPort, string assemblerLogFile)
         {

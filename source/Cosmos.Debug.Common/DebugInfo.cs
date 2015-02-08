@@ -21,27 +21,27 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// Current id of the generation.
         /// </summary>
-        private static UInt64 mLastGuid = 0;
+        private static long mLastGuid = 0;
 
         /// <summary>
         /// Range for the id generation process.
         /// </summary>
-        private static UInt64 mPrefix = 0;
+        private static long mPrefix = 0;
 
         /// <summary>
         /// Specifies range which is used by the assembler during compilation phase.
         /// </summary>
-        public const ulong AssemblerDebugSymbolsRange = 0xUL;
+        public const long AssemblerDebugSymbolsRange = 0xL;
 
         /// <summary>
         /// Specifies range which is used by the Elf map extraction process.
         /// </summary>
-        public const ulong ElfFileMapExtractionRange = 0x1000000000000000UL;
+        public const long ElfFileMapExtractionRange = 0x1000000000000000L;
 
         /// <summary>
         /// Specifies range which is used by the Nasm map extraction process.
         /// </summary>
-        public const ulong NAsmMapExtractionRange = 0x4000000000000000UL;
+        public const long NAsmMapExtractionRange = 0x4000000000000000L;
 
         // Please beware this field, it may cause issues if used incorrectly.
         public static DebugInfo CurrentInstance { get; private set; }
@@ -316,7 +316,7 @@ namespace Cosmos.Debug.Common
 
         // Quick look up of assemblies so we dont have to go to the database and compare by fullname.
         // This and other GUID lists contain only a few members, and save us from issuing a lot of selects to SQL.
-		public Dictionary<Assembly, UInt64> AssemblyGUIDs = new Dictionary<Assembly, UInt64>();
+        public Dictionary<Assembly, long> AssemblyGUIDs = new Dictionary<Assembly, long>();
         List<Cosmos.Debug.Common.AssemblyFile> xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
         public void AddAssemblies(List<Assembly> aAssemblies, bool aFlush = false)
         {
@@ -338,7 +338,7 @@ namespace Cosmos.Debug.Common
             BulkInsert("AssemblyFiles", xAssemblies, 2500, aFlush);
         }
 
-		public Dictionary<string, UInt64> DocumentGUIDs = new Dictionary<string, UInt64>();
+        public Dictionary<string, long> DocumentGUIDs = new Dictionary<string, long>();
         List<Document> xDocuments = new List<Document>(1);
         public void AddDocument(string aPathname, bool aFlush = false)
         {
@@ -500,7 +500,7 @@ namespace Cosmos.Debug.Common
 
         public Label GetMethodHeaderLabel(UInt32 aAddress)
         {
-            var xAddress = (ulong)aAddress;
+            var xAddress = (long)aAddress;
             var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address <= xAddress).OrderByDescending(i => i.Address)).ToArray();
             
             Label methodHeaderLabel = null;
@@ -682,7 +682,7 @@ namespace Cosmos.Debug.Common
         /// Sets the range in which id would be generated.
         /// </summary>
         /// <param name="idRange">Number which specified id range.</param>
-        public static void SetRange(ulong idRange)
+        public static void SetRange(long idRange)
         {
             mPrefix = idRange;
             mLastGuid = idRange;
@@ -692,7 +692,7 @@ namespace Cosmos.Debug.Common
         /// Gets count of ids generated during last session.
         /// </summary>
         /// <returns>Count of generated ids.</returns>
-        public static ulong GeneratedIdsCount()
+        public static long GeneratedIdsCount()
         {
             return mLastGuid - mPrefix;
         }
@@ -701,7 +701,7 @@ namespace Cosmos.Debug.Common
         /// Generates new id for the symbol.
         /// </summary>
         /// <returns>New value for the id.</returns>
-        public static ulong CreateId()
+        public static long CreateId()
         {
             mLastGuid++;
             return mLastGuid;

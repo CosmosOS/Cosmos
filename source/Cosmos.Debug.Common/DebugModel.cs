@@ -20,7 +20,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [SQLinqColumn("ID")]
-        public global::System.UInt64 ID
+        public global::System.Int64 ID
         {
             get;set;
         }
@@ -47,7 +47,7 @@ namespace Cosmos.Debug.Common
         [Key]
         [DataMemberAttribute()]
         [SQLinqColumn("ID")]
-			public global::System.UInt64 ID
+			public global::System.Int64 ID
         {
             get;
             set;
@@ -110,7 +110,7 @@ namespace Cosmos.Debug.Common
         [DataMemberAttribute()]
         [Key]
         [SQLinqColumn("ID")]
-				public global::System.UInt64 ID
+				public global::System.Int64 ID
         {
             get;
             set;
@@ -154,7 +154,7 @@ namespace Cosmos.Debug.Common
         [Key]
         [DataMemberAttribute()]
         [SQLinqColumn("ID")]
-        public global::System.UInt64 ID
+        public global::System.Int64 ID
         {
             get;
             set;
@@ -174,7 +174,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [SQLinqColumn("ID")]
-			public global::System.UInt64 ID
+			public global::System.Int64 ID
         {
             get;
             set;
@@ -196,7 +196,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [SQLinqColumn("ADDRESS")]
-        public global::System.UInt64 Address
+        public global::System.Int64 Address
         {
             get;
             set;
@@ -283,7 +283,7 @@ namespace Cosmos.Debug.Common
         [Key]
         [DataMemberAttribute()]
         [SQLinqColumn("ID")]
-				public global::System.UInt64 ID
+				public global::System.Int64 ID
         {
             get;
             set;
@@ -304,7 +304,7 @@ namespace Cosmos.Debug.Common
         [DataMemberAttribute()]
         [Key]
         [SQLinqColumn("ID")]
-			public global::System.UInt64 ID
+			public global::System.Int64 ID
         {
             get;
             set;
@@ -337,7 +337,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [SQLinqColumn("ASSEMBLYFILEID")]
-				public global::System.UInt64 AssemblyFileID
+				public global::System.Int64 AssemblyFileID
         {
             get;
             set;
@@ -370,7 +370,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [SQLinqColumn("DOCUMENTID")]
-				public global::System.UInt64 DocumentID
+				public global::System.Int64 DocumentID
         {
             get;
             set;
@@ -381,7 +381,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [SQLinqColumn("LABELSTARTID")]
-				public Nullable<global::System.UInt64> LabelStartID
+				public Nullable<global::System.Int64> LabelStartID
         {
             get;
             set;
@@ -392,7 +392,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [SQLinqColumn("LABELENDID")]
-				public Nullable<global::System.UInt64> LabelEndID
+				public Nullable<global::System.Int64> LabelEndID
         {
             get;
             set;
@@ -424,7 +424,7 @@ namespace Cosmos.Debug.Common
         [Key]
         [DataMemberAttribute()]
         [SQLinqColumn("ID")]
-			public global::System.UInt64 ID
+			public global::System.Int64 ID
         {
             get;
             set;
@@ -468,7 +468,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [SQLinqColumn("METHODID")]
-				public Nullable<global::System.UInt64> MethodID
+				public Nullable<global::System.Int64> MethodID
         {
             get;
             set;
@@ -499,7 +499,7 @@ namespace Cosmos.Debug.Common
         /// </summary>
         [DataMemberAttribute()]
         [SQLinqColumn("METHODID")]
-				public global::System.UInt64 MethodID
+				public global::System.Int64 MethodID
         {
             get;
             set;

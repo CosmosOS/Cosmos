@@ -83,11 +83,11 @@ namespace Cosmos.Debug.Common {
                     continue;
                 }
 
-                UInt64 xGuid;
+                long xGuid;
                 // See if label has an embedded GUID. If so, use it.
                 if (xLabel.StartsWith("GUID_"))
                 {
-                    xGuid = ulong.Parse(xLabel.Substring(5));
+                    xGuid = long.Parse(xLabel.Substring(5));
                 }
                 else
                 {
