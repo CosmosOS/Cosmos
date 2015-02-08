@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinFormat.cs" />
     <Compile Include="BuildProperties.cs" />
     <Compile Include="CosmosPaths.cs" />
     <Compile Include="Enums.cs" />

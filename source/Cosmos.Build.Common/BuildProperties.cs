@@ -221,5 +221,19 @@ namespace Cosmos.Build.Common {
         get { return GetProperty(EnableBochsDebugString, false); }
         set { SetProperty(EnableBochsDebugString, value); }
     }
+
+      /// <summary>
+      /// Name of the configuration property in the project file.
+      /// </summary>
+      public const string BinFormatString = "BinFormat";
+
+      /// <summary>
+      /// Gets or sets binary format which is used for producing kernel image.
+      /// </summary>
+      public BinFormat BinFormat
+      {
+          get { return GetProperty(BinFormatString, BinFormat.Bin); }
+          set { SetProperty(BinFormatString, value); }
+      }
   }
 }
