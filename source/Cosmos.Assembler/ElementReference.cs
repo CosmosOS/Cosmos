@@ -6,23 +6,24 @@ using System.Threading;
 
 namespace Cosmos.Assembler {
   public class ElementReference {
-    private static Dictionary<string, ElementReference> mLookup = new Dictionary<string, ElementReference>(StringComparer.InvariantCultureIgnoreCase);
-    public static ElementReference New(string aName, int aOffset) {
-      ElementReference xResult;
-      if (aName.StartsWith(".")) {
-        aName = Label.LastFullLabel + aName;
-      }
-      string xId = String.Intern(aName + "@@" + aOffset);
-      if (mLookup.TryGetValue(xId, out xResult)) {
+    public static ElementReference New(string aName, int aOffset)
+    {
+        ElementReference xResult;
+        if (aName.StartsWith("."))
+        {
+            aName = Label.LastFullLabel + aName;
+        }
+        
+        if (aOffset == 0)
+        {
+            xResult = new ElementReference(aName);
+        }
+        else
+        {
+            xResult = new ElementReference(aName, aOffset);
+        }
+
         return xResult;
-      }
-      if (aOffset == 0) {
-        xResult = new ElementReference(aName);
-      } else {
-        xResult = new ElementReference(aName, aOffset);
-      }
-      mLookup.Add(xId, xResult);
-      return xResult;
     }
 
     public static ElementReference New(string aName) {
