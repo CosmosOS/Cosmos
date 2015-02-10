@@ -23,22 +23,58 @@ namespace Cosmos.Build.Common {
       }
     }
 
-    public void SaveProfile(string aName) {
-      foreach (var xName in BuildProperties.PropNames) {
-        string xValue = GetProperty(xName);
-        if (!string.IsNullOrWhiteSpace(xValue)) {
-          SetProperty(aName + "_" + xName, xValue);
-        }
-      }
+    /// <summary>
+    /// Gets array of project names which are project independent.
+    /// </summary>
+    public override string[] ProjectIndependentProperties
+    {
+        get { return new string[] { BinFormatString }; }
     }
 
-    public void LoadProfile(string aName) {
-      foreach (var xName in BuildProperties.PropNames) {
-        string xValue = GetProperty(aName + "_" + xName);
-        if (!string.IsNullOrWhiteSpace(xValue)) {
-          SetProperty(xName, xValue);
+    /// <summary>
+    /// Save properties under selected profile.
+    /// </summary>
+    /// <param name="aName">Name of the profile for which save properties.</param>
+    public void SaveProfile(string aName) {
+        foreach (var xName in BuildProperties.PropNames)
+        {
+            // Skip project independent properties.
+            if (this.ProjectIndependentProperties.Contains(xName))
+            {
+                continue;
+            }
+
+            string xValue = GetProperty(xName);
+            if (!string.IsNullOrWhiteSpace(xValue))
+            {
+                SetProperty(aName + "_" + xName, xValue);
+            }
         }
-      }
+    }
+
+    /// <summary>
+    /// Load properties for the given profile.
+    /// </summary>
+    /// <param name="aName">Name of the profile for which load properties.</param>
+    public void LoadProfile(string aName) {
+        foreach (var xName in BuildProperties.PropNames)
+        {
+            string xValue;
+            // Skip project independent properties.
+            if (this.ProjectIndependentProperties.Contains(xName))
+            {
+                xValue = GetProperty(xName);
+            }
+            else
+            {
+                xValue = GetProperty(aName + "_" + xName);
+            }
+            
+            if (!string.IsNullOrWhiteSpace(xValue))
+            {
+                SetProperty(xName, xValue);
+            }
+        }
 
       // Reforce fixed settings for presets on each load.
       if (aName == "ISO") {

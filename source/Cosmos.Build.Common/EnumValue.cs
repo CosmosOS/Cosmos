@@ -7,20 +7,27 @@ namespace Cosmos.Build.Common {
 
 	public class EnumValue {
 
-		public static T Parse<T>(String value, T @default)
+        /// <summary>
+        /// Parse string to enumeration.
+        /// </summary>
+        /// <typeparam name="T">Type of enumeration to use.</typeparam>
+        /// <param name="value">Value which should be parsed as the enumeration.</param>
+        /// <param name="default">Default value to use, if input string contains invalid value.</param>
+        /// <returns>Parsed value, or default value if input string is invalid.</returns>
+		public static T Parse<T>(string value, T @default)
+            where T: struct
 		{
 			T result = @default;
 
 			Type valueType = typeof(T);
 			if (valueType.IsEnum == false)
-			{ throw new ArgumentException("Enum types only supported.", "T"); }
+			{ 
+                throw new ArgumentException("Enum types only supported.", "T"); 
+            }
 
 			if (String.IsNullOrEmpty(value) == false)
 			{
-				if (Enum.IsDefined(valueType, value) == true)
-				{
-					result = (T)Enum.Parse(valueType, value);
-				}
+                Enum.TryParse(value, true, out result);
 			}
 			
 			return result;
