@@ -1373,7 +1373,7 @@ namespace Cosmos.IL2CPU
                 Assembler.EmitAsmLabels = false;
                 try
                 {
-                    Assembler.WriteDebugVideo(String.Format("Method {0}:{1}.", aMethod.UID, aOpCode.Position));
+                    //Assembler.WriteDebugVideo(String.Format("Method {0}:{1}.", aMethod.UID, aOpCode.Position));
                     //Assembler.WriteDebugVideo(xLabel);
                 }
                 finally

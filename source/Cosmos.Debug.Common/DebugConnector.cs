@@ -60,15 +60,15 @@ namespace Cosmos.Debug.Common
         {
             mDebugWriter.WriteLine(aMsg);
             mDebugWriter.Flush();
-            mOut.WriteLine(aMsg);
-            mOut.Flush();
+            //mOut.WriteLine(aMsg);
+            //mOut.Flush();
             DoDebugMsg(aMsg, true);
         }
 
-        private static StreamWriter mOut = new StreamWriter(@"c:\data\sources\dcoutput.txt", false)
-                                    {
-                                        AutoFlush = true
-                                    };
+        //private static StreamWriter mOut = new StreamWriter(@"c:\data\sources\dcoutput.txt", false)
+        //                            {
+        //                                AutoFlush = true
+        //                            };
 
         protected void DoDebugMsg(string aMsg, bool aOnlyIfConnected)
         {
