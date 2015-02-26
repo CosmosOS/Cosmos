@@ -123,7 +123,7 @@ namespace Cosmos.Core
             mStart = mStartAddress = aStartAddress + (4 - (aStartAddress % 4));
             mLength = aEndOfRam - aStartAddress;
             mLength = (mLength / 4) * 4;
-            //ClearMemory(aStartAddress, mLength);
+            ClearMemory(aStartAddress, mLength);
 
             mStartAddress += 1024;
             mEndOfRam = aEndOfRam;
@@ -138,8 +138,8 @@ namespace Cosmos.Core
             if (!mInitialized)
             {
                 mInitialized = true;
-                //DoInitialize(CPU.GetEndOfKernel(), (CPU.GetAmountOfRAM() - 1) * 1024 * 1024);
-                DoInitialize(4 * 1024 * 1024, 16 * 1024 * 1024);
+                DoInitialize(CPU.GetEndOfKernel(), (CPU.GetAmountOfRAM() - 1) * 1024 * 1024);
+                //DoInitialize(4 * 1024 * 1024, 16 * 1024 * 1024);
             }
         }
 
