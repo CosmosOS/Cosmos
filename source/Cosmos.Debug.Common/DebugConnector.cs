@@ -65,10 +65,11 @@ namespace Cosmos.Debug.Common
             DoDebugMsg(aMsg, true);
         }
 
-        private static StreamWriter mOut = new StreamWriter(@"c:\data\sources\dcoutput.txt", false)
-                                    {
-                                        AutoFlush = true
-                                    };
+        //private static StreamWriter mOut = new StreamWriter(@"c:\data\sources\dcoutput.txt", false)
+        //                            {
+        //                                AutoFlush = true
+        //                            };
+        private static StreamWriter mOut = StreamWriter.Null;
 
         protected void DoDebugMsg(string aMsg, bool aOnlyIfConnected)
         {
@@ -101,7 +102,7 @@ namespace Cosmos.Debug.Common
 
         protected virtual void BeforeSendCmd()
         {
-            
+
         }
 
         protected void SendCmd(byte aCmd, byte[] aData, bool aWait)

@@ -123,7 +123,7 @@ namespace Cosmos.IL2CPU
                 xMethodLabel = LabelName.Get(aMethod.MethodBase);
             }
             new Cosmos.Assembler.Label(xMethodLabel);
-            Assembler.WriteDebugVideo("Method " + aMethod.UID);
+            //Assembler.WriteDebugVideo("Method " + aMethod.UID);
 
             // We could use same GUID as MethodLabelStart, but its better to keep GUIDs unique globaly for items
             // so during debugging they can never be confused as to what they point to.
