@@ -350,6 +350,16 @@ namespace Cosmos.Assembler {
       if (mComPort > 0) {
         SetIdtDescriptor(1, "DebugStub_TracerEntry", false);
         SetIdtDescriptor(3, "DebugStub_TracerEntry", false);
+
+        for (int i = 0; i < 256; i++)
+        {
+          if (i == 1 || i == 3)
+          {
+            continue;
+          }
+
+          SetIdtDescriptor(i, "DebugStub_Interrupt_" + i.ToString(), true);
+        }
       }
       //SetIdtDescriptor(1, "DebugStub_INT0"); - Change to GPF
 

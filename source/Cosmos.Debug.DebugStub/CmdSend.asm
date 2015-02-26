@@ -1,4 +1,4 @@
-; Generated at 3-2-2015 19:33:21
+; Generated at 14-2-2015 16:16:41
 
 
 
@@ -161,13 +161,14 @@ Call DebugStub_ComWrite16
 Mov ESI, [EBP + 8]
 DebugStub_SendText_WriteChar:
 Cmp ECX, 0
-JE DebugStub_SendText_Exit
+JE DebugStub_SendText_Finalize
 Call DebugStub_ComWrite8
 Dec ECX
 Inc ESI
 Jmp DebugStub_SendText_WriteChar
 
 
+DebugStub_SendText_Finalize:
 Popad
 DebugStub_SendText_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendText_Exit

@@ -171,7 +171,7 @@ function SendText {
     // Address of string
     ESI = EBP[8]
 WriteChar:
-    if ECX = 0 return
+    if ECX = 0 goto Finalize
     ComWrite8()
     ECX--
     // We are storing as 16 bits, but for now I will transmit 8 bits
@@ -187,6 +187,7 @@ WriteChar:
 	//
     //// Address of string
     //ESI = EBP[8]
+Finalize:
 	-All
 }
 

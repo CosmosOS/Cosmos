@@ -75,6 +75,7 @@
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>AsmBreak.asm</LastGenOutput>
     </EmbeddedResource>
+    <None Include=".editorconfig" />
     <None Include="CmdMisc.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>CmdMisc.asm</LastGenOutput>

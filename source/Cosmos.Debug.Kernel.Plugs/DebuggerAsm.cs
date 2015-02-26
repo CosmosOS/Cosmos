@@ -79,9 +79,17 @@ namespace Cosmos.Debug.Kernel.Plugs {
   public class DebugSend : AssemblerMethod {
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
-     new LiteralAssemblerCode("pushad");
+     //new LiteralAssemblerCode("pushad");
      new LiteralAssemblerCode("Call DebugStub_SendText");
-     new LiteralAssemblerCode("popad");
+     //new LiteralAssemblerCode("popad");
+        //new LiteralAssemblerCode("mov ecx, [ebp+12]");
+        //new LiteralAssemblerCode("imul ecx, 2");
+
+        //new LiteralAssemblerCode("mov al, 129");
+        //new LiteralAssemblerCode("mov bl, 0");
+        //new LiteralAssemblerCode("mov esi, [ebp+8]");
+        //new LiteralAssemblerCode("add esi, 16");
+        //new LiteralAssemblerCode("call DebugStub_SendCommandOnChannel");
      new LiteralAssemblerCode("%endif");
     }
   }

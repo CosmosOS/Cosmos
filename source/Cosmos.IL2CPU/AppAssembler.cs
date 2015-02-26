@@ -637,7 +637,7 @@ namespace Cosmos.IL2CPU
                 }
                 xILOp.DebugEnabled = DebugEnabled;
                 xILOp.Execute(aMethod, xOpCode);
-                
+
                 AfterOp(aMethod, xOpCode);
                 //mLog.WriteLine( " end: " + Stack.Count.ToString() );
             }
@@ -1373,7 +1373,7 @@ namespace Cosmos.IL2CPU
                 Assembler.EmitAsmLabels = false;
                 try
                 {
-                    Assembler.WriteDebugVideo(String.Format("Method {0}:{1}.", aMethod.UID, aOpCode.Position.ToString("X")));
+                    //Assembler.WriteDebugVideo(String.Format("Method {0}:{1}.", aMethod.UID, aOpCode.Position.ToString("X")));
                     //Assembler.WriteDebugVideo(xLabel);
                 }
                 finally
