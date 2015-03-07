@@ -35,7 +35,7 @@ function ComRead32 {
 // Modifies: EDX
 function ComWriteAL {
 	+ESI
-    +EAX	
+    +EAX
 	ESI = ESP
     ComWrite8()
     // Is a local var, cant use Return(4). X// issues the return.

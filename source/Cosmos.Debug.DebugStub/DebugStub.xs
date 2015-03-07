@@ -5,7 +5,7 @@ var CallerEBP
 var CallerEIP
 var CallerESP
 
-// Tracing: 0=Off, 1=On 
+// Tracing: 0=Off, 1=On
 var TraceMode
 // enum Status
 var DebugStatus
@@ -15,7 +15,7 @@ var PushAllPtr
 // If set non 0, on next trace a break will occur
 var DebugBreakOnNextTrace
 // For step out and over this is used to determine where the initial request was made
-// EBP is logged when the trace is started and can be used to determine 
+// EBP is logged when the trace is started and can be used to determine
 // what level we are "at" relative to the original step start location.
 var BreakEBP
 // Command ID of last command received
@@ -38,7 +38,7 @@ function BreakOnAddress {
 
     //Push EAX so we preserve it for later
 	+EAX
-    
+
 	// Calculate location in table
     // Mov [EBX + EAX * 4], ECX would be better, but our X# doesn't handle this yet
 	EBX = @.DebugBPs
@@ -47,7 +47,7 @@ function BreakOnAddress {
 
 	if ECX = 0 {
 		//This is a BP removal
-		
+
 		EDI = EBX[0]
 		AL = $90
 		EDI[0] = AL
@@ -61,11 +61,11 @@ function BreakOnAddress {
 	EDI[0] = AL
 
 DontSetBP:
-	
+
 	//Restore EAX - the BP Id
 	-EAX
-	
-	//Re-scan for max BP Id	
+
+	//Re-scan for max BP Id
 	//We _could_ try and work it out based on what happened...but my attempts to do so
 	//proved futile...so I just programmed it to re-scan and find highest BP Id every time.
 
@@ -152,7 +152,7 @@ function Executing {
 	   //Reset the debug register
 	   EAX & $BFFF
 	   ! MOV DR6, EAX
-	   
+
 	   ResetINT1_TrapFLAG()
 
 	   Break()
@@ -174,7 +174,7 @@ function Executing {
     //   -Find a faster way - a list of 256 straight compares and code modifation?
     //   -Move this scan earlier - Have to set a global flag when anything (StepTriggers, etc below) is going on at all
     //     A selective disable of the DS
-    
+
 	//If there are 0 BPs, skip scan - easy and should have a good increase
     EAX = .MaxBPId
 	if EAX = 0 {
@@ -203,7 +203,7 @@ SkipBPScan:
 
 	// .CallerEBP is the stack on method entry.
 	EAX = .CallerEBP
-	
+
 	// F10
     if dword .DebugBreakOnNextTrace = #StepTrigger_Over {
 		// If EAX = .BreakEBP then we are in same method.
@@ -234,9 +234,8 @@ Normal:
     // Is there a new incoming command? We dont want to wait for one
     // if there isn't one already here. This is a non blocking check.
 CheckForCmd:
-	DX = .ComAddr
-	DX + 5
-    AL = Port[DX]
+	  DX = 5
+    ReadRegister()
     AL ?& 1
     // If a command is waiting, process it and then check for another.
     // If no command waiting, break from loop.
@@ -279,7 +278,7 @@ WaitCmd:
 	    AckCommand()
 	    goto WaitCmd
 	}
-	
+
     if AL = #Vs2Ds_StepInto {
         .DebugBreakOnNextTrace = #StepTrigger_Into
 		// Not used, but set for consistency

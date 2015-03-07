@@ -132,23 +132,25 @@ namespace Cosmos.Build.MSBuild
 				}
 
         LogInfo logContent;
-        foreach (var xError in mErrors)
-        {
-          if (ExtendLineError(xProcess.ExitCode, xError, out logContent))
-          {
-            Logs(logContent);
-          }
-        }
+			  for (int xIndex = 0; xIndex < mErrors.Count; xIndex++)
+			  {
+			    var xError = mErrors[xIndex];
+			    if (ExtendLineError(xProcess.ExitCode, xError, out logContent))
+			    {
+			      Logs(logContent);
+			    }
+			  }
 
-        foreach (var xOutput in mOutput)
-        {
-					if (ExtendLineOutput(xProcess.ExitCode, xOutput, out logContent))
-          {
-            Logs(logContent);
-          }
-        }
+			  for (int xIndex = 0; xIndex < mOutput.Count; xIndex++)
+			  {
+			    var xOutput = mOutput[xIndex];
+			    if (ExtendLineOutput(xProcess.ExitCode, xOutput, out logContent))
+			    {
+			      Logs(logContent);
+			    }
+			  }
 
-				return xProcess.ExitCode == 0;
+			  return xProcess.ExitCode == 0;
 			}
 		}
 
