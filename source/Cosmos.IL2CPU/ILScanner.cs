@@ -131,6 +131,12 @@ namespace Cosmos.IL2CPU
                 mItems.Add(aItem);
                 mItemsList.Add(aItem);
 
+                MethodBase methodBaseSource = aSrc as MethodBase;
+                if (methodBaseSource != null)
+                {
+                    aSrc = methodBaseSource.DeclaringType.ToString() + "::" + aSrc.ToString();
+                }
+
                 mQueue.Enqueue(new ScannerQueueItem() { Item = aItem, QueueReason = aSrcType, SourceItem = aSrc + Environment.NewLine + sourceItem });
             }
         }
