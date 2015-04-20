@@ -41,9 +41,11 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Constrained:
           return 0;
         case Code.Unbox_Any:
-             return 1;
+          return 1;
         case Code.Unbox:
-             return 1;
+          return 1;
+        case Code.Stobj:
+          return 2;
         default:
           throw new NotImplementedException("OpCode '" + OpCode + "' not implemented! Encountered in method " + aMethod.ToString());
       }
@@ -75,6 +77,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           return 1;
         case Code.Unbox:
           return 1;
+        case Code.Stobj:
+          return 0;
         default:
           throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
       }
