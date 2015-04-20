@@ -72,10 +72,10 @@ namespace Cosmos.HAL {
 
       // Find hardcoded ATA controllers
       Global.Dbg.Send("ATA Master");
-      InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
-
-      Global.Dbg.Send("ATA Slave");
       InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
+
+      //Global.Dbg.Send("ATA Slave");
+      //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);      
 
       //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum? 
       // They do show up in PCI space as well as the fixed space. 

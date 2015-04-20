@@ -19,9 +19,6 @@ namespace SentinelKernel.System.Plugs.System.IO
         /// <returns></returns>
         public static string GetDirectoryName(string aPath)
         {
-            return "";
-
-            /*
             if (aPath == null || aPath.Length <= 1)
             {
                 return "/";
@@ -32,7 +29,6 @@ namespace SentinelKernel.System.Plugs.System.IO
                 return aPath;
             }
             return aPath.Substring(0, xIndex);
-            */ 
         }
 
         public static void Cctor(
