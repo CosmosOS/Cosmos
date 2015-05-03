@@ -18,7 +18,7 @@
     <!-- Looks like this was a mispelled attribute. Replaced by DebugEnabled below.
     <DebugEnable>true</DebugEnable>
     -->
-    <DebugEnabled>False</DebugEnabled>
+    <DebugEnabled>True</DebugEnabled>
     <DebugMode>IL</DebugMode>
     <TraceMode>User</TraceMode>
     <EnableGDB>False</EnableGDB>
@@ -30,13 +30,13 @@
     <Deployment>ISO</Deployment>
     <Launch>VMware</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <StackCorruptionDetectionEnabled>False</StackCorruptionDetectionEnabled>
     <VMware_Name>SentinelKernelBoot</VMware_Name>
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
-    <VMware_DebugEnabled>False</VMware_DebugEnabled>
-    <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
+    <VMware_DebugEnabled>True</VMware_DebugEnabled>
+    <VMware_StackCorruptionDetectionEnabled>False</VMware_StackCorruptionDetectionEnabled>
     <VMware_DebugMode>IL</VMware_DebugMode>
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
     <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
@@ -60,6 +60,20 @@
     <VMware_EnableBochsDebug>True</VMware_EnableBochsDebug>
     <TraceAssemblies>All</TraceAssemblies>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
+    <IntelEdison_Name>SentinelKernelBoot</IntelEdison_Name>
+    <IntelEdison_Description>Connect to Intel Edison device to deploy and debug.</IntelEdison_Description>
+    <IntelEdison_Deployment>BinaryImage</IntelEdison_Deployment>
+    <IntelEdison_Launch>IntelEdison</IntelEdison_Launch>
+    <IntelEdison_DebugEnabled>True</IntelEdison_DebugEnabled>
+    <IntelEdison_StackCorruptionDetectionEnabled>True</IntelEdison_StackCorruptionDetectionEnabled>
+    <IntelEdison_DebugMode>IL</IntelEdison_DebugMode>
+    <IntelEdison_VisualStudioDebugPort>Pipe: Cosmos\Serial</IntelEdison_VisualStudioDebugPort>
+    <IntelEdison_VMwareEdition>Workstation</IntelEdison_VMwareEdition>
+    <IntelEdison_OutputPath>bin\Debug\</IntelEdison_OutputPath>
+    <IntelEdison_TraceAssemblies>All</IntelEdison_TraceAssemblies>
+    <IntelEdison_EnableGDB>False</IntelEdison_EnableGDB>
+    <IntelEdison_StartCosmosGDB>False</IntelEdison_StartCosmosGDB>
+    <IntelEdison_EnableBochsDebug>True</IntelEdison_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
@@ -77,13 +91,23 @@
       <Project>{7c64b97f-516d-4a6d-b9e1-3fe48f561409}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\SentinelCore\SentinelCore.csproj">
+      <Name>SentinelCore</Name>
+      <Project>{c296973c-63d7-4a29-95b1-9fc6f36a83ee}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SentinelHAL\SentinelHAL.csproj">
+      <Name>SentinelHAL</Name>
+      <Project>{abe135d1-acf8-4c25-a5df-a96f013242c5}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\SentinelKernel\SentinelKernel.csproj">
       <Name>SentinelKernel</Name>
       <Project>{3b0f484c-0a26-4cc2-b44d-ddda3a3e9381}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\SentinelSystemLib\SentinelSystemLib.csproj">
-      <Name>SentinelSystemLib</Name>
+    <ProjectReference Include="..\SentinelSystem\SentinelSystem.csproj">
+      <Name>SentinelSystem</Name>
       <Project>{93d6ff56-6e23-4e80-98f6-730ac533f631}</Project>
       <Private>True</Private>
     </ProjectReference>
