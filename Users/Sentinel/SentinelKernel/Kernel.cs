@@ -20,7 +20,17 @@ namespace SentinelKernel
 
         protected override void Run()
         {
+            Console.WriteLine("Run");
             bool xTest = Directory.Exists("0:\\test");
+            Console.WriteLine("After test");
+            if (xTest)
+            {
+                Console.WriteLine("Folder exists!");
+            }
+            else
+            {
+                Console.WriteLine("Folder does not exist!");
+            }
             Stop();
         }
     }
