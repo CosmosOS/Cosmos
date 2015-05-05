@@ -44,7 +44,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       // EnumFrameInfo is called several times on each break becuase "different callers can call with different flags".
       // We ignore flags through and always return full, but EnumFrameInfo gets called half a dozen times which is slow
       // if we refresh each and every time. So we cache our info.
-      if (mProcess.mStackFrame == null) {
+      if (mProcess.mStackFrame == null || true) {
         // Ask the lower-level to perform a stack walk on this thread
         //m_engine.DebuggedProcess.DoStackWalk(this.m_debuggedThread);
         oEnumObject = null;
