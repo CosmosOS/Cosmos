@@ -2,7 +2,7 @@
 plugin_ctrl: unmapped=1, biosdev=1, speaker=1, extfpuirq=1, parallel=1, serial=1, gameport=1, iodebug=1
 config_interface: win32config
 display_library: win32
-memory: host=32, guest=32
+memory: host=256, guest=256
 romimage: file="C:\Program Files (x86)\Bochs-2.6.8/BIOS-bochs-latest"
 vgaromimage: file="C:\Program Files (x86)\Bochs-2.6.8/VGABIOS-lgpl-latest"
 boot: cdrom
@@ -34,7 +34,7 @@ clock: sync=none, time0=local, rtc_sync=0
 # no loader
 log: -
 logprefix: %t%e%d
-debug: action=ignore
+debug: action=ignore, cpu0=report
 info: action=report
 error: action=report
 panic: action=ask
