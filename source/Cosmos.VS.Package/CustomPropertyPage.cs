@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.VisualStudio;
@@ -107,13 +108,40 @@ namespace Cosmos.VS.Package {
     public virtual void ApplyChanges() {
       if (this.Properties != null) {
         var properties = Properties.GetProperties();
-
+        var independentProperties = Properties.ProjectIndependentProperties;
         foreach (KeyValuePair<String, String> pair in properties) {
-          SetConfigProperty(pair.Key, pair.Value);
+            var propertyName = pair.Key;
+            if (independentProperties.Contains(propertyName))
+            {
+                SetProjectProperty(pair.Key, pair.Value);
+            }
+            else 
+            { 
+                SetConfigProperty(pair.Key, pair.Value);
+            }
         }
 
         this.IsDirty = false;
       }
+    }
+
+    /// <summary>
+    /// Sets project specific property.
+    /// </summary>
+    /// <param name="name">Name of the property to set.</param>
+    /// <param name="value">Value of the property.</param>
+    public virtual void SetProjectProperty(String name, String value)
+    {
+        CCITracing.TraceCall();
+        if (value == null)
+        {
+            value = String.Empty;
+        }
+
+        if (this.ProjectMgr != null)
+        {
+            this.ProjectMgr.SetProjectProperty(name, value);
+        }
     }
 
     public virtual void SetConfigProperty(String name, String value) {

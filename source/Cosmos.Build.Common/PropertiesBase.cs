@@ -17,6 +17,11 @@ namespace Cosmos.Build.Common {
       return clonedTable;
     }
 
+        /// <summary>
+        /// Gets array of project names which are project independent.
+        /// </summary>
+        public abstract string[] ProjectIndependentProperties { get;  }
+
     public void Reset() {
       mPropTable.Clear();
     }
@@ -37,7 +42,33 @@ namespace Cosmos.Build.Common {
       return GetProperty(name, string.Empty);
     }
 
-    public T GetProperty<T>(string name, T @default) {
+    /// <summary>
+    /// Get string value of the property.
+    /// </summary>
+    /// <param name="name">Name of the property.</param>
+    /// <param name="default">Default value for the property.</param>
+    /// <returns>Vaue of the property with given name.</returns>
+    public string GetProperty(string name, string @default)
+    {
+        string value = @default;
+        if (mPropTable.ContainsKey(name) == true)
+        {
+            value = mPropTable[name];
+        }
+
+        return value;
+    }
+
+    /// <summary>
+    /// Gets typed value of the property.
+    /// </summary>
+    /// <typeparam name="T">Get property type.</typeparam>
+    /// <param name="name">Get name of the property.</param>
+    /// <param name="default">Default value for the proeprty.</param>
+    /// <returns>Value of the property with given name.</returns>
+    public T GetProperty<T>(string name, T @default) 
+        where T: struct
+    {
       T value = @default;
       if (mPropTable.ContainsKey(name) == true) {
         string stringValue = mPropTable[name];
@@ -45,12 +76,9 @@ namespace Cosmos.Build.Common {
         string valueTypeName = valueType.Name;
 
         if (valueType.IsEnum == true) {
-          value = EnumValue.Parse(stringValue, @default);
+            value = EnumValue.Parse(stringValue, @default);
         } else {
-          // TODO Check on types directly instead of string literal
-          if (valueType == typeof(string)) {
-            value = (T)((Object)stringValue);
-          } else if ((valueTypeName == "Int16") || (valueTypeName == "Short")) {
+          if ((valueTypeName == "Int16") || (valueTypeName == "Short")) {
             Int16 newValue;
             if (Int16.TryParse(stringValue, out newValue) == true) { value = (T)((Object)newValue); }
 
