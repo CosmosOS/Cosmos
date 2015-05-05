@@ -42,9 +42,6 @@ Build/VMWare/Workstation/Cosmos.vmxf
 
 Setup/Current.iss
 Cosmos.Assembler.Log
-<<<<<<< Updated upstream
-UpgradeLog.htm
-.sync/
-=======
 UpgradeLog*.htm
->>>>>>> Stashed changes
+.sync/
+source/packages/
