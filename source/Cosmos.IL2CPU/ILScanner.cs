@@ -387,7 +387,9 @@ namespace Cosmos.IL2CPU
             var xParamTypes = new Type[xParams.Length];
             // Dont use foreach, enum generaly keeps order but
             // isn't guaranteed.
-            string xMethodFullName = LabelName.GenerateFullName(aMethod);
+            //string xMethodFullName = LabelName.GenerateFullName(aMethod);
+
+
             for (int i = 0; i < xParams.Length; i++)
             {
                 xParamTypes[i] = xParams[i].ParameterType;

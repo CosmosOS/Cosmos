@@ -522,6 +522,7 @@ namespace Cosmos.IL2CPU
         private void AfterEmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
         {
             // do optimizations
+
             //if (Assembler.Stack.Count > 0)
             //{
             //    if (mDebugStackErrors)
@@ -966,10 +967,6 @@ namespace Cosmos.IL2CPU
 
                     }
                 }
-                if (!xType.IsInterface)
-                {
-                    Push(aGetTypeID(xType));
-                }
                 int? xBaseIndex = null;
                 if (xType.BaseType == null)
                 {
@@ -1001,6 +998,10 @@ namespace Cosmos.IL2CPU
                 }
                 if (!xType.IsInterface)
                 {
+                    if (!xType.IsInterface)
+                    {
+                        Push(aGetTypeID(xType));
+                    }
                     Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(
                         new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { (int)aGetTypeID(xType) }));
