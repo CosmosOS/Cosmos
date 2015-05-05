@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
+﻿using System.Linq;
 using System.Windows;
+using Cosmos.Build.Installer;
 
 namespace Cosmos.Build.Builder {
   public partial class App : Application {
@@ -17,6 +14,7 @@ namespace Cosmos.Build.Builder {
     public static bool IgnoreVS;
     public static bool TestMode = false;
     public static bool HasParams = false;
+    public static VsVersion VsVersion;
 
     protected override void OnStartup(StartupEventArgs e) {
       HasParams = e.Args.Length > 0;
@@ -35,6 +33,11 @@ namespace Cosmos.Build.Builder {
       // For use during dev of Builder only.
       IgnoreVS = xArgs.Contains("-IGNOREVS");
       TestMode = xArgs.Contains("-TESTMODE");
+      if (xArgs.Contains("-VS2015") || xArgs.Contains("/VS2015")) {
+        VsVersion = VsVersion.Vs2015;
+        Paths.VsVersion = VsVersion.Vs2015;
+      }
+
       base.OnStartup(e);
     }
   }

@@ -233,13 +233,21 @@ namespace Cosmos.Build.Builder {
       CheckIfUserKitRunning();
       CheckIsVsRunning();
       CheckIfBuilderRunning();
-
-      CheckVs2013();
+      
+      switch (App.VsVersion) {
+        case VsVersion.Vs2013:
+          CheckVs2013();
+          CheckForInstall("Microsoft Visual Studio 2013 SDK", true);
+          break;
+        case VsVersion.Vs2015:
+          CheckVs2015();
+          CheckForInstall("Microsoft Visual Studio 2015 RC SDK", true);
+          break;
+      }
 
       //works also without, only close of VMWare is not working! CheckNet35Sp1(); // Required by VMWareLib
       CheckNet403();
       CheckForInno();
-      CheckForInstall("Microsoft Visual Studio 2013 SDK", true);
       bool vmWareInstalled = true;
       bool bochsInstalled = IsBochsInstalled();
       if (!CheckForInstall("VMware Workstation", false)) {
@@ -318,6 +326,19 @@ namespace Cosmos.Build.Builder {
         string xDir = (string)xKey.GetValue("InstallDir");
         if (String.IsNullOrWhiteSpace(xDir)) {
           throw new Exception("Visual Studio 2013 not detected!");
+        }
+      }
+    }
+
+    void CheckVs2015() {
+      Echo("Checking for Visual Studio 2015 RC");
+      string key = @"SOFTWARE\Microsoft\VisualStudio\14.0";
+      if (Environment.Is64BitOperatingSystem)
+        key = @"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0";
+      using (var xKey = Registry.LocalMachine.OpenSubKey(key)) {
+        string xDir = (string)xKey.GetValue("InstallDir");
+        if (String.IsNullOrWhiteSpace(xDir)) {
+          throw new Exception("Visual Studio 2015 RC not detected!");
         }
       }
     }
@@ -407,7 +428,16 @@ namespace Cosmos.Build.Builder {
         throw new Exception("Cannot find Inno setup.");
       }
       string xCfg = App.IsUserKit ? "UserKit" : "DevKit";
-      StartConsole(xISCC, @"/Q " + Quoted(mInnoFile) + " /dBuildConfiguration=" + xCfg);
+      string vsVersionConfiguration = "vs2013";
+      switch (App.VsVersion) {
+         case VsVersion.Vs2013:
+           vsVersionConfiguration = "vs2013";
+           break;
+         case VsVersion.Vs2015:
+           vsVersionConfiguration = "vs2015";
+           break;
+      }
+      StartConsole(xISCC, @"/Q " + Quoted(mInnoFile) + " /dBuildConfiguration=" + xCfg + " /dVsVersion=" + vsVersionConfiguration);
 
       if (App.IsUserKit) {
         File.Delete(mInnoFile);
