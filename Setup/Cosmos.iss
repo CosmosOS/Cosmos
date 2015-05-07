@@ -308,7 +308,7 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\Projects\{{471ec4bb-e47
 ; Debug engine
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: ; ValueData: guidCosmosDebugEngine
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: CLSID; ValueData: {{8355452D-6D2F-41B0-89B8-BB2AA2529E94}
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: CLSID; ValueData: {{DC8503AB-7EE6-456C-A209-66C690D9F6F4}
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: ProgramProvider; ValueData: {{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: Name; ValueData: Cosmos Debug Engine
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}\AutoSelectIncompatibleList; ValueType: string; ValueName: guidCOMPlusNativeEng; ValueData: {{92EF0900-2251-11D2-B72E-0000F87572EF}
@@ -317,11 +317,11 @@ Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{{FA1
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}\AutoSelectIncompatibleList; ValueType: string; ValueName: guidScriptEng; ValueData: {{F200A7E7-DEA5-11D0-B854-00A0244A1DE2}
 
 ; Debug engine
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: none; Flags: uninsdeletekey
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.Debug.VSDebugEngine
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: Class; ValueData: Cosmos.Debug.VSDebugEngine.AD7Engine
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
-Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{8355452D-6D2F-41B0-89B8-BB2AA2529E94}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.Debug.VSDebugEngine.dll
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: none; Flags: uninsdeletekey
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.Debug.VSDebugEngine
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: string; ValueName: Class; ValueData: Cosmos.Debug.VSDebugEngine.AD7Engine
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
+Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.Debug.VSDebugEngine.dll
 
 ; X# custom tool registration
 Root: HKLM; SubKey: Software\Microsoft\VisualStudio\12.0\Generators\{{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}\CosmosXSharpGenerator; ValueType: none; Flags: uninsdeletekey
