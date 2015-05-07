@@ -84,6 +84,9 @@
     <Compile Include="FileSystem\VFS\VFSManager.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Kernel.cs" />
+    <Compile Include="LocalizationSettings.cs" />
+    <Compile Include="Localization\Keybord\IKeybordLocalization.cs" />
+    <Compile Include="Localization\Keybord\USinternationalKeybord.cs" />
     <Compile Include="Network\ARP\ARPCache.cs" />
     <Compile Include="Network\ARP\ARPPacket.cs" />
     <Compile Include="Network\EthernetPacket.cs" />

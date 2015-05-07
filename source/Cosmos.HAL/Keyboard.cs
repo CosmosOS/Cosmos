@@ -25,6 +25,8 @@ namespace Cosmos.HAL {
             }
         }
 
+       
+
         public void HandleIRQ(ref Core.INTs.IRQContext aContext) {
             if (mHandleKeyboardKey != null) {
                 byte xScanCode = IO.Port60.Byte;
@@ -298,6 +300,7 @@ namespace Cosmos.HAL {
 
         public void ChangeKeyMap(List<KeyMapping> aKeys) {
             mKeys = aKeys;
+            KeyCount = (uint)aKeys.Count;
         }
 
         public bool GetCharValue(uint aScanCode, out char aValue) {
