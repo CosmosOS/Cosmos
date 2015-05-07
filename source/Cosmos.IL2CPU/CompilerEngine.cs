@@ -282,6 +282,11 @@ namespace Cosmos.IL2CPU
                 foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies())
                 {
                     // HACK: find another way to skip dynamic assemblies (which belong to dynamic methods)
+                    if (xAsm.IsDynamic)
+                    {
+                        continue;
+                    }
+
                     try
                     {
                         LogMessage(xAsm.Location);
