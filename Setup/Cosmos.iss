@@ -9,17 +9,38 @@
 ;#define BuildConfiguration "userkit"
 #endif
 
-#define VsVersion "vs2013"
-#define VsVersionHuman "2013"
-#define VsRegVersion "12.0"
+#ifndef VsVersion
+  #define VsVersion "vs2013"
+#endif
+
+#if VsVersion == "vs2013"
+    #define VsVersionHuman "2013"
+    #define VsRegVersion "12.0"
+    #define VsRegVersionLM "12.0"
+#endif
+
+#if VsVersion == "vs2013Exp"
+    #define VsVersionHuman "2013"
+    #define VsRegVersion "12.0Exp"
+    #define VsRegVersionLM "12.0"
+#endif
 
 #if VsVersion == "vs2015"
     #define VsRegVersion "14.0"
     #define VsVersionHuman "2015"
+    #define VsRegVersionLM "14.0"
+#endif
+
+#if VsVersion == "vs2015Exp"
+    #define VsRegVersion "14.0Exp"
+    #define VsVersionHuman "2015"
+    #define VsRegVersionLM "14.0"
 #endif
 
 #define VsRegRoot ("Software\Microsoft\VisualStudio\" + VsRegVersion)
 #define VsRegRootWow ("SOFTWARE\Wow6432Node\Microsoft\VisualStudio\" + VsRegVersion)
+#define VsRegRootLM ("Software\Microsoft\VisualStudio\" + VsRegVersionLM)
+#define VsRegRootWowLM ("SOFTWARE\Wow6432Node\Microsoft\VisualStudio\" + VsRegVersionLM)
 
 #if BuildConfiguration == "Devkit"
 	; devkit releases are not compressed
@@ -90,10 +111,10 @@ Type: filesandordirs; Name: "{code:GetCSharpExpress2013ProjectTemplatePath}\*Cos
 
 [Files]
 ; Cecil dll, pdb
-Source: ".\Resources\Dependencies\cecil\Mono.Cecil.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\cecil\Mono.Cecil.pdb"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\cecil\Mono.Cecil.Pdb.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\cecil\Mono.Cecil.Pdb.pdb"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+#define MonoCecilPath ".\source\packages\Mono.Cecil.0.9.6.1\lib\net45"
+Source: "{#MonoCecilPath}\Mono.Cecil.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: "{#MonoCecilPath}\Mono.Cecil.Pdb.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: "{#MonoCecilPath}\Mono.Cecil.Rocks.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
 ; Tools
 Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly

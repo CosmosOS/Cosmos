@@ -20,7 +20,8 @@ var
 	__VBExpress2013ProjectTemplatePath: string;
   
 procedure InitializePaths;
-var __VisualStudioLocation : string;
+var __VisualStudioLocation,
+    __VSRegistryLocation: string;
 begin  
   if __PathsInitialized then exit;
 
@@ -60,20 +61,28 @@ begin
   __NET_FRAMEWORK_64BIT_INSTALLED := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETFramework,Enable64Bit|0}') = '1';
   __NET_FRAMEWORK_64BIT_INSTALLED := __NET_FRAMEWORK_64BIT_INSTALLED or ((__RegAsm64<> '') and FileExists(__RegAsm64));
 
-  Log('Registry root: {#VsRegRoot}');
-  __VSNET2013_PATH := ExpandConstant('{reg:HKLM\{#VsRegRoot},InstallDir|}');
+  if not IsWin64 then
+  begin
+    __VSRegistryLocation := '{#VsRegRootLM}';
+    Log('not 64');
+  end
+  else
+    __VSRegistryLocation := '{#VsRegRootWowLM}';
+
+  Log(__VSRegistryLocation);
+  __VSNET2013_PATH := ExpandConstant('{reg:HKLM\' + __VSRegistryLocation + ',InstallDir|}');
   __VSNET2013 := __VSNET2013_PATH <> '';
 
   if __VSNET2013 then
     __VSNET2013_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2013_PATH)+'..\..');
  
-  if RegQueryStringValue(HKCU, '{#VsRegRoot}', 'UserProjectTemplatesLocation', __CSharpExpress2013ProjectTemplatePath) then
+  if RegQueryStringValue(HKCU, __VSRegistryLocation, 'UserProjectTemplatesLocation', __CSharpExpress2013ProjectTemplatePath) then
   begin
     StringChangeEx(__CSharpExpress2013ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
   end
   else
   begin
-    if RegQueryStringValue(HKCU, '{#VsRegRoot}', 'VisualStudioLocation', __VisualStudioLocation) then
+    if RegQueryStringValue(HKCU, __VSRegistryLocation, 'VisualStudioLocation', __VisualStudioLocation) then
     begin
       StringChangeEx(__VisualStudioLocation, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
 	  __CSharpExpress2013ProjectTemplatePath := __VisualStudioLocation + '\Templates\ProjectTemplates';
@@ -217,7 +226,7 @@ function InitializeSetup: Boolean;
 begin
   InitializePaths;
   if not VSNET2013 then begin
-    MsgBox(ExpandConstant('Either Visual Studio {#VsVersionHuman} or Visual Studio {#VsVersionHuman} (integrated shell) is installed! Please see CodePlex documentation for supported editions/versions of Visual Studio.'), MbError, MB_OK);
+    MsgBox(ExpandConstant('Either Visual Studio {#VsVersionHuman} or Visual Studio {#VsVersionHuman} (integrated shell) is not installed! Please see CodePlex documentation for supported editions/versions of Visual Studio.'), MbError, MB_OK);
     Result := false;
     exit;
   end;
