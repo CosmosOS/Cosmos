@@ -437,6 +437,10 @@ namespace Cosmos.Build.Builder {
            vsVersionConfiguration = "vs2015";
            break;
       }
+      // Use configuration which will instal to the VS Exp Hive
+      if (App.UseVsHive) {
+           vsVersionConfiguration += "Exp";
+      }
       StartConsole(xISCC, @"/Q " + Quoted(mInnoFile) + " /dBuildConfiguration=" + xCfg + " /dVsVersion=" + vsVersionConfiguration);
 
       if (App.IsUserKit) {
