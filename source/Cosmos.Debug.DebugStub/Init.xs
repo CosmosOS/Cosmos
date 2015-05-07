@@ -32,6 +32,10 @@ function WaitForDbgHandshake {
     // "Clear" the UART out
     AL = 0
     ComWriteAL()
+	AL = 0
+    ComWriteAL()
+	AL = 0
+    ComWriteAL()
 
     // Cosmos.Debug.Consts.Consts.SerialSignature
 	+#Signature
@@ -51,5 +55,10 @@ function WaitForDbgHandshake {
 
     WaitForSignature()
     ProcessCommandBatch()
+	Hook_OnHandshakeCompleted()
 }
 
+! %ifndef Exclude_Dummy_Hooks
+function Hook_OnHandshakeCompleted {
+}
+! %endif

@@ -157,13 +157,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu.Hive", "..\Users\Kudz
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assembler", "Assembler", "{612401E0-F733-40DB-95D5-E22D332DDAAA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sentinel209", "Sentinel209", "{45E223F1-F219-4D48-96EC-85E0E0065BE7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sentinel", "Sentinel", "{45E223F1-F219-4D48-96EC-85E0E0065BE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentinelKernel", "..\Users\Sentinel209\SentinelKernel\SentinelKernel.csproj", "{3B0F484C-0A26-4CC2-B44D-DDDA3A3E9381}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentinelKernel", "..\Users\Sentinel\SentinelKernel\SentinelKernel.csproj", "{3B0F484C-0A26-4CC2-B44D-DDDA3A3E9381}"
 EndProject
-Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "SentinelKernelBoot", "..\Users\Sentinel209\SentinelKernel\SentinelKernelBoot.Cosmos", "{40C3F1E6-2880-4AF4-91FD-DFD41484719D}"
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "SentinelKernelBoot", "..\Users\Sentinel\SentinelKernel\SentinelKernelBoot.Cosmos", "{40C3F1E6-2880-4AF4-91FD-DFD41484719D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentinelSystemLib", "..\Users\Sentinel209\SentinelSystemLib\SentinelSystemLib.csproj", "{93D6FF56-6E23-4E80-98F6-730AC533F631}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentinelSystem", "..\Users\Sentinel\SentinelSystem\SentinelSystem.csproj", "{93D6FF56-6E23-4E80-98F6-730AC533F631}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILSpyPlugAddIn", "Tools\ILSpyPlugAddIn\ILSpyPlugAddIn.csproj", "{8840988C-0D5B-4761-96BF-7241FAC38199}"
 EndProject
@@ -202,6 +202,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IL2CPU", "IL2CPU\IL2CPU.csproj", "{6128DEEB-D30F-4859-B60F-C36D5452F3E9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlaygroundCore", "..\Users\Matthijs\PlaygroundCore\PlaygroundCore.csproj", "{AB869246-4887-4117-851D-766EB9FF1E29}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.IL2CPU.Tests", "Cosmos.IL2CPU.Tests\Cosmos.IL2CPU.Tests.csproj", "{17329379-67D5-45D2-8EF0-9C625C43E117}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentinelCore", "..\Users\Sentinel\SentinelCore\SentinelCore.csproj", "{C296973C-63D7-4A29-95B1-9FC6F36A83EE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentinelHAL", "..\Users\Sentinel\SentinelHAL\SentinelHAL.csproj", "{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -988,6 +994,42 @@ Global
 		{AB869246-4887-4117-851D-766EB9FF1E29}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{AB869246-4887-4117-851D-766EB9FF1E29}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{AB869246-4887-4117-851D-766EB9FF1E29}.Release|x86.ActiveCfg = Release|Any CPU
+		{17329379-67D5-45D2-8EF0-9C625C43E117}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17329379-67D5-45D2-8EF0-9C625C43E117}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17329379-67D5-45D2-8EF0-9C625C43E117}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{17329379-67D5-45D2-8EF0-9C625C43E117}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{17329379-67D5-45D2-8EF0-9C625C43E117}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{17329379-67D5-45D2-8EF0-9C625C43E117}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{17329379-67D5-45D2-8EF0-9C625C43E117}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17329379-67D5-45D2-8EF0-9C625C43E117}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17329379-67D5-45D2-8EF0-9C625C43E117}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{17329379-67D5-45D2-8EF0-9C625C43E117}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{17329379-67D5-45D2-8EF0-9C625C43E117}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{17329379-67D5-45D2-8EF0-9C625C43E117}.Release|x86.ActiveCfg = Release|Any CPU
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE}.Release|x86.ActiveCfg = Release|Any CPU
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1064,5 +1106,8 @@ Global
 		{7E059184-F2C5-4CC6-B86D-FA12590C3C40} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 		{6128DEEB-D30F-4859-B60F-C36D5452F3E9} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{AB869246-4887-4117-851D-766EB9FF1E29} = {A0073D91-D9D3-4A90-9845-10E5CDBA5511}
+		{17329379-67D5-45D2-8EF0-9C625C43E117} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
+		{C296973C-63D7-4A29-95B1-9FC6F36A83EE} = {45E223F1-F219-4D48-96EC-85E0E0065BE7}
+		{ABE135D1-ACF8-4C25-A5DF-A96F013242C5} = {45E223F1-F219-4D48-96EC-85E0E0065BE7}
 	EndGlobalSection
 EndGlobal

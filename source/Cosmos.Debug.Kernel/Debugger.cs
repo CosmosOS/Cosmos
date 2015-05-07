@@ -22,7 +22,7 @@ namespace Cosmos.Debug.Kernel {
             }
         }
 
-        public unsafe void SendChannelCommand(byte aChannel, byte aCommand, int aByteCount, byte* aData)
+        public static unsafe void SendChannelCommand(byte aChannel, byte aCommand, int aByteCount, byte* aData)
         {
             //
         }

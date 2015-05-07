@@ -50,11 +50,23 @@ namespace Cosmos.System.Plugs.System {
 		}
 
 		public static int get_CursorLeft() {
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return 0;
+      }
             return GetConsole().X;
 		}
 
 		public static void set_CursorLeft(int x) {
-            GetConsole().X = x;
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return;
+      }
+      xConsole.X = x;
 		}
 
 		public static int get_CursorSize() {
@@ -67,10 +79,22 @@ namespace Cosmos.System.Plugs.System {
 		}
 
 		public static int get_CursorTop() {
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return 0;
+      }
             return GetConsole().Y;
 		}
 
 		public static void set_CursorTop(int y) {
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return;
+      }
             GetConsole().Y = y;
 		}
 
@@ -169,6 +193,12 @@ namespace Cosmos.System.Plugs.System {
 		}
 
 		public static int get_WindowHeight() {
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return 25;
+      }
             return GetConsole().Rows;
 		}
 
@@ -195,6 +225,12 @@ namespace Cosmos.System.Plugs.System {
 		}
 
 		public static int get_WindowWidth() {
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return 85;
+      }
             return GetConsole().Cols;
 		}
 
@@ -224,6 +260,12 @@ namespace Cosmos.System.Plugs.System {
 
 		//TODO: Console uses TextWriter - intercept and plug it instead
 		public static void Clear() {
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return;
+      }
             GetConsole().Clear();
 		}
 
@@ -281,6 +323,12 @@ namespace Cosmos.System.Plugs.System {
 		}
 
 		public static String ReadLine() {
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return null;
+      }
 			List<char> chars = new List<char>(32);
 			char current;
 			int currentCount = 0;
@@ -410,6 +458,12 @@ namespace Cosmos.System.Plugs.System {
 		}
 
 		public static void Write(char aChar) {
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return;
+      }
             GetConsole().WriteChar(aChar);
 		}
 
@@ -444,6 +498,12 @@ namespace Cosmos.System.Plugs.System {
 		}
 
 		public static void Write(string aText) {
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return;
+      }
             GetConsole().Write(aText);
 		}
 
@@ -503,20 +563,44 @@ namespace Cosmos.System.Plugs.System {
         #region WriteLine
 
         public static void WriteLine() {
+          var xConsole = GetConsole();
+          if (xConsole == null)
+          {
+            // for now:
+            return;
+          }
             GetConsole().NewLine();
         }
 
 		public static void WriteLine(bool aBool) {
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return;
+      }
 			Write(aBool.ToString());
             GetConsole().NewLine();
 		}
 
 		public static void WriteLine(char aChar) {
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return;
+      }
 			Write(aChar);
             GetConsole().NewLine();
 		}
 
 		public static void WriteLine(char[] aBuffer) {
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return;
+      }
 			Write(aBuffer, 0, aBuffer.Length);
             GetConsole().NewLine();
 		}
@@ -549,24 +633,48 @@ namespace Cosmos.System.Plugs.System {
 		public static void WriteLine(object value) {
 			if (value != null)
 			{
+        var xConsole = GetConsole();
+        if (xConsole == null)
+        {
+          // for now:
+          return;
+        }
 				Write(value.ToString());
-                GetConsole().NewLine();
+        xConsole.NewLine();
 			}
 		}
 
 		public static void WriteLine(string aText) {
-      GetConsole().Write(aText);
-      GetConsole().NewLine();
+		  var xConsole = GetConsole();
+		  if (xConsole == null)
+		  {
+		    // for now:
+		    return;
+		  }
+		  xConsole.Write(aText);
+      xConsole.NewLine();
 		}
 
 		public static void WriteLine(uint aInt) {
-			Write(aInt.ToString());
-      GetConsole().NewLine();
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return;
+      }
+      Write(aInt.ToString());
+      xConsole.NewLine();
 		}
 
 		public static void WriteLine(ulong aLong) {
-			Write(aLong.ToString());
-      GetConsole().NewLine();
+      var xConsole = GetConsole();
+      if (xConsole == null)
+      {
+        // for now:
+        return;
+      }
+      Write(aLong.ToString());
+      xConsole.NewLine();
 		}
 
 		public static void WriteLine(string format, object arg0) {

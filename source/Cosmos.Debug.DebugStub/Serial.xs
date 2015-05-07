@@ -1,13 +1,6 @@
 ﻿namespace DebugStub
 // optionally exclude this serial version
 
-! %ifndef Exclude_IOPort_Based_Serial
-
-
-// mComPortAddresses = 0x3F8, 0x2F8, 0x3E8, 0x2E8;
-// Currently hardcoded to COM1.
-var ComAddr = $03F8
-
 // All information relating to our serial usage should be documented in this comment.
 // http://wiki.osdev.org/Serial_ports
 //
@@ -48,70 +41,62 @@ var ComAddr = $03F8
 // Todo Auto params
 // Todo ebp frame ptr auto etc
 function InitSerial {
-	DX = .ComAddr
-
 	// Disable interrupts
-	BX = DX
-	DX + 1
+  DX = 1
 	AL = 0
-	Port[DX] = AL
+  WriteRegister()
 
 	// Enable DLAB (set baud rate divisor)
-	DX = BX
-	DX + 3
+	DX = 3
 	AL = $80
-	Port[DX] = AL
+	WriteRegister()
 
 	// 0x01, 0x00 - 115200
 	// 0x02, 0x00 - 57600
 	// 0x03, 0x00 - 38400
 	//
 	// Set divisor (lo byte)
-	DX = BX
+	DX = 0
 	AL = $01
-	Port[DX] = AL
+	WriteRegister()
+
 	// hi byte
-	DX = BX
-	DX + 1
+	DX = 1
 	AL = $00
-	Port[DX] = AL
+	WriteRegister()
 
 	// 8N1
-	DX = BX
-	DX + 3
+	DX = 3
 	AL = $03
-	Port[DX] = AL
+	WriteRegister()
 
 	// Enable FIFO, clear them
 	// Set 14-byte threshold for IRQ.
 	// We dont use IRQ, but you cant set it to 0
-	// either. IRQ is enabled/diabled separately
-	DX = BX
-	DX + 2
+	// either. IRQ is enabled/disabled separately
+  DX = 2
 	AL = $C7
-	Port[DX] = AL
+	WriteRegister()
 
 	// 0x20 AFE Automatic Flow control Enable - 16550 (VMWare uses 16550A) is most common and does not support it
 	// 0x02 RTS
 	// 0x01 DTR
 	// Send 0x03 if no AFE
-	DX = BX
-	DX + 4
+	DX = 4
 	AL = $03
-	Port[DX] = AL
+	WriteRegister()
 }
 
 // Modifies: AL, DX
 function ComReadAL {
-	DX = .ComAddr
-	DX + 5
+	DX = 5
 Wait:
-    AL = Port[DX]
+    ReadRegister()
     AL ?& $01
     if 0 goto Wait
 
-	DX = .ComAddr
-    AL = Port[DX]
+	DX = 0
+  ReadRegister()
 }
 
 function ComWrite8 {
@@ -132,24 +117,21 @@ function ComWrite8 {
 
 	// Sucks again to use DX just for this, but x86 only supports
 	// 8 bit address for literals on ports
-	DX = .ComAddr
-	DX + 5
+	DX = 5
 
 	// Wait for serial port to be ready
 	// Bit 5 (0x20) test for Transmit Holding Register to be empty.
 Wait:
-	AL = Port[DX]
-	AL ?& $20
-	if 0 goto Wait
+    ReadRegister()
+	  AL ?& $20
+	  if 0 goto Wait
 
-	// Set address of port
-	DX = $03F8
+  // Set address of port
+	DX = 0
 	// Get byte to send
-	AL = ESI[0]
+  AL = ESI[0]
 	// Send the byte
-	Port[DX] = AL
+	WriteRegister()
 
 	ESI++
 }
-
-! %endif

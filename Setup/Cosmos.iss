@@ -1,5 +1,5 @@
 ; Do NOT change this next line in Dev Kit
-#define ChangeSetVersion "105955"
+#define ChangeSetVersion "20150130"
 
 #ifndef BuildConfiguration   
 ; Currently we dont use "UserKit" but this allows us to test/compile from Inno
@@ -157,9 +157,9 @@ Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversio
 Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\Tools\mkisofs\*"; DestDir: "{app}\Build\Tools\mkisofs"; Flags: ignoreversion uninsremovereadonly overwritereadonly
-Source: ".\source\IL2CPU\bin\Debug\*.exe"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion ignoreversion uninsremovereadonly
-Source: ".\source\IL2CPU\bin\Debug\*.dll"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion ignoreversion uninsremovereadonly
-Source: ".\source\IL2CPU\bin\Debug\*.pdb"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\*.dll"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\*.exe"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\*.pdb"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion ignoreversion uninsremovereadonly
 
 ;
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
@@ -243,8 +243,7 @@ Source: ".\Build\VSIP\Cosmos.zip"; DestDir: "{code:VSNET2013_PATH}\ProjectTempla
 Source: ".\Build\VSIP\CosmosKernel (C#).zip"; DestDir: "{code:GetCSharpExpress2013ProjectTemplatePath}"; DestName: "CosmosKernel (C#).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsCSharpExpress2013Installed('dummy')
 ; Install templates into VB Express
 Source: ".\Build\VSIP\CosmosKernel (VB).zip"; DestDir: "{code:GetVBExpress2013ProjectTemplatePath}"; DestName: "CosmosKernel (VB).zip"; Flags: ignoreversion uninsremovereadonly; Check: IsVBExpress2013Installed('dummy')
-;Compiler
-Source: ".\source\IL2CPU\bin\Debug\*"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly overwritereadonly
+
 [Registry]
 
 ; Regiter .xs Extension

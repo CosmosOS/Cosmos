@@ -1,7 +1,10 @@
 ﻿namespace DebugStub
 
-const VidBase = $B8000
 var .DebugWaitMsg = 'Waiting for debugger connection...'
+
+! %ifndef Exclude_Memory_Based_Console
+
+const VidBase = $B8000
 
 function Cls {
     ESI = #VidBase
@@ -34,3 +37,5 @@ function DisplayWaitMsg {
 		EDI + 2
 	}
 }
+
+! %endif

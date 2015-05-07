@@ -1,9 +1,4 @@
-; Generated at 1-1-2015 12:50:54
-
-DebugStub_ComAddr dd 0x03F8
-
-
-%ifndef Exclude_IOPort_Based_Serial
+; Generated at 7-3-2015 19:22:31
 
 
 
@@ -17,55 +12,47 @@ DebugStub_ComAddr dd 0x03F8
 
 
 DebugStub_InitSerial:
-Mov DX, [DebugStub_ComAddr]
-
-Mov BX, DX
-Add DX, 1
+Mov DX, 1
 Mov AL, 0
-Out DX, AL
+Call DebugStub_WriteRegister
 
-Mov DX, BX
-Add DX, 3
+Mov DX, 3
 Mov AL, 0x80
-Out DX, AL
+Call DebugStub_WriteRegister
 
 
-Mov DX, BX
+Mov DX, 0
 Mov AL, 0x01
-Out DX, AL
-Mov DX, BX
-Add DX, 1
+Call DebugStub_WriteRegister
+
+Mov DX, 1
 Mov AL, 0x00
-Out DX, AL
+Call DebugStub_WriteRegister
 
-Mov DX, BX
-Add DX, 3
+Mov DX, 3
 Mov AL, 0x03
-Out DX, AL
+Call DebugStub_WriteRegister
 
-Mov DX, BX
-Add DX, 2
+Mov DX, 2
 Mov AL, 0xC7
-Out DX, AL
+Call DebugStub_WriteRegister
 
-Mov DX, BX
-Add DX, 4
+Mov DX, 4
 Mov AL, 0x03
-Out DX, AL
+Call DebugStub_WriteRegister
 DebugStub_InitSerial_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_InitSerial_Exit
 Ret
 
 DebugStub_ComReadAL:
-Mov DX, [DebugStub_ComAddr]
-Add DX, 5
+Mov DX, 5
 DebugStub_ComReadAL_Wait:
-In AL, DX
+Call DebugStub_ReadRegister
 Test AL, 0x01
 JZ DebugStub_ComReadAL_Wait
 
-Mov DX, [DebugStub_ComAddr]
-In AL, DX
+Mov DX, 0
+Call DebugStub_ReadRegister
 DebugStub_ComReadAL_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ComReadAL_Exit
 Ret
@@ -75,22 +62,19 @@ DebugStub_ComWrite8:
 
 
 
-Mov DX, [DebugStub_ComAddr]
-Add DX, 5
+Mov DX, 5
 
 DebugStub_ComWrite8_Wait:
-In AL, DX
+Call DebugStub_ReadRegister
 Test AL, 0x20
 JZ DebugStub_ComWrite8_Wait
 
-Mov DX, 0x03F8
+Mov DX, 0
 Mov AL, [ESI + 0]
-Out DX, AL
+Call DebugStub_WriteRegister
 
 Inc ESI
 DebugStub_ComWrite8_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ComWrite8_Exit
 Ret
-
-%endif
 

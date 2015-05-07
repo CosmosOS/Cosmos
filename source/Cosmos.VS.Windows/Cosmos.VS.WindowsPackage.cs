@@ -147,7 +147,7 @@ namespace Cosmos.VS.Windows
 
         private void UpdateWindow(Type aWindowType, string aTag, byte[] aData)
         {
-            System.Windows.Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal,
+            System.Windows.Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.DataBind,
                 (Action)delegate()
                 {
                     var xWindow = FindWindow(aWindowType);

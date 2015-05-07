@@ -6,5 +6,5 @@
              xmlns:windows="clr-namespace:Cosmos.VS.Windows"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
-  <TextBox x:Name="textBox" AcceptsReturn="True" TextWrapping="NoWrap" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
+  <TextBox x:Name="textBox" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
 </windows:DebuggerChannelUC>

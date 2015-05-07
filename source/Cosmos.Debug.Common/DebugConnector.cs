@@ -56,12 +56,20 @@ namespace Cosmos.Debug.Common
             Connected = handler;
         }
 
-        protected void DoDebugMsg(string aMsg)
+        protected virtual void DoDebugMsg(string aMsg)
         {
             mDebugWriter.WriteLine(aMsg);
             mDebugWriter.Flush();
+            mOut.WriteLine(aMsg);
+            mOut.Flush();
             DoDebugMsg(aMsg, true);
         }
+
+        //private static StreamWriter mOut = new StreamWriter(@"c:\data\sources\dcoutput.txt", false)
+        //                            {
+        //                                AutoFlush = true
+        //                            };
+        private static StreamWriter mOut = StreamWriter.Null;
 
         protected void DoDebugMsg(string aMsg, bool aOnlyIfConnected)
         {
@@ -92,6 +100,11 @@ namespace Cosmos.Debug.Common
             SendCmd(aCmd, aData, true);
         }
 
+        protected virtual void BeforeSendCmd()
+        {
+
+        }
+
         protected void SendCmd(byte aCmd, byte[] aData, bool aWait)
         {
             //System.Windows.Forms.MessageBox.Show(xSB.ToString());
@@ -115,9 +128,11 @@ namespace Cosmos.Debug.Common
                     //    xSB.AppendLine(x.ToString("X2"));
                     //}
                     //System.Windows.Forms.MessageBox.Show(xSB.ToString());
-                    DoDebugMsg("DC Send: " + aCmd.ToString());
+                    DoDebugMsg("DC Send: " + aCmd.ToString() + ", data.Length = " + aData.Length + ", aWait = " + aWait);
 
                     DoDebugMsg("Send locked...");
+
+                    BeforeSendCmd();
 
                     if (aCmd == Vs2Ds.Noop)
                     {
@@ -171,24 +186,24 @@ namespace Cosmos.Debug.Common
                                 //So this forces us to only return when we are back in-sync or after we think we've frozen the system for
                                 //too long
                                 //If we haven't gone past the command already!
-                                if ((!resetID && lastCmdCompletedID < mCommandID)
-                                    || (resetID && lastCmdCompletedID > 5))
-                                {
-                                    int attempts = 0;
-                                    do
+                                    if ((!resetID && lastCmdCompletedID < mCommandID)
+                                        || (resetID && lastCmdCompletedID > 5))
                                     {
-                                        mCmdWait.WaitOne(2000 /*60000*/);
-                                    } while ((
-                                                 (!resetID && lastCmdCompletedID < mCommandID) ||
-                                                 (resetID && lastCmdCompletedID > 5)
-                                             )
-                                             &&
-                                             ++attempts < 10);
+                                        int attempts = 0;
+                                        do
+                                        {
+                                            mCmdWait.WaitOne(2000 /*60000*/);
+                                        } while ((
+                                                     (!resetID && lastCmdCompletedID < mCommandID) ||
+                                                     (resetID && lastCmdCompletedID > 5)
+                                                 )
+                                                 &&
+                                                 ++attempts < 10);
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
                 DoDebugMsg("Send unlocked.");
             }
@@ -200,6 +215,22 @@ namespace Cosmos.Debug.Common
 
         protected abstract bool SendRawData(byte[] aBytes);
         protected abstract void Next(int aPacketSize, Action<byte[]> aCompleted);
+
+        protected bool SendRawData(string aData, Encoding aEncoding = null)
+        {
+            if (aEncoding == null)
+            {
+                aEncoding = Encoding.UTF8;
+            }
+
+            if (aData == null)
+            {
+                return true;
+            }
+
+            var xBytes = aEncoding.GetBytes(aData);
+            return SendRawData(xBytes);
+        }
 
         protected byte mCommandID = 0;
         protected byte mCurrCmdID;
@@ -510,15 +541,25 @@ namespace Cosmos.Debug.Common
             {
                 // Sig found, wait for messages
                 mSigReceived = true;
+                SendTextToConsole("SigReceived!");
                 WaitForMessage();
             }
             else
             {
-                CmdChannel(129, 0, aPacket);
+                SendPacketToConsole(aPacket);
                 // Sig not found, keep looking
                 Next(1, WaitForSignature);
-
             }
+        }
+
+        protected void SendPacketToConsole(byte[] aPacket)
+        {
+            CmdChannel(129, 0, aPacket);
+        }
+
+        protected void SendTextToConsole(string aText)
+        {
+            SendPacketToConsole(Encoding.UTF8.GetBytes(aText));
         }
 
         protected void WaitForMessage()
@@ -538,7 +579,9 @@ namespace Cosmos.Debug.Common
 
         protected void PacketOtherChannelSize(byte aChannel, byte aCommand, byte[] aPacket)
         {
-            Next((int)GetUInt32(aPacket, 0), data => PacketChannel(aChannel, aCommand, data));
+            var xPacketSize = (int)GetUInt32(aPacket, 0);
+            xPacketSize &= 0xFFF;
+            Next(xPacketSize, data => PacketChannel(aChannel, aCommand, data));
         }
 
         protected void PacketMessageBoxTextSize(byte[] aPacket)

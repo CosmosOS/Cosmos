@@ -11,12 +11,12 @@ namespace Cosmos.Core {
     // This class must be static, as for creating objects, we needd the hea
     public static class Heap
     {
-        public static bool EnableDebug = true;  
+        public static bool EnableDebug = true;
         //GC variables
 
-        public static bool SkipRalloc = true;      
+        public static bool SkipRalloc = true;
         public static uint LastMallocAddr;
-        
+
 
         private static uint mStartAddress;
         private static uint mEndOfRam;
@@ -67,7 +67,7 @@ namespace Cosmos.Core {
             if (xAddr == 0)
             {
                 xAddr = mStartAddress;
-             
+
                 if (mStartAddress >= mEndOfRam)
                 {
                     HMI.HeapOutOfMemory();
@@ -85,12 +85,12 @@ namespace Cosmos.Core {
                     {
                         LastMallocAddr = xAddr;//Update this when we allocate a new block not extend an old block
                     }
-                    SkipRalloc = false; 
-                   
+                    SkipRalloc = false;
+
                 }
-          
+
             }
-            
+
             return xAddr;
         }
 
@@ -117,19 +117,19 @@ namespace Cosmos.Core
         private static uint mStartAddress;
         private static uint mLength;
         private static uint mEndOfRam;
-        
+
         private static void DoInitialize(uint aStartAddress, uint aEndOfRam)
         {
             mStart = mStartAddress = aStartAddress + (4 - (aStartAddress % 4));
             mLength = aEndOfRam - aStartAddress;
             mLength = (mLength / 4) * 4;
             ClearMemory(aStartAddress, mLength);
-           
+
             mStartAddress += 1024;
             mEndOfRam = aEndOfRam;
             mStartAddress = (mStartAddress / 4) * 4;
             mLength -= 1024;
-            UpdateDebugDisplay();
+            //UpdateDebugDisplay();
         }
 
         private static bool mInitialized = false;
@@ -139,6 +139,7 @@ namespace Cosmos.Core
             {
                 mInitialized = true;
                 DoInitialize(CPU.GetEndOfKernel(), (CPU.GetAmountOfRAM() - 1) * 1024 * 1024);
+                //DoInitialize(4 * 1024 * 1024, 16 * 1024 * 1024);
             }
         }
 
@@ -150,73 +151,73 @@ namespace Cosmos.Core
 
         private static void WriteNumber(uint aNumber, byte aBits)
         {
-            uint xValue = aNumber;
-            byte xCurrentBits = aBits;
-            Console.Write("0x");
-            while (xCurrentBits >= 4)
-            {
-                xCurrentBits -= 4;
-                byte xCurrentDigit = (byte)((xValue >> xCurrentBits) & 0xF);
-                string xDigitString = null;
-                switch (xCurrentDigit)
-                {
-                    case 0:
-                        xDigitString = "0";
-                        goto default;
-                    case 1:
-                        xDigitString = "1";
-                        goto default;
-                    case 2:
-                        xDigitString = "2";
-                        goto default;
-                    case 3:
-                        xDigitString = "3";
-                        goto default;
-                    case 4:
-                        xDigitString = "4";
-                        goto default;
-                    case 5:
-                        xDigitString = "5";
-                        goto default;
-                    case 6:
-                        xDigitString = "6";
-                        goto default;
-                    case 7:
-                        xDigitString = "7";
-                        goto default;
-                    case 8:
-                        xDigitString = "8";
-                        goto default;
-                    case 9:
-                        xDigitString = "9";
-                        goto default;
-                    case 10:
-                        xDigitString = "A";
-                        goto default;
-                    case 11:
-                        xDigitString = "B";
-                        goto default;
-                    case 12:
-                        xDigitString = "C";
-                        goto default;
-                    case 13:
-                        xDigitString = "D";
-                        goto default;
-                    case 14:
-                        xDigitString = "E";
-                        goto default;
-                    case 15:
-                        xDigitString = "F";
-                        goto default;
-                    default:
-                        if (xDigitString == null)
-                        {
-                            System.Diagnostics.Debugger.Break();
-                        }
-                        Console.Write(xDigitString);
-                        break;
-                }
-            }
+            //uint xValue = aNumber;
+            //byte xCurrentBits = aBits;
+            //Console.Write("0x");
+            //while (xCurrentBits >= 4)
+            //{
+            //    xCurrentBits -= 4;
+            //    byte xCurrentDigit = (byte)((xValue >> xCurrentBits) & 0xF);
+            //    string xDigitString = null;
+            //    switch (xCurrentDigit)
+            //    {
+            //        case 0:
+            //            xDigitString = "0";
+            //            goto default;
+            //        case 1:
+            //            xDigitString = "1";
+            //            goto default;
+            //        case 2:
+            //            xDigitString = "2";
+            //            goto default;
+            //        case 3:
+            //            xDigitString = "3";
+            //            goto default;
+            //        case 4:
+            //            xDigitString = "4";
+            //            goto default;
+            //        case 5:
+            //            xDigitString = "5";
+            //            goto default;
+            //        case 6:
+            //            xDigitString = "6";
+            //            goto default;
+            //        case 7:
+            //            xDigitString = "7";
+            //            goto default;
+            //        case 8:
+            //            xDigitString = "8";
+            //            goto default;
+            //        case 9:
+            //            xDigitString = "9";
+            //            goto default;
+            //        case 10:
+            //            xDigitString = "A";
+            //            goto default;
+            //        case 11:
+            //            xDigitString = "B";
+            //            goto default;
+            //        case 12:
+            //            xDigitString = "C";
+            //            goto default;
+            //        case 13:
+            //            xDigitString = "D";
+            //            goto default;
+            //        case 14:
+            //            xDigitString = "E";
+            //            goto default;
+            //        case 15:
+            //            xDigitString = "F";
+            //            goto default;
+            //        default:
+            //            if (xDigitString == null)
+            //            {
+            //                System.Diagnostics.Debugger.Break();
+            //            }
+            //            Console.Write(xDigitString);
+            //            break;
+            //    }
+            //}
         }
 
         //private static bool mDebugDisplayInitialized = false;

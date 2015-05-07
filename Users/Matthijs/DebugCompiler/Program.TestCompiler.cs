@@ -18,7 +18,8 @@ namespace DebugCompiler
 {
     internal class Program
     {
-        public const string CosmosRoot = @"e:\OpenSource\Cosmos";
+        public const string CosmosRoot = @"c:\data\sources\OpenSource\Cosmos";
+
         //public const string CosmosRoot = @"C:\Users\Emile\Source\Repos\Cosmos";
         //public const string CosmosRoot = @"c:\Development\Cosmos";
         //public const string CosmosRoot = @"C:\Users\Huge\Documents\Visual Studio 2010\Projects\IL2CPU";
@@ -27,8 +28,10 @@ namespace DebugCompiler
         //private const string OutputFile = CosmosRoot + @"\Users\Sentinel209\SentinelKernel\bin\Debug\SentinelKernelBoot.asm";
         //private const string KernelFile = CosmosRoot + @"\Users\Matthijs\Playground\bin\Debug\Playground.dll";
         //private const string OutputFile = CosmosRoot + @"\Users\Matthijs\Playground\bin\Debug\PlaygroundBoot.asm";
-        private const string KernelFile = CosmosRoot + @"\Demos\Guess\bin\Debug\GuessKernel.dll";
-        private const string OutputFile = CosmosRoot + @"\Demos\Guess\bin\Debug\GuessKernelBoot.asm";
+        //private const string KernelFile = CosmosRoot + @"\Demos\Guess\bin\Debug\GuessKernel.dll";
+        //private const string OutputFile = CosmosRoot + @"\Demos\Guess\bin\Debug\GuessKernelBoot.asm";
+        private const string KernelFile = @"c:\Data\Sources\OpenSource\Edison\CosmosEdison\Sources\Playgrounds.Matthijs\bin\Debug\Playgrounds.Matthijs.dll";
+        private const string OutputFile = @"c:\Data\Sources\OpenSource\Edison\CosmosEdison\Sources\Playgrounds.Matthijs\bin\Debug\Playgrounds.MatthijsBoot.asm";
         //private const string KernelFile = CosmosRoot + @"\Users\Emile\TestBed\TestBed\bin\Debug\TestBed.dll";
         //private const string OutputFile = CosmosRoot + @"\Users\Emile\TestBed\TestBed\bin\Debug\TestBedBoot.asm";
 

@@ -174,7 +174,7 @@ namespace Cosmos.Assembler {
     }
 
     // Allows to emit footers to the code and datamember sections
-    protected void OnBeforeFlush() {
+    protected virtual void OnBeforeFlush() {
       DataMembers.AddRange(new DataMember[] { new DataMember("_end_data", new byte[0]) });
       new Label("_end_code");
     }
@@ -218,7 +218,7 @@ namespace Cosmos.Assembler {
 
       aOutput.WriteLine("%ifndef ELF_COMPILATION");
       aOutput.WriteLine("use32");
-      aOutput.WriteLine("org 0x200000");
+      aOutput.WriteLine("org 0x1000000");
       aOutput.WriteLine("[map all main.map]");
       aOutput.WriteLine("%endif");
 
@@ -256,7 +256,7 @@ namespace Cosmos.Assembler {
       aOutput.Flush();
     }
 
-    static public void WriteDebugVideo(string aText) {
+    public virtual void WriteDebugVideo(string aText) {
       // This method emits a lot of ASM, but thats what we want becuase
       // at this point we need ASM as simple as possible and completely transparent.
       // No stack changes, no register mods, etc.
@@ -350,6 +350,16 @@ namespace Cosmos.Assembler {
       if (mComPort > 0) {
         SetIdtDescriptor(1, "DebugStub_TracerEntry", false);
         SetIdtDescriptor(3, "DebugStub_TracerEntry", false);
+
+        for (int i = 0; i < 256; i++)
+        {
+          if (i == 1 || i == 3)
+          {
+            continue;
+          }
+
+          SetIdtDescriptor(i, "DebugStub_Interrupt_" + i.ToString(), true);
+        }
       }
       //SetIdtDescriptor(1, "DebugStub_INT0"); - Change to GPF
 
@@ -406,6 +416,11 @@ namespace Cosmos.Assembler {
 
       // This is our first entry point. Multiboot uses this as Cosmos entry point.
       new Label("Kernel_Start", isGlobal: true);
+      new Mov
+      {
+        DestinationReg = Registers.ESP,
+        SourceRef = Cosmos.Assembler.ElementReference.New("Kernel_Stack")
+      };
 
       // Displays "Cosmos" in top left. Used to make sure Cosmos is booted in case of hang.
       // ie bootloader debugging. This must be the FIRST code, even before setup so we know
@@ -420,10 +435,12 @@ namespace Cosmos.Assembler {
       WriteDebugVideo("Clearing interrupts.");
       new ClrInterruptFlag();
 
+
       WriteDebugVideo("Begin multiboot info.");
+      new LiteralAssemblerCode("%ifndef EXCLUDE_MULTIBOOT_MAGIC");
       new Comment(this, "MultiBoot compliant loader provides info in registers: ");
       new Comment(this, "EBX=multiboot_info ");
-      new Comment(this, "EAX=0x2BADB002 - check if it's really Multiboot loader ");
+      new Comment(this, "EAX=0x2BADB002 - check if it's really Multiboot-compliant loader ");
       new Comment(this, "                ;- copy mb info - some stuff for you  ");
       new Comment(this, "BEGIN - Multiboot Info");
       new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = Registers.EBX };
@@ -437,18 +454,13 @@ namespace Cosmos.Assembler {
         SourceIsIndirect = true
       };
       new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
-      new Mov {
-        DestinationReg = Registers.ESP,
-        SourceRef = Cosmos.Assembler.ElementReference.New("Kernel_Stack")
-      };
       new Comment(this, "END - Multiboot Info");
-
+      new LiteralAssemblerCode("%endif EXCLUDE_MULTIBOOT_MAGIC");
       WriteDebugVideo("Creating GDT.");
       CreateGDT();
 
       WriteDebugVideo("Creating IDT.");
       CreateIDT();
-
 #if LFB_1024_8
             new Comment("Set graphics fields");
             new Move { DestinationReg = Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Structure"), SourceIsIndirect = true };
@@ -460,24 +472,24 @@ namespace Cosmos.Assembler {
             new Move { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeMode"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
 #endif
 
-      WriteDebugVideo("Initializing SSE.");
-      new Comment(this, "BEGIN - SSE Init");
-      // CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
-      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-      new Or { DestinationReg = Registers.EAX, SourceValue = 0x100 };
-      new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
-      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-      new Or { DestinationReg = Registers.EAX, SourceValue = 0x200 };
-      new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
-      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
+      //WriteDebugVideo("Initializing SSE.");
+      //new Comment(this, "BEGIN - SSE Init");
+      //// CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
+      //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
+      //new Or { DestinationReg = Registers.EAX, SourceValue = 0x100 };
+      //new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
+      //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
+      //new Or { DestinationReg = Registers.EAX, SourceValue = 0x200 };
+      //new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
+      //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
-      new And { DestinationReg = Registers.EAX, SourceValue = 0xfffffffd };
-      new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
-      new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
+      //new And { DestinationReg = Registers.EAX, SourceValue = 0xfffffffd };
+      //new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
+      //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
-      new And { DestinationReg = Registers.EAX, SourceValue = 1 };
-      new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
-      new Comment(this, "END - SSE Init");
+      //new And { DestinationReg = Registers.EAX, SourceValue = 1 };
+      //new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
+      //new Comment(this, "END - SSE Init");
 
       if (mComPort > 0) {
         WriteDebugVideo("Initializing DebugStub.");
@@ -505,12 +517,18 @@ namespace Cosmos.Assembler {
             new LiteralAssemblerCode(xCode);
           }
         }
+        OnAfterEmitDebugStub();
       } else {
         new Label("DebugStub_Step");
         new Return();
       }
       // Start emitting assembly labels
       Cosmos.Assembler.Assembler.CurrentInstance.EmitAsmLabels = true;
+    }
+
+    protected virtual void OnAfterEmitDebugStub()
+    {
+      //
     }
   }
 }

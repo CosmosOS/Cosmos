@@ -335,7 +335,7 @@ namespace Cosmos.IL2CPU
             {
               if (File.Exists(xRef))
               {
-                var xAssembly = Assembly.LoadFile(xRef);
+                var xAssembly = Assembly.LoadFrom(xRef);
                 foreach (var xType in xAssembly.GetExportedTypes())
                 {
                   if (!xType.IsGenericTypeDefinition

@@ -1,3 +1,5 @@
+; Generated at 7-3-2015 18:37:33
+
 DebugStub_CallerEBP dd 0
 DebugStub_CallerEIP dd 0
 DebugStub_CallerESP dd 0
@@ -74,6 +76,7 @@ Mov dword [DebugStub_MaxBPId], 0
 DebugStub_BreakOnAddress_Continue:
 DebugStub_BreakOnAddress_Exit:
 Popad
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_BreakOnAddress_Exit
 Ret
 
 DebugStub_SetINT3:
@@ -86,6 +89,7 @@ Mov [EDI + 0], AL
 
 DebugStub_SetINT3_Exit:
 Popad
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SetINT3_Exit
 Ret
 DebugStub_ClearINT3:
 Pushad
@@ -97,6 +101,7 @@ Mov [EDI + 0], AL
 
 DebugStub_ClearINT3_Exit:
 Popad
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ClearINT3_Exit
 Ret
 
 DebugStub_Executing:
@@ -173,15 +178,15 @@ Call DebugStub_SendTrace
 DebugStub_Executing_Block10_End:
 
 DebugStub_Executing_CheckForCmd:
-Mov DX, [DebugStub_ComAddr]
-Add DX, 5
-In AL, DX
+Mov DX, 5
+Call DebugStub_ReadRegister
 Test AL, 1
 JZ DebugStub_Executing_Block11_End
 Call DebugStub_ProcessCommand
 Jmp DebugStub_Executing_CheckForCmd
 DebugStub_Executing_Block11_End:
 DebugStub_Executing_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_Executing_Exit
 Ret
 
 DebugStub_Break:
@@ -240,6 +245,7 @@ DebugStub_Break_Done:
 Call DebugStub_AckCommand
 Mov dword [DebugStub_DebugStatus], DebugStub_Const_Status_Run
 DebugStub_Break_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_Break_Exit
 Ret
 
 

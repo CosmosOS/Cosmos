@@ -94,8 +94,8 @@ namespace Cosmos.Build.MSBuild
 			xProcessStartInfo.RedirectStandardError = true;
       xProcessStartInfo.CreateNoWindow = true;
 
-      //Log.LogWarning("Running '{0}' with arguments: '{1}'", filename, arguments);
-      //Log.LogWarning("Working directory = '{0}'", workingDir);
+			Log.LogCommandLine(string.Format("Executing command line \"{0}\" {1}", filename, arguments));
+			Log.LogCommandLine(string.Format("Working directory = '{0}'", workingDir));
 
 			using (var xProcess = new Process())
 			{
@@ -130,34 +130,27 @@ namespace Cosmos.Build.MSBuild
 					  Log.LogError("Error occurred while invoking {0}.", name);
 					}
 				}
-        foreach (var xError in mErrors)
-        {
-          Log.LogError(xError);
-        }
-        foreach (var xOutput in mOutput)
-        {
-          Log.LogMessage(xOutput);
-        }
 
-        //while (!xProcess.StandardOutput.EndOfStream)
-        //{
-        //  var xLine = xProcess.StandardOutput.ReadLine();
-        //  if (xLine != null)
-        //  {
-        //    Log.LogMessage(xLine);
-        //  }
-        //}
+        LogInfo logContent;
+			  for (int xIndex = 0; xIndex < mErrors.Count; xIndex++)
+			  {
+			    var xError = mErrors[xIndex];
+			    if (ExtendLineError(xProcess.ExitCode, xError, out logContent))
+			    {
+			      Logs(logContent);
+			    }
+			  }
 
-        //while (!xProcess.StandardError.EndOfStream)
-        //{
-        //  var xLine = xProcess.StandardError.ReadLine();
-        //  if (xLine != null)
-        //  {
-        //    Log.LogError(xLine);
-        //  }
-        //}
+			  for (int xIndex = 0; xIndex < mOutput.Count; xIndex++)
+			  {
+			    var xOutput = mOutput[xIndex];
+			    if (ExtendLineOutput(xProcess.ExitCode, xOutput, out logContent))
+			    {
+			      Logs(logContent);
+			    }
+			  }
 
-				return xProcess.ExitCode == 0;
+			  return xProcess.ExitCode == 0;
 			}
 		}
 
@@ -174,7 +167,7 @@ namespace Cosmos.Build.MSBuild
 	    return true;
 	  }
 
-	  public virtual bool ExtendLineOutput(int exitCode, ref string errorMessage, out LogInfo log)
+	  public virtual bool ExtendLineOutput(int exitCode, string errorMessage, out LogInfo log)
 	  {
 	    log = new LogInfo();
 	    log.logType = WriteType.Info;

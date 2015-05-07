@@ -150,12 +150,16 @@ namespace Cosmos.Build.MSBuild {
         {
           Arguments += "\"References:" + Ref + "\" ";
         }
+        Log.LogMessage(MessageImportance.High,
+            string.Format("Invoking il2cpu.exe {0}",
+                Arguments));
         return base.ExecuteTool(WorkingDir,
                   Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe"),
                   Arguments,
                   "IL2CPU");
       } finally {
         xSW.Stop();
+
         Log.LogMessage(MessageImportance.High,
          string.Format("IL2CPU invoked with DebugMode='{0}', DebugEnabled='{1}', TraceAssemblies='{2}', IgnoreDebugStub='{3}'",
            DebugMode, DebugEnabled, TraceAssemblies ?? "{NULL}", IgnoreDebugStubAttribute
@@ -164,5 +168,13 @@ namespace Cosmos.Build.MSBuild {
         Log.LogMessage(MessageImportance.High, "IL2CPU task took {0}", xSW.Elapsed);
       }
     }
+
+		public override bool ExtendLineError(int exitCode, string errorMessage, out LogInfo log)
+		{
+			log = new LogInfo();
+			log.logType = WriteType.Error;
+			log.message = errorMessage;
+			return true;
+		}
   }
 }

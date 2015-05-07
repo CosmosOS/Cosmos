@@ -73,17 +73,17 @@ namespace IL2CPU
           Console.WriteLine("Message: {0}", m);
         };
         xTask.OnLogException = (m) => Console.Error.WriteLine("Exception: {0}", m.ToString());
-
+        xTask.AssemblerLog = "Cosmos.Assembler.log";
         if (xTask.Execute())
         {
           Console.WriteLine("Executed OK");
-          File.WriteAllText(@"e:\compiler.log", "OK");
+//          File.WriteAllText(@"e:\compiler.log", "OK");
           return 0;
         }
         else
         {
           Console.WriteLine("Errorred");
-          File.WriteAllText(@"e:\compiler.log", "Errored");
+//          File.WriteAllText(@"e:\compiler.log", "Errored");
           return 2;
         }
       }
@@ -92,7 +92,7 @@ namespace IL2CPU
        // Console.Out.Flush();
       // File.WriteAllText("./ErrorDump.txt",E.ToString()  + " " + E.Source);
         Console.WriteLine("Error occurred: " + E.ToString());
-        File.WriteAllText(@"e:\compiler.log", "Exception: " + E.ToString());
+//        File.WriteAllText(@"e:\compiler.log", "Exception: " + E.ToString());
         return 1;
       }
     }

@@ -131,6 +131,12 @@ namespace Cosmos.IL2CPU
                 mItems.Add(aItem);
                 mItemsList.Add(aItem);
 
+                MethodBase methodBaseSource = aSrc as MethodBase;
+                if (methodBaseSource != null)
+                {
+                    aSrc = methodBaseSource.DeclaringType.ToString() + "::" + aSrc.ToString();
+                }
+
                 mQueue.Enqueue(new ScannerQueueItem() { Item = aItem, QueueReason = aSrcType, SourceItem = aSrc + Environment.NewLine + sourceItem });
             }
         }
@@ -296,13 +302,15 @@ namespace Cosmos.IL2CPU
                     mLogWriter.WriteLine("<html><body>");
                     foreach (var xList in mLogMap)
                     {
-                        mLogWriter.WriteLine("<hr>");
+                        var xLogItemText = LogItemText(xList.Key);
+
+                         mLogWriter.WriteLine("<hr>");
 
                         // Emit bookmarks above source, so when clicking links user doesn't need
                         // to constantly scroll up.
                         foreach (var xItem in xList.Value)
                         {
-                            mLogWriter.WriteLine("<a name=\"Item" + xBookmarks[xItem.Item].ToString() + "\"></a>");
+                            mLogWriter.WriteLine("<a name=\"Item" + xBookmarks[xItem.Item].ToString() + "_S\"></a>");
                         }
 
                         int xHref;
@@ -313,7 +321,8 @@ namespace Cosmos.IL2CPU
                         mLogWriter.Write("<p>");
                         if (xHref >= 0)
                         {
-                            mLogWriter.WriteLine("<a href=\"#Item" + xHref.ToString() + "\">");
+                            mLogWriter.WriteLine("<a href=\"#Item" + xHref.ToString() + "_S\">");
+                            mLogWriter.WriteLine("<a name=\"Item{0}\">", xHref);
                         }
                         if (xList.Key == null)
                         {
@@ -321,21 +330,22 @@ namespace Cosmos.IL2CPU
                         }
                         else
                         {
-                            mLogWriter.WriteLine(LogItemText(xList.Key));
+                            mLogWriter.WriteLine(xLogItemText);
                         }
                         if (xHref >= 0)
                         {
                             mLogWriter.Write("</a>");
+                            mLogWriter.Write("</a>");
                         }
-                        mLogWriter.WriteLine("</a></p>");
+                        mLogWriter.WriteLine("</p>");
 
                         mLogWriter.WriteLine("<ul>");
                         foreach (var xItem in xList.Value)
                         {
-                            mLogWriter.Write("<li>" + LogItemText(xItem.Item) + "</li>");
+                            mLogWriter.Write("<li><a href=\"#Item{1}\">{0}</a></li>", LogItemText(xItem.Item), xBookmarks[xItem.Item]);
 
                             mLogWriter.WriteLine("<ul>");
-                            mLogWriter.WriteLine("<li>" + xItem.SrcType + "</<li>");
+                            mLogWriter.WriteLine("<li>" + xItem.SrcType + "</li>");
                             mLogWriter.WriteLine("</ul>");
                         }
                         mLogWriter.WriteLine("</ul>");
@@ -377,11 +387,13 @@ namespace Cosmos.IL2CPU
             var xParamTypes = new Type[xParams.Length];
             // Dont use foreach, enum generaly keeps order but
             // isn't guaranteed.
-            string xMethodFullName = LabelName.GenerateFullName(aMethod);
+            //string xMethodFullName = LabelName.GenerateFullName(aMethod);
+
+
             for (int i = 0; i < xParams.Length; i++)
             {
                 xParamTypes[i] = xParams[i].ParameterType;
-                Queue(xParamTypes[i], xMethodFullName, "Parameter");
+                Queue(xParamTypes[i], aMethod, "Parameter");
             }
             var xIsDynamicMethod = aMethod.DeclaringType == null;
             // Queue Types directly related to method
@@ -391,12 +403,12 @@ namespace Cosmos.IL2CPU
                 if (!xIsDynamicMethod)
                 {
                     // dont queue declaring types of dynamic methods either, those dont have a declaring type
-                    Queue(aMethod.DeclaringType, xMethodFullName, "Declaring Type");
+                    Queue(aMethod.DeclaringType, aMethod, "Declaring Type");
                 }
             }
             if (aMethod is SysReflection.MethodInfo)
             {
-                Queue(((SysReflection.MethodInfo)aMethod).ReturnType, xMethodFullName, "Return Type");
+                Queue(((SysReflection.MethodInfo)aMethod).ReturnType, aMethod, "Return Type");
             }
 
             // Scan virtuals
@@ -453,7 +465,7 @@ namespace Cosmos.IL2CPU
                 // care of new additions.
                 if (xVirtMethod != null)
                 {
-                    Queue(xVirtMethod, xMethodFullName, "Virtual Base");
+                    Queue(xVirtMethod, aMethod, "Virtual Base");
                     mVirtuals.Add(xVirtMethod);
 
                     // List changes as we go, cant be foreach
@@ -471,7 +483,7 @@ namespace Cosmos.IL2CPU
                                     // "replace" a virtual above it?
                                     if (xNewMethod.IsVirtual)
                                     {
-                                        Queue(xNewMethod, xMethodFullName, "Virtual Downscan");
+                                        Queue(xNewMethod, aMethod, "Virtual Downscan");
                                     }
                                 }
                             }
@@ -538,22 +550,22 @@ namespace Cosmos.IL2CPU
                     {
                         if (xOpCode is ILOpCodes.OpMethod)
                         {
-                            Queue(((ILOpCodes.OpMethod)xOpCode).Value, xMethodFullName, "Call", sourceItem);
+                            Queue(((ILOpCodes.OpMethod)xOpCode).Value, aMethod, "Call", sourceItem);
                         }
                         else if (xOpCode is ILOpCodes.OpType)
                         {
-                            Queue(((ILOpCodes.OpType)xOpCode).Value, xMethodFullName, "OpCode Value");
+                            Queue(((ILOpCodes.OpType)xOpCode).Value, aMethod, "OpCode Value");
                         }
                         else if (xOpCode is ILOpCodes.OpField)
                         {
                             var xOpField = (ILOpCodes.OpField)xOpCode;
                             //TODO: Need to do this? Will we get a ILOpCodes.OpType as well?
-                            Queue(xOpField.Value.DeclaringType, xMethodFullName, "OpCode Value");
+                            Queue(xOpField.Value.DeclaringType, aMethod, "OpCode Value");
                             if (xOpField.Value.IsStatic)
                             {
                                 //TODO: Why do we add static fields, but not instance?
                                 // AW: instance fields are "added" always, as part of a type, but for static fields, we need to emit a datamember
-                                Queue(xOpField.Value, xMethodFullName, "OpCode Value");
+                                Queue(xOpField.Value, aMethod, "OpCode Value");
                             }
                         }
                         else if (xOpCode is ILOpCodes.OpToken)
@@ -561,16 +573,16 @@ namespace Cosmos.IL2CPU
                             var xTokenOp = (ILOpCodes.OpToken)xOpCode;
                             if (xTokenOp.ValueIsType)
                             {
-                                Queue(xTokenOp.ValueType, xMethodFullName, "OpCode Value");
+                                Queue(xTokenOp.ValueType, aMethod, "OpCode Value");
                             }
                             if (xTokenOp.ValueIsField)
                             {
-                                Queue(xTokenOp.ValueField.DeclaringType, xMethodFullName, "OpCode Value");
+                                Queue(xTokenOp.ValueField.DeclaringType, aMethod, "OpCode Value");
                                 if (xTokenOp.ValueField.IsStatic)
                                 {
                                     //TODO: Why do we add static fields, but not instance?
                                     // AW: instance fields are "added" always, as part of a type, but for static fields, we need to emit a datamember
-                                    Queue(xTokenOp.ValueField, xMethodFullName, "OpCode Value");
+                                    Queue(xTokenOp.ValueField, aMethod, "OpCode Value");
                                 }
                             }
                         }

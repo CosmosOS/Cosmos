@@ -125,7 +125,11 @@ namespace Cosmos.Debug.Common
             }
             else
             {
-                xIncoming.Completed = aCompleted;
+                xIncoming.Completed = bytes =>
+                                      {
+                                          DoDebugMsg(String.Format("DC - Received: 0x{0}", BytesToString(bytes, 0, bytes.Length)));
+                                          aCompleted(bytes);
+                                      };
             }
             if (aPacketSize > (1024 * 1024))
             {
@@ -135,6 +139,7 @@ namespace Cosmos.Debug.Common
             xIncoming.Stream = mStream;
 
             System.Diagnostics.Debug.WriteLine(String.Format("DC - Next: Expecting: {0}", aPacketSize));
+            DoDebugMsg(String.Format("DC - Next: Expecting: {0}", aPacketSize) + "\r\n");
 
             Read(xIncoming);
 

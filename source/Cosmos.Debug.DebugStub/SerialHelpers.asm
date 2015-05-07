@@ -1,4 +1,4 @@
-; Generated at 1-1-2015 12:56:21
+; Generated at 7-3-2015 18:33:43
 
 
 
@@ -40,10 +40,12 @@ mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ComRead3
 Ret
 
 DebugStub_ComWriteAL:
+Push ESI
 Push EAX
 Mov ESI, ESP
 Call DebugStub_ComWrite8
 Pop EAX
+Pop ESI
 DebugStub_ComWriteAL_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ComWriteAL_Exit
 Ret

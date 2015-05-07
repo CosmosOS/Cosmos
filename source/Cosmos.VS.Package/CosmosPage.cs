@@ -5,6 +5,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Drawing;
 using System.Data;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
@@ -192,6 +193,7 @@ namespace Cosmos.VS.Package {
       cmboVisualStudioDebugPort.SelectedIndex = cmboVisualStudioDebugPort.Items.IndexOf(mProps.VisualStudioDebugPort);
       textOutputPath.Text = mProps.OutputPath;
       comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);
+      comboBinFormat.SelectedItem = EnumValue.Find(comboBinFormat.Items, mProps.BinFormat);
       checkUseInternalAssembler.Checked = mProps.UseInternalAssembler;
       checkEnableGDB.Checked = mProps.EnableGDB;
       checkStartCosmosGDB.Checked = mProps.StartCosmosGDB;
@@ -321,6 +323,15 @@ namespace Cosmos.VS.Package {
           mProps.Framework = value;
           IsDirty = true;
         }
+      };
+      comboBinFormat.SelectedIndexChanged += delegate(Object sender, EventArgs e)
+      {
+          var value = (BinFormat)((EnumValue)comboBinFormat.SelectedItem).Value;
+          if (value != mProps.BinFormat)
+          {
+              mProps.BinFormat = value;
+              IsDirty = true;
+          }
       };
 
       textOutputPath.TextChanged += delegate(Object sender, EventArgs e) {
@@ -519,14 +530,34 @@ namespace Cosmos.VS.Package {
       get { return mProps; }
     }
 
+      /// <summary>
+      /// Load project independent properties.
+      /// </summary>
+      protected void LoadProjectProps()
+      {
+          foreach (var propertyName in mProps.ProjectIndependentProperties)
+          {
+              var propertyValue = ProjectMgr.GetProjectProperty(propertyName);
+              mProps.SetProperty(propertyName, propertyValue);
+          }
+      }
+
+    /// <summary>
+    /// Load properties for the given profile.
+    /// </summary>
+    /// <param name="aPrefix">Name of the profile for which load properties.</param>
     protected void LoadProfileProps(string aPrefix) {
       string xPrefix = aPrefix + (aPrefix == "" ? "" : "_");
       foreach (var xName in BuildProperties.PropNames) {
-        string xValue = ProjectConfigs[0].GetConfigurationProperty(xPrefix + xName, false);
-        // This is important that we dont copy empty values, so instead the defaults will be used.
-        if (!string.IsNullOrWhiteSpace(xValue)) {
-          mProps.SetProperty(xPrefix + xName, xValue);
-        }
+          if (!mProps.ProjectIndependentProperties.Contains(xName))
+          {
+              string xValue = ProjectConfigs[0].GetConfigurationProperty(xPrefix + xName, false);
+              // This is important that we dont copy empty values, so instead the defaults will be used.
+              if (!string.IsNullOrWhiteSpace(xValue))
+              {
+                  mProps.SetProperty(xPrefix + xName, xValue);
+              }
+          }
       }
     }
 
@@ -538,6 +569,8 @@ namespace Cosmos.VS.Package {
       // Reset cache only on first one
       // Get selected profile
       mProps.SetProperty(BuildProperties.ProfileString, ProjectConfigs[0].GetConfigurationProperty(BuildProperties.ProfileString, true));
+
+      LoadProjectProps();
 
       // Load selected profile props
       LoadProfileProps("");
@@ -566,6 +599,7 @@ namespace Cosmos.VS.Package {
 
       lboxDeployment.Items.AddRange(EnumValue.GetEnumValues(typeof(DeploymentType), true));
       comboFramework.Items.AddRange(EnumValue.GetEnumValues(typeof(Framework), true));
+      comboBinFormat.Items.AddRange(EnumValue.GetEnumValues(typeof(BinFormat), true));
       lboxLaunch.Items.AddRange(EnumValue.GetEnumValues(typeof(LaunchType), true));
 
       #region VMware

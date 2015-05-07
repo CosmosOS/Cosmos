@@ -50,9 +50,14 @@ namespace Cosmos.IL2CPU
 
         public AppAssembler(int aComPort, string assemblerLogFile)
         {
-            Assembler = new Cosmos.Assembler.Assembler(aComPort);
+            Assembler = CreateAssembler(aComPort);
             mLog = new StreamWriter(assemblerLogFile, false);
             InitILOps();
+        }
+
+        protected virtual Assembler.Assembler CreateAssembler(int aComPort)
+        {
+            return new Cosmos.Assembler.Assembler(aComPort);
         }
 
         public void Dispose()
@@ -118,6 +123,7 @@ namespace Cosmos.IL2CPU
                 xMethodLabel = LabelName.Get(aMethod.MethodBase);
             }
             new Cosmos.Assembler.Label(xMethodLabel);
+            //Assembler.WriteDebugVideo("Method " + aMethod.UID);
 
             // We could use same GUID as MethodLabelStart, but its better to keep GUIDs unique globaly for items
             // so during debugging they can never be confused as to what they point to.
@@ -455,7 +461,7 @@ namespace Cosmos.IL2CPU
             }
 
             MethodBegin(aMethod);
-            mLog.WriteLine("Method '{0}'", aMethod.MethodBase.GetFullName());
+            mLog.WriteLine("Method '{0}', ID = '{1}'", aMethod.MethodBase.GetFullName(), aMethod.UID);
             mLog.Flush();
             if (aMethod.MethodAssembler != null)
             {
@@ -516,6 +522,7 @@ namespace Cosmos.IL2CPU
         private void AfterEmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
         {
             // do optimizations
+
             //if (Assembler.Stack.Count > 0)
             //{
             //    if (mDebugStackErrors)
@@ -960,10 +967,6 @@ namespace Cosmos.IL2CPU
 
                     }
                 }
-                if (!xType.IsInterface)
-                {
-                    Push(aGetTypeID(xType));
-                }
                 int? xBaseIndex = null;
                 if (xType.BaseType == null)
                 {
@@ -995,6 +998,10 @@ namespace Cosmos.IL2CPU
                 }
                 if (!xType.IsInterface)
                 {
+                    if (!xType.IsInterface)
+                    {
+                        Push(aGetTypeID(xType));
+                    }
                     Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(
                         new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { (int)aGetTypeID(xType) }));
@@ -1319,12 +1326,12 @@ namespace Cosmos.IL2CPU
                 }
                 if (xMemberId % 100 == 0)
                 {
-                    Cosmos.Assembler.Assembler.WriteDebugVideo(".");
+                    Assembler.WriteDebugVideo(".");
                 }
                 xMemberId ++;
                 new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = Registers.EAX };
             }
-            Cosmos.Assembler.Assembler.WriteDebugVideo("Done");
+            Assembler.WriteDebugVideo("Done");
             new Pop { DestinationReg = Registers.EBP };
             new Return();
 
@@ -1332,13 +1339,13 @@ namespace Cosmos.IL2CPU
             new Push { DestinationReg = Registers.EBP };
             new Mov { DestinationReg = Registers.EBP, SourceReg = Registers.ESP };
             new Call { DestinationLabel = InitVMTCodeLabel };
-            Cosmos.Assembler.Assembler.WriteDebugVideo("Initializing string IDs.");
+            Assembler.WriteDebugVideo("Initializing string IDs.");
             new Call { DestinationLabel = InitStringIDsLabel };
-            Cosmos.Assembler.Assembler.WriteDebugVideo("Done initializing string IDs");
+            Assembler.WriteDebugVideo("Done initializing string IDs");
             // we now need to do "newobj" on the entry point, and after that, call .Start on it
             var xCurLabel = Cosmos.Assembler.Assembler.EntryPointName + ".CreateEntrypoint";
             new Cosmos.Assembler.Label(xCurLabel);
-            Cosmos.Assembler.Assembler.WriteDebugVideo("Now create kernel class");
+            Assembler.WriteDebugVideo("Now create kernel class");
             X86.IL.Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
             xCurLabel = Cosmos.Assembler.Assembler.EntryPointName + ".CallStart";
             new Cosmos.Assembler.Label(xCurLabel);
@@ -1362,6 +1369,19 @@ namespace Cosmos.IL2CPU
             string xLabel = TmpPosLabel(aMethod, aOpCode);
             Assembler.CurrentIlLabel = xLabel;
             new Cosmos.Assembler.Label(xLabel);
+            if (aMethod.MethodBase.DeclaringType != typeof(VTablesImpl))
+            {
+                Assembler.EmitAsmLabels = false;
+                try
+                {
+                    //Assembler.WriteDebugVideo(String.Format("Method {0}:{1}.", aMethod.UID, aOpCode.Position.ToString("X")));
+                    //Assembler.WriteDebugVideo(xLabel);
+                }
+                finally
+                {
+                    Assembler.EmitAsmLabels = true;
+                }
+            }
 
             uint? xStackDifference = null;
 
@@ -1437,6 +1457,11 @@ namespace Cosmos.IL2CPU
                 new Halt();
                 new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
 
+            }
+
+            if (xLabel == "SystemUInt32CosmosCorePlugsGCImplementionImplAllocNewObjectSystemUInt32.IL_0001")
+            {
+                //
             }
         }
 
