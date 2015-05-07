@@ -22,8 +22,10 @@ Currently only the structure exists, no checking occurs but in the future will
 occur via attributes and other methods. Future checks to include:
 
   1. Restriction of core level exclusive abilities at the assembly level by attribute.
-  2. Restriction of references list to higher levels only. ie HAL can reference Core but not vice versa. Also via attribute. That is an assembly level attribute to mark which level an assembly is.
-  3. Restrict access to BCL and other assemblies. ie Core should never need XML or other higher level services. Make a defined list of what is allowed and verify against it.
+  2. Restriction of references list to higher levels only. ie HAL can reference Core
+but not vice versa. Also via attribute. That is an assembly level attribute to mark which level an assembly is.
+  3. Restrict access to BCL and other assemblies. ie Core should never need XML
+ or other higher level services. Make a defined list of what is allowed and verify against it.
 
 For now we must be vigilant to watch these restrictions manually.
 
@@ -33,7 +35,19 @@ Many operating systems refer to their security "areas" as rings. ie Kernel
 ring, etc. Rings are harder to draw in text and make diagramming a bit harder,
 so for now we will refer to our "areas" as levels.
 
-Please note if you would like to run some code on a ring you must create an new project with the attribute below to specify on what ring this code is(add the attribute in AssemblyInfo.cs), fither more you want to refrince this project in your boot project.
+Cosmos is split into the following levels:
+
+  * 0 Core
+  * 1 Hardware
+  * 2 System
+  * 3 User
+
+Each level can only communicate with adjacent levels. That is User can only
+talk to System, but not Core.
+
+To make an assembly part of a specific level, you'll have to mark it with the
+attribute below to specify on what ring this code is (add the attribute in
+AssemblyInfo.cs).
 
 ``` [assembly: Ring(Ring.User)] ```
 
@@ -46,19 +60,9 @@ public enum Ring
     HAL = 1,
     System = 2,
     User = 3,
-    
+
 }
 ```
-
-Cosmos is split into the following levels:
-
-  * 0 Core
-  * 1 Hardware
-  * 2 System
-  * 3 User
-
-Each level can only communicate with adjacent levels. That is User can only
-talk to System, but not Core.
 
 ### 0 Core Level
 
