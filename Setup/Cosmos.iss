@@ -272,7 +272,7 @@ Root: HKLM; SubKey: {#VsRegRoot}\Projects\{{471ec4bb-e47e-4229-a789-d1f5f83b52d4
 ; Debug engine
 Root: HKLM; SubKey: {#VsRegRoot}\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; SubKey: {#VsRegRoot}\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: ; ValueData: guidCosmosDebugEngine
-Root: HKLM; SubKey: {#VsRegRoot}\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: CLSID; ValueData: {{8355452D-6D2F-41B0-89B8-BB2AA2529E94}
+Root: HKLM; SubKey: {#VsRegRoot}\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: CLSID; ValueData: {{DC8503AB-7EE6-456C-A209-66C690D9F6F4}
 Root: HKLM; SubKey: {#VsRegRoot}\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: ProgramProvider; ValueData: {{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}
 Root: HKLM; SubKey: {#VsRegRoot}\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}; ValueType: string; ValueName: Name; ValueData: Cosmos Debug Engine
 Root: HKLM; SubKey: {#VsRegRoot}\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}\AutoSelectIncompatibleList; ValueType: string; ValueName: guidCOMPlusNativeEng; ValueData: {{92EF0900-2251-11D2-B72E-0000F87572EF}
