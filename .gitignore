@@ -1,5 +1,5 @@
 # User-specific files
-
+.vs/
 *.suo 
 *.user 
 *.userosscache 
@@ -42,5 +42,5 @@ Build/VMWare/Workstation/Cosmos.vmxf
 
 Setup/Current.iss
 Cosmos.Assembler.Log
-UpgradeLog.htm
+UpgradeLog*.htm
 .sync/

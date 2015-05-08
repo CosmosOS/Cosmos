@@ -25,6 +25,32 @@ namespace Cosmos.Build.Builder {
       mInnoFile = Path.Combine(mCosmosDir, @"Setup\Cosmos.iss");
     }
 
+    /// <summary>
+    /// Get name of the setup file based on release number and the current setting.
+    /// </summary>
+    /// <param name="releaseNumber">Release number for the current setup.</param>
+    /// <returns>Name of the setup file.</returns>
+    public static string GetSetupName(int releaseNumber)
+    {
+        var setupName = "CosmosUserKit-" + releaseNumber;
+        switch (App.VsVersion)
+        {
+            case VsVersion.Vs2013:
+                setupName += "-vs2013";
+                break;
+            case VsVersion.Vs2015:
+                setupName += "-vs2015";
+                break;
+        }
+
+        if (App.UseVsHive)
+        {
+            setupName += "Exp";
+        }
+
+        return setupName;
+    }
+
     void CleanupVSIPFolder() {
       if (Directory.Exists(mOutputDir)) {
         Section("Cleaning up VSIP Folder");
@@ -233,13 +259,21 @@ namespace Cosmos.Build.Builder {
       CheckIfUserKitRunning();
       CheckIsVsRunning();
       CheckIfBuilderRunning();
-
-      CheckVs2013();
+      
+      switch (App.VsVersion) {
+        case VsVersion.Vs2013:
+          CheckVs2013();
+          CheckForInstall("Microsoft Visual Studio 2013 SDK", true);
+          break;
+        case VsVersion.Vs2015:
+          CheckVs2015();
+          CheckForInstall("Microsoft Visual Studio 2015 RC SDK", true);
+          break;
+      }
 
       //works also without, only close of VMWare is not working! CheckNet35Sp1(); // Required by VMWareLib
       CheckNet403();
       CheckForInno();
-      CheckForInstall("Microsoft Visual Studio 2013 SDK", true);
       bool vmWareInstalled = true;
       bool bochsInstalled = IsBochsInstalled();
       if (!CheckForInstall("VMware Workstation", false)) {
@@ -318,6 +352,19 @@ namespace Cosmos.Build.Builder {
         string xDir = (string)xKey.GetValue("InstallDir");
         if (String.IsNullOrWhiteSpace(xDir)) {
           throw new Exception("Visual Studio 2013 not detected!");
+        }
+      }
+    }
+
+    void CheckVs2015() {
+      Echo("Checking for Visual Studio 2015 RC");
+      string key = @"SOFTWARE\Microsoft\VisualStudio\14.0";
+      if (Environment.Is64BitOperatingSystem)
+        key = @"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0";
+      using (var xKey = Registry.LocalMachine.OpenSubKey(key)) {
+        string xDir = (string)xKey.GetValue("InstallDir");
+        if (String.IsNullOrWhiteSpace(xDir)) {
+          throw new Exception("Visual Studio 2015 RC not detected!");
         }
       }
     }
@@ -407,7 +454,20 @@ namespace Cosmos.Build.Builder {
         throw new Exception("Cannot find Inno setup.");
       }
       string xCfg = App.IsUserKit ? "UserKit" : "DevKit";
-      StartConsole(xISCC, @"/Q " + Quoted(mInnoFile) + " /dBuildConfiguration=" + xCfg);
+      string vsVersionConfiguration = "vs2013";
+      switch (App.VsVersion) {
+         case VsVersion.Vs2013:
+           vsVersionConfiguration = "vs2013";
+           break;
+         case VsVersion.Vs2015:
+           vsVersionConfiguration = "vs2015";
+           break;
+      }
+      // Use configuration which will instal to the VS Exp Hive
+      if (App.UseVsHive) {
+           vsVersionConfiguration += "Exp";
+      }
+      StartConsole(xISCC, @"/Q " + Quoted(mInnoFile) + " /dBuildConfiguration=" + xCfg + " /dVsVersion=" + vsVersionConfiguration);
 
       if (App.IsUserKit) {
         File.Delete(mInnoFile);
@@ -433,30 +493,32 @@ namespace Cosmos.Build.Builder {
     }
 
     void RunSetup() {
-      Section("Running Setup");
+        Section("Running Setup");
 
-      if (App.UseTask) {
-        // This is a hack to avoid the UAC dialog on every run which can be very disturbing if you run
-        // the dev kit a lot.
-        Start(@"schtasks.exe", @"/run /tn " + Quoted("CosmosSetup"), true, false);
+        string setupName = GetSetupName(mReleaseNo);
 
-        // Must check for start before stop, else on slow machines we exit quickly because Exit is found before
-        // it starts.
-        // Some slow user PCs take around 5 seconds to start up the task...
-        int xSeconds = 10;
-        var xTimed = DateTime.Now;
-        Echo("Waiting " + xSeconds + " seconds for Setup to start.");
-        if (WaitForStart("CosmosUserKit-" + mReleaseNo, xSeconds * 1000)) {
-          throw new Exception("Setup did not start.");
+        if (App.UseTask) {
+            // This is a hack to avoid the UAC dialog on every run which can be very disturbing if you run
+            // the dev kit a lot.
+            Start(@"schtasks.exe", @"/run /tn " + Quoted("CosmosSetup"), true, false);
+
+            // Must check for start before stop, else on slow machines we exit quickly because Exit is found before
+            // it starts.
+            // Some slow user PCs take around 5 seconds to start up the task...
+            int xSeconds = 10;
+            var xTimed = DateTime.Now;
+            Echo("Waiting " + xSeconds + " seconds for Setup to start.");
+            if (WaitForStart(setupName, xSeconds * 1000)) {
+                throw new Exception("Setup did not start.");
+            }
+            Echo("Setup is running. " + DateTime.Now.Subtract(xTimed).ToString(@"ss\.fff"));
+
+            // Scheduler starts it an exits, but we need to wait for the setup itself to exit before proceding
+            Echo("Waiting for Setup to complete.");
+            WaitForExit(setupName);
+        } else {
+            Start(mCosmosDir + @"Setup\Output\" + setupName + ".exe", @"/SILENT");
         }
-        Echo("Setup is running. " + DateTime.Now.Subtract(xTimed).ToString(@"ss\.fff"));
-
-        // Scheduler starts it an exits, but we need to wait for the setup itself to exit before proceding
-        Echo("Waiting for Setup to complete.");
-        WaitForExit("CosmosUserKit-" + mReleaseNo);
-      } else {
-        Start(mCosmosDir + @"Setup\Output\CosmosUserKit-" + mReleaseNo + ".exe", @"/SILENT");
-      }
     }
 
     void Done() {

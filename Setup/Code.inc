@@ -20,7 +20,8 @@ var
 	__VBExpress2013ProjectTemplatePath: string;
   
 procedure InitializePaths;
-var __VisualStudioLocation : string;
+var __VisualStudioLocation,
+    __VSRegistryLocation: string;
 begin  
   if __PathsInitialized then exit;
 
@@ -60,31 +61,44 @@ begin
   __NET_FRAMEWORK_64BIT_INSTALLED := ExpandConstant('{reg:HKLM\SOFTWARE\Microsoft\.NETFramework,Enable64Bit|0}') = '1';
   __NET_FRAMEWORK_64BIT_INSTALLED := __NET_FRAMEWORK_64BIT_INSTALLED or ((__RegAsm64<> '') and FileExists(__RegAsm64));
 
+  if not IsWin64 then
+  begin
+    __VSRegistryLocation := '{#VsRegRootLM}';
+    Log('not 64');
+  end
+  else
+    __VSRegistryLocation := '{#VsRegRootWowLM}';
 
-  __VSNET2013_PATH := ExpandConstant('{reg:HKLM\Software\Microsoft\VisualStudio\12.0,InstallDir|}');
+  Log(__VSRegistryLocation);
+  __VSNET2013_PATH := ExpandConstant('{reg:HKLM\' + __VSRegistryLocation + ',InstallDir|}');
   __VSNET2013 := __VSNET2013_PATH <> '';
 
   if __VSNET2013 then
     __VSNET2013_BASE_PATH := ExpandFilename(AddBackslash(__VSNET2013_PATH)+'..\..');
  
-  if RegQueryStringValue(HKCU, 'Software\Microsoft\VisualStudio\12.0', 'UserProjectTemplatesLocation', __CSharpExpress2013ProjectTemplatePath) then
+  if RegQueryStringValue(HKCU, __VSRegistryLocation, 'UserProjectTemplatesLocation', __CSharpExpress2013ProjectTemplatePath) then
   begin
     StringChangeEx(__CSharpExpress2013ProjectTemplatePath, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
   end
   else
   begin
-    if RegQueryStringValue(HKCU, 'Software\Microsoft\VisualStudio\12.0', 'VisualStudioLocation', __VisualStudioLocation) then
+    if RegQueryStringValue(HKCU, __VSRegistryLocation, 'VisualStudioLocation', __VisualStudioLocation) then
     begin
       StringChangeEx(__VisualStudioLocation, '%USERPROFILE%',  GetEnv('USERPROFILE'), False);
 	  __CSharpExpress2013ProjectTemplatePath := __VisualStudioLocation + '\Templates\ProjectTemplates';
     end
     else
     begin
-      __CSharpExpress2013ProjectTemplatePath := ExpandConstant('{userdocs}\Visual Studio 2013\Templates\ProjectTemplates');
+#if VsVersion == "vs2015"
+      __CSharpExpress2013ProjectTemplatePath := ExpandConstant('{userdocs}\Visual Studio {#VsVersionHuman}\Templates\ProjectTemplates');
+#else
+      __CSharpExpress2013ProjectTemplatePath := ExpandConstant('{userdocs}\Visual Studio {#VsVersionHuman}\Templates\ProjectTemplates');
+#endif
     end;
   end;
 
   __VBExpress2013ProjectTemplatePath := __CSharpExpress2013ProjectTemplatePath;
+  Log('VS path:' + __VSNET2013_PATH);
 end;
 
 procedure DeInitializePaths;
@@ -127,8 +141,8 @@ end;
 
 function Csharp2013_Installed(dummy: string): Boolean;
 begin
-  Result := RegKeyExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\12.0\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}')
-		or RegKeyExists(HKLM,'SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\Projects\{FAE04EC0-301F-11d3-BF4B-00C04F79EFBC}');
+  Result := RegKeyExists(HKLM,'{#VsRegRoot}\Projects\{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}')
+		or RegKeyExists(HKLM,'{#VsRegRootWow}\Projects\{FAE04EC0-301F-11d3-BF4B-00C04F79EFBC}');
 end;
 
 function PythonTools2013_Installed: Boolean;
@@ -138,19 +152,19 @@ end;
 
 function Fsharp2013_Installed(dummy: string): Boolean;
 begin
-  Result := RegKeyExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\12.0\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}')
-		or RegKeyExists(HKLM,'SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}');
+  Result := RegKeyExists(HKLM,'{#VsRegRoot}\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}')
+		or RegKeyExists(HKLM,'{#VsRegRootWow}\Projects\{f2a71f9b-5d33-465a-a702-920d77279786}');
 end;
 
 function Vb2013_Installed(dummy: string): Boolean;
 begin
-  Result := RegKeyExists(HKLM,'SOFTWARE\Microsoft\VisualStudio\12.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}')
-        or RegKeyExists(HKLM,'SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}');
+  Result := RegKeyExists(HKLM,'{#VsRegRoot}\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}')
+        or RegKeyExists(HKLM,'{#VsRegRootWow}\Projects\{F184B08F-C81C-45f6-A57F-5ABD9991F28F}');
 end;
 
 function VS2013_REGISTRY_HIVE(dummy: string): string;
 begin
-  Result := '12.0';
+  Result := '{#VsRegVersion}';
 end;
 
 function VS2013_BASE_PATH(dummy: string): string;
@@ -190,7 +204,7 @@ end;
 
 function IsCSharpExpress2013Installed(dummy: string): Boolean;
 begin
-	Result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VCExpress\12.0\Setup\VC','ProductDir');
+	Result := RegValueExists(HKLM,'SOFTWARE\Microsoft\VCExpress\{#VsRegVersion}\Setup\VC','ProductDir');
 end;
 
 function GetCSharpExpress2013ProjectTemplatePath(dummy: string): string;
@@ -212,7 +226,7 @@ function InitializeSetup: Boolean;
 begin
   InitializePaths;
   if not VSNET2013 then begin
-    MsgBox(ExpandConstant('Either Visual Studio 2013 or Visual Studio 2013 (integrated shell) is installed! Please see CodePlex documentation for supported editions/versions of Visual Studio.'), MbError, MB_OK);
+    MsgBox(ExpandConstant('Either Visual Studio {#VsVersionHuman} or Visual Studio {#VsVersionHuman} (integrated shell) is not installed! Please see CodePlex documentation for supported editions/versions of Visual Studio.'), MbError, MB_OK);
     Result := false;
     exit;
   end;
