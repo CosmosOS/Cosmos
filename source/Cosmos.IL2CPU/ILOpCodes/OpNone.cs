@@ -122,6 +122,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           return 2;
         case Code.Neg:
           return 1;
+        case Code.Localloc
+          return 1;
         case Code.Ldlen:
           return 1;
         case Code.Ldelem:
@@ -248,6 +250,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Shl:
           return 1;
         case Code.Neg:
+          return 1;
+        case Code.Localloc
           return 1;
         case Code.Ldlen:
           return 1;
