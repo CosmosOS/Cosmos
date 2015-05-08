@@ -33,6 +33,7 @@ namespace Cosmos.Build.MSBuild {
         using (var xDebugInfo = new DebugInfo(DebugInfoFile))
         {
           xDebugInfo.AddLabels(xSourceInfos);
+          xDebugInfo.CreateIndexes();
         }
         return true;
       }
@@ -53,7 +54,7 @@ namespace Cosmos.Build.MSBuild {
       var xSourceStrings = File.ReadAllLines(Path.Combine(inputBaseDir, "main.map"));
       var xSource = new List<Label>();
       uint xIndex = 0;
-      DebugInfo.mLastGuid = 0x4000000000000000;
+      DebugInfo.SetRange(DebugInfo.NAsmMapExtractionRange);
       for (xIndex = 0; xIndex < xSourceStrings.Length; xIndex++)
       {
         if (xSourceStrings[xIndex].StartsWith("Real "))
@@ -78,14 +79,14 @@ namespace Cosmos.Build.MSBuild {
         {
           uint xAddress = UInt32.Parse(xLineParts[0], NumberStyles.HexNumber);
 
-          Guid xId;
+          long xId;
           if (xLineParts[2].StartsWith("GUID_"))
           {
-            xId = new Guid(xLineParts[2].Substring(5));
+              xId = long.Parse(xLineParts[2].Substring(5));
           }
           else
           {
-            xId = DebugInfo.Guid_NewGuid();
+            xId = DebugInfo.CreateId();
           }
           xSource.Add(new Label()
           {

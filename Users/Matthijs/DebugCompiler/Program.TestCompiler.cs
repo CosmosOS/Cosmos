@@ -82,7 +82,7 @@ namespace DebugCompiler
                 return;
             }
             Console.WriteLine("Run took {0}", xSW.Elapsed);
-            Console.WriteLine("Generated {0} Guids", DebugInfo.mLastGuid);
+            Console.WriteLine("Generated {0} Guids", DebugInfo.GeneratedIdsCount());
             Console.Out.Flush();
             Console.ReadKey();
         }

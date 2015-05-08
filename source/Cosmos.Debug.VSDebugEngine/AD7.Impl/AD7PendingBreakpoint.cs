@@ -106,7 +106,7 @@ namespace Cosmos.Debug.VSDebugEngine {
           // VS will send us BPs from other Cosmos projects (and possibly non Cosmos ones, didnt look that deep)
           // but we wont have them in our doc list because it contains only ones from the currently project
           // to run.
-          Guid xDocID;
+          long xDocID;
           if (xDebugInfo.DocumentGUIDs.TryGetValue(xDocName, out xDocID)) {
               // Find which Method the Doc, Line, Col are in.
               // Must add +1 for both Line and Col. They are 0 based, while SP ones are 1 based.

@@ -206,7 +206,7 @@ namespace Cosmos.IL2CPU
 
                 using (var xAsm = GetAppAssembler())
                 {
-                    using (var xDebugInfo = new DebugInfo(xOutputFilename + ".cdb", true))
+                    using (var xDebugInfo = new DebugInfo(xOutputFilename + ".cdb", true, false))
                     {
                         xAsm.DebugInfo = xDebugInfo;
                         xAsm.DebugEnabled = DebugEnabled;

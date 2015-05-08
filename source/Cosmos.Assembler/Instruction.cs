@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace Cosmos.Assembler {
   public abstract class Instruction : BaseAssemblerElement {
+      /// <summary>
+      /// Cache for the default mnemonics.
+      /// </summary>
+      public static Dictionary<Type, string> defaultMnemonicsCache = new Dictionary<Type,string>();
+
     protected string mMnemonic;
     public string Mnemonic {
       get { return mMnemonic; }
@@ -33,14 +38,38 @@ namespace Cosmos.Assembler {
         mMnemonic = mnemonic;
         if (mMnemonic == null)
         {
-            var xAttribs = GetType().GetCustomAttributes(typeof (OpCodeAttribute), false);
-            if (xAttribs != null && xAttribs.Length > 0)
-            {
-                var xAttrib = (OpCodeAttribute) xAttribs[0];
-                mMnemonic = xAttrib.Mnemonic;
-            }
+            var type = GetType();
+            mMnemonic = GetDefaultMnemonic(type);
         }
     }
+
+        /// <summary>
+        /// Gets default operation mnemonic for given type.
+        /// </summary>
+        /// <param name="type">Type for which gets default mnemonics.</param>
+        /// <returns>Default mnemonics for the type.</returns>
+        private static string GetDefaultMnemonic(Type type)
+        {
+            string xMnemonic;
+            if (defaultMnemonicsCache.TryGetValue(type, out xMnemonic))
+            {
+                return xMnemonic;
+            }
+
+            var xAttribs = type.GetCustomAttributes(typeof(OpCodeAttribute), false);
+            if (xAttribs != null && xAttribs.Length > 0)
+            {
+                var xAttrib = (OpCodeAttribute)xAttribs[0];
+                xMnemonic = xAttrib.Mnemonic;
+            }
+            else
+            {
+                xMnemonic = string.Empty;
+            }
+
+            defaultMnemonicsCache.Add(type, xMnemonic);
+            return xMnemonic;
+        }
 
     public override ulong? ActualAddress {
       get {

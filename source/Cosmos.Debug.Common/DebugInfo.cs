@@ -1,28 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.IO;
 using System.Data;
-using System.Data.Common;
-using System.Reflection;
-using System.Text;
-using Microsoft.Win32;
-using Microsoft.Samples.Debugging.CorSymbolStore;
-using System.Diagnostics.SymbolStore;
-using System.Configuration;
-using System.Threading;
 using System.Data.SQLite;
+using System.Diagnostics.SymbolStore;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using Dapper;
-using SQLinq;
-using SQLinq.Dapper;
 using DapperExtensions;
 using DapperExtensions.Mapper;
 using DapperExtensions.Sql;
+using Microsoft.Samples.Debugging.CorSymbolStore;
+using SQLinq;
+using SQLinq.Dapper;
 
 namespace Cosmos.Debug.Common
 {
     public class DebugInfo : IDisposable
     {
+        /// <summary>
+        /// Current id of the generation.
+        /// </summary>
+        private static long mLastGuid = 0;
+
+        /// <summary>
+        /// Range for the id generation process.
+        /// </summary>
+        private static long mPrefix = 0;
+
+        /// <summary>
+        /// Specifies range which is used by the assembler during compilation phase.
+        /// </summary>
+        public const long AssemblerDebugSymbolsRange = 0xL;
+
+        /// <summary>
+        /// Specifies range which is used by the Elf map extraction process.
+        /// </summary>
+        public const long ElfFileMapExtractionRange = 0x1000000000000000L;
+
+        /// <summary>
+        /// Specifies range which is used by the Nasm map extraction process.
+        /// </summary>
+        public const long NAsmMapExtractionRange = 0x4000000000000000L;
 
         // Please beware this field, it may cause issues if used incorrectly.
         public static DebugInfo CurrentInstance { get; private set; }
@@ -44,7 +63,7 @@ namespace Cosmos.Debug.Common
             File.Delete(aDbName);
         }
 
-        public DebugInfo(string aPathname, bool aCreate = false)
+        public DebugInfo(string aPathname, bool aCreate = false, bool aCreateIndexes = false)
         {
             CurrentInstance = this;
 
@@ -74,9 +93,10 @@ namespace Cosmos.Debug.Common
                     // Be careful with indexes, they slow down inserts. So on tables that we have a 
                     // lot of inserts, but limited look ups, dont add them.
                     //
-                    xSQL.MakeIndex("Labels", "Address", false);
-                    xSQL.MakeIndex("Labels", "Name", true);
-                    xSQL.MakeIndex("Methods", "DocumentID", false);
+                    if (aCreateIndexes)
+                    {
+                        this.CreateIndexes();
+                    }
                 }
             }
             if (mConnection.State == ConnectionState.Closed)
@@ -91,6 +111,20 @@ namespace Cosmos.Debug.Common
             {
                 return mConnection;
             }
+        }
+
+        /// <summary>
+        /// Create indexes inside the database.
+        /// </summary>
+        public void CreateIndexes()
+        {
+            var xSQL = new SQL(mConnection);
+
+            xSQL.MakeIndex("Labels", "Address", false);
+            xSQL.MakeIndex("Labels", "Name", true);
+            xSQL.MakeIndex("Methods", "DocumentID", false);
+
+            xSQL.ExecuteAssemblyResource("SQLiteIndexes.sql");
         }
 
         // The GUIDs etc are populated by the MSBuild task, so they wont be loaded when the debugger runs.
@@ -143,7 +177,7 @@ namespace Cosmos.Debug.Common
                 foreach (var xFieldName in xItem.FieldNames)
                 {
                     var xRow = new FIELD_MAPPING();
-                    xRow.ID = Guid_NewGuid();
+                    xRow.ID = CreateId();
                     xRow.TYPE_NAME = xItem.TypeName;
                     xRow.FIELD_NAME = xFieldName;
                     xItemsToAdd.Add(xRow);
@@ -192,7 +226,7 @@ namespace Cosmos.Debug.Common
             {
                 if (!mLocalFieldInfoNames.Contains(xItem.NAME))
                 {
-                    xItem.ID = Guid_NewGuid();
+                    xItem.ID = CreateId();
                     mLocalFieldInfoNames.Add(xItem.NAME);
                     itemsToAdd.Add(xItem);
                 }
@@ -282,7 +316,7 @@ namespace Cosmos.Debug.Common
 
         // Quick look up of assemblies so we dont have to go to the database and compare by fullname.
         // This and other GUID lists contain only a few members, and save us from issuing a lot of selects to SQL.
-        public Dictionary<Assembly, Guid> AssemblyGUIDs = new Dictionary<Assembly, Guid>();
+        public Dictionary<Assembly, long> AssemblyGUIDs = new Dictionary<Assembly, long>();
         List<Cosmos.Debug.Common.AssemblyFile> xAssemblies = new List<Cosmos.Debug.Common.AssemblyFile>();
         public void AddAssemblies(List<Assembly> aAssemblies, bool aFlush = false)
         {
@@ -293,7 +327,7 @@ namespace Cosmos.Debug.Common
                 {
                     var xRow = new Cosmos.Debug.Common.AssemblyFile()
                     {
-                        ID = Guid_NewGuid(),
+                        ID = CreateId(),
                         Pathname = xAsm.Location
                     };
                     xAssemblies.Add(xRow);
@@ -304,7 +338,7 @@ namespace Cosmos.Debug.Common
             BulkInsert("AssemblyFiles", xAssemblies, 2500, aFlush);
         }
 
-        public Dictionary<string, Guid> DocumentGUIDs = new Dictionary<string, Guid>();
+        public Dictionary<string, long> DocumentGUIDs = new Dictionary<string, long>();
         List<Document> xDocuments = new List<Document>(1);
         public void AddDocument(string aPathname, bool aFlush = false)
         {
@@ -316,7 +350,7 @@ namespace Cosmos.Debug.Common
                 {
                     var xRow = new Document()
                     {
-                        ID = Guid_NewGuid(),
+                        ID = CreateId(),
                         Pathname = aPathname
                     };
                     DocumentGUIDs.Add(aPathname, xRow.ID);
@@ -337,7 +371,7 @@ namespace Cosmos.Debug.Common
         {
             foreach (var x in aSymbols)
             {
-                x.ID = Guid_NewGuid();
+                x.ID = CreateId();
             }
             BulkInsert("MethodIlOps", aSymbols, 2500, aFlush);
         }
@@ -346,7 +380,7 @@ namespace Cosmos.Debug.Common
         {
             foreach (var x in aInfos)
             {
-                x.ID = Guid_NewGuid();
+                x.ID = CreateId();
             }
             BulkInsert("LOCAL_ARGUMENT_INFOS", aInfos, aFlush: true);
         }
@@ -644,27 +678,33 @@ namespace Cosmos.Debug.Common
             return address;
         }
 
-        public static UInt64 mLastGuid = 0;
-        public static Guid Guid_NewGuid()
+        /// <summary>
+        /// Sets the range in which id would be generated.
+        /// </summary>
+        /// <param name="idRange">Number which specified id range.</param>
+        public static void SetRange(long idRange)
         {
-            // Old code: 
-            //return Guid.NewGuid();
-            // Do NOT use Guid.NewGuid(). During compilation we're generating
-            // about 60 milion guids. Guid.NewGuid slows down compilation significantly (about half the time!)
+            mPrefix = idRange;
+            mLastGuid = idRange;
+        }
 
+        /// <summary>
+        /// Gets count of ids generated during last session.
+        /// </summary>
+        /// <returns>Count of generated ids.</returns>
+        public static long GeneratedIdsCount()
+        {
+            return mLastGuid - mPrefix;
+        }
+
+        /// <summary>
+        /// Generates new id for the symbol.
+        /// </summary>
+        /// <returns>New value for the id.</returns>
+        public static long CreateId()
+        {
             mLastGuid++;
-            var bytes = new byte[16];
-            bytes[0] = (byte)(mLastGuid >> 56);
-            bytes[1] = (byte)(mLastGuid >> 48);
-            bytes[2] = (byte)(mLastGuid >> 40);
-            bytes[3] = (byte)(mLastGuid >> 32);
-            bytes[4] = (byte)(mLastGuid >> 24);
-            bytes[5] = (byte)(mLastGuid >> 16);
-            bytes[6] = (byte)(mLastGuid >> 8);
-            bytes[7] = (byte)(mLastGuid);
-
-            var r = new Guid(bytes);
-            return r;
+            return mLastGuid;
         }
     }
 

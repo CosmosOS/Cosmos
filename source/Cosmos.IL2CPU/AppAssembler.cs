@@ -45,8 +45,8 @@ namespace Cosmos.IL2CPU
         public readonly Cosmos.Assembler.Assembler Assembler;
         //
         protected string mCurrentMethodLabel;
-        protected Guid mCurrentMethodLabelEndGuid;
-        protected Guid mCurrentMethodGuid;
+        protected long mCurrentMethodLabelEndGuid;
+        protected long mCurrentMethodGuid;
 
         public AppAssembler(int aComPort, string assemblerLogFile)
         {
@@ -127,17 +127,17 @@ namespace Cosmos.IL2CPU
 
             // We could use same GUID as MethodLabelStart, but its better to keep GUIDs unique globaly for items
             // so during debugging they can never be confused as to what they point to.
-            mCurrentMethodGuid = DebugInfo.Guid_NewGuid();
+            mCurrentMethodGuid = DebugInfo.CreateId();
 
             // We issue a second label for GUID. This is increases label count, but for now we need a master label first.
             // We issue a GUID label to reduce amount of work and time needed to construct debugging DB.
-            var xLabelGuid = DebugInfo.Guid_NewGuid();
-            new Cosmos.Assembler.Label("GUID_" + xLabelGuid.ToString("N"));
+            var xLabelGuid = DebugInfo.CreateId();
+            new Cosmos.Assembler.Label("GUID_" + xLabelGuid.ToString());
 
-            mCurrentMethodLabel = "METHOD_" + xLabelGuid.ToString("N");
+            mCurrentMethodLabel = "METHOD_" + xLabelGuid.ToString();
             Cosmos.Assembler.Label.LastFullLabel = mCurrentMethodLabel;
 
-            mCurrentMethodLabelEndGuid = DebugInfo.Guid_NewGuid();
+            mCurrentMethodLabelEndGuid = DebugInfo.CreateId();
 
             if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo)
             {
@@ -419,7 +419,7 @@ namespace Cosmos.IL2CPU
             new Return { DestinationValue = (uint)xRetSize };
 
             // Final, after all code. Points to op AFTER method.
-            new Cosmos.Assembler.Label("GUID_" + mCurrentMethodLabelEndGuid.ToString("N"));
+            new Cosmos.Assembler.Label("GUID_" + mCurrentMethodLabelEndGuid.ToString());
         }
 
         public void FinalizeDebugInfo()
