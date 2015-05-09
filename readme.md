@@ -12,19 +12,19 @@ Download
 
 Cosmos is available in two forms:
 * **User Kit** - User Kit allows you to develop your own custom operating system in Visual Studio. 
-  If you are new to Cosmos, [start here](http://cosmos.codeplex.com/documentation). [Latest Release](https://github.com/CosmosOS/Cosmos/releases/latest)
+  If you are new to Cosmos, [start here](https://github.com/CosmosOS/Cosmos/wiki). [Latest Release](https://github.com/CosmosOS/Cosmos/releases/latest)
 * **Dev Kit** - Dev Kit is the full Cosmos source with build tools. 
   If you need to modify core Cosmos functions or modify built in drivers, boot, compiler, etc then you will need to use Dev Kit.
-  [How to build the Dev Kit](https://cosmos.codeplex.com/wikipage?title=Building%20Dev%20Kit&referringTitle=Devkit#) - Building from source is easy with our automated builder.
+  [How to build the Dev Kit](https://github.com/CosmosOS/Cosmos/wiki/Devkit) - Building from source is easy with our automated builder.
 
 
 Getting Started
 ---------
 
-* [Cosmos Documentation](http://cosmos.codeplex.com/documentation)
+* [Cosmos Documentation](https://github.com/CosmosOS/Cosmos/wiki)
 * Video: [Using VS Express Editions](https://www.youtube.com/watch?v=NNl8S2xOtdo)
 * [FAQ](http://cosmos.codeplex.com/wikipage?title=FAQ&referringTitle=Home)
-* [Low Hanging Fruit](http://cosmos.codeplex.com/workitem/list/advanced?Status=Active&page=0) - Looking for something easy to do and prove your worth in Cosmos? Here are a few easy tasks we have on our to do list that are also of importance to us.
+* [Low Hanging Fruit](https://github.com/CosmosOS/Cosmos/issues?q=is%3Aopen+is%3Aissue+label%3Acomplexity_low) - Looking for something easy to do and prove your worth in Cosmos? Here are a few easy tasks we have on our to do list that are also of importance to us.
 
 
 Joining Cosmos
