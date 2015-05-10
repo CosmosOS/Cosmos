@@ -185,9 +185,15 @@ namespace Cosmos.Core.Plugs {
                                      char[] aSeparators,
                                      int aStartIndex,
                                      int aLength) {
+
+            if (aSeparators == null)
+            {
+                throw new ArgumentNullException("aSeparators");
+            }
+
             int xResult = -1;
             for (int i = 0; i < aSeparators.Length; i++) {
-                var xValue = aThis.IndexOf(aSeparators[i],
+              var xValue = IndexOf(aThis, aSeparators[i],
                                            aStartIndex,
                                            aLength);
                 if (xValue < xResult || xResult == -1) {
