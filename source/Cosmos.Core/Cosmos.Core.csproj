@@ -117,6 +117,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="Cosmos.snk" />
   </ItemGroup>
   <ItemGroup>

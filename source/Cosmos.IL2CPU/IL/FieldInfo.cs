@@ -30,7 +30,13 @@ namespace Cosmos.IL2CPU.X86.IL {
         }
     }
 
-    public readonly Type DeclaringType;
+      public global::System.Reflection.FieldInfo Field
+      {
+          get;
+          set;
+      }
+
+      public readonly Type DeclaringType;
     public Type FieldType;
     public uint Size;
     public bool IsExternalValue;

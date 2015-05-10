@@ -21,16 +21,25 @@ namespace SentinelKernel
         protected override void Run()
         {
             Console.WriteLine("Run");
-            bool xTest = Directory.Exists("0:\\test");
-            Console.WriteLine("After test");
-            if (xTest)
+            try
             {
-                Console.WriteLine("Folder exists!");
+                var xRoot = Path.GetPathRoot(@"0:\test");
             }
-            else
+            catch (Exception E)
             {
-                Console.WriteLine("Folder does not exist!");
+                Console.WriteLine("Exception occurred:");
+                Console.WriteLine(E.Message);
             }
+            //bool xTest = Directory.Exists("0:\\test");
+            //Console.WriteLine("After test");
+            //if (xTest)
+            //{
+            //    Console.WriteLine("Folder exists!");
+            //}
+            //else
+            //{
+            //    Console.WriteLine("Folder does not exist!");
+            //}
             Stop();
         }
     }

@@ -193,7 +193,7 @@ namespace Cosmos.Core
         //IRQ 0 - System timer. Reserved for the system. Cannot be changed by a user.
         public static void HandleInterrupt_20(ref IRQContext aContext)
         {
-            IRQ(0x20, ref aContext);  
+            IRQ(0x20, ref aContext);
             Global.PIC.EoiMaster();
         }
 
@@ -368,7 +368,7 @@ namespace Cosmos.Core
 
         public static void HandleInterrupt_00(ref IRQContext aContext)
         {
-            HandleException(aContext.EIP, "Divide by zero", "EDivideByZero", ref aContext);
+            HandleException(aContext.EIP, "Divide by zero", "EDivideByZero", ref aContext, aContext.EIP);
         }
 
         public static void HandleInterrupt_01(ref IRQContext aContext)
@@ -453,7 +453,7 @@ namespace Cosmos.Core
         {
             HandleException(aContext.EIP, "Unknown Interrupt Exception", "Unknown Interrupt Exception", ref aContext);
         }
-   
+
         public static void HandleInterrupt_10(ref IRQContext aContext)
         {
             HandleException(aContext.EIP, "x87 Floating Point Exception", "Coprocessor Fault Exception", ref aContext);
@@ -478,9 +478,9 @@ namespace Cosmos.Core
 
         private static void HandleException(uint aEIP, string aDescription, string aName, ref IRQContext ctx, uint lastKnownAddressValue = 0)
         {
-          // At this point we are in a very unstable state.
-          // Try not to use any Cosmos routines, just
-          // report a crash dump.
+            // At this point we are in a very unstable state.
+            // Try not to use any Cosmos routines, just
+            // report a crash dump.
             const string xHex = "0123456789ABCDEF";
             uint xPtr = ctx.EIP;
 
@@ -521,7 +521,7 @@ namespace Cosmos.Core
                 if (lastKnownAddressValue != 0)
                 {
                     PutErrorString(1, 0, "Last known address: 0x");
-                    
+
                     PutErrorChar(1, 22, xHex[(int)((lastKnownAddressValue >> 28) & 0xF)]);
                     PutErrorChar(1, 23, xHex[(int)((lastKnownAddressValue >> 24) & 0xF)]);
                     PutErrorChar(1, 24, xHex[(int)((lastKnownAddressValue >> 20) & 0xF)]);
@@ -547,7 +547,7 @@ namespace Cosmos.Core
                 byte* xAddress = (byte*)0xB8000;
 
                 xAddress += ((line * 80) + col) * 2;
-                
+
                 xAddress[0] = (byte)c;
                 xAddress[1] = 0x0C;
             }

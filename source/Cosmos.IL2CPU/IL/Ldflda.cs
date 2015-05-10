@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField, bool aDerefValue, bool aDebugEnabled)
         {
-          var xFieldInfo = ResolveField(aDeclaringType, aField);
+          var xFieldInfo = ResolveField(aDeclaringType, aField, true);
           DoExecute(Assembler, aMethod, aDeclaringType, xFieldInfo, aDerefValue, aDebugEnabled);
         }
 

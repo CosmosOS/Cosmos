@@ -291,8 +291,8 @@ namespace Cosmos.IL2CPU
                 xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
             }
             var xMethodLabel = ILOp.GetMethodLabel(aMethod);
-            if (aMethod.PlugMethod == null
-                && !aMethod.IsInlineAssembler)
+            //if (aMethod.PlugMethod == null
+            //    && !aMethod.IsInlineAssembler)
             {
                 new Cosmos.Assembler.Label(xMethodLabel + EndOfMethodLabelNameNormal);
 
@@ -812,9 +812,9 @@ namespace Cosmos.IL2CPU
             };
         }
 
-        protected X86.IL.FieldInfo ResolveField(MethodInfo method, string fieldId)
+        protected X86.IL.FieldInfo ResolveField(MethodInfo method, string fieldId, bool aOnlyInstance)
         {
-            return X86.IL.Ldflda.ResolveField(method.MethodBase.DeclaringType, fieldId);
+            return X86.IL.Ldflda.ResolveField(method.MethodBase.DeclaringType, fieldId, aOnlyInstance);
         }
 
         protected void Ldarg(MethodInfo aMethod, int aIndex)
@@ -822,7 +822,7 @@ namespace Cosmos.IL2CPU
             X86.IL.Ldarg.DoExecute(Assembler, aMethod, (ushort)aIndex);
         }
 
-        protected void Call(MethodInfo aMethod, MethodInfo aTargetMethod)
+        protected void Call(MethodInfo aMethod, MethodInfo aTargetMethod, string aNextLabel)
         {
             var xSize = X86.IL.Call.GetStackSizeToReservate(aTargetMethod.MethodBase);
             if (xSize > 0)
@@ -830,6 +830,31 @@ namespace Cosmos.IL2CPU
                 new Sub { DestinationReg = Registers.ESP, SourceValue = xSize };
             }
             new Call { DestinationLabel = ILOp.GetMethodLabel(aTargetMethod) };
+            var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
+
+            uint xReturnsize = 0;
+            if (xMethodInfo != null)
+            {
+                xReturnsize = ILOp.SizeOfType(((SysReflection.MethodInfo)aMethod.MethodBase).ReturnType);
+            }
+
+            ILOp.EmitExceptionLogic(Assembler, aMethod, null, true,
+                     delegate()
+                     {
+                         var xResultSize = xReturnsize;
+                         if (xResultSize % 4 != 0)
+                         {
+                             xResultSize += 4 - (xResultSize % 4);
+                         }
+                         for (int i = 0; i < xResultSize / 4; i++)
+                         {
+                             new Add
+                             {
+                                 DestinationReg = Registers.ESP,
+                                 SourceValue = 4
+                             };
+                         }
+                     }, aNextLabel);
         }
 
         protected void Ldflda(MethodInfo aMethod, string aFieldId)
@@ -844,7 +869,7 @@ namespace Cosmos.IL2CPU
 
         protected void Ldsflda(MethodInfo aMethod, X86.IL.FieldInfo aFieldInfo)
         {
-          X86.IL.Ldsflda.DoExecute(Assembler, aMethod, aFieldInfo.Id, aMethod.PluggedMethod.MethodBase.DeclaringType, null);
+            X86.IL.Ldsflda.DoExecute(Assembler, aMethod, DataMember.GetStaticFieldName(aFieldInfo.Field), aMethod.MethodBase.DeclaringType, null);
         }
 
         protected int GetVTableEntrySize()
@@ -1262,7 +1287,7 @@ namespace Cosmos.IL2CPU
                     {
                         // field access
                         new Comment("Loading address of field '" + xFieldAccessAttrib.Name + "'");
-                        var xFieldInfo = ResolveField(aFrom, xFieldAccessAttrib.Name);
+                        var xFieldInfo = ResolveField(aFrom, xFieldAccessAttrib.Name, false);
                         if (xFieldInfo.IsStatic)
                         {
                             Ldsflda(aFrom, xFieldInfo);
@@ -1281,7 +1306,9 @@ namespace Cosmos.IL2CPU
                         xCurParamIdx++;
                     }
                 }
-                Call(aFrom, aTo);
+                var xMethodLabel = ILOp.GetMethodLabel(aFrom);
+                var xEndOfMethodLabel = xMethodLabel + EndOfMethodLabelNameNormal;
+                Call(aFrom, aTo, xEndOfMethodLabel);
             }
             MethodEnd(aFrom);
         }

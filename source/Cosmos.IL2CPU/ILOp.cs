@@ -196,7 +196,7 @@ namespace Cosmos.IL2CPU {
 
     private static void DoGetFieldsInfo(Type aType, List<X86.IL.FieldInfo> aFields) {
       var xCurList = new Dictionary<string, X86.IL.FieldInfo>();
-      var xFields = (from item in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+      var xFields = (from item in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
                      orderby item.Name, item.DeclaringType.ToString()
                      select item).ToArray();
       for (int i = 0; i < xFields.Length; i++) {
@@ -210,7 +210,8 @@ namespace Cosmos.IL2CPU {
 
         var xInfo = new X86.IL.FieldInfo(xId, SizeOfType(xField.FieldType), aType, xField.FieldType);
         xInfo.IsStatic = xField.IsStatic;
-        
+        xInfo.Field = xField;
+
         var xFieldOffsetAttrib = xField.GetCustomAttributes(typeof(FieldOffsetAttribute), true).FirstOrDefault() as FieldOffsetAttribute;
         if (xFieldOffsetAttrib != null) {
           xInfo.Offset = (uint)xFieldOffsetAttrib.Value;
@@ -252,18 +253,22 @@ namespace Cosmos.IL2CPU {
       xResult.Reverse();
       uint xOffset = 0;
       foreach (var xInfo in xResult) {
-        if (!xInfo.IsOffsetSet) {
+        if (!xInfo.IsOffsetSet && !xInfo.IsStatic) {
           xInfo.Offset = xOffset;
+          xOffset += xInfo.Size;
         }
-        xOffset += xInfo.Size;
       }
       var xDebugInfs = new List<FIELD_INFO>();
       foreach (var xInfo in xResult) {
-        xDebugInfs.Add(new FIELD_INFO() {
-          TYPE = xInfo.FieldType.AssemblyQualifiedName,
-          OFFSET = (int)xInfo.Offset,
-          NAME = GetNameForField(xInfo),
-        });
+        if (!xInfo.IsStatic)
+        {
+          xDebugInfs.Add(new FIELD_INFO()
+                         {
+                           TYPE = xInfo.FieldType.AssemblyQualifiedName,
+                           OFFSET = (int)xInfo.Offset,
+                           NAME = GetNameForField(xInfo),
+                         });
+        }
       }
       DebugInfo.CurrentInstance.WriteFieldInfoToFile(xDebugInfs);
       List<DebugInfo.Field_Map> xFieldMapping = new List<DebugInfo.Field_Map>();
@@ -295,6 +300,7 @@ namespace Cosmos.IL2CPU {
 
     protected static uint GetStorageSize(Type aType) {
       return (from item in GetFieldsInfo(aType)
+              where !item.IsStatic
               orderby item.Offset descending
               select item.Offset + item.Size).FirstOrDefault();
     }
@@ -389,15 +395,25 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    public static FieldInfo ResolveField(Type aDeclaringType, string aField)
+    public static FieldInfo ResolveField(Type aDeclaringType, string aField, bool aOnlyInstance)
     {
       var xFields = GetFieldsInfo(aDeclaringType);
       var xFieldInfo = (from item in xFields
                         where item.Id == aField
-                        select item).Single();
+                        && (!aOnlyInstance || item.IsStatic == false)
+                        select item).SingleOrDefault();
+      if (xFieldInfo == null)
+      {
+        Console.WriteLine("Following fields have been found on '{0}'", aDeclaringType.FullName);
+        foreach (var xField in xFields)
+        {
+          Console.WriteLine("\t'{0}'", xField.Id);
+        }
+        throw new Exception(string.Format("Field '{0}' not found on type '{1}'", aField, aDeclaringType.FullName));
+      }
       return xFieldInfo;
     }
 
-        
+
   }
 }

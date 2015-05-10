@@ -32,10 +32,16 @@ namespace SentinelKernel.System.Plugs.System.IO
         }
 
         public static void Cctor(
-            /*[FieldAccess(Name = "System.Char System.IO.Path.DirectorySeparatorChar")]
-            ref char aDirectorySeparatorChar*/)
+            [FieldAccess(Name = "System.Char System.IO.Path.DirectorySeparatorChar")]
+            ref char aDirectorySeparatorChar,
+            [FieldAccess(Name = "System.Char[] System.IO.Path.InvalidPathCharsWithAdditionalChecks")]
+            ref char[] aInvalidPathCharsWithAdditionalChecks,
+            [FieldAccess(Name = "System.Char[] System.IO.Path.RealInvalidPathChars")]
+            ref char[] aRealInvalidPathChars)
         {
-            //aDirectorySeparatorChar = '\\';
+            aDirectorySeparatorChar = '\\';
+            aInvalidPathCharsWithAdditionalChecks = new[] {'"'};
+            aRealInvalidPathChars = new[] { '"' };
         }
 
         //public static string GetFileName(string aPath)
@@ -81,7 +87,7 @@ namespace SentinelKernel.System.Plugs.System.IO
         {
             if (aPath.IsRelativePath())
                 return Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + aPath;
-            else 
+            else
                 return aPath.TrimEnd(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
         }
 

@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 // using System.Collections.Generic;
 // using System.IO;
-// 
+//
 // using CPU = Cosmos.Assembler.x86;
 // using System.Reflection;
 using Cosmos.Assembler;
@@ -20,22 +20,22 @@ namespace Cosmos.IL2CPU.X86.IL
     /// 1. An object reference (or pointer) is pushed onto the stack.
     /// 2. The object reference (or pointer) is popped from the stack; the value of the specified field in the object is found.
     /// 3. The value stored in the field is pushed onto the stack.
-    /// The ldfld instruction pushes the value of a field located in an object onto the stack. 
-    /// The object must be on the stack as an object reference (type O), a managed pointer (type &), 
-    /// an unmanaged pointer (type native int), a transient pointer (type *), or an instance of a value type. 
-    /// The use of an unmanaged pointer is not permitted in verifiable code. 
-    /// The object's field is specified by a metadata token that must refer to a field member. 
-    /// The return type is the same as the one associated with the field. The field may be either an instance field 
+    /// The ldfld instruction pushes the value of a field located in an object onto the stack.
+    /// The object must be on the stack as an object reference (type O), a managed pointer (type &),
+    /// an unmanaged pointer (type native int), a transient pointer (type *), or an instance of a value type.
+    /// The use of an unmanaged pointer is not permitted in verifiable code.
+    /// The object's field is specified by a metadata token that must refer to a field member.
+    /// The return type is the same as the one associated with the field. The field may be either an instance field
     /// (in which case the object must not be a null reference) or a static field.
-    /// 
+    ///
     /// The ldfld instruction can be preceded by either or both of the Unaligned and Volatile prefixes.
-    /// 
+    ///
     /// NullReferenceException is thrown if the object is null and the field is not static.
-    /// 
-    /// MissingFieldException is thrown if the specified field is not found in the metadata. 
-    /// 
+    ///
+    /// MissingFieldException is thrown if the specified field is not found in the metadata.
+    ///
     /// This is typically checked when Microsoft Intermediate Language (MSIL) instructions are converted to native code, not at run time.
-    /// </remarks> 
+    /// </remarks>
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldfld )]
     public class Ldfld : ILOp
     {
@@ -49,12 +49,10 @@ namespace Cosmos.IL2CPU.X86.IL
           var xOpCode = (ILOpCodes.OpField)aOpCode;
           DoExecute(Assembler, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true, DebugEnabled);
         }
+
         public static int GetFieldOffset(Type aDeclaringType, string aFieldId) {
           int xExtraOffset = 0;
-          var xFields = GetFieldsInfo(aDeclaringType);
-          var xFieldInfo = (from item in xFields
-                            where item.Id == aFieldId
-                            select item).Single();
+          var xFieldInfo = ResolveField(aDeclaringType, aFieldId, true);
           bool xNeedsGC = aDeclaringType.IsClass && !aDeclaringType.IsValueType;
           if (xNeedsGC) {
             xExtraOffset = 12;
@@ -71,7 +69,7 @@ namespace Cosmos.IL2CPU.X86.IL
           new Comment("Field = '" + xFieldId + "'");
 
             DoNullReferenceCheck(Assembler, debugEnabled, 0);
-          
+
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 
 #if DOTNETCOMPATIBLE
@@ -87,7 +85,7 @@ namespace Cosmos.IL2CPU.X86.IL
           {
               new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
           }
-          
+
           for (int i = 1; i <= (xSize / 4); i++) {
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (int)(xSize - (i * 4)) };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };

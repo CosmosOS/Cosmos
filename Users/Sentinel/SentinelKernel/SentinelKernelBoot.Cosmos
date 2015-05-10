@@ -21,7 +21,7 @@
     <DebugEnabled>True</DebugEnabled>
     <DebugMode>IL</DebugMode>
     <TraceMode>User</TraceMode>
-    <EnableGDB>False</EnableGDB>
+    <EnableGDB>True</EnableGDB>
     <StartCosmosGDB>False</StartCosmosGDB>
     <VMWareEdition>Workstation</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
@@ -30,18 +30,18 @@
     <Deployment>ISO</Deployment>
     <Launch>VMware</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-    <StackCorruptionDetectionEnabled>False</StackCorruptionDetectionEnabled>
+    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
     <VMware_Name>SentinelKernelBoot</VMware_Name>
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
     <VMware_DebugEnabled>True</VMware_DebugEnabled>
-    <VMware_StackCorruptionDetectionEnabled>False</VMware_StackCorruptionDetectionEnabled>
+    <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
     <VMware_DebugMode>IL</VMware_DebugMode>
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
     <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
-    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_EnableGDB>True</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <EnableBochsDebug>True</EnableBochsDebug>
     <Bochs_Name>SentinelKernelBoot</Bochs_Name>
@@ -74,6 +74,20 @@
     <IntelEdison_EnableGDB>False</IntelEdison_EnableGDB>
     <IntelEdison_StartCosmosGDB>False</IntelEdison_StartCosmosGDB>
     <IntelEdison_EnableBochsDebug>True</IntelEdison_EnableBochsDebug>
+    <ISO_Name>SentinelKernelBoot</ISO_Name>
+    <ISO_Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</ISO_Description>
+    <ISO_Deployment>ISO</ISO_Deployment>
+    <ISO_Launch>None</ISO_Launch>
+    <ISO_DebugEnabled>False</ISO_DebugEnabled>
+    <ISO_StackCorruptionDetectionEnabled>True</ISO_StackCorruptionDetectionEnabled>
+    <ISO_DebugMode>IL</ISO_DebugMode>
+    <ISO_VisualStudioDebugPort>Pipe: Cosmos\Serial</ISO_VisualStudioDebugPort>
+    <ISO_VMwareEdition>Workstation</ISO_VMwareEdition>
+    <ISO_OutputPath>bin\Debug\</ISO_OutputPath>
+    <ISO_TraceAssemblies>All</ISO_TraceAssemblies>
+    <ISO_EnableGDB>False</ISO_EnableGDB>
+    <ISO_StartCosmosGDB>False</ISO_StartCosmosGDB>
+    <ISO_EnableBochsDebug>True</ISO_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
