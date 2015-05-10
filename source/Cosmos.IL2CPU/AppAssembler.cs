@@ -305,7 +305,7 @@ namespace Cosmos.IL2CPU
                 };
             }
 
-          new Mov { DestinationReg = Registers.ECX, SourceValue = 0 };
+            new Mov { DestinationReg = Registers.ECX, SourceValue = 0 };
             var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
                                   select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
             if (!aMethod.MethodBase.IsStatic)
@@ -1222,6 +1222,12 @@ namespace Cosmos.IL2CPU
             return ILOp.SizeOfType(aType);
         }
 
+
+        /// <summary>
+        /// Generates a forwarding stub, which transforms from the actual method to the plug.
+        /// </summary>
+        /// <param name="aFrom">The method to forward to the plug</param>
+        /// <param name="aTo">The plug</param>
         internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo)
         {
             // todo: completely get rid of this kind of trampoline code
