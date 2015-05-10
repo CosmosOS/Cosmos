@@ -58,10 +58,19 @@ namespace Cosmos.Debug.Common
 
         protected virtual void DoDebugMsg(string aMsg)
         {
-            mDebugWriter.WriteLine(aMsg);
-            mDebugWriter.Flush();
-            mOut.WriteLine(aMsg);
-            mOut.Flush();
+            // MtW: Copying mDebugWriter and mOut to local variables may seem weird, but in some situations, this method can be called when they are null.
+            var xStreamWriter = mDebugWriter;
+            if (xStreamWriter != null)
+            {
+                xStreamWriter.WriteLine(aMsg);
+                xStreamWriter.Flush();
+            }
+            var xWriter = mOut;
+            if (xWriter != StreamWriter.Null)
+            {
+                xWriter.WriteLine(aMsg);
+                xWriter.Flush();
+            }
             DoDebugMsg(aMsg, true);
         }
 
