@@ -19,10 +19,10 @@ namespace Cosmos.IL2CPU.X86.IL
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
-            //new CPUx86.Call { DestinationLabel = aExceptionOccurredLabel };
+            new CPUx86.Call { DestinationLabel = "SystemExceptionOccurred" };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
             Call.EmitExceptionLogic( Assembler,aMethod, aOpCode, false, null );
-          
+
         }
 
         // namespace Cosmos.IL2CPU.IL.X86 {
@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			mMethodInfo = aMethodInfo;
         // 			mCurrentILOffset = (int)aReader.Position;
         // 		}
-        // 
+        //
         // 		public static void Assemble(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, int aCurrentILOffset, string aExceptionOccurredLabel) {
         //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
         //             new CPUx86.Move { DestinationRef = CPU.ElementReference.New(CPU.DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef)), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
@@ -44,7 +44,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			Call.EmitExceptionLogic(aAssembler, (uint)aCurrentILOffset, aMethodInfo, null, false, null);
         // 			aAssembler.Stack.Pop();
         // 		}
-        // 	
+        //
         // 		public override void DoAssemble() {
         // 		    var xMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(CPU.Assembler.CurrentExceptionOccurredRef,
         // 		                                                                       false);

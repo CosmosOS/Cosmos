@@ -251,7 +251,9 @@ namespace Cosmos.Assembler {
           xOp.WriteText(this, aOutput);
           aOutput.WriteLine();
         }
-     }
+      }
+      aOutput.WriteLine("SystemExceptionOccurred:");
+      aOutput.WriteLine("\tret");
       aOutput.WriteLine("global Kernel_Start");
       aOutput.Flush();
     }
