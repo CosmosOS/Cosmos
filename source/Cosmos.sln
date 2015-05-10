@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.22823.1
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
@@ -168,8 +168,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sentinel", "Sentinel", "{D2CDC006-49F1-469B-AFAB-05E6F4DF3762}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentinelKernel", "..\Users\Sentinel\SentinelKernel\SentinelKernel.csproj", "{3B0F484C-0A26-4CC2-B44D-DDDA3A3E9381}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentinelKernel", "..\Users\Sentinel209\SentinelKernel\SentinelKernel.csproj", "{7852FE75-C1D6-4AC8-9354-E05B3F9F7D4D}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "SentinelKernelBoot", "..\Users\Sentinel\SentinelKernel\SentinelKernelBoot.Cosmos", "{40C3F1E6-2880-4AF4-91FD-DFD41484719D}"
 EndProject
