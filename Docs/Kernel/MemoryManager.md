@@ -15,16 +15,23 @@ Block =
 Meta Data|Data
 
 Meta data =
-1 dword (preveus block address start)|1 dword (next block address start)|1 dword (curent[this] block size)| 1 dword (curent[this] block flag)
+8 bytes (preveus block address start)|8 bytes (next block address start)|8 bytes (curent[this] block size)| 8 bytes (curent[this] block flag)
 ```
+BlockFlags :
+
+```
+Allocated = 0,
+Free = 1,
+```
+
 the final layout looks like this:
 
 ```
-4 dword|4 dword|4 dword|4 dword | (size of Block) bytes  |  4 dword|4 dword|4 dword | 4 dword | (size of Block) bytes  | etc
+8 bytes|8 bytes|8 bytes|8 bytes | (size of Block) bytes  |  8 bytes|8 bytes|8 bytes | 8 bytes | (size of Block) bytes  | etc
 
 ```
 Note:
-this means the smallest size an Block can occupy is 129 bytes, 128 bytes for the header and 1 for the smallest data type a byte.
+this means the smallest size an Block can occupy is 33 bytes, 32 bytes for the header and 1 for the smallest data type a byte.
 
 # How this system is used.
 
@@ -32,4 +39,4 @@ this means the smallest size an Block can occupy is 129 bytes, 128 bytes for the
   Adding an Block is easy, you simply find the first free block using compare exchange and split it.
 
 ## Deallocation (free)
-  Freeing ablock is easy set its flag(in meta data) to 0
+  Freeing a block is easy set its flag(in meta data) to Allocated
