@@ -7,7 +7,7 @@ The layout has not preset list or table but rather every item has meta data link
 
 The data layout looks as follow :
 
-```
+````
 Block|Block|Block etc.
 
 Block =
@@ -15,7 +15,7 @@ Block =
 Meta Data|Data
 
 Meta data =
-8 bytes (preveus block address start)|8 bytes (next block address start)|8 bytes (curent[this] block size)| 8 bytes (curent[this] block flag)
+4 bytes (preveus block address start)|4 bytes (next block address start)|4 bytes (curent[this] block size)| 4 bytes (curent[this] block flag)
 ```
 BlockFlags :
 
@@ -27,11 +27,11 @@ Free = 1,
 the final layout looks like this:
 
 ```
-8 bytes|8 bytes|8 bytes|8 bytes | (size of Block) bytes  |  8 bytes|8 bytes|8 bytes | 8 bytes | (size of Block) bytes  | etc
+4 bytes|4 bytes|4 bytes|4 bytes | (size of Block) bytes  |  4 bytes|4 bytes|4 bytes | 4 bytes | (size of Block) bytes  | etc
 
 ```
 Note:
-this means the smallest size an Block can occupy is 33 bytes, 32 bytes for the header and 1 for the smallest data type a byte.
+this means the smallest size an Block can occupy is 17 bytes, 16 bytes for the header and 1 for the smallest data type a byte.
 
 # How this system is used.
 
@@ -39,4 +39,4 @@ this means the smallest size an Block can occupy is 33 bytes, 32 bytes for the h
   Adding an Block is easy, you simply find the first free block using compare exchange and split it.
 
 ## Deallocation (free)
-  Freeing a block is easy set its flag(in meta data) to Allocated
+  Freeing a block is easy set its flag(in meta data) to Free
