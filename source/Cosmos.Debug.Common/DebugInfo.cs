@@ -31,7 +31,7 @@ namespace Cosmos.Debug.Common
         /// <summary>
         /// Specifies range which is used by the assembler during compilation phase.
         /// </summary>
-        public const long AssemblerDebugSymbolsRange = 0xL;
+        public const long AssemblerDebugSymbolsRange = 0x0L;
 
         /// <summary>
         /// Specifies range which is used by the Elf map extraction process.
@@ -78,7 +78,7 @@ namespace Cosmos.Debug.Common
             // Use the SQLiteConnectionFactory as the default database connection
             // Do not open mConnection before mEntities.CreateDatabase
             mConnection = new SQLiteConnection(mConnStr);
-            
+
             DapperExtensions.DapperExtensions.DefaultMapper = typeof(PluralizedAutoClassMapper<>);
             DapperExtensions.DapperExtensions.SqlDialect = new SqliteDialect();
             if (aCreate)
@@ -90,7 +90,7 @@ namespace Cosmos.Debug.Common
                     var xSQL = new SQL(mConnection);
                     xSQL.CreateDB();
 
-                    // Be careful with indexes, they slow down inserts. So on tables that we have a 
+                    // Be careful with indexes, they slow down inserts. So on tables that we have a
                     // lot of inserts, but limited look ups, dont add them.
                     //
                     if (aCreateIndexes)
@@ -392,7 +392,7 @@ namespace Cosmos.Debug.Common
         // and EntityDataReader to bridge the gap to SqlBulk.
         //
         // We dont want to issue individual inserts to SQL as this is very slow.
-        // But accumulating too many records in RAM also is a problem. For example 
+        // But accumulating too many records in RAM also is a problem. For example
         // at time of writing the full structure would take up 11 MB of RAM just for this structure.
         // This is not a huge amount, but as we compile in more and more this figure will grow.
         // So as a compromise, we collect 2500 records then bulk insert.
@@ -502,7 +502,7 @@ namespace Cosmos.Debug.Common
         {
             var xAddress = (long)aAddress;
             var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address <= xAddress).OrderByDescending(i => i.Address)).ToArray();
-            
+
             Label methodHeaderLabel = null;
             //The first label we find searching upwards with "GUID_" at the start will be the very start of the method header
             foreach (var xLabel in xLabels)
@@ -515,7 +515,7 @@ namespace Cosmos.Debug.Common
             }
             return methodHeaderLabel;
         }
-        
+
         public Label[] GetMethodLabels(uint address)
         {
             var method = GetMethod(address);
@@ -550,7 +550,7 @@ namespace Cosmos.Debug.Common
                 "where LStart.Address <= @Address and LEnd.Address > @Address;", new { Address = aAddress }).Single();
             return method;
         }
-        
+
         // Gets MLSymbols for a method, given an address within the method.
         public MethodIlOp[] GetSymbols(Method aMethod)
         {
@@ -648,7 +648,7 @@ namespace Cosmos.Debug.Common
             // Get the IL Offsets for these sequence points
             var xSPOffsets = xSPs.Select(x => x.Offset);
 
-            // Get all the MethodILOps for this method 
+            // Get all the MethodILOps for this method
             // Then filter to get only the MethodILOps that also have sequence points
             // Then get the MethodILOp with the highest address <= to aAddress
 
