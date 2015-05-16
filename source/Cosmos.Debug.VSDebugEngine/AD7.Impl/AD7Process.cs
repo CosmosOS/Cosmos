@@ -19,7 +19,7 @@ using Label = Cosmos.Debug.Common.Label;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
-    public class AD7Process : IDebugProcess2
+    public partial class AD7Process : IDebugProcess2
     {
         public bool ASMSteppingMode = false;
 

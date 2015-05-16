@@ -21,8 +21,8 @@ namespace Cosmos.Debug.Common
         {
           get
           {
-            //return (null != BochsExe);
-            return false;
+            return (null != BochsExe);
+            //return false;
           }
         }
 

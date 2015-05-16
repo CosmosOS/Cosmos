@@ -14,7 +14,7 @@ using Cosmos.Debug.Common;
 namespace Cosmos.Debug.VSDebugEngine.Host
 {
   /// <summary>This class handles interactions with the Bochs emulation environment.</summary>
-  public class Bochs : Base
+  public partial class Bochs : Base
   {
     /// <summary>The emulator process once started.</summary>
     private static Process _bochsProcess;
@@ -29,7 +29,12 @@ namespace Cosmos.Debug.VSDebugEngine.Host
       : base(aParams, aUseGDB)
     {
       if (null == configurationFile) { throw new ArgumentNullException("configurationFile"); }
-      if (!configurationFile.Exists) { throw new FileNotFoundException("Configuration file doesn't exist."); }
+      /*if (!configurationFile.Exists)
+      {
+          InitializeKeyValues();
+      }*/
+      InitializeKeyValues();
+      GenerateConfiguration(configurationFile.FullName);
       _bochsConfigurationFile = configurationFile;
       bool parseSucceeded = bool.TryParse(aParams[BuildProperties.EnableBochsDebugString], out _useDebugVersion);
       return;
