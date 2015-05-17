@@ -23,7 +23,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
 "plugin_ctrl: unmapped=1, biosdev=1, speaker=1, extfpuirq=1, parallel=1, serial=1, gameport=1\n" +
 "config_interface: win32config\n" +
 "display_library: win32\n" +
-"memory: host=32, guest=32\n" +
+"memory: host=128, guest=128\n" +
 "romimage: file=\""+BochsDirectory+"/BIOS-bochs-latest\"\n" +
 "vgaromimage: file=\""+BochsDirectory+"/VGABIOS-lgpl-latest\"\n" +
 "boot: cdrom\n" +
@@ -57,7 +57,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
 "speaker: enabled=1, mode=sound\n" +
 "parport1: enabled=1, file=none\n" +
 "parport2: enabled=0\n" +
-"com1: enabled=1, mode=pip-client, dev=\"%PIPESERVERNAME%\"\n" +
+"com1: enabled=1, mode=pipe-client, dev=\"\\\\.\\%PIPESERVERNAME%\"\n" +
 "com2: enabled=0\n" +
 "com3: enabled=0\n" +
 "com4: enabled=0";
