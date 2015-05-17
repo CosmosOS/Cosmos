@@ -57,7 +57,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
 "speaker: enabled=1, mode=sound\n" +
 "parport1: enabled=1, file=none\n" +
 "parport2: enabled=0\n" +
-"com1: enabled=1, mode=null\n" +
+"com1: enabled=1, mode=pip-client, dev=\"%PIPESERVERNAME%\"\n" +
 "com2: enabled=0\n" +
 "com3: enabled=0\n" +
 "com4: enabled=0";
@@ -76,9 +76,10 @@ namespace Cosmos.Debug.VSDebugEngine.Host
                     defaultConfigs.Add(comboItem, "");
                 }
             }
-            string iso_paramater = defaultConfigs.Get("ata0-master");
-            iso_paramater = iso_paramater.Replace("%CDROMBOOTPATH%", mParams["ISOFile"]);
-            defaultConfigs.Set("ata0-master", iso_paramater);
+            string xPort = mParams["VisualStudioDebugPort"];
+            string[] xParts = xPort.Split(new char[] {' '});
+            defaultConfigs.Set("com1", defaultConfigs.Get("com1").Replace("%PIPESERVERNAME%", xParts[1].ToLower()));
+            defaultConfigs.Set("ata0-master", defaultConfigs.Get("ata0-master").Replace("%CDROMBOOTPATH%", mParams["ISOFile"]));
         }
 
         private void GenerateConfiguration(string filePath)

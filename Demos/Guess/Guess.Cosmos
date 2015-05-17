@@ -150,8 +150,8 @@
     <Bochs_TraceAssemblies>All</Bochs_TraceAssemblies>
     <Bochs_EnableGDB>False</Bochs_EnableGDB>
     <Bochs_StartCosmosGDB>False</Bochs_StartCosmosGDB>
-    <EnableBochsDebug>False</EnableBochsDebug>
-    <Bochs_EnableBochsDebug>False</Bochs_EnableBochsDebug>
+    <EnableBochsDebug>True</EnableBochsDebug>
+    <Bochs_EnableBochsDebug>True</Bochs_EnableBochsDebug>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Profile>Bochs</Profile>
@@ -295,8 +295,8 @@
     <Bochs_TraceAssemblies>All</Bochs_TraceAssemblies>
     <Bochs_EnableGDB>False</Bochs_EnableGDB>
     <Bochs_StartCosmosGDB>False</Bochs_StartCosmosGDB>
-    <EnableBochsDebug>False</EnableBochsDebug>
-    <Bochs_EnableBochsDebug>False</Bochs_EnableBochsDebug>
+    <EnableBochsDebug>True</EnableBochsDebug>
+    <Bochs_EnableBochsDebug>True</Bochs_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Cosmos.bxrc">
