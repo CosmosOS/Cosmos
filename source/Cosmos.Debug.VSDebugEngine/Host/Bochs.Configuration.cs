@@ -57,7 +57,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
 "speaker: enabled=1, mode=sound\n" +
 "parport1: enabled=1, file=none\n" +
 "parport2: enabled=0\n" +
-"com1: enabled=1, mode=pipe-client, dev=\"\\\\.\\%PIPESERVERNAME%\"\n" +
+"com1: enabled=1, mode=pipe-client, dev=\"" + @"\\.\pipe\" + "%PIPESERVERNAME%\"\n" +
 "com2: enabled=0\n" +
 "com3: enabled=0\n" +
 "com4: enabled=0";
