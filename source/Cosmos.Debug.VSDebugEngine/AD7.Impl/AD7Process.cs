@@ -19,7 +19,7 @@ using Label = Cosmos.Debug.Common.Label;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
-    public class AD7Process : IDebugProcess2
+    public partial class AD7Process : IDebugProcess2
     {
         public bool ASMSteppingMode = false;
 
@@ -429,7 +429,8 @@ namespace Cosmos.Debug.VSDebugEngine
                     // TODO : What if the configuration file doesn't exist ? This will throw a FileNotFoundException in
                     // the Bochs class constructor. Is this appropriate behavior ?
                     mHost = new Host.Bochs(mDebugInfo, xUseGDB, bochsConfigurationFile);
-                    ((Host.Bochs)mHost).FixBochsConfiguration(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("IsoFileName", mISO) });
+                    
+                    //((Host.Bochs)mHost).FixBochsConfiguration(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("IsoFileName", mISO) });
                     break;
                 case LaunchType.IntelEdison:
                     mHost = new Host.IntelEdison(mDebugInfo, false);
