@@ -19,9 +19,9 @@
     <DebugEnable>true</DebugEnable>
     -->
     <DebugEnabled>True</DebugEnabled>
-    <DebugMode>IL</DebugMode>
+    <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
-    <EnableGDB>True</EnableGDB>
+    <EnableGDB>False</EnableGDB>
     <StartCosmosGDB>False</StartCosmosGDB>
     <VMWareEdition>Workstation</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
@@ -30,18 +30,18 @@
     <Deployment>ISO</Deployment>
     <Launch>VMware</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <StackCorruptionDetectionEnabled>False</StackCorruptionDetectionEnabled>
     <VMware_Name>SentinelKernelBoot</VMware_Name>
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
     <VMware_DebugEnabled>True</VMware_DebugEnabled>
-    <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
-    <VMware_DebugMode>IL</VMware_DebugMode>
+    <VMware_StackCorruptionDetectionEnabled>False</VMware_StackCorruptionDetectionEnabled>
+    <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
     <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
-    <VMware_EnableGDB>True</VMware_EnableGDB>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <EnableBochsDebug>True</EnableBochsDebug>
     <Bochs_Name>SentinelKernelBoot</Bochs_Name>
@@ -88,6 +88,20 @@
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>False</ISO_StartCosmosGDB>
     <ISO_EnableBochsDebug>True</ISO_EnableBochsDebug>
+    <USB_Name>SentinelKernelBoot</USB_Name>
+    <USB_Description>Makes a USB device such as a flash drive or external hard disk bootable.</USB_Description>
+    <USB_Deployment>USB</USB_Deployment>
+    <USB_Launch>None</USB_Launch>
+    <USB_DebugEnabled>False</USB_DebugEnabled>
+    <USB_StackCorruptionDetectionEnabled>True</USB_StackCorruptionDetectionEnabled>
+    <USB_DebugMode>IL</USB_DebugMode>
+    <USB_VisualStudioDebugPort>Pipe: Cosmos\Serial</USB_VisualStudioDebugPort>
+    <USB_VMwareEdition>Workstation</USB_VMwareEdition>
+    <USB_OutputPath>bin\Debug\</USB_OutputPath>
+    <USB_TraceAssemblies>All</USB_TraceAssemblies>
+    <USB_EnableGDB>True</USB_EnableGDB>
+    <USB_StartCosmosGDB>True</USB_StartCosmosGDB>
+    <USB_EnableBochsDebug>True</USB_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">

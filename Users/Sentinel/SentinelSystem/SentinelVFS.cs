@@ -5,9 +5,6 @@ using Cosmos.System;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Console = global::System.Console;
 
 namespace SentinelKernel.System.FileSystem.VFS
@@ -15,8 +12,8 @@ namespace SentinelKernel.System.FileSystem.VFS
     [Serializable]
     public struct KVP<TKey, TValue>
     {
-        private TKey key;
-        private TValue value;
+        private readonly TKey key;
+        private readonly TValue value;
 
         public KVP(TKey key, TValue value)
         {
@@ -70,17 +67,17 @@ namespace SentinelKernel.System.FileSystem.VFS
         {
             for (int i = 0; i < mPartitions.Count; i++)
             {
-                string xRootPath = string.Concat(i, VFSBase.VolumeSeparatorChar, VFSBase.DirectorySeparatorChar);
+                string xRootPath = string.Concat(i, VolumeSeparatorChar, DirectorySeparatorChar);
                 switch (FileSystem.GetFileSystemType(mPartitions[i]))
                 {
                     case FileSystemType.FAT:
-                        mFileSystems.Add(new KVP<string, FileSystem>(xRootPath, new System.FileSystem.FAT.FatFileSystem(mPartitions[i])));
+                        mFileSystems.Add(new KVP<string, FileSystem>(xRootPath, new FAT.FatFileSystem(mPartitions[i])));
                         break;
                 }
 
                 if (mFileSystems[i].Key == xRootPath)
                 {
-                    var xFatFS = mFileSystems[i].Value as System.FileSystem.FAT.FatFileSystem;
+                    var xFatFS = mFileSystems[i].Value as FAT.FatFileSystem;
                     Console.WriteLine("-------File System--------");
                     Console.WriteLine("Bytes per Cluster: " + xFatFS.BytesPerCluster);
                     Console.WriteLine("Bytes per Sector: " + xFatFS.BytesPerSector);
@@ -189,7 +186,7 @@ namespace SentinelKernel.System.FileSystem.VFS
             for (int i = 0; i < mFileSystems.Count; i++)
             {
                 string xTest = mFileSystems[i].Key;
-                if (mFileSystems[i].Key == xPath)
+                if (xTest == xPath)
                 {
                     return mFileSystems[i].Value;
                 }
@@ -209,7 +206,7 @@ namespace SentinelKernel.System.FileSystem.VFS
             }
         }
 
-        public override System.FileSystem.Listing.Directory GetDirectory(string aPath)
+        public override Listing.Directory GetDirectory(string aPath)
         {
             string[] xPathParts = VFSManager.SplitPath(aPath);
             var xFS = GetFileSystemFromPath(aPath);
@@ -228,7 +225,7 @@ namespace SentinelKernel.System.FileSystem.VFS
                     {
                         if (xListing[j].Name == aPath)
                         {
-                            return (System.FileSystem.Listing.Directory)xListing[j];
+                            return (Listing.Directory)xListing[j];
                         }
                     }
                 }
@@ -236,22 +233,22 @@ namespace SentinelKernel.System.FileSystem.VFS
             return null;
         }
 
-        public override List<System.FileSystem.Listing.Base> GetDirectoryListing(string aPath)
+        public override List<Listing.Base> GetDirectoryListing(string aPath)
         {
             throw new NotImplementedException();
         }
 
-        public override List<System.FileSystem.Listing.Base> GetDirectoryListing(System.FileSystem.Listing.Directory aEntry)
+        public override List<Listing.Base> GetDirectoryListing(Listing.Directory aEntry)
         {
             throw new NotImplementedException();
         }
 
-        public override System.FileSystem.Listing.Directory GetVolume(string aVolume)
+        public override Listing.Directory GetVolume(string aVolume)
         {
             throw new NotImplementedException();
         }
 
-        public override List<System.FileSystem.Listing.Directory> GetVolumes()
+        public override List<Listing.Directory> GetVolumes()
         {
             throw new NotImplementedException();
         }

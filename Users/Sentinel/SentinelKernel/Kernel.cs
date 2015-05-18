@@ -24,22 +24,24 @@ namespace SentinelKernel
             try
             {
                 var xRoot = Path.GetPathRoot(@"0:\test");
+                bool xTest = Directory.Exists("0:\\test");
+                Console.WriteLine("After test");
+                if (xTest)
+                {
+                    Console.WriteLine("Folder exists!");
+                }
+                else
+                {
+                    Console.WriteLine("Folder does not exist!");
+                }
+
             }
-            catch (Exception E)
+            catch (Exception e)
             {
                 Console.WriteLine("Exception occurred:");
-                Console.WriteLine(E.Message);
+                Console.WriteLine(e.Message);
             }
-            //bool xTest = Directory.Exists("0:\\test");
-            //Console.WriteLine("After test");
-            //if (xTest)
-            //{
-            //    Console.WriteLine("Folder exists!");
-            //}
-            //else
-            //{
-            //    Console.WriteLine("Folder does not exist!");
-            //}
+            
             Stop();
         }
     }

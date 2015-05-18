@@ -10,7 +10,7 @@ namespace SentinelKernel.System.FileSystem.VFS
 
         public static void RegisterVFS(VFSBase aVFS)
         {
-           Cosmos.System.Global.Dbg.Send("VFSManager.RegisterVFS");
+            Cosmos.System.Global.Dbg.Send("VFSManager.RegisterVFS");
             if (mVFS != null)
             {
                 throw new Exception("Virtual File System Manager already initialized!");
@@ -22,29 +22,119 @@ namespace SentinelKernel.System.FileSystem.VFS
 
         #region Helpers
 
-        public static bool IsAbsolutePath(this string aPath)
+        public static char GetAltDirectorySeparatorChar()
         {
-            return ((aPath[0] == VFSBase.DirectorySeparatorChar) || (aPath[0] == VFSBase.AltDirectorySeparatorChar));
+            return '/';
         }
 
-        public static bool IsRelativePath(this string aPath)
+        public static char GetDirectorySeparatorChar()
         {
-            return (!(aPath[0] == VFSBase.DirectorySeparatorChar) || !(aPath[0] == VFSBase.AltDirectorySeparatorChar));
+            return '\\';
         }
+
+        public static char[] GetInvalidFileNameChars()
+        {
+            return new[]
+            {
+                '"',
+                '<',
+                '>',
+                '|',
+                '\0',
+                '\a',
+                '\b',
+                '\t',
+                '\n',
+                '\v',
+                '\f',
+                '\r',
+                ':',
+                '*',
+                '?',
+                '\\',
+                '/'
+            };
+        }
+
+        public static char[] GetInvalidPathCharsWithAdditionalChecks()
+        {
+            return new[]
+            {
+                '"',
+                '<',
+                '>',
+                '|',
+                '\0',
+                '\a',
+                '\b',
+                '\t',
+                '\n',
+                '\v',
+                '\f',
+                '\r',
+                '*',
+                '?'
+            };
+        }
+
+        public static char GetPathSeparator()
+        {
+            return ';';
+        }
+
+        public static char[] GetRealInvalidPathChars()
+        {
+            return new[]
+            {
+                '"',
+                '<',
+                '>',
+                '|',
+                '\0',
+                '\a',
+                '\b',
+                '\t',
+                '\n',
+                '\v',
+                '\f',
+                '\r'
+            };
+        }
+
+        public static char GetVolumeSeparatorChar()
+        {
+            return ':';
+        }
+
+        public static int GetMaxPath()
+        {
+            return 260;
+        }
+
+        //public static bool IsAbsolutePath(this string aPath)
+        //{
+        //    return ((aPath[0] == VFSBase.DirectorySeparatorChar) || (aPath[0] == VFSBase.AltDirectorySeparatorChar));
+        //}
+
+        //public static bool IsRelativePath(this string aPath)
+        //{
+        //    return (aPath[0] != VFSBase.DirectorySeparatorChar || aPath[0] != VFSBase.AltDirectorySeparatorChar);
+        //}
 
         public static string[] SplitPath(string aPath)
         {
+            //TODO: This should call Path.GetDirectoryName() and then loop calling Directory.GetParent(), but those aren't implemented yet.
             return aPath.Split(GetDirectorySeparators(), StringSplitOptions.RemoveEmptyEntries);
         }
 
         private static char[] GetDirectorySeparators()
         {
-            return new char[] { VFSBase.DirectorySeparatorChar, VFSBase.AltDirectorySeparatorChar };
+            return new[] { GetDirectorySeparatorChar(), GetAltDirectorySeparatorChar() };
         }
 
         #endregion
 
-        public static System.FileSystem.Listing.File GetFile(string aPath)
+        public static Listing.File GetFile(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))
             {
@@ -69,7 +159,7 @@ namespace SentinelKernel.System.FileSystem.VFS
             */ 
         }
 
-        public static List<System.FileSystem.Listing.File> GetFiles(string aPath)
+        public static List<Listing.File> GetFiles(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))
             {
@@ -94,7 +184,7 @@ namespace SentinelKernel.System.FileSystem.VFS
             */ 
         }
 
-        public static System.FileSystem.Listing.Directory GetDirectory(string aPath)
+        public static Listing.Directory GetDirectory(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))
             {
@@ -104,7 +194,7 @@ namespace SentinelKernel.System.FileSystem.VFS
             return mVFS.GetDirectory(aPath);
         }
 
-        public static List<System.FileSystem.Listing.Base> GetDirectoryListing(string aPath)
+        public static List<Listing.Base> GetDirectoryListing(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))
             {
@@ -114,7 +204,7 @@ namespace SentinelKernel.System.FileSystem.VFS
             return mVFS.GetDirectoryListing(aPath);
         }
 
-        public static System.FileSystem.Listing.Directory GetVolume(string aVolume)
+        public static Listing.Directory GetVolume(string aVolume)
         {
             if (string.IsNullOrEmpty(aVolume))
             {
@@ -124,13 +214,14 @@ namespace SentinelKernel.System.FileSystem.VFS
             return null;
         }
 
-        public static List<System.FileSystem.Listing.Directory> GetVolumes()
+        public static List<Listing.Directory> GetVolumes()
         {
             return null;
         }
 
         public static List<string> GetLogicalDrives()
         {
+            //TODO: Directory.GetLogicalDrives() will call this.
             return null;
 
             /*

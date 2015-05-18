@@ -11,7 +11,7 @@ namespace SentinelKernel.System.Plugs.System.IO
     [Plug(Target = typeof(Directory))]
     public static class DirectoryImpl
     {
-        private static string mCurrentDirectory = @"/0";
+        private static string mCurrentDirectory = string.Empty;
 
         public static string GetCurrentDirectory()
         {
@@ -25,7 +25,7 @@ namespace SentinelKernel.System.Plugs.System.IO
 
         public static bool Exists(string aPath)
         {
-            return FileSystem.VFS.VFSManager.DirectoryExists(aPath);
+            return VFSManager.DirectoryExists(aPath);
         }
     }
 }

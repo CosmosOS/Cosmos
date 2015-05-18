@@ -15,6 +15,7 @@ namespace SentinelKernel.System.Plugs.System.IO
         //[PlugMethod(Signature = "System_Void__System_IO_FileInfo__ctor_System_String_")]
         public static void Ctor(FileInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref FileSystem.Listing.Directory aStorage, string aFile)
         {
+            /*
             //Determine if aFile is relative or absolute
             string xFile;
             if (aFile.IsRelativePath())
@@ -28,6 +29,7 @@ namespace SentinelKernel.System.Plugs.System.IO
             {
                 aStorage = xEntry as FileSystem.Listing.Directory;
             }
+            */
         }
 
         public static string get_Name([FieldAccess(Name = "$$Storage$$")] ref FileSystem.Listing.File aStorage)
