@@ -155,6 +155,7 @@
     <Compile Include="CustomImplementation\System\UInt16Impl.cs" />
     <Compile Include="CustomImplementation\System\UInt32Impl.cs" />
     <Compile Include="CustomImplementation\System\UInt64Impl.cs" />
+    <Compile Include="CustomImplementation\System\UIntPtrImpl.cs" />
     <Compile Include="ElfHash.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="Extensions.cs" />
