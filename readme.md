@@ -34,7 +34,7 @@ Joining Cosmos
 * [Cosmos Chat Room](http://cosmos.codeplex.com/wikipage?title=Cosmos%20Chat%20Room&referringTitle=Home) - Live chat. When joining give some time for response. Asking a question and leaving a few minutes or seconds later will not give anyone any time to notice your presence.
 * [Facebook](http://www.facebook.com/pages/Cosmos-Operating-System/10235842745) - Like us to see frequent updates of what is going on with Cosmos.
 * [YouTube Channel](https://www.youtube.com/channel/UCsSKtqjfpSR0B3Ov4cBIarQ/) - Follow use to see useful videos.
-* [Resources](https://github.com/CosmosOS/Cosmos/wiki/Resources.md) - More Cosmos related links.
+* [Resources](https://github.com/CosmosOS/Cosmos/wiki/Resources) - More Cosmos related links.
 
 
 Articles and Resources
@@ -46,7 +46,7 @@ Articles and Resources
 * [X86 Assembly Debugger Preview](http://www.codeproject.com/KB/cs/CosmosAsmDebuggerPreview.aspx)
 * [Making a Remote PC Slave for Debugging or Fun](http://www.codeproject.com/Articles/413942/Making-a-Remote-PC-Slave-for-Debugging-or-Fun)
 * [Cosmos Tutorials](http://www.thedevforum.com/forum-28.html)
-* [Cosmos Projects](http://cosmos.codeplex.com/wikipage?title=Cosmos%20Projects&referringTitle=Home)
+* [Cosmos Projects](https://github.com/CosmosOS/Cosmos/wiki/Cosmos-Projects)
 
 
 Publicity
