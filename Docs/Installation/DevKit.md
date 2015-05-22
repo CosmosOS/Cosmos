@@ -1,7 +1,7 @@
 
 ###  Prerequisites
 
-* (Free) source code of Devkit from [Cosmos on CodePlex](http://cosmos.codeplex.com/SourceControl/list/changesets)	
+* (Free) source code of Devkit from [Cosmos on CodePlex](https://github.com/CosmosOS/Cosmos)	
 * (Optional) [Visual Studio 2013 Community](http://go.microsoft.com/fwlink/?LinkId=517284)  
 If you do not wish to use the integrated source control, you can use the SVN
 bridge instead.
