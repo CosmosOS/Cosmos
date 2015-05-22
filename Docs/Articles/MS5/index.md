@@ -142,5 +142,5 @@ not a Linux distro.
 ###  Obtaining Cosmos
 
   * Cosmos Website - [http://www.GoCosmos.org](http://www.GoCosmos.org)
-  * Source Code - Both dev kit and user kit - [ http://Cosmos.CodePlex.com](http://Cosmos.CodePlex.com)
+  * Source Code - Both dev kit and user kit - [http://github.com/CosmosOS/Cosmos/](http://github.com/CosmosOS/Cosmos/)
 
