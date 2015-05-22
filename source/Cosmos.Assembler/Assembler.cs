@@ -176,7 +176,6 @@ namespace Cosmos.Assembler {
     // Allows to emit footers to the code and datamember sections
     protected virtual void OnBeforeFlush() {
       DataMembers.AddRange(new DataMember[] { new DataMember("_end_data", new byte[0]) });
-      new Label("_end_code");
     }
 
     private uint mDataMemberCounter = 0;
@@ -255,6 +254,8 @@ namespace Cosmos.Assembler {
       aOutput.WriteLine("SystemExceptionOccurred:");
       aOutput.WriteLine("\tret");
       aOutput.WriteLine("global Kernel_Start");
+      aOutput.WriteLine("_end_code:");
+
       aOutput.Flush();
     }
 
