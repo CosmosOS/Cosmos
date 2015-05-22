@@ -76,8 +76,6 @@ namespace Cosmos.IL2CPU
                     var xDepRing = GetRingFromAssembly(xAsmDep);
                     RingsWriteLine("\t\tRing = {0}", xDepRing);
 
-                    continue; // zdimension: Disabled ring verification for my personal needs
-
                     var xDepRingInt = (int)xDepRing;
 
                     if (xDepRingInt == xRingInt)
