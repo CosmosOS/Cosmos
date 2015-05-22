@@ -26,21 +26,21 @@ setups the Visual Studio IP. At the end it starts Visual Studio.
 
 You should close Visual Studio before executing install.bat.
 
-#### Docs
+#### \Docs
 
 Just a bunch of bad-structured documentation about Cosmos
 
-#### QA
+#### \QA
 
 Todo.
 
-#### Resources
+#### \Resources
 
 Here you can put any pdf, doc, rtf, txt which can be used as a reference help
 to develop Cosmos. It also contains the folder **x86**. Inside you can find
 many interesting references about the x86 architecture.
 
-#### Setup
+#### \Setup
 
 Contains scripts and languages to build the Cosmos User Kit Installer. The
 creation (and execution) of the installer is started from
@@ -48,10 +48,16 @@ creation (and execution) of the installer is started from
 
 #### \Source
 
-**TODO: Check correctness of the following sentences: **Contains a lot of code which is now not used. It was used previously, but it was decided to take it away and to restructure the code organization. It may be reintegrated however in future, with some code changes.
+Contains the code of the Cosmos project, including the Compiler, Installer, Debugger and the main features of Cosmos. It also contains unused code.
+
+**TODO: Check the following:** Contains a lot of code which is now not used. It was used previously, but it was decided to take it away and to restructure the code organization. It may be reintegrated however in future, with some code changes.
 
 It also contains the solution file of Cosmos and some support libraries, which
 IMHO should be moved to Source2
+
+#### \Source\Unused
+
+This folder contains work-in-progress or deprecated features, like FAT, VGA and Networking.
 
 #### \Source2
 
@@ -75,12 +81,12 @@ Contains the Debug Engine and Connector code. Also gives the possibility to
 work with GDB. For more informations about debugging see
 [Debugger](debugger.htm)
 
-#### \Source2\Demos
+#### \Demos
 
 Should contain examples of the use of the Cosmos User Kit. Actually only a
 number Guess demo is available
 
-#### \Source2\IL2CPU
+#### \Source\IL2CPU
 
 Code for the IL2CPU program. It's the Cosmos AOT Compiler. Form more
 informations about AOT compilers and IL2CPU see [IL2CPU](il2cpu.htm)
@@ -108,7 +114,7 @@ TODO
 
 TODO
 
-#### \Source2\Users
+#### Users
 
 Custom code playground. You can put your examples, random code, and toughts
 here
