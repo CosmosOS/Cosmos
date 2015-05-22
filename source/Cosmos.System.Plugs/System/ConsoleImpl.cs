@@ -23,7 +23,8 @@ namespace Cosmos.System.Plugs.System {
 
 		public static void set_BackgroundColor(ConsoleColor value) {
 			mBackground = value;
-            Cosmos.HAL.Global.TextScreen.SetColors(mForeground, mBackground);
+            //Cosmos.HAL.Global.TextScreen.SetColors(mForeground, mBackground);
+		    if(GetConsole() != null) GetConsole().Background = value;
 		}
 
 		public static int get_BufferHeight() {
@@ -118,8 +119,9 @@ namespace Cosmos.System.Plugs.System {
 
 		public static void set_ForegroundColor(ConsoleColor value) {
 			mForeground = value;
-			Cosmos.HAL.Global.TextScreen.SetColors(mForeground, mBackground);
-		}
+            //Cosmos.HAL.Global.TextScreen.SetColors(mForeground, mBackground);
+            if (GetConsole() != null) GetConsole().Foreground = value;
+        }
 
 		//public static TextReader get_In()
 		//{
