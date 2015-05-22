@@ -1,5 +1,4 @@
 ﻿using System;
-using PlaygroundSystem;
 using Sys = Cosmos.System;
 
 namespace Playground
@@ -14,12 +13,23 @@ namespace Playground
         protected override void Run()
         {
             Console.WriteLine("Started");
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.BackgroundColor=ConsoleColor.DarkYellow;
-            Console.WriteLine("Rood op donker geel!");
-            Console.ReadLine();
-            Console.WriteLine("Done");
+            //Console.ForegroundColor = ConsoleColor.Red;
+            //Console.BackgroundColor=ConsoleColor.DarkYellow;
+            //Console.WriteLine("Rood op donker geel!");
+            //Console.ReadLine();
+            //Console.WriteLine("Done");
 
+            try
+            {
+                Console.Write("");
+            }
+            catch(Exception E)
+            {
+                Console.WriteLine("Error occurred!");
+                Console.Write("Error: ");
+                Console.WriteLine(E.Message);
+            }
+            Console.WriteLine("Done.");
             while (true)
                 ;
 

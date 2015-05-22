@@ -40,10 +40,6 @@
       <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PlaygroundSystem\PlaygroundSystem.csproj">
-      <Project>{82F6DDA3-E45D-4E7A-AA09-85FC2EDE2F76}</Project>
-      <Name>PlaygroundSystem</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
