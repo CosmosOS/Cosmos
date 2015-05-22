@@ -37,12 +37,12 @@
     <PXE_Launch>None</PXE_Launch>
     <PXE_DebugEnabled>False</PXE_DebugEnabled>
     <PXE_DebugMode>Source</PXE_DebugMode>
-    <PXE_IgnoreDebugStubAttribute />
+    <PXE_IgnoreDebugStubAttribute>False</PXE_IgnoreDebugStubAttribute>
     <PXE_VMwareEdition>Player</PXE_VMwareEdition>
     <PXE_OutputPath>bin\Debug\</PXE_OutputPath>
     <PXE_Framework>MicrosoftNET</PXE_Framework>
     <PXE_UseInternalAssembler>False</PXE_UseInternalAssembler>
-    <PXE_TraceAssemblies />
+    <PXE_TraceAssemblies>All</PXE_TraceAssemblies>
     <PXE_EnableGDB>False</PXE_EnableGDB>
     <PXE_StartCosmosGDB>false</PXE_StartCosmosGDB>
     <USB_Deployment>USB</USB_Deployment>
@@ -59,7 +59,7 @@
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
-    <VMware_DebugEnabled>True</VMware_DebugEnabled>
+    <VMware_DebugEnabled>False</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute>False</VMware_IgnoreDebugStubAttribute>
     <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
@@ -97,12 +97,12 @@
     <User001_Launch>Slave</User001_Launch>
     <User001_DebugEnabled>True</User001_DebugEnabled>
     <User001_DebugMode>Source</User001_DebugMode>
-    <User001_IgnoreDebugStubAttribute />
+    <User001_IgnoreDebugStubAttribute>False</User001_IgnoreDebugStubAttribute>
     <User001_VMwareEdition>Player</User001_VMwareEdition>
     <User001_OutputPath>bin\Debug\</User001_OutputPath>
     <User001_Framework>MicrosoftNET</User001_Framework>
     <User001_UseInternalAssembler>False</User001_UseInternalAssembler>
-    <User001_TraceAssemblies />
+    <User001_TraceAssemblies>All</User001_TraceAssemblies>
     <User001_EnableGDB>False</User001_EnableGDB>
     <User001_StartCosmosGDB>false</User001_StartCosmosGDB>
     <PxeInterface>192.168.43.1</PxeInterface>
@@ -129,7 +129,7 @@
     <ISO_VisualStudioDebugPort>Pipe: Cosmos\Serial</ISO_VisualStudioDebugPort>
     <PXE_ShowLaunchConsole>False</PXE_ShowLaunchConsole>
     <PXE_VisualStudioDebugPort>Pipe: Cosmos\Serial</PXE_VisualStudioDebugPort>
-    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <StackCorruptionDetectionEnabled>False</StackCorruptionDetectionEnabled>
     <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
     <Bochs_Name>Guess</Bochs_Name>
     <Bochs_Description>Use Bochs emulator to deploy and debug.</Bochs_Description>
@@ -137,7 +137,7 @@
     <Bochs_Launch>Bochs</Bochs_Launch>
     <Bochs_ShowLaunchConsole>False</Bochs_ShowLaunchConsole>
     <Bochs_DebugEnabled>True</Bochs_DebugEnabled>
-    <Bochs_StackCorruptionDetectionEnabled>True</Bochs_StackCorruptionDetectionEnabled>
+    <Bochs_StackCorruptionDetectionEnabled>False</Bochs_StackCorruptionDetectionEnabled>
     <Bochs_DebugMode>Source</Bochs_DebugMode>
     <Bochs_IgnoreDebugStubAttribute>False</Bochs_IgnoreDebugStubAttribute>
     <Bochs_VisualStudioDebugPort>Pipe: Cosmos\Serial</Bochs_VisualStudioDebugPort>
@@ -152,6 +152,31 @@
     <Bochs_StartCosmosGDB>False</Bochs_StartCosmosGDB>
     <EnableBochsDebug>False</EnableBochsDebug>
     <Bochs_EnableBochsDebug>False</Bochs_EnableBochsDebug>
+    <PXE_StackCorruptionDetectionEnabled>False</PXE_StackCorruptionDetectionEnabled>
+    <PXE_EnableBochsDebug>False</PXE_EnableBochsDebug>
+    <VMware_EnableBochsDebug>False</VMware_EnableBochsDebug>
+    <IntelEdison_Name>Guess</IntelEdison_Name>
+    <IntelEdison_Description>Connect to Intel Edison device to deploy and debug.</IntelEdison_Description>
+    <IntelEdison_Deployment>BinaryImage</IntelEdison_Deployment>
+    <IntelEdison_Launch>IntelEdison</IntelEdison_Launch>
+    <IntelEdison_ShowLaunchConsole>False</IntelEdison_ShowLaunchConsole>
+    <IntelEdison_DebugEnabled>False</IntelEdison_DebugEnabled>
+    <IntelEdison_StackCorruptionDetectionEnabled>True</IntelEdison_StackCorruptionDetectionEnabled>
+    <IntelEdison_DebugMode>Source</IntelEdison_DebugMode>
+    <IntelEdison_IgnoreDebugStubAttribute>False</IntelEdison_IgnoreDebugStubAttribute>
+    <IntelEdison_VisualStudioDebugPort>Pipe: Cosmos\Serial</IntelEdison_VisualStudioDebugPort>
+    <IntelEdison_PxeInterface>192.168.43.1</IntelEdison_PxeInterface>
+    <IntelEdison_SlavePort>Serial: COM3</IntelEdison_SlavePort>
+    <IntelEdison_VMwareEdition>Workstation</IntelEdison_VMwareEdition>
+    <IntelEdison_OutputPath>bin\Debug\</IntelEdison_OutputPath>
+    <IntelEdison_Framework>MicrosoftNET</IntelEdison_Framework>
+    <IntelEdison_UseInternalAssembler>False</IntelEdison_UseInternalAssembler>
+    <IntelEdison_TraceAssemblies>All</IntelEdison_TraceAssemblies>
+    <IntelEdison_EnableGDB>False</IntelEdison_EnableGDB>
+    <IntelEdison_StartCosmosGDB>False</IntelEdison_StartCosmosGDB>
+    <IntelEdison_EnableBochsDebug>False</IntelEdison_EnableBochsDebug>
+    <User001_StackCorruptionDetectionEnabled>False</User001_StackCorruptionDetectionEnabled>
+    <User001_EnableBochsDebug>False</User001_EnableBochsDebug>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Profile>Bochs</Profile>
@@ -176,12 +201,12 @@
     <PXE_Launch>None</PXE_Launch>
     <PXE_DebugEnabled>False</PXE_DebugEnabled>
     <PXE_DebugMode>Source</PXE_DebugMode>
-    <PXE_IgnoreDebugStubAttribute />
+    <PXE_IgnoreDebugStubAttribute>False</PXE_IgnoreDebugStubAttribute>
     <PXE_VMwareEdition>Player</PXE_VMwareEdition>
     <PXE_OutputPath>bin\Debug\</PXE_OutputPath>
     <PXE_Framework>MicrosoftNET</PXE_Framework>
     <PXE_UseInternalAssembler>False</PXE_UseInternalAssembler>
-    <PXE_TraceAssemblies />
+    <PXE_TraceAssemblies>All</PXE_TraceAssemblies>
     <PXE_EnableGDB>False</PXE_EnableGDB>
     <PXE_StartCosmosGDB>false</PXE_StartCosmosGDB>
     <USB_Deployment>USB</USB_Deployment>
@@ -198,7 +223,7 @@
     <USB_StartCosmosGDB>false</USB_StartCosmosGDB>
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
-    <VMware_DebugEnabled>True</VMware_DebugEnabled>
+    <VMware_DebugEnabled>False</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute>False</VMware_IgnoreDebugStubAttribute>
     <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
@@ -236,12 +261,12 @@
     <User001_Launch>Slave</User001_Launch>
     <User001_DebugEnabled>True</User001_DebugEnabled>
     <User001_DebugMode>Source</User001_DebugMode>
-    <User001_IgnoreDebugStubAttribute />
+    <User001_IgnoreDebugStubAttribute>False</User001_IgnoreDebugStubAttribute>
     <User001_VMwareEdition>Player</User001_VMwareEdition>
     <User001_OutputPath>bin\Debug\</User001_OutputPath>
     <User001_Framework>MicrosoftNET</User001_Framework>
     <User001_UseInternalAssembler>False</User001_UseInternalAssembler>
-    <User001_TraceAssemblies />
+    <User001_TraceAssemblies>All</User001_TraceAssemblies>
     <User001_EnableGDB>False</User001_EnableGDB>
     <User001_StartCosmosGDB>false</User001_StartCosmosGDB>
     <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
@@ -274,7 +299,7 @@
     <VMware_ShowLaunchConsole>False</VMware_ShowLaunchConsole>
     <ISO_ShowLaunchConsole>False</ISO_ShowLaunchConsole>
     <PXE_ShowLaunchConsole>False</PXE_ShowLaunchConsole>
-    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <StackCorruptionDetectionEnabled>False</StackCorruptionDetectionEnabled>
     <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
     <Bochs_Name>Guess</Bochs_Name>
     <Bochs_Description>Use Bochs emulator to deploy and debug.</Bochs_Description>
@@ -282,7 +307,7 @@
     <Bochs_Launch>Bochs</Bochs_Launch>
     <Bochs_ShowLaunchConsole>False</Bochs_ShowLaunchConsole>
     <Bochs_DebugEnabled>True</Bochs_DebugEnabled>
-    <Bochs_StackCorruptionDetectionEnabled>True</Bochs_StackCorruptionDetectionEnabled>
+    <Bochs_StackCorruptionDetectionEnabled>False</Bochs_StackCorruptionDetectionEnabled>
     <Bochs_DebugMode>Source</Bochs_DebugMode>
     <Bochs_IgnoreDebugStubAttribute>False</Bochs_IgnoreDebugStubAttribute>
     <Bochs_VisualStudioDebugPort>Pipe: Cosmos\Serial</Bochs_VisualStudioDebugPort>
@@ -297,6 +322,31 @@
     <Bochs_StartCosmosGDB>False</Bochs_StartCosmosGDB>
     <EnableBochsDebug>False</EnableBochsDebug>
     <Bochs_EnableBochsDebug>False</Bochs_EnableBochsDebug>
+    <PXE_StackCorruptionDetectionEnabled>False</PXE_StackCorruptionDetectionEnabled>
+    <PXE_EnableBochsDebug>False</PXE_EnableBochsDebug>
+    <VMware_EnableBochsDebug>False</VMware_EnableBochsDebug>
+    <IntelEdison_Name>Guess</IntelEdison_Name>
+    <IntelEdison_Description>Connect to Intel Edison device to deploy and debug.</IntelEdison_Description>
+    <IntelEdison_Deployment>BinaryImage</IntelEdison_Deployment>
+    <IntelEdison_Launch>IntelEdison</IntelEdison_Launch>
+    <IntelEdison_ShowLaunchConsole>False</IntelEdison_ShowLaunchConsole>
+    <IntelEdison_DebugEnabled>False</IntelEdison_DebugEnabled>
+    <IntelEdison_StackCorruptionDetectionEnabled>True</IntelEdison_StackCorruptionDetectionEnabled>
+    <IntelEdison_DebugMode>Source</IntelEdison_DebugMode>
+    <IntelEdison_IgnoreDebugStubAttribute>False</IntelEdison_IgnoreDebugStubAttribute>
+    <IntelEdison_VisualStudioDebugPort>Pipe: Cosmos\Serial</IntelEdison_VisualStudioDebugPort>
+    <IntelEdison_PxeInterface>192.168.43.1</IntelEdison_PxeInterface>
+    <IntelEdison_SlavePort>Serial: COM3</IntelEdison_SlavePort>
+    <IntelEdison_VMwareEdition>Workstation</IntelEdison_VMwareEdition>
+    <IntelEdison_OutputPath>bin\Debug\</IntelEdison_OutputPath>
+    <IntelEdison_Framework>MicrosoftNET</IntelEdison_Framework>
+    <IntelEdison_UseInternalAssembler>False</IntelEdison_UseInternalAssembler>
+    <IntelEdison_TraceAssemblies>All</IntelEdison_TraceAssemblies>
+    <IntelEdison_EnableGDB>False</IntelEdison_EnableGDB>
+    <IntelEdison_StartCosmosGDB>False</IntelEdison_StartCosmosGDB>
+    <IntelEdison_EnableBochsDebug>False</IntelEdison_EnableBochsDebug>
+    <User001_StackCorruptionDetectionEnabled>False</User001_StackCorruptionDetectionEnabled>
+    <User001_EnableBochsDebug>False</User001_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Cosmos.bxrc">

@@ -60,6 +60,8 @@ namespace Cosmos.VS.Package {
     protected bool mShowTabISO;
     protected bool mShowTabSlave;
 
+    protected bool FreezeEvents = false;
+
     public override void ApplyChanges() {
       // Save now, because when we reload this form it will
       // reload out of the saved profile and trash any changes
@@ -125,6 +127,8 @@ namespace Cosmos.VS.Package {
     }
 
     protected void UpdatePresetsUI() {
+      FreezeEvents = true;
+
       mShowTabDebug = true;
       cmboCosmosDebugPort.Enabled = true;
       cmboVisualStudioDebugPort.Enabled = true;
@@ -161,6 +165,7 @@ namespace Cosmos.VS.Package {
         mShowTabVMware = false;
         cmboVisualStudioDebugPort.Enabled = false;
       }
+      FreezeEvents = false;
     }
 
     protected void UpdateUI() {
@@ -318,6 +323,8 @@ namespace Cosmos.VS.Package {
 
       #region Compile
       comboFramework.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         var value = (Framework)((EnumValue)comboFramework.SelectedItem).Value;
         if (value != mProps.Framework) {
           mProps.Framework = value;
@@ -326,6 +333,8 @@ namespace Cosmos.VS.Package {
       };
       comboBinFormat.SelectedIndexChanged += delegate(Object sender, EventArgs e)
       {
+        if (FreezeEvents)
+          return;
           var value = (BinFormat)((EnumValue)comboBinFormat.SelectedItem).Value;
           if (value != mProps.BinFormat)
           {
@@ -335,6 +344,8 @@ namespace Cosmos.VS.Package {
       };
 
       textOutputPath.TextChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         string value = textOutputPath.Text;
         if (!string.Equals(value, mProps.OutputPath, StringComparison.InvariantCultureIgnoreCase)) {
           mProps.OutputPath = textOutputPath.Text;
@@ -345,6 +356,8 @@ namespace Cosmos.VS.Package {
 
       #region Assembler
       checkUseInternalAssembler.CheckedChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         bool value = checkUseInternalAssembler.Checked;
         if (value != mProps.UseInternalAssembler) {
           mProps.UseInternalAssembler = value;
@@ -356,6 +369,8 @@ namespace Cosmos.VS.Package {
 
       #region VMware
       cmboVMwareEdition.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         var x = (VMwareEdition)((EnumValue)cmboVMwareEdition.SelectedItem).Value;
         if (x != mProps.VMwareEdition) {
           mProps.VMwareEdition = x;
@@ -366,6 +381,8 @@ namespace Cosmos.VS.Package {
 
       #region PXE
       textPxeInterface.TextChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         var x = textPxeInterface.Text.Trim();
         if (x != mProps.PxeInterface) {
           mProps.PxeInterface = x;
@@ -374,6 +391,8 @@ namespace Cosmos.VS.Package {
       };
 
       cmboSlavePort.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         var x = (string)cmboSlavePort.SelectedItem;
         if (x != mProps.SlavePort) {
           mProps.SlavePort = x;
@@ -384,6 +403,8 @@ namespace Cosmos.VS.Package {
 
       #region Debug
       comboDebugMode.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         var x = (Cosmos.Build.Common.DebugMode)((EnumValue)comboDebugMode.SelectedItem).Value;
         if (x != mProps.DebugMode) {
           mProps.DebugMode = x;
@@ -392,12 +413,16 @@ namespace Cosmos.VS.Package {
       };
 
       chckEnableDebugStub.CheckedChanged += delegate(object aSender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         panlDebugSettings.Enabled = chckEnableDebugStub.Checked;
         mProps.DebugEnabled = chckEnableDebugStub.Checked;
         IsDirty = true;
       };
 
       comboTraceMode.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         var x = (TraceAssemblies)((EnumValue)comboTraceMode.SelectedItem).Value;
         if (x != mProps.TraceAssemblies) {
           mProps.TraceAssemblies = x;
@@ -406,6 +431,8 @@ namespace Cosmos.VS.Package {
       };
 
       checkIgnoreDebugStubAttribute.CheckedChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         bool x = checkIgnoreDebugStubAttribute.Checked;
         if (x != mProps.IgnoreDebugStubAttribute) {
           mProps.IgnoreDebugStubAttribute = x;
@@ -414,6 +441,8 @@ namespace Cosmos.VS.Package {
       };
 
       cmboCosmosDebugPort.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         var x = (string)cmboCosmosDebugPort.SelectedItem;
         if (x != mProps.CosmosDebugPort) {
           mProps.CosmosDebugPort = x;
@@ -422,6 +451,8 @@ namespace Cosmos.VS.Package {
       };
 
       cmboVisualStudioDebugPort.SelectedIndexChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         var x = (string)cmboVisualStudioDebugPort.SelectedItem;
         if (x != mProps.VisualStudioDebugPort) {
           mProps.VisualStudioDebugPort = x;
@@ -431,6 +462,8 @@ namespace Cosmos.VS.Package {
       #endregion
 
       checkEnableGDB.CheckedChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         bool x = checkEnableGDB.Checked;
         if (x != mProps.EnableGDB) {
           mProps.EnableGDB = x;
@@ -441,6 +474,8 @@ namespace Cosmos.VS.Package {
       };
 
       checkStartCosmosGDB.CheckedChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
         bool x = checkStartCosmosGDB.Checked;
         if (x != mProps.StartCosmosGDB) {
           mProps.StartCosmosGDB = x;
@@ -448,8 +483,9 @@ namespace Cosmos.VS.Package {
         }
       };
 
-      checkEnableBochsDebug.CheckedChanged += delegate(Object sender, EventArgs e)
-      {
+      checkEnableBochsDebug.CheckedChanged += delegate(Object sender, EventArgs e) {
+        if (FreezeEvents)
+          return;
           bool x = checkEnableBochsDebug.Checked;
           if (x != mProps.EnableBochsDebug)
           {
@@ -672,6 +708,8 @@ namespace Cosmos.VS.Package {
 
     private void chkEnableStacckCorruptionDetection_CheckedChanged(object sender, EventArgs e)
     {
+      if (FreezeEvents)
+        return;
       IsDirty = true;
       mProps.StackCorruptionDetectionEnabled = chkEnableStackCorruptionDetection.Checked;
     }
