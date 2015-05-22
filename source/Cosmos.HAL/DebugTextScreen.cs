@@ -20,6 +20,11 @@ namespace Cosmos.HAL
         {
         }
 
+        public override byte GetColor()
+        {
+            return 0x0F;
+        }
+
         public override ushort Cols
         {
             get

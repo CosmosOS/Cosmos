@@ -97,5 +97,15 @@ namespace Cosmos.System {
             }
         }
 
+        public ConsoleColor Foreground
+        {
+            get { return (ConsoleColor)(mText.GetColor() ^ (byte)((byte)Background << 4)); }
+            set { mText.SetColors(value, Background); }
+        }
+        public ConsoleColor Background
+        {
+            get { return (ConsoleColor)(mText.GetColor() >> 4); }
+            set { mText.SetColors(Foreground, value); }
+        }
     }
 }

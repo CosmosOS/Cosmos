@@ -53,7 +53,9 @@ namespace Cosmos.HAL {
       }
     }
 
-    public override void SetColors(ConsoleColor aForeground, ConsoleColor aBackground) {
+     
+
+        public override void SetColors(ConsoleColor aForeground, ConsoleColor aBackground) {
       Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
     }
 
@@ -67,6 +69,9 @@ namespace Cosmos.HAL {
       IO.Idx3.Byte = 0x0E;
       IO.Data3.Byte = (byte)(xPos >> 8);
     }
-
-  }
+        public override byte GetColor()
+        {
+            return Color;
+        }
+    }
 }

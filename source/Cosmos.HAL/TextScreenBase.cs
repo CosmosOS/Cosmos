@@ -12,6 +12,8 @@ namespace Cosmos.HAL
 
         public abstract void SetColors(ConsoleColor aForeground, ConsoleColor aBackground);
 
+        public abstract byte GetColor();
+
         public abstract ushort Cols
         {
             get;
@@ -20,6 +22,17 @@ namespace Cosmos.HAL
         public abstract ushort Rows
         {
             get;
+        }
+
+        public ConsoleColor Foreground
+        {
+            get { return (ConsoleColor)(GetColor() ^ (byte)((byte)Background << 4)); }
+            set { SetColors(value, Background); }
+        }
+        public ConsoleColor Background
+        {
+            get { return (ConsoleColor)(GetColor() >> 4); }
+            set { SetColors(Foreground, value); }
         }
 
         public abstract void SetCursorPos(int x, int y);
