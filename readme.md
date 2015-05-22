@@ -23,7 +23,7 @@ Getting Started
 
 * [Cosmos Documentation](https://github.com/CosmosOS/Cosmos/wiki)
 * Video: [Using VS Express Editions](https://www.youtube.com/watch?v=NNl8S2xOtdo)
-* [FAQ](http://cosmos.codeplex.com/wikipage?title=FAQ&referringTitle=Home)
+* [FAQ](https://github.com/CosmosOS/Cosmos/wiki/FAQ)
 * [Low Hanging Fruit](https://github.com/CosmosOS/Cosmos/issues?q=is%3Aopen+is%3Aissue+label%3Acomplexity_low) - Looking for something easy to do and prove your worth in Cosmos? Here are a few easy tasks we have on our to do list that are also of importance to us.
 
 
@@ -34,7 +34,7 @@ Joining Cosmos
 * [Cosmos Chat Room](http://cosmos.codeplex.com/wikipage?title=Cosmos%20Chat%20Room&referringTitle=Home) - Live chat. When joining give some time for response. Asking a question and leaving a few minutes or seconds later will not give anyone any time to notice your presence.
 * [Facebook](http://www.facebook.com/pages/Cosmos-Operating-System/10235842745) - Like us to see frequent updates of what is going on with Cosmos.
 * [YouTube Channel](https://www.youtube.com/channel/UCsSKtqjfpSR0B3Ov4cBIarQ/) - Follow use to see useful videos.
-* [Resources](http://cosmos.codeplex.com/wikipage?title=Resources&referringTitle=Home) - More Cosmos related links.
+* [Resources](https://github.com/CosmosOS/Cosmos/wiki/Resources.md) - More Cosmos related links.
 
 
 Articles and Resources
