@@ -38,6 +38,8 @@
 //
 // http://www.nondot.org/sabre/os/files/Communication/ser_port.txt
 
+! %ifndef Exclude_IOPort_Based_SerialInit
+
 // Todo Auto params
 // Todo ebp frame ptr auto etc
 function InitSerial {
@@ -135,3 +137,5 @@ Wait:
 
 	ESI++
 }
+
+! %endif
