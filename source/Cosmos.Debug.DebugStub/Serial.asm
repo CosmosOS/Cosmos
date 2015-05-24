@@ -1,4 +1,4 @@
-; Generated at 7-3-2015 19:22:31
+; Generated at 22-5-2015 19:17:06
 
 
 
@@ -10,6 +10,8 @@
 
 
 
+
+%ifndef Exclude_IOPort_Based_SerialInit
 
 DebugStub_InitSerial:
 Mov DX, 1
@@ -77,4 +79,6 @@ Inc ESI
 DebugStub_ComWrite8_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ComWrite8_Exit
 Ret
+
+%endif
 
