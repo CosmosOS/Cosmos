@@ -308,14 +308,9 @@ namespace Cosmos.System.Plugs.System {
 
 		// ReadKey() pure CIL
 
-		public static ConsoleKeyInfo ReadKey(Boolean intercept) {
-			var key = Cosmos.HAL.Global.Keyboard.ReadMapping();
-			var returnValue = new ConsoleKeyInfo(
-				key.Value,
-				key.Key,
-				Cosmos.HAL.Global.Keyboard.ShiftPressed,
-				Cosmos.HAL.Global.Keyboard.AltPressed,
-				Cosmos.HAL.Global.Keyboard.CtrlPressed);
+		public static ConsoleKeyInfo ReadKey(Boolean intercept)
+		{
+		    var returnValue = Cosmos.HAL.Global.Keyboard.ReadKeyInfo();
 
 			if (false == intercept)
 			{
