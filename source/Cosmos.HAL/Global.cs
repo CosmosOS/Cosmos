@@ -99,11 +99,15 @@ namespace Cosmos.HAL {
 
     }
 
-    static public void Init(TextScreenBase textScreen)
+    static public void Init(TextScreenBase textScreen, Keyboard keyboard)
     {
       if (textScreen != null)
       {
         TextScreen = textScreen;
+      }
+      if (keyboard != null)
+      {
+          Keyboard = keyboard;
       }
       Core.Bootstrap.Init();
       Core.Global.Init();
