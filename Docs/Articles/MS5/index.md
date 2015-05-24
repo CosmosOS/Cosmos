@@ -43,7 +43,7 @@ console window, you will see the following:
 ![](CosmosMS5/SNAG-0003.png)
 
 This is your operating system running in VMWare Player! Cosmos can of course
-also be booted in VMWare Workstation, Hyper-V, Virtual PC, or on real
+also be booted in VMWare Workstation, Hyper-V, Virtual PC, Bochs, or on real
 hardware. But by default Cosmos uses VMWare Player because it is both free,
 and reliable. Cosmos can even debug in Visual Studio, even when running on
 another machine.
