@@ -14,8 +14,8 @@ namespace Cosmos.IL2CPU.X86.IL
         public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  uint aElementSize,bool isSigned , bool debugEnabled)
         {
           DoNullReferenceCheck(aAssembler, debugEnabled, 4);
-			if (aElementSize <= 0 || aElementSize > 8 || (aElementSize > 4 && aElementSize < 8))
-				throw new Exception("Unsupported size for Ldelem_Ref: " + aElementSize);
+			    if (aElementSize <= 0 || aElementSize > 8 || (aElementSize > 4 && aElementSize < 8))
+				    throw new Exception("Unsupported size for Ldelem_Ref: " + aElementSize);
 
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };

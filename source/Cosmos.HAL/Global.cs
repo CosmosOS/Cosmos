@@ -18,7 +18,7 @@ namespace Cosmos.HAL {
       var xIO = aControllerID == BlockDevice.Ata.ControllerIdEnum.Primary ? Cosmos.Core.Global.BaseIOGroups.ATA1 : Cosmos.Core.Global.BaseIOGroups.ATA2;
       var xATA = new BlockDevice.AtaPio(xIO, aControllerID, aBusPosition);
       if (xATA.DriveType != BlockDevice.AtaPio.SpecLevel.Null) {
-        BlockDevice.BlockDevice.Devices.Add(xATA);        
+        BlockDevice.BlockDevice.Devices.Add(xATA);
           var xMbrData = new byte[512];
           xATA.ReadBlock(0UL, 1U, xMbrData);
           var xMBR = new BlockDevice.MBR(xMbrData);
@@ -64,21 +64,21 @@ namespace Cosmos.HAL {
     static internal void InitStaticDevices() {
       //TextScreen = new TextScreen();
       Global.Dbg.Send("CLS");
-        
+
       TextScreen.Clear();
 
       Global.Dbg.Send("Keyboard");
-      Keyboard = new Keyboard();
+      Keyboard = new DefaultKeyboard();
 
       // Find hardcoded ATA controllers
       Global.Dbg.Send("ATA Master");
       InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
 
       //Global.Dbg.Send("ATA Slave");
-      //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);      
+      //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
 
-      //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum? 
-      // They do show up in PCI space as well as the fixed space. 
+      //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum?
+      // They do show up in PCI space as well as the fixed space.
       // Or is it always here, and was our compiler stack corruption issue?
       //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Master);
       //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);

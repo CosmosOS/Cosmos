@@ -303,25 +303,28 @@ namespace Cosmos.System.Plugs.System {
 
 		public static int Read() {
 			// TODO special cases, if needed, that returns -1
-			return HAL.Global.Keyboard.ReadChar();
+		  ConsoleKeyInfo xResult;
+
+		  if (HAL.Global.Keyboard.TryReadKey(out xResult))
+		  {
+		    return xResult.KeyChar;
+		  }
+		  else
+		  {
+		    return -1;
+		  }
 		}
 
 		// ReadKey() pure CIL
 
 		public static ConsoleKeyInfo ReadKey(Boolean intercept) {
-			var key = Cosmos.HAL.Global.Keyboard.ReadMapping();
-			var returnValue = new ConsoleKeyInfo(
-				key.Value,
-				key.Key,
-				Cosmos.HAL.Global.Keyboard.ShiftPressed,
-				Cosmos.HAL.Global.Keyboard.AltPressed,
-				Cosmos.HAL.Global.Keyboard.CtrlPressed);
+      var key = Cosmos.HAL.Global.Keyboard.ReadKey();
 
 			if (false == intercept)
 			{
-				Write(returnValue.KeyChar);
+				Write(key.KeyChar);
 			}
-			return returnValue;
+			return key;
 		}
 
 		public static String ReadLine() {
@@ -332,13 +335,13 @@ namespace Cosmos.System.Plugs.System {
         return null;
       }
 			List<char> chars = new List<char>(32);
-			char current;
+			ConsoleKeyInfo current;
 			int currentCount = 0;
 
-			while ((current = HAL.Global.Keyboard.ReadChar()) != '\n')
+			while ((current = HAL.Global.Keyboard.ReadKey()).KeyChar != '\n')
 			{
 				//Check for "special" keys
-				if (current == '\u0968') // Backspace
+				if (current.Key == ConsoleKey.Backspace) // Backspace
 				{
 					if (currentCount > 0)
 					{
@@ -360,7 +363,7 @@ namespace Cosmos.System.Plugs.System {
 					}
 					continue;
 				}
-				else if (current == '\u2190') // Arrow Left
+				else if (current.Key == ConsoleKey.LeftArrow)
 				{
 					if (currentCount > 0)
 					{
@@ -369,7 +372,7 @@ namespace Cosmos.System.Plugs.System {
 					}
 					continue;
 				}
-				else if (current == '\u2192') // Arrow Right
+				else if (current.Key == ConsoleKey.RightArrow)
 				{
 					if (currentCount < chars.Count)
 					{
@@ -382,7 +385,7 @@ namespace Cosmos.System.Plugs.System {
 				//Write the character to the screen
 				if (currentCount == chars.Count)
 				{
-					chars.Add(current);
+          chars.Add(current.KeyChar);
 					Write(current);
 					currentCount++;
 				}
@@ -397,7 +400,7 @@ namespace Cosmos.System.Plugs.System {
 					{
 						if (x == currentCount)
 						{
-							temp.Add(current);
+              temp.Add(current.KeyChar);
 						}
 
 						temp.Add(chars[x]);

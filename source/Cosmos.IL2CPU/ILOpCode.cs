@@ -370,7 +370,8 @@ namespace Cosmos.IL2CPU {
           aSituationChanged = true;
         }
         if (StackPopTypes[i] != xActualStackItem
-          && !StackPopTypes[i].IsAssignableFrom(xActualStackItem))
+          && !StackPopTypes[i].IsAssignableFrom(xActualStackItem) 
+          && !((StackPopTypes[i].IsPointer || StackPopTypes[i].IsByRef) && (xActualStackItem.IsPointer || xActualStackItem.IsByRef)))
         {
           throw new Exception(String.Format("OpCode {0} tries to pop item at stack position {1} with type {2}, but actual type is {3}",
             this, i, StackPopTypes[i], xActualStackItem));
