@@ -80,7 +80,6 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             Assemble( Assembler, 4, false, DebugEnabled);
-            Assemble(Assembler, 4, false, DebugEnabled);
         }
     }
 }
