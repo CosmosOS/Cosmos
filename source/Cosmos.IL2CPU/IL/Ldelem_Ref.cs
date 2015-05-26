@@ -1,3 +1,4 @@
+using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
@@ -38,8 +39,8 @@ namespace Cosmos.IL2CPU.X86.IL
             var xSizeLeft = aElementSize;
             while (xSizeLeft > 0)
             {
-                var xCurrentStep = xSizeLeft % 4;
-                xSizeLeft = xSizeLeft / 4;
+                var xCurrentStep = Math.Min(xSizeLeft, 4);
+                xSizeLeft = xSizeLeft - xCurrentStep;
                 switch (xCurrentStep)
                 {
                     case 1:
@@ -64,7 +65,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         }
                         new CPUx86.Push {DestinationReg = CPUx86.Registers.ECX};
                         break;
-                    case 0:
+                    case 4:
                         // copy a full dword
                         new CPUx86.Push {DestinationReg = CPUx86.Registers.EDX, DestinationIsIndirect = true};
                         new CPUx86.Sub {DestinationReg = CPUx86.RegistersEnum.EDX, SourceValue = 4}; // move to previous 4 bytes
