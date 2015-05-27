@@ -14,7 +14,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>Bochs</Profile>
+    <Profile>VMware</Profile>
     <DebugEnabled>True</DebugEnabled>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
@@ -23,9 +23,9 @@
     <VMWareEdition>Workstation</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
     <Name>PlaygroundBoot</Name>
-    <Description>Use Bochs emulator to deploy and debug.</Description>
+    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
     <Deployment>ISO</Deployment>
-    <Launch>Bochs</Launch>
+    <Launch>VMware</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
     <TraceAssemblies>All</TraceAssemblies>
     <VMware_Name>PlaygroundBoot</VMware_Name>
@@ -104,8 +104,8 @@
     <Bochs_Description>Use Bochs emulator to deploy and debug.</Bochs_Description>
     <Bochs_Deployment>ISO</Bochs_Deployment>
     <Bochs_Launch>Bochs</Bochs_Launch>
-    <Bochs_DebugEnabled>True</Bochs_DebugEnabled>
-    <Bochs_StackCorruptionDetectionEnabled>True</Bochs_StackCorruptionDetectionEnabled>
+    <Bochs_DebugEnabled>False</Bochs_DebugEnabled>
+    <Bochs_StackCorruptionDetectionEnabled>False</Bochs_StackCorruptionDetectionEnabled>
     <Bochs_DebugMode>Source</Bochs_DebugMode>
     <Bochs_CosmosDebugPort>Serial: COM1</Bochs_CosmosDebugPort>
     <Bochs_VisualStudioDebugPort>Pipe: Cosmos\Serial</Bochs_VisualStudioDebugPort>
@@ -115,6 +115,7 @@
     <Bochs_EnableGDB>False</Bochs_EnableGDB>
     <Bochs_StartCosmosGDB>False</Bochs_StartCosmosGDB>
     <Bochs_EnableBochsDebug>True</Bochs_EnableBochsDebug>
+    <VMware_EnableBochsDebug>True</VMware_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">

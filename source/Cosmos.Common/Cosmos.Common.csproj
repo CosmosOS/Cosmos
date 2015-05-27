@@ -80,6 +80,7 @@
     <Compile Include="Enums.cs" />
     <Compile Include="Extensions\ByteConverter.cs" />
     <Compile Include="Extensions\ToHexString.cs" />
+    <Compile Include="NumberHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RingAttribute.cs" />
   </ItemGroup>

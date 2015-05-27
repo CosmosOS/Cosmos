@@ -177,6 +177,8 @@
     <IntelEdison_EnableBochsDebug>False</IntelEdison_EnableBochsDebug>
     <User001_StackCorruptionDetectionEnabled>False</User001_StackCorruptionDetectionEnabled>
     <User001_EnableBochsDebug>False</User001_EnableBochsDebug>
+    <USB_StackCorruptionDetectionEnabled>False</USB_StackCorruptionDetectionEnabled>
+    <USB_EnableBochsDebug>False</USB_EnableBochsDebug>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Profile>VMware</Profile>
@@ -347,6 +349,8 @@
     <IntelEdison_EnableBochsDebug>False</IntelEdison_EnableBochsDebug>
     <User001_StackCorruptionDetectionEnabled>False</User001_StackCorruptionDetectionEnabled>
     <User001_EnableBochsDebug>False</User001_EnableBochsDebug>
+    <USB_StackCorruptionDetectionEnabled>False</USB_StackCorruptionDetectionEnabled>
+    <USB_EnableBochsDebug>False</USB_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Cosmos.bxrc">

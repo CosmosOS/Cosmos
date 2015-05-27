@@ -100,6 +100,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
 
     private void CleanUp()
     {
+        OnShutDown(this, null);
         _bochsProcess.Exited -= ExitCallback;
         // TODO BlueSkeye : What kind of garbage may Bochs have left for us to clean ?
     }
