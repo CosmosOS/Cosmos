@@ -49,18 +49,82 @@ This folder contains the Cosmos assembler, the thing that writes generated assem
 Any code related to the building process of Cosmos with the exception of
 IL2CPU which is however executed from here. Contains code for executing ld,
 nasm, makeiso, MSBuild, and others.
+All those projects are using during build.
+
+#### \Source\Cosmos.Build.Builder
+
+This is Cosmos bootstrap utility, used to build and install Cosmos user/dev kit.
 
 #### \Source\Cosmos.Common
 
-TODO
+This folder contains shared code from compiler and debugger.
 
 #### \Source\Cosmos.Core.Plugs
 
-This folder contains plugs for
+This folder contains plugs for the core components of Cosmos.
 
-#### \Source\Cosmos.Common
+#### \Source\Cosmos.Core
 
-TODO
+This is Cosmos implementation of low-level hardware (CPU, heap, interrupts, etc...).
+
+#### \Source\Cosmos.Debug.*
+
+Any code related to the Cosmos debugger.
+
+#### \Source\Cosmos.Debug.Common
+
+Tontains common stuff, shared with compiler, but debug related.
+
+#### \Source\Cosmos.Debug.DebugStub
+
+This contains the code for the debug stub (the assembler code which lives in the kernel allowing you to debug it without leaving your chair).
+
+#### \Source\Cosmos.Debug.GDB
+
+This contains the code of the GDB client.
+
+#### \Source\Cosmos.Debug.Kernel.Plugs
+
+This contains plugs related to Cosmos.Debug.Kernel.
+
+#### \Source\Cosmos.Debug.Kernel
+
+This contains kernel level debugger helpers.
+
+#### \Source\Cosmos.Debug.VSDebugEngine
+
+This contains the code for the debug engine (VS debugger).
+
+#### \Source\Cosmos.Deploy.Pixie
+
+This is a DHCP/PXE/TFTP server for autobooting live machines (see Youtube/codeproject).
+
+#### \Source\Cosmos.Deploy.USB
+
+Some USB deploy related stuff.
+
+#### \Source\Cosmos.HAL
+
+This is one main component of Cosmos, the HAL (Hardware Abstraction Layer). It contains code and drivers for the computer's hardware (like keyboard, mouse, PCI, console, etc...).
+
+#### \Source\Cosmos.IL2CPU.Plugs
+
+Contains plugs for IL2CPU (see down).
+
+#### \Source\Cosmos.IL2CPU.Profiler
+
+Special use of the compiler for doing some speed testing.
+Not used currently.
+
+#### \Source\Cosmos.IL2CPU.Tests
+
+Contains tests for IL2CPU.
+
+#### \Source\Cosmos.IL2CPU
+
+This is another main component of Cosmos. IL2CPU means it converts IL (Intermediate Language), the sortof assembly resulting of the compilation of a C# (or any other .NET language) app to Assembly. When you run a .NET app, the .NET Framework interprets the IL code. When you compile a Cosmos OS, the main project is compiled to IL, and then IL2CPU converts it to ASM so that it can be used as an OS.
+
+#### \Source\Cosmos.System
 
 #### \Source2\XSharp.*
 
