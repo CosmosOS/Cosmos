@@ -1,8 +1,6 @@
 Plugs are used to fill "holes" in .NET libraries and replace them with different 
  code. Holes exist for example when a method in .NET library uses a Windows API 
- call. That API call will not be available on Cosmos. One method would be to 
- emulate the Windows API as WINE does, but the WINE API is a low level C style API 
- relying on pre-existing memory structures. Emulating the win32 API would be highly inefficient. Instead, 
+ call. That API call will not be available on Cosmos. Emulating the win32 API would be highly inefficient. Instead, 
  Cosmos replaces specific methods and property implementations that rely on 
  win32 API calls. Plugs can also be used to provide an alternate implementation 
  for a method, even if it does not rely on the Windows API.
