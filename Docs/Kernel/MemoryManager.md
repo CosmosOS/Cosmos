@@ -36,7 +36,7 @@ this means the smallest size an Block can occupy is 17 bytes, 16 bytes for the h
 # Usage
 
 ### Allocation
-  Adding an Block is easy, you simply find the first free block using compare/exchange(x86 opcode-CMPXCHG) and split it.
+  Adding an Block is easy, just use the System.Threading.Interlocked class.
 
 ## Deallocation
-  Freeing a block is easy set its flag(in the metadata) to free.
+  Freeing a block is easy set its flag (in the metadata) to free.
