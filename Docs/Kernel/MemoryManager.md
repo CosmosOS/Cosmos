@@ -36,7 +36,7 @@ this means the smallest size an Block can occupy is 17 bytes, 16 bytes for the h
 # Usage
 
 ### Allocation
-  Adding an Block is easy, just use the System.Threading.Interlocked class.
+  Allocating a block happens by finding the first free block and split it (if necessary).
 
 ## Deallocation
   Freeing a block is easy set its flag (in the metadata) to free.
