@@ -2,7 +2,7 @@
 
 ### IL2CPU
 
-This is one of the most important pieces of code of Cosmos. It is an AOT
+This is one of the most important pieces of code in Cosmos. It's an AOT
 (Ahead-Of-Time) compiler.
 
 When you compile your C# (or any .NET language) program, it is compiled into the IL (intermediate
