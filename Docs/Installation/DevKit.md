@@ -5,8 +5,6 @@
    * You must clone the repository using Git. For a detailed walkthrough, [see here](https://help.github.com/articles/fork-a-repo/).
    * When following the tutorial, replace *OctoCat* with *CosmosOS* and *Spoon-Knife* with *Cosmos*.
 * (Free) [Visual Studio 2013 Community](http://go.microsoft.com/fwlink/?LinkId=517284)  
-
-* If using Visual Studio 2010, you will need to download the [GitHub for Windows](#) tool.
 * (Free) [InnoSetup QuickStart Kit](http://www.jrsoftware.org/isdl.php#qsp)
    * This is required to build the setup kit which is used to build and install the Visual Studio integration libaries for Cosmos.
     * During install it will ask you about optional components to install. Be sure you check "Install Inno Setup Preprocessor".
