@@ -1,11 +1,11 @@
 # The Memory Manager
 
-The manager will init it self if there is no blocks, the manager is model after a double LinkedList and not a List.
+The manager will init itself if there are no blocks. The manager is modeled after a double LinkedList and is not a List.
 
 # Memory Layout
-The layout has not preset list or table but rather every item has meta data linking the next and previous item this allows for a robust system.
+The layout does  not have a preset list or table but rather every item has meta data linking the next and previous item. This allows for a robust system.
 
-The data layout looks as follow :
+The data layout is as follows:
 
 ````
 Block|Block|Block etc.
@@ -33,10 +33,10 @@ the final layout looks like this:
 Note:
 this means the smallest size an Block can occupy is 17 bytes, 16 bytes for the header and 1 for the smallest data type a byte.
 
-# How this system is used.
+# Usage
 
 ### Allocation
-  Adding an Block is easy, you simply find the first free block using compare exchange and split it.
+  Adding an Block is easy, you simply find the first free block using compare/exchange(x86 opcode-CMPXCHG) and split it.
 
-## Deallocation (free)
-  Freeing a block is easy set its flag(in meta data) to Free
+## Deallocation
+  Freeing a block is easy set its flag(in the metadata) to free.
