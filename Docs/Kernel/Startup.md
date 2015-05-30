@@ -1,8 +1,3 @@
-﻿
+On startup, there is some hand-coded assembly that runs before the Cosmos layer kicks in. From there, the C# entry point Cosmos.System.Kernel.Start() is called.
 
-There is some basic hand coded assembly which is the first entry point of
-Cosmos. From there the first C# entry point is Cosmos.System.Kernel.Start().
-
-Cosmos.System.Kernel is an abstract class that each project creates one
-descendant of to create the operating system.
-
+Cosmos.System.Kernel is an abstract class that forms the Cosmos framework upon which your OS is built upon.

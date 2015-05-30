@@ -1,36 +1,35 @@
 Plugs are used to fill "holes" in .NET libraries and replace them with different 
  code. Holes exist for example when a method in .NET library uses a Windows API 
- call. That API call will not be available on Cosmos. One method would be to 
- emulate the Windows API as WINE does, but the API is a low level C style API 
- relying on memory structures. Emulating it would be highly inefficient. Instead, 
+ call. That API call will not be available on Cosmos. Emulating the win32 API would be highly inefficient. Instead, 
  Cosmos replaces specific methods and property implementations that rely on 
- Windows API calls. Plugs can also be used to provide an alternate implementation 
+ win32 API calls. Plugs can also be used to provide an alternate implementation 
  for a method, even if it does not rely on the Windows API.
 
  Plugs can be implemented in the following manners:
 
 *   Code Plug - Standard C# (or any .NET language) is used to provide the alternate  implementation.
-*   Assembly Languge - In a few low level cases assembly language is used. This is  reserved for a few few cases and only allowed in the Cosmos.Core ring.
+*   Assembly Languge - In a few low level cases assembly language is used. This is  reserved for a few cases and only allowed in the Cosmos.Core ring.
+*   X# - Not supported as of yet. Used in place of Assembly language.
 
  When a Cosmos project is compiled, IL2CPU creates a list of plugs. When it 
  encounters a method or property for which a plug exists, instead of using the IL 
- contained in the existing implementation, it substitutes the plug version 
+ contained in the existing implementation, it substitutes it with the plug version 
  instead.
 
 ### 
  Plug Targets
 
-*   Source Plugs - Used to target a class library without modifiable or available  source.  For example the Console class in the .NET Framework. The Console class uses the  Windows API, so plugs can be used to redefine the methods in the Console class  to use code which interacts with Cosmos instead. For these types of plug  targets, the attributes are specified on the plug implemenation since the source  cannot be modified of the target. If we coud modify the source, we wouldn&#39;t need  plugs. :)Sou
+*   Source Plugs - Used to target a class library without modifiable or available  source.  For example the Console class in the .NET Framework. The Console class uses the  Windows API, so plugs can be used to redefine the methods in the Console class  to use code which interacts with Cosmos instead. For these types of plug  targets, the attributes are specified on the plug implemenation since the source  cannot be modified of the target. If we coud modify the source, we wouldn&#39;t need  plugs. :)
 *   Assembly Plug - Empty methods which create a sort of &quot;abstract&quot; class are used  to define an interface to an assembly language plug. This type of plug is rare  and only for the core ring. For these types of plugs, the attributes are  specified on the target, rather than the implementation.
 
- Non source targets should never need to use assembly language, but if they do 
+ Non-source targets should never need to use assembly language, but if they do 
  the plugs must be cascaded since assembly language plugs can only be applied to 
  classes with modifiable source.
 
 ### 
  Implementing a Plug
 
- Plugs can be applied at the class, or to an individual method or property. Plug 
+ Plugs can be applied to a class, or to an individual method or property. Plug 
  implementations are defined by applying attributes to the class which provides 
  the plug implementation.
 
