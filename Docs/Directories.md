@@ -94,7 +94,7 @@ Not used currently.
 Contains tests for IL2CPU.
 
 ### Cosmos.System
-It's the system part of Cosmos. It contains wrappers TODO TODO TODO
+It's the part of the kernel that lives in the System ring of Cosmos. It contains some system-side wrappers, like Console.
 
 ### Cosmos.VS.*
 Contains code for VS integration.
@@ -115,16 +115,16 @@ The tests for Cosmos.VS.Windows.
 The code for the Cosmos wizards, for example the project creation wizard, which generates the Cosmos project file.
 
 ### ElfMap2DebugDb
-TODO
+Simple utility to read in symbol locations from an ELF map.
 
 ### IL2CPU
-TODO
+This is the executable of the compiler.
 
 ### MDbg4
-TODO
+This is an API for reading PDB (Program Debug Database) files.
 
 ### MPF
-TODO
+MPF is a base set of files used for VS extensibility.
 
 ### Tools
 Some tools for development.
@@ -133,7 +133,7 @@ Some tools for development.
 Some old unused code.
 
 ### VMWareLib
-TODO
+VMWareLib is a library for controlling VMWare for running the OSes directly.
 
 ### XSharp.*
 Contains all the code for the homemade Cosmos programming language, X# (XSharp).
@@ -151,13 +151,13 @@ Tests for X#.
 VS integration for X#.
 
 ### libraries\nunit
-TODO
+Contains NUnit (unit-testing framework) DLLs.
 
 ### Build.sln
 This is the build solution file for Cosmos. This is the one which will be used for Cosmos compilation (Userkit / Devkit). It only contains Cosmos code (not tests or something else).
 
 ### Builder.sln
-TODO
+This contains all the stuff for building.. the builder.
 
 ### Cosmos.sln
 This is the FULL solution of Cosmos. It's quite huge (90 KB) and contains lots of projects. It contains all the projects, including users' playgrounds, demos and others.
@@ -165,15 +165,15 @@ This is the FULL solution of Cosmos. It's quite huge (90 KB) and contains lots o
 ### XSharp.sln
 This solution contains the code for compiling X# stuff (compiler, assembler, VS integration, tests etc..).
 
-#### \Source\<insert name here>.Tests
+### [insert name here].Tests
 
-If you see a folder with a name ending by Tests, it means it contains tests.
+If you see a folder with a name ending by Tests, it means it contains tests for [insert name here].
 
-#### \Source\<insert name here>.Plugs
+### [insert name here].Plugs
 
-If you see a folder with a name ending by Plugs, it means it contains plugs for <insert name here>.
+If you see a folder with a name ending by Plugs, it means it contains plugs for [insert name here].
 
-#### \Users
+### Users
 
 Custom code playground. You can put your examples, random code, and toughts
 here
