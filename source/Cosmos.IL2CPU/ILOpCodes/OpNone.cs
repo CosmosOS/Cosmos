@@ -72,6 +72,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Rem:
         case Code.Rem_Un:
         case Code.Xor:
+          case Code.Mul_Ovf_Un:
           return 2;
         case Code.Ldind_I:
         case Code.Ldind_I1:
@@ -202,6 +203,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Rem:
         case Code.Rem_Un:
         case Code.Xor:
+          case Code.Mul_Ovf_Un:
           return 1;
         case Code.Ldind_I:
         case Code.Ldind_I1:

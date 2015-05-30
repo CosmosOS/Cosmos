@@ -71,6 +71,7 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="System\DateTimeImpl.cs" />
     <Compile Include="System\DictionaryImpl.cs" />
     <Compile Include="System\IO\FileStreamImpl.cs" />
     <Compile Include="System\IO\StreamReaderImpl.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="System\IO\FileInfoImpl.cs" />
     <Compile Include="System\IO\FileSystemInfoImpl.cs" />
     <Compile Include="System\IO\PathImpl.cs" />
+    <Compile Include="System\TimeSpanImpl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
