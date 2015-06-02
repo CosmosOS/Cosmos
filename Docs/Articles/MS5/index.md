@@ -43,7 +43,7 @@ console window, you will see the following:
 ![](CosmosMS5/SNAG-0003.png)
 
 This is your operating system running in VMWare Player! Cosmos can of course
-also be booted in VMWare Workstation, Hyper-V, Virtual PC, or on real
+also be booted in VMWare Workstation, Hyper-V, Virtual PC, Bochs, or on real
 hardware. But by default Cosmos uses VMWare Player because it is both free,
 and reliable. Cosmos can even debug in Visual Studio, even when running on
 another machine.
@@ -126,10 +126,10 @@ and it will appear in the Visual Studio output window.
 
 ###  What's the catch?
 
-There really is no catch. Everything I've shown here is functioning as seen.
+There really is no catch. Everything We've shown here is functioning as seen.
 No mockups were used. However we still have a lot of work to go. Items of
 interest that are on our current task list include interfaces (necessary for
-foreach), file systems (partial support exists), threads, networking, and
+foreach loops), file systems (partial support exists), threads, networking, and
 graphics. We have prototypes and experimentation for each, but none have been
 rolled into the mainline Cosmos development as of yet.
 
@@ -137,7 +137,7 @@ rolled into the mainline Cosmos development as of yet.
 
 Cosmos does not run on Linux. A boot loader called Syslinux is used to boot
 Cosmos. After booting, Syslinux is not used. Syslinux is a bootloader and is
-not a Linux distro.
+not a Linux distro. Syslinux simplifies the booting process by doing tasks such as enabline the A20 gate, initializing hardware, and switching to real mode (all of which are required by modern operating systems).
 
 ###  Obtaining Cosmos
 
