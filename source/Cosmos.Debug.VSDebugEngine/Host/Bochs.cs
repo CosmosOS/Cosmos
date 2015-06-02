@@ -14,12 +14,14 @@ using Cosmos.Debug.Common;
 namespace Cosmos.Debug.VSDebugEngine.Host
 {
   /// <summary>This class handles interactions with the Bochs emulation environment.</summary>
-  public partial class Bochs : Base
+  public partial class Bochs: Base
   {
     /// <summary>The emulator process once started.</summary>
     private static Process _bochsProcess;
+
     /// <summary>The configuration file to be used when launching the Bochs virtual machine.</summary>
     private FileInfo _bochsConfigurationFile;
+
     private bool _useDebugVersion;
 
     /// <summary>Instanciation occurs when debugging engine is invoked to launch the process in suspended
@@ -28,7 +30,10 @@ namespace Cosmos.Debug.VSDebugEngine.Host
     public Bochs(NameValueCollection aParams, bool aUseGDB, FileInfo configurationFile)
       : base(aParams, aUseGDB)
     {
-      if (null == configurationFile) { throw new ArgumentNullException("configurationFile"); }
+      if (null == configurationFile)
+      {
+        throw new ArgumentNullException("configurationFile");
+      }
       /*if (!configurationFile.Exists)
       {
           InitializeKeyValues();
@@ -46,22 +51,25 @@ namespace Cosmos.Debug.VSDebugEngine.Host
     /// used for variable replacement. Variables are case sensistive.</param>
     internal void FixBochsConfiguration(KeyValuePair<string, string>[] symbols)
     {
-        if ((null == symbols) || (0 == symbols.Length)) { return; }
-        string content;
-        using (StreamReader reader = new StreamReader(File.Open(_bochsConfigurationFile.FullName, FileMode.Open, FileAccess.Read)))
-        {
-            content = reader.ReadToEnd();
-        }
-        foreach (KeyValuePair<string, string> pair in symbols)
-        {
-            string variableName = string.Format("$({0})", pair.Key);
+      if ((null == symbols) || (0 == symbols.Length))
+      {
+        return;
+      }
+      string content;
+      using (StreamReader reader = new StreamReader(File.Open(_bochsConfigurationFile.FullName, FileMode.Open, FileAccess.Read)))
+      {
+        content = reader.ReadToEnd();
+      }
+      foreach (KeyValuePair<string, string> pair in symbols)
+      {
+        string variableName = string.Format("$({0})", pair.Key);
 
-            content.Replace(variableName, pair.Value);
-        }
-        using (StreamWriter writer = new StreamWriter(File.Open(_bochsConfigurationFile.FullName, FileMode.Create, FileAccess.Write)))
-        {
-            writer.Write(content);
-        }
+        content.Replace(variableName, pair.Value);
+      }
+      using (StreamWriter writer = new StreamWriter(File.Open(_bochsConfigurationFile.FullName, FileMode.Create, FileAccess.Write)))
+      {
+        writer.Write(content);
+      }
     }
 
     /// <summary>Initialize and start the Bochs process.</summary>
@@ -70,8 +78,8 @@ namespace Cosmos.Debug.VSDebugEngine.Host
       _bochsProcess = new Process();
       ProcessStartInfo _bochsStartInfo = _bochsProcess.StartInfo;
       _bochsStartInfo.FileName = (_useDebugVersion && BochsSupport.BochsDebugExe.Exists)
-        ? BochsSupport.BochsDebugExe.FullName
-        : BochsSupport.BochsExe.FullName;
+                                   ? BochsSupport.BochsDebugExe.FullName
+                                   : BochsSupport.BochsExe.FullName;
       // Start Bochs without displaying the configuration interface (-q) and using the specified
       // configuration file (-f). The user is intended to edit the configuration file coming with
       // the Cosmos project whenever she wants to modify the environment.
@@ -89,20 +97,38 @@ namespace Cosmos.Debug.VSDebugEngine.Host
 
     private void ExitCallback(object sender, EventArgs e)
     {
-        if (null != OnShutDown) { try { OnShutDown(sender, e); } catch { } }
+      if (null != OnShutDown)
+      {
+        try
+        {
+          OnShutDown(sender, e);
+        }
+        catch
+        {
+        }
+      }
     }
 
     public override void Stop()
     {
-        if (null != _bochsProcess) { try { _bochsProcess.Kill(); } catch { } }
-        CleanUp();
+      if (null != _bochsProcess)
+      {
+        try
+        {
+          _bochsProcess.Kill();
+        }
+        catch
+        {
+        }
+      }
+      CleanUp();
     }
 
     private void CleanUp()
     {
-        OnShutDown(this, null);
-        _bochsProcess.Exited -= ExitCallback;
-        // TODO BlueSkeye : What kind of garbage may Bochs have left for us to clean ?
+      OnShutDown(this, null);
+      _bochsProcess.Exited -= ExitCallback;
+      // TODO BlueSkeye : What kind of garbage may Bochs have left for us to clean ?
     }
   }
 }
