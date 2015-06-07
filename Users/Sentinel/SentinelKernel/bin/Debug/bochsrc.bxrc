@@ -13,7 +13,7 @@ ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
 ata0-master: type=cdrom, path="SentinelKernelBoot.iso", status=inserted, model="Generic 1234", biosdetect=auto
 ata0-slave: type=none
 ata1: enabled=1, ioaddr1=0x170, ioaddr2=0x370, irq=15
-ata1-master: type=none
+ata1-master: type=disk, path="C:\Data\Sources\OpenSource\Cosmos\Build\VMWare\Workstation\Filesystem.vmdk", mode=vmware4, cylinders=0, heads=0, spt=0, model="Generic 1234", biosdetect=auto, translation=auto
 ata1-slave: type=none
 ata2: enabled=0
 ata3: enabled=0

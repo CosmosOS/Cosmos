@@ -50,13 +50,15 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 
 					// pop both 8 byte values
-					new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 16 };
+					new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
 
 					//dividend
 					// low
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 8 };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
 					//high
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 12 };
+					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
 
 					// set flags
 					new CPUx86.Or { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
@@ -91,7 +93,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					// sign extend
 					new CPUx86.SignExtendAX { Size = 32 };
-					
+
 					// save result to stack
 					new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
 					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
