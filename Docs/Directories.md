@@ -1,131 +1,180 @@
-﻿
 
-### Topic is out of date!
-***TODO: Must rewrite Directories for latest release***
 
-### Directories
+# Directories
+At a first look, the directory structure of Cosmos is quite confusing. There are folders with same names and so on. I'll try to show you how the directories are structured, so that you can find what you're looking for.
 
-At a first look, the directory structure of Cosmos is quite confusing. There
-are folders with same names, two source folders and so on. I'll try to show
-you how the directories are structured, so that you can find what you're
-looking for
+## Artwork
+Just some Cosmos artwork.
 
-#### \Build
+## Build
+The build directory contains file used to build ISO images and Virtual Machines files and images. There is a folder with support files for BOCHS, for Virtual PC, for VMware, QEMU, for support for boot from ISO CD, USB, Ethernet (PXE)
 
-The build directory contains file used to build ISO images and Virtual
-Machines files and images. There is a folder with support files for BOCHS, for
-VirtualPc, for VMware, QEMU, for support for boot from ISO CD, USB, Ethernet
-(PXE)
+## Demos
+This folder contains some Cosmos demo projects to help you.
 
-There is also an additional folder **VSIP**. It normally contains a file
-called _install.bat_. That file must be executed as you download the code and
-everytime you change some code which is non-kernel related (eg. the debugger,
-the VS integration package, the IL2CPU code etc)
+## Docs
+This folder contains the Cosmos documentation that you're currently reading.
 
-It compiles all the projects to libraries, creates a Win32 Installer and
-setups the Visual Studio IP. At the end it starts Visual Studio.
+## QA
+This folder contains the old Cosmos build scripts.
+It isn't used at the moment.
 
-You should close Visual Studio before executing install.bat.
+## Resources
+This folder contains the 3rd party libraries that Cosmos uses.
 
-#### \Docs
+## Setup
+Contains scripts and languages to build the Cosmos User Kit Installer. The creation (and execution) of the installer is started from \install.bat.
 
-Just a bunch of bad-structured documentation about Cosmos
+## Source
+Contains all the code of the Cosmos project, including the Compiler, Installer, Debugger and the main features of Cosmos. It also contains unused code. You will spend most of your time here. 
+It also contains the solution file of Cosmos and some support libraries.
 
-#### \QA
+### Cosmos.Assembler
+This folder contains the Cosmos assembler, the thing that writes generated assembly code in the kernel file.
 
-Todo.
-
-#### \Resources
-
-Here you can put any pdf, doc, rtf, txt which can be used as a reference help
-to develop Cosmos. It also contains the folder **x86**. Inside you can find
-many interesting references about the x86 architecture.
-
-#### \Setup
-
-Contains scripts and languages to build the Cosmos User Kit Installer. The
-creation (and execution) of the installer is started from
-\Build\VSIP\install.bat
-
-#### \Source
-
-Contains the code of the Cosmos project, including the Compiler, Installer, Debugger and the main features of Cosmos. It also contains unused code.
-
-**TODO: Check the following:** Contains a lot of code which is now not used. It was used previously, but it was decided to take it away and to restructure the code organization. It may be reintegrated however in future, with some code changes.
-
-It also contains the solution file of Cosmos and some support libraries, which
-IMHO should be moved to Source2
-
-#### \Source\Unused
-
-This folder contains work-in-progress or deprecated features, like FAT, VGA and Networking.
-
-#### \Source2
-
-Contains the real code of Cosmos. You will spend most of your time here.
-However as you open it, you get confused again. Another Build, another VSIP,
-two or three Debug directories, etc. Let's summarize:
-
-#### \Source2\Build
-
+### Cosmos.Build.*
 Any code related to the building process of Cosmos with the exception of
 IL2CPU which is however executed from here. Contains code for executing ld,
 nasm, makeiso, MSBuild, and others.
+All those projects are using during build.
 
-#### \Source2\Compiler
+#### Cosmos.Build.Builder
+This is Cosmos bootstrap utility, used to build and install Cosmos user/dev kit.
 
-**TODO: Check**. This piece of code gives us the possibility to write Assembly in C#. In this way we can keep all in an OO-like style.
+### Cosmos.Common
+This folder contains shared code from compiler and debugger.
 
-#### \Source2\Debug
+### Cosmos.Core
+This is Cosmos implementation of low-level hardware (CPU, heap, interrupts, etc...).
 
-Contains the Debug Engine and Connector code. Also gives the possibility to
-work with GDB. For more informations about debugging see
-[Debugger](debugger.htm)
+#### Cosmos.Core.Plugs
+This folder contains plugs for the core components of Cosmos.
 
-#### \Demos
+### Cosmos.Debug.*
+Any code related to the Cosmos debugger.
 
-Should contain examples of the use of the Cosmos User Kit. Actually only a
-number Guess demo is available
+#### Cosmos.Debug.Common
+Contains common stuff, shared with compiler, but debug related.
 
-#### \Source\IL2CPU
+#### Cosmos.Debug.DebugStub
+This contains the code for the debug stub (the assembler code which lives in the kernel allowing you to debug it without leaving your chair).
 
-Code for the IL2CPU program. It's the Cosmos AOT Compiler. Form more
-informations about AOT compilers and IL2CPU see [IL2CPU](il2cpu.htm)
+#### Cosmos.Debug.GDB
+This contains the code of the GDB client.
 
-#### \Source2\Kernel
+#### Cosmos.Debug.Kernel.Plugs
+This contains plugs related to Cosmos.Debug.Kernel.
 
-The kernel code. One might think that in an operating system, the kernel code
-must be the most complex, but in this case it is actually the simplest as we
-are concentrating on debugging. As we finish the debug step, we will develop
-the kernel full-time. At the time it contains three folders:
+#### Cosmos.Debug.Kernel
+This contains kernel level debugger helpers.
 
-#### \Source2\Kernel\Debug
+#### Cosmos.Debug.VSDebugEngine
+This contains the code for the debug engine (VS debugger).
 
-Contains helpers for the DS code.
+### Cosmos.Deploy.Pixie
+This is a DHCP/PXE/TFTP server for autobooting live machines (see Youtube/codeproject).
 
-#### \Source2\Kernel\System
+### Cosmos.Deploy.USB
+Some USB deploy related stuff.
 
-Contains most of the code of the kernel, including drivers and the core.
+### Cosmos.HAL
+This is one main component of Cosmos, the HAL (Hardware Abstraction Layer). It contains code and drivers for the computer's hardware (like keyboard, mouse, PCI, console, etc...).
 
-#### \Source2\Tests
+### Cosmos.IL2CPU
+This is another main component of Cosmos. IL2CPU means it converts IL (Intermediate Language), the sortof assembly resulting of the compilation of a C# (or any other .NET language) app to Assembly. When you run a .NET app, the .NET Framework interprets the IL code. When you compile a Cosmos OS, the main project is compiled to IL, and then IL2CPU converts it to ASM so that it can be used as an OS.
 
-TODO
+#### Cosmos.IL2CPU.Plugs
+Contains plugs for IL2CPU.
 
-#### \Source2\UserKit
+#### Cosmos.IL2CPU.Profiler
+Special use of the compiler for doing some speed testing.
+Not used currently.
 
-TODO
+#### Cosmos.IL2CPU.Tests
+Contains tests for IL2CPU.
 
-#### \Users
+### Cosmos.System
+It's the part of the kernel that lives in the System ring of Cosmos. It contains some system-side wrappers, like Console.
+
+### Cosmos.VS.*
+Contains code for VS integration.
+
+#### Cosmos.VS.Debug
+Code for VS debugging engine.
+
+#### Cosmos.VS.Package
+The Cosmos VS package.
+
+#### Cosmos.VS.Windows
+The Cosmos VS windows, like the Cosmos project settings, the Assembly window, the Registers window etc.
+
+#### Cosmos.VS.Windows.Test
+The tests for Cosmos.VS.Windows.
+
+#### Cosmos.VS.Wizards
+The code for the Cosmos wizards, for example the project creation wizard, which generates the Cosmos project file.
+
+### ElfMap2DebugDb
+Simple utility to read in symbol locations from an ELF map.
+
+### IL2CPU
+This is the executable of the compiler.
+
+### MDbg4
+This is an API for reading PDB (Program Debug Database) files.
+
+### MPF
+MPF is a base set of files used for VS extensibility.
+
+### Tools
+Some tools for development.
+
+### Unused
+Some old unused code.
+
+### VMWareLib
+VMWareLib is a library for controlling VMWare for running the OSes directly.
+
+### XSharp.*
+Contains all the code for the homemade Cosmos programming language, X# (XSharp).
+
+#### XSharp.Compiler
+The X# compiler.
+
+#### XSharp.Nasm
+The program that converts X# to assembly code.
+
+#### XSharp.Test
+Tests for X#.
+
+#### XSharp.VS
+VS integration for X#.
+
+### libraries\nunit
+Contains NUnit (unit-testing framework) DLLs.
+
+### Build.sln
+This is the build solution file for Cosmos. This is the one which will be used for Cosmos compilation (Userkit / Devkit). It only contains Cosmos code (not tests or something else).
+
+### Builder.sln
+This contains all the stuff for building.. the builder.
+
+### Cosmos.sln
+This is the FULL solution of Cosmos. It's quite huge (90 KB) and contains lots of projects. It contains all the projects, including users' playgrounds, demos and others.
+
+### XSharp.sln
+This solution contains the code for compiling X# stuff (compiler, assembler, VS integration, tests etc..).
+
+### [insert name here].Tests
+
+If you see a folder with a name ending by Tests, it means it contains tests for [insert name here].
+
+### [insert name here].Plugs
+
+If you see a folder with a name ending by Plugs, it means it contains plugs for [insert name here].
+
+### Users
 
 Custom code playground. You can put your examples, random code, and toughts
 here
-
-#### \Source2\Utils
-
-TODO
-
-#### \Source2\VSIP
-
-Contains the code for the integration with Visual Studio. Adds support for the
-Cosmos Kernel project tipe, and custom build steps.
 
