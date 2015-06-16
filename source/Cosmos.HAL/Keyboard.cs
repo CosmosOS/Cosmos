@@ -9,7 +9,11 @@ namespace Cosmos.HAL {
         protected Core.IOGroup.Keyboard IO = Core.Global.BaseIOGroups.Keyboard;
         protected Keyboard()
         {
-            mQueuedKeys = new Queue<ConsoleKeyInfo>();
+            if (mQueuedKeys != null)
+            {
+                Console.WriteLine("Skippign creation on key queue!");
+            }
+            mQueuedKeys = new Queue<ConsoleKeyInfo>(32);
 
             Initialize();
             Core.INTs.SetIrqHandler(0x01, HandleIRQ);
@@ -33,11 +37,16 @@ namespace Cosmos.HAL {
 
         protected abstract void HandleScancode(byte aScancode, bool aReleased);
 
-        private readonly Queue<ConsoleKeyInfo> mQueuedKeys;
+        private static Queue<ConsoleKeyInfo> mQueuedKeys;
 
         protected void Enqueue(ConsoleKeyInfo aKey)
         {
             mQueuedKeys.Enqueue(aKey);
+            Global.Dbg.SendNumber("Keyboard", "Key enqueued. QueuedKeys.Count", (uint)mQueuedKeys.Count, 32);
+            global::System.Console.WriteLine("Key enqueued!");
+            global::System.Console.Write("Key char: " );
+            global::System.Console.Write(aKey.KeyChar);
+            global::System.Console.WriteLine();
         }
 
         public bool TryReadKey(out ConsoleKeyInfo oKey)

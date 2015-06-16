@@ -65,7 +65,7 @@ namespace Cosmos.HAL {
       //TextScreen = new TextScreen();
       Global.Dbg.Send("CLS");
 
-      TextScreen.Clear();
+      //TextScreen.Clear();
 
       Global.Dbg.Send("Keyboard");
       Keyboard = new DefaultKeyboard();

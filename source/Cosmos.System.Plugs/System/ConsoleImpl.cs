@@ -338,16 +338,23 @@ namespace Cosmos.System.Plugs.System {
 			ConsoleKeyInfo current;
 			int currentCount = 0;
 
-			while ((current = HAL.Global.Keyboard.ReadKey()).KeyChar != '\n')
+			while ((current = HAL.Global.Keyboard.ReadKey()).Key != ConsoleKey.Enter)
 			{
+        global::System.Console.WriteLine("Key read");
+			  global::System.Console.Write("  Char = ");
+			  global::System.Console.Write(current.KeyChar);
+			  global::System.Console.WriteLine();
+        global::System.Console.Write("  Key = ");
+        global::System.Console.Write((int)current.Key);
+        global::System.Console.WriteLine();
 				//Check for "special" keys
 				if (current.Key == ConsoleKey.Backspace) // Backspace
 				{
-					if (currentCount > 0)
-					{
-                        int curCharTemp = GetConsole().X;
-						chars.RemoveAt(currentCount - 1);
-                        GetConsole().X = GetConsole().X - 1;
+				  if (currentCount > 0)
+				  {
+				    int curCharTemp = GetConsole().X;
+					  chars.RemoveAt(currentCount - 1);
+					  GetConsole().X = GetConsole().X - 1;
 
 						//Move characters to the left
 						for (int x = currentCount - 1; x < chars.Count; x++)
@@ -357,7 +364,7 @@ namespace Cosmos.System.Plugs.System {
 
 						Write(' ');
 
-                        GetConsole().X = curCharTemp - 1;
+					  GetConsole().X = curCharTemp - 1;
 
 						currentCount--;
 					}
@@ -376,7 +383,7 @@ namespace Cosmos.System.Plugs.System {
 				{
 					if (currentCount < chars.Count)
 					{
-                        GetConsole().X = GetConsole().X + 1;
+					  GetConsole().X = GetConsole().X + 1;
 						currentCount++;
 					}
 					continue;
@@ -386,7 +393,7 @@ namespace Cosmos.System.Plugs.System {
 				if (currentCount == chars.Count)
 				{
           chars.Add(current.KeyChar);
-					Write(current);
+					Write(current.KeyChar);
 					currentCount++;
 				}
 				else
@@ -414,7 +421,7 @@ namespace Cosmos.System.Plugs.System {
 						Write(chars[x]);
 					}
 
-                    GetConsole().X -= (chars.Count - currentCount) - 1;
+				  GetConsole().X -= (chars.Count - currentCount) - 1;
 					currentCount++;
 				}
 			}

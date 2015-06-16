@@ -54,7 +54,7 @@ namespace Cosmos.System
                 // Provide the user with a clear screen if they requested it
                 if (ClearScreen) {
                     Global.Dbg.Send("Cls");
-                    Global.Console.Clear();
+                    //Global.Console.Clear();
                 }
 
                 Global.Dbg.Send("Before Run");

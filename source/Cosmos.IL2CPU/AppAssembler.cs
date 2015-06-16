@@ -1611,7 +1611,7 @@ namespace Cosmos.IL2CPU
             {
                 var xMethodInfo = (SysReflection.MethodInfo)xMethodBase;
                 xMethodBase = xMethodInfo.GetGenericMethodDefinition();
-                if (xMethodBase.IsGenericMethod)
+                if (xMethodBase.IsGenericMethod && !xMethodBase.IsGenericMethod)
                 {
                     // apparently, a generic method can be derived from a generic method..
                     throw new Exception("Make recursive");
