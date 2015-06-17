@@ -341,14 +341,7 @@ namespace Cosmos.System.Plugs.System {
 
 			while ((current = HAL.Global.Keyboard.ReadKey()).Key != ConsoleKey.Enter)
 			{
-        global::System.Console.WriteLine("Key read");
-			  global::System.Console.Write("  Char = ");
-			  global::System.Console.Write(current.KeyChar);
-			  global::System.Console.WriteLine();
-        global::System.Console.Write("  Key = ");
-        global::System.Console.Write((int)current.Key);
-        global::System.Console.WriteLine();
-				//Check for "special" keys
+        //Check for "special" keys
 				if (current.Key == ConsoleKey.Backspace) // Backspace
 				{
 				  if (currentCount > 0)
@@ -375,7 +368,7 @@ namespace Cosmos.System.Plugs.System {
 				{
 					if (currentCount > 0)
 					{
-                        GetConsole().X = GetConsole().X - 1;
+            GetConsole().X = GetConsole().X - 1;
 						currentCount--;
 					}
 					continue;

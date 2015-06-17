@@ -25,7 +25,7 @@
     <TraceMode>User</TraceMode>
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
-    <StartCosmosGDB>True</StartCosmosGDB>
+    <StartCosmosGDB>False</StartCosmosGDB>
     <VMwareEdition>Workstation</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
@@ -68,7 +68,7 @@
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <VMware_EnableGDB>True</VMware_EnableGDB>
-    <VMware_StartCosmosGDB>True</VMware_StartCosmosGDB>
+    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
     <ISO_Launch>None</ISO_Launch>
     <ISO_DebugEnabled>False</ISO_DebugEnabled>
@@ -191,7 +191,7 @@
     <TraceMode>User</TraceMode>
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
-    <StartCosmosGDB>True</StartCosmosGDB>
+    <StartCosmosGDB>False</StartCosmosGDB>
     <VMwareEdition>Workstation</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
@@ -234,7 +234,7 @@
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <VMware_EnableGDB>True</VMware_EnableGDB>
-    <VMware_StartCosmosGDB>True</VMware_StartCosmosGDB>
+    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
     <ISO_Launch>None</ISO_Launch>
     <ISO_DebugEnabled>False</ISO_DebugEnabled>

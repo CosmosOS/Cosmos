@@ -84,11 +84,6 @@ namespace Cosmos.HAL {
         protected void Enqueue(ConsoleKeyInfoEx aKey)
         {
             mQueuedKeys.Enqueue(aKey);
-            Global.Dbg.SendNumber("Keyboard", "Key enqueued. QueuedKeys.Count", (uint)mQueuedKeys.Count, 32);
-            global::System.Console.WriteLine("Key enqueued!");
-            global::System.Console.Write("Key char: " );
-            global::System.Console.Write(aKey.KeyChar);
-            global::System.Console.WriteLine();
         }
 
         public bool TryReadKey(out ConsoleKeyInfoEx oKey)

@@ -92,8 +92,6 @@ namespace Cosmos.HAL
                         }
                         else
                         {
-                            Global.Dbg.SendNumber("Keyboard", "Scancode", xTheScancode, 32);
-                            Global.Dbg.SendNumber("Keyboard", "Char", (uint)xKeyInfo.KeyChar, 16);
                             Enqueue(xKeyInfo);
                         }
                     }
@@ -108,64 +106,64 @@ namespace Cosmos.HAL
 
             //TODO: fn (for laptops)
 
-            //#region Letters
+            #region Letters
 
-            //AddKey(0x10, 'q', ConsoleKey.Q);
-            //AddKey(0x100000, 'Q', ConsoleKey.Q);
-            //AddKey(0x11, 'w', ConsoleKey.W);
-            //AddKey(0x110000, 'W', ConsoleKey.W);
-            //AddKey(0x12, 'e', ConsoleKey.E);
-            //AddKey(0x120000, 'E', ConsoleKey.E);
-            //AddKey(0x13, 'r', ConsoleKey.R);
-            //AddKey(0x130000, 'R', ConsoleKey.R);
-            //AddKey(0x14, 't', ConsoleKey.T);
-            //AddKey(0x140000, 'T', ConsoleKey.T);
-            //AddKey(0x15, 'y', ConsoleKey.Y);
-            //AddKey(0x150000, 'Y', ConsoleKey.Y);
-            //AddKey(0x16, 'u', ConsoleKey.U);
-            //AddKey(0x160000, 'U', ConsoleKey.U);
-            //AddKey(0x17, 'i', ConsoleKey.I);
-            //AddKey(0x170000, 'I', ConsoleKey.I);
-            //AddKey(0x18, 'o', ConsoleKey.O);
-            //AddKey(0x180000, 'O', ConsoleKey.O);
-            //AddKey(0x19, 'p', ConsoleKey.P);
-            //AddKey(0x190000, 'P', ConsoleKey.P);
+            AddKey(0x10, 'q', ConsoleKey.Q);
+            AddKey(0x100000, 'Q', ConsoleKey.Q);
+            AddKey(0x11, 'w', ConsoleKey.W);
+            AddKey(0x110000, 'W', ConsoleKey.W);
+            AddKey(0x12, 'e', ConsoleKey.E);
+            AddKey(0x120000, 'E', ConsoleKey.E);
+            AddKey(0x13, 'r', ConsoleKey.R);
+            AddKey(0x130000, 'R', ConsoleKey.R);
+            AddKey(0x14, 't', ConsoleKey.T);
+            AddKey(0x140000, 'T', ConsoleKey.T);
+            AddKey(0x15, 'y', ConsoleKey.Y);
+            AddKey(0x150000, 'Y', ConsoleKey.Y);
+            AddKey(0x16, 'u', ConsoleKey.U);
+            AddKey(0x160000, 'U', ConsoleKey.U);
+            AddKey(0x17, 'i', ConsoleKey.I);
+            AddKey(0x170000, 'I', ConsoleKey.I);
+            AddKey(0x18, 'o', ConsoleKey.O);
+            AddKey(0x180000, 'O', ConsoleKey.O);
+            AddKey(0x19, 'p', ConsoleKey.P);
+            AddKey(0x190000, 'P', ConsoleKey.P);
 
-            //AddKey(0x1E, 'a', ConsoleKey.A);
-            //AddKey(0x1E0000, 'A', ConsoleKey.A);
-            //AddKey(0x1F, 's', ConsoleKey.S);
-            //AddKey(0x1F0000, 'S', ConsoleKey.S);
-            //AddKey(0x20, 'd', ConsoleKey.D);
-            //AddKey(0x200000, 'D', ConsoleKey.D);
-            //AddKey(0x21, 'f', ConsoleKey.F);
-            //AddKey(0x210000, 'F', ConsoleKey.F);
-            //AddKey(0x22, 'g', ConsoleKey.G);
-            //AddKey(0x220000, 'G', ConsoleKey.G);
-            //AddKey(0x23, 'h', ConsoleKey.H);
-            //AddKey(0x230000, 'H', ConsoleKey.H);
-            //AddKey(0x24, 'j', ConsoleKey.J);
-            //AddKey(0x240000, 'J', ConsoleKey.J);
-            //AddKey(0x25, 'k', ConsoleKey.K);
-            //AddKey(0x250000, 'K', ConsoleKey.K);
-            //AddKey(0x26, 'l', ConsoleKey.L);
-            //AddKey(0x260000, 'L', ConsoleKey.L);
+            AddKey(0x1E, 'a', ConsoleKey.A);
+            AddKey(0x1E0000, 'A', ConsoleKey.A);
+            AddKey(0x1F, 's', ConsoleKey.S);
+            AddKey(0x1F0000, 'S', ConsoleKey.S);
+            AddKey(0x20, 'd', ConsoleKey.D);
+            AddKey(0x200000, 'D', ConsoleKey.D);
+            AddKey(0x21, 'f', ConsoleKey.F);
+            AddKey(0x210000, 'F', ConsoleKey.F);
+            AddKey(0x22, 'g', ConsoleKey.G);
+            AddKey(0x220000, 'G', ConsoleKey.G);
+            AddKey(0x23, 'h', ConsoleKey.H);
+            AddKey(0x230000, 'H', ConsoleKey.H);
+            AddKey(0x24, 'j', ConsoleKey.J);
+            AddKey(0x240000, 'J', ConsoleKey.J);
+            AddKey(0x25, 'k', ConsoleKey.K);
+            AddKey(0x250000, 'K', ConsoleKey.K);
+            AddKey(0x26, 'l', ConsoleKey.L);
+            AddKey(0x260000, 'L', ConsoleKey.L);
 
-            //AddKey(0x2C, 'z', ConsoleKey.Z);
-            //AddKey(0x2C0000, 'Z', ConsoleKey.Z);
-            //AddKey(0x2D, 'x', ConsoleKey.X);
-            //AddKey(0x2D0000, 'X', ConsoleKey.X);
-            //AddKey(0x2E, 'c', ConsoleKey.C);
-            //AddKey(0x2E0000, 'C', ConsoleKey.C);
-            //AddKey(0x2F, 'v', ConsoleKey.V);
-            //AddKey(0x2F0000, 'V', ConsoleKey.V);
-            //AddKey(0x30, 'b', ConsoleKey.B);
-            //AddKey(0x300000, 'B', ConsoleKey.B);
-            //AddKey(0x31, 'n', ConsoleKey.N);
-            //AddKey(0x310000, 'N', ConsoleKey.N);
-            //AddKey(0x32, 'm', ConsoleKey.M);
-            //AddKey(0x320000, 'M', ConsoleKey.M);
+            AddKey(0x2C, 'z', ConsoleKey.Z);
+            AddKey(0x2C0000, 'Z', ConsoleKey.Z);
+            AddKey(0x2D, 'x', ConsoleKey.X);
+            AddKey(0x2D0000, 'X', ConsoleKey.X);
+            AddKey(0x2E, 'c', ConsoleKey.C);
+            AddKey(0x2E0000, 'C', ConsoleKey.C);
+            AddKey(0x2F, 'v', ConsoleKey.V);
+            AddKey(0x2F0000, 'V', ConsoleKey.V);
+            AddKey(0x30, 'b', ConsoleKey.B);
+            AddKey(0x300000, 'B', ConsoleKey.B);
+            AddKey(0x31, 'n', ConsoleKey.N);
+            AddKey(0x310000, 'N', ConsoleKey.N);
+            AddKey(0x32, 'm', ConsoleKey.M);
+            AddKey(0x320000, 'M', ConsoleKey.M);
 
-            //#endregion
+            #endregion
 
             #region digits
 
@@ -196,102 +194,84 @@ namespace Cosmos.HAL
 
             #endregion
 
-            //#region Special
+            #region Special
 
-            //AddKeyWithShift(0x0E, '\u0968', ConsoleKey.Backspace); //Backspace
-            //AddKeyWithShift(0x0F, '\t', ConsoleKey.Tab); //Tabulator
+            AddKeyWithShift(0x0E, '\u0968', ConsoleKey.Backspace); //Backspace
+            AddKeyWithShift(0x0F, '\t', ConsoleKey.Tab); //Tabulator
             var xEnterItem = AddKey(0x1C, '\n', ConsoleKey.Enter); //Enter
-            if (xEnterItem.Key != ConsoleKey.Enter)
-            {
-                Console.WriteLine("Key != Enter");
-                while (true)
-                    ;
-            }
-            if (xEnterItem.Value != '\n')
-            {
-                Console.WriteLine("Value != \\n");
-                while (true)
-                    ;
-            }
-            if (xEnterItem.Scancode != 0x1C)
-            {
-                Console.WriteLine("Scancode != 0x1C");
-                while (true)
-                    ;
-            }
 
-            //AddKeyWithShift(0x39, ' ', ConsoleKey.Spacebar); //Space
-            //AddKeyWithShift(0x4b, '\u2190', ConsoleKey.LeftArrow); //Left arrow
-            //AddKeyWithShift(0x48, '\u2191', ConsoleKey.UpArrow); //Up arrow
-            //AddKeyWithShift(0x4d, '\u2192', ConsoleKey.RightArrow); //Right arrow
-            //AddKeyWithShift(0x50, '\u2193', ConsoleKey.DownArrow); //Down arrow
+            AddKeyWithShift(0x39, ' ', ConsoleKey.Spacebar); //Space
+            AddKeyWithShift(0x4b, '\u2190', ConsoleKey.LeftArrow); //Left arrow
+            AddKeyWithShift(0x48, '\u2191', ConsoleKey.UpArrow); //Up arrow
+            AddKeyWithShift(0x4d, '\u2192', ConsoleKey.RightArrow); //Right arrow
+            AddKeyWithShift(0x50, '\u2193', ConsoleKey.DownArrow); //Down arrow
 
-            //AddKeyWithShift(0x5b, ConsoleKey.LeftWindows);
-            //AddKeyWithShift(0x5c, ConsoleKey.RightWindows);
-            ////AddKey(0x5d, ConsoleKey.NoName);                                   //Context Menu
+            AddKeyWithShift(0x5b, ConsoleKey.LeftWindows);
+            AddKeyWithShift(0x5c, ConsoleKey.RightWindows);
+            //AddKey(0x5d, ConsoleKey.NoName);                                   //Context Menu
 
-            //AddKeyWithShift(0x52, ConsoleKey.Insert);
-            //AddKeyWithShift(0x47, ConsoleKey.Home);
-            //AddKeyWithShift(0x49, ConsoleKey.PageUp);
-            //AddKeyWithShift(0x53, ConsoleKey.Delete);
-            //AddKeyWithShift(0x4f, ConsoleKey.End);
-            //AddKeyWithShift(0x51, ConsoleKey.PageDown);
+            AddKeyWithShift(0x52, ConsoleKey.Insert);
+            AddKeyWithShift(0x47, ConsoleKey.Home);
+            AddKeyWithShift(0x49, ConsoleKey.PageUp);
+            AddKeyWithShift(0x53, ConsoleKey.Delete);
+            AddKeyWithShift(0x4f, ConsoleKey.End);
+            AddKeyWithShift(0x51, ConsoleKey.PageDown);
 
-            //AddKeyWithShift(0x37, ConsoleKey.PrintScreen);
-            ////AddKeyWithShift(0x46, ConsoleKey.NoName);                          //Scroll Lock
-            ////AddKeyWithShift(0x3a, ConsoleKey.NoName);                          //Caps Lock
-            //AddKeyWithShift(0x45, ConsoleKey.Pause);
+            AddKeyWithShift(0x37, ConsoleKey.PrintScreen);
+            //AddKeyWithShift(0x46, ConsoleKey.NoName);                          //Scroll Lock
+            //AddKeyWithShift(0x3a, ConsoleKey.NoName);                          //Caps Lock
+            AddKeyWithShift(0x45, ConsoleKey.Pause);
 
-            //AddKeyWithShift(0x3b, ConsoleKey.F1);
-            //AddKeyWithShift(0x3c, ConsoleKey.F2);
-            //AddKeyWithShift(0x3d, ConsoleKey.F3);
-            //AddKeyWithShift(0x3e, ConsoleKey.F4);
-            //AddKeyWithShift(0x3f, ConsoleKey.F5);
-            //AddKeyWithShift(0x40, ConsoleKey.F6);
-            //AddKeyWithShift(0x41, ConsoleKey.F7);
-            //AddKeyWithShift(0x42, ConsoleKey.F8);
-            //AddKeyWithShift(0x43, ConsoleKey.F9);
-            //AddKeyWithShift(0x44, ConsoleKey.F10);
-            //AddKeyWithShift(0x57, ConsoleKey.F11);
-            //AddKeyWithShift(0x58, ConsoleKey.F12);
+            AddKeyWithShift(0x3b, ConsoleKey.F1);
+            AddKeyWithShift(0x3c, ConsoleKey.F2);
+            AddKeyWithShift(0x3d, ConsoleKey.F3);
+            AddKeyWithShift(0x3e, ConsoleKey.F4);
+            AddKeyWithShift(0x3f, ConsoleKey.F5);
+            AddKeyWithShift(0x40, ConsoleKey.F6);
+            AddKeyWithShift(0x41, ConsoleKey.F7);
+            AddKeyWithShift(0x42, ConsoleKey.F8);
+            AddKeyWithShift(0x43, ConsoleKey.F9);
+            AddKeyWithShift(0x44, ConsoleKey.F10);
+            AddKeyWithShift(0x57, ConsoleKey.F11);
+            AddKeyWithShift(0x58, ConsoleKey.F12);
 
-            //AddKeyWithShift(0x1, ConsoleKey.Escape);
+            AddKeyWithShift(0x1, ConsoleKey.Escape);
 
-            //#endregion
+            #endregion
 
-            //#region Punctuation and Signs
+            #region Punctuation and Signs
 
-            //AddKey(0x27, ';', ConsoleKey.NoName);
-            //AddKey(0x270000, ':', ConsoleKey.NoName);
-            //AddKey(0x28, '\'', ConsoleKey.NoName);
-            //AddKey(0x280000, '"', ConsoleKey.NoName);
-            //AddKey(0x2B, '\\', ConsoleKey.NoName);
-            //AddKey(0x2B0000, '|', ConsoleKey.NoName);
-            //AddKey(0x33, ',', ConsoleKey.OemComma);
-            //AddKey(0x330000, '<', ConsoleKey.OemComma);
-            //AddKey(0x34, '.', ConsoleKey.OemPeriod);
-            //AddKey(0x340000, '>', ConsoleKey.OemPeriod);
-            //AddKey(0x35, '/', ConsoleKey.Divide);
-            //AddKey(0x350000, '?', ConsoleKey.Divide);
-            ////AddKey(0x4A, '-');
-            //AddKey(0x0C, '-', ConsoleKey.Subtract);
-            //AddKey(0x0C0000, '_', ConsoleKey.Subtract);
-            //AddKey(0x0D, '=', ConsoleKey.OemPlus);
-            //AddKey(0x0D0000, '+', ConsoleKey.OemPlus);
-            ////AddKey(0x4E, '+');
-            //AddKey(0x1A, '[', ConsoleKey.NoName);
-            //AddKey(0x1A0000, '{', ConsoleKey.NoName);
-            //AddKey(0x1B, ']', ConsoleKey.NoName);
-            //AddKey(0x1B0000, '}', ConsoleKey.NoName);
+            AddKey(0x27, ';', ConsoleKey.NoName);
+            AddKey(0x270000, ':', ConsoleKey.NoName);
+            AddKey(0x28, '\'', ConsoleKey.NoName);
+            AddKey(0x280000, '"', ConsoleKey.NoName);
+            AddKey(0x2B, '\\', ConsoleKey.NoName);
+            AddKey(0x2B0000, '|', ConsoleKey.NoName);
+            AddKey(0x33, ',', ConsoleKey.OemComma);
+            AddKey(0x330000, '<', ConsoleKey.OemComma);
+            AddKey(0x34, '.', ConsoleKey.OemPeriod);
+            AddKey(0x340000, '>', ConsoleKey.OemPeriod);
+            AddKey(0x35, '/', ConsoleKey.Divide);
+            AddKey(0x350000, '?', ConsoleKey.Divide);
+            //AddKey(0x4A, '-');
+            AddKey(0x0C, '-', ConsoleKey.Subtract);
+            AddKey(0x0C0000, '_', ConsoleKey.Subtract);
+            AddKey(0x0D, '=', ConsoleKey.OemPlus);
+            AddKey(0x0D0000, '+', ConsoleKey.OemPlus);
+            //AddKey(0x4E, '+');
+            AddKey(0x1A, '[', ConsoleKey.NoName);
+            AddKey(0x1A0000, '{', ConsoleKey.NoName);
+            AddKey(0x1B, ']', ConsoleKey.NoName);
+            AddKey(0x1B0000, '}', ConsoleKey.NoName);
 
-            //AddKeyWithShift(0x4c, '5', ConsoleKey.NumPad5);
+            AddKeyWithShift(0x4c, '5', ConsoleKey.NumPad5);
 
-            //AddKeyWithShift(0x4a, '-', ConsoleKey.OemMinus);
-            //AddKeyWithShift(0x4e, '+', ConsoleKey.OemPlus);
+            AddKeyWithShift(0x4a, '-', ConsoleKey.OemMinus);
+            AddKeyWithShift(0x4e, '+', ConsoleKey.OemPlus);
 
-            //AddKeyWithShift(0x37, '*', ConsoleKey.Multiply);
+            AddKeyWithShift(0x37, '*', ConsoleKey.Multiply);
 
-            //#endregion
+            #endregion
         }
 
         private KeyMapping AddKey(uint p, char p_2, ConsoleKey p_3)
@@ -435,13 +415,6 @@ namespace Cosmos.HAL
                 keyInfo = null;
                 return false;
             }
-            Console.WriteLine("Returning key");
-            Console.Write("Scancode = ");
-            Console.WriteLine(aScancode.ToString());
-            Console.Write("Key = ");
-            Console.WriteLine((int)xKey);
-            Console.Write("Char = ");
-            Console.WriteLine((int)xChar);
             keyInfo = new ConsoleKeyInfoEx(xChar, xKey, ShiftPressed, AltPressed, ControlPressed);
             return true;
         }
