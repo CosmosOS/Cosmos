@@ -26,8 +26,13 @@ namespace GuessKernel {
     private Debugger mDebugger = new Debugger("User", "Guess");
 
     [StructLayout(LayoutKind.Explicit)]
-    private struct MyStruct
+    private class MyStruct
     {
+      public MyStruct()
+      {
+
+      }
+
       public MyStruct(short a, short b, short c, short d, short e)
       {
         A = a;
@@ -60,63 +65,63 @@ namespace GuessKernel {
       //xQueue.Enqueue(new MyStruct(1, 2, 3, 4, 5));
       //xQueue.Enqueue(new MyStruct(6, 7, 8, 9, 10));
 
-      var xTest = 3 % 8;
-      Console.Write("Test: ");
-      Console.WriteLine(xTest.ToString());
+      //var xTest = 3 % 8;
+      //Console.Write("Test: ");
+      //Console.WriteLine(xTest.ToString());
 
-      //var xItem = xQueue.Dequeue();
-      //Console.Write("Char: ");
-      //Console.WriteLine(xResult.KeyChar);
-      var xItem = new MyStruct
-                  {
-                    A = 1,
-                    B = 2,
-                    C = 3,
-                    D = 4,
-                    E = 5
-                  };
+      ////var xItem = xQueue.Dequeue();
+      ////Console.Write("Char: ");
+      ////Console.WriteLine(xResult.KeyChar);
+      //var xItem = new MyStruct
+      //            {
+      //              A = 1,
+      //              B = 2,
+      //              C = 3,
+      //              D = 4,
+      //              E = 5
+      //            };
 
-      var xArray = new MyStruct[1];
-      xArray[0] = xItem;
-      //xArray[0] = new MyStruct(1, 2, 3, 4, 5);
+      //var xArray = new MyStruct[1];
+      //xArray[0] = xItem;
+      ////xArray[0] = new MyStruct(1, 2, 3, 4, 5);
 
-      xItem = xArray[0];
-      Console.Write("A: ");
-      Console.WriteLine(xItem.A);
-      Console.Write("B: ");
-      Console.WriteLine(xItem.B);
-      Console.Write("C: ");
-      Console.WriteLine(xItem.C);
-      Console.Write("D: ");
-      Console.WriteLine(xItem.D);
-      Console.Write("E: ");
-      Console.WriteLine(xItem.E);
+      //xItem = xArray[0];
+      //Console.Write("A: ");
+      //Console.WriteLine(xItem.A);
+      //Console.Write("B: ");
+      //Console.WriteLine(xItem.B);
+      //Console.Write("C: ");
+      //Console.WriteLine(xItem.C);
+      //Console.Write("D: ");
+      //Console.WriteLine(xItem.D);
+      //Console.Write("E: ");
+      //Console.WriteLine(xItem.E);
 
-      //xItem = new MyStruct(6, 7, 8, 9, 10);
+      ////xItem = new MyStruct(6, 7, 8, 9, 10);
 
-      Console.WriteLine("Next: ");
-      //xItem = xQueue.Dequeue();
-      //Console.Write("Char: ");
-      //Console.WriteLine(xResult.KeyChar);
+      //Console.WriteLine("Next: ");
+      ////xItem = xQueue.Dequeue();
+      ////Console.Write("Char: ");
+      ////Console.WriteLine(xResult.KeyChar);
 
-      //var xArray = new MyStruct[0];
-      //xArray[0] = new MyStruct(1, 2, 3, 4, 5);
+      ////var xArray = new MyStruct[0];
+      ////xArray[0] = new MyStruct(1, 2, 3, 4, 5);
 
-      xItem = GetValue(xArray, 0);
-      Console.Write("A: ");
-      Console.WriteLine(xItem.A);
-      Console.Write("B: ");
-      Console.WriteLine(xItem.B);
-      Console.Write("C: ");
-      Console.WriteLine(xItem.C);
-      Console.Write("D: ");
-      Console.WriteLine(xItem.D);
-      Console.Write("E: ");
-      Console.WriteLine(xItem.E);
+      //xItem = GetValue(xArray, 0);
+      //Console.Write("A: ");
+      //Console.WriteLine(xItem.A);
+      //Console.Write("B: ");
+      //Console.WriteLine(xItem.B);
+      //Console.Write("C: ");
+      //Console.WriteLine(xItem.C);
+      //Console.Write("D: ");
+      //Console.WriteLine(xItem.D);
+      //Console.Write("E: ");
+      //Console.WriteLine(xItem.E);
 
 
-      while (true)
-        ;
+      //while (true)
+      //  ;
 
       //Stop();
       mCount++;

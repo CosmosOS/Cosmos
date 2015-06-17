@@ -85,7 +85,7 @@ namespace Cosmos.HAL
                     }
                     if (!aReleased)
                     {
-                        ConsoleKeyInfo xKeyInfo;
+                        ConsoleKeyInfoEx xKeyInfo;
                         if (!GetKey(xTheScancode, out xKeyInfo))
                         {
                             Global.Dbg.SendError("Keyboard", "error while getting scancode character!");
@@ -169,30 +169,30 @@ namespace Cosmos.HAL
 
             #region digits
 
-            //AddKey(0x1, '`');
+            //AddKey(0x1, '`',);
             //AddKey(0x10000, '~');
-            //AddKey(0x29, '`', ConsoleKey.NoName);
-            //AddKey(0x290000, '~', ConsoleKey.NoName);
-            //AddKey(0x2, '1', ConsoleKey.D1);
-            //AddKey(0x20000, '!', ConsoleKey.D1);
-            //AddKey(0x3, '2', ConsoleKey.D2);
-            //AddKey(0x30000, '@', ConsoleKey.D2);
-            //AddKey(0x4, '3', ConsoleKey.D3);
-            //AddKey(0x40000, '#', ConsoleKey.D3);
-            //AddKey(0x5, '4', ConsoleKey.D4);
-            //AddKey(0x50000, '$', ConsoleKey.D5);
-            //AddKey(0x6, '5', ConsoleKey.D5);
-            //AddKey(0x60000, '%', ConsoleKey.D5);
-            //AddKey(0x7, '6', ConsoleKey.D6);
-            //AddKey(0x70000, '^', ConsoleKey.D6);
-            //AddKey(0x8, '7', ConsoleKey.D7);
-            //AddKey(0x80000, '&', ConsoleKey.D7);
-            //AddKey(0x9, '8', ConsoleKey.D8);
-            //AddKey(0x90000, '*', ConsoleKey.D8);
-            //AddKey(0xA, '9', ConsoleKey.D9);
-            //AddKey(0xA0000, '(', ConsoleKey.D9);
+            AddKey(0x29, '`', ConsoleKey.NoName);
+            AddKey(0x290000, '~', ConsoleKey.NoName);
+            AddKey(0x2, '1', ConsoleKey.D1);
+            AddKey(0x20000, '!', ConsoleKey.D1);
+            AddKey(0x3, '2', ConsoleKey.D2);
+            AddKey(0x30000, '@', ConsoleKey.D2);
+            AddKey(0x4, '3', ConsoleKey.D3);
+            AddKey(0x40000, '#', ConsoleKey.D3);
+            AddKey(0x5, '4', ConsoleKey.D4);
+            AddKey(0x50000, '$', ConsoleKey.D5);
+            AddKey(0x6, '5', ConsoleKey.D5);
+            AddKey(0x60000, '%', ConsoleKey.D5);
+            AddKey(0x7, '6', ConsoleKey.D6);
+            AddKey(0x70000, '^', ConsoleKey.D6);
+            AddKey(0x8, '7', ConsoleKey.D7);
+            AddKey(0x80000, '&', ConsoleKey.D7);
+            AddKey(0x9, '8', ConsoleKey.D8);
+            AddKey(0x90000, '*', ConsoleKey.D8);
+            AddKey(0xA, '9', ConsoleKey.D9);
+            AddKey(0xA0000, '(', ConsoleKey.D9);
             AddKey(0xB, '0', ConsoleKey.D0);
-            //AddKey(0xB0000, ')', ConsoleKey.D0);
+            AddKey(0xB0000, ')', ConsoleKey.D0);
 
             #endregion
 
@@ -419,20 +419,20 @@ namespace Cosmos.HAL
         //    return xResult;
         //}
 
-        public bool GetKey(uint aScancode, out ConsoleKeyInfo keyInfo)
+        public bool GetKey(uint aScancode, out ConsoleKeyInfoEx keyInfo)
         {
             ConsoleKey xKey;
 
             if (!GetKeyValue(aScancode, out xKey))
             {
-                keyInfo = new ConsoleKeyInfo();
+                keyInfo = null;
                 return false;
             }
 
             char xChar;
             if (!GetCharValue(aScancode, out xChar))
             {
-                keyInfo = new ConsoleKeyInfo();
+                keyInfo = null;
                 return false;
             }
             Console.WriteLine("Returning key");
@@ -442,7 +442,7 @@ namespace Cosmos.HAL
             Console.WriteLine((int)xKey);
             Console.Write("Char = ");
             Console.WriteLine((int)xChar);
-            keyInfo = new ConsoleKeyInfo(xChar, xKey, ShiftPressed, AltPressed, ControlPressed);
+            keyInfo = new ConsoleKeyInfoEx(xChar, xKey, ShiftPressed, AltPressed, ControlPressed);
             return true;
         }
 

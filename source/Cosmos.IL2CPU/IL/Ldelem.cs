@@ -11,6 +11,12 @@ namespace Cosmos.IL2CPU.X86.IL {
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpType = (OpType)aOpCode;
       var xSize = SizeOfType(xOpType.Value);
+      if (xOpType.Value.IsValueType && !xOpType.Value.IsPrimitive)
+      {
+        Ldelema.Assemble(Assembler, xSize, DebugEnabled);
+        Ldobj.DoAssemble(xOpType.Value);
+        return;
+      }
       Ldelem_Ref.Assemble(Assembler, xSize, false, DebugEnabled);
     }
   }

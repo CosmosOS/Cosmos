@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cosmos.HAL;
 using Encoding = System.Text.Encoding;
 using Plug = Cosmos.IL2CPU.Plugs.PlugAttribute;
 
@@ -303,7 +304,7 @@ namespace Cosmos.System.Plugs.System {
 
 		public static int Read() {
 			// TODO special cases, if needed, that returns -1
-		  ConsoleKeyInfo xResult;
+      ConsoleKeyInfoEx xResult;
 
 		  if (HAL.Global.Keyboard.TryReadKey(out xResult))
 		  {
@@ -317,7 +318,7 @@ namespace Cosmos.System.Plugs.System {
 
 		// ReadKey() pure CIL
 
-		public static ConsoleKeyInfo ReadKey(Boolean intercept) {
+		public static ConsoleKeyInfoEx ReadKey(Boolean intercept) {
       var key = Cosmos.HAL.Global.Keyboard.ReadKey();
 
 			if (false == intercept)
@@ -335,7 +336,7 @@ namespace Cosmos.System.Plugs.System {
         return null;
       }
 			List<char> chars = new List<char>(32);
-			ConsoleKeyInfo current;
+			ConsoleKeyInfoEx current;
 			int currentCount = 0;
 
 			while ((current = HAL.Global.Keyboard.ReadKey()).Key != ConsoleKey.Enter)
