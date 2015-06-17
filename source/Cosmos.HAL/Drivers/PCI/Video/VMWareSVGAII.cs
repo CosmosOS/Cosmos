@@ -45,10 +45,10 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             NumDisplays = 31,
             PitchLock = 32,
 
-			/// <summary>
-			/// Indicates maximum size of FIFO Registers.
-			/// </summary>
-			FifoNumRegisters = 293
+            /// <summary>
+            /// Indicates maximum size of FIFO Registers.
+            /// </summary>
+            FifoNumRegisters = 293
         }
 
         private enum ID : uint
@@ -83,15 +83,15 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             RECT_PIXMAP_COPY = 11,
             FREE_OBJECT = 12,
             RECT_ROP_FILL = 13,
-			RECT_ROP_COPY = 14,
-			RECT_ROP_BITMAP_FILL = 15,
-			RECT_ROP_PIXMAP_FILL = 16,
-			RECT_ROP_BITMAP_COPY = 17,
-			RECT_ROP_PIXMAP_COPY = 18,
-			DEFINE_CURSOR = 19,
-			DISPLAY_CURSOR = 20,
-			MOVE_CURSOR = 21,
-			DEFINE_ALPHA_CURSOR = 22
+            RECT_ROP_COPY = 14,
+            RECT_ROP_BITMAP_FILL = 15,
+            RECT_ROP_PIXMAP_FILL = 16,
+            RECT_ROP_BITMAP_COPY = 17,
+            RECT_ROP_PIXMAP_COPY = 18,
+            DEFINE_CURSOR = 19,
+            DISPLAY_CURSOR = 20,
+            MOVE_CURSOR = 21,
+            DEFINE_ALPHA_CURSOR = 22
         }
 
         private enum IOPortOffset : byte
@@ -102,35 +102,35 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             IRQ = 3
         }
 
-		[Flags]
-		private enum Capability
-		{
-			None = 0,
-			RectFill = 1,
-			RectCopy = 2,
-			RectPatFill = 4,
-			LecacyOffscreen = 8,
-			RasterOp = 16,
-			Cursor = 32,
-			CursorByPass = 64,
-			CursorByPass2 = 128,
-			EigthBitEmulation = 256,
-			AlphaCursor = 512,
-			Glyph = 1024,
-			GlyphClipping = 0x00000800,
-			Offscreen1 = 0x00001000,
-			AlphaBlend = 0x00002000,
-			ThreeD = 0x00004000,
-			ExtendedFifo = 0x00008000,
-			MultiMon = 0x00010000,
-			PitchLock = 0x00020000,
-			IrqMask = 0x00040000,
-			DisplayTopology = 0x00080000,
-			Gmr = 0x00100000,
-			Traces = 0x00200000,
-			Gmr2 = 0x00400000,
-			ScreenObject2 = 0x00800000
-		}
+        [Flags]
+        private enum Capability
+        {
+            None = 0,
+            RectFill = 1,
+            RectCopy = 2,
+            RectPatFill = 4,
+            LecacyOffscreen = 8,
+            RasterOp = 16,
+            Cursor = 32,
+            CursorByPass = 64,
+            CursorByPass2 = 128,
+            EigthBitEmulation = 256,
+            AlphaCursor = 512,
+            Glyph = 1024,
+            GlyphClipping = 0x00000800,
+            Offscreen1 = 0x00001000,
+            AlphaBlend = 0x00002000,
+            ThreeD = 0x00004000,
+            ExtendedFifo = 0x00008000,
+            MultiMon = 0x00010000,
+            PitchLock = 0x00020000,
+            IrqMask = 0x00040000,
+            DisplayTopology = 0x00080000,
+            Gmr = 0x00100000,
+            Traces = 0x00200000,
+            Gmr2 = 0x00400000,
+            ScreenObject2 = 0x00800000
+        }
 
         private Cosmos.Core.IOPort IndexPort;
         private Cosmos.Core.IOPort ValuePort;
@@ -141,14 +141,14 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         private Cosmos.Core.MemoryBlock FIFO_Memory;
 
         private PCIDeviceNormal device;
-		private ushort height;
-		private ushort width;
+        private uint height;
+        private uint width;
         private uint depth;
-		private uint capabilities;
+        private uint capabilities;
 
         public VMWareSVGAII()
         {
-            device = (PCIDeviceNormal)Cosmos.HAL.PCI.GetDevice(0x15AD, 0x0405);
+            device = (PCIDeviceNormal)(PCI.GetDevice(0x15AD, 0x0405));
             device.EnableMemory(true);
             uint basePort = device.BaseAddresses[0].BaseAddress();
             IndexPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Index));
@@ -161,26 +161,26 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 return;
 
             Video_Memory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));
-			capabilities = ReadRegister(Register.Capabilities);
+            capabilities = ReadRegister(Register.Capabilities);
             InitializeFIFO();
         }
 
         protected void InitializeFIFO()
         {
             FIFO_Memory = new MemoryBlock(ReadRegister(Register.MemStart), ReadRegister(Register.MemSize));
-			FIFO_Memory[(uint)FIFO.Min] = (uint)Register.FifoNumRegisters * sizeof(uint);
-			FIFO_Memory[(uint)FIFO.Max] = FIFO_Memory.Size;
-			FIFO_Memory[(uint)FIFO.NextCmd] = FIFO_Memory[(uint)FIFO.Min];
-			FIFO_Memory[(uint)FIFO.Stop] = FIFO_Memory[(uint)FIFO.Min];
+            FIFO_Memory[(uint)FIFO.Min] = (uint)Register.FifoNumRegisters * sizeof(uint);
+            FIFO_Memory[(uint)FIFO.Max] = FIFO_Memory.Size;
+            FIFO_Memory[(uint)FIFO.NextCmd] = FIFO_Memory[(uint)FIFO.Min];
+            FIFO_Memory[(uint)FIFO.Stop] = FIFO_Memory[(uint)FIFO.Min];
             WriteRegister(Register.ConfigDone, 1);
         }
 
-        public void SetMode(ushort width, ushort height, ushort depth = 32)
+        public void SetMode(uint width, uint height, uint depth = 32)
         {
-			// Depth is color depth in bytes.
-            this.depth = (uint)(depth / 8);
-			this.width = width;
-			this.height = height;
+            // Depth is color depth in bytes.
+            this.depth = (depth / 8);
+            this.width = width;
+            this.height = height;
             WriteRegister(Register.Width, width);
             WriteRegister(Register.Height, height);
             WriteRegister(Register.BitsPerPixel, depth);
@@ -213,7 +213,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
         protected void WaitForFifo()
         {
             WriteRegister(Register.Sync, 1);
-            while (ReadRegister(Register.Busy) != 0){}
+            while (ReadRegister(Register.Busy) != 0) { }
         }
 
         protected void WriteToFifo(uint value)
@@ -229,7 +229,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
                 SetFIFO(FIFO.NextCmd, GetFIFO(FIFO.Min));
         }
 
-        public void Update(ushort x, ushort y, ushort width, ushort height)
+        public void Update(uint x, uint y, uint width, uint height)
         {
             WriteToFifo((uint)FIFOCommand.Update);
             WriteToFifo(x);
@@ -239,83 +239,83 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             WaitForFifo();
         }
 
-        public void SetPixel(ushort x, ushort y, uint color)
+        public void SetPixel(uint x, uint y,uint color)
         {
-            Video_Memory[(uint)((y * width + x) * depth)] = color;
+            Video_Memory[((y * width + x) * depth)] = color;
         }
 
-        public uint GetPixel(ushort x, ushort y)
+        public uint GetPixel(uint x, uint y)
         {
-			return Video_Memory[(uint)((y * width + x) * depth)];
+            return Video_Memory[((y * width + x) * depth)];
         }
 
         public void Clear(uint color)
         {
-			Fill(0, 0, width, height, color);
+            Fill(0, 0, width, height, color);
         }
 
-		public void Copy(ushort x, ushort y, ushort newX, ushort newY, ushort width, ushort height)
-		{
-			if ((capabilities & (uint)Capability.RectCopy) != 0)
-			{
-				WriteToFifo((uint)FIFOCommand.RECT_COPY);
-				WriteToFifo(x);
-				WriteToFifo(y);
-				WriteToFifo(newX);
-				WriteToFifo(newY);
-				WriteToFifo(width);
-				WriteToFifo(height);
-				WaitForFifo();
-			}
-			else
-				throw new NotImplementedException("VMWareSVGAII Copy()");
-		}
-
-        public void Fill(ushort x, ushort y, ushort width, ushort height, uint color)
+        public void Copy(uint x, uint y, uint newX, uint newY, uint width, uint height)
         {
-			if ((capabilities & (uint)Capability.RectFill) != 0)
-			{
-				WriteToFifo((uint)FIFOCommand.RECT_FILL);
-				WriteToFifo(color);
-				WriteToFifo(x);
-				WriteToFifo(y);
-				WriteToFifo(width);
-				WriteToFifo(height);
-				WaitForFifo();
-			}
-			else
-			{
-				if ((capabilities & (uint)Capability.RectCopy) != 0)
-				{
-					// fill first line and copy it to all other
-					ushort xTarget = (ushort)(x + width);
-					ushort yTarget = (ushort)(y + height);
-					
-					for (ushort xTmp = x; xTmp < xTarget; xTmp++)
-					{
-						SetPixel(xTmp, y, color);
-					}
-					// refresh first line for copy process
-					Update(x, y, width, 1);
-					for (ushort yTmp = (ushort)(y + 1); yTmp < yTarget; yTmp++)
-					{
-						Copy(x, y, x, yTmp, width, 1);
-					}
-				}
-				else
-				{
-					ushort xTarget = (ushort)(x + width);
-					ushort yTarget = (ushort)(y + height);
-					for (ushort xTmp = x; xTmp < xTarget; xTmp++)
-					{
-						for (ushort yTmp = y; yTmp < yTarget; yTmp++)
-						{
-							SetPixel(xTmp, yTmp, color);
-						}
-					}
-					Update(x, y, width, height);
-				}
-			}
+            if ((capabilities & (uint)Capability.RectCopy) != 0)
+            {
+                WriteToFifo((uint)FIFOCommand.RECT_COPY);
+                WriteToFifo(x);
+                WriteToFifo(y);
+                WriteToFifo(newX);
+                WriteToFifo(newY);
+                WriteToFifo(width);
+                WriteToFifo(height);
+                WaitForFifo();
+            }
+            else
+                throw new NotImplementedException("VMWareSVGAII Copy()");
+        }
+
+        public void Fill(uint x, uint y, uint width, uint height, uint color)
+        {
+            if ((capabilities & (uint)Capability.RectFill) != 0)
+            {
+                WriteToFifo((uint)FIFOCommand.RECT_FILL);
+                WriteToFifo(color);
+                WriteToFifo(x);
+                WriteToFifo(y);
+                WriteToFifo(width);
+                WriteToFifo(height);
+                WaitForFifo();
+            }
+            else
+            {
+                if ((capabilities & (uint)Capability.RectCopy) != 0)
+                {
+                    // fill first line and copy it to all other
+                    uint xTarget = (x + width);
+                    uint yTarget = (y + height);
+
+                    for (uint xTmp = x; xTmp < xTarget; xTmp++)
+                    {
+                        SetPixel(xTmp, y, color);
+                    }
+                    // refresh first line for copy process
+                    Update(x, y, width, 1);
+                    for (uint yTmp = y + 1; yTmp < yTarget; yTmp++)
+                    {
+                        Copy(x, y, x, yTmp, width, 1);
+                    }
+                }
+                else
+                {
+                    uint xTarget = (x + width);
+                    uint yTarget = (y + height);
+                    for (uint xTmp = x; xTmp < xTarget; xTmp++)
+                    {
+                        for (uint yTmp = y; yTmp < yTarget; yTmp++)
+                        {
+                            SetPixel(xTmp, yTmp, color);
+                        }
+                    }
+                    Update(x, y, width, height);
+                }
+            }
         }
 
         public void DefineCursor()
