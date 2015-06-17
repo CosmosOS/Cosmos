@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using Cosmos.Debug.Kernel;
 using Sys = Cosmos.System;
@@ -24,7 +25,8 @@ namespace GuessKernel {
 
     private Debugger mDebugger = new Debugger("User", "Guess");
 
-    protected override void Run() {
+    protected override void Run()
+    {
       mCount++;
       mDebugger.SendMessage("Kernel", "New iteration");
       Console.WriteLine();
@@ -35,11 +37,16 @@ namespace GuessKernel {
       Console.WriteLine(xInputStr.Length.ToString());
       int xGuess = int.Parse(xInputStr);
       Console.WriteLine("Your guess was " + xGuess);
-      if (xGuess < mMagicNo) {
+      if (xGuess < mMagicNo)
+      {
         Console.WriteLine("Too low.");
-      } else if (xGuess > mMagicNo) {
+      }
+      else if (xGuess > mMagicNo)
+      {
         Console.WriteLine("Too high.");
-      } else {
+      }
+      else
+      {
         Console.WriteLine("You guessed it!");
         Stop();
       }

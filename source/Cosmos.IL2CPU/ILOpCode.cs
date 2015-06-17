@@ -6,7 +6,7 @@ using System.Text;
 using SR = System.Reflection;
 
 namespace Cosmos.IL2CPU {
-  // ILOpcode represents the opcode during for scanning. 
+  // ILOpcode represents the opcode during for scanning.
   // Do not:
   //   Include reference to ILOp, the scanner should do that
   //   Include referense to System.Reflection.Emit, this is metadata
@@ -261,26 +261,26 @@ namespace Cosmos.IL2CPU {
 
     public override string ToString()
     {
-        // leave here, makes easier debugging the compiler. Compiler will 
+        // leave here, makes easier debugging the compiler. Compiler will
         // show for example "IL_0001: ldstr" instead of just ILOpCode
         return String.Format("IL_{0}: {1}", Position.ToString("X4"), OpCode);
     }
 
     /// <summary>
-    /// Returns the number of items popped from the stack. This is the logical stack, not physical items. 
+    /// Returns the number of items popped from the stack. This is the logical stack, not physical items.
     /// So a 100byte struct is 1 pop, even though it might be multiple 32-bit or 64-bit words on the stack.
     /// </summary>
     /// <param name="aMethod"></param>
     public abstract int GetNumberOfStackPops(SR.MethodBase aMethod);
 
     /// <summary>
-    /// Returns the number of items pushed to the stack. This is the logical stack, not physical items. 
+    /// Returns the number of items pushed to the stack. This is the logical stack, not physical items.
     /// So a 100byte struct is 1 pop, even though it might be multiple 32-bit or 64-bit words on the stack.
     /// </summary>
     /// <param name="aMethod"></param>
     public abstract int GetNumberOfStackPushes(SR.MethodBase aMethod);
 
-    public Type[] StackPopTypes { 
+    public Type[] StackPopTypes {
       get;
       private set;
     }
@@ -324,7 +324,14 @@ namespace Cosmos.IL2CPU {
                                   sb.AppendFormat("Interpreting {0}. StackCount = {1}. Contents: ", this, aStack.Count);
                                   foreach (var item in aStack)
                                   {
-                                    sb.AppendFormat("{0}, ", item.FullName);
+                                    if (item == null)
+                                    {
+                                      sb.Append("**NULL**, ");
+                                    }
+                                    else
+                                    {
+                                      sb.AppendFormat("{0}, ", item.FullName);
+                                    }
                                   }
                                   return sb.ToString().Trim(',', ' ');
                                 });
@@ -338,6 +345,11 @@ namespace Cosmos.IL2CPU {
         StackOffsetBeforeExecution = 0;
         foreach (var item in aStack)
         {
+          if (item == null)
+          {
+            StackOffsetBeforeExecution = null;
+            break;
+          }
           StackOffsetBeforeExecution += ILOp.Align(ILOp.SizeOfType(item), 4);
         }
       }
@@ -370,7 +382,8 @@ namespace Cosmos.IL2CPU {
           aSituationChanged = true;
         }
         if (StackPopTypes[i] != xActualStackItem
-          && !StackPopTypes[i].IsAssignableFrom(xActualStackItem))
+          && !StackPopTypes[i].IsAssignableFrom(xActualStackItem)
+          && !((StackPopTypes[i].IsPointer || StackPopTypes[i].IsByRef) && (xActualStackItem.IsPointer || xActualStackItem.IsByRef)))
         {
           throw new Exception(String.Format("OpCode {0} tries to pop item at stack position {1} with type {2}, but actual type is {3}",
             this, i, StackPopTypes[i], xActualStackItem));
@@ -390,7 +403,7 @@ namespace Cosmos.IL2CPU {
     }
 
     /// <summary>
-    /// Based on updated StackPopTypes, try to update 
+    /// Based on updated StackPopTypes, try to update
     /// </summary>
     protected virtual void DoInterpretStackTypes(ref bool aSituationChanged)
     {

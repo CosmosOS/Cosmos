@@ -445,73 +445,80 @@ namespace Cosmos.IL2CPU
 
         public void ProcessMethod(MethodInfo aMethod, List<ILOpCode> aOpCodes)
         {
-            // We check this here and not scanner as when scanner makes these
-            // plugs may still have not yet been scanned that it will depend on.
-            // But by the time we make it here, they have to be resolved.
-            if (aMethod.Type == MethodInfo.TypeEnum.NeedsPlug && aMethod.PlugMethod == null)
+            try
             {
-                throw new Exception("Method needs plug, but no plug was assigned.");
-            }
+                // We check this here and not scanner as when scanner makes these
+                // plugs may still have not yet been scanned that it will depend on.
+                // But by the time we make it here, they have to be resolved.
+                if (aMethod.Type == MethodInfo.TypeEnum.NeedsPlug && aMethod.PlugMethod == null)
+                {
+                    throw new Exception("Method needs plug, but no plug was assigned.");
+                }
 
-            // todo: MtW: how to do this? we need some extra space.
-            //		see ConstructLabel for extra info
-            if (aMethod.UID > 0x00FFFFFF)
-            {
-                throw new Exception("Too many methods.");
-            }
+                // todo: MtW: how to do this? we need some extra space.
+                //		see ConstructLabel for extra info
+                if (aMethod.UID > 0x00FFFFFF)
+                {
+                    throw new Exception("Too many methods.");
+                }
 
-            MethodBegin(aMethod);
-            mLog.WriteLine("Method '{0}', ID = '{1}'", aMethod.MethodBase.GetFullName(), aMethod.UID);
-            mLog.Flush();
-            if (aMethod.MethodAssembler != null)
-            {
-                var xAssembler = (AssemblerMethod)Activator.CreateInstance(aMethod.MethodAssembler);
-                xAssembler.AssembleNew(Assembler, aMethod.PluggedMethod);
-            }
-            else if (aMethod.IsInlineAssembler)
-            {
-                aMethod.MethodBase.Invoke("", new object[aMethod.MethodBase.GetParameters().Length]);
-            }
-            else
-            {
-                // now emit the actual assembler code for this method.
+                MethodBegin(aMethod);
+                mLog.WriteLine("Method '{0}', ID = '{1}'", aMethod.MethodBase.GetFullName(), aMethod.UID);
+                mLog.Flush();
+                if (aMethod.MethodAssembler != null)
+                {
+                    var xAssembler = (AssemblerMethod)Activator.CreateInstance(aMethod.MethodAssembler);
+                    xAssembler.AssembleNew(Assembler, aMethod.PluggedMethod);
+                }
+                else if (aMethod.IsInlineAssembler)
+                {
+                    aMethod.MethodBase.Invoke("", new object[aMethod.MethodBase.GetParameters().Length]);
+                }
+                else
+                {
+                    // now emit the actual assembler code for this method.
 
-                //Conditions under which we should emit an INT3 instead of a plceholder NOP:
-                /* - First instruction in a Method / Loop / If / Else etc.
+                    //Conditions under which we should emit an INT3 instead of a plceholder NOP:
+                    /* - First instruction in a Method / Loop / If / Else etc.
                  *   -- In essence, whenever there is a opening {
                  *   -- C# Debug builds automatically insert NOPs at these locations (otherwise NOP is not used)
                  *   -- So only insert an INT3 when we are about to insert a NOP that came from IL code
                  */
 
-                /* We group opcodes together by logical statement. Each statement will have its logical stack cleared.
+                    /* We group opcodes together by logical statement. Each statement will have its logical stack cleared.
                  * Also, this lets us do optimizations later on.
                  */
-                bool emitINT3 = true;
-                DebugInfo.SequencePoint xPreviousSequencePoint = null;
-                var xCurrentGroup = new List<ILOpCode>();
-                ILOpCode.ILInterpretationDebugLine(() => String.Format("Method: {0}", aMethod.MethodBase.GetFullName()));
-                foreach (var xRawOpcode in aOpCodes)
-                {
-                    var xSP = mSequences.FirstOrDefault(q => q.Offset == xRawOpcode.Position && q.LineStart != 0xFEEFEE);
-                    // detect if we're at a new statement.
-                    if (xPreviousSequencePoint == null && xSP != null)
+                    bool emitINT3 = true;
+                    DebugInfo.SequencePoint xPreviousSequencePoint = null;
+                    var xCurrentGroup = new List<ILOpCode>();
+                    ILOpCode.ILInterpretationDebugLine(() => String.Format("Method: {0}", aMethod.MethodBase.GetFullName()));
+                    foreach (var xRawOpcode in aOpCodes)
                     {
+                        var xSP = mSequences.FirstOrDefault(q => q.Offset == xRawOpcode.Position && q.LineStart != 0xFEEFEE);
+                        // detect if we're at a new statement.
+                        if (xPreviousSequencePoint == null && xSP != null)
+                        {
 
+                        }
+                        if (xSP != null && xCurrentGroup.Count > 0)
+                        {
+                            EmitInstructions(aMethod, xCurrentGroup, ref emitINT3);
+                            xCurrentGroup.Clear();
+                            xPreviousSequencePoint = xSP;
+                        }
+                        xCurrentGroup.Add(xRawOpcode);
                     }
-                    if (xSP != null && xCurrentGroup.Count > 0)
+                    if (xCurrentGroup.Count > 0)
                     {
                         EmitInstructions(aMethod, xCurrentGroup, ref emitINT3);
-                        xCurrentGroup.Clear();
-                        xPreviousSequencePoint = xSP;
                     }
-                    xCurrentGroup.Add(xRawOpcode);
                 }
-                if (xCurrentGroup.Count > 0)
-                {
-                    EmitInstructions(aMethod, xCurrentGroup, ref emitINT3);
-                }
+                MethodEnd(aMethod);
             }
-            MethodEnd(aMethod);
+            catch (Exception E)
+            {
+                throw new Exception("Error compiling method '" + aMethod.MethodBase.GetFullName() + "': " + E.ToString(), E);
+            }
         }
 
         private void BeforeEmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
@@ -1604,7 +1611,7 @@ namespace Cosmos.IL2CPU
             {
                 var xMethodInfo = (SysReflection.MethodInfo)xMethodBase;
                 xMethodBase = xMethodInfo.GetGenericMethodDefinition();
-                if (xMethodBase.IsGenericMethod)
+                if (xMethodBase.IsGenericMethod && !xMethodBase.IsGenericMethod)
                 {
                     // apparently, a generic method can be derived from a generic method..
                     throw new Exception("Make recursive");
