@@ -24,6 +24,11 @@ namespace Cosmos.System
             return null;
         }
 
+        protected virtual Keyboard GetKeyboard()
+        {
+            return null;
+        }
+
         /// <summary>
         /// Start the system up using the properties for configuration.
         /// </summary>
@@ -44,12 +49,12 @@ namespace Cosmos.System
                 HAL.Bootstrap.Init();
 
                 Global.Dbg.Send("Global Init");
-                Global.Init(GetTextScreen());
+                Global.Init(GetTextScreen(), GetKeyboard());
 
                 // Provide the user with a clear screen if they requested it
                 if (ClearScreen) {
                     Global.Dbg.Send("Cls");
-                    Global.Console.Clear();
+                    //Global.Console.Clear();
                 }
 
                 Global.Dbg.Send("Before Run");

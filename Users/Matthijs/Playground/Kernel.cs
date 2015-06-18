@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmos.HAL;
 using Sys = Cosmos.System;
 
 namespace Playground
@@ -9,6 +10,8 @@ namespace Playground
         {
             Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
         }
+
+
 
         protected override void Run()
         {
