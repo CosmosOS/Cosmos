@@ -321,7 +321,7 @@ namespace Cosmos.System.Plugs.System {
 		public static ConsoleKeyInfoEx ReadKey(Boolean intercept) {
       var key = Cosmos.HAL.Global.Keyboard.ReadKey();
 
-			if (false == intercept)
+			if (false == intercept && key.KeyChar != '\0')
 			{
 				Write(key.KeyChar);
 			}
@@ -382,6 +382,8 @@ namespace Cosmos.System.Plugs.System {
 					}
 					continue;
 				}
+
+			    if (current.KeyChar == '\0') continue;
 
 				//Write the character to the screen
 				if (currentCount == chars.Count)
