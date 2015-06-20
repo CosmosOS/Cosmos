@@ -1,23 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{3B0F484C-0A26-4CC2-B44D-DDDA3A3E9381}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{78304B1E-C323-4A78-9E7D-2578E58311B6}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SentinelKernel</RootNamespace>
-    <AssemblyName>SentinelKernel</AssemblyName>
-    <FileAlignment>512</FileAlignment>
+    <RootNamespace>Cosmos.TestRunner.Console</RootNamespace>
+    <AssemblyName>Cosmos.TestRunner.Console</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -25,9 +21,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -37,27 +33,31 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Kernel.cs" />
-    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Common\Cosmos.Common.csproj">
-      <Project>{1fac100c-d732-4ea4-b518-5af4baf64f2e}</Project>
-      <Name>Cosmos.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.HAL\Cosmos.HAL.csproj">
-      <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
-      <Name>Cosmos.HAL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.System\Cosmos.System.csproj">
-      <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
+      <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SentinelSystem\SentinelSystem.csproj">
-      <Project>{93D6FF56-6E23-4E80-98F6-730AC533F631}</Project>
-      <Name>SentinelSystem</Name>
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.Kernel.csproj">
+      <Project>{BDC011BE-6041-4A58-A6E7-0F592E78CB27}</Project>
+      <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj">
+      <Project>{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}</Project>
+      <Name>Cosmos.TestRunner.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

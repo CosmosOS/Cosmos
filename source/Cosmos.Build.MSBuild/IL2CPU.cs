@@ -169,7 +169,7 @@ namespace Cosmos.Build.MSBuild {
       }
     }
 
-		public override bool ExtendLineError(int exitCode, string errorMessage, out LogInfo log)
+		public override bool ExtendLineError(bool hasErrored, string errorMessage, out LogInfo log)
 		{
 			log = new LogInfo();
 			log.logType = WriteType.Error;

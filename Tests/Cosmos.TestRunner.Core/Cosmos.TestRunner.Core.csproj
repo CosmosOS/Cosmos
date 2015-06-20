@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Cosmos.TestRunner.Core</RootNamespace>
+    <AssemblyName>Cosmos.TestRunner.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Utilities.v4.0" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Engine.cs" />
+    <Compile Include="Engine.Helpers.cs">
+      <DependentUpon>Engine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Engine.Run.cs">
+      <DependentUpon>Engine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj">
+      <Project>{BC6AE974-1F18-4A19-A956-5062E4D3FD53}</Project>
+      <Name>Cosmos.Build.MSBuild</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
+      <Project>{D9A87AAD-FCC9-4517-B31D-E904DAD00784}</Project>
+      <Name>Cosmos.Core.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
+      <Project>{B97A2956-C363-47F2-A6AA-B4FCCFF4D315}</Project>
+      <Name>Cosmos.Debug.Kernel.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+      <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
+      <Project>{7C64B97F-516D-4A6D-B9E1-3FE48F561409}</Project>
+      <Name>Cosmos.System.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\IL2CPU\IL2CPU.csproj">
+      <Project>{6128DEEB-D30F-4859-B60F-C36D5452F3E9}</Project>
+      <Name>IL2CPU</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

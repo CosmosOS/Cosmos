@@ -83,91 +83,99 @@ namespace Cosmos.Build.MSBuild
 
 	public abstract class BaseToolTask : AppDomainIsolatedTask
 	{
-		protected bool ExecuteTool(string workingDir, string filename, string arguments, string name)
-		{
-			var xProcessStartInfo = new ProcessStartInfo();
-			xProcessStartInfo.WorkingDirectory = workingDir;
-			xProcessStartInfo.FileName = filename;
-			xProcessStartInfo.Arguments = arguments;
-			xProcessStartInfo.UseShellExecute = false;
-			xProcessStartInfo.RedirectStandardOutput = true;
-			xProcessStartInfo.RedirectStandardError = true;
-      xProcessStartInfo.CreateNoWindow = true;
+	    public static bool ExecuteTool(string workingDir, string filename, string arguments, string name, Action<string> errorReceived, Action<string> outputReceived)
+	    {
+            var xProcessStartInfo = new ProcessStartInfo();
+            xProcessStartInfo.WorkingDirectory = workingDir;
+            xProcessStartInfo.FileName = filename;
+            xProcessStartInfo.Arguments = arguments;
+            xProcessStartInfo.UseShellExecute = false;
+            xProcessStartInfo.RedirectStandardOutput = true;
+            xProcessStartInfo.RedirectStandardError = true;
+            xProcessStartInfo.CreateNoWindow = true;
 
-			Log.LogCommandLine(string.Format("Executing command line \"{0}\" {1}", filename, arguments));
-			Log.LogCommandLine(string.Format("Working directory = '{0}'", workingDir));
+            outputReceived(string.Format("Executing command line \"{0}\" {1}", filename, arguments));
+            outputReceived(string.Format("Working directory = '{0}'", workingDir));
 
-			using (var xProcess = new Process())
-			{
-        xProcess.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)
-        {
-          if (e.Data != null)
-          {
-            mErrors.Add(e.Data);
-          }
-        };
-        xProcess.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e)
-        {
-          if (e.Data != null)
-          {
-            mOutput.Add(e.Data);
-          }
-        };
-				xProcess.StartInfo = xProcessStartInfo;
-				mErrors = new List<string>();
-				mOutput = new List<string>();
-			  xProcess.Start();
-        xProcess.BeginErrorReadLine();
-        xProcess.BeginOutputReadLine();
-        xProcess.WaitForExit(15 * 60 * 1000); // wait 15 minutes
-			  if (!xProcess.HasExited) {
-					xProcess.Kill();
-					Log.LogError("{0} timed out.", name);
-				}
-				else {
-					if (xProcess.ExitCode != 0)
-					{
-					  Log.LogError("Error occurred while invoking {0}.", name);
-					}
-				}
+            using (var xProcess = new Process())
+            {
+                xProcess.ErrorDataReceived += delegate(object sender, DataReceivedEventArgs e)
+                {
+                    if (e.Data != null)
+                    {
+                        errorReceived(e.Data);
+                    }
+                };
+                xProcess.OutputDataReceived += delegate(object sender, DataReceivedEventArgs e)
+                {
+                    if (e.Data != null)
+                    {
+                        outputReceived(e.Data);
+                    }
+                };
+                xProcess.StartInfo = xProcessStartInfo;
+                xProcess.Start();
+                xProcess.BeginErrorReadLine();
+                xProcess.BeginOutputReadLine();
+                xProcess.WaitForExit(15 * 60 * 1000); // wait 15 minutes
+                if (!xProcess.HasExited)
+                {
+                    xProcess.Kill();
+                    errorReceived(String.Format("{0} timed out.", name));
+                    return false;
+                }
+                else
+                {
+                    if (xProcess.ExitCode != 0)
+                    {
+                        errorReceived(String.Format("Error occurred while invoking {0}.", name));
+                        return false;
+                    }
+                }
+                return true;
+            }
+	    }
 
-        LogInfo logContent;
-			  for (int xIndex = 0; xIndex < mErrors.Count; xIndex++)
-			  {
-			    var xError = mErrors[xIndex];
-			    if (ExtendLineError(xProcess.ExitCode, xError, out logContent))
-			    {
-			      Logs(logContent);
-			    }
-			  }
+	    protected bool ExecuteTool(string workingDir, string filename, string arguments, string name)
+	    {
+	        var xResult = ExecuteTool(workingDir, filename, arguments, name, s => mErrors.Add(s), s => mOutput.Add(s));
 
-			  for (int xIndex = 0; xIndex < mOutput.Count; xIndex++)
-			  {
-			    var xOutput = mOutput[xIndex];
-			    if (ExtendLineOutput(xProcess.ExitCode, xOutput, out logContent))
-			    {
-			      Logs(logContent);
-			    }
-			  }
+	        LogInfo logContent;
+	        for (int xIndex = 0; xIndex < mErrors.Count; xIndex++)
+	        {
+	            var xError = mErrors[xIndex];
+	            if (ExtendLineError(xResult, xError, out logContent))
+	            {
+	                Logs(logContent);
+	            }
+	        }
 
-			  return xProcess.ExitCode == 0;
-			}
-		}
+	        for (int xIndex = 0; xIndex < mOutput.Count; xIndex++)
+	        {
+	            var xOutput = mOutput[xIndex];
+	            if (ExtendLineOutput(xResult, xOutput, out logContent))
+	            {
+	                Logs(logContent);
+	            }
+	        }
 
-		private List<string> mErrors;
+	        return xResult;
+	    }
+
+	    private List<string> mErrors;
 		private List<string> mOutput;
 
-	  public virtual bool ExtendLineError(int exitCode, string errorMessage, out LogInfo log)
+	  public virtual bool ExtendLineError(bool hasErrored, string errorMessage, out LogInfo log)
 	  {
 	    log = new LogInfo();
 	    log.logType = WriteType.Error;
 	    log.message = errorMessage;
-	    if (exitCode == 0)
+	    if (!hasErrored)
 	      return false;
 	    return true;
 	  }
 
-	  public virtual bool ExtendLineOutput(int exitCode, string errorMessage, out LogInfo log)
+	  public virtual bool ExtendLineOutput(bool hasErrored, string errorMessage, out LogInfo log)
 	  {
 	    log = new LogInfo();
 	    log.logType = WriteType.Info;
