@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cosmos.Core;
 
 namespace Cosmos.HAL
 {
@@ -21,6 +22,9 @@ namespace Cosmos.HAL
         private bool mShiftState;
         private bool mCtrlState;
         private bool mAltState;
+        private bool _num;
+        private bool _scroll;
+        private bool _caps;
 
         public bool ShiftPressed
         {
@@ -45,256 +49,208 @@ namespace Cosmos.HAL
                 return mAltState;
             }
         }
+        public bool NumLock
+        {
+            get { return _num; }
+        }
+
+        public bool CapsLock
+        {
+            get { return _caps; }
+        }
+
+        public bool ScrollLock
+        {
+            get { return _scroll; }
+        }
+
+        private void updateLed()
+        {
+            IO.Port60.Byte = 0xED;
+            while ((new IOPort(0x64).Byte & 2) != 0)
+            {
+            }
+            var led_status = (_scroll ? 1 : 0) | ((_num ? 1 : 0) << 1) | ((_caps ? 1 : 0) << 2);
+            IO.Port60.Byte = (byte)led_status;
+            while ((new IOPort(0x64).Byte & 2) != 0)
+            {
+            }
+        }
 
         protected override void HandleScancode(byte aScancode, bool aReleased)
         {
-            uint xTheScancode = aScancode;
-            if (mEscaped)
+            uint key = aScancode;
+            if (key == 0x3A && !aReleased)
             {
-                xTheScancode = (ushort)(xTheScancode << 8);
-                mEscaped = false;
+                // caps lock
+                _caps = !_caps;
+                updateLed();
             }
-            switch (xTheScancode)
+            else if (key == 0x45 && !aReleased)
             {
-                case 0x36:
-                case 0x2A:
-                {
-                    mShiftState = !aReleased;
-                    break;
-                }
-                case 0x1D:
-                {
-                    mCtrlState = !aReleased;
-                    break;
-                }
-                case 0x38:
-                {
-                    mAltState = !aReleased;
-                    break;
-                }
-                default:
-                {
-                    if ((mCtrlState) && (mAltState) && (xTheScancode == 0x53))
-                    {
-                        Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
-                        Core.Global.CPU.Reboot();
-                    }
-                    if (mShiftState)
-                    {
-                        xTheScancode = xTheScancode << 16;
-                    }
-                    if (!aReleased)
-                    {
-                        ConsoleKeyInfoEx xKeyInfo;
-                        if (!GetKey(xTheScancode, out xKeyInfo))
-                        {
-                            Global.Dbg.SendError("Keyboard", "error while getting scancode character!");
-                        }
-                        else
-                        {
-                            Enqueue(xKeyInfo);
-                        }
-                    }
-                    break;
-                }
+                // num lock
+                _num = !_num;
+                updateLed();
             }
+            else if (key == 0x46 && !aReleased)
+            {
+                // scroll lock
+                _scroll = !_scroll;
+                updateLed();
+            }
+            else
+                switch (key)
+                {
+                    case 0x1D:
+                        mCtrlState = !aReleased;
+                        break;
+                    case 0x2A:
+                    case 0x36:
+                        mShiftState = !aReleased;
+                        break;
+                    case 0x38:
+                        mAltState = !aReleased;
+                        break;
+                    default:
+                        if (CtrlPressed && AltPressed && (key == 0x53))
+                        {
+                            Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
+                            Core.Global.CPU.Reboot();
+                        }
+
+                        if (!aReleased)
+                        {
+                            ConsoleKeyInfoEx keyInfo;
+                            GetKey(key, out keyInfo);
+                            Enqueue(keyInfo);
+                        }
+
+
+                        break;
+                }
         }
 
         private void CreateDefaultKeymap()
         {
-            mKeys = new List<KeyMapping>(164);
+            mKeys = new List<KeyMapping>();
 
-            //TODO: fn (for laptops)
+            /*     Scan  Norm Shift Ctrl Alt     Num  Caps ShCaps ShNum ConsoleKey */
+            AddKey(0x00000, 0, 0, 0, 0, 0, 0, 0, 0, ConsoleKey.NoName);
+            AddKey(0x01, 0x001B, 0x001B, 0x001B, 0x00, 0x001B, 0x1B, 0x1B, 0x1B, ConsoleKey.Escape);
+            /* 1 -> 9 */
+            AddKey(0x02, '1', '!', '\0', 0x7800, '1', '1', '!', '1', ConsoleKey.D1);
+            AddKey(0x03, '2', '@', '\0', 0x7900, '2', '2', '@', '2', ConsoleKey.D2);
+            AddKey(0x04, '3', '#', '\0', 0x7A00, '3', '3', '#', '3', ConsoleKey.D3);
+            AddKey(0x05, '4', '$', '\0', 0x7B00, '4', '4', '$', '4', ConsoleKey.D4);
+            AddKey(0x06, '5', '%', '\0', 0x7C00, '5', '5', '%', '5', ConsoleKey.D5);
+            AddKey(0x07, '6', '^', '\0', 0x7D00, '6', '6', '^', '6', ConsoleKey.D6);
+            AddKey(0x08, '7', '&', '\0', 0x7E00, '7', '7', '&', '7', ConsoleKey.D7);
+            AddKey(0x09, '8', '*', '\0', 0x7F00, '8', '8', '*', '8', ConsoleKey.D8);
+            AddKey(0x0A, '9', '(', '\0', 0x8000, '9', '9', '(', '9', ConsoleKey.D9);
+            AddKey(0x0B, '0', ')', '\0', 0x8100, '0', '0', ')', '0', ConsoleKey.D0);
+            /* -, =, Bksp, Tab */
+            AddKey(0x0C, '-', '_', '\0', 0x8200, '-', '-', '_', '-', ConsoleKey.OemMinus);
+            AddKey(0x0D, '=', '+', '\0', 0x8300, '=', '=', '+', '=', ConsoleKey.NoName);
+            AddKey(0x0E, '\u0968', '\u0968', '\u0968', '\u0968', '\u0968', '\u0968', '\u0968', '\u0968', ConsoleKey.Backspace);
+            AddKey(0x0F, '\t', '\t', '\t', '\t', '\t', '\t', '\t', '\t', ConsoleKey.Tab);
+            /*      QWERTYUIOP[] */
+            AddKey(0x10, 'q', 'Q', '\0', 0x1000, 'q', 'Q', 'q', 'Q', ConsoleKey.Q);
+            AddKey(0x11, 'w', 'W', '\0', 0x1100, 'w', 'W', 'w', 'W', ConsoleKey.W);
+            AddKey(0x12, 'e', 'E', '\0', 0x1200, 'e', 'E', 'e', 'E', ConsoleKey.E);
+            AddKey(0x13, 'r', 'R', '\0', 0x1300, 'r', 'R', 'r', 'R', ConsoleKey.R);
+            AddKey(0x14, 't', 'T', '\0', 0x1400, 't', 'T', 't', 'T', ConsoleKey.T);
+            AddKey(0x15, 'y', 'Y', '\0', 0x1500, 'y', 'Y', 'y', 'Y', ConsoleKey.Y);
+            AddKey(0x16, 'u', 'U', '\0', 0x1600, 'u', 'U', 'u', 'U', ConsoleKey.U);
+            AddKey(0x17, 'i', 'I', '\0', 0x1700, 'i', 'I', 'i', 'I', ConsoleKey.I);
+            AddKey(0x18, 'o', 'O', '\0', 0x1800, 'o', 'O', 'o', 'O', ConsoleKey.O);
+            AddKey(0x19, 'p', 'P', '\0', 0x1900, 'p', 'P', 'p', 'P', ConsoleKey.P);
+            AddKey(0x1A, '[', '{', '\0', 0x0000, '[', '{', '[', '{', ConsoleKey.NoName);
+            AddKey(0x1B, ']', '}', '\0', 0x0000, ']', '}', ']', '}', ConsoleKey.NoName);
+            /* ENTER, CTRL */
+            AddKey(0x1C, '\n', '\n', '\n', '\n', '\n', '\n', '\n', '\n', ConsoleKey.Enter);
+            AddKey(0x1D, 0, 0, 0, 0, 0, 0, 0, 0, ConsoleKey.NoName);
+            /* ASDFGHJKL;'` */
+            AddKey(0x1E, 'a', 'A', '\0', 0x1E00, 'a', 'A', 'a', 'A', ConsoleKey.A);
+            AddKey(0x1F, 's', 'S', '\0', 0x1F00, 's', 'S', 's', 'S', ConsoleKey.S);
+            AddKey(0x20, 'd', 'D', '\0', 0x2000, 'd', 'D', 'd', 'D', ConsoleKey.D);
+            AddKey(0x21, 'f', 'F', '\0', 0x2100, 'f', 'F', 'f', 'F', ConsoleKey.F);
+            AddKey(0x22, 'g', 'G', '\0', 0x2200, 'g', 'G', 'g', 'G', ConsoleKey.G);
+            AddKey(0x23, 'h', 'H', '\0', 0x2300, 'h', 'H', 'h', 'H', ConsoleKey.H);
+            AddKey(0x24, 'j', 'J', '\0', 0x2400, 'j', 'J', 'j', 'J', ConsoleKey.J);
+            AddKey(0x25, 'k', 'K', '\0', 0x3500, 'k', 'K', 'k', 'K', ConsoleKey.K);
+            AddKey(0x26, 'l', 'L', '\0', 0x2600, 'l', 'L', 'l', 'L', ConsoleKey.L);
+            AddKey(0x27, ';', ':', '\0', 0x0000, ';', ';', ':', ':', ConsoleKey.NoName);
+            AddKey(0x28, '\'', '"', '\0', 0x0000, '\'', '\'', '"', '"', ConsoleKey.NoName);
+            AddKey(0x29, '`', '~', '\0', 0x0000, '`', '`', '~', '~', ConsoleKey.NoName);
+            /* Left Shift*/
+            AddKey(0x2A, 0, 0, 0, 0, 0, 0, 0, 0, ConsoleKey.NoName);
+            /* \ZXCVBNM,./ */
+            AddKey(0x2B, '\\', '|', '\0', 0x0000, '\\', '\\', '|', '|', ConsoleKey.NoName);
+            AddKey(0x2C, 'z', 'Z', '\0', 0x2C00, 'z', 'Z', 'z', 'Z', ConsoleKey.Z);
+            AddKey(0x2D, 'x', 'X', '\0', 0x2D00, 'x', 'X', 'x', 'X', ConsoleKey.X);
+            AddKey(0x2E, 'c', 'C', '\0', 0x2E00, 'c', 'C', 'c', 'C', ConsoleKey.C);
+            AddKey(0x2F, 'v', 'V', '\0', 0x2F00, 'v', 'V', 'v', 'V', ConsoleKey.V);
+            AddKey(0x30, 'b', 'B', '\0', 0x3000, 'b', 'B', 'b', 'B', ConsoleKey.B);
+            AddKey(0x31, 'n', 'N', '\0', 0x3100, 'n', 'N', 'n', 'N', ConsoleKey.N);
+            AddKey(0x32, 'm', 'M', '\0', 0x3200, 'm', 'M', 'm', 'M', ConsoleKey.M);
+            AddKey(0x33, ',', '<', '\0', 0x0000, ',', ',', '<', '<', ConsoleKey.OemComma);
+            AddKey(0x34, '.', '>', '\0', 0x0000, '.', '.', '>', '>', ConsoleKey.OemPeriod);
+            AddKey(0x35, '/', '?', '\0', 0x0000, '/', '/', '?', '?', ConsoleKey.Divide);
+            /* Right Shift */
+            AddKey(0x36, 0, 0, 0, 0, 0, 0, 0, 0, ConsoleKey.NoName);
+            /* Print Screen */
+            AddKey(0x37, 0, 0, 0, 0, 0, 0, 0, 0, ConsoleKey.PrintScreen);
+            /* Alt  */
+            AddKey(0x38, 0, 0, 0, 0, 0, 0, 0, 0, ConsoleKey.NoName);
+            /* Space */
+            AddKey(0x39, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ConsoleKey.Spacebar);
+            /* Caps */
+            AddKey(0x3A, 0, 0, 0, 0, 0, 0, 0, 0, ConsoleKey.NoName);
+            /* F1-F12 */
+            AddKey(0x3B, 0x3B00, 0x5400, 0x5E00, 0x6800, 0x3B00, 0x3B00, 0x5400, 0x5400, ConsoleKey.F1);
+            AddKey(0x3C, 0x3C00, 0x5500, 0x5F00, 0x6900, 0x3C00, 0x3C00, 0x5500, 0x5500, ConsoleKey.F2);
+            AddKey(0x3D, 0x3D00, 0x5600, 0x6000, 0x6A00, 0x3D00, 0x3D00, 0x5600, 0x5600, ConsoleKey.F3);
+            AddKey(0x3E, 0x3E00, 0x5700, 0x6100, 0x6B00, 0x3E00, 0x3E00, 0x5700, 0x5700, ConsoleKey.F4);
+            AddKey(0x3F, 0x3F00, 0x5800, 0x6200, 0x6C00, 0x3F00, 0x3F00, 0x5800, 0x5800, ConsoleKey.F5);
+            AddKey(0x40, 0x4000, 0x5900, 0x6300, 0x6D00, 0x4000, 0x4000, 0x5900, 0x5900, ConsoleKey.F6);
+            AddKey(0x41, 0x4100, 0x5A00, 0x6400, 0x6E00, 0x4100, 0x4100, 0x5A00, 0x5A00, ConsoleKey.F7);
+            AddKey(0x42, 0x4200, 0x5B00, 0x6500, 0x6F00, 0x4200, 0x4200, 0x5B00, 0x5B00, ConsoleKey.F8);
+            AddKey(0x43, 0x4300, 0x5C00, 0x6600, 0x7000, 0x4300, 0x4300, 0x5C00, 0x5C00, ConsoleKey.F9);
+            AddKey(0x44, 0x4400, 0x5D00, 0x6700, 0x7100, 0x4400, 0x4400, 0x5D00, 0x5D00, ConsoleKey.F10);
+            AddKey(0x57, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, ConsoleKey.F11); // Todo: Add the chars
+            AddKey(0x58, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, ConsoleKey.F12);
+            /* Num Lock, Scrl Lock */
+            AddKey(0x45, 0, 0, 0, 0, 0, 0, 0, 0, ConsoleKey.NoName);
+            AddKey(0x46, 0, 0, 0, 0, 0, 0, 0, 0, ConsoleKey.NoName);
+            /* HOME, Up, Pgup, -kpad, left, center, right, +keypad, end, down, pgdn, ins, del */
+            AddKey(0x47, 0x4700, '7', 0x7700, 0, '7', 0x4700, '7', 0x4700, ConsoleKey.Home);
+            AddKey(0x48, '\u2191', '8', '\u2191', '\u2191', '8', '\u2191', '8', '\u2191', ConsoleKey.UpArrow);
+            AddKey(0x49, 0x4900, '9', 0x8400, 0, '9', 0x4900, '9', 0x4900, ConsoleKey.PageUp);
+            AddKey(0x4A, '-', '-', 0, 0, '-', '-', '-', '-', ConsoleKey.OemMinus);
+            AddKey(0x4B, '\u2190', '4', '\u2190', '\u2190', '4', '\u2190', '4', '\u2190', ConsoleKey.LeftArrow);
+            AddKey(0x4C, 0x4C00, '5', 0, 0, '5', 0x4C00, '5', 0x4C00, ConsoleKey.NumPad5);
+            AddKey(0x4D, '\u2192', '6', '\u2192', '\u2192', '6', '\u2192', '6', '\u2192', ConsoleKey.RightArrow);
+            AddKey(0x4E, '+', '+', 0, 0, '+', '+', '+', '+', ConsoleKey.OemPlus);
+            AddKey(0x4F, 0x4F00, '1', 0x7500, 0, '1', 0x4F00, '1', 0x4F00, ConsoleKey.End);
+            AddKey(0x50, '\u2193', '2', '\u2193', '\u2193', '2', '\u2193', '2', '\u2193', ConsoleKey.DownArrow);
+            AddKey(0x51, 0x5100, '3', 0x7600, 0, '3', 0x5100, '3', 0x5100, ConsoleKey.PageDown);
+            AddKey(0x52, 0x5200, '0', 0, 0, '0', 0x5200, '0', 0x5200, ConsoleKey.Insert);
+            AddKey(0x53, 0x5300, '.', 0, 0, '.', 0x5300, '.', 0x5300, ConsoleKey.Delete);
 
-            #region Letters
 
-            AddKey(0x10, 'q', ConsoleKey.Q);
-            AddKey(0x100000, 'Q', ConsoleKey.Q);
-            AddKey(0x11, 'w', ConsoleKey.W);
-            AddKey(0x110000, 'W', ConsoleKey.W);
-            AddKey(0x12, 'e', ConsoleKey.E);
-            AddKey(0x120000, 'E', ConsoleKey.E);
-            AddKey(0x13, 'r', ConsoleKey.R);
-            AddKey(0x130000, 'R', ConsoleKey.R);
-            AddKey(0x14, 't', ConsoleKey.T);
-            AddKey(0x140000, 'T', ConsoleKey.T);
-            AddKey(0x15, 'y', ConsoleKey.Y);
-            AddKey(0x150000, 'Y', ConsoleKey.Y);
-            AddKey(0x16, 'u', ConsoleKey.U);
-            AddKey(0x160000, 'U', ConsoleKey.U);
-            AddKey(0x17, 'i', ConsoleKey.I);
-            AddKey(0x170000, 'I', ConsoleKey.I);
-            AddKey(0x18, 'o', ConsoleKey.O);
-            AddKey(0x180000, 'O', ConsoleKey.O);
-            AddKey(0x19, 'p', ConsoleKey.P);
-            AddKey(0x190000, 'P', ConsoleKey.P);
 
-            AddKey(0x1E, 'a', ConsoleKey.A);
-            AddKey(0x1E0000, 'A', ConsoleKey.A);
-            AddKey(0x1F, 's', ConsoleKey.S);
-            AddKey(0x1F0000, 'S', ConsoleKey.S);
-            AddKey(0x20, 'd', ConsoleKey.D);
-            AddKey(0x200000, 'D', ConsoleKey.D);
-            AddKey(0x21, 'f', ConsoleKey.F);
-            AddKey(0x210000, 'F', ConsoleKey.F);
-            AddKey(0x22, 'g', ConsoleKey.G);
-            AddKey(0x220000, 'G', ConsoleKey.G);
-            AddKey(0x23, 'h', ConsoleKey.H);
-            AddKey(0x230000, 'H', ConsoleKey.H);
-            AddKey(0x24, 'j', ConsoleKey.J);
-            AddKey(0x240000, 'J', ConsoleKey.J);
-            AddKey(0x25, 'k', ConsoleKey.K);
-            AddKey(0x250000, 'K', ConsoleKey.K);
-            AddKey(0x26, 'l', ConsoleKey.L);
-            AddKey(0x260000, 'L', ConsoleKey.L);
-
-            AddKey(0x2C, 'z', ConsoleKey.Z);
-            AddKey(0x2C0000, 'Z', ConsoleKey.Z);
-            AddKey(0x2D, 'x', ConsoleKey.X);
-            AddKey(0x2D0000, 'X', ConsoleKey.X);
-            AddKey(0x2E, 'c', ConsoleKey.C);
-            AddKey(0x2E0000, 'C', ConsoleKey.C);
-            AddKey(0x2F, 'v', ConsoleKey.V);
-            AddKey(0x2F0000, 'V', ConsoleKey.V);
-            AddKey(0x30, 'b', ConsoleKey.B);
-            AddKey(0x300000, 'B', ConsoleKey.B);
-            AddKey(0x31, 'n', ConsoleKey.N);
-            AddKey(0x310000, 'N', ConsoleKey.N);
-            AddKey(0x32, 'm', ConsoleKey.M);
-            AddKey(0x320000, 'M', ConsoleKey.M);
-
-            #endregion
-
-            #region digits
-
-            //AddKey(0x1, '`',);
-            //AddKey(0x10000, '~');
-            AddKey(0x29, '`', ConsoleKey.NoName);
-            AddKey(0x290000, '~', ConsoleKey.NoName);
-            AddKey(0x2, '1', ConsoleKey.D1);
-            AddKey(0x20000, '!', ConsoleKey.D1);
-            AddKey(0x3, '2', ConsoleKey.D2);
-            AddKey(0x30000, '@', ConsoleKey.D2);
-            AddKey(0x4, '3', ConsoleKey.D3);
-            AddKey(0x40000, '#', ConsoleKey.D3);
-            AddKey(0x5, '4', ConsoleKey.D4);
-            AddKey(0x50000, '$', ConsoleKey.D5);
-            AddKey(0x6, '5', ConsoleKey.D5);
-            AddKey(0x60000, '%', ConsoleKey.D5);
-            AddKey(0x7, '6', ConsoleKey.D6);
-            AddKey(0x70000, '^', ConsoleKey.D6);
-            AddKey(0x8, '7', ConsoleKey.D7);
-            AddKey(0x80000, '&', ConsoleKey.D7);
-            AddKey(0x9, '8', ConsoleKey.D8);
-            AddKey(0x90000, '*', ConsoleKey.D8);
-            AddKey(0xA, '9', ConsoleKey.D9);
-            AddKey(0xA0000, '(', ConsoleKey.D9);
-            AddKey(0xB, '0', ConsoleKey.D0);
-            AddKey(0xB0000, ')', ConsoleKey.D0);
-
-            #endregion
-
-            #region Special
-
-            AddKeyWithShift(0x0E, '\u0968', ConsoleKey.Backspace); //Backspace
-            AddKeyWithShift(0x0F, '\t', ConsoleKey.Tab); //Tabulator
-            var xEnterItem = AddKey(0x1C, '\n', ConsoleKey.Enter); //Enter
-
-            AddKeyWithShift(0x39, ' ', ConsoleKey.Spacebar); //Space
-            AddKeyWithShift(0x4b, '\u2190', ConsoleKey.LeftArrow); //Left arrow
-            AddKeyWithShift(0x48, '\u2191', ConsoleKey.UpArrow); //Up arrow
-            AddKeyWithShift(0x4d, '\u2192', ConsoleKey.RightArrow); //Right arrow
-            AddKeyWithShift(0x50, '\u2193', ConsoleKey.DownArrow); //Down arrow
-
-            AddKeyWithShift(0x5b, ConsoleKey.LeftWindows);
-            AddKeyWithShift(0x5c, ConsoleKey.RightWindows);
-            //AddKey(0x5d, ConsoleKey.NoName);                                   //Context Menu
-
-            AddKeyWithShift(0x52, ConsoleKey.Insert);
-            AddKeyWithShift(0x47, ConsoleKey.Home);
-            AddKeyWithShift(0x49, ConsoleKey.PageUp);
-            AddKeyWithShift(0x53, ConsoleKey.Delete);
-            AddKeyWithShift(0x4f, ConsoleKey.End);
-            AddKeyWithShift(0x51, ConsoleKey.PageDown);
-
-            AddKeyWithShift(0x37, ConsoleKey.PrintScreen);
-            //AddKeyWithShift(0x46, ConsoleKey.NoName);                          //Scroll Lock
-            //AddKeyWithShift(0x3a, ConsoleKey.NoName);                          //Caps Lock
-            AddKeyWithShift(0x45, ConsoleKey.Pause);
-
-            AddKeyWithShift(0x3b, ConsoleKey.F1);
-            AddKeyWithShift(0x3c, ConsoleKey.F2);
-            AddKeyWithShift(0x3d, ConsoleKey.F3);
-            AddKeyWithShift(0x3e, ConsoleKey.F4);
-            AddKeyWithShift(0x3f, ConsoleKey.F5);
-            AddKeyWithShift(0x40, ConsoleKey.F6);
-            AddKeyWithShift(0x41, ConsoleKey.F7);
-            AddKeyWithShift(0x42, ConsoleKey.F8);
-            AddKeyWithShift(0x43, ConsoleKey.F9);
-            AddKeyWithShift(0x44, ConsoleKey.F10);
-            AddKeyWithShift(0x57, ConsoleKey.F11);
-            AddKeyWithShift(0x58, ConsoleKey.F12);
-
-            AddKeyWithShift(0x1, ConsoleKey.Escape);
-
-            #endregion
-
-            #region Punctuation and Signs
-
-            AddKey(0x27, ';', ConsoleKey.NoName);
-            AddKey(0x270000, ':', ConsoleKey.NoName);
-            AddKey(0x28, '\'', ConsoleKey.NoName);
-            AddKey(0x280000, '"', ConsoleKey.NoName);
-            AddKey(0x2B, '\\', ConsoleKey.NoName);
-            AddKey(0x2B0000, '|', ConsoleKey.NoName);
-            AddKey(0x33, ',', ConsoleKey.OemComma);
-            AddKey(0x330000, '<', ConsoleKey.OemComma);
-            AddKey(0x34, '.', ConsoleKey.OemPeriod);
-            AddKey(0x340000, '>', ConsoleKey.OemPeriod);
-            AddKey(0x35, '/', ConsoleKey.Divide);
-            AddKey(0x350000, '?', ConsoleKey.Divide);
-            //AddKey(0x4A, '-');
-            AddKey(0x0C, '-', ConsoleKey.Subtract);
-            AddKey(0x0C0000, '_', ConsoleKey.Subtract);
-            AddKey(0x0D, '=', ConsoleKey.OemPlus);
-            AddKey(0x0D0000, '+', ConsoleKey.OemPlus);
-            //AddKey(0x4E, '+');
-            AddKey(0x1A, '[', ConsoleKey.NoName);
-            AddKey(0x1A0000, '{', ConsoleKey.NoName);
-            AddKey(0x1B, ']', ConsoleKey.NoName);
-            AddKey(0x1B0000, '}', ConsoleKey.NoName);
-
-            AddKeyWithShift(0x4c, '5', ConsoleKey.NumPad5);
-
-            AddKeyWithShift(0x4a, '-', ConsoleKey.OemMinus);
-            AddKeyWithShift(0x4e, '+', ConsoleKey.OemPlus);
-
-            AddKeyWithShift(0x37, '*', ConsoleKey.Multiply);
-
-            #endregion
+            AddKey(0x5b, 0, 0, 0, 0, 0, 0, 0, 0, ConsoleKey.LeftWindows);
+            AddKey(0x5c, 0, 0, 0, 0, 0, 0, 0, 0, ConsoleKey.RightWindows);
         }
 
-        private KeyMapping AddKey(uint p, char p_2, ConsoleKey p_3)
-        {
-            var xResult = new KeyMapping(p, p_2, p_3);
-            mKeys.Add(xResult);
-            return xResult;
-        }
 
-        private void AddKeyWithShift(uint p, char p_2, ConsoleKey p_3)
+        private void AddKey(uint aScanCode, char norm, char shift, char ctrl, char alt, char num, char caps, char shiftcaps, char shiftnum, ConsoleKey aKey)
         {
-            AddKey(p, p_2, p_3);
-            AddKey(p << 16, p_2, p_3);
+            mKeys.Add(new KeyMapping(aScanCode, norm, shift, ctrl, alt, num, caps, shiftcaps, shiftnum, aKey));
         }
-
-        private void AddKey(uint p, ConsoleKey p_3)
+        private void AddKey(uint aScanCode, int norm, int shift, int ctrl, int alt, int num, int caps, int shiftcaps, int shiftnum, ConsoleKey aKey)
         {
-            AddKey(p, '\0', p_3);
-        }
-
-        private void AddKeyWithShift(uint p, ConsoleKey p_3)
-        {
-            AddKeyWithShift(p, '\0', p_3);
+            mKeys.Add(new KeyMapping(aScanCode, norm, shift, ctrl, alt, num, caps, shiftcaps, shiftnum, aKey));
         }
 
         public void ChangeKeyMap(List<KeyMapping> aKeys)
@@ -304,18 +260,25 @@ namespace Cosmos.HAL
 
         public bool GetCharValue(uint aScanCode, out char aValue)
         {
-            for (int i = 0; i < mKeys.Count; i++)
+            for (var i = 0; i < mKeys.Count; i++)
             {
-                //if (i == 0) {
-                //  Console.Write("ScanCode in KeyMapping: ");
-                //  Interrupts.WriteNumber(mKeys[i].Scancode, 32);
-                //  Console.WriteLine("");
-                //}
                 if (mKeys[i].Scancode == aScanCode)
                 {
                     if (mKeys[i].Value != '\0')
                     {
-                        aValue = mKeys[i].Value;
+                        var map = mKeys[i];
+                        var key = '\0';
+
+                        if (ShiftPressed && CapsLock) key = map.ShiftCaps;
+                        else if (ShiftPressed) key = map.Shift;
+                        else if (CtrlPressed) key = map.Ctrl;
+                        else if (AltPressed) key = map.Alt;
+                        else if (ShiftPressed && NumLock) key = map.ShiftNum;
+                        else if (CapsLock) key = map.Caps;
+                        else if (NumLock) key = map.Num;
+                        else key = map.Value;
+
+                        aValue = key;
                         return true;
                     }
                     break;
@@ -328,12 +291,11 @@ namespace Cosmos.HAL
 
         public bool GetKeyValue(uint aScanCode, out ConsoleKey aValue)
         {
-            for (int i = 0; i < mKeys.Count; i++)
+            for (var i = 0; i < mKeys.Count; i++)
             {
-                var xCurrentKey = mKeys[i];
-                if (xCurrentKey.Scancode == aScanCode)
+                if (mKeys[i].Scancode == aScanCode)
                 {
-                    aValue = xCurrentKey.Key;
+                    aValue = mKeys[i].Key;
                     return true;
                 }
             }
@@ -460,34 +422,80 @@ namespace Cosmos.HAL
 
         public class KeyMapping
         {
-            public uint Scancode
-            {
-                get;
-                set;
-            }
-            public char Value
-            {
-                get;
-                set;
-            }
+            public uint Scancode;
+            public char Value;
+            public char Shift;
+            public char Ctrl;
+            public char Alt;
+            public char Num;
+            public char Caps;
+            public char ShiftCaps;
+            public char ShiftNum;
+            public ConsoleKey Key;
 
-            public ConsoleKey Key
-            {
-                get;
-                set;
-            }
-
-            public KeyMapping(uint aScanCode, char aValue, ConsoleKey aKey)
+            public KeyMapping(uint aScanCode, char norm, char shift, char ctrl, char alt, char num, char caps, char shiftcaps, char shiftnum, ConsoleKey aKey)
             {
                 Scancode = aScanCode;
-                Value = aValue;
+                Value = norm;
+                Shift = shift;
+                Ctrl = ctrl;
+                Alt = alt;
+                Num = num;
+                Caps = caps;
+                ShiftCaps = shiftcaps;
+                ShiftNum = shiftnum;
                 Key = aKey;
             }
-
+            public KeyMapping(uint aScanCode, int norm, int shift, int ctrl, int alt, int num, int caps, int shiftcaps, int shiftnum, ConsoleKey aKey)
+            {
+                Scancode = aScanCode;
+                Value = (char)norm;
+                Shift = (char)shift;
+                Ctrl = (char)ctrl;
+                Alt = (char)alt;
+                Num = (char)num;
+                Caps = (char)caps;
+                ShiftCaps = (char)shiftcaps;
+                ShiftNum = (char)shiftnum;
+                Key = aKey;
+            }
+            public KeyMapping(uint aScanCode, byte norm, byte shift, byte ctrl, byte alt, byte num, byte caps, byte shiftcaps, byte shiftnum, ConsoleKey aKey)
+            {
+                Scancode = aScanCode;
+                Value = (char)norm;
+                Shift = (char)shift;
+                Ctrl = (char)ctrl;
+                Alt = (char)alt;
+                Num = (char)num;
+                Caps = (char)caps;
+                ShiftCaps = (char)shiftcaps;
+                ShiftNum = (char)shiftnum;
+                Key = aKey;
+            }
+            public KeyMapping(uint aScanCode, char n, ConsoleKey aKey)
+            {
+                Scancode = aScanCode;
+                Value = n;
+                Shift = n;
+                Ctrl = n;
+                Alt = n;
+                Num = n;
+                Caps = n;
+                ShiftCaps = n;
+                ShiftNum = n;
+                Key = aKey;
+            }
             public KeyMapping(uint aScanCode, ConsoleKey aKey)
             {
                 Scancode = aScanCode;
                 Value = '\0';
+                Shift = '\0';
+                Ctrl = '\0';
+                Alt = '\0';
+                Num = '\0';
+                Caps = '\0';
+                ShiftCaps = '\0';
+                ShiftNum = '\0';
                 Key = aKey;
             }
         }
