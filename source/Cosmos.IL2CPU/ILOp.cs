@@ -96,6 +96,10 @@ namespace Cosmos.IL2CPU {
     }
 
     public static uint SizeOfType(Type aType) {
+      if (aType == null)
+      {
+        throw new ArgumentNullException("aType");
+      }
       if (aType.FullName == "System.Void") {
         return 0;
       } else if ((!aType.IsValueType && aType.IsClass) || aType.IsInterface) {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Cosmos.HAL;
 using Encoding = System.Text.Encoding;
 using Plug = Cosmos.IL2CPU.Plugs.PlugAttribute;
 
@@ -303,25 +304,28 @@ namespace Cosmos.System.Plugs.System {
 
 		public static int Read() {
 			// TODO special cases, if needed, that returns -1
-			return HAL.Global.Keyboard.ReadChar();
+      ConsoleKeyInfoEx xResult;
+
+		  if (HAL.Global.Keyboard.TryReadKey(out xResult))
+		  {
+		    return xResult.KeyChar;
+		  }
+		  else
+		  {
+		    return -1;
+		  }
 		}
 
 		// ReadKey() pure CIL
 
-		public static ConsoleKeyInfo ReadKey(Boolean intercept) {
-			var key = Cosmos.HAL.Global.Keyboard.ReadMapping();
-			var returnValue = new ConsoleKeyInfo(
-				key.Value,
-				key.Key,
-				Cosmos.HAL.Global.Keyboard.ShiftPressed,
-				Cosmos.HAL.Global.Keyboard.AltPressed,
-				Cosmos.HAL.Global.Keyboard.CtrlPressed);
+		public static ConsoleKeyInfoEx ReadKey(Boolean intercept) {
+      var key = Cosmos.HAL.Global.Keyboard.ReadKey();
 
 			if (false == intercept)
 			{
-				Write(returnValue.KeyChar);
+				Write(key.KeyChar);
 			}
-			return returnValue;
+			return key;
 		}
 
 		public static String ReadLine() {
@@ -332,19 +336,19 @@ namespace Cosmos.System.Plugs.System {
         return null;
       }
 			List<char> chars = new List<char>(32);
-			char current;
+			ConsoleKeyInfoEx current;
 			int currentCount = 0;
 
-			while ((current = HAL.Global.Keyboard.ReadChar()) != '\n')
+			while ((current = HAL.Global.Keyboard.ReadKey()).Key != ConsoleKey.Enter)
 			{
-				//Check for "special" keys
-				if (current == '\u0968') // Backspace
+        //Check for "special" keys
+				if (current.Key == ConsoleKey.Backspace) // Backspace
 				{
-					if (currentCount > 0)
-					{
-                        int curCharTemp = GetConsole().X;
-						chars.RemoveAt(currentCount - 1);
-                        GetConsole().X = GetConsole().X - 1;
+				  if (currentCount > 0)
+				  {
+				    int curCharTemp = GetConsole().X;
+					  chars.RemoveAt(currentCount - 1);
+					  GetConsole().X = GetConsole().X - 1;
 
 						//Move characters to the left
 						for (int x = currentCount - 1; x < chars.Count; x++)
@@ -354,26 +358,26 @@ namespace Cosmos.System.Plugs.System {
 
 						Write(' ');
 
-                        GetConsole().X = curCharTemp - 1;
+					  GetConsole().X = curCharTemp - 1;
 
 						currentCount--;
 					}
 					continue;
 				}
-				else if (current == '\u2190') // Arrow Left
+				else if (current.Key == ConsoleKey.LeftArrow)
 				{
 					if (currentCount > 0)
 					{
-                        GetConsole().X = GetConsole().X - 1;
+            GetConsole().X = GetConsole().X - 1;
 						currentCount--;
 					}
 					continue;
 				}
-				else if (current == '\u2192') // Arrow Right
+				else if (current.Key == ConsoleKey.RightArrow)
 				{
 					if (currentCount < chars.Count)
 					{
-                        GetConsole().X = GetConsole().X + 1;
+					  GetConsole().X = GetConsole().X + 1;
 						currentCount++;
 					}
 					continue;
@@ -382,8 +386,8 @@ namespace Cosmos.System.Plugs.System {
 				//Write the character to the screen
 				if (currentCount == chars.Count)
 				{
-					chars.Add(current);
-					Write(current);
+          chars.Add(current.KeyChar);
+					Write(current.KeyChar);
 					currentCount++;
 				}
 				else
@@ -397,7 +401,7 @@ namespace Cosmos.System.Plugs.System {
 					{
 						if (x == currentCount)
 						{
-							temp.Add(current);
+              temp.Add(current.KeyChar);
 						}
 
 						temp.Add(chars[x]);
@@ -411,7 +415,7 @@ namespace Cosmos.System.Plugs.System {
 						Write(chars[x]);
 					}
 
-                    GetConsole().X -= (chars.Count - currentCount) - 1;
+				  GetConsole().X -= (chars.Count - currentCount) - 1;
 					currentCount++;
 				}
 			}

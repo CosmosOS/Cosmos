@@ -40,6 +40,10 @@ namespace Cosmos.IL2CPU.X86.IL
             while (xSizeLeft > 0)
             {
                 var xCurrentStep = Math.Min(xSizeLeft, 4);
+                if (xSizeLeft % 4 != 0)
+                {
+                    xCurrentStep = xSizeLeft % 4;
+                }
                 xSizeLeft = xSizeLeft - xCurrentStep;
                 switch (xCurrentStep)
                 {

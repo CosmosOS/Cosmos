@@ -9,7 +9,7 @@ namespace Cosmos.System {
         protected int mX = 0;
         public int X {
             get { return mX; }
-            set { 
+            set {
                 mX = value;
                 UpdateCursor();
             }
@@ -18,7 +18,7 @@ namespace Cosmos.System {
         protected int mY = 0;
         public int Y {
             get { return mY; }
-            set { 
+            set {
                 mY = value;
                 UpdateCursor();
             }
@@ -88,6 +88,7 @@ namespace Cosmos.System {
             for (int i = 0; i < aText.Length; i++) {
                 if (aText[i] == '\n') {
                     NewLine();
+                    WriteChar('\n');
                 } else if (aText[i] == '\r') {
                 } else if (aText[i] == '\t') {
                     Write("    ");

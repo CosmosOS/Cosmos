@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 
 namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
@@ -14,10 +15,9 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
 
         protected override void Run()
         {
-            Console.Write("Input: ");
-            var input = Console.ReadLine();
-            Console.Write("Text typed: ");
-            Console.WriteLine(input);
+            Console.WriteLine("Started correctly!");
+            Assert.IsTrue(true, "Dummy assertion, to test the system");
+            TestController.Completed();
         }
     }
 }

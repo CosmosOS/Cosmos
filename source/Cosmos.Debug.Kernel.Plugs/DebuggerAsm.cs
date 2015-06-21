@@ -18,8 +18,12 @@ namespace Cosmos.Debug.Kernel.Plugs {
 
     [PlugMethod(Assembler = typeof(DebugSendPtr))]
     public static unsafe void SendPtr(Kernel.Debugger aThis, object aPtr) { }
+
     [PlugMethod(Assembler = typeof(DebugSendChannelCommand))]
     public static unsafe void SendChannelCommand(byte aChannel, byte aCommand, int aByteCount, byte* aData) { }
+
+    [PlugMethod(Assembler = typeof(DebugSendChannelCommandNoData))]
+    public static unsafe void SendChannelCommand(byte aChannel, byte aCommand) { }
     //[PlugMethod(Assembler = typeof(DebugTraceOff))]
     //public static void TraceOff() { }
 
@@ -56,13 +60,31 @@ namespace Cosmos.Debug.Kernel.Plugs {
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       // AL contains channel
-      new LiteralAssemblerCode("mov AL, [EBP + 16]");
+      new LiteralAssemblerCode("mov AL, [EBP + 20]");
       // BL contains command
-      new LiteralAssemblerCode("mov BL, [EBP + 12]");
+      new LiteralAssemblerCode("mov BL, [EBP + 16]");
       // ECX contains number of bytes to send as command data
-      new LiteralAssemblerCode("mov ECX, [EBP + 8]");
+      new LiteralAssemblerCode("mov ECX, [EBP + 12]");
       // ESI contains data start pointer
-      new LiteralAssemblerCode("mov ESI, [EBP + 4]");
+      new LiteralAssemblerCode("mov ESI, [EBP + 8]");
+      new LiteralAssemblerCode("call DebugStub_SendCommandOnChannel");
+      new LiteralAssemblerCode("%endif");
+    }
+  }
+
+  public class DebugSendChannelCommandNoData : AssemblerMethod
+  {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    {
+      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+      // AL contains channel
+      new LiteralAssemblerCode("mov AL, [EBP + 12]");
+      // BL contains command
+      new LiteralAssemblerCode("mov BL, [EBP + 8]");
+      // ECX contains number of bytes to send as command data
+      new LiteralAssemblerCode("mov ECX, 0");
+      // ESI contains data start pointer
+      new LiteralAssemblerCode("mov ESI, EBP");
       new LiteralAssemblerCode("call DebugStub_SendCommandOnChannel");
       new LiteralAssemblerCode("%endif");
     }

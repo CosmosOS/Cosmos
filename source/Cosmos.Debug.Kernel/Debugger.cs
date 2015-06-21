@@ -4,15 +4,24 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Debug.Kernel {
-    public class Debugger {
-        public Debugger(string aRing, string aSection) {
+    public class Debugger
+    {
+        public Debugger(string aRing, string aSection)
+        {
         }
 
-        public void Break() { } // Plugged
-        public unsafe void Send(int aLength, char* aText) { } // Plugged
+        public void Break()
+        {
+        } // Plugged
+
+        public unsafe void Send(int aLength, char* aText)
+        {
+        } // Plugged
         //public void TraceOff() { } // Plugged
         //public void TraceOn() { } // Plugged
-        public void SendPtr(object aObject) { } // plugged
+        public void SendPtr(object aObject)
+        {
+        } // plugged
 
         public unsafe void SendChannelCommand(byte aChannel, byte aCommand, byte[] aData)
         {
@@ -23,6 +32,11 @@ namespace Cosmos.Debug.Kernel {
         }
 
         public static unsafe void SendChannelCommand(byte aChannel, byte aCommand, int aByteCount, byte* aData)
+        {
+            //
+        }
+
+        public static unsafe void SendChannelCommand(byte aChannel, byte aCommand)
         {
             //
         }

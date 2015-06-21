@@ -57,7 +57,7 @@
     </ProjectReference>
     <ProjectReference Include="..\SentinelSystem\SentinelSystem.csproj">
       <Project>{93D6FF56-6E23-4E80-98F6-730AC533F631}</Project>
-      <Name>SentinelSystemLib</Name>
+      <Name>SentinelSystem</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

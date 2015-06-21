@@ -97,6 +97,9 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Initobj:
           StackPopTypes[0] = typeof(void*);
           return;
+        case Code.Ldobj:
+          StackPushTypes[0] = Value;
+          break;
         case Code.Ldelema:
           StackPopTypes[1] = Value.MakeArrayType();
           StackPushTypes[0] = typeof(void*);

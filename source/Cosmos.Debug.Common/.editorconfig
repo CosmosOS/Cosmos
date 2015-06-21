@@ -3,3 +3,6 @@ indent_size = 4
 
 [DebugConnectorEdison.cs]
 indent_size = 4
+
+[DebugConnectorStream.cs]
+indent_size = 4

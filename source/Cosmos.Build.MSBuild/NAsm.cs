@@ -31,27 +31,14 @@ namespace Cosmos.Build.MSBuild {
 
     #endregion
 
-    private bool DoExecute() {
-      if (File.Exists(OutputFile)) {
-        File.Delete(OutputFile);
-      }
-      if (!File.Exists(InputFile)) {
-        Log.LogError("Input file \"" + InputFile + "\" does not exist!");
-        return false;
-      } else if (!File.Exists(ExePath)) {
-        Log.LogError("Exe file not found! (File = \"" + ExePath + "\")");
-        return false;
-      }
-
-      var xFormat = IsELF ? "elf" : "bin";
-      var xResult = ExecuteTool(Path.GetDirectoryName(OutputFile), ExePath,
-          String.Format("-g -f {0} -o \"{1}\" -D{3}_COMPILATION \"{2}\"", xFormat, Path.Combine(Environment.CurrentDirectory, OutputFile), Path.Combine(Environment.CurrentDirectory, InputFile), xFormat.ToUpper()),
-          "NAsm");
-
-      if (xResult) {
-        Log.LogMessage("{0} -> {1}", InputFile, OutputFile);
-      }
-      return xResult;
+    private bool DoExecute()
+    {
+      var xNasmTask = new NAsmTask();
+      xNasmTask.InputFile = InputFile;
+      xNasmTask.OutputFile = OutputFile;
+      xNasmTask.IsELF = IsELF;
+      xNasmTask.ExePath = ExePath;
+      return xNasmTask.Execute();
     }
 
     public override bool Execute()
@@ -68,7 +55,7 @@ namespace Cosmos.Build.MSBuild {
       }
     }
 
-    public override bool ExtendLineError(int exitCode, string errorMessage, out LogInfo log) {
+    public override bool ExtendLineError(bool hasErrored, string errorMessage, out LogInfo log) {
       log = new LogInfo();
       try {
         if (errorMessage.StartsWith(InputFile)) {

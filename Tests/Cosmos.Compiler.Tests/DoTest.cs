@@ -18,7 +18,7 @@ namespace Cosmos.Compiler.Tests
             // these files contain the output to be verified. don't clean them.
             var xOutputFile = Path.GetTempFileName();
             var xLogFile = Path.GetTempFileName();
-            
+
             var xRunner = new CompilerRunner();
 
             xRunner.References.Add(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
@@ -29,7 +29,7 @@ namespace Cosmos.Compiler.Tests
             xRunner.AssemblerLogFile = xLogFile;
             xRunner.OutputFile = xOutputFile;
             xRunner.Execute();
-            
+
             Verify("Output", File.ReadAllText(xOutputFile));
             Verify("Logfile", File.ReadAllText(xLogFile));
         }

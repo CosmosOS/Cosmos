@@ -10,7 +10,7 @@ using Cosmos.IL2CPU;
 
 namespace IL2CPU
 {
-  internal class Program
+  public class Program
   {
 
     public const string CosmosRoot = "";//@"e:\OpenSource\Cosmos";
@@ -19,7 +19,7 @@ namespace IL2CPU
     private static  Dictionary<string, string> CmdOptions = new Dictionary<string, string>();
     private static List<string> References = new List<string>();
 
-    private static int Main(string[] args)
+    public static int Main(string[] args)
     {
       try {
         var tmp = "";

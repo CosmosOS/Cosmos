@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 
 namespace Cosmos.Compiler.Tests.Interfaces.Kernel
@@ -96,9 +97,7 @@ namespace Cosmos.Compiler.Tests.Interfaces.Kernel
             Console.WriteLine("-- T --");
             xT.PrintText("Test");
 
-            Console.WriteLine("Press a key: ");
-            Console.ReadKey();
-            Stop();
+            TestController.Completed();
         }
     }
 }
