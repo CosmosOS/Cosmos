@@ -32,6 +32,8 @@ namespace Cosmos.TestRunner.Core
             xDebugConnector.Error = e =>
                                     {
                                         OutputHandler.LogMessage("DC Error: " + e.ToString());
+                                        OutputHandler.SetKernelTestResult(false, "DC Error");
+                                        mKernelResultSet = true;
                                         mBochsRunning = false;
                                     };
             xDebugConnector.CmdText += s => OutputHandler.LogMessage("Text from kernel: " + s);
@@ -88,26 +90,22 @@ namespace Cosmos.TestRunner.Core
                 // for now, skip
                 return;
             }
-            if (arg1 != TestController.TestChannel)
+            if (arg1 == TestController.TestChannel)
             {
-                throw new Exception("Unhandled channel " + arg1);
-            }
-
-            switch (arg2)
-            {
-                case (byte)TestChannelCommandEnum.TestCompleted:
-                    mBochsRunning = false;
-                    break;
-                case (byte)TestChannelCommandEnum.TestFailed:
-                    OutputHandler.SetKernelTestResult(false, "Test failed");
-                    mKernelResultSet = true;
-                    mBochsRunning = false;
-                    break;
-                case (byte)TestChannelCommandEnum.AssertionSucceeded:
-                    Interlocked.Increment(ref mSucceededAssertions);
-                    break;
-                default:
-                    throw new NotImplementedException("TestChannel command " + arg2 + " is not implemented!");
+                switch (arg2)
+                {
+                    case (byte)TestChannelCommandEnum.TestCompleted:
+                        mBochsRunning = false;
+                        break;
+                    case (byte)TestChannelCommandEnum.TestFailed:
+                        OutputHandler.SetKernelTestResult(false, "Test failed");
+                        mKernelResultSet = true;
+                        mBochsRunning = false;
+                        break;
+                    case (byte)TestChannelCommandEnum.AssertionSucceeded:
+                        Interlocked.Increment(ref mSucceededAssertions);
+                        break;
+                }
             }
         }
     }

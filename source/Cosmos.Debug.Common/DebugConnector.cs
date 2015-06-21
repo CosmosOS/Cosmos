@@ -652,9 +652,12 @@ namespace Cosmos.Debug.Common
 
         protected void PacketChannel(byte channel, byte command, byte[] aPacket)
         {
-            if (CmdChannel != null)
+            if (SigReceived)
             {
-                CmdChannel(channel, command, aPacket);
+                if (CmdChannel != null)
+                {
+                    CmdChannel(channel, command, aPacket);
+                }
             }
             WaitForMessage();
         }

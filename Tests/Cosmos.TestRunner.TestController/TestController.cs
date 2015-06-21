@@ -15,11 +15,7 @@ namespace Cosmos.TestRunner
         {
             get
             {
-                if (mDebugger == null)
-                {
-                    mDebugger = new Debugger("Tests", "TestController");
-                }
-                return mDebugger;
+                return new Debugger("Tests", "TestController");
             }
         }
 
@@ -36,7 +32,7 @@ namespace Cosmos.TestRunner
 
         internal static void AssertionSucceeded()
         {
-            Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.AssertionSucceeded, new byte[0]);
+            //Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.AssertionSucceeded, new byte[0]);
         }
     }
 }
