@@ -123,5 +123,11 @@ namespace Cosmos.HAL {
             get;
             protected set;
         }
+
+        public bool NumLock { get; protected set; }
+
+        public bool CapsLock { get; protected set; }
+
+        public bool ScrollLock { get; protected set; }
     }
 }
