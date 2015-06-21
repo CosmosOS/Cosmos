@@ -31,19 +31,19 @@ namespace Cosmos.TestRunner.Core
                 throw new InvalidOperationException("No OutputHandler set!");
             }
 
-            mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
-            if (Directory.Exists(mBaseWorkingDirectory))
-            {
-                Directory.Delete(mBaseWorkingDirectory, true);
-            }
-            Directory.CreateDirectory(mBaseWorkingDirectory);
-
             OutputHandler.ExecutionStart();
             try
             {
                 // todo: test with multiple configurations (for example, ELF and BIN format, with or without stack corruption detection, etc)
                 foreach (var xAssemblyFile in mKernelsToRun)
                 {
+                    mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
+                    if (Directory.Exists(mBaseWorkingDirectory))
+                    {
+                        Directory.Delete(mBaseWorkingDirectory, true);
+                    }
+                    Directory.CreateDirectory(mBaseWorkingDirectory);
+
                     ExecuteKernel(xAssemblyFile);
                 }
             }

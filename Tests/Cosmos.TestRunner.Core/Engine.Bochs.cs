@@ -65,6 +65,7 @@ namespace Cosmos.TestRunner.Core
             {
                 xBochs.Stop();
                 xDebugConnector.Dispose();
+                Thread.Sleep(50);
             }
         }
 
