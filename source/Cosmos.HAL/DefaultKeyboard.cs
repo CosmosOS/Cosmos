@@ -7,7 +7,7 @@ namespace Cosmos.HAL
 {
     //public delegate void HandleKeyboardDelegate(byte aScanCode, bool aReleased);
 
-    public class DefaultKeyboard: Keyboard
+    public class DefaultKeyboard : Keyboard
     {
 
         protected override void Initialize()
@@ -20,7 +20,7 @@ namespace Cosmos.HAL
 
         private List<KeyMapping> mKeys;
 
-        
+
 
         private void updateLed()
         {
@@ -60,33 +60,41 @@ namespace Cosmos.HAL
                 switch (key)
                 {
                     case 0x1D:
-                        ControlPressed = !aReleased;
-                        break;
+                        {
+                            ControlPressed = !aReleased;
+                            break;
+                        }
                     case 0x2A:
                     case 0x36:
-                        ShiftPressed = !aReleased;
-                        break;
+                        {
+                            ShiftPressed = !aReleased;
+                            break;
+                        }
                     case 0x38:
-                        AltPressed = !aReleased;
-                        break;
+                        {
+                            AltPressed = !aReleased;
+                            break;
+                        }
                     default:
-                        if (ControlPressed && AltPressed && (key == 0x53))
                         {
-                            Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
-                            Core.Global.CPU.Reboot();
-                        }
-
-                        if (!aReleased)
-                        {
-                            ConsoleKeyInfoEx keyInfo;
-                            if (GetKey(key, out keyInfo))
+                            if (ControlPressed && AltPressed && (key == 0x53))
                             {
-                                Enqueue(keyInfo);
+                                Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
+                                Core.Global.CPU.Reboot();
                             }
+
+                            if (!aReleased)
+                            {
+                                ConsoleKeyInfoEx keyInfo;
+                                if (GetKey(key, out keyInfo))
+                                {
+                                    Enqueue(keyInfo);
+                                }
+                            }
+
+
+                            break;
                         }
-
-
-                        break;
                 }
         }
 
@@ -201,7 +209,7 @@ namespace Cosmos.HAL
 
             AddKey(0x5b, ConsoleKey.LeftWindows);
             AddKey(0x5c, ConsoleKey.RightWindows);
-     
+
         }
 
 
@@ -240,14 +248,38 @@ namespace Cosmos.HAL
                     var map = t;
                     var key = '\0';
 
-                    if (ShiftPressed && CapsLock) key = map.ShiftCaps;
-                    else if (ShiftPressed) key = map.Shift;
-                    else if (ControlPressed) key = map.Ctrl;
-                    else if (AltPressed) key = map.Alt;
-                    else if (ShiftPressed && NumLock) key = map.ShiftNum;
-                    else if (CapsLock) key = map.Caps;
-                    else if (NumLock) key = map.Num;
-                    else key = map.Value;
+                    if (ShiftPressed && CapsLock)
+                    {
+                        key = map.ShiftCaps;
+                    }
+                    else if (ShiftPressed)
+                    {
+                        key = map.Shift;
+                    }
+                    else if (ControlPressed)
+                    {
+                        key = map.Ctrl;
+                    }
+                    else if (AltPressed)
+                    {
+                        key = map.Alt;
+                    }
+                    else if (ShiftPressed && NumLock)
+                    {
+                        key = map.ShiftNum;
+                    }
+                    else if (CapsLock)
+                    {
+                        key = map.Caps;
+                    }
+                    else if (NumLock)
+                    {
+                        key = map.Num;
+                    }
+                    else
+                    {
+                        key = map.Value;
+                    }
 
                     aValue = key;
                     return true;
@@ -290,7 +322,7 @@ namespace Cosmos.HAL
             return false;
         }
 
-        
+
         public bool GetKey(uint aScancode, out ConsoleKeyInfoEx keyInfo)
         {
             ConsoleKey xKey;
