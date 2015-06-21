@@ -22,25 +22,22 @@ namespace Cosmos.TestRunner
         public const byte TestChannel = 255;
         public static unsafe void Completed()
         {
-            Debugger.Send("SYS_TestKernel_Completed");
-            //Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.TestCompleted);
+            Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.TestCompleted);
             while (true)
                 ;
         }
 
         public static void Failed()
         {
-            Debugger.Send("SYS_TestKernel_Failed");
-            //Debugger.Send("Failed");
-            //Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.TestFailed, new byte[0]);
+            Debugger.Send("Failed");
+            Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.TestFailed);
             while (true)
                 ;
         }
 
         internal static void AssertionSucceeded()
         {
-            Debugger.Send("SYS_TestKernel_AssertionSucceeded");
-            //Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.AssertionSucceeded, new byte[1]{42});
+            Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.AssertionSucceeded);
         }
     }
 }
