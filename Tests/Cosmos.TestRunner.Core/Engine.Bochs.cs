@@ -47,7 +47,8 @@ namespace Cosmos.TestRunner.Core
             try
             {
                 var xStartTime = DateTime.Now;
-                var xKernelResultSet = false;
+                mKernelResultSet = false;
+                Interlocked.Exchange(ref mSucceededAssertions, 0);
 
                 Console.WriteLine("Bochs started");
                 while (mBochsRunning)
@@ -57,14 +58,15 @@ namespace Cosmos.TestRunner.Core
                     if (Math.Abs(DateTime.Now.Subtract(xStartTime).TotalSeconds) > AllowedSecondsInKernel)
                     {
                         OutputHandler.SetKernelTestResult(false, "Timeout exceeded");
-                        xKernelResultSet = true;
+                        mKernelResultSet = true;
                         break;
                     }
                 }
-                if (!xKernelResultSet)
+                if (!mKernelResultSet)
                 {
                     OutputHandler.SetKernelTestResult(true, null);
                 }
+                OutputHandler.SetKernelSucceededAssertionsCount(mSucceededAssertions);
                 Console.WriteLine("Stopping bochs now");
             }
             finally
@@ -75,11 +77,38 @@ namespace Cosmos.TestRunner.Core
             }
         }
 
-        private bool mBochsRunning = true;
+        private volatile bool mBochsRunning = true;
+        private volatile bool mKernelResultSet;
+        private int mSucceededAssertions;
 
         private void ChannelPacketReceived(byte arg1, byte arg2, byte[] arg3)
         {
-            Console.WriteLine("ChannelPacket received. Channel = {0}, command = {1}", arg1, arg2);
+            if (arg1 == 129)
+            {
+                // for now, skip
+                return;
+            }
+            if (arg1 != TestController.TestChannel)
+            {
+                throw new Exception("Unhandled channel " + arg1);
+            }
+
+            switch (arg2)
+            {
+                case (byte)TestChannelCommandEnum.TestCompleted:
+                    mBochsRunning = false;
+                    break;
+                case (byte)TestChannelCommandEnum.TestFailed:
+                    OutputHandler.SetKernelTestResult(false, "Test failed");
+                    mKernelResultSet = true;
+                    mBochsRunning = false;
+                    break;
+                case (byte)TestChannelCommandEnum.AssertionSucceeded:
+                    Interlocked.Increment(ref mSucceededAssertions);
+                    break;
+                default:
+                    throw new NotImplementedException("TestChannel command " + arg2 + " is not implemented!");
+            }
         }
     }
 }

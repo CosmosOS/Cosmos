@@ -19,5 +19,7 @@ namespace Cosmos.TestRunner.Core
 
         public abstract void RunConfigurationStart(RunConfiguration configuration);
         public abstract void RunConfigurationEnd(RunConfiguration configuration);
+
+        public abstract void SetKernelSucceededAssertionsCount(int succeededAssertions);
     }
 }

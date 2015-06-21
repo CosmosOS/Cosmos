@@ -223,6 +223,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.TestRunner.Core", ".
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.TestRunner", "..\Tests\Cosmos.TestRunner\Cosmos.TestRunner.csproj", "{78304B1E-C323-4A78-9E7D-2578E58311B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.TestRunner.TestController", "..\Tests\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj", "{E6D3B644-C487-472D-A978-C1A82D0C099B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1108,6 +1110,18 @@ Global
 		{78304B1E-C323-4A78-9E7D-2578E58311B6}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{78304B1E-C323-4A78-9E7D-2578E58311B6}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{78304B1E-C323-4A78-9E7D-2578E58311B6}.Release|x86.ActiveCfg = Release|Any CPU
+		{E6D3B644-C487-472D-A978-C1A82D0C099B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6D3B644-C487-472D-A978-C1A82D0C099B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6D3B644-C487-472D-A978-C1A82D0C099B}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{E6D3B644-C487-472D-A978-C1A82D0C099B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{E6D3B644-C487-472D-A978-C1A82D0C099B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{E6D3B644-C487-472D-A978-C1A82D0C099B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E6D3B644-C487-472D-A978-C1A82D0C099B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6D3B644-C487-472D-A978-C1A82D0C099B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6D3B644-C487-472D-A978-C1A82D0C099B}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{E6D3B644-C487-472D-A978-C1A82D0C099B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{E6D3B644-C487-472D-A978-C1A82D0C099B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{E6D3B644-C487-472D-A978-C1A82D0C099B}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1193,5 +1207,6 @@ Global
 		{79173AE7-4596-4D33-866F-6F94A2314BE8} = {A06B122A-4AB7-4090-B41A-35028A293450}
 		{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC} = {79173AE7-4596-4D33-866F-6F94A2314BE8}
 		{78304B1E-C323-4A78-9E7D-2578E58311B6} = {79173AE7-4596-4D33-866F-6F94A2314BE8}
+		{E6D3B644-C487-472D-A978-C1A82D0C099B} = {79173AE7-4596-4D33-866F-6F94A2314BE8}
 	EndGlobalSection
 EndGlobal

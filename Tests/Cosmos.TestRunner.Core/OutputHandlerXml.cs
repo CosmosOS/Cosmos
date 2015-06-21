@@ -13,6 +13,9 @@ namespace Cosmos.TestRunner.Core
         private readonly string mFilename;
         private XmlDocument mDocument;
 
+        private bool mConfigurationSucceeded = false;
+        private bool mExecutionSucceeded = false;
+
         public OutputHandlerXml(string filename)
         {
             mFilename = filename;
@@ -25,6 +28,7 @@ namespace Cosmos.TestRunner.Core
             xItem.Attributes.Append(NewXmlAttribute("AssemblyName", assemblyName));
             xParent.AppendChild(xItem);
             mCurrentNode.Push(xItem);
+            mCurrentKernelNode = xItem;
             mKernelStopwatch = Stopwatch.StartNew();
         }
 
@@ -34,6 +38,7 @@ namespace Cosmos.TestRunner.Core
         {
             mKernelStopwatch.Stop();
             var xItem = mCurrentNode.Pop();
+            mCurrentKernelNode = null;
             xItem.Attributes.Append(NewXmlAttribute("Duration", mKernelStopwatch.Elapsed.ToString("c")));
         }
 
@@ -60,6 +65,7 @@ namespace Cosmos.TestRunner.Core
             mDocument.DocumentElement.Attributes.Append(NewXmlAttribute("DateTime", DateTime.UtcNow.ToString("O")));
             mCurrentNode.Push(mDocument.DocumentElement);
             mExecutionStopwatch = Stopwatch.StartNew();
+            mExecutionSucceeded = true;
         }
 
         private Stopwatch mExecutionStopwatch;
@@ -68,6 +74,7 @@ namespace Cosmos.TestRunner.Core
         {
             mExecutionStopwatch.Stop();
             mDocument.DocumentElement.Attributes.Append(NewXmlAttribute("Duration", mExecutionStopwatch.Elapsed.ToString("c")));
+            mDocument.DocumentElement.Attributes.Append(NewXmlAttribute("Succeeded", mExecutionSucceeded.ToString()));
             mDocument.Save(mFilename);
             mCurrentNode.Pop();
         }
@@ -75,6 +82,7 @@ namespace Cosmos.TestRunner.Core
         private Stack<XmlElement> mCurrentNode = new Stack<XmlElement>();
         private Stopwatch mTaskStopwatch;
         private Stopwatch mConfigurationStopwatch;
+        private XmlElement mCurrentKernelNode;
 
         public override void UnhandledException(Exception exception)
         {
@@ -103,7 +111,6 @@ namespace Cosmos.TestRunner.Core
 
         public override void SetKernelTestResult(bool succeeded, string message)
         {
-            var xItem = mCurrentNode.ElementAt(1);
             if (succeeded)
             {
                 LogMessage(message);
@@ -112,7 +119,14 @@ namespace Cosmos.TestRunner.Core
             {
                 LogError(message);
             }
-            xItem.Attributes.Append(NewXmlAttribute("Succeeded", succeeded.ToString()));
+            mCurrentKernelNode.Attributes.Append(NewXmlAttribute("Succeeded", succeeded.ToString()));
+            mConfigurationSucceeded &= succeeded;
+            mExecutionSucceeded &= succeeded;
+        }
+
+        public override void SetKernelSucceededAssertionsCount(int succeededAssertions)
+        {
+            mCurrentKernelNode.Attributes.Append(NewXmlAttribute("SucceededAssertionsCount", succeededAssertions.ToString()));
         }
 
         public override void RunConfigurationStart(RunConfiguration configuration)
@@ -122,6 +136,7 @@ namespace Cosmos.TestRunner.Core
             xItem.Attributes.Append(NewXmlAttribute("IsELF", configuration.IsELF.ToString()));
             xParent.AppendChild(xItem);
             mCurrentNode.Push(xItem);
+            mConfigurationSucceeded = true;
             mConfigurationStopwatch = Stopwatch.StartNew();
         }
 
@@ -130,6 +145,9 @@ namespace Cosmos.TestRunner.Core
             mConfigurationStopwatch.Stop();
             var xItem = mCurrentNode.Pop();
             xItem.Attributes.Append(NewXmlAttribute("Duration", mKernelStopwatch.Elapsed.ToString("c")));
+            xItem.Attributes.Append(NewXmlAttribute("Succeeded", mConfigurationSucceeded.ToString()));
         }
+
+
     }
 }

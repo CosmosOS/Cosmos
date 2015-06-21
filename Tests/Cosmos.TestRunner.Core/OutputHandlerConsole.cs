@@ -89,5 +89,9 @@ namespace Cosmos.TestRunner.Core
         {
             Log(string.Format("Success = {0}, Message = '{1}'", succeeded, message));
         }
+
+        public override void SetKernelSucceededAssertionsCount(int succeededAssertions)
+        {
+        }
     }
 }

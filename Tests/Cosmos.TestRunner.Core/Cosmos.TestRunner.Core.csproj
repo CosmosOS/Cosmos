@@ -102,6 +102,10 @@
       <Project>{6128DEEB-D30F-4859-B60F-C36D5452F3E9}</Project>
       <Name>IL2CPU</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">
+      <Project>{E6D3B644-C487-472D-A978-C1A82D0C099B}</Project>
+      <Name>Cosmos.TestRunner.TestController</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
