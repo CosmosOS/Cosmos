@@ -30,6 +30,7 @@ namespace Cosmos.Debug.Common
         public Action<byte, byte, byte[]> CmdChannel;
         public Action<UInt32> CmdStackCorruptionOccurred;
         public Action<UInt32> CmdNullReferenceOccurred;
+        public Action<Exception> Error;
 
         protected byte mCurrentMsgType;
         protected AutoResetEvent mCmdWait = new AutoResetEvent(false);
@@ -38,6 +39,18 @@ namespace Cosmos.Debug.Common
 
         // This member used to be public. The SetConnectionHandler has been added.
         private Action Connected;
+
+        protected void HandleError(Exception E)
+        {
+            if (Error != null)
+            {
+                Error(E);
+            }
+            else
+            {
+                throw new Exception("Unhandled exception occurred!", E);
+            }
+        }
 
         /// <summary>Descendants must invoke this method whenever they detect an incoming connection.</summary>
         public void DoConnected()
