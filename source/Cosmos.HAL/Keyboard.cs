@@ -6,7 +6,7 @@ using System.Text;
 namespace Cosmos.HAL {
     public class ConsoleKeyInfoEx
     {
-        // once Github issue #137 is fixed, replace this class with ConsoleKeyInfo struct.
+        // todo: once Github issue #137 is fixed, replace this class with ConsoleKeyInfo struct.
 
         public char KeyChar
         {

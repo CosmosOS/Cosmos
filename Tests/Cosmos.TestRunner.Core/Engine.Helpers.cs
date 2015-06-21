@@ -32,8 +32,8 @@ namespace Cosmos.TestRunner.Core
             var xProcess = new Process();
             xProcess.StartInfo = xStartInfo;
 
-            xProcess.OutputDataReceived += (sender, e) => DoLog(e.Data);
-            xProcess.ErrorDataReceived += (sender, e) => DoLog(e.Data);
+            xProcess.OutputDataReceived += (sender, e) => OutputHandler.LogMessage(e.Data);
+            xProcess.ErrorDataReceived += (sender, e) => OutputHandler.LogError(e.Data);
             xProcess.Start();
             xProcess.BeginErrorReadLine();
             xProcess.BeginOutputReadLine();
@@ -46,9 +46,6 @@ namespace Cosmos.TestRunner.Core
 
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
-            DoLog("Running IL2CPU");
-            mLogLevel++;
-
             RunProcess(typeof(Program).Assembly.Location,
                        mBaseWorkingDirectory,
                        new[]
@@ -72,16 +69,13 @@ namespace Cosmos.TestRunner.Core
 
         private void RunNasm(string inputFile, string outputFile, bool isElf)
         {
-            DoLog("Running Nasm");
-            mLogLevel++;
-
             var xNasmTask = new NAsmTask();
             xNasmTask.InputFile = inputFile;
             xNasmTask.OutputFile = outputFile;
             xNasmTask.IsELF = isElf;
             xNasmTask.ExePath = Path.Combine(GetCosmosUserkitFolder(), "build", "tools", "nasm", "nasm.exe");
-            xNasmTask.LogMessage = DoLog;
-            xNasmTask.LogError = DoLog;
+            xNasmTask.LogMessage = OutputHandler.LogMessage;
+            xNasmTask.LogError = OutputHandler.LogError;
             if (!xNasmTask.Execute())
             {
                 throw new Exception("Error running nasm!");
@@ -90,9 +84,6 @@ namespace Cosmos.TestRunner.Core
 
         private void RunLd(string inputFile, string outputFile)
         {
-            DoLog("Running Ld");
-            mLogLevel++;
-
             RunProcess(Path.Combine(GetCosmosUserkitFolder(), "build", "tools", "cygwin", "ld.exe"),
                        mBaseWorkingDirectory,
                        new[]
@@ -121,7 +112,6 @@ namespace Cosmos.TestRunner.Core
 
         private void MakeIso(string objectFile, string isoFile)
         {
-            DoLog("Build ISO");
             IsoMaker.Generate(objectFile, isoFile);
             if (!File.Exists(isoFile))
             {

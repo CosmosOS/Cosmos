@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.IO;
+using System.Threading;
 using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
 using Cosmos.Debug.VSDebugEngine.Host;
@@ -9,6 +10,8 @@ namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
+        private const int AllowedSecondsInKernel = 10;
+
         private void RunIsoInBochs(string iso)
         {
             var xBochsConfig = Path.Combine(mBaseWorkingDirectory, "Kernel.bochsrc");
@@ -20,27 +23,52 @@ namespace Cosmos.TestRunner.Core
 
             var xDebugConnector = new DebugConnectorPipeServer("Cosmos\\Serial");
 
-            xDebugConnector.CmdChannel += ChannelPacketReceived;
-            xDebugConnector.CmdStarted += () =>
+            xDebugConnector.CmdChannel = ChannelPacketReceived;
+            xDebugConnector.CmdStarted = () =>
                                           {
-                                              DoLog("DC: Started");
+                                              OutputHandler.LogMessage("DC: Started");
                                               xDebugConnector.SendCmd(Vs2Ds.BatchEnd);
                                           };
-            xDebugConnector.CmdText += s => DoLog("Text from kernel: " + s);
-            xDebugConnector.CmdMessageBox += s => DoLog("MessageBox from kernel: " + s);
+            xDebugConnector.Error = e =>
+                                     {
+                                         OutputHandler.LogMessage("DC Error: " + e.ToString());
+                                         mBochsRunning = false;
+                                     };
+            xDebugConnector.CmdText += s => OutputHandler.LogMessage("Text from kernel: " + s);
+            xDebugConnector.CmdMessageBox = s => OutputHandler.LogMessage("MessageBox from kernel: " + s);
 
             var xBochs = new Bochs(xParams, false, new FileInfo(xBochsConfig));
+            xBochs.OnShutDown = (a, b) =>
+                                {
+                                };
+
+            mBochsRunning = true;
             xBochs.Start();
             try
             {
+                var xStartTime = DateTime.Now;
+
                 Console.WriteLine("Bochs started");
-                Console.ReadLine();
+                while (mBochsRunning)
+                {
+                    Thread.Sleep(50);
+
+                    if (Math.Abs(DateTime.Now.Subtract(xStartTime).TotalSeconds) > AllowedSecondsInKernel)
+                    {
+                        OutputHandler.SetKernelTestResult(false, "Timeout exceeded");
+                        break;
+                    }
+                }
+                Console.WriteLine("Stopping bochs now");
             }
-            catch
+            finally
             {
                 xBochs.Stop();
+                xDebugConnector.Dispose();
             }
         }
+
+        private bool mBochsRunning = true;
 
         private void ChannelPacketReceived(byte arg1, byte arg2, byte[] arg3)
         {

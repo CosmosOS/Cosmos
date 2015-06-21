@@ -16,31 +16,58 @@ namespace Cosmos.TestRunner.Core
         private bool mIsELF = true;
         private void ExecuteKernel(string assemblyFileName)
         {
-            var xAssemblyFile = Path.Combine(mBaseWorkingDirectory, "Kernel.asm");
-            var xObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.obj");
-            var xTempObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.o");
-            var xIsoFile = Path.Combine(mBaseWorkingDirectory, "Kernel.iso");
-
-            mLogLevel = 1;
-            DoLog(string.Format("Testing '{0}'", assemblyFileName));
-            mLogLevel = 2;
-            RunIL2CPU(assemblyFileName, xAssemblyFile);
-            mLogLevel = 2;
-            RunNasm(xAssemblyFile, xObjectFile, mIsELF);
-            if (mIsELF)
+            OutputHandler.ExecuteKernelStart(assemblyFileName);
+            try
             {
-                File.Move(xObjectFile, xTempObjectFile);
 
-                mLogLevel = 2;
-                RunLd(xTempObjectFile, xObjectFile);
+                var xAssemblyFile = Path.Combine(mBaseWorkingDirectory, "Kernel.asm");
+                var xObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.obj");
+                var xTempObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.o");
+                var xIsoFile = Path.Combine(mBaseWorkingDirectory, "Kernel.iso");
+
+                RunTask("IL2CPU", () => RunIL2CPU(assemblyFileName, xAssemblyFile));
+                RunTask("Nasm", () => RunNasm(xAssemblyFile, xObjectFile, mIsELF));
+                if (mIsELF)
+                {
+                    File.Move(xObjectFile, xTempObjectFile);
+
+                    RunTask("Ld", () => RunLd(xTempObjectFile, xObjectFile));
+                }
+
+                RunTask("MakeISO", () => MakeIso(xObjectFile, xIsoFile));
+                RunTask("IL2CPU", () => RunIsoInBochs(xIsoFile));
             }
-
-            mLogLevel = 2;
-            MakeIso(xObjectFile, xIsoFile);
-            mLogLevel = 2;
-            RunIsoInBochs(xIsoFile);
+            catch (Exception e)
+            {
+                OutputHandler.UnhandledException(e);
+            }
+            finally
+            {
+                OutputHandler.ExecuteKernelEnd(assemblyFileName);
+            }
         }
 
 
+        private void RunTask(string taskName, Action action)
+        {
+            if (action == null)
+            {
+                throw new ArgumentNullException("action");
+            }
+
+            OutputHandler.TaskStart(taskName);
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                OutputHandler.UnhandledException(e);
+            }
+            finally
+            {
+                OutputHandler.TaskEnd(taskName);
+            }
+        }
     }
 }

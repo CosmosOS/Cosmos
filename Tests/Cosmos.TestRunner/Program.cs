@@ -14,6 +14,7 @@ namespace Cosmos.TestRunner.Console
         {
             var xEngine = new Engine();
             xEngine.AddKernel(typeof(Kernel).Assembly.Location);
+            xEngine.OutputHandler = new OutputHandlerConsole();
             xEngine.Execute();
         }
     }

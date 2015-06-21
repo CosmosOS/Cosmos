@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,8 +22,15 @@ namespace Cosmos.TestRunner.Core
 
         private string mBaseWorkingDirectory;
 
+        public OutputHandlerBase OutputHandler;
+
         public void Execute()
         {
+            if (OutputHandler == null)
+            {
+                throw new InvalidOperationException("No OutputHandler set!");
+            }
+
             mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
             if (Directory.Exists(mBaseWorkingDirectory))
             {
@@ -30,23 +38,26 @@ namespace Cosmos.TestRunner.Core
             }
             Directory.CreateDirectory(mBaseWorkingDirectory);
 
-            DoLog("Start executing");
-            // todo: test with multiple configurations (for example, ELF and BIN format, with or without stack corruption detection, etc)
-
-            foreach (var xAssemblyFile in mKernelsToRun)
+            OutputHandler.ExecutionStart();
+            try
             {
-                ExecuteKernel(xAssemblyFile);
+                // todo: test with multiple configurations (for example, ELF and BIN format, with or without stack corruption detection, etc)
+                foreach (var xAssemblyFile in mKernelsToRun)
+                {
+                    ExecuteKernel(xAssemblyFile);
+                }
+            }
+            catch (Exception E)
+            {
+                OutputHandler.UnhandledException(E);
+            }
+            finally
+            {
+                OutputHandler.ExecutionEnd();
             }
 
             // todo: now report summary
-            throw new NotImplementedException();
-        }
-
-        private int mLogLevel = 0;
-        private void DoLog(string message)
-        {
-            Console.Write(new String(' ', mLogLevel * 2));
-            Console.WriteLine(message);
+            //DoLog("NotImplemented, summary?");
         }
     }
 }
