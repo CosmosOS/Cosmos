@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using Cosmos.Common.Extensions;
 using Cosmos.Core;
-// ReSharper disable LoopCanBePartlyConvertedToQuery
-// ReSharper disable ForCanBeConvertedToForeach
 
 namespace Cosmos.HAL
 {
@@ -22,11 +20,7 @@ namespace Cosmos.HAL
 
         private List<KeyMapping> mKeys;
 
-        public bool NumLock { get; private set; }
-
-        public bool CapsLock { get; private set; }
-
-        public bool ScrollLock { get; private set; }
+        
 
         private void updateLed()
         {
@@ -85,8 +79,10 @@ namespace Cosmos.HAL
                         if (!aReleased)
                         {
                             ConsoleKeyInfoEx keyInfo;
-                            GetKey(key, out keyInfo);
-                            Enqueue(keyInfo);
+                            if (GetKey(key, out keyInfo))
+                            {
+                                Enqueue(keyInfo);
+                            }
                         }
 
 
