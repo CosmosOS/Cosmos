@@ -25,15 +25,15 @@ namespace Cosmos.TestRunner.Core
 
             xDebugConnector.CmdChannel = ChannelPacketReceived;
             xDebugConnector.CmdStarted = () =>
-                                          {
-                                              OutputHandler.LogMessage("DC: Started");
-                                              xDebugConnector.SendCmd(Vs2Ds.BatchEnd);
-                                          };
+                                         {
+                                             OutputHandler.LogMessage("DC: Started");
+                                             xDebugConnector.SendCmd(Vs2Ds.BatchEnd);
+                                         };
             xDebugConnector.Error = e =>
-                                     {
-                                         OutputHandler.LogMessage("DC Error: " + e.ToString());
-                                         mBochsRunning = false;
-                                     };
+                                    {
+                                        OutputHandler.LogMessage("DC Error: " + e.ToString());
+                                        mBochsRunning = false;
+                                    };
             xDebugConnector.CmdText += s => OutputHandler.LogMessage("Text from kernel: " + s);
             xDebugConnector.CmdMessageBox = s => OutputHandler.LogMessage("MessageBox from kernel: " + s);
 
@@ -47,6 +47,7 @@ namespace Cosmos.TestRunner.Core
             try
             {
                 var xStartTime = DateTime.Now;
+                var xKernelResultSet = false;
 
                 Console.WriteLine("Bochs started");
                 while (mBochsRunning)
@@ -56,8 +57,13 @@ namespace Cosmos.TestRunner.Core
                     if (Math.Abs(DateTime.Now.Subtract(xStartTime).TotalSeconds) > AllowedSecondsInKernel)
                     {
                         OutputHandler.SetKernelTestResult(false, "Timeout exceeded");
+                        xKernelResultSet = true;
                         break;
                     }
+                }
+                if (!xKernelResultSet)
+                {
+                    OutputHandler.SetKernelTestResult(true, null);
                 }
                 Console.WriteLine("Stopping bochs now");
             }

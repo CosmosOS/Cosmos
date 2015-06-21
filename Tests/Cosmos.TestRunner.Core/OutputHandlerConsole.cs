@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Cosmos.TestRunner.Core
@@ -14,13 +15,13 @@ namespace Cosmos.TestRunner.Core
             Log("Running task '" + taskName + "'");
             mCurrentTaskStopwatch.Reset();
             mCurrentTaskStopwatch.Start();
-            mLogLevel = 2;
+            mLogLevel = 3;
         }
 
         public override void TaskEnd(string taskName)
         {
             mCurrentTaskStopwatch.Stop();
-            mLogLevel = 1;
+            mLogLevel = 2;
             Log("Done running task '" + taskName + "'. Took " + mCurrentTaskStopwatch.Elapsed);
         }
 
@@ -43,6 +44,14 @@ namespace Cosmos.TestRunner.Core
             mExecutionStopwatch.Reset();
             mExecutionStopwatch.Start();
             mLogLevel = 1;
+        }
+
+        public override void RunConfigurationStart(RunConfiguration configuration)
+        {
+        }
+
+        public override void RunConfigurationEnd(RunConfiguration configuration)
+        {
         }
 
         public override void LogError(string message)

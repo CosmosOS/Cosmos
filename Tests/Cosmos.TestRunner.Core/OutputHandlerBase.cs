@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -14,5 +16,8 @@ namespace Cosmos.TestRunner.Core
         public abstract void TaskStart(string taskName);
         public abstract void TaskEnd(string taskName);
         public abstract void SetKernelTestResult(bool succeeded, string message);
+
+        public abstract void RunConfigurationStart(RunConfiguration configuration);
+        public abstract void RunConfigurationEnd(RunConfiguration configuration);
     }
 }

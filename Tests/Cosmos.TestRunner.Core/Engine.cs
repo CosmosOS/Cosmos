@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,17 +35,31 @@ namespace Cosmos.TestRunner.Core
             OutputHandler.ExecutionStart();
             try
             {
-                // todo: test with multiple configurations (for example, ELF and BIN format, with or without stack corruption detection, etc)
-                foreach (var xAssemblyFile in mKernelsToRun)
+                foreach (var xConfig in GetRunConfigurations())
                 {
-                    mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
-                    if (Directory.Exists(mBaseWorkingDirectory))
+                    OutputHandler.RunConfigurationStart(xConfig);
+                    try
                     {
-                        Directory.Delete(mBaseWorkingDirectory, true);
-                    }
-                    Directory.CreateDirectory(mBaseWorkingDirectory);
+                        foreach (var xAssemblyFile in mKernelsToRun)
+                        {
+                            mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
+                            if (Directory.Exists(mBaseWorkingDirectory))
+                            {
+                                Directory.Delete(mBaseWorkingDirectory, true);
+                            }
+                            Directory.CreateDirectory(mBaseWorkingDirectory);
 
-                    ExecuteKernel(xAssemblyFile);
+                            ExecuteKernel(xAssemblyFile, xConfig);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        OutputHandler.UnhandledException(e);
+                    }
+                    finally
+                    {
+                        OutputHandler.RunConfigurationEnd(xConfig);
+                    }
                 }
             }
             catch (Exception E)
@@ -58,6 +73,11 @@ namespace Cosmos.TestRunner.Core
 
             // todo: now report summary
             //DoLog("NotImplemented, summary?");
+        }
+
+        private IEnumerable<RunConfiguration> GetRunConfigurations()
+        {
+            yield return new RunConfiguration {IsELF = true};
         }
     }
 }

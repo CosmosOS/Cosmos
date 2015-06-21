@@ -13,8 +13,7 @@ namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
-        private bool mIsELF = true;
-        private void ExecuteKernel(string assemblyFileName)
+        private void ExecuteKernel(string assemblyFileName, RunConfiguration configuration)
         {
             OutputHandler.ExecuteKernelStart(assemblyFileName);
             try
@@ -26,8 +25,8 @@ namespace Cosmos.TestRunner.Core
                 var xIsoFile = Path.Combine(mBaseWorkingDirectory, "Kernel.iso");
 
                 RunTask("IL2CPU", () => RunIL2CPU(assemblyFileName, xAssemblyFile));
-                RunTask("Nasm", () => RunNasm(xAssemblyFile, xObjectFile, mIsELF));
-                if (mIsELF)
+                RunTask("Nasm", () => RunNasm(xAssemblyFile, xObjectFile, configuration.IsELF));
+                if (configuration.IsELF)
                 {
                     File.Move(xObjectFile, xTempObjectFile);
 
@@ -35,7 +34,7 @@ namespace Cosmos.TestRunner.Core
                 }
 
                 RunTask("MakeISO", () => MakeIso(xObjectFile, xIsoFile));
-                RunTask("IL2CPU", () => RunIsoInBochs(xIsoFile));
+                RunTask("RunISOInBochs", () => RunIsoInBochs(xIsoFile));
             }
             catch (Exception e)
             {

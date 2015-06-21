@@ -54,7 +54,12 @@
     <Compile Include="OutputHandlerBase.cs" />
     <Compile Include="OutputHandlerConsole.cs" />
     <Compile Include="OutputHandlerText.cs" />
+    <Compile Include="OutputHandlerXml.cs" />
+    <Compile Include="OutputHandlerXml.Helpers.cs">
+      <DependentUpon>OutputHandlerXml.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RunConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
