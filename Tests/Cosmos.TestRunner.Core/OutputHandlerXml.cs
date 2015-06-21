@@ -60,7 +60,6 @@ namespace Cosmos.TestRunner.Core
             mDocument.DocumentElement.Attributes.Append(NewXmlAttribute("DateTime", DateTime.UtcNow.ToString("O")));
             mCurrentNode.Push(mDocument.DocumentElement);
             mExecutionStopwatch = Stopwatch.StartNew();
-
         }
 
         private Stopwatch mExecutionStopwatch;
@@ -87,7 +86,6 @@ namespace Cosmos.TestRunner.Core
 
         public override void TaskStart(string taskName)
         {
-            Console.WriteLine("Start task '{0}'", taskName);
             var xParent = mCurrentNode.Peek();
             var xItem = mDocument.CreateElement("Task");
             xItem.Attributes.Append(NewXmlAttribute("TaskName", taskName));
@@ -98,7 +96,6 @@ namespace Cosmos.TestRunner.Core
 
         public override void TaskEnd(string taskName)
         {
-            Console.WriteLine("End task '{0}'", taskName);
             mTaskStopwatch.Stop();
             var xItem = mCurrentNode.Pop();
             xItem.Attributes.Append(NewXmlAttribute("Duration", mKernelStopwatch.Elapsed.ToString("c")));
