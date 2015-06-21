@@ -6,7 +6,7 @@ namespace Cosmos.Build.Common
 {
     public class IsoMaker
     {
-        static public void Generate(string imageFile, string isoFilename)
+        static public string Generate(string imageFile, string isoFilename)
         {
             var destinationDirectory = Path.GetDirectoryName(imageFile);
 
@@ -42,6 +42,7 @@ namespace Cosmos.Build.Common
                 true
             );
 
+            return output;
         }
 
         protected static string Quote(string location)
