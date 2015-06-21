@@ -98,7 +98,6 @@ namespace Cosmos.Compiler.Tests.Interfaces.Kernel
             xT.PrintText("Test");
 
             TestController.Completed();
-            TestController.Completed();
         }
     }
 }

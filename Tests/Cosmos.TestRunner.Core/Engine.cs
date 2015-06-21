@@ -78,7 +78,7 @@ namespace Cosmos.TestRunner.Core
         private IEnumerable<RunConfiguration> GetRunConfigurations()
         {
             yield return new RunConfiguration {IsELF = true};
-            //yield return new RunConfiguration {IsELF = false};
+            yield return new RunConfiguration {IsELF = false};
         }
     }
 }

@@ -36,8 +36,35 @@ namespace Cosmos.TestRunner.Core
                                         mKernelResultSet = true;
                                         mBochsRunning = false;
                                     };
-            xDebugConnector.CmdText += s => OutputHandler.LogMessage("Text from kernel: " + s);
-            xDebugConnector.CmdMessageBox = s => OutputHandler.LogMessage("MessageBox from kernel: " + s);
+            xDebugConnector.CmdText += s =>
+                                       {
+                                           if (s == "SYS_TestKernel_Completed")
+                                           {
+                                               KernelTestCompleted();
+                                               return;
+                                           }
+                                           else if (s == "SYS_TestKernel_Failed")
+                                           {
+                                               KernelTestFailed();
+                                               return;
+                                           }
+                                           else if (s == "SYS_TestKernel_AssertionSucceeded")
+                                           {
+                                               KernelAssertionSucceeded();
+                                               return;
+                                           }
+                                           OutputHandler.LogMessage("Text from kernel: " + s);
+                                       };
+            xDebugConnector.CmdMessageBox = s =>
+                                            {
+                                                //OutputHandler.LogMessage("MessageBox from kernel: " + s)
+                                            };
+            xDebugConnector.CmdTrace = t =>
+                                       {
+                                       };
+            xDebugConnector.CmdBreak = t =>
+                                       {
+                                       };
 
             var xBochs = new Bochs(xParams, false, new FileInfo(xBochsConfig));
             xBochs.OnShutDown = (a, b) =>
@@ -85,6 +112,7 @@ namespace Cosmos.TestRunner.Core
 
         private void ChannelPacketReceived(byte arg1, byte arg2, byte[] arg3)
         {
+            OutputHandler.LogMessage(String.Format("ChannelPacketReceived, Channel = {0}, Command = {1}", arg1, arg2));
             if (arg1 == 129)
             {
                 // for now, skip
@@ -95,18 +123,33 @@ namespace Cosmos.TestRunner.Core
                 switch (arg2)
                 {
                     case (byte)TestChannelCommandEnum.TestCompleted:
-                        mBochsRunning = false;
+                        KernelTestCompleted();
                         break;
                     case (byte)TestChannelCommandEnum.TestFailed:
-                        OutputHandler.SetKernelTestResult(false, "Test failed");
-                        mKernelResultSet = true;
-                        mBochsRunning = false;
+                        KernelTestFailed();
                         break;
                     case (byte)TestChannelCommandEnum.AssertionSucceeded:
-                        Interlocked.Increment(ref mSucceededAssertions);
+                        KernelAssertionSucceeded();
                         break;
                 }
             }
+        }
+
+        private void KernelAssertionSucceeded()
+        {
+            Interlocked.Increment(ref mSucceededAssertions);
+        }
+
+        private void KernelTestFailed()
+        {
+            OutputHandler.SetKernelTestResult(false, "Test failed");
+            mKernelResultSet = true;
+            mBochsRunning = false;
+        }
+
+        private void KernelTestCompleted()
+        {
+            mBochsRunning = false;
         }
     }
 }
