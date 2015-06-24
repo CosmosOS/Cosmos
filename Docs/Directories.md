@@ -111,7 +111,7 @@ TODO
 #### \Source2\VSIP
 
 Contains the code for the integration with Visual Studio. Adds support for the
-Cosmos Kernel project tipe, and custom build steps.
+Cosmos Kernel project type, and custom build steps.
 
 #### \Source\<insert name here>.Tests
 
