@@ -458,7 +458,7 @@ namespace Cosmos.Assembler {
       };
       new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
       new Comment(this, "END - Multiboot Info");
-      new LiteralAssemblerCode("%endif EXCLUDE_MULTIBOOT_MAGIC");
+      new LiteralAssemblerCode("%endif");
       WriteDebugVideo("Creating GDT.");
       CreateGDT();
 
