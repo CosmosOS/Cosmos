@@ -193,10 +193,6 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             expectedType = expectedType.GetEnumUnderlyingType();
           }
-          else if (Value.DeclaringType.IsValueType)
-          {
-            expectedType = typeof(void*);
-          }
           if (StackPopTypes[0] == expectedType ||
               StackPopTypes[0] == Value.FieldType)
           {

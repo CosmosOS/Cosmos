@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering. if that changes, we need to change the code below!
       #region Debug verification
 
-      var xFields = GetFieldsInfo(typeof(string)).Where(i => !i.IsStatic).ToArray();
+      var xFields = GetFieldsInfo(typeof(string), false).Where(i => !i.IsStatic).ToArray();
       if (xFields[0].Id != "System.Int32 System.String.m_stringLength"
         || xFields[0].Offset != 0) {
         throw new Exception("Fields changed!");

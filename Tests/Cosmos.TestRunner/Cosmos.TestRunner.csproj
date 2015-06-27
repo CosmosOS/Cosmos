@@ -67,7 +67,7 @@
       <Project>{839edc9d-6d2e-4892-a7f0-17861ba9fa0c}</Project>
       <Name>SimpleStructsAndArraysTest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Staging\VGACompilerCrash\VGACompilerCrash.csproj">
+    <ProjectReference Include="..\VGACompilerCrash\VGACompilerCrash.csproj">
       <Project>{21915a7e-cc84-4836-8b87-857b6149d496}</Project>
       <Name>VGACompilerCrash</Name>
     </ProjectReference>

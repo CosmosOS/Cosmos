@@ -15,10 +15,10 @@ namespace Cosmos.TestRunner.Console
 
             xEngine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
             xEngine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
+            xEngine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
 
 
             // known bugs, therefor disabled for now:
-            //xEngine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
 
             xEngine.OutputHandler = new OutputHandlerXml(@"c:\data\CosmosTests.xml");
             //xEngine.OutputHandler = new OutputHandlerConsole();

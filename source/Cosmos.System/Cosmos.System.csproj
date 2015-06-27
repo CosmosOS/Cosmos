@@ -99,6 +99,7 @@
     <Compile Include="Network\TempDictionary.cs" />
     <Compile Include="Network\UdpClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VGAScreen.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Console.html" />

@@ -62,7 +62,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void DoExecute(Cosmos.Assembler.Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField, bool debugEnabled) {
           var xOffset = GetFieldOffset(aDeclaringType, xFieldId);
-          var xFields = GetFieldsInfo(aDeclaringType);
+          var xFields = GetFieldsInfo(aDeclaringType, false);
           var xFieldInfo = (from item in xFields
                             where item.Id == xFieldId
                             select item).Single();

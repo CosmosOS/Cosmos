@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       var xType = aMethod.MethodBase.DeclaringType;
       int xExtraOffset = aNeedsGC ? 12 : 0;
 
-      var xFields = GetFieldsInfo(aDeclaringObject);
+      var xFields = GetFieldsInfo(aDeclaringObject, false);
       var xFieldInfo = (from item in xFields
                         where item.Id == aFieldId
                         select item).Single();
