@@ -19,6 +19,10 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
           var xOpVar = (OpVar)aOpCode;
+          if (aMethod.MethodBase.Name == "GetValue" && aMethod.MethodBase.DeclaringType.Name == "Kernel")
+            {
+                Console.Write("");
+            }
           DoExecute(Assembler, aMethod, xOpVar.Value);
         }
 
@@ -82,7 +86,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     xArgSize += Align(SizeOfType(xParam.ParameterType), 4);
                 }
-                xReturnSize = 0;
 
                 if (xReturnSize > xArgSize)
                 {
