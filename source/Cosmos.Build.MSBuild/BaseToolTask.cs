@@ -162,8 +162,8 @@ namespace Cosmos.Build.MSBuild
 	        return xResult;
 	    }
 
-	    private List<string> mErrors;
-		private List<string> mOutput;
+	    private List<string> mErrors = new List<string>();
+	    private List<string> mOutput = new List<string>();
 
 	  public virtual bool ExtendLineError(bool hasErrored, string errorMessage, out LogInfo log)
 	  {
