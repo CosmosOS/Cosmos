@@ -107,6 +107,7 @@ namespace Cosmos.TestRunner.Core
             mTaskStopwatch.Stop();
             var xItem = mCurrentNode.Pop();
             xItem.Attributes.Append(NewXmlAttribute("Duration", mTaskStopwatch.Elapsed.ToString("c")));
+
         }
 
         public override void SetKernelTestResult(bool succeeded, string message)

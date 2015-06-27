@@ -38,6 +38,14 @@ namespace Cosmos.TestRunner.Core
             }
             catch (Exception e)
             {
+                if (!mKernelResultSet)
+                {
+                    OutputHandler.SetKernelTestResult(false, e.ToString());
+                }
+                if (e is TaskFailedException)
+                {
+                    return;
+                }
                 OutputHandler.UnhandledException(e);
             }
             finally
@@ -62,6 +70,7 @@ namespace Cosmos.TestRunner.Core
             catch (Exception e)
             {
                 OutputHandler.UnhandledException(e);
+                throw new TaskFailedException();
             }
             finally
             {

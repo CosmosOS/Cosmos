@@ -63,6 +63,10 @@
       <Project>{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}</Project>
       <Name>Cosmos.TestRunner.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Staging\VGACompilerCrash\VGACompilerCrash.csproj">
+      <Project>{21915a7e-cc84-4836-8b87-857b6149d496}</Project>
+      <Name>VGACompilerCrash</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

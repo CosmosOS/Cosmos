@@ -60,6 +60,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RunConfiguration.cs" />
+    <Compile Include="TaskFailedException.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
