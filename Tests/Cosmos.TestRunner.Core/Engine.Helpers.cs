@@ -22,23 +22,9 @@ namespace Cosmos.TestRunner.Core
             {
                 throw new ArgumentNullException("arguments");
             }
-            var xStartInfo = new ProcessStartInfo(fileName);
-            xStartInfo.WorkingDirectory = workingDirectory;
-            xStartInfo.Arguments = arguments.Aggregate("", (a, b) => a + " \"" + b + "\"");
-            xStartInfo.RedirectStandardError = true;
-            xStartInfo.RedirectStandardOutput = true;
-            xStartInfo.UseShellExecute = false;
-
-            var xProcess = new Process();
-            xProcess.StartInfo = xStartInfo;
-
-            xProcess.OutputDataReceived += (sender, e) => OutputHandler.LogMessage(e.Data);
-            xProcess.ErrorDataReceived += (sender, e) => OutputHandler.LogError(e.Data);
-            xProcess.Start();
-            xProcess.BeginErrorReadLine();
-            xProcess.BeginOutputReadLine();
-            xProcess.WaitForExit(30000); // max 30 seconds
-            if (xProcess.ExitCode != 0)
+            var xArgsString = arguments.Aggregate("", (a, b) => a + " \"" + b + "\"");
+            var xResult = BaseToolTask.ExecuteTool(workingDirectory, fileName, xArgsString, "IL2CPU", OutputHandler.LogError, OutputHandler.LogMessage);
+            if (!xResult)
             {
                 throw new Exception("Error running process!");
             }
