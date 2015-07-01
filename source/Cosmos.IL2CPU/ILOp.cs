@@ -411,7 +411,7 @@ namespace Cosmos.IL2CPU {
 
     public static FieldInfo ResolveField(Type aDeclaringType, string aField, bool aOnlyInstance)
     {
-      var xFields = GetFieldsInfo(aDeclaringType, false);
+      var xFields = GetFieldsInfo(aDeclaringType, !aOnlyInstance);
       var xFieldInfo = (from item in xFields
                         where item.Id == aField
                         && (!aOnlyInstance || item.IsStatic == false)
