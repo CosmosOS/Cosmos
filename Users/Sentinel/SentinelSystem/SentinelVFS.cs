@@ -5,12 +5,13 @@ using Cosmos.System;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using SentinelKernel.System.FileSystem.FAT;
 using Console = global::System.Console;
 
 namespace SentinelKernel.System.FileSystem.VFS
 {
     [Serializable]
-    public struct KVP<TKey, TValue>
+    public class KVP<TKey, TValue>
     {
         private readonly TKey key;
         private readonly TValue value;
@@ -45,6 +46,7 @@ namespace SentinelKernel.System.FileSystem.VFS
                 if (BlockDevice.Devices[i] is Partition)
                 {
                     mPartitions.Add((Partition)BlockDevice.Devices[i]);
+                    break;
                 }
             }
 
@@ -68,16 +70,25 @@ namespace SentinelKernel.System.FileSystem.VFS
             for (int i = 0; i < mPartitions.Count; i++)
             {
                 string xRootPath = string.Concat(i, VolumeSeparatorChar, DirectorySeparatorChar);
+                FatFileSystem xFileSystem = null;
                 switch (FileSystem.GetFileSystemType(mPartitions[i]))
                 {
                     case FileSystemType.FAT:
-                        mFileSystems.Add(new KVP<string, FileSystem>(xRootPath, new FAT.FatFileSystem(mPartitions[i])));
+                        xFileSystem = new FAT.FatFileSystem(mPartitions[i]);
+                        mFileSystems.Add(new KVP<string, FileSystem>(xRootPath, xFileSystem));
                         break;
+                    default:
+                        Console.WriteLine("Unknown filesystem type!");
+                        return;
                 }
 
-                if (mFileSystems[i].Key == xRootPath)
+                Console.Write("i = ");
+                Console.WriteLine(i.ToString());
+                Console.Write("mFileSystems.Count = ");
+                Console.WriteLine(mFileSystems.Count);
+                if (xFileSystem!=null)
                 {
-                    var xFatFS = mFileSystems[i].Value as FAT.FatFileSystem;
+                    var xFatFS = (FAT.FatFileSystem)xFileSystem;
                     Console.WriteLine("-------File System--------");
                     Console.WriteLine("Bytes per Cluster: " + xFatFS.BytesPerCluster);
                     Console.WriteLine("Bytes per Sector: " + xFatFS.BytesPerSector);
