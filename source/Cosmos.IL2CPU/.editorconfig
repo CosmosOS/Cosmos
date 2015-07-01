@@ -26,3 +26,6 @@ indent_size = 4
 
 [CompilerExtensionAttribute.cs]
 indent_size = 4
+
+[AppAssemblerRingsCheck.cs]
+indent_size = 4

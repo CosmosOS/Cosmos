@@ -237,7 +237,7 @@ namespace Cosmos.IL2CPU
                             xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
                             xScanner.Execute(xInitMethod);
 
-                            AppAssemblerRingsCheck.Execute(xScanner);
+                            AppAssemblerRingsCheck.Execute(xScanner, xInitMethod.DeclaringType.Assembly);
 
                             using (var xOut = new StreamWriter(OutputFilename, false, Encoding.ASCII , 128*1024))
                             {

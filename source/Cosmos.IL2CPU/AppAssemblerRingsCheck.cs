@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Cosmos.Common;
 using Cosmos.IL2CPU.Plugs;
+using Cosmos.TestRunner;
 
 namespace Cosmos.IL2CPU
 {
@@ -41,6 +42,11 @@ namespace Cosmos.IL2CPU
                 return true;
             }
 
+            if (assembly == typeof(TestController).Assembly)
+            {
+                return true;
+            }
+
             return false;
         }
 
@@ -49,9 +55,22 @@ namespace Cosmos.IL2CPU
         /// the same ring or one ring "up" (ie, User can reference System, etc), but not other way around.
         /// </summary>
         /// <param name="scanner"></param>
-        public static void Execute(ILScanner scanner)
+        public static void Execute(ILScanner scanner, Assembly entryAssembly)
         {
+            if (entryAssembly == null)
+            {
+                throw new ArgumentNullException("entryAssembly");
+            }
+
+
             RingsWriteLine("Start check");
+
+            // verify the entry assembly is in the User ring.
+            var xRing = GetRingFromAssembly(entryAssembly);
+            if (xRing != Ring.User)
+            {
+                throw new Exception(String.Format("Assembly '{0}' contains your kernel class, which means it should be in the ring {1}!", entryAssembly.GetName().Name, Ring.User));
+            }
 
             foreach (var xAssembly in scanner.mUsedAssemblies)
             {
@@ -61,7 +80,7 @@ namespace Cosmos.IL2CPU
                 }
 
                 RingsWriteLine("Assembly '{0}'", xAssembly.GetName().Name);
-                var xRing = GetRingFromAssembly(xAssembly);
+                xRing = GetRingFromAssembly(xAssembly);
                 var xRingInt = (int)xRing;
 
                 RingsWriteLine("\t\tRing = {0}", xRing);
