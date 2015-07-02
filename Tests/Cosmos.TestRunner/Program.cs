@@ -13,12 +13,7 @@ namespace Cosmos.TestRunner.Console
         {
             var xEngine = new Engine();
 
-            xEngine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
-            xEngine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
-            xEngine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
-
-
-            // known bugs, therefor disabled for now:
+            DefaultEngineConfiguration.Apply(xEngine);
 
             xEngine.OutputHandler = new OutputHandlerXml(@"c:\data\CosmosTests.xml");
             //xEngine.OutputHandler = new OutputHandlerConsole();
