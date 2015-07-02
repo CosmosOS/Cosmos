@@ -38,6 +38,8 @@ namespace Cosmos.System
                 case ScreenSize.Size720x480:
                     ScrSize = HALVGAScreen.ScreenSize.Size720x480;
                     break;
+                default:
+                    throw new Exception("This situation is not implemented!");
             }
 
             switch (colorDepth)
@@ -54,6 +56,8 @@ namespace Cosmos.System
                 case ColorDepth.BitDepth16:
                     ClrDepth = HALVGAScreen.ColorDepth.BitDepth16;
                     break;
+                default:
+                    throw new Exception("This situation is not implemented!");
             }
 
             mScreen.SetGraphicsMode(ScrSize, ClrDepth);
@@ -111,6 +115,8 @@ namespace Cosmos.System
                 case TextSize.Size90x60:
                     mScreen.SetTextMode(HALVGAScreen.TextSize.Size90x60);
                     break;
+                default:
+                    throw new Exception("This situation is not implemented!");
             }
         }
 
