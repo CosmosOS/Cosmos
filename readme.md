@@ -1,5 +1,7 @@
 ### C# Open Source Managed Operating System
 
+[![Join the chat at https://gitter.im/CosmosOS/Cosmos](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/CosmosOS/Cosmos?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [We are currently migrating from codeplex](http://cosmos.codeplex.com/)
 
 Cosmos is an operating system "construction kit", built from the ground up around the IL2CPU compiler in C# and our home-brewed language called X#.
