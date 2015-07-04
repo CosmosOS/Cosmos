@@ -19,13 +19,31 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xOpVar = (OpVar)aOpCode;
-            if (aMethod.MethodBase.Name == "GetValue" && aMethod.MethodBase.DeclaringType.Name == "Kernel")
+            if (aMethod.MethodBase.DeclaringType.Name == "OurList`1")
             {
-                Console.Write("");
+                if (aMethod.MethodBase.Name == "get_Item")
+                {
+                    Console.Write("");
+                }
             }
             DoExecute(Assembler, aMethod, xOpVar.Value);
         }
 
+        /// <summary>
+        /// <para>This methods gives the full displacement for an argument. Arguments are in "reverse" order:
+        /// <code>public static int Add(int a, int b)</code>
+        /// In this situation, argument b is at EBP+8, argument A is at EBP+12
+        /// </para>
+        /// <para>
+        /// After the method returns, the return value is on the stack. This means, that when the return size is larger than the
+        /// total argument size, we need to reserve extra stack:
+        /// <code>public static Int64 Convert(int value)</code>
+        /// In this situation, argument <code>value</code> is at EBP+12
+        /// </para>
+        /// </summary>
+        /// <param name="aMethod"></param>
+        /// <param name="aParam"></param>
+        /// <returns></returns>
         public static int GetArgumentDisplacement(MethodInfo aMethod, ushort aParam)
         {
             var xMethodBase = aMethod.MethodBase;
@@ -60,17 +78,20 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     xCurArgSize = Align(SizeOfType(xMethodBase.DeclaringType), 4);
                 }
-                uint xArgSize = xCurArgSize;
+                uint xArgSize = 0;
                 foreach (var xParam in xParams)
                 {
                     xArgSize += Align(SizeOfType(xParam.ParameterType), 4);
+                }
+                if (!xMethodBase.IsStatic)
+                {
+                    xArgSize += 4; // add $this pointer
                 }
                 for (int i = xParams.Length - 1; i >= aParam; i--)
                 {
                     var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
                     xOffset += xSize;
                 }
-
                 if (xReturnSize > xArgSize)
                 {
                     uint xExtraSize = xReturnSize - xCurArgSize;
@@ -94,7 +115,10 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         xArgSize += Align(SizeOfType(xParam.ParameterType), 4);
                     }
-
+                    if (!xMethodBase.IsStatic)
+                    {
+                        xArgSize += 4; // add $this pointer
+                    }
                     if (xReturnSize > xArgSize)
                     {
                         uint xExtraSize = xReturnSize - xArgSize;

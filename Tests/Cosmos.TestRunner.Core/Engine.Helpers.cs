@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Channels;
@@ -32,25 +33,43 @@ namespace Cosmos.TestRunner.Core
 
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
-            RunProcess(typeof(Program).Assembly.Location,
-                       mBaseWorkingDirectory,
-                       new[]
-                       {
-                           "DebugEnabled:True",
-                           "StackCorruptionDetectionEnabled:False",
-                           "DebugMode:Source",
-                           "TraceAssemblies:",
-                           "DebugCom:1",
-                           "UseNAsm:True",
-                           "OutputFilename:" + outputFile,
-                           "EnableLogging:True",
-                           "EmitDebugSymbols:True",
-                           "IgnoreDebugStubAttribute:False",
-                           "References:" + kernelFileName,
-                           "References:" + typeof(CPUImpl).Assembly.Location,
-                           "References:" + typeof(DebugBreak).Assembly.Location,
-                           "References:" + typeof(ConsoleImpl).Assembly.Location
-                       });
+            var xArguments = new[]
+                             {
+                                 "DebugEnabled:True",
+                                 "StackCorruptionDetectionEnabled:False",
+                                 "DebugMode:Source",
+                                 "TraceAssemblies:",
+                                 "DebugCom:1",
+                                 "UseNAsm:True",
+                                 "OutputFilename:" + outputFile,
+                                 "EnableLogging:True",
+                                 "EmitDebugSymbols:True",
+                                 "IgnoreDebugStubAttribute:False",
+                                 "References:" + kernelFileName,
+                                 "References:" + typeof(CPUImpl).Assembly.Location,
+                                 "References:" + typeof(DebugBreak).Assembly.Location,
+                                 "References:" + typeof(ConsoleImpl).Assembly.Location
+                             };
+
+            if (RunIL2CPUInProcess)
+            {
+                if (mKernelsToRun.Count > 1)
+                {
+                    throw new Exception("Cannot run multiple kernels with in-process compilation!");
+                }
+                var xResult = Program.Run(xArguments, OutputHandler.LogMessage, OutputHandler.LogError);
+                if (xResult != 0)
+                {
+                    throw new Exception("Error running IL2CPU");
+                }
+            }
+            else
+            {
+
+                RunProcess(typeof(Program).Assembly.Location,
+                           mBaseWorkingDirectory,
+                           xArguments);
+            }
         }
 
         private void RunNasm(string inputFile, string outputFile, bool isElf)

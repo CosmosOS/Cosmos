@@ -20,5 +20,16 @@ namespace Cosmos.TestRunner
                 throw new Exception("Assertion failed!");
             }
         }
+
+        public static void AreEqual(int expected, int actual, string message)
+        {
+            var xResult = expected == actual;
+            if (!xResult)
+            {
+                TestController.Debugger.SendNumber("TestAssertion", "Expected", (uint)expected, 32);
+                TestController.Debugger.SendNumber("TestAssertion", "Actual", (uint)actual, 32);
+            }
+            IsTrue(xResult, message);
+        }
     }
 }

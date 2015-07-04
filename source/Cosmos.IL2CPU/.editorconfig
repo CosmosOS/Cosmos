@@ -29,3 +29,6 @@ indent_size = 4
 
 [AppAssemblerRingsCheck.cs]
 indent_size = 4
+
+[IL/Stfld.cs]
+indent_size = 2

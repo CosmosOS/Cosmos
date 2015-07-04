@@ -43,6 +43,13 @@
     <Reference Include="Cosmos.System.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj">
+      <Name>SimpleStructsAndArraysTest</Name>
+      <Project>{839edc9d-6d2e-4892-a7f0-17861ba9fa0c}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
   <!--<ItemGroup>
     <Content Include="Cosmos.bxrc">
       <SubType>Content</SubType>

@@ -95,7 +95,7 @@ namespace Cosmos.IL2CPU
                     var xIdxOffset = 0u;
                     if (!aMethod.MethodBase.IsStatic)
                     {
-                        new Comment(String.Format("Argument $this at EBP+{0}, size = {1}", X86.IL.Ldarg.GetArgumentDisplacement(aMethod, 0), ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4)));
+                        new Comment(String.Format("Argument[0] $this at EBP+{0}, size = {1}", X86.IL.Ldarg.GetArgumentDisplacement(aMethod, 0), ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4)));
                         xIdxOffset++;
                     }
 
@@ -107,7 +107,14 @@ namespace Cosmos.IL2CPU
                         var xOffset = X86.IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort) (i + xIdxOffset));
                         var xSize = X86.IL.Ldarg.SizeOfType(xParams[i].ParameterType);
                         // if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
-                        new Comment(String.Format("Argument {0} at EBP+{1}, size = {2}", xParams[i].Name, xOffset, xSize));
+                        new Comment(String.Format("Argument[{3}] {0} at EBP+{1}, size = {2}", xParams[i].Name, xOffset, xSize, (xIdxOffset + i)));
+                    }
+
+                    var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
+                    if (xMethodInfo != null)
+                    {
+                        var xSize = ILOp.Align(ILOp.SizeOfType(xMethodInfo.ReturnType), 4);
+                        new Comment(String.Format("Return size: {0}", xSize));
                     }
                 }
             }

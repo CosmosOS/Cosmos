@@ -66,8 +66,10 @@ namespace Cosmos.IL2CPU.X86.IL
           var xFieldInfo = (from item in xFields
                             where item.Id == xFieldId
                             select item).Single();
-          new Comment("Field = '" + xFieldId + "'");
-
+        new Comment("Field: " + xFieldInfo.Id);
+        new Comment("Type: " + xFieldInfo.FieldType.ToString());
+        new Comment("Size: " + xFieldInfo.Size);
+        new Comment("Offset: " + xOffset + " (includes object header)");
             DoNullReferenceCheck(Assembler, debugEnabled, 0);
 
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };

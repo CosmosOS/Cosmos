@@ -11,7 +11,7 @@ using Console = global::System.Console;
 namespace SentinelKernel.System.FileSystem.VFS
 {
     [Serializable]
-    public class KVP<TKey, TValue>
+    public struct KVP<TKey, TValue>
     {
         private readonly TKey key;
         private readonly TValue value;

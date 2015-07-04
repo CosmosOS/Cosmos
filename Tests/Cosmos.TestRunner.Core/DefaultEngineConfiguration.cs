@@ -15,7 +15,6 @@ namespace Cosmos.TestRunner.Core
             engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
             engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
 
-
             // known bugs, therefor disabled for now:
         }
     }

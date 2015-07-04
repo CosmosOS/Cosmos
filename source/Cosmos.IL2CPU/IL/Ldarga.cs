@@ -16,68 +16,10 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public static int GetArgumentDisplacement(MethodInfo aMethod, ushort aParam)
-        {
-            var xMethodBase = aMethod.MethodBase;
-            if (aMethod.PluggedMethod != null)
-            {
-                xMethodBase = aMethod.PluggedMethod.MethodBase;
-            }
-            var xMethodInfo = xMethodBase as SysReflection.MethodInfo;
-            uint xReturnSize = 0;
-            if (xMethodInfo != null)
-            {
-                xReturnSize = Align(SizeOfType(xMethodInfo.ReturnType), 4);
-            }
-            uint xOffset = 8;
-            var xCorrectedOpValValue = aParam;
-            if (!aMethod.MethodBase.IsStatic && aParam > 0)
-            {
-                // if the method has a $this, the OpCode value includes the this at index 0, but GetParameters() doesnt include the this
-                xCorrectedOpValValue -= 1;
-            }
-            var xParams = xMethodBase.GetParameters();
-            if (aParam == 0 && !xMethodBase.IsStatic)
-            {
-                // return the this parameter, which is not in .GetParameters()
-                var xCurArgSize = Align(SizeOfType(xMethodBase.DeclaringType), 4);
-                for (int i = xParams.Length - 1; i >= aParam; i--) {
-                    var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
-                    xOffset += xSize;
-                }
-                if (xReturnSize > xCurArgSize) {
-                    uint xExtraSize = xReturnSize - xCurArgSize;
-					xOffset += xExtraSize;
-                }
-
-                return (int)(xOffset);
-            }
-            else
-            {
-                for (int i = xParams.Length - 1; i > xCorrectedOpValValue; i--) {
-                    var xSize = Align(SizeOfType(xParams[i].ParameterType), 4);
-                    xOffset += xSize;
-                }
-                var xCurArgSize = Align(SizeOfType(xParams[xCorrectedOpValValue].ParameterType), 4);
-                uint xArgSize = 0;
-                foreach (var xParam in xParams) {
-                    xArgSize += Align(SizeOfType(xParam.ParameterType), 4);
-                }
-                xReturnSize = 0;
-
-                if (xReturnSize > xArgSize) {
-					uint xExtraSize = xReturnSize - xArgSize;
-					xOffset += xExtraSize;
-                }
-
-                return (int)(xOffset);
-            }
-        }
-
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xOpVar = (OpVar)aOpCode;
-            var xDisplacement = Ldarga.GetArgumentDisplacement(aMethod, xOpVar.Value);
+            var xDisplacement = Ldarg.GetArgumentDisplacement(aMethod, xOpVar.Value);
             new Mov {DestinationReg=RegistersEnum.EBX, SourceValue = (uint)(xDisplacement) };
             new Mov{DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBP };
             new CPUx86.Add { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBX };
