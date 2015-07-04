@@ -29,6 +29,15 @@ namespace SentinelKernel
                 if (xTest)
                 {
                     Console.WriteLine("Folder exists!");
+                    xTest = Directory.Exists("0:\\test\\DirInTest");
+                    if (xTest)
+                    {
+                        Console.WriteLine("Subfolder exists as well!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Subfolder doesn't exist!");
+                    }
                 }
                 else
                 {
