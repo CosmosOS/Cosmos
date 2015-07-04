@@ -284,6 +284,7 @@ namespace SentinelKernel.System.FileSystem.VFS
         {
             try
             {
+                FatHelpers.Debug("DirectoryExists. Path = '" + aPath + "'");
                 string xDir = aPath + VFSBase.DirectorySeparatorChar;
                 //xDir = Path.GetDirectoryName(xDir);
                 return (VFSManager.GetDirectory(xDir) != null);

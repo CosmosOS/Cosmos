@@ -33,7 +33,7 @@ namespace SentinelKernel.System.FileSystem.FAT
         public enum FatTypeEnum { Unknown, Fat12, Fat16, Fat32 }
         readonly public FatTypeEnum FatType = FatTypeEnum.Unknown;
 
-        Cosmos.HAL.BlockDevice.BlockDevice mDevice;
+        BlockDevice mDevice;
 
         public void ReadFatTableSector(UInt64 xSectorNum, byte[] aData)
         {
@@ -96,7 +96,7 @@ namespace SentinelKernel.System.FileSystem.FAT
             }
         }
 
-        public FatFileSystem(Cosmos.HAL.BlockDevice.BlockDevice aDevice)
+        public FatFileSystem(BlockDevice aDevice)
         {
 
             mDevice = aDevice;
@@ -196,10 +196,8 @@ namespace SentinelKernel.System.FileSystem.FAT
             oOffset = (UInt32)(xOffset % BytesPerSector);
         }
 
-        public List<System.FileSystem.Listing.Base> GetRoot()
+        public List<Base> GetRoot()
         {
-            var xResult = new List<System.FileSystem.Listing.Base>();
-
             byte[] xData;
             if (FatType == FatTypeEnum.Fat32)
             {
@@ -210,7 +208,38 @@ namespace SentinelKernel.System.FileSystem.FAT
             {
                 xData = mDevice.NewBlockArray(RootSectorCount);
                 mDevice.ReadBlock(RootSector, RootSectorCount, xData);
+                // todo: is this correct??
             }
+            return ReadDirectoryContents(xData);
+        }
+
+        public List<Base> GetDirectoryContents(FatDirectory directory)
+        {
+            if (directory == null)
+            {
+                throw new ArgumentNullException("directory");
+            }
+
+            byte[] xData;
+            if (FatType == FatTypeEnum.Fat32)
+            {
+                xData = NewClusterArray();
+                ReadCluster(directory.FirstClusterNr, xData);
+            }
+            else
+            {
+                xData = mDevice.NewBlockArray(1);
+                mDevice.ReadBlock(directory.FirstClusterNr, RootSectorCount, xData);
+            }
+            // todo: what about larger directories?
+
+
+            return ReadDirectoryContents(xData);
+        }
+
+        private List<Base> ReadDirectoryContents(byte[] xData)
+        {
+            var xResult = new List<Base>();
             //TODO: Change xLongName to StringBuilder
             for (UInt32 i = 0; i < xData.Length; i = i + 32)
             {
@@ -230,7 +259,6 @@ namespace SentinelKernel.System.FileSystem.FAT
                     }
                     if (xType == 0)
                     {
-
                         if ((xOrd & 0x40) > 0)
                         {
                             xLongName = "";
@@ -272,7 +300,6 @@ namespace SentinelKernel.System.FileSystem.FAT
                 }
                 else if (xStatus >= 0x20)
                 {
-
                     if (xLongName.Length > 0)
                     {
                         // Leading and trailing spaces are to be ignored according to spec.
@@ -314,19 +341,24 @@ namespace SentinelKernel.System.FileSystem.FAT
                 if (xTest == 0)
                 {
                     UInt32 xSize = xData.ToUInt32(i + 28);
-                    xResult.Add(new Listing.FatFile(this, xName, xSize, xFirstCluster));
+                    if (xSize == 0 && xName.Length == 0)
+                    {
+                        continue;
+                    }
+                    xResult.Add(new FatFile(this, xName, xSize, xFirstCluster));
                     FatHelpers.Debug("Returning file '" + xName + "'");
+                }
+                else if (xTest == DirectoryEntryAttributeConsts.Directory || xAttrib == DirectoryEntryAttributeConsts.LongName)
+                {
+                    UInt32 xSize = xData.ToUInt32(i + 28);
+                    var xFatDirectory = new FatDirectory(this, xName, xFirstCluster);
+                    FatHelpers.Debug("Returning directory '" + xFatDirectory.Name + "'");
+                    xResult.Add(xFatDirectory);
                 }
                 else if (xTest == DirectoryEntryAttributeConsts.VolumeID)
                 {
                     FatHelpers.Debug("Directory entry is VolumeID");
                     //
-                }
-                else if (xTest == DirectoryEntryAttributeConsts.Directory || xAttrib == DirectoryEntryAttributeConsts.LongName)
-                {
-                    var xFatDirectory = new Listing.FatDirectory(this, xName);
-                    FatHelpers.Debug("Returning directory '" + xName + "'");
-                    xResult.Add(xFatDirectory);
                 }
                 else
                 {
@@ -337,8 +369,6 @@ namespace SentinelKernel.System.FileSystem.FAT
 
             return xResult;
         }
-
-
 
         public static bool IsDeviceFAT(Partition aDevice)
         {
@@ -359,7 +389,10 @@ namespace SentinelKernel.System.FileSystem.FAT
                 // get root folder
                 return GetRoot();
             }
-            throw new NotImplementedException();
+            else
+            {
+                return GetDirectoryContents((FatDirectory)baseDirectory);
+            }
         }
     }
 }

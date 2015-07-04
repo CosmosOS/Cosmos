@@ -24,11 +24,20 @@ namespace SentinelKernel
             try
             {
                 var xRoot = Path.GetPathRoot(@"0:\test");
-                bool xTest = Directory.Exists("0:\\TEST");
+                bool xTest = Directory.Exists("0:\\test");
                 Console.WriteLine("After test");
                 if (xTest)
                 {
                     Console.WriteLine("Folder exists!");
+                    xTest = Directory.Exists("0:\\test\\DirInTest");
+                    if (xTest)
+                    {
+                        Console.WriteLine("Subfolder exists as well!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Subfolder doesn't exist!");
+                    }
                 }
                 else
                 {
@@ -41,7 +50,7 @@ namespace SentinelKernel
                 Console.WriteLine("Exception occurred:");
                 Console.WriteLine(e.Message);
             }
-            
+
             Stop();
         }
     }

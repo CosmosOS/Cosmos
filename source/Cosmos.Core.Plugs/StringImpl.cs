@@ -144,6 +144,12 @@ namespace Cosmos.Core.Plugs {
 
         public static bool Equals(string aThis, string aThat, StringComparison aComparison) {
 #warning TODO: implement
+            if (aComparison == StringComparison.OrdinalIgnoreCase)
+            {
+                var xLowerThis = aThis.ToLower();
+                var xLowerThat = aThat.ToLower();
+                return EqualsHelper(xLowerThis, xLowerThat);
+            }
             return EqualsHelper(aThis,
                                 aThat);
         }
