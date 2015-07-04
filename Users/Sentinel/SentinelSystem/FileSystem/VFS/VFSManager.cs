@@ -141,29 +141,34 @@ namespace SentinelKernel.System.FileSystem.VFS
                 throw new ArgumentNullException("aPath");
             }
 
-            return null;
-
-            /*
             string xFileName = Path.GetFileName(aPath);
-            string xDirectory = Path.GetDirectoryName(aPath) + Path.DirectorySeparatorChar;
-
-            foreach (var xEntry in GetDirectoryListing(xDirectory))
+            string xDirectory = Path.GetDirectoryName(aPath);
+            var xLastChar = xDirectory[xDirectory.Length - 1];
+            if (xLastChar != Path.DirectorySeparatorChar)
             {
-                if ((xEntry is FileSystem.Listing.File) && (xEntry.Name == xFileName))
+                xDirectory = xDirectory + Path.DirectorySeparatorChar;
+            }
+
+
+            var xList = GetDirectoryListing(xDirectory);
+            for (int i = 0; i < xList.Count; i++)
+            {
+                var xEntry = xList[i];
+                var xFile = xEntry as Listing.File;
+                if (xFile != null && String.Equals(xEntry.Name, xFileName, StringComparison.OrdinalIgnoreCase))
                 {
-                    return (xEntry as FileSystem.Listing.File);
+                    return xFile;
                 }
             }
 
             return null;
-            */
         }
 
         public static List<Listing.File> GetFiles(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))
             {
-                throw new ArgumentNullException("sPath");
+                throw new ArgumentNullException("aPath");
             }
 
             return null;
@@ -274,8 +279,10 @@ namespace SentinelKernel.System.FileSystem.VFS
             {
                 return (VFSManager.GetFile(aPath) != null);
             }
-            catch (Exception)
+            catch (Exception E)
             {
+                Console.Write("Exception occurred: ");
+                Console.WriteLine(E.Message);
                 return false;
             }
         }

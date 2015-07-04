@@ -394,5 +394,10 @@ namespace SentinelKernel.System.FileSystem.FAT
                 return GetDirectoryContents((FatDirectory)baseDirectory);
             }
         }
+
+        public override Directory GetRootDirectory(string name)
+        {
+            return new FatDirectory(this, name, RootCluster);
+        }
     }
 }

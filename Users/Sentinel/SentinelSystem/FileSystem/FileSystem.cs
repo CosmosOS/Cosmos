@@ -41,5 +41,7 @@ namespace SentinelKernel.System.FileSystem
         }
 
         public abstract List<Listing.Base> GetDirectoryListing(Directory baseDirectory);
+
+        public abstract Directory GetRootDirectory(string name);
     }
 }
