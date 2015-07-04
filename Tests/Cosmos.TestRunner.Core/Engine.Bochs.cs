@@ -10,7 +10,7 @@ namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
-        private const int AllowedSecondsInKernel = 10;
+        private const int AllowedSecondsInKernel = 30;
 
         private void RunIsoInBochs(string iso)
         {
