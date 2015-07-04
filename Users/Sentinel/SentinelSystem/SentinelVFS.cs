@@ -243,6 +243,10 @@ namespace SentinelKernel.System.FileSystem.VFS
                     for (int j = 0; j < xListing.Count; j++)
                     {
                         var xListingItem = xListing[j];
+                        Console.Write("xListingItem.Name: ");
+                        Console.WriteLine(xListingItem.Name);
+                        Console.Write("xPathPart: ");
+                        Console.WriteLine(xPathPart);
                         if (String.Equals(xListingItem.Name, xPathPart, StringComparison.OrdinalIgnoreCase))
                         {
                             if (xListingItem is Listing.Directory)
