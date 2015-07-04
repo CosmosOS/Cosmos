@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileSystem\FatHelpers.cs" />
+    <Compile Include="FileSystem\FAT\DirectoryEntryAttributeConsts.cs" />
     <Compile Include="FileSystem\FAT\FatFileSystem.cs" />
     <Compile Include="FileSystem\FAT\FatStream.cs" />
     <Compile Include="FileSystem\FAT\Listing\FatDirectory.cs" />

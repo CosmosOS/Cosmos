@@ -156,7 +156,7 @@ namespace SentinelKernel.System.FileSystem.VFS
             }
 
             return null;
-            */ 
+            */
         }
 
         public static List<Listing.File> GetFiles(string aPath)
@@ -181,7 +181,7 @@ namespace SentinelKernel.System.FileSystem.VFS
             }
 
             return xFiles.ToArray();
-            */ 
+            */
         }
 
         public static Listing.Directory GetDirectory(string aPath)
@@ -230,7 +230,7 @@ namespace SentinelKernel.System.FileSystem.VFS
                 xDrives.Add(entry.Name + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar);
 
             return xDrives.ToArray();
-            */ 
+            */
         }
 
         public static List<string> InternalGetFileDirectoryNames(string path, string userPathOriginal, string searchPattern, bool includeFiles, bool includeDirs, SearchOption searchOption)
@@ -264,8 +264,8 @@ namespace SentinelKernel.System.FileSystem.VFS
             }
 
             return xFileAndDirectoryNames.ToArray();
-            
-             */ 
+
+             */
         }
 
         public static bool FileExists(string aPath)
@@ -285,11 +285,13 @@ namespace SentinelKernel.System.FileSystem.VFS
             try
             {
                 string xDir = aPath + VFSBase.DirectorySeparatorChar;
-                xDir = Path.GetDirectoryName(xDir);
+                //xDir = Path.GetDirectoryName(xDir);
                 return (VFSManager.GetDirectory(xDir) != null);
             }
-            catch (Exception)
+            catch (Exception E)
             {
+                Console.Write("Exception occurred: ");
+                Console.WriteLine(E.Message);
                 return false;
             }
 

@@ -24,7 +24,7 @@ namespace SentinelKernel
             try
             {
                 var xRoot = Path.GetPathRoot(@"0:\test");
-                bool xTest = Directory.Exists("0:\\test");
+                bool xTest = Directory.Exists("0:\\TEST");
                 Console.WriteLine("After test");
                 if (xTest)
                 {
