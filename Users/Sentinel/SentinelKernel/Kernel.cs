@@ -41,7 +41,7 @@ namespace SentinelKernel
                 }
                 Console.WriteLine("Subfolder exists as well!");
 
-                xTest = File.Exists(@"0:\Kudzu.txt");
+                xTest = File.Exists(@"0:\KudzU.txt");
                 if (!xTest)
                 {
                     Console.WriteLine(@"\Kudzu.txt not found!");
@@ -49,6 +49,15 @@ namespace SentinelKernel
                 }
 
                 Console.WriteLine("Kudzu.txt found!");
+
+                xTest = File.Exists(@"0:\Test\DirInTest\Readme.txt");
+                if (!xTest)
+                {
+                    Console.WriteLine(@"\Test\DirInTest\Readme.txt not found!");
+                    return;
+                }
+
+                Console.WriteLine(@"Test\DirInTest\Readme.txt found!");
 
             }
             catch (Exception e)

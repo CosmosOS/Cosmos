@@ -149,7 +149,6 @@ namespace SentinelKernel.System.FileSystem.VFS
                 xDirectory = xDirectory + Path.DirectorySeparatorChar;
             }
 
-
             var xList = GetDirectoryListing(xDirectory);
             for (int i = 0; i < xList.Count; i++)
             {
