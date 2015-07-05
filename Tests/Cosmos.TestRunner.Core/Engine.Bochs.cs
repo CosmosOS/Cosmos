@@ -82,7 +82,6 @@ namespace Cosmos.TestRunner.Core
                 mKernelResultSet = false;
                 Interlocked.Exchange(ref mSucceededAssertions, 0);
 
-                Console.WriteLine("Bochs started");
                 while (mBochsRunning)
                 {
                     Thread.Sleep(50);
@@ -99,7 +98,6 @@ namespace Cosmos.TestRunner.Core
                     OutputHandler.SetKernelTestResult(true, null);
                 }
                 OutputHandler.SetKernelSucceededAssertionsCount(mSucceededAssertions);
-                Console.WriteLine("Stopping bochs now");
             }
             finally
             {

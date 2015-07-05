@@ -108,8 +108,6 @@ namespace SimpleStructsAndArraysTest
             Assert.IsTrue(xItem2.E == 5, "xItem2.E == 5");
             Console.Write("E: ");
             Console.WriteLine(xItem2.E);
-
-            TestController.Completed();
         }
 
         private class KVPClass
@@ -199,7 +197,7 @@ namespace SimpleStructsAndArraysTest
             {
                 get
                 {
-                    Assert.IsTrue(index == ExpectedIndex, "index = " + ExpectedIndex);
+                    Assert.IsTrue(index == ExpectedIndex, "index == " + ExpectedIndex);
                     if (index >= this._size)
                     {
                         throw new Exception("Out of range!");
@@ -212,7 +210,7 @@ namespace SimpleStructsAndArraysTest
 
         }
 
-        protected static void TestSimpleItemsInArray()
+        protected static void TestOurList()
         {
             Assert.IsTrue(true, "Start of test");
             var xListClasses = new OurList<KVPClass>();
@@ -243,11 +241,40 @@ namespace SimpleStructsAndArraysTest
             Assert.AreEqual(5, xStructItem.Value, "xListStructs[1].Value == 5");
         }
 
+        protected static void TestStandardList()
+        {
+            Assert.IsTrue(true, "Start of test");
+            var xListClasses = new List<KVPClass>();
+            var xListStructs = new List<KVPStruct>();
+
+            xListClasses.Add(new KVPClass { Key = 1, Value = 2 });
+            xListClasses.Add(new KVPClass { Key = 2, Value = 5 });
+
+            var xListItem = xListClasses[0];
+            Assert.AreEqual(1, xListItem.Key, "xListClasses[0].Key == 1");
+            Assert.AreEqual(2, xListItem.Value, "xListClasses[0].Value == 2");
+            xListItem = xListClasses[1];
+            Assert.AreEqual(2, xListItem.Key, "xListClasses[1].Key == 2");
+            Assert.AreEqual(5, xListItem.Value, "xListClasses[1].Value == 5");
+
+            xListStructs.Add(new KVPStruct { Key = 1, Value = 2 });
+            xListStructs.Add(new KVPStruct { Key = 2, Value = 5 });
+
+            var xStructItem = xListStructs[0];
+            Assert.AreEqual(1, xStructItem.Key, "xListStructs[0].Key == 1");
+            Assert.AreEqual(2, xStructItem.Value, "xListStructs[0].Value == 2");
+            xStructItem = xListStructs[1];
+            Assert.AreEqual(2, xStructItem.Key, "xListStructs[1].Key == 2");
+            Assert.AreEqual(5, xStructItem.Value, "xListStructs[1].Value == 5");
+        }
+
         protected override void Run()
         {
             TestStep1();
-            TestSimpleItemsInArray();
-            Assert.IsTrue(true, "After TestSimpleItemsInArray");
+            TestOurList();
+            Assert.IsTrue(true, "After TestOurList");
+            TestStandardList();
+            Assert.IsTrue(true, "After TestStandardList");
             TestController.Completed();
         }
     }

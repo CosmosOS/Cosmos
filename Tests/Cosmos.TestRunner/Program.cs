@@ -15,8 +15,8 @@ namespace Cosmos.TestRunner.Console
 
             DefaultEngineConfiguration.Apply(xEngine);
 
-            xEngine.OutputHandler = new OutputHandlerXml(@"c:\data\CosmosTests.xml");
-            //xEngine.OutputHandler = new OutputHandlerConsole();
+            //xEngine.OutputHandler = new OutputHandlerXml(@"c:\data\CosmosTests.xml");
+            xEngine.OutputHandler = new OutputHandlerConsole();
             xEngine.Execute();
         }
     }
