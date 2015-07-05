@@ -52,6 +52,7 @@
     <Compile Include="Engine.Run.cs">
       <DependentUpon>Engine.cs</DependentUpon>
     </Compile>
+    <Compile Include="MultiplexingOutputHandler.cs" />
     <Compile Include="OutputHandlerBase.cs" />
     <Compile Include="OutputHandlerConsole.cs" />
     <Compile Include="OutputHandlerText.cs" />
