@@ -46,7 +46,7 @@ namespace Cosmos.TestRunner.Core
         {
             var xParent = mCurrentNode.Peek();
             var xItem = mDocument.CreateElement("Message");
-            xItem.AppendChild(mDocument.CreateCDataSection(message));
+            xItem.InnerText = message;
             xParent.AppendChild(xItem);
         }
 
