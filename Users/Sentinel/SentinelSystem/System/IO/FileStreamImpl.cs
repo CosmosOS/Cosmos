@@ -21,7 +21,6 @@ namespace SentinelKernel.System.Plugs.System.IO
 
         public static void Ctor(IO::FileStream aThis, string aPathname, IO::FileMode aMode, [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
         {
-            Console.WriteLine("In FileStreamImpl.Ctor");
             innerStream = VFSManager.GetFileStream(aPathname);
         }
 

@@ -62,6 +62,9 @@ namespace SentinelKernel
 
                 Console.Write("File contents of Kudzu.txt: ");
                 Console.WriteLine(File.ReadAllText(@"0:\Kudzu.txt"));
+
+                Console.WriteLine(@"File contents of Test\DirInTest\Readme.txt: ");
+                Console.WriteLine(File.ReadAllText(@"0:\Test\DirInTest\Readme.txt"));
             }
             catch (Exception e)
             {
