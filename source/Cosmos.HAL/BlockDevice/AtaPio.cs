@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using Cosmos.Common;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL.BlockDevice
 {
@@ -80,7 +81,7 @@ namespace Cosmos.HAL.BlockDevice
 			//* Bit 6: LBA (0: CHS, 1: LBA).
 			LBA = 0x40,
 			//* Bit 5: Obsolete and isn't used, but should be set.
-			//* Bit 7: Obsolete and isn't used, but should be set. 
+			//* Bit 7: Obsolete and isn't used, but should be set.
 			Default = 0xA0
 		};
 
@@ -126,6 +127,13 @@ namespace Cosmos.HAL.BlockDevice
 			ATAPI
 		}
 		#endregion
+
+	    internal static Debugger mDebugger = new Debugger("HAL", "AtaPio");
+
+	    private static void Debug(string message)
+	    {
+	        mDebugger.Send("AtaPio debug: " + message);
+	    }
 
 		public AtaPio(Core.IOGroup.ATA aIO, Ata.ControllerIdEnum aControllerId, Ata.BusPositionEnum aBusPosition)
 		{
@@ -180,10 +188,10 @@ namespace Cosmos.HAL.BlockDevice
 		}
 
 		// ATA requires a wait of 400 nanoseconds.
-		// Read the Status register FIVE TIMES, and only pay attention to the value 
-		// returned by the last one -- after selecting a new master or slave device. The point being that 
-		// you can assume an IO port read takes approximately 100ns, so doing the first four creates a 400ns 
-		// delay -- which allows the drive time to push the correct voltages onto the bus. 
+		// Read the Status register FIVE TIMES, and only pay attention to the value
+		// returned by the last one -- after selecting a new master or slave device. The point being that
+		// you can assume an IO port read takes approximately 100ns, so doing the first four creates a 400ns
+		// delay -- which allows the drive time to push the correct voltages onto the bus.
 		// Since we read status again later, we wait by reading it 4 times.
 		protected void Wait()
 		{
@@ -206,7 +214,6 @@ namespace Cosmos.HAL.BlockDevice
 			return SendCmd(aCmd, true);
 		}
 
-
 		public Status SendCmd(Cmd aCmd, bool aThrowOnError)
 		{
 			IO.Command.Byte = (byte)aCmd;
@@ -221,6 +228,7 @@ namespace Cosmos.HAL.BlockDevice
 			if (aThrowOnError && (xStatus & Status.Error) != 0)
 			{
 				// TODO: Read error port
+                Debug("ATA Error in SendCmd. Cmd = " + (byte)aCmd + ", Status = " + (byte)xStatus);
 				throw new Exception("ATA Error");
 			}
 			return xStatus;
@@ -228,7 +236,7 @@ namespace Cosmos.HAL.BlockDevice
 
 		protected string GetString(UInt16[] aBuffer, int aIndexStart, int aStringLength)
 		{
-			// Would be nice to convert to byte[] and use 
+			// Would be nice to convert to byte[] and use
 			// new string(ASCIIEncoding.ASCII.GetChars(xBytes));
 			// But it requires some code Cosmos doesnt support yet
 			var xChars = new char[aStringLength];
@@ -256,13 +264,13 @@ namespace Cosmos.HAL.BlockDevice
 			// Not sure if all this is needed, its different than documented elsewhere but might not be bad
 			// to add code to do all listed here:
 			//
-			//To use the IDENTIFY command, select a target drive by sending 0xA0 for the master drive, or 0xB0 for the slave, to the "drive select" IO port. On the Primary bus, this would be port 0x1F6. 
-			// Then set the Sectorcount, LBAlo, LBAmid, and LBAhi IO ports to 0 (port 0x1F2 to 0x1F5). 
-			// Then send the IDENTIFY command (0xEC) to the Command IO port (0x1F7). 
-			// Then read the Status port (0x1F7) again. If the value read is 0, the drive does not exist. For any other value: poll the Status port (0x1F7) until bit 7 (BSY, value = 0x80) clears. 
-			// Because of some ATAPI drives that do not follow spec, at this point you need to check the LBAmid and LBAhi ports (0x1F4 and 0x1F5) to see if they are non-zero. 
+			//To use the IDENTIFY command, select a target drive by sending 0xA0 for the master drive, or 0xB0 for the slave, to the "drive select" IO port. On the Primary bus, this would be port 0x1F6.
+			// Then set the Sectorcount, LBAlo, LBAmid, and LBAhi IO ports to 0 (port 0x1F2 to 0x1F5).
+			// Then send the IDENTIFY command (0xEC) to the Command IO port (0x1F7).
+			// Then read the Status port (0x1F7) again. If the value read is 0, the drive does not exist. For any other value: poll the Status port (0x1F7) until bit 7 (BSY, value = 0x80) clears.
+			// Because of some ATAPI drives that do not follow spec, at this point you need to check the LBAmid and LBAhi ports (0x1F4 and 0x1F5) to see if they are non-zero.
 			// If so, the drive is not ATA, and you should stop polling. Otherwise, continue polling one of the Status ports until bit 3 (DRQ, value = 8) sets, or until bit 0 (ERR, value = 1) sets.
-			// At that point, if ERR is clear, the data is ready to read from the Data port (0x1F0). Read 256 words, and store them. 
+			// At that point, if ERR is clear, the data is ready to read from the Data port (0x1F0). Read 256 words, and store them.
 
 			// Read Identification Space of the Device
 			var xBuff = new UInt16[256];
@@ -310,7 +318,7 @@ namespace Cosmos.HAL.BlockDevice
 				IO.SectorCount.Byte = (byte)aSectorCount;
 				IO.LBA0.Byte = (byte)(aSectorNo);
 				IO.LBA1.Byte = (byte)(aSectorNo >> 8);
-				IO.LBA2.Byte = (byte)(aSectorNo >> 16);				
+				IO.LBA2.Byte = (byte)(aSectorNo >> 16);
 				//IO.LBA0.Byte = (byte)(aSectorNo & 0xFF);
 				//IO.LBA1.Byte = (byte)((aSectorNo & 0xFF00) >> 8);
 				//IO.LBA2.Byte = (byte)((aSectorNo & 0xFF0000) >> 16);
