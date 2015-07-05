@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Cosmos.Common.Extensions;
 using Cosmos.HAL.BlockDevice;
 using SentinelKernel.System.FileSystem.FAT.Listing;
 using SentinelKernel.System.FileSystem.Listing;
+using Directory = SentinelKernel.System.FileSystem.Listing.Directory;
+using File = SentinelKernel.System.FileSystem.Listing.File;
 
 namespace SentinelKernel.System.FileSystem.FAT
 {
@@ -409,6 +412,11 @@ namespace SentinelKernel.System.FileSystem.FAT
         public override Directory GetRootDirectory(string name)
         {
             return new FatDirectory(this, name, RootCluster);
+        }
+
+        public override Stream GetFileStream(File fileInfo)
+        {
+            return new FatStream((FatFile)fileInfo);
         }
     }
 }

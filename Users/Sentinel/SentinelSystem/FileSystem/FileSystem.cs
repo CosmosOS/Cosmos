@@ -1,9 +1,11 @@
 ﻿using Cosmos.HAL.BlockDevice;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
-using SentinelKernel.System.FileSystem.Listing;
+using Directory = SentinelKernel.System.FileSystem.Listing.Directory;
+using File = SentinelKernel.System.FileSystem.Listing.File;
 
 namespace SentinelKernel.System.FileSystem
 {
@@ -43,5 +45,6 @@ namespace SentinelKernel.System.FileSystem
         public abstract List<Listing.Base> GetDirectoryListing(Directory baseDirectory);
 
         public abstract Directory GetRootDirectory(string name);
+        public abstract Stream GetFileStream(File fileInfo);
     }
 }

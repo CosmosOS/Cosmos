@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using SentinelKernel.System.FileSystem.VFS;
+using Cosmos.Common.Extensions;
 using Sys = Cosmos.System;
 
 namespace SentinelKernel
@@ -59,6 +60,8 @@ namespace SentinelKernel
 
                 Console.WriteLine(@"Test\DirInTest\Readme.txt found!");
 
+                Console.Write("File contents of Kudzu.txt: ");
+                Console.WriteLine(File.ReadAllText(@"0:\Kudzu.txt"));
             }
             catch (Exception e)
             {

@@ -134,7 +134,7 @@ namespace SentinelKernel.System.FileSystem.VFS
 
         #endregion
 
-        public static Listing.File GetFile(string aPath)
+        public static Listing.File TryGetFile(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))
             {
@@ -276,7 +276,7 @@ namespace SentinelKernel.System.FileSystem.VFS
         {
             try
             {
-                return (VFSManager.GetFile(aPath) != null);
+                return (VFSManager.TryGetFile(aPath) != null);
             }
             catch (Exception E)
             {
@@ -302,6 +302,17 @@ namespace SentinelKernel.System.FileSystem.VFS
                 return false;
             }
 
+        }
+
+        public static Stream GetFileStream(string aPathname)
+        {
+            var xFileInfo = TryGetFile(aPathname);
+            if (xFileInfo == null)
+            {
+                throw new Exception("File not found: " + aPathname);
+            }
+
+            return xFileInfo.FileSystem.GetFileStream(xFileInfo);
         }
     }
 }

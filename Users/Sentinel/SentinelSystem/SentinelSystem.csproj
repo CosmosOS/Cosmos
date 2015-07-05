@@ -59,6 +59,7 @@
     <Compile Include="System\IO\DriveInfoImpl.cs" />
     <Compile Include="System\IO\FileImpl.cs" />
     <Compile Include="System\IO\FileInfoImpl.cs" />
+    <Compile Include="System\IO\FileStreamImpl.cs" />
     <Compile Include="System\IO\FileSystemInfoImpl.cs" />
     <Compile Include="System\IO\PathImpl.cs" />
     <Compile Include="System\IO\StreamReaderImpl.cs" />
