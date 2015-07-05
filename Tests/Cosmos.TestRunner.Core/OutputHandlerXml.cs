@@ -42,6 +42,20 @@ namespace Cosmos.TestRunner.Core
             xItem.Attributes.Append(NewXmlAttribute("Duration", mKernelStopwatch.Elapsed.ToString("c")));
         }
 
+        public override void LogDebugMessage(string message)
+        {
+            var xParent = mCurrentNode.Peek();
+            var xNode = xParent.SelectSingleNode("./DebugMessages");
+            if (xNode == null)
+            {
+                xNode = mDocument.CreateElement("DebugMessages");
+                xParent.PrependChild(xNode);
+            }
+            var xItem = mDocument.CreateElement("Message");
+            xItem.InnerText = message;
+            xNode.AppendChild(xItem);
+        }
+
         public override void LogMessage(string message)
         {
             var xParent = mCurrentNode.Peek();

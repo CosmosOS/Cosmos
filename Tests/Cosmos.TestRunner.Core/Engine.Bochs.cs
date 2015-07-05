@@ -70,6 +70,9 @@ namespace Cosmos.TestRunner.Core
             xBochs.OnShutDown = (a, b) =>
                                 {
                                 };
+            xBochs.RedirectOutput = true;
+            xBochs.LogError = s => OutputHandler.LogDebugMessage(s);
+            xBochs.LogOutput = s => OutputHandler.LogDebugMessage(s);
 
             mBochsRunning = true;
             xBochs.Start();

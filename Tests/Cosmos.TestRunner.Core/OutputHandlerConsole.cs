@@ -46,6 +46,11 @@ namespace Cosmos.TestRunner.Core
             mLogLevel = 1;
         }
 
+        public override void LogDebugMessage(string message)
+        {
+
+        }
+
         public override void RunConfigurationStart(RunConfiguration configuration)
         {
         }
