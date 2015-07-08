@@ -245,7 +245,12 @@ namespace SentinelKernel.System.Plugs.System.IO
                 return null;
             }
             aPath = NormalizePath(aPath, false);
-            return aPath.Substring(0, GetRootLength(aPath));
+            var xResult = aPath.Substring(0, GetRootLength(aPath));
+            if (xResult[xResult.Length - 1] != Path.DirectorySeparatorChar)
+            {
+                xResult = xResult + Path.DirectorySeparatorChar;
+            }
+            return xResult;
         }
 
         public static string GetRandomFileName()

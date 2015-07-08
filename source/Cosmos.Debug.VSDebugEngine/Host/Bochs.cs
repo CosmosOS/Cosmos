@@ -72,6 +72,11 @@ namespace Cosmos.Debug.VSDebugEngine.Host
       }
     }
 
+    public bool RedirectOutput = false;
+
+    public Action<string> LogOutput;
+    public Action<string> LogError;
+
     /// <summary>Initialize and start the Bochs process.</summary>
     public override void Start()
     {
@@ -86,12 +91,31 @@ namespace Cosmos.Debug.VSDebugEngine.Host
       _bochsStartInfo.Arguments = string.Format("-q -f \"{0}\"", _bochsConfigurationFile.FullName);
       _bochsStartInfo.WorkingDirectory = _bochsConfigurationFile.Directory.FullName;
       _bochsStartInfo.UseShellExecute = false;
-
+      if (RedirectOutput)
+      {
+        if (LogOutput == null)
+        {
+          throw new Exception("No LogOutput handler specified!");
+        }
+        if (LogError == null)
+        {
+          throw new Exception("No LogError handler specified!");
+        }
+        _bochsStartInfo.RedirectStandardOutput = true;
+        _bochsStartInfo.RedirectStandardError = true;
+        _bochsProcess.OutputDataReceived += (sender, args) => LogOutput(args.Data);
+        _bochsProcess.ErrorDataReceived += (sender, args) => LogError(args.Data);
+      }
       // Register for process completion event so that we can funnel it to any code that
       // subscribed to this event in our base class.
       _bochsProcess.EnableRaisingEvents = true;
       _bochsProcess.Exited += ExitCallback;
       _bochsProcess.Start();
+      if (RedirectOutput)
+      {
+        _bochsProcess.BeginErrorReadLine();
+        _bochsProcess.BeginOutputReadLine();
+      }
       return;
     }
 

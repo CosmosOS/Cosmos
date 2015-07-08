@@ -70,6 +70,9 @@ namespace Cosmos.TestRunner.Core
             xBochs.OnShutDown = (a, b) =>
                                 {
                                 };
+            xBochs.RedirectOutput = true;
+            xBochs.LogError = s => OutputHandler.LogDebugMessage(s);
+            xBochs.LogOutput = s => OutputHandler.LogDebugMessage(s);
 
             mBochsRunning = true;
             xBochs.Start();
@@ -79,7 +82,6 @@ namespace Cosmos.TestRunner.Core
                 mKernelResultSet = false;
                 Interlocked.Exchange(ref mSucceededAssertions, 0);
 
-                Console.WriteLine("Bochs started");
                 while (mBochsRunning)
                 {
                     Thread.Sleep(50);
@@ -96,7 +98,6 @@ namespace Cosmos.TestRunner.Core
                     OutputHandler.SetKernelTestResult(true, null);
                 }
                 OutputHandler.SetKernelSucceededAssertionsCount(mSucceededAssertions);
-                Console.WriteLine("Stopping bochs now");
             }
             finally
             {

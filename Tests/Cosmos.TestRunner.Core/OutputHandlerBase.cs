@@ -8,6 +8,7 @@ namespace Cosmos.TestRunner.Core
     {
         public abstract void ExecuteKernelStart(string assemblyName);
         public abstract void ExecuteKernelEnd(string assemblyName);
+        public abstract void LogDebugMessage(string message);
         public abstract void LogMessage(string message);
         public abstract void LogError(string message);
         public abstract void ExecutionStart();

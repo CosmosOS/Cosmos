@@ -10,15 +10,13 @@ namespace Cosmos.TestRunner.Core
 {
     public partial class OutputHandlerXml: OutputHandlerBase
     {
-        private readonly string mFilename;
         private XmlDocument mDocument;
 
         private bool mConfigurationSucceeded = false;
         private bool mExecutionSucceeded = false;
 
-        public OutputHandlerXml(string filename)
+        public OutputHandlerXml()
         {
-            mFilename = filename;
         }
 
         public override void ExecuteKernelStart(string assemblyName)
@@ -42,11 +40,25 @@ namespace Cosmos.TestRunner.Core
             xItem.Attributes.Append(NewXmlAttribute("Duration", mKernelStopwatch.Elapsed.ToString("c")));
         }
 
+        public override void LogDebugMessage(string message)
+        {
+            var xParent = mCurrentNode.Peek();
+            var xNode = xParent.SelectSingleNode("./DebugMessages");
+            if (xNode == null)
+            {
+                xNode = mDocument.CreateElement("DebugMessages");
+                xParent.PrependChild(xNode);
+            }
+            var xItem = mDocument.CreateElement("Message");
+            xItem.InnerText = message;
+            xNode.AppendChild(xItem);
+        }
+
         public override void LogMessage(string message)
         {
             var xParent = mCurrentNode.Peek();
             var xItem = mDocument.CreateElement("Message");
-            xItem.AppendChild(mDocument.CreateCDataSection(message));
+            xItem.InnerText = message;
             xParent.AppendChild(xItem);
         }
 
@@ -75,8 +87,12 @@ namespace Cosmos.TestRunner.Core
             mExecutionStopwatch.Stop();
             mDocument.DocumentElement.Attributes.Append(NewXmlAttribute("Duration", mExecutionStopwatch.Elapsed.ToString("c")));
             mDocument.DocumentElement.Attributes.Append(NewXmlAttribute("Succeeded", mExecutionSucceeded.ToString()));
-            mDocument.Save(mFilename);
             mCurrentNode.Pop();
+        }
+
+        public void SaveToFile(string filename)
+        {
+            mDocument.Save(filename);
         }
 
         private Stack<XmlElement> mCurrentNode = new Stack<XmlElement>();

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Cosmos.Common.Extensions;
 using Cosmos.HAL.BlockDevice;
 using SentinelKernel.System.FileSystem.FAT.Listing;
 using SentinelKernel.System.FileSystem.Listing;
+using Directory = SentinelKernel.System.FileSystem.Listing.Directory;
+using File = SentinelKernel.System.FileSystem.Listing.File;
 
 namespace SentinelKernel.System.FileSystem.FAT
 {
@@ -241,17 +244,20 @@ namespace SentinelKernel.System.FileSystem.FAT
         {
             var xResult = new List<Base>();
             //TODO: Change xLongName to StringBuilder
+            string xLongName = "";
+            string xName = "";
             for (UInt32 i = 0; i < xData.Length; i = i + 32)
             {
                 FatHelpers.Debug("-------------------------------------------------");
-                string xLongName = "";
                 byte xAttrib = xData[i + 11];
-                FatHelpers.Debug("Attrib = " + xAttrib.ToString());
+                byte xStatus = xData[i];
+
+                FatHelpers.Debug("Attrib = " + xAttrib.ToString() + ", Status = " + xStatus);
                 if (xAttrib == DirectoryEntryAttributeConsts.LongName)
                 {
                     byte xType = xData[i + 12];
                     byte xOrd = xData[i];
-                    FatHelpers.Debug("Reading LFN with Seqnr " + xOrd.ToString());
+                    FatHelpers.Debug("Reading LFN with Seqnr " + xOrd.ToString() + ", Type = " + xType);
                     if (xOrd == 0xE5)
                     {
                         FatHelpers.Debug("Skipping deleted entry");
@@ -280,65 +286,74 @@ namespace SentinelKernel.System.FileSystem.FAT
                             }
                         }
                         xLongName = xLongPart + xLongName;
+                        xLongPart = null;
                         //TODO: LDIR_Chksum
                     }
                 }
-                string xName = xLongName;
-                byte xStatus = xData[i];
-                if (xStatus == 0x00)
+                else
                 {
-                    // Empty slot, and no more entries after this
-                    break;
-                }
-                else if (xStatus == 0x05)
-                {
-                    // Japanese characters - We dont handle these
-                }
-                else if (xStatus == 0xE5)
-                {
-                    // Empty slot, skip it
-                }
-                else if (xStatus >= 0x20)
-                {
-                    if (xLongName.Length > 0)
+                    xName = xLongName;
+                    if (xStatus == 0x00)
                     {
-                        // Leading and trailing spaces are to be ignored according to spec.
-                        // Many programs (including Windows) pad trailing spaces although it
-                        // it is not required for long names.
-                        // As per spec, ignore trailing periods
-                        xName = xLongName.Trim();
-
-                        //If there are trailing periods
-                        int nameIndex = xName.Length - 1;
-                        if (xName[nameIndex] == '.')
-                        {
-                            //Search backwards till we find the first non-period character
-                            for (; nameIndex > 0; nameIndex--)
-                            {
-                                if (xName[nameIndex] != '.')
-                                {
-                                    break;
-                                }
-                            }
-                            //Substring to remove the periods
-                            xName = xName.Substring(0, nameIndex + 1);
-                        }
+                        // Empty slot, and no more entries after this
+                        break;
                     }
-                    else
+                    else if (xStatus == 0x05)
                     {
-                        string xEntry = xData.GetAsciiString(i, 11);
-                        xName = xEntry.Substring(0, 8).TrimEnd();
-                        string xExt = xEntry.Substring(8, 3).TrimEnd();
-                        if (xExt.Length > 0)
+                        // Japanese characters - We dont handle these
+                    }
+                    else if (xStatus == 0xE5)
+                    {
+                        // Empty slot, skip it
+                    }
+                    else if (xStatus >= 0x20)
+                    {
+                        if (xLongName.Length > 0)
                         {
-                            xName = xName + "." + xExt;
+                            // Leading and trailing spaces are to be ignored according to spec.
+                            // Many programs (including Windows) pad trailing spaces although it
+                            // it is not required for long names.
+                            // As per spec, ignore trailing periods
+                            xName = xLongName.Trim();
+
+                            //If there are trailing periods
+                            int nameIndex = xName.Length - 1;
+                            if (xName[nameIndex] == '.')
+                            {
+                                //Search backwards till we find the first non-period character
+                                for (; nameIndex > 0; nameIndex--)
+                                {
+                                    if (xName[nameIndex] != '.')
+                                    {
+                                        break;
+                                    }
+                                }
+                                //Substring to remove the periods
+                                xName = xName.Substring(0, nameIndex + 1);
+                            }
+                            xLongName = "";
+                        }
+                        else
+                        {
+                            string xEntry = xData.GetAsciiString(i, 11);
+                            xName = xEntry.Substring(0, 8).TrimEnd();
+                            string xExt = xEntry.Substring(8, 3).TrimEnd();
+                            if (xExt.Length > 0)
+                            {
+                                xName = xName + "." + xExt;
+                            }
                         }
                     }
                 }
                 UInt32 xFirstCluster = (UInt32)(xData.ToUInt16(i + 20) << 16 | xData.ToUInt16(i + 26));
 
                 var xTest = xAttrib & (DirectoryEntryAttributeConsts.Directory | DirectoryEntryAttributeConsts.VolumeID);
-                if (xTest == 0)
+                if (xAttrib == DirectoryEntryAttributeConsts.LongName)
+                {
+                    // skip adding, as it's a LongFileName entry, meaning the next normal entry is the item with the name.
+                    FatHelpers.Debug("Entry was an Long FileName entry. Current LongName = '" + xLongName + "'");
+                }
+                else if (xTest == 0)
                 {
                     UInt32 xSize = xData.ToUInt32(i + 28);
                     if (xSize == 0 && xName.Length == 0)
@@ -348,11 +363,11 @@ namespace SentinelKernel.System.FileSystem.FAT
                     xResult.Add(new FatFile(this, xName, xSize, xFirstCluster));
                     FatHelpers.Debug("Returning file '" + xName + "'");
                 }
-                else if (xTest == DirectoryEntryAttributeConsts.Directory || xAttrib == DirectoryEntryAttributeConsts.LongName)
+                else if (xTest == DirectoryEntryAttributeConsts.Directory)
                 {
                     UInt32 xSize = xData.ToUInt32(i + 28);
                     var xFatDirectory = new FatDirectory(this, xName, xFirstCluster);
-                    FatHelpers.Debug("Returning directory '" + xFatDirectory.Name + "'");
+                    FatHelpers.Debug("Returning directory '" + xFatDirectory.Name + "', FirstCluster = " + xFirstCluster);
                     xResult.Add(xFatDirectory);
                 }
                 else if (xTest == DirectoryEntryAttributeConsts.VolumeID)
@@ -364,7 +379,6 @@ namespace SentinelKernel.System.FileSystem.FAT
                 {
                     FatHelpers.Debug("Not sure what to do!");
                 }
-                xLongName = "";
             }
 
             return xResult;
@@ -393,6 +407,16 @@ namespace SentinelKernel.System.FileSystem.FAT
             {
                 return GetDirectoryContents((FatDirectory)baseDirectory);
             }
+        }
+
+        public override Directory GetRootDirectory(string name)
+        {
+            return new FatDirectory(this, name, RootCluster);
+        }
+
+        public override Stream GetFileStream(File fileInfo)
+        {
+            return new FatStream((FatFile)fileInfo);
         }
     }
 }

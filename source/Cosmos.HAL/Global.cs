@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.HAL.BlockDevice;
 
 namespace Cosmos.HAL {
   static public class Global {
@@ -14,46 +15,57 @@ namespace Cosmos.HAL {
 
       public static PCI Pci;
 
-    static void InitAta(BlockDevice.Ata.ControllerIdEnum aControllerID, BlockDevice.Ata.BusPositionEnum aBusPosition) {
+    private static void InitAta(BlockDevice.Ata.ControllerIdEnum aControllerID, BlockDevice.Ata.BusPositionEnum aBusPosition)
+    {
       var xIO = aControllerID == BlockDevice.Ata.ControllerIdEnum.Primary ? Cosmos.Core.Global.BaseIOGroups.ATA1 : Cosmos.Core.Global.BaseIOGroups.ATA2;
       var xATA = new BlockDevice.AtaPio(xIO, aControllerID, aBusPosition);
-      if (xATA.DriveType != BlockDevice.AtaPio.SpecLevel.Null) {
+      if (xATA.DriveType == BlockDevice.AtaPio.SpecLevel.Null)
+      {
+        return;
+      }
+      if (xATA.DriveType == BlockDevice.AtaPio.SpecLevel.ATA)
+      {
         BlockDevice.BlockDevice.Devices.Add(xATA);
-          var xMbrData = new byte[512];
-          xATA.ReadBlock(0UL, 1U, xMbrData);
-          var xMBR = new BlockDevice.MBR(xMbrData);
+      }
+      else
+      {
+        Ata.AtaDebugger.Send("ATA device with spec level " + (int)xATA.DriveType + " found, which is not supported!");
+        return;
+      }
+      var xMbrData = new byte[512];
+      xATA.ReadBlock(0UL, 1U, xMbrData);
+      var xMBR = new BlockDevice.MBR(xMbrData);
 
-          if (xMBR.EBRLocation != 0)
-          {
-              //EBR Detected
-              var xEbrData = new byte[512];
-              xATA.ReadBlock(xMBR.EBRLocation, 1U, xEbrData);
-              var xEBR = new BlockDevice.EBR(xEbrData);
+      if (xMBR.EBRLocation != 0)
+      {
+        //EBR Detected
+        var xEbrData = new byte[512];
+        xATA.ReadBlock(xMBR.EBRLocation, 1U, xEbrData);
+        var xEBR = new BlockDevice.EBR(xEbrData);
 
-              for (int i = 0; i < xEBR.Partitions.Count; i++)
-              {
-                  //var xPart = xEBR.Partitions[i];
-                  //var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
-                  //BlockDevice.BlockDevice.Devices.Add(xPartDevice);
-              }
-          }
+        for (int i = 0; i < xEBR.Partitions.Count; i++)
+        {
+          //var xPart = xEBR.Partitions[i];
+          //var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
+          //BlockDevice.BlockDevice.Devices.Add(xPartDevice);
+        }
+      }
 
-          // TODO Change this to foreach when foreach is supported
-          Console.WriteLine("Number of MBR partitions found:  " + xMBR.Partitions.Count);
-          for (int i = 0; i < xMBR.Partitions.Count; i++)
-          {
-              var xPart = xMBR.Partitions[i];
-              if (xPart == null)
-              {
-                  Console.WriteLine("Null partition found at idx " + i);
-              }
-              else
-              {
-                  var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
-                  BlockDevice.BlockDevice.Devices.Add(xPartDevice);
-                  Console.WriteLine("Found partition at idx " + i);
-              }
-          }
+      // TODO Change this to foreach when foreach is supported
+      Console.WriteLine("Number of MBR partitions found:  " + xMBR.Partitions.Count);
+      for (int i = 0; i < xMBR.Partitions.Count; i++)
+      {
+        var xPart = xMBR.Partitions[i];
+        if (xPart == null)
+        {
+          Console.WriteLine("Null partition found at idx " + i);
+        }
+        else
+        {
+          var xPartDevice = new BlockDevice.Partition(xATA, xPart.StartSector, xPart.SectorCount);
+          BlockDevice.BlockDevice.Devices.Add(xPartDevice);
+          Console.WriteLine("Found partition at idx " + i);
+        }
       }
     }
 
