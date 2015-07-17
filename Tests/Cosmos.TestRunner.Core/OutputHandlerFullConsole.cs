@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace Cosmos.TestRunner.Core
 {
-    public class OutputHandlerConsole: OutputHandlerBase
+    public class OutputHandlerFullConsole: OutputHandlerBase
     {
         private readonly Stopwatch mCurrentTaskStopwatch=new Stopwatch();
         private readonly Stopwatch mCurrentKernelStopwatch = new Stopwatch();
@@ -72,6 +72,7 @@ namespace Cosmos.TestRunner.Core
 
         public override void LogMessage(string message)
         {
+            Log("Msg: " + message);
         }
 
         public override void ExecuteKernelEnd(string assemblyName)

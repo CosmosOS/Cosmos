@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.TestRunner
 {
-    public enum TestChannelCommandEnum
+    public enum TestChannelCommandEnum: byte
     {
         TestCompleted = 0,
         TestFailed = 1,

@@ -28,7 +28,7 @@ namespace Cosmos.TestRunner.Core
                 OutputHandler.LogMessage("DC Error: " + e.ToString());
                 OutputHandler.SetKernelTestResult(false, "DC Error");
                 mKernelResultSet = true;
-                mBochsRunning = false;
+                mKernelRunning = false;
             };
             debugConnector.CmdText += s =>
             {
@@ -71,6 +71,8 @@ namespace Cosmos.TestRunner.Core
             {
                 throw new ArgumentNullException("host");
             }
+            mKernelRunning = true;
+
             host.Start();
             try
             {
@@ -78,7 +80,7 @@ namespace Cosmos.TestRunner.Core
                 mKernelResultSet = false;
                 Interlocked.Exchange(ref mSucceededAssertions, 0);
 
-                while (mBochsRunning)
+                while (mKernelRunning)
                 {
                     Thread.Sleep(50);
 
@@ -97,6 +99,7 @@ namespace Cosmos.TestRunner.Core
             }
             finally
             {
+                Console.WriteLine("Stopping now");
                 host.Stop();
                 debugConnector.Dispose();
                 Thread.Sleep(50);
@@ -140,12 +143,13 @@ namespace Cosmos.TestRunner.Core
         {
             OutputHandler.SetKernelTestResult(false, "Test failed");
             mKernelResultSet = true;
-            mBochsRunning = false;
+            mKernelRunning = false;
         }
 
         private void KernelTestCompleted()
         {
-            mBochsRunning = false;
+            Console.WriteLine("Test completed");
+            mKernelRunning = false;
         }
     }
 }

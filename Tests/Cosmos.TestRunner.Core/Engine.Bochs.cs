@@ -30,12 +30,10 @@ namespace Cosmos.TestRunner.Core
             xBochs.LogError = s => OutputHandler.LogDebugMessage(s);
             xBochs.LogOutput = s => OutputHandler.LogDebugMessage(s);
 
-            mBochsRunning = true;
-
             HandleRunning(xDebugConnector, xBochs);
         }
 
-        private volatile bool mBochsRunning = true;
+        private volatile bool mKernelRunning = true;
 
     }
 }
