@@ -13,6 +13,8 @@ namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
+        private const int AllowedSecondsInKernel = 30;
+
         private void ExecuteKernel(string assemblyFileName, RunConfiguration configuration)
         {
             OutputHandler.ExecuteKernelStart(assemblyFileName);
@@ -34,7 +36,17 @@ namespace Cosmos.TestRunner.Core
                 }
 
                 RunTask("MakeISO", () => MakeIso(xObjectFile, xIsoFile));
-                RunTask("RunISOInBochs", () => RunIsoInBochs(xIsoFile));
+                switch (configuration.RunTarget)
+                {
+                    case RunTargetEnum.Bochs:
+                        RunTask("RunISO", () => RunIsoInBochs(xIsoFile));
+                        break;
+                    //case RunTargetEnum.VMware:
+                    //    RunTask("RunISO", () => RunIsoInVMware(xIsoFile));
+                    //    break;
+                    default:
+                        throw new ArgumentOutOfRangeException("RunTarget " + configuration.RunTarget + " not implemented!");
+                }
             }
             catch (Exception e)
             {

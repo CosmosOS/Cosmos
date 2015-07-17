@@ -14,6 +14,8 @@ namespace Cosmos.Debug.Common {
     // private AutoResetEvent mWaitConnectEvent = new AutoResetEvent(false);
     private NamedPipeServerStream mPipe;
 
+    public const string DefaultCosmosPipeName = "Cosmos\\Serial";
+
     public DebugConnectorPipeServer(string aName) {
       mPipe = new NamedPipeServerStream(aName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte,
         PipeOptions.Asynchronous);

@@ -52,6 +52,13 @@
     <Compile Include="Engine.Run.cs">
       <DependentUpon>Engine.cs</DependentUpon>
     </Compile>
+    <Compile Include="Engine.Running.cs">
+      <DependentUpon>Engine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Engine.VMware.cs">
+      <DependentUpon>Engine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Enums.cs" />
     <Compile Include="MultiplexingOutputHandler.cs" />
     <Compile Include="OutputHandlerBase.cs" />
     <Compile Include="OutputHandlerConsole.cs" />
