@@ -81,7 +81,7 @@ namespace Cosmos.IL2CPU
             var shouldIncludeArgAndLocalsComment = true;
             if (shouldIncludeArgAndLocalsComment)
             {
-                if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
+                if (aMethod.MethodAssembler == null && !aMethod.IsInlineAssembler)
                 {
                     // the body of aMethod is getting emitted
                     var xBody = aMethod.MethodBase.GetMethodBody();
