@@ -148,8 +148,9 @@ namespace Cosmos.TestRunner.Core
 
         private void KernelTestCompleted()
         {
-            Console.WriteLine("Test completed");
+            Thread.Sleep(50);
             mKernelRunning = false;
+            Console.WriteLine("Test completed");
         }
     }
 }

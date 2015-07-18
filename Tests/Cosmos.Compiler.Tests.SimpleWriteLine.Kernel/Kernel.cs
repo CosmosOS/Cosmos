@@ -17,7 +17,9 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
         {
             Console.WriteLine("Started correctly!");
             Assert.IsTrue(true, "Dummy assertion, to test the system");
+            Console.WriteLine("After assertion");
             TestController.Completed();
+
         }
     }
 }
