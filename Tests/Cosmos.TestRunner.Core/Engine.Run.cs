@@ -13,7 +13,7 @@ namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
-        private const int AllowedSecondsInKernel = 300;
+        public int AllowedSecondsInKernel;
 
         private void ExecuteKernel(string assemblyFileName, RunConfiguration configuration)
         {
