@@ -32,27 +32,12 @@ namespace Cosmos.TestRunner.Core
             };
             debugConnector.CmdText += s =>
             {
-                if (s == "SYS_TestKernel_Completed")
-                {
-                    KernelTestCompleted();
-                    return;
-                }
-                else if (s == "SYS_TestKernel_Failed")
-                {
-                    KernelTestFailed();
-                    return;
-                }
-                else if (s == "SYS_TestKernel_AssertionSucceeded")
-                {
-                    KernelAssertionSucceeded();
-                    return;
-                }
                 OutputHandler.LogMessage("Text from kernel: " + s);
             };
             debugConnector.CmdMessageBox = s =>
-            {
-                //OutputHandler.LogMessage("MessageBox from kernel: " + s)
-            };
+                                           {
+                                               OutputHandler.LogMessage("MessageBox from kernel: " + s);
+                                           };
             debugConnector.CmdTrace = t =>
             {
             };

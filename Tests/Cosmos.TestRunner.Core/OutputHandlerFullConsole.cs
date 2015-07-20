@@ -10,7 +10,7 @@ namespace Cosmos.TestRunner.Core
         private readonly Stopwatch mCurrentKernelStopwatch = new Stopwatch();
         private readonly Stopwatch mExecutionStopwatch = new Stopwatch();
 
-        public override void TaskStart(string taskName)
+        protected override void OnTaskStart(string taskName)
         {
             Log("Running task '" + taskName + "'");
             mCurrentTaskStopwatch.Reset();
@@ -18,19 +18,19 @@ namespace Cosmos.TestRunner.Core
             mLogLevel ++;
         }
 
-        public override void TaskEnd(string taskName)
+        protected override void OnTaskEnd(string taskName)
         {
             mCurrentTaskStopwatch.Stop();
             mLogLevel --;
             Log("Done running task '" + taskName + "'. Took " + mCurrentTaskStopwatch.Elapsed);
         }
 
-        public override void UnhandledException(Exception exception)
+        protected override void OnUnhandledException(Exception exception)
         {
             Log("Unhandled exception: "+ exception.ToString());
         }
 
-        public override void ExecutionEnd()
+        protected override void OnExecutionEnd()
         {
             mLogLevel = 0;
             Log("Done executing");
@@ -40,7 +40,7 @@ namespace Cosmos.TestRunner.Core
             Log(String.Format("{0} kernels failed their tests", mNumberOfFailures));
         }
 
-        public override void ExecutionStart()
+        protected override void OnExecutionStart()
         {
             mLogLevel = 0;
             Log("Start executing");
@@ -49,40 +49,40 @@ namespace Cosmos.TestRunner.Core
             mLogLevel = 1;
         }
 
-        public override void LogDebugMessage(string message)
+        protected override void OnLogDebugMessage(string message)
         {
 
         }
 
-        public override void RunConfigurationStart(RunConfiguration configuration)
+        protected override void OnRunConfigurationStart(RunConfiguration configuration)
         {
             Log(string.Format("Start configuration. IsELF = {0}, Target = {1}", configuration.IsELF, configuration.RunTarget));
             mLogLevel++;
         }
 
-        public override void RunConfigurationEnd(RunConfiguration configuration)
+        protected override void OnRunConfigurationEnd(RunConfiguration configuration)
         {
             mLogLevel --;
         }
 
-        public override void LogError(string message)
+        protected override void OnLogError(string message)
         {
             Log("Error: " + message);
         }
 
-        public override void LogMessage(string message)
+        protected override void OnLogMessage(string message)
         {
             Log("Msg: " + message);
         }
 
-        public override void ExecuteKernelEnd(string assemblyName)
+        protected override void OnExecuteKernelEnd(string assemblyName)
         {
             mCurrentKernelStopwatch.Stop();
             Log("Done running kernel. Took " + mCurrentKernelStopwatch.Elapsed);
             mLogLevel--;
         }
 
-        public override void ExecuteKernelStart(string assemblyName)
+        protected override void OnExecuteKernelStart(string assemblyName)
         {
             Log("Starting kernel '" + assemblyName + "'");
             mCurrentKernelStopwatch.Reset();
@@ -98,7 +98,7 @@ namespace Cosmos.TestRunner.Core
             Console.WriteLine(message);
         }
 
-        public override void SetKernelTestResult(bool succeeded, string message)
+        protected override void OnSetKernelTestResult(bool succeeded, string message)
         {
             Log(string.Format("Success = {0}, Message = '{1}'", succeeded, message));
             if (succeeded)
@@ -114,7 +114,7 @@ namespace Cosmos.TestRunner.Core
         private int mNumberOfSuccesses = 0;
         private int mNumberOfFailures = 0;
 
-        public override void SetKernelSucceededAssertionsCount(int succeededAssertions)
+        protected override void OnSetKernelSucceededAssertionsCount(int succeededAssertions)
         {
         }
     }

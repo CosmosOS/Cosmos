@@ -65,7 +65,6 @@ namespace Cosmos.TestRunner.Core
             }
             else
             {
-
                 RunProcess(typeof(Program).Assembly.Location,
                            mBaseWorkingDirectory,
                            xArguments);

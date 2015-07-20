@@ -2,16 +2,16 @@
 
 namespace Cosmos.TestRunner.Core
 {
-    public class MultiplexingOutputHandler: OutputHandlerBase
+    public class MultiplexingOutputHandler: OutputHandlerBasic
     {
-        private readonly OutputHandlerBase[] mTargets;
+        private readonly OutputHandlerBasic[] mTargets;
 
-        public MultiplexingOutputHandler(params OutputHandlerBase[] targets)
+        public MultiplexingOutputHandler(params OutputHandlerBasic[] targets)
         {
             mTargets = targets;
         }
 
-        private void RunOnTargets(Action<OutputHandlerBase> action)
+        private void RunOnTargets(Action<OutputHandlerBasic> action)
         {
             foreach (var xTarget in mTargets)
             {

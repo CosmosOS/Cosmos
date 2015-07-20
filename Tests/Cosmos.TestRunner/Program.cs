@@ -21,7 +21,7 @@ namespace Cosmos.TestRunner.Console
             var xOutputXml = new OutputHandlerXml();
             xEngine.OutputHandler = new MultiplexingOutputHandler(
                 xOutputXml,
-                new OutputHandlerConsole());
+                new OutputHandlerFullConsole());
 
             xEngine.Execute();
 
