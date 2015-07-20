@@ -165,8 +165,6 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Kudzu.Breakpoints", "..\Use
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kudzu.Hive", "..\Users\Kudzu\Hive\Kudzu.Hive\Kudzu.Hive.csproj", "{8E71FA9E-BB28-4B34-AB11-729E33B8C8E6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sentinel", "Sentinel", "{D2CDC006-49F1-469B-AFAB-05E6F4DF3762}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SentinelKernel", "..\Users\Sentinel\SentinelKernel\SentinelKernel.csproj", "{3B0F484C-0A26-4CC2-B44D-DDDA3A3E9381}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "SentinelKernelBoot", "..\Users\Sentinel\SentinelKernel\SentinelKernelBoot.Cosmos", "{40C3F1E6-2880-4AF4-91FD-DFD41484719D}"

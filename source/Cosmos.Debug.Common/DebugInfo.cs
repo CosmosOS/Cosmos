@@ -65,6 +65,7 @@ namespace Cosmos.Debug.Common
 
         public DebugInfo(string aPathname, bool aCreate = false, bool aCreateIndexes = false)
         {
+            InitializeCache();
             CurrentInstance = this;
 
             if (aCreate)
@@ -105,14 +106,6 @@ namespace Cosmos.Debug.Common
             }
         }
 
-        public IDbConnection Connection
-        {
-            get
-            {
-                return mConnection;
-            }
-        }
-
         /// <summary>
         /// Create indexes inside the database.
         /// </summary>
@@ -131,15 +124,104 @@ namespace Cosmos.Debug.Common
         // Because of this, we also allow manual loading.
         public void LoadLookups()
         {
-            foreach (var xDoc in Connection.Query<Document>(new SQLinq<Document>().ToSQL().ToQuery()))
+            foreach (var xDoc in mConnection.Query<Document>(new SQLinq<Document>().ToSQL().ToQuery()))
             {
                 DocumentGUIDs.Add(xDoc.Pathname.ToLower(), xDoc.ID);
             }
         }
 
-        public UInt32 AddressOfLabel(string aLabel)
+        private void InitializeCache()
         {
-            var xRow = Connection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == aLabel)).FirstOrDefault();
+            mSourceInfosCache = new CacheHelper<uint, SourceInfos>(a => DoGetSourceInfos(a));
+            mLabelsCache = new CacheHelper<uint, string[]>(a => DoGetLabels(a));
+            mFirstMethodIlOpByLabelNameCache = new CacheHelper<string, MethodIlOp>(n => mConnection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(q => q.LabelName == n)).FirstOrDefault());
+            mMethodCache = new CacheHelper<long, Method>(i => mConnection.Get<Method>(i));
+            mAllLocalsAndArgumentsInfosByMethodLabelNameCache = new CacheHelper<string, LOCAL_ARGUMENT_INFO[]>(a => mConnection.Query<LOCAL_ARGUMENT_INFO>(new SQLinq<LOCAL_ARGUMENT_INFO>().Where(q => q.METHODLABELNAME == a)).ToArray());
+            mDocumentIdByNameCache = new CacheHelper<string, long?>(n =>
+            {
+                long xId;
+                var xHasResult = DocumentGUIDs.TryGetValue(n, out xId);
+                if (xHasResult)
+                {
+                    return xId;
+                }
+                else
+                {
+                    return null;
+                }
+            });
+            mAssemblyFileByIdCache = new CacheHelper<long, AssemblyFile>(i => mConnection.Get<AssemblyFile>(i));
+            mAddressOfLabelCache = new CacheHelper<string, uint>(l => DoGetAddressOfLabel(l));
+            mFieldMapCache = new CacheHelper<string, DebugInfo.Field_Map>(t => DoGetFieldMap(t));
+            mFieldInfoByNameCache = new CacheHelper<string, FIELD_INFO>(n => mConnection.Query(new SQLinq<Cosmos.Debug.Common.FIELD_INFO>().Where(q => q.NAME == n)).First());
+        }
+
+        private CacheHelper<uint, SourceInfos> mSourceInfosCache;
+        public SourceInfos GetSourceInfos(uint aAddress)
+        {
+            return mSourceInfosCache.GetValue(aAddress);
+        }
+
+        private CacheHelper<uint, string[]> mLabelsCache;
+        public string[] GetLabels(uint aAddress)
+        {
+            return mLabelsCache.GetValue(aAddress);
+        }
+
+        private CacheHelper<string, MethodIlOp> mFirstMethodIlOpByLabelNameCache;
+        public MethodIlOp TryGetFirstMethodIlOpByLabelName(string aLabelName)
+        {
+            return mFirstMethodIlOpByLabelNameCache.GetValue(aLabelName);
+        }
+
+        private CacheHelper<long, Method> mMethodCache;
+        public Method GetMethod(long aMethodId)
+        {
+            return mMethodCache.GetValue(aMethodId);
+        }
+
+
+        private CacheHelper<string, LOCAL_ARGUMENT_INFO[]> mAllLocalsAndArgumentsInfosByMethodLabelNameCache;
+        public LOCAL_ARGUMENT_INFO[] GetAllLocalsAndArgumentsInfosByMethodLabelName(string aLabelName)
+        {
+            return mAllLocalsAndArgumentsInfosByMethodLabelNameCache.GetValue(aLabelName);
+        }
+
+        private CacheHelper<string, long?> mDocumentIdByNameCache;
+        public bool TryGetDocumentIdByName(string aDocumentName, out long oDocumentId)
+        {
+            var xValue = mDocumentIdByNameCache.GetValue(aDocumentName);
+            oDocumentId = xValue.GetValueOrDefault();
+            return xValue != null;
+        }
+
+        private CacheHelper<long, AssemblyFile> mAssemblyFileByIdCache;
+        public AssemblyFile GetAssemblyFileById(long aId)
+        {
+            return mAssemblyFileByIdCache.GetValue(aId);
+        }
+
+        private CacheHelper<string, uint> mAddressOfLabelCache;
+        public uint GetAddressOfLabel(string aLabelName)
+        {
+            return mAddressOfLabelCache.GetValue(aLabelName);
+        }
+
+        private CacheHelper<string, DebugInfo.Field_Map> mFieldMapCache;
+        public DebugInfo.Field_Map GetFieldMap(string aTypeName)
+        {
+            return mFieldMapCache.GetValue(aTypeName);
+        }
+
+        private CacheHelper<string, FIELD_INFO> mFieldInfoByNameCache;
+        public FIELD_INFO GetFieldInfoByName(string aName)
+        {
+            return mFieldInfoByNameCache.GetValue(aName);
+        }
+
+        private UInt32 DoGetAddressOfLabel(string aLabel)
+        {
+            var xRow = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Name == aLabel)).FirstOrDefault();
 
             if (xRow == null)
             {
@@ -148,9 +230,9 @@ namespace Cosmos.Debug.Common
             return (UInt32)xRow.Address;
         }
 
-        public string[] GetLabels(UInt32 aAddress)
+        private string[] DoGetLabels(UInt32 aAddress)
         {
-            var xLabels = Connection.Query<Label>(new SQLinq<Label>().Where(i => i.Address == aAddress)).Select(i => i.Name).ToArray();
+            var xLabels = mConnection.Query<Label>(new SQLinq<Label>().Where(i => i.Address == aAddress)).Select(i => i.Name).ToArray();
             return xLabels;
         }
 
@@ -186,7 +268,7 @@ namespace Cosmos.Debug.Common
             BulkInsert<FIELD_MAPPING>("FIELD_MAPPINGS", xItemsToAdd);
         }
 
-        public Field_Map GetFieldMap(string aName)
+        private Field_Map DoGetFieldMap(string aName)
         {
             var xMap = new Field_Map();
             xMap.TypeName = aName;
@@ -558,7 +640,7 @@ namespace Cosmos.Debug.Common
             return xSymbols;
         }
 
-        public SourceInfos GetSourceInfos(UInt32 aAddress)
+        private SourceInfos DoGetSourceInfos(UInt32 aAddress)
         {
             var xResult = new SourceInfos();
             try
@@ -629,12 +711,12 @@ namespace Cosmos.Debug.Common
 
         public List<KeyValuePair<uint, string>> GetAllINT3AddressesForMethod(Method aMethod, bool filterPermanentINT3s)
         {
-            var INT3Labels = Connection.Query<INT3Label>(new SQLinq<INT3Label>().Where(i => i.MethodID == aMethod.ID));
+            var INT3Labels = mConnection.Query<INT3Label>(new SQLinq<INT3Label>().Where(i => i.MethodID == aMethod.ID));
             if (filterPermanentINT3s)
             {
                 INT3Labels = INT3Labels.Where(x => !x.LeaveAsINT3);
             }
-            return INT3Labels.Select(x => new KeyValuePair<uint, string>(AddressOfLabel(x.LabelName), x.LabelName)).ToList();
+            return INT3Labels.Select(x => new KeyValuePair<uint, string>(GetAddressOfLabel(x.LabelName), x.LabelName)).ToList();
         }
         public UInt32 GetClosestCSharpBPAddress(UInt32 aAddress)
         {
@@ -642,7 +724,7 @@ namespace Cosmos.Debug.Common
             var xMethod = GetMethod(aAddress);
 
             // Get the assembly file this method belongs to
-            var asm = Connection.Get<AssemblyFile>(xMethod.AssemblyFileID);
+            var asm = mConnection.Get<AssemblyFile>(xMethod.AssemblyFileID);
             // Get the Sequence Points for this method
             var xSPs = GetSequencePoints(asm.Pathname, xMethod.MethodToken);
             // Get the IL Offsets for these sequence points
@@ -655,7 +737,7 @@ namespace Cosmos.Debug.Common
             // Get all ILOps for current method
             // Filter out ones that don't have sequence points associated with them
             // Oorder by increasing address (this will happen by order by method ID because of how label names are constructed)
-            var xOps = Connection.Query(new SQLinq<MethodIlOp>().Where(q => q.MethodID == xMethod.ID)).Where(delegate(MethodIlOp x)
+            var xOps = mConnection.Query(new SQLinq<MethodIlOp>().Where(q => q.MethodID == xMethod.ID)).Where(delegate(MethodIlOp x)
             {
                 return xSPOffsets.Contains(x.IlOffset);
             }).OrderBy(x => x.MethodID);
@@ -664,7 +746,7 @@ namespace Cosmos.Debug.Common
             UInt32 address = 0;
             foreach (var op in xOps)
             {
-                UInt32 addr = AddressOfLabel(op.LabelName);
+                UInt32 addr = GetAddressOfLabel(op.LabelName);
                 if (addr > aAddress)
                 {
                     break;
@@ -676,6 +758,24 @@ namespace Cosmos.Debug.Common
             }
 
             return address;
+        }
+
+        public MethodIlOp GetFirstMethodIlOpByMethodIdAndILOffset(long aMethodId, long aILOffset)
+        {
+            //Debug("GetFirstMethodIlOpByMethodIdAndILOffset. MethodID = {0}, ILOffset = 0x{1}", aMethodId, aILOffset.ToString("X4"));
+            var xResult = mConnection.Query(new SQLinq<MethodIlOp>().Where(q => q.MethodID == aMethodId && q.IlOffset == aILOffset)).First();
+            //Debug("Result.LabelName = '{0}'", xResult.LabelName);
+            return xResult;
+        }
+
+        public Method GetMethodByDocumentIDAndLinePosition(long aDocID, long aStartPos, long aEndPos)
+        {
+            //Debug("GetMethodByDocumentIDAndLinePosition. DocID = {0}, StartPos = {1}, EndPos = {2}", aDocID, aStartPos, aEndPos);
+            var xResult = mConnection.Query(new SQLinq<Method>().Where(x => x.DocumentID == aDocID
+                                                                                        && x.LineColStart <= aStartPos
+                                                                                        && x.LineColEnd >= aEndPos)).Single();
+            //Debug("Result.LabelCall = '{0}'", xResult.LabelCall);
+            return xResult;
         }
 
         /// <summary>

@@ -80,11 +80,11 @@ namespace Cosmos.Debug.VSDebugEngine {
                 {
                     MethodIlOp xSymbolInfo;
                     string xLabel = xLabelsForAddr[0]; // Necessary for LINQ
-                    xSymbolInfo = aProcess.mDebugInfoDb.Connection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(q => q.LabelName == xLabel)).FirstOrDefault();
+                    xSymbolInfo = aProcess.mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel);
                     if (xSymbolInfo != null)
                     {
-                        var xMethod = mProcess.mDebugInfoDb.Connection.Get<Method>(xSymbolInfo.MethodID);
-                        var xAllInfos = aProcess.mDebugInfoDb.Connection.Query<LOCAL_ARGUMENT_INFO>(new SQLinq<LOCAL_ARGUMENT_INFO>().Where(q => q.METHODLABELNAME == xMethod.LabelCall));
+                        var xMethod = mProcess.mDebugInfoDb.GetMethod(xSymbolInfo.MethodID.Value);
+                        var xAllInfos = aProcess.mDebugInfoDb.GetAllLocalsAndArgumentsInfosByMethodLabelName(xMethod.LabelCall);
                         mLocalInfos = xAllInfos.Where(q => !q.IsArgument).ToArray();
                         mArgumentInfos = xAllInfos.Where(q => q.IsArgument).ToArray();
                         if (mArgumentInfos.Length > 0)

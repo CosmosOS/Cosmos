@@ -20,12 +20,12 @@
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <EnableGDB>True</EnableGDB>
+    <EnableGDB>False</EnableGDB>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
-    <StartCosmosGDB>True</StartCosmosGDB>
+    <StartCosmosGDB>False</StartCosmosGDB>
     <VMwareEdition>Workstation</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
@@ -67,8 +67,8 @@
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
-    <VMware_EnableGDB>True</VMware_EnableGDB>
-    <VMware_StartCosmosGDB>True</VMware_StartCosmosGDB>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
     <ISO_Launch>None</ISO_Launch>
     <ISO_DebugEnabled>False</ISO_DebugEnabled>
@@ -186,12 +186,12 @@
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <EnableGDB>True</EnableGDB>
+    <EnableGDB>False</EnableGDB>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
-    <StartCosmosGDB>True</StartCosmosGDB>
+    <StartCosmosGDB>False</StartCosmosGDB>
     <VMwareEdition>Workstation</VMwareEdition>
     <VMwareDeploy>ISO</VMwareDeploy>
     <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
@@ -233,8 +233,8 @@
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
-    <VMware_EnableGDB>True</VMware_EnableGDB>
-    <VMware_StartCosmosGDB>True</VMware_StartCosmosGDB>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
     <ISO_Launch>None</ISO_Launch>
     <ISO_DebugEnabled>False</ISO_DebugEnabled>

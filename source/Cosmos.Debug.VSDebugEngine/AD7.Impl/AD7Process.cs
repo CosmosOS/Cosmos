@@ -127,7 +127,7 @@ namespace Cosmos.Debug.VSDebugEngine
                         case Windows2Debugger.SetAsmBreak:
                         {
                             string xLabel = Encoding.UTF8.GetString(aData);
-                            UInt32 xAddress = mDebugInfoDb.AddressOfLabel(xLabel);
+                            UInt32 xAddress = mDebugInfoDb.GetAddressOfLabel(xLabel);
                             mDbgConnector.SetAsmBreakpoint(xAddress);
                             mDbgConnector.Continue();
                         }
@@ -136,7 +136,7 @@ namespace Cosmos.Debug.VSDebugEngine
                         case Windows2Debugger.ToggleAsmBreak2:
                         {
                             string xLabel = Encoding.UTF8.GetString(aData);
-                            UInt32 xAddress = mDebugInfoDb.AddressOfLabel(xLabel);
+                            UInt32 xAddress = mDebugInfoDb.GetAddressOfLabel(xLabel);
                             if (GetASMBreakpointInfoFromASMAddress(xAddress) == null)
                             {
                                 SetASMBreakpoint(xAddress);
@@ -182,7 +182,7 @@ namespace Cosmos.Debug.VSDebugEngine
                         case Windows2Debugger.NextLabel1:
                         {
                             string nextLabel = Encoding.UTF8.GetString(aData);
-                            mNextAddress1 = mDebugInfoDb.AddressOfLabel(nextLabel);
+                            mNextAddress1 = mDebugInfoDb.GetAddressOfLabel(nextLabel);
                             ASMWindow_NextAddress1Updated.Set();
                             break;
                         }

@@ -12,8 +12,8 @@ using SQLinq;
 namespace Cosmos.Debug.VSDebugEngine
 {
     // An implementation of IDebugProperty2
-    // This interface represents a stack frame property, a program document property, or some other property. 
-    // The property is usually the result of an expression evaluation. 
+    // This interface represents a stack frame property, a program document property, or some other property.
+    // The property is usually the result of an expression evaluation.
     //
     // The sample engine only supports locals and parameters for functions that have symbols loaded.
     class AD7Property : IDebugProperty2
@@ -477,7 +477,7 @@ namespace Cosmos.Debug.VSDebugEngine
                                     foreach (string str in mp.FieldNames)
                                     {
                                         Cosmos.Debug.Common.FIELD_INFO xFieldInfo;
-                                        xFieldInfo = mProcess.mDebugInfoDb.Connection.Query(new SQLinq<Cosmos.Debug.Common.FIELD_INFO>().Where(q => q.NAME == str)).First();
+                                        xFieldInfo = mProcess.mDebugInfoDb.GetFieldInfoByName(str);
                                         var inf = new DebugLocalInfo();
                                         inf.IsReference = true;
                                         inf.Type = xFieldInfo.TYPE;
@@ -521,7 +521,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 propertyInfo.dwFields |= (enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP);
                 // If the debugger has asked for the property, or the property has children (meaning it is a pointer in the sample)
                 // then set the pProperty field so the debugger can call back when the children are enumerated.
-                //if (((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0) 
+                //if (((dwFields & (uint)enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0)
                 //|| (this.m_variableInformation.child != null))
                 //{
                 //    propertyInfo.pProperty = (IDebugProperty2)this;
@@ -577,14 +577,14 @@ namespace Cosmos.Debug.VSDebugEngine
         }
 
         // Returns the property that describes the most-derived property of a property
-        // This is called to support object oriented languages. It allows the debug engine to return an IDebugProperty2 for the most-derived 
+        // This is called to support object oriented languages. It allows the debug engine to return an IDebugProperty2 for the most-derived
         // object in a hierarchy. This engine does not support this.
         public int GetDerivedMostProperty(out IDebugProperty2 ppDerivedMost)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
-        // This method exists for the purpose of retrieving information that does not lend itself to being retrieved by calling the IDebugProperty2::GetPropertyInfo 
+        // This method exists for the purpose of retrieving information that does not lend itself to being retrieved by calling the IDebugProperty2::GetPropertyInfo
         // method. This includes information about custom viewers, managed type slots and other information.
         // The sample engine does not support this.
         public int GetExtendedInfo(ref System.Guid guidExtendedInfo, out object pExtendedInfo)
