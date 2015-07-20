@@ -80,14 +80,11 @@ namespace Cosmos.TestRunner.Core
 
         private IEnumerable<RunConfiguration> GetRunConfigurations()
         {
-            //yield return new RunConfiguration { IsELF = true, RunTarget = RunTargetEnum.VMware };
-            yield return new RunConfiguration { IsELF = true, RunTarget = RunTargetEnum.Bochs };
-
-            //foreach (RunTargetEnum xTarget in Enum.GetValues(typeof(RunTargetEnum)))
-            //{
-            //    yield return new RunConfiguration {IsELF = true, RunTarget = xTarget};
-            //    //yield return new RunConfiguration { IsELF = false, RunTarget = xTarget };
-            //}
+            foreach (RunTargetEnum xTarget in RunTargets)
+            {
+                yield return new RunConfiguration { IsELF = true, RunTarget = xTarget };
+                //yield return new RunConfiguration { IsELF = false, RunTarget = xTarget };
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Cosmos.Build.Common;
 using Cosmos.Build.MSBuild;
@@ -13,7 +14,8 @@ namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
-        public int AllowedSecondsInKernel;
+        public int AllowedSecondsInKernel = 30;
+        public List<RunTargetEnum> RunTargets = new List<RunTargetEnum>((RunTargetEnum[])Enum.GetValues(typeof(RunTargetEnum)));
 
         private void ExecuteKernel(string assemblyFileName, RunConfiguration configuration)
         {
