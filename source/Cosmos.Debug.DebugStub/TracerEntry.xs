@@ -20,6 +20,10 @@ Interrupt TracerEntry {
 // This code is temporarily disabled as IRQs are not enabled right now.
 // LockOrExit
 
+// First, disable interrupts, so debugging is much more stable
+! cli
+
+
 	+All
 // Save current ESP so we can look at the results of PushAll later
 .PushAllPtr = ESP
@@ -56,6 +60,9 @@ EAX = EBX
 	Executing()
 
 -All
+
+// restore interupts
+! sti
 
 // Temp disabled, see comment on LockOrExit above
 // Unlock
