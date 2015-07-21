@@ -40,6 +40,7 @@ namespace Cosmos.Debug.Common
                     //    xSB.AppendLine(x.ToString("X2"));
                     //}
                     //System.Windows.Forms.MessageBox.Show(xSB.ToString());
+
                     DoDebugMsg("DC Send: " + aCmd.ToString() + ", data.Length = " + aData.Length + ", aWait = " + aWait);
 
                     DoDebugMsg("Send locked...");

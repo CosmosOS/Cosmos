@@ -59,6 +59,7 @@ namespace Cosmos.Debug.Common
                 try
                 {
                     mStream.Write(aBytes, 0, aBytes.Length);
+                    mStream.Flush();
                     OK = true;
                 }
                 catch (IOException)
@@ -220,7 +221,7 @@ namespace Cosmos.Debug.Common
 
         private void Read(Incoming packet)
         {
-            //lock (ReadQueue)
+            lock (ReadQueue)
             {
                 ReadQueue.Add(packet);
             }
@@ -228,67 +229,49 @@ namespace Cosmos.Debug.Common
         }
         private void ContinueRead()
         {
-            if(ReadQueue.Count > 0 && !reading)
+            lock (ReadQueue)
             {
-                reading = true;
+                if (ReadQueue.Count > 0 && !reading)
+                {
+                    reading = true;
 
-                Incoming next = ReadQueue[0];
-                if (mStream == null)
-                {
-                    DoDebugMsg("Error! mStream is null! Cannot read data! Is the debugger shutting down?");
-                }
-                else
-                {
-                    mStream.BeginRead(next.Packet, next.CurrentPos, next.Packet.Length - next.CurrentPos, new AsyncCallback(DoRead), next);
+                    Incoming next = ReadQueue[0];
+                    if (mStream == null)
+                    {
+                        DoDebugMsg("Error! mStream is null! Cannot read data! Is the debugger shutting down?");
+                    }
+                    else
+                    {
+                        //var xAction = new Action(() =>
+                        //                         {
+                        //                             var xStream = mStream;
+                        //                             if (xStream != null)
+                        //                             {
+                        //                                 var xCount = mStream.Read(next.Packet, next.CurrentPos, next.Packet.Length - next.CurrentPos);
+
+                        //                                 //mStream.BeginRead(next.Packet, next.CurrentPos, next.Packet.Length - next.CurrentPos, new AsyncCallback(DoRead), next);
+                        //                                 HandleReadResults(next, xCount);
+                        //                             }
+                        //                         });
+                        //xAction.BeginInvoke(r => xAction.EndInvoke(r), null);
+                        mStream.BeginRead(next.Packet, next.CurrentPos, next.Packet.Length - next.CurrentPos, new AsyncCallback(DoRead), next);
+                    }
                 }
             }
         }
         private void DoRead(IAsyncResult result)
         {
+            if (mStream == null)
+            {
+                return;
+            }
             try
             {
                 Incoming xIncoming = (Incoming)result.AsyncState;
                 int xCount = xIncoming.Stream.EndRead(result);
                 //System.Diagnostics.Debug.Write(string.Format("DC DR2 - Received ({0}): ", xCount));
                 //System.Diagnostics.Debug.WriteLine(BytesToString(xIncoming.Packet, xIncoming.CurrentPos, xCount));
-                xIncoming.CurrentPos += xCount;
-                if (xCount == 0)
-                {
-                   // // If 0, end of stream then just exit without calling BeginRead again
-                   // reading = false;
-
-                   //// lock (ReadQueue)
-                   // {
-                   //     ReadQueue.Remove(xIncoming);
-                   // }
-
-                   // return;
-                    mStream.Flush();
-                }
-                else if (xIncoming.CurrentPos < xIncoming.Packet.Length)
-                {
-                    // Packet is not full yet, read more data
-                    //Do nothing
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine(String.Format("DC DR2 - Full packet received - Received: {0}", BytesToString(xIncoming.Packet, 0, xIncoming.Packet.Length)));
-
-                    //lock (ReadQueue)
-                    {
-                        ReadQueue.Remove(xIncoming);
-                    }
-
-                    // Full packet received, process it
-                    xIncoming.Completed.BeginInvoke(xIncoming.Packet, new AsyncCallback((IAsyncResult bResult) =>
-                        {
-                            ((Incoming)(bResult.AsyncState)).Completed.EndInvoke(bResult);
-                        }), xIncoming);
-                }
-
-                reading = false;
-
-                ContinueRead();
+                HandleReadResults(xIncoming, xCount);
             }
             catch (System.IO.IOException ex)
             {
@@ -296,6 +279,47 @@ namespace Cosmos.Debug.Common
 
                 ConnectionLost(ex);
             }
+        }
+
+        private void HandleReadResults(Incoming xIncoming, int xCount)
+        {
+            xIncoming.CurrentPos += xCount;
+            if (xCount == 0)
+            {
+                // // If 0, end of stream then just exit without calling BeginRead again
+                // reading = false;
+
+                //// lock (ReadQueue)
+                // {
+                //     ReadQueue.Remove(xIncoming);
+                // }
+
+                // return;
+            }
+            else if (xIncoming.CurrentPos < xIncoming.Packet.Length)
+            {
+                // Packet is not full yet, read more data
+                //Do nothing
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine(String.Format("DC DR2 - Full packet received - Received: {0}", BytesToString(xIncoming.Packet, 0, xIncoming.Packet.Length)));
+
+                lock (ReadQueue)
+                {
+                    ReadQueue.Remove(xIncoming);
+                }
+
+                // Full packet received, process it
+                xIncoming.Completed.BeginInvoke(xIncoming.Packet, new AsyncCallback((IAsyncResult bResult) =>
+                                                                                    {
+                                                                                        ((Incoming)(bResult.AsyncState)).Completed.EndInvoke(bResult);
+                                                                                    }), xIncoming);
+            }
+
+            reading = false;
+
+            ContinueRead();
         }
     }
 }
