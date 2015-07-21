@@ -19,5 +19,10 @@ namespace Cosmos.Debug.Common {
       mPort.Open();
       Start(mPort.BaseStream);
     }
+
+      protected override void InitializeBackground()
+      {
+          throw new NotImplementedException();
+      }
   }
 }

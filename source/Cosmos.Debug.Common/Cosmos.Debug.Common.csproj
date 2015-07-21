@@ -118,7 +118,16 @@
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Consts.cs" />
     <Compile Include="DebugConnector.cs" />
+    <Compile Include="DebugConnector.DebugStub.cs">
+      <DependentUpon>DebugConnector.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DebugConnector.Helpers.cs">
+      <DependentUpon>DebugConnector.cs</DependentUpon>
+    </Compile>
     <Compile Include="DebugConnector.Receiving.cs">
+      <DependentUpon>DebugConnector.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DebugConnector.Thread.cs">
       <DependentUpon>DebugConnector.cs</DependentUpon>
     </Compile>
     <Compile Include="DebugConnectorEdison.cs" />
@@ -126,6 +135,7 @@
     <Compile Include="DebugConnectorSerial.cs" />
     <Compile Include="DebugConnectorStream.cs" />
     <Compile Include="DebugConnectorTCPServer.cs" />
+    <Compile Include="DebugConnectorTestPipeServer.cs" />
     <Compile Include="DebugInfo.cs" />
     <Compile Include="DebugModel.cs" />
     <Compile Include="NameValueCollectionHelper.cs" />

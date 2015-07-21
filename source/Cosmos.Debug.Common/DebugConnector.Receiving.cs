@@ -6,8 +6,6 @@ namespace Cosmos.Debug.Common
 {
     partial class DebugConnector
     {
-        protected abstract void Next(int aPacketSize, Action<byte[]> aCompleted);
-
         protected void WaitForMessage()
         {
             Next(1, PacketMsg);
@@ -153,6 +151,12 @@ namespace Cosmos.Debug.Common
         {
             WaitForMessage();
             CmdMessageBox(Encoding.ASCII.GetString(aPacket));
+        }
+
+        protected void SizePacket(byte[] aPacket)
+        {
+            int xSize = aPacket[0] + (aPacket[1] << 8);
+            Next(xSize, mCompletedAfterSize);
         }
     }
 }

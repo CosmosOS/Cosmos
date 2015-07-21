@@ -17,7 +17,12 @@ namespace Cosmos.Debug.Common {
       xTCPListener.BeginAcceptTcpClient(new AsyncCallback(DoAcceptTcpClientCallback), xTCPListener);
     }
 
-    public void DoAcceptTcpClientCallback(IAsyncResult aResult) {
+      protected override void InitializeBackground()
+      {
+          throw new NotImplementedException();
+      }
+
+      public void DoAcceptTcpClientCallback(IAsyncResult aResult) {
       var xListener = (TcpListener)aResult.AsyncState;
       var xClient = xListener.EndAcceptTcpClient(aResult);
       Start(xClient.GetStream());

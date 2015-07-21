@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Cosmos.Debug.Common
@@ -15,6 +17,21 @@ namespace Cosmos.Debug.Common
         protected virtual void BeforeSendCmd()
         {
 
+        }
+
+        private bool RawSendHelper(byte[] aData)
+        {
+            if (IsInBackgroundThread)
+            {
+                return SendRawData(aData);
+            }
+
+            using (var xEvent = new AutoResetEvent(false))
+            {
+                mPendingWrites.Enqueue(new KeyValuePair<byte[], AutoResetEvent>(aData, xEvent));
+                xEvent.WaitOne();
+                return true; // ??
+            }
         }
 
         protected void SendCmd(byte aCmd, byte[] aData, bool aWait)
@@ -54,10 +71,11 @@ namespace Cosmos.Debug.Common
                         // channel and are often not received. Sending noop + data
                         // usually causes the data to be interpreted as a command
                         // as its often the first byte received.
-                        SendRawData(new byte[1]
-                                    {
-                                        Vs2Ds.Noop
-                                    });
+
+                        RawSendHelper(new byte[1]
+                                      {
+                                          Vs2Ds.Noop
+                                      });
                     }
                     else
                     {
@@ -86,7 +104,7 @@ namespace Cosmos.Debug.Common
                         xData[1] = mCommandID;
                         mCurrCmdID = mCommandID;
 
-                        if (SendRawData(xData))
+                        if (RawSendHelper(xData))
                         {
                             if (aWait)
                             {
@@ -155,24 +173,6 @@ namespace Cosmos.Debug.Common
             SendCmd(aCmd, new byte[0], true);
         }
 
-        public void SendRegisters()
-        {
-            SendCmd(Vs2Ds.SendRegisters);
-        }
 
-        public void SendFrame()
-        {
-            SendCmd(Vs2Ds.SendFrame);
-        }
-
-        public void SendStack()
-        {
-            SendCmd(Vs2Ds.SendStack);
-        }
-
-        public void Ping()
-        {
-            SendCmd(Vs2Ds.Ping);
-        }
     }
 }
