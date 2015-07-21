@@ -38,5 +38,10 @@ namespace Cosmos.Debug.Common
             // mWaitConnectEvent.Set();
             Start(xPipe);
         }
+
+        protected override bool GetIsConnectedToDebugStub()
+        {
+            return mPipe.IsConnected;
+        }
     }
 }

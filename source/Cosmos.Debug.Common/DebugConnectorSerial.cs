@@ -24,5 +24,10 @@ namespace Cosmos.Debug.Common {
       {
           throw new NotImplementedException();
       }
+
+      protected override bool GetIsConnectedToDebugStub()
+      {
+          return mPort.IsOpen;
+      }
   }
 }

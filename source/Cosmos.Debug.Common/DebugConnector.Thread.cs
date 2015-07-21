@@ -94,6 +94,8 @@ namespace Cosmos.Debug.Common
 
         protected abstract int Read(byte[] buffer, int offset, int count);
 
+        protected abstract bool GetIsConnectedToDebugStub();
+
         private void ThreadMethod()
         {
             // todo: error handling
@@ -102,6 +104,11 @@ namespace Cosmos.Debug.Common
             Next(1, WaitForSignature);
             while (true)
             {
+                if (!GetIsConnectedToDebugStub())
+                {
+                    ConnectionLost(null);
+                    return;
+                }
                 var xAnythingDone = false;
                 do
                 {
