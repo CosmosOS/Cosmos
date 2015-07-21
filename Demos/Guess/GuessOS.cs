@@ -45,6 +45,7 @@ namespace GuessKernel
     {
       mCount++;
 
+        mDebugger.Send("");
       mDebugger.SendMessage("Kernel", "New iteration");
       Console.WriteLine();
       Console.WriteLine("Guess #" + mCount);

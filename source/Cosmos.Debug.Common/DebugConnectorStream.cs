@@ -254,15 +254,16 @@ namespace Cosmos.Debug.Common
                 xIncoming.CurrentPos += xCount;
                 if (xCount == 0)
                 {
-                    // If 0, end of stream then just exit without calling BeginRead again
-                    reading = false;
+                   // // If 0, end of stream then just exit without calling BeginRead again
+                   // reading = false;
 
-                   // lock (ReadQueue)
-                    {
-                        ReadQueue.Remove(xIncoming);
-                    }
+                   //// lock (ReadQueue)
+                   // {
+                   //     ReadQueue.Remove(xIncoming);
+                   // }
 
-                    return;
+                   // return;
+                    mStream.Flush();
                 }
                 else if (xIncoming.CurrentPos < xIncoming.Packet.Length)
                 {
