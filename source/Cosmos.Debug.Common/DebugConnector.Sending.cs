@@ -28,7 +28,7 @@ namespace Cosmos.Debug.Common
 
             using (var xEvent = new AutoResetEvent(false))
             {
-                mPendingWrites.Enqueue(new KeyValuePair<byte[], AutoResetEvent>(aData, xEvent));
+                mPendingActions.Add(new KeyValuePair<byte[], AutoResetEvent>(aData, xEvent));
                 xEvent.WaitOne();
                 return true; // ??
             }

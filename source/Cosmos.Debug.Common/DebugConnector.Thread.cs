@@ -16,6 +16,15 @@ namespace Cosmos.Debug.Common
             public Action<byte[]> Completed;
         }
 
+        protected class Outgoing
+        {
+            // Buffer to hold outcoming message
+            public byte[] Packet;
+
+            // signal completion
+            public AutoResetEvent Completed;
+        }
+
         private bool IsInBackgroundThread
         {
             get
@@ -34,8 +43,7 @@ namespace Cosmos.Debug.Common
             mBackgroundThread.Start();
         }
 
-        private readonly ConcurrentQueue<Incoming> mPendingReads = new ConcurrentQueue<Incoming>();
-        private readonly ConcurrentQueue<KeyValuePair<byte[], AutoResetEvent>> mPendingWrites = new ConcurrentQueue<KeyValuePair<byte[], AutoResetEvent>>();
+        private readonly BlockingCollection<Object> mPendingActions = new BlockingCollection<object>();
 
         private Action<byte[]> mCompletedAfterSize; // Action to call after size received
 
@@ -89,7 +97,7 @@ namespace Cosmos.Debug.Common
             {
                 throw new InvalidOperationException("No completed!");
             }
-            mPendingReads.Enqueue(xIncoming);
+            mPendingActions.Add(xIncoming);
         }
 
         protected abstract int Read(byte[] buffer, int offset, int count);
@@ -109,37 +117,37 @@ namespace Cosmos.Debug.Common
                     ConnectionLost(null);
                     return;
                 }
-                var xAnythingDone = false;
-                do
+                object xPendingAction;
+                if (!mPendingActions.TryTake(out xPendingAction, 100))
                 {
-                    xAnythingDone = false;
-                    Incoming xPendingRead;
-                    if (mPendingReads.TryDequeue(out xPendingRead))
-                    {
-                        while (xPendingRead.CurrentPos < xPendingRead.Packet.Length)
-                        {
-                            xPendingRead.CurrentPos += Read(xPendingRead.Packet, xPendingRead.CurrentPos, xPendingRead.Packet.Length - xPendingRead.CurrentPos);
-                        }
-
-                        // Full packet received, process it
-                        xPendingRead.Completed(xPendingRead.Packet);
-                        xAnythingDone = true;
-                    }
-
-                    // now process sends.
-                    KeyValuePair<byte[], AutoResetEvent> xPendingWrite;
-                    if (mPendingWrites.TryDequeue(out xPendingWrite))
-                    {
-                        if (!SendRawData(xPendingWrite.Key))
-                        {
-                            throw new Exception("SendRawData returned false!");
-                        }
-                        xPendingWrite.Value.Set();
-                        xAnythingDone = true;
-                    }
+                    break;
                 }
-                while (xAnythingDone);
-                Thread.Sleep(25);
+                var xPendingRead = xPendingAction as Incoming;
+                if (xPendingRead != null)
+                {
+                    while (xPendingRead.CurrentPos < xPendingRead.Packet.Length)
+                    {
+                        xPendingRead.CurrentPos += Read(xPendingRead.Packet, xPendingRead.CurrentPos, xPendingRead.Packet.Length - xPendingRead.CurrentPos);
+                    }
+
+                    // Full packet received, process it
+                    xPendingRead.Completed(xPendingRead.Packet);
+                    continue;
+                }
+
+                // now process sends.
+                Outgoing xPendingWrite = xPendingAction as Outgoing;
+                if (xPendingWrite != null)
+                {
+                    if (!SendRawData(xPendingWrite.Packet))
+                    {
+                        throw new Exception("SendRawData returned false!");
+                    }
+                    xPendingWrite.Completed.Set();
+                    continue;
+                }
+
+                throw new Exception("Pending action '" + xPendingAction.GetType().FullName + "' not implemented!");
             }
         }
     }
