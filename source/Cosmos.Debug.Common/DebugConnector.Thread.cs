@@ -77,7 +77,7 @@ namespace Cosmos.Debug.Common
             {
                 xIncoming.Completed = bytes =>
                 {
-                    DoDebugMsg(String.Format("DC - Received: 0x{0}", BytesToString(bytes, 0, bytes.Length)));
+                    DebugLog(String.Format("DC - Received: 0x{0}", BytesToString(bytes, 0, bytes.Length)));
                     try
                     {
                         aCompleted(bytes);
@@ -94,7 +94,7 @@ namespace Cosmos.Debug.Common
             }
             xIncoming.Packet = new byte[aPacketSize];
 
-            DoDebugMsg(String.Format("DC - Next: Expecting: {0}", aPacketSize) + "\r\n");
+            DebugLog(String.Format("DC - Next: Expecting: {0}", aPacketSize) + "\r\n");
             if (xIncoming.Completed == null)
             {
                 throw new InvalidOperationException("No completed!");

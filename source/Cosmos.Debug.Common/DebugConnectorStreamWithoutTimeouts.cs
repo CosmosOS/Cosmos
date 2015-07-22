@@ -45,7 +45,7 @@ namespace Cosmos.Debug.Common
             }
             else
             {
-                DoDebugMsg("Error! mStream is null! Cannot send data! Is the debugger shutting down?");
+                DebugLog("Error! mStream is null! Cannot send data! Is the debugger shutting down?");
             }
             return OK;
         }

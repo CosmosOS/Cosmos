@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using Cosmos.Debug.Common;
@@ -72,31 +73,15 @@ namespace Cosmos.Debug.Common
             Connected = handler;
         }
 
-        protected virtual void DoDebugMsg(string aMsg)
+        /// <summary>
+        /// Method to do debug logging of the debug connector itself.
+        /// </summary>
+        [Conditional("DEBUGCONNECTOR_DEBUG")]
+        protected void DebugLog(string message)
         {
-            //Console.WriteLine(aMsg);
-            //System.Diagnostics.Debug.WriteLine(aMsg);
-            // MtW: Copying mDebugWriter and mOut to local variables may seem weird, but in some situations, this method can be called when they are null.
-            var xStreamWriter = mDebugWriter;
-            if (xStreamWriter != null)
-            {
-                xStreamWriter.WriteLine(aMsg);
-                xStreamWriter.Flush();
-            }
-            var xWriter = mOut;
-            if (xWriter != StreamWriter.Null)
-            {
-                xWriter.WriteLine(aMsg);
-                xWriter.Flush();
-            }
-            //DoDebugMsg(aMsg, false);
+            // even when this method doesn't do anything, DON'T REMOVE IT
+            // it's used when debugging the DebugConnector, as it provides insights to what happens
         }
-
-        //private static StreamWriter mOut = new StreamWriter(@"c:\data\sources\dcoutput.txt", false)
-        //                            {
-        //                                AutoFlush = true
-        //                            };
-        private static StreamWriter mOut = StreamWriter.Null;
 
         protected void DoDebugMsg(string aMsg, bool aOnlyIfConnected)
         {
@@ -152,27 +137,27 @@ namespace Cosmos.Debug.Common
             switch (mCurrentMsgType)
             {
                 case Ds2Vs.TracePoint:
-                    DoDebugMsg("DC Recv: TracePoint");
+                    DebugLog("DC Recv: TracePoint");
                     Next(4, PacketTracePoint);
                     break;
 
                 case Ds2Vs.BreakPoint:
-                    DoDebugMsg("DC Recv: BreakPoint");
+                    DebugLog("DC Recv: BreakPoint");
                     Next(4, PacketBreakPoint);
                     break;
 
                 case Ds2Vs.Message:
-                    DoDebugMsg("DC Recv: Message");
+                    DebugLog("DC Recv: Message");
                     Next(2, PacketTextSize);
                     break;
 
                 case Ds2Vs.MessageBox:
-                    DoDebugMsg("DC Recv: MessageBox");
+                    DebugLog("DC Recv: MessageBox");
                     Next(2, PacketMessageBoxTextSize);
                     break;
 
                 case Ds2Vs.Started:
-                    DoDebugMsg("DC Recv: Started");
+                    DebugLog("DC Recv: Started");
                     // Call WaitForMessage first, else it blocks because Ds2Vs.Started triggers
                     // other commands which need responses.
                     WaitForMessage();
@@ -191,7 +176,7 @@ namespace Cosmos.Debug.Common
                     break;
 
                 case Ds2Vs.Noop:
-                    DoDebugMsg("DC Recv: Noop");
+                    DebugLog("DC Recv: Noop");
                     // MtW: When implementing Serial support for debugging on real hardware, it appears
                     //      that when booting a machine, in the bios it emits zero's to the serial port.
                     // Kudzu: Made a Noop command to handle this
@@ -199,61 +184,61 @@ namespace Cosmos.Debug.Common
                     break;
 
                 case Ds2Vs.CmdCompleted:
-                    DoDebugMsg("DC Recv: CmdCompleted");
+                    DebugLog("DC Recv: CmdCompleted");
                     Next(1, PacketCmdCompleted);
                     break;
 
                 case Ds2Vs.MethodContext:
-                    DoDebugMsg("DC Recv: MethodContext");
+                    DebugLog("DC Recv: MethodContext");
                     Next(mDataSize, PacketMethodContext);
                     break;
 
                 case Ds2Vs.MemoryData:
-                    DoDebugMsg("DC Recv: MemoryData");
+                    DebugLog("DC Recv: MemoryData");
                     Next(mDataSize, PacketMemoryData);
                     break;
 
                 case Ds2Vs.Registers:
-                    DoDebugMsg("DC Recv: Registers");
+                    DebugLog("DC Recv: Registers");
                     Next(40, PacketRegisters);
                     break;
 
                 case Ds2Vs.Frame:
-                    DoDebugMsg("DC Recv: Frame");
+                    DebugLog("DC Recv: Frame");
                     Next(-1, PacketFrame);
                     break;
 
                 case Ds2Vs.Stack:
-                    DoDebugMsg("DC Recv: Stack");
+                    DebugLog("DC Recv: Stack");
                     Next(-1, PacketStack);
                     break;
 
                 case Ds2Vs.Pong:
-                    DoDebugMsg("DC Recv: Pong");
+                    DebugLog("DC Recv: Pong");
                     Next(0, PacketPong);
                     break;
 
                 case Ds2Vs.StackCorruptionOccurred:
-                    DoDebugMsg("DC Recv: StackCorruptionOccurred");
+                    DebugLog("DC Recv: StackCorruptionOccurred");
                     Next(4, PacketStackCorruptionOccurred);
                     break;
 
                 case Ds2Vs.NullReferenceOccurred:
-                    DoDebugMsg("DC Recv: NullReferenceOccurred");
+                    DebugLog("DC Recv: NullReferenceOccurred");
                     Next(4, PacketNullReferenceOccurred);
                     break;
                 default:
                     if (mCurrentMsgType > 128)
                     {
                         // other channels than debugstub
-                        DoDebugMsg("DC Recv: Console");
+                        DebugLog("DC Recv: Console");
                         // copy to local variable, so the anonymous method will get the correct value!
                         var xChannel = mCurrentMsgType;
                         Next(1, data => PacketOtherChannelCommand(xChannel, data));
                         break;
                     }
                     // Exceptions crash VS so use MsgBox instead
-                    DoDebugMsg("Unknown debug command: " + mCurrentMsgType);
+                    DebugLog("Unknown debug command: " + mCurrentMsgType);
                     // Despite it being unkonwn, we try again. Normally this will
                     // just cause more unknowns, but can be useful for debugging.
                     WaitForMessage();
@@ -287,13 +272,13 @@ namespace Cosmos.Debug.Common
             mSigCheck[2] = mSigCheck[3];
             mSigCheck[3] = aPacket[0];
             var xSig = GetUInt32(mSigCheck, 0);
-            DoDebugMsg("DC: Sig Byte " + aPacket[0].ToString("X2").ToUpper() + " : " + xSig.ToString("X8").ToUpper());
+            DebugLog("DC: Sig Byte " + aPacket[0].ToString("X2").ToUpper() + " : " + xSig.ToString("X8").ToUpper());
             if (xSig == Consts.SerialSignature)
             {
                 // Sig found, wait for messages
                 mSigReceived = true;
                 SendTextToConsole("SigReceived!");
-                DoDebugMsg("SigReceived");
+                DebugLog("SigReceived");
                 WaitForMessage();
             }
             else

@@ -79,11 +79,11 @@ namespace Cosmos.Debug.Common
                         // end - for debug
 
 
-                        DoDebugMsg("DC Send: " + aCmd.ToString() + ", data.Length = " + aData.Length + ", aWait = " + aWait);
-                        DoDebugMsg("Send locked...");
+                        DebugLog("DC Send: " + aCmd.ToString() + ", data.Length = " + aData.Length + ", aWait = " + aWait);
+                        DebugLog("Send locked...");
                         if (IsInBackgroundThread)
                         {
-                            DoDebugMsg("In background thread already");
+                            DebugLog("In background thread already");
                         }
 
                         BeforeSendCmd();
@@ -175,11 +175,11 @@ namespace Cosmos.Debug.Common
                     }
                 }
 
-                DoDebugMsg("Send unlocked.");
+                DebugLog("Send unlocked.");
             }
             else
             {
-                DoDebugMsg("Tried to send command " + aCmd + ", but signature was not yet received!");
+                DebugLog("Tried to send command " + aCmd + ", but signature was not yet received!");
             }
         }
 

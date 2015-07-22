@@ -115,10 +115,10 @@ namespace Cosmos.Debug.Common
         protected void PacketCmdCompleted(byte[] aPacket)
         {
             byte xCmdID = aPacket[0];
-            DoDebugMsg("DS Msg: Cmd " + xCmdID + " Complete");
+            DebugLog("DS Msg: Cmd " + xCmdID + " Complete");
             if (mCurrCmdID != xCmdID)
             {
-                DoDebugMsg("DebugStub CmdCompleted Mismatch. Expected " + mCurrCmdID + ", received " + xCmdID + ".");
+                DebugLog("DebugStub CmdCompleted Mismatch. Expected " + mCurrCmdID + ", received " + xCmdID + ".");
             }
             // Release command
             lastCmdCompletedID = xCmdID;

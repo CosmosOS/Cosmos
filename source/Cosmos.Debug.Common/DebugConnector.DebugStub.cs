@@ -31,11 +31,11 @@ namespace Cosmos.Debug.Common
         {
             if (aAddress == 0)
             {
-                DoDebugMsg("DS Cmd: BP " + aID + " deleted.");
+                DebugLog("DS Cmd: BP " + aID + " deleted.");
             }
             else
             {
-                DoDebugMsg("DS Cmd: BP " + aID + " @ " + aAddress.ToString("X8").ToUpper());
+                DebugLog("DS Cmd: BP " + aID + " @ " + aAddress.ToString("X8").ToUpper());
             }
 
             var xData = new byte[5];
