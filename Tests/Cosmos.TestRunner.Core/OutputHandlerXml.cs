@@ -151,6 +151,7 @@ namespace Cosmos.TestRunner.Core
             var xParent = mCurrentNode.Peek();
             var xItem = mDocument.CreateElement("Configuration");
             xItem.Attributes.Append(NewXmlAttribute("IsELF", configuration.IsELF.ToString()));
+            xItem.Attributes.Append(NewXmlAttribute("RunTarget", configuration.RunTarget.ToString()));
             xParent.AppendChild(xItem);
             mCurrentNode.Push(xItem);
             mConfigurationSucceeded = true;
