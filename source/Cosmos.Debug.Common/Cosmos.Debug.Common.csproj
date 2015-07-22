@@ -133,7 +133,8 @@
     <Compile Include="DebugConnectorEdison.cs" />
     <Compile Include="DebugConnectorPipeServer.cs" />
     <Compile Include="DebugConnectorSerial.cs" />
-    <Compile Include="DebugConnectorStream.cs" />
+    <Compile Include="DebugConnectorStreamWithoutTimeouts.cs" />
+    <Compile Include="DebugConnectorStreamWithTimeouts.cs" />
     <Compile Include="DebugConnectorTCPServer.cs" />
     <Compile Include="DebugConnectorTestPipeServer.cs" />
     <Compile Include="DebugInfo.cs" />

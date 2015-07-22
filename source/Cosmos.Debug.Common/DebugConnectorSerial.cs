@@ -7,7 +7,7 @@ using System.IO.Ports;
 namespace Cosmos.Debug.Common {
   /// <summary>Use a serial port to implement wire transfer protocol between a Debug Stub hosted
   /// in a debugged Cosmos Kernel and our Debug Engine hosted in Visual Studio.</summary>
-  public class DebugConnectorSerial : DebugConnectorStream {
+  public class DebugConnectorSerial : DebugConnectorStreamWithTimeouts {
     private SerialPort mPort;
 
     public DebugConnectorSerial(string aPort) {

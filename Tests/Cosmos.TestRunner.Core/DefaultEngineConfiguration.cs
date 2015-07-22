@@ -11,7 +11,7 @@ namespace Cosmos.TestRunner.Core
                 throw new ArgumentNullException("engine");
             }
 
-            engine.AllowedSecondsInKernel = 60;
+            engine.AllowedSecondsInKernel = 120;
 
             // Currently, there's still a bug somewhere for testing vmware.
             //engine.RunTargets.Remove(RunTargetEnum.Bochs);

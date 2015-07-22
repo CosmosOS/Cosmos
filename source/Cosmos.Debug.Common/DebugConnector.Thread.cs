@@ -47,6 +47,7 @@ namespace Cosmos.Debug.Common
         private readonly BlockingCollection<Outgoing> mPendingWrites = new BlockingCollection<Outgoing>();
 
         private Action<byte[]> mCompletedAfterSize; // Action to call after size received
+        private Incoming mIncompletePendingRead;
 
         protected abstract void InitializeBackground();
 
@@ -108,7 +109,7 @@ namespace Cosmos.Debug.Common
         private void ThreadMethod()
         {
             // todo: error handling
-            Incoming xIncompletePendingRead = null;
+            mIncompletePendingRead = null;
             InitializeBackground();
             DoConnected();
             Next(1, WaitForSignature);
@@ -119,36 +120,45 @@ namespace Cosmos.Debug.Common
                     ConnectionLost(null);
                     return;
                 }
-                Incoming xPendingRead = xIncompletePendingRead;
-                if (xPendingRead != null || mPendingReads.TryTake(out xPendingRead, 50))
-                {
-                    while (xPendingRead.CurrentPos < xPendingRead.Packet.Length)
-                    {
-                        var xNrOfBytesToRead = xPendingRead.Packet.Length - xPendingRead.CurrentPos;
-                        var xBytesRead = TryRead(xPendingRead.Packet, xPendingRead.CurrentPos, xNrOfBytesToRead, 25);
-                        //if (xBytesRead )
-                        xPendingRead.CurrentPos += xBytesRead;
-                    }
+                ProcessPendingActions();
+            }
+        }
 
+        private void ProcessPendingActions()
+        {
+            Incoming xPendingRead = mIncompletePendingRead;
+            if (xPendingRead != null || mPendingReads.TryTake(out xPendingRead, 5))
+            {
+                var xNrOfBytesToRead = xPendingRead.Packet.Length - xPendingRead.CurrentPos;
+                var xBytesRead = TryRead(xPendingRead.Packet, xPendingRead.CurrentPos, xNrOfBytesToRead, 5);
+
+                xPendingRead.CurrentPos += xBytesRead;
+
+                if (xPendingRead.CurrentPos == xPendingRead.Packet.Length)
+                {
                     // Full packet received, process it
                     xPendingRead.Completed(xPendingRead.Packet);
+                    mIncompletePendingRead = null;
                 }
+                else
+                {
+                    mIncompletePendingRead = xPendingRead;
+                }
+            }
 
             //process_writes:
 
-                // now process sends.
-                Outgoing xPendingWrite;
-                if (mPendingWrites.TryTake(out xPendingWrite, 50))
+            // now process sends.
+            Outgoing xPendingWrite;
+            if (mPendingWrites.TryTake(out xPendingWrite, 5))
+            {
+                if (!SendRawData(xPendingWrite.Packet))
                 {
-                    if (!SendRawData(xPendingWrite.Packet))
-                    {
-                        throw new Exception("SendRawData returned false!");
-                    }
-					if (xPendingWrite.Completed != null) 
-					{
-						xPendingWrite.Completed.Set();
-					}
-                    continue;
+                    throw new Exception("SendRawData returned false!");
+                }
+                if (xPendingWrite.Completed != null)
+                {
+                    xPendingWrite.Completed.Set();
                 }
             }
         }

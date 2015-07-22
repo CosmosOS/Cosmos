@@ -6,7 +6,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace Cosmos.Debug.Common
 {
-    public class DebugConnectorTestPipeServer : DebugConnectorStream
+    public class DebugConnectorTestPipeServer : DebugConnectorStreamWithoutTimeouts
     {
         // private AutoResetEvent mWaitConnectEvent = new AutoResetEvent(false);
         private FileStream mPipe;
@@ -24,6 +24,19 @@ namespace Cosmos.Debug.Common
                 );
             Start();
         }
+
+        protected override int TryRead(byte[] buffer, int offset, int count, int timeout)
+        {
+            mStream.ReadTimeout = timeout;
+            var xStream = mStream;
+            if (xStream == null)
+            {
+                return 0;
+            }
+            return xStream.Read(buffer, offset, count);
+        }
+
+
 
         protected override void InitializeBackground()
         {

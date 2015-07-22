@@ -31,7 +31,7 @@ namespace Cosmos.Debug.Common
                 {
                     mPendingWrites.Add(new Outgoing {Packet = aData, Completed = xEvent});
                     xEvent.WaitOne();
-                    return true; // ??
+                    return IsConnected; // ??
                 }
             }
             else
@@ -74,6 +74,10 @@ namespace Cosmos.Debug.Common
 
                         DoDebugMsg("DC Send: " + aCmd.ToString() + ", data.Length = " + aData.Length + ", aWait = " + aWait);
                         DoDebugMsg("Send locked...");
+                        if (IsInBackgroundThread)
+                        {
+                            DoDebugMsg("In background thread already");
+                        }
 
                         BeforeSendCmd();
 
@@ -137,6 +141,13 @@ namespace Cosmos.Debug.Common
                                         do
                                         {
                                             mCmdWait.WaitOne(2000 /*60000*/);
+
+                                            if (IsInBackgroundThread)
+                                            {
+                                                // we're running inside our message loop (see ThreadMethod). Which means we need to kick it off once, to allow
+                                                // it to read new stuff.
+                                                ProcessPendingActions();
+                                            }
                                         }
                                         while ((
                                                    (!resetID && lastCmdCompletedID < mCommandID) ||

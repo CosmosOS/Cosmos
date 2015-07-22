@@ -74,8 +74,8 @@ namespace Cosmos.Debug.Common
 
         protected virtual void DoDebugMsg(string aMsg)
         {
-            Console.WriteLine(aMsg);
-            System.Diagnostics.Debug.WriteLine(aMsg);
+            //Console.WriteLine(aMsg);
+            //System.Diagnostics.Debug.WriteLine(aMsg);
             // MtW: Copying mDebugWriter and mOut to local variables may seem weird, but in some situations, this method can be called when they are null.
             var xStreamWriter = mDebugWriter;
             if (xStreamWriter != null)
@@ -89,7 +89,7 @@ namespace Cosmos.Debug.Common
                 xWriter.WriteLine(aMsg);
                 xWriter.Flush();
             }
-            DoDebugMsg(aMsg, false);
+            //DoDebugMsg(aMsg, false);
         }
 
         //private static StreamWriter mOut = new StreamWriter(@"c:\data\sources\dcoutput.txt", false)
@@ -146,7 +146,7 @@ namespace Cosmos.Debug.Common
         {
             mCurrentMsgType = aPacket[0];
 
-            //DoDebugMsg(String.Format("DC - PacketMsg: {0}", DebugConnectorStream.BytesToString(aPacket, 0, aPacket.Length)));
+            //DoDebugMsg(String.Format("DC - PacketMsg: {0}", DebugConnectorStreamWithTimeouts.BytesToString(aPacket, 0, aPacket.Length)));
             //DoDebugMsg("DC - " + mCurrentMsgType);
             // Could change to an array, but really not much benefit
             switch (mCurrentMsgType)
@@ -271,6 +271,7 @@ namespace Cosmos.Debug.Common
             if (mBackgroundThread != null)
             {
                 mBackgroundThread.Abort();
+                mBackgroundThread.Join();
                 mBackgroundThread = null;
             }
             GC.SuppressFinalize(this);
