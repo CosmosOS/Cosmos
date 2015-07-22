@@ -267,8 +267,10 @@ namespace Cosmos.Build.Builder {
           break;
         case VsVersion.Vs2015:
           CheckVs2015();
-          CheckForInstall("Microsoft Visual Studio 2015 RC SDK", true);
+          CheckForInstall("Microsoft Visual Studio 2015 SDK - ENU", true);
           break;
+        default:
+          throw new NotImplementedException();
       }
 
       //works also without, only close of VMWare is not working! CheckNet35Sp1(); // Required by VMWareLib
