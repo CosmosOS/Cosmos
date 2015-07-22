@@ -19,7 +19,7 @@ namespace Cosmos.Debug.Common
         protected class Outgoing
         {
             // Buffer to hold outcoming message
-            public byte[] Packet;
+            public volatile byte[] Packet;
 
             // signal completion
             public AutoResetEvent Completed;
@@ -110,18 +110,41 @@ namespace Cosmos.Debug.Common
         {
             // todo: error handling
             mIncompletePendingRead = null;
-            InitializeBackground();
-            DoConnected();
-            Next(1, WaitForSignature);
-            while (true)
+            try
             {
-                if (!GetIsConnectedToDebugStub())
+                InitializeBackground();
+                DoConnected();
+                Next(1, WaitForSignature);
+                while (true)
                 {
-                    ConnectionLost(null);
-                    return;
+                    if (!GetIsConnectedToDebugStub())
+                    {
+                        ConnectionLost(null);
+                        return;
+                    }
+                    ProcessPendingActions();
                 }
-                ProcessPendingActions();
             }
+            catch (ThreadAbortException)
+            {
+                while (true)
+                {
+                    Outgoing xPendingOutgoing;
+                    if (!mPendingWrites.TryTake(out xPendingOutgoing))
+                    {
+                        break;
+                    }
+                    xPendingOutgoing.Packet = null;
+                    xPendingOutgoing.Completed.Set();
+                }
+
+                throw;
+            }
+            catch (Exception E)
+            {
+                CmdMessageBox("Error occurred in DebugConnector.ThreadMethod: " + E.ToString());
+            }
+            ConnectionLost(null);
         }
 
         private void ProcessPendingActions()

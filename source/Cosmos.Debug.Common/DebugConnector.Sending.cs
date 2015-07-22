@@ -25,12 +25,19 @@ namespace Cosmos.Debug.Common
             {
                 return SendRawData(aData);
             }
+            if (!IsConnected)
+            {
+                return false;
+            }
             if (aWait)
             {
                 using (var xEvent = new AutoResetEvent(false))
                 {
                     mPendingWrites.Add(new Outgoing {Packet = aData, Completed = xEvent});
-                    xEvent.WaitOne();
+                    while (IsConnected)
+                    {
+                        xEvent.WaitOne(1000);
+                    }
                     return IsConnected; // ??
                 }
             }
