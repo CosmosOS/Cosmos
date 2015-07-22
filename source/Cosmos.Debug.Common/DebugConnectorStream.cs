@@ -24,8 +24,9 @@ namespace Cosmos.Debug.Common
 #endif
         protected Stream mStream;
 
-        protected override int Read(byte[] buffer, int offset, int count)
+        protected override int TryRead(byte[] buffer, int offset, int count, int timeout)
         {
+            //mStream.ReadTimeout = timeout;
             return mStream.Read(buffer, offset, count);
         }
 
@@ -68,6 +69,10 @@ namespace Cosmos.Debug.Common
         // invoking this method from their constructor.
         protected void Start(Stream aStream)
         {
+            if (aStream == null)
+            {
+                throw new ArgumentNullException("aStream");
+            }
             mStream = aStream;
             Start();
         }

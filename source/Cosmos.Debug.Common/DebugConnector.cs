@@ -75,6 +75,7 @@ namespace Cosmos.Debug.Common
         protected virtual void DoDebugMsg(string aMsg)
         {
             Console.WriteLine(aMsg);
+            System.Diagnostics.Debug.WriteLine(aMsg);
             // MtW: Copying mDebugWriter and mOut to local variables may seem weird, but in some situations, this method can be called when they are null.
             var xStreamWriter = mDebugWriter;
             if (xStreamWriter != null)

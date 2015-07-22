@@ -19,21 +19,32 @@ namespace Cosmos.Debug.Common
 
         }
 
-        private bool RawSendHelper(byte[] aData)
+        private bool RawSendHelper(byte[] aData, bool aWait)
         {
             if (IsInBackgroundThread)
             {
                 return SendRawData(aData);
             }
-
-            using (var xEvent = new AutoResetEvent(false))
+            if (aWait)
             {
-                mPendingActions.Add(new KeyValuePair<byte[], AutoResetEvent>(aData, xEvent));
-                xEvent.WaitOne();
-                return true; // ??
+                using (var xEvent = new AutoResetEvent(false))
+                {
+                    mPendingWrites.Add(new Outgoing {Packet = aData, Completed = xEvent});
+                    xEvent.WaitOne();
+                    return true; // ??
+                }
             }
+            else
+            {
+                mPendingWrites.Add(new Outgoing {Packet = aData});
+                return true;
+            }
+
         }
 
+        private byte? mCurrentSendingCmd;
+        private byte[] mCurrentSendingData;
+        private string mCurrentSendingStackTrace;
         protected void SendCmd(byte aCmd, byte[] aData, bool aWait)
         {
             //System.Windows.Forms.MessageBox.Show(xSB.ToString());
@@ -52,87 +63,97 @@ namespace Cosmos.Debug.Common
                 //  2) Becuase in VSDebugEngine and commands from Debug.Windows can occur concurrently
                 lock (mSendCmdLock)
                 {
-                    //var xSB = new StringBuilder();
-                    //foreach(byte x in aBytes) {
-                    //    xSB.AppendLine(x.ToString("X2"));
-                    //}
-                    //System.Windows.Forms.MessageBox.Show(xSB.ToString());
-
-                    DoDebugMsg("DC Send: " + aCmd.ToString() + ", data.Length = " + aData.Length + ", aWait = " + aWait);
-
-                    DoDebugMsg("Send locked...");
-
-                    BeforeSendCmd();
-
-                    if (aCmd == Vs2Ds.Noop)
+                    try
                     {
-                        // Noops dont have any data.
-                        // This is becuase Noops are used to clear out the
-                        // channel and are often not received. Sending noop + data
-                        // usually causes the data to be interpreted as a command
-                        // as its often the first byte received.
+                        // for debug:
+                        mCurrentSendingCmd = aCmd;
+                        mCurrentSendingData = aData;
+                        mCurrentSendingStackTrace = Environment.StackTrace;
+                        // end - for debug
 
-                        RawSendHelper(new byte[1]
-                                      {
-                                          Vs2Ds.Noop
-                                      });
-                    }
-                    else
-                    {
-                        // +2 - Leave room for Cmd and CmdID
-                        var xData = new byte[aData.Length + 2];
-                        // See comments about flow control in the DebugStub class
-                        // to see why we limit to 16.
-                        if (aData.Length > 16)
+
+                        DoDebugMsg("DC Send: " + aCmd.ToString() + ", data.Length = " + aData.Length + ", aWait = " + aWait);
+                        DoDebugMsg("Send locked...");
+
+                        BeforeSendCmd();
+
+                        if (aCmd == Vs2Ds.Noop)
                         {
-                            throw new Exception("Command is too large. 16 bytes max.");
-                        }
+                            // Noops dont have any data.
+                            // This is becuase Noops are used to clear out the
+                            // channel and are often not received. Sending noop + data
+                            // usually causes the data to be interpreted as a command
+                            // as its often the first byte received.
 
-                        xData[0] = (byte)aCmd;
-                        aData.CopyTo(xData, 2);
-
-                        bool resetID = false;
-                        if (mCommandID == 255)
-                        {
-                            mCommandID = 0;
-                            resetID = true;
+                            RawSendHelper(new byte[1]
+                                          {
+                                              Vs2Ds.Noop
+                                          }, aWait);
                         }
                         else
                         {
-                            mCommandID++;
-                        }
-                        xData[1] = mCommandID;
-                        mCurrCmdID = mCommandID;
-
-                        if (RawSendHelper(xData))
-                        {
-                            if (aWait)
+                            // +2 - Leave room for Cmd and CmdID
+                            var xData = new byte[aData.Length + 2];
+                            // See comments about flow control in the DebugStub class
+                            // to see why we limit to 16.
+                            if (aData.Length > 16)
                             {
-                                // All commands except NOOP reply back from the DebugStub
-                                // with an ACK. The ACK will set the event and allow us to proceed.
-                                // This wait causes this method to wait on the ACK to be receive back from
-                                // DebugStub.
+                                throw new Exception("Command is too large. 16 bytes max.");
+                            }
 
-                                //Sometimes we get out of sync or recieve something we aren't expecting
-                                //So this forces us to only return when we are back in-sync or after we think we've frozen the system for
-                                //too long
-                                //If we haven't gone past the command already!
-                                if ((!resetID && lastCmdCompletedID < mCommandID)
-                                    || (resetID && lastCmdCompletedID > 5))
+                            xData[0] = (byte)aCmd;
+                            aData.CopyTo(xData, 2);
+
+                            bool resetID = false;
+                            if (mCommandID == 255)
+                            {
+                                mCommandID = 0;
+                                resetID = true;
+                            }
+                            else
+                            {
+                                mCommandID++;
+                            }
+                            xData[1] = mCommandID;
+                            mCurrCmdID = mCommandID;
+
+                            if (RawSendHelper(xData, aWait))
+                            {
+                                if (aWait)
                                 {
-                                    int attempts = 0;
-                                    do
+                                    // All commands except NOOP reply back from the DebugStub
+                                    // with an ACK. The ACK will set the event and allow us to proceed.
+                                    // This wait causes this method to wait on the ACK to be receive back from
+                                    // DebugStub.
+
+                                    //Sometimes we get out of sync or recieve something we aren't expecting
+                                    //So this forces us to only return when we are back in-sync or after we think we've frozen the system for
+                                    //too long
+                                    //If we haven't gone past the command already!
+                                    if ((!resetID && lastCmdCompletedID < mCommandID)
+                                        || (resetID && lastCmdCompletedID > 5))
                                     {
-                                        mCmdWait.WaitOne(2000 /*60000*/);
-                                    } while ((
-                                                 (!resetID && lastCmdCompletedID < mCommandID) ||
-                                                 (resetID && lastCmdCompletedID > 5)
-                                             )
-                                             &&
-                                             ++attempts < 10);
+                                        int attempts = 0;
+                                        do
+                                        {
+                                            mCmdWait.WaitOne(2000 /*60000*/);
+                                        }
+                                        while ((
+                                                   (!resetID && lastCmdCompletedID < mCommandID) ||
+                                                   (resetID && lastCmdCompletedID > 5)
+                                               )
+                                               &&
+                                               ++attempts < 10);
+                                    }
                                 }
                             }
                         }
+                    }
+                    finally
+                    {
+                        mCurrentSendingCmd = null;
+                        mCurrentSendingData = null;
+                        mCurrentSendingStackTrace = null;
                     }
                 }
 

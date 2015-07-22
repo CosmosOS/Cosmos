@@ -11,7 +11,7 @@ namespace Cosmos.TestRunner.Core
                 throw new ArgumentNullException("engine");
             }
 
-            engine.AllowedSecondsInKernel = 3000;
+            engine.AllowedSecondsInKernel = 60;
 
             // Currently, there's still a bug somewhere for testing vmware.
             //engine.RunTargets.Remove(RunTargetEnum.Bochs);
@@ -21,8 +21,8 @@ namespace Cosmos.TestRunner.Core
             engine.RunIL2CPUInProcess = false;
 
             engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
-            engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
-            engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
+            //engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
+            //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
 
             // known bugs, therefor disabled for now:
         }
