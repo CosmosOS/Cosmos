@@ -87,20 +87,20 @@ namespace Cosmos.IL2CPU.X86.IL
                 switch (xFieldInfo.Size)
                 {
                     case 1:
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.ESP, SourceDisplacement=xOffset, SourceIsIndirect = true };
                         break;
 
                     case 2:
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.ESP, SourceDisplacement = xOffset, SourceIsIndirect = true };
                         break;
 
                     case 3: //For Release
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceDisplacement = xOffset, SourceIsIndirect = true };
                         new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };
                         break;
 
                     case 4:
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceDisplacement = xOffset, SourceIsIndirect = true };
                         break;
 
                     default:
