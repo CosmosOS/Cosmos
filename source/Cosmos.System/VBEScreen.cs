@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Cosmos.System
 {
-   public  class VBEScreen
+   public class VBEScreen
     {
         private VBEDriver _vbe = new VBEDriver();
 
@@ -15,7 +15,7 @@ namespace Cosmos.System
         public int ScreenHeight { get; set; }
         public int ScreenBpp { get; set; }
 
-        public enum ScreenSize
+        public  enum ScreenSize
         {
             Size320x200,
             Size640x400,
@@ -28,10 +28,10 @@ namespace Cosmos.System
 
         public enum Bpp
         {
-            Bpp15 = 15,
-            Bpp16 = 16,
-            Bpp24 = 24,
-            Bpp32 = 32
+            Bpp15 = 1500,
+            Bpp16 = 1600,
+            Bpp24 = 2400,
+            Bpp32 = 3200
         }
 
         public void SetMode(ScreenSize aSize, Bpp aBpp)
@@ -81,7 +81,40 @@ namespace Cosmos.System
                     break;
             }
            _vbe.vbe_set((ushort)ScreenWidth, (ushort)ScreenHeight, (ushort)ScreenBpp);
+        }
+
+        public void Clear(uint color)
+        {
+            for (uint x = 0; x < ScreenWidth; x++)
+            {
+                for (uint y = 0; y < ScreenHeight; y++)
+                {
+                    SetPixel(x, y, color);
+                }
+            }
+
 
         }
+
+        public void Clear(byte red, byte green, byte blue)
+        {
+
+        }
+
+        public void SetPixel(uint x, uint y, uint color)
+        {
+           
+            uint where = x * ((uint)ScreenBpp  / 8) + y * (uint)(ScreenWidth * ((uint)ScreenBpp / 8));
+            _vbe.set_vram(where, (byte)(color & 255));              // BLUE
+            _vbe.set_vram(where + 1, (byte)((color >> 8) & 255));   // GREEN
+            _vbe.set_vram(where + 2, (byte)((color >> 16) & 255));  // RED
+        }
+
+        public void SetPixel(uint x, uint y, byte red, byte green, byte blue)
+        {
+
+        }
+
+
     }
 }

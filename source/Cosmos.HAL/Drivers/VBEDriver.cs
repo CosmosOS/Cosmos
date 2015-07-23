@@ -13,8 +13,8 @@ namespace Cosmos.HAL.Drivers
 
         private void vbe_write(ushort index, ushort value)
         {
-            IO.VBE_DISPI_IOPORT_INDEX.Word =  index;
-            IO.VBE_DISPI_IOPORT_DATA.Word = value;
+            IO.VbeIndex.Word =  index;
+            IO.VbeData.Word = value;
         }
 
         public void vbe_set(ushort xres, ushort yres, ushort bpp)
@@ -30,6 +30,12 @@ namespace Cosmos.HAL.Drivers
             //Enable Display
             vbe_write(0x4, (ushort)(0x01 | 0x00));
         }
+
+        public void set_vram(uint index, byte value)
+        {
+            IO.VGAMemoryBlock[index] = value;
+        }
+
 
 
     }
