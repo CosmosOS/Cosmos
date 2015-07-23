@@ -235,7 +235,11 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-          throw new Exception("Wrong Poptype encountered! (Type = " + StackPopTypes[0].FullName + ")");
+          if (StackPopTypes[0] == Value.DeclaringType)
+          {
+            return;
+          }
+          throw new Exception("Wrong Poptype encountered! (Type = " + StackPopTypes[0].FullName + ", expected = " + Value.DeclaringType.FullName + ")");
       }
     }
   }
