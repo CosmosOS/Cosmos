@@ -1,0 +1,31 @@
+﻿<Window x:Class="Cosmos.TestRunner.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Test Runner" Height="393" Width="634">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="1">
+            <Button x:Name="s_messages_btn" Content="Show Messages" Width="90" Height="24" Margin="3" Click="s_messages_btn_Click" />
+            <Button x:Name="h_messages_btn" Content="Hide Messages" Width="90" Height="24" Margin="3" Click="h_messages_btn_Click" />
+        </StackPanel>
+        <ListView x:Name="message_display_list"  Grid.Row="2" Grid.Column="1">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Width="50px" Header="Date" HeaderStringFormat="Date" DisplayMemberBinding="{Binding Date}"/>
+                    <GridViewColumn Width="50px"  Header="Level" HeaderStringFormat="Level" DisplayMemberBinding="{Binding Level}"/>
+                    <GridViewColumn Width="Auto" Header="Message" HeaderStringFormat="Message" DisplayMemberBinding="{Binding Message}"/>
+
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</Window>
