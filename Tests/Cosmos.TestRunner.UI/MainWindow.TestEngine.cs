@@ -1,15 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using Cosmos.TestRunner.Core;
 
 namespace Cosmos.TestRunner.UI
 {
     public partial class MainWindow
     {
+        private ParameterizedThreadStart tEngineThreadStart = null;
+        private Thread TestEngineThread = null;
         private void RunTestEngine()
+        {
+            tEngineThreadStart = new ParameterizedThreadStart(TestEngineThreadMain);
+            TestEngineThread = new Thread(tEngineThreadStart);
+            TestEngineThread.Start((OutputHandlerBase)this);
+        }
+
+        private void TestEngineThreadMain(object refrence)
         {
             var xEngine = new Engine();
 
@@ -18,7 +25,7 @@ namespace Cosmos.TestRunner.UI
             var xOutputXml = new OutputHandlerXml();
             xEngine.OutputHandler = new MultiplexingOutputHandler(
                 xOutputXml,
-                (OutputHandlerBase)this);
+                (OutputHandlerBase)refrence);
 
             xEngine.Execute();
         }

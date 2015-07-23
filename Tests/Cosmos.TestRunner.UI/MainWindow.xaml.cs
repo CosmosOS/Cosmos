@@ -25,5 +25,15 @@ namespace Cosmos.TestRunner.UI
             InitializeComponent();
             RunTestEngine();
         }
+
+        private void h_messages_btn_Click(object sender, RoutedEventArgs e)
+        {
+            message_display.Visibility = Visibility.Collapsed;
+        }
+
+        private void s_messages_btn_Click(object sender, RoutedEventArgs e)
+        {
+            message_display.Visibility = Visibility.Visible;
+        }
     }
 }
