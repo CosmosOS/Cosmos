@@ -22,7 +22,7 @@ namespace Cosmos.Debug.Common
             public volatile byte[] Packet;
 
             // signal completion
-            public AutoResetEvent Completed;
+            public ManualResetEventSlim Completed;
         }
 
         private bool IsInBackgroundThread

@@ -31,12 +31,12 @@ namespace Cosmos.Debug.Common
             }
             if (aWait)
             {
-                using (var xEvent = new AutoResetEvent(false))
+                using (var xEvent = new ManualResetEventSlim(false))
                 {
                     mPendingWrites.Add(new Outgoing {Packet = aData, Completed = xEvent});
                     while (IsConnected)
                     {
-                        xEvent.WaitOne(1000);
+                        xEvent.Wait(1000);
                     }
                     return IsConnected; // ??
                 }
