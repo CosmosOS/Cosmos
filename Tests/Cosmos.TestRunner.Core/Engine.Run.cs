@@ -35,6 +35,7 @@ namespace Cosmos.TestRunner.Core
                     File.Move(xObjectFile, xTempObjectFile);
 
                     RunTask("Ld", () => RunLd(xTempObjectFile, xObjectFile));
+                    RunTask("ExtractMapFromElfFile", () => RunExtractMapFromElfFile(mBaseWorkingDirectory, xObjectFile));
                 }
 
                 RunTask("MakeISO", () => MakeIso(xObjectFile, xIsoFile));

@@ -26,8 +26,8 @@ namespace Cosmos.Build.MSBuild {
             {
                 // Important! A given address can have more than one label.
                 // Do NOT filter by duplicate addresses as this causes serious lookup problems.
-                string xFile = RunObjDump();
-                
+                string xFile = RunObjDump(CosmosBuildDir, WorkingDir, InputFile, s => LogError(s), s => Log.LogMessage(s));
+
                 ObjDump.ExtractMapSymbolsForElfFile(DebugInfoFile, xFile);
 
                 return true;
@@ -44,18 +44,19 @@ namespace Cosmos.Build.MSBuild {
             }
         }
 
-        private string RunObjDump() {
-            var xMapFile = Path.ChangeExtension(InputFile, "map");
+        public static string RunObjDump(string cosmosBuildDir, string workingDir, string inputFile, Action<string> errorReceived, Action<string> outputReceived) {
+            var xMapFile = Path.ChangeExtension(inputFile, "map");
             File.Delete(xMapFile);
             if (File.Exists(xMapFile)) {
                 throw new Exception("Could not delete " + xMapFile);
             }
 
-            var xTempBatFile = Path.Combine(WorkingDir, "ExtractElfMap.bat");
-            File.WriteAllText(xTempBatFile, "@ECHO OFF\r\n\"" + Path.Combine(CosmosBuildDir, @"tools\cygwin\objdump.exe") + "\" --wide --syms \"" + InputFile + "\" > \"" + Path.GetFileName(xMapFile) + "\"");
+            var xTempBatFile = Path.Combine(workingDir, "ExtractElfMap.bat");
+            File.WriteAllText(xTempBatFile, "@ECHO OFF\r\n\"" + Path.Combine(cosmosBuildDir, @"tools\cygwin\objdump.exe") + "\" --wide --syms \"" + inputFile + "\" > \"" + Path.GetFileName(xMapFile) + "\"");
 
-            if (!ExecuteTool(WorkingDir, xTempBatFile, "", "objdump")) {
-                throw new Exception("Error extracting map from " + InputFile);
+            var xResult = ExecuteTool(workingDir, xTempBatFile, "", "objdump", errorReceived, outputReceived);
+            if (!xResult) {
+                throw new Exception("Error extracting map from " + inputFile);
             }
             File.Delete(xTempBatFile);
 

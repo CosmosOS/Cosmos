@@ -31,6 +31,11 @@ namespace Cosmos.TestRunner.Core
             }
         }
 
+        private void RunExtractMapFromElfFile(string workingDir, string kernelFileName)
+        {
+            ExtractMapFromElfFile.RunObjDump(CosmosPaths.Build, workingDir, kernelFileName, OutputHandler.LogError, OutputHandler.LogMessage);
+        }
+
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
             var xArguments = new[]
