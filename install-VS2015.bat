@@ -1,7 +1,7 @@
 @REM Delete so if builder fails it wont exist
 del source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.*
 
-%windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe "source\Builder.sln" /nologo /maxcpucount /p:Configuration=Debug /p:Platform=x86
+"%ProgramFiles(x86)%\MSBuild\14.0\Bin\msbuild.exe" "source\Builder.sln" /nologo /maxcpucount /p:Configuration=Debug /p:Platform=x86
 
 @if not exist source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe goto error
 

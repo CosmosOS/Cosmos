@@ -41,6 +41,7 @@ namespace Cosmos.Build.Builder {
             case VsVersion.Vs2015:
                 setupName += "-vs2015";
                 break;
+
         }
 
         if (App.UseVsHive)
@@ -82,7 +83,7 @@ namespace Cosmos.Build.Builder {
 
         CompileCosmos();                                //Working
         CopyTemplates();
-        
+
         CreateScriptToUseChangesetWhichTaskIsUse();
 
         CreateSetup();                                  //Working
@@ -119,7 +120,7 @@ namespace Cosmos.Build.Builder {
     }
 
     protected void MsBuild(string aSlnFile, string aBuildCfg) {
-      string xMsBuild = Path.Combine(Paths.Windows, @"Microsoft.NET\Framework\v4.0.30319\msbuild.exe");
+      string xMsBuild = Path.Combine(Paths.ProgFiles32, @"MSBuild\14.0\Bin\msbuild.exe");
       string xParams = Quoted(aSlnFile) + @" /maxcpucount /verbosity:normal /nologo /p:Configuration=" + aBuildCfg + " /p:Platform=x86 /p:OutputPath=" + Quoted(mOutputDir);
       // Clean then build: http://adrianfoyn.wordpress.com/2011/03/30/wrestling-with-msbuild-the-bane-of-trebuild/
       if (false == App.NoMsBuildClean) {
@@ -259,7 +260,7 @@ namespace Cosmos.Build.Builder {
       CheckIfUserKitRunning();
       CheckIsVsRunning();
       CheckIfBuilderRunning();
-      
+
       switch (App.VsVersion) {
         case VsVersion.Vs2013:
           CheckVs2013();
@@ -374,7 +375,7 @@ namespace Cosmos.Build.Builder {
     void WriteDevKit() {
       Section("Writing Dev Kit to Registry");
 
-      // Inno deletes this from registry, so we must add this after. 
+      // Inno deletes this from registry, so we must add this after.
       // We let Inno delete it, so if user runs it by itself they get
       // only UserKit, and no DevKit settings.
       // HKCU instead of HKLM because builder does not run as admin.

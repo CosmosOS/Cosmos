@@ -45,6 +45,14 @@ namespace Cosmos.TestRunner.Core
             debugConnector.CmdBreak = t =>
             {
             };
+            debugConnector.CmdStackCorruptionOccurred =
+                a =>
+                {
+                    OutputHandler.LogMessage("Stackcorruption occurred at: 0x" + a.ToString("X8"));
+                    OutputHandler.SetKernelTestResult(false, "Stackcorruption occurred at: 0x" + a.ToString("X8"));
+                    mKernelResultSet = true;
+                    mKernelRunning = false;
+                };
         }
 
         private void HandleRunning(DebugConnector debugConnector, Base host)

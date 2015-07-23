@@ -208,24 +208,27 @@ namespace Cosmos.IL2CPU.X86.IL
                 //else
                 //{
                 // todo: improve code clarity
-                if (xStackContentSize > 4)
+                if (xStackContentSize <= 4)
                 {
-                    throw new Exception("Cosmos.IL2CPU.x86->IL->Branch.cs->Error: Simple branches are not yet supported on operands > 4 bytes!");
-                }
-                new CPU.Pop { DestinationReg = CPU.Registers.EAX };
-                if (xTestOp == ConditionalTestEnum.Zero)
-                {
-                    new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceValue = 0 };
-                    new CPU.ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
-                }
-                else if (xTestOp == ConditionalTestEnum.NotZero)
-                {
-                    new CPU.Compare { DestinationReg = CPU.Registers.EAX, SourceValue = 0 };
-                    new CPU.ConditionalJump { Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
+                    new CPU.Pop {DestinationReg = CPU.Registers.EAX};
+                    if (xTestOp == ConditionalTestEnum.Zero)
+                    {
+                        new CPU.Compare {DestinationReg = CPU.Registers.EAX, SourceValue = 0};
+                        new CPU.ConditionalJump {Condition = ConditionalTestEnum.Equal, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                    }
+                    else if (xTestOp == ConditionalTestEnum.NotZero)
+                    {
+                        new CPU.Compare {DestinationReg = CPU.Registers.EAX, SourceValue = 0};
+                        new CPU.ConditionalJump {Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                    }
+                    else
+                    {
+                        throw new NotSupportedException("Cosmos.IL2CPU.x86->IL->Branch.cs->Error: Situation not supported yet! (In the Simple Comparison)");
+                    }
                 }
                 else
                 {
-                    throw new NotSupportedException("Cosmos.IL2CPU.x86->IL->Branch.cs->Error: Situation not supported yet! (In the Simple Comparison)");
+                    throw new Exception("Cosmos.IL2CPU.x86->IL->Branch.cs->Error: Simple branches are not yet supported on operands > 4 bytes!");
                 }
             }
             //}

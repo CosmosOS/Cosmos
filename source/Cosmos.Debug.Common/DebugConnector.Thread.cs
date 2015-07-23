@@ -138,7 +138,7 @@ namespace Cosmos.Debug.Common
                     xPendingOutgoing.Completed.Set();
                 }
 
-                throw;
+                return;
             }
             catch (Exception E)
             {
