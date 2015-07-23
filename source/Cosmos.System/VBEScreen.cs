@@ -28,10 +28,10 @@ namespace Cosmos.System
 
         public enum Bpp
         {
-            Bpp15 = 1500,
-            Bpp16 = 1600,
-            Bpp24 = 2400,
-            Bpp32 = 3200
+            Bpp15,
+            Bpp16,
+            Bpp24,
+            Bpp32
         }
 
         public void SetMode(ScreenSize aSize, Bpp aBpp)
