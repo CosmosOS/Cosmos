@@ -277,8 +277,12 @@ namespace Cosmos.IL2CPU
                     xOpMethod.ValueUID = (uint)GetMethodUID(xOpMethod.Value, true);
                     xOpMethod.BaseMethodUID = GetMethodUID(xOpMethod.Value, false);
                 }
+
+                mUsedCodes.Add(xOpCode.OpCode);
             }
         }
+
+        private List<ILOpCode.Code> mUsedCodes = new List<ILOpCode.Code>(128 * 1024);
 
         public void Dispose()
         {
@@ -962,6 +966,18 @@ namespace Cosmos.IL2CPU
                 }
             }
             mAsmblr.GenerateVMTCode(xTypes, xMethods, GetTypeUID, x => GetMethodUID(x, false));
+        }
+
+        public void SaveILInstructions(string filename)
+        {
+            var xUsedCodes = mUsedCodes.Distinct().OrderBy(i => i.ToString()).ToArray();
+            using (var xOut = new StreamWriter(filename, false))
+            {
+                foreach (var xCode in xUsedCodes)
+                {
+                    xOut.WriteLine(xCode.ToString());
+                }
+            }
         }
     }
 }
