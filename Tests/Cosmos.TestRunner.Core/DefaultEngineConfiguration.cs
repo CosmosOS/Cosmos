@@ -14,7 +14,7 @@ namespace Cosmos.TestRunner.Core
             engine.AllowedSecondsInKernel = 120;
 
             // If you want to exclude a testing platform, modify uncomment and modify the following line
-            engine.RunTargets.Remove(RunTargetEnum.VMware);
+            engine.RunTargets.Remove(RunTargetEnum.Bochs);
 
             // if you're working on the compiler (or other lower parts), you can choose to run the compiler in process
             // 1 thing to keep in mind though, is that this only works with 1 kernel at a time!
