@@ -28,12 +28,12 @@ namespace Cosmos.TestRunner.UI
 
         private void h_messages_btn_Click(object sender, RoutedEventArgs e)
         {
-            message_display.Visibility = Visibility.Collapsed;
+            message_display_list.Visibility = Visibility.Collapsed;
         }
 
         private void s_messages_btn_Click(object sender, RoutedEventArgs e)
         {
-            message_display.Visibility = Visibility.Visible;
+            message_display_list.Visibility = Visibility.Visible;
         }
     }
 }
