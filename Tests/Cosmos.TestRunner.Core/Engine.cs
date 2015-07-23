@@ -43,6 +43,11 @@ namespace Cosmos.TestRunner.Core
                 throw new InvalidOperationException("No OutputHandler set!");
             }
 
+            if (RunTargets.Count == 0)
+            {
+                RunTargets.AddRange((RunTargetEnum[])Enum.GetValues(typeof(RunTargetEnum)));
+            }
+
             OutputHandler.ExecutionStart();
             try
             {

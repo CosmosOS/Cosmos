@@ -15,7 +15,7 @@ namespace Cosmos.TestRunner.Core
     partial class Engine
     {
         public int AllowedSecondsInKernel = 30;
-        public List<RunTargetEnum> RunTargets = new List<RunTargetEnum>((RunTargetEnum[])Enum.GetValues(typeof(RunTargetEnum)));
+        public List<RunTargetEnum> RunTargets = new List<RunTargetEnum>();
 
         private void ExecuteKernel(string assemblyFileName, RunConfiguration configuration)
         {
