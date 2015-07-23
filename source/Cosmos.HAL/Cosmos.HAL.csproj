@@ -102,6 +102,7 @@
     <Compile Include="Drivers\PCI\Audio\PCMStream.cs" />
     <Compile Include="Drivers\PCI\Network\AMDPCNetII.cs" />
     <Compile Include="Drivers\PCI\Video\VMWareSVGAII.cs" />
+    <Compile Include="Drivers\VBEDriver.cs" />
     <Compile Include="Drivers\VGAScreen.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Keyboard.cs" />
