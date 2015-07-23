@@ -1,38 +1,19 @@
-﻿using System;
+﻿using Cosmos.HAL.Drivers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cosmos.HAL.Drivers
+namespace Cosmos.System
 {
-    public class VBEScreen
+   public  class VBEScreen
     {
+        private VBEDriver _vbe = new VBEDriver();
+
         public int ScreenWidth { get; set; }
         public int ScreenHeight { get; set; }
         public int ScreenBpp { get; set; }
-
-        #region Internals
-
-        private Core.IOGroup.VBE IO = Core.Global.BaseIOGroups.VBE;
-
-        private void vbe_set(ushort xres, ushort yres, ushort bpp)
-        {
-            //Disable Display
-            IO.VBE_DISPI_INDEX_ENABLE.Word = 0x00;
-            //Set Display Xres
-            IO.VBE_DISPI_INDEX_XRES.Word = xres;
-            //SetDisplay Yres
-            IO.VBE_DISPI_INDEX_YRES.Word = yres;
-            //SetDisplay bpp
-            IO.VBE_DISPI_INDEX_BPP.Word = bpp;
-            //Enable Display
-            IO.VBE_DISPI_INDEX_ENABLE.Word = (ushort)(0x01 | 0x00);
-        }
-
-        #endregion
-
-
 
         public enum ScreenSize
         {
@@ -99,7 +80,7 @@ namespace Cosmos.HAL.Drivers
                     ScreenBpp = 32;
                     break;
             }
-            vbe_set((ushort)ScreenWidth, (ushort)ScreenHeight, (ushort)ScreenBpp);
+           _vbe.vbe_set((ushort)ScreenWidth, (ushort)ScreenHeight, (ushort)ScreenBpp);
 
         }
     }
