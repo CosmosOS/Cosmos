@@ -23,6 +23,7 @@ namespace Cosmos.TestRunner.UI
         public MainWindow()
         {
             InitializeComponent();
+            RunTestEngine();
         }
     }
 }
