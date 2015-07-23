@@ -5,15 +5,15 @@ using Cosmos.TestRunner.Core;
 
 namespace Cosmos.TestRunner.UI
 {
-    public partial class MainWindow
+    public partial class MainWindowHandler
     {
         private ParameterizedThreadStart tEngineThreadStart = null;
         private Thread TestEngineThread = null;
-        private void RunTestEngine()
+        public void RunTestEngine()
         {
             tEngineThreadStart = new ParameterizedThreadStart(TestEngineThreadMain);
             TestEngineThread = new Thread(tEngineThreadStart);
-            TestEngineThread.Start((OutputHandlerBase)this);
+            TestEngineThread.Start(this);
         }
 
         private void TestEngineThreadMain(object refrence)

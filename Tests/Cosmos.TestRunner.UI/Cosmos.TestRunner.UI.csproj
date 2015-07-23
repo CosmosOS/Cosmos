@@ -62,14 +62,14 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ListViewLogMessage.cs" />
-    <Compile Include="MainWindow.TestEngine.cs" />
+    <Compile Include="MainWindowHandler.TestEngine.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainWindow.OutputHandler.cs" />
+    <Compile Include="MainWindowHandler.OutputHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

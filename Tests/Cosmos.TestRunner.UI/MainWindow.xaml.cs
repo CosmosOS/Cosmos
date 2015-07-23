@@ -20,10 +20,12 @@ namespace Cosmos.TestRunner.UI
     /// </summary>
     public partial class MainWindow : Window
     {
+        private MainWindowHandler testEngineHandler = null;
         public MainWindow()
         {
             InitializeComponent();
-            RunTestEngine();
+            testEngineHandler = new MainWindowHandler(message_display_list);
+            testEngineHandler.RunTestEngine();
         }
 
         private void h_messages_btn_Click(object sender, RoutedEventArgs e)

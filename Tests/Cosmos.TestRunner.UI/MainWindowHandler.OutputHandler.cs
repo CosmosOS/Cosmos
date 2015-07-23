@@ -2,11 +2,18 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Cosmos.TestRunner.Core;
+using System.Windows.Controls;
 
 namespace Cosmos.TestRunner.UI
 {
-    public partial class MainWindow : OutputHandlerBase
+    public partial class MainWindowHandler : OutputHandlerBase
     {
+        private ListView message_display_list;
+        public MainWindowHandler(ListView wpflistView)
+        {
+            message_display_list = wpflistView;
+        }
+
         private readonly Stopwatch mCurrentTaskStopwatch = new Stopwatch();
         private readonly Stopwatch mCurrentKernelStopwatch = new Stopwatch();
         private readonly Stopwatch mExecutionStopwatch = new Stopwatch();
@@ -96,7 +103,7 @@ namespace Cosmos.TestRunner.UI
         {
             string Date = DateTime.Now.ToString("hh:mm:ss.ffffff ");
             string level = new String(' ', mLogLevel * 2);
-            message_display_list.Dispatcher.Invoke(new Action<string, string, string>((d, l, m) => DisplayOnWindow(Date, level, message)));
+            message_display_list.Dispatcher.Invoke(new Action<string, string, string>(DisplayOnWindow), new object[] { Date, level, message });
         }
 
         protected override void OnSetKernelTestResult(bool succeeded, string message)
