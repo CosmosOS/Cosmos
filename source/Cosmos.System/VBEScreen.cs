@@ -83,6 +83,17 @@ namespace Cosmos.System
            _vbe.vbe_set((ushort)ScreenWidth, (ushort)ScreenHeight, (ushort)ScreenBpp);
         }
 
+
+        private uint GetIntFromRBG(byte red, byte green, byte blue)
+        {
+            uint x;
+            x = (blue);
+            x += (uint)(green << 8);
+            x += (uint)(red << 16);
+            return x;
+        }
+
+
         public void Clear(uint color)
         {
             for (uint x = 0; x < ScreenWidth; x++)
@@ -92,18 +103,15 @@ namespace Cosmos.System
                     SetPixel(x, y, color);
                 }
             }
-
-
         }
 
         public void Clear(byte red, byte green, byte blue)
         {
-
+            Clear(GetIntFromRBG(red, green, blue));
         }
 
         public void SetPixel(uint x, uint y, uint color)
-        {
-           
+        {           
             uint where = x * ((uint)ScreenBpp  / 8) + y * (uint)(ScreenWidth * ((uint)ScreenBpp / 8));
             _vbe.set_vram(where, (byte)(color & 255));              // BLUE
             _vbe.set_vram(where + 1, (byte)((color >> 8) & 255));   // GREEN
@@ -112,9 +120,8 @@ namespace Cosmos.System
 
         public void SetPixel(uint x, uint y, byte red, byte green, byte blue)
         {
-
+            SetPixel(x, y, GetIntFromRBG(red, green, blue));
         }
-
 
     }
 }
