@@ -47,7 +47,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xOpCode = (ILOpCodes.OpField)aOpCode;
-            DoExecute(Assembler, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true, DebugEnabled);
+            DoExecute(Assembler, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true, DebugEnabled, aOpCode.StackPopTypes[0]);
         }
 
         public static int GetFieldOffset(Type aDeclaringType, string aFieldId)
@@ -62,7 +62,7 @@ namespace Cosmos.IL2CPU.X86.IL
             return (int)(xExtraOffset + xFieldInfo.Offset);
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField, bool debugEnabled)
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField, bool debugEnabled, Type aTypeOnStack)
         {
             var xOffset = GetFieldOffset(aDeclaringType, xFieldId);
             var xFields = GetFieldsInfo(aDeclaringType, false);
@@ -73,6 +73,47 @@ namespace Cosmos.IL2CPU.X86.IL
             new Comment("Type: " + xFieldInfo.FieldType.ToString());
             new Comment("Size: " + xFieldInfo.Size);
             new Comment("Offset: " + xOffset + " (includes object header)");
+
+            if (aDeclaringType.IsValueType && aTypeOnStack == aDeclaringType)
+            {
+                // the full struct is on the stack, instead of only a pointer to it
+                if (xFieldInfo.Size > 4)
+                {
+                    throw new Exception("For now, loading fields with sizes > 4 bytes from structs on the stack is not possible!");
+                }
+
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+
+                switch (xFieldInfo.Size)
+                {
+                    case 1:
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        break;
+
+                    case 2:
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        break;
+
+                    case 3: //For Release
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };
+                        break;
+
+                    case 4:
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        break;
+
+                    default:
+                        throw new Exception(string.Format("Field size {0} not supported!", xFieldInfo.Size));
+                }
+
+                // now remove the struct from the stack
+                new CPUx86.Add {DestinationReg = CPUx86.Registers.ESP, SourceValue = Align(GetStorageSize(aDeclaringType), 4)};
+
+                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+
+                return;
+            }
             DoNullReferenceCheck(Assembler, debugEnabled, 0);
 
             new CPUx86.Pop {DestinationReg = CPUx86.Registers.ECX};
@@ -96,25 +137,22 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (int)(xSize - (i * 4))};
                 new CPUx86.Push {DestinationReg = CPUx86.Registers.EAX};
             }
+
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+
             switch (xSize % 4)
             {
                 case 1:
-                {
-                    new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceValue = 0};
                     new CPUx86.Mov {DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true};
                     new CPUx86.Push {DestinationReg = CPUx86.Registers.EAX};
                     break;
-                }
+
                 case 2:
-                {
-                    new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceValue = 0};
                     new CPUx86.Mov {DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true};
                     new CPUx86.Push {DestinationReg = CPUx86.Registers.EAX};
                     break;
-                }
 
                 case 3: //For Release
-                    new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceValue = 0};
                     new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true};
                     new CPUx86.ShiftRight {DestinationReg = CPUx86.Registers.EAX, SourceValue = 8};
                     new CPUx86.Push {DestinationReg = CPUx86.Registers.EAX};
