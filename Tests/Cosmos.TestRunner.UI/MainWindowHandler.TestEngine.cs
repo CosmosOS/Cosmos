@@ -5,18 +5,16 @@ using Cosmos.TestRunner.Core;
 
 namespace Cosmos.TestRunner.UI
 {
-    public partial class MainWindowHandler
+    partial class MainWindowHandler
     {
-        private ParameterizedThreadStart tEngineThreadStart = null;
         private Thread TestEngineThread = null;
         public void RunTestEngine()
         {
-            tEngineThreadStart = new ParameterizedThreadStart(TestEngineThreadMain);
-            TestEngineThread = new Thread(tEngineThreadStart);
-            TestEngineThread.Start(this);
+            TestEngineThread = new Thread(TestEngineThreadMain);
+            TestEngineThread.Start();
         }
 
-        private void TestEngineThreadMain(object refrence)
+        private void TestEngineThreadMain()
         {
             var xEngine = new Engine();
 
@@ -25,7 +23,7 @@ namespace Cosmos.TestRunner.UI
             var xOutputXml = new OutputHandlerXml();
             xEngine.OutputHandler = new MultiplexingOutputHandler(
                 xOutputXml,
-                (OutputHandlerBase)refrence);
+                this);
 
             xEngine.Execute();
         }
