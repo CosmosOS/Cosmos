@@ -36,7 +36,10 @@ namespace Cosmos.HAL.Drivers
             IO.VGAMemoryBlock[index] = value;
         }
 
-
+        public byte get_vram(uint index)
+        {
+            return IO.VGAMemoryBlock[index];
+        }
 
     }
 }
