@@ -9,13 +9,30 @@ namespace Cosmos.System
 {
    public class VBEScreen
     {
+        /// <summary>
+        /// Driver for Setting vbe modes and ploting/getting pixels
+        /// </summary>
         private VBEDriver _vbe = new VBEDriver();
 
+        /// <summary>
+        /// The current Width of the screen in pixels
+        /// </summary>
         public int ScreenWidth { get; set; }
+        /// <summary>
+        /// The current Height of the screen in pixels
+        /// </summary>
         public int ScreenHeight { get; set; }
+        /// <summary>
+        /// The current Bytes per pixel
+        /// </summary>
         public int ScreenBpp { get; set; }
 
-        public  enum ScreenSize
+        #region Display
+
+        /// <summary>
+        /// All the avalible screen resolutions
+        /// </summary>
+        public enum ScreenSize
         {
             Size320x200,
             Size640x400,
@@ -25,7 +42,9 @@ namespace Cosmos.System
             Size1280x1024
 
         }
-
+        /// <summary>
+        /// All the suported Bytes per pixel
+        /// </summary>
         public enum Bpp
         {
             Bpp15,
@@ -34,6 +53,11 @@ namespace Cosmos.System
             Bpp32
         }
 
+        /// <summary>
+        /// Use this to setup the screen, this will disable the console.
+        /// </summary>
+        /// <param name="aSize">The dezired screen resolution</param>
+        /// <param name="aBpp">The dezired Bytes per pixel</param>
         public void SetMode(ScreenSize aSize, Bpp aBpp)
         {
             //Get screen size
@@ -80,10 +104,14 @@ namespace Cosmos.System
                     ScreenBpp = 32;
                     break;
             }
+            //set the screen
            _vbe.vbe_set((ushort)ScreenWidth, (ushort)ScreenHeight, (ushort)ScreenBpp);
         }
 
+        #endregion
 
+        #region Drawing
+        //used to convert from rgb to hex color
         private uint GetIntFromRBG(byte red, byte green, byte blue)
         {
             uint x;
@@ -93,7 +121,10 @@ namespace Cosmos.System
             return x;
         }
 
-
+        /// <summary>
+        /// Clear the screen with a given color
+        /// </summary>
+        /// <param name="color">The color in hex</param>
         public void Clear(uint color)
         {
             for (uint x = 0; x < ScreenWidth; x++)
@@ -104,12 +135,23 @@ namespace Cosmos.System
                 }
             }
         }
-
+        /// <summary>
+        /// Clear the screen with a given color
+        /// </summary>
+        /// <param name="red">Red value max is 255</param>
+        /// <param name="green">Green value max is 255</param>
+        /// <param name="blue">Blue value max is 255</param>
         public void Clear(byte red, byte green, byte blue)
         {
             Clear(GetIntFromRBG(red, green, blue));
         }
 
+        /// <summary>
+        /// Set a pixel at a given point to the give color
+        /// </summary>
+        /// <param name="x">X coordinate</param>
+        /// <param name="y">Y coordinate</param>
+        /// <param name="color">Color in hex</param>
         public void SetPixel(uint x, uint y, uint color)
         {           
             uint where = x * ((uint)ScreenBpp  / 8) + y * (uint)(ScreenWidth * ((uint)ScreenBpp / 8));
@@ -118,10 +160,34 @@ namespace Cosmos.System
             _vbe.set_vram(where + 2, (byte)((color >> 16) & 255));  // RED
         }
 
+        /// <summary>
+        /// Set a pixel at a given point to the give color
+        /// </summary>
+        /// <param name="x">X coordinate</param>
+        /// <param name="y">Y coordinate</param>
+        /// <param name="red">Red value max is 255</param>
+        /// <param name="green">Green value max is 255</param>
+        /// <param name="blue">Blue value max is 255</param>
         public void SetPixel(uint x, uint y, byte red, byte green, byte blue)
         {
             SetPixel(x, y, GetIntFromRBG(red, green, blue));
         }
+        #endregion
+
+        #region Reading
+
+        /// <summary>
+        /// Get a pixel's color at the given point
+        /// </summary>
+        /// <param name="x">X coordinate</param>
+        /// <param name="y"></param>
+        /// <returns>Returns the color in hex</returns>
+        public uint GetPixel(uint x, uint y)
+        {
+            uint where = x * ((uint)ScreenBpp / 8) + y * (uint)(ScreenWidth * ((uint)ScreenBpp / 8));
+            return GetIntFromRBG(_vbe.get_vram(where + 2), _vbe.get_vram(where + 1), _vbe.get_vram(where));
+        }
+        #endregion
 
     }
 }
