@@ -23,6 +23,7 @@ namespace Cosmos.TestRunner.Console
                 xOutputXml,
                 new OutputHandlerConsole());
 
+            xEngine.RunTargets.Add(RunTargetEnum.Bochs);
             xEngine.Execute();
 
             global::System.Console.WriteLine("Do you want to save test run details?");

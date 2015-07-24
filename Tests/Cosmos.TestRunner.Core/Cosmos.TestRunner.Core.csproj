@@ -117,6 +117,10 @@
       <Project>{6128DEEB-D30F-4859-B60F-C36D5452F3E9}</Project>
       <Name>IL2CPU</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BoxingTests\BoxingTests.csproj">
+      <Project>{f8889473-5866-4913-86ac-8072a1a2558c}</Project>
+      <Name>BoxingTests</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.Kernel.csproj">
       <Project>{bdc011be-6041-4a58-a6e7-0f592e78cb27}</Project>
       <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>

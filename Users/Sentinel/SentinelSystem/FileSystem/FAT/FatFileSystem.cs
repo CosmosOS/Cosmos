@@ -179,6 +179,12 @@ namespace SentinelKernel.System.FileSystem.FAT
             mDevice.ReadBlock(xSector, SectorsPerCluster, aData);
         }
 
+        public void WriteCluster(UInt64 aCluster, byte[] aData)
+        {
+            UInt64 xSector = DataSector + ((aCluster - 2) * SectorsPerCluster);
+            mDevice.WriteBlock(xSector, SectorsPerCluster, aData);
+        }
+
         public void GetFatTableSector(UInt64 aClusterNum, out UInt32 oSector, out UInt32 oOffset)
         {
             UInt64 xOffset = 0;

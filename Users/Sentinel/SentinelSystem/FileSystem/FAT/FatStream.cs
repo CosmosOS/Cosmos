@@ -44,7 +44,7 @@ namespace SentinelKernel.System.FileSystem.FAT
 
         public override bool CanWrite
         {
-            get { return false; }
+            get { return true; }
         }
 
         public override long Length
@@ -71,10 +71,10 @@ namespace SentinelKernel.System.FileSystem.FAT
 
         public override int Read(byte[] aBuffer, int aOffset, int aCount)
         {
-            return Read(aBuffer, (Int64)aOffset, (Int64)aCount);
+            return Read(aBuffer, aOffset, aCount);
         }
 
-        public int Read(byte[] aBuffer, Int64 aOffset, Int64 aCount)
+        protected int Read(byte[] aBuffer, Int64 aOffset, Int64 aCount)
         {
             if (aCount < 0)
             {
@@ -131,7 +131,6 @@ namespace SentinelKernel.System.FileSystem.FAT
 
                 aOffset += xReadSize;
                 xCount -= (ulong)xReadSize;
-                xCount = 0;
             }
 
             mPosition += (ulong)aOffset;
@@ -150,17 +149,80 @@ namespace SentinelKernel.System.FileSystem.FAT
 
         public override void SetLength(long value)
         {
-            throw new NotImplementedException();
+            var xOldClusterTotal = Length/mFS.BytesPerCluster;
+            if (Length%mFS.BytesPerCluster != 0)
+            {
+                xOldClusterTotal++;
+            }
+
+            var xNewClusterTotal = value/mFS.BytesPerCluster;
+            if (value%mFS.BytesPerCluster != 0)
+            {
+                xNewClusterTotal++;
+            }
+
+            if (xNewClusterTotal != xOldClusterTotal)
+            {
+                throw new NotImplementedException("Setting the stream length to a size that requires alllcating new clusters is not currently implemented.");
+            }
+
+            //mFile.Size = value;
         }
 
         public override void Write(byte[] aBuffer, int aOffset, int aCount)
         {
-            Write(aBuffer, (long)aOffset, (long)aCount);
+            Write(aBuffer, aOffset, aCount);
         }
 
-        public void Write(byte[] buffer, long offset, long count)
+        protected void Write(byte[] aBuffer, long aOffset, long aCount)
         {
-            throw new NotImplementedException();
+            if (aCount < 0)
+            {
+                throw new ArgumentOutOfRangeException("aCount");
+            }
+            if (aOffset < 0)
+            {
+                throw new ArgumentOutOfRangeException("aOffset");
+            }
+            if (aBuffer == null || aBuffer.Length - aOffset < aCount)
+            {
+                throw new ArgumentException("Invalid offset length!");
+            }
+
+            ulong xCount = (ulong)aCount;
+            var xCluster = mFS.NewClusterArray();
+            UInt32 xClusterSize = mFS.BytesPerCluster;
+
+            long xTotalLength = (long) (mPosition + xCount);
+            if (xTotalLength > Length)
+            {
+                SetLength(xTotalLength);
+            }
+
+            while (xCount > 0)
+            {
+                long xWriteSize;
+                UInt64 xClusterIdx = mPosition / xClusterSize;
+                UInt64 xPosInCluster = mPosition % xClusterSize;
+                if (xPosInCluster + xCount > xClusterSize)
+                {
+                    xWriteSize = (long)(xClusterSize - xPosInCluster - 1);
+                }
+                else
+                {
+                    xWriteSize = (long)xCount;
+                }
+
+                Array.Copy(aBuffer, (long)xPosInCluster, xCluster, aOffset, xWriteSize);
+
+                mFS.WriteCluster((ulong)mFatTable[(int)xClusterIdx], xCluster);
+
+                aOffset += xWriteSize;
+                xCount -= (ulong)xWriteSize;
+            }
+
+            mPosition += (ulong)aOffset;
+
         }
     }
 }

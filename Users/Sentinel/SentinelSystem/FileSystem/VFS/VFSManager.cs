@@ -134,7 +134,7 @@ namespace SentinelKernel.System.FileSystem.VFS
 
         #endregion
 
-        public static Listing.File TryGetFile(string aPath)
+        public static Listing.File  TryGetFile(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))
             {
@@ -291,7 +291,7 @@ namespace SentinelKernel.System.FileSystem.VFS
             try
             {
                 FatHelpers.Debug("DirectoryExists. Path = '" + aPath + "'");
-                string xDir = aPath + VFSBase.DirectorySeparatorChar;
+                string xDir = string.Concat(aPath + VFSBase.DirectorySeparatorChar);
                 //xDir = Path.GetDirectoryName(xDir);
                 return (VFSManager.GetDirectory(xDir) != null);
             }
