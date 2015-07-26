@@ -9,5 +9,7 @@
         public DataLookupTable* Next;
 
         public DataLookupEntry* Entries;
+
+        public void* FirstByteAfterTable;
     }
 }

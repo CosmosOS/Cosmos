@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Core.Plugs.Assemblers;
 using Cosmos.IL2CPU.Plugs;
 using Assembler = Cosmos.Assembler.Assembler;
 using CPUAll = Cosmos.Assembler;
@@ -34,8 +35,8 @@ namespace Cosmos.Core.Plugs {
         }
 
         [PlugMethod(Assembler = typeof(GetEndOfKernelAsm))]
-        public static uint GetEndOfKernel() { 
-          return 0; 
+        public static uint GetEndOfKernel() {
+          return 0;
         }
 
         public class ZeroFillAsm : AssemblerMethod {
@@ -65,7 +66,7 @@ namespace Cosmos.Core.Plugs {
                 new CPUx86.x87.FloatInit();
             }
         }
-      
+
       [PlugMethod(Assembler = typeof(InitFloatAsm))]
         public static void InitFloat(CPU aThis) { }
 
@@ -74,58 +75,59 @@ namespace Cosmos.Core.Plugs {
                 new CPUx86.Halt();
             }
         }
-        
+
       [PlugMethod(Assembler = typeof(HaltAsm))]
         public static void Halt(CPU aThis) { }
 
+        //    [PlugMethod(Assembler = typeof(P2.Assemblers.GetEndOfStack))]
+        //    public static uint GetEndOfStack() {
+        //        return 0;
+        //    }
 
-    //    [PlugMethod(Assembler = typeof(P2.Assemblers.GetEndOfStack))]
-    //    public static uint GetEndOfStack() {
-    //        return 0;
-    //    }
+        //    [PlugMethod(Assembler = typeof(P2.Assemblers.GetCurrentESP))]
+        //    public static uint GetCurrentESP() {
+        //        return 0;
+        //    }
 
-    //    [PlugMethod(Assembler = typeof(P2.Assemblers.GetCurrentESP))]
-    //    public static uint GetCurrentESP() {
-    //        return 0;
-    //    }
-
-    //    [PlugMethod(Assembler = typeof(P2.Assemblers.DoTest))]
-    //    public static void DoTest() {
-    //    }
+        //    [PlugMethod(Assembler = typeof(P2.Assemblers.DoTest))]
+        //    public static void DoTest() {
+        //    }
 
 
-    //    [PlugMethod(Assembler = typeof(P2.Assemblers.CPUIDSupport))]
-    //    public static uint HasCPUIDSupport() {
-    //        return 0;
-    //    }
+        //    [PlugMethod(Assembler = typeof(P2.Assemblers.CPUIDSupport))]
+        //    public static uint HasCPUIDSupport() {
+        //        return 0;
+        //    }
 
-    //    [PlugMethod(Assembler = typeof(P2.Assemblers.GetCPUIDInternal))]
-    //    public static void GetCPUId(out uint d, out uint c, out uint b, out uint a, uint v) {
-    //        d = 0;
-    //        c = 0;
-    //        b = 0;
-    //        a = 0;
-    //    }
+        //    [PlugMethod(Assembler = typeof(P2.Assemblers.GetCPUIDInternal))]
+        //    public static void GetCPUId(out uint d, out uint c, out uint b, out uint a, uint v) {
+        //        d = 0;
+        //        c = 0;
+        //        b = 0;
+        //        a = 0;
+        //    }
 
-    //    [PlugMethod(Assembler = typeof(P2.Assemblers.Halt))]
-    //    public static void Halt() { }
+        //    [PlugMethod(Assembler = typeof(P2.Assemblers.Halt))]
+        //    public static void Halt() { }
 
-    //    [PlugMethod(Assembler = typeof(P2.Assemblers.DisableInterrupts))]
-    //    public static void DisableInterrupts() {
-    //    }
+        [PlugMethod(Assembler = typeof(Assemblers.DisableInterruptsAssembler))]
+        public static void DisableInterrupts()
+        {
+        }
 
-    //    [PlugMethod(Assembler = typeof(P2.Assemblers.EnableInterrupts))]
-    //    public static void EnableInterrupts() {
-    //    }
+        [PlugMethod(Assembler = typeof(Assemblers.EnableInterruptsAssembler))]
+        public static void EnableInterrupts()
+        {
+        }
 
-    //    [PlugMethod(Assembler = typeof(P2.Assemblers.Interrupt30))]
-    //    public static void Interrupt30(ref uint aEAX, ref uint aEBX, ref uint aECX, ref uint aEDX) {
-    //        aEAX = 0;
-    //    }
+        //    [PlugMethod(Assembler = typeof(P2.Assemblers.Interrupt30))]
+        //    public static void Interrupt30(ref uint aEAX, ref uint aEBX, ref uint aECX, ref uint aEDX) {
+        //        aEAX = 0;
+        //    }
 
-    //    [PlugMethod(Assembler = typeof(P2.Assemblers.GetMBIAddress))]
-    //    public static uint GetMBIAddress() {
-    //        return 0;
-    //    }
+        //    [PlugMethod(Assembler = typeof(P2.Assemblers.GetMBIAddress))]
+        //    public static uint GetMBIAddress() {
+        //        return 0;
+        //    }
     }
 }

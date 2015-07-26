@@ -406,7 +406,7 @@ namespace Cosmos.IL2CPU
               new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
                 new Compare {SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX};
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabelExc + "__2" };
-                new ClrInterruptFlag();
+                new ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location" };
                 new Assembler.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
@@ -1495,7 +1495,7 @@ namespace Cosmos.IL2CPU
                 new Add { DestinationReg = Registers.EAX, SourceValue = xStackDifference };
                 new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".StackCorruptionCheck_End" };
-                new ClrInterruptFlag();
+                new ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = xLabel + ".StackCorruptionCheck_GetAddress" };
                 new Assembler.Label(xLabel + ".StackCorruptionCheck_GetAddress");

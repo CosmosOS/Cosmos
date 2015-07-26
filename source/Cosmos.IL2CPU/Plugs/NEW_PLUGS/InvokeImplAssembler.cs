@@ -33,7 +33,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.NEW_PLUGS {
  * EBX contains the number of items in the array
  * ECX contains the argument size
  */
-      new CPUx86.ClrInterruptFlag();
+      new CPUx86.ClearInterruptFlag();
       new CPU.Label(".DEBUG");
       //new CPU.Label("____DEBUG_FOR_MULTICAST___");
       new CPU.Comment("move address of delgate to eax");

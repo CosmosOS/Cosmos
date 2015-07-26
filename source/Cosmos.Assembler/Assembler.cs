@@ -436,7 +436,7 @@ namespace Cosmos.Assembler {
 
       // CLI ASAP
       WriteDebugVideo("Clearing interrupts.");
-      new ClrInterruptFlag();
+      new ClearInterruptFlag();
 
 
       WriteDebugVideo("Begin multiboot info.");
@@ -505,7 +505,7 @@ namespace Cosmos.Assembler {
 
       new Comment(this, "Kernel done - loop till next IRQ");
       new Label(".loop");
-      new ClrInterruptFlag();
+      new ClearInterruptFlag();
       new Halt();
       new Jump { DestinationLabel = ".loop" };
 

@@ -98,6 +98,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assemblers\DisableInterruptsAssembler.cs" />
+    <Compile Include="Assemblers\EnableInterruptsAssembler.cs" />
     <Compile Include="UpdateIDT.cs" />
     <Compile Include="CPUImpl.cs" />
     <Compile Include="GCImplementionImpl.cs" />
