@@ -81,7 +81,6 @@
     <Compile Include="DataLookupTable.cs" />
     <Compile Include="GlobalInformationTable.cs" />
     <Compile Include="GlobalSystemInfo.cs" />
-    <Compile Include="HMI.cs" />
     <Compile Include="IOGroup\COM.cs" />
     <Compile Include="IOGroup\Network\AMDPCNetIIIOGroup.cs" />
     <Compile Include="IOGroup\PCSpeaker.cs" />
