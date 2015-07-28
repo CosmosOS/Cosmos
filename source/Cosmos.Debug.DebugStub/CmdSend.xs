@@ -157,6 +157,8 @@ function SendTrace {
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
 function SendText {
++EBP
+EBP = ESP
 	+All
 	// Write the type
     AL = #Ds2Vs_Message
@@ -189,6 +191,7 @@ WriteChar:
     //ESI = EBP[8]
 Finalize:
 	-All
+  -EBP
 }
 
 // Input: Stack
