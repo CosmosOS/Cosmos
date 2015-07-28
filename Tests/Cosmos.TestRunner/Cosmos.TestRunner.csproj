@@ -53,10 +53,6 @@
       <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
-    <ProjectReference Include="..\BoxingTests\BoxingTests.csproj">
-      <Project>{f8889473-5866-4913-86ac-8072a1a2558c}</Project>
-      <Name>BoxingTests</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.Kernel.csproj">
       <Project>{BDC011BE-6041-4A58-A6E7-0F592E78CB27}</Project>
       <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>

@@ -21,9 +21,8 @@ namespace Cosmos.TestRunner.Console
             var xOutputXml = new OutputHandlerXml();
             xEngine.OutputHandler = new MultiplexingOutputHandler(
                 xOutputXml,
-                new OutputHandlerConsole());
+                new OutputHandlerFullConsole());
 
-            xEngine.RunTargets.Add(RunTargetEnum.Bochs);
             xEngine.Execute();
 
             global::System.Console.WriteLine("Do you want to save test run details?");

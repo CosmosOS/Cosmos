@@ -14,9 +14,10 @@ namespace Cosmos.Debug.Kernel {
         {
         } // Plugged
 
-        public unsafe void Send(int aLength, char* aText)
+        private static unsafe void Send(int aLength, char* aText)
         {
         } // Plugged
+
         //public void TraceOff() { } // Plugged
         //public void TraceOn() { } // Plugged
         public void SendPtr(object aObject)
