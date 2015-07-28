@@ -35,6 +35,10 @@ namespace Cosmos.TestRunner.Core
             {
                 OutputHandler.LogMessage("Text from kernel: " + s);
             };
+            debugConnector.CmdSimpleNumber += n =>
+                                              {
+                                                  OutputHandler.LogMessage("Number from kernel: 0x" + n.ToString("X8").ToUpper());
+                                              };
             debugConnector.CmdMessageBox = s =>
                                            {
                                                OutputHandler.LogMessage("MessageBox from kernel: " + s);

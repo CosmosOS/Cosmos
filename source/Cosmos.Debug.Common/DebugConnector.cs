@@ -34,6 +34,7 @@ namespace Cosmos.Debug.Common
         public Action<byte, byte, byte[]> CmdChannel;
         public Action<UInt32> CmdStackCorruptionOccurred;
         public Action<UInt32> CmdNullReferenceOccurred;
+        public Action<UInt32> CmdSimpleNumber;
         public Action<Exception> Error;
 
         protected byte mCurrentMsgType;
@@ -227,6 +228,12 @@ namespace Cosmos.Debug.Common
                     DebugLog("DC Recv: NullReferenceOccurred");
                     Next(4, PacketNullReferenceOccurred);
                     break;
+
+                case Ds2Vs.SimpleNumber:
+                    DebugLog("DC Recv: SimpleNumber");
+                    Next(4, PacketSimpleNumber);
+                    break;
+
                 default:
                     if (mCurrentMsgType > 128)
                     {
