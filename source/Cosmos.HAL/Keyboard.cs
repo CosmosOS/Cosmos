@@ -101,7 +101,7 @@ namespace Cosmos.HAL {
         {
             while (mQueuedKeys.Count == 0)
             {
-                Core.Global.CPU.Halt();
+                Core.CPU.Halt();
             }
             return mQueuedKeys.Dequeue();
         }
