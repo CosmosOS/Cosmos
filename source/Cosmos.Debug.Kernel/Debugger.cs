@@ -14,9 +14,10 @@ namespace Cosmos.Debug.Kernel {
         {
         } // Plugged
 
-        public unsafe void Send(int aLength, char* aText)
+        private static unsafe void ActualSend(int aLength, char* aText)
         {
         } // Plugged
+
         //public void TraceOff() { } // Plugged
         //public void TraceOn() { } // Plugged
         public void SendPtr(object aObject)
@@ -41,18 +42,30 @@ namespace Cosmos.Debug.Kernel {
             //
         }
 
-        public unsafe void Send(string aText) {
-            // TODO: Need to fix this so it can send empty strings.
-            // Sending empty strings locks it up right now
-            if (aText.Length == 0) {
-              return;
-            }
-
-            var xChars = aText.ToCharArray();
-            fixed (char* xPtr = &xChars[0]) {
-                Send(xChars.Length, xPtr);
-            }
+        internal static void DoSend(string aText)
+        {
+            // plugged
         }
+
+        public void Send(string aText)
+        {
+            DoSend(aText);
+        }
+
+        //public void OldSend(string aText) {
+        //    // TODO: Need to fix this so it can send empty strings.
+        //    // Sending empty strings locks it up right now
+        //    if (aText.Length == 0)
+        //    {
+        //        return;
+        //    }
+
+        //    var xChars = aText.ToCharArray();
+        //    fixed (char* xPtr = &xChars[0])
+        //    {
+        //        ActualSend(xChars.Length, xPtr);
+        //    }
+        //}
 
         public unsafe void SendMessageBox(int aLength, char* aText) { } // Plugged
         public unsafe void SendMessageBox(string aText)

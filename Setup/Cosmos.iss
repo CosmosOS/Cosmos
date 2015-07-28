@@ -60,7 +60,7 @@
 AppId=CosmosUserKit
 AppName=Cosmos User Kit
 AppVerName=Cosmos User Kit v{#ChangeSetVersion}
-AppCopyright=Copyright © 2007-2015 The Cosmos Project
+AppCopyright=Copyright Â© 2007-2015 The Cosmos Project
 AppPublisher=Cosmos Project
 AppPublisherURL=http://www.goCosmos.org/
 AppSupportURL=http://www.goCosmos.org/
@@ -213,8 +213,8 @@ Source: ".\Build\VSIP\CosmosKernel (VB).zip"; DestDir: "{code:GetVBExpress2013Pr
 ; Regiter .xs Extension
 Root: HKCR; Subkey: ".xs"; ValueType: string; ValueName: ""; ValueData: "XSharp"; Flags: uninsdeletevalue
 Root: HKCR; Subkey: "XSharp"; ValueType: string; ValueName: ""; ValueData: "X# source file"; Flags: uninsdeletekey
-Root: HKCR; Subkey: "XSharp\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Build\Tools\XSC.exe,0"
-Root: HKCR; Subkey: "XSharp\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Build\Tools\XSC.exe"" ""%1"""
+Root: HKCR; Subkey: "XSharp\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Build\IL2CPU\XSC.exe,0"
+Root: HKCR; Subkey: "XSharp\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Build\IL2CPU\XSC.exe"" ""%1"""
 
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v4.5\AssemblyFoldersEx\Cosmos; ValueType: none; Flags: uninsdeletekey
 Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v4.5\AssemblyFoldersEx\Cosmos; ValueType: string; ValueName: ; ValueData: {app}\Kernel\; Flags: uninsdeletevalue

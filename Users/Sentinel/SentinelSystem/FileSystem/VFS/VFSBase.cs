@@ -20,7 +20,7 @@ namespace SentinelKernel.System.FileSystem.VFS
 
         public abstract List<System.FileSystem.Listing.Directory> GetVolumes();
 
-        public static char DirectorySeparatorChar { get { return '\\'; } }
+        public static char DirectorySeparatorChar => '\\';
 
         public static char AltDirectorySeparatorChar { get { return '/'; } }
 
