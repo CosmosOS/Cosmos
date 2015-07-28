@@ -80,6 +80,7 @@
     <Content Include="Docs\Old.html" />
     <Content Include="Docs\ToDo.html" />
     <Content Include="Docs\XSharp.htm" />
+    <None Include=".editorconfig" />
     <None Include="XSharp.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
