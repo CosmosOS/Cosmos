@@ -139,7 +139,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     }
                     else
-                        throw new NotImplementedException("In NewObj is a string ctor implementation missing!");
+                        throw new NotImplementedException("In NewObj, a string ctor implementation is missing!");
                 }
                 uint xMemSize = GetStorageSize(objectType);
                 int xExtraSize = 12; // additional size for set values after alloc
@@ -155,6 +155,8 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 
+                // it's on the stack now 3 times. Once from the Alloc return value, twice from the pushes
+
                 //? ?? uint xObjSize;// = 0;
                 //int xGCFieldCount = ( from item in aCtorDeclTypeInfo.Fields.Values
                 //where item.NeedsGC
@@ -169,6 +171,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New(strTypeId), SourceIsIndirect = true };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };

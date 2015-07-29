@@ -14,16 +14,17 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
         }
 
 
         // using System;
-        // 
+        //
         // using CPUx86 = Cosmos.Assembler.x86;
         // using Cosmos.IL2CPU.X86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Ldlen)]
         // 	public class Ldlen: Op {

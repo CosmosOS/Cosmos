@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 			//TODO cache it to reduce calculation
             string xTypeID = GetTypeIDLabel(typeof(Array));
-            MethodBase xCtor = typeof( Array ).GetConstructors( BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance )[ 0 ];
+            MethodBase xCtor = typeof(Array).GetConstructors(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance)[0];
             string xCtorName = LabelName.Get( xCtor );
 
             new Comment( Assembler, "Element Size = " + xSize );
@@ -43,8 +43,10 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Call { DestinationLabel = LabelName.Get( GCImplementationRefs.AllocNewObjectRef ) };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
             new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+            // it's on the stack 3 times now, once from the return value, twice from the pushes;
 
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New( xTypeID ), SourceIsIndirect = true };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
             new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };

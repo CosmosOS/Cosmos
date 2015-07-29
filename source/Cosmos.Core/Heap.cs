@@ -119,7 +119,7 @@ namespace Cosmos.Core
 
                     var xResult = (uint)((aTableIdx * DataLookupTable.EntriesPerTable) + i + 1);
                     DebugHex("Returning handle ", xResult, 32);
-                    aHandle = xResult;
+                    aHandle = (uint)aTable->Entries[i].DataBlock;
                     return true;
                 }
 
@@ -133,7 +133,7 @@ namespace Cosmos.Core
                         aTable->Entries[i].Refcount = 1;
                         var xResult = (uint)((aTableIdx * DataLookupTable.EntriesPerTable) + i + 1);
                         DebugHex("Returning reused handle ", xResult, 32);
-                        aHandle = xResult;
+                        aHandle = (uint)aTable->Entries[i].DataBlock;
                         return true;
                     }
                 }

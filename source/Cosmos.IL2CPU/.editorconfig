@@ -32,3 +32,6 @@ indent_size = 4
 
 [IL/Stfld.cs]
 indent_size = 2
+
+[IL/Stelem_Ref.cs]
+indent_size = 2

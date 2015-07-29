@@ -116,7 +116,7 @@ namespace Cosmos.IL2CPU.X86.IL
              */
 
                 new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xThisOffset};
-
+                new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true};
                 new CPUx86.Push {DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true};
                 new CPUx86.Push {DestinationValue = aTargetMethodUID};
                 new CPUx86.Call
@@ -165,6 +165,7 @@ namespace Cosmos.IL2CPU.X86.IL
                */
                     new CPUx86.ConditionalJump {Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = xCurrentMethodLabel + ".NotBoxedThis"};
                     new CPUx86.Pop {DestinationReg = CPUx86.Registers.ECX};
+                    new CPUx86.Mov {DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true};
                     /*
                * On the stack now:
                * $esp                 Params

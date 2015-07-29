@@ -43,15 +43,18 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (aDerefValue && aField.IsExternalValue)
             {
-                new CPUx86.Mov
-                {
-                    DestinationReg = CPUx86.Registers.EAX,
-                    SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int) xActualOffset
-                };
+                new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xActualOffset};
+                new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true, SourceDisplacement = (int)xActualOffset};
+
                 new CPUx86.Mov {DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX};
             }
             else
-                new CPUx86.Add {DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceValue = (uint) (xActualOffset)};
+            {
+                new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true};
+                new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true};
+                new CPUx86.Add {DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceValue = (uint)(xActualOffset)};
+                new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EAX};
+            }
         }
     }
 }

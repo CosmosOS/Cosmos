@@ -54,12 +54,17 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             int xExtraOffset = 0;
             var xFieldInfo = ResolveField(aDeclaringType, aFieldId, true);
-            bool xNeedsGC = aDeclaringType.IsClass && !aDeclaringType.IsValueType;
+            bool xNeedsGC = TypeNeedsGC(aDeclaringType);
             if (xNeedsGC)
             {
                 xExtraOffset = 12;
             }
             return (int)(xExtraOffset + xFieldInfo.Offset);
+        }
+
+        public static bool TypeNeedsGC(Type aDeclaringType)
+        {
+            return aDeclaringType.IsClass && !aDeclaringType.IsValueType;
         }
 
         public static void DoExecute(Cosmos.Assembler.Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField, bool debugEnabled, Type aTypeOnStack)
@@ -126,6 +131,8 @@ namespace Cosmos.IL2CPU.X86.IL
 #endif
 
             new CPUx86.Add {DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xOffset)};
+            // convert to real memory address
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
 
             if (xFieldInfo.IsExternalValue && aDerefExternalField)
             {

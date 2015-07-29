@@ -154,7 +154,7 @@ namespace Cosmos.HAL {
             RegisterTimer(new PITTimer(SignalWait, (int)(TimeoutMS * 1000000), false));
 
             while (!WaitSignaled) {
-                Core.CPU.Halt();
+                Core.Global.CPU.Halt();
             }
         }
         public void WaitNS(int TimeoutNS) {
@@ -163,7 +163,7 @@ namespace Cosmos.HAL {
             RegisterTimer(new PITTimer(SignalWait, TimeoutNS, false));
 
             while (!WaitSignaled) {
-                Core.CPU.Halt();
+                Core.Global.CPU.Halt();
             }
         }
 

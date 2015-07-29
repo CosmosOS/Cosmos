@@ -32,9 +32,14 @@ namespace Cosmos.Core
         {
         } // Plugged
 
-        public static void Halt()
+        internal static void DoHalt()
         {
         } // Plugged
+
+        public void Halt()
+        {
+            DoHalt();
+        }
 
         public void Reboot()
         {
