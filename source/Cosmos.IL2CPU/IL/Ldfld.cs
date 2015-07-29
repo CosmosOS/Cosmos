@@ -77,6 +77,8 @@ namespace Cosmos.IL2CPU.X86.IL
             new Comment("Field: " + xFieldInfo.Id);
             new Comment("Type: " + xFieldInfo.FieldType.ToString());
             new Comment("Size: " + xFieldInfo.Size);
+            new Comment("DeclaringType: " + aDeclaringType.FullName);
+            new Comment("TypeOnStack: " + aTypeOnStack.FullName);
             new Comment("Offset: " + xOffset + " (includes object header)");
 
             if (aDeclaringType.IsValueType && aTypeOnStack == aDeclaringType)
@@ -123,16 +125,14 @@ namespace Cosmos.IL2CPU.X86.IL
 
             new CPUx86.Pop {DestinationReg = CPUx86.Registers.ECX};
 
-#if DOTNETCOMPATIBLE
-    // pushed size is always 4 or 8
-			var xSize = ILOp.Align(xFieldInfo.Size, 4);
-#else
-            var xSize = xFieldInfo.Size;
-#endif
-
+            // pushed size is always 4 or 8
+            var xSize = ILOp.Align(xFieldInfo.Size, 4);
+            if (!aTypeOnStack.IsPointer)
+            {
+              // convert to real memory address
+              new CPUx86.Mov {DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true};
+            }
             new CPUx86.Add {DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xOffset)};
-            // convert to real memory address
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
 
             if (xFieldInfo.IsExternalValue && aDerefExternalField)
             {

@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL {
 
       uint xRoundedSize = Align(xSize, 4);
       DoNullReferenceCheck(aAssembler, debugEnabled, xRoundedSize);
-
+      new Comment("After Nullref check");
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
       // ECX contains the object pointer now
       if (aNeedsGC)
