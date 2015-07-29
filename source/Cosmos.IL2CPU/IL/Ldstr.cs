@@ -44,7 +44,7 @@ namespace Cosmos.IL2CPU.X86.IL
 	{
 	  var xAsm = CPU.Assembler.CurrentInstance;
 	  var xResult = labelArray + "__Handle";
-	  xAsm.DataMembers.Add(new DataMember(xResult, "labelArray"));
+	  xAsm.DataMembers.Add(new DataMember(xResult, ElementReference.New(labelArray)));
 	  return xResult;
 	}
 

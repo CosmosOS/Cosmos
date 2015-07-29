@@ -1,4 +1,6 @@
-﻿namespace Cosmos.Core
+﻿using Cosmos.Debug.Kernel;
+
+namespace Cosmos.Core
 {
     internal static unsafe class GlobalSystemInfo
     {
@@ -14,7 +16,12 @@
                     var xEndOfKernel = CPU.GetEndOfKernel();
                     CPU.ZeroFill(xEndOfKernel, (uint)(sizeof(GlobalInformationTable) + GetTotalDataLookupSize));
                     mGlobalInformationTable = (GlobalInformationTable*)xEndOfKernel;
-                    mGlobalInformationTable->FirstDataLookupTable = (DataLookupTable*)(xEndOfKernel + sizeof(GlobalInformationTable));
+                    uint xFirstDataLookupLocation = (uint)(xEndOfKernel + sizeof(GlobalInformationTable));
+                    Debugger.DoSend("Setting FirstDataLookupTable to ");
+                    Debugger.DoSendNumber(xFirstDataLookupLocation);
+                    mGlobalInformationTable->FirstDataLookupTable = (DataLookupTable*)xFirstDataLookupLocation;
+                    Debugger.DoSend("FirstDataLookupTable was set to ");
+                    Debugger.DoSendNumber((uint)mGlobalInformationTable->FirstDataLookupTable);
                 }
                 return mGlobalInformationTable;
             }

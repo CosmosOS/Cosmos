@@ -924,7 +924,8 @@ namespace Cosmos.IL2CPU
             xTemp = BitConverter.GetBytes(GetVTableEntrySize());
             Array.Copy(xTemp, 0, xData, 12, 4);
             Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
-            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName, Cosmos.Assembler.ElementReference.New(xTheName + "__Contents")));
+            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Handle", xTheName + "__Contents"));
+            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName, Cosmos.Assembler.ElementReference.New(xTheName + "__Handle")));
 #if VMT_DEBUG
         using (var xVmtDebugOutput = XmlWriter.Create(@"e:\vmt_debug.xml"))
         {
@@ -1367,7 +1368,7 @@ namespace Cosmos.IL2CPU
                 {
                     continue;
                 }
-                if (xDataMember.Name.EndsWith("__Contents"))
+                if (xDataMember.Name.EndsWith("__Handle"))
                 {
                     continue;
                 }

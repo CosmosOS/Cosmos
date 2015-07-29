@@ -46,6 +46,11 @@ namespace Cosmos.Core
 
                 var xCurrentTableIdx = 0u;
                 DataLookupTable* xCurrentTable = GlobalSystemInfo.GlobalInformationTable->FirstDataLookupTable;
+                if (xCurrentTable == null)
+                {
+                    DebugHex("FirstDataLookupTable address: ", (uint)GlobalSystemInfo.GlobalInformationTable->FirstDataLookupTable);
+                    DebugAndHalt("GlobalInformationTable is not initialized correctly!");
+                }
                 DataLookupTable* xPreviousTable = null;
                 uint xResult;
                 while (xCurrentTable != null)
@@ -61,6 +66,10 @@ namespace Cosmos.Core
                 }
 
                 // no tables found, lets
+                if (xPreviousTable == null)
+                {
+                    DebugAndHalt("No PreviousTable found!");
+                }
                 var xLastItem = xPreviousTable->Entries[DataLookupTable.EntriesPerTable - 1];
                 var xNextTablePointer = (DataLookupTable*)((uint)xLastItem.DataBlock + xLastItem.Size);
                 // the memory hasn't been cleared yet, so lets do that now.

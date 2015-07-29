@@ -15,11 +15,6 @@ namespace Cosmos.TestRunner.Console
         [STAThread]
         static void Main(string[] args)
         {
-            int xCompletionPortThreads;
-            int xWorkerThread;
-            ThreadPool.GetMaxThreads(out xWorkerThread, out xCompletionPortThreads);
-            global::System.Console.WriteLine("WorkerThreads = {0}, CompletionPortThreads = {1}", xWorkerThread, xCompletionPortThreads);
-            global::System.Console.ReadLine();
             var xEngine = new Engine();
 
             DefaultEngineConfiguration.Apply(xEngine);
@@ -45,9 +40,6 @@ namespace Cosmos.TestRunner.Console
 
                 xOutputXml.SaveToFile(xSaveDialog.FileName);
             }
-            ThreadPool.GetMaxThreads(out xWorkerThread, out xCompletionPortThreads);
-            global::System.Console.WriteLine("WorkerThreads = {0}, CompletionPortThreads = {1}", xWorkerThread, xCompletionPortThreads);
-            global::System.Console.ReadLine();
         }
     }
 }

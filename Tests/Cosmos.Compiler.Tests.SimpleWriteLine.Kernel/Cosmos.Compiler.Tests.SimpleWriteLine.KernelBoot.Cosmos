@@ -19,7 +19,7 @@
     <TraceMode>User</TraceMode>
     <EnableGDB>True</EnableGDB>
     <StartCosmosGDB>False</StartCosmosGDB>
-    <VMWareEdition>Player</VMWareEdition>
+    <VMWareEdition>Workstation</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
     <Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</Name>
     <Description>Use VMware Player or Workstation to deploy and debug.</Description>
@@ -36,7 +36,7 @@
     <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
-    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
+    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <VMware_EnableGDB>True</VMware_EnableGDB>
