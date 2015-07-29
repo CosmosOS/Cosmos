@@ -14,7 +14,7 @@ namespace Cosmos.Core
                     // todo: should we align this structure somehow?
 
                     var xEndOfKernel = CPU.GetEndOfKernel();
-                    CPU.ZeroFill(xEndOfKernel, (uint)(sizeof(GlobalInformationTable) + TotalDataLookupTableSize));
+                    CPU.ZeroFill(xEndOfKernel, (uint)(sizeof(GlobalInformationTable) + TotalDataLookupTableSize) * 4);
                     mGlobalInformationTable = (GlobalInformationTable*)xEndOfKernel;
                     uint xFirstDataLookupLocation = (uint)(xEndOfKernel + sizeof(GlobalInformationTable));
                     Debugger.DoSend("Setting FirstDataLookupTable to ");

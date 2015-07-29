@@ -3,28 +3,31 @@
 namespace Cosmos.Core
 {
     // The DataLookupTable (DLT) basically is a linked list.
+    [StructLayout(LayoutKind.Explicit)]
     internal unsafe struct DataLookupTable
     {
         public const int EntriesPerTable = 169;
 
+        [FieldOffset(0)]
         public DataLookupTable* Previous;
+        [FieldOffset(4)]
         public DataLookupTable* Next;
 
+        [FieldOffset(8)]
         public DataLookupEntry FirstEntry;
 
         public unsafe DataLookupEntry* GetEntry(int index)
         {
             fixed (DataLookupEntry* xFirstEntryPtr = &FirstEntry)
             {
-                return &xFirstEntryPtr[index];
-            }
-        }
-
-        public void* GetFirstByteAfterTable()
-        {
-            fixed (DataLookupTable* xThisPtr = &this)
-            {
-                return (void*)(uint)(xThisPtr + GlobalSystemInfo.TotalDataLookupTableSize);
+                if (index == 0)
+                {
+                    return xFirstEntryPtr;
+                }
+                else
+                {
+                    return &xFirstEntryPtr[index];
+                }
             }
         }
     }

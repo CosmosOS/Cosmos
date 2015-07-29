@@ -56,6 +56,7 @@ namespace Cosmos.Core
                 while (xCurrentTable != null)
                 {
                     DebugHex("Scanning DataLookupTable ", xCurrentTableIdx);
+                    DebugHex("At address", (uint)xCurrentTable);
                     if (ScanDataLookupTable(xCurrentTableIdx, xCurrentTable, aLength, out xResult))
                     {
                         DebugHex("Returning handle ", xResult);
@@ -100,10 +101,14 @@ namespace Cosmos.Core
         private static bool ScanDataLookupTable(uint aTableIdx, DataLookupTable* aTable, uint aSize, out uint aHandle)
         {
             DataLookupEntry* xPreviousEntry = null;
-            for (int i = 0; i < DataLookupTable.EntriesPerTable; i++)
+            for (int i = 1; i < DataLookupTable.EntriesPerTable; i++)
             {
                 //DebugHex("Scanning item ", (uint)i);
+
                 var xCurrentEntry = aTable->GetEntry(i);
+
+                //DebugHex("Item.Size", xCurrentEntry->Size);
+                //DebugHex("Item.Refcount", xCurrentEntry->Refcount);
                 if (xCurrentEntry->Size == 0)
                 {
                     DebugHex("Found an entry at position ", (uint)i);
@@ -118,12 +123,16 @@ namespace Cosmos.Core
                     void* xDataBlock;
                     Debug("Now calculate datablock pointer");
                     // now we found ourself a free handle
-                    if (i == 0)
+                    if (i == 1)
                     {
                         Debug("Using table end");
                         // we don't have a previous handle yet, so we take the FirstByteAfterTable field of the DataLookupTable
                         // note: we're explicitly initializing all blocks, as memory hasn't been cleared yet.
-                        xDataBlock = aTable->GetFirstByteAfterTable();
+                        var xTableAddr = (uint)aTable;
+                        DebugHex("aTableAddr", xTableAddr);
+                        var xTotalTableSize = GlobalSystemInfo.TotalDataLookupTableSize;
+                        DebugHex("TotalTableSize", xTotalTableSize);
+                        xDataBlock = (void*)(((uint)aTable) + GlobalSystemInfo.TotalDataLookupTableSize);
                     }
                     else
                     {

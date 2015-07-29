@@ -12,7 +12,7 @@ namespace Cosmos.TestRunner.Core
                 throw new ArgumentNullException("engine");
             }
 
-            engine.AllowedSecondsInKernel = 30;
+            engine.AllowedSecondsInKernel = 60;
 
             // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are ran.
             engine.RunTargets.Add(RunTargetEnum.Bochs);
