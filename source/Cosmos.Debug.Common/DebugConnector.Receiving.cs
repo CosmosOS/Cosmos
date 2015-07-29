@@ -8,7 +8,7 @@ namespace Cosmos.Debug.Common
     {
         protected void WaitForMessage()
         {
-            //Next(1, PacketMsg);
+            Next(1, PacketMsg);
         }
 
         protected void PacketTextSize(byte[] aPacket)
