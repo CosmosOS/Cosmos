@@ -13,18 +13,19 @@ namespace Cosmos.Core
                 return;
             }
 
-            //Debugger.DoSend(message);
+            Debugger.DoSend(message);
         }
 
         private static int mConsoleX = 0;
 
-        private static void DebugHex(string message, uint value, byte bits)
+        private static void DebugHex(string message, uint value)
         {
             if (!EnableDebug)
             {
                 return;
             }
-            //Console.Write("Heap: ");
+            Debugger.DoSend(message);
+            Debugger.DoSendNumber(value);
             //Console.Write(message);
             //WriteNumberHex(value, bits);
             //NewLine();

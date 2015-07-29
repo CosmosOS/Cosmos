@@ -197,6 +197,25 @@ Finalize:
 // Input: Stack
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
+function SendSimpleNumber {
++EBP
+EBP = ESP
+	+All
+	// Write the type
+    AL = #Ds2Vs_SimpleNumber
+    ComWriteAL()
+
+	// Write Length
+    EAX = EBP[8]
+    ComWriteEAX()
+
+	-All
+  -EBP
+}
+
+// Input: Stack
+// Output: None
+// Modifies: EAX, ECX, EDX, ESI
 function SendPtr {
     // Write the type
     AL = #Ds2Vs_Pointer

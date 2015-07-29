@@ -24,6 +24,17 @@ namespace Cosmos.Debug.Kernel {
         {
         } // plugged
 
+
+        internal static void DoSendNumber(uint aNumber)
+        {
+            // plugged
+        }
+
+        public void SendNumber(uint aNumber)
+        {
+            DoSendNumber(aNumber);
+        }
+
         public unsafe void SendChannelCommand(byte aChannel, byte aCommand, byte[] aData)
         {
             fixed (byte* xPtr = &aData[0])

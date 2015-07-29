@@ -93,6 +93,15 @@ namespace Cosmos.Debug.Common
             WaitForMessage();
         }
 
+        protected void PacketSimpleNumber(byte[] aPacket)
+        {
+            if (CmdSimpleNumber != null)
+            {
+                CmdSimpleNumber(GetUInt32(aPacket, 0));
+            }
+            WaitForMessage();
+        }
+
         protected void PacketStackCorruptionOccurred(byte[] aPacket)
         {
             if (CmdStackCorruptionOccurred != null)

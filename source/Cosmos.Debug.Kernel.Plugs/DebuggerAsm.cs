@@ -16,6 +16,9 @@ namespace Cosmos.Debug.Kernel.Plugs {
     [PlugMethod(Assembler = typeof(DebugDoSend))]
     public static void DoSend(string aText) { }
 
+    [PlugMethod(Assembler = typeof(DebugDoSendNumber))]
+    public static void DoSendNumber(uint aNumber) { }
+
     [PlugMethod(Assembler = typeof(DebugSendMessageBox))]
     public static unsafe void SendMessageBox(Kernel.Debugger aThis, int aLength, char* aText) { }
 
@@ -132,6 +135,17 @@ namespace Cosmos.Debug.Kernel.Plugs {
     }
   }
 
+  public class DebugDoSendNumber : AssemblerMethod
+  {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    {
+      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+      new LiteralAssemblerCode("push dword [ebp+8]");
+      new LiteralAssemblerCode("Call DebugStub_SendSimpleNumber");
+      new LiteralAssemblerCode("add esp, 4");
+      new LiteralAssemblerCode("%endif");
+    }
+  }
   public class DebugSendMessageBox : AssemblerMethod
   {
       public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)

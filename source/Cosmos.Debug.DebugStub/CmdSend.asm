@@ -1,4 +1,4 @@
-; Generated at 28-7-2015 15:55:56
+; Generated at 28-7-2015 17:36:29
 
 
 
@@ -175,6 +175,22 @@ Popad
 Pop EBP
 DebugStub_SendText_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendText_Exit
+Ret
+
+DebugStub_SendSimpleNumber:
+Push EBP
+Mov EBP, ESP
+Pushad
+Mov AL, DebugStub_Const_Ds2Vs_SimpleNumber
+Call DebugStub_ComWriteAL
+
+Mov EAX, [EBP + 8]
+Call DebugStub_ComWriteEAX
+
+Popad
+Pop EBP
+DebugStub_SendSimpleNumber_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendSimpleNumber_Exit
 Ret
 
 DebugStub_SendPtr:

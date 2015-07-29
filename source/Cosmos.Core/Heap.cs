@@ -50,7 +50,7 @@ namespace Cosmos.Core
                 uint xResult;
                 while (xCurrentTable != null)
                 {
-                    DebugHex("Scanning DataLookupTable ", xCurrentTableIdx, 32);
+                    DebugHex("Scanning DataLookupTable ", xCurrentTableIdx);
                     if (ScanDataLookupTable(xCurrentTableIdx, xCurrentTable, aLength, out xResult))
                     {
                         return xResult;
@@ -118,7 +118,7 @@ namespace Cosmos.Core
                     aTable->Entries[i].Refcount = 1;
 
                     var xResult = (uint)((aTableIdx * DataLookupTable.EntriesPerTable) + i + 1);
-                    DebugHex("Returning handle ", xResult, 32);
+                    DebugHex("Returning handle ", xResult);
                     aHandle = (uint)aTable->Entries[i].DataBlock;
                     return true;
                 }
@@ -132,7 +132,7 @@ namespace Cosmos.Core
                         // we can reuse this entry
                         aTable->Entries[i].Refcount = 1;
                         var xResult = (uint)((aTableIdx * DataLookupTable.EntriesPerTable) + i + 1);
-                        DebugHex("Returning reused handle ", xResult, 32);
+                        DebugHex("Returning reused handle ", xResult);
                         aHandle = (uint)aTable->Entries[i].DataBlock;
                         return true;
                     }
