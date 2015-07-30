@@ -1061,7 +1061,8 @@ namespace Cosmos.IL2CPU
                     Push(xDataName + "_Handle");
                     xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-                    Push(xDataName);
+                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName + "_Handle", ElementReference.New(xDataName)));
+                    Push(xDataName + "_Handle");
                     xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
                     xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
                     Array.Copy(xTemp, 0, xData, 0, 4);
@@ -1074,7 +1075,6 @@ namespace Cosmos.IL2CPU
                     xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName + "_Handle", ElementReference.New(xDataName)));
-                    Push(xDataName + "_Handle");
                     Push("0" + xEmittedMethods.Count.ToString("X") + "h");
                     Call(xSetTypeInfoRef);
                 }

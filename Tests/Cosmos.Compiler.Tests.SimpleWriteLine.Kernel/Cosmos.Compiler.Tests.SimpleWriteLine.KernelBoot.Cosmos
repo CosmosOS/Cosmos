@@ -10,7 +10,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>VMware</Profile>
+    <Profile>Bochs</Profile>
     <!-- Looks like this was a mispelled attribute. Replaced by DebugEnabled below.
     <DebugEnable>true</DebugEnable>
     -->
@@ -18,13 +18,13 @@
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <EnableGDB>True</EnableGDB>
-    <StartCosmosGDB>False</StartCosmosGDB>
+    <StartCosmosGDB>True</StartCosmosGDB>
     <VMWareEdition>Workstation</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
     <Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</Name>
-    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
+    <Description>Use Bochs emulator to deploy and debug.</Description>
     <Deployment>ISO</Deployment>
-    <Launch>VMware</Launch>
+    <Launch>Bochs</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
     <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
     <TraceAssemblies>All</TraceAssemblies>
@@ -40,7 +40,22 @@
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <VMware_EnableGDB>True</VMware_EnableGDB>
-    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
+    <VMware_StartCosmosGDB>True</VMware_StartCosmosGDB>
+    <EnableBochsDebug>True</EnableBochsDebug>
+    <Bochs_Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</Bochs_Name>
+    <Bochs_Description>Use Bochs emulator to deploy and debug.</Bochs_Description>
+    <Bochs_Deployment>ISO</Bochs_Deployment>
+    <Bochs_Launch>Bochs</Bochs_Launch>
+    <Bochs_DebugEnabled>True</Bochs_DebugEnabled>
+    <Bochs_StackCorruptionDetectionEnabled>True</Bochs_StackCorruptionDetectionEnabled>
+    <Bochs_DebugMode>Source</Bochs_DebugMode>
+    <Bochs_VisualStudioDebugPort>Pipe: Cosmos\Serial</Bochs_VisualStudioDebugPort>
+    <Bochs_VMwareEdition>Workstation</Bochs_VMwareEdition>
+    <Bochs_OutputPath>bin\Debug\</Bochs_OutputPath>
+    <Bochs_TraceAssemblies>All</Bochs_TraceAssemblies>
+    <Bochs_EnableGDB>True</Bochs_EnableGDB>
+    <Bochs_StartCosmosGDB>True</Bochs_StartCosmosGDB>
+    <Bochs_EnableBochsDebug>True</Bochs_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
