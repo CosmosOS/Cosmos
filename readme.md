@@ -1,6 +1,14 @@
 ### C# Open Source Managed Operating System
 
 [![Join the chat at https://gitter.im/CosmosOS/Cosmos](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/CosmosOS/Cosmos?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![GitHub license](https://img.shields.io/github/license/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/blob/master/LICENSE.txt)
+[![GitHub forks](https://img.shields.io/github/forks/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/network)
+[![GitHub stars](https://img.shields.io/github/stars/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/stargazers)
+[![GitHub release](https://img.shields.io/github/release/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/releases)
+[![Github Releases](https://img.shields.io/github/downloads/CosmosOS/Cosmos/latest/total.svg)](https://github.com/CosmosOS/Cosmos/releases)
+[![GitHub issues](https://img.shields.io/github/issues/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/issues)
+[![Issue Stats](http://issuestats.com/github/CosmosOS/Cosmos/badge/pr?style=flat)](http://issuestats.com/github/CosmosOS/Cosmos)
+[![Issue Stats](http://issuestats.com/github/CosmosOS/Cosmos/badge/issue?style=flat)](http://issuestats.com/github/CosmosOS/Cosmos)
 
 [We are currently migrating from codeplex](http://cosmos.codeplex.com/)
 
@@ -26,12 +34,13 @@ Getting Started
 * [Cosmos Documentation](https://github.com/CosmosOS/Cosmos/wiki)
 * Video: [Using VS Express Editions](https://www.youtube.com/watch?v=NNl8S2xOtdo)
 * [FAQ](https://github.com/CosmosOS/Cosmos/wiki/FAQ)
-* [Low Hanging Fruit](https://github.com/CosmosOS/Cosmos/issues?q=is%3Aopen+is%3Aissue+label%3Acomplexity_low) - Looking for something easy to do and prove your worth in Cosmos? Here are a few easy tasks we have on our to do list that are also of importance to us.
+* [Low Hanging Fruit](https://github.com/CosmosOS/Cosmos/issues?q=is%3Aopen+is%3Aissue+label%3Acomplexity_low+sort%3Acreated-asc) - Looking for something easy to do and prove your worth in Cosmos? Here are a few easy tasks we have on our to do list that are also of importance to us.
 
 
 Joining Cosmos
 ---------
 
+* [Gitter.im](https://gitter.im/CosmosOS/Cosmos) - Live chat. Click the green `Join Chat` badge at the top of this file. As with the IRC and CodePlex chatroom, please be patient if we don't respond immediately (no pinging).
 * [Yahoo Group](https://tech.groups.yahoo.com/group/Cosmos-Dev) - Email Discussion List. To prevent spambots from spamming our list we ask you introduce yourself to join. Please mention something specific to Cosmos. "Hey I want to join" won't get you in....
 * [Cosmos Chat Room](http://cosmos.codeplex.com/wikipage?title=Cosmos%20Chat%20Room&referringTitle=Home) - Live chat. When joining give some time for response. Asking a question and leaving a few minutes or seconds later will not give anyone any time to notice your presence.
 * [Facebook](http://www.facebook.com/pages/Cosmos-Operating-System/10235842745) - Like us to see frequent updates of what is going on with Cosmos.
