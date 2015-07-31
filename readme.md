@@ -1,14 +1,7 @@
 ### C# Open Source Managed Operating System
 
 [![Join the chat at https://gitter.im/CosmosOS/Cosmos](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/CosmosOS/Cosmos?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![GitHub license](https://img.shields.io/github/license/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/blob/master/LICENSE.txt)
-[![GitHub forks](https://img.shields.io/github/forks/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/network)
-[![GitHub stars](https://img.shields.io/github/stars/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/stargazers)
 [![GitHub release](https://img.shields.io/github/release/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/releases)
-[![Github Releases](https://img.shields.io/github/downloads/CosmosOS/Cosmos/latest/total.svg)](https://github.com/CosmosOS/Cosmos/releases)
-[![GitHub issues](https://img.shields.io/github/issues/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/issues)
-[![Issue Stats](http://issuestats.com/github/CosmosOS/Cosmos/badge/pr?style=flat)](http://issuestats.com/github/CosmosOS/Cosmos)
-[![Issue Stats](http://issuestats.com/github/CosmosOS/Cosmos/badge/issue?style=flat)](http://issuestats.com/github/CosmosOS/Cosmos)
 
 [We are currently migrating from codeplex](http://cosmos.codeplex.com/)
 
