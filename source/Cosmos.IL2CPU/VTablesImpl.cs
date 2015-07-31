@@ -71,10 +71,8 @@ namespace Cosmos.IL2CPU
 
     public static int GetMethodAddressForType(int aType, int aMethodId)
     {
-      if (aType == 0x9D && aMethodId == 0x9C)
-      {
-        ;
-      }
+      DebugHex("Type", (uint)aType);
+      DebugHex("MethodId", (uint)aMethodId);
       do
       {
         var xCurrentTypeInfo = mTypes[aType];
@@ -104,8 +102,6 @@ namespace Cosmos.IL2CPU
             var xResult = xCurrentTypeInfo.MethodAddresses[i];
             if (xResult < 1048576) // if pointer is under 1MB, some issue exists!
             {
-              DebugHex("Type", (uint)aType);
-              DebugHex("MethodId", (uint)aMethodId);
               DebugHex("Result", (uint)xResult);
               DebugHex("i", (uint)i);
               DebugHex("MethodCount", (uint)xCurrentTypeInfo.MethodCount);
@@ -114,8 +110,6 @@ namespace Cosmos.IL2CPU
               while (true)
                 ;
             }
-            DebugHex("Type", (uint)aType);
-            DebugHex("MethodIndex", (uint)aMethodId);
             Debug("Found.");
             return xResult;
           }
