@@ -1273,6 +1273,9 @@ namespace Cosmos.IL2CPU
         /// <param name="aTo">The plug</param>
         internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo)
         {
+            var xMethodLabel = ILOp.GetMethodLabel(aFrom);
+            var xEndOfMethodLabel = xMethodLabel + EndOfMethodLabelNameNormal;
+
             // todo: completely get rid of this kind of trampoline code
             MethodBegin(aFrom);
             {
@@ -1324,8 +1327,6 @@ namespace Cosmos.IL2CPU
                         xCurParamIdx++;
                     }
                 }
-                var xMethodLabel = ILOp.GetMethodLabel(aFrom);
-                var xEndOfMethodLabel = xMethodLabel + EndOfMethodLabelNameNormal;
                 Call(aFrom, aTo, xEndOfMethodLabel);
             }
             MethodEnd(aFrom);
