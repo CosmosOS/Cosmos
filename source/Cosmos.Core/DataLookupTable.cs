@@ -6,7 +6,7 @@ namespace Cosmos.Core
     [StructLayout(LayoutKind.Explicit)]
     internal unsafe struct DataLookupTable
     {
-        public const int EntriesPerTable = 169;
+        public const int EntriesPerTable = 170;
 
         [FieldOffset(0)]
         public DataLookupTable* Previous;
