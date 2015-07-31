@@ -43,19 +43,38 @@ namespace Cosmos.IL2CPU
       mTypes[aType].MethodIndexes = aMethodIndexes;
       mTypes[aType].MethodAddresses = aMethodAddresses;
       mTypes[aType].MethodCount = aMethodCount;
-      DebugHex("SetTypeInfo for type", (uint)aType);
-      DebugHex("MethodCount", (uint)aMethodCount);
-      DebugHex("MethodAddresses.Length", (uint)aMethodAddresses.Length);
     }
 
     public static void SetMethodInfo(int aType, int aMethodIndex, int aMethodIdentifier, int aMethodAddress, char[] aName)
     {
       mTypes[aType].MethodIndexes[aMethodIndex] = aMethodIdentifier;
       mTypes[aType].MethodAddresses[aMethodIndex] = aMethodAddress;
+      if (aType == 0x9D && aMethodIdentifier == 0x9C)
+      {
+        Debug("SetMethodInfo");
+        DebugHex("Type", (uint)aType);
+        DebugHex("MethodId", (uint)aMethodIdentifier);
+        DebugHex("MethodIdx", (uint)aMethodIndex);
+        DebugHex("aMethodAddress", (uint)aMethodAddress);
+        DebugHex("Read back address: ", (uint)mTypes[aType].MethodAddresses[aMethodIndex]);
+      }
+
+      if (mTypes[aType].MethodIndexes[aMethodIndex] != aMethodIdentifier)
+      {
+        DebugAndHalt("Setting went wrong! (1)");
+      }
+      if (mTypes[aType].MethodAddresses[aMethodIndex] != aMethodAddress)
+      {
+        DebugAndHalt("Setting went wrong! (2)");
+      }
     }
 
-    public static int GetMethodAddressForType(int aType, int aMethodIndex)
+    public static int GetMethodAddressForType(int aType, int aMethodId)
     {
+      if (aType == 0x9D && aMethodId == 0x9C)
+      {
+        ;
+      }
       do
       {
         var xCurrentTypeInfo = mTypes[aType];
@@ -66,6 +85,12 @@ namespace Cosmos.IL2CPU
           while (true)
             ;
         }
+        var xMethodCount = xCurrentTypeInfo.MethodIndexes.Length;
+        // for now:
+        //if (xMethodCount > 4096)
+        //{
+        //  xMethodCount = 4096;
+        //}
         for (int i = 0; i < xCurrentTypeInfo.MethodIndexes.Length; i++)
         {
           if (xCurrentTypeInfo.MethodAddresses == null)
@@ -74,13 +99,13 @@ namespace Cosmos.IL2CPU
             while (true)
               ;
           }
-          if (xCurrentTypeInfo.MethodIndexes[i] == aMethodIndex)
+          if (xCurrentTypeInfo.MethodIndexes[i] == aMethodId)
           {
             var xResult = xCurrentTypeInfo.MethodAddresses[i];
             if (xResult < 1048576) // if pointer is under 1MB, some issue exists!
             {
               DebugHex("Type", (uint)aType);
-              DebugHex("MethodIndex", (uint)aMethodIndex);
+              DebugHex("MethodId", (uint)aMethodId);
               DebugHex("Result", (uint)xResult);
               DebugHex("i", (uint)i);
               DebugHex("MethodCount", (uint)xCurrentTypeInfo.MethodCount);
@@ -90,7 +115,7 @@ namespace Cosmos.IL2CPU
                 ;
             }
             DebugHex("Type", (uint)aType);
-            DebugHex("MethodIndex", (uint)aMethodIndex);
+            DebugHex("MethodIndex", (uint)aMethodId);
             Debug("Found.");
             return xResult;
           }
@@ -106,7 +131,7 @@ namespace Cosmos.IL2CPU
       Debugger.DoSend("Type");
       Debugger.DoSendNumber((uint)aType);
       Debugger.DoSend("MethodIndex");
-      Debugger.DoSendNumber((uint)aMethodIndex);
+      Debugger.DoSendNumber((uint)aMethodId);
       Debugger.DoSend("Not FOUND!");
       while (true)
         ;

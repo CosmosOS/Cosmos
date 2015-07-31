@@ -31,6 +31,12 @@ namespace Cosmos.HAL {
         Debugger.DoSend("ERROR: This is not of type TextScreen!");
       }
 
+        unsafe
+        {
+            var xPtr = ((byte*)0xB8000);
+            xPtr[0] = 65;
+        }
+
       mRAM = IO.Memory.Bytes;
       mClearCellValue32 = (UInt32)(mClearCellValue << 16 | mClearCellValue);
       mRow2Addr = (UInt32)(Cols * 2);

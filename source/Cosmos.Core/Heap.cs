@@ -46,17 +46,12 @@ namespace Cosmos.Core
 
                 var xCurrentTableIdx = 0u;
                 DataLookupTable* xCurrentTable = GlobalSystemInfo.GlobalInformationTable->FirstDataLookupTable;
-                if (xCurrentTable == null)
-                {
-                    DebugHex("FirstDataLookupTable address: ", (uint)GlobalSystemInfo.GlobalInformationTable->FirstDataLookupTable);
-                    DebugAndHalt("GlobalInformationTable is not initialized correctly!");
-                }
                 DataLookupTable* xPreviousTable = null;
                 uint xResult;
                 while (xCurrentTable != null)
                 {
                     DebugHex("Scanning DataLookupTable ", xCurrentTableIdx);
-                    DebugHex("At address", (uint)xCurrentTable);
+                    //DebugHex("At address", (uint)xCurrentTable);
                     if (ScanDataLookupTable(xCurrentTableIdx, xCurrentTable, aLength, out xResult))
                     {
                         DebugHex("Returning handle ", xResult);
@@ -71,14 +66,11 @@ namespace Cosmos.Core
                     xCurrentTable = xCurrentTable->Next;
                 }
 
-                // no tables found, lets
+                // no tables found, lets create a new one, and use that
                 if (xPreviousTable == null)
                 {
+                    // this check should theoretically be unnecessary, but lets keep it, to do some double-checking.
                     DebugAndHalt("No PreviousTable found!");
-                }
-                else
-                {
-                    Debug("PreviousTable found!");
                 }
                 var xLastItem = xPreviousTable->GetEntry(DataLookupTable.EntriesPerTable - 1);
                 var xNextTablePointer = (DataLookupTable*)((uint)xLastItem->DataBlock + xLastItem->Size);
@@ -87,17 +79,13 @@ namespace Cosmos.Core
                 xPreviousTable->Next = xNextTablePointer;
                 xNextTablePointer->Previous = xPreviousTable;
                 //xNextTablePointer->FirstByteAfterTable = (void*)((uint)xNextTablePointer + GlobalSystemInfo.GetTotalDataLookupSize);
-                if (!ScanDataLookupTable(xCurrentTableIdx, xPreviousTable, aLength, out xResult))
+                if (!ScanDataLookupTable(xCurrentTableIdx, xNextTablePointer, aLength, out xResult))
                 {
                     // Something seriously weird happened: we could create a new DataLookupTable (with new entries)
                     // but couldn't allocate a new handle from it.
                     DebugAndHalt("Something seriously weird happened: we could create a new DataLookupTable (with new entries), but couldn't allocate a new handle from it.");
                 }
                 DebugHex("Returning handle ", xResult);
-                if (xResult < 0x02138f26)
-                {
-                    DebugAndHalt("Wrong handle returned!");
-                }
                 return xResult;
             }
             finally
@@ -111,12 +99,6 @@ namespace Cosmos.Core
             DataLookupEntry* xPreviousEntry = null;
             for (int i = 1; i < DataLookupTable.EntriesPerTable; i++)
             {
-                //DebugHex("Scanning item ", (uint)i);
-                if (i == 0x11)
-                {
-                    Debug("Item 11");
-                }
-
                 var xCurrentEntry = aTable->GetEntry(i);
 
                 //DebugHex("Item.Size", xCurrentEntry->Size);
@@ -133,22 +115,22 @@ namespace Cosmos.Core
                     }
 
                     void* xDataBlock;
-                    Debug("Now calculate datablock pointer");
+                    //Debug("Now calculate datablock pointer");
                     // now we found ourself a free handle
                     if (i == 1)
                     {
-                        Debug("Using table end");
+                        //Debug("Using table end");
                         // we don't have a previous handle yet, so we take the FirstByteAfterTable field of the DataLookupTable
                         // note: we're explicitly initializing all blocks, as memory hasn't been cleared yet.
                         var xTableAddr = (uint)aTable;
-                        DebugHex("aTableAddr", xTableAddr);
+                        //DebugHex("aTableAddr", xTableAddr);
                         var xTotalTableSize = GlobalSystemInfo.TotalDataLookupTableSize;
-                        DebugHex("TotalTableSize", xTotalTableSize);
+                        //DebugHex("TotalTableSize", xTotalTableSize);
                         xDataBlock = (void*)(((uint)aTable) + GlobalSystemInfo.TotalDataLookupTableSize);
                     }
                     else
                     {
-                        Debug("Using previous entry");
+                        //Debug("Using previous entry");
                         // We're not the very first handle being assigned, so calculate the start address using the previous block
                         xDataBlock = (void*)((uint)xPreviousEntry->DataBlock + xPreviousEntry->Size);
                     }
@@ -156,13 +138,13 @@ namespace Cosmos.Core
 
                     // make sure the memory is empty
                     ClearMemory(xDataBlock, aSize);
-                    Debug("Cleared memory");
+                    //Debug("Cleared memory");
                     xCurrentEntry->Size = aSize;
                     xCurrentEntry->DataBlock = xDataBlock;
                     xCurrentEntry->Refcount = 1;
 
                     aHandle = (uint)xCurrentEntry;
-                    DebugHex("Returning handle ", aHandle);
+                    //DebugHex("Returning handle ", aHandle);
                     if (aHandle == 0x0213D185)
                     {
                         Debug("Last known one");

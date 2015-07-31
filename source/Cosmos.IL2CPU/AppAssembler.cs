@@ -1,4 +1,4 @@
-﻿#define VMT_DEBUG
+﻿//#define VMT_DEBUG
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.SymbolStore;
@@ -925,7 +925,7 @@ namespace Cosmos.IL2CPU
             xTemp = BitConverter.GetBytes(GetVTableEntrySize());
             Array.Copy(xTemp, 0, xData, 12, 4);
             Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
-            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Handle", xTheName + "__Contents"));
+            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Handle", ElementReference.New(xTheName + "__Contents")));
             Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName, Cosmos.Assembler.ElementReference.New(xTheName + "__Handle")));
 #if VMT_DEBUG
         using (var xVmtDebugOutput = XmlWriter.Create(@"c:\data\vmt_debug.xml"))
