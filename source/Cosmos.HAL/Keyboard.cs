@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL {
     public class ConsoleKeyInfoEx
@@ -53,7 +54,7 @@ namespace Cosmos.HAL {
         {
             if (mQueuedKeys != null)
             {
-                Console.WriteLine("Skipping creation of key queue!");
+                Debugger.DoSend("Skipping creation of key queue!");
             }
             mQueuedKeys = new Queue<ConsoleKeyInfoEx>(32);
 

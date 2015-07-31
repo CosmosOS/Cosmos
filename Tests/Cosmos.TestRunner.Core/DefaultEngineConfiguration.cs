@@ -12,10 +12,10 @@ namespace Cosmos.TestRunner.Core
                 throw new ArgumentNullException("engine");
             }
 
-            engine.AllowedSecondsInKernel = 60;
+            engine.AllowedSecondsInKernel = 120;
 
             // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are ran.
-            engine.RunTargets.Add(RunTargetEnum.Bochs);
+            engine.RunTargets.Add(RunTargetEnum.VMware);
 
             // if you're working on the compiler (or other lower parts), you can choose to run the compiler in process
             // 1 thing to keep in mind though, is that this only works with 1 kernel at a time!

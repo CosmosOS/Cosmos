@@ -60,6 +60,10 @@ namespace Cosmos.Core
                     if (ScanDataLookupTable(xCurrentTableIdx, xCurrentTable, aLength, out xResult))
                     {
                         DebugHex("Returning handle ", xResult);
+                        if (xResult < CPU.GetEndOfKernel())
+                        {
+                            DebugAndHalt("Wrong handle returned!");
+                        }
                         return xResult;
                     }
                     xCurrentTableIdx ++;
@@ -90,6 +94,10 @@ namespace Cosmos.Core
                     DebugAndHalt("Something seriously weird happened: we could create a new DataLookupTable (with new entries), but couldn't allocate a new handle from it.");
                 }
                 DebugHex("Returning handle ", xResult);
+                if (xResult < 0x02138f26)
+                {
+                    DebugAndHalt("Wrong handle returned!");
+                }
                 return xResult;
             }
             finally
@@ -104,6 +112,10 @@ namespace Cosmos.Core
             for (int i = 1; i < DataLookupTable.EntriesPerTable; i++)
             {
                 //DebugHex("Scanning item ", (uint)i);
+                if (i == 0x11)
+                {
+                    Debug("Item 11");
+                }
 
                 var xCurrentEntry = aTable->GetEntry(i);
 
@@ -151,6 +163,10 @@ namespace Cosmos.Core
 
                     aHandle = (uint)xCurrentEntry;
                     DebugHex("Returning handle ", aHandle);
+                    if (aHandle == 0x0213D185)
+                    {
+                        Debug("Last known one");
+                    }
                     return true;
                 }
 
@@ -164,7 +180,7 @@ namespace Cosmos.Core
                         Debug("Can be reused");
                         // we can reuse this entry
                         xCurrentEntry->Refcount = 1;
-                        aHandle = (uint)xCurrentEntry->DataBlock;
+                        aHandle = (uint)xCurrentEntry;
                         DebugHex("Returning reused handle ", aHandle);
                         return true;
                     }

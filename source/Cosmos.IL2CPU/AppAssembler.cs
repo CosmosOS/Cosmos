@@ -1,4 +1,5 @@
-﻿using System;
+﻿#define VMT_DEBUG
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.SymbolStore;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
@@ -902,7 +904,6 @@ namespace Cosmos.IL2CPU
 
             var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
             var xSetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
-            var xLoadTypeTableRef = VTablesImplRefs.LoadTypeTableRef;
             var xTypesFieldRef = VTablesImplRefs.VTablesImplDef.GetField("mTypes",
                                                                                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             string xTheName = DataMember.GetStaticFieldName(xTypesFieldRef);
@@ -927,13 +928,12 @@ namespace Cosmos.IL2CPU
             Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Handle", xTheName + "__Contents"));
             Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName, Cosmos.Assembler.ElementReference.New(xTheName + "__Handle")));
 #if VMT_DEBUG
-        using (var xVmtDebugOutput = XmlWriter.Create(@"e:\vmt_debug.xml"))
+        using (var xVmtDebugOutput = XmlWriter.Create(@"c:\data\vmt_debug.xml"))
         {
             xVmtDebugOutput.WriteStartDocument();
             xVmtDebugOutput.WriteStartElement("VMT");
 #endif
             //Push((uint)aTypesSet.Count);
-            //Call(xLoadTypeTableRef);
             foreach (var xType in aTypesSet)
             {
 #if VMT_DEBUG
@@ -1396,8 +1396,9 @@ namespace Cosmos.IL2CPU
             // we now need to do "newobj" on the entry point, and after that, call .Start on it
             var xCurLabel = Cosmos.Assembler.Assembler.EntryPointName + ".CreateEntrypoint";
             new Cosmos.Assembler.Label(xCurLabel);
-            Assembler.WriteDebugVideo("Now create kernel class");
+            Assembler.WriteDebugVideo("Now create the kernel class");
             X86.IL.Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
+            Assembler.WriteDebugVideo("Kernel class created");
             xCurLabel = Cosmos.Assembler.Assembler.EntryPointName + ".CallStart";
             new Cosmos.Assembler.Label(xCurLabel);
             X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, Cosmos.Assembler.Assembler.EntryPointName + ".AfterStart", DebugEnabled);

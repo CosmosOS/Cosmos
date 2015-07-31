@@ -1,5 +1,8 @@
 ; 4-column space indentation
 
+[VTablesImpl.cs]
+indent_size=2
+
 [ILScanner.cs]
 indent_size = 4
 

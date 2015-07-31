@@ -258,10 +258,6 @@ namespace Cosmos.IL2CPU {
 
     public static List<X86.IL.FieldInfo> GetFieldsInfo(Type aType, bool includeStatic)
     {
-      if (aType.FullName == "System.Drawing.Color")
-      {
-        Console.Write("");
-      }
       var xResult = new List<X86.IL.FieldInfo>(16);
       DoGetFieldsInfo(aType, xResult, includeStatic);
       xResult.Reverse();

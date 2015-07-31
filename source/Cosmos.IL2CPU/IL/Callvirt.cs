@@ -26,7 +26,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp, bool debugEnabled)
         {
-
             string xCurrentMethodLabel = GetLabel(aMethod, aOp.Position);
 
             // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
@@ -71,33 +70,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
             new Comment(Assembler, "ThisOffset = " + xThisOffset);
             Call.DoNullReferenceCheck(Assembler, debugEnabled, xThisOffset);
-
-            //             Action xEmitCleanup = delegate() {
-            //                                       foreach (MethodInformation.Argument xArg in mTargetMethodInfo.Arguments) {
-            //                                           new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = xArg.Size };
-            //                                       }
-
-            //                                   };
-
-            //EmitCompareWithNull( Assembler,
-            //                    mCurrentMethodInfo,
-            //                    delegate( CPUx86.Compare c )
-            //                    {
-            //                        c.DestinationReg = CPUx86.Registers.ESP;
-            //                        c.DestinationIsIndirect = true;
-            //                        c.DestinationDisplacement = mThisOffset;
-            //                    },
-            //                    mLabelName,
-            //                    mLabelName + "_AfterNullRefCheck",
-            //                    xEmitCleanup,
-            //                    ( int )mCurrentILOffset,
-            //                    GetService<IMetaDataInfoService>().GetTypeIdLabel( typeof( NullReferenceException ) ),
-            //                    GetService<IMetaDataInfoService>().GetTypeInfo( typeof( NullReferenceException ) ),
-            //                    GetService<IMetaDataInfoService>().GetMethodInfo( typeof( NullReferenceException ).GetConstructor( Type.EmptyTypes ), false ),
-            //                    GetServiceProvider() );
-            // todo: add exception support
-
-            new Label(xCurrentMethodLabel + ".AfterNullRefCheck");
 
             if (!String.IsNullOrEmpty(xNormalAddress))
             {

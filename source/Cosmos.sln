@@ -239,6 +239,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoxingTests", "..\Tests\Box
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "BoxingTestsBoot", "..\Tests\BoxingTests\BoxingTestsBoot.Cosmos", "{444098BC-8F72-4030-A8C0-118D2DD93EB8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core.VSTests", "Cosmos.Core.VSTests\Cosmos.Core.VSTests.csproj", "{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1228,6 +1230,22 @@ Global
 		{444098BC-8F72-4030-A8C0-118D2DD93EB8}.Release|Mixed Platforms.Build.0 = Debug|x86
 		{444098BC-8F72-4030-A8C0-118D2DD93EB8}.Release|x86.ActiveCfg = Debug|x86
 		{444098BC-8F72-4030-A8C0-118D2DD93EB8}.Release|x86.Build.0 = Debug|x86
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Debug|Itanium.Build.0 = Debug|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Debug|x86.Build.0 = Debug|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|Itanium.Build.0 = Release|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|x86.ActiveCfg = Release|Any CPU
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1322,5 +1340,6 @@ Global
 		{0B20C26F-CA92-4D88-8211-EC7B0A261337} = {79173AE7-4596-4D33-866F-6F94A2314BE8}
 		{F8889473-5866-4913-86AC-8072A1A2558C} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 		{444098BC-8F72-4030-A8C0-118D2DD93EB8} = {F104F6BC-EF8E-4408-A786-D570D7565231}
+		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D} = {360A9DE9-F8CF-4A38-9593-3699648DA616}
 	EndGlobalSection
 EndGlobal

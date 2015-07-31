@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 
 namespace Cosmos.System
@@ -29,10 +30,13 @@ namespace Cosmos.System
             return null;
         }
 
+
         /// <summary>
         /// Start the system up using the properties for configuration.
         /// </summary>
-        public virtual void Start() {
+        public virtual void Start()
+        {
+            Debugger.DoSend("In Kernel.Start now");
             try {
                 Global.Dbg.Send("Starting kernel");
                 if (mStarted) {
@@ -100,7 +104,10 @@ namespace Cosmos.System
             mStopped = true;
         }
 
-        public Kernel() { }
+        public Kernel()
+        {
+            Debugger.DoSend("In Cosmos.System.Kernel..ctor");
+        }
 
         // Shutdown and restart
         public void Restart() {

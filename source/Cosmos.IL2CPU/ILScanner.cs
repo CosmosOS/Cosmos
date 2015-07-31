@@ -225,7 +225,6 @@ namespace Cosmos.IL2CPU
             Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
             Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
             //Queue(typeof(CosmosAssembler).GetMethod("PrintException"), null, "Explicit Entry");
-            Queue(VTablesImplRefs.LoadTypeTableRef, null, "Explicit Entry");
             Queue(VTablesImplRefs.SetMethodInfoRef, null, "Explicit Entry");
             Queue(VTablesImplRefs.IsInstanceRef, null, "Explicit Entry");
             Queue(VTablesImplRefs.SetTypeInfoRef, null, "Explicit Entry");

@@ -152,6 +152,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 // todo: probably we want to check for exceptions after calling Alloc
                 new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.AllocNewObjectRef) };
+                new Label(".AfterAlloc");
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
 
