@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
@@ -9,7 +10,12 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
+            Debugger.DoSend("In Ctor(char[])");
+            Debugger.DoSend("aChars.Length");
+            Debugger.DoSendNumber((uint)aChars.Length);
             aStringLength = aChars.Length;
+            Debugger.DoSend("aStringLength");
+            Debugger.DoSendNumber((uint)aStringLength);
             for (int i = 0; i < aChars.Length; i++) {
                 aFirstChar[i] = aChars[i];
             }
@@ -36,9 +42,12 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
 			}
 		}
 
-        [PlugMethod(Signature = "System_Int32__System_String_get_Length__")]
-		public static unsafe int get_Length(int* aThis, [FieldAccess(Name = "System.Int32 System.String.m_stringLength")]ref int aLength) {
-			return aLength;
+        public static unsafe int get_Length(int* aThis, [FieldAccess(Name = "System.Int32 System.String.m_stringLength")]ref int aLength)
+        {
+            Debugger.DoSend("In get_Length");
+            Debugger.DoSend("aLength");
+            Debugger.DoSendNumber((uint)aLength);
+            return aLength;
 		}
 
 		public static unsafe char get_Chars(byte* aThis, int aIndex) {

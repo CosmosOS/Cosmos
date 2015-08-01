@@ -13,9 +13,9 @@ namespace Cosmos.IL2CPU
     // this field seems to be always empty, but the VTablesImpl class is embedded in the final exe.
     public static VTable[] mTypes;
 
-    public static bool IsInstance(int aObjectType, int aDesiredObjectType)
+    public static bool IsInstance(uint aObjectType, uint aDesiredObjectType)
     {
-      int xCurrentType = aObjectType;
+      var xCurrentType = aObjectType;
       if (aObjectType == 0)
       {
         return true;
@@ -36,7 +36,7 @@ namespace Cosmos.IL2CPU
       return false;
     }
 
-    public static void SetTypeInfo(int aType, int aBaseType, int[] aMethodIndexes, int[] aMethodAddresses, int aMethodCount)
+    public static void SetTypeInfo(int aType, uint aBaseType, int[] aMethodIndexes, int[] aMethodAddresses, int aMethodCount)
     {
       //mTypes[aType] = new VTable();
       mTypes[aType].BaseTypeIdentifier = aBaseType;
@@ -69,34 +69,33 @@ namespace Cosmos.IL2CPU
       }
     }
 
-    public static int GetMethodAddressForType(int aType, int aMethodId)
+    public static int GetMethodAddressForType(uint aType, uint aMethodId)
     {
-      DebugHex("Type", (uint)aType);
-      DebugHex("MethodId", (uint)aMethodId);
+      if (aType > 0xFFFF)
+      {
+        Debug("Oops");
+      }
+      DebugHex("Type", aType);
+      DebugHex("MethodId", aMethodId);
       do
       {
         var xCurrentTypeInfo = mTypes[aType];
 
         if (xCurrentTypeInfo.MethodIndexes == null)
         {
-          DebugHex("MethodIndexes is null for type", (uint)aType);
+          DebugHex("MethodIndexes is null for type", aType);
           while (true)
             ;
         }
-        var xMethodCount = xCurrentTypeInfo.MethodIndexes.Length;
-        // for now:
-        //if (xMethodCount > 4096)
-        //{
-        //  xMethodCount = 4096;
-        //}
+        if (xCurrentTypeInfo.MethodAddresses == null)
+        {
+          DebugHex("MethodAddresses is null for type", aType);
+          while (true)
+            ;
+        }
+
         for (int i = 0; i < xCurrentTypeInfo.MethodIndexes.Length; i++)
         {
-          if (xCurrentTypeInfo.MethodAddresses == null)
-          {
-            DebugHex("MethodAddresses is null for type", (uint)aType);
-            while (true)
-              ;
-          }
           if (xCurrentTypeInfo.MethodIndexes[i] == aMethodId)
           {
             var xResult = xCurrentTypeInfo.MethodAddresses[i];
@@ -123,9 +122,9 @@ namespace Cosmos.IL2CPU
       while (true);
       //}
       Debugger.DoSend("Type");
-      Debugger.DoSendNumber((uint)aType);
+      Debugger.DoSendNumber(aType);
       Debugger.DoSend("MethodIndex");
-      Debugger.DoSendNumber((uint)aMethodId);
+      Debugger.DoSendNumber(aMethodId);
       Debugger.DoSend("Not FOUND!");
       while (true)
         ;
@@ -137,7 +136,7 @@ namespace Cosmos.IL2CPU
   public struct VTable
   {
     [FieldOffset(0)]
-    public int BaseTypeIdentifier;
+    public uint BaseTypeIdentifier;
 
     [FieldOffset(4)]
     public int MethodCount;

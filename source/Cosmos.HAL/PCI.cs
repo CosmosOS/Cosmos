@@ -35,6 +35,11 @@ namespace Cosmos.HAL
 
         private static void EnumerateBus(uint xBus, uint step)
         {
+            mDebugger.Send("Enumerating bus");
+            mDebugger.Send("Bus");
+            mDebugger.SendNumber(xBus);
+            mDebugger.Send("Step");
+            mDebugger.SendNumber(step);
             for (uint xDevice = 0; xDevice < 32; xDevice++)
             {
                 PCIDevice xPCIDevice = new PCIDevice(xBus, xDevice, 0x00);
@@ -65,13 +70,17 @@ namespace Cosmos.HAL
         {
             string str = "";
             for (int i = 0; i < step; i++)
+            {
                 str += "     ";
+            }
             var xText = str + device.bus + ":" + device.slot + ":" + device.function + "   " + PCIDevice.DeviceClass.GetString(device);
             mDebugger.Send(xText);
-            Console.WriteLine(xText);
+            //Console.WriteLine(xText);
             devices.Add(device);
             if (device is PCIDeviceBridge)
+            {
                 EnumerateBus(((PCIDeviceBridge)device).SecondaryBusNumber, step + 1);
+            }
         }
     }
 }

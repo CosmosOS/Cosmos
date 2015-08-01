@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU.CustomImplementation.System
@@ -74,31 +75,42 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
             int len = 0;
             for (int i = 0; i < values.Length; i++)
             {
-                len += values[i].Length;
+                var xValue = values[i];
+                if (xValue != null)
+                {
+                    len += values[i].Length;
+                }
             }
             return ConcatArray(values, len);
         }
         public static string Concat(params object[] args)
         {
+            Debugger.DoSendNumber((uint)args.Length);
             string[] values = new string[args.Length];
             for (int i = 0; i < args.Length; i++)
             {
-                values[i] = args[i].ToString();
+                var xValue = values[i];
+                if (xValue != null)
+                {
+                    values[i] = args[i].ToString();
+                }
             }
             return Concat(values);
         }
         public static string ConcatArray(string[] values, int totalLength)
         {
-
             char[] xResult = new char[totalLength];
             int xCurPos = 0;
             for (int i = 0; i < values.Length; i++)
             {
                 var xStr = values[i];
-                for (int j = 0; j < xStr.Length; j++)
+                if (xStr != null)
                 {
-                    xResult[xCurPos] = xStr[j];
-                    xCurPos++;
+                    for (int j = 0; j < xStr.Length; j++)
+                    {
+                        xResult[xCurPos] = xStr[j];
+                        xCurPos++;
+                    }
                 }
             }
             return new String(xResult);

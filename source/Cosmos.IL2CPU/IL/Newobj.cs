@@ -42,6 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (objectType.IsValueType)
             {
+                #region Valuetypes
                 new Comment("ValueType");
                 /*
                  * Current sitation on stack:
@@ -103,6 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 // Need to put these *after* the call because the Call pops the args from the stack
                 // and we have mucked about on the stack, so this makes it right before the next
                 // op.
+                #endregion Valuetypes
             }
             else
             {
@@ -119,6 +121,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         xHasCalcSize = true;
                         new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        // EAX contains a memory handle now, lets dereference it to a pointer
+                        new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true};
                         new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 8 };
                         new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceValue = 2 };
                         new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };

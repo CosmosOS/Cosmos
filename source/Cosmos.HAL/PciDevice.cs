@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Core.IOGroup;
 using Cosmos.Common.Extensions;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL
 {
@@ -130,7 +131,7 @@ namespace Cosmos.HAL
         protected UInt32 GetAddressBase(uint aBus, uint aSlot, uint aFunction)
         {
             // 31 	        30 - 24    23 - 16      15 - 11 	    10 - 8 	          7 - 2 	        1 - 0
-            // Enable Bit 	Reserved   Bus Number 	Device Number 	Function Number   Register Number 	00 
+            // Enable Bit 	Reserved   Bus Number 	Device Number 	Function Number   Register Number 	00
             return (UInt32)(
                 // Enable bit - must be set
                 0x80000000
@@ -204,52 +205,52 @@ namespace Cosmos.HAL
         {
             public static string GetString(PCIDevice device)
             {
-                switch (ToHex(device.VendorID, 16))
+                switch (device.VendorID)
                 {
-                    case "0x1022"://AMD
-                        switch (ToHex(device.DeviceID, 16))
+                    case 0x1022: //AMD
+                        switch (device.DeviceID)
                         {
-                            case "0x2000":
+                            case 0x2000:
                                 return "AMD PCnet LANCE PCI Ethernet Controller";
                         }
                         break;
-                    case "0x104B"://Sony
-                        switch (ToHex(device.DeviceID, 16))
+                    case 0x104B: //Sony
+                        switch (device.DeviceID)
                         {
-                            case "0x1040":
+                            case 0x1040:
                                 return "Mylex BT958 SCSI Host Adaptor";
                         }
                         break;
-                    case "0x1274"://Ensoniq
-                        switch (ToHex(device.DeviceID, 16))
+                    case 0x1274: //Ensoniq
+                        switch (device.DeviceID)
                         {
-                            case "0x1371":
+                            case 0x1371:
                                 return "Ensoniq AudioPCI";
                         }
                         break;
-                    case "0x15AD"://VMware
-                        switch (ToHex(device.DeviceID, 16))
+                    case 0x15AD: //VMware
+                        switch (device.DeviceID)
                         {
-                            case "0x0405":
+                            case 0x0405:
                                 return "VMware NVIDIA 9500MGS";
-                            case "0x0770":
+                            case 0x0770:
                                 return "VMware Standard Enhanced PCI to USB Host Controller";
-                            case "0x0790":
+                            case 0x0790:
                                 return "VMware 6.0 Virtual USB 2.0 Host Controller";
-                            case "0x07A0":
+                            case 0x07A0:
                                 return "VMware PCI Express Root Port";
                         }
                         break;
-                    case "0x8086"://Intel
-                        switch (ToHex(device.DeviceID, 16))
+                    case 0x8086: //Intel
+                        switch (device.DeviceID)
                         {
-                            case "0x7190":
+                            case 0x7190:
                                 return "Intel 440BX/ZX AGPset Host Bridge";
-                            case "0x7191":
+                            case 0x7191:
                                 return "Intel 440BX/ZX AGPset PCI-to-PCI bridge";
-                            case "0x7110":
+                            case 0x7110:
                                 return "Intel PIIX4/4E/4M ISA Bridge";
-                            case "0x7112":
+                            case 0x7112:
                                 return "Intel PIIX4/4E/4M USB Interface";
                         }
                         break;

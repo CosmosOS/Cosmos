@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 
 namespace Cosmos.HAL {
@@ -84,7 +85,7 @@ namespace Cosmos.HAL {
 
       // Find hardcoded ATA controllers
       Global.Dbg.Send("ATA Master");
-      InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
+      //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
 
       //Global.Dbg.Send("ATA Slave");
       //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
@@ -106,9 +107,8 @@ namespace Cosmos.HAL {
       //TODO: Since this is FCL, its "common". Otherwise it should be
       // system level and not accessible from Core. Need to think about this
       // for the future.
-      Console.WriteLine("Finding PCI Devices");
+      Debugger.DoSend("Finding PCI Devices");
       PCI.Setup();
-
     }
 
     static public void Init(TextScreenBase textScreen, Keyboard keyboard)
@@ -121,12 +121,12 @@ namespace Cosmos.HAL {
       {
           Keyboard = keyboard;
       }
-      Core.Bootstrap.Init();
       Core.Global.Init();
       Global.Dbg.Send("Static Devices");
       InitStaticDevices();
       Global.Dbg.Send("PCI Devices");
-      InitPciDevices();
+      //InitPciDevices();
+      Global.Dbg.Send("Done initializing Cosmos.HAL.Global");
     }
 
     //static void PCIDeviceFound(Core.PCI.PciInfo aInfo, Core.IOGroup.PciDevice aIO) {
