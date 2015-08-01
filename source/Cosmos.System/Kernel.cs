@@ -36,30 +36,6 @@ namespace Cosmos.System
         /// </summary>
         public virtual void Start()
         {
-            Debugger.DoSend("In Kernel.Start now");
-
-            //var x = new object[]
-            //        {
-            //            "Hello, ",
-            //            null,
-            //            "World!"
-            //        };
-
-            //var xMessage = String.Concat(x);
-            //Debugger.DoSend("Concatting worked?");
-            //Debugger.DoSend(xMessage);
-            var xChars = new char[1];
-            xChars[0] = 'A';
-            //xChars[1] = 'B';
-            //xChars[2] = 'C';
-            Debugger.DoSendNumber((uint)xChars.Length);
-            Debugger.DoSend("Character array created");
-            var xText = new String(xChars);
-            Debugger.DoSend("String created");
-            Debugger.DoSendNumber((uint)xText.Length);
-            Debugger.DoSend(xText);
-
-
             try {
                 Global.Dbg.Send("Starting kernel");
                 if (mStarted) {
@@ -88,11 +64,21 @@ namespace Cosmos.System
                 BeforeRun();
 
                 Global.Dbg.Send("Run");
+                if (mStopped)
+                {
+                    Global.Dbg.Send("Already stopped");
+                }
+                else
+                {
+                    Global.Dbg.Send("Not yet stopped");
+                }
                 while (!mStopped) {
                     //Network.NetworkStack.Update();
+                    Global.Dbg.Send("Really before Run");
                     Run();
+                    Global.Dbg.Send("Really after Run");
                 }
-
+                Global.Dbg.Send("AfterRun");
                 AfterRun();
                 //bool xTest = 1 != 3;
                 //while (xTest) {

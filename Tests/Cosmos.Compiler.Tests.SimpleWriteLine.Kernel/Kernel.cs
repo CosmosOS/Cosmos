@@ -13,16 +13,26 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
         {
             var xMessage = "Cosmos booted successfully. Type a line of text to get it echoed back.";
             Console.WriteLine(xMessage);
+            Debugger.DoSend("After writeline");
         }
 
         protected override void Run()
         {
-            new Debugger("User", "test").SendNumber(0x01020304);
-            Console.WriteLine("Started correctly!");
-            Assert.IsTrue(true, "Dummy assertion, to test the system");
-            Console.WriteLine("After assertion");
-            TestController.Completed();
-
+            Debugger.DoSend("In Run");
+            try
+            {
+                Console.WriteLine("Started correctly!");
+                Assert.IsTrue(true, "Dummy assertion, to test the system");
+                Console.WriteLine("After assertion");
+                TestController.Completed();
+                while (true)
+                    ;
+            }
+            catch(Exception E)
+            {
+                Console.WriteLine("Exception");
+                Console.WriteLine(E.ToString());
+            }
         }
     }
 }

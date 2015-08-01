@@ -125,7 +125,7 @@ namespace Cosmos.HAL {
       Global.Dbg.Send("Static Devices");
       InitStaticDevices();
       Global.Dbg.Send("PCI Devices");
-      //InitPciDevices();
+      InitPciDevices();
       Global.Dbg.Send("Done initializing Cosmos.HAL.Global");
     }
 

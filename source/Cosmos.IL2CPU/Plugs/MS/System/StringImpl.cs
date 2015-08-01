@@ -10,12 +10,6 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
-            Debugger.DoSend("In Ctor(char[])");
-            Debugger.DoSend("aChars.Length");
-            Debugger.DoSendNumber((uint)aChars.Length);
-            aStringLength = aChars.Length;
-            Debugger.DoSend("aStringLength");
-            Debugger.DoSendNumber((uint)aStringLength);
             for (int i = 0; i < aChars.Length; i++) {
                 aFirstChar[i] = aChars[i];
             }

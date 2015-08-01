@@ -126,7 +126,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Pop {DestinationReg = CPUx86.Registers.ECX};
 
             // pushed size is always 4 or 8
-            var xSize = ILOp.Align(xFieldInfo.Size, 4);
+            var xSize = xFieldInfo.Size;
             if (!aTypeOnStack.IsPointer)
             {
               // convert to real memory address
