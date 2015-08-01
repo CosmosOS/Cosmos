@@ -81,25 +81,39 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
                     len += values[i].Length;
                 }
             }
+            Console.Write("Concatting to ");
+            Console.Write(len.ToString());
+            Console.WriteLine(" characters.");
             return ConcatArray(values, len);
         }
         public static string Concat(params object[] args)
         {
-            Debugger.DoSendNumber((uint)args.Length);
+            Console.WriteLine("In Concat(object[])");
             string[] values = new string[args.Length];
             for (int i = 0; i < args.Length; i++)
             {
-                var xValue = values[i];
-                if (xValue != null)
+                var xArg = args[i];
+                if (xArg != null)
                 {
-                    values[i] = args[i].ToString();
+                    var xStrArg = xArg as string;
+                    if (xStrArg != null)
+                    {
+                        Console.WriteLine("Providing casted item");
+                        values[i] = xStrArg;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Providing converted item");
+                        values[i] = xArg.ToString();
+                    }
                 }
             }
+            Console.WriteLine("Before Concat(string[])");
             return Concat(values);
         }
         public static string ConcatArray(string[] values, int totalLength)
         {
-            char[] xResult = new char[totalLength];
+            char[] xResultChars = new char[totalLength];
             int xCurPos = 0;
             for (int i = 0; i < values.Length; i++)
             {
@@ -108,12 +122,13 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
                 {
                     for (int j = 0; j < xStr.Length; j++)
                     {
-                        xResult[xCurPos] = xStr[j];
+                        xResultChars[xCurPos] = xStr[j];
                         xCurPos++;
                     }
                 }
             }
-            return new String(xResult);
+            var xResult = new String(xResultChars);
+            return xResult;
         }
 
         public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)

@@ -25,6 +25,9 @@ namespace Cosmos.IL2CPU.X86.IL
             string mReturnNullLabel = GetLabel( aMethod, aOpCode ) + "_ReturnNull";
 
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+            // EAX contains a memory handle now. Lets convert it to a pointer
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
+
             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
             new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true};
