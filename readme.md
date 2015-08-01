@@ -1,6 +1,6 @@
 ### C# Open Source Managed Operating System
 
-[![Join the chat at https://gitter.im/CosmosOS/Cosmos](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/CosmosOS/Cosmos?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/CosmosOS/Cosmos](https://img.shields.io/badge/GITTER-Join%20Chat-brightgreen.svg)](https://gitter.im/CosmosOS/Cosmos?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![GitHub release](https://img.shields.io/github/release/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/releases)
 
 [We are currently migrating from codeplex](http://cosmos.codeplex.com/)
