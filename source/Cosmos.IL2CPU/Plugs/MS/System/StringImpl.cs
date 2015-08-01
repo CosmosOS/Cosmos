@@ -44,14 +44,16 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.MS.System {
 
         public static unsafe int get_Length(int* aThis, [FieldAccess(Name = "System.Int32 System.String.m_stringLength")]ref int aLength)
         {
-            Debugger.DoSend("In get_Length");
-            Debugger.DoSend("aLength");
-            Debugger.DoSendNumber((uint)aLength);
             return aLength;
 		}
 
-		public static unsafe char get_Chars(byte* aThis, int aIndex) {
-            var xCharIdx = (char*)(aThis + 16);
+		public static unsafe char get_Chars(uint* aThis, int aIndex)
+		{
+            // todo: change to use a FieldAccessAttribute, to get the pointer to the first character and go from there
+
+            // we first need to dereference the handle to a pointer.
+            var xActualThis = (uint)aThis[0];
+            var xCharIdx = (char*)(xActualThis + 16);
             return xCharIdx[aIndex];
 		}
 

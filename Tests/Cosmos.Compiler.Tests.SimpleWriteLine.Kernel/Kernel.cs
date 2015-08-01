@@ -11,7 +11,8 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
     {
         protected override void BeforeRun()
         {
-            Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
+            var xMessage = "Cosmos booted successfully. Type a line of text to get it echoed back.";
+            Console.WriteLine(xMessage);
         }
 
         protected override void Run()
