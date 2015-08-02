@@ -1,4 +1,4 @@
-﻿//#define VMT_DEBUG
+﻿#define VMT_DEBUG
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.SymbolStore;

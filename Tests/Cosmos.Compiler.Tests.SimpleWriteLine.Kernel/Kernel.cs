@@ -22,20 +22,13 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
             try
             {
                 Console.WriteLine("Started correctly!");
-                var x = new object[]
-                        {
-                            "The solution is: ",
-                            (int)42
-                        };
-                var xMessage = String.Concat(x);
-                Console.WriteLine(xMessage);
+                object x = 42;
+                Console.WriteLine(x.ToString());
                 Console.WriteLine("Done doing tests");
                 Assert.IsTrue(true, "Dummy assertion, to test the system");
-                //TestController.Completed();
-                while (true)
-                    ;
+                TestController.Completed();
             }
-            catch(Exception E)
+            catch (Exception E)
             {
                 Console.WriteLine("Exception");
                 Console.WriteLine(E.ToString());

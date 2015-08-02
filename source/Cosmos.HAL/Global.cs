@@ -108,7 +108,7 @@ namespace Cosmos.HAL {
       // system level and not accessible from Core. Need to think about this
       // for the future.
       Debugger.DoSend("Finding PCI Devices");
-      PCI.Setup();
+      //PCI.Setup();
     }
 
     static public void Init(TextScreenBase textScreen, Keyboard keyboard)
