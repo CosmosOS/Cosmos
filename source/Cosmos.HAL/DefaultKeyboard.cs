@@ -297,7 +297,22 @@ namespace Cosmos.HAL
                 var t = mKeys[index];
                 if (t.Scancode == aScanCode)
                 {
-                    aValue = NumLock ? t.NumLockKey : t.Key;
+                    if (NumLock)
+                    {
+                        if (ShiftPressed && aScanCode >= 0x47 && aScanCode != 0x4A && aScanCode != 0x4E && aScanCode <= 0x52)
+                        {
+                            aValue = t.Key; // ex: Shift+NumPad4=LeftArrow (extended keyset not supported yet)
+                        }
+                        else
+                        {
+                            aValue = t.NumLockKey;
+                        }
+                    }
+                    else
+                    {
+                        aValue = t.Key;
+                    }
+                    //aValue = NumLock ? t.NumLockKey : t.Key;
                     return true;
                 }
             }
