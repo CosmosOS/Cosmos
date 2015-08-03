@@ -11,23 +11,30 @@ namespace Cosmos.Debug.Common {
     private SerialPort mPort;
 
     public DebugConnectorSerial(string aPort) {
+      DebugLog("Connecting to port " + aPort);
       mPort = new SerialPort(aPort);
       mPort.BaudRate = 115200;
       mPort.Parity = Parity.None;
       mPort.DataBits = 8;
       mPort.StopBits = StopBits.One;
-      mPort.Open();
-      Start(mPort.BaseStream);
+      Start();
     }
 
-      protected override void InitializeBackground()
-      {
-          throw new NotImplementedException();
+    protected override void InitializeBackground()
+    {
+      DebugLog("Try opening port now");
+      try {
+        mPort.Open();
+      } catch (Exception E) {
+        DebugLog("Error opening serial port: " + E.ToString());
       }
 
-      protected override bool GetIsConnectedToDebugStub()
-      {
-          return mPort.IsOpen;
-      }
+      mStream = mPort.BaseStream;
+    }
+
+    protected override bool GetIsConnectedToDebugStub()
+    {
+        return mPort.IsOpen;
+    }
   }
 }
