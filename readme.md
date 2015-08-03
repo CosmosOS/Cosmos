@@ -35,7 +35,6 @@ Joining Cosmos
 
 * [Gitter.im](https://gitter.im/CosmosOS/Cosmos) - Live chat. Click the green `Join Chat` badge at the top of this file. As with the IRC and CodePlex chatroom, please be patient if we don't respond immediately (no pinging).
 * [Yahoo Group](https://tech.groups.yahoo.com/group/Cosmos-Dev) - Email Discussion List. To prevent spambots from spamming our list we ask you introduce yourself to join. Please mention something specific to Cosmos. "Hey I want to join" won't get you in....
-* [Cosmos Chat Room](http://cosmos.codeplex.com/wikipage?title=Cosmos%20Chat%20Room&referringTitle=Home) - Live chat. When joining give some time for response. Asking a question and leaving a few minutes or seconds later will not give anyone any time to notice your presence.
 * [Facebook](http://www.facebook.com/pages/Cosmos-Operating-System/10235842745) - Like us to see frequent updates of what is going on with Cosmos.
 * [YouTube Channel](https://www.youtube.com/channel/UCsSKtqjfpSR0B3Ov4cBIarQ/) - Follow use to see useful videos.
 * [Resources](https://github.com/CosmosOS/Cosmos/wiki/Resources) - More Cosmos related links.
@@ -44,12 +43,12 @@ Joining Cosmos
 Articles and Resources
 ---------
 
-* [Develop Your Own Operating System in C# or VB.NET](http://www.codeproject.com/KB/cs/CosmosMS5.aspx)
-* [Quick View Under the Hood](http://www.codeproject.com/KB/cs/CosmosUnderHood.aspx)
-* [Intro to Plugs](http://www.codeproject.com/KB/cs/CosmosPlugs.aspx)
-* [X86 Assembly Debugger Preview](http://www.codeproject.com/KB/cs/CosmosAsmDebuggerPreview.aspx)
-* [Making a Remote PC Slave for Debugging or Fun](http://www.codeproject.com/Articles/413942/Making-a-Remote-PC-Slave-for-Debugging-or-Fun)
-* [Cosmos Tutorials](http://www.thedevforum.com/forum-28.html)
+* [Develop Your Own Operating System in C# or VB.NET](https://github.com/CosmosOS/Cosmos/wiki/Develop-Your-Own-Operating-System-in-C%23-or-VB.NET)
+* [Quick View Under the Hood](https://github.com/CosmosOS/Cosmos/wiki/Quick-look-under-the-hood)
+* [Intro to Plugs](https://github.com/CosmosOS/Cosmos/wiki/Intro-to-Plugs)
+* [X86 Assembly Debugger Preview](https://github.com/CosmosOS/Cosmos/wiki/Visual-Studio-X86-Assembly-Debugger)
+* [Making a Remote PC Slave for Debugging or Fun](http://www.codeproject.com/Articles/413942/Making-a-Remote-PC-Slave-for-Debugging-or-Fun) (old article, code deprecated)
+* [Cosmos Tutorials](https://int0x10.com/forums/forum-22.html)
 * [Cosmos Projects](https://github.com/CosmosOS/Cosmos/wiki/Cosmos-Projects)
 
 
@@ -79,7 +78,3 @@ We encourage you to add your own Cosmos videos to YouTube. Please add the tags C
 * [Cosmos Tutorial C# Lesson 1 - Part 2 - int0x10.com](https://www.youtube.com/watch?v=V_Bxq0aGs_A)
 * [Cosmos Tutorial C# Lesson 2 - int0x10.com](https://www.youtube.com/watch?v=5Wzp1bGr8o0)
 
-
-![](http://download-codeplex.sec.s-msft.com/Download?ProjectName=Cosmos&DownloadId=775267)
-
-![](http://download-codeplex.sec.s-msft.com/Download?ProjectName=Cosmos&DownloadId=775266)
