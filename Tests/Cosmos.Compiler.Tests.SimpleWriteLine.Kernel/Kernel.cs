@@ -25,7 +25,13 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
                 object x = 42;
                 Console.WriteLine(x.ToString());
                 Console.WriteLine("Done doing tests");
+
                 Assert.IsTrue(true, "Dummy assertion, to test the system");
+
+                Debugger.DoSend("Test TryFinally now");
+                TestTryFinally.Execute();
+
+                Assert.IsTrue(InterruptsEnabled, "Interrupts are not enabled!");
                 TestController.Completed();
             }
             catch (Exception E)

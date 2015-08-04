@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core
 {
@@ -60,12 +61,29 @@ namespace Cosmos.Core
             Halt(); // If it didn't work, Halt the CPU
         }
 
+        private static void DoEnableInterrupts()
+        {
+
+        }
+
+        private static void DoDisableInterrupts()
+        {
+
+        }
+
+        public static bool mInterruptsEnabled;
         public static void EnableInterrupts()
         {
+            Debugger.DoSend("Enabling interrupts");
+            mInterruptsEnabled = true;
+            DoEnableInterrupts();
         }
 
         public static void DisableInterrupts()
         {
+            mInterruptsEnabled = false;
+            DoDisableInterrupts();
+            Debugger.DoSend("Disable interrupts");
         }
     }
 }

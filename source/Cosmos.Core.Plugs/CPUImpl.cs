@@ -111,12 +111,12 @@ namespace Cosmos.Core.Plugs {
         //    public static void Halt() { }
 
         [PlugMethod(Assembler = typeof(Assemblers.DisableInterruptsAssembler))]
-        public static void DisableInterrupts()
+        public static void DoDisableInterrupts()
         {
         }
 
         [PlugMethod(Assembler = typeof(Assemblers.EnableInterruptsAssembler))]
-        public static void EnableInterrupts()
+        public static void DoEnableInterrupts()
         {
         }
 

@@ -12,18 +12,18 @@ namespace Cosmos.TestRunner.Core
                 throw new ArgumentNullException("engine");
             }
 
-            engine.AllowedSecondsInKernel = 3600;
+            engine.AllowedSecondsInKernel = 120;
 
             // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are ran.
             engine.RunTargets.Add(RunTargetEnum.VMware);
 
             // if you're working on the compiler (or other lower parts), you can choose to run the compiler in process
             // 1 thing to keep in mind though, is that this only works with 1 kernel at a time!
-            // engine.RunIL2CPUInProcess = true;
+            engine.RunIL2CPUInProcess = true;
 
-            //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
+            engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
-            engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
+            //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
             // engine.AddKernel(typeof(BoxingTests.Kernel).Assembly.Location);
             // known bugs, therefor disabled for now:
 

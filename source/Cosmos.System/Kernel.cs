@@ -63,6 +63,9 @@ namespace Cosmos.System
                 Global.Dbg.Send("Before Run");
                 BeforeRun();
 
+                // now enable interrupts:
+                HAL.Global.EnableInterrupts();
+
                 Global.Dbg.Send("Run");
                 if (mStopped)
                 {
@@ -125,6 +128,14 @@ namespace Cosmos.System
         public static void PrintDebug(string message)
         {
             Global.Dbg.Send(message);
+        }
+
+        public static bool InterruptsEnabled
+        {
+            get
+            {
+                return HAL.Global.InterruptsEnabled;
+            }
         }
     }
 }

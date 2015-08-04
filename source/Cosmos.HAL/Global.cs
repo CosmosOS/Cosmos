@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 
@@ -136,5 +137,17 @@ namespace Cosmos.HAL {
     //  }
     //}
 
+    public static void EnableInterrupts()
+    {
+      CPU.EnableInterrupts();
+    }
+
+    public static bool InterruptsEnabled
+    {
+      get
+      {
+        return CPU.mInterruptsEnabled;
+      }
+    }
   }
 }

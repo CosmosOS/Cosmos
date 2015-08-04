@@ -78,7 +78,7 @@ namespace Cosmos.Core
                 ClearMemory(xNextTablePointer, GlobalSystemInfo.TotalDataLookupTableSize);
                 xPreviousTable->Next = xNextTablePointer;
                 xNextTablePointer->Previous = xPreviousTable;
-                //xNextTablePointer->FirstByteAfterTable = (void*)((uint)xNextTablePointer + GlobalSystemInfo.GetTotalDataLookupSize);
+
                 if (!ScanDataLookupTable(xCurrentTableIdx, xNextTablePointer, aLength, out xResult))
                 {
                     // Something seriously weird happened: we could create a new DataLookupTable (with new entries)
