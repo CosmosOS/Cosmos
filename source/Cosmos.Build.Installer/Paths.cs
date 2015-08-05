@@ -59,9 +59,6 @@ namespace Cosmos.Build.Installer
             string vsVersionCode;
             switch (VsVersion)
             {
-                case VsVersion.Vs2013:
-                    vsVersionCode = "12.0";
-                    break;
                 case VsVersion.Vs2015:
                     vsVersionCode = "14.0";
                     break;
