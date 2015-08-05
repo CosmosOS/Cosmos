@@ -68,7 +68,6 @@ namespace Cosmos.Core
 
         private static void DoDisableInterrupts()
         {
-
         }
 
         public static bool mInterruptsEnabled;
@@ -77,13 +76,19 @@ namespace Cosmos.Core
             Debugger.DoSend("Enabling interrupts");
             mInterruptsEnabled = true;
             DoEnableInterrupts();
+            Debugger.DoSend("After DoEnableInterrupts");
         }
 
-        public static void DisableInterrupts()
+        /// <summary>
+        /// Returns if the interrupts were actually enabled
+        /// </summary>
+        /// <returns></returns>
+        public static bool DisableInterrupts()
         {
-            mInterruptsEnabled = false;
             DoDisableInterrupts();
-            Debugger.DoSend("Disable interrupts");
+            var xResult = mInterruptsEnabled;
+            mInterruptsEnabled = false;
+            return xResult;
         }
     }
 }

@@ -39,7 +39,11 @@ namespace Cosmos.Core
 
         public static uint MemAlloc(uint aLength)
         {
-            CPU.DisableInterrupts();
+            if (aLength == 0)
+            {
+                DebugAndHalt("Request to retrieve block with size = 0 was halted!");
+            }
+            var xInterruptsWereEnabled = CPU.DisableInterrupts();
             try
             {
                 EnsureIsInitialized();
@@ -90,7 +94,16 @@ namespace Cosmos.Core
             }
             finally
             {
-                CPU.EnableInterrupts();
+                if (xInterruptsWereEnabled)
+                {
+                    Debug("Before CPU.EnableInterrupts");
+                    CPU.EnableInterrupts();
+                    Debug("After CPU.EnableInterrupts");
+                }
+                else
+                {
+                    Debug("Not enabling interrupts, because they weren't enabled yet!");
+                }
             }
         }
 

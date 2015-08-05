@@ -138,6 +138,10 @@ namespace Cosmos.Core.Plugs.Assemblers {
       new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
       new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".__AFTER_ENABLE_INTERRUPTS" };
 
+      // reload interrupt list
+      new CPUx86.Mov { DestinationReg =  CPUx86.Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Pointer") };
+      new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("static_field__Cosmos_Core_CPU_mInterruptsEnabled"), DestinationIsIndirect = true, SourceValue = 1 };
+      new CPUx86.Lidt { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
       // Reenable interrupts
       new CPUx86.Sti();
 

@@ -10,29 +10,29 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>VMware</Profile>
+    <Profile>Bochs</Profile>
     <!-- Looks like this was a mispelled attribute. Replaced by DebugEnabled below.
     <DebugEnable>true</DebugEnable>
     -->
-    <DebugEnabled>True</DebugEnabled>
+    <DebugEnabled>False</DebugEnabled>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <EnableGDB>True</EnableGDB>
-    <StartCosmosGDB>False</StartCosmosGDB>
+    <StartCosmosGDB>True</StartCosmosGDB>
     <VMWareEdition>Workstation</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
     <Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</Name>
-    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
+    <Description>Use Bochs emulator to deploy and debug.</Description>
     <Deployment>ISO</Deployment>
-    <Launch>VMware</Launch>
+    <Launch>Bochs</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <StackCorruptionDetectionEnabled>False</StackCorruptionDetectionEnabled>
     <TraceAssemblies>All</TraceAssemblies>
     <VMware_Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</VMware_Name>
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
-    <VMware_DebugEnabled>True</VMware_DebugEnabled>
+    <VMware_DebugEnabled>False</VMware_DebugEnabled>
     <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
@@ -46,8 +46,8 @@
     <Bochs_Description>Use Bochs emulator to deploy and debug.</Bochs_Description>
     <Bochs_Deployment>ISO</Bochs_Deployment>
     <Bochs_Launch>Bochs</Bochs_Launch>
-    <Bochs_DebugEnabled>True</Bochs_DebugEnabled>
-    <Bochs_StackCorruptionDetectionEnabled>True</Bochs_StackCorruptionDetectionEnabled>
+    <Bochs_DebugEnabled>False</Bochs_DebugEnabled>
+    <Bochs_StackCorruptionDetectionEnabled>False</Bochs_StackCorruptionDetectionEnabled>
     <Bochs_DebugMode>Source</Bochs_DebugMode>
     <Bochs_VisualStudioDebugPort>Pipe: Cosmos\Serial</Bochs_VisualStudioDebugPort>
     <Bochs_VMwareEdition>Workstation</Bochs_VMwareEdition>

@@ -21,7 +21,7 @@ namespace Cosmos.TestRunner.Core
             var xDebugConnector = new DebugConnectorPipeServer(DebugConnectorPipeServer.DefaultCosmosPipeName);
             InitializeDebugConnector(xDebugConnector);
 
-            var xVMware = new VMware(xParams, false);
+            var xVMware = new VMware(xParams, RunWithGDB);
             xVMware.OnShutDown = (a, b) =>
             {
             };
