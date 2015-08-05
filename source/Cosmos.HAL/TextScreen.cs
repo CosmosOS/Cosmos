@@ -35,6 +35,7 @@ namespace Cosmos.HAL {
       mRow2Addr = (UInt32)(Cols * 2);
       mScrollSize = (UInt32)(Cols * (Rows - 1) * 2);
       mRowSize32 = (UInt32)Cols * 2 / 4;
+      Debugger.DoSend("End of TextScreen..ctor");
     }
 
     public override UInt16 Rows { get { return 25; } }

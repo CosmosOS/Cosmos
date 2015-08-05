@@ -5,7 +5,7 @@ namespace Cosmos.Core
 {
     partial class Heap
     {
-        public static bool EnableDebug = true;
+        public static bool EnableDebug = false;
         private static void Debug(string message)
         {
             if (!EnableDebug)
@@ -33,7 +33,7 @@ namespace Cosmos.Core
 
         private static void DebugAndHalt(string message)
         {
-            Debug(message);
+            Debugger.DoSend(message);
             while (true)
                 ;
         }

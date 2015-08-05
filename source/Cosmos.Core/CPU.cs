@@ -73,10 +73,8 @@ namespace Cosmos.Core
         public static bool mInterruptsEnabled;
         public static void EnableInterrupts()
         {
-            Debugger.DoSend("Enabling interrupts");
             mInterruptsEnabled = true;
             DoEnableInterrupts();
-            Debugger.DoSend("After DoEnableInterrupts");
         }
 
         /// <summary>

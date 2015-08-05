@@ -20,7 +20,8 @@ namespace Cosmos.System {
 
       Global.Dbg.Send("HW Init");
       Cosmos.HAL.Global.Init(textScreen, keyboard);
-      //Network.NetworkStack.Init();
+      Global.Dbg.Send("After HW Init");
+        //Network.NetworkStack.Init();
     }
   }
 }

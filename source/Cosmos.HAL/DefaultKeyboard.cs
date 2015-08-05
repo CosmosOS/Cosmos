@@ -9,6 +9,9 @@ namespace Cosmos.HAL
 
     public class DefaultKeyboard : Keyboard
     {
+        public DefaultKeyboard()
+        {
+        }
 
         protected override void Initialize()
         {
@@ -19,8 +22,6 @@ namespace Cosmos.HAL
         }
 
         private List<KeyMapping> mKeys;
-
-
 
         private void updateLed()
         {

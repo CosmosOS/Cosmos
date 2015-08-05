@@ -58,6 +58,8 @@ namespace Cosmos.Core
                     //DebugHex("At address", (uint)xCurrentTable);
                     if (ScanDataLookupTable(xCurrentTableIdx, xCurrentTable, aLength, out xResult))
                     {
+                        Debugger.DoSend("Returning handle");
+                        Debugger.DoSendNumber(xResult);
                         DebugHex("Returning handle ", xResult);
                         if (xResult < CPU.GetEndOfKernel())
                         {
@@ -76,6 +78,7 @@ namespace Cosmos.Core
                     // this check should theoretically be unnecessary, but lets keep it, to do some double-checking.
                     DebugAndHalt("No PreviousTable found!");
                 }
+                Debugger.DoSend("Creating new DataLookupTable");
                 var xLastItem = xPreviousTable->GetEntry(DataLookupTable.EntriesPerTable - 1);
                 var xNextTablePointer = (DataLookupTable*)((uint)xLastItem->DataBlock + xLastItem->Size);
                 // the memory hasn't been cleared yet, so lets do that now.
@@ -89,6 +92,8 @@ namespace Cosmos.Core
                     // but couldn't allocate a new handle from it.
                     DebugAndHalt("Something seriously weird happened: we could create a new DataLookupTable (with new entries), but couldn't allocate a new handle from it.");
                 }
+                Debugger.DoSend("Returning handle");
+                Debugger.DoSendNumber(xResult);
                 DebugHex("Returning handle ", xResult);
                 return xResult;
             }
@@ -110,7 +115,7 @@ namespace Cosmos.Core
         private static bool ScanDataLookupTable(uint aTableIdx, DataLookupTable* aTable, uint aSize, out uint aHandle)
         {
             DataLookupEntry* xPreviousEntry = null;
-            for (int i = 1; i < DataLookupTable.EntriesPerTable; i++)
+            for (int i = 0; i < DataLookupTable.EntriesPerTable; i++)
             {
                 var xCurrentEntry = aTable->GetEntry(i);
 
@@ -124,13 +129,17 @@ namespace Cosmos.Core
                     {
                         // once a handle is used, the size should be set. But at this point, it somehow got unset again.
                         // This should never occur.
+                        Debugger.DoSend("TableIdx");
+                        Debugger.DoSendNumber(aTableIdx);
+                        Debugger.DoSend("Index");
+                        Debugger.DoSendNumber((uint)i);
                         DebugAndHalt("Found an entry which has no size, but there is a followup DataLookupTable");
                     }
 
                     void* xDataBlock;
                     //Debug("Now calculate datablock pointer");
                     // now we found ourself a free handle
-                    if (i == 1)
+                    if (i == 0)
                     {
                         //Debug("Using table end");
                         // we don't have a previous handle yet, so we take the FirstByteAfterTable field of the DataLookupTable

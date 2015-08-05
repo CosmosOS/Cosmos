@@ -75,11 +75,12 @@ namespace Cosmos.IL2CPU
       {
         Debug("Oops");
       }
-      DebugHex("Type", aType);
+      var xCurrentType = aType;
+      DebugHex("Type", xCurrentType);
       DebugHex("MethodId", aMethodId);
       do
       {
-        var xCurrentTypeInfo = mTypes[aType];
+        var xCurrentTypeInfo = mTypes[xCurrentType];
 
         if (xCurrentTypeInfo.MethodIndexes == null)
         {
@@ -113,17 +114,17 @@ namespace Cosmos.IL2CPU
             return xResult;
           }
         }
-        if (aType == xCurrentTypeInfo.BaseTypeIdentifier)
+        if (xCurrentType == xCurrentTypeInfo.BaseTypeIdentifier)
         {
           break;
         }
-        aType = xCurrentTypeInfo.BaseTypeIdentifier;
+        xCurrentType = xCurrentTypeInfo.BaseTypeIdentifier;
       }
       while (true);
       //}
       Debugger.DoSend("Type");
       Debugger.DoSendNumber(aType);
-      Debugger.DoSend("MethodIndex");
+      Debugger.DoSend("MethodId");
       Debugger.DoSendNumber(aMethodId);
       Debugger.DoSend("Not FOUND!");
       while (true)
