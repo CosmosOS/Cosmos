@@ -17,10 +17,12 @@ namespace Cosmos.System {
       {
         Console = new Console(textScreen);
       }
-
+        var x = new String('a', 1);
       Global.Dbg.Send("HW Init");
-      Cosmos.HAL.Global.Init(textScreen, keyboard);
-      Global.Dbg.Send("After HW Init");
+            x = new String('a', 1);
+            Cosmos.HAL.Global.Init(textScreen, keyboard);
+            x = new String('a', 1);
+            Global.Dbg.Send("After HW Init");
         //Network.NetworkStack.Init();
     }
   }

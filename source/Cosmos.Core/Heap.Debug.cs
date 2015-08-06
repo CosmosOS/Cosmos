@@ -5,7 +5,7 @@ namespace Cosmos.Core
 {
     partial class Heap
     {
-        public static bool EnableDebug = false;
+        public static bool EnableDebug = true;
         private static void Debug(string message)
         {
             if (!EnableDebug)
