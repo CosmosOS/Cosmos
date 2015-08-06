@@ -47,11 +47,6 @@ namespace Cosmos.Build.Builder {
         Paths.VsVersion = VsVersion.Vs2015;
       }
 
-      if (xArgs.Contains("-VS2013") || xArgs.Contains("/VS2013")) {
-        VsVersion = VsVersion.Vs2013;
-        Paths.VsVersion = VsVersion.Vs2013;
-      }
-
       if (xArgs.Contains("-VSEXPHIVE") || xArgs.Contains("/VSEXPHIVE")) {
         UseVsHive = true;
       }
