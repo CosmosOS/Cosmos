@@ -61,7 +61,7 @@ Contains various helpers and files for Cosmos.
 
 This is the core assembly of cosmos. It contains code for managing CPU, IO groups, interrupts, etc.
 
-#### \Source\Cosmos.Core.Plugs
+##### \Source\Cosmos.Core.Plugs
 
 This folder contains the low-level plugs for Cosmos.Core.
 
@@ -91,6 +91,26 @@ Contains the system-level code for Cosmos. It contains wrappers for Console, net
 #### \Source\Cosmos.VS
 
 Contains the code for the integration with Visual Studio. Adds support for the Cosmos Kernel project type, and custom build steps.
+
+##### \Source\Cosmos.VS.Debug
+
+Contains the code for the Visual Studio debugger integration.
+
+##### \Source\Cosmos.VS.Package
+
+Contains the code for the Visual Studio package of Cosmos.
+
+##### \Source\Cosmos.VS.Windows
+
+Contains the Cosmos windows in VS, like the Registers window.
+
+##### \Source\Cosmos.VS.Windows.Test
+
+Contains the tests for Cosmos.VS.Windows.
+
+##### \Source\Cosmos.VS.Wizards
+
+Contains the project wizards of Cosmos.
 
 #### \Source\Unused
 
