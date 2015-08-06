@@ -54,14 +54,12 @@ namespace Cosmos.Core
                 uint xResult;
                 while (xCurrentTable != null)
                 {
-                    DebugHex("    Scanning DataLookupTable ", xCurrentTableIdx);
+                    DebugHex("Scanning DataLookupTable ", xCurrentTableIdx);
                     //DebugHex("At address", (uint)xCurrentTable);
                     if (ScanDataLookupTable(xCurrentTableIdx, xCurrentTable, aLength, out xResult))
                     {
-                        Debugger.DoSend("    Returning handle");
-                        Debugger.DoSendNumber(xResult);
-                        Debugger.DoSend("    For dataobject size");
-                        Debugger.DoSendNumber(aLength);
+                        DebugHex("Returning handle", xResult);
+                        DebugHex("For dataobject size", aLength);
                         if (xResult < CPU.GetEndOfKernel())
                         {
                             DebugAndHalt("Wrong handle returned!");
@@ -77,9 +75,9 @@ namespace Cosmos.Core
                 if (xPreviousTable == null)
                 {
                     // this check should theoretically be unnecessary, but lets keep it, to do some double-checking.
-                    DebugAndHalt("    No PreviousTable found!");
+                    DebugAndHalt("No PreviousTable found!");
                 }
-                Debugger.DoSend("    Creating new DataLookupTable");
+                Debug("Creating new DataLookupTable");
                 var xLastItem = xPreviousTable->GetEntry(DataLookupTable.EntriesPerTable - 1);
                 var xNextTablePointer = (DataLookupTable*)((uint)xLastItem->DataBlock + xLastItem->Size);
                 // the memory hasn't been cleared yet, so lets do that now.
@@ -93,8 +91,8 @@ namespace Cosmos.Core
                     // but couldn't allocate a new handle from it.
                     DebugAndHalt("    Something seriously weird happened: we could create a new DataLookupTable (with new entries), but couldn't allocate a new handle from it.");
                 }
-                Debugger.DoSend("    Returning handle");
-                Debugger.DoSendNumber(xResult);
+                DebugHex("Returning handle", xResult);
+                DebugHex("For dataobject size", aLength);
                 return xResult;
             }
             finally
@@ -121,17 +119,15 @@ namespace Cosmos.Core
                 //DebugHex("Item.Refcount", xCurrentEntry->Refcount);
                 if (xCurrentEntry->Size == 0)
                 {
-                    DebugHex("    Found an entry at position ", (uint)i);
+                    DebugHex("Found an entry at position ", (uint)i);
                     // found an entry now. Let's set it
                     if (aTable->Next != null)
                     {
                         // once a handle is used, the size should be set. But at this point, it somehow got unset again.
                         // This should never occur.
-                        Debugger.DoSend("    TableIdx");
-                        Debugger.DoSendNumber(aTableIdx);
-                        Debugger.DoSend("    Index");
-                        Debugger.DoSendNumber((uint)i);
-                        DebugAndHalt("    Found an entry which has no size, but there is a followup DataLookupTable");
+                        DebugHex("TableIdx", aTableIdx);
+                        DebugHex("Index", (uint)i);
+                        DebugAndHalt("Found an entry which has no size, but there is a followup DataLookupTable");
                     }
 
                     void* xDataBlock;
@@ -154,7 +150,7 @@ namespace Cosmos.Core
                         // We're not the very first handle being assigned, so calculate the start address using the previous block
                         xDataBlock = (void*)((uint)xPreviousEntry->DataBlock + xPreviousEntry->Size);
                     }
-                    DebugHex("    Datablock", (uint)xDataBlock);
+                    DebugHex("Datablock", (uint)xDataBlock);
 
                     // make sure the memory is empty
                     ClearMemory(xDataBlock, aSize);
@@ -167,7 +163,7 @@ namespace Cosmos.Core
                     //DebugHex("Returning handle ", aHandle);
                     if (aHandle == 0x0213D185)
                     {
-                        Debug("    Last known one");
+                        Debug("Last known one");
                     }
                     return true;
                 }
@@ -175,15 +171,15 @@ namespace Cosmos.Core
                 // Refcount == UInt32.MaxValue, it means that the block has been reclaimed, and can be reused now.
                 if (xCurrentEntry->Refcount == UInt32.MaxValue)
                 {
-                    Debug("    Found a reclaimed entry");
+                    Debug("Found a reclaimed entry");
                     // we can reuse this entry if its Size >= aLength
                     if (xCurrentEntry->Size >= aSize)
                     {
-                        Debug("    Can be reused");
+                        Debug("Can be reused");
                         // we can reuse this entry
                         xCurrentEntry->Refcount = 1;
                         aHandle = (uint)xCurrentEntry;
-                        DebugHex("    Returning reused handle ", aHandle);
+                        DebugHex("Returning reused handle ", aHandle);
                         return true;
                     }
                 }
