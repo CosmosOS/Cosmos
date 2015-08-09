@@ -126,6 +126,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RTC.cs" />
     <Compile Include="ScanMapBase.cs" />
+    <Compile Include="ScanMaps\FR_Standard.cs" />
     <Compile Include="ScanMaps\US_Standard.cs" />
     <Compile Include="TextScreen.cs" />
     <Compile Include="Drivers\USB\USBHost.cs" />

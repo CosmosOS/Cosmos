@@ -65,7 +65,13 @@ namespace Cosmos.HAL
         K,
         L,
         Semicolon,
+        Colon,
         Apostrophe,
+
+        LowerThan,
+        BiggerThan,
+
+        ExclamationPoint,
 
         Shift,
         Z,
