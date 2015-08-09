@@ -80,7 +80,7 @@ namespace Cosmos.HAL {
       //TextScreen.Clear();
 
       Global.Dbg.Send("Keyboard");
-      Keyboard = new DefaultKeyboard();
+      Keyboard = new PS2Keyboard();
 
       // Find hardcoded ATA controllers
       Global.Dbg.Send("ATA Master");

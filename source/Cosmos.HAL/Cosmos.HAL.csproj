@@ -79,8 +79,11 @@
     <Compile Include="BlockDevice\MBR.cs" />
     <Compile Include="BlockDevice\Partition.cs" />
     <Compile Include="Bootstrap.cs" />
+    <Compile Include="ConsoleKeyEx.cs" />
     <Compile Include="DebugTextScreen.cs" />
-    <Compile Include="DefaultKeyboard.cs" />
+    <Compile Include="KeyEvent.cs" />
+    <Compile Include="KeyMapping.cs" />
+    <Compile Include="PS2Keyboard.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="Drivers\PCI\Audio\ES1370\Components\DACak4531.cs" />
     <Compile Include="Drivers\PCI\Audio\ES1370\ES1370.cs" />
@@ -122,6 +125,8 @@
     <Compile Include="PIT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RTC.cs" />
+    <Compile Include="ScanMapBase.cs" />
+    <Compile Include="ScanMaps\US_Standard.cs" />
     <Compile Include="TextScreen.cs" />
     <Compile Include="Drivers\USB\USBHost.cs" />
     <Compile Include="Drivers\USB\USBHostOHCI.cs" />
