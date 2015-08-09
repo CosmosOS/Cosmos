@@ -2,19 +2,21 @@
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
+using System.Collections.Generic;
 
 namespace Cosmos.Build.Installer {
   public abstract class Task {
-    protected abstract void DoRun();
+    protected abstract List<string> DoRun();
 
     public void Run() {
-      try {
-        DoRun();
-      } catch (Exception ex) {
+        var exceptions = DoRun();
         Log.NewSection("Error");
-        Log.WriteLine(ex.Message);
+        //Collect all the exceptions from the build stage, and list them
+        foreach(var msg in exceptions)
+        {
+          Log.WriteLine(msg);
+        }
         Log.SetError();
-      }
     }
 
     public bool AmRunning32Bit() {
