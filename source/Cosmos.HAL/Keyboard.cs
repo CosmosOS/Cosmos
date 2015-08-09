@@ -12,8 +12,9 @@ namespace Cosmos.HAL {
             {
                 Console.WriteLine("Skipping creation of key queue!");
             }
-            mQueuedKeys = new Queue<KeyEvent>(32);     
-            SetKeyLayout(new US_Standard());   
+            mQueuedKeys = new Queue<KeyEvent>(32);
+            SetKeyLayout(new US_Standard());
+            Initialize();
         }
 
         /// <summary>
