@@ -78,6 +78,14 @@ namespace Cosmos.HAL {
             HandleScancode(xScanCode, xReleased);
         }
 
+        /// <summary>
+        /// Allow faking scancodes. Used for test kernels
+        /// </summary>
+        internal void HandleFakeScanCode(byte aScancode, bool aReleased)
+        {
+            HandleScancode(aScancode, aReleased);
+        }
+
         protected abstract void HandleScancode(byte aScancode, bool aReleased);
 
         private static Queue<ConsoleKeyInfoEx> mQueuedKeys;
