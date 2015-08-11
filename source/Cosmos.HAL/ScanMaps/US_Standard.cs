@@ -48,7 +48,7 @@ namespace Cosmos.HAL.ScanMaps
             _keys.Add(new KeyMapping(0x1B, ']', '}', ']', '}', ']', '}', ConsoleKeyEx.RBracket));
             /* ENTER, CTRL */
             _keys.Add(new KeyMapping(0x1C, ConsoleKeyEx.Enter));
-            _keys.Add(new KeyMapping(0x1D, ConsoleKeyEx.Ctrl));
+            _keys.Add(new KeyMapping(0x1D, ConsoleKeyEx.LCtrl));
             /* ASDFGHJKL;'` */
             _keys.Add(new KeyMapping(0x1E, 'a', 'A', 'a', 'A', 'a', 'A', ConsoleKeyEx.A));
             _keys.Add(new KeyMapping(0x1F, 's', 'S', 's', 'S', 's', 'S', ConsoleKeyEx.S));
@@ -63,7 +63,7 @@ namespace Cosmos.HAL.ScanMaps
             _keys.Add(new KeyMapping(0x28, '\'', '"', '\'', '\'', '"', '"', ConsoleKeyEx.Apostrophe));
             _keys.Add(new KeyMapping(0x29, '`', '~', '`', '`', '~', '~', ConsoleKeyEx.Backquote));
             /* Left Shift*/
-            _keys.Add(new KeyMapping(0x2A, ConsoleKeyEx.Shift));
+            _keys.Add(new KeyMapping(0x2A, ConsoleKeyEx.LShift));
             /* \ZXCVBNM,./ */
             _keys.Add(new KeyMapping(0x2B, '\\', '|', '\\', '\\', '|', '|', ConsoleKeyEx.Backslash));
             _keys.Add(new KeyMapping(0x2C, 'z', 'Z', 'z', 'Z', 'z', 'Z', ConsoleKeyEx.Z));
@@ -77,12 +77,12 @@ namespace Cosmos.HAL.ScanMaps
             _keys.Add(new KeyMapping(0x34, '.', '>', '.', '.', '>', '>', ConsoleKeyEx.Period));
             _keys.Add(new KeyMapping(0x35, '/', '?', '/', '/', '?', '/', ConsoleKeyEx.Slash)); // also numpad divide
             /* Right Shift */
-            _keys.Add(new KeyMapping(0x36, ConsoleKeyEx.Shift));
+            _keys.Add(new KeyMapping(0x36, ConsoleKeyEx.RShift));
             /* Print Screen */
             _keys.Add(new KeyMapping(0x37, '*', '*', '*', '*', '*', '*', ConsoleKeyEx.NumMultiply));
                 // also numpad multiply
             /* Alt  */
-            _keys.Add(new KeyMapping(0x38, ConsoleKeyEx.Alt));
+            _keys.Add(new KeyMapping(0x38, ConsoleKeyEx.LAlt));
             /* Space */
             _keys.Add(new KeyMapping(0x39, ' ', ConsoleKeyEx.Spacebar));
             /* Caps */

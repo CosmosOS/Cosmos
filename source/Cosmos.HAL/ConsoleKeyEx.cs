@@ -73,7 +73,8 @@ namespace Cosmos.HAL
 
         ExclamationPoint,
 
-        Shift,
+        LShift,
+        RShift,
         Z,
         X,
         C,
@@ -85,9 +86,11 @@ namespace Cosmos.HAL
         Period,
         Slash,
 
-        Ctrl,
+        LCtrl,
+        RCtrl,
         LWin,
-        Alt,
+        LAlt,
+        RAlt,
         Spacebar,
         AltGr,
         RWin,

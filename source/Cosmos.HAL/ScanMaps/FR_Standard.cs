@@ -47,7 +47,7 @@ namespace Cosmos.HAL.ScanMaps
             _keys.Add(new KeyMapping(0x1B, '$', '£', '$', '£', '$', '£', ConsoleKeyEx.RBracket));
             /* ENTER, CTRL */
             _keys.Add(new KeyMapping(0x1C, ConsoleKeyEx.Enter));
-            _keys.Add(new KeyMapping(0x1D, ConsoleKeyEx.Ctrl));
+            _keys.Add(new KeyMapping(0x1D, ConsoleKeyEx.LCtrl));
             /* ASDFGHJKL;'` */
             _keys.Add(new KeyMapping(0x1E, 'q', 'Q', 'q', 'Q', 'q', 'Q', ConsoleKeyEx.Q));
             _keys.Add(new KeyMapping(0x1F, 's', 'S', 's', 'S', 's', 'S', ConsoleKeyEx.S));
@@ -62,7 +62,7 @@ namespace Cosmos.HAL.ScanMaps
             _keys.Add(new KeyMapping(0x28, 'ù', '%', 'ù', '%', 'ù', '%', ConsoleKeyEx.Apostrophe));
             _keys.Add(new KeyMapping(0x29, '²', '\0', '²', '²', '\0', '\0', ConsoleKeyEx.Backquote));
             /* Left Shift*/
-            _keys.Add(new KeyMapping(0x2A, ConsoleKeyEx.Shift));
+            _keys.Add(new KeyMapping(0x2A, ConsoleKeyEx.LShift));
             /* \ZXCVBNM,./ */
             _keys.Add(new KeyMapping(0x2B, '*', 'µ', '*', 'µ', '*', 'µ', ConsoleKeyEx.Backslash));
             _keys.Add(new KeyMapping(0x2C, 'w', 'W', 'w', 'W', 'w', 'W', ConsoleKeyEx.W));
@@ -76,11 +76,11 @@ namespace Cosmos.HAL.ScanMaps
             _keys.Add(new KeyMapping(0x34, ':', '/', ':', '/', ':', '/', ConsoleKeyEx.Colon));
             _keys.Add(new KeyMapping(0x35, '!', '§', '!', '§', '!', '§', ConsoleKeyEx.ExclamationPoint)); // also numpad divide
                                                                                                            /* Right Shift */
-            _keys.Add(new KeyMapping(0x36, ConsoleKeyEx.Shift));
+            _keys.Add(new KeyMapping(0x36, ConsoleKeyEx.RShift));
             /* Print Screen */
             _keys.Add(new KeyMapping(0x37, '*', '*', '*', '*', '*', '*', ConsoleKeyEx.NumMultiply)); // also numpad multiply
                                                                                                                  /* Alt  */
-            _keys.Add(new KeyMapping(0x38, ConsoleKeyEx.Alt));
+            _keys.Add(new KeyMapping(0x38, ConsoleKeyEx.LAlt));
             /* Space */
             _keys.Add(new KeyMapping(0x39, ' ', ConsoleKeyEx.Spacebar));
             /* Caps */

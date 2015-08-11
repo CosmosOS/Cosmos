@@ -10,12 +10,12 @@ namespace Cosmos.HAL
         protected Core.IOGroup.Keyboard IO = Core.Global.BaseIOGroups.Keyboard;
 
         public PS2Keyboard()
-        {
-            INTs.SetIrqHandler(0x01, HandleIRQ);
+        {           
         }
 
         protected override void Initialize()
         {
+            INTs.SetIrqHandler(0x01, HandleIRQ);
         }
 
         private void HandleIRQ(ref INTs.IRQContext aContext)
@@ -29,13 +29,13 @@ namespace Cosmos.HAL
             HandleScancode(xScanCode, xReleased);
         }
 
-        private void updateLed()
+        public override void UpdateLeds()
         {
             IO.Port60.Byte = 0xED;
             while ((new IOPort(0x64).Byte & 2) != 0)
             {
             }
-            var led_status = (ScrollLock ? 1 : 0) | ((NumLock ? 1 : 0) << 1) | ((CapsLock ? 1 : 0) << 2);
+            var led_status = (Global.ScrollLock ? 1 : 0) | ((Global.NumLock ? 1 : 0) << 1) | ((Global.CapsLock ? 1 : 0) << 2);
             IO.Port60.Byte = (byte)led_status;
             while ((new IOPort(0x64).Byte & 2) != 0)
             {
@@ -48,20 +48,20 @@ namespace Cosmos.HAL
             if (key == 0x3A && !aReleased)
             {
                 // caps lock
-                CapsLock = !CapsLock;
-                updateLed();
+                Global.CapsLock = !Global.CapsLock;
+                UpdateLeds();
             }
             else if (key == 0x45 && !aReleased)
             {
                 // num lock
-                NumLock = !NumLock;
-                updateLed();
+                Global.NumLock = !Global.NumLock;
+                UpdateLeds();
             }
             else if (key == 0x46 && !aReleased)
             {
                 // scroll lock
-                ScrollLock = !ScrollLock;
-                updateLed();
+                Global.ScrollLock = !Global.ScrollLock;
+                UpdateLeds();
             }
             else
                 switch (key)
@@ -107,7 +107,7 @@ namespace Cosmos.HAL
 
         public bool GetKey(byte aScancode, bool released, out KeyEvent keyInfo)
         {
-            keyInfo = KeyLayout.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, NumLock, CapsLock, ScrollLock);
+            keyInfo = KeyLayout.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, Global.NumLock, Global.CapsLock, Global.ScrollLock);
             return keyInfo != null;
         }
     }

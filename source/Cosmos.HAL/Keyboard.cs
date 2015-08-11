@@ -15,6 +15,7 @@ namespace Cosmos.HAL {
             mQueuedKeys = new Queue<KeyEvent>(32);
             SetKeyLayout(new US_Standard());
             Initialize();
+            UpdateLeds();
         }
 
         /// <summary>
@@ -28,6 +29,8 @@ namespace Cosmos.HAL {
         {
             KeyLayout = layout;
         }
+
+        public abstract void UpdateLeds();
 
         protected abstract void HandleScancode(byte aScancode, bool aReleased);
 
@@ -75,11 +78,5 @@ namespace Cosmos.HAL {
             get;
             protected set;
         }
-
-        public bool NumLock { get; protected set; }
-
-        public bool CapsLock { get; protected set; }
-
-        public bool ScrollLock { get; protected set; }
     }
 }
