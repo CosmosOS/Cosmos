@@ -20,10 +20,11 @@ namespace Cosmos.Core {
             // Disable all interrupts
             //DisableInterrupts();
 
-            while ((new IOPort(0x64).Byte & 0x02) != 0)
+            var myPort = new IOPort(0x64);
+            while ((myPort.Byte & 0x02) != 0)
             {
             }
-            new IOPort(0x64).Byte = 0xFE;
+            myPort.Byte = 0xFE;
             Halt(); // If it didn't work, Halt the CPU
         }
     }
