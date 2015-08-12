@@ -11,11 +11,7 @@ namespace Cosmos.HAL
     {
         public static void Reboot()
         {
-            byte good = 0x02;
-            while ((good & 0x02) != 0)
-                good = new IOPort(0x64).Byte;
-            new IOPort(0x64).Byte = 0xFE;
-            Core.Global.CPU.Halt();
+            Core.Global.CPU.Reboot();
         }
     }
 }

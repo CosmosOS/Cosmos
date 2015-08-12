@@ -20,17 +20,10 @@ namespace Cosmos.Core {
             // Disable all interrupts
             //DisableInterrupts();
 
-            //byte temp;
-
-            //// Clear all keyboard buffers
-            //do {
-            //    temp = CPUBus.Read8(0x64); // Empty user data
-            //    if ((temp & 0x01) != 0) {
-            //        CPUBus.Read8(0x60); // Empty keyboard data
-            //    }
-            //} while ((temp & 0x02) != 0);
-
-            //CPUBus.Write8(0x64, 0xFE); // Pulse CPU Reset line
+            while ((new IOPort(0x64).Byte & 0x02) != 0)
+            {
+            }
+            new IOPort(0x64).Byte = 0xFE;
             Halt(); // If it didn't work, Halt the CPU
         }
     }
