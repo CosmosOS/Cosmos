@@ -9,7 +9,8 @@ namespace Cosmos.IL2CPU.Plugs
     public Type Assembler = null;
     public bool IsMonoOnly = false;
     public bool IsMicrosoftdotNETOnly = false;
-    
+    public bool RequiresPlug = false;
+    public bool PlugNotImplemented = false;
     public bool IsWildcard = false;
     public bool WildcardMatchParameters = false;
   }
