@@ -110,8 +110,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.HAL", "Cosmos.HAL\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System.Plugs", "Cosmos.System.Plugs\Cosmos.System.Plugs.csproj", "{7C64B97F-516D-4A6D-B9E1-3FE48F561409}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Wizards", "Cosmos.VS.Wizards\Cosmos.VS.Wizards.csproj", "{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core.Plugs", "Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{D9A87AAD-FCC9-4517-B31D-E904DAD00784}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Debug.Kernel", "Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj", "{61607F1E-58F9-41CF-972F-128384F3E115}"
@@ -444,19 +442,6 @@ Global
 		{7C64B97F-516D-4A6D-B9E1-3FE48F561409}.Release|Mixed Platforms.Build.0 = Release|x86
 		{7C64B97F-516D-4A6D-B9E1-3FE48F561409}.Release|x86.ActiveCfg = Release|x86
 		{7C64B97F-516D-4A6D-B9E1-3FE48F561409}.Release|x86.Build.0 = Release|x86
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Debug|Itanium.ActiveCfg = Debug|Any CPU
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Debug|x86.Build.0 = Debug|Any CPU
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Release|Itanium.ActiveCfg = Release|Any CPU
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}.Release|x86.ActiveCfg = Release|Any CPU
 		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9A87AAD-FCC9-4517-B31D-E904DAD00784}.Debug|Itanium.ActiveCfg = Debug|Itanium
