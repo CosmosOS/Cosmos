@@ -16,9 +16,19 @@ namespace Cosmos.Core {
         public static void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged
         public void Halt() { } // Plugged
 
+        public static void DisableInterrupts()
+        {
+            // plugged
+        }
+
+        public static void EnableInterrupts()
+        {
+            // plugged
+        }
+
         public void Reboot() {
             // Disable all interrupts
-            //DisableInterrupts();
+            DisableInterrupts();
 
             var myPort = new IOPort(0x64);
             while ((myPort.Byte & 0x02) != 0)
