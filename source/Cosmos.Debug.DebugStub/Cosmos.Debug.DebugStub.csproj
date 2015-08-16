@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReferenceHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="AsmBreak.xs">
@@ -76,55 +77,55 @@
       <LastGenOutput>AsmBreak.asm</LastGenOutput>
     </EmbeddedResource>
     <None Include=".editorconfig" />
-    <None Include="CmdMisc.xs">
+    <EmbeddedResource Include="CmdMisc.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>CmdMisc.asm</LastGenOutput>
-    </None>
-    <None Include="CmdProcess.xs">
+    </EmbeddedResource>
+    <EmbeddedResource Include="CmdProcess.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>CmdProcess.asm</LastGenOutput>
-    </None>
-    <None Include="CmdSend.xs">
+    </EmbeddedResource>
+    <EmbeddedResource Include="CmdSend.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>CmdSend.asm</LastGenOutput>
-    </None>
-    <None Include="Consts.xs">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Consts.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>Consts.asm</LastGenOutput>
-    </None>
+    </EmbeddedResource>
     <None Include="Cosmos.snk" />
-    <None Include="DebugStub.xs">
+    <EmbeddedResource Include="DebugStub.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>DebugStub.asm</LastGenOutput>
-    </None>
-    <None Include="Init.xs">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Init.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>Init.asm</LastGenOutput>
-    </None>
-    <None Include="Screen.xs">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Screen.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>Screen.asm</LastGenOutput>
-    </None>
-    <None Include="SerialIO.xs">
+    </EmbeddedResource>
+    <EmbeddedResource Include="SerialIO.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>SerialIO.asm</LastGenOutput>
-    </None>
-    <None Include="SerialHelpers.xs">
+    </EmbeddedResource>
+    <EmbeddedResource Include="SerialHelpers.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>SerialHelpers.asm</LastGenOutput>
-    </None>
-    <None Include="Serial.xs">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Serial.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>Serial.asm</LastGenOutput>
-    </None>
-    <None Include="TracerEntry.xs">
+    </EmbeddedResource>
+    <EmbeddedResource Include="TracerEntry.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>TracerEntry.asm</LastGenOutput>
-    </None>
-    <None Include="Utilities.xs">
+    </EmbeddedResource>
+    <EmbeddedResource Include="Utilities.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>Utilities.asm</LastGenOutput>
-    </None>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Content Include="AsmBreak.asm">

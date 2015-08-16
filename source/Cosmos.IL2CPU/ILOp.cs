@@ -161,7 +161,7 @@ namespace Cosmos.IL2CPU {
             return (uint)xSla.Size;
           }
         }
-        return (uint)(from item in GetFieldsInfo(aType)
+        return (uint)(from item in GetFieldsInfo(aType, false)
                       select (int)item.Size).Sum();
       }
       return 4;
@@ -198,9 +198,14 @@ namespace Cosmos.IL2CPU {
       };
     }
 
-    private static void DoGetFieldsInfo(Type aType, List<X86.IL.FieldInfo> aFields) {
+    private static void DoGetFieldsInfo(Type aType, List<X86.IL.FieldInfo> aFields, bool includeStatic) {
       var xCurList = new Dictionary<string, X86.IL.FieldInfo>();
-      var xFields = (from item in aType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static)
+      var xBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
+      if (includeStatic)
+      {
+        xBindingFlags |= BindingFlags.Static;
+      }
+      var xFields = (from item in aType.GetFields(xBindingFlags)
                      orderby item.Name, item.DeclaringType.ToString()
                      select item).ToArray();
       for (int i = 0; i < xFields.Length; i++) {
@@ -247,13 +252,18 @@ namespace Cosmos.IL2CPU {
       }
 
       if (aType.BaseType != null) {
-        DoGetFieldsInfo(aType.BaseType, aFields);
+        DoGetFieldsInfo(aType.BaseType, aFields, includeStatic);
       }
     }
 
-    public static List<X86.IL.FieldInfo> GetFieldsInfo(Type aType) {
+    public static List<X86.IL.FieldInfo> GetFieldsInfo(Type aType, bool includeStatic)
+    {
+      if (aType.FullName == "System.Drawing.Color")
+      {
+        Console.Write("");
+      }
       var xResult = new List<X86.IL.FieldInfo>(16);
-      DoGetFieldsInfo(aType, xResult);
+      DoGetFieldsInfo(aType, xResult, includeStatic);
       xResult.Reverse();
       uint xOffset = 0;
       foreach (var xInfo in xResult) {
@@ -303,7 +313,7 @@ namespace Cosmos.IL2CPU {
     }
 
     protected static uint GetStorageSize(Type aType) {
-      return (from item in GetFieldsInfo(aType)
+      return (from item in GetFieldsInfo(aType, false)
               where !item.IsStatic
               orderby item.Offset descending
               select item.Offset + item.Size).FirstOrDefault();
@@ -401,7 +411,7 @@ namespace Cosmos.IL2CPU {
 
     public static FieldInfo ResolveField(Type aDeclaringType, string aField, bool aOnlyInstance)
     {
-      var xFields = GetFieldsInfo(aDeclaringType);
+      var xFields = GetFieldsInfo(aDeclaringType, !aOnlyInstance);
       var xFieldInfo = (from item in xFields
                         where item.Id == aField
                         && (!aOnlyInstance || item.IsStatic == false)

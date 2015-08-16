@@ -5,18 +5,22 @@ using System.Text;
 using Cosmos.Debug.Kernel;
 using Sys = Cosmos.System;
 
-namespace GuessKernel {
-  public class GuessOS : Sys.Kernel {
+namespace GuessKernel
+{
+  public class GuessOS: Sys.Kernel
+  {
     protected int mCount = 0;
     protected int mMagicNo = 22;
 
-    public GuessOS() {
+    public GuessOS()
+    {
       // Didnt check if tickcount is working yet.. can change this later
       //var xRandom = new Random(234243534);
       //mMagicNo = xRandom.Next(1, 100);
     }
 
-    protected override void BeforeRun() {
+    protected override void BeforeRun()
+    {
       //Cosmos.Core.HMI.Init();
 
       Console.WriteLine("Guess Demo");
@@ -28,6 +32,8 @@ namespace GuessKernel {
     protected override void Run()
     {
       mCount++;
+
+        mDebugger.Send("");
       mDebugger.SendMessage("Kernel", "New iteration");
       Console.WriteLine();
       Console.WriteLine("Guess #" + mCount);

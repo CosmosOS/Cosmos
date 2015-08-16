@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Xml;
 using Cosmos.Assembler.x86;
+using Cosmos.Debug.DebugStub;
 
 namespace Cosmos.Assembler {
   public class Assembler {
@@ -458,7 +459,7 @@ namespace Cosmos.Assembler {
       };
       new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
       new Comment(this, "END - Multiboot Info");
-      new LiteralAssemblerCode("%endif EXCLUDE_MULTIBOOT_MAGIC");
+      new LiteralAssemblerCode("%endif");
       WriteDebugVideo("Creating GDT.");
       CreateGDT();
 
@@ -511,13 +512,54 @@ namespace Cosmos.Assembler {
 
       if (mComPort > 0) {
         var xGen = new XSharp.Compiler.AsmGenerator();
-        foreach (var xFile in Directory.GetFiles(Cosmos.Build.Common.CosmosPaths.DebugStubSrc, "*.xs")) {
-          var xAsm = xGen.Generate(xFile);
-          foreach (var xData in xAsm.Data) {
-            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember() { RawAsm = xData });
+
+        var xGenerateAssembler =
+          new Action<object>(i =>
+                             {
+                               XSharp.Nasm.Assembler xAsm;
+                               if (i is StreamReader)
+                               {
+                                 xAsm = xGen.Generate((StreamReader)i);
+                               }
+                               else if (i is string)
+                               {
+                                 xAsm = xGen.Generate((string)i);
+                               }
+                               else
+                               {
+                                 throw new Exception("Object type '" + i.ToString() + "' not supported!");
+                               }
+                               foreach (var xData in xAsm.Data)
+                               {
+                                 Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember() {RawAsm = xData});
+                               }
+                               foreach (var xCode in xAsm.Code)
+                               {
+                                 new LiteralAssemblerCode(xCode);
+                               }
+                             });
+        if (ReadDebugStubFromDisk)
+        {
+          foreach (var xFile in Directory.GetFiles(Cosmos.Build.Common.CosmosPaths.DebugStubSrc, "*.xs"))
+          {
+            xGenerateAssembler(xFile);
           }
-          foreach (var xCode in xAsm.Code) {
-            new LiteralAssemblerCode(xCode);
+        }
+        else
+        {
+          foreach (var xManifestName in typeof(ReferenceHelper).Assembly.GetManifestResourceNames())
+          {
+            if (!xManifestName.EndsWith(".xs", StringComparison.OrdinalIgnoreCase))
+            {
+              continue;
+            }
+            using (var xStream = typeof(ReferenceHelper).Assembly.GetManifestResourceStream(xManifestName))
+            {
+              using (var xReader = new StreamReader(xStream))
+              {
+                xGenerateAssembler(xReader);
+              }
+            }
           }
         }
         OnAfterEmitDebugStub();
@@ -528,6 +570,12 @@ namespace Cosmos.Assembler {
       // Start emitting assembly labels
       Cosmos.Assembler.Assembler.CurrentInstance.EmitAsmLabels = true;
     }
+
+    /// <summary>
+    /// Setting this field to false means the .xs files for the debug stub are read from the DebugStub assembly.
+    /// This allows the automated kernel tester to use the live ones, instead of the installed ones.
+    /// </summary>
+    public static bool ReadDebugStubFromDisk = true;
 
     protected virtual void OnAfterEmitDebugStub()
     {

@@ -394,7 +394,14 @@ namespace Cosmos.IL2CPU {
       {
         aStack.Pop();
       }
-      DoInterpretStackTypes(ref aSituationChanged);
+      try
+      {
+        DoInterpretStackTypes(ref aSituationChanged);
+      }
+      catch (Exception E)
+      {
+        throw new Exception("Error interpreting stacktypes for " + this, E);
+      }
       foreach (var xPushItem in StackPushTypes)
       {
         aStack.Push(xPushItem);

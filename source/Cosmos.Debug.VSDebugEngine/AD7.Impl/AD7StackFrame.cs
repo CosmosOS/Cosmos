@@ -13,7 +13,7 @@ using SQLinq;
 using SQLinq.Dapper;
 
 namespace Cosmos.Debug.VSDebugEngine {
-  // Represents a logical stack frame on the thread stack. 
+  // Represents a logical stack frame on the thread stack.
   // Also implements the IDebugExpressionContext interface, which allows expression evaluation and watch windows.
   public class AD7StackFrame : IDebugStackFrame2, IDebugExpressionContext2 {
     readonly AD7Engine mEngine;
@@ -24,7 +24,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     private string mFunctionName;
     private uint mLineNum;
     private bool mHasSource;
-    
+
     // Must have empty holders, some code looks at length and can run
     // before we set them.
     internal LOCAL_ARGUMENT_INFO[] mLocalInfos = new LOCAL_ARGUMENT_INFO[] {};
@@ -36,7 +36,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     // An array of this frame's locals
     private DebugLocalInfo[] mLocals;
     private AD7Process mProcess;
-      
+
     public AD7StackFrame(AD7Engine aEngine, AD7Thread aThread, AD7Process aProcess)
     {
         mEngine = aEngine;
@@ -49,7 +49,7 @@ namespace Cosmos.Debug.VSDebugEngine {
             var xSourceInfos = xProcess.mDebugInfoDb.GetSourceInfos(xAddress);
             if (!xSourceInfos.ContainsKey(xAddress))
             {
-                //Attempt to find the ASM address of the first ASM line of the C# line that contains 
+                //Attempt to find the ASM address of the first ASM line of the C# line that contains
                 //the current ASM address line
 
                 // Because of Asm breakpoints the address we have might be in the middle of a C# line.
@@ -80,11 +80,11 @@ namespace Cosmos.Debug.VSDebugEngine {
                 {
                     MethodIlOp xSymbolInfo;
                     string xLabel = xLabelsForAddr[0]; // Necessary for LINQ
-                    xSymbolInfo = aProcess.mDebugInfoDb.Connection.Query<MethodIlOp>(new SQLinq<MethodIlOp>().Where(q => q.LabelName == xLabel)).FirstOrDefault();
+                    xSymbolInfo = aProcess.mDebugInfoDb.TryGetFirstMethodIlOpByLabelName(xLabel);
                     if (xSymbolInfo != null)
                     {
-                        var xMethod = mProcess.mDebugInfoDb.Connection.Get<Method>(xSymbolInfo.MethodID);                    
-                        var xAllInfos = aProcess.mDebugInfoDb.Connection.Query<LOCAL_ARGUMENT_INFO>(new SQLinq<LOCAL_ARGUMENT_INFO>().Where(q => q.METHODLABELNAME == xMethod.LabelCall));
+                        var xMethod = mProcess.mDebugInfoDb.GetMethod(xSymbolInfo.MethodID.Value);
+                        var xAllInfos = aProcess.mDebugInfoDb.GetAllLocalsAndArgumentsInfosByMethodLabelName(xMethod.LabelCall);
                         mLocalInfos = xAllInfos.Where(q => !q.IsArgument).ToArray();
                         mArgumentInfos = xAllInfos.Where(q => q.IsArgument).ToArray();
                         if (mArgumentInfos.Length > 0)
@@ -99,6 +99,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                                     IsLocal = false
                                 };
                             }
+                            mParams = mParams.OrderBy(i => i.Name, StringComparer.OrdinalIgnoreCase).ToArray();
                         }
 
                         if (mLocalInfos.Length > 0)
@@ -113,6 +114,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                                     IsLocal = true
                                 };
                             }
+                            mLocals = mLocals.OrderBy(i => i.Name, StringComparer.OrdinalIgnoreCase).ToArray();
                         }
                     }
                 }
@@ -278,6 +280,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         }
       }
 
+      propInfo = propInfo.OrderBy(i => i.bstrName).ToArray();
       enumObject = new AD7PropertyInfoEnum(propInfo);
     }
 
@@ -291,6 +294,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         propInfo[i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
       }
 
+      propInfo = propInfo.OrderBy(i => i.bstrName).ToArray();
       enumObject = new AD7PropertyInfoEnum(propInfo);
     }
 
@@ -304,6 +308,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         propInfo[i] = property.ConstructDebugPropertyInfo(enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_STANDARD);
       }
 
+      propInfo = propInfo.OrderBy(i => i.bstrName).ToArray();
       enumObject = new AD7PropertyInfoEnum(propInfo);
     }
 
@@ -364,7 +369,7 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     // Gets a description of the properties of a stack frame.
-    // Calling the IDebugProperty2::EnumChildren method with appropriate filters can retrieve the local variables, method parameters, registers, and "this" 
+    // Calling the IDebugProperty2::EnumChildren method with appropriate filters can retrieve the local variables, method parameters, registers, and "this"
     // pointer associated with the stack frame. The debugger calls EnumProperties to obtain these values in the sample.
     int IDebugStackFrame2.GetDebugProperty(out IDebugProperty2 property) {
       throw new NotImplementedException();
@@ -400,8 +405,8 @@ namespace Cosmos.Debug.VSDebugEngine {
     }
 
     // Gets an evaluation context for expression evaluation within the current context of a stack frame and thread.
-    // Generally, an expression evaluation context can be thought of as a scope for performing expression evaluation. 
-    // Call the IDebugExpressionContext2::ParseText method to parse an expression and then call the resulting IDebugExpression2::EvaluateSync 
+    // Generally, an expression evaluation context can be thought of as a scope for performing expression evaluation.
+    // Call the IDebugExpressionContext2::ParseText method to parse an expression and then call the resulting IDebugExpression2::EvaluateSync
     // or IDebugExpression2::EvaluateAsync methods to evaluate the parsed expression.
     int IDebugStackFrame2.GetExpressionContext(out IDebugExpressionContext2 ppExprCxt) {
       ppExprCxt = (IDebugExpressionContext2)this;
@@ -424,7 +429,7 @@ namespace Cosmos.Debug.VSDebugEngine {
       }
     }
 
-    // Gets the language associated with this stack frame. 
+    // Gets the language associated with this stack frame.
     // In this sample, all the supported stack frames are C++
     int IDebugStackFrame2.GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage) {
       pbstrLanguage = "CSharp";
@@ -466,9 +471,9 @@ namespace Cosmos.Debug.VSDebugEngine {
 
     #endregion
 
-    // Retrieves the name of the evaluation context. 
-    // The name is the description of this evaluation context. It is typically something that can be parsed by an expression evaluator 
-    // that refers to this exact evaluation context. For example, in C++ the name is as follows: 
+    // Retrieves the name of the evaluation context.
+    // The name is the description of this evaluation context. It is typically something that can be parsed by an expression evaluator
+    // that refers to this exact evaluation context. For example, in C++ the name is as follows:
     // "{ function-name, source-file-name, module-file-name }"
     int IDebugExpressionContext2.GetName(out string pbstrName) {
       throw new NotImplementedException();

@@ -13,7 +13,7 @@ indent_size = 2
 indent_size = 2
 
 [IL/*.cs]
-indent_size = 4
+indent_size = 2
 
 [AppAssembler.cs]
 indent_size = 4
@@ -26,3 +26,9 @@ indent_size = 4
 
 [CompilerExtensionAttribute.cs]
 indent_size = 4
+
+[AppAssemblerRingsCheck.cs]
+indent_size = 4
+
+[IL/Stfld.cs]
+indent_size = 2

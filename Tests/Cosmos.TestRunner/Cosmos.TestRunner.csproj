@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.TestRunner.Console</RootNamespace>
     <AssemblyName>Cosmos.TestRunner.Console</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -34,6 +35,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -51,6 +53,10 @@
       <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BoxingTests\BoxingTests.csproj">
+      <Project>{f8889473-5866-4913-86ac-8072a1a2558c}</Project>
+      <Name>BoxingTests</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.Kernel.csproj">
       <Project>{BDC011BE-6041-4A58-A6E7-0F592E78CB27}</Project>
       <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>
@@ -62,6 +68,14 @@
     <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj">
       <Project>{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}</Project>
       <Name>Cosmos.TestRunner.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj">
+      <Project>{839edc9d-6d2e-4892-a7f0-17861ba9fa0c}</Project>
+      <Name>SimpleStructsAndArraysTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VGACompilerCrash\VGACompilerCrash.csproj">
+      <Project>{21915a7e-cc84-4836-8b87-857b6149d496}</Project>
+      <Name>VGACompilerCrash</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

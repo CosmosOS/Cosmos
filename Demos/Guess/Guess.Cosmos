@@ -20,8 +20,8 @@
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <EnableGDB>True</EnableGDB>
-    <DebugMode>IL</DebugMode>
+    <EnableGDB>False</EnableGDB>
+    <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
@@ -60,14 +60,14 @@
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
     <VMware_DebugEnabled>True</VMware_DebugEnabled>
-    <VMware_DebugMode>IL</VMware_DebugMode>
+    <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute>False</VMware_IgnoreDebugStubAttribute>
     <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
-    <VMware_EnableGDB>True</VMware_EnableGDB>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
     <ISO_Launch>None</ISO_Launch>
@@ -138,7 +138,7 @@
     <Bochs_ShowLaunchConsole>False</Bochs_ShowLaunchConsole>
     <Bochs_DebugEnabled>True</Bochs_DebugEnabled>
     <Bochs_StackCorruptionDetectionEnabled>True</Bochs_StackCorruptionDetectionEnabled>
-    <Bochs_DebugMode>Source</Bochs_DebugMode>
+    <Bochs_DebugMode>IL</Bochs_DebugMode>
     <Bochs_IgnoreDebugStubAttribute>False</Bochs_IgnoreDebugStubAttribute>
     <Bochs_VisualStudioDebugPort>Pipe: Cosmos\Serial</Bochs_VisualStudioDebugPort>
     <Bochs_PxeInterface>192.168.43.1</Bochs_PxeInterface>
@@ -186,8 +186,8 @@
     <OutputPath>bin\Debug\</OutputPath>
     <Framework>MicrosoftNET</Framework>
     <UseInternalAssembler>False</UseInternalAssembler>
-    <EnableGDB>True</EnableGDB>
-    <DebugMode>IL</DebugMode>
+    <EnableGDB>False</EnableGDB>
+    <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <BuildTarget>PXE</BuildTarget>
     <VMWareFlavor>Player</VMWareFlavor>
@@ -226,14 +226,14 @@
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
     <VMware_DebugEnabled>True</VMware_DebugEnabled>
-    <VMware_DebugMode>IL</VMware_DebugMode>
+    <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_IgnoreDebugStubAttribute>False</VMware_IgnoreDebugStubAttribute>
     <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_Framework>MicrosoftNET</VMware_Framework>
     <VMware_UseInternalAssembler>False</VMware_UseInternalAssembler>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
-    <VMware_EnableGDB>True</VMware_EnableGDB>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <ISO_Deployment>ISO</ISO_Deployment>
     <ISO_Launch>None</ISO_Launch>
@@ -310,7 +310,7 @@
     <Bochs_ShowLaunchConsole>False</Bochs_ShowLaunchConsole>
     <Bochs_DebugEnabled>True</Bochs_DebugEnabled>
     <Bochs_StackCorruptionDetectionEnabled>True</Bochs_StackCorruptionDetectionEnabled>
-    <Bochs_DebugMode>Source</Bochs_DebugMode>
+    <Bochs_DebugMode>IL</Bochs_DebugMode>
     <Bochs_IgnoreDebugStubAttribute>False</Bochs_IgnoreDebugStubAttribute>
     <Bochs_VisualStudioDebugPort>Pipe: Cosmos\Serial</Bochs_VisualStudioDebugPort>
     <Bochs_PxeInterface>192.168.43.1</Bochs_PxeInterface>

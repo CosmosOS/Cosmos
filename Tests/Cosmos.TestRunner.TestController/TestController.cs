@@ -22,7 +22,10 @@ namespace Cosmos.TestRunner
         public const byte TestChannel = 255;
         public static unsafe void Completed()
         {
+            Console.WriteLine("Sending test completed now");
             Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.TestCompleted);
+            Debugger.Send("Test completed");
+            Console.WriteLine("Test completed");
             while (true)
                 ;
         }

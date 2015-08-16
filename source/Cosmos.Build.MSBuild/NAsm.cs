@@ -38,6 +38,8 @@ namespace Cosmos.Build.MSBuild {
       xNasmTask.OutputFile = OutputFile;
       xNasmTask.IsELF = IsELF;
       xNasmTask.ExePath = ExePath;
+      xNasmTask.LogMessage = s => Log.LogMessage(s);
+      xNasmTask.LogError = s => Log.LogError(s);
       return xNasmTask.Execute();
     }
 

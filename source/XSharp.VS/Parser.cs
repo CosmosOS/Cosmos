@@ -18,9 +18,9 @@ namespace XSharp.VS {
       return null;
     }
 
-    public override string Goto(VSConstants.VSStd97CmdID cmd, IVsTextView textView, int line, int col, out TextSpan span) {
-        span = new TextSpan();
-        return null;
+    public override string Goto(VSConstants.VSStd97CmdID cmd, IVsTextView textView, int line, int col, out TextSpan span)
+    {
+      throw new NotImplementedException();
     }
 
     public override Methods GetMethods(int line, int col, string name) {

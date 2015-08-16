@@ -11,6 +11,17 @@ namespace Cosmos.TestRunner.Core
 {
     public partial class Engine
     {
+        // configuration: in process eases debugging, but means certain errors (like stack overflow) kill the test runner.
+        public bool RunIL2CPUInProcess = false;
+
+        public IEnumerable<string> KernelsToRun
+        {
+            get
+            {
+                return mKernelsToRun;
+            }
+        }
+
         private List<string> mKernelsToRun = new List<string>();
         public void AddKernel(string assemblyFile)
         {
@@ -23,13 +34,18 @@ namespace Cosmos.TestRunner.Core
 
         private string mBaseWorkingDirectory;
 
-        public OutputHandlerBase OutputHandler;
+        public OutputHandlerBasic OutputHandler;
 
         public void Execute()
         {
             if (OutputHandler == null)
             {
                 throw new InvalidOperationException("No OutputHandler set!");
+            }
+
+            if (RunTargets.Count == 0)
+            {
+                RunTargets.AddRange((RunTargetEnum[])Enum.GetValues(typeof(RunTargetEnum)));
             }
 
             OutputHandler.ExecutionStart();
@@ -77,8 +93,11 @@ namespace Cosmos.TestRunner.Core
 
         private IEnumerable<RunConfiguration> GetRunConfigurations()
         {
-            yield return new RunConfiguration {IsELF = true};
-            //yield return new RunConfiguration {IsELF = false};
+            foreach (RunTargetEnum xTarget in RunTargets)
+            {
+                yield return new RunConfiguration { IsELF = true, RunTarget = xTarget };
+                //yield return new RunConfiguration { IsELF = false, RunTarget = xTarget };
+            }
         }
     }
 }

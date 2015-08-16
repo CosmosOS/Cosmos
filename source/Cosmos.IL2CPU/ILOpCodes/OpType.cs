@@ -95,7 +95,6 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       switch (OpCode)
       {
         case Code.Initobj:
-          StackPopTypes[0] = typeof(void*);
           return;
         case Code.Ldobj:
           StackPushTypes[0] = Value;

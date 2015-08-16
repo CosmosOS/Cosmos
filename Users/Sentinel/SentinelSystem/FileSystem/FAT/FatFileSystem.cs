@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Cosmos.Common.Extensions;
 using Cosmos.HAL.BlockDevice;
+using SentinelKernel.System.FileSystem.FAT.Listing;
+using SentinelKernel.System.FileSystem.Listing;
+using Directory = SentinelKernel.System.FileSystem.Listing.Directory;
+using File = SentinelKernel.System.FileSystem.Listing.File;
 
 namespace SentinelKernel.System.FileSystem.FAT
 {
@@ -28,22 +33,10 @@ namespace SentinelKernel.System.FileSystem.FAT
         readonly public UInt32 DataSector; // First Data Sector
         readonly public UInt32 DataSectorCount;
 
-        public static class Attribs
-        {
-            public const int Test = 0x01;
-            public const int Hidden = 0x02;
-            public const int System = 0x04;
-            public const int VolumeID = 0x08;
-            public const int Directory = 0x10;
-            public const int Archive = 0x20;
-            // LongName was created after and is a combination of other attribs. Its "special".
-            public const int LongName = 0x0F;
-        }
-
         public enum FatTypeEnum { Unknown, Fat12, Fat16, Fat32 }
         readonly public FatTypeEnum FatType = FatTypeEnum.Unknown;
 
-        Cosmos.HAL.BlockDevice.BlockDevice mDevice;
+        BlockDevice mDevice;
 
         public void ReadFatTableSector(UInt64 xSectorNum, byte[] aData)
         {
@@ -85,7 +78,7 @@ namespace SentinelKernel.System.FileSystem.FAT
                 }
                 // We now access the FAT entry as a WORD just as we do for FAT16, but if the cluster number is
                 // EVEN, we only want the low 12-bits of the 16-bits we fetch. If the cluster number is ODD
-                // we want the high 12-bits of the 16-bits we fetch. 
+                // we want the high 12-bits of the 16-bits we fetch.
                 UInt32 xResult = aSector.ToUInt16(aOffset);
                 if ((aClusterNum & 0x01) == 0)
                 { // Even
@@ -106,7 +99,7 @@ namespace SentinelKernel.System.FileSystem.FAT
             }
         }
 
-        public FatFileSystem(Cosmos.HAL.BlockDevice.BlockDevice aDevice)
+        public FatFileSystem(BlockDevice aDevice)
         {
 
             mDevice = aDevice;
@@ -143,12 +136,12 @@ namespace SentinelKernel.System.FileSystem.FAT
 
             DataSectorCount = TotalSectorCount - (ReservedSectorCount + (NumberOfFATs * FatSectorCount) + ReservedSectorCount);
 
-            // Computation rounds down. 
+            // Computation rounds down.
             ClusterCount = DataSectorCount / SectorsPerCluster;
             // Determine the FAT type. Do not use another method - this IS the official and
             // proper way to determine FAT type.
             // Comparisons are purposefully < and not <=
-            // FAT16 starts at 4085, FAT32 starts at 65525 
+            // FAT16 starts at 4085, FAT32 starts at 65525
             if (ClusterCount < 4085)
             {
                 FatType = FatTypeEnum.Fat12;
@@ -186,6 +179,12 @@ namespace SentinelKernel.System.FileSystem.FAT
             mDevice.ReadBlock(xSector, SectorsPerCluster, aData);
         }
 
+        public void WriteCluster(UInt64 aCluster, byte[] aData)
+        {
+            UInt64 xSector = DataSector + ((aCluster - 2) * SectorsPerCluster);
+            mDevice.WriteBlock(xSector, SectorsPerCluster, aData);
+        }
+
         public void GetFatTableSector(UInt64 aClusterNum, out UInt32 oSector, out UInt32 oOffset)
         {
             UInt64 xOffset = 0;
@@ -206,10 +205,8 @@ namespace SentinelKernel.System.FileSystem.FAT
             oOffset = (UInt32)(xOffset % BytesPerSector);
         }
 
-        public List<System.FileSystem.Listing.Base> GetRoot()
+        public List<Base> GetRoot()
         {
-            var xResult = new List<System.FileSystem.Listing.Base>();
-
             byte[] xData;
             if (FatType == FatTypeEnum.Fat32)
             {
@@ -220,18 +217,60 @@ namespace SentinelKernel.System.FileSystem.FAT
             {
                 xData = mDevice.NewBlockArray(RootSectorCount);
                 mDevice.ReadBlock(RootSector, RootSectorCount, xData);
+                // todo: is this correct??
             }
+            return ReadDirectoryContents(xData);
+        }
+
+        public List<Base> GetDirectoryContents(FatDirectory directory)
+        {
+            if (directory == null)
+            {
+                throw new ArgumentNullException("directory");
+            }
+
+            byte[] xData;
+            if (FatType == FatTypeEnum.Fat32)
+            {
+                xData = NewClusterArray();
+                ReadCluster(directory.FirstClusterNr, xData);
+            }
+            else
+            {
+                xData = mDevice.NewBlockArray(1);
+                mDevice.ReadBlock(directory.FirstClusterNr, RootSectorCount, xData);
+            }
+            // todo: what about larger directories?
+
+
+            return ReadDirectoryContents(xData);
+        }
+
+        private List<Base> ReadDirectoryContents(byte[] xData)
+        {
+            var xResult = new List<Base>();
             //TODO: Change xLongName to StringBuilder
             string xLongName = "";
+            string xName = "";
             for (UInt32 i = 0; i < xData.Length; i = i + 32)
             {
+                FatHelpers.Debug("-------------------------------------------------");
                 byte xAttrib = xData[i + 11];
-                if (xAttrib == Attribs.LongName)
+                byte xStatus = xData[i];
+
+                FatHelpers.Debug("Attrib = " + xAttrib.ToString() + ", Status = " + xStatus);
+                if (xAttrib == DirectoryEntryAttributeConsts.LongName)
                 {
                     byte xType = xData[i + 12];
+                    byte xOrd = xData[i];
+                    FatHelpers.Debug("Reading LFN with Seqnr " + xOrd.ToString() + ", Type = " + xType);
+                    if (xOrd == 0xE5)
+                    {
+                        FatHelpers.Debug("Skipping deleted entry");
+                        continue;
+                    }
                     if (xType == 0)
                     {
-                        byte xOrd = xData[i];
                         if ((xOrd & 0x40) > 0)
                         {
                             xLongName = "";
@@ -253,12 +292,13 @@ namespace SentinelKernel.System.FileSystem.FAT
                             }
                         }
                         xLongName = xLongPart + xLongName;
-                        //TODO: LDIR_Chksum 
+                        xLongPart = null;
+                        //TODO: LDIR_Chksum
                     }
                 }
                 else
                 {
-                    byte xStatus = xData[i];
+                    xName = xLongName;
                     if (xStatus == 0x00)
                     {
                         // Empty slot, and no more entries after this
@@ -274,11 +314,10 @@ namespace SentinelKernel.System.FileSystem.FAT
                     }
                     else if (xStatus >= 0x20)
                     {
-                        string xName;
                         if (xLongName.Length > 0)
                         {
                             // Leading and trailing spaces are to be ignored according to spec.
-                            // Many programs (including Windows) pad trailing spaces although it 
+                            // Many programs (including Windows) pad trailing spaces although it
                             // it is not required for long names.
                             // As per spec, ignore trailing periods
                             xName = xLongName.Trim();
@@ -298,6 +337,7 @@ namespace SentinelKernel.System.FileSystem.FAT
                                 //Substring to remove the periods
                                 xName = xName.Substring(0, nameIndex + 1);
                             }
+                            xLongName = "";
                         }
                         else
                         {
@@ -309,25 +349,41 @@ namespace SentinelKernel.System.FileSystem.FAT
                                 xName = xName + "." + xExt;
                             }
                         }
-
-                        UInt32 xFirstCluster = (UInt32)(xData.ToUInt16(i + 20) << 16 | xData.ToUInt16(i + 26));
-
-                        var xTest = xAttrib & (Attribs.Directory | Attribs.VolumeID);
-                        if (xTest == 0)
-                        {
-                            UInt32 xSize = xData.ToUInt32(i + 28);
-                            xResult.Add(new Listing.FatFile(this, xName, xSize, xFirstCluster));
-                        }
-                        else if (xTest == Attribs.VolumeID)
-                        {
-                            //
-                        }
-                        else if (xTest == Attribs.Directory)
-                        {
-                            xResult.Add(new Listing.FatDirectory(this, xName));
-                        }
-                        xLongName = "";
                     }
+                }
+                UInt32 xFirstCluster = (UInt32)(xData.ToUInt16(i + 20) << 16 | xData.ToUInt16(i + 26));
+
+                var xTest = xAttrib & (DirectoryEntryAttributeConsts.Directory | DirectoryEntryAttributeConsts.VolumeID);
+                if (xAttrib == DirectoryEntryAttributeConsts.LongName)
+                {
+                    // skip adding, as it's a LongFileName entry, meaning the next normal entry is the item with the name.
+                    FatHelpers.Debug("Entry was an Long FileName entry. Current LongName = '" + xLongName + "'");
+                }
+                else if (xTest == 0)
+                {
+                    UInt32 xSize = xData.ToUInt32(i + 28);
+                    if (xSize == 0 && xName.Length == 0)
+                    {
+                        continue;
+                    }
+                    xResult.Add(new FatFile(this, xName, xSize, xFirstCluster));
+                    FatHelpers.Debug("Returning file '" + xName + "'");
+                }
+                else if (xTest == DirectoryEntryAttributeConsts.Directory)
+                {
+                    UInt32 xSize = xData.ToUInt32(i + 28);
+                    var xFatDirectory = new FatDirectory(this, xName, xFirstCluster);
+                    FatHelpers.Debug("Returning directory '" + xFatDirectory.Name + "', FirstCluster = " + xFirstCluster);
+                    xResult.Add(xFatDirectory);
+                }
+                else if (xTest == DirectoryEntryAttributeConsts.VolumeID)
+                {
+                    FatHelpers.Debug("Directory entry is VolumeID");
+                    //
+                }
+                else
+                {
+                    FatHelpers.Debug("Not sure what to do!");
                 }
             }
 
@@ -344,6 +400,29 @@ namespace SentinelKernel.System.FileSystem.FAT
                 return false;
             }
             return true;
+        }
+
+        public override List<Base> GetDirectoryListing(Directory baseDirectory)
+        {
+            if (baseDirectory == null)
+            {
+                // get root folder
+                return GetRoot();
+            }
+            else
+            {
+                return GetDirectoryContents((FatDirectory)baseDirectory);
+            }
+        }
+
+        public override Directory GetRootDirectory(string name)
+        {
+            return new FatDirectory(this, name, RootCluster);
+        }
+
+        public override Stream GetFileStream(File fileInfo)
+        {
+            return new FatStream((FatFile)fileInfo);
         }
     }
 }

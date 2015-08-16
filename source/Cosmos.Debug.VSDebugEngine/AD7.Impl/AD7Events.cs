@@ -11,6 +11,8 @@ using Microsoft.VisualStudio.Debugger.Interop;
 // each implement the IDebugEvent2.GetAttributes method for the type of event they represent. 
 // Most events sent the debugger are asynchronous events.
 
+// For more info on events, see https://msdn.microsoft.com/en-us/library/bb161367.aspx
+
 namespace Cosmos.Debug.VSDebugEngine
 {
     #region Event base classes

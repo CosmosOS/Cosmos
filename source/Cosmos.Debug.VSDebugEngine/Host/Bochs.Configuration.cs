@@ -32,11 +32,11 @@ namespace Cosmos.Debug.VSDebugEngine.Host
         "floppy_bootsig_check: disabled=0\n" +
         "# no floppya\n" +
         "# no floppyb\n" +
+        "ata0-master: type=cdrom, path=\"%CDROMBOOTPATH%\", status=inserted, model=\"Generic 1234\", biosdetect=auto\n" +
         "ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14\n" +
-        "ata0-master: type=disk, path=\"%HARDDISKPATH%\", mode=vmware4, cylinders=0, heads=0, spt=0, model=\"Generic 1234\", biosdetect=auto, translation=auto\n" +
         "ata0-slave: type=none\n" +
         "ata1: enabled=1, ioaddr1=0x170, ioaddr2=0x370, irq=15\n" +
-        "ata1-master: type=cdrom, path=\"%CDROMBOOTPATH%\", status=inserted, model=\"Generic 1234\", biosdetect=auto\n" +
+        "ata1-master: type=disk, path=\"%HARDDISKPATH%\", mode=vmware4, cylinders=0, heads=0, spt=0, model=\"Generic 1234\", biosdetect=auto, translation=auto\n" +
         "ata2: enabled=0\n" +
         "ata3: enabled=0\n" +
         "pci: enabled=1, chipset=i440fx\n" +
@@ -85,11 +85,8 @@ namespace Cosmos.Debug.VSDebugEngine.Host
 
       defaultConfigs.Set("com1", defaultConfigs.Get("com1").Replace("%PIPESERVERNAME%", xParts[1].ToLower()));
       var xHarddiskFile = Path.Combine(CosmosPaths.Build, @"VMWare\Workstation\Filesystem.vmdk");
-      defaultConfigs.Set("ata0-master", defaultConfigs.Get("ata0-master").Replace("%HARDDISKPATH%", xHarddiskFile));
-
-      defaultConfigs.Set("ata1-master", defaultConfigs.Get("ata1-master").Replace("%CDROMBOOTPATH%", mParams["ISOFile"]));
-
-
+      defaultConfigs.Set("ata0-master", defaultConfigs.Get("ata0-master").Replace("%CDROMBOOTPATH%", mParams["ISOFile"]));
+      defaultConfigs.Set("ata1-master", defaultConfigs.Get("ata1-master").Replace("%HARDDISKPATH%", xHarddiskFile));
     }
 
     private void GenerateConfiguration(string filePath)

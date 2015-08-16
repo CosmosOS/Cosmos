@@ -5,7 +5,10 @@ using Cosmos.System;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using SentinelKernel.System.FileSystem.FAT;
+using SentinelKernel.System.FileSystem.Listing;
 using Console = global::System.Console;
+using Directory = SentinelKernel.System.FileSystem.Listing.Directory;
 
 namespace SentinelKernel.System.FileSystem.VFS
 {
@@ -45,6 +48,7 @@ namespace SentinelKernel.System.FileSystem.VFS
                 if (BlockDevice.Devices[i] is Partition)
                 {
                     mPartitions.Add((Partition)BlockDevice.Devices[i]);
+                    break;
                 }
             }
 
@@ -68,16 +72,26 @@ namespace SentinelKernel.System.FileSystem.VFS
             for (int i = 0; i < mPartitions.Count; i++)
             {
                 string xRootPath = string.Concat(i, VolumeSeparatorChar, DirectorySeparatorChar);
+                FileSystem xFileSystem = null;
                 switch (FileSystem.GetFileSystemType(mPartitions[i]))
                 {
                     case FileSystemType.FAT:
-                        mFileSystems.Add(new KVP<string, FileSystem>(xRootPath, new FAT.FatFileSystem(mPartitions[i])));
+                        xFileSystem = new FAT.FatFileSystem(mPartitions[i]);
+                        mFileSystems.Add(new KVP<string, FileSystem>(xRootPath, xFileSystem));
                         break;
+                    default:
+                        Console.WriteLine("Unknown filesystem type!");
+                        return;
                 }
 
-                if (mFileSystems[i].Key == xRootPath)
+                Console.Write("i = ");
+                Console.WriteLine(i.ToString());
+                Console.Write("mFileSystems.Count = ");
+                Console.WriteLine(mFileSystems.Count);
+                var xEntry = mFileSystems[i];
+                if (xEntry.Key == xRootPath)
                 {
-                    var xFatFS = mFileSystems[i].Value as FAT.FatFileSystem;
+                    var xFatFS = (FAT.FatFileSystem)xEntry.Value;
                     Console.WriteLine("-------File System--------");
                     Console.WriteLine("Bytes per Cluster: " + xFatFS.BytesPerCluster);
                     Console.WriteLine("Bytes per Sector: " + xFatFS.BytesPerSector);
@@ -186,12 +200,12 @@ namespace SentinelKernel.System.FileSystem.VFS
             for (int i = 0; i < mFileSystems.Count; i++)
             {
                 string xTest = mFileSystems[i].Key;
-                if (xTest == xPath)
+                if (String.Equals(xTest, xPath))
                 {
                     return mFileSystems[i].Value;
                 }
             }
-            return null;
+            throw new Exception("Unable to determine filesystem for path: " + aPath);
         }
 
         public override void Initialize()
@@ -208,37 +222,66 @@ namespace SentinelKernel.System.FileSystem.VFS
 
         public override Listing.Directory GetDirectory(string aPath)
         {
-            string[] xPathParts = VFSManager.SplitPath(aPath);
             var xFS = GetFileSystemFromPath(aPath);
 
-            if (xFS != null)
-            {
-                if (xPathParts.Length == 1)
-                {
-                    return GetVolume(xPathParts[0]);
-                }
+            return DoGetDirectory(aPath, xFS);
+        }
 
-                for (int i = 0; i < xPathParts.Length; i++)
+        private Directory DoGetDirectory(string aPath, FileSystem aFS)
+        {
+            if (aFS == null)
+            {
+                throw new ArgumentNullException("aFS");
+            }
+            string[] xPathParts = VFSManager.SplitPath(aPath);
+
+            if (xPathParts.Length == 1)
+            {
+                return GetVolume(aFS, aPath);
+            }
+
+            Listing.Directory xBaseDirectory = null;
+
+            // start at index 1, because 0 is the volume
+            for (int i = 1; i < xPathParts.Length; i++)
+            {
+                var xPathPart = xPathParts[i];
+                var xPartFound = false;
+                var xListing = aFS.GetDirectoryListing(xBaseDirectory);
+
+                for (int j = 0; j < xListing.Count; j++)
                 {
-                    var xListing = GetDirectoryListing(xPathParts[i]);
-                    for (int j = 0; j < xListing.Count; j++)
+                    var xListingItem = xListing[j];
+                    if (String.Equals(xListingItem.Name, xPathPart, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (xListing[j].Name == aPath)
+                        if (xListingItem is Listing.Directory)
                         {
-                            return (Listing.Directory)xListing[j];
+                            xBaseDirectory = (Listing.Directory)xListingItem;
+                            xPartFound = true;
+                        }
+                        else
+                        {
+                            throw new Exception("Path part '" + xPathPart + "' found, but not a directory!");
                         }
                     }
                 }
+
+                if (!xPartFound)
+                {
+                    throw new Exception("Path part '" + xPathPart + "' not found!");
+                }
             }
-            return null;
+            return xBaseDirectory;
         }
 
         public override List<Listing.Base> GetDirectoryListing(string aPath)
         {
-            throw new NotImplementedException();
+            var xFS = GetFileSystemFromPath(aPath);
+            var xDirectory = DoGetDirectory(aPath, xFS);
+            return xFS.GetDirectoryListing(xDirectory);
         }
 
-        public override List<Listing.Base> GetDirectoryListing(Listing.Directory aEntry)
+        public override List<Listing.Base> GetDirectoryListing(Listing.Directory aParentDirectory)
         {
             throw new NotImplementedException();
         }
@@ -251,6 +294,11 @@ namespace SentinelKernel.System.FileSystem.VFS
         public override List<Listing.Directory> GetVolumes()
         {
             throw new NotImplementedException();
+        }
+
+        public Listing.Directory GetVolume(FileSystem filesystem, string name)
+        {
+            return filesystem.GetRootDirectory(name);
         }
 
         /*

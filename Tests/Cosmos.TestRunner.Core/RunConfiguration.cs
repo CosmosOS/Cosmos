@@ -7,5 +7,11 @@
             get;
             set;
         }
+
+        public RunTargetEnum RunTarget
+        {
+            get;
+            set;
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Cosmos.Build.Common;
 using Cosmos.Build.MSBuild;
@@ -13,6 +14,9 @@ namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
+        public int AllowedSecondsInKernel = 30;
+        public List<RunTargetEnum> RunTargets = new List<RunTargetEnum>();
+
         private void ExecuteKernel(string assemblyFileName, RunConfiguration configuration)
         {
             OutputHandler.ExecuteKernelStart(assemblyFileName);
@@ -31,13 +35,32 @@ namespace Cosmos.TestRunner.Core
                     File.Move(xObjectFile, xTempObjectFile);
 
                     RunTask("Ld", () => RunLd(xTempObjectFile, xObjectFile));
+                    RunTask("ExtractMapFromElfFile", () => RunExtractMapFromElfFile(mBaseWorkingDirectory, xObjectFile));
                 }
 
                 RunTask("MakeISO", () => MakeIso(xObjectFile, xIsoFile));
-                RunTask("RunISOInBochs", () => RunIsoInBochs(xIsoFile));
+                switch (configuration.RunTarget)
+                {
+                    case RunTargetEnum.Bochs:
+                        RunTask("RunISO", () => RunIsoInBochs(xIsoFile));
+                        break;
+                    case RunTargetEnum.VMware:
+                        RunTask("RunISO", () => RunIsoInVMware(xIsoFile));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("RunTarget " + configuration.RunTarget + " not implemented!");
+                }
             }
             catch (Exception e)
             {
+                if (!mKernelResultSet)
+                {
+                    OutputHandler.SetKernelTestResult(false, e.ToString());
+                }
+                if (e is TaskFailedException)
+                {
+                    return;
+                }
                 OutputHandler.UnhandledException(e);
             }
             finally
@@ -62,6 +85,7 @@ namespace Cosmos.TestRunner.Core
             catch (Exception e)
             {
                 OutputHandler.UnhandledException(e);
+                throw new TaskFailedException();
             }
             finally
             {

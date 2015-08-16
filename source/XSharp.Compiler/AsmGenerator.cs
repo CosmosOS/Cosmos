@@ -29,34 +29,49 @@ namespace XSharp.Compiler {
 
     /// <summary>Parse the input X# source code file and generate the matching target assembly
     /// language.</summary>
+    /// <param name="aReader">X# source code reader.</param>
+    /// <returns>The resulting target assembler content. The returned object contains
+    /// a code and a data block.</returns>
+    public Assembler Generate(StreamReader aReader)
+    {
+      if (aReader == null)
+      {
+        throw new ArgumentNullException(nameof(aReader));
+      }
+      mPatterns.EmitUserComments = EmitUserComments;
+      mLineNo = 0;
+      var xResult = new Assembler();
+      // Read one X# source code line at a time and process it.
+      while (true)
+      {
+        mLineNo++;
+        string xLine = aReader.ReadLine();
+        if (xLine == null)
+        {
+          break;
+        }
+
+        var xAsm = ProcessLine(xLine, mLineNo);
+        xResult.Data.AddRange(xAsm.Data);
+        xResult.Code.AddRange(xAsm.Code);
+      }
+      AssertLastFunctionComplete();
+      return xResult;
+    }
+
+    /// <summary>Parse the input X# source code file and generate the matching target assembly
+    /// language.</summary>
     /// <param name="aSrcPathname">X# source code file.</param>
     /// <returns>The resulting target assembler content. The returned object contains
     /// a code and a data block.</returns>
-    public Assembler Generate(string aSrcPathname) {
+    public Assembler Generate(string aSrcPathname)
+    {
       try
       {
-        mPatterns.EmitUserComments = EmitUserComments;
-        mLineNo = 0;
-        var xResult = new Assembler();
         using (var xInput = new StreamReader(aSrcPathname))
         {
-          // Read one X# source code line at a time and process it.
-          while (true)
-          {
-            mLineNo++;
-            string xLine = xInput.ReadLine();
-            if (xLine == null)
-            {
-              break;
-            }
-
-            var xAsm = ProcessLine(xLine, mLineNo);
-            xResult.Data.AddRange(xAsm.Data);
-            xResult.Code.AddRange(xAsm.Code);
-          }
+          return Generate(xInput);
         }
-        AssertLastFunctionComplete();
-        return xResult;
       }
       catch (Exception E)
       {

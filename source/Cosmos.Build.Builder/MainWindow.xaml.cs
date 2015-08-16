@@ -19,6 +19,7 @@ using Microsoft.VisualBasic;
 using Microsoft.Win32;
 using TaskScheduler;
 using System.Reflection;
+using Cosmos.Build.Installer;
 
 namespace Cosmos.Build.Builder {
   public partial class MainWindow : Window {
@@ -122,7 +123,7 @@ namespace Cosmos.Build.Builder {
       if (0 != string.Compare(xExistingExecAction.Path, expectedPath, true)) { return true; }
       return false;
     }
-      
+
     // http://yoursandmyideas.wordpress.com/2012/01/07/task-scheduler-in-c-net/
     bool ScheduledTaskIsInstalled() {
       ITaskService xService = new TaskScheduler.TaskScheduler();
@@ -150,6 +151,11 @@ namespace Cosmos.Build.Builder {
         xPSI.UseShellExecute = true;
         xPSI.FileName = Assembly.GetEntryAssembly().GetName().CodeBase.Replace("file:///", "");
         xPSI.Arguments = "-InstallTask";
+        if (App.VsVersion == VsVersion.Vs2015)
+        {
+          xPSI.Arguments += " -Vs2015";
+        }
+
         xPSI.Verb = "runas";
         try {
             xProcess.Start();

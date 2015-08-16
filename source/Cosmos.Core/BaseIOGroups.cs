@@ -17,5 +17,6 @@ namespace Cosmos.Core {
         public readonly IOGroup.ATA ATA1 = new IOGroup.ATA(false);
         public readonly IOGroup.ATA ATA2 = new IOGroup.ATA(true);
         public readonly IOGroup.RTC RTC = new IOGroup.RTC();
+        public readonly IOGroup.VBE VBE = new IOGroup.VBE();
     }
 }

@@ -35,6 +35,32 @@ namespace Cosmos.Common.Extensions {
       return new string(xChars);
     }
 
+    static public string GetUtf8String(this byte[] n, UInt32 aStart, UInt32 aCharCount)
+    {
+      // TODO: This method handles ASCII only currently, no unicode.
+      var xChars = new char[aCharCount];
+      for (int i = 0; i < aCharCount; i++)
+      {
+        xChars[i] = (char)n[(aStart) + i];
+        if (xChars[i] == 0)
+        {
+          return new string(xChars, 0, i);
+        }
+      }
+      return new string(xChars);
+    }
+
+    static public byte[] GetUtf8Bytes(this string n, UInt32 aStart, UInt32 aCharCount)
+    {
+        // TODO: This method handles ASCII only currently, no unicode.
+        var xBytes = new byte[aCharCount];
+        for (int i = 0; i < aCharCount; i++)
+        {
+            xBytes[i] = (byte)n[(int) ((aStart) + i)];
+        }
+        return xBytes;
+    }
+
     static public string GetUtf16String(this byte[] n, UInt32 aStart, UInt32 aCharCount) {
       //TODO: This routine only handles ASCII. It does not handle unicode yet.
       var xChars = new char[aCharCount];

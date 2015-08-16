@@ -134,36 +134,40 @@ namespace SentinelKernel.System.FileSystem.VFS
 
         #endregion
 
-        public static Listing.File GetFile(string aPath)
+        public static Listing.File  TryGetFile(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))
             {
                 throw new ArgumentNullException("aPath");
             }
 
-            return null;
-
-            /*
             string xFileName = Path.GetFileName(aPath);
-            string xDirectory = Path.GetDirectoryName(aPath) + Path.DirectorySeparatorChar;
-
-            foreach (var xEntry in GetDirectoryListing(xDirectory))
+            string xDirectory = Path.GetDirectoryName(aPath);
+            var xLastChar = xDirectory[xDirectory.Length - 1];
+            if (xLastChar != Path.DirectorySeparatorChar)
             {
-                if ((xEntry is FileSystem.Listing.File) && (xEntry.Name == xFileName))
+                xDirectory = xDirectory + Path.DirectorySeparatorChar;
+            }
+
+            var xList = GetDirectoryListing(xDirectory);
+            for (int i = 0; i < xList.Count; i++)
+            {
+                var xEntry = xList[i];
+                var xFile = xEntry as Listing.File;
+                if (xFile != null && String.Equals(xEntry.Name, xFileName, StringComparison.OrdinalIgnoreCase))
                 {
-                    return (xEntry as FileSystem.Listing.File);
+                    return xFile;
                 }
             }
 
             return null;
-            */ 
         }
 
         public static List<Listing.File> GetFiles(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))
             {
-                throw new ArgumentNullException("sPath");
+                throw new ArgumentNullException("aPath");
             }
 
             return null;
@@ -181,7 +185,7 @@ namespace SentinelKernel.System.FileSystem.VFS
             }
 
             return xFiles.ToArray();
-            */ 
+            */
         }
 
         public static Listing.Directory GetDirectory(string aPath)
@@ -230,7 +234,7 @@ namespace SentinelKernel.System.FileSystem.VFS
                 xDrives.Add(entry.Name + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar);
 
             return xDrives.ToArray();
-            */ 
+            */
         }
 
         public static List<string> InternalGetFileDirectoryNames(string path, string userPathOriginal, string searchPattern, bool includeFiles, bool includeDirs, SearchOption searchOption)
@@ -264,18 +268,20 @@ namespace SentinelKernel.System.FileSystem.VFS
             }
 
             return xFileAndDirectoryNames.ToArray();
-            
-             */ 
+
+             */
         }
 
         public static bool FileExists(string aPath)
         {
             try
             {
-                return (VFSManager.GetFile(aPath) != null);
+                return (VFSManager.TryGetFile(aPath) != null);
             }
-            catch (Exception)
+            catch (Exception E)
             {
+                Console.Write("Exception occurred: ");
+                Console.WriteLine(E.Message);
                 return false;
             }
         }
@@ -284,15 +290,29 @@ namespace SentinelKernel.System.FileSystem.VFS
         {
             try
             {
-                string xDir = aPath + VFSBase.DirectorySeparatorChar;
-                xDir = Path.GetDirectoryName(xDir);
+                FatHelpers.Debug("DirectoryExists. Path = '" + aPath + "'");
+                string xDir = string.Concat(aPath + VFSBase.DirectorySeparatorChar);
+                //xDir = Path.GetDirectoryName(xDir);
                 return (VFSManager.GetDirectory(xDir) != null);
             }
-            catch (Exception)
+            catch (Exception E)
             {
+                Console.Write("Exception occurred: ");
+                Console.WriteLine(E.Message);
                 return false;
             }
 
+        }
+
+        public static Stream GetFileStream(string aPathname)
+        {
+            var xFileInfo = TryGetFile(aPathname);
+            if (xFileInfo == null)
+            {
+                throw new Exception("File not found: " + aPathname);
+            }
+
+            return xFileInfo.FileSystem.GetFileStream(xFileInfo);
         }
     }
 }

@@ -110,7 +110,6 @@
     <Compile Include="CustomImplementation\System\ArrayImplRefs.cs" />
     <Compile Include="CustomImplementation\System\BooleanImpl.cs" />
     <Compile Include="CustomImplementation\System\ByteImpl.cs" />
-    <Compile Include="CustomImplementation\System\CharImpl.cs" />
     <Compile Include="CustomImplementation\System\DelegateHelper.cs" />
     <Compile Include="CustomImplementation\System\DelegateImpl.cs" />
     <Compile Include="CustomImplementation\System\DoubleImpl.cs" />
@@ -396,6 +395,10 @@
     <Content Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Tests\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">
+      <Project>{E6D3B644-C487-472D-A978-C1A82D0C099B}</Project>
+      <Name>Cosmos.TestRunner.TestController</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common</Name>

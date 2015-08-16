@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DefaultEngineConfiguration.cs" />
     <Compile Include="Engine.Bochs.cs">
       <DependentUpon>Engine.cs</DependentUpon>
     </Compile>
@@ -51,17 +52,31 @@
     <Compile Include="Engine.Run.cs">
       <DependentUpon>Engine.cs</DependentUpon>
     </Compile>
+    <Compile Include="Engine.Running.cs">
+      <DependentUpon>Engine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Engine.VMware.cs">
+      <DependentUpon>Engine.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Enums.cs" />
+    <Compile Include="MultiplexingOutputHandler.cs" />
     <Compile Include="OutputHandlerBase.cs" />
+    <Compile Include="OutputHandlerBasic.cs" />
+    <Compile Include="OutputHandlerFullConsole.cs" />
     <Compile Include="OutputHandlerConsole.cs" />
-    <Compile Include="OutputHandlerText.cs" />
     <Compile Include="OutputHandlerXml.cs" />
     <Compile Include="OutputHandlerXml.Helpers.cs">
       <DependentUpon>OutputHandlerXml.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RunConfiguration.cs" />
+    <Compile Include="TaskFailedException.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.Assembler\Cosmos.Assembler.csproj">
+      <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
+      <Name>Cosmos.Assembler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>
@@ -98,13 +113,37 @@
       <Project>{7C64B97F-516D-4A6D-B9E1-3FE48F561409}</Project>
       <Name>Cosmos.System.Plugs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
+      <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
+      <Name>Cosmos.System</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\source\IL2CPU\IL2CPU.csproj">
       <Project>{6128DEEB-D30F-4859-B60F-C36D5452F3E9}</Project>
       <Name>IL2CPU</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BoxingTests\BoxingTests.csproj">
+      <Project>{f8889473-5866-4913-86ac-8072a1a2558c}</Project>
+      <Name>BoxingTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.Kernel.csproj">
+      <Project>{bdc011be-6041-4a58-a6e7-0f592e78cb27}</Project>
+      <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.csproj">
+      <Project>{57045fe8-b0fe-4fc1-810f-7c3914aef1de}</Project>
+      <Name>Cosmos.Compiler.Tests.SimpleWriteLine.Kernel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">
       <Project>{E6D3B644-C487-472D-A978-C1A82D0C099B}</Project>
       <Name>Cosmos.TestRunner.TestController</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj">
+      <Project>{839edc9d-6d2e-4892-a7f0-17861ba9fa0c}</Project>
+      <Name>SimpleStructsAndArraysTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VGACompilerCrash\VGACompilerCrash.csproj">
+      <Project>{21915a7e-cc84-4836-8b87-857b6149d496}</Project>
+      <Name>VGACompilerCrash</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

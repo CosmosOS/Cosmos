@@ -18,17 +18,17 @@ namespace Cosmos.IL2CPU.X86.IL {
 
     public static void DoExecute(Cosmos.Assembler.Assembler aAssembler,  MethodInfo aMethod, string aFieldId, Type aDeclaringObject, bool aNeedsGC, bool debugEnabled) {
       var xType = aMethod.MethodBase.DeclaringType;
-      int xExtraOffset = aNeedsGC ? 12 : 0;
 
-      var xFields = GetFieldsInfo(aDeclaringObject);
+      var xFields = GetFieldsInfo(aDeclaringObject, false);
       var xFieldInfo = (from item in xFields
                         where item.Id == aFieldId
                         select item).Single();
-      var xActualOffset = xFieldInfo.Offset + xExtraOffset;
+      var xActualOffset = Ldfld.GetFieldOffset(aDeclaringObject, aFieldId);
       var xSize = xFieldInfo.Size;
       new Comment("Field: " + xFieldInfo.Id);
       new Comment("Type: " + xFieldInfo.FieldType.ToString());
       new Comment("Size: " + xFieldInfo.Size);
+      new Comment("Offset: " + xActualOffset + " (includes object header)");
 
       uint xRoundedSize = Align(xSize, 4);
       DoNullReferenceCheck(aAssembler, debugEnabled, xRoundedSize);
