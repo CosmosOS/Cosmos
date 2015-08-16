@@ -17,9 +17,9 @@ using System.Runtime.InteropServices;
 // Managed Babel
 //   http://msdn.microsoft.com/en-us/library/bb165037.aspx
 
-[Guid(Guids.guidCosmos_VS_XSharpLangSvcString)]
 namespace XSharp.VS {
-  public class XSharpLanguageService : LanguageService {
+    [Guid(Guids.guidCosmos_VS_XSharpLangSvcString)]
+    public class XSharpLanguageService : LanguageService {
     public override string GetFormatFilterList() {
       return "X# files (*.xs)\n*.xs\n";
     }
