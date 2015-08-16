@@ -6,6 +6,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
+using System.Runtime.InteropServices;
 
 // Walkthrough: Creating a Language Service (MPF)
 //   http://msdn.microsoft.com/en-us/library/bb165744
@@ -16,6 +17,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 // Managed Babel
 //   http://msdn.microsoft.com/en-us/library/bb165037.aspx
 
+[Guid(Guids.guidCosmos_VS_XSharpLangSvcString)]
 namespace XSharp.VS {
   public class XSharpLanguageService : LanguageService {
     public override string GetFormatFilterList() {
