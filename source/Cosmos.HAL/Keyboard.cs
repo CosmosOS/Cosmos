@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-<<<<<<< HEAD
 using Cosmos.Debug.Kernel;
-=======
 using Cosmos.HAL.ScanMaps;
->>>>>>> master
 
 namespace Cosmos.HAL {
     public abstract class Keyboard : Device {
@@ -34,7 +31,6 @@ namespace Cosmos.HAL {
             KeyLayout = layout;
         }
 
-<<<<<<< HEAD
         /// <summary>
         /// Allow faking scancodes. Used for test kernels
         /// </summary>
@@ -42,9 +38,8 @@ namespace Cosmos.HAL {
         {
             HandleScancode(aScancode, aReleased);
         }
-=======
+
         public abstract void UpdateLeds();
->>>>>>> master
 
         protected abstract void HandleScancode(byte aScancode, bool aReleased);
 

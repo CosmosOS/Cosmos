@@ -11,23 +11,6 @@ namespace Cosmos.System
         public static readonly Cosmos.Debug.Kernel.Debugger Dbg = new Cosmos.Debug.Kernel.Debugger("System", "");
         public static Console Console = new Console(null);
 
-<<<<<<< HEAD
-    static public void Init(TextScreenBase textScreen, Keyboard keyboard){
-      // We must init Console before calling Inits. This is part of the
-      // "minimal" boot to allow output
-      Global.Dbg.Send("Creating Console");
-      if (textScreen != null)
-      {
-        Console = new Console(textScreen);
-      }
-        var x = new String('a', 1);
-      Global.Dbg.Send("HW Init");
-            x = new String('a', 1);
-            Cosmos.HAL.Global.Init(textScreen, keyboard);
-            x = new String('a', 1);
-            Global.Dbg.Send("After HW Init");
-        //Network.NetworkStack.Init();
-=======
         public static bool NumLock
         {
             get { return HAL.Global.NumLock; }
@@ -63,6 +46,5 @@ namespace Cosmos.System
             ScrollLock = false;
             //Network.NetworkStack.Init();
         }
->>>>>>> master
     }
 }

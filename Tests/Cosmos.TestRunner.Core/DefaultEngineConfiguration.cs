@@ -19,13 +19,13 @@ namespace Cosmos.TestRunner.Core
 
             // if you're working on the compiler (or other lower parts), you can choose to run the compiler in process
             // 1 thing to keep in mind though, is that this only works with 1 kernel at a time!
-            engine.RunIL2CPUInProcess = true;
+            //engine.RunIL2CPUInProcess = true;
             engine.RunWithGDB = false;
 
-            //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
-            //engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
-            //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
-            engine.AddKernel(typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel).Assembly.Location);
+            engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
+            engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
+            engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
+            //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel).Assembly.Location);
 
             // known bugs, therefor disabled for now:
             //engine.AddKernel(typeof(BoxingTests.Kernel).Assembly.Location);

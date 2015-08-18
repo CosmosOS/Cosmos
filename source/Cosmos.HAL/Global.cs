@@ -6,22 +6,11 @@ using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 
-<<<<<<< HEAD
-namespace Cosmos.HAL {
-  static public class Global {
-    static readonly public Cosmos.Debug.Kernel.Debugger Dbg = new Cosmos.Debug.Kernel.Debugger("Hardware", "");
-
-    static public Keyboard Keyboard;
-    //static public PIT PIT = new PIT();
-    // Must be static init, other static inits rely on it not being null
-      static public TextScreenBase TextScreen;
-=======
 namespace Cosmos.HAL
 {
     public static class Global
     {
         public static readonly Cosmos.Debug.Kernel.Debugger Dbg = new Cosmos.Debug.Kernel.Debugger("Hardware", "");
->>>>>>> master
 
         public static Keyboard Keyboard;
 
@@ -56,17 +45,6 @@ namespace Cosmos.HAL
         private static bool _capsLock;
         private static bool _scrollLock;
 
-<<<<<<< HEAD
-      Global.Dbg.Send("Keyboard");
-      if (Keyboard == null)
-      {
-        Keyboard = new DefaultKeyboard();
-      }
-
-      // Find hardcoded ATA controllers
-      Global.Dbg.Send("ATA Master");
-      //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
-=======
         private static void InitAta(BlockDevice.Ata.ControllerIdEnum aControllerID,
             BlockDevice.Ata.BusPositionEnum aBusPosition)
         {
@@ -133,18 +111,6 @@ namespace Cosmos.HAL
         {
             //TextScreen = new TextScreen();
             Global.Dbg.Send("CLS");
->>>>>>> master
-
-            //TextScreen.Clear();
-
-            Global.Dbg.Send("Keyboard");
-            Keyboard = new PS2Keyboard();
-
-            // Find hardcoded ATA controllers
-            Global.Dbg.Send("ATA Master");
-            InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
-
-<<<<<<< HEAD
       //TODO: Since this is FCL, its "common". Otherwise it should be
       // system level and not accessible from Core. Need to think about this
       // for the future.
@@ -169,8 +135,7 @@ namespace Cosmos.HAL
       Global.Dbg.Send("PCI Devices");
       InitPciDevices();
       Global.Dbg.Send("Done initializing Cosmos.HAL.Global");
-    }
-=======
+
             //Global.Dbg.Send("ATA Slave");
             //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
 
@@ -195,27 +160,7 @@ namespace Cosmos.HAL
             Console.WriteLine("Finding PCI Devices");
             PCI.Setup();
         }
->>>>>>> master
-
-        public static void Init(TextScreenBase textScreen, Keyboard keyboard)
-        {
-            if (textScreen != null)
-            {
-                TextScreen = textScreen;
-            }
-            if (keyboard != null)
-            {
-                Keyboard = keyboard;
-            }
-            Core.Bootstrap.Init();
-            Core.Global.Init();
-            Global.Dbg.Send("Static Devices");
-            InitStaticDevices();
-            Global.Dbg.Send("PCI Devices");
-            InitPciDevices();
-        }
-
-<<<<<<< HEAD
+        
     public static void EnableInterrupts()
     {
       CPU.EnableInterrupts();
@@ -230,13 +175,3 @@ namespace Cosmos.HAL
     }
   }
 }
-=======
-        //static void PCIDeviceFound(Core.PCI.PciInfo aInfo, Core.IOGroup.PciDevice aIO) {
-        // Later we need to dynamically load these, but we need to finish the design first.
-        //  if ((aInfo.VendorID == 0x8086) && (aInfo.DeviceID == 0x7111)) {
-        //ATA1 = new ATA(Core.Global.BaseIOGroups.ATA1);
-        //  }
-        //}
-    }
-}
->>>>>>> master
