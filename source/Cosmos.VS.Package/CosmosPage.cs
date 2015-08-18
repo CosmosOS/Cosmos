@@ -195,7 +195,10 @@ namespace Cosmos.VS.Package {
       chkEnableStackCorruptionDetection.Checked = mProps.StackCorruptionDetectionEnabled;
       panlDebugSettings.Enabled = mProps.DebugEnabled;
       cmboCosmosDebugPort.SelectedIndex = cmboCosmosDebugPort.Items.IndexOf(mProps.CosmosDebugPort);
-      cmboVisualStudioDebugPort.SelectedIndex = cmboVisualStudioDebugPort.Items.IndexOf(mProps.VisualStudioDebugPort);
+      if (!String.IsNullOrWhiteSpace(mProps.VisualStudioDebugPort))
+      {
+        cmboVisualStudioDebugPort.SelectedIndex = cmboVisualStudioDebugPort.Items.IndexOf(mProps.VisualStudioDebugPort);
+      }
       textOutputPath.Text = mProps.OutputPath;
       comboFramework.SelectedItem = EnumValue.Find(comboFramework.Items, mProps.Framework);
       comboBinFormat.SelectedItem = EnumValue.Find(comboBinFormat.Items, mProps.BinFormat);

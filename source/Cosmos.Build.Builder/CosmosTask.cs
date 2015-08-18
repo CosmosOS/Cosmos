@@ -35,9 +35,6 @@ namespace Cosmos.Build.Builder {
         var setupName = "CosmosUserKit-" + releaseNumber;
         switch (App.VsVersion)
         {
-            case VsVersion.Vs2013:
-                setupName += "-vs2013";
-                break;
             case VsVersion.Vs2015:
                 setupName += "-vs2015";
                 break;
@@ -262,10 +259,6 @@ namespace Cosmos.Build.Builder {
       CheckIfBuilderRunning();
 
       switch (App.VsVersion) {
-        case VsVersion.Vs2013:
-          CheckVs2013();
-          CheckForInstall("Microsoft Visual Studio 2013 SDK", true);
-          break;
         case VsVersion.Vs2015:
           CheckVs2015();
           CheckForInstall("Microsoft Visual Studio 2015 SDK - ENU", true);
@@ -343,19 +336,6 @@ namespace Cosmos.Build.Builder {
       Echo("Checking for Inno Preprocessor");
       if (!File.Exists(Path.Combine(mInnoPath, "ISPP.dll"))) {
         throw new Exception("Inno Preprocessor not detected.");
-      }
-    }
-
-    void CheckVs2013() {
-      Echo("Checking for Visual Studio 2013");
-      string key = @"SOFTWARE\Microsoft\VisualStudio\12.0";
-      if (Environment.Is64BitOperatingSystem)
-        key = @"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0";
-      using (var xKey = Registry.LocalMachine.OpenSubKey(key)) {
-        string xDir = (string)xKey.GetValue("InstallDir");
-        if (String.IsNullOrWhiteSpace(xDir)) {
-          throw new Exception("Visual Studio 2013 not detected!");
-        }
       }
     }
 
@@ -457,11 +437,8 @@ namespace Cosmos.Build.Builder {
         throw new Exception("Cannot find Inno setup.");
       }
       string xCfg = App.IsUserKit ? "UserKit" : "DevKit";
-      string vsVersionConfiguration = "vs2013";
+      string vsVersionConfiguration = "vs2015";
       switch (App.VsVersion) {
-         case VsVersion.Vs2013:
-           vsVersionConfiguration = "vs2013";
-           break;
          case VsVersion.Vs2015:
            vsVersionConfiguration = "vs2015";
            break;
