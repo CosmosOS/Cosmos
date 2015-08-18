@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL
 {
@@ -37,6 +38,11 @@ namespace Cosmos.HAL
             for (var index = 0; index < _keys.Count; index++)
             {
                 var t = _keys[index];
+                if (t == null)
+                {
+                    Debugger.DoSend("Key received but item is NULL");
+                    continue;
+                }
                 if (t.Scancode == scan)
                 {
                     found = true;

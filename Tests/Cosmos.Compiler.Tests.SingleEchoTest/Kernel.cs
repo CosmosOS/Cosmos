@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.Debug.Kernel;
 using Sys = Cosmos.System;
 
 namespace Cosmos.Compiler.Tests.SingleEchoTest

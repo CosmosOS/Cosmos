@@ -124,11 +124,16 @@ namespace Cosmos.HAL
       {
         TextScreen = textScreen;
       }
-      if (keyboard != null)
-      {
-        Keyboard = keyboard;
-      }
-      Global.Dbg.Send("Before Core.Global.Init");
+        if (keyboard == null)
+        {
+            Core.Global.Dbg.Send("No keyboard specified!");
+            Keyboard = new PS2Keyboard();
+        }
+        else
+        {
+            Keyboard = keyboard;
+        }
+        Global.Dbg.Send("Before Core.Global.Init");
       Core.Global.Init();
       Global.Dbg.Send("Static Devices");
       InitStaticDevices();
