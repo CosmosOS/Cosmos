@@ -874,12 +874,7 @@ namespace Cosmos.IL2CPU
                                     mAsmblr.ProcessMethod(xPlugInfo, xInstructions);
                                 }
                             }
-                            else if (xAttrib != null && xAttrib.PlugNotImplemented)
-                            {
-                                //Method is plug, but plug is not properly implemented
-                                throw new Exception(xMethod.Name + " is plugged, but plug is not properly implemented!");
-                            }
-                            mAsmblr.GenerateMethodForward(xMethodInfo, xPlugInfo);    
+                            mAsmblr.GenerateMethodForward(xMethodInfo, xPlugInfo);
                         }
                         else
                         {
@@ -934,11 +929,6 @@ namespace Cosmos.IL2CPU
                             if (xAttrib.IsWildcard)
                             {
                                 continue;
-                            }
-                            else if (xAttrib.RequiresPlug)
-                            {
-                                //Plug is required, but not found for this method -> Throw an exception
-                                throw new Exception("Plug is required for " + xMethod.Name + ", but none is found!");
                             }
                             xPlugAssembler = xAttrib.Assembler;
                         }

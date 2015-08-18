@@ -9,24 +9,23 @@ using System.Text;
 using System.Threading;
 using System.Diagnostics;
 using Cosmos.Common;
-using Cosmos.IL2CPU.Plugs;
+
 namespace Cosmos.IL2CPU {
     [DebuggerStepThrough]
 	public static class GCImplementation {
-        [PlugMethod(RequiresPlug = true)]
 		private static void AcquireLock() {
 //			do {
 //			} while (Interlocked.CompareExchange(ref mLock, 1, 0) != 0);
             throw new NotImplementedException();
 		}
-        [PlugMethod(RequiresPlug = true)]
-        private static void ReleaseLock() {
+
+		private static void ReleaseLock() {
 //			do {
 //			} while (Interlocked.CompareExchange(ref mLock, 0, 1) != 1);
             throw new NotImplementedException();
         }
-        [PlugMethod(RequiresPlug = true)]
-        public static uint AllocNewObject(uint aSize) {
+
+		public static uint AllocNewObject(uint aSize) {
 //			uint xNewObject = RuntimeEngine.Heap_AllocNewObject(aSize + 4);
 //#if GC_DEBUG
 //			Console.Write("New Object allocated: ");
@@ -38,12 +37,11 @@ namespace Cosmos.IL2CPU {
 
 		}
 
-        /// <summary>
-        /// This function gets the pointer to the memory location of where it's stored. 
-        /// </summary>
-        /// <param name="aObject"></param>
-        [PlugMethod(RequiresPlug = true)]
-        public static unsafe void IncRefCount(uint aObject) {
+		/// <summary>
+		/// This function gets the pointer to the memory location of where it's stored. 
+		/// </summary>
+		/// <param name="aObject"></param>
+		public static unsafe void IncRefCount(uint aObject) {
 ////			if (aObject == 0) {
 ////				return;
 ////			}
@@ -79,13 +77,11 @@ namespace Cosmos.IL2CPU {
 
 		}
 
-        /// <summary>
-        /// This function gets the pointer to the memory location of where it's stored. 
-        /// </summary>
-        /// <param name="aObject"></param>
-        /// 
-        [PlugMethod(RequiresPlug = true)]
-        public static unsafe void DecRefCount(uint aObject) {
+		/// <summary>
+		/// This function gets the pointer to the memory location of where it's stored. 
+		/// </summary>
+		/// <param name="aObject"></param>
+		public static unsafe void DecRefCount(uint aObject) {
       ////			if (aObject == 0) {
       ////				return;
       ////			}

@@ -21,12 +21,11 @@ namespace Cosmos.Core.Plugs
             //}
             return Heap.MemAlloc(aSize);
         }
-        [PlugMethod(PlugNotImplemented = true)]
+
         public static void IncRefCount(uint aObject)
         {
             //
         }
-        [PlugMethod(PlugNotImplemented = true)]
         public static void DecRefCount(uint aObject)
         {
             //
