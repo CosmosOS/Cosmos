@@ -930,6 +930,10 @@ namespace Cosmos.IL2CPU
                             {
                                 continue;
                             }
+                            else if(xAttrib.PlugRequired)
+                            {
+                                throw new Exception(string.Format("Method {0} requires a plug, but none is implemented",xMethod.Name));
+                            }
                             xPlugAssembler = xAttrib.Assembler;
                         }
 
