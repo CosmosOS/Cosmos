@@ -10,13 +10,15 @@ namespace Cosmos.Build.Installer {
 
     public void Run() {
         var exceptions = DoRun();
-        Log.NewSection("Error");
-        //Collect all the exceptions from the build stage, and list them
-        foreach(var msg in exceptions)
-        {
-          Log.WriteLine(msg);
+        if (exceptions.Count > 0) {
+            Log.NewSection("Error");
+                   //Collect all the exceptions from the build stage, and list them
+            foreach(var msg in exceptions) {
+                Log.WriteLine(msg);
+            }
+            Log.SetError();
         }
-        Log.SetError();
+ 
     }
 
     public bool AmRunning32Bit() {
