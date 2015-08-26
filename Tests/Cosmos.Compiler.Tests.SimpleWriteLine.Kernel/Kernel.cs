@@ -32,6 +32,11 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
                 TestTryFinally.Execute();
 
                 Assert.IsTrue(InterruptsEnabled, "Interrupts are not enabled!");
+
+                var xTempString = new String('a', 4);
+                Assert.AreEqual(4, xTempString.Length, "Dynamic string has wrong length!");
+                Assert.AreEqual(97, (int)xTempString[0], "First character of dynamic string is wrong!");
+
                 TestController.Completed();
             }
             catch (Exception E)
