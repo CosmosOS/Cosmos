@@ -34,7 +34,8 @@ namespace Cosmos.HAL
 
             keyev.Type = (scan & 0x80) != 0 ? KeyEvent.KeyEventType.Break : KeyEvent.KeyEventType.Make;
             if ((scan & 0x80) != 0) scan = (byte)(scan ^ 0x80);
-
+            Debugger.DoSend("Number of keys: ");
+            Debugger.DoSendNumber((uint) _keys.Count);
             for (var index = 0; index < _keys.Count; index++)
             {
                 var t = _keys[index];

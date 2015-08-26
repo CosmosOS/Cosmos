@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.Debug.Kernel;
+using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 
 namespace Cosmos.Compiler.Tests.SingleEchoTest
@@ -27,11 +28,18 @@ namespace Cosmos.Compiler.Tests.SingleEchoTest
             Sys.TestingHelpers.KeyboardAddFakeScanCode(0x1C, true);
 
             Console.Write("Input: ");
+            Assert.IsTrue(true, "Before readline");
             var input = Console.ReadLine();
             Console.Write("Text typed: ");
             Console.WriteLine(input);
+
+            Assert.AreEqual(3, input.Length, "Length of returned string is not 3!");
+            Assert.AreEqual(97, (int) input[0], "First char of returned string is not a!");
+            Assert.AreEqual(98, (int)input[1], "Second char of returned string is not b!");
+            Assert.AreEqual(99, (int)input[2], "Third char of returned string is not c!");
             while (true)
                 ;
         }
     }
 }
+
