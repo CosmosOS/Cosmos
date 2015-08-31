@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Core;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL {
   // Dont hold state here. This is a raw to hardware class. Virtual screens should be done
@@ -20,11 +21,21 @@ namespace Cosmos.HAL {
     protected readonly MemoryBlock08 mRAM;
 
     public TextScreen() {
+
+      if (this is TextScreen)
+      {
+        Debugger.DoSend("this is TextScreen");
+      }
+      else
+      {
+        Debugger.DoSend("ERROR: This is not of type TextScreen!");
+      }
       mRAM = IO.Memory.Bytes;
       mClearCellValue32 = (UInt32)(mClearCellValue << 16 | mClearCellValue);
       mRow2Addr = (UInt32)(Cols * 2);
       mScrollSize = (UInt32)(Cols * (Rows - 1) * 2);
       mRowSize32 = (UInt32)Cols * 2 / 4;
+      Debugger.DoSend("End of TextScreen..ctor");
     }
 
     public override UInt16 Rows { get { return 25; } }
@@ -53,7 +64,7 @@ namespace Cosmos.HAL {
       }
     }
 
-     
+
 
         public override void SetColors(ConsoleColor aForeground, ConsoleColor aBackground) {
       Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));

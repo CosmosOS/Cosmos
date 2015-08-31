@@ -21,6 +21,11 @@ namespace Cosmos.TestRunner
             }
         }
 
+        public static void IsFalse(bool condition, string message)
+        {
+            IsTrue(!condition, message);
+        }
+
         public static void AreEqual(int expected, int actual, string message)
         {
             var xResult = expected == actual;

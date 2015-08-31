@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 
 namespace Cosmos.System
@@ -29,10 +30,12 @@ namespace Cosmos.System
             return null;
         }
 
+
         /// <summary>
         /// Start the system up using the properties for configuration.
         /// </summary>
-        public virtual void Start() {
+        public virtual void Start()
+        {
             try {
                 Global.Dbg.Send("Starting kernel");
                 if (mStarted) {
@@ -60,12 +63,25 @@ namespace Cosmos.System
                 Global.Dbg.Send("Before Run");
                 BeforeRun();
 
+                // now enable interrupts:
+                HAL.Global.EnableInterrupts();
+
                 Global.Dbg.Send("Run");
+                if (mStopped)
+                {
+                    Global.Dbg.Send("Already stopped");
+                }
+                else
+                {
+                    Global.Dbg.Send("Not yet stopped");
+                }
                 while (!mStopped) {
                     //Network.NetworkStack.Update();
+                    Global.Dbg.Send("Really before Run");
                     Run();
+                    Global.Dbg.Send("Really after Run");
                 }
-
+                Global.Dbg.Send("AfterRun");
                 AfterRun();
                 //bool xTest = 1 != 3;
                 //while (xTest) {
@@ -100,7 +116,10 @@ namespace Cosmos.System
             mStopped = true;
         }
 
-        public Kernel() { }
+        public Kernel()
+        {
+            Debugger.DoSend("In Cosmos.System.Kernel..ctor");
+        }
 
         // Shutdown and restart
         public void Restart() {
@@ -109,6 +128,14 @@ namespace Cosmos.System
         public static void PrintDebug(string message)
         {
             Global.Dbg.Send(message);
+        }
+
+        public static bool InterruptsEnabled
+        {
+            get
+            {
+                return HAL.Global.InterruptsEnabled;
+            }
         }
     }
 }

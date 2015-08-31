@@ -258,10 +258,6 @@ namespace Cosmos.IL2CPU {
 
     public static List<X86.IL.FieldInfo> GetFieldsInfo(Type aType, bool includeStatic)
     {
-      if (aType.FullName == "System.Drawing.Color")
-      {
-        Console.Write("");
-      }
       var xResult = new List<X86.IL.FieldInfo>(16);
       DoGetFieldsInfo(aType, xResult, includeStatic);
       xResult.Reverse();
@@ -397,7 +393,7 @@ namespace Cosmos.IL2CPU {
       {
         new CPU.Compare {DestinationReg = CPU.RegistersEnum.ESP, DestinationDisplacement = (int) stackOffsetToCheck, DestinationIsIndirect = true, SourceValue = 0};
         new CPU.ConditionalJump {DestinationLabel = ".AfterNullCheck", Condition = CPU.ConditionalTestEnum.NotEqual};
-        new CPU.ClrInterruptFlag();
+        new CPU.ClearInterruptFlag();
         // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
         new CPU.Call {DestinationLabel = ".NullCheck_GetCurrAddress"};
         new Assembler.Label(".NullCheck_GetCurrAddress");

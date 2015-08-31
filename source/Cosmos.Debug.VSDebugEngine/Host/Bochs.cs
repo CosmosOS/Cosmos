@@ -90,7 +90,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
       // the Cosmos project whenever she wants to modify the environment.
       _bochsStartInfo.Arguments = string.Format("-q -f \"{0}\"", _bochsConfigurationFile.FullName);
       _bochsStartInfo.WorkingDirectory = _bochsConfigurationFile.Directory.FullName;
-      _bochsStartInfo.UseShellExecute = false;
+      _bochsStartInfo.UseShellExecute = true;
       if (RedirectOutput)
       {
         if (LogOutput == null)
@@ -101,10 +101,10 @@ namespace Cosmos.Debug.VSDebugEngine.Host
         {
           throw new Exception("No LogError handler specified!");
         }
-        _bochsStartInfo.RedirectStandardOutput = true;
-        _bochsStartInfo.RedirectStandardError = true;
-        _bochsProcess.OutputDataReceived += (sender, args) => LogOutput(args.Data);
-        _bochsProcess.ErrorDataReceived += (sender, args) => LogError(args.Data);
+        //_bochsStartInfo.RedirectStandardOutput = true;
+        //_bochsStartInfo.RedirectStandardError = true;
+        // _bochsProcess.OutputDataReceived += (sender, args) => LogOutput(args.Data);
+        // _bochsProcess.ErrorDataReceived += (sender, args) => LogError(args.Data);
       }
       // Register for process completion event so that we can funnel it to any code that
       // subscribed to this event in our base class.

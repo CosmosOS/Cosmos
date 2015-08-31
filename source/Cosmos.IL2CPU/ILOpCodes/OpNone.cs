@@ -553,6 +553,13 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               aSituationChanged = true;
               return;
             }
+            if ((StackPopTypes[0] == typeof(IntPtr) && StackPopTypes[1] == typeof(uint))
+              || (StackPopTypes[0] == typeof(uint) && StackPopTypes[1] == typeof(IntPtr)))
+            {
+              StackPushTypes[0] = typeof(UIntPtr);
+              aSituationChanged = true;
+              return;
+            }
             if ((StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(UIntPtr))
               || (StackPopTypes[0] == typeof(UIntPtr) && StackPopTypes[1] == typeof(int)))
             {
@@ -627,6 +634,13 @@ namespace Cosmos.IL2CPU.ILOpCodes {
              || (StackPopTypes[0] == typeof(char) && StackPopTypes[1] == typeof(int)))
             {
               StackPushTypes[0] = typeof(int);
+              aSituationChanged = true;
+              return;
+            }
+            if ((StackPopTypes[0] == typeof(IntPtr) && StackPopTypes[1] == typeof(UIntPtr))
+             || (StackPopTypes[0] == typeof(UIntPtr) && StackPopTypes[1] == typeof(IntPtr)))
+            {
+              StackPushTypes[0] = typeof(UIntPtr);
               aSituationChanged = true;
               return;
             }

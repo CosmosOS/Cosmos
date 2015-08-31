@@ -77,7 +77,13 @@
   <ItemGroup>
     <Compile Include="BaseIOGroups.cs" />
     <Compile Include="Bootstrap.cs" />
-    <Compile Include="HMI.cs" />
+    <Compile Include="DataLookupEntry.cs" />
+    <Compile Include="DataLookupTable.cs" />
+    <Compile Include="GlobalInformationTable.cs" />
+    <Compile Include="GlobalSystemInfo.cs" />
+    <Compile Include="Heap.Debug.cs">
+      <DependentUpon>Heap.cs</DependentUpon>
+    </Compile>
     <Compile Include="IOGroup\COM.cs" />
     <Compile Include="IOGroup\Network\AMDPCNetIIIOGroup.cs" />
     <Compile Include="IOGroup\PCSpeaker.cs" />
@@ -126,6 +132,9 @@
     <Content Include="INTs.html" />
     <Content Include="MemoryBlock.html" />
     <Content Include="PIC.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="MemoryManagers\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

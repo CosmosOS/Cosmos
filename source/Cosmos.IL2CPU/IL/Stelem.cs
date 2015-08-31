@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.Linq;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.Compiler;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stelem)]
         // 	public class Stelem: Op {
@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 	    private string mCurLabel;
         // 	    private uint mCurOffset;
         // 	    private MethodInformation mMethodInformation;
-        //         
+        //
         //         public Stelem(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {
         // 			mType = aReader.OperandValueType;
@@ -46,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		    mCurLabel = IL.Op.GetInstructionLabel(aReader);
         //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
         // 		}
-        // 
+        //
         // 		public override void DoAssemble() {
         //             var xElementSize = GetService<IMetaDataInfoService>().SizeOfType(mType);
         // 		    new Comment("Element size: " + xElementSize);

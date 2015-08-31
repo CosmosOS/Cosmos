@@ -68,11 +68,14 @@ namespace Cosmos.Debug.Common
             InitializeCache();
             CurrentInstance = this;
 
-            if (aCreate)
+            if (aPathname != ":memory:")
             {
-                File.Delete(aPathname);
+                if (aCreate)
+                {
+                    File.Delete(aPathname);
+                }
+                aCreate = !File.Exists(aPathname);
             }
-            aCreate = !File.Exists(aPathname);
 
             // Manually register the data provider. Do not remove this otherwise the data provider doesn't register properly.
             mConnStr = String.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;BinaryGuid=false", aPathname);
@@ -565,6 +568,7 @@ namespace Cosmos.Debug.Common
 
         public void Dispose()
         {
+            CurrentInstance = null;
             if (mConnection != null)
             {
                 AddAssemblies(null, true);

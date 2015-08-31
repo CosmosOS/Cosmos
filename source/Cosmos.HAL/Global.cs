@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Core;
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 
 namespace Cosmos.HAL
@@ -109,15 +111,35 @@ namespace Cosmos.HAL
         {
             //TextScreen = new TextScreen();
             Global.Dbg.Send("CLS");
+      //TODO: Since this is FCL, its "common". Otherwise it should be
+      // system level and not accessible from Core. Need to think about this
+      // for the future.
+      Debugger.DoSend("Finding PCI Devices");
+      //PCI.Setup();
+    }
 
-            //TextScreen.Clear();
-
-            Global.Dbg.Send("Keyboard");
+    static public void Init(TextScreenBase textScreen, Keyboard keyboard)
+    {
+      if (textScreen != null)
+      {
+        TextScreen = textScreen;
+      }
+        if (keyboard == null)
+        {
+            Core.Global.Dbg.Send("No keyboard specified!");
             Keyboard = new PS2Keyboard();
-
-            // Find hardcoded ATA controllers
-            Global.Dbg.Send("ATA Master");
-            InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
+        }
+        else
+        {
+            Keyboard = keyboard;
+        }
+        Global.Dbg.Send("Before Core.Global.Init");
+      Core.Global.Init();
+      Global.Dbg.Send("Static Devices");
+      InitStaticDevices();
+      Global.Dbg.Send("PCI Devices");
+      InitPciDevices();
+      Global.Dbg.Send("Done initializing Cosmos.HAL.Global");
 
             //Global.Dbg.Send("ATA Slave");
             //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
@@ -143,30 +165,18 @@ namespace Cosmos.HAL
             Console.WriteLine("Finding PCI Devices");
             PCI.Setup();
         }
-
-        public static void Init(TextScreenBase textScreen, Keyboard keyboard)
-        {
-            if (textScreen != null)
-            {
-                TextScreen = textScreen;
-            }
-            if (keyboard != null)
-            {
-                Keyboard = keyboard;
-            }
-            Core.Bootstrap.Init();
-            Core.Global.Init();
-            Global.Dbg.Send("Static Devices");
-            InitStaticDevices();
-            Global.Dbg.Send("PCI Devices");
-            InitPciDevices();
-        }
-
-        //static void PCIDeviceFound(Core.PCI.PciInfo aInfo, Core.IOGroup.PciDevice aIO) {
-        // Later we need to dynamically load these, but we need to finish the design first.
-        //  if ((aInfo.VendorID == 0x8086) && (aInfo.DeviceID == 0x7111)) {
-        //ATA1 = new ATA(Core.Global.BaseIOGroups.ATA1);
-        //  }
-        //}
+        
+    public static void EnableInterrupts()
+    {
+      CPU.EnableInterrupts();
     }
+
+    public static bool InterruptsEnabled
+    {
+      get
+      {
+        return CPU.mInterruptsEnabled;
+      }
+    }
+  }
 }

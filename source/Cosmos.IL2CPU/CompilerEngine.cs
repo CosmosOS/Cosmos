@@ -236,6 +236,7 @@ namespace Cosmos.IL2CPU
                             }
                             xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
                             xScanner.Execute(xInitMethod);
+                            xScanner.SaveILInstructions(Path.ChangeExtension(OutputFilename, ".ilinstructions"));
 
                             AppAssemblerRingsCheck.Execute(xScanner, xInitMethod.DeclaringType.Assembly);
 
