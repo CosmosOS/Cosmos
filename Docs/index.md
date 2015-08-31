@@ -13,7 +13,8 @@ Cosmos is not an operating system in the traditional sense, but instead it is
 an "Operating System Kit", or as I like to say "Operating System Legos".
 Cosmos lets you create operating systems just as Visual Studio and C# normally
 let you create applications. Most users can write and boot their own operating
-system in just a few minutes, all using Visual Studio. Since milestone 5, Cosmos includes an integrated project type in Visual Studio, and an
+system in just a few minutes, all using Visual Studio. Since milestone 5,
+Cosmos includes an integrated project type in Visual Studio, and an
 integrated debugger. You can debug your operating system directly from Visual
 Studio using breakpoints.
 
@@ -86,7 +87,7 @@ assembly is used by all Cosmos projects.
 
 ###  Code Based Breakpoints
 
-    
+
     Global.Dbg.Break();
 
 Break can be used to issue a code based break. Visual Studio will break on the
@@ -105,7 +106,7 @@ if (x == 5) {
 
 Alternatively you can call the .NET class libary break:
 
-    
+
     System.Diagnostics.Debugger.Break();
 
 Both functions will produce the same result.
@@ -116,7 +117,7 @@ Debug strings can be output to the debug window of the host. Because Cosmos
 does not support watches yet, this functionality can be very useful for
 watching variable values and for performing tracing without breakpoints.
 
-```csharp    
+```csharp
 Global.Dbg.Send("Hello from Cosmos!");
 ```
 
