@@ -13,6 +13,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System
         [PlugMethod(Signature = "System_Void__System_Array_Clear_System_Array__System_Int32__System_Int32_")]
         public static unsafe void Clear(uint* aArray, uint aIndex, uint aLength)
         {
+            aArray = (uint*)aArray[0];
             aArray += 3;
             uint xElementSize = *aArray;
             aArray += 1;
@@ -48,12 +49,14 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System
         [PlugMethod(Signature = "System_Boolean__System_Array_TrySZBinarySearch_System_Array__System_Int32__System_Int32__System_Object___System_Int32_")]
         public static unsafe bool TrySZBinarySearch(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal)
         {
+            aArray = (uint*)aArray[0];
             return TrySZIndexOf(aArray, sourceIndex, count, value, out retVal);
         }
 
         [PlugMethod(Signature = "System_Boolean__System_Array_TrySZLastIndexOf_System_Array__System_Int32__System_Int32__System_Object___System_Int32_")]
         public static unsafe bool TrySZLastIndexOf(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal)
         {
+            aArray = (uint*)aArray[0];
             aArray += 4;
             for (uint i = (sourceIndex + count); i > sourceIndex; i--)
             {
@@ -70,6 +73,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System
         //[PlugMethod(Signature = "System_Boolean__System_Array_TrySZIndexOf_System_Array__System_Int32__System_Int32__System_Object__System_Int32__")]
         private static unsafe bool TrySZIndexOf(uint* aArray, uint sourceIndex, uint count, uint value, out uint retVal)
         {
+            aArray = (uint*)aArray[0];
             aArray += 4;
             for (uint i = sourceIndex; i < (sourceIndex + count); i++)
             {
@@ -95,6 +99,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System
 
         public static unsafe int GetLowerBound(int* aThis, int aDimension)
         {
+            aThis = (int*)aThis[0];
             if (aDimension != 0)
             {
                 //throw new NotSupportedException("Multidimensional arrays not supported yet!");
@@ -105,6 +110,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System
         [PlugMethod(Signature = "System_Object__System_Array_GetValue_System_Int32_")]
         public static unsafe uint GetValue(uint* aThis, int aIndex)
         {
+            aThis = (uint*)aThis[0];
             aThis += 3;
             uint xElementSize = *aThis;
             aThis += 1;
@@ -131,6 +137,7 @@ namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System
         [PlugMethod(Signature = "System_Void__System_Array_SetValue_System_Object__System_Int32_")]
         public static unsafe void SetValue(uint* aThis, uint aValue, int aIndex)
         {
+            aThis = (uint*)aThis[0];
             aThis += 3;
             uint xElementSize = *aThis;
             aThis += 1;
