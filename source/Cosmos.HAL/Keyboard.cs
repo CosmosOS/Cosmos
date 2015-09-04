@@ -13,7 +13,7 @@ namespace Cosmos.HAL {
             {
                 Debugger.DoSend("Skipping creation of key queue!");
             }
-            mQueuedKeys = new Queue<KeyEvent>(32);
+            mQueuedKeys = new Queue<KeyEvent>();
             Debugger.DoSend("mQueuedKeys created");
             SetKeyLayout(new US_Standard());
             Debugger.DoSend("Keylayout set");
