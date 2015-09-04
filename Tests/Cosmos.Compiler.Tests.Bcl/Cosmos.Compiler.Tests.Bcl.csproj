@@ -45,6 +45,7 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="System\Collections\Generic\ListTest.cs" />
     <Compile Include="System\Collections\Generic\QueueTest.cs" />
+    <Compile Include="System\DelegatesTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">

@@ -17,7 +17,7 @@ namespace Cosmos.Compiler.Tests.Bcl
         {
             System.Collections.Generic.ListTest.Execute();
             System.Collections.Generic.QueueTest.Execute();
-
+            System.DelegatesTest.Execute();
             TestController.Completed();
         }
     }
