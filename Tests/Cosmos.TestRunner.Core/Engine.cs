@@ -97,7 +97,7 @@ namespace Cosmos.TestRunner.Core
             foreach (RunTargetEnum xTarget in RunTargets)
             {
                 yield return new RunConfiguration { IsELF = true, RunTarget = xTarget };
-                yield return new RunConfiguration { IsELF = false, RunTarget = xTarget };
+                //yield return new RunConfiguration { IsELF = false, RunTarget = xTarget };
             }
         }
     }
