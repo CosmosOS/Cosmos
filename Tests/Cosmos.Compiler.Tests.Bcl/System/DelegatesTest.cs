@@ -5,7 +5,7 @@ using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
-    public static class DelegatesTest
+    public class DelegatesTest
     {
         private static int mCount;
 
@@ -14,22 +14,54 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             mCount++;
         }
 
-        private static void IncreaseCounterTwice()
+
+        private void IncreaseCounterTwiceFromInstanceMethod()
         {
-            mCount++;
+            mCount += 2;
         }
         
         public static void Execute()
+        {
+            TestDelegateWithoutArguments();
+            TestDelegateWithArguments();
+        }
+
+        private static void TestDelegateWithoutArguments()
         {
             mCount = 0;
             Action xDelegate = IncreaseCounterOnce;
 
             xDelegate();
             Assert.AreEqual(1, mCount, "After calling delegate once, Count != 1");
-            //xDelegate += IncreaseCounterTwice;
-            //xDelegate();
-            //Assert.AreEqual(4, mCount, "After calling delegate second time, Count != 4");
+            var xTestInstance = new DelegatesTest();
+            xDelegate = xTestInstance.IncreaseCounterTwiceFromInstanceMethod;
+            mCount = 0;
+            xDelegate();
+            Assert.AreEqual(2, mCount, "After calling delegate second time, Count != 2");
+        }
 
+        private static void IncreaseCounter(int number)
+        {
+            mCount += number;
+        }
+
+        private void IncreaseCounterFromInstanceMethod(int number)
+        {
+            mCount += number;
+        }
+        
+        private static void TestDelegateWithArguments()
+        {
+            mCount = 0;
+            Action<int> xDelegate = IncreaseCounter;
+
+            xDelegate(2);
+            Assert.AreEqual(2, mCount, "After calling delegate once, Count != 2");
+            var xTestInstance = new DelegatesTest();
+            xDelegate = xTestInstance.IncreaseCounterFromInstanceMethod;
+            mCount = 0;
+            xDelegate(3);
+            Assert.AreEqual(3, mCount, "After calling delegate second time, Count != 3");
         }
     }
 }
