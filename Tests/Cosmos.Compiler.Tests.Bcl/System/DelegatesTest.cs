@@ -13,14 +13,20 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         {
             mCount++;
         }
+
+        private static void IncreaseCounterTwice()
+        {
+            mCount++;
+        }
+        
         public static void Execute()
         {
             mCount = 0;
             Action xDelegate = IncreaseCounterOnce;
 
             xDelegate();
-            //Assert.AreEqual(1, mCount, "After calling delegate once, Count != 1");
-            ////xDelegate += () => mCount += 2;
+            Assert.AreEqual(1, mCount, "After calling delegate once, Count != 1");
+            //xDelegate += IncreaseCounterTwice;
             //xDelegate();
             //Assert.AreEqual(4, mCount, "After calling delegate second time, Count != 4");
 

@@ -19,10 +19,10 @@ namespace Cosmos.Compiler.Tests.SingleEchoTest
             // start by faking a b c
             Sys.TestingHelpers.KeyboardAddFakeScanCode(0x1E, false);
             Sys.TestingHelpers.KeyboardAddFakeScanCode(0x1E, true);
-            Sys.TestingHelpers.KeyboardAddFakeScanCode(0x2E, false);
-            Sys.TestingHelpers.KeyboardAddFakeScanCode(0x2E, true);
             Sys.TestingHelpers.KeyboardAddFakeScanCode(0x30, false);
             Sys.TestingHelpers.KeyboardAddFakeScanCode(0x30, true);
+            Sys.TestingHelpers.KeyboardAddFakeScanCode(0x2E, false);
+            Sys.TestingHelpers.KeyboardAddFakeScanCode(0x2E, true);
             // enter:
             Sys.TestingHelpers.KeyboardAddFakeScanCode(0x1C, false);
             Sys.TestingHelpers.KeyboardAddFakeScanCode(0x1C, true);
@@ -37,8 +37,7 @@ namespace Cosmos.Compiler.Tests.SingleEchoTest
             Assert.AreEqual(97, (int) input[0], "First char of returned string is not a!");
             Assert.AreEqual(98, (int)input[1], "Second char of returned string is not b!");
             Assert.AreEqual(99, (int)input[2], "Third char of returned string is not c!");
-            while (true)
-                ;
+            TestController.Completed();
         }
     }
 }

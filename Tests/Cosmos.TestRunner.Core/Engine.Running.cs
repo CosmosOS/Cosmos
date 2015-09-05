@@ -117,7 +117,6 @@ namespace Cosmos.TestRunner.Core
 
         private void ChannelPacketReceived(byte arg1, byte arg2, byte[] arg3)
         {
-            OutputHandler.LogMessage(String.Format("ChannelPacketReceived, Channel = {0}, Command = {1}", arg1, arg2));
             if (arg1 == 129)
             {
                 // for now, skip
@@ -127,16 +126,22 @@ namespace Cosmos.TestRunner.Core
             {
                 switch (arg2)
                 {
-                    case (byte)TestChannelCommandEnum.TestCompleted:
+                    case (byte) TestChannelCommandEnum.TestCompleted:
+                        Thread.Sleep(1000);
                         KernelTestCompleted();
                         break;
-                    case (byte)TestChannelCommandEnum.TestFailed:
+                    case (byte) TestChannelCommandEnum.TestFailed:
+                        Thread.Sleep(1000);
                         KernelTestFailed();
                         break;
-                    case (byte)TestChannelCommandEnum.AssertionSucceeded:
+                    case (byte) TestChannelCommandEnum.AssertionSucceeded:
                         KernelAssertionSucceeded();
                         break;
                 }
+            }
+            else
+            {
+                OutputHandler.LogMessage(String.Format("ChannelPacketReceived, Channel = {0}, Command = {1}", arg1, arg2));
             }
         }
 

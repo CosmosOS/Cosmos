@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.TestRunner
 {
@@ -31,8 +32,13 @@ namespace Cosmos.TestRunner
             var xResult = expected == actual;
             if (!xResult)
             {
+                Debugger.DoSend("Expected value");
+                Debugger.DoSendNumber((uint) expected);
+                Debugger.DoSend("Actual value");
+                Debugger.DoSendNumber((uint)actual);
                 TestController.Debugger.SendNumber("TestAssertion", "Expected", (uint)expected, 32);
                 TestController.Debugger.SendNumber("TestAssertion", "Actual", (uint)actual, 32);
+                TestController.Debugger.Send("Numbers sent!");
             }
             IsTrue(xResult, message);
         }
