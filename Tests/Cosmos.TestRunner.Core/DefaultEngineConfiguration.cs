@@ -22,10 +22,10 @@ namespace Cosmos.TestRunner.Core
             //engine.RunIL2CPUInProcess = true;
             //engine.RunWithGDB = true;
 
-            //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
-            //engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
-            //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
-            //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel).Assembly.Location);
+            engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
+            engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
+            engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
+            engine.AddKernel(typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel).Assembly.Location);
             engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);
 
             // known bugs, therefor disabled for now:

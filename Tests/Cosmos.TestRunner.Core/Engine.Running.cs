@@ -127,11 +127,9 @@ namespace Cosmos.TestRunner.Core
                 switch (arg2)
                 {
                     case (byte) TestChannelCommandEnum.TestCompleted:
-                        Thread.Sleep(1000);
                         KernelTestCompleted();
                         break;
                     case (byte) TestChannelCommandEnum.TestFailed:
-                        Thread.Sleep(1000);
                         KernelTestFailed();
                         break;
                     case (byte) TestChannelCommandEnum.AssertionSucceeded:
