@@ -334,6 +334,7 @@ namespace Cosmos.Debug.VSDebugEngine
             mDbgConnector.CmdBreak += new Action<UInt32>(DbgCmdBreak);
             mDbgConnector.CmdTrace += new Action<UInt32>(DbgCmdTrace);
             mDbgConnector.CmdText += new Action<string>(DbgCmdText);
+            mDbgConnector.CmdSimpleNumber += new Action<uint>(DbgCmdSimpleNumber);
             mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
             mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
             mDbgConnector.ConnectionLost += new Action<Exception>(DbgConnector_ConnectionLost);
@@ -524,6 +525,10 @@ namespace Cosmos.Debug.VSDebugEngine
             mDbgConnector.SendCmd(Vs2Ds.BatchEnd);
         }
 
+        void DbgCmdSimpleNumber(uint nr)
+        {
+            mCallback.OnOutputStringUser("0x" + nr.ToString("X8").ToUpper() + "\r\n");
+        }
         void DbgCmdText(string obj)
         {
             mCallback.OnOutputStringUser(obj + "\r\n");

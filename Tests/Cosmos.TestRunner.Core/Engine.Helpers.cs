@@ -62,6 +62,8 @@ namespace Cosmos.TestRunner.Core
                 {
                     throw new Exception("Cannot run multiple kernels with in-process compilation!");
                 }
+                // ensure we're using the referenced (= solution) version
+                Assembler.Assembler.ReadDebugStubFromDisk = false;
                 var xResult = Program.Run(xArguments, OutputHandler.LogMessage, OutputHandler.LogError);
                 if (xResult != 0)
                 {

@@ -31,12 +31,15 @@ namespace Cosmos.Debug.Common
             }
             if (aWait)
             {
-                using (var xEvent = new AutoResetEvent(false))
+                using (var xEvent = new ManualResetEventSlim(false))
                 {
                     mPendingWrites.Add(new Outgoing {Packet = aData, Completed = xEvent});
                     while (IsConnected)
                     {
-                        xEvent.WaitOne(1000);
+                        if (xEvent.Wait(25))
+                        {
+                            break;
+                        }
                     }
                     return IsConnected; // ??
                 }
@@ -147,7 +150,7 @@ namespace Cosmos.Debug.Common
                                         int attempts = 0;
                                         do
                                         {
-                                            mCmdWait.WaitOne(2000 /*60000*/);
+                                            mCmdWait.WaitOne(200 /*60000*/);
 
                                             if (IsInBackgroundThread)
                                             {
@@ -161,7 +164,7 @@ namespace Cosmos.Debug.Common
                                                    (resetID && lastCmdCompletedID > 5)
                                                )
                                                &&
-                                               ++attempts < 10);
+                                               ++attempts < 100);
                                     }
                                 }
                             }

@@ -1416,6 +1416,7 @@ namespace Cosmos.IL2CPU
             string xLabel = TmpPosLabel(aMethod, aOpCode);
             Assembler.CurrentIlLabel = xLabel;
             new Cosmos.Assembler.Label(xLabel);
+
             if (aMethod.MethodBase.DeclaringType != typeof(VTablesImpl))
             {
                 Assembler.EmitAsmLabels = false;

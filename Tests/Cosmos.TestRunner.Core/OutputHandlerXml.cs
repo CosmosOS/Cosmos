@@ -21,7 +21,11 @@ namespace Cosmos.TestRunner.Core
 
         protected override void OnExecuteKernelStart(string assemblyName)
         {
-            var xParent = mCurrentNode.Peek();
+            XmlElement xParent = mDocument.DocumentElement;
+            if (mCurrentNode.Count > 0)
+            {
+                xParent = mCurrentNode.Peek();
+            }
             var xItem = mDocument.CreateElement("Kernel");
             xItem.Attributes.Append(NewXmlAttribute("AssemblyName", assemblyName));
             xParent.AppendChild(xItem);
@@ -42,7 +46,11 @@ namespace Cosmos.TestRunner.Core
 
         protected override void OnLogDebugMessage(string message)
         {
-            var xParent = mCurrentNode.Peek();
+            XmlElement xParent = mDocument.DocumentElement;
+            if (mCurrentNode.Count > 0)
+            {
+                xParent = mCurrentNode.Peek();
+            }
             var xNode = xParent.SelectSingleNode("./DebugMessages");
             if (xNode == null)
             {
@@ -56,7 +64,17 @@ namespace Cosmos.TestRunner.Core
 
         protected override void OnLogMessage(string message)
         {
-            var xParent = mCurrentNode.Peek();
+            XmlElement xParent = mDocument.DocumentElement;
+            if (mCurrentNode.Count > 0)
+            {
+                xParent = mCurrentNode.Peek();
+            }
+            var xNode = xParent.SelectSingleNode("./Messages");
+            if (xNode == null)
+            {
+                xNode = mDocument.CreateElement("Messages");
+                xParent.PrependChild(xNode);
+            }
             var xItem = mDocument.CreateElement("Message");
             xItem.InnerText = message;
             xParent.AppendChild(xItem);
@@ -64,7 +82,11 @@ namespace Cosmos.TestRunner.Core
 
         protected override void OnLogError(string message)
         {
-            var xParent = mCurrentNode.Peek();
+            XmlElement xParent = mDocument.DocumentElement;
+            if (mCurrentNode.Count > 0)
+            {
+                xParent = mCurrentNode.Peek();
+            }
             var xItem = mDocument.CreateElement("Error");
             xItem.AppendChild(mDocument.CreateCDataSection(message));
             xParent.AppendChild(xItem);
@@ -102,7 +124,11 @@ namespace Cosmos.TestRunner.Core
 
         protected override void OnUnhandledException(Exception exception)
         {
-            var xParent = mCurrentNode.Peek();
+            XmlElement xParent = mDocument.DocumentElement;
+            if (mCurrentNode.Count > 0)
+            {
+                xParent = mCurrentNode.Peek();
+            }
             var xItem = mDocument.CreateElement("Exception");
             xItem.AppendChild(mDocument.CreateCDataSection(exception.ToString()));
             xParent.AppendChild(xItem);
@@ -110,7 +136,11 @@ namespace Cosmos.TestRunner.Core
 
         protected override void OnTaskStart(string taskName)
         {
-            var xParent = mCurrentNode.Peek();
+            XmlElement xParent = mDocument.DocumentElement;
+            if (mCurrentNode.Count > 0)
+            {
+                xParent = mCurrentNode.Peek();
+            }
             var xItem = mDocument.CreateElement("Task");
             xItem.Attributes.Append(NewXmlAttribute("TaskName", taskName));
             xParent.AppendChild(xItem);
@@ -148,7 +178,11 @@ namespace Cosmos.TestRunner.Core
 
         protected override void OnRunConfigurationStart(RunConfiguration configuration)
         {
-            var xParent = mCurrentNode.Peek();
+            XmlElement xParent = mDocument.DocumentElement;
+            if (mCurrentNode.Count > 0)
+            {
+                xParent = mCurrentNode.Peek();
+            }
             var xItem = mDocument.CreateElement("Configuration");
             xItem.Attributes.Append(NewXmlAttribute("IsELF", configuration.IsELF.ToString()));
             xItem.Attributes.Append(NewXmlAttribute("RunTarget", configuration.RunTarget.ToString()));

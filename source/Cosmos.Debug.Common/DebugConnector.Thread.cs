@@ -19,10 +19,10 @@ namespace Cosmos.Debug.Common
         protected class Outgoing
         {
             // Buffer to hold outcoming message
-            public volatile byte[] Packet;
+            public byte[] Packet;
 
             // signal completion
-            public AutoResetEvent Completed;
+            public ManualResetEventSlim Completed;
         }
 
         private bool IsInBackgroundThread

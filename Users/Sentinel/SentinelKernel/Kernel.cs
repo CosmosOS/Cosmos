@@ -33,14 +33,14 @@ namespace SentinelKernel
                     return;
                 }
 
-                Console.WriteLine("Folder exists!");
-                xTest = Directory.Exists("0:\\test\\DirInTest");
-                if (!xTest)
-                {
-                    Console.WriteLine("Subfolder doesn't exist!");
-                    return;
-                }
-                Console.WriteLine("Subfolder exists as well!");
+                //Console.WriteLine("Folder exists!");
+                //xTest = Directory.Exists("0:\\test\\DirInTest");
+                //if (!xTest)
+                //{
+                //    Console.WriteLine("Subfolder doesn't exist!");
+                //    return;
+                //}
+                //Console.WriteLine("Subfolder exists as well!");
 
                 xTest = File.Exists(@"0:\KudzU.txt");
                 if (!xTest)
@@ -48,23 +48,23 @@ namespace SentinelKernel
                     Console.WriteLine(@"\Kudzu.txt not found!");
                     return;
                 }
-
                 Console.WriteLine("Kudzu.txt found!");
-
-                xTest = File.Exists(@"0:\Test\DirInTest\Readme.txt");
-                if (!xTest)
-                {
-                    Console.WriteLine(@"\Test\DirInTest\Readme.txt not found!");
-                    return;
-                }
-
-                Console.WriteLine(@"Test\DirInTest\Readme.txt found!");
-
                 Console.Write("File contents of Kudzu.txt: ");
                 Console.WriteLine(File.ReadAllText(@"0:\Kudzu.txt"));
+                File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
+                Console.WriteLine(File.ReadAllText(@"0:\Kudzu.txt"));
 
-                Console.WriteLine(@"File contents of Test\DirInTest\Readme.txt: ");
-                Console.WriteLine(File.ReadAllText(@"0:\Test\DirInTest\Readme.txt"));
+                //xTest = File.Exists(@"0:\Test\DirInTest\Readme.txt");
+                //if (!xTest)
+                //{
+                //    Console.WriteLine(@"\Test\DirInTest\Readme.txt not found!");
+                //    return;
+                //}
+
+                //Console.WriteLine(@"Test\DirInTest\Readme.txt found!");
+
+                //Console.WriteLine(@"File contents of Test\DirInTest\Readme.txt: ");
+                //Console.WriteLine(File.ReadAllText(@"0:\Test\DirInTest\Readme.txt"));
             }
             catch (Exception e)
             {
@@ -74,7 +74,8 @@ namespace SentinelKernel
             finally
             {
                 while (true)
-                    ;
+                {
+                }
             }
         }
     }

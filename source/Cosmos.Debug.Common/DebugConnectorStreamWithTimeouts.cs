@@ -1,4 +1,6 @@
-﻿namespace Cosmos.Debug.Common
+﻿using System;
+
+namespace Cosmos.Debug.Common
 {
     public abstract class DebugConnectorStreamWithTimeouts : DebugConnectorStreamWithoutTimeouts
     {
@@ -10,7 +12,18 @@
                 return 0;
             }
             mStream.ReadTimeout = timeout;
-            return xStream.Read(buffer, offset, count);
+            try
+            {
+                return xStream.Read(buffer, offset, count);
+            }
+            catch (TimeoutException)
+            {
+                return 0;
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }

@@ -16,21 +16,25 @@ namespace Cosmos.Core {
         public static void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged
         public void Halt() { } // Plugged
 
+        public static void DisableInterrupts()
+        {
+            // plugged
+        }
+
+        public static void EnableInterrupts()
+        {
+            // plugged
+        }
+
         public void Reboot() {
             // Disable all interrupts
-            //DisableInterrupts();
+            DisableInterrupts();
 
-            //byte temp;
-
-            //// Clear all keyboard buffers
-            //do {
-            //    temp = CPUBus.Read8(0x64); // Empty user data
-            //    if ((temp & 0x01) != 0) {
-            //        CPUBus.Read8(0x60); // Empty keyboard data
-            //    }
-            //} while ((temp & 0x02) != 0);
-
-            //CPUBus.Write8(0x64, 0xFE); // Pulse CPU Reset line
+            var myPort = new IOPort(0x64);
+            while ((myPort.Byte & 0x02) != 0)
+            {
+            }
+            myPort.Byte = 0xFE;
             Halt(); // If it didn't work, Halt the CPU
         }
     }

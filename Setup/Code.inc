@@ -226,7 +226,7 @@ function InitializeSetup: Boolean;
 begin
   InitializePaths;
   if not VSNET2013 then begin
-    MsgBox(ExpandConstant('Either Visual Studio {#VsVersionHuman} or Visual Studio {#VsVersionHuman} (integrated shell) is not installed! Please see CodePlex documentation for supported editions/versions of Visual Studio.'), MbError, MB_OK);
+    MsgBox(ExpandConstant('Either Visual Studio {#VsVersionHuman} or Visual Studio {#VsVersionHuman} (integrated shell) is not installed! Please see Cosmos documentation on GitHub for supported editions/versions of Visual Studio.'), MbError, MB_OK);
     Result := false;
     exit;
   end;

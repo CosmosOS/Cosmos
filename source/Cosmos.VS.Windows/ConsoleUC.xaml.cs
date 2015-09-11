@@ -32,11 +32,11 @@ namespace Cosmos.VS.Windows
             InitializeComponent();
         }
 
-        private StreamWriter mOut = StreamWriter.Null;
-        //private StreamWriter mOut = new StreamWriter(@"c:\data\sources\output.txt", false)
-        //                            {
-        //                                AutoFlush = true
-        //                            };
+        //private StreamWriter mOut = StreamWriter.Null;
+        private StreamWriter mOut = new StreamWriter(@"c:\data\output.txt", false)
+                                    {
+                                        AutoFlush = true
+                                    };
 
         protected override void HandleChannelMessage(byte aChannel, byte aCommand, byte[] aData)
         {

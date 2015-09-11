@@ -304,7 +304,7 @@ namespace Cosmos.System.Plugs.System {
 
 		public static int Read() {
 			// TODO special cases, if needed, that returns -1
-      ConsoleKeyInfoEx xResult;
+      KeyEvent xResult;
 
 		  if (HAL.Global.Keyboard.TryReadKey(out xResult))
 		  {
@@ -318,7 +318,7 @@ namespace Cosmos.System.Plugs.System {
 
 		// ReadKey() pure CIL
 
-		public static ConsoleKeyInfoEx ReadKey(Boolean intercept) {
+		public static KeyEvent ReadKey(Boolean intercept) {
       var key = Cosmos.HAL.Global.Keyboard.ReadKey();
 
 			if (false == intercept && key.KeyChar != '\0')
@@ -336,13 +336,14 @@ namespace Cosmos.System.Plugs.System {
         return null;
       }
 			List<char> chars = new List<char>(32);
-			ConsoleKeyInfoEx current;
+			KeyEvent current;
 			int currentCount = 0;
 
-			while ((current = HAL.Global.Keyboard.ReadKey()).Key != ConsoleKey.Enter)
+			while ((current = HAL.Global.Keyboard.ReadKey()).Key != ConsoleKeyEx.Enter)
 			{
+			    if (current.Key == ConsoleKeyEx.NumEnter) break;
         //Check for "special" keys
-				if (current.Key == ConsoleKey.Backspace) // Backspace
+				if (current.Key == ConsoleKeyEx.Backspace) // Backspace
 				{
 				  if (currentCount > 0)
 				  {
@@ -364,7 +365,7 @@ namespace Cosmos.System.Plugs.System {
 					}
 					continue;
 				}
-				else if (current.Key == ConsoleKey.LeftArrow)
+				else if (current.Key == ConsoleKeyEx.LeftArrow)
 				{
 					if (currentCount > 0)
 					{
@@ -373,7 +374,7 @@ namespace Cosmos.System.Plugs.System {
 					}
 					continue;
 				}
-				else if (current.Key == ConsoleKey.RightArrow)
+				else if (current.Key == ConsoleKeyEx.RightArrow)
 				{
 					if (currentCount < chars.Count)
 					{

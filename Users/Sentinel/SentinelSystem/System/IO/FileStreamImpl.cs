@@ -8,18 +8,16 @@ using SentinelKernel.System.FileSystem.VFS;
 
 namespace SentinelKernel.System.Plugs.System.IO
 {
-    [Plug(Target = typeof(IO::FileStream))]
-                [PlugField(FieldId = "$$InnerStream$$", FieldType = typeof(IO::Stream))]
+    [Plug(Target = typeof (IO::FileStream))]
+    [PlugField(FieldId = "$$InnerStream$$", FieldType = typeof (IO::Stream))]
     public class FileStreamImpl
     {
         // This plug basically forwards all calls to the $$InnerStream$$ stream, which is supplied by the file system.
 
+        //  public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength,
 
-
-
-                    //  public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength,
-
-        public static void Ctor(IO::FileStream aThis, string aPathname, IO::FileMode aMode, [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        public static void Ctor(IO::FileStream aThis, string aPathname, IO::FileMode aMode,
+            [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
         {
             innerStream = VFSManager.GetFileStream(aPathname);
         }
@@ -29,19 +27,28 @@ namespace SentinelKernel.System.Plugs.System.IO
             // plug cctor as it (indirectly) uses Thread.MemoryBarrier()
         }
 
-        public static int Read(IO::FileStream aThis, byte[] aBuffer, int aOffset, int aCount, [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        public static int Read(IO::FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
+            [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
         {
             return innerStream.Read(aBuffer, aOffset, aCount);
         }
 
-        public static long get_Length(IO::FileStream aThis, [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        public static void Write(IO::FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
+            [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        {
+            innerStream.Write(aBuffer, aOffset, aCount);
+        }
+
+        public static long get_Length(IO::FileStream aThis,
+            [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
         {
             return innerStream.Length;
         }
 
-        public static void SetLength(IO::FileStream aThis, long value)
+        public static void SetLength(IO::FileStream aThis, long aLength,
+            [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
         {
-            throw new NotImplementedException();
+            innerStream.SetLength(aLength);
         }
 
         public static void Dispose(IO::FileStream aThis, bool disposing)

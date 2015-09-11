@@ -81,6 +81,7 @@
     <Compile Include="IOGroup\COM.cs" />
     <Compile Include="IOGroup\Network\AMDPCNetIIIOGroup.cs" />
     <Compile Include="IOGroup\PCSpeaker.cs" />
+    <Compile Include="IOGroup\VBE.cs" />
     <Compile Include="ManagedMemoryBlock.cs" />
     <Compile Include="CPU.cs" />
     <Compile Include="DeviceIDAttribute.cs" />

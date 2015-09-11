@@ -2,63 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.HAL.ScanMaps;
 
 namespace Cosmos.HAL {
-    public class ConsoleKeyInfoEx
-    {
-        // todo: once Github issue #137 is fixed, replace this class with ConsoleKeyInfo struct.
-
-        public char KeyChar
-        {
-            get;
-            set;
-        }
-
-        public ConsoleKey Key
-        {
-            get;
-            set;
-        }
-
-        public ConsoleModifiers Modifiers
-        {
-            get;
-            set;
-        }
-
-        public ConsoleKeyInfoEx(char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
-        {
-            this.KeyChar = keyChar;
-            this.Key = key;
-            this.Modifiers = (ConsoleModifiers)0;
-            if (shift)
-            {
-                this.Modifiers |= ConsoleModifiers.Shift;
-            }
-            if (alt)
-            {
-                this.Modifiers |= ConsoleModifiers.Alt;
-            }
-            if (control)
-            {
-                this.Modifiers |= ConsoleModifiers.Control;
-            }
-        }
-    }
-
     public abstract class Keyboard : Device {
-        // TODO: MtW: I don't like the following line in the baseclass, but for now, lets keep it here.
-        protected Core.IOGroup.Keyboard IO = Core.Global.BaseIOGroups.Keyboard;
         protected Keyboard()
         {
             if (mQueuedKeys != null)
             {
                 Console.WriteLine("Skipping creation of key queue!");
             }
-            mQueuedKeys = new Queue<ConsoleKeyInfoEx>(32);
-
+            mQueuedKeys = new Queue<KeyEvent>(32);
+            SetKeyLayout(new US_Standard());
             Initialize();
-            Core.INTs.SetIrqHandler(0x01, HandleIRQ);
+            UpdateLeds();
         }
 
         /// <summary>
@@ -66,38 +23,36 @@ namespace Cosmos.HAL {
         /// </summary>
         protected abstract void Initialize();
 
-        private void HandleIRQ(ref Core.INTs.IRQContext aContext)
+        public ScanMapBase KeyLayout { get; private set; }
+
+        public void SetKeyLayout(ScanMapBase layout)
         {
-            byte xScanCode = IO.Port60.Byte;
-            bool xReleased = (xScanCode & 0x80) == 0x80;
-            if (xReleased)
-            {
-                xScanCode = (byte)(xScanCode ^ 0x80);
-            }
-            HandleScancode(xScanCode, xReleased);
+            KeyLayout = layout;
         }
+
+        public abstract void UpdateLeds();
 
         protected abstract void HandleScancode(byte aScancode, bool aReleased);
 
-        private static Queue<ConsoleKeyInfoEx> mQueuedKeys;
+        private static Queue<KeyEvent> mQueuedKeys;
 
-        protected void Enqueue(ConsoleKeyInfoEx aKey)
+        protected void Enqueue(KeyEvent aKey)
         {
             mQueuedKeys.Enqueue(aKey);
         }
 
-        public bool TryReadKey(out ConsoleKeyInfoEx oKey)
+        public bool TryReadKey(out KeyEvent oKey)
         {
             if (mQueuedKeys.Count > 0)
             {
                 oKey = mQueuedKeys.Dequeue();
                 return true;
             }
-            oKey = default(ConsoleKeyInfoEx);
+            oKey = default(KeyEvent);
             return false;
         }
 
-        public ConsoleKeyInfoEx ReadKey()
+        public KeyEvent ReadKey()
         {
             while (mQueuedKeys.Count == 0)
             {
@@ -123,11 +78,5 @@ namespace Cosmos.HAL {
             get;
             protected set;
         }
-
-        public bool NumLock { get; protected set; }
-
-        public bool CapsLock { get; protected set; }
-
-        public bool ScrollLock { get; protected set; }
     }
 }

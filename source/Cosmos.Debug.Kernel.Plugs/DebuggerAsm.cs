@@ -10,8 +10,14 @@ namespace Cosmos.Debug.Kernel.Plugs {
     [PlugMethod(Assembler = typeof(DebugBreak))]
     public static void Break(Kernel.Debugger aThis) { }
 
-    [PlugMethod(Assembler = typeof(DebugSend))]
-    public static unsafe void Send(Kernel.Debugger aThis, int aLength, char* aText) { }
+    //[PlugMethod(Assembler = typeof(DebugActualSend))]
+    //public static unsafe void ActualSend(int aLength, char* aText) { }
+
+    [PlugMethod(Assembler = typeof(DebugDoSend))]
+    public static void DoSend(string aText) { }
+
+    [PlugMethod(Assembler = typeof(DebugDoSendNumber))]
+    public static void DoSendNumber(uint aNumber) { }
 
     [PlugMethod(Assembler = typeof(DebugSendMessageBox))]
     public static unsafe void SendMessageBox(Kernel.Debugger aThis, int aLength, char* aText) { }
@@ -98,24 +104,48 @@ namespace Cosmos.Debug.Kernel.Plugs {
     }
   }
 
-  public class DebugSend : AssemblerMethod {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-     new LiteralAssemblerCode("%ifdef DEBUGSTUB");
-     //new LiteralAssemblerCode("pushad");
-     new LiteralAssemblerCode("Call DebugStub_SendText");
-     //new LiteralAssemblerCode("popad");
-        //new LiteralAssemblerCode("mov ecx, [ebp+12]");
-        //new LiteralAssemblerCode("imul ecx, 2");
+  public class DebugDoSend : AssemblerMethod
+  {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    {
+      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+      //new LiteralAssemblerCode("pushad");
+      new Label(".BeforeArgumentsPrepare");
+      // length: will be at EBP+12 in DebugStub_SendText
+      new LiteralAssemblerCode("mov eax, [ebp+8]");
+      new LiteralAssemblerCode("add eax, 12");
+      new LiteralAssemblerCode("push dword [eax]");
+      // first char pointer, will be at EBP+8 in DebugStub_SendText
+      new LiteralAssemblerCode("add eax, 4");
+      new LiteralAssemblerCode("push eax");
+      new Label(".BeforeCall");
+      new LiteralAssemblerCode("Call DebugStub_SendText");
+      // for x#, we need to cleanup after a call:
+      new LiteralAssemblerCode("add esp, 8");
+      //new LiteralAssemblerCode("popad");
+      //new LiteralAssemblerCode("mov ecx, [ebp+12]");
+      //new LiteralAssemblerCode("imul ecx, 2");
 
-        //new LiteralAssemblerCode("mov al, 129");
-        //new LiteralAssemblerCode("mov bl, 0");
-        //new LiteralAssemblerCode("mov esi, [ebp+8]");
-        //new LiteralAssemblerCode("add esi, 16");
-        //new LiteralAssemblerCode("call DebugStub_SendCommandOnChannel");
-     new LiteralAssemblerCode("%endif");
+      //new LiteralAssemblerCode("mov al, 129");
+      //new LiteralAssemblerCode("mov bl, 0");
+      //new LiteralAssemblerCode("mov esi, [ebp+8]");
+      //new LiteralAssemblerCode("add esi, 16");
+      //new LiteralAssemblerCode("call DebugStub_SendCommandOnChannel");
+      new LiteralAssemblerCode("%endif");
     }
   }
 
+  public class DebugDoSendNumber : AssemblerMethod
+  {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    {
+      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+      new LiteralAssemblerCode("push dword [ebp+8]");
+      new LiteralAssemblerCode("Call DebugStub_SendSimpleNumber");
+      new LiteralAssemblerCode("add esp, 4");
+      new LiteralAssemblerCode("%endif");
+    }
+  }
   public class DebugSendMessageBox : AssemblerMethod
   {
       public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
