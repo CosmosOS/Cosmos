@@ -81,6 +81,7 @@
     <Compile Include="Bootstrap.cs" />
     <Compile Include="ConsoleKeyEx.cs" />
     <Compile Include="DebugTextScreen.cs" />
+    <Compile Include="Drivers\NewVGA.cs" />
     <Compile Include="KeyEvent.cs" />
     <Compile Include="KeyMapping.cs" />
     <Compile Include="PS2Keyboard.cs" />
