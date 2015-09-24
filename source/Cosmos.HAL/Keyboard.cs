@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL.ScanMaps;
 
 namespace Cosmos.HAL {
@@ -10,12 +11,16 @@ namespace Cosmos.HAL {
         {
             if (mQueuedKeys != null)
             {
-                Console.WriteLine("Skipping creation of key queue!");
+                Debugger.DoSend("Skipping creation of key queue!");
             }
-            mQueuedKeys = new Queue<KeyEvent>(32);
+            mQueuedKeys = new Queue<KeyEvent>();
+            Debugger.DoSend("mQueuedKeys created");
             SetKeyLayout(new US_Standard());
+            Debugger.DoSend("Keylayout set");
             Initialize();
+            Debugger.DoSend("Initialized");
             UpdateLeds();
+            Debugger.DoSend("Leds updated");
         }
 
         /// <summary>
@@ -28,6 +33,14 @@ namespace Cosmos.HAL {
         public void SetKeyLayout(ScanMapBase layout)
         {
             KeyLayout = layout;
+        }
+
+        /// <summary>
+        /// Allow faking scancodes. Used for test kernels
+        /// </summary>
+        internal void HandleFakeScanCode(byte aScancode, bool aReleased)
+        {
+            HandleScancode(aScancode, aReleased);
         }
 
         public abstract void UpdateLeds();

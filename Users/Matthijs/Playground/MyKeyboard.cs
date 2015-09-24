@@ -17,5 +17,10 @@ namespace Playground
         {
             //
         }
+
+        public override void UpdateLeds()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

@@ -48,6 +48,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           return 2;
         case Code.Ldobj:
           return 1;
+        case Code.Sizeof:
+          return 0;
         default:
           throw new NotImplementedException("OpCode '" + OpCode + "' not implemented! Encountered in method " + aMethod.ToString());
       }
@@ -82,6 +84,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Stobj:
           return 0;
         case Code.Ldobj:
+          return 1;
+        case Code.Sizeof:
           return 1;
         default:
           throw new NotImplementedException("OpCode '" + OpCode + "' not implemented!");
@@ -148,6 +152,9 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             StackPushTypes[0] = Value;
           }
+          return;
+        case Code.Sizeof:
+          StackPushTypes[0] = typeof(uint);
           return;
         default:
           break;

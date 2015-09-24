@@ -26,6 +26,8 @@ namespace Cosmos.IL2CPU.X86.IL {
 
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xStackSize }; // the index
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xStackSize + 4 }; // the array
+      // now convert the array handle to an actual memory address
+      new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
 
       new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(ObjectImpl.FieldDataOffset + 4) };
 
@@ -35,7 +37,7 @@ namespace Cosmos.IL2CPU.X86.IL {
 
       //Multiply( aAssembler, aServiceProvider, aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
       string xBaseLabel = GetLabel(aMethod, aOpCode) + ".";
-                    
+
       Mul.DoExecute(4, false, xBaseLabel);
 
       new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };

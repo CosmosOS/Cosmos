@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            
+            // MtW: for now, disable this instruction. To me, it's unclear in what context it's being used.
             uint mObjSize = 0;
 
             Type mType = (( Cosmos.IL2CPU.ILOpCodes.OpType )aOpCode).Value;
@@ -55,12 +55,12 @@ namespace Cosmos.IL2CPU.X86.IL
         // using System.Collections.Generic;
         // using CPUx86 = Cosmos.Assembler.x86;
         // using Cosmos.IL2CPU.Compiler;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Initobj)]
         // 	public class Initobj: Op {
         // 		private uint mObjSize;
-        // 
+        //
         //         //public static void ScanOp(ILReader aReader, MethodInformation aMethodInfo, SortedList<string, object> aMethodData) {
         //         //    Type xTypeRef = aReader.OperandValueType;
         //         //    if (xTypeRef == null)
@@ -70,7 +70,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //         //    Engine.RegisterType(xTypeRef);
         //         //}
         //         private Type mType;
-        // 
+        //
         // 		public Initobj(ILReader aReader, MethodInformation aMethodInfo)
         // 			: base(aReader, aMethodInfo) {
         // 			mType = aReader.OperandValueType;
@@ -80,7 +80,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			}
         // 			mObjSize = 0;
         // 		}
-        // 
+        //
         // 		public override void DoAssemble() {
         //             if (mType.IsValueType)
         //             {

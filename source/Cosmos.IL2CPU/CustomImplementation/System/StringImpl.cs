@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU.CustomImplementation.System
@@ -74,34 +75,60 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
             int len = 0;
             for (int i = 0; i < values.Length; i++)
             {
-                len += values[i].Length;
+                var xValue = values[i];
+                if (xValue != null)
+                {
+                    len += values[i].Length;
+                }
             }
+            Console.Write("Concatting to ");
+            Console.Write(len.ToString());
+            Console.WriteLine(" characters.");
             return ConcatArray(values, len);
         }
         public static string Concat(params object[] args)
         {
+            Console.WriteLine("In Concat(object[])");
             string[] values = new string[args.Length];
             for (int i = 0; i < args.Length; i++)
             {
-                values[i] = args[i].ToString();
+                var xArg = args[i];
+                if (xArg != null)
+                {
+                    var xStrArg = xArg as string;
+                    if (xStrArg != null)
+                    {
+                        Console.WriteLine("Providing casted item");
+                        values[i] = xStrArg;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Providing converted item");
+                        values[i] = xArg.ToString();
+                    }
+                }
             }
+            Console.WriteLine("Before Concat(string[])");
             return Concat(values);
         }
         public static string ConcatArray(string[] values, int totalLength)
         {
-
-            char[] xResult = new char[totalLength];
+            char[] xResultChars = new char[totalLength];
             int xCurPos = 0;
             for (int i = 0; i < values.Length; i++)
             {
                 var xStr = values[i];
-                for (int j = 0; j < xStr.Length; j++)
+                if (xStr != null)
                 {
-                    xResult[xCurPos] = xStr[j];
-                    xCurPos++;
+                    for (int j = 0; j < xStr.Length; j++)
+                    {
+                        xResultChars[xCurPos] = xStr[j];
+                        xCurPos++;
+                    }
                 }
             }
-            return new String(xResult);
+            var xResult = new String(xResultChars);
+            return xResult;
         }
 
         public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)

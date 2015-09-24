@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Cosmos.Common.Extensions;
 using Cosmos.Core;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL
 {
@@ -31,15 +32,16 @@ namespace Cosmos.HAL
 
         public override void UpdateLeds()
         {
-            IO.Port60.Byte = 0xED;
-            while ((new IOPort(0x64).Byte & 2) != 0)
-            {
-            }
-            var led_status = (Global.ScrollLock ? 1 : 0) | ((Global.NumLock ? 1 : 0) << 1) | ((Global.CapsLock ? 1 : 0) << 2);
-            IO.Port60.Byte = (byte)led_status;
-            while ((new IOPort(0x64).Byte & 2) != 0)
-            {
-            }
+            // for now, lets not do this..
+            //IO.Port60.Byte = 0xED;
+            //while ((new IOPort(0x64).Byte & 2) != 0)
+            //{
+            //}
+            //var led_status = (Global.ScrollLock ? 1 : 0) | ((Global.NumLock ? 1 : 0) << 1) | ((Global.CapsLock ? 1 : 0) << 2);
+            //IO.Port60.Byte = (byte)led_status;
+            //while ((new IOPort(0x64).Byte & 2) != 0)
+            //{
+            //}
         }
 
         protected override void HandleScancode(byte aScancode, bool aReleased)
@@ -107,6 +109,10 @@ namespace Cosmos.HAL
 
         public bool GetKey(byte aScancode, bool released, out KeyEvent keyInfo)
         {
+            if (KeyLayout == null)
+            {
+                Debugger.DoSend("No KeyLayout");
+            }
             keyInfo = KeyLayout.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, Global.NumLock, Global.CapsLock, Global.ScrollLock);
             return keyInfo != null;
         }

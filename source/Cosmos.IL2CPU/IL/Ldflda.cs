@@ -28,6 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, FieldInfo aField, bool aDerefValue, bool aDebugEnabled)
         {
+            new Comment("Field: " + aField.Id);
             int xExtraOffset = 0;
             var xType = aMethod.MethodBase.DeclaringType;
             bool xNeedsGC = aDeclaringType.IsClass && !aDeclaringType.IsValueType;
@@ -43,15 +44,25 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (aDerefValue && aField.IsExternalValue)
             {
-                new CPUx86.Mov
+                if (xNeedsGC)
                 {
-                    DestinationReg = CPUx86.Registers.EAX,
-                    SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int) xActualOffset
-                };
+                    // eax contains the handle now, lets convert it to the real memory address
+                    new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true, SourceDisplacement = (int)xActualOffset};
+                }
+
                 new CPUx86.Mov {DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX};
             }
             else
-                new CPUx86.Add {DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceValue = (uint) (xActualOffset)};
+            {
+                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                if (xNeedsGC)
+                {
+                    // eax contains the handle now, lets convert it to the real memory address
+                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
+                }
+                new CPUx86.Add {DestinationReg = CPUx86.Registers.EAX, SourceValue = (uint)(xActualOffset)};
+                new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EAX};
+            }
         }
     }
 }

@@ -1,214 +1,192 @@
-﻿#define OLD_HEAP
-// BE CAREFUL: enabling/disabling the OLD_HEAP define must happen in HMI.cs as well!
-
-#if !OLD_HEAP
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Cosmos.Core {
-    // This class must be static, as for creating objects, we needd the hea
-    public static class Heap
-    {
-        public static bool EnableDebug = true;
-        //GC variables
-
-        public static bool SkipRalloc = true;
-        public static uint LastMallocAddr;
-
-
-        private static uint mStartAddress;
-        private static uint mEndOfRam;
-        internal static uint xAddr;
-        internal static bool IsInitalised = false;
-
-        public static uint GetMemoryUse()
-        {
-           return mStartAddress;
-        }
-
-        public static void DecreaseMemoryUse(uint aSize)
-        {
-
-            mStartAddress -= aSize;
-            if (mStartAddress < HMI.ProtectArea)
-            {
-                HMI.CauseProgramFault("[ Heap Error: Memory Access Violation ]");
-            }
-            else
-            {
-                LastMallocAddr = mStartAddress;
-            }
-        }
-
-
-        internal static void Initialize()
-        {
-            if (IsInitalised == false)
-            {
-                mEndOfRam = ((Cosmos.Core.CPU.GetAmountOfRAM() - 1) * 1048576);
-                mStartAddress = Cosmos.Core.CPU.GetEndOfKernel();
-                mStartAddress += 1024; // leave at 1024 bytes between  kernel and User space;
-                IsInitalised = true;
-            }
-        }
-
-        public static uint MemAlloc(uint aLength)
-        {
-            Initialize();
-            xAddr = 0;
-
-            if (SkipRalloc == false)
-            {
-                xAddr = HMI.ReAlloc(aLength);
-            }
-
-            if (xAddr == 0)
-            {
-                xAddr = mStartAddress;
-
-                if (mStartAddress >= mEndOfRam)
-                {
-                    HMI.HeapOutOfMemory();
-                }
-
-                else
-                {
-                    mStartAddress += aLength;
-                    Cosmos.Core.Global.CPU.ZeroFill(xAddr, aLength);
-                    if (HMI.IsInitalised == true)//Prevent it from interfering with unmanaged memory before boot
-                    {
-                        HMI.AddBlock(xAddr, aLength);
-                    }
-                    if (SkipRalloc == false)
-                    {
-                        LastMallocAddr = xAddr;//Update this when we allocate a new block not extend an old block
-                    }
-                    SkipRalloc = false;
-
-                }
-
-            }
-
-            return xAddr;
-        }
-
-        public static void xHeapExcessUseFault()
-        {
-            HMI.HeapExcessUseFault();
-        }
-
-    }
-}
-#else
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Common;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core
 {
-    // This class must be static, as for creating objects, we needd the hea
-    public static class Heap
+    // This class must be static, as for creating objects, we need the heap
+    // this heap implementation it the very most basic one: no reentrancy, etc.
+    // Interrupts are disabled when trying to allocate a new block of memory.
+    public static unsafe partial class Heap
     {
-        public static bool EnableDebug = true;
-        private static uint mStart;
-        private static uint mStartAddress;
-        private static uint mLength;
         private static uint mEndOfRam;
 
-        private static void DoInitialize(uint aStartAddress, uint aEndOfRam)
+        private static void DoInitialize(uint aEndOfRam)
         {
-            mStart = mStartAddress = aStartAddress + (4 - (aStartAddress % 4));
-            mLength = aEndOfRam - aStartAddress;
-            mLength = (mLength / 4) * 4;
-            ClearMemory(aStartAddress, mLength);
-
-            mStartAddress += 1024;
             mEndOfRam = aEndOfRam;
-            mStartAddress = (mStartAddress / 4) * 4;
-            mLength -= 1024;
-            //UpdateDebugDisplay();
+            //
         }
 
         private static bool mInitialized = false;
-        internal static void Initialize()
+        internal static void EnsureIsInitialized()
         {
             if (!mInitialized)
             {
                 mInitialized = true;
-                DoInitialize(CPU.GetEndOfKernel(), (CPU.GetAmountOfRAM() - 1) * 1024 * 1024);
+                DoInitialize((CPU.GetAmountOfRAM() - 1) * 1024 * 1024);
                 //DoInitialize(4 * 1024 * 1024, 16 * 1024 * 1024);
             }
         }
 
-        private static void ClearMemory(uint aStartAddress, uint aLength)
+        private static void ClearMemory(void* aStartAddress, uint aLength)
         {
             //TODO: Move to memory. Internal access only...
-            CPU.ZeroFill(aStartAddress, aLength);
-        }
-
-        //private static bool mDebugDisplayInitialized = false;
-
-        // this method displays the used/total memory of the heap on the first line of the text screen
-        private static void UpdateDebugDisplay()
-        {
-            //if (EnableDebug)
-            //{
-            //    if (!mDebugDisplayInitialized)
-            //    {
-            //        mDebugDisplayInitialized = true;
-            //        int xOldPositionLeft = Console.CursorLeft;
-            //        int xOldPositionTop = Console.CursorTop;
-            //        Console.CursorLeft = 0;
-            //        Console.CursorTop = 0;
-            //        Console.Write("[Heap Usage: ");
-            //        NumberHelper.WriteNumber(mStartAddress,
-            //                    32);
-            //        Console.Write("/");
-            //        NumberHelper.WriteNumber(mEndOfRam,
-            //                    32);
-            //        Console.Write("] bytes");
-            //        while (Console.CursorLeft < (Console.WindowWidth-1))
-            //        {
-            //            Console.Write(" ");
-            //        }
-            //        Console.CursorLeft = xOldPositionLeft;
-            //        Console.CursorTop = xOldPositionTop;
-            //    }
-            //    else
-            //    {
-            //        int xOldPositionLeft = Console.CursorLeft;
-            //        int xOldPositionTop = Console.CursorTop;
-            //        Console.CursorLeft = 13;
-            //        Console.CursorTop = 0;
-            //        NumberHelper.WriteNumber(mStartAddress,
-            //                    32);
-            //        Console.CursorLeft = xOldPositionLeft;
-            //        Console.CursorTop = xOldPositionTop;
-            //    }
-            //}
+            CPU.ZeroFill((uint)aStartAddress, aLength);
         }
 
         public static uint MemAlloc(uint aLength)
         {
-            Initialize();
-            uint xTemp = mStartAddress;
-
-            if ((xTemp + aLength) > (mStart + mLength))
+            if (aLength == 0)
             {
-                Console.WriteLine("Too large memory block allocated!");
-                NumberHelper.WriteNumber(aLength, 32);
-                while (true)
-                    ;
+                DebugAndHalt("    Request to retrieve block with size = 0 was halted!");
             }
-            mStartAddress += aLength;
-            UpdateDebugDisplay();
-            ClearMemory(xTemp, aLength);
-            return xTemp;
+            var xInterruptsWereEnabled = CPU.DisableInterrupts();
+            try
+            {
+                EnsureIsInitialized();
+
+                var xCurrentTableIdx = 0u;
+                DataLookupTable* xCurrentTable = GlobalSystemInfo.GlobalInformationTable->FirstDataLookupTable;
+                DataLookupTable* xPreviousTable = null;
+                uint xResult;
+                while (xCurrentTable != null)
+                {
+                    DebugHex("Scanning DataLookupTable ", xCurrentTableIdx);
+                    //DebugHex("At address", (uint)xCurrentTable);
+                    if (ScanDataLookupTable(xCurrentTableIdx, xCurrentTable, aLength, out xResult))
+                    {
+                        DebugHex("Returning handle", xResult);
+                        DebugHex("For dataobject size", aLength);
+                        if (xResult < CPU.GetEndOfKernel())
+                        {
+                            DebugAndHalt("Wrong handle returned!");
+                        }
+                        return xResult;
+                    }
+                    xCurrentTableIdx ++;
+                    xPreviousTable = xCurrentTable;
+                    xCurrentTable = xCurrentTable->Next;
+                }
+
+                // no tables found, lets create a new one, and use that
+                if (xPreviousTable == null)
+                {
+                    // this check should theoretically be unnecessary, but lets keep it, to do some double-checking.
+                    DebugAndHalt("No PreviousTable found!");
+                }
+                Debug("Creating new DataLookupTable");
+                var xLastItem = xPreviousTable->GetEntry(DataLookupTable.EntriesPerTable - 1);
+                var xNextTablePointer = (DataLookupTable*)((uint)xLastItem->DataBlock + xLastItem->Size);
+                // the memory hasn't been cleared yet, so lets do that now.
+                ClearMemory(xNextTablePointer, GlobalSystemInfo.TotalDataLookupTableSize);
+                xPreviousTable->Next = xNextTablePointer;
+                xNextTablePointer->Previous = xPreviousTable;
+
+                if (!ScanDataLookupTable(xCurrentTableIdx, xNextTablePointer, aLength, out xResult))
+                {
+                    // Something seriously weird happened: we could create a new DataLookupTable (with new entries)
+                    // but couldn't allocate a new handle from it.
+                    DebugAndHalt("    Something seriously weird happened: we could create a new DataLookupTable (with new entries), but couldn't allocate a new handle from it.");
+                }
+                DebugHex("Returning handle", xResult);
+                DebugHex("For dataobject size", aLength);
+                return xResult;
+            }
+            finally
+            {
+                if (xInterruptsWereEnabled)
+                {
+                    CPU.EnableInterrupts();
+                }
+                else
+                {
+                    //Debug("    Not enabling interrupts, because they weren't enabled yet!");
+                }
+            }
+        }
+
+        private static bool ScanDataLookupTable(uint aTableIdx, DataLookupTable* aTable, uint aSize, out uint aHandle)
+        {
+            DataLookupEntry* xPreviousEntry = null;
+            for (int i = 0; i < DataLookupTable.EntriesPerTable; i++)
+            {
+                var xCurrentEntry = aTable->GetEntry(i);
+
+                //DebugHex("Item.Size", xCurrentEntry->Size);
+                //DebugHex("Item.Refcount", xCurrentEntry->Refcount);
+                if (xCurrentEntry->Size == 0)
+                {
+                    DebugHex("Found an entry at position ", (uint)i);
+                    // found an entry now. Let's set it
+                    if (aTable->Next != null)
+                    {
+                        // once a handle is used, the size should be set. But at this point, it somehow got unset again.
+                        // This should never occur.
+                        DebugHex("TableIdx", aTableIdx);
+                        DebugHex("Index", (uint)i);
+                        DebugAndHalt("Found an entry which has no size, but there is a followup DataLookupTable");
+                    }
+
+                    void* xDataBlock;
+                    //Debug("Now calculate datablock pointer");
+                    // now we found ourself a free handle
+                    if (i == 0)
+                    {
+                        //Debug("Using table end");
+                        // we don't have a previous handle yet, so we take the FirstByteAfterTable field of the DataLookupTable
+                        // note: we're explicitly initializing all blocks, as memory hasn't been cleared yet.
+                        var xTableAddr = (uint)aTable;
+                        //DebugHex("aTableAddr", xTableAddr);
+                        var xTotalTableSize = GlobalSystemInfo.TotalDataLookupTableSize;
+                        //DebugHex("TotalTableSize", xTotalTableSize);
+                        xDataBlock = (void*)(((uint)aTable) + GlobalSystemInfo.TotalDataLookupTableSize);
+                    }
+                    else
+                    {
+                        //Debug("Using previous entry");
+                        // We're not the very first handle being assigned, so calculate the start address using the previous block
+                        xDataBlock = (void*)((uint)xPreviousEntry->DataBlock + xPreviousEntry->Size);
+                    }
+                    DebugHex("Datablock", (uint)xDataBlock);
+
+                    // make sure the memory is empty
+                    ClearMemory(xDataBlock, aSize);
+                    //Debug("Cleared memory");
+                    xCurrentEntry->Size = aSize;
+                    xCurrentEntry->DataBlock = xDataBlock;
+                    xCurrentEntry->Refcount = 1;
+
+                    aHandle = (uint)xCurrentEntry;
+                    //DebugHex("Returning handle ", aHandle);
+                    if (aHandle == 0x0213D185)
+                    {
+                        Debug("Last known one");
+                    }
+                    return true;
+                }
+
+                // Refcount == UInt32.MaxValue, it means that the block has been reclaimed, and can be reused now.
+                if (xCurrentEntry->Refcount == UInt32.MaxValue)
+                {
+                    Debug("Found a reclaimed entry");
+                    // we can reuse this entry if its Size >= aLength
+                    if (xCurrentEntry->Size >= aSize)
+                    {
+                        Debug("Can be reused");
+                        // we can reuse this entry
+                        xCurrentEntry->Refcount = 1;
+                        aHandle = (uint)xCurrentEntry;
+                        DebugHex("Returning reused handle ", aHandle);
+                        return true;
+                    }
+                }
+                xPreviousEntry = xCurrentEntry;
+            }
+            aHandle = 0;
+            return false;
         }
     }
 }
-#endif

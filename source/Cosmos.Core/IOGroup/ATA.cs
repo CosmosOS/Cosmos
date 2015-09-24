@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core.IOGroup {
   public class ATA : IOGroup {
@@ -25,7 +26,14 @@ namespace Cosmos.Core.IOGroup {
 
     internal ATA(bool aSecondary)
     {
-      Console.WriteLine("Creating ATA IOGroup");
+      if (aSecondary)
+      {
+        Debugger.DoSend("Creating Secondary ATA IOGroup");
+      }
+      else
+      {
+        Debugger.DoSend("Creating Primary ATA IOGroup");
+      }
 
       var xBAR0 = GetBAR0(aSecondary);
       var xBAR1 = GetBAR1(aSecondary);
