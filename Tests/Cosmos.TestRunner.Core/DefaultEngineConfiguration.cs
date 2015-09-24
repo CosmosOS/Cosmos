@@ -25,11 +25,10 @@ namespace Cosmos.TestRunner.Core
             engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
             engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
             engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
-            engine.AddKernel(typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel).Assembly.Location);
-            engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);
-
+            
             // known bugs, therefor disabled for now:
             //engine.AddKernel(typeof(BoxingTests.Kernel).Assembly.Location);
+
             // end of known bugs
 
             // double check: this check is in the engine, but lets put it here as well
