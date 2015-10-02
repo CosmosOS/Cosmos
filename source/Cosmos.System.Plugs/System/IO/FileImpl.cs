@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Cosmos.Common.Extensions;
 using Cosmos.IL2CPU.Plugs;
+using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 
 namespace SentinelKernel.System.Plugs.System.IO
@@ -19,6 +20,7 @@ namespace SentinelKernel.System.Plugs.System.IO
 
         public static string ReadAllText(string aFile)
         {
+            FatHelpers.Debug("In FileImpl.ReadAllText");
             using (var xFS = new FileStream(aFile, FileMode.Open))
             {
                 var xBuff = new byte[(int)xFS.Length];
@@ -27,8 +29,10 @@ namespace SentinelKernel.System.Plugs.System.IO
                 {
                     throw new Exception("Couldn't read complete file!");
                 }
-
-                return xBuff.GetUtf8String(0, (uint)xBuff.Length);
+                FatHelpers.Debug("Bytes read");
+                var xResultStr = xBuff.GetUtf8String(0, (uint)xBuff.Length);
+                FatHelpers.Debug("ResultString retrieved");
+                return xResultStr;
             }
         }
 

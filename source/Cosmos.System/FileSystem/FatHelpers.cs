@@ -12,5 +12,10 @@ namespace Cosmos.System.FileSystem
         {
             mDebugger.Send("FAT Debug: " + message);
         }
+
+        public static void DevDebug(string message)
+        {
+            mDebugger.Send("FAT DevDebug: " + message);
+        }
     }
 }

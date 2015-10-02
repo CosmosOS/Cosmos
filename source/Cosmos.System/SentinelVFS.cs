@@ -135,7 +135,9 @@ namespace Cosmos.System
 
         protected Cosmos.System.FileSystem.FileSystem GetFileSystemFromPath(string aPath)
         {
+            FatHelpers.Debug("In SentinelVFS.GetFileSystemFromPath");
             string xPath = Path.GetPathRoot(aPath);
+            FatHelpers.Debug("PathRoot retrieved");
             for (int i = 0; i < mFileSystems.Count; i++)
             {
                 string xTest = mFileSystems[i].Key;
@@ -181,6 +183,8 @@ namespace Cosmos.System
             {
                 throw new ArgumentNullException("aFS");
             }
+            FatHelpers.Debug("In SentinelVFS.DoGetDirectory");
+            FatHelpers.Debug("Path = " + aPath);
             string[] xPathParts = VFSManager.SplitPath(aPath);
 
             if (xPathParts.Length == 1)
@@ -224,8 +228,11 @@ namespace Cosmos.System
 
         public override List<Base> GetDirectoryListing(string aPath)
         {
+            FatHelpers.Debug("In SentinelVFS.GetDirectoryListing");
             var xFS = GetFileSystemFromPath(aPath);
+            FatHelpers.Debug("Filesystem retrieved");
             var xDirectory = DoGetDirectory(aPath, xFS);
+            FatHelpers.Debug("Base directory retrieved.");
             return xFS.GetDirectoryListing(xDirectory);
         }
 

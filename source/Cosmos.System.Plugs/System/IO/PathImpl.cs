@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
+using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 
 namespace SentinelKernel.System.Plugs.System.IO
@@ -244,11 +245,17 @@ namespace SentinelKernel.System.Plugs.System.IO
             {
                 return null;
             }
+            FatHelpers.Debug("In PathImpl.GetPathRoot");
             aPath = NormalizePath(aPath, false);
-            var xResult = aPath.Substring(0, GetRootLength(aPath));
+            FatHelpers.Debug("Path normalized");
+            var xRootLength = GetRootLength(aPath);
+            FatHelpers.Debug("RootLength retrieved");
+            FatHelpers.Debug("Value: " + xRootLength);
+            var xResult = aPath.Substring(0, xRootLength);
             if (xResult[xResult.Length - 1] != Path.DirectorySeparatorChar)
             {
-                xResult = xResult + Path.DirectorySeparatorChar;
+                FatHelpers.Debug("Adding directory separator");
+                xResult = String.Concat(xResult, Path.DirectorySeparatorChar);
             }
             return xResult;
         }
@@ -260,7 +267,10 @@ namespace SentinelKernel.System.Plugs.System.IO
 
         public static int GetRootLength(string aPath)
         {
+            FatHelpers.Debug("In PathImpl.GetRootLength");
             CheckInvalidPathChars(aPath, false);
+            FatHelpers.Debug("Checked for invalid path characters");
+            FatHelpers.Debug("String length = " + aPath.Length);
             int i = 0;
             int length = aPath.Length;
             if (length >= 1 && IsDirectorySeparator(aPath[0]))
@@ -284,6 +294,7 @@ namespace SentinelKernel.System.Plugs.System.IO
             {
                 if (length >= 2 && aPath[1] == VFSManager.GetVolumeSeparatorChar())
                 {
+                    FatHelpers.Debug("Taking the '2' path");
                     i = 2;
                     if (length >= 3 && IsDirectorySeparator(aPath[2]))
                     {

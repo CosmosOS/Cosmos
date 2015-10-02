@@ -15,6 +15,7 @@ namespace Cosmos.Compiler.Tests.Bcl
 
         protected override void Run()
         {
+            System.StringTest.Execute();
             System.Collections.Generic.ListTest.Execute();
             System.Collections.Generic.QueueTest.Execute();
             System.DelegatesTest.Execute();

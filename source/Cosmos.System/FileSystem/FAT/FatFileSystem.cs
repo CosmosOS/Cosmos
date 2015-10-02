@@ -254,19 +254,19 @@ namespace Cosmos.System.FileSystem.FAT
             string xName = "";
             for (UInt32 i = 0; i < xData.Length; i = i + 32)
             {
-                FatHelpers.Debug("-------------------------------------------------");
+                FatHelpers.DevDebug("-------------------------------------------------");
                 byte xAttrib = xData[i + 11];
                 byte xStatus = xData[i];
 
-                FatHelpers.Debug("Attrib = " + xAttrib.ToString() + ", Status = " + xStatus);
+                FatHelpers.DevDebug("Attrib = " + xAttrib.ToString() + ", Status = " + xStatus);
                 if (xAttrib == DirectoryEntryAttributeConsts.LongName)
                 {
                     byte xType = xData[i + 12];
                     byte xOrd = xData[i];
-                    FatHelpers.Debug("Reading LFN with Seqnr " + xOrd.ToString() + ", Type = " + xType);
+                    FatHelpers.DevDebug("Reading LFN with Seqnr " + xOrd.ToString() + ", Type = " + xType);
                     if (xOrd == 0xE5)
                     {
-                        FatHelpers.Debug("Skipping deleted entry");
+                        FatHelpers.DevDebug("Skipping deleted entry");
                         continue;
                     }
                     if (xType == 0)
@@ -357,7 +357,7 @@ namespace Cosmos.System.FileSystem.FAT
                 if (xAttrib == DirectoryEntryAttributeConsts.LongName)
                 {
                     // skip adding, as it's a LongFileName entry, meaning the next normal entry is the item with the name.
-                    FatHelpers.Debug("Entry was an Long FileName entry. Current LongName = '" + xLongName + "'");
+                    FatHelpers.DevDebug("Entry was an Long FileName entry. Current LongName = '" + xLongName + "'");
                 }
                 else if (xTest == 0)
                 {
@@ -367,23 +367,23 @@ namespace Cosmos.System.FileSystem.FAT
                         continue;
                     }
                     xResult.Add(new FatFile(this, xName, xSize, xFirstCluster));
-                    FatHelpers.Debug("Returning file '" + xName + "'");
+                    FatHelpers.DevDebug("Returning file '" + xName + "'");
                 }
                 else if (xTest == DirectoryEntryAttributeConsts.Directory)
                 {
                     UInt32 xSize = xData.ToUInt32(i + 28);
                     var xFatDirectory = new FatDirectory(this, xName, xFirstCluster);
-                    FatHelpers.Debug("Returning directory '" + xFatDirectory.Name + "', FirstCluster = " + xFirstCluster);
+                    FatHelpers.DevDebug("Returning directory '" + xFatDirectory.Name + "', FirstCluster = " + xFirstCluster);
                     xResult.Add(xFatDirectory);
                 }
                 else if (xTest == DirectoryEntryAttributeConsts.VolumeID)
                 {
-                    FatHelpers.Debug("Directory entry is VolumeID");
+                    FatHelpers.DevDebug("Directory entry is VolumeID");
                     //
                 }
                 else
                 {
-                    FatHelpers.Debug("Not sure what to do!");
+                    FatHelpers.DevDebug("Not sure what to do!");
                 }
             }
 

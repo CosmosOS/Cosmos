@@ -25,21 +25,22 @@ namespace Cosmos.Kernel.Tests.Fat
         protected override void Run()
         {
             mDebugger.Send("Run");
-            var xRoot = Path.GetPathRoot(@"0:\test");
-            bool xTest = Directory.Exists("0:\\test");
-            Console.WriteLine("After test");
-            Assert.IsTrue(xTest, "Folder does not exist!");
+            //var xRoot = Path.GetPathRoot(@"0:\test");
+            //bool xTest = Directory.Exists("0:\\test");
+            //Console.WriteLine("After test");
+            //Assert.IsTrue(xTest, "Folder does not exist!");
 
-            Console.WriteLine("Folder exists!");
-            xTest = Directory.Exists("0:\\test\\DirInTest");
-            Assert.IsTrue(xTest, "Subfolder doesn't exist!");
+            //Console.WriteLine("Folder exists!");
+            //xTest = Directory.Exists("0:\\test\\DirInTest");
+            //Assert.IsTrue(xTest, "Subfolder doesn't exist!");
 
-            xTest = File.Exists(@"0:\KudzU.txt");
-            Assert.IsTrue(xTest, @"\Kudzu.txt not found!");
+            //var xTest = File.Exists(@"0:\Kudzu.txt");
+            //Assert.IsTrue(xTest, @"\Kudzu.txt not found!");
 
-            Console.WriteLine("Kudzu.txt found!");
-            Console.Write("File contents of Kudzu.txt: ");
-            Console.WriteLine(File.ReadAllText(@"0:\Kudzu.txt"));
+            mDebugger.Send("File contents of Kudzu.txt: ");
+            var xContents = File.ReadAllText(@"0:\Kudzu.txt");
+            mDebugger.Send("Contents retrieved");
+            mDebugger.Send(xContents);
             //                File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
             //                Console.WriteLine(File.ReadAllText(@"0:\Kudzu.txt"));
 

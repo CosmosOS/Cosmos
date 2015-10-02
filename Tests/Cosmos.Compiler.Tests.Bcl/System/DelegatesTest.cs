@@ -19,7 +19,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         {
             mCount += 2;
         }
-        
+
         public static void Execute()
         {
             TestDelegateWithoutArguments();
@@ -49,7 +49,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         {
             mCount += number;
         }
-        
+
         private static void TestDelegateWithArguments()
         {
             mCount = 0;

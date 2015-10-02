@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Common.Extensions {
   // This class duplicates BitConvertor. BitConvertor uses ulong though and currently does not
@@ -38,15 +39,21 @@ namespace Cosmos.Common.Extensions {
     static public string GetUtf8String(this byte[] n, UInt32 aStart, UInt32 aCharCount)
     {
       // TODO: This method handles ASCII only currently, no unicode.
+      Debugger.DoSend("GetUtf8String");
       var xChars = new char[aCharCount];
+      Debugger.DoSend("Array created");
+      Debugger.DoSend("Charcount: ");
+      Debugger.DoSendNumber(aCharCount);
       for (int i = 0; i < aCharCount; i++)
       {
         xChars[i] = (char)n[(aStart) + i];
         if (xChars[i] == 0)
         {
+          Debugger.DoSend("Returning string");
           return new string(xChars, 0, i);
         }
       }
+      Debugger.DoSend("Returning full string");
       return new string(xChars);
     }
 

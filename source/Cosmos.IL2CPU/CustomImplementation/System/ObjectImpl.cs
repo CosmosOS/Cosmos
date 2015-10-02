@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
@@ -26,6 +27,7 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
             //{
             //    return "--object--";
             //}
+            Debugger.DoSend("<Object.ToString not yet implemented!>");
             return "<Object.ToString not yet implemented!>";
 		}
 

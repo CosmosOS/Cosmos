@@ -143,7 +143,7 @@ namespace Cosmos.System.FileSystem.VFS
             {
                 throw new ArgumentNullException("aPath");
             }
-
+            FatHelpers.Debug("In VFSManager.TryGetFile");
             string xFileName = Path.GetFileName(aPath);
             string xDirectory = Path.GetDirectoryName(aPath);
             var xLastChar = xDirectory[xDirectory.Length - 1];
@@ -151,7 +151,7 @@ namespace Cosmos.System.FileSystem.VFS
             {
                 xDirectory = xDirectory + Path.DirectorySeparatorChar;
             }
-
+            FatHelpers.Debug("Now Try to get directory listing");
             var xList = GetDirectoryListing(xDirectory);
             for (int i = 0; i < xList.Count; i++)
             {
@@ -280,6 +280,7 @@ namespace Cosmos.System.FileSystem.VFS
         {
             try
             {
+                FatHelpers.Debug("In VFSManager.FileExists");
                 return (VFSManager.TryGetFile(aPath) != null);
             }
             catch (Exception E)
