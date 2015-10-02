@@ -38,3 +38,9 @@ indent_size = 2
 
 [IL/Stelem_Ref.cs]
 indent_size = 2
+
+[IL/Isinst.cs]
+indent_size = 4
+
+[IL/Castclass.cs]
+indent_size = 4

@@ -10,7 +10,7 @@ namespace Cosmos.System.FileSystem
         private static Debugger mDebugger = new Debugger("FAT", "Debug");
         public static void Debug(string message)
         {
-            //mDebugger.Send("FAT Debug: " + message);
+            mDebugger.Send("FAT Debug: " + message);
         }
     }
 }

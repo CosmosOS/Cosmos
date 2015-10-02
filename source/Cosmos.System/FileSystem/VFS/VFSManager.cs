@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.System.FileSystem.VFS
 {
@@ -196,6 +197,7 @@ namespace Cosmos.System.FileSystem.VFS
             {
                 throw new ArgumentNullException("aPath");
             }
+            FatHelpers.Debug("In VFSManager.GetDirectory");
 
             return mVFS.GetDirectory(aPath);
         }
@@ -282,8 +284,10 @@ namespace Cosmos.System.FileSystem.VFS
             }
             catch (Exception E)
             {
-                global::System.Console.Write("Exception occurred: ");
-                global::System.Console.WriteLine(E.Message);
+                // don't ever remove this method, even if it doesn't contain any code!
+                FatHelpers.Debug("Exception occurred in VFSManager.FileExists: ");
+                // don't ever remove this method, even if it doesn't contain any code!
+                FatHelpers.Debug(E.Message);
                 return false;
             }
         }
@@ -293,14 +297,15 @@ namespace Cosmos.System.FileSystem.VFS
             try
             {
                 FatHelpers.Debug("DirectoryExists. Path = '" + aPath + "'");
-                string xDir = string.Concat(aPath + VFSBase.DirectorySeparatorChar);
+                string xDir = string.Concat(aPath, VFSBase.DirectorySeparatorChar);
                 //xDir = Path.GetDirectoryName(xDir);
+                FatHelpers.Debug("Before VFSManager.GetDirectory");
                 return (VFSManager.GetDirectory(xDir) != null);
             }
             catch (Exception E)
             {
-                global::System.Console.Write("Exception occurred: ");
-                global::System.Console.WriteLine(E.Message);
+                FatHelpers.Debug("Exception occurred in VFSManager.DirectoryExists: ");
+                FatHelpers.Debug(E.Message);
                 return false;
             }
 
