@@ -66,6 +66,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           return 1;
         case Code.Add:
         case Code.Mul:
+        case Code.Mul_Ovf_Un:
         case Code.Div:
         case Code.Div_Un:
         case Code.Sub:
@@ -196,6 +197,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           return 1;
         case Code.Add:
         case Code.Mul:
+        case Code.Mul_Ovf_Un:
         case Code.Div:
         case Code.Div_Un:
         case Code.Sub:

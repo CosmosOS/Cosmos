@@ -53,6 +53,22 @@
       <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Users\Sentinel\SentinelCore\SentinelCore.csproj">
+      <Project>{c296973c-63d7-4a29-95b1-9fc6f36a83ee}</Project>
+      <Name>SentinelCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Users\Sentinel\SentinelHAL\SentinelHAL.csproj">
+      <Project>{abe135d1-acf8-4c25-a5df-a96f013242c5}</Project>
+      <Name>SentinelHAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Users\Sentinel\SentinelKernel\SentinelKernel.csproj">
+      <Project>{3b0f484c-0a26-4cc2-b44d-ddda3a3e9381}</Project>
+      <Name>SentinelKernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Users\Sentinel\SentinelSystem\SentinelSystem.csproj">
+      <Project>{93d6ff56-6e23-4e80-98f6-730ac533f631}</Project>
+      <Name>SentinelSystem</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BoxingTests\BoxingTests.csproj">
       <Project>{f8889473-5866-4913-86ac-8072a1a2558c}</Project>
       <Name>BoxingTests</Name>
@@ -68,6 +84,10 @@
     <ProjectReference Include="..\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTest.csproj">
       <Project>{3e28cfd9-25d4-4ebb-86e3-4a4a8a8936fe}</Project>
       <Name>Cosmos.Compiler.Tests.SingleEchoTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj">
+      <Project>{a0893493-d4f0-4b9f-9826-86319e143d86}</Project>
+      <Name>Cosmos.Kernel.Tests.Fat</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj">
       <Project>{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}</Project>

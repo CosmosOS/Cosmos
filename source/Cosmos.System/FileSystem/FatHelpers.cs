@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Cosmos.Debug.Kernel;
 
-namespace SentinelKernel.System.FileSystem
+namespace Cosmos.System.FileSystem
 {
     public static class FatHelpers
     {

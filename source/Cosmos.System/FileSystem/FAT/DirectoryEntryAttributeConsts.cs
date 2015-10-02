@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SentinelKernel.System.FileSystem.FAT
+namespace Cosmos.System.FileSystem.FAT
 {
     public static class DirectoryEntryAttributeConsts
     {

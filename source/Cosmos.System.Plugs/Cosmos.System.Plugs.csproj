@@ -73,7 +73,14 @@
   <ItemGroup>
     <Compile Include="System\CharImpl.cs" />
     <Compile Include="System\DictionaryImpl.cs" />
+    <Compile Include="System\IO\DirectoryImpl.cs" />
+    <Compile Include="System\IO\DirectoryInfoImpl.cs" />
+    <Compile Include="System\IO\DriveInfoImpl.cs" />
+    <Compile Include="System\IO\FileImpl.cs" />
+    <Compile Include="System\IO\FileInfoImpl.cs" />
     <Compile Include="System\IO\FileStreamImpl.cs" />
+    <Compile Include="System\IO\FileSystemInfoImpl.cs" />
+    <Compile Include="System\IO\PathImpl.cs" />
     <Compile Include="System\IO\StreamReaderImpl.cs" />
     <Compile Include="System\RandomImpl.cs" />
     <Compile Include="System\Text\DecoderFallbackImpl.cs" />
@@ -86,13 +93,6 @@
     <Compile Include="System\Threading\MonitorImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="System\TypeImpl.cs" />
-    <Compile Include="System\IO\DirectoryImpl.cs" />
-    <Compile Include="System\IO\DirectoryInfoImpl.cs" />
-    <Compile Include="System\IO\DriveInfoImpl.cs" />
-    <Compile Include="System\IO\FileImpl.cs" />
-    <Compile Include="System\IO\FileInfoImpl.cs" />
-    <Compile Include="System\IO\FileSystemInfoImpl.cs" />
-    <Compile Include="System\IO\PathImpl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">

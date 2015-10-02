@@ -28,5 +28,9 @@ namespace Cosmos.HAL.BlockDevice {
       get { return mBusPosition; }
     }
 
+    public override string ToString()
+    {
+      return "Ata (Abstract)";
+    }
   }
 }

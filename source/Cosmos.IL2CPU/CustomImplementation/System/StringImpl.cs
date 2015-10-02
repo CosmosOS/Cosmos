@@ -81,14 +81,10 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
                     len += values[i].Length;
                 }
             }
-            Console.Write("Concatting to ");
-            Console.Write(len.ToString());
-            Console.WriteLine(" characters.");
             return ConcatArray(values, len);
         }
         public static string Concat(params object[] args)
         {
-            Console.WriteLine("In Concat(object[])");
             string[] values = new string[args.Length];
             for (int i = 0; i < args.Length; i++)
             {
@@ -98,17 +94,14 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
                     var xStrArg = xArg as string;
                     if (xStrArg != null)
                     {
-                        Console.WriteLine("Providing casted item");
                         values[i] = xStrArg;
                     }
                     else
                     {
-                        Console.WriteLine("Providing converted item");
                         values[i] = xArg.ToString();
                     }
                 }
             }
-            Console.WriteLine("Before Concat(string[])");
             return Concat(values);
         }
         public static string ConcatArray(string[] values, int totalLength)

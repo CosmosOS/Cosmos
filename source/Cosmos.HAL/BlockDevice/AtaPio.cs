@@ -362,5 +362,9 @@ namespace Cosmos.HAL.BlockDevice
 			SendCmd(Cmd.CacheFlush);
 		}
 
+	    public override string ToString()
+	    {
+	        return "AtaPio";
+	    }
 	}
 }

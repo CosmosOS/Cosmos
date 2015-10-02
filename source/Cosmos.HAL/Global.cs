@@ -59,6 +59,7 @@ namespace Cosmos.HAL
             if (xATA.DriveType == BlockDevice.AtaPio.SpecLevel.ATA)
             {
                 BlockDevice.BlockDevice.Devices.Add(xATA);
+                Ata.AtaDebugger.Send("ATA device with speclevel ATA found.");
             }
             else
             {
@@ -86,7 +87,7 @@ namespace Cosmos.HAL
             }
 
             // TODO Change this to foreach when foreach is supported
-            Console.WriteLine("Number of MBR partitions found:  " + xMBR.Partitions.Count);
+            Ata.AtaDebugger.Send("Number of MBR partitions found:  " + xMBR.Partitions.Count);
             for (int i = 0; i < xMBR.Partitions.Count; i++)
             {
                 var xPart = xMBR.Partitions[i];
@@ -141,13 +142,14 @@ namespace Cosmos.HAL
       InitPciDevices();
       Global.Dbg.Send("Done initializing Cosmos.HAL.Global");
 
-            //Global.Dbg.Send("ATA Slave");
-            //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
+            Global.Dbg.Send("ATA Primary Master");
+            InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
 
             //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum?
             // They do show up in PCI space as well as the fixed space.
             // Or is it always here, and was our compiler stack corruption issue?
-            //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Master);
+            Global.Dbg.Send("ATA Secondary Master");
+            InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Master);
             //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
         }
 
