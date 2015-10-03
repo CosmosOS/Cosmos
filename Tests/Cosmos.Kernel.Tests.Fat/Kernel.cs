@@ -25,17 +25,17 @@ namespace Cosmos.Kernel.Tests.Fat
         protected override void Run()
         {
             mDebugger.Send("Run");
-            //var xRoot = Path.GetPathRoot(@"0:\test");
-            //bool xTest = Directory.Exists("0:\\test");
-            //Console.WriteLine("After test");
-            //Assert.IsTrue(xTest, "Folder does not exist!");
+            var xRoot = Path.GetPathRoot(@"0:\test");
+            var xTest = Directory.Exists("0:\\test");
+            Console.WriteLine("After test");
+            Assert.IsTrue(xTest, "Folder does not exist!");
 
-            //Console.WriteLine("Folder exists!");
-            //xTest = Directory.Exists("0:\\test\\DirInTest");
-            //Assert.IsTrue(xTest, "Subfolder doesn't exist!");
+            Console.WriteLine("Folder exists!");
+            xTest = Directory.Exists("0:\\test\\DirInTest");
+            Assert.IsTrue(xTest, "Subfolder doesn't exist!");
 
-            //var xTest = File.Exists(@"0:\Kudzu.txt");
-            //Assert.IsTrue(xTest, @"\Kudzu.txt not found!");
+            xTest = File.Exists(@"0:\Kudzu.txt");
+            Assert.IsTrue(xTest, @"\Kudzu.txt not found!");
 
             mDebugger.Send("File contents of Kudzu.txt: ");
             var xContents = File.ReadAllText(@"0:\Kudzu.txt");
@@ -55,7 +55,7 @@ namespace Cosmos.Kernel.Tests.Fat
 
             //Console.WriteLine(@"File contents of Test\DirInTest\Readme.txt: ");
             //Console.WriteLine(File.ReadAllText(@"0:\Test\DirInTest\Readme.txt"));
-
+            TestController.Completed();
         }
     }
 }

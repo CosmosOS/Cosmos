@@ -56,9 +56,14 @@ namespace Cosmos.System
                 {
                     FatHelpers.Debug("BlockDevice returns partition, but type check doesn't work!");
                 }
+                else
+                {
+                    FatHelpers.Debug("Partition found");
+                }
                 xItem = xBlockDevice as Partition;
                 if (xItem != null)
                 {
+                    FatHelpers.Debug("Adding partition to list");
                     mPartitions.Add(xItem);
                     break;
                 }

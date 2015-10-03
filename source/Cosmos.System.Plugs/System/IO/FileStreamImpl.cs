@@ -51,9 +51,13 @@ namespace SentinelKernel.System.Plugs.System.IO
             innerStream.SetLength(aLength);
         }
 
-        public static void Dispose(IO::FileStream aThis, bool disposing)
+        public static void Dispose(IO::FileStream aThis, bool disposing,
+            [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
         {
-            throw new NotImplementedException();
+            if (disposing)
+            {
+                innerStream.Dispose();
+            }
         }
 
         //static void Init(IO::FileStream aThis, string path, IO::FileMode mode, IO::FileAccess access, int rights, bool useRights, IO::FileShare share, int bufferSize
