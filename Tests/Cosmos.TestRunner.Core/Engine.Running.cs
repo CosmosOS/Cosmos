@@ -16,7 +16,6 @@ namespace Cosmos.TestRunner.Core
             {
                 throw new ArgumentNullException("debugConnector");
             }
-
             debugConnector.OnDebugMsg = s => OutputHandler.LogDebugMessage(s);
             debugConnector.CmdChannel = ChannelPacketReceived;
             debugConnector.CmdStarted = () =>

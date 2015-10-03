@@ -10,14 +10,15 @@ namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
-        private void RunIsoInBochs(string iso)
+        private void RunIsoInBochs(string iso, string harddisk)
         {
             var xBochsConfig = Path.Combine(mBaseWorkingDirectory, "Kernel.bochsrc");
             var xParams = new NameValueCollection();
 
             xParams.Add("ISOFile", iso);
-            xParams.Add(BuildProperties.VisualStudioDebugPortString, "Pipe: Cosmos\\Serial");
-            xParams.Add(BuildProperties.EnableBochsDebugString, RunWithGDB.ToString());
+            xParams.Add(BuildPropertyNames.VisualStudioDebugPortString, "Pipe: Cosmos\\Serial");
+            xParams.Add(BuildPropertyNames.EnableBochsDebugString, RunWithGDB.ToString());
+            BuildProperties.
 
             var xDebugConnector = new DebugConnectorPipeServer(DebugConnectorPipeServer.DefaultCosmosPipeName);
             InitializeDebugConnector(xDebugConnector);

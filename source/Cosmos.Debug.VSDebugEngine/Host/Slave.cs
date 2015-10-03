@@ -15,7 +15,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
 
     public Slave(NameValueCollection aParams, bool aUseGDB)
       : base(aParams, aUseGDB) {
-      var xPort = mParams[BuildProperties.SlavePortString];
+      var xPort = mParams[BuildPropertyNames.SlavePortString];
       if (xPort == "None") {
         throw new Exception("No slave port is set.");
       }

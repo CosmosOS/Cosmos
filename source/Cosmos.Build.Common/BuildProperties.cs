@@ -16,7 +16,7 @@ namespace Cosmos.Build.Common {
         // for C# a field which is readonly keyword would have both true but a const field would have only IsLiteral equal to true
         if (xField.IsLiteral && !xField.IsInitOnly && xField.FieldType == typeof(string)) {
           string xName = (string)xField.GetValue(null);
-          if (xName != BuildProperties.ProfileString) {
+          if (xName != BuildPropertyNames.ProfileString) {
             PropNames.Add(xName);
           }
         }
@@ -28,7 +28,8 @@ namespace Cosmos.Build.Common {
     /// </summary>
     public override string[] ProjectIndependentProperties
     {
-        get { return new string[] { BinFormatString }; }
+        get { return new string[] {
+                                      BuildPropertyNames.BinFormatString }; }
     }
 
     /// <summary>
@@ -69,7 +70,7 @@ namespace Cosmos.Build.Common {
             {
                 xValue = GetProperty(aName + "_" + xName);
             }
-            
+
             if (!string.IsNullOrWhiteSpace(xValue))
             {
                 SetProperty(xName, xValue);
@@ -119,84 +120,79 @@ namespace Cosmos.Build.Common {
     }
 
     // Profile
-    public const string ProfileString = "Profile";
-    public string Profile {
-      get { return GetProperty(ProfileString, "VMware"); }
-      set { SetProperty(ProfileString, value); }
+      public string Profile {
+      get { return GetProperty(BuildPropertyNames.ProfileString, "VMware"); }
+      set { SetProperty(BuildPropertyNames.ProfileString, value); }
     }
-    public const string NameString = "Name";
-    public string Name {
-      get { return GetProperty(NameString, ""); }
-      set { SetProperty(NameString, value); }
+
+      public string Name {
+      get { return GetProperty(BuildPropertyNames.NameString, ""); }
+      set { SetProperty(BuildPropertyNames.NameString, value); }
     }
-    public const string DescriptionString = "Description";
-    public string Description {
-      get { return GetProperty(DescriptionString, ""); }
-      set { SetProperty(DescriptionString, value); }
+
+      public string Description {
+      get { return GetProperty(BuildPropertyNames.DescriptionString, ""); }
+      set { SetProperty(BuildPropertyNames.DescriptionString, value); }
     }
 
     // Deployment
-    public const string DeploymentString = "Deployment";
-    public DeploymentType Deployment {
-      get { return GetProperty(DeploymentString, DeploymentType.ISO); }
-      set { SetProperty(DeploymentString, value); }
+      public DeploymentType Deployment {
+      get { return GetProperty(BuildPropertyNames.DeploymentString, DeploymentType.ISO); }
+      set { SetProperty(BuildPropertyNames.DeploymentString, value); }
     }
 
     // Launch
-    public const string LaunchString = "Launch";
-    public LaunchType Launch {
-      get { return GetProperty(LaunchString, LaunchType.VMware); }
-      set { SetProperty(LaunchString, value); }
+      public LaunchType Launch {
+      get { return GetProperty(BuildPropertyNames.LaunchString, LaunchType.VMware); }
+      set { SetProperty(BuildPropertyNames.LaunchString, value); }
     }
-    public const string ShowLaunchConsoleString = "ShowLaunchConsole";
-    public bool ShowLaunchConsole {
-      get { return GetProperty(ShowLaunchConsoleString, false); }
-      set { SetProperty(ShowLaunchConsoleString, value); }
+
+      public bool ShowLaunchConsole {
+      get { return GetProperty(BuildPropertyNames.ShowLaunchConsoleString, false); }
+      set { SetProperty(BuildPropertyNames.ShowLaunchConsoleString, value); }
     }
 
     // Debug
-    public const string DebugEnabledString = "DebugEnabled";
-    public bool DebugEnabled {
-      get { return GetProperty(DebugEnabledString, true); }
-      set { SetProperty(DebugEnabledString, value); }
+      public bool DebugEnabled {
+      get { return GetProperty(BuildPropertyNames.DebugEnabledString, true); }
+      set { SetProperty(BuildPropertyNames.DebugEnabledString, value); }
     }
-    public const string StackCorruptionDetectionEnabledString = "StackCorruptionDetectionEnabled";
-    public bool StackCorruptionDetectionEnabled
+
+      public bool StackCorruptionDetectionEnabled
     {
-      get { return GetProperty(StackCorruptionDetectionEnabledString, true); }
-      set { SetProperty(StackCorruptionDetectionEnabledString, value); }
+      get { return GetProperty(BuildPropertyNames.StackCorruptionDetectionEnabledString, true); }
+      set { SetProperty(BuildPropertyNames.StackCorruptionDetectionEnabledString, value); }
     }
-    public const string DebugModeString = "DebugMode";
-    public DebugMode DebugMode {
-      get { return GetProperty(DebugModeString, DebugMode.Source); }
-      set { SetProperty(DebugModeString, value); }
+
+      public DebugMode DebugMode {
+      get { return GetProperty(BuildPropertyNames.DebugModeString, DebugMode.Source); }
+      set { SetProperty(BuildPropertyNames.DebugModeString, value); }
     }
-    public const string IgnoreDebugStubAttributeString = "IgnoreDebugStubAttribute";
-    public bool IgnoreDebugStubAttribute {
-      get { return GetProperty(IgnoreDebugStubAttributeString, false); }
-      set { SetProperty(IgnoreDebugStubAttributeString, value); }
+
+      public bool IgnoreDebugStubAttribute {
+      get { return GetProperty(BuildPropertyNames.IgnoreDebugStubAttributeString, false); }
+      set { SetProperty(BuildPropertyNames.IgnoreDebugStubAttributeString, value); }
     }
-    public const string CosmosDebugPortString = "CosmosDebugPort";
-    public string CosmosDebugPort {
-      get { return GetProperty(CosmosDebugPortString, "Serial: COM1"); }
-      set { SetProperty(CosmosDebugPortString, value); }
+
+      public string CosmosDebugPort {
+      get { return GetProperty(BuildPropertyNames.CosmosDebugPortString, "Serial: COM1"); }
+      set { SetProperty(BuildPropertyNames.CosmosDebugPortString, value); }
     }
-    public const string VisualStudioDebugPortString = "VisualStudioDebugPort";
-    public string VisualStudioDebugPort {
-      get { return GetProperty(VisualStudioDebugPortString, "Serial: COM1"); }
-      set { SetProperty(VisualStudioDebugPortString, value); }
+
+      public string VisualStudioDebugPort {
+      get { return GetProperty(BuildPropertyNames.VisualStudioDebugPortString, "Serial: COM1"); }
+      set { SetProperty(BuildPropertyNames.VisualStudioDebugPortString, value); }
     }
 
     // PXE
-    public const string PxeInterfaceString = "PxeInterface";
-    public string PxeInterface {
-      get { return GetProperty(PxeInterfaceString, "192.168.42.1"); }
-      set { SetProperty(PxeInterfaceString, value); }
+      public string PxeInterface {
+      get { return GetProperty(BuildPropertyNames.PxeInterfaceString, "192.168.42.1"); }
+      set { SetProperty(BuildPropertyNames.PxeInterfaceString, value); }
     }
-    public const string SlavePortString = "SlavePort";
-    public string SlavePort {
-      get { return GetProperty(SlavePortString, "None"); }
-      set { SetProperty(SlavePortString, value); }
+
+      public string SlavePort {
+      get { return GetProperty(BuildPropertyNames.SlavePortString, "None"); }
+      set { SetProperty(BuildPropertyNames.SlavePortString, value); }
     }
 
     // Bochs
@@ -212,64 +208,54 @@ namespace Cosmos.Build.Common {
     }
 
     // VMware
-    public const string VMwareEditionString = "VMwareEdition";
-    public VMwareEdition VMwareEdition {
-      get { return GetProperty(VMwareEditionString, VMwareEdition.Player); }
-      set { SetProperty(VMwareEditionString, value); }
+      public VMwareEdition VMwareEdition {
+      get { return GetProperty(BuildPropertyNames.VMwareEditionString, VMwareEdition.Player); }
+      set { SetProperty(BuildPropertyNames.VMwareEditionString, value); }
     }
 
-    public const string OutputPathString = "OutputPath";
-    public String OutputPath {
-      get { return GetProperty(OutputPathString, @"bin\debug"); }
-      set { SetProperty(OutputPathString, value); }
-    }
-    public const string FrameworkString = "Framework";
-    public Framework Framework {
-      get { return GetProperty(FrameworkString, Common.Framework.MicrosoftNET); }
-      set { SetProperty(FrameworkString, value); }
-    }
-    public const string UseInternalAssemblerString = "UseInternalAssembler";
-    public Boolean UseInternalAssembler {
-      get { return GetProperty(UseInternalAssemblerString, false); }
-      set { SetProperty(UseInternalAssemblerString, value); }
+      public String OutputPath {
+      get { return GetProperty(BuildPropertyNames.OutputPathString, @"bin\debug"); }
+      set { SetProperty(BuildPropertyNames.OutputPathString, value); }
     }
 
-    public const string TraceAssembliesString = "TraceAssemblies";
-    public TraceAssemblies TraceAssemblies {
-      get { return GetProperty(TraceAssembliesString, TraceAssemblies.User); }
-      set { SetProperty(TraceAssembliesString, value); }
+      public Framework Framework {
+      get { return GetProperty(BuildPropertyNames.FrameworkString, Common.Framework.MicrosoftNET); }
+      set { SetProperty(BuildPropertyNames.FrameworkString, value); }
     }
 
-    public const string EnableGDBString = "EnableGDB";
-    public Boolean EnableGDB {
-      get { return GetProperty(EnableGDBString, false); }
-      set { SetProperty(EnableGDBString, value); }
-    }
-    public const string StartCosmosGDBString = "StartCosmosGDB";
-    public bool StartCosmosGDB {
-      get { return GetProperty(StartCosmosGDBString, false); }
-      set { SetProperty(StartCosmosGDBString, value); }
+      public Boolean UseInternalAssembler {
+      get { return GetProperty(BuildPropertyNames.UseInternalAssemblerString, false); }
+      set { SetProperty(BuildPropertyNames.UseInternalAssemblerString, value); }
     }
 
-    public const string EnableBochsDebugString = "EnableBochsDebug";
-    public Boolean EnableBochsDebug
+      public TraceAssemblies TraceAssemblies {
+      get { return GetProperty(BuildPropertyNames.TraceAssembliesString, TraceAssemblies.User); }
+      set { SetProperty(BuildPropertyNames.TraceAssembliesString, value); }
+    }
+
+      public Boolean EnableGDB {
+      get { return GetProperty(BuildPropertyNames.EnableGDBString, false); }
+      set { SetProperty(BuildPropertyNames.EnableGDBString, value); }
+    }
+
+      public bool StartCosmosGDB {
+      get { return GetProperty(BuildPropertyNames.StartCosmosGDBString, false); }
+      set { SetProperty(BuildPropertyNames.StartCosmosGDBString, value); }
+    }
+
+      public Boolean EnableBochsDebug
     {
-        get { return GetProperty(EnableBochsDebugString, false); }
-        set { SetProperty(EnableBochsDebugString, value); }
+        get { return GetProperty(BuildPropertyNames.EnableBochsDebugString, false); }
+        set { SetProperty(BuildPropertyNames.EnableBochsDebugString, value); }
     }
-
-      /// <summary>
-      /// Name of the configuration property in the project file.
-      /// </summary>
-      public const string BinFormatString = "BinFormat";
 
       /// <summary>
       /// Gets or sets binary format which is used for producing kernel image.
       /// </summary>
       public BinFormat BinFormat
       {
-          get { return GetProperty(BinFormatString, BinFormat.Bin); }
-          set { SetProperty(BinFormatString, value); }
+          get { return GetProperty(BuildPropertyNames.BinFormatString, BinFormat.Bin); }
+          set { SetProperty(BuildPropertyNames.BinFormatString, value); }
       }
   }
 }

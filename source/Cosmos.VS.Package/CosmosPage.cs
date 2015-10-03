@@ -607,7 +607,7 @@ namespace Cosmos.VS.Package {
 
       // Reset cache only on first one
       // Get selected profile
-      mProps.SetProperty(BuildProperties.ProfileString, ProjectConfigs[0].GetConfigurationProperty(BuildProperties.ProfileString, true));
+      mProps.SetProperty(BuildPropertyNames.ProfileString, ProjectConfigs[0].GetConfigurationProperty(BuildPropertyNames.ProfileString, true));
 
       LoadProjectProps();
 

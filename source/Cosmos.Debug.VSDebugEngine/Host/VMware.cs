@@ -31,7 +31,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
 
       CheckIfHyperVServiceIsRunning();
 
-      string xFlavor = aParams[BuildProperties.VMwareEditionString].ToUpper();
+      string xFlavor = aParams[BuildPropertyNames.VMwareEditionString].ToUpper();
       mEdition = VMwareEdition.Player;
       if (xFlavor == "WORKSTATION") {
         mEdition = VMwareEdition.Workstation;
@@ -208,6 +208,6 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
           throw;
         }
       }
-    } 
+    }
   }
 }

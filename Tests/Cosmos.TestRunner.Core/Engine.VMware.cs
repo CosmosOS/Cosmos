@@ -15,8 +15,8 @@ namespace Cosmos.TestRunner.Core
             var xParams = new NameValueCollection();
 
             xParams.Add("ISOFile", iso);
-            xParams.Add(BuildProperties.VisualStudioDebugPortString, "Pipe: Cosmos\\Serial");
-            xParams.Add(BuildProperties.VMwareEditionString, "Workstation");
+            xParams.Add(BuildPropertyNames.VisualStudioDebugPortString, "Pipe: Cosmos\\Serial");
+            xParams.Add(BuildPropertyNames.VMwareEditionString, "Workstation");
 
             var xDebugConnector = new DebugConnectorPipeServer(DebugConnectorPipeServer.DefaultCosmosPipeName);
             InitializeDebugConnector(xDebugConnector);

@@ -41,7 +41,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
       InitializeKeyValues();
       GenerateConfiguration(configurationFile.FullName);
       _bochsConfigurationFile = configurationFile;
-      bool parseSucceeded = bool.TryParse(aParams[BuildProperties.EnableBochsDebugString], out _useDebugVersion);
+      bool parseSucceeded = bool.TryParse(aParams[BuildPropertyNames.EnableBochsDebugString], out _useDebugVersion);
       return;
     }
 
