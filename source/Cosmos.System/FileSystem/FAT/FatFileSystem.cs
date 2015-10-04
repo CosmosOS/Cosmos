@@ -208,39 +208,20 @@ namespace Cosmos.System.FileSystem.FAT
 
         public List<Base> GetRoot()
         {
-            byte[] xData;
-            if (FatType == FatTypeEnum.Fat32)
+            var xRootDirectory = GetRootDirectory(null);
+            using (var xStream = new FatDirectoryStream((FatDirectory) xRootDirectory))
             {
-                xData = NewClusterArray();
-                ReadCluster(RootCluster, xData);
+                return ReadDirectoryContents(null, xStream);
             }
-            else
-            {
-                xData = mDevice.NewBlockArray(RootSectorCount);
-                mDevice.ReadBlock(RootSector, RootSectorCount, xData);
-                // todo: is this correct??
-            }
-            return ReadDirectoryContents(xData, null);
         }
 
-        public List<Base> GetDirectoryContents(FatDirectory directory)
+        private List<Base> GetDirectoryContents(FatDirectory directory, Stream directoryContents)
         {
             if (directory == null)
             {
                 throw new ArgumentNullException("directory");
             }
 
-            byte[] xData;
-            if (FatType == FatTypeEnum.Fat32)
-            {
-                xData = NewClusterArray();
-                ReadCluster(directory.FirstClusterNr, xData);
-            }
-            else
-            {
-                xData = mDevice.NewBlockArray(1);
-                mDevice.ReadBlock(directory.FirstClusterNr, RootSectorCount, xData);
-            }
             // todo: what about larger directories?
 
             string xDirectoryPath;
@@ -252,26 +233,34 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 xDirectoryPath = directory.BaseDirectory + "\\" + directory.Name;
             }
-            return ReadDirectoryContents(xData, xDirectoryPath);
+            return ReadDirectoryContents(xDirectoryPath, directoryContents);
         }
 
-        private List<Base> ReadDirectoryContents(byte[] xData, string directoryPath)
+        private List<Base> ReadDirectoryContents(string directoryPath, Stream directoryContents)
         {
+            FatHelpers.Debug("--ReadDirectoryContents");
+            Debugger.DoSendNumber((uint) directoryContents.Length);
+
             var xResult = new List<Base>();
             //TODO: Change xLongName to StringBuilder
             string xLongName = "";
             string xName = "";
-            for (UInt32 i = 0; i < xData.Length; i = i + 32)
+            var xBuff = new byte[32];
+            while(directoryContents.Position < directoryContents.Length)
             {
+                if (directoryContents.Read(xBuff, 0, 32) != 32)
+                {
+                    throw new Exception("Unable to read 32 bytes from stream!");
+                }
                 FatHelpers.DevDebug("-------------------------------------------------");
-                byte xAttrib = xData[i + 11];
-                byte xStatus = xData[i];
+                byte xAttrib = xBuff[11];
+                byte xStatus = xBuff[0];
 
                 FatHelpers.DevDebug("Attrib = " + xAttrib.ToString() + ", Status = " + xStatus);
                 if (xAttrib == DirectoryEntryAttributeConsts.LongName)
                 {
-                    byte xType = xData[i + 12];
-                    byte xOrd = xData[i];
+                    byte xType = xBuff[12];
+                    byte xOrd = xBuff[0];
                     FatHelpers.DevDebug("Reading LFN with Seqnr " + xOrd.ToString() + ", Type = " + xType);
                     if (xOrd == 0xE5)
                     {
@@ -287,17 +276,17 @@ namespace Cosmos.System.FileSystem.FAT
                         //TODO: Check LDIR_Ord for ordering and throw exception
                         // if entries are found out of order.
                         // Also save buffer and only copy name if a end Ord marker is found.
-                        string xLongPart = xData.GetUtf16String(i + 1, 5);
+                        string xLongPart = xBuff.GetUtf16String(0 + 1, 5);
                         // We have to check the length because 0xFFFF is a valid Unicode codepoint.
                         // So we only want to stop if the 0xFFFF is AFTER a 0x0000. We can determin
                         // this by also looking at the length. Since we short circuit the or, the length
                         // is rarely evaluated.
-                        if (xData.ToUInt16(i + 14) != 0xFFFF || xLongPart.Length == 5)
+                        if (xBuff.ToUInt16(0 + 14) != 0xFFFF || xLongPart.Length == 5)
                         {
-                            xLongPart = xLongPart + xData.GetUtf16String(i + 14, 6);
-                            if (xData.ToUInt16(i + 28) != 0xFFFF || xLongPart.Length == 11)
+                            xLongPart = xLongPart + xBuff.GetUtf16String(0 + 14, 6);
+                            if (xBuff.ToUInt16(0 + 28) != 0xFFFF || xLongPart.Length == 11)
                             {
-                                xLongPart = xLongPart + xData.GetUtf16String(i + 28, 2);
+                                xLongPart = xLongPart + xBuff.GetUtf16String(0 + 28, 2);
                             }
                         }
                         xLongName = xLongPart + xLongName;
@@ -350,7 +339,7 @@ namespace Cosmos.System.FileSystem.FAT
                         }
                         else
                         {
-                            string xEntry = xData.GetAsciiString(i, 11);
+                            string xEntry = xBuff.GetAsciiString(0, 11);
                             xName = xEntry.Substring(0, 8).TrimEnd();
                             string xExt = xEntry.Substring(8, 3).TrimEnd();
                             if (xExt.Length > 0)
@@ -360,7 +349,7 @@ namespace Cosmos.System.FileSystem.FAT
                         }
                     }
                 }
-                UInt32 xFirstCluster = (UInt32)(xData.ToUInt16(i + 20) << 16 | xData.ToUInt16(i + 26));
+                UInt32 xFirstCluster = (UInt32)(xBuff.ToUInt16(0 + 20) << 16 | xBuff.ToUInt16(0 + 26));
 
                 var xTest = xAttrib & (DirectoryEntryAttributeConsts.Directory | DirectoryEntryAttributeConsts.VolumeID);
                 if (xAttrib == DirectoryEntryAttributeConsts.LongName)
@@ -370,7 +359,7 @@ namespace Cosmos.System.FileSystem.FAT
                 }
                 else if (xTest == 0)
                 {
-                    UInt32 xSize = xData.ToUInt32(i + 28);
+                    UInt32 xSize = xBuff.ToUInt32(0 + 28);
                     if (xSize == 0 && xName.Length == 0)
                     {
                         continue;
@@ -380,8 +369,8 @@ namespace Cosmos.System.FileSystem.FAT
                 }
                 else if (xTest == DirectoryEntryAttributeConsts.Directory)
                 {
-                    UInt32 xSize = xData.ToUInt32(i + 28);
-                    var xFatDirectory = new FatDirectory(this, xName, xFirstCluster, directoryPath);
+                    UInt32 xSize = xBuff.ToUInt32(0 + 28);
+                    var xFatDirectory = new FatDirectory(this, xName, xFirstCluster, directoryPath, xSize);
                     FatHelpers.Debug("Returning directory '" + xFatDirectory.Name + "', BaseDirectory = '" + directoryPath + "', FirstCluster = " + xFirstCluster);
                     xResult.Add(xFatDirectory);
                 }
@@ -415,23 +404,39 @@ namespace Cosmos.System.FileSystem.FAT
         {
             if (baseDirectory == null)
             {
-                // get root folder
-                return GetRoot();
+                baseDirectory = GetRootDirectory(null);
             }
-            else
+
+            using (var xStream = new FatDirectoryStream((FatDirectory)baseDirectory))
             {
-                return GetDirectoryContents((FatDirectory)baseDirectory);
+                return GetDirectoryContents((FatDirectory)baseDirectory, xStream);
             }
         }
 
         public override Directory GetRootDirectory(string name)
         {
-            return new FatDirectory(this, name, RootCluster, null);
+            FatHelpers.Debug("---- GetRoot");
+            Debugger.DoSendNumber(RootEntryCount);
+            ulong xSize;
+            if (FatType == FatTypeEnum.Fat32)
+            {
+                xSize = BytesPerCluster;
+            }
+            else
+            {
+                throw new Exception("Root directory size calculation not implemented!");
+            }
+            return new FatDirectory(this, name, RootCluster, null, xSize);
         }
 
         public override Stream GetFileStream(File fileInfo)
         {
-            return new FatStream((FatFile)fileInfo);
+            return new FatFileStream((FatFile)fileInfo);
+        }
+
+        public void SetDirectoryLength(FatDirectory file, long value)
+        {
+            throw new NotImplementedException("Changing directory length not yet implemented!");
         }
 
         public void SetFileLength(FatFile file, long value)
@@ -444,7 +449,36 @@ namespace Cosmos.System.FileSystem.FAT
 
 
 
+
             throw new NotImplementedException();
+        }
+
+        //TODO: Seperate out the file mechanics from the Listing class
+        // so a file can exist without a listing instance
+        public List<UInt64> GetFatTable(ulong firstClusterNum)
+        {
+            var xResult = new List<UInt64>(128);
+            UInt64 xClusterNum = firstClusterNum;
+
+            byte[] xSector = new byte[BytesPerSector];
+            UInt32? xSectorNum = null;
+
+            UInt32 xNextSectorNum;
+            UInt32 xNextSectorOffset;
+            do
+            {
+                GetFatTableSector(xClusterNum, out xNextSectorNum, out xNextSectorOffset);
+                if (xSectorNum.HasValue == false || xSectorNum != xNextSectorNum)
+                {
+                    ReadFatTableSector(xNextSectorNum, xSector);
+                    xSectorNum = xNextSectorNum;
+                }
+
+                xResult.Add(xClusterNum);
+                xClusterNum = GetFatEntry(xSector, xClusterNum, xNextSectorOffset);
+            } while (!FatEntryIsEOF(xClusterNum));
+
+            return xResult;
         }
     }
 }

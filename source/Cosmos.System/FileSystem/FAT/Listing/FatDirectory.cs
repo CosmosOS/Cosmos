@@ -6,12 +6,15 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 {
     public class FatDirectory : System.FileSystem.Listing.Directory
     {
-        public FatDirectory(FileSystem aFileSystem, string aName, uint firstCluster, string baseDirectory)
+        public new readonly FatFileSystem FileSystem;
+        public readonly UInt64 FirstClusterNum;
+
+        public FatDirectory(FatFileSystem aFileSystem, string aName, ulong firstCluster, string baseDirectory, ulong size)
             : base(aFileSystem, aName, baseDirectory)
         {
-            FirstClusterNr = firstCluster;
+            FileSystem = aFileSystem;
+            FirstClusterNum = firstCluster;
+            Size = size;
         }
-
-        public uint FirstClusterNr;
     }
 }

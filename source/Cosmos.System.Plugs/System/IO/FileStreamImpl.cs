@@ -60,6 +60,18 @@ namespace SentinelKernel.System.Plugs.System.IO
             }
         }
 
+        public static long get_Position(IO::FileStream aThis,
+                                        [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        {
+            return innerStream.Position;
+        }
+
+        public static void set_Position(IO::FileStream aThis,
+                                        [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream, long value)
+        {
+            innerStream.Position = value;
+        }
+
         //static void Init(IO::FileStream aThis, string path, IO::FileMode mode, IO::FileAccess access, int rights, bool useRights, IO::FileShare share, int bufferSize
         //  , IO::FileOptions options, Microsoft.Win32.Win32Native.SECURITY_ATTRIBUTES secAttrs, string msgPath, bool bFromProxy) { }
 

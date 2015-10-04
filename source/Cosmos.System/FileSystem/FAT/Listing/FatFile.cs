@@ -18,34 +18,5 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             FileSystem = aFileSystem;
             FirstClusterNum = aFirstCluster;
         }
-
-        //TODO: Seperate out the file mechanics from the Listing class
-        // so a file can exist without a listing instance
-        public List<UInt64> GetFatTable()
-        {
-            var xResult = new List<UInt64>((int)(Size / (FileSystem.SectorsPerCluster * FileSystem.BytesPerSector)));
-            UInt64 xClusterNum = FirstClusterNum;
-
-            byte[] xSector = new byte[FileSystem.BytesPerSector];
-            UInt32? xSectorNum = null;
-
-            UInt32 xNextSectorNum;
-            UInt32 xNextSectorOffset;
-            do
-            {
-                FileSystem.GetFatTableSector(xClusterNum, out xNextSectorNum, out xNextSectorOffset);
-                if (xSectorNum.HasValue == false || xSectorNum != xNextSectorNum)
-                {
-                    FileSystem.ReadFatTableSector(xNextSectorNum, xSector);
-                    xSectorNum = xNextSectorNum;
-                }
-
-                xResult.Add(xClusterNum);
-                xClusterNum = FileSystem.GetFatEntry(xSector, xClusterNum, xNextSectorOffset);
-            } while (!FileSystem.FatEntryIsEOF(xClusterNum));
-
-            return xResult;
-        }
-
     }
 }

@@ -31,17 +31,17 @@ namespace Cosmos.Kernel.Tests.Fat
                 //Assert.IsTrue(Path.GetDirectoryName(@"0:\test") == @"0:\", @"Path.GetDirectoryName(@'0:\test') == @'0:\'");
                 //Assert.IsTrue(Path.GetFileName(@"0:\test") == @"test", @"Path.GetFileName(@'0:\test') == @'test'");
 
-                //bool xTest;
+                bool xTest;
 
                 ////Assert.IsTrue(xTest, "Subfolder doesn't exist!");
                 //mDebugger.Send("File exist check:");
                 //xTest = File.Exists(@"0:\Kudzu.txt");
                 //Assert.IsTrue(xTest, @"\Kudzu.txt not found!");
 
-                //mDebugger.Send("Directory exist check:");
-                //xTest = Directory.Exists(@"0:\test");
-                //Console.WriteLine("After test");
-                //Assert.IsTrue(xTest, "Folder does not exist!");
+                mDebugger.Send("Directory exist check:");
+                xTest = Directory.Exists(@"0:\test");
+                Console.WriteLine("After test");
+                Assert.IsTrue(xTest, "Folder does not exist!");
 
                 //mDebugger.Send("File contents of Kudzu.txt: ");
                 //xContents = File.ReadAllText(@"0:\Kudzu.txt");
@@ -49,14 +49,14 @@ namespace Cosmos.Kernel.Tests.Fat
                 //mDebugger.Send(xContents);
                 //Assert.IsTrue(xContents == "Hello Cosmos", "Contents of Kudzu.txt was read incorrectly!");
 
-                mDebugger.Send("Write to file now");
-                File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
-                mDebugger.Send("Text written");
-                xContents = File.ReadAllText(@"0:\Kudzu.txt");
+                //mDebugger.Send("Write to file now");
+                //File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
+                //mDebugger.Send("Text written");
+                //xContents = File.ReadAllText(@"0:\Kudzu.txt");
 
-                mDebugger.Send("Contents retrieved after writing");
-                mDebugger.Send(xContents);
-                Assert.IsTrue(xContents == "Test FAT write.", "Contents of Kudzu.txt was written incorrectly!");
+                //mDebugger.Send("Contents retrieved after writing");
+                //mDebugger.Send(xContents);
+                //Assert.IsTrue(xContents == "Test FAT write.", "Contents of Kudzu.txt was written incorrectly!");
 
                 TestController.Completed();
             }

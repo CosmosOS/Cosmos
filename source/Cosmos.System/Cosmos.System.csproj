@@ -74,8 +74,9 @@
     <Compile Include="Console.cs" />
     <Compile Include="FileSystem\FatHelpers.cs" />
     <Compile Include="FileSystem\FAT\DirectoryEntryAttributeConsts.cs" />
+    <Compile Include="FileSystem\FAT\FatDirectoryStream.cs" />
     <Compile Include="FileSystem\FAT\FatFileSystem.cs" />
-    <Compile Include="FileSystem\FAT\FatStream.cs" />
+    <Compile Include="FileSystem\FAT\FatFileStream.cs" />
     <Compile Include="FileSystem\FAT\Listing\FatDirectory.cs" />
     <Compile Include="FileSystem\FAT\Listing\FatFile.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
