@@ -17,6 +17,12 @@ namespace Cosmos.System.FileSystem
         }
 
         //[Conditional("EXCLUDE")]
+        public static void DebugNumber(uint value)
+        {
+            mDebugger.SendNumber(value);
+        }
+
+        //[Conditional("EXCLUDE")]
         public static void DevDebug(string message)
         {
             mDebugger.Send("FAT DevDebug: " + message);

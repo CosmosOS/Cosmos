@@ -165,8 +165,6 @@ namespace Cosmos.System.FileSystem.VFS
                     FatHelpers.Debug("--- Returning file");
                     FatHelpers.Debug("Name");
                     FatHelpers.Debug(xFile.Name);
-                    FatHelpers.Debug("Directory");
-                    FatHelpers.Debug(xFile.BaseDirectory);
                     return xFile;
                 }
             }
@@ -194,7 +192,7 @@ namespace Cosmos.System.FileSystem.VFS
             }
             FatHelpers.Debug("Now Try to get directory listing");
             var xList = GetDirectoryListing(xDirectory);
-            Debugger.DoSendNumber((uint) xList.Count);
+            FatHelpers.DebugNumber((uint) xList.Count);
             for (int i = 0; i < xList.Count; i++)
             {
                 var xEntry = xList[i];
@@ -344,10 +342,6 @@ namespace Cosmos.System.FileSystem.VFS
                 FatHelpers.Debug("In VFSManager.FileExists");
 
                 var xFile = VFSManager.TryGetFile(aPath);
-                FatHelpers.Debug("File.Name:");
-                FatHelpers.Debug(xFile.Name);
-                FatHelpers.Debug("File.BaseDirectory");
-                FatHelpers.Debug(xFile.BaseDirectory);
                 return (xFile != null);
             }
             catch (Exception E)
@@ -377,8 +371,6 @@ namespace Cosmos.System.FileSystem.VFS
                 }
                 FatHelpers.Debug("Directory.Name:");
                 FatHelpers.Debug(xDirectory.Name);
-                FatHelpers.Debug("Directory.BaseDirectory");
-                FatHelpers.Debug(xDirectory.BaseDirectory);
                 return (xDirectory != null);
             }
             catch (Exception E)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using IO = System.IO;
 using System.Linq;
 using System.Text;
@@ -58,6 +59,18 @@ namespace SentinelKernel.System.Plugs.System.IO
             {
                 innerStream.Dispose();
             }
+        }
+
+        public static long Seek(IO::FileStream aThis,
+                                [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream, long offset, SeekOrigin origin)
+        {
+            return innerStream.Seek(offset, origin);
+        }
+
+        public static void Flush(IO::FileStream aThis,
+           [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        {
+            innerStream.Flush();
         }
 
         public static long get_Position(IO::FileStream aThis,

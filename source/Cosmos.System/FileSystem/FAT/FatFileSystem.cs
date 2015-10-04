@@ -209,10 +209,7 @@ namespace Cosmos.System.FileSystem.FAT
         public List<Base> GetRoot()
         {
             var xRootDirectory = GetRootDirectory(null);
-            using (var xStream = new FatDirectoryStream((FatDirectory) xRootDirectory))
-            {
-                return ReadDirectoryContents(null, xStream);
-            }
+            return GetDirectoryListing(xRootDirectory);
         }
 
         private List<Base> GetDirectoryContents(FatDirectory directory, Stream directoryContents)
@@ -222,36 +219,43 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentNullException("directory");
             }
 
-            // todo: what about larger directories?
-
-            string xDirectoryPath;
-            if (directory.BaseDirectory == null)
+            FatHelpers.Debug("--GetDirectoryContents");
+            if (directoryContents == null)
             {
-                xDirectoryPath = directory.Name;
+                FatHelpers.Debug("No Stream specified!");
             }
             else
             {
-                xDirectoryPath = directory.BaseDirectory + "\\" + directory.Name;
+                FatHelpers.Debug("Stream specified.");
             }
-            return ReadDirectoryContents(xDirectoryPath, directoryContents);
-        }
-
-        private List<Base> ReadDirectoryContents(string directoryPath, Stream directoryContents)
-        {
-            FatHelpers.Debug("--ReadDirectoryContents");
-            Debugger.DoSendNumber((uint) directoryContents.Length);
 
             var xResult = new List<Base>();
             //TODO: Change xLongName to StringBuilder
             string xLongName = "";
             string xName = "";
             var xBuff = new byte[32];
-            while(directoryContents.Position < directoryContents.Length)
+            FatHelpers.Debug("Stream.Position");
+            FatHelpers.DebugNumber((uint) directoryContents.Position);
+            FatHelpers.Debug("Stream.Length");
+            FatHelpers.DebugNumber((uint) directoryContents.Length);
+
+            if (directoryContents.Position < directoryContents.Length)
+            {
+                FatHelpers.Debug("Data to read!");
+            }
+            else
+            {
+                FatHelpers.Debug("No data to read!");
+            }
+
+            while (directoryContents.Position < directoryContents.Length)
             {
                 if (directoryContents.Read(xBuff, 0, 32) != 32)
                 {
+                    FatHelpers.Debug("Not enough data read!");
                     throw new Exception("Unable to read 32 bytes from stream!");
                 }
+                FatHelpers.Debug("No data read");
                 FatHelpers.DevDebug("-------------------------------------------------");
                 byte xAttrib = xBuff[11];
                 byte xStatus = xBuff[0];
@@ -364,14 +368,14 @@ namespace Cosmos.System.FileSystem.FAT
                     {
                         continue;
                     }
-                    xResult.Add(new FatFile(this, xName, xSize, xFirstCluster, directoryPath));
-                    FatHelpers.Debug("Returning file '" + xName + "', BaseDirectory = '" + directoryPath + "'");
+                    xResult.Add(new FatFile(this, xName, xSize, xFirstCluster, directory));
+                    FatHelpers.Debug("Returning file '" + xName + "'");
                 }
                 else if (xTest == DirectoryEntryAttributeConsts.Directory)
                 {
                     UInt32 xSize = xBuff.ToUInt32(0 + 28);
-                    var xFatDirectory = new FatDirectory(this, xName, xFirstCluster, directoryPath, xSize);
-                    FatHelpers.Debug("Returning directory '" + xFatDirectory.Name + "', BaseDirectory = '" + directoryPath + "', FirstCluster = " + xFirstCluster);
+                    var xFatDirectory = new FatDirectory(this, xName, xFirstCluster, directory, xSize);
+                    FatHelpers.Debug("Returning directory '" + xFatDirectory.Name + "', FirstCluster = " + xFirstCluster);
                     xResult.Add(xFatDirectory);
                 }
                 else if (xTest == DirectoryEntryAttributeConsts.VolumeID)
@@ -409,14 +413,12 @@ namespace Cosmos.System.FileSystem.FAT
 
             using (var xStream = new FatDirectoryStream((FatDirectory)baseDirectory))
             {
-                return GetDirectoryContents((FatDirectory)baseDirectory, xStream);
+                return GetDirectoryContents((FatDirectory) baseDirectory, xStream);
             }
         }
 
         public override Directory GetRootDirectory(string name)
         {
-            FatHelpers.Debug("---- GetRoot");
-            Debugger.DoSendNumber(RootEntryCount);
             ulong xSize;
             if (FatType == FatTypeEnum.Fat32)
             {
@@ -439,22 +441,176 @@ namespace Cosmos.System.FileSystem.FAT
             throw new NotImplementedException("Changing directory length not yet implemented!");
         }
 
-        public void SetFileLength(FatFile file, long value)
+        public void SetFileLength(Base file, long value)
         {
+            if (file == null)
+            {
+                throw new ArgumentNullException(nameof(file));
+            }
+
             FatHelpers.Debug("File.Name:");
             FatHelpers.Debug(file.Name);
-            FatHelpers.Debug("File.BaseDirectory:");
-            FatHelpers.Debug(file.BaseDirectory);
-            Debugger.DoSend("FatFileSystem.SetFileLength not implemented!");
 
+            var xIsFile = file is FatFile;
+            var xIsDirectory = !xIsFile;
 
+            using (var xDirectoryContents = new FatDirectoryStream((FatDirectory) file.BaseDirectory))
+            {
+                FatHelpers.Debug("--SetFileLength");
+                FatHelpers.DebugNumber((uint)xDirectoryContents.Length);
 
+                //TODO: Change xLongName to StringBuilder
+                string xLongName = "";
+                string xName = "";
+                var xBuff = new byte[32];
+                while (xDirectoryContents.Position < xDirectoryContents.Length)
+                {
+                    if (xDirectoryContents.Read(xBuff, 0, 32) != 32)
+                    {
+                        throw new Exception("Unable to read 32 bytes from stream!");
+                    }
+                    FatHelpers.DevDebug("-------------------------------------------------");
+                    byte xAttrib = xBuff[11];
+                    byte xStatus = xBuff[0];
 
-            throw new NotImplementedException();
+                    FatHelpers.DevDebug("Attrib = " + xAttrib.ToString() + ", Status = " + xStatus);
+                    if (xAttrib == DirectoryEntryAttributeConsts.LongName)
+                    {
+                        byte xType = xBuff[12];
+                        byte xOrd = xBuff[0];
+                        FatHelpers.DevDebug("Reading LFN with Seqnr " + xOrd.ToString() + ", Type = " + xType);
+                        if (xOrd == 0xE5)
+                        {
+                            FatHelpers.DevDebug("Skipping deleted entry");
+                            continue;
+                        }
+                        if (xType == 0)
+                        {
+                            if ((xOrd & 0x40) > 0)
+                            {
+                                xLongName = "";
+                            }
+                            //TODO: Check LDIR_Ord for ordering and throw exception
+                            // if entries are found out of order.
+                            // Also save buffer and only copy name if a end Ord marker is found.
+                            string xLongPart = xBuff.GetUtf16String(0 + 1, 5);
+                            // We have to check the length because 0xFFFF is a valid Unicode codepoint.
+                            // So we only want to stop if the 0xFFFF is AFTER a 0x0000. We can determin
+                            // this by also looking at the length. Since we short circuit the or, the length
+                            // is rarely evaluated.
+                            if (xBuff.ToUInt16(0 + 14) != 0xFFFF || xLongPart.Length == 5)
+                            {
+                                xLongPart = xLongPart + xBuff.GetUtf16String(0 + 14, 6);
+                                if (xBuff.ToUInt16(0 + 28) != 0xFFFF || xLongPart.Length == 11)
+                                {
+                                    xLongPart = xLongPart + xBuff.GetUtf16String(0 + 28, 2);
+                                }
+                            }
+                            xLongName = xLongPart + xLongName;
+                            xLongPart = null;
+                            //TODO: LDIR_Chksum
+                        }
+                    }
+                    else
+                    {
+                        xName = xLongName;
+                        if (xStatus == 0x00)
+                        {
+                            // Empty slot, and no more entries after this
+                            break;
+                        }
+                        else if (xStatus == 0x05)
+                        {
+                            // Japanese characters - We dont handle these
+                        }
+                        else if (xStatus == 0xE5)
+                        {
+                            // Empty slot, skip it
+                        }
+                        else if (xStatus >= 0x20)
+                        {
+                            if (xLongName.Length > 0)
+                            {
+                                // Leading and trailing spaces are to be ignored according to spec.
+                                // Many programs (including Windows) pad trailing spaces although it
+                                // it is not required for long names.
+                                // As per spec, ignore trailing periods
+                                xName = xLongName.Trim();
+
+                                //If there are trailing periods
+                                int nameIndex = xName.Length - 1;
+                                if (xName[nameIndex] == '.')
+                                {
+                                    //Search backwards till we find the first non-period character
+                                    for (; nameIndex > 0; nameIndex--)
+                                    {
+                                        if (xName[nameIndex] != '.')
+                                        {
+                                            break;
+                                        }
+                                    }
+                                    //Substring to remove the periods
+                                    xName = xName.Substring(0, nameIndex + 1);
+                                }
+                                xLongName = "";
+                            }
+                            else
+                            {
+                                string xEntry = xBuff.GetAsciiString(0, 11);
+                                xName = xEntry.Substring(0, 8).TrimEnd();
+                                string xExt = xEntry.Substring(8, 3).TrimEnd();
+                                if (xExt.Length > 0)
+                                {
+                                    xName = xName + "." + xExt;
+                                }
+                            }
+                        }
+                    }
+                    UInt32 xFirstCluster = (UInt32)(xBuff.ToUInt16(0 + 20) << 16 | xBuff.ToUInt16(0 + 26));
+
+                    var xTest = xAttrib & (DirectoryEntryAttributeConsts.Directory | DirectoryEntryAttributeConsts.VolumeID);
+                    if (xAttrib == DirectoryEntryAttributeConsts.LongName)
+                    {
+                        // skip adding, as it's a LongFileName entry, meaning the next normal entry is the item with the name.
+                        FatHelpers.Debug("Entry was an Long FileName entry. Current LongName = '" + xLongName + "'");
+                    }
+                    else if (xTest == 0)
+                    {
+                        if (xIsFile && String.Equals(file.Name, xName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            // found, now update size and write back
+                            xBuff.SetUInt32(28, (uint) value);
+                            xDirectoryContents.Position -= 32;
+                            xDirectoryContents.Write(xBuff, 0, 32);
+                            FatHelpers.Debug("--- File size changed!");
+                            return;
+                        }
+                    }
+                    else if (xTest == DirectoryEntryAttributeConsts.Directory)
+                    {
+                        if (xIsDirectory && String.Equals(file.Name, xName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            xBuff.SetUInt32(28, (uint)value);
+                            xDirectoryContents.Position -= 32;
+                            xDirectoryContents.Write(xBuff, 0, 32);
+                            FatHelpers.Debug("--- Directory size changed!");
+                            return;
+                        }
+                    }
+                    else if (xTest == DirectoryEntryAttributeConsts.VolumeID)
+                    {
+                        FatHelpers.DevDebug("Directory entry is VolumeID");
+                        //
+                    }
+                    else
+                    {
+                        FatHelpers.DevDebug("Not sure what to do!");
+                    }
+                }
+            }
+            throw new Exception("Unable to find the file entry!");
         }
 
-        //TODO: Seperate out the file mechanics from the Listing class
-        // so a file can exist without a listing instance
         public List<UInt64> GetFatTable(ulong firstClusterNum)
         {
             var xResult = new List<UInt64>(128);

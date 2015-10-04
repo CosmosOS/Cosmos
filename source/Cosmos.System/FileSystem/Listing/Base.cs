@@ -9,9 +9,9 @@ namespace Cosmos.System.FileSystem.Listing
         public readonly FileSystem FileSystem;
         public readonly string Name;
 
-        public readonly string BaseDirectory;
+        public readonly Directory BaseDirectory;
 
-        protected Base(FileSystem aFileSystem, string aName, string baseDirectory)
+        protected Base(FileSystem aFileSystem, string aName, Directory baseDirectory)
         {
             FileSystem = aFileSystem;
             Name = aName;

@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="Console.cs" />
     <Compile Include="FileSystem\FatHelpers.cs" />
+    <Compile Include="FileSystem\FAT\BaseFatStream.cs" />
     <Compile Include="FileSystem\FAT\DirectoryEntryAttributeConsts.cs" />
     <Compile Include="FileSystem\FAT\FatDirectoryStream.cs" />
     <Compile Include="FileSystem\FAT\FatFileSystem.cs" />

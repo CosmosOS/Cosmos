@@ -25,6 +25,13 @@ namespace Cosmos.Common.Extensions {
       return (UInt32)(n[aPos + 3] << 24 | n[aPos + 2] << 16 | n[aPos + 1] << 8 | n[aPos]);
     }
 
+    public static void SetUInt32(this byte[] n, UInt64 aPos, UInt32 value) {
+      n[aPos + 0] = (byte) value;
+      n[aPos + 1] = (byte) (value >> 8);
+      n[aPos + 2] = (byte) (value >> 16);
+      n[aPos + 3] = (byte) (value >> 24);
+    }
+
     static public string GetAsciiString(this byte[] n, UInt32 aStart, UInt32 aCharCount) {
       var xChars = new char[aCharCount];
       for (int i = 0; i < aCharCount; i++) {
@@ -36,24 +43,18 @@ namespace Cosmos.Common.Extensions {
       return new string(xChars);
     }
 
-    static public string GetUtf8String(this byte[] n, UInt32 aStart, UInt32 aCharCount)
+    static public string GetUtf8String(this byte[] n, UInt32 aStart, uint aCharCount)
     {
       // TODO: This method handles ASCII only currently, no unicode.
-      Debugger.DoSend("GetUtf8String");
       var xChars = new char[aCharCount];
-      Debugger.DoSend("Array created");
-      Debugger.DoSend("Charcount: ");
-      Debugger.DoSendNumber(aCharCount);
       for (int i = 0; i < aCharCount; i++)
       {
         xChars[i] = (char)n[(aStart) + i];
         if (xChars[i] == 0)
         {
-          Debugger.DoSend("Returning string");
           return new string(xChars, 0, i);
         }
       }
-      Debugger.DoSend("Returning full string");
       return new string(xChars);
     }
 
