@@ -12,8 +12,8 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
         // Size is UInt32 because FAT doesn't support bigger.
         // Dont change to UInt64
-        public FatFile(FatFileSystem aFileSystem, string aName, UInt32 aSize, UInt64 aFirstCluster)
-            : base(aFileSystem, aName, aSize)
+        public FatFile(FatFileSystem aFileSystem, string aName, UInt32 aSize, UInt64 aFirstCluster, string baseDirectory)
+            : base(aFileSystem, aName, aSize, baseDirectory)
         {
             FileSystem = aFileSystem;
             FirstClusterNum = aFirstCluster;

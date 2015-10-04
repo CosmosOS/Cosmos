@@ -10,10 +10,10 @@ namespace Cosmos.System.FileSystem
     {
         private static Debugger mDebugger = new Debugger("FAT", "Debug");
 
-        [Conditional("EXCLUDE")]
+        //[Conditional("EXCLUDE")]
         public static void Debug(string message)
         {
-            //mDebugger.Send("FAT Debug: " + message);
+            mDebugger.Send("FAT Debug: " + message);
         }
 
         [Conditional("EXCLUDE")]

@@ -16,6 +16,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
   public partial class Bochs
   {
     private NameValueCollection defaultConfigs = new NameValueCollection();
+    private readonly string mHarddiskFile;
 
     private void InitializeKeyValues()
     {
@@ -84,32 +85,31 @@ namespace Cosmos.Debug.VSDebugEngine.Host
       string[] xParts = xPort.Split(new char[] {' '});
 
       defaultConfigs.Set("com1", defaultConfigs.Get("com1").Replace("%PIPESERVERNAME%", xParts[1].ToLower()));
-      var xHarddiskFile = Path.Combine(CosmosPaths.Build, @"VMWare\Workstation\Filesystem.vmdk");
       defaultConfigs.Set("ata0-master", defaultConfigs.Get("ata0-master").Replace("%CDROMBOOTPATH%", mParams["ISOFile"]));
-      defaultConfigs.Set("ata1-master", defaultConfigs.Get("ata1-master").Replace("%HARDDISKPATH%", xHarddiskFile));
+      defaultConfigs.Set("ata1-master", defaultConfigs.Get("ata1-master").Replace("%HARDDISKPATH%", mHarddiskFile));
     }
 
     private void GenerateConfiguration(string filePath)
     {
-      FileStream configFileHandler = File.Create(filePath);
-      for (int i = 0; i < defaultConfigs.AllKeys.Length; i++)
+      using (FileStream configFileHandler = File.Create(filePath))
       {
-        string value = defaultConfigs.Get(i);
-        string key = defaultConfigs.GetKey(i);
-        if (value.Length < 1)
+        for (int i = 0; i < defaultConfigs.AllKeys.Length; i++)
         {
-          byte[] lineData = Encoding.ASCII.GetBytes(key + Environment.NewLine);
-          configFileHandler.Write(lineData, 0, lineData.Length);
-        }
-        else
-        {
-          string configItem = key + ":" + value;
-          byte[] lineData = Encoding.ASCII.GetBytes(configItem + Environment.NewLine);
-          configFileHandler.Write(lineData, 0, lineData.Length);
+          string value = defaultConfigs.Get(i);
+          string key = defaultConfigs.GetKey(i);
+          if (value.Length < 1)
+          {
+            byte[] lineData = Encoding.ASCII.GetBytes(key + Environment.NewLine);
+            configFileHandler.Write(lineData, 0, lineData.Length);
+          }
+          else
+          {
+            string configItem = key + ":" + value;
+            byte[] lineData = Encoding.ASCII.GetBytes(configItem + Environment.NewLine);
+            configFileHandler.Write(lineData, 0, lineData.Length);
+          }
         }
       }
-      configFileHandler.Flush();
-      configFileHandler.Close();
     }
   }
 }

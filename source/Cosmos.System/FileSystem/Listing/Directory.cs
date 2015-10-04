@@ -6,8 +6,8 @@ namespace Cosmos.System.FileSystem.Listing
 {
     public class Directory : Base
     {
-        public Directory(FileSystem aFileSystem, string aName)
-            : base(aFileSystem, aName)
+        public Directory(FileSystem aFileSystem, string aName, string baseDirectory)
+            : base(aFileSystem, aName, baseDirectory)
         {
         }
     }

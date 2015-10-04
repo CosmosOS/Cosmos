@@ -15,7 +15,7 @@ namespace Cosmos.Kernel.Tests.Fat
 
         protected override void BeforeRun()
         {
-            Console.WriteLine("Cosmos booted successfully.");
+            Console.WriteLine("Cosmos booted successfully, now start testing");
             myVFS = new Sys.SentinelVFS();
             VFSManager.RegisterVFS(myVFS);
         }
@@ -24,38 +24,48 @@ namespace Cosmos.Kernel.Tests.Fat
 
         protected override void Run()
         {
-            mDebugger.Send("Run");
-            var xRoot = Path.GetPathRoot(@"0:\test");
-            var xTest = Directory.Exists("0:\\test");
-            Console.WriteLine("After test");
-            Assert.IsTrue(xTest, "Folder does not exist!");
+            try
+            {
+                mDebugger.Send("Run");
+                string xContents;
+                //Assert.IsTrue(Path.GetDirectoryName(@"0:\test") == @"0:\", @"Path.GetDirectoryName(@'0:\test') == @'0:\'");
+                //Assert.IsTrue(Path.GetFileName(@"0:\test") == @"test", @"Path.GetFileName(@'0:\test') == @'test'");
 
-            Console.WriteLine("Folder exists!");
-            xTest = Directory.Exists("0:\\test\\DirInTest");
-            Assert.IsTrue(xTest, "Subfolder doesn't exist!");
+                //bool xTest;
 
-            xTest = File.Exists(@"0:\Kudzu.txt");
-            Assert.IsTrue(xTest, @"\Kudzu.txt not found!");
+                ////Assert.IsTrue(xTest, "Subfolder doesn't exist!");
+                //mDebugger.Send("File exist check:");
+                //xTest = File.Exists(@"0:\Kudzu.txt");
+                //Assert.IsTrue(xTest, @"\Kudzu.txt not found!");
 
-            mDebugger.Send("File contents of Kudzu.txt: ");
-            var xContents = File.ReadAllText(@"0:\Kudzu.txt");
-            mDebugger.Send("Contents retrieved");
-            mDebugger.Send(xContents);
-            //                File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
-            //                Console.WriteLine(File.ReadAllText(@"0:\Kudzu.txt"));
+                //mDebugger.Send("Directory exist check:");
+                //xTest = Directory.Exists(@"0:\test");
+                //Console.WriteLine("After test");
+                //Assert.IsTrue(xTest, "Folder does not exist!");
 
-            //xTest = File.Exists(@"0:\Test\DirInTest\Readme.txt");
-            //if (!xTest)
-            //{
-            //    Console.WriteLine(@"\Test\DirInTest\Readme.txt not found!");
-            //    return;
-            //}
+                //mDebugger.Send("File contents of Kudzu.txt: ");
+                //xContents = File.ReadAllText(@"0:\Kudzu.txt");
+                //mDebugger.Send("Contents retrieved");
+                //mDebugger.Send(xContents);
+                //Assert.IsTrue(xContents == "Hello Cosmos", "Contents of Kudzu.txt was read incorrectly!");
 
-            //Console.WriteLine(@"Test\DirInTest\Readme.txt found!");
+                mDebugger.Send("Write to file now");
+                File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
+                mDebugger.Send("Text written");
+                xContents = File.ReadAllText(@"0:\Kudzu.txt");
 
-            //Console.WriteLine(@"File contents of Test\DirInTest\Readme.txt: ");
-            //Console.WriteLine(File.ReadAllText(@"0:\Test\DirInTest\Readme.txt"));
-            TestController.Completed();
+                mDebugger.Send("Contents retrieved after writing");
+                mDebugger.Send(xContents);
+                Assert.IsTrue(xContents == "Test FAT write.", "Contents of Kudzu.txt was written incorrectly!");
+
+                TestController.Completed();
+            }
+            catch (Exception E)
+            {
+                mDebugger.Send("Exception occurred");
+                mDebugger.Send(E.Message);
+                TestController.Failed();
+            }
         }
     }
 }

@@ -9,10 +9,13 @@ namespace Cosmos.System.FileSystem.Listing
         public readonly FileSystem FileSystem;
         public readonly string Name;
 
-        protected Base(FileSystem aFileSystem, string aName)
+        public readonly string BaseDirectory;
+
+        protected Base(FileSystem aFileSystem, string aName, string baseDirectory)
         {
             FileSystem = aFileSystem;
             Name = aName;
+            BaseDirectory = baseDirectory;
         }
 
         // Size might be updated in an ancestor destructor or on demand,
@@ -21,6 +24,10 @@ namespace Cosmos.System.FileSystem.Listing
         public UInt64 Size
         {
             get { return mSize; }
+            set
+            {
+                mSize = value;
+            }
         }
     }
 }

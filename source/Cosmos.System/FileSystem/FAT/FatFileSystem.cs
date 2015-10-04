@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmos.Common.Extensions;
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT.Listing;
 using Cosmos.System.FileSystem.Listing;
@@ -219,7 +220,7 @@ namespace Cosmos.System.FileSystem.FAT
                 mDevice.ReadBlock(RootSector, RootSectorCount, xData);
                 // todo: is this correct??
             }
-            return ReadDirectoryContents(xData);
+            return ReadDirectoryContents(xData, null);
         }
 
         public List<Base> GetDirectoryContents(FatDirectory directory)
@@ -242,11 +243,19 @@ namespace Cosmos.System.FileSystem.FAT
             }
             // todo: what about larger directories?
 
-
-            return ReadDirectoryContents(xData);
+            string xDirectoryPath;
+            if (directory.BaseDirectory == null)
+            {
+                xDirectoryPath = directory.Name;
+            }
+            else
+            {
+                xDirectoryPath = directory.BaseDirectory + "\\" + directory.Name;
+            }
+            return ReadDirectoryContents(xData, xDirectoryPath);
         }
 
-        private List<Base> ReadDirectoryContents(byte[] xData)
+        private List<Base> ReadDirectoryContents(byte[] xData, string directoryPath)
         {
             var xResult = new List<Base>();
             //TODO: Change xLongName to StringBuilder
@@ -357,7 +366,7 @@ namespace Cosmos.System.FileSystem.FAT
                 if (xAttrib == DirectoryEntryAttributeConsts.LongName)
                 {
                     // skip adding, as it's a LongFileName entry, meaning the next normal entry is the item with the name.
-                    FatHelpers.DevDebug("Entry was an Long FileName entry. Current LongName = '" + xLongName + "'");
+                    FatHelpers.Debug("Entry was an Long FileName entry. Current LongName = '" + xLongName + "'");
                 }
                 else if (xTest == 0)
                 {
@@ -366,14 +375,14 @@ namespace Cosmos.System.FileSystem.FAT
                     {
                         continue;
                     }
-                    xResult.Add(new FatFile(this, xName, xSize, xFirstCluster));
-                    FatHelpers.DevDebug("Returning file '" + xName + "'");
+                    xResult.Add(new FatFile(this, xName, xSize, xFirstCluster, directoryPath));
+                    FatHelpers.Debug("Returning file '" + xName + "', BaseDirectory = '" + directoryPath + "'");
                 }
                 else if (xTest == DirectoryEntryAttributeConsts.Directory)
                 {
                     UInt32 xSize = xData.ToUInt32(i + 28);
-                    var xFatDirectory = new FatDirectory(this, xName, xFirstCluster);
-                    FatHelpers.DevDebug("Returning directory '" + xFatDirectory.Name + "', FirstCluster = " + xFirstCluster);
+                    var xFatDirectory = new FatDirectory(this, xName, xFirstCluster, directoryPath);
+                    FatHelpers.Debug("Returning directory '" + xFatDirectory.Name + "', BaseDirectory = '" + directoryPath + "', FirstCluster = " + xFirstCluster);
                     xResult.Add(xFatDirectory);
                 }
                 else if (xTest == DirectoryEntryAttributeConsts.VolumeID)
@@ -417,12 +426,25 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override Directory GetRootDirectory(string name)
         {
-            return new FatDirectory(this, name, RootCluster);
+            return new FatDirectory(this, name, RootCluster, null);
         }
 
         public override Stream GetFileStream(File fileInfo)
         {
             return new FatStream((FatFile)fileInfo);
+        }
+
+        public void SetFileLength(FatFile file, long value)
+        {
+            FatHelpers.Debug("File.Name:");
+            FatHelpers.Debug(file.Name);
+            FatHelpers.Debug("File.BaseDirectory:");
+            FatHelpers.Debug(file.BaseDirectory);
+            Debugger.DoSend("FatFileSystem.SetFileLength not implemented!");
+
+
+
+            throw new NotImplementedException();
         }
     }
 }

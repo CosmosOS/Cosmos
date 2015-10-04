@@ -42,15 +42,15 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
         //String concatenation plugs
         public static string Concat(string str0, string str1, string str2)
         {
-            return ConcatArray(new string[] { str0, str1, str2 }, str0.Length + str1.Length + str2.Length);
+            return Concat(new string[] { str0, str1, str2 });
         }
         public static string Concat(string str0, string str1)
         {
-            return ConcatArray(new string[] { str0, str1 }, str0.Length + str1.Length);
+            return Concat(new string[] { str0, str1 });
         }
         public static string Concat(string str0, string str1, string str2, string str3)
         {
-            return ConcatArray(new string[] { str0, str1, str2, str3 }, str0.Length + str1.Length + str2.Length + str3.Length);
+            return Concat(new string[] { str0, str1, str2, str3 });
         }
         //Object concatenation plugs
         public static string Concat(object obj0)
@@ -67,7 +67,10 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
         }
         public static string Concat(object obj0, object obj1, object obj2, object obj3)
         {
-            return Concat(obj0.ToString(), obj1.ToString(), obj2.ToString(), obj3.ToString());
+            return Concat(new object[]
+                          {
+                              obj0, obj1, obj2, obj3
+                          });
         }
         //Array concatenation plugs
         public static string Concat(params string[] values)

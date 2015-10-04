@@ -41,7 +41,7 @@ namespace Cosmos.TestRunner.Core
             var xArguments = new[]
                              {
                                  "DebugEnabled:true",
-                                 "StackCorruptionDetectionEnabled:true",
+                                 "StackCorruptionDetectionEnabled:" + EnableStackCorruptionChecks.ToString(),
                                  "DebugMode:Source",
                                  "TraceAssemblies:",
                                  "DebugCom:1",

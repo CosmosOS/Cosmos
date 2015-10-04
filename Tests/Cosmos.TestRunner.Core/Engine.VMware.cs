@@ -10,8 +10,13 @@ namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
-        private void RunIsoInVMware(string iso)
+        private void RunIsoInVMware(string iso, string harddisk)
         {
+            if (!File.Exists(harddisk))
+            {
+                throw new FileNotFoundException("Harddisk file not found!", harddisk);
+            }
+
             var xParams = new NameValueCollection();
 
             xParams.Add("ISOFile", iso);
@@ -21,7 +26,7 @@ namespace Cosmos.TestRunner.Core
             var xDebugConnector = new DebugConnectorPipeServer(DebugConnectorPipeServer.DefaultCosmosPipeName);
             InitializeDebugConnector(xDebugConnector);
 
-            var xVMware = new VMware(xParams, RunWithGDB);
+            var xVMware = new VMware(xParams, RunWithGDB, harddisk);
             xVMware.OnShutDown = (a, b) =>
             {
             };

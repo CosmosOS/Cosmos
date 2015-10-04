@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.System.FileSystem.FAT
 {
@@ -22,6 +24,8 @@ namespace Cosmos.System.FileSystem.FAT
 
         public FatStream(Listing.FatFile aFile)
         {
+            FatHelpers.Debug("FatStream created. BaseDirectory: ");
+            FatHelpers.Debug(aFile.BaseDirectory);
             mFile = aFile;
             mFS = mFile.FileSystem;
             mReadBuffer = mFile.FileSystem.NewClusterArray();
@@ -166,7 +170,8 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new NotImplementedException("Setting the stream length to a size that requires alllcating new clusters is not currently implemented.");
             }
 
-            //mFile.Size = value;
+            mFS.SetFileLength(mFile, value);
+            //mFile.Size = (ulong) value;
         }
 
         public override void Write(byte[] aBuffer, int aOffset, int aCount)
@@ -213,8 +218,18 @@ namespace Cosmos.System.FileSystem.FAT
                     xWriteSize = (long)xCount;
                 }
 
-                Array.Copy(aBuffer, (long)xPosInCluster, xCluster, aOffset, xWriteSize);
+                FatHelpers.Debug("Writing to cluster idx");
+                Debugger.DoSendNumber((uint) xClusterIdx);
+                FatHelpers.Debug("Writing to pos in cluster");
+                Debugger.DoSendNumber((uint)xPosInCluster);
+                FatHelpers.Debug("Offset");
+                Debugger.DoSendNumber((uint)aOffset);
+                FatHelpers.Debug("xWriteSize");
+                Debugger.DoSendNumber((uint)xWriteSize);
+                FatHelpers.Debug("First byte");
+                Debugger.DoSendNumber((uint)aBuffer[0]);
 
+                Array.Copy(aBuffer, (long)xPosInCluster, xCluster, aOffset, xWriteSize);
                 mFS.WriteCluster((ulong)mFatTable[(int)xClusterIdx], xCluster);
 
                 aOffset += xWriteSize;

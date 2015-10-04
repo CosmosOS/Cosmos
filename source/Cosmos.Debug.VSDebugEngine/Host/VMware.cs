@@ -18,8 +18,10 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
     protected Process mProcess;
     protected string mWorkstationPath;
     protected string mPlayerPath;
+    protected string mHarddisk;
 
-    public VMware(NameValueCollection aParams, bool aUseGDB) : base(aParams, aUseGDB) {
+    public VMware(NameValueCollection aParams, bool aUseGDB,string harddisk = "Filesystem.vmdk") : base(aParams, aUseGDB) {
+      mHarddisk = harddisk;
       mDir = Path.Combine(CosmosPaths.Build, @"VMWare\Workstation\");
       mVmxPath = Path.Combine(mDir, @"Debug.vmx");
 
@@ -177,10 +179,12 @@ namespace Cosmos.Debug.VSDebugEngine.Host {
                   // We delete uuid entries so VMWare doesnt ask the user "Did you move or copy" the file
                   xValue = null;
 
-                } else if (xName == "ide1:0.fileName") {
+                } else if (xName == "ide1:0.fileName")
+                {
                   // Set the ISO file for booting
                   xValue = "\"" + mParams["ISOFile"] + "\"";
-
+                } else if (xName == "ide0:0.fileName") {
+                  xValue = "\"" + mHarddisk + "\"";
                 } else if (xName == "nvram") {
                   // Point it to an initially non-existent nvram.
                   // This has the effect of disabling PXE so the boot is faster.

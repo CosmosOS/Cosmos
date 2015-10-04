@@ -237,7 +237,6 @@ namespace Cosmos.System
             var xFS = GetFileSystemFromPath(aPath);
             FatHelpers.Debug("Filesystem retrieved");
             var xDirectory = DoGetDirectory(aPath, xFS);
-            FatHelpers.Debug("Base directory retrieved.");
             return xFS.GetDirectoryListing(xDirectory);
         }
 

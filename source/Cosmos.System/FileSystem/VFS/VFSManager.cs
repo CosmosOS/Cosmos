@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmos.Debug.Kernel;
+using Directory = Cosmos.System.FileSystem.Listing.Directory;
+using File = Cosmos.System.FileSystem.Listing.File;
 
 namespace Cosmos.System.FileSystem.VFS
 {
@@ -137,13 +139,14 @@ namespace Cosmos.System.FileSystem.VFS
 
         #endregion
 
-        public static Listing.File  TryGetFile(string aPath)
+        public static Listing.File TryGetFile(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))
             {
                 throw new ArgumentNullException("aPath");
             }
             FatHelpers.Debug("In VFSManager.TryGetFile");
+            FatHelpers.Debug(aPath);
             string xFileName = Path.GetFileName(aPath);
             string xDirectory = Path.GetDirectoryName(aPath);
             var xLastChar = xDirectory[xDirectory.Length - 1];
@@ -159,10 +162,66 @@ namespace Cosmos.System.FileSystem.VFS
                 var xFile = xEntry as Listing.File;
                 if (xFile != null && String.Equals(xEntry.Name, xFileName, StringComparison.OrdinalIgnoreCase))
                 {
+                    FatHelpers.Debug("--- Returning file");
+                    FatHelpers.Debug("Name");
+                    FatHelpers.Debug(xFile.Name);
+                    FatHelpers.Debug("Directory");
+                    FatHelpers.Debug(xFile.BaseDirectory);
                     return xFile;
                 }
             }
 
+            return null;
+        }
+
+        public static Listing.Directory TryGetDirectory(string aPath)
+        {
+            if (string.IsNullOrEmpty(aPath))
+            {
+                throw new ArgumentNullException("aPath");
+            }
+            FatHelpers.Debug("In VFSManager.TryGetFile");
+            string xFileName = Path.GetFileName(aPath);
+            string xDirectory = Path.GetDirectoryName(aPath);
+            FatHelpers.Debug("Filename: ");
+            FatHelpers.Debug(xFileName);
+            FatHelpers.Debug("Directory:");
+            FatHelpers.Debug(xDirectory);
+            var xLastChar = xDirectory[xDirectory.Length - 1];
+            if (xLastChar != Path.DirectorySeparatorChar)
+            {
+                xDirectory = xDirectory + Path.DirectorySeparatorChar;
+            }
+            FatHelpers.Debug("Now Try to get directory listing");
+            var xList = GetDirectoryListing(xDirectory);
+            Debugger.DoSendNumber((uint) xList.Count);
+            for (int i = 0; i < xList.Count; i++)
+            {
+                var xEntry = xList[i];
+                var xFile = xEntry as Listing.Directory;
+                if (xFile != null && String.Equals(xEntry.Name, xFileName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return xFile;
+                }
+                else
+                {
+                    FatHelpers.Debug("--Skipping item");
+                    if (xFile == null)
+                    {
+                        FatHelpers.Debug("  File");
+                    }
+                    else
+                    {
+                        FatHelpers.Debug("  Directory");
+                    }
+                    FatHelpers.Debug("  Name");
+                    FatHelpers.Debug(xEntry.Name);
+
+                }
+            }
+
+            FatHelpers.Debug("Directory not found");
+            FatHelpers.Debug(xFileName);
             return null;
         }
 
@@ -227,6 +286,8 @@ namespace Cosmos.System.FileSystem.VFS
             return null;
         }
 
+
+
         public static List<string> GetLogicalDrives()
         {
             //TODO: Directory.GetLogicalDrives() will call this.
@@ -281,7 +342,13 @@ namespace Cosmos.System.FileSystem.VFS
             try
             {
                 FatHelpers.Debug("In VFSManager.FileExists");
-                return (VFSManager.TryGetFile(aPath) != null);
+
+                var xFile = VFSManager.TryGetFile(aPath);
+                FatHelpers.Debug("File.Name:");
+                FatHelpers.Debug(xFile.Name);
+                FatHelpers.Debug("File.BaseDirectory");
+                FatHelpers.Debug(xFile.BaseDirectory);
+                return (xFile != null);
             }
             catch (Exception E)
             {
@@ -298,10 +365,21 @@ namespace Cosmos.System.FileSystem.VFS
             try
             {
                 FatHelpers.Debug("DirectoryExists. Path = '" + aPath + "'");
-                string xDir = string.Concat(aPath, VFSBase.DirectorySeparatorChar);
                 //xDir = Path.GetDirectoryName(xDir);
                 FatHelpers.Debug("Before VFSManager.GetDirectory");
-                return (VFSManager.GetDirectory(xDir) != null);
+
+                var xDirectory = VFSManager.TryGetDirectory(aPath);
+                if (xDirectory == null)
+                {
+                    FatHelpers.Debug("Directory not found!");
+                    FatHelpers.Debug(aPath);
+                    return false;
+                }
+                FatHelpers.Debug("Directory.Name:");
+                FatHelpers.Debug(xDirectory.Name);
+                FatHelpers.Debug("Directory.BaseDirectory");
+                FatHelpers.Debug(xDirectory.BaseDirectory);
+                return (xDirectory != null);
             }
             catch (Exception E)
             {
