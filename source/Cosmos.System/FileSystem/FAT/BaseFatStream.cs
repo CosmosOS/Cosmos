@@ -27,7 +27,8 @@ namespace Cosmos.System.FileSystem.FAT
             mFirstClusterNumber = firstClusterNumber;
             mFileSystem = fileSystem;
 
-            if (mFileOrDirectory.Size > 0)
+            mSize = mFileOrDirectory.Size;
+            if (mSize > 0)
             {
                 mFatTable = mFileSystem.GetFatTable(firstClusterNumber);
             }
@@ -66,11 +67,12 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     FatHelpers.Debug("No FileOrDirectory!");
                 }
-                return (long) mFileOrDirectory.Size;
+                return (long) mSize;
             }
         }
 
         protected UInt64 mPosition;
+        private ulong mSize;
 
         public override sealed long Position
         {
@@ -112,7 +114,7 @@ namespace Cosmos.System.FileSystem.FAT
                 // FirstSector can be 0 for 0 length files
                 return 0;
             }
-            if (mPosition == mFileOrDirectory.Size)
+            if (mPosition == mSize)
             {
                 // EOF
                 return 0;
@@ -120,7 +122,7 @@ namespace Cosmos.System.FileSystem.FAT
 
             // reduce count, so that no out of bound exception occurs if not existing
             // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
-            ulong xMaxReadableBytes = mFileOrDirectory.Size - mPosition;
+            ulong xMaxReadableBytes = mSize - mPosition;
             ulong xCount = (ulong) aCount;
             if (xCount > xMaxReadableBytes)
             {

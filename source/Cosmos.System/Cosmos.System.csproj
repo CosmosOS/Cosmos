@@ -80,6 +80,7 @@
     <Compile Include="FileSystem\FAT\FatFileStream.cs" />
     <Compile Include="FileSystem\FAT\Listing\FatDirectory.cs" />
     <Compile Include="FileSystem\FAT\Listing\FatFile.cs" />
+    <Compile Include="FileSystem\FAT\TestFatDirectoryStream.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\Listing\Base.cs" />
     <Compile Include="FileSystem\Listing\Directory.cs" />

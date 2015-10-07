@@ -412,6 +412,7 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             using (var xStream = new FatDirectoryStream((FatDirectory)baseDirectory))
+            //using(var xStream = new TestFatDirectoryStream((FatDirectory)baseDirectory))
             {
                 return GetDirectoryContents((FatDirectory) baseDirectory, xStream);
             }
