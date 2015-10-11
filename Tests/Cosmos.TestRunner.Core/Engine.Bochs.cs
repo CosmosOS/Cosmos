@@ -10,23 +10,30 @@ namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
-        private void RunIsoInBochs(string iso)
+        private void RunIsoInBochs(string iso, string harddisk)
         {
+            if (!File.Exists(harddisk))
+            {
+                throw new FileNotFoundException("Harddisk file not found!", harddisk);
+            }
+
             var xBochsConfig = Path.Combine(mBaseWorkingDirectory, "Kernel.bochsrc");
             var xParams = new NameValueCollection();
 
-            xParams.Add(BuildProperties.EnableBochsDebugString, "false");
             xParams.Add("ISOFile", iso);
-            xParams.Add(BuildProperties.VisualStudioDebugPortString, "Pipe: Cosmos\\Serial");
+            xParams.Add(BuildPropertyNames.VisualStudioDebugPortString, "Pipe: Cosmos\\Serial");
+            xParams.Add(BuildPropertyNames.EnableBochsDebugString, RunWithGDB.ToString());
 
             var xDebugConnector = new DebugConnectorPipeServer(DebugConnectorPipeServer.DefaultCosmosPipeName);
             InitializeDebugConnector(xDebugConnector);
 
-            var xBochs = new Bochs(xParams, false, new FileInfo(xBochsConfig));
+            var xBochs = new Bochs(xParams, RunWithGDB, new FileInfo(xBochsConfig), harddisk);
+
             xBochs.OnShutDown = (a, b) =>
                                 {
                                 };
-            xBochs.RedirectOutput = true;
+
+            xBochs.RedirectOutput = false;
             xBochs.LogError = s => OutputHandler.LogDebugMessage(s);
             xBochs.LogOutput = s => OutputHandler.LogDebugMessage(s);
 

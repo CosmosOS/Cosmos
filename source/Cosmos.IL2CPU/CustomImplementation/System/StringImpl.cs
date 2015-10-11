@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU.CustomImplementation.System
@@ -41,15 +42,15 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
         //String concatenation plugs
         public static string Concat(string str0, string str1, string str2)
         {
-            return ConcatArray(new string[] { str0, str1, str2 }, str0.Length + str1.Length + str2.Length);
+            return Concat(new string[] { str0, str1, str2 });
         }
         public static string Concat(string str0, string str1)
         {
-            return ConcatArray(new string[] { str0, str1 }, str0.Length + str1.Length);
+            return Concat(new string[] { str0, str1 });
         }
         public static string Concat(string str0, string str1, string str2, string str3)
         {
-            return ConcatArray(new string[] { str0, str1, str2, str3 }, str0.Length + str1.Length + str2.Length + str3.Length);
+            return Concat(new string[] { str0, str1, str2, str3 });
         }
         //Object concatenation plugs
         public static string Concat(object obj0)
@@ -66,7 +67,10 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
         }
         public static string Concat(object obj0, object obj1, object obj2, object obj3)
         {
-            return Concat(obj0.ToString(), obj1.ToString(), obj2.ToString(), obj3.ToString());
+            return Concat(new object[]
+                          {
+                              obj0, obj1, obj2, obj3
+                          });
         }
         //Array concatenation plugs
         public static string Concat(params string[] values)
@@ -74,7 +78,11 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
             int len = 0;
             for (int i = 0; i < values.Length; i++)
             {
-                len += values[i].Length;
+                var xValue = values[i];
+                if (xValue != null)
+                {
+                    len += values[i].Length;
+                }
             }
             return ConcatArray(values, len);
         }
@@ -83,25 +91,40 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
             string[] values = new string[args.Length];
             for (int i = 0; i < args.Length; i++)
             {
-                values[i] = args[i].ToString();
+                var xArg = args[i];
+                if (xArg != null)
+                {
+                    var xStrArg = xArg as string;
+                    if (xStrArg != null)
+                    {
+                        values[i] = xStrArg;
+                    }
+                    else
+                    {
+                        values[i] = xArg.ToString();
+                    }
+                }
             }
             return Concat(values);
         }
         public static string ConcatArray(string[] values, int totalLength)
         {
-
-            char[] xResult = new char[totalLength];
+            char[] xResultChars = new char[totalLength];
             int xCurPos = 0;
             for (int i = 0; i < values.Length; i++)
             {
                 var xStr = values[i];
-                for (int j = 0; j < xStr.Length; j++)
+                if (xStr != null)
                 {
-                    xResult[xCurPos] = xStr[j];
-                    xCurPos++;
+                    for (int j = 0; j < xStr.Length; j++)
+                    {
+                        xResultChars[xCurPos] = xStr[j];
+                        xCurPos++;
+                    }
                 }
             }
-            return new String(xResult);
+            var xResult = new String(xResultChars);
+            return xResult;
         }
 
         public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)

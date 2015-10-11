@@ -22,12 +22,10 @@ namespace Cosmos.Debug.VSDebugEngine.Host
     /// <summary>The configuration file to be used when launching the Bochs virtual machine.</summary>
     private FileInfo _bochsConfigurationFile;
 
-    private bool _useDebugVersion;
-
     /// <summary>Instanciation occurs when debugging engine is invoked to launch the process in suspended
     /// mode. Bochs process will eventually be launched later when debugging engine is instructed to
     /// Attach to the debugged process.</summary>
-    public Bochs(NameValueCollection aParams, bool aUseGDB, FileInfo configurationFile)
+    public Bochs(NameValueCollection aParams, bool aUseGDB, FileInfo configurationFile, string harddisk = null)
       : base(aParams, aUseGDB)
     {
       if (null == configurationFile)
@@ -38,12 +36,23 @@ namespace Cosmos.Debug.VSDebugEngine.Host
       {
           InitializeKeyValues();
       }*/
+      bool parseSucceeded = bool.TryParse(aParams[BuildPropertyNames.EnableBochsDebugString], out _useDebugVersion);
+
+      if (String.IsNullOrWhiteSpace(harddisk))
+      {
+        mHarddiskFile = Path.Combine(CosmosPaths.Build, @"VMWare\Workstation\Filesystem.vmdk");
+      }
+      else
+      {
+        mHarddiskFile = harddisk;
+      }
+
       InitializeKeyValues();
       GenerateConfiguration(configurationFile.FullName);
       _bochsConfigurationFile = configurationFile;
-      bool parseSucceeded = bool.TryParse(aParams[BuildProperties.EnableBochsDebugString], out _useDebugVersion);
-      return;
     }
+
+    private bool _useDebugVersion;
 
     /// <summary>Fix the content of the configuration file, replacing each of the symbolic variable occurence
     /// with its associated value.</summary>
@@ -90,7 +99,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
       // the Cosmos project whenever she wants to modify the environment.
       _bochsStartInfo.Arguments = string.Format("-q -f \"{0}\"", _bochsConfigurationFile.FullName);
       _bochsStartInfo.WorkingDirectory = _bochsConfigurationFile.Directory.FullName;
-      _bochsStartInfo.UseShellExecute = false;
+      _bochsStartInfo.UseShellExecute = true;
       if (RedirectOutput)
       {
         if (LogOutput == null)
@@ -101,10 +110,10 @@ namespace Cosmos.Debug.VSDebugEngine.Host
         {
           throw new Exception("No LogError handler specified!");
         }
-        _bochsStartInfo.RedirectStandardOutput = true;
-        _bochsStartInfo.RedirectStandardError = true;
-        _bochsProcess.OutputDataReceived += (sender, args) => LogOutput(args.Data);
-        _bochsProcess.ErrorDataReceived += (sender, args) => LogError(args.Data);
+        //_bochsStartInfo.RedirectStandardOutput = true;
+        //_bochsStartInfo.RedirectStandardError = true;
+        // _bochsProcess.OutputDataReceived += (sender, args) => LogOutput(args.Data);
+        // _bochsProcess.ErrorDataReceived += (sender, args) => LogError(args.Data);
       }
       // Register for process completion event so that we can funnel it to any code that
       // subscribed to this event in our base class.

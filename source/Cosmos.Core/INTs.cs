@@ -164,9 +164,7 @@ namespace Cosmos.Core
             var xCallback = mIRQ_Handlers[irq];
             if (xCallback != null)
             {
-                HMI.GCMonitor();
                 xCallback(ref aContext);
-                HMI.GCFreeAll();
             }
         }
 
@@ -503,20 +501,20 @@ namespace Cosmos.Core
                 PutErrorChar(0, 10, 'x');
                 PutErrorChar(0, 11, 'c');
                 PutErrorChar(0, 12, 'e');
-                PutErrorChar(0, 13,'p');
-                PutErrorChar(0, 14,'t');
-                PutErrorChar(0, 15,'i');
-                PutErrorChar(0, 16,'o');
-                PutErrorChar(0, 17,'n');
-                PutErrorChar(0, 18,' ');
-                PutErrorChar(0, 19,'x');
-                PutErrorChar(0, 20,xHex[(int)((ctx.Interrupt >> 4) & 0xF)]);
-                PutErrorChar(0, 21,xHex[(int)(ctx.Interrupt & 0xF)]);
-                PutErrorChar(0, 22,' ');
-                PutErrorChar(0, 23,'*');
-                PutErrorChar(0, 24,'*');
-                PutErrorChar(0, 25,'*');
-                PutErrorChar(0, 26,' ');
+                PutErrorChar(0, 13, 'p');
+                PutErrorChar(0, 14, 't');
+                PutErrorChar(0, 15, 'i');
+                PutErrorChar(0, 16, 'o');
+                PutErrorChar(0, 17, 'n');
+                PutErrorChar(0, 18, ' ');
+                PutErrorChar(0, 19, 'x');
+                PutErrorChar(0, 20, xHex[(int)((ctx.Interrupt >> 4) & 0xF)]);
+                PutErrorChar(0, 21, xHex[(int)(ctx.Interrupt & 0xF)]);
+                PutErrorChar(0, 22, ' ');
+                PutErrorChar(0, 23, '*');
+                PutErrorChar(0, 24, '*');
+                PutErrorChar(0, 25, '*');
+                PutErrorChar(0, 26, ' ');
 
                 if (lastKnownAddressValue != 0)
                 {

@@ -16,7 +16,6 @@ namespace Cosmos.TestRunner.Core
             {
                 throw new ArgumentNullException("debugConnector");
             }
-
             debugConnector.OnDebugMsg = s => OutputHandler.LogDebugMessage(s);
             debugConnector.CmdChannel = ChannelPacketReceived;
             debugConnector.CmdStarted = () =>
@@ -54,6 +53,14 @@ namespace Cosmos.TestRunner.Core
                 {
                     OutputHandler.LogMessage("Stackcorruption occurred at: 0x" + a.ToString("X8"));
                     OutputHandler.SetKernelTestResult(false, "Stackcorruption occurred at: 0x" + a.ToString("X8"));
+                    mKernelResultSet = true;
+                    mKernelRunning = false;
+                };
+            debugConnector.CmdNullReferenceOccurred =
+                a =>
+                {
+                    OutputHandler.LogMessage("Null Reference Exception occurred at: 0x" + a.ToString("X8"));
+                    OutputHandler.SetKernelTestResult(false, "Null Reference Exception occurred at: 0x" + a.ToString("X8"));
                     mKernelResultSet = true;
                     mKernelRunning = false;
                 };
@@ -109,7 +116,6 @@ namespace Cosmos.TestRunner.Core
 
         private void ChannelPacketReceived(byte arg1, byte arg2, byte[] arg3)
         {
-            OutputHandler.LogMessage(String.Format("ChannelPacketReceived, Channel = {0}, Command = {1}", arg1, arg2));
             if (arg1 == 129)
             {
                 // for now, skip
@@ -119,16 +125,20 @@ namespace Cosmos.TestRunner.Core
             {
                 switch (arg2)
                 {
-                    case (byte)TestChannelCommandEnum.TestCompleted:
+                    case (byte) TestChannelCommandEnum.TestCompleted:
                         KernelTestCompleted();
                         break;
-                    case (byte)TestChannelCommandEnum.TestFailed:
+                    case (byte) TestChannelCommandEnum.TestFailed:
                         KernelTestFailed();
                         break;
-                    case (byte)TestChannelCommandEnum.AssertionSucceeded:
+                    case (byte) TestChannelCommandEnum.AssertionSucceeded:
                         KernelAssertionSucceeded();
                         break;
                 }
+            }
+            else
+            {
+                OutputHandler.LogMessage(String.Format("ChannelPacketReceived, Channel = {0}, Command = {1}", arg1, arg2));
             }
         }
 

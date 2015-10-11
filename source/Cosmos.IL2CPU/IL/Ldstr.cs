@@ -9,18 +9,19 @@ using Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldstr)]
-	public class LdStr: ILOp
+  [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldstr)]
+  public class LdStr: ILOp
+  {
+	public LdStr(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
 	{
-		public LdStr(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)
-		{
-		}
+	}
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpString = aOpCode as OpString;
       string xDataName = GetContentsArrayName(xOpString.Value);
       new Comment( Assembler, "String Value: " + xOpString.Value.Replace( "\r", "\\r" ).Replace( "\n", "\\n" ) );
-      new Mov { DestinationReg = RegistersEnum.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(xDataName) };
+      var xRefName = GetFakeHandleForLiteralArray(xDataName);
+      new Mov { DestinationReg = RegistersEnum.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(xRefName) };
       new Push { DestinationReg = RegistersEnum.EAX };
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering.
       // if that changes, we need to change the code below!
@@ -38,6 +39,14 @@ namespace Cosmos.IL2CPU.X86.IL
       }
       #endregion
     }
+
+	public static string GetFakeHandleForLiteralArray(string labelArray)
+	{
+	  var xAsm = CPU.Assembler.CurrentInstance;
+	  var xResult = labelArray + "__Handle";
+	  xAsm.DataMembers.Add(new DataMember(xResult, ElementReference.New(labelArray)));
+	  return xResult;
+	}
 
     public static string GetContentsArrayName(string aLiteral) {
       var xAsm = CPU.Assembler.CurrentInstance;

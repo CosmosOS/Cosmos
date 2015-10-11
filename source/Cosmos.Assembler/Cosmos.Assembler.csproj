@@ -133,7 +133,7 @@
     <Compile Include="x86\Call.cs" />
     <Compile Include="x86\ClrCarryFlag.cs" />
     <Compile Include="x86\ClrDirFlag.cs" />
-    <Compile Include="x86\ClrInterruptFlag.cs" />
+    <Compile Include="x86\ClearInterruptFlag.cs" />
     <Compile Include="x86\Cmps.cs" />
     <Compile Include="x86\CmpXchg.cs" />
     <Compile Include="x86\Compare.cs" />

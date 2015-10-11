@@ -1,5 +1,8 @@
 ; 4-column space indentation
 
+[VTablesImpl.cs]
+indent_size=2
+
 [ILScanner.cs]
 indent_size = 4
 
@@ -32,3 +35,12 @@ indent_size = 4
 
 [IL/Stfld.cs]
 indent_size = 2
+
+[IL/Stelem_Ref.cs]
+indent_size = 2
+
+[IL/Isinst.cs]
+indent_size = 4
+
+[IL/Castclass.cs]
+indent_size = 4

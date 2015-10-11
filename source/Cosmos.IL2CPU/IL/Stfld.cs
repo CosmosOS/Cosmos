@@ -32,13 +32,20 @@ namespace Cosmos.IL2CPU.X86.IL {
 
       uint xRoundedSize = Align(xSize, 4);
       DoNullReferenceCheck(aAssembler, debugEnabled, xRoundedSize);
-
+      new Comment("After Nullref check");
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
-        if (debugEnabled)
-        {
-            new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.ECX};
-            new CPUx86.Pop {DestinationReg = CPUx86.RegistersEnum.ECX};
-        }
+      // ECX contains the object pointer now
+      if (aNeedsGC)
+      {
+        // for reference types (or boxed types), ECX actually contains the handle now, so we need to convert it to a memory address
+        new Comment("Dereference memory handle now");
+        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+      }
+      if (debugEnabled)
+      {
+        new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.ECX};
+        new CPUx86.Pop {DestinationReg = CPUx86.RegistersEnum.ECX};
+      }
       new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xActualOffset) };
       //TODO: Can't we use an x86 op to do a byte copy instead and be faster?
       for (int i = 0; i < (xSize / 4); i++) {

@@ -35,7 +35,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
       // the other INTs
 
       // We are updating the IDT, disable interrupts
-      new CPUx86.ClrInterruptFlag();
+      new CPUx86.ClearInterruptFlag();
 
       for (int i = 0; i < 256; i++) {
         // These are already mapped, don't remap them.
@@ -106,7 +106,7 @@ namespace Cosmos.Core.Plugs.Assemblers {
         new CPUx86.x87.FXSave { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true }; // save the registers
         new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.ESP };
 
-        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX }; // 
+        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX }; //
         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX }; // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
         //new CPUx86.Move("eax",
         //                "esp");
@@ -138,9 +138,13 @@ namespace Cosmos.Core.Plugs.Assemblers {
       new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
       new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".__AFTER_ENABLE_INTERRUPTS" };
 
+      // reload interrupt list
+      new CPUx86.Mov { DestinationReg =  CPUx86.Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Pointer") };
+      new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("static_field__Cosmos_Core_CPU_mInterruptsEnabled"), DestinationIsIndirect = true, SourceValue = 1 };
+      new CPUx86.Lidt { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
       // Reenable interrupts
       new CPUx86.Sti();
-      
+
       new CPUAll.Label(".__AFTER_ENABLE_INTERRUPTS");
     }
   }

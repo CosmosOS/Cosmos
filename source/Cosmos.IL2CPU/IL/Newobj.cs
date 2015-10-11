@@ -42,6 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (objectType.IsValueType)
             {
+                #region Valuetypes
                 new Comment("ValueType");
                 /*
                  * Current sitation on stack:
@@ -103,6 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 // Need to put these *after* the call because the Call pops the args from the stack
                 // and we have mucked about on the stack, so this makes it right before the next
                 // op.
+                #endregion Valuetypes
             }
             else
             {
@@ -119,6 +121,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         xHasCalcSize = true;
                         new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                        // EAX contains a memory handle now, lets dereference it to a pointer
+                        new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true};
                         new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true, SourceDisplacement = 8 };
                         new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceValue = 2 };
                         new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };
@@ -139,7 +143,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     }
                     else
-                        throw new NotImplementedException("In NewObj is a string ctor implementation missing!");
+                        throw new NotImplementedException("In NewObj, a string ctor implementation is missing!");
                 }
                 uint xMemSize = GetStorageSize(objectType);
                 int xExtraSize = 12; // additional size for set values after alloc
@@ -152,8 +156,11 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 // todo: probably we want to check for exceptions after calling Alloc
                 new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.AllocNewObjectRef) };
+                new Label(".AfterAlloc");
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+
+                // it's on the stack now 3 times. Once from the Alloc return value, twice from the pushes
 
                 //? ?? uint xObjSize;// = 0;
                 //int xGCFieldCount = ( from item in aCtorDeclTypeInfo.Fields.Values
@@ -169,6 +176,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New(strTypeId), SourceIsIndirect = true };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };

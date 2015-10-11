@@ -37,15 +37,17 @@ namespace Cosmos.TestRunner.Core
                     RunTask("Ld", () => RunLd(xTempObjectFile, xObjectFile));
                     RunTask("ExtractMapFromElfFile", () => RunExtractMapFromElfFile(mBaseWorkingDirectory, xObjectFile));
                 }
-
+                var xHarddiskPath = Path.Combine(mBaseWorkingDirectory, "Harddisk.vmdk");
+                var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "VMware", "Workstation", "Filesystem.vmdk");
+                File.Copy(xOriginalHarddiskPath, xHarddiskPath);
                 RunTask("MakeISO", () => MakeIso(xObjectFile, xIsoFile));
                 switch (configuration.RunTarget)
                 {
                     case RunTargetEnum.Bochs:
-                        RunTask("RunISO", () => RunIsoInBochs(xIsoFile));
+                        RunTask("RunISO", () => RunIsoInBochs(xIsoFile, xHarddiskPath));
                         break;
                     case RunTargetEnum.VMware:
-                        RunTask("RunISO", () => RunIsoInVMware(xIsoFile));
+                        RunTask("RunISO", () => RunIsoInVMware(xIsoFile, xHarddiskPath));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("RunTarget " + configuration.RunTarget + " not implemented!");

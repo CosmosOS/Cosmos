@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Core;
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 
 namespace Cosmos.HAL
@@ -57,6 +59,7 @@ namespace Cosmos.HAL
             if (xATA.DriveType == BlockDevice.AtaPio.SpecLevel.ATA)
             {
                 BlockDevice.BlockDevice.Devices.Add(xATA);
+                Ata.AtaDebugger.Send("ATA device with speclevel ATA found.");
             }
             else
             {
@@ -84,7 +87,7 @@ namespace Cosmos.HAL
             }
 
             // TODO Change this to foreach when foreach is supported
-            Console.WriteLine("Number of MBR partitions found:  " + xMBR.Partitions.Count);
+            Ata.AtaDebugger.Send("Number of MBR partitions found:  " + xMBR.Partitions.Count);
             for (int i = 0; i < xMBR.Partitions.Count; i++)
             {
                 var xPart = xMBR.Partitions[i];
@@ -109,23 +112,44 @@ namespace Cosmos.HAL
         {
             //TextScreen = new TextScreen();
             Global.Dbg.Send("CLS");
+      //TODO: Since this is FCL, its "common". Otherwise it should be
+      // system level and not accessible from Core. Need to think about this
+      // for the future.
+      Debugger.DoSend("Finding PCI Devices");
+      //PCI.Setup();
+    }
 
-            //TextScreen.Clear();
-
-            Global.Dbg.Send("Keyboard");
+    static public void Init(TextScreenBase textScreen, Keyboard keyboard)
+    {
+      if (textScreen != null)
+      {
+        TextScreen = textScreen;
+      }
+        if (keyboard == null)
+        {
+            Core.Global.Dbg.Send("No keyboard specified!");
             Keyboard = new PS2Keyboard();
+        }
+        else
+        {
+            Keyboard = keyboard;
+        }
+        Global.Dbg.Send("Before Core.Global.Init");
+      Core.Global.Init();
+      Global.Dbg.Send("Static Devices");
+      InitStaticDevices();
+      Global.Dbg.Send("PCI Devices");
+      InitPciDevices();
+      Global.Dbg.Send("Done initializing Cosmos.HAL.Global");
 
-            // Find hardcoded ATA controllers
-            Global.Dbg.Send("ATA Master");
+            Global.Dbg.Send("ATA Primary Master");
             InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Master);
-
-            //Global.Dbg.Send("ATA Slave");
-            //InitAta(BlockDevice.Ata.ControllerIdEnum.Primary, BlockDevice.Ata.BusPositionEnum.Slave);
 
             //TODO Need to change code to detect if ATA controllers are present or not. How to do this? via PCI enum?
             // They do show up in PCI space as well as the fixed space.
             // Or is it always here, and was our compiler stack corruption issue?
-            //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Master);
+            Global.Dbg.Send("ATA Secondary Master");
+            InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Master);
             //InitAta(BlockDevice.Ata.ControllerIdEnum.Secondary, BlockDevice.Ata.BusPositionEnum.Slave);
         }
 
@@ -143,30 +167,18 @@ namespace Cosmos.HAL
             Console.WriteLine("Finding PCI Devices");
             PCI.Setup();
         }
-
-        public static void Init(TextScreenBase textScreen, Keyboard keyboard)
-        {
-            if (textScreen != null)
-            {
-                TextScreen = textScreen;
-            }
-            if (keyboard != null)
-            {
-                Keyboard = keyboard;
-            }
-            Core.Bootstrap.Init();
-            Core.Global.Init();
-            Global.Dbg.Send("Static Devices");
-            InitStaticDevices();
-            Global.Dbg.Send("PCI Devices");
-            InitPciDevices();
-        }
-
-        //static void PCIDeviceFound(Core.PCI.PciInfo aInfo, Core.IOGroup.PciDevice aIO) {
-        // Later we need to dynamically load these, but we need to finish the design first.
-        //  if ((aInfo.VendorID == 0x8086) && (aInfo.DeviceID == 0x7111)) {
-        //ATA1 = new ATA(Core.Global.BaseIOGroups.ATA1);
-        //  }
-        //}
+        
+    public static void EnableInterrupts()
+    {
+      CPU.EnableInterrupts();
     }
+
+    public static bool InterruptsEnabled
+    {
+      get
+      {
+        return CPU.mInterruptsEnabled;
+      }
+    }
+  }
 }

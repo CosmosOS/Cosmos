@@ -9,9 +9,9 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
 	public static class Int32Impl {
         public static string ToString(ref int aThis)
         {
-      return Int32Impl2.GetNumberString(aThis);
+            return Int32Impl2.GetNumberString(aThis);
 		}
-  }
+    }
 
   // See comment in UInt32Impl
   public static class Int32Impl2 {

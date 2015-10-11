@@ -10,7 +10,7 @@ namespace Cosmos.HAL.ScanMaps
     {
         protected override void InitKeys()
         {
-            _keys = new List<KeyMapping>();
+            _keys = new List<KeyMapping>(100);
 
             #region Keys
 

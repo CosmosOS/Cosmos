@@ -91,7 +91,7 @@ namespace Cosmos.IL2CPU
                     return xMethod;
                 }
             }
-            throw new Exception("Method not found!");
+            throw new Exception($"Method '{aMethod}' not found on type '{aType.FullName}'!");
         }
     }
 }

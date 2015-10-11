@@ -31,9 +31,9 @@ namespace Cosmos.VS.Package {
         // On first call, reset the cache, following calls will use the cached values
         // Think we will change this to a dummy program when we get our debugger working
         // This is the program that gest launched after build
-        var xDeployment = (DeploymentType)Enum.Parse(typeof(DeploymentType), GetConfigurationProperty(BuildProperties.DeploymentString, true));
-        var xLaunch = (LaunchType)Enum.Parse(typeof(LaunchType), GetConfigurationProperty(BuildProperties.LaunchString, false));
-        var xVSDebugPort = GetConfigurationProperty(BuildProperties.VisualStudioDebugPortString, false);
+        var xDeployment = (DeploymentType)Enum.Parse(typeof(DeploymentType), GetConfigurationProperty(BuildPropertyNames.DeploymentString, true));
+        var xLaunch = (LaunchType)Enum.Parse(typeof(LaunchType), GetConfigurationProperty(BuildPropertyNames.LaunchString, false));
+        var xVSDebugPort = GetConfigurationProperty(BuildPropertyNames.VisualStudioDebugPortString, false);
 
         string xOutputAsm = ProjectMgr.GetOutputAssembly(ConfigName);
         string xOutputPath = Path.GetDirectoryName(xOutputAsm);
@@ -49,7 +49,7 @@ namespace Cosmos.VS.Package {
         } else if (xDeployment == DeploymentType.PXE)
         {
           string xPxePath = Path.Combine(CosmosPaths.Build, "PXE");
-          string xPxeIntf = GetConfigurationProperty(BuildProperties.PxeInterfaceString, false);
+          string xPxeIntf = GetConfigurationProperty(BuildPropertyNames.PxeInterfaceString, false);
           File.Copy(xBinFile, Path.Combine(xPxePath, "Cosmos.bin"), true);
           Process.Start(Path.Combine(CosmosPaths.Tools, "Cosmos.Deploy.Pixie.exe"), xPxeIntf + " \"" + xPxePath + "\"");
         }else if (xDeployment == DeploymentType.BinaryImage)

@@ -281,7 +281,7 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             mDbgConnector = null;
 
-            string xPort = mDebugInfo[BuildProperties.VisualStudioDebugPortString];
+            string xPort = mDebugInfo[BuildPropertyNames.VisualStudioDebugPortString];
 
             // using (var xDebug = new StreamWriter(@"e:\debug.info", false))
             // {
@@ -294,7 +294,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
             if (String.IsNullOrWhiteSpace(xPort))
             {
-                xPort = mDebugInfo[BuildProperties.CosmosDebugPortString];
+                xPort = mDebugInfo[BuildPropertyNames.CosmosDebugPortString];
             }
 
             var xParts = (null == xPort) ? null : xPort.Split(' ');
@@ -308,7 +308,7 @@ namespace Cosmos.Debug.VSDebugEngine
             string xPortType = xParts[0].ToLower();
             string xPortParam = xParts[1].ToLower();
 
-            var xLaunch = mDebugInfo[BuildProperties.LaunchString];
+            var xLaunch = mDebugInfo[BuildPropertyNames.LaunchString];
 
             OutputText("Starting debug connector.");
             switch (xPortType)
@@ -373,7 +373,7 @@ namespace Cosmos.Debug.VSDebugEngine
             mCallback = aCallback;
             mDebugInfo = aDebugInfo;
 
-            mLaunch = (LaunchType)Enum.Parse(typeof(LaunchType), aDebugInfo[BuildProperties.LaunchString]);
+            mLaunch = (LaunchType)Enum.Parse(typeof(LaunchType), aDebugInfo[BuildPropertyNames.LaunchString]);
 
             if (mDebugDownPipe == null)
             {
@@ -397,11 +397,11 @@ namespace Cosmos.Debug.VSDebugEngine
             OutputText("Using ISO file " + mISO + ".");
             mProjectFile = mDebugInfo["ProjectFile"];
             //
-            bool xUseGDB = string.Equals(mDebugInfo[BuildProperties.EnableGDBString], "true", StringComparison.InvariantCultureIgnoreCase);
+            bool xUseGDB = string.Equals(mDebugInfo[BuildPropertyNames.EnableGDBString], "true", StringComparison.InvariantCultureIgnoreCase);
             OutputText("GDB " + (xUseGDB ? "Enabled" : "Disabled") + ".");
             //
             var xGDBClient = false;
-            Boolean.TryParse(mDebugInfo[BuildProperties.StartCosmosGDBString], out xGDBClient);
+            Boolean.TryParse(mDebugInfo[BuildPropertyNames.StartCosmosGDBString], out xGDBClient);
 
             switch (mLaunch)
             {

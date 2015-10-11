@@ -55,6 +55,10 @@
       <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Tests\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">
+      <Project>{E6D3B644-C487-472D-A978-C1A82D0C099B}</Project>
+      <Name>Cosmos.TestRunner.TestController</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SentinelSystem\SentinelSystem.csproj">
       <Project>{93D6FF56-6E23-4E80-98F6-730AC533F631}</Project>
       <Name>SentinelSystem</Name>

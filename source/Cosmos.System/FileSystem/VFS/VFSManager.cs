@@ -1,208 +1,396 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.IO;
-//using Cosmos.System.FileSystem;
-//using Cosmos.HAL.BlockDevice;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
+using Directory = Cosmos.System.FileSystem.Listing.Directory;
+using File = Cosmos.System.FileSystem.Listing.File;
 
-//namespace Cosmos.System.FileSystem.VFS
-//{
-//    public static class VFSManager
-//    {
-//        private static VFSBase mVFS;
+namespace Cosmos.System.FileSystem.VFS
+{
+    public static class VFSManager
+    {
+        private static VFSBase mVFS;
 
-//        public static void RegisterVFS(VFSBase aVFS)
-//        {
-//            Global.Dbg.Send("VFSManager.RegisterVFS");
-//            if (mVFS != null)
-//            {
-//                throw new Exception("Virtual File System Manager already initialized!");
-//            }
+        public static void RegisterVFS(VFSBase aVFS)
+        {
+            Cosmos.System.Global.Dbg.Send("VFSManager.RegisterVFS");
+            if (mVFS != null)
+            {
+                throw new Exception("Virtual File System Manager already initialized!");
+            }
 
-//            aVFS.Initialize();
-//            mVFS = aVFS;
-//        }
+            aVFS.Initialize();
+            mVFS = aVFS;
+        }
 
-//        #region Helpers
+        #region Helpers
 
-//        public static bool IsAbsolutePath(this string aPath)
-//        {
-//            return ((aPath[0] == VFSBase.DirectorySeparatorChar) || (aPath[0] == VFSBase.AltDirectorySeparatorChar));
-//        }
+        public static char GetAltDirectorySeparatorChar()
+        {
+            return '/';
+        }
 
-//        public static bool IsRelativePath(this string aPath)
-//        {
-//            return (!(aPath[0] == VFSBase.DirectorySeparatorChar) || !(aPath[0] == VFSBase.AltDirectorySeparatorChar));
-//        }
+        public static char GetDirectorySeparatorChar()
+        {
+            return '\\';
+        }
 
-//        public static string[] SplitPath(string aPath)
-//        {
-//            return aPath.Split(GetDirectorySeparators(), StringSplitOptions.RemoveEmptyEntries);
-//        }
+        public static char[] GetInvalidFileNameChars()
+        {
+            return new[]
+            {
+                '"',
+                '<',
+                '>',
+                '|',
+                '\0',
+                '\a',
+                '\b',
+                '\t',
+                '\n',
+                '\v',
+                '\f',
+                '\r',
+                ':',
+                '*',
+                '?',
+                '\\',
+                '/'
+            };
+        }
 
-//        private static char[] GetDirectorySeparators()
-//        {
-//            return new char[] { VFSBase.DirectorySeparatorChar, VFSBase.AltDirectorySeparatorChar };
-//        }
+        public static char[] GetInvalidPathCharsWithAdditionalChecks()
+        {
+            return new[]
+            {
+                '"',
+                '<',
+                '>',
+                '|',
+                '\0',
+                '\a',
+                '\b',
+                '\t',
+                '\n',
+                '\v',
+                '\f',
+                '\r',
+                '*',
+                '?'
+            };
+        }
 
-//        #endregion
+        public static char GetPathSeparator()
+        {
+            return ';';
+        }
 
-//        public static Cosmos.System.FileSystem.Listing.File GetFile(string aPath)
-//        {
-//            if (string.IsNullOrEmpty(aPath))
-//            {
-//                throw new ArgumentNullException("aPath");
-//            }
+        public static char[] GetRealInvalidPathChars()
+        {
+            return new[]
+            {
+                '"',
+                '<',
+                '>',
+                '|',
+                '\0',
+                '\a',
+                '\b',
+                '\t',
+                '\n',
+                '\v',
+                '\f',
+                '\r'
+            };
+        }
 
-//            return null;
+        public static char GetVolumeSeparatorChar()
+        {
+            return ':';
+        }
 
-//            /*
-//            string xFileName = Path.GetFileName(aPath);
-//            string xDirectory = Path.GetDirectoryName(aPath) + Path.DirectorySeparatorChar;
+        public static int GetMaxPath()
+        {
+            return 260;
+        }
 
-//            foreach (var xEntry in GetDirectoryListing(xDirectory))
-//            {
-//                if ((xEntry is Cosmos.System.FileSystem.Listing.File) && (xEntry.Name == xFileName))
-//                {
-//                    return (xEntry as Cosmos.System.FileSystem.Listing.File);
-//                }
-//            }
+        //public static bool IsAbsolutePath(this string aPath)
+        //{
+        //    return ((aPath[0] == VFSBase.DirectorySeparatorChar) || (aPath[0] == VFSBase.AltDirectorySeparatorChar));
+        //}
 
-//            return null;
-//            */ 
-//        }
+        //public static bool IsRelativePath(this string aPath)
+        //{
+        //    return (aPath[0] != VFSBase.DirectorySeparatorChar || aPath[0] != VFSBase.AltDirectorySeparatorChar);
+        //}
 
-//        public static List<Cosmos.System.FileSystem.Listing.File> GetFiles(string aPath)
-//        {
-//            if (string.IsNullOrEmpty(aPath))
-//            {
-//                throw new ArgumentNullException("sPath");
-//            }
+        public static string[] SplitPath(string aPath)
+        {
+            //TODO: This should call Path.GetDirectoryName() and then loop calling Directory.GetParent(), but those aren't implemented yet.
+            return aPath.Split(GetDirectorySeparators(), StringSplitOptions.RemoveEmptyEntries);
+        }
 
-//            return null;
+        private static char[] GetDirectorySeparators()
+        {
+            return new[] { GetDirectorySeparatorChar(), GetAltDirectorySeparatorChar() };
+        }
 
-//            /*
-//            List<FilesystemEntry> xFiles = new List<FilesystemEntry>();
-//            var xDirName = Path.GetDirectoryName(aPath);
-//            var xEntries = GetDirectoryListing(xDirName);
+        #endregion
 
-//            for (int i = 0; i < xEntries.Length; i++)
-//            {
-//                var entry = xEntries[i];
-//                if (!entry.IsDirectory)
-//                    xFiles.Add(entry);
-//            }
+        public static Listing.File TryGetFile(string aPath)
+        {
+            if (string.IsNullOrEmpty(aPath))
+            {
+                throw new ArgumentNullException("aPath");
+            }
+            FatHelpers.Debug("In VFSManager.TryGetFile");
+            FatHelpers.Debug(aPath);
+            string xFileName = Path.GetFileName(aPath);
+            string xDirectory = Path.GetDirectoryName(aPath);
+            var xLastChar = xDirectory[xDirectory.Length - 1];
+            if (xLastChar != Path.DirectorySeparatorChar)
+            {
+                xDirectory = xDirectory + Path.DirectorySeparatorChar;
+            }
+            FatHelpers.Debug("Now Try to get directory listing");
+            var xList = GetDirectoryListing(xDirectory);
+            for (int i = 0; i < xList.Count; i++)
+            {
+                var xEntry = xList[i];
+                var xFile = xEntry as Listing.File;
+                if (xFile != null && String.Equals(xEntry.Name, xFileName, StringComparison.OrdinalIgnoreCase))
+                {
+                    FatHelpers.Debug("--- Returning file");
+                    FatHelpers.Debug("Name");
+                    FatHelpers.Debug(xFile.Name);
+                    return xFile;
+                }
+            }
 
-//            return xFiles.ToArray();
-//            */ 
-//        }
+            return null;
+        }
 
-//        public static Cosmos.System.FileSystem.Listing.Directory GetDirectory(string aPath)
-//        {
-//            if (string.IsNullOrEmpty(aPath))
-//            {
-//                throw new ArgumentNullException("aPath");
-//            }
+        public static Listing.Directory TryGetDirectory(string aPath)
+        {
+            if (string.IsNullOrEmpty(aPath))
+            {
+                throw new ArgumentNullException("aPath");
+            }
+            FatHelpers.Debug("In VFSManager.TryGetFile");
+            string xFileName = Path.GetFileName(aPath);
+            string xDirectory = Path.GetDirectoryName(aPath);
+            FatHelpers.Debug("Filename: ");
+            FatHelpers.Debug(xFileName);
+            FatHelpers.Debug("Directory:");
+            FatHelpers.Debug(xDirectory);
+            var xLastChar = xDirectory[xDirectory.Length - 1];
+            if (xLastChar != Path.DirectorySeparatorChar)
+            {
+                xDirectory = xDirectory + Path.DirectorySeparatorChar;
+            }
+            FatHelpers.Debug("Now Try to get directory listing");
+            var xList = GetDirectoryListing(xDirectory);
+            FatHelpers.DebugNumber((uint) xList.Count);
+            for (int i = 0; i < xList.Count; i++)
+            {
+                var xEntry = xList[i];
+                var xFile = xEntry as Listing.Directory;
+                if (xFile != null && String.Equals(xEntry.Name, xFileName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return xFile;
+                }
+                else
+                {
+                    FatHelpers.Debug("--Skipping item");
+                    if (xFile == null)
+                    {
+                        FatHelpers.Debug("  File");
+                    }
+                    else
+                    {
+                        FatHelpers.Debug("  Directory");
+                    }
+                    FatHelpers.Debug("  Name");
+                    FatHelpers.Debug(xEntry.Name);
 
-//            return null;
-//        }
+                }
+            }
 
-//        public static List<Cosmos.System.FileSystem.Listing.Base> GetDirectoryListing(string aPath)
-//        {
-//            if (string.IsNullOrEmpty(aPath))
-//            {
-//                throw new ArgumentNullException("aPath");
-//            }
+            FatHelpers.Debug("Directory not found");
+            FatHelpers.Debug(xFileName);
+            return null;
+        }
 
-//            return null;
-//        }
+        public static List<Listing.File> GetFiles(string aPath)
+        {
+            if (string.IsNullOrEmpty(aPath))
+            {
+                throw new ArgumentNullException("aPath");
+            }
 
-//        public static Cosmos.System.FileSystem.Listing.Directory GetVolume(string aVolume)
-//        {
-//            if (string.IsNullOrEmpty(aVolume))
-//            {
-//                throw new ArgumentNullException("aVolume");
-//            }
+            return null;
 
-//            return null;
-//        }
+            /*
+            List<FilesystemEntry> xFiles = new List<FilesystemEntry>();
+            var xDirName = Path.GetDirectoryName(aPath);
+            var xEntries = GetDirectoryListing(xDirName);
 
-//        public static List<Cosmos.System.FileSystem.Listing.Directory> GetVolumes()
-//        {
-//            return null;
-//        }
+            for (int i = 0; i < xEntries.Length; i++)
+            {
+                var entry = xEntries[i];
+                if (!entry.IsDirectory)
+                    xFiles.Add(entry);
+            }
 
-//        public static List<string> GetLogicalDrives()
-//        {
-//            return null;
+            return xFiles.ToArray();
+            */
+        }
 
-//            /*
-//            List<string> xDrives = new List<string>();
-//            foreach (FilesystemEntry entry in GetVolumes())
-//                xDrives.Add(entry.Name + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar);
+        public static Listing.Directory GetDirectory(string aPath)
+        {
+            if (string.IsNullOrEmpty(aPath))
+            {
+                throw new ArgumentNullException("aPath");
+            }
+            FatHelpers.Debug("In VFSManager.GetDirectory");
 
-//            return xDrives.ToArray();
-//            */ 
-//        }
+            return mVFS.GetDirectory(aPath);
+        }
 
-//        public static List<string> InternalGetFileDirectoryNames(string path, string userPathOriginal, string searchPattern, bool includeFiles, bool includeDirs, SearchOption searchOption)
-//        {
-//            return null;
+        public static List<Listing.Base> GetDirectoryListing(string aPath)
+        {
+            if (string.IsNullOrEmpty(aPath))
+            {
+                throw new ArgumentNullException("aPath");
+            }
 
-//            /*
-//            //TODO: Add SearchOption functionality
-//            //TODO: What is userPathOriginal?
-//            //TODO: Add SearchPattern functionality
+            return mVFS.GetDirectoryListing(aPath);
+        }
 
-//            List<string> xFileAndDirectoryNames = new List<string>();
+        public static Listing.Directory GetVolume(string aVolume)
+        {
+            if (string.IsNullOrEmpty(aVolume))
+            {
+                throw new ArgumentNullException("aVolume");
+            }
 
-//            //Validate input arguments
-//            if ((searchOption != SearchOption.TopDirectoryOnly) && (searchOption != SearchOption.AllDirectories))
-//                throw new ArgumentOutOfRangeException("searchOption");
+            return null;
+        }
 
-//            searchPattern = searchPattern.TrimEnd(new char[0]);
-//            if (searchPattern.Length == 0)
-//                return new string[0];
+        public static List<Listing.Directory> GetVolumes()
+        {
+            return null;
+        }
 
-//            //Perform search in filesystem
-//            FilesystemEntry[] xEntries = GetDirectoryListing(path);
 
-//            foreach (FilesystemEntry xEntry in xEntries)
-//            {
-//                if (xEntry.IsDirectory && includeDirs)
-//                    xFileAndDirectoryNames.Add(xEntry.Name);
-//                else if (!xEntry.IsDirectory && includeFiles)
-//                    xFileAndDirectoryNames.Add(xEntry.Name);
-//            }
 
-//            return xFileAndDirectoryNames.ToArray();
-            
-//             */ 
-//        }
+        public static List<string> GetLogicalDrives()
+        {
+            //TODO: Directory.GetLogicalDrives() will call this.
+            return null;
 
-//        public static bool FileExists(string aPath)
-//        {
-//            try
-//            {
-//                return (GetFile(aPath) != null);
-//            }
-//            catch (Exception)
-//            {
-//                return false;
-//            }
-//        }
+            /*
+            List<string> xDrives = new List<string>();
+            foreach (FilesystemEntry entry in GetVolumes())
+                xDrives.Add(entry.Name + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar);
 
-//        public static bool DirectoryExists(string aPath)
-//        {
-//            try
-//            {
-//                string xDir = aPath + VFSBase.DirectorySeparatorChar;
-//                return (GetDirectory(Path.GetDirectoryName(xDir)) != null);
-//            }
-//            catch (Exception)
-//            {
-//                return false;
-//            }
+            return xDrives.ToArray();
+            */
+        }
 
-//        }
-//    }
-//}
+        public static List<string> InternalGetFileDirectoryNames(string path, string userPathOriginal, string searchPattern, bool includeFiles, bool includeDirs, SearchOption searchOption)
+        {
+            return null;
+
+            /*
+            //TODO: Add SearchOption functionality
+            //TODO: What is userPathOriginal?
+            //TODO: Add SearchPattern functionality
+
+            List<string> xFileAndDirectoryNames = new List<string>();
+
+            //Validate input arguments
+            if ((searchOption != SearchOption.TopDirectoryOnly) && (searchOption != SearchOption.AllDirectories))
+                throw new ArgumentOutOfRangeException("searchOption");
+
+            searchPattern = searchPattern.TrimEnd(new char[0]);
+            if (searchPattern.Length == 0)
+                return new string[0];
+
+            //Perform search in filesystem
+            FilesystemEntry[] xEntries = GetDirectoryListing(path);
+
+            foreach (FilesystemEntry xEntry in xEntries)
+            {
+                if (xEntry.IsDirectory && includeDirs)
+                    xFileAndDirectoryNames.Add(xEntry.Name);
+                else if (!xEntry.IsDirectory && includeFiles)
+                    xFileAndDirectoryNames.Add(xEntry.Name);
+            }
+
+            return xFileAndDirectoryNames.ToArray();
+
+             */
+        }
+
+        public static bool FileExists(string aPath)
+        {
+            try
+            {
+                FatHelpers.Debug("In VFSManager.FileExists");
+
+                var xFile = VFSManager.TryGetFile(aPath);
+                return (xFile != null);
+            }
+            catch (Exception E)
+            {
+                // don't ever remove this method, even if it doesn't contain any code!
+                FatHelpers.Debug("Exception occurred in VFSManager.FileExists: ");
+                // don't ever remove this method, even if it doesn't contain any code!
+                FatHelpers.Debug(E.Message);
+                return false;
+            }
+        }
+
+        public static bool DirectoryExists(string aPath)
+        {
+            try
+            {
+                FatHelpers.Debug("DirectoryExists. Path = '" + aPath + "'");
+                //xDir = Path.GetDirectoryName(xDir);
+                FatHelpers.Debug("Before VFSManager.GetDirectory");
+
+                var xDirectory = VFSManager.TryGetDirectory(aPath);
+                if (xDirectory == null)
+                {
+                    FatHelpers.Debug("Directory not found!");
+                    FatHelpers.Debug(aPath);
+                    return false;
+                }
+                FatHelpers.Debug("Directory.Name:");
+                FatHelpers.Debug(xDirectory.Name);
+                return (xDirectory != null);
+            }
+            catch (Exception E)
+            {
+                FatHelpers.Debug("Exception occurred in VFSManager.DirectoryExists: ");
+                FatHelpers.Debug(E.Message);
+                return false;
+            }
+
+        }
+
+        public static Stream GetFileStream(string aPathname)
+        {
+            var xFileInfo = TryGetFile(aPathname);
+            if (xFileInfo == null)
+            {
+                throw new Exception("File not found: " + aPathname);
+            }
+
+            return xFileInfo.FileSystem.GetFileStream(xFileInfo);
+        }
+    }
+}

@@ -1,27 +1,33 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 
-//namespace Cosmos.System.FileSystem.Listing
-//{
-//    public abstract class Base
-//    {
-//        public readonly FileSystem FileSystem;
-//        public readonly string Name;
+namespace Cosmos.System.FileSystem.Listing
+{
+    public abstract class Base
+    {
+        public readonly FileSystem FileSystem;
+        public readonly string Name;
 
-//        protected Base(FileSystem aFileSystem, string aName)
-//        {
-//            FileSystem = aFileSystem;
-//            Name = aName;
-//        }
+        public readonly Directory BaseDirectory;
 
-//        // Size might be updated in an ancestor destructor or on demand,
-//        // so its not a readonly field
-//        protected UInt64 mSize;
-//        public UInt64 Size
-//        {
-//            get { return mSize; }
-//        }
-//    }
-//}
+        protected Base(FileSystem aFileSystem, string aName, Directory baseDirectory)
+        {
+            FileSystem = aFileSystem;
+            Name = aName;
+            BaseDirectory = baseDirectory;
+        }
+
+        // Size might be updated in an ancestor destructor or on demand,
+        // so its not a readonly field
+        protected UInt64 mSize;
+        public UInt64 Size
+        {
+            get { return mSize; }
+            set
+            {
+                mSize = value;
+            }
+        }
+    }
+}

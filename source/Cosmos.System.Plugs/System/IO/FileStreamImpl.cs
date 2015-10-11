@@ -1,43 +1,93 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using IO = System.IO;
-//using System.Linq;
-//using System.Text;
-//using Cosmos.IL2CPU.Plugs;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using IO = System.IO;
+using System.Linq;
+using System.Text;
+using Cosmos.IL2CPU.Plugs;
+using Cosmos.System.FileSystem.VFS;
 
-//namespace Cosmos.System.Plugs.System.IO {
-//  [Plug(Target = typeof(IO::FileStream))]
-//  public class FileStreamImpl {
+namespace SentinelKernel.System.Plugs.System.IO
+{
+    [Plug(Target = typeof (IO::FileStream))]
+    [PlugField(FieldId = "$$InnerStream$$", FieldType = typeof (IO::Stream))]
+    public class FileStreamImpl
+    {
+        // This plug basically forwards all calls to the $$InnerStream$$ stream, which is supplied by the file system.
 
-//            //[PlugField(FieldId = "$$Storage$$", FieldType = typeof(char[]))]
-//            //[PlugField(FieldId = "System.Char System.String.m_firstChar", IsExternalValue = true)]
-//            //public static class StringImpl {
-//            //  //[PlugMethod(Signature = "System_Void__System_String__ctor_System_Char____System_Int32__System_Int32_")]
-//            //  public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength,
-//            //    [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-//            //    [FieldAccess(Name = "System.Char System.String.m_firstChar")] ref char* aFirstChar) {
-//            //    Char[] newChars = new Char[aLength];
-//            //    Array.Copy(aChars, aStartIndex, newChars, 0, aLength);
-//            //    aStorage = newChars;
-//            //    aStringLength = newChars.Length;
-//            //    fixed (char* xFirstChar = &aStorage[0]) {
-//            //      aFirstChar = xFirstChar;
-//            //    }
-//            //  }
+        //  public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength,
 
-//    static public void Ctor(IO::FileStream aThis, string aPathname, IO::FileMode aMode) {
-//    }
+        public static void Ctor(IO::FileStream aThis, string aPathname, IO::FileMode aMode,
+            [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        {
+            innerStream = VFSManager.GetFileStream(aPathname);
+        }
 
-//    static public void CCtor() {
-//      // plug cctor as it (indirectly) uses Thread.MemoryBarrier()
-//    }
+        public static void CCtor()
+        {
+            // plug cctor as it (indirectly) uses Thread.MemoryBarrier()
+        }
 
-//    static public int Read(IO::FileStream aThis, byte[] aBuffer, int aOffset, int aCount) {
-//      return 0;
-//    }
+        public static int Read(IO::FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
+            [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        {
+            return innerStream.Read(aBuffer, aOffset, aCount);
+        }
 
-//    //static void Init(IO::FileStream aThis, string path, IO::FileMode mode, IO::FileAccess access, int rights, bool useRights, IO::FileShare share, int bufferSize
-//    //  , IO::FileOptions options, Microsoft.Win32.Win32Native.SECURITY_ATTRIBUTES secAttrs, string msgPath, bool bFromProxy) { }
+        public static void Write(IO::FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
+            [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        {
+            innerStream.Write(aBuffer, aOffset, aCount);
+        }
 
-//  }
-//}
+        public static long get_Length(IO::FileStream aThis,
+            [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        {
+            return innerStream.Length;
+        }
+
+        public static void SetLength(IO::FileStream aThis, long aLength,
+            [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        {
+            innerStream.SetLength(aLength);
+        }
+
+        public static void Dispose(IO::FileStream aThis, bool disposing,
+            [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        {
+            if (disposing)
+            {
+                innerStream.Dispose();
+            }
+        }
+
+        public static long Seek(IO::FileStream aThis,
+                                [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream, long offset, SeekOrigin origin)
+        {
+            return innerStream.Seek(offset, origin);
+        }
+
+        public static void Flush(IO::FileStream aThis,
+           [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        {
+            innerStream.Flush();
+        }
+
+        public static long get_Position(IO::FileStream aThis,
+                                        [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
+        {
+            return innerStream.Position;
+        }
+
+        public static void set_Position(IO::FileStream aThis,
+                                        [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream, long value)
+        {
+            innerStream.Position = value;
+        }
+
+        //static void Init(IO::FileStream aThis, string path, IO::FileMode mode, IO::FileAccess access, int rights, bool useRights, IO::FileShare share, int bufferSize
+        //  , IO::FileOptions options, Microsoft.Win32.Win32Native.SECURITY_ATTRIBUTES secAttrs, string msgPath, bool bFromProxy) { }
+
+
+    }
+}

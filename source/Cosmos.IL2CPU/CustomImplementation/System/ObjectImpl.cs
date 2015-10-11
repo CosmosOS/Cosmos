@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
@@ -26,6 +27,7 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
             //{
             //    return "--object--";
             //}
+            Debugger.DoSend("<Object.ToString not yet implemented!>");
             return "<Object.ToString not yet implemented!>";
 		}
 
@@ -35,13 +37,15 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
 
 		/// <summary>
 		///		<para>
-		///			The object first stores any metadata involved. (Most likely containing a reference to the 
+		///			The object first stores any metadata involved. (Most likely containing a reference to the
 		///			object type). This is the number of bytes.
 		///		</para>
 		///		<para>
-		///			The first 4 bytes are the reference to the type information of the instance, the second 4 bytes 
-		///			are the <see cref="InstanceTypeEnum"/> value. For arrays, there are 4 following bytes containing the element count, for objects, the amount of reference fields.
-		/// For arrays, next 4 bytes containing the element size.
+		///			The first 4 bytes are the reference to the type information of the instance,
+		///         the second 4 bytes are the <see cref="InstanceTypeEnum"/> value.
+		///         For arrays, there are 4 following bytes containing the element count,
+		///         for objects, the amount of reference fields.
+		///         For arrays, next 4 bytes containing the element size.
 		///		</para>
 		/// </summary>
 		public const int FieldDataOffset = 12;

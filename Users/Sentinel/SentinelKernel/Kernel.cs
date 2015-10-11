@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using SentinelKernel.System.FileSystem.VFS;
 using Cosmos.Common.Extensions;
+using Cosmos.System.FileSystem.VFS;
+using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 
 namespace SentinelKernel
@@ -15,7 +16,7 @@ namespace SentinelKernel
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully.");
-            myVFS = new SentinelVFS();
+            myVFS = new Sys.SentinelVFS();
             VFSManager.RegisterVFS(myVFS);
         }
 
@@ -27,32 +28,20 @@ namespace SentinelKernel
                 var xRoot = Path.GetPathRoot(@"0:\test");
                 bool xTest = Directory.Exists("0:\\test");
                 Console.WriteLine("After test");
-                if (!xTest)
-                {
-                    Console.WriteLine("Folder does not exist!");
-                    return;
-                }
+                Assert.IsTrue(xTest, "Folder does not exist!");
 
-                //Console.WriteLine("Folder exists!");
-                //xTest = Directory.Exists("0:\\test\\DirInTest");
-                //if (!xTest)
-                //{
-                //    Console.WriteLine("Subfolder doesn't exist!");
-                //    return;
-                //}
-                //Console.WriteLine("Subfolder exists as well!");
-
+                Console.WriteLine("Folder exists!");
+                xTest = Directory.Exists("0:\\test\\DirInTest");
+                Assert.IsTrue(xTest, "Subfolder doesn't exist!");
+                
                 xTest = File.Exists(@"0:\KudzU.txt");
-                if (!xTest)
-                {
-                    Console.WriteLine(@"\Kudzu.txt not found!");
-                    return;
-                }
+                Assert.IsTrue(xTest, @"\Kudzu.txt not found!");
+
                 Console.WriteLine("Kudzu.txt found!");
                 Console.Write("File contents of Kudzu.txt: ");
                 Console.WriteLine(File.ReadAllText(@"0:\Kudzu.txt"));
-                File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
-                Console.WriteLine(File.ReadAllText(@"0:\Kudzu.txt"));
+//                File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
+//                Console.WriteLine(File.ReadAllText(@"0:\Kudzu.txt"));
 
                 //xTest = File.Exists(@"0:\Test\DirInTest\Readme.txt");
                 //if (!xTest)
@@ -65,17 +54,13 @@ namespace SentinelKernel
 
                 //Console.WriteLine(@"File contents of Test\DirInTest\Readme.txt: ");
                 //Console.WriteLine(File.ReadAllText(@"0:\Test\DirInTest\Readme.txt"));
+                Stop();
             }
             catch (Exception e)
             {
                 Console.WriteLine("Exception occurred:");
                 Console.WriteLine(e.Message);
-            }
-            finally
-            {
-                while (true)
-                {
-                }
+                
             }
         }
     }

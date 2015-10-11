@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.IL2CPU
 {
   // todo: optimize this, probably using assembler
-  public static class VTablesImpl
+  public static partial class VTablesImpl
   {
     // this field seems to be always empty, but the VTablesImpl class is embedded in the final exe.
     public static VTable[] mTypes;
 
-    public static bool IsInstance(int aObjectType, int aDesiredObjectType)
+    public static bool IsInstance(uint aObjectType, uint aDesiredObjectType)
     {
-      int xCurrentType = aObjectType;
+      var xCurrentType = aObjectType;
       if (aObjectType == 0)
       {
         return true;
@@ -35,16 +36,7 @@ namespace Cosmos.IL2CPU
       return false;
     }
 
-    public static void LoadTypeTable(int aTypeCount)
-    {
-      mTypes = new VTable[aTypeCount];
-      if (mTypes == null)
-      {
-        Console.WriteLine("No array exists!");
-      }
-    }
-
-    public static void SetTypeInfo(int aType, int aBaseType, int[] aMethodIndexes, int[] aMethodAddresses, int aMethodCount)
+    public static void SetTypeInfo(int aType, uint aBaseType, int[] aMethodIndexes, int[] aMethodAddresses, int aMethodCount)
     {
       //mTypes[aType] = new VTable();
       mTypes[aType].BaseTypeIdentifier = aBaseType;
@@ -57,133 +49,84 @@ namespace Cosmos.IL2CPU
     {
       mTypes[aType].MethodIndexes[aMethodIndex] = aMethodIdentifier;
       mTypes[aType].MethodAddresses[aMethodIndex] = aMethodAddress;
-      mTypes[aType].MethodCount = aMethodIndex + 1;
-    }
-
-    private static void WriteNumber(uint aValue, byte aBitCount)
-    {
-      uint xValue = aValue;
-      byte xCurrentBits = aBitCount;
-      Console.Write("0x");
-      while (xCurrentBits >= 4)
+      if (aType == 0x9D && aMethodIdentifier == 0x9C)
       {
-        xCurrentBits -= 4;
-        byte xCurrentDigit = (byte)((xValue >> xCurrentBits) & 0xF);
-        string xDigitString = null;
-        switch (xCurrentDigit)
-        {
-          case 0:
-            xDigitString = "0";
-            goto default;
-          case 1:
-            xDigitString = "1";
-            goto default;
-          case 2:
-            xDigitString = "2";
-            goto default;
-          case 3:
-            xDigitString = "3";
-            goto default;
-          case 4:
-            xDigitString = "4";
-            goto default;
-          case 5:
-            xDigitString = "5";
-            goto default;
-          case 6:
-            xDigitString = "6";
-            goto default;
-          case 7:
-            xDigitString = "7";
-            goto default;
-          case 8:
-            xDigitString = "8";
-            goto default;
-          case 9:
-            xDigitString = "9";
-            goto default;
-          case 10:
-            xDigitString = "A";
-            goto default;
-          case 11:
-            xDigitString = "B";
-            goto default;
-          case 12:
-            xDigitString = "C";
-            goto default;
-          case 13:
-            xDigitString = "D";
-            goto default;
-          case 14:
-            xDigitString = "E";
-            goto default;
-          case 15:
-            xDigitString = "F";
-            goto default;
-          default:
-            Console.Write(xDigitString);
-            break;
-        }
+        Debug("SetMethodInfo");
+        DebugHex("Type", (uint)aType);
+        DebugHex("MethodId", (uint)aMethodIdentifier);
+        DebugHex("MethodIdx", (uint)aMethodIndex);
+        DebugHex("aMethodAddress", (uint)aMethodAddress);
+        DebugHex("Read back address: ", (uint)mTypes[aType].MethodAddresses[aMethodIndex]);
+      }
+
+      if (mTypes[aType].MethodIndexes[aMethodIndex] != aMethodIdentifier)
+      {
+        DebugAndHalt("Setting went wrong! (1)");
+      }
+      if (mTypes[aType].MethodAddresses[aMethodIndex] != aMethodAddress)
+      {
+        DebugAndHalt("Setting went wrong! (2)");
       }
     }
 
-    public static int GetMethodAddressForType(int aType, int aMethodIndex)
+    public static int GetMethodAddressForType(uint aType, uint aMethodId)
     {
+      if (aType > 0xFFFF)
+      {
+        Debug("Oops");
+      }
+      var xCurrentType = aType;
+      DebugHex("Type", xCurrentType);
+      DebugHex("MethodId", aMethodId);
       do
       {
-        if (mTypes[aType].MethodIndexes == null)
+        var xCurrentTypeInfo = mTypes[xCurrentType];
+
+        if (xCurrentTypeInfo.MethodIndexes == null)
         {
-          Console.Write("Type ");
-          WriteNumber((uint)aType, 32);
-          Console.WriteLine(", MethodIndexes is null!");
+          DebugHex("MethodIndexes is null for type", aType);
           while (true)
             ;
         }
-        for (int i = 0; i < mTypes[aType].MethodIndexes.Length; i++)
+        if (xCurrentTypeInfo.MethodAddresses == null)
         {
-          if (mTypes[aType].MethodAddresses == null)
+          DebugHex("MethodAddresses is null for type", aType);
+          while (true)
+            ;
+        }
+
+        for (int i = 0; i < xCurrentTypeInfo.MethodIndexes.Length; i++)
+        {
+          if (xCurrentTypeInfo.MethodIndexes[i] == aMethodId)
           {
-            Console.Write("Type ");
-            WriteNumber((uint)aType, 32);
-            Console.WriteLine(", MethodAddresses is null!");
-            while (true)
-              ;
-          }
-          if (mTypes[aType].MethodIndexes[i] == aMethodIndex)
-          {
-            var xResult = mTypes[aType].MethodAddresses[i];
+            var xResult = xCurrentTypeInfo.MethodAddresses[i];
             if (xResult < 1048576) // if pointer is under 1MB, some issue exists!
             {
-              Console.Write("Type ");
-              WriteNumber((uint)aType, 32);
-              Console.Write(", MethodIndex = ");
-              WriteNumber((uint)aMethodIndex, 32);
-              Console.Write(", Result ");
-              WriteNumber((uint)xResult, 32);
-              Console.Write(", i ");
-              WriteNumber((uint)i, 32);
-              Console.WriteLine("");
-              Console.WriteLine("Method found, but address invalid!");
+              DebugHex("Result", (uint)xResult);
+              DebugHex("i", (uint)i);
+              DebugHex("MethodCount", (uint)xCurrentTypeInfo.MethodCount);
+              DebugHex("MethodAddresses.Length", (uint)xCurrentTypeInfo.MethodAddresses.Length);
+              Debug("Method found, but address is invalid!");
               while (true)
                 ;
             }
+            Debug("Found.");
             return xResult;
           }
         }
-        if (aType == mTypes[aType].BaseTypeIdentifier)
+        if (xCurrentType == xCurrentTypeInfo.BaseTypeIdentifier)
         {
           break;
         }
-        aType = mTypes[aType].BaseTypeIdentifier;
+        xCurrentType = xCurrentTypeInfo.BaseTypeIdentifier;
       }
       while (true);
       //}
-      Console.Write("Type ");
-      WriteNumber((uint)aType, 32);
-      Console.Write(", MethodIndex = ");
-      WriteNumber((uint)aMethodIndex, 32);
-      Console.WriteLine("");
-      Console.WriteLine("Not FOUND!");
+      Debugger.DoSend("Type");
+      Debugger.DoSendNumber(aType);
+      Debugger.DoSend("MethodId");
+      Debugger.DoSendNumber(aMethodId);
+      Debugger.DoSend("Not FOUND!");
       while (true)
         ;
       throw new Exception("Cannot find virtual method!");
@@ -194,7 +137,7 @@ namespace Cosmos.IL2CPU
   public struct VTable
   {
     [FieldOffset(0)]
-    public int BaseTypeIdentifier;
+    public uint BaseTypeIdentifier;
 
     [FieldOffset(4)]
     public int MethodCount;
