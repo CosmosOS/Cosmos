@@ -12,24 +12,28 @@ namespace Cosmos.TestRunner.Core
                 throw new ArgumentNullException("engine");
             }
 
+            // Sets the time before an error is registered. For example if set to 60 then if a kernel runs for more than 60 seconds then
+            // that kernel will be marked as a failiure and terminated
             engine.AllowedSecondsInKernel = 1800;
 
-            // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are ran.
+            // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are run.
             engine.RunTargets.Add(RunTargetEnum.Bochs);
 
-            // if you're working on the compiler (or other lower parts), you can choose to run the compiler in process
-            // 1 thing to keep in mind though, is that this only works with 1 kernel at a time!
+            // If you're working on the compiler (or other lower parts), you can choose to run the compiler in process
+            // one thing to keep in mind though, is that this only works with 1 kernel at a time!
             //engine.RunIL2CPUInProcess = true;
+
             engine.EnableStackCorruptionChecks = false;
             //engine.RunWithGDB = true;
 
+            // Select kernels to be tested by adding them to the engine
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
 
-            // known bugs, therefor disabled for now:
+            // Known bugs, therefore disabled for now:
             //engine.AddKernel(typeof(BoxingTests.Kernel).Assembly.Location);
 
             // Experimental stuff:
