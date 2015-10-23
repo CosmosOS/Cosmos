@@ -9,7 +9,7 @@ namespace Cosmos.Build.Common {
     static public List<string> PropNames = new List<string>();
 
     static BuildProperties() {
-      foreach (var xField in typeof(BuildProperties).GetFields()) {
+      foreach (var xField in typeof(BuildPropertyNames).GetFields()) {
         // IsLiteral determines if its value is written at compile time and not changeable.
         // Consts are static even if we dont use static keyword.
         // IsInitOnly determine if the field can be set in the body of the constructor
