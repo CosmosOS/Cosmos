@@ -23,7 +23,7 @@ namespace Cosmos.TestRunner.Core
             // one thing to keep in mind though, is that this only works with 1 kernel at a time!
             //engine.RunIL2CPUInProcess = true;
 
-            engine.EnableStackCorruptionChecks = false;
+            //engine.EnableStackCorruptionChecks = false;
             //engine.RunWithGDB = true;
 
             // Select kernels to be tested by adding them to the engine
