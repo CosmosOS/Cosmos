@@ -15,27 +15,27 @@ Release Changelog
 
 Evolution
 ------------
-Cosmos Source Code
-Dewitcher library
-Some very basics. (bench, top, help, ...)
-Beginning of process and thread system in order to manage memory.
+* Cosmos Source Code
+* Dewitcher library
+* Some very basics. (bench, top, help, ...)
+* Beginning of process and thread system in order to manage memory.
 ... Nothing more at the moment.
 
 
 To Come
 ------------
-Garbage Collector
-Basic configuration management
-Process and thread system
-Basic user management
-Basic environnement
-Re-integrate new version of Cosmos, without breaking breakpoint.
-Write some basic commands (ping, top, ...) (will need some plugs)
-Update Command Engine of dewitcher in order to add special option supports
-Enable console shortcuts
-Basic integration of a FileSystem (own or others,...)
-Make init of system with dewitcher's menu class
-Log System
+* Garbage Collector
+* Basic configuration management
+* Process and thread system
+* Basic user management
+* Basic environnement
+* Re-integrate new version of Cosmos, without breaking breakpoint.
+* Write some basic commands (ping, top, ...) (will need some plugs)
+* Update Command Engine of dewitcher in order to add special option supports
+* Enable console shortcuts
+* Basic integration of a FileSystem (own or others,...)
+* Make init of system with dewitcher's menu class
+* Log System
 
 More and more to come, will release full todoList as soon as i have some time to spend !
 Joining DuNodes
