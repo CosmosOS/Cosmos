@@ -1,4 +1,5 @@
-!!!Project Description
+Project Description
+===================
 DuNodes is an Hypervisor based on Cosmos OS.
 DuNodes should be able to span virtual machine across several nodes.
 
@@ -9,9 +10,11 @@ You can still refer to cosmos project in order to have more informations.
 Documentation will be written later.
 
 
-!!!Release Changelog
+Release Changelog
+==================
 
-!!!Evolution
+Evolution
+------------
 Cosmos Source Code
 Dewitcher library
 Some very basics. (bench, top, help, ...)
@@ -19,7 +22,8 @@ Beginning of process and thread system in order to manage memory.
 ... Nothing more at the moment.
 
 
-!!!To Come
+To Come
+------------
 Garbage Collector
 Basic configuration management
 Process and thread system
