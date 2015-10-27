@@ -1,0 +1,2021 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Vestris.VMWareLib</name>
+    </assembly>
+    <members>
+        <member name="T:Vestris.VMWareLib.VMWareException">
+            <summary>
+            A VMWare exception. Every VMWare operational failure is translated into 
+            a <see cref="T:Vestris.VMWareLib.VMWareException" />.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareException.ErrorCode">
+            <summary>
+            The original VMWare error code.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareException.#ctor(System.UInt64)">
+            <summary>
+            A VMWare exception with default error text in English-US.
+            </summary>
+            <param name="code">VMWare VixCOM.Constants error code.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareException.#ctor(System.UInt64,System.String)">
+            <summary>
+            A VMWare exception.
+            </summary>
+            <param name="code">VMWare VixCOM.Constants error code.</param>
+            <param name="message">Error description.</param>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareInterop">
+            <summary>
+            Helper functions for VMWare interop.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareInterop.Timeouts">
+            <summary>
+            Default timeouts for VMWare operations.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareInterop.Check(System.UInt64)">
+            <summary>
+            Checks whether an error indicates failure and throws an exception in that case.
+            </summary>
+            <param name="errCode">Error code.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareInterop.FromUnixEpoch(System.Int64)">
+            <summary>
+            VMWare VIX date/time is expressed in UNIX EPOCH (number of seconds since January 1st, 1970).
+            Convert VIX date/time into .NET DateTime.
+            </summary>
+            <param name="dt">Unix epoch date/time.</param>
+            <returns>DateTime in .NET format.</returns>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareJob">
+            <summary>
+            A VixCOM job.
+            Implements synchronous execution of VixCOM tasks.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJob.#ctor(Interop.VixCOM.IJob,Vestris.VMWareLib.VMWareJobCallback)">
+            <summary>
+            A VMWare job created with a job completion callback.
+            </summary>
+            <param name="job">An instance of IJob.</param>
+            <param name="callback">Job completion callback.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJob.Wait(System.Int32)">
+            <summary>
+            Wait for the job to complete, timeout.
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJob.Wait``1(System.Object[],System.Int32)">
+            <summary>
+            Wait for the job to complete, return a result.
+            </summary>
+            <param name="properties">Properties array.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <typeparam name="T">Type of the property to return.</typeparam>
+            <returns>Job result.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJob.YieldWait(System.Object[],System.Int32)">
+            <summary>
+            Wait for the job to complete and enumerate results.
+            </summary>
+            <param name="properties">Properties to yield.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>A results enumerator.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJob.Wait``1(System.Object[],System.Int32,System.Int32)">
+            <summary>
+            Wait for the job to complete, return a result.
+            </summary>
+            <param name="properties">Properties to yield.</param>
+            <param name="index">Property index to yield.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <typeparam name="T">Type of the property to return.</typeparam>
+            <returns>Job result.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJob.Wait``1(System.Int32,System.Int32)">
+            <summary>
+            Wait for the job to complete, return a single result.
+            </summary>
+            <param name="propertyId">Property id.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <typeparam name="T">Type of property to return.</typeparam>
+            <returns>A single job result.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJob.Wait``1(System.Object[])">
+            <summary>
+            Wait for the job to complete, return a result.
+            </summary>
+            <param name="properties">Properties to return.</param>
+            <typeparam name="T">Type of results.</typeparam>
+            <returns>A job result.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJob.GetNthProperties``1(System.Int32,System.Object[])">
+            <summary>
+            Get n-th properties.
+            </summary>
+            <typeparam name="T">Type of result.</typeparam>
+            <param name="index">Property index.</param>
+            <param name="properties">Property objects.</param>
+            <returns>N'th properties.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJob.GetNumProperties(System.Int32)">
+            <summary>
+            Get the number of property values returned by the job.
+            </summary>
+            <param name="property">Property ID.</param>
+            <returns>The number of property values returned by the job.</returns>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareJobCallback">
+            <summary>
+            A job completion callback, used with <see cref="T:Vestris.VMWareLib.VMWareJob" />.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJobCallback.OnVixEvent(Interop.VixCOM.IJob,System.Int32,Interop.VixCOM.IVixHandle)">
+            <summary>
+            Handle a Vix event.
+            </summary>
+            <param name="job">An instance that implements IJob.</param>
+            <param name="eventType">Event type.</param>
+            <param name="moreEventInfo">Additional event info.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJobCallback.OnVixEvent(Vestris.VMWareLib.VMWareVixHandle{Interop.VixCOM.IJob},System.Int32,Interop.VixCOM.IVixHandle)">
+            <summary>
+            Handle a Vix event.
+            Currently handles the job completion event, call WaitForCompletion to block with a timeout.
+            </summary>
+            <param name="job">An instance that implements IJob.</param>
+            <param name="eventType">Event type.</param>
+            <param name="moreEventInfo">Additional event info.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJobCallback.TryWaitForCompletion(System.Int32)">
+            <summary>
+            Wait for completion of the job with a timeout.
+            </summary>
+            <param name="timeoutInMilliseconds">Timeout in milliseconds.</param>
+            <returns>True if job completed, false if timeout expired.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareJobCallback.WaitForCompletion(System.Int32)">
+            <summary>
+            Wait for completion of the job with a timeout.
+            A <see cref="T:System.TimeoutException" /> occurs if the job hasn't completed within the timeout specified.
+            </summary>
+            <param name="timeoutInMilliseconds">Timeout in milliseconds.</param>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareProcessCollection">
+            <summary>
+            A collection of vmware processes, organized by process id.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareProcessCollection.FindProcess(System.String,System.StringComparison)">
+            <summary>
+            Find a process by name.
+            </summary>
+            <param name="processName">The name of the process.</param>
+            <param name="comparisonType">The type of string comparison.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareRootSnapshotCollection">
+            <summary>
+            A collection of root snapshots.
+            </summary>
+            <remarks>
+            Shared snapshots will only be accessible inside the guest operating system if snapshots are 
+            enabled for the virtual machine.
+            </remarks>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareRootSnapshotCollection.#ctor(Interop.VixCOM.IVM2)">
+            <summary>
+             A collection of snapshots that belong to a virtual machine.
+            </summary>
+            <param name="vm">A virtual machine instance.</param>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareRootSnapshotCollection.Snapshots">
+            <summary>
+            A list of root snapshots on the current virtual machine.
+            </summary>
+            <remarks>
+            The list is populated on first access, this may time some time.
+            </remarks>
+            <returns>A list of snapshots.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareRootSnapshotCollection.GetNamedSnapshot(System.String)">
+            <summary>
+            Get a snapshot by its exact name. 
+            </summary>
+            <param name="name">Snapshot name.</param>
+            <returns>A snapshot.</returns>
+            <remarks>This function will throw an exception if more than one snapshot with the same exists or if the snapshot doesn't exist.</remarks>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareRootSnapshotCollection.GetCurrentSnapshot">
+            <summary>
+            Current snapshot.
+            </summary>
+            <returns>Current snapshot.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareRootSnapshotCollection.RemoveSnapshot(Vestris.VMWareLib.VMWareSnapshot)">
+            <summary>
+            Delete/remove a snapshot.
+            </summary>
+            <param name="item">Snapshot to delete.</param>
+            <returns>True if the snapshot was deleted.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareRootSnapshotCollection.RemoveSnapshot(Vestris.VMWareLib.VMWareSnapshot,System.Int32)">
+            <summary>
+            Delete/remove a snapshot.
+            </summary>
+            <param name="item">Snapshot to delete.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>True if the snapshot was deleted.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareRootSnapshotCollection.RemoveSnapshot(System.String)">
+            <summary>
+            Delete a snapshot.
+            </summary>
+            <param name="name">Name of the snapshot to delete.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareRootSnapshotCollection.RemoveSnapshot(System.String,System.Int32)">
+            <summary>
+            Delete a snapshot.
+            </summary>
+            <param name="name">Name of the snapshot to delete.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareRootSnapshotCollection.CreateSnapshot(System.String,System.String)">
+            <summary>
+            Create a new snapshot, child of the current snapshot.
+            </summary>
+            <param name="name">Snapshot name.</param>
+            <param name="description">Snapshot description.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareRootSnapshotCollection.CreateSnapshot(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Create a new snapshot, child of the current snapshot.
+            </summary>
+            <param name="name">Snapshot name.</param>
+            <param name="description">Snapshot description.</param>
+            <param name="flags">Flags, one of 
+            <list type="bullet">
+             <item>VIX_SNAPSHOT_INCLUDE_MEMORY: Captures the full state of a running virtual machine, including the memory</item>
+            </list>
+            </param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareSharedFolder">
+            <summary>
+            A VMWare Shared Folder.
+            A shared folder is a local mount point in the guest file system which mounts a shared folder exported by the host.
+            Shared folders are not supported for the following guest operating systems: 
+            Windows ME, Windows 98, Windows 95, Windows 3.x, and DOS. 
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolder.#ctor(System.String,System.String)">
+            <summary>
+            A shared folder defined by share name and host path.
+            </summary>
+            <param name="shareName">share name</param>
+            <param name="hostPath">host path</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolder.#ctor(System.String,System.String,System.Int32)">
+            <summary>
+            A shared folder defined by share name, host path and additional flags.
+            </summary>
+            <param name="shareName">share name</param>
+            <param name="hostPath">host path</param>
+            <param name="flags">additional flags</param>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSharedFolder.ShareName">
+            <summary>
+            The name of the folder.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSharedFolder.HostPath">
+            <summary>
+            Host path this folder is mounted from.
+            Only absolute paths should be used for files in the guest; the resolution of relative paths is not specified. 
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSharedFolder.Flags">
+            <summary>
+            Shared folder flags, one of the following.
+            <list type="bullet">
+             <item>VIX_SHAREDFOLDER_WRITE_ACCESS: allow write access</item>
+            </list>
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolder.Equals(System.Object)">
+            <summary>
+            Compare with another instance of a shared folder or object.
+            </summary>
+            <param name="obj">another shared folder</param>
+            <returns>true if the shared folders are identical</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolder.GetHashCode">
+            <summary>
+            Serves as a hash function for a particular type.
+            </summary>
+            <returns>A hash code for the current System.Object.</returns>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareSharedFolderCollection">
+            <summary>
+            A collection of shared folders.
+            Shared folders will only be accessible inside the guest operating system if shared folders are 
+            enabled for the virtual machine.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolderCollection.#ctor(Interop.VixCOM.IVM)">
+            <summary>
+            A collection of shared folders that belong to a virtual machine.
+            </summary>
+            <param name="vm">Virtual machine.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolderCollection.Add(Vestris.VMWareLib.VMWareSharedFolder)">
+            <summary>
+            Add (create) a shared folder.
+            </summary>
+            <param name="sharedFolder">The shared folder to add.</param>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSharedFolderCollection.SharedFolders">
+            <summary>
+            Get shared folders.
+            </summary>
+            <returns>A list of shared folders.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolderCollection.Clear">
+            <summary>
+            Delete all shared folders.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolderCollection.CopyTo(Vestris.VMWareLib.VMWareSharedFolder[],System.Int32)">
+            <summary>
+            A function to copy shared folder objects between arrays.
+            Don't use externally.
+            </summary>
+            <param name="array">Target array.</param>
+            <param name="arrayIndex">Array index.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolderCollection.Contains(Vestris.VMWareLib.VMWareSharedFolder)">
+            <summary>
+            Returns true if this virtual machine has the folder specified.
+            </summary>
+            <param name="item">Shared folder.</param>
+            <returns>True if the virtual machine contains the specified shared folder.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolderCollection.Remove(Vestris.VMWareLib.VMWareSharedFolder)">
+            <summary>
+            Delete a shared folder.
+            </summary>
+            <param name="item">Shared folder to delete.</param>
+            <returns>True if the folder was deleted.</returns>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSharedFolderCollection.Count">
+            <summary>
+            Number of shared folders.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSharedFolderCollection.IsReadOnly">
+            <summary>
+            Returns true if the collection is read-only.
+            Shared folder collections are never read-only.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolderCollection.System#Collections#Generic#IEnumerable{Vestris#VMWareLib#VMWareSharedFolder}#GetEnumerator">
+            <summary>
+            A shared folder enumerator.
+            </summary>
+            <returns>Shared folders enumerator.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolderCollection.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            A shared folder enumerator.
+            </summary>
+            <returns>Shared folders enumerator.</returns>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSharedFolderCollection.Enabled">
+            <summary>
+            Enable/disable all shared folders as a feature on a virtual machine. 
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSharedFolderCollection.Item(System.Int32)">
+            <summary>
+            Returns a shared folder at a given index.
+            </summary>
+            <param name="index">Shared folder index.</param>
+            <returns>A shared folder.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSharedFolderCollection.Dispose">
+            <summary>
+            Dispose the object.
+            </summary>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareSnapshot">
+            <summary>
+            A VMWare snapshot.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.#ctor(Interop.VixCOM.IVM2,Interop.VixCOM.ISnapshot,Vestris.VMWareLib.VMWareSnapshot)">
+            <summary>
+            A VMWare snapshot constructor.
+            </summary>
+            <param name="vm">Virtual machine.</param>
+            <param name="snapshot">Snapshot.</param>
+            <param name="parent">Parent snapshot.</param>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSnapshot.Parent">
+            <summary>
+            Parent snapshot.
+            </summary>
+            <remarks>
+            Root snapshots have a null parent.
+            </remarks>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.RevertToSnapshot(System.Int32,System.Int32)">
+            <summary>
+            Restores the virtual machine to the state when the specified snapshot was created.
+            </summary>
+            <param name="powerOnOptions">
+             Any applicable VixVMPowerOpOptions. If the virtual machine was powered on when the snapshot was created, 
+             then this will determine how the virtual machine is powered back on. To prevent the virtual machine from being 
+             powered on regardless of the power state when the snapshot was created, use the 
+             VIX_VMPOWEROP_SUPPRESS_SNAPSHOT_POWERON flag. VIX_VMPOWEROP_SUPPRESS_SNAPSHOT_POWERON is mutually exclusive to 
+             all other VixVMPowerOpOptions. 
+            </param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.RevertToSnapshot(System.Int32)">
+            <summary>
+            Restores the virtual machine to the state when the specified snapshot was created.
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.RevertToSnapshot">
+            <summary>
+            Restores the virtual machine to the state when the specified snapshot was created.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.RemoveSnapshot">
+            <summary>
+            Remove/delete this snapshot.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.RemoveSnapshot(System.Int32)">
+            <summary>
+            Remove/delete this snapshot.
+            </summary>
+            <remarks>
+            If the snapshot is a member of a collection, the latter is updated with orphaned
+            snapshots appended to the parent.
+            </remarks>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSnapshot.ChildSnapshots">
+            <summary>
+            Child snapshots.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSnapshot.DisplayName">
+            <summary>
+            Display name of the snapshot.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSnapshot.Description">
+            <summary>
+            Display name of the snapshot.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSnapshot.Path">
+            <summary>
+            Complete snapshot path, from root.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSnapshot.PowerState">
+            <summary>
+            The power state of this snapshot, an OR-ed set of VIX_POWERSTATE_* values.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSnapshot.IsReplayable">
+            <summary>
+            Returns true if the snapshot is replayable.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.BeginReplay">
+            <summary>
+            Replay a recording of a virtual machine. 
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.BeginReplay(System.Int32,System.Int32)">
+            <summary>
+            Replay a recording of a virtual machine. 
+            </summary>
+            <param name="powerOnOptions">One of VIX_VMPOWEROP_NORMAL or VIX_VMPOWEROP_LAUNCH_GUI.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.EndReplay">
+            <summary>
+            Stop replaying a virtual machine's recording.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.EndReplay(System.Int32)">
+            <summary>
+            Stop replaying a virtual machine's recording.
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.Clone(Vestris.VMWareLib.VMWareVirtualMachineCloneType,System.String)">
+            <summary>
+            Creates a copy of the virtual machine at the state at which this snapshot was taken.
+            </summary>
+            <param name="cloneType">Virtual Machine clone type.</param>
+            <param name="destConfigPathName">The path name of the virtual machine configuration file that will be created.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.Clone(Vestris.VMWareLib.VMWareVirtualMachineCloneType,System.String,System.Int32)">
+            <summary>
+            Creates a copy of the virtual machine at the state at which this snapshot was taken.
+            </summary>
+            <param name="cloneType">Virtual Machine clone type.</param>
+            <param name="destConfigPathName">The path name of the virtual machine configuration file that will be created.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshot.Dispose">
+            <summary>
+            Dispose the snapshot.
+            </summary>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareSnapshotCollection">
+            <summary>
+            A collection of snapshots at any snapshot level.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareSnapshotCollection._vm">
+            <summary>
+            Virtual machine handle.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareSnapshotCollection._snapshots">
+            <summary>
+            Internal list of snapshots.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshotCollection.#ctor(Interop.VixCOM.IVM2,Vestris.VMWareLib.VMWareSnapshot)">
+            <summary>
+            Snapshot collection constructor.
+            </summary>
+            <param name="vm">Virtual machine.</param>
+            <param name="parent">Snapshot parent.</param>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSnapshotCollection.Snapshots">
+            <summary>
+            The list of snapshots.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshotCollection.FindSnapshot(System.String)">
+            <summary>
+            Find a snapshot.
+            </summary>
+            <param name="pathToSnapshot">Path to a snapshot.</param>
+            <returns>A snapshot, null if not found.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshotCollection.FindSnapshotByName(System.String)">
+            <summary>
+            Find a snapshot by name. Unlike GetSnapshotByName this function 
+            doesn't throw an exception when there're two snapshots of the same name, it returns
+            the first snapshot found.
+            </summary>
+            <param name="name">Name of a snapshot.</param>
+            <returns>The first snapshot that matches the name, null if not found.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshotCollection.FindSnapshotsByName(System.String)">
+            <summary>
+            Find all snapshots by name. This can return multiple snapshots
+            that have the same name.
+            </summary>
+            <param name="name">Name of a snapshot.</param>
+            <returns>The first snapshot that matches the name, null if not found.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshotCollection.CopyTo(Vestris.VMWareLib.VMWareSnapshot[],System.Int32)">
+            <summary>
+            Copy to an array of VMWareSnapshots.
+            </summary>
+            <param name="array">Target array.</param>
+            <param name="arrayIndex">Array index.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshotCollection.Contains(Vestris.VMWareLib.VMWareSnapshot)">
+            <summary>
+            Returns true if this virtual machine has the snapshot specified.
+            </summary>
+            <param name="item">Snapshot.</param>
+            <returns>True if the virtual machine contains the specified snapshot.</returns>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSnapshotCollection.Count">
+            <summary>
+            Number of snapshots.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareSnapshotCollection.IsReadOnly">
+            <summary>
+            Returns true if the collection is read-only.
+            A collection of snapshots is never read-only.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshotCollection.System#Collections#Generic#IEnumerable{Vestris#VMWareLib#VMWareSnapshot}#GetEnumerator">
+            <summary>
+            A snapshot collection enumerator.
+            </summary>
+            <returns>Snapshots enumerator.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshotCollection.System#Collections#IEnumerable#GetEnumerator">
+            <summary>
+            A snapshot collection enumerator.
+            </summary>
+            <returns>Snapshots enumerator.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshotCollection.Add(Vestris.VMWareLib.VMWareSnapshot)">
+            <summary>
+            Add a snapshot to the list.
+            </summary>
+            <param name="snapshot">Snapshot to add.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshotCollection.Remove(Vestris.VMWareLib.VMWareSnapshot)">
+            <summary>
+            Remove a snapshot from this collection, append orphaned children.
+            </summary>
+            <param name="snapshot">Snapshot to remove.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshotCollection.RemoveAll">
+            <summary>
+            Remove all elements from the snapshot collection.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareSnapshotCollection.Dispose">
+            <summary>
+            Dispose the collection.
+            </summary>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareTimeoutAttribute">
+            <summary>
+            VMWare job timeout metadata.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareTimeoutAttribute.Multiplier">
+            <summary>
+            A default base timeout multiplier.
+            </summary>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareTimeouts">
+            <summary>
+            A collection of default timeouts used in VMWareTasks functions exposed without a timeout parameter.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.ConnectTimeout">
+            <summary>
+            Maximum time, in seconds, to establish a connection to a VMWare host.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.OpenVMTimeout">
+            <summary>
+            Maximum time, in seconds, to open a virtual machine.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.RegisterVMTimeout">
+            <summary>
+            Maximum time, in seconds, to register or unregister a virtual machine.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.RevertToSnapshotTimeout">
+            <summary>
+            Maximum time, in seconds, to revert a snapshot.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.RemoveSnapshotTimeout">
+            <summary>
+            Maximum time, in seconds, to remove (delete) a snapshot.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.CreateSnapshotTimeout">
+            <summary>
+            Maximum time, in seconds, to create a snapshot.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.PowerOnTimeout">
+            <summary>
+            The maximum operational time, in seconds, to bring the power to/from the vm, not to boot it
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.PowerOffTimeout">
+            <summary>
+            The maximum time, in seconds, to power off a virtual machine.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.ResetTimeout">
+            <summary>
+            The maximum time, in seconds, to reset a virtual machine.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.SuspendTimeout">
+            <summary>
+            The maximum time, in seconds, to suspend a virtual machine.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.PauseTimeout">
+            <summary>
+            The maximum time, in seconds, to pause a virtual machine.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.UnpauseTimeout">
+            <summary>
+            The maximum time, in seconds, to unpause (continue execution of) a virtual machine.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.WaitForToolsTimeout">
+            <summary>
+            The maximum time, in seconds, to wait for tools in a guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.LoginTimeout">
+            <summary>
+            The maximum time, in seconds, to wait for a log-in to a guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.CopyFileTimeout">
+            <summary>
+            Maximum time, in seconds, to copy a file from guest to host and from host to guest.
+            <remarks>
+            Copy is very slow, see http://communities.vmware.com/thread/184489.
+            </remarks>
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.DeleteFileTimeout">
+            <summary>
+            Maximum time, in seconds, to wait for a file to be deleted in the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.DeleteDirectoryTimeout">
+            <summary>
+            Maximum time, in seconds, to wait for a directory to be deleted in the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.RunProgramTimeout">
+            <summary>
+            Maximum time, in seconds, to wait for a program to run in the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.RunScriptTimeout">
+            <summary>
+            Maximum time, in seconds, to wait for a script to run in the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.OpenUrlTimeout">
+            <summary>
+            Maximum time, in seconds, to wait for an url to open in a browser on the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.FileExistsTimeout">
+            <summary>
+            Maximum time, in seconds, to wait to check whether a file exists in the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.DirectoryExistsTimeout">
+            <summary>
+            Maximum time, in seconds, to wait to check whether a directory exists in the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.LogoutTimeout">
+            <summary>
+            Maximum time, in seconds, to wait for a logout from a guest operating system to complete.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.ListDirectoryTimeout">
+            <summary>
+            Maximum time, in seconds, to list the contents of a directory in the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.ReadVariableTimeout">
+            <summary>
+            Maximum time, in seconds, to wait to read a remote variable.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.WriteVariableTimeout">
+            <summary>
+            Maximum time, in seconds, to wait to write a remote variable.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.EnableSharedFoldersTimeout">
+            <summary>
+            Maximum time, in seconds, to wait to enable or disable shared folders.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.GetSharedFoldersTimeout">
+            <summary>
+            Maximum time, in seconds, to wait to fetch the list of shared folders.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.AddRemoveSharedFolderTimeout">
+            <summary>
+            Maximum time, in seconds, to add/remove a shared folder.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.CaptureScreenImageTimeout">
+            <summary>
+            Maximum time, in seconds, to capture a screen image.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.CreateDirectoryTimeout">
+            <summary>
+            Maximum time, in seconds, to create a directory in the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.CreateTempFileTimeout">
+            <summary>
+            Maximum time, in seconds, to create a temporary file in the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.ListProcessesTimeout">
+            <summary>
+            Maximum time, in seconds, to list processes in the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.FindItemsTimeout">
+            <summary>
+            Maximum time, in seconds, to fetch a collection of items in find operations.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.KillProcessTimeout">
+            <summary>
+            Maximum time, in seconds, to kill a process in the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.RecordingTimeout">
+            <summary>
+            Maximum time, in seconds, to begin and end a recording.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.ReplayTimeout">
+            <summary>
+            Maximum time, in seconds, to replay a snapshot.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.UpgradeVirtualHardwareTimeout">
+            <summary>
+            Maximum time, in seconds, to wait for an upgrade for the virtual hardware.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.CloneTimeout">
+            <summary>
+            Maximum time, in seconds, to clone a virtual machine.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.DeleteTimeout">
+            <summary>
+            Maximum time, in seconds, to delete a virtual machine.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.GetFileInfoTimeout">
+            <summary>
+            Maximum time, in seconds, to get file information from a guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareTimeouts.InstallToolsTimeout">
+            <summary>
+            Maximum time, in seconds, to prepare to install or upgrade VMWare Tools.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareTimeouts.#ctor">
+            <summary>
+            A collection of timeouts based on a default 60-seconds base timeout.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareTimeouts.#ctor(System.Int32)">
+            <summary>
+            A collection of timeouts based on a configurable base timeout.
+            </summary>
+            <param name="baseTimeout">a base timeout</param>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareVirtualHost">
+            <summary>
+            A VMWare virtual host.
+            </summary>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareVirtualHost.ServiceProviderType">
+            <summary>
+            VMWare service provider type.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualHost.ServiceProviderType.None">
+            <summary>
+            No service provider type, not connected.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualHost.ServiceProviderType.Server">
+            <summary>
+            VMWare Server.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualHost.ServiceProviderType.Workstation">
+            <summary>
+            VMWare Workstation.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualHost.ServiceProviderType.VirtualInfrastructureServer">
+            <summary>
+            Virtual Infrastructure Server, eg. ESX.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualHost.ServiceProviderType.Player">
+            <summary>
+            VMWare Player.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualHost._host2">
+            <summary>
+            An IHost2 handle, where supported.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.#ctor">
+            <summary>
+            A VMWare virtual host.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualHost.ConnectionType">
+            <summary>
+            Connected host type.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.ConnectToVMWarePlayer">
+            <summary>
+            Connect to a WMWare Player.
+            </summary>
+            <example>
+            <code>
+            using System;
+            using System.Collections.Generic;
+            using Vestris.VMWareLib;
+            
+            VMWareVirtualHost virtualHost = new VMWareVirtualHost();
+            virtualHost.ConnectToVMWarePlayer();
+            VMWareVirtualMachine virtualMachine = virtualHost.Open("C:\Virtual Machines\xp\xp.vmx");
+            virtualMachine.PowerOn();
+            </code>
+            </example>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.ConnectToVMWarePlayer(System.Int32)">
+            <summary>
+            Connect to a WMWare Player.
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.ConnectToVMWareWorkstation">
+            <summary>
+            Connect to a WMWare Workstation.
+            </summary>
+            <example>
+            <code>
+            using System;
+            using System.Collections.Generic;
+            using Vestris.VMWareLib;
+            
+            VMWareVirtualHost virtualHost = new VMWareVirtualHost();
+            virtualHost.ConnectToVMWareWorkstation();
+            VMWareVirtualMachine virtualMachine = virtualHost.Open("C:\Virtual Machines\xp\xp.vmx");
+            virtualMachine.PowerOn();
+            </code>
+            </example>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.ConnectToVMWareWorkstation(System.Int32)">
+            <summary>
+            Connect to a WMWare Workstation.
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.ConnectToVMWareVIServer(System.String,System.String,System.String)">
+            <summary>
+            Connect to a WMWare Virtual Infrastructure Server (eg. ESX or VMWare Server 2.x).
+            </summary>
+            <param name="hostName">VMWare host name and optional port.</param>
+            <param name="username">Username.</param>
+            <param name="password">Password.</param>
+            <example>
+            <code>
+            using System;
+            using System.Collections.Generic;
+            using Vestris.VMWareLib;
+            
+            VMWareVirtualHost virtualHost = new VMWareVirtualHost();
+            virtualHost.ConnectToVMWareVIServer("esx.mycompany.com", "vmuser", "password");
+            VMWareVirtualMachine virtualMachine = virtualHost.Open("[storage] testvm/testvm.vmx");
+            virtualMachine.PowerOn();
+            </code>
+            </example>
+            <example>
+            <code>
+            using System;
+            using System.Collections.Generic;
+            using Vestris.VMWareLib;
+            
+            VMWareVirtualHost virtualHost = new VMWareVirtualHost();
+            virtualHost.ConnectToVMWareVIServer("localhost:8333", "vmuser", "password");
+            VMWareVirtualMachine virtualMachine = virtualHost.Open("[standard] testvm/testvm.vmx");
+            virtualMachine.PowerOn();
+            </code>
+            </example>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.ConnectToVMWareVIServer(System.String,System.String,System.String,System.Int32)">
+            <summary>
+            Connect to a WMWare Virtual Infrastructure Server (eg. ESX or VMWare Server 2.x).
+            </summary>
+            <param name="hostName">VMWare host name and optional port.</param>
+            <param name="username">Username.</param>
+            <param name="password">Password.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <example>
+            <code>
+            using System;
+            using System.Collections.Generic;
+            using Vestris.VMWareLib;
+            
+            VMWareVirtualHost virtualHost = new VMWareVirtualHost();
+            virtualHost.ConnectToVMWareVIServer("esx.mycompany.com", "vmuser", "password");
+            VMWareVirtualMachine virtualMachine = virtualHost.Open("[storage] testvm/testvm.vmx");
+            virtualMachine.PowerOn();
+            </code>
+            </example>
+            <example>
+            <code>
+            using System;
+            using System.Collections.Generic;
+            using Vestris.VMWareLib;
+            
+            VMWareVirtualHost virtualHost = new VMWareVirtualHost();
+            virtualHost.ConnectToVMWareVIServer("localhost:8333", "vmuser", "password");
+            VMWareVirtualMachine virtualMachine = virtualHost.Open("[standard] testvm/testvm.vmx");
+            virtualMachine.PowerOn();
+            </code>
+            </example>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.ConnectToVMWareVIServer(System.Uri,System.String,System.String,System.Int32)">
+            <summary>
+            Connect to a WMWare Virtual Infrastructure Server (eg. ESX).
+            </summary>
+            <param name="hostUri">Host SDK uri, eg. http://server/sdk.</param>
+            <param name="username">Username.</param>
+            <param name="password">Password.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.ConnectToVMWareServer(System.String,System.String,System.String)">
+            <summary>
+            Connect to a WMWare Server.
+            </summary>
+            <param name="username">Username.</param>
+            <param name="password">Password.</param>
+            <param name="hostName">DNS name or IP address of a VMWare host, leave blank for localhost.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.ConnectToVMWareServer(System.String,System.String,System.String,System.Int32)">
+            <summary>
+            Connect to a WMWare Server.
+            </summary>
+            <param name="hostName">DNS name or IP address of a VMWare host, leave blank for localhost.</param>
+            <param name="username">Username.</param>
+            <param name="password">Password.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.Connect(Vestris.VMWareLib.VMWareVirtualHost.ServiceProviderType,System.String,System.Int32,System.String,System.String,System.Int32)">
+            <summary>
+            Connects to a VMWare VI Server, VMWare Server or Workstation.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.Open(System.String)">
+            <summary>
+            Open a virtual machine.
+            </summary>
+            <param name="fileName">Virtual Machine file, local .vmx or [storage] .vmx.</param>
+            <returns>An instance of a virtual machine.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.Open(System.String,System.Int32)">
+            <summary>
+            Open a virtual machine.
+            </summary>
+            <param name="fileName">Virtual Machine file, local .vmx or [storage] .vmx.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>An instance of a virtual machine.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.Register(System.String)">
+            <summary>
+            Add a virtual machine to the host's inventory.
+            </summary>
+            <param name="fileName">Virtual Machine file, local .vmx or [storage] .vmx.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.Register(System.String,System.Int32)">
+            <summary>
+            Add a virtual machine to the host's inventory.
+            </summary>
+            <param name="fileName">Virtual Machine file, local .vmx or [storage] .vmx.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.Unregister(System.String)">
+            <summary>
+            Remove a virtual machine from the host's inventory.
+            </summary>
+            <param name="fileName">Virtual Machine file, local .vmx or [storage] .vmx.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.Unregister(System.String,System.Int32)">
+            <summary>
+            Remove a virtual machine from the host's inventory.
+            </summary>
+            <param name="fileName">Virtual Machine file, local .vmx or [storage] .vmx.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.Dispose">
+            <summary>
+            Dispose the object, hard-disconnect from the remote host.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.Disconnect">
+            <summary>
+            Disconnect from a remote host.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualHost.IsConnected">
+            <summary>
+            Returns true when connected to a virtual host, false otherwise.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualHost.Finalize">
+            <summary>
+            Destructor.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualHost.RunningVirtualMachines">
+            <summary>
+            Returns all running virtual machines.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualHost.RegisteredVirtualMachines">
+            <summary>
+            All registered virtual machines.
+            </summary>
+            <remarks>This function is only supported on Virtual Infrastructure servers.</remarks>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareVirtualMachineCloneType">
+            <summary>
+            Virtual machine clone type.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualMachineCloneType.Full">
+            <summary>
+            A full, independent clone of the virtual machine.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualMachineCloneType.Linked">
+            <summary>
+            A linked clone is a copy of a virtual machine that shares virtual disks with the parent virtual 
+            machine in an ongoing manner. 
+            </summary>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareVirtualMachine">
+            <summary>
+            A VMWare Virtual Machine.
+            </summary>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareVirtualMachine.GuestFileInfo">
+            <summary>
+            Guest file info.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.GuestFileInfo.FileSize">
+            <summary>
+            File size in bytes, zero for directories.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.GuestFileInfo.Flags">
+            <summary>
+            File attributes/flags.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.GuestFileInfo.IsDirectory">
+            <summary>
+            True if directory.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.GuestFileInfo.IsSymLink">
+            <summary>
+            True if symbolic link.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.GuestFileInfo.LastModified">
+            <summary>
+            Last modified time.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.GuestFileInfo.GuestPathName">
+            <summary>
+            Guest file or directory name.
+            </summary>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareVirtualMachine.VariableIndexer">
+            <summary>
+            An indexer for variables.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.VariableIndexer.#ctor(Interop.VixCOM.IVM2,System.Int32)">
+            <summary>
+            A variables indexer.
+            </summary>
+            <param name="vm">Virtual machine's variables to index.</param>
+            <param name="variableType">Variable type, one of the following.
+            <list type="bullet">
+             <item>Constants.VIX_VM_GUEST_VARIABLE</item>
+             <item>Constants.VIX_VM_CONFIG_RUNTIME_ONLY</item>
+             <item>Constants.VIX_GUEST_ENVIRONMENT_VARIABLE</item>
+            </list>
+            </param>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.VariableIndexer.Variables(System.String)">
+            <summary>
+            Environment, guest and runtime variables.
+            </summary>
+            <param name="name">Name of the variable.</param>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareVirtualMachine.Process">
+            <summary>
+            A process running in the guest operating system.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualMachine.Process.Id">
+            <summary>
+            Process ID.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualMachine.Process.Name">
+            <summary>
+            Process name.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualMachine.Process.Owner">
+            <summary>
+            Process owner.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualMachine.Process.StartDateTime">
+            <summary>
+            Process start date/time.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualMachine.Process.Command">
+            <summary>
+            Process command line.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualMachine.Process.IsBeingDebugged">
+            <summary>
+            True if process is being debugged.
+            </summary>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVirtualMachine.Process.ExitCode">
+            <summary>
+            Process exit code for finished processes.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Process.#ctor(Interop.VixCOM.IVM2)">
+            <summary>
+            A process running in the guest operating system on a virtual machine.
+            </summary>
+            <param name="vm">Virtual machine.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Process.KillProcessInGuest">
+            <summary>
+            Kill a process in the guest operating system.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Process.KillProcessInGuest(System.Int32)">
+            <summary>
+            Kill a process in the guest operating system.
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.#ctor(Interop.VixCOM.IVM2)">
+            <summary>
+            A VMWare Virtual Machine.
+            </summary>
+            <param name="vm">A handle to a virtual machine.</param>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.PathName">
+            <summary>
+            The path to the virtual machine configuration file.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.IsRunning">
+            <summary>
+            Returns true if the virtual machine is running.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.PowerState">
+            <summary>
+            Returns virtual machine powerstate, an OR-ed set of VIX_POWERSTATE_* values.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.IsPaused">
+            <summary>
+            Returns true if the virtual machine is paused.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.IsSuspended">
+            <summary>
+            Returns true if the virtual machine is suspended.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.MemorySize">
+            <summary>
+            The memory size of the virtual machine. 
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.CPUCount">
+            <summary>
+            The number of virtual CPUs configured for the virtual machine.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.PowerOn">
+            <summary>
+            Power on a virtual machine.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.PowerOn(System.Int32)">
+            <summary>
+            Power on a virtual machine.
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.PowerOn(System.Int32,System.Int32)">
+            <summary>
+            Power on a virtual machine.
+            </summary>
+            <param name="powerOnOptions">Additional power options.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.WaitForToolsInGuest">
+            <summary>
+            This function returns when VMware Tools has successfully started in the guest operating system. 
+            VMware Tools is a collection of services that run in the guest. 
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.WaitForToolsInGuest(System.Int32)">
+            <summary>
+            This function returns when VMware Tools has successfully started in the guest operating system. 
+            VMware Tools is a collection of services that run in the guest. 
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.Snapshots">
+            <summary>
+            Get all snapshots.
+            </summary>
+            <returns>A list of snapshots.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.LoginInGuest(System.String,System.String)">
+            <summary>
+            This function establishes a guest operating system authentication context. 
+            </summary>
+            <param name="username">The name of a user account on the guest operating system.</param>
+            <param name="password">The password of the account identified by userName.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.LoginInGuest(System.String,System.String,System.Int32)">
+            <summary>
+            This function establishes a guest operating system authentication context.
+            </summary>
+            <param name="username">The name of a user account on the guest operating system.</param>
+            <param name="password">The password of the account identified by userName.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.LoginInGuest(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            This function establishes a guest operating system authentication context.
+            </summary>
+            <param name="username">The name of a user account on the guest operating system.</param>
+            <param name="password">The password of the account identified by userName.</param>
+            <param name="options">
+             Must be 0 or VixCOM.Constants.VIX_LOGIN_IN_GUEST_REQUIRE_INTERACTIVE_ENVIRONMENT, which forces interactive 
+             guest login within a graphical session that is visible to the user. On Linux, interactive environment 
+             requires that the X11 window system be running to start the vmware-user process. Without X11, pass 0 as 
+             options to start the vmware-guestd process instead.
+            </param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <remarks>
+            Logins are supported on Linux and Windows. To log in as a Windows Domain user, specify the "userName" parameter in 
+            the form "domain\username". Other guest operating systems are not supported for login, including Solaris, FreeBSD, 
+            and Netware.
+            </remarks>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.WaitForVMWareUserProcessInGuest(System.String,System.String,System.Int32)">
+            <summary>
+            This function waits for the vmwareuser process to exist in the guest.
+            </summary>
+            <param name="username">The name of a user account on the guest operating system.</param>
+            <param name="password">The password of the account identified by userName.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.WaitForVMWareUserProcessInGuest(System.String,System.String)">
+            <summary>
+            This function waits for the vmwareuser process to exist in the guest.
+            </summary>
+            <param name="username">The name of a user account on the guest operating system.</param>
+            <param name="password">The password of the account identified by userName.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.CopyFileFromHostToGuest(System.String,System.String)">
+            <summary>
+            Copies a file or directory from the local system (where the Vix client is running) to the guest operating system.
+            </summary>
+            <param name="hostPathName">File location on the host operating system.</param>
+            <param name="guestPathName">File location on the guest operating system.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.CopyFileFromHostToGuest(System.String,System.String,System.Int32)">
+            <summary>
+            Copies a file or directory from the local system (where the Vix client is running) to the guest operating system.
+            You must call LoginInGuest() before calling this procedure.
+            Only absolute paths should be used for files in the guest; the resolution of relative paths is not specified.
+            </summary>
+            <param name="hostPathName">File location on the host operating system.</param>
+            <param name="guestPathName">File location on the guest operating system.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.DeleteFileFromGuest(System.String)">
+            <summary>
+            Deletes a file from guest file system.
+            </summary>
+            <param name="guestPathName">File location on the guest operating system.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.DeleteFileFromGuest(System.String,System.Int32)">
+            <summary>
+            Deletes a file from guest file system.
+            </summary>
+            <param name="guestPathName">File location on the guest operating system.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.DeleteDirectoryFromGuest(System.String)">
+            <summary>
+            Deletes a directory from guest directory system.
+            </summary>
+            <param name="guestPathName">Directory location on the guest operating system.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.DeleteDirectoryFromGuest(System.String,System.Int32)">
+            <summary>
+            Deletes a directory from guest directory system.
+            </summary>
+            <param name="guestPathName">Directory location on the guest operating system.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.CopyFileFromGuestToHost(System.String,System.String)">
+            <summary>
+            Copies a file or directory from the guest operating system to the local system (where the Vix client is running).
+            </summary>
+            <param name="guestPathName">File location on the guest operating system.</param>
+            <param name="hostPathName">File location on the host operating system.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.CopyFileFromGuestToHost(System.String,System.String,System.Int32)">
+            <summary>
+            Copies a file or directory from the guest operating system to the local system (where the Vix client is running).
+            You must call LoginInGuest() before calling this procedure.
+            Only absolute paths should be used for files in the guest; the resolution of relative paths is not specified. 
+            </summary>
+            <param name="guestPathName">File location on the guest operating system.</param>
+            <param name="hostPathName">File location on the host operating system.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.CreateDirectoryInGuest(System.String)">
+            <summary>
+            Creates a directory on the guest operating system.
+            </summary>
+            <param name="guestPathName">Directory location on the guest operating system.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.CreateDirectoryInGuest(System.String,System.Int32)">
+            <summary>
+            Creates a directory on the guest operating system.
+            </summary>
+            <param name="guestPathName">Directory location on the guest operating system.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.CreateTempFileInGuest">
+            <summary>
+            Creates a temp file on the guest operating system.
+            </summary>
+            <returns>Name of the temporary file created.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.CreateTempFileInGuest(System.Int32)">
+            <summary>
+            Creates a temp file on the guest operating system.
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>Name of the temporary file created.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.GetFileInfoInGuest(System.String)">
+            <summary>
+            Return information about a file or directory in the guest operating system.
+            </summary>
+            <param name="guestPathName">File or path in the guest operating system.</param>
+            <returns>Guest file information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.GetFileInfoInGuest(System.String,System.Int32)">
+            <summary>
+            Return information about a file or directory in the guest operating system.
+            </summary>
+            <param name="guestPathName">File or path in the guest operating system.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>Guest file information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.RunProgramInGuest(System.String)">
+            <summary>
+            Runs a program in the guest operating system.
+            </summary>       
+            <param name="guestProgramName">Program to execute.</param>
+            <returns>Process information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.RunProgramInGuest(System.String,System.String)">
+            <summary>
+            Run a program in the guest operating system.
+            </summary>
+            <param name="commandLineArgs">Additional command line arguments.</param>
+            <param name="guestProgramName">Program to execute.</param>
+            <returns>Process information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.DetachProgramInGuest(System.String)">
+            <summary>
+            Run a detached program in the guest operating system.
+            </summary>
+            <param name="guestProgramName">Program to execute.</param>
+            <returns>Process information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.DetachProgramInGuest(System.String,System.String)">
+            <summary>
+            Run a detached program in the guest operating system.
+            </summary>
+            <param name="guestProgramName">Program to execute.</param>
+            <param name="commandLineArgs">Additional command line arguments.</param>
+            <returns>Process information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.DetachProgramInGuest(System.String,System.String,System.Int32)">
+            <summary>
+            Run a detached program in the guest operating system.
+            </summary>
+            <param name="guestProgramName">Program to execute.</param>
+            <param name="commandLineArgs">Additional command line arguments.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>Process information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.RunProgramInGuest(System.String,System.String,System.Int32)">
+            <summary>
+            Run a program in the guest operating system.
+            </summary>
+            <param name="guestProgramName">Guest program to run.</param>
+            <param name="commandLineArgs">Additional command line arguments.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>Process information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.RunProgramInGuest(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Run a program in the guest operating system.
+            </summary>
+            <param name="guestProgramName">Guest program to run.</param>
+            <param name="commandLineArgs">Additional command line arguments.</param>
+            <param name="options">Additional options, one of VIX_RUNPROGRAM_RETURN_IMMEDIATELY or VIX_RUNPROGRAM_ACTIVATE_WINDOW.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>Process information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.RunScriptInGuest(System.String,System.String)">
+            <summary>
+            Run a script in the guest operating system.
+            </summary>
+            <param name="interpreter">The path to the script interpreter.</param>
+            <param name="scriptText">The text of the script.</param>
+            <returns>Process information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.DetachScriptInGuest(System.String,System.String)">
+            <summary>
+            Detach a script in the guest operating system.
+            </summary>
+            <param name="interpreter">The path to the script interpreter.</param>
+            <param name="scriptText">The text of the script.</param>
+            <returns>Process information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.DetachScriptInGuest(System.String,System.String,System.Int32)">
+            <summary>
+            Detach a script in the guest operating system.
+            </summary>
+            <param name="interpreter">The path to the script interpreter.</param>
+            <param name="scriptText">The text of the script.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>Process information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.RunScriptInGuest(System.String,System.String,System.Int32,System.Int32)">
+            <summary>
+            Run a script in the guest operating system.
+            </summary>
+            <param name="interpreter">The path to the script interpreter.</param>
+            <param name="scriptText">The text of the script.</param>
+            <param name="options">Run options for the program.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>Process information.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.OpenUrlInGuest(System.String)">
+            <summary>
+            Open a browser window on the specified URL in the guest operating system.
+            </summary>
+            <param name="url">The url to be opened.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.OpenUrlInGuest(System.String,System.Int32)">
+            <summary>
+            Open a browser window on the specified URL in the guest operating system.
+            </summary>
+            <param name="url">The url to be opened.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.FileExistsInGuest(System.String)">
+            <summary>
+            Tests the existence of a file in the guest operating system.
+            </summary>
+            <param name="guestPathName">Path to a file in the guest operating system.</param>
+            <returns>True if the file exists in the guest operating system.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.FileExistsInGuest(System.String,System.Int32)">
+            <summary>
+            Tests the existence of a file in the guest operating system.
+            </summary>
+            <param name="guestPathName">Path to a file in the guest operating system.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>True if the file exists in the guest operating system.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.DirectoryExistsInGuest(System.String)">
+            <summary>
+            Tests the existence of a directory in the guest operating system.
+            </summary>
+            <param name="guestPathName">Path to a directory in the guest operating system.</param>
+            <returns>True if the directory exists in the guest operating system.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.DirectoryExistsInGuest(System.String,System.Int32)">
+            <summary>
+            Tests the existence of a directory in the guest operating system.
+            </summary>
+            <param name="guestPathName">Path to a directory in the guest operating system.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>True if the directory exists in the guest operating system.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.LogoutFromGuest">
+            <summary>
+            Remove any guest operating system authentication context created by a previous call to LoginInGuest(), ie. Logout.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.LogoutFromGuest(System.Int32)">
+            <summary>
+            Remove any guest operating system authentication context created by a previous call to LoginInGuest(), ie. Logout.
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.PowerOff">
+            <summary>
+            Power off a virtual machine. The virtual machine will be powered off at the hardware level. 
+            Any state of the guest that has not been committed to disk will be lost. 
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.ShutdownGuest">
+            <summary>
+            Power off a virtual machine. The virtual machine will be powered off at the hardware level. 
+            Any state of the guest that has not been committed to disk will be lost. 
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.ShutdownGuest(System.Int32)">
+            <summary>
+            Power off a virtual machine. The virtual machine will be powered off at the hardware level. 
+            Any state of the guest that has not been committed to disk will be lost. 
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.PowerOff(System.Int32,System.Int32)">
+            <summary>
+            Power off or shutdown a virtual machine.
+            If you call this function while the virtual machine is powered off or suspended, the operation will throw an 
+            exception with a VIX_E_VM_NOT_RUNNING error.
+            </summary>
+            <param name="powerOffOptions">Power-off options. Passing the VIX_VMPOWEROP_FROM_GUEST flag will cause the function 
+            to try to power off the guest OS. This will ensure a clean shutdown of the guest. This option requires that the 
+            VMware Tools be installed and running in the guest. If VIX_VMPOWEROP_NORMAL is passed as the "powerOffOptions" parameter, 
+            then the virtual machine will be powered off at the hardware level. Any state of the guest that has not been committed 
+            to disk will be lost.
+            </param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Reset">
+            <summary>
+            Hardware reset the virtual machine.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Reset(System.Int32)">
+            <summary>
+            Hardware reset the virtual machine.
+            </summary>
+            <param name="resetOptions">Reset options.
+            Passing VIX_VMPOWEROP_NORMAL will force a hardware reset.
+            Passing VIX_VMPOWEROP_FROM_GUEST will attempt a clean shutdown of the guest operating system.
+            </param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Reset(System.Int32,System.Int32)">
+            <summary>
+            Reset a virtual machine.
+            </summary>
+            <param name="resetOptions">Reset options.
+            Passing VIX_VMPOWEROP_NORMAL will force a hardware reset.
+            Passing VIX_VMPOWEROP_FROM_GUEST will attempt a clean shutdown of the guest operating system.
+            </param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Suspend">
+            <summary>
+            Suspend the virtual machine.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Suspend(System.Int32)">
+            <summary>
+            Suspend a virtual machine.
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Pause">
+            <summary>
+            Pause the virtual machine.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Pause(System.Int32)">
+            <summary>
+            Pause a virtual machine.
+            This stops execution of the virtual machine. 
+            Call Unpause to continue execution of the virtual machine. 
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Unpause">
+            <summary>
+            Continue execution of a virtual machine that was stopped using Pause. 
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Unpause(System.Int32)">
+            <summary>
+            Continue execution of a virtual machine that was stopped using Pause. 
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.ListDirectoryInGuest(System.String,System.Boolean)">
+            <summary>
+            List files in the guest operating system.
+            </summary>
+            <param name="pathName">Path in the guest operating system to list.</param>
+            <param name="recurse">Recruse into subdirectories.</param>
+            <returns>A list of files and directories with full paths.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.ListDirectoryInGuest(System.String,System.Boolean,System.Int32)">
+            <summary>
+            List files in the guest operating system.
+            </summary>
+            <param name="pathName">Path in the guest operating system to list.</param>
+            <param name="recurse">Recruse into subdirectories.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <remarks>
+            The function throws an exception if pathName doesn't exist.
+            </remarks>
+            <returns>A list of files and directories with full paths.</returns>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.GuestEnvironmentVariables">
+            <summary>
+            An environment variable in the guest of the VM. On a Windows NT series guest, writing these 
+            values is saved persistently so they are immediately visible to every process. On a Linux or Windows 9X guest, 
+            writing these values is not persistent so they are only visible to the VMware tools process. 
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.GuestVariables">
+            <summary>
+            A "Guest Variable". This is a runtime-only value; it is never stored persistently. 
+            This is the same guest variable that is exposed through the VMControl APIs, and is a simple 
+            way to pass runtime values in and out of the guest. 
+            VMWare doesn't publish a list of known variables, the following guest variables have been observed.
+            <list type="bullet">
+            <item>ip: IP address of the guest operating system.</item>
+            </list>
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.RuntimeConfigVariables">
+            <summary>
+            The configuration state of the virtual machine. This is the .vmx file that is stored on the host. 
+            You can read this and it will return the persistent data. If you write to this, it will only be a 
+            runtime change, so changes will be lost when the VM powers off. 
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.SharedFolders">
+            <summary>
+            Shared folders on this virtual machine.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.CaptureScreenImage">
+            <summary>
+            Captures the screen of the guest operating system.
+            </summary>
+            <returns>A <see cref="T:System.Drawing.Image"/> object holding the captured screen image.</returns>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.GuestProcesses">
+            <summary>
+            Running processes in the guest operating system.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.IsRecording">
+            <summary>
+            Returns true if the virtual machine is in the process of recording.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVirtualMachine.IsReplaying">
+            <summary>
+            Returns true if the virtual machine is in the process of replaying.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.BeginRecording(System.String)">
+            <summary>
+            Records a virtual machine's activity as a snapshot object.
+            </summary>
+            <param name="name">Snapshot name.</param>
+            <returns>Resulting snapshot.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.BeginRecording(System.String,System.String)">
+            <summary>
+            Records a virtual machine's activity as a snapshot object.
+            </summary>
+            <param name="name">Snapshot name.</param>
+            <param name="description">Snapshot description.</param>
+            <returns>Resulting snapshot.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.BeginRecording(System.String,System.String,System.Int32)">
+            <summary>
+            Records a virtual machine's activity as a snapshot object.
+            </summary>
+            <param name="name">Snapshot name.</param>
+            <param name="description">Snapshot description.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+            <returns>Resulting snapshot.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.EndRecording">
+            <summary>
+            This function stops recording a virtual machine's activity.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.EndRecording(System.Int32)">
+            <summary>
+            This function stops recording a virtual machine's activity.
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.UpgradeVirtualHardware">
+            <summary>
+            Upgrades the virtual hardware version of the virtual machine to match the version of the VIX library. 
+            This has no effect if the virtual machine is already at the same version or at a newer version than the VIX library.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.UpgradeVirtualHardware(System.Int32)">
+            <summary>
+            Upgrades the virtual hardware version of the virtual machine to match the version of the VIX library. 
+            This has no effect if the virtual machine is already at the same version or at a newer version than the VIX library.
+            </summary>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Clone(Vestris.VMWareLib.VMWareVirtualMachineCloneType,System.String)">
+            <summary>
+            Creates a copy of the virtual machine at current state.
+            </summary>
+            <param name="cloneType">Virtual Machine clone type.</param>
+            <param name="destConfigPathName">The path name of the virtual machine configuration file that will be created.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Clone(Vestris.VMWareLib.VMWareVirtualMachineCloneType,System.String,System.Int32)">
+            <summary>
+            Creates a copy of the virtual machine at current state.
+            </summary>
+            <param name="cloneType">Virtual Machine clone type.</param>
+            <param name="destConfigPathName">The path name of the virtual machine configuration file that will be created.</param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Delete">
+            <summary>
+            Permanently deletes a virtual machine from the host system.
+            </summary>
+            <remarks>
+            Does not delete all associated files.
+            </remarks>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Delete(System.Int32)">
+            <summary>
+            Permanently deletes a virtual machine from the host system.
+            </summary>
+            <param name="deleteOptions">Delete options.
+            <list type="bullet">
+             <item>VixCOM.Constants.VIX_VMDELETE_DISK_FILES: delete all associated files.</item>
+            </list>
+            </param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Delete(System.Int32,System.Int32)">
+            <summary>
+            Permanently deletes a virtual machine from the host system.
+            </summary>
+            <param name="deleteOptions">
+            <list type="bullet">
+             <item>VixCOM.Constants.VIX_VMDELETE_DISK_FILES: delete all associated files.</item>
+            </list>
+            </param>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.InstallTools">
+            <summary>
+            Prepares to install VMware Tools on the guest operating system.
+            </summary>
+            <remarks>
+            Prepares an ISO image to install VMware Tools on the guest operating system. 
+            If autorun is enabled, as it often is on Windows, installation begins, otherwise 
+            you must initiate installation. If VMware Tools is already installed, this function 
+            prepares to upgrade it to the version matching the product. 
+            </remarks>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.InstallTools(System.Int32)">
+            <summary>
+            Prepares to install VMware Tools on the guest operating system.
+            </summary>
+            <remarks>
+            Prepares an ISO image to install VMware Tools on the guest operating system. 
+            If autorun is enabled, as it often is on Windows, installation begins, otherwise 
+            you must initiate installation. If VMware Tools is already installed, this function 
+            prepares to upgrade it to the version matching the product. 
+            </remarks>
+            <param name="timeoutInSeconds">Timeout in seconds.</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVirtualMachine.Dispose">
+            <summary>
+            Dispose the virtual machine object.
+            </summary>
+        </member>
+        <member name="T:Vestris.VMWareLib.VMWareVixHandle`1">
+            <summary>
+            A wrapper for a VixCOM handle. 
+            </summary>
+            <typeparam name="T">Type of VixCOM handle.</typeparam>
+            <remarks>
+            Most VixCOM objects returned from VixCOM API functions implement IVixHandle.
+            </remarks>
+        </member>
+        <member name="F:Vestris.VMWareLib.VMWareVixHandle`1._handle">
+            <summary>
+            Raw VixCOM handle of implemented type.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVixHandle`1._vixhandle">
+            <summary>
+            Pointer to the IVixHandle interface.
+            </summary>
+        </member>
+        <member name="P:Vestris.VMWareLib.VMWareVixHandle`1._vixhandle2">
+            <summary>
+            Pointer to the IVixHandle2 interface.
+            </summary>
+            <remarks>
+            This type was introduced in VixCOM 1.7.0 and will return null with older versions of VixCOM.
+            </remarks>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVixHandle`1.#ctor">
+            <summary>
+            A constructor for a null Vix handle.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVixHandle`1.#ctor(`0)">
+            <summary>
+            A constructor for an existing Vix handle.
+            </summary>
+            <param name="handle">handle value</param>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVixHandle`1.GetProperties(System.Object[])">
+            <summary>
+            Get an array of properties.
+            </summary>
+            <param name="properties">properties to fetch</param>
+            <returns>An array of property values.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVixHandle`1.GetProperty``1(System.Int32)">
+            <summary>
+            Return the value of a single property.
+            </summary>
+            <param name="propertyId">property id</param>
+            <typeparam name="R">property value type</typeparam>
+            <returns>The value of a single property of type R.</returns>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVixHandle`1.Close">
+            <summary>
+            Close the handle.
+            </summary>
+        </member>
+        <member name="M:Vestris.VMWareLib.VMWareVixHandle`1.Dispose">
+            <summary>
+            Close the handle with VixCOM 1.7.0 or newer.
+            </summary>
+        </member>
+    </members>
+</doc>

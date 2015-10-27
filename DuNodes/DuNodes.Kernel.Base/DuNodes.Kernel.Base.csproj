@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CB228BEA-C8C5-42BF-8664-8275D5C46BE4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DuNodes.Kernel.Base</RootNamespace>
+    <AssemblyName>DuNodes.Kernel.Base</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Cosmos.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Cosmos.Debug.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\AppData\Roaming\Cosmos User Kit\Build\VSIP\Cosmos.Debug.Kernel.dll</HintPath>
+    </Reference>
+    <Reference Include="Cosmos.Hardware, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86">
+      <HintPath>..\..\..\..\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.Hardware.dll</HintPath>
+    </Reference>
+    <Reference Include="Cosmos.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86">
+      <HintPath>..\..\..\..\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.System.dll</HintPath>
+    </Reference>
+    <Reference Include="GLNFSLib">
+      <HintPath>.\GLNFSLib.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Console\CommandManager\Command.cs" />
+    <Compile Include="Console\CommandManager\CommandBase.cs" />
+    <Compile Include="Console\CommandManager\Commands\bench.cs" />
+    <Compile Include="Console\CommandManager\Commands\config.cs" />
+    <Compile Include="Console\CommandManager\Commands\ping.cs" />
+    <Compile Include="Console\CommandManager\Commands\rammanager.cs" />
+    <Compile Include="Console\CommandManager\Commands\top.cs" />
+    <Compile Include="Console\Console.Animations.cs" />
+    <Compile Include="Console\Console.Error.cs" />
+    <Compile Include="Console\Menu\Console.Menu.Category.cs" />
+    <Compile Include="Console\Menu\Console.Menu.Commands.Back.cs" />
+    <Compile Include="Console\Menu\Console.Menu.cs" />
+    <Compile Include="Console\Menu\Console.Menu.Entry.cs" />
+    <Compile Include="Console\Menu\Console.Menu.Themepack.cs" />
+    <Compile Include="Core\Memory.cs" />
+    <Compile Include="Core\Random.cs" />
+    <Compile Include="Crypto\RockPotato.cs" />
+    <Compile Include="Core\ACPI.cs" />
+    <Compile Include="Core\Bluescreen.cs" />
+    <Compile Include="Console\Console.ProgressBar.cs" />
+    <Compile Include="Console\Console.VideoRAM.cs" />
+    <Compile Include="Core\IDT.cs" />
+    <Compile Include="Core\INTs.cs" />
+    <Compile Include="Core\IRQ.cs" />
+    <Compile Include="Core\PIT.cs" />
+    <Compile Include="Crypto\MD5.cs" />
+    <Compile Include="Console\Console.cs" />
+    <Compile Include="Audio\PCSpeaker.cs" />
+    <Compile Include="Extensions\KernelExtensions.cs" />
+    <Compile Include="Extensions\NumericExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="IO\BinaryWriter.cs" />
+    <Compile Include="IO\PortIO.cs" />
+    <Compile Include="IO\FileSystem\FileStream.cs" />
+    <Compile Include="IO\FileSystem\FileSystem.cs" />
+    <Compile Include="IO\FileSystem\VirtualFileSystem.cs" />
+    <Compile Include="IO\MemoryStream.cs" />
+    <Compile Include="IO\Stream.cs" />
+    <Compile Include="IO\VideoStream.cs" />
+    <Compile Include="Kenneth.cs" />
+    <Compile Include="Core\KeyLayout.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RTC.cs" />
+    <Compile Include="Console\Console.Bootscreen.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Crypto\Rot.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.Assembler\Cosmos.Assembler.csproj">
+      <Project>{1116130e-28e0-428a-a597-f4b3b676c0ca}</Project>
+      <Name>Cosmos.Assembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+      <Project>{c801f19c-a9d3-42d5-9a57-9ffdf9b4d05e}</Project>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

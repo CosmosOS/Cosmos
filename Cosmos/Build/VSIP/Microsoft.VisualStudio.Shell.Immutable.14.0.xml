@@ -1,0 +1,1495 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.Shell.Immutable.14.0</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.Imaging.Interop.IImageHandle">
+      <summary>Represents a handle which keeps a custom image stored in memory. Only keeping the IImageHandle strongly referenced in memory can guarantee that the image associated with the handle's moniker will be kept in memory in the ImageLibrary.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Imaging.Interop.ImageMoniker">
+      <summary>Contains the GUID and ID of the image.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Imaging.Interop.ImageMoniker.Guid">
+      <summary>The GUID of the moniker.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Imaging.Interop.ImageMoniker.Id">
+      <summary>The ID of the moniker.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.AccountPickerOptions">
+      <summary>Represents the options used to create an account picker.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.AccountPickerOptions.#ctor(System.Windows.Window)">
+      <summary>Initializes a new instance of the options.</summary>
+      <param name="parentWindow">The window hosting the account picker.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.AccountPickerOptions.#ctor(System.Windows.Window,System.String)"></member>
+    <member name="P:Microsoft.VisualStudio.Shell.AccountPickerOptions.CustomFilter">
+      <summary>Represents the options used to create an account picker.</summary>
+      <returns>The filter.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.AccountPickerOptions.HostId"></member>
+    <member name="P:Microsoft.VisualStudio.Shell.AccountPickerOptions.IsAuthenticationStateUIEnabled"></member>
+    <member name="P:Microsoft.VisualStudio.Shell.AccountPickerOptions.IsCompactHeight">
+      <summary>Determines whether the picker will be displayed in smaller height compared to the default height.</summary>
+      <returns>True if the picker is to be displayed with a smaller height, otherwise false.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.AccountPickerOptions.ParentWindow">
+      <summary>Gets the window hosting the account picker.</summary>
+      <returns>The window.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.AccountPickerOptions.UseWindowsPresentationFoundationStyle">
+      <summary>Determines whether the picker will use styles based on Windows Presentation Framework.</summary>
+      <returns>True if the picker uses WPF styles, otherwise false.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.AsyncServiceCreatorCallback">
+      <summary>The callback for the async service creator.</summary>
+      <returns>A task that returns the service.</returns>
+      <param name="container">The service container.</param>
+      <param name="cancellationToken">The cancellation token.</param>
+      <param name="serviceType">The type of the service.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.AsyncServiceCreatorWithProgressCallback">
+      <summary>The callback that is invoked when an instance of the service is needed. This is called only one time, and the result is cached.</summary>
+      <returns>A task that returns the service.</returns>
+      <param name="container">The service container.</param>
+      <param name="cancellationToken">The cancellation token.</param>
+      <param name="serviceType">The type of the service to get.</param>
+      <param name="progress">The progress marker.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.AuthenticationState">
+      <summary>The authentication state.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.AuthenticationState.Authenticated">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.AuthenticationState.Unauthenticated">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.AuthenticationState.Unknown">
+      <summary />
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.CommandNavigationHelper">
+      <summary>Saves and restores elements to be focused after interacting with menus and toolbars.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.CommandNavigationHelper.CommandFocusMode">
+      <summary>Specifies the CommandFocusMode.</summary>
+      <returns>The focus mode.</returns>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.CommandNavigationHelper.CommandFocusModeProperty">
+      <summary>Specifies how the control on which it's set is registered with the CommandFocusManager for handling focus restoration and entering menu mode.</summary>
+    </member>
+    <member name="E:Microsoft.VisualStudio.Shell.CommandNavigationHelper.CommandFocusModePropertyChanged">
+      <summary>Raised when the CommandFocusMode property has changed.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.CommandNavigationHelper.CommandNavigationOrder">
+      <summary>Allows a control to specify its keyboard navigation cycle order with respect to other command navigable controls. A larger value moves the control later in the cycle list.</summary>
+      <returns>The command navigation order.</returns>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.CommandNavigationHelper.CommandNavigationOrderProperty">
+      <summary>Allows a control to specify its keyboard navigation cycle order with respect to other command navigable controls.  A larger value moves the control later in the cycle list.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.CommandNavigationHelper.GetCommandFocusMode(System.Windows.DependencyObject)">
+      <summary>Gets the command focus mode for the specified element.</summary>
+      <returns>The command focus mode.</returns>
+      <param name="element">The element.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.CommandNavigationHelper.GetCommandNavigationOrder(System.Windows.DependencyObject)">
+      <summary>Gets the command navigation order for the specified element.</summary>
+      <returns>The command navigation order.</returns>
+      <param name="element">The element.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.CommandNavigationHelper.GetIsCommandNavigable(System.Windows.DependencyObject)">
+      <summary>Determins whether the command is navigable.</summary>
+      <returns>True if the command is navigable, otherwise false.</returns>
+      <param name="element">The element.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.CommandNavigationHelper.IsCommandNavigable">
+      <summary>Marks a control as part of the keyboard navigation cycle list for menus/toolbars.</summary>
+      <returns>True if the control is part of the keyboard navigation cycle.</returns>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.CommandNavigationHelper.IsCommandNavigableProperty">
+      <summary>Marks a control as part of the keyboard navigation cycle list for menus/toolbars.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.CommandNavigationHelper.SetCommandFocusMode(System.Windows.DependencyObject,Microsoft.VisualStudio.Shell.CommandNavigationHelper.CommandFocusMode)">
+      <summary>Sets the command focus mode for the element.</summary>
+      <param name="element">The element.</param>
+      <param name="value">The command focus mode.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.CommandNavigationHelper.SetCommandNavigationOrder(System.Windows.DependencyObject,System.Int32)">
+      <summary>Sets the command navigation order for the specified element.</summary>
+      <param name="element">The element.</param>
+      <param name="value">The command navigation order.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.CommandNavigationHelper.SetIsCommandNavigable(System.Windows.DependencyObject,System.Boolean)">
+      <summary>Determines whether or not the command is navigable.</summary>
+      <param name="element">The element.</param>
+      <param name="value">True if the command is navigable, otherwise false.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.CommandNavigationHelper.CommandFocusMode">
+      <summary>Specifies how the control on which it's set  is registered with CommandFocusManager for handling focus restoration and entering menu mode.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.CommandNavigationHelper.CommandFocusMode.Attached">
+      <summary>The element does not participate in command focus restoration. However, getting focus to this element is tracked and used in command focus restoration of command focus containers, such that focus is never restored to this control when lost by other command focus containers, even if they received focus from this control.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.CommandNavigationHelper.CommandFocusMode.Container">
+      <summary>The element participates in command focus restoration and is considered to be part of the command UI, along with menus and toolbars (when the control is focused InputManager.IsInMenuMode is set and VS keybindings does not work).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.CommandNavigationHelper.CommandFocusMode.None">
+      <summary>The element does not participate in command focus restoration.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.CommentTaskPriority">
+      <summary>Value that indicates the priority of a task in the task list. The values in this enumeration correspond to the values in a the Microsoft.VisualStudio.Shell.Interop.VSTASKPRIORITY enumeration.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.CommentTaskPriority.High">
+      <summary>High priority.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.CommentTaskPriority.Low">
+      <summary>Low priority.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.CommentTaskPriority.Normal">
+      <summary>Normal priority.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.HierarchyGraphNodeProperties"></member>
+    <member name="F:Microsoft.VisualStudio.Shell.HierarchyGraphNodeProperties.HierarchyItem"></member>
+    <member name="T:Microsoft.VisualStudio.Shell.IAsyncServiceContainer">
+      <summary>Provides methods to add and remove services.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.IAsyncServiceContainer.AddService(System.Type,Microsoft.VisualStudio.Shell.AsyncServiceCreatorCallback)">
+      <summary>Adds a service.</summary>
+      <param name="serviceType">The type of the service to get.</param>
+      <param name="callback">The callback.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.IAsyncServiceContainer.AddService(System.Type,Microsoft.VisualStudio.Shell.AsyncServiceCreatorCallback,System.Boolean)">
+      <summary>Gets a service.</summary>
+      <param name="serviceType">The type of the service to get.</param>
+      <param name="callback">The callback.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.IAsyncServiceContainer.AddService(System.Type,Microsoft.VisualStudio.Shell.AsyncServiceCreatorWithProgressCallback)"></member>
+    <member name="M:Microsoft.VisualStudio.Shell.IAsyncServiceContainer.AddService(System.Type,Microsoft.VisualStudio.Shell.AsyncServiceCreatorWithProgressCallback,System.Boolean)"></member>
+    <member name="M:Microsoft.VisualStudio.Shell.IAsyncServiceContainer.RemoveService(System.Type)">
+      <summary>Removes the service of the type specified.</summary>
+      <param name="serviceType">The type of service to remove.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.IAsyncServiceContainer.RemoveService(System.Type,System.Boolean)">
+      <summary>Removes the service of the type specified.</summary>
+      <param name="serviceType">The type of service to remove.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.IAsyncServiceProvider">
+      <summary>Provides a method to get a service asynchronously.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.IAsyncServiceProvider.GetServiceAsync(System.Type)"></member>
+    <member name="T:Microsoft.VisualStudio.Shell.ICommentTaskToken">
+      <summary>This interface is used to get information about one of the tokens used to generate tasks.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ICommentTaskToken.Priority">
+      <summary>Gets the CommentTaskPriority to use when creating tasks based on this token.</summary>
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.Shell.CommentTaskPriority" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ICommentTaskToken.Text">
+      <summary>Gets the keyword used to identify tasks in comments.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.IErrorList">
+      <summary>This interface is used to get the state of the various switches in the chrome around the ErrorList tool window.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.IErrorList.AreBuildErrorSourceEntriesShown">
+      <summary>Returns true if filter for StandardTableColumnDefinitions.ErrorSource column does not exclude entries that have the label associated with ErrorSource.Build.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.IErrorList.AreErrorsShown">
+      <summary>Returns true if filter for the StandardTableColumnDefinitions.ErrorSeverity column does not exclude entries that have the label associated with __VSERRORCATEGORY.EC_ERROR.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.IErrorList.AreMessagesShown">
+      <summary>Returns true if filter for the StandardTableColumnDefinitions.ErrorSeverity column does not exclude entries that have the label associated with __VSERRORCATEGORY.EC_MESSAGE.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.IErrorList.AreOtherErrorSourceEntriesShown">
+      <summary>Returns true if filter for StandardTableColumnDefinitions.ErrorSource column does not exclude entries that have the label associated with ErrorSource.Other.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.IErrorList.AreWarningsShown">
+      <summary>Returns true if filter for the StandardTableColumnDefinitions.ErrorSeverity column does not exclude entries that have the label associated with __VSERRORCATEGORY.EC_WARNING.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.IErrorList.TableControl">
+      <summary>The IWpfTableControl used to display the error list.</summary>
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.IMSDNChannel">
+      <summary>interface for MSDN subscription channel information.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.IMSDNChannel.SubscriptionChannel">
+      <summary>Gets the subscription channel, e.g. FTE, RETAIL etc.</summary>
+      <returns>The subscription channel.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.INonClientArea">
+      <summary>Represents a visual element that may logically contain a non-client Win32 area when WM_NCHITTEST is sent to an HwndSource.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.INonClientArea.HitTest(System.Windows.Point)">
+      <summary>Given a point, determines what the hit test result should be for WM_NCHITTEST.</summary>
+      <returns>The HT* result representing the non-client hit test result, or HTNOWHERE if the point is not within this element. </returns>
+      <param name="point">The point hit, relative to the screen.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.ISettingsMachineLocalityEvaluator">
+      <summary>Used in conjunction with SharedSettingsAttribute to evaluate whether a property value is machine-local (i.e. should not roam to other machines) at runtime.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.ISettingsMachineLocalityEvaluator.IsMachineLocal(System.String,System.Object)">
+      <summary>Determines whether a property value is machine-local.</summary>
+      <returns>True If the setting is machine-local, otherwise false.</returns>
+      <param name="name">The full name of the setting specified via SharedSettingsAttribute.</param>
+      <param name="value">The current value of the property.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.ITaskList">
+      <summary>This interface is used to get the state of the TaskList tool window.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ITaskList.CommentTokens">
+      <summary>Get the list of IVsCommentTaskToken objects the user has defined.</summary>
+      <returns>Returns <see cref="T:System.Collections.Generic.IReadOnlyList`1" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ITaskList.TableControl">
+      <summary>The &lt; IWpfTableControl used to display the task list.</summary>
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.IToolboxExtensionsSdkInfo2"></member>
+    <member name="M:Microsoft.VisualStudio.Shell.IToolboxExtensionsSdkInfo2.GetAttributeValue(System.String)"></member>
+    <member name="T:Microsoft.VisualStudio.Shell.IToolboxItemDiscoveryWithContext">
+      <summary>Provides information about managed types from which toolbox items could be created. Implemented by packages and supplied from IToolboxItemDiscoveryFactory.CreateItemDiscovery. Packages deriving from Microsoft.VisualStudio.Shell.Package supply this object via the dicoveryType argument to ProvideToolboxItemDiscoveryAttribute.  This object is only used in a secondary appdomain which is unloaded after assembly enumeration completes.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.IToolboxItemDiscoveryWithContext.AdditionalAssemblyPaths">
+      <summary>Gets a collection of additional assembly paths to search for toolbox items. For each framework in the "frameworksToEnumerate" argument of the ProvideToolboxItemDiscovery attribute, the toolbox will enumerate all assemblies registered under AssemblyFoldersEx keys, and pass their types to GetItemInfo.  However, if you want additional assemblies to show up in your list, you can supply their paths here. You can even omit the "frameworksToEnumerate" argument altogether to use only the assemblies returned from this property.  You can return null or an empty enumerator if you don't need to provide any additional assemblies. This method may be called on a background thread.</summary>
+      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerable`1" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.IToolboxItemDiscoveryWithContext.GetItemInfo(Microsoft.VisualStudio.Shell.IToolboxType,Microsoft.VisualStudio.Shell.ToolboxItemDiscoveryContext)">
+      <summary>Returns the IToolboxItemInfo corresponding to a given type. This method should inspect the type of the <paramref name="type" /> argument I it needs to provide different information depending on the source of the type (such as an extension SDK).  See the IToolbox*Type interfaces that derive from IToolboxType. This method may be called on a background thread.</summary>
+      <returns>The info about this type, or null if the type is not a valid toolbox control type recognized by this provider..</returns>
+      <param name="type">The type.</param>
+      <param name="context">The context.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.IVsAccountManagementService">
+      <summary>Represents the Visual Studio account management service.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.IVsAccountManagementService.CreateWpfAccountPicker(Microsoft.VisualStudio.Shell.AccountPickerOptions)">
+      <summary>Creates a Windows Presentation Foundation account picker.</summary>
+      <returns>A WPF account picker.</returns>
+      <param name="options">The options used to create an account picker.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.IVsAccountManagementService.CreateWpfAccountPickerAsync(Microsoft.VisualStudio.Shell.AccountPickerOptions)"></member>
+    <member name="T:Microsoft.VisualStudio.Shell.IVsManagedImageService">
+      <summary>an interface proffered by SVsImageService that allows direct addition of WPF bitmaps to the image library.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.IVsManagedImageService.AddCustomImage(System.Windows.Media.ImageSource,System.Boolean)"></member>
+    <member name="T:Microsoft.VisualStudio.Shell.IWpfAccountPicker">
+      <summary>Represents the Windows Presentation Foundation account picker control provided by <see cref="T:Microsoft.VisualStudio.Shell.IVsAccountManagementService" />.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.IWpfAccountPicker.Control">
+      <summary>Gets the Windows Presentation Foundation account picker control.</summary>
+      <returns>The control.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.IWpfAccountPicker.SelectedAccount">
+      <summary>Gets or sets the account being selected for the account picker control.</summary>
+      <returns>The account.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.IWpfAccountPicker.SelectedAccountAuthenticationState"></member>
+    <member name="T:Microsoft.VisualStudio.Shell.ServiceProgressData">
+      <summary>This class used to propagate service or package load progress for async service and packages. Messages and values passed through this class will be shown to the user in some appropriate manner by the shell.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.ServiceProgressData.#ctor(System.String,System.String)">
+      <summary>Reports progress with no completion information./// &lt;/summary&gt;/// &lt;param name="waitMessage"&gt; &lt;/param&gt;/// &lt;param name="progressText"&gt;Message indicating current progress of the operation&lt;/param&gt;/// &lt;remarks&gt;Threaded wait dialog will show marquee style progress bar because no detailed progress information is provided&lt;/remarks&gt;</summary>
+      <param name="waitMessage">The message to be displayed to the user.</param>
+      <param name="progressText">The message that indicates the current progress of the operation.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.ServiceProgressData.#ctor(System.String,System.String,System.Int32,System.Int32)">
+      <summary>Reports progress with no completion information.</summary>
+      <param name="waitMessage">The message to be displayed to the user.</param>
+      <param name="progressText">The message that indicates the current progress of the operation.</param>
+      <param name="currentStep">The number of the current step.</param>
+      <param name="totalSteps">The number of total steps.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ServiceProgressData.CurrentStep">
+      <summary>Gets the number of the current step.</summary>
+      <returns>The number of the current step.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ServiceProgressData.ProgressText">
+      <summary>Gets the message that indicates the current progress.</summary>
+      <returns>The message that indicates the current progress.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ServiceProgressData.TotalSteps">
+      <summary>Gets the number of total steps.</summary>
+      <returns>The number of total steps.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ServiceProgressData.WaitMessage">
+      <summary>Gets the message that is displayed to the user.</summary>
+      <returns>The message that is displayed to the user.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.ThreadedWaitDialogProgressData">
+      <summary>Contains details on the progress of a long-running operation for purposes of updating the IVsThreadedWaitDialog.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.ThreadedWaitDialogProgressData.#ctor(System.String,System.String,System.String,System.Boolean)">
+      <summary>Initializes a new instance of the ThreadedWaitDialogProgressData class without reporting completion information.</summary>
+      <param name="waitMessage">High-level description of the operation.</param>
+      <param name="progressText">A more precise description of the operation in progress.</param>
+      <param name="statusBarText">Message to display on the status bar.</param>
+      <param name="isCancelable">A value indicating whether the user should be offered an option to cancel the operation.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.ThreadedWaitDialogProgressData.#ctor(System.String,System.String,System.String,System.Boolean,System.Int32,System.Int32)">
+      <summary>Initializes a new instance of the ThreadedWaitDialogProgressData class and reports completion information.</summary>
+      <param name="waitMessage">High-level description of the operation.</param>
+      <param name="progressText">A more precise description of the operation in progress.</param>
+      <param name="statusBarText">Message to display on the status bar.</param>
+      <param name="isCancelable">A value indicating whether the user should be offered an option to cancel the operation.</param>
+      <param name="currentStep">Current step in the progress.</param>
+      <param name="totalSteps">Total number of steps available. Use 0 to display the indeterminate marquee in the wait dialog.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ThreadedWaitDialogProgressData.CurrentStep">
+      <summary>Current step in the progress.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ThreadedWaitDialogProgressData.IsCancelable">
+      <summary>A value indicating whether the user should be offered an option to cancel the operation.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.ThreadedWaitDialogProgressData.NextStep">
+      <summary>Creates a clone of this instance with CurrentStep incremented by one. No validation is done by this method to ensure that CurrentStep remains less than or equal to TotalSteps.</summary>
+      <returns>A modified clone of this instance.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ThreadedWaitDialogProgressData.ProgressText">
+      <summary>A more precise description of the operation in progress.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ThreadedWaitDialogProgressData.StatusBarText">
+      <summary>Message to display on the status bar.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ThreadedWaitDialogProgressData.TotalSteps">
+      <summary>Total number of steps available. Use 0 to display the indeterminate marquee in the wait dialog.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.ThreadedWaitDialogProgressData.WaitMessage">
+      <summary>High-level description of the operation.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.ToolboxItemDiscoveryContext">
+      <summary>Indicates the context in which IToolboxItemDiscoveryWithContext.GetItemInfo is being called.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.ToolboxItemDiscoveryContext.AutoAddingToToolbox">
+      <summary>If IToolboxItemDiscoveryWithContext.GetItemInfo returns non-null, the item will be automatically added to the toolbox.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.ToolboxItemDiscoveryContext.ListingAddableItems">
+      <summary>If IToolboxItemDiscoveryWithContext.GetItemInfo returns non-null, the item will be added to a list of types in the Choose Toolbox Items dialog which the user may add to the toolbox.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.ColumnState">
+      <summary>Representation of the persistent state associated with a TableColumnDefinition in a particular instance of a IWpfTableControl.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ColumnState.#ctor(System.String,System.Boolean,System.Double,System.Int32,System.Boolean)">
+      <summary>Create a ColumnState with the indicated attributes.</summary>
+      <param name="name">The name of the column that this state applies to.</param>
+      <param name="isVisible">The visibility of the column</param>
+      <param name="width">The width of the column in pixels.</param>
+      <param name="sortPriority">The sort priority for the column.</param>
+      <param name="descendingSort">true if a descending sort should be used for the column.</param>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.ColumnState.DescendingSort">
+      <summary>Indicates whether the sort is a descending sort.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.ColumnState.IsVisible">
+      <summary>The current visibility of the column.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.ColumnState.Name">
+      <summary>The name of the column that this state applies to. Equal to TableColumnDefinition.Name.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.ColumnState.SortPriority">
+      <summary>Sort priority for the column. A priority of 0 means the table is not sorted using this column. If more than one column has a priority &gt; 0, then the table sorted by chaining the columns together in priority order (e.g. if two rows are equal according to the column with a priority of 1, then the two rows are compared using the column with a priority of 2, etc.).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.ColumnState.Width">
+      <summary>The current visibility of the column.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.DataSourceAttribute">
+      <summary>Attribute on an ITableControlEventProcessorProvider to restrict the ITableControlEventProcessor it creates to events on entries created by ITableDataSource whose &lt;see cref="ITableDataSource.Identifier"/&gt; matches this attribute. The ITableControlEventProcessorProvider can have multiple DataSource attributes.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.DataSourceAttribute.#ctor(System.String)">
+      <summary>Creates a new instance of DataSourceAttribute.</summary>
+      <param name="dataSources">The DataSource identifier.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.DataSourceAttribute.DataSources">
+      <summary>Gets the DataSource identifier associated with this attribute.</summary>
+      <returns>the DataSource identifier associated with this attribute.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.DataSourceTypeAttribute">
+      <summary>Attribute on an ITableControlEventProcessorProvider to restrict the ITableControlEventProcessor it creates to events on entries created by ITableDataSource whose ITableDataSource.SourceTypeIdentifier matches this attribute. The ITableControlEventProcessorProvider can have multiple DataSourceType attributes.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.DataSourceTypeAttribute.#ctor(System.String)">
+      <summary>Creates a new instance of DataSourceTypeAttribute.</summary>
+      <param name="dataSourceTypes">The data source types.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.DataSourceTypeAttribute.DataSourceTypes">
+      <summary>Gets the data source types.</summary>
+      <returns>The data source types.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.EntriesChangedEventArgs">
+      <summary>Event arguments for an IWpfTableControl.EntriesChanged event.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.EntriesChangedEventArgs.#ctor(System.Int32)">
+      <summary>Create a new instance of EntriesChangedEventArgs with the specified version number.</summary>
+      <param name="versionNumber">The version number.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.EntriesChangedEventArgs.AllEntries">
+      <summary>Gets all entries contained in the table (whether or not they are visible).</summary>
+      <returns>All entries contained in the table (whether or not they are visible).</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.EntriesChangedEventArgs.FilteredAndSortedEntries">
+      <returns>Returns <see cref="T:System.Collections.Generic.IReadOnlyCollection`1" />.</returns>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.EntriesChangedEventArgs.VersionNumber">
+      <summary>Version number of the update. This number is incremented by the table control on every update.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.FiltersChangedEventArgs">
+      <summary>Event arguments for an IWpfTableControl.FiltersChanged event.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.FiltersChangedEventArgs.#ctor(System.String,Microsoft.VisualStudio.Shell.TableControl.IEntryFilter,Microsoft.VisualStudio.Shell.TableControl.IEntryFilter)">
+      <summary>Create an instance of FiltersChangedEventArgs with the specified key.</summary>
+      <param name="key">Key name passed IWpfTableControl.SetFilter(string, IEntryFilter).</param>
+      <param name="oldFilter">The filter associated with &lt;paramref name="key"/&gt; before the change.</param>
+      <param name="newFilter">The filter associated with &lt;paramref name="key"/&gt; after the change.</param>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.FiltersChangedEventArgs.Key">
+      <summary>The key.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.FiltersChangedEventArgs.NewFilter">
+      <summary>Filter after the change. This will be null if the filter associated with &lt;see name="Key"/&gt; was removed.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.FiltersChangedEventArgs.OldFilter">
+      <summary>The filter before the change. This will be null if there was no filter associated with Key.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.IEntryBucket">
+      <summary>This class is used to group ITableEntries.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IEntryBucket.IsExpandedByDefault">
+      <summary>Should this group be expanded by default?</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IEntryBucket.PersistExpansionState">
+      <summary>Should the expansion state of this group persist from session to session?</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IEntryBucket.TryCreateColumnContent(System.Windows.FrameworkElement@)">
+      <summary>Get the FrameworkElement used to display the group.</summary>
+      <returns>true if the group should be displayed using a FrameworkElement. </returns>
+      <param name="content">The FrameworkElement to display the group.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IEntryBucket.TryCreateImageContent(Microsoft.VisualStudio.Imaging.Interop.ImageMoniker@)">
+      <summary>Get the ImageMoniker used to display the group.</summary>
+      <returns>True if the group should be displayed using ImageMoniker.</returns>
+      <param name="content">The ImageMoniker to display the group.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IEntryBucket.TryCreateStringContent(System.String@)">
+      <summary>Get the string used to display the group. </summary>
+      <returns>True if the group should be displayed using a string. </returns>
+      <param name="content">The string to display the group.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IEntryBucket.TryCreateToolTip(System.Object@)">
+      <summary>Gets the tool tip for this group.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <param name="toolTip">[out] The tooltip.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.IEntryFilter">
+      <summary>Interface passed to IWpfTableControl.SetFilter(string, IEntryFilter) to filter entries.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IEntryFilter.Match(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle)">
+      <summary>Return true if the specified <paramref name="entry" /> satisfies the filter.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <param name="entry">The entry.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition">
+      <summary>Describes a column of data.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.ColumnDefinition">
+      <summary>Gets the width of the item in the table's header (which is inherited by the corresponding columns of the entries).</summary>
+      <returns>Returns <see cref="T:System.Windows.GridLength" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.CompareContent(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle)">
+      <summary>Compare the sort order of two entries of the data in one column of two different entries. The default comparisons does a ITableEntry.TryGetValue(string, out object) using the column name as the key. If the left and right values are strings, then the strings are compared. If they are &lt; IComparables and the same underlying type, then IComparable.CompareTo(object) is used. Otherwise we get the string content for this column and compare those.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+      <param name="leftEntry">The left entry.</param>
+      <param name="rightEntry">The right entry.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.Comparer">
+      <summary>Gets the StringComparer used to sort and compare entries in this column. This value is used for the filtering, sorting and grouping.</summary>
+      <returns>Returns <see cref="T:System.StringComparer" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.CreateBucketForEntry(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle)">
+      <summary>Get the IEntryBucket associated this this column for this entry. The identity of a bucket is based on object.GetHashCode() and object.Equals() two entries that return different objects for their bucket will be grouped together as long as the two buckets are equivalent. This method is unused at the moment.</summary>
+      <returns>The associated bucket. This can be null.</returns>
+      <param name="entry">Entry for which to get the bucket.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.DefaultVisible">
+      <summary>Indicates whether the column is visible by default. If this returns false then the column will be hidden the first time there is data in the table that could be shown using this column.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.DisplayImage">
+      <summary>ImageMoniker shown for this column in the header.</summary>
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.Imaging.Interop.ImageMoniker" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.DisplayName">
+      <summary>Localized name of the column.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.FilterPresets">
+      <summary>The strings that always exist as filterable items for this list. For example, if you want to always show "Errors", "Warnings" and "Messages" as filtering </summary>
+      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerable`1" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.HeaderName">
+      <summary>Localized name used when adding headers to entries copied from the control to the clipboard.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.IsCopyable">
+      <summary>Indicates whether the user can copy the column's content using the default copy command.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.IsFilterable">
+      <summary>Indicates whether the column can be filtered using the default UI. If this returns false then there will be no built-in UI for letting the user filter the column.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.IsHideable">
+      <summary>Indicates whether the user can hide the column using the default UI.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.IsMovable">
+      <summary>Indicates whether the user can move the column using the default UI.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.IsResizable">
+      <summary>Indicates whether the user can change the column's width using the default UI.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.IsSortable">
+      <summary>Indicates whether the column can be sorted using the default UI. If this returns false then there will be no built-in UI for letting the user sort the column.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.MaxWidth">
+      <summary>Maximum width of the column (in pixels).</summary>
+      <returns>Returns <see cref="T:System.Double" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.MinWidth">
+      <summary>Minumum width of the column (in pixels). The minimum width is 22 pixels (so that there is space to display the sorting and filtering UI.</summary>
+      <returns>Returns <see cref="T:System.Double" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.Name">
+      <summary>Unique identifier of the column. This value must match the value provided by the Name attribute.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.TextWrapping">
+      <summary>Indicates whether the user can copy the column's content should be wrapped if it is too large to fit.</summary>
+      <returns>Returns <see cref="T:System.Windows.TextWrapping" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.TryCreateColumnContent(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Boolean,System.Windows.FrameworkElement@)">
+      <summary>Get the data for this column of an ITableEntryHandle as an FrameworkElement. The default implementation fails to return a FrameworkElement.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <param name="entry">The entry.</param>
+      <param name="singleColumnView">The view.</param>
+      <param name="content">The content.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.TryCreateImageContent(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Boolean,Microsoft.VisualStudio.Imaging.Interop.ImageMoniker@)">
+      <summary>Get the data for this column of an ITableEntryHandle as an ImageMoniker. The default implementation fails to return an ImageMoniker.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <param name="entry">The entry.</param>
+      <param name="singleColumnView">The view.</param>
+      <param name="content">The content.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.TryCreateStringContent(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Boolean,System.Boolean,System.String@)">
+      <summary>Get the data for this column of an ITableEntryHandle as a string. The default implementation is to get the value using Name as a key and, if it is a string, display that.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <param name="entry">The entry.</param>
+      <param name="truncatedText">The truncated text.</param>
+      <param name="singleColumnView">The view.</param>
+      <param name="content">The content.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition.TryCreateToolTip(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Object@)">
+      <summary>Get the tool tip for this column of an ITableEntryHandle. The default implementation returns false and sets <paramref name="toolTip" /> to null.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <param name="entry">The entry.</param>
+      <param name="toolTip">The tooltip.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinitionManager">
+      <summary>Manager for the TableColumnDefinitions used by any instance of an IWpfTableControl.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinitionManager.AddColumnDefinition(Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinition)">
+      <summary>Add a new TableColumnDefinition.</summary>
+      <returns>true if the <paramref name="newDefinition" /> was added (adding a TableColumnDefinition with the same name as an existing TableColumnDefinition will fail). </returns>
+      <param name="newDefinition">The table column definition.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinitionManager.GetColumnDefinition(System.String)">
+      <summary>Gets the TableColumnDefinition associated with <paramref name="columnName" />.</summary>
+      <returns>The corresponding definition or null if no definition is found.</returns>
+      <param name="columnName">The name of the column.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinitionManager.RemoveColumnDefinition(System.String)">
+      <summary>Remove an existing TableColumnDefinition.</summary>
+      <returns>true if the definition corresponding to <paramref name="definitionToRemove" />was removed.</returns>
+      <param name="definitionToRemove">Name of the TableColumnDefinition to remove.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor">
+      <summary>Interface used to implement event handlers for UI actions in the IWpfTableControl.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.KeyDown(System.Windows.Input.KeyEventArgs)">
+      <summary>Handles the KeyDown event.</summary>
+      <param name="args">A KeyEventArgs describing the key event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.KeyUp(System.Windows.Input.KeyEventArgs)">
+      <summary>Handles the KeyUp event.</summary>
+      <param name="args">A KeyEventArgs describing the key event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessDragEnter(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.DragEventArgs)">
+      <summary>Handles a drag enter event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessDragLeave(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.DragEventArgs)">
+      <summary>Handles a drag leave event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessDragOver(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.DragEventArgs)">
+      <summary>Handles a drag over event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessDrop(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.DragEventArgs)">
+      <summary>Handles a drop event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessGiveFeedback(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.GiveFeedbackEventArgs)">
+      <summary>Handles a GiveFeedback event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessMouseDown(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseButtonEventArgs)">
+      <summary>Handles a mouse down event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessMouseEnter(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseEventArgs)">
+      <summary>Handles a mouse enter event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessMouseLeave(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseEventArgs)">
+      <summary>Handles a mouse leave event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessMouseLeftButtonDown(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseButtonEventArgs)">
+      <summary>Handles a mouse left button down event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessMouseLeftButtonUp(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseButtonEventArgs)">
+      <summary>Handles a mouse left button up event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessMouseMove(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseEventArgs)">
+      <summary>Handles a mouse move event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessMouseRightButtonDown(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseButtonEventArgs)">
+      <summary>Handles a mouse right button down event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessMouseRightButtonUp(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseButtonEventArgs)">
+      <summary>Handles a mouse right button up event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessMouseUp(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseButtonEventArgs)">
+      <summary>Handles a mouse up event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessMouseWheel(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseWheelEventArgs)">
+      <summary>Handles a mouse wheel event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessNavigate(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,Microsoft.VisualStudio.Shell.TableControl.TableEntryNavigateEventArgs)">
+      <summary>Handles a Navigate event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessNavigateToHelp(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,Microsoft.VisualStudio.Shell.TableControl.TableEntryEventArgs)">
+      <summary>Handles a Navigate event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessQueryContinueDrag(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.QueryContinueDragEventArgs)">
+      <summary>Handles a QueryContinueDrag event after the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PostprocessSelectionChanged(Microsoft.VisualStudio.Shell.TableControl.TableSelectionChangedEventArgs)">
+      <summary>Handles a SelectionChanged event after the default handler.</summary>
+      <param name="e">A TableEntryNavigateEventArgs describing the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessDragEnter(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.DragEventArgs)">
+      <summary>Handles a drag enter event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessDragLeave(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.DragEventArgs)">
+      <summary>Handles a drag leave event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessDragOver(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.DragEventArgs)">
+      <summary>Handles a drag over event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessDrop(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.DragEventArgs)">
+      <summary>Handles a drop event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessGiveFeedback(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.GiveFeedbackEventArgs)">
+      <summary>Handles a GiveFeedback event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessMouseDown(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseButtonEventArgs)">
+      <summary>Handles a mouse down event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessMouseEnter(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseEventArgs)">
+      <summary>Handles a mouse enter event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessMouseLeave(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseEventArgs)">
+      <summary>Handles a mouse leave event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessMouseLeftButtonDown(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseButtonEventArgs)">
+      <summary>Handles a mouse left button down event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessMouseLeftButtonUp(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseButtonEventArgs)">
+      <summary>Handles a mouse left button up event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessMouseMove(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseEventArgs)">
+      <summary>Handles a mouse move event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessMouseRightButtonDown(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseButtonEventArgs)">
+      <summary>Handles a mouse right button down event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessMouseRightButtonUp(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseButtonEventArgs)">
+      <summary>Handles a mouse left button up event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessMouseUp(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseButtonEventArgs)">
+      <summary>Handles a mouse up event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessMouseWheel(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.Input.MouseWheelEventArgs)">
+      <summary>Handles a mouse wheel event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessNavigate(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,Microsoft.VisualStudio.Shell.TableControl.TableEntryNavigateEventArgs)">
+      <summary>Handles a Navigate event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessNavigateToHelp(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,Microsoft.VisualStudio.Shell.TableControl.TableEntryEventArgs)">
+      <summary>Handles a Navigate event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessQueryContinueDrag(Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle,System.Windows.QueryContinueDragEventArgs)">
+      <summary>Handles a QueryContinueDrag event before the default handler.</summary>
+      <param name="entry">The table entry raising the event.</param>
+      <param name="e">Event arguments that describe the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreprocessSelectionChanged(Microsoft.VisualStudio.Shell.TableControl.TableSelectionChangedEventArgs)">
+      <summary>Handles a SelectionChanged event before the default handler.</summary>
+      <param name="e">A TableEntryNavigateEventArgs describing the event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreviewKeyDown(System.Windows.Input.KeyEventArgs)">
+      <summary>Handles the PreviewKeyDown event.</summary>
+      <param name="args">A KeyEventArgs describing the key event.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessor.PreviewKeyUp(System.Windows.Input.KeyEventArgs)">
+      <summary>Handles the PreviewKeyUp event.</summary>
+      <param name="args">A KeyEventArgs describing the key event.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessorProvider">
+      <summary>Represents an exportable MEF component able to create ITableControlEventProcessor a given IWpfTableControl.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableControlEventProcessorProvider.GetAssociatedEventProcessor(Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl)">
+      <summary>Creates  an ITableControlEventProcessor for a given IWpfTableControl.</summary>
+      <returns>The created ITableControlEventProcessor. The value may be null if this ITableControlEventProcessorProvider does not wish to participate in the current context.</returns>
+      <param name="tableControl">The IWpfTableControl for which to create the ITableControlEventProcessor.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle">
+      <summary>A wrapper for an ITableEntry or a "virtual" entry created from an ITableEntriesSnapshot.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.AreDetailsShown">
+      <summary>Gets or sets whether details of the entry this ITableEntryHandle is associated with are being shown.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.CanShowDetails">
+      <summary>Gets whether the entry this ITableEntryHandle is associated with is selected can show details.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.EnsureVisible">
+      <summary>Ensure that the entry is visible in the table control, scrolling the contents of the table control if needed.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.HasVerticalContent">
+      <summary>Gets whether the entry this ITableEntryHandle is associated with has vertical content.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.IsSelected">
+      <summary>Gets or sets whether the entry this ITableEntryHandle is associated with is selected.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.IsVisible">
+      <summary>Is the entry visible in the table control.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.NavigateTo(System.Boolean)">
+      <summary>Navigates to the data the entry this ITableEntryHandle is associated with represents. Calling this is equivalent to the user initiating an navigation action from the table control itself.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <param name="isPreview">True if this a preview.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.NavigateToHelp">
+      <summary>Navigates to the help link the entry this ITableEntryHandle is associated with represents. Calling this is equivalent to the user initiating an navigate to help action from the table control itself.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.PinSnapshot">
+      <summary>Pin the snapshot for this ITableEntryHandle.</summary>
+      <returns>The ITableEntriesSnapshot used to create this entry, or null if it or its equivalent no longer exists.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.TryGetEntry(Microsoft.VisualStudio.Shell.TableManager.ITableEntry@)">
+      <summary>Gets the ITableEntry associated with this ITableEntryHandle.</summary>
+      <returns>true if this was created from an ITableEntry.</returns>
+      <param name="tableEntry">The table entry.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.TryGetFactory(Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshotFactory@,System.Int32@,System.Int32@)">
+      <summary>Gets the ITableEntriesSnapshotFactory, version number and index associated with this ITableEntryHandle. The entry's snapshot will be returned if it is being held by the table control.</summary>
+      <returns>true if this was created from an ITableEntriesSnapshot that, in turn, was created by an ITableEntriesSnapshotFactory.</returns>
+      <param name="factory">The factory.</param>
+      <param name="versionNumber">The version number.</param>
+      <param name="index">The index.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.TryGetSnapshot(Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot@,System.Int32@)">
+      <summary>Gets ITableEntriesSnapshot and index associated with this ITableEntryHandle.</summary>
+      <returns>True if this was created from an ITableEntriesSnapshot and that snapshot has been pinned ITableEntryHandle.PinSnapshot).</returns>
+      <param name="snapshot">The snapshot.</param>
+      <param name="index">The index of the handle.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle.UnpinSnapshot"></member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl">
+      <summary>Displays and manages a data as a table.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.AutoSubscribe">
+      <summary>Indicates whether this table control will automatically subscribe to all data sources added to its Manager.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.ColumnDefinitionManager">
+      <summary>Gets the ITableColumnDefinitionManager used by this (and every other) IWpfTableControl.</summary>
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.Shell.TableControl.ITableColumnDefinitionManager" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.ColumnStates">
+      <summary>Gets a snapshot of the current column states.</summary>
+      <returns>Returns <see cref="T:System.Collections.Generic.IReadOnlyList`1" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.Control">
+      <summary>Gets the WPF control that displays the data from the activated ITableDataSources.</summary>
+      <returns>Returns <see cref="T:System.Windows.FrameworkElement" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.Entries">
+      <summary>Gets the entries displayed in the control.</summary>
+      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerable`1" />.</returns>
+    </member>
+    <member name="E:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.EntriesChanged">
+      <summary>Raised (on the thread that created the control) after the controls entries have changed.</summary>
+    </member>
+    <member name="E:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.FiltersChanged">
+      <summary>Raised whenever the table's filter is changed via SetFilter.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.ForceUpdateAsync">
+      <summary>Force the table control to begin an update (which may not happen immediately).</summary>
+      <returns>The version number of the pending update.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.GetFilter(System.String)">
+      <summary>Get the filter for the specified &lt;<paramref name="key" />if it exists, or null if there is no corresponding filter.</summary>
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.Shell.TableControl.IEntryFilter" />.</returns>
+      <param name="key">The key.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.Manager">
+      <summary>Gets the ITableManager that provides the data for this control.</summary>
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.Shell.TableManager.ITableManager" />.</returns>
+    </member>
+    <member name="E:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.PreEntriesChanged">
+      <summary>Raised before the control entries have changed.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.RefreshUI">
+      <summary>Force the elements in the table to be redrawn (because, for example, the user changed a setting that changes the way file names are displayed).</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.SelectAll">
+      <summary>Selects all entries.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.SelectedEntries">
+      <summary>Gets or sets entries selected in the control.</summary>
+      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerable`1" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.SelectedEntry">
+      <summary>Gets the selected entry in the table control. Returns null if no items are selected. If multiple items are selected, then we return whatever item considered (by the underlying WPF controls consider to be the selected item.</summary>
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.SelectedOrFirstEntry">
+      <summary>Gets the selected entry in the table control or, if no entry is selected the first entry.</summary>
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.Shell.TableControl.ITableEntryHandle" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.SelectionMode">
+      <summary>Gets or sets the selection mode of the table control.  The default is Extended (multi-select with modifier).</summary>
+      <returns>Returns <see cref="T:System.Windows.Controls.SelectionMode" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.SetFilter(System.String,Microsoft.VisualStudio.Shell.TableControl.IEntryFilter)">
+      <summary>Set the filter for the specified <paramref name="key" />.</summary>
+      <returns>The previous filter for <paramref name="key" /> if one exists, or null if there is no corresponding filter.</returns>
+      <param name="key">The key.</param>
+      <param name="newFilter">The new filter.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.SortFunction">
+      <summary>Gets or sets the default sort function associated with the table control.</summary>
+      <returns>Returns <see cref="T:System.Comparison`1" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.SubscribeToDataSource(Microsoft.VisualStudio.Shell.TableManager.ITableDataSource)">
+      <summary>Start subscribing to the ITableEntry objects produced by a ITableDataSource.</summary>
+      <param name="source">The source.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.UnselectAll">
+      <summary>Clears all the selections.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableControl.UnsubscribeFromDataSource(Microsoft.VisualStudio.Shell.TableManager.ITableDataSource)">
+      <summary>Stop subscribing to the specified ITableDataSource.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+      <param name="source">The source.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntriesSnapshot">
+      <summary>Extension of the ITableEntriesSnapshot that allows an entry provider to override the default behavior for what gets displayed for an entry in a particular column.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntriesSnapshot.CanCreateDetailsContent(System.Int32)">
+      <summary>Indicates whether the virtual entry at position <paramref name="index" /> has details content that can be displayed.</summary>
+      <returns>true if the entry has content that could be displayed.</returns>
+      <param name="index">Index of the virtual entry in the snapshot.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntriesSnapshot.TryCreateColumnContent(System.Int32,System.String,System.Boolean,System.Windows.FrameworkElement@)">
+      <summary>Get the FrameworkElement for the virtual entry at position <paramref name="index" /> and <paramref name="columnName" />.</summary>
+      <returns>true if <paramref name="content" /> should be used.</returns>
+      <param name="index">Index of the virtual entry in the snapshot</param>
+      <param name="columnName">Name of the column for which to get the FrameworkElement.</param>
+      <param name="singleColumnView">true if the table control is displaying everything in a single column.</param>
+      <param name="content">The FrameworkElement to display in the column.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntriesSnapshot.TryCreateDetailsContent(System.Int32,System.Windows.FrameworkElement@)">
+      <summary>Get the details content for the virtual entry <paramref name="index" /> so that it can be displayed in the table control.</summary>
+      <returns>true if <paramref name="expandedContent" /> should be used.</returns>
+      <param name="index">Index of the virtual entry in the snapshot.</param>
+      <param name="expandedContent">The FrameworkElement to display below the entry in the table control.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntriesSnapshot.TryCreateDetailsStringContent(System.Int32,System.String@)">
+      <summary>Get the string equivalent of the details content for the virtual entry <paramref name="index" /> (used for search and copy and paste).</summary>
+      <returns>true if <paramref name="content" /> should be used.</returns>
+      <param name="index">Index of the virtual entry in the snapshot.</param>
+      <param name="content">The string equivalent to display in the column.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntriesSnapshot.TryCreateImageContent(System.Int32,System.String,System.Boolean,Microsoft.VisualStudio.Imaging.Interop.ImageMoniker@)">
+      <summary>Get the ImageMoniker for the virtual entry at position <paramref name="index" /> and <paramref name="columnName" />.</summary>
+      <returns>true if <paramref name="content" /> should be used.</returns>
+      <param name="index">Index of the virtual entry in the snapshot.</param>
+      <param name="columnName">Name of the column for which to get the &lt;see cref="ImageMoniker"/&gt;.</param>
+      <param name="singleColumnView">true if the table control is displaying everything in a single column.</param>
+      <param name="content">The &lt;see cref="ImageMoniker"/&gt; to display in the column.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntriesSnapshot.TryCreateStringContent(System.Int32,System.String,System.Boolean,System.Boolean,System.String@)">
+      <summary>Get the string for the virtual entry at position <paramref name="index" /> and <paramref name="columnName" />.</summary>
+      <returns>true if <paramref name="content" /> should be used.</returns>
+      <param name="index">Index of the virtual entry in the snapshot.</param>
+      <param name="columnName">Name of the column for which to get the &lt;see cref="string"/&gt;.</param>
+      <param name="truncatedText">Truncate the text for fit on a single line.</param>
+      <param name="singleColumnView">true if the table control is displaying everything in a single column.</param>
+      <param name="content">The &lt;see cref="string"/&gt; to display in the column.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntriesSnapshot.TryCreateToolTip(System.Int32,System.String,System.Object@)">
+      <summary>Get the tooltip for the entry and columnName.</summary>
+      <returns>true if <paramref name="toolTip" /> should be used.</returns>
+      <param name="index">Index of the virtual entry in the snapshot.</param>
+      <param name="columnName">Name of the column for which to get the image.</param>
+      <param name="toolTip">The object to display as a tool tip for the column.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntry">
+      <summary>Extension of the IWpfTableEntry that allows an entry provider to override the default behavior for what gets displayed for an entry in a particular column.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntry.CanCreateDetailsContent">
+      <summary>Does the entry have details content that can be displayed?</summary>
+      <returns>true if the entry has content that could be displayed.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntry.TryCreateColumnContent(System.String,System.Boolean,System.Windows.FrameworkElement@)">
+      <summary>Get the FrameworkElement for the entry and <paramref name="columnName" />.</summary>
+      <returns>true if <paramref name="content" /> should be used.</returns>
+      <param name="columnName">Name of the column for which to get the FrameworkElement.</param>
+      <param name="singleColumnView">true if the table control is displaying everything in a single column.</param>
+      <param name="content">The FrameworkElement to display in the column.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntry.TryCreateDetailsContent(System.Windows.FrameworkElement@)">
+      <summary>Get the details content for the entry so that it can be displayed in the table control.</summary>
+      <returns>true if &lt;paramref name="expandedContent"/&gt; should be used.</returns>
+      <param name="expandedContent"> The FrameworkElement to display below the entry in the table control.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntry.TryCreateDetailsStringContent(System.String@)">
+      <summary>Get the string equivalent of the details content for the entry (used for search and copy and paste).</summary>
+      <returns>true if <paramref name="content" /> should be used.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntry.TryCreateImageContent(System.String,System.Boolean,Microsoft.VisualStudio.Imaging.Interop.ImageMoniker@)">
+      <summary>Get the ImageMoniker for the entry and <paramref name="columnName" />.</summary>
+      <returns>true if <paramref name="content" /> should be used.</returns>
+      <param name="columnName">Name of the column for which to get the ImageMoniker.</param>
+      <param name="singleColumnView">true if the table control is displaying everything in a single column.</param>
+      <param name="content">The ImageMoniker to display in the column.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntry.TryCreateStringContent(System.String,System.Boolean,System.Boolean,System.String@)">
+      <summary>Get the string for the entry and <paramref name="columnName" />.</summary>
+      <returns>true if <paramref name="content" /> should be used.</returns>
+      <param name="columnName">Name of the column for which to get the &lt;see cref="string"/&gt;</param>
+      <param name="truncatedText">Truncate the text for fit on a single line.</param>
+      <param name="singleColumnView">true if the table control is displaying everything in a single column.</param>
+      <param name="content">The &lt;see cref="string"/&gt; to display in the column.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.IWpfTableEntry.TryCreateToolTip(System.String,System.Object@)">
+      <summary>Get the tooltip for the entry and <paramref name="columnName" />.</summary>
+      <returns>true if <paramref name="toolTip" /> should be used.</returns>
+      <param name="columnName">Name of the column for which to get the image.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.ManagerTypeAttribute">
+      <summary>An attribute on an ITableControlEventProcessorProvider to restrict the ITableControlEventProcessor it creates to events on entries provided through an ITableManager whose ITableManager.Identifier matches this attribute.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.ManagerTypeAttribute.#ctor(System.String)">
+      <summary>Creates a new instance of the ManagerTypeAttribute.</summary>
+      <param name="managerTypes">The manager types.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.ManagerTypeAttribute.ManagerIdentifiers">
+      <summary>Gets the manager identifiers.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions">
+      <summary>Names of predefined columns in the table.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.BuildTool">
+      <summary>Column used to display the build tool that generated the error (e.g. "FxCop"). This column uses the StandardTableKeyNames.BuildTool key name in an entry.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.Column">
+      <summary>The column used to display the column number associated with the entry. This column uses the StandardTableKeyNames.Column key name in an entry. The value displayed in the column is one more than the entry's StandardTableKeyNames.Column value.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.DetailsExpander">
+      <summary>The column used to indicate whether or not the entry has additional content associated with it.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.DocumentName">
+      <summary>The column used to display the document name associated with the entry. This column uses the StandardTableKeyNames.DocumentName key name in an entry. This column displays only the file name Path.GetFileName(string) in the column. The full path is displayed as a tool tip on the column (and is used when copying the column's contents).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.ErrorCategory">
+      <summary>Column used to display the entry's error category (e.g. "Compiler"). This column uses the StandardTableKeyNames.ErrorCategory key name in an entry.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.ErrorCode">
+      <summary>Column used to display the entry's error code (e.g. "CS2912"). This column uses the StandardTableKeyNames.ErrorCode and StandardTableKeyNames.ErrorCodeToolTip key names in an entry. This column is displayed as a hyperlink in the table. The &lt; StandardTableKeyNames.ErrorCode is the hyperlink's text and the StandardTableKeyNames.ErrorCodeToolTip is the tooltip that is displayed when hovering over the link. Clicking on the hyperlink is equivalent to navigating to the entry's associated help information (see ITableEntryHandle.NavigateToHelp.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.ErrorRank">
+      <summary>Column used to display the entry's error rank (see StandardTableKeyNames.ErrorRank for more details). This column uses the StandardTableKeyNames.ErrorRank key name in an entry.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.ErrorSeverity">
+      <summary>Column used to display the entry's severity (based on either StandardTableKeyNames.ErrorSeverityImage or StandardTableKeyNames.ErrorSeverity). This column uses the StandardTableKeyNames.ErrorSeverity or StandardTableKeyNames.ErrorSeverityImage key name in an entry. If StandardTableKeyNames.ErrorSeverityImage is specified, then that ImageMoniker displayed in the column. Otherwise, a moniker based on StandardTableKeyNames.ErrorSeverity is used.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.ErrorSource">
+      <summary>Column used to display the entry's error source (e.g. "Build"). This column uses the StandardTableKeyNames.ErrorSource key name in an entry.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.Line">
+      <summary>The column used to display the line number associated with the entry. This column uses the StandardTableKeyNames.Line key name in an entry. The value displayed in the column is one more than the entry's StandardTableKeyNames.Line value.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.Priority">
+      <summary>Column used to display the entry's priority. This column uses the StandardTableKeyNames.Priority or StandardTableKeyNames.PriorityImage key name in an entry. If StandardTableKeyNames.PriorityImage is specified then that ImageMoniker displayed in the column. Otherwise a moniker based on StandardTableKeyNames.Priority is used.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.ProjectName">
+      <summary>Column used to display the entry's project (e.g. "ConsoleApplication1"). This column uses the StandardTableKeyNames.ProjectName key name in an entry.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableColumnDefinitions.Text">
+      <summary>The column used to display the descriptive text associated with the entry. This column uses the StandardTableKeyNames.Text and StandardTableKeyNames.FullText key names in an entry. If the StandardTableKeyNames.FullText value exists, then StandardTableKeyNames.Text is displayed in the column, and the full text is used as a tool tip and when copying the contents. If the StandardTableKeyNames.FullText value doesn't exist, then StandardTableKeyNames.Text is displayed in the column and when copying the contents, and there is no tool tip.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.StandardTableControlEventProcessors"></member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableControlEventProcessors.Default"></member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.StandardTableControlEventProcessors.ErrorList"></member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.TableEntryEventArgs">
+      <summary>Provides data about a table entry navigation event.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.TableEntryEventArgs.#ctor">
+      <summary>Creates s new instance of TableEntryEventArgs.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.TableEntryEventArgs.Handled">
+      <summary>Indicates whether or not the event has been handled.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.TableEntryNavigateEventArgs">
+      <summary>Provides data about a table entry navigation event.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.TableEntryNavigateEventArgs.#ctor(System.Boolean)">
+      <summary>Creates a new instance of TableEntryNavigateEventArgs.</summary>
+      <param name="isPreview">True if this navigation is a preview.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.TableEntryNavigateEventArgs.IsPreview">
+      <summary>Indicates whether the navigation is a preview operation.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableControl.TableSelectionChangedEventArgs">
+      <summary>Provides data for the ITableControlEventProcessor.PreprocessSelectionChanged(TableSelectionChangedEventArgs) and ITableControlEventProcessor.PostprocessSelectionChanged(TableSelectionChangedEventArgs) events.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableControl.TableSelectionChangedEventArgs.#ctor(System.Windows.Controls.SelectionChangedEventArgs)">
+      <summary>Creates a new instance of TableSelectionChangedEventArgs.</summary>
+      <param name="e">The event.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.TableSelectionChangedEventArgs.AddedEntries">
+      <summary>Gets a list that contains the items that were selected.</summary>
+      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerable`1" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableControl.TableSelectionChangedEventArgs.RemovedEntries">
+      <summary>Gets a list that contains the items that were unselected.</summary>
+      <returns>Returns <see cref="T:System.Collections.Generic.IEnumerable`1" />.</returns>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableControl.TableSelectionChangedEventArgs.SelectionChangedEventArgs">
+      <summary>The SelectionChangedEventArgs that initiated this event.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableManager.ErrorRank">
+      <summary>Value that indicates the rank of an in the error list (errors with a lower rank are, by default, displayed before errors with a higher rank).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.ErrorRank.Declaration">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.ErrorRank.Emit">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.ErrorRank.Lexical">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.ErrorRank.Other">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.ErrorRank.PostBuild">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.ErrorRank.Semantic">
+      <summary />
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.ErrorRank.Syntactic">
+      <summary />
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableManager.ErrorSource">
+      <summary>Value that indicates the source of an error in the error list.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.ErrorSource.Build">
+      <summary>Used to indicate any error generated by an explicit build command.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.ErrorSource.Other">
+      <summary>Used to indicate any error generated from any compilation process that was not explicitly invoked by the end-user (e.g. in response to typing a character).</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink">
+      <summary>Class used to consume data provided by an ITableDataSource. ITableDataSource can have multiple subscribers and each subscriber will have its own ITableDataSink.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.AddEntries(System.Collections.Generic.IReadOnlyList{Microsoft.VisualStudio.Shell.TableManager.ITableEntry},System.Boolean)"></member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.AddFactory(Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshotFactory,System.Boolean)">
+      <summary>Add the specified <paramref name="newFactory" />.</summary>
+      <param name="newFactory">The new factory.</param>
+      <param name="removeAllFactories">Determines whether to remove all factories.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.AddSnapshot(Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot,System.Boolean)">
+      <summary>Add the specified ITableEntriesSnapshotFactory.</summary>
+      <param name="newSnapshot">The new snapshot.</param>
+      <param name="removeAllSnapshots">Determines whether to remove all snapshots.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.FactorySnapshotChanged(Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshotFactory)">
+      <summary>Tell the sink that the ITableEntriesSnapshotFactory.GetCurrentSnapshot for <paramref name="factory" /> has changed.</summary>
+      <param name="factory">The &lt;see cref="ITableEntriesSnapshotFactory"/&gt; that has a new &lt;see cref="ITableEntriesSnapsho"/&gt;. This can be null, which indicates one or more factories have changed.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.IsStable">
+      <summary>Indicates whether the results reported to the sink are stable.</summary>
+      <returns>Returns <see cref="T:System.Boolean" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.RemoveAllEntries">
+      <summary>Remove all ITableEntry objects previously added to the sink.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.RemoveAllFactories">
+      <summary>Remove all ITableEntriesSnapshotFactory objects that had previously been added to the sink.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.RemoveAllSnapshots">
+      <summary>Remove all ITableEntriesSnapshot objects that had previously been added to the sink.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.RemoveEntries(System.Collections.Generic.IReadOnlyList{Microsoft.VisualStudio.Shell.TableManager.ITableEntry})"></member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.RemoveFactory(Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshotFactory)">
+      <summary>Remove the specified ITableEntriesSnapshotFactory.</summary>
+      <param name="oldFactory">The old factory.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.RemoveSnapshot(Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot)">
+      <summary>Remove the specified snapshot.</summary>
+      <param name="oldSnapshot">The old snapshot.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.ReplaceEntries(System.Collections.Generic.IReadOnlyList{Microsoft.VisualStudio.Shell.TableManager.ITableEntry},System.Collections.Generic.IReadOnlyList{Microsoft.VisualStudio.Shell.TableManager.ITableEntry})"></member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.ReplaceFactory(Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshotFactory,Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshotFactory)">
+      <summary>Remove <paramref name="oldFactory" /> and add <paramref name="newFactory" />.</summary>
+      <param name="oldFactory">The old factory.</param>
+      <param name="newFactory">The new factory.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSink.ReplaceSnapshot(Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot,Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot)">
+      <summary>Remove <paramref name="oldSnapshot" /> and add <paramref name="newSnapshot" />.</summary>
+      <param name="oldSnapshot">The old snapshot.</param>
+      <param name="newSnapshot">The new snapshot.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableManager.ITableDataSource">
+      <summary>A source for data given to an ITableManager.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableManager.ITableDataSource.DisplayName">
+      <summary>Localized name to identify the source in any UI displayed to the user. Can be null.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableManager.ITableDataSource.Identifier">
+      <summary>Unique identifier of this data source.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableManager.ITableDataSource.SourceTypeIdentifier">
+      <summary>Identifier that describes the type of entries provided by this source (e.g. StandardTableDataSources.CommentTableDataSource).</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableDataSource.Subscribe(Microsoft.VisualStudio.Shell.TableManager.ITableDataSink)">
+      <summary>Subscribe to ITableEntry objects created by this data source.</summary>
+      <returns>A key that controls the lifetime of the subscription. The ITableDataSource must continue to provide updates until either the key is disposed or the source is removed from the table (which will, as a side-effect, cause the key to be disposed of).</returns>
+      <param name="sink">Contains methods called when the entries provided by the source change.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot">
+      <summary>An abstraction for a fixed set of ITableEntry objects.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot.Count">
+      <summary>Number of entries in this snapshot.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot.IndexOf(System.Int32,Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot)">
+      <summary>Returns the index of the entry at <paramref name="currentIndex" /> in this snapshot in a later snapshot <paramref name="newSnapshot" />).</summary>
+      <returns>The index in <paramref name="newSnapshot" /> if it exists, or -1 otherwise.</returns>
+      <param name="currentIndex">Index of the entry in this ITableEntriesSnapshot.</param>
+      <param name="newSnapshot">Desired snapshot.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot.StartCaching">
+      <summary>Hint to the snapshot that there will be a lot of access to the snapshot's data.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot.StopCaching">
+      <summary>Hint to the snapshot that the snapshot's entries will no longer be accessed.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot.TryGetValue(System.Int32,System.String,System.Object@)">
+      <summary>Get the data for the <paramref name="columnName" /> of the entry at <paramref name="index" />.</summary>
+      <returns>true if successful.</returns>
+      <param name="index">The index.</param>
+      <param name="content">The content.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot.VersionNumber">
+      <summary>Get the version number associated with the snapshot.</summary>
+      <returns>Returns <see cref="T:System.Int32" />.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshotFactory">
+      <summary>A manager that provides stable snapshots of a collection of entries at a point in time. The factory can provide different snapshots over time (generating, for example, new snapshots after each build).</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshotFactory.CurrentVersionNumber">
+      <summary>Gets the version number associated with the current snapshot</summary>
+      <returns>The version number associated with the current snapshot</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshotFactory.GetCurrentSnapshot">
+      <summary>Get the current snapshot of the entries associated with the factory.</summary>
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshotFactory.GetSnapshot(System.Int32)">
+      <summary>Get the snapshot associated with the specified <paramref name="versionNumber" />. Return null if that snapshot is no longer available.</summary>
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.Shell.TableManager.ITableEntriesSnapshot" />.</returns>
+      <param name="versionNumber">The version number</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableManager.ITableEntry">
+      <summary>An entry that corresponds to a row of data in a table control.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableEntry.CanSetValue(System.String)">
+      <summary>Can the data associated with the specified column be set?</summary>
+      <returns>true if the entry can be set.</returns>
+      <param name="keyName">The key name.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableManager.ITableEntry.Identity">
+      <summary>The identifier.</summary>
+      <returns>Returns <see cref="T:System.Object" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableEntry.TryGetValue(System.String,System.Object@)">
+      <summary>Get the data associated with the specified column (if this entry has data associated with that column).</summary>
+      <returns>true if the entry has data associated with the column</returns>
+      <param name="keyName">The key name.</param>
+      <param name="content">The content.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableEntry.TrySetValue(System.String,System.Object)">
+      <summary>Set the data associated with the specified column (if this entry has data associated with that column).</summary>
+      <returns>true if the value was changed.</returns>
+      <param name="keyName">The key name.</param>
+      <param name="content">The content.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableManager.ITableManager">
+      <summary>A manager for tabular data of a particular type.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableManager.AddSource(Microsoft.VisualStudio.Shell.TableManager.ITableDataSource,System.Collections.Generic.IReadOnlyCollection{System.String})"></member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableManager.AddSource(Microsoft.VisualStudio.Shell.TableManager.ITableDataSource,System.String[])">
+      <summary>Add <paramref name="source" /> to the list of sources associated with the table manager.</summary>
+      <returns>true if <paramref name="source" /> was added to the table manager's Sources. Returns false if it was not (because it was already one of the table manager's sources)</returns>
+      <param name="source">Table data source.</param>
+      <param name="columns">Indicates the columns that could be displayed by a table containing data from <paramref name="source" />.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableManager.GetColumnsForSources(System.Collections.Generic.IEnumerable{Microsoft.VisualStudio.Shell.TableManager.ITableDataSource})"></member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableManager.ITableManager.Identifier">
+      <summary>Identifier of the table manager.</summary>
+      <returns>Returns <see cref="T:System.String" />.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableManager.RemoveSource(Microsoft.VisualStudio.Shell.TableManager.ITableDataSource)">
+      <summary>Remove <paramref name="source" /> from the list of sources associated with this table manager.</summary>
+      <returns>true if <paramref name="source" /> was removed from the table manager. Returns false if it was not (because it was not one of the table manager's Sources).</returns>
+      <param name="source">The source.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.TableManager.ITableManager.Sources">
+      <summary>The list of sources currently associated with the table manager.</summary>
+      <returns>Returns <see cref="T:System.Collections.Generic.IReadOnlyList`1" />.</returns>
+    </member>
+    <member name="E:Microsoft.VisualStudio.Shell.TableManager.ITableManager.SourcesChanged">
+      <summary>Raised whenever sources are added or removed from this table manager.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableManager.ITableManagerProvider">
+      <summary>Provider for ITableManagers.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.TableManager.ITableManagerProvider.GetTableManager(System.String)">
+      <summary>Gets the table manager.</summary>
+      <returns>Returns <see cref="T:Microsoft.VisualStudio.Shell.TableManager.ITableManager" />.</returns>
+      <param name="identifier">The identifier.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableManager.StandardTableDataSources">
+      <summary>Standard ITableDataSource.SourceTypeIdentifier&gt; used by the Error and Task Lists.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableDataSources.AnyDataSource">
+      <summary>Represents a string identifier of an "any data source". Used by ITableControlEventProcessorProvider to identify event processors that are not limited to any particular data source. Wildcards in the source string are not supported in general. This is handled as a special case.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableDataSources.CommentTableDataSource">
+      <summary>The ITableDataSource.SourceTypeIdentifier for sources providing comment tasks to the task list.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableDataSources.ErrorTableDataSource">
+      <summary>The string equivalent of the "ITableDataSource.SourceTypeIdentifier for sources providing errors to the error list.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableDataSources.ShortcutTableDataSource">
+      <summary>The string equivalent of the ITableDataSource.SourceTypeIdentifier for sources providing shortcut tasks to the task list. Corresponds to GUID_Shortcut_TaskProvider&lt;/para&gt;</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableDataSources.UserTableDataSource">
+      <summary>The string equivalent of the ITableDataSource.SourceTypeIdentifier for sources providing user tasks to the task list.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames">
+      <summary>Names of predefined keys for data in an ITableEntry.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.BuildTool">
+      <summary>The name of the tool that generated the error (e.g. "fxcop"). Expected data type is string.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.Column">
+      <summary>The column number associated with a table-entry. The raw value should be an integer. The first column of a line should be column 0.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.DetailsExpander">
+      <summary>The details expander associated with a table-entry.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.DocumentName">
+      <summary>The full path of the document associated with a table-entry. The raw value should be string.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.ErrorCategory">
+      <summary>The error category. Expected data type type is string (e.g. "Compiler").</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.ErrorCode">
+      <summary>The text displayed in the StandardTableColumnDefinitions.ErrorCode column. Expected data type is string (e.g. "CS1591"). If this value is not set, then the column will be left blank.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.ErrorCodeToolTip">
+      <summary>The tooltip displayed in the StandardTableColumnDefinitions.ErrorCode column. Expected data type is string.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.ErrorRank">
+      <summary>The ranking of the error compared with other errors. Expected data type is ErrorRank .Errors with the lowest rank are, by default, displayed first in the error list.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.ErrorSeverity">
+      <summary>The error severity (despite the expected data type of the value). Expected data type is __VSERRORCATEGORY.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.ErrorSeverityImage">
+      <summary>The icon used to indicate the error severity. Expected data type is Imaging.Interop.ImageMoniker.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.ErrorSource">
+      <summary>The entry's error source (e.g. "Build"). Expected data type is ErrorSource.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.FullText">
+      <summary>The full text associated with a table-entry in the case when StandardTableKeyNames.Text is truncated. The raw value should be string. If StandardTableKeyNames.Text has not been truncated, then attempts to get the value for this key should fail. If StandardTableKeyNames.Text has been truncated, then this value should contain the all of the truncated text (along with whatever text was removed).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.HasVerticalContent">
+      <summary>Definition for whether a table-entry has vertical content. The raw value should be a boolean.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.HelpKeyword">
+      <summary>Help keyword of the help associated with this table entry. Expected data type is string. VS will, first, try to display help using the keyword. If that fails, it will try to open the link specified in StandardTableKeyNames.HelpLink.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.HelpLink">
+      <summary>URI of the help associated with this table entry. Expected data type is string. This entry will be used to open a URI if the either the entry has no StandardTableKeyNames.HelpKeyword or attempting to use the keyword to open help fails.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.ImageIndex">
+      <summary>The IVsTaskItem.ImageListIndex() of the error (for errors reported using the legacy APIs).</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.IsActiveContext"></member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.Line">
+      <summary>The line number associated with a table-entry. The raw value should be an integer. The first line of a file should be line 0.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.OutputWindowMessageId"></member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.OutputWindowMessageProvider"></member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.Priority">
+      <summary>The error priority. Expected data type is VSTASKPRIORITY.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.PriorityImage">
+      <summary>The icon used to indicate the error priority. Expected data type is Imaging.Interop.ImageMoniker.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.ProjectGuid">
+      <summary>The Guid of the project. Expected data type is Guid.Use IVsSolution.GetGuidOfProject to get the project's Guid from an IVsHierarchy. Performance will be improved if you "prebox" your Guid by, in your ITableEntry or ITableEntriesSnapshot, having a member variable private object boxedProjectGuid = projectGuid; and returning boxedProjectGuid instead of projectGuid.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.ProjectName">
+      <summary>The name of the project. Expected data type is string (e.g. "ConsoleApplication1").</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.TaskCategory">
+      <summary>The category of the item. Expected data type is VSTASKCATEGORY.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTableKeyNames.Text">
+      <summary>The text associated with a table-entry. The raw value should be string. The length of this text should be constrained to what fits nicely in the error list. If it is too long, you should truncate text to something reasonable and return the untruncated text in StandardTableKeyNames.FullText.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.TableManager.StandardTables">
+      <summary>Standard ITableManager.Identifier used by the Error and Task Lists.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTables.ErrorsTable">
+      <summary>The string equivalent of the ITableManager.Identifier for the ITableManager providing errors for the Error List.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.TableManager.StandardTables.TasksTable">
+      <summary>The string equivalent of the ITableManager.Identifier for the ITableManager providing tasks for the Task List.</summary>
+    </member>
+  </members>
+</doc>

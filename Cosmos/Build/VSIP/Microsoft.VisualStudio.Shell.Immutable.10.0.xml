@@ -1,0 +1,125 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.Shell.Immutable.10.0</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.Shell.RegistrationAttribute">
+      <summary>An abstract class for VSPackage registration. The RegistrationAttribute class allows new registration information to be added without changing the registration tools.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.#ctor">
+      <summary>Initializes a new instance of the class.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.GetPackageRegKeyPath(System.Guid)">
+      <summary>Gets the registry path (relative to the registry root of the application) of the VSPackage.</summary>
+      <returns>The registry path (relative to the registry root of the application) of the VSPackage.</returns>
+      <param name="package">The GUID of the VSPackage.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.Register(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)">
+      <summary>Registers this VSPackage with a given context, when called by an external registration tool such as regpkg.exe. For more information, see Registering VSPackages.</summary>
+      <param name="context">A registration context provided by an external registration tool. The context can be used to create registry keys, log registration activity, and obtain information about the component being registered.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.RegistrationAttribute.TypeId">
+      <summary>Gets the current instance of this attribute.</summary>
+      <returns>The current instance of this attribute.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.Unregister(Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext)">
+      <summary>Called to unregister this attribute with the given context. </summary>
+      <param name="context">A registration context provided by an external registration tool. The context can be used to remove registry keys, log registration activity, and obtain information about the component being registered.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.RegistrationAttribute.Key">
+      <summary>Provides an abstract class that represents a registration key.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.Key.#ctor">
+      <summary>Creates a new <see cref="T:Microsoft.VisualStudio.Shell.RegistrationAttribute.Key" /> object.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.Key.Close">
+      <summary>Closes a key after writing is complete.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.Key.CreateSubkey(System.String)">
+      <summary>Creates a new registration key. The new key is a subkey of the current Key.</summary>
+      <returns>The newly created Key.</returns>
+      <param name="name">The name of the new key. This name is relative to the current key. An empty or null string sets the default value for the key.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.Key.SetValue(System.String,System.Object)">
+      <summary>Sets the name to the given value.</summary>
+      <param name="valueName">The name of the value to set. If <paramref name="valueName" /> is null or an empty string, SetValue sets the default value for the current Key.</param>
+      <param name="value">An object to store in the value. Use an empty string or null to set the default value for a key. If the object is a numeric type that can be converted to an integer, it is stored as a DWORD registry encoding. Otherwise it is stored as a string.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.Key.System#IDisposable#Dispose">
+      <summary>Disposes the object and its resources.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext">
+      <summary>An abstract base class that provides context information from an external source to a registration attribute.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.#ctor">
+      <summary>Creates a new RegistrationAttribute.RegistrationContext.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.CodeBase">
+      <summary>Gets the path and filename of the object being registered.</summary>
+      <returns>The path and filename of the object being registered.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.ComponentPath">
+      <summary>Gets the path to the component that is being registered.</summary>
+      <returns>The path to the component being registered, including the file name.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.ComponentType">
+      <summary>Gets the type of component being registered.</summary>
+      <returns>The type of component being registered.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.CreateKey(System.String)">
+      <summary>Creates a new registration key by name.</summary>
+      <returns>A new <see cref="T:Microsoft.VisualStudio.Shell.RegistrationAttribute.Key" /> object.</returns>
+      <param name="name">The name of the key to create.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.EscapePath(System.String)">
+      <summary>Reformats a string as needed by the registration tool.</summary>
+      <returns>The reformatted path string.</returns>
+      <param name="str">The path string to reformat.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.InprocServerPath">
+      <summary>Gets the path to the in-process server DLL.</summary>
+      <returns>The path to the in-process server DLL.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.Log">
+      <summary>Gets a <see cref="T:System.IO.TextWriter" /> object that can be used to log events during registration.</summary>
+      <returns>A <see cref="T:System.IO.TextWriter" /> object.</returns>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.RegistrationMethod">
+      <summary>Gets a value that specifies how the assembly should be located (CodeBase or Assembly).</summary>
+      <returns>Specifies how the assembly should be located (CodeBase or Assembly).</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.RemoveKey(System.String)">
+      <summary>Removes an existing registration key.</summary>
+      <param name="name">The name of the key to remove.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.RemoveKeyIfEmpty(System.String)">
+      <summary>Removes the key of the specified name if it has no child key and no value.</summary>
+      <param name="name">The name of the key to remove.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.RemoveValue(System.String,System.String)">
+      <summary>Removes a value from a registration key.</summary>
+      <param name="keyname">The name of the key that contains the value to be removed.</param>
+      <param name="valuename">The name of the value to remove.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.Shell.RegistrationAttribute.RegistrationContext.RootFolder">
+      <summary>Gets or sets the root folder.</summary>
+      <returns>The root folder.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.RegistrationMethod">
+      <summary>Specifies how the assembly should be registered or located.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.RegistrationMethod.Assembly">
+      <summary>The assembly should be in the GAC or in the PrivateAssemblies folder.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.RegistrationMethod.CodeBase">
+      <summary>The path to the assembly should be stored in the registry and used to locate the assembly at runtime.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.Shell.RegistrationMethod.Default">
+      <summary>Should be used only by tools.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.Shell.SVsServiceProvider">
+      <summary>Represents a Visual Studio service provider.</summary>
+    </member>
+  </members>
+</doc>

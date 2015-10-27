@@ -1,0 +1,127 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.TemplateWizardInterface</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.TemplateWizard.IFilterTokenValues">
+      <summary>Specifies the filtering logic to run when a project or item is instantiated from a template.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.IFilterTokenValues.FilterReplacementTokens(System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String})">
+      <summary>Specifies the filtering logic to run when a project or item is instantiated from a template.</summary>
+      <param name="projectFileExtension">The file name extenstion of the project file.</param>
+      <param name="projectItemFileExtension">The file name extension of the item.</param>
+      <param name="replacementValues">The keys and values to use during parameter replacement.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TemplateWizard.IWizard">
+      <summary>Defines the logic for a template wizard extension.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.IWizard.BeforeOpeningFile(EnvDTE.ProjectItem)">
+      <summary>Runs custom wizard logic before opening an item in the template.</summary>
+      <param name="projectItem">The project item that will be opened.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.IWizard.ProjectFinishedGenerating(EnvDTE.Project)">
+      <summary>Runs custom wizard logic when a project has finished generating.</summary>
+      <param name="project">The project that finished generating.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.IWizard.ProjectItemFinishedGenerating(EnvDTE.ProjectItem)">
+      <summary>Runs custom wizard logic when a project item has finished generating.</summary>
+      <param name="projectItem">The project item that finished generating.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.IWizard.RunFinished">
+      <summary>Runs custom wizard logic when the wizard has completed all tasks.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.IWizard.RunStarted(System.Object,System.Collections.Generic.Dictionary{System.String,System.String},Microsoft.VisualStudio.TemplateWizard.WizardRunKind,System.Object[])">
+      <summary>Runs custom wizard logic at the beginning of a template wizard run.</summary>
+      <param name="automationObject">The automation object being used by the template wizard.</param>
+      <param name="replacementsDictionary">The list of standard parameters to be replaced.</param>
+      <param name="runKind">A <see cref="T:Microsoft.VisualStudio.TemplateWizard.WizardRunKind" /> indicating the type of wizard run.</param>
+      <param name="customParams">The custom parameters with which to perform parameter replacement in the project.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.IWizard.ShouldAddProjectItem(System.String)">
+      <summary>Indicates whether the specified project item should be added to the project.</summary>
+      <returns>true if the project item should be added to the project; otherwise, false.</returns>
+      <param name="filePath">The path to the project item.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TemplateWizard.TemplateWizardDisallowUserTemplatesSecurityAttribute">
+      <summary>Specifies that the template wizard extension will only load templates located in the Visual Studio installation directory or one of its subdirectories.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.TemplateWizardDisallowUserTemplatesSecurityAttribute.#ctor(System.Boolean)">
+      <summary>Specifies that the template wizard extension will only load templates located in the Visual Studio installation directory or one of its subdirectories.</summary>
+      <param name="disallowUserTemplates">true to specify that the template wizard extension will only load templates located in the Visual Studio installation directory or one of its subdirectories; otherwise, false. The default is false.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TemplateWizard.TemplateWizardDisallowUserTemplatesSecurityAttribute.DisallowUserTemplates">
+      <summary>Gets a value that indicates whether to disallow user templates.</summary>
+      <returns>true to disallow user templates; otherwise, false.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TemplateWizard.TemplateWizardSecurityAttribute">
+      <summary>Specifies that the template wizard extension will only run when called by the specified template.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.TemplateWizardSecurityAttribute.#ctor(System.String)">
+      <summary>Specifies that the template wizard extension will only run when called by the specified template.</summary>
+      <param name="callingTemplate">The name of the template allowed to call the template wizard extension. For example, MyTemplate.vstemplate.</param>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TemplateWizard.TemplateWizardSecurityAttribute.CallingTemplate">
+      <summary>Gets the name of the template allowed to call the template wizard extension.</summary>
+      <returns>The name of the template allowed to call the template wizard extension.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TemplateWizard.WizardBackoutException">
+      <summary>The exception that is thrown when the template wizard is backed out before it has completed.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.WizardBackoutException.#ctor">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TemplateWizard.WizardBackoutException" />.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.WizardBackoutException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TemplateWizard.WizardBackoutException" /> class with serialized data.</summary>
+      <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
+      <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
+      <exception cref="T:System.ArgumentNullException">The <paramref name="info" /> parameter is a null reference (Nothing in Visual Basic)</exception>
+      <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is a null reference (Nothing in Visual Basic) or <see cref="P:Microsoft.VisualStudio.TemplateWizard.WizardBackoutException.HResult" /> is zero (0).</exception>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.WizardBackoutException.#ctor(System.String)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TemplateWizard.WizardBackoutException" /> class with the specified error message.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.WizardBackoutException.#ctor(System.String,System.Exception)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TemplateWizard.WizardBackoutException" /> class with the specified error message and a reference to the inner exception that is the cause of this exception.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TemplateWizard.WizardBackoutException.HResult">
+      <summary>Gets or sets HRESULT, a coded numerical value that is assigned to a specific exception.</summary>
+      <returns>The HRESULT value.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TemplateWizard.WizardCancelledException">
+      <summary>The exception that is thrown when the template wizard is cancelled before it has completed.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.WizardCancelledException.#ctor">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TemplateWizard.WizardCancelledException" /> class.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.WizardCancelledException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TemplateWizard.WizardCancelledException" /> class with serialized data.</summary>
+      <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
+      <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
+      <exception cref="T:System.ArgumentNullException">The <paramref name="info" /> parameter is a null reference (Nothing in Visual Basic)</exception>
+      <exception cref="T:System.Runtime.Serialization.SerializationException">The class name is a null reference (Nothing in Visual Basic) or <see cref="P:Microsoft.VisualStudio.TemplateWizard.WizardCancelledException.HResult" /> is zero (0).</exception>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.WizardCancelledException.#ctor(System.String)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TemplateWizard.WizardCancelledException" /> class with the specified error message.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TemplateWizard.WizardCancelledException.#ctor(System.String,System.Exception)">
+      <summary>Initializes a new instance of the <see cref="T:Microsoft.VisualStudio.TemplateWizard.WizardCancelledException" /> class with the specified error message and a reference to the inner exception that is the cause of this exception.</summary>
+    </member>
+    <member name="P:Microsoft.VisualStudio.TemplateWizard.WizardCancelledException.HResult">
+      <summary>Gets or sets HRESULT, a coded numerical value that is assigned to a specific exception.</summary>
+      <returns>The HRESULT value.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TemplateWizard.WizardRunKind">
+      <summary>Specifies constants that define the different templates the template wizard can create.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TemplateWizard.WizardRunKind.AsNewItem">
+      <summary>A new item template.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TemplateWizard.WizardRunKind.AsNewProject">
+      <summary>A new project template.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TemplateWizard.WizardRunKind.AsMultiProject">
+      <summary>A new multi-project template.</summary>
+    </member>
+  </members>
+</doc>

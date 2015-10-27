@@ -2,7 +2,7 @@ Project Description
 DuNodes is an Hypervisor based on Cosmos OS.
 DuNodes should be able to span virtual machine across several nodes.
 
-DuNodes is an HyperVisor based on Cosmos https://cosmos.codeplex.com/ release 92560 (for the moment, i will include all new release soon.) .
+DuNodes is an HyperVisor based on Cosmos https://cosmos.codeplex.com/ release cd7f5e5 (for the moment, i will include all new release soon.) .
 The aim of the project is to provide an hypervisor that support spanning virtual machines across several node.
 
 You can still refer to cosmos project in order to have more informations.
@@ -10,12 +10,7 @@ Documentation will be written later.
 Release Changelog
 
 Evolution
-
-18/04/13 : Working on Heap in order to create a real basic ram management (linked to process and thread management).
-16/04/13 : Restart from zero, cosmos source wasn't good and block beakpoint. Restart from release 92560. Breakpoint now works. Re-integrate Cosmos Source, and dewitcher Framework.
-16/04/13 : First cleaned version of DuNodes. Contains Cosmos Source, and some part of Dewitcher framework. Removed some unused part of Cosmos and dewitcher. Dewitcher library is not usable for the moment. It blocks the generation of DuNodes.
-14/04/13 : DuNodes starts
-What's included
+TODO
 
 Cosmos Source Code
 Dewitcher library

@@ -1,0 +1,840 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NativeDebugWrappers</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpException">
+            <summary>
+            Base class for DumpReader exceptions
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpMissingDataException">
+            <summary>
+            Dump is valid, but missing the requested data.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpFormatException">
+            <summary>
+            Dump is malformed or corrupted.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpPointer">
+            <summary>
+            Immutable pointer into the dump file. Has associated size for runtime checking.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpPointer.Shrink(System.UInt32)">
+            <summary>
+            Returns a DumpPointer to the same memory, but associated with a smaller size.
+            </summary>
+            <param name="size">smaller size to shrink the pointer to.</param>
+            <returns>new DumpPointer</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpPointer.Copy(System.IntPtr,System.UInt32,System.UInt32,System.UInt32)">
+            <summary>
+            Copy numberBytesToCopy from the DumpPointer into &amp;destinationBuffer[indexDestination].
+            </summary>
+            <param name="destinationBuffer">buffer for memory</param>
+            <param name="destinationBufferSizeInBytes">size of allocated buffer</param>
+            <param name="indexDestination">index into buffer</param>
+            <param name="numberBytesToCopy">number of bytes to copy</param>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpPointer.Copy(System.IntPtr,System.UInt32)">
+            <summary>
+            Copy raw bytes to buffer
+            </summary>
+            <param name="destinationBuffer">buffer to copy to.</param>
+            <param name="numberBytesToCopy">number of bytes to copy. Caller ensures the destinationBuffer
+            is large enough</param>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpPointer.PtrToStructure``1">
+            <summary>
+            Marshal this into a managed structure, and do bounds checks.
+            </summary>
+            <typeparam name="T">Type of managed structure to marshal as</typeparam>
+            <returns>a managed copy of the structure</returns>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpReader">
+            <summary>
+            Read contents of a minidump. 
+            If we have a 32-bit dump, then there's an addressing collision possible.
+            OS debugging code sign extends 32 bit wide addresses into 64 bit wide addresses.
+            The CLR does not sign extend, thus you cannot round-trip target addresses exposed by this class.
+            Currently we read these addresses once and don't hand them back, so it's not an issue.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_STREAM_TYPE">
+            <summary>
+            Type of stream within the minidump.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.ZeroExtendAddress(System.UInt64)">
+            <summary>
+            Remove the OS sign-extension from a target address.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_LOCATION_DESCRIPTOR">
+            <summary>
+            Describes a data stream within the minidump
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_LOCATION_DESCRIPTOR.DataSize">
+            <summary>
+            Size of the stream in bytes.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_LOCATION_DESCRIPTOR.Rva">
+            <summary>
+            Offset (in bytes) from the start of the minidump to the data stream.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_LOCATION_DESCRIPTOR.IsNull">
+            <summary>
+            True iff the data is missing.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_LOCATION_DESCRIPTOR64">
+            <summary>
+            Describes a data stream within the minidump
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_LOCATION_DESCRIPTOR64.DataSize">
+            <summary>
+            Size of the stream in bytes.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_LOCATION_DESCRIPTOR64.Rva">
+            <summary>
+            Offset (in bytes) from the start of the minidump to the data stream.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MEMORY_DESCRIPTOR">
+            <summary>
+            Describes a range of memory in the target.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MEMORY_DESCRIPTOR.startofmemoryrange">
+            <summary>
+            Starting Target address of the memory range.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MEMORY_DESCRIPTOR.Memory">
+            <summary>
+            Location in minidump containing the memory corresponding to StartOfMemoryRage
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MEMORY_DESCRIPTOR64">
+            <summary>
+            Describes a range of memory in the target.
+            </summary>
+            <remarks>
+            This is used for full-memory minidumps where
+            all of the raw memory is laid out sequentially at the
+            end of the dump.  There is no need for individual RVAs
+            as the RVA is the base RVA plus the sum of the preceeding
+            data blocks.
+            </remarks>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MEMORY_DESCRIPTOR64.startofmemoryrange">
+            <summary>
+            Starting Target address of the memory range.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MEMORY_DESCRIPTOR64.DataSize">
+            <summary>
+            Size of memory in bytes.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_EXCEPTION">
+            <summary>
+            The struct that holds an EXCEPTION_RECORD
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_EXCEPTION_STREAM">
+            <summary>
+            The struct that holds contents of a dump's MINIDUMP_STREAM_TYPE.ExceptionStream
+            which is a MINIDUMP_EXCEPTION_STREAM.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_SYSTEM_INFO">
+            <summary>
+            Describes system information about the system the dump was taken on.
+            This is returned by the MINIDUMP_STREAM_TYPE.SystemInfoStream stream.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MODULE.baseofimage">
+            <summary>
+            Address that module is loaded within target.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MODULE.SizeOfImage">
+            <summary>
+            Size of image within memory copied from IMAGE_OPTIONAL_HEADER.SizeOfImage.
+            Note that this is usually different than the file size.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MODULE.CheckSum">
+            <summary>
+            Checksum, copied from IMAGE_OPTIONAL_HEADER.CheckSum. May be 0 if not optional
+            header is not available.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MODULE.TimeDateStamp">
+            <summary>
+            TimeStamp in Unix 32-bit time_t format. Copied from IMAGE_FILE_HEADER.TimeDateStamp
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MODULE.ModuleNameRva">
+            <summary>
+            RVA within minidump of the string containing the full path of the module.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MODULE.Timestamp">
+            <summary>
+            Gets TimeDateStamp as a DateTime. This is based off a 32-bit value and will overflow in 2038.
+            This is not the same as the timestamps on the file.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_THREAD">
+            <summary>
+            Raw MINIDUMP_THREAD structure imported from DbgHelp.h
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_THREAD.Stack">
+            <summary>
+            Describes the memory location of the thread's raw stack.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_THREAD_LIST`1">
+            <summary>
+            List of Threads in the minidump.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.TranslateRVA(System.UInt64)">
+            <summary>
+            Translates from an RVA to Dump Pointer. 
+            </summary>
+            <param name="rva">RVA within the dump</param>
+            <returns>DumpPointer representing RVA.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.TranslateRVA(Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.RVA)">
+            <summary>
+            Translates from an RVA to Dump Pointer. 
+            </summary>
+            <param name="rva">RVA within the dump</param>
+            <returns>DumpPointer representing RVA.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.TranslateRVA(Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.RVA64)">
+            <summary>
+            Translates from an RVA to Dump Pointer. 
+            </summary>
+            <param name="rva">RVA within the dump</param>
+            <returns>DumpPointer representing RVA.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.GetString(Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.RVA)">
+            <summary>
+            Gets a MINIDUMP_STRING at the given RVA as an System.String.
+            </summary>
+            <param name="rva">RVA of MINIDUMP_STRING</param>
+            <returns>System.String representing contents of MINIDUMP_STRING at the given RVA</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.GetString(Microsoft.Samples.Debugging.Native.DumpPointer)">
+            <summary>
+            Gets a MINIDUMP_STRING at the given DumpPointer as an System.String.
+            </summary>
+            <param name="ptr">DumpPointer to a MINIDUMP_STRING</param>
+            <returns>System.String representing contents of MINIDUMP_STRING at the given location
+            in the dump</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.ReadMemory(System.UInt64,System.Int32)">
+            <summary>
+            Read memory from the dump file and return results in newly allocated buffer
+            </summary>
+            <param name="targetAddress">target address in dump to read length bytes from</param>
+            <param name="length">number of bytes to read</param>
+            <returns>newly allocated byte array containing dump memory</returns>
+            <remarks>All memory requested must be readable or it throws.</remarks>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.ReadMemory(System.UInt64,System.Byte[])">
+            <summary>
+            Read memory from the dump file and copy into the buffer
+            </summary>
+            <param name="targetAddress">target address in dump to read buffer.Length bytets from</param>
+            <param name="buffer">destination buffer to copy target memory to.</param>
+            <remarks>All memory requested must be readable or it throws.</remarks>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.ReadMemory(System.UInt64,System.IntPtr,System.UInt32)">
+            <summary>
+            Read memory from target and copy it to the local buffer pointed to by
+            destinationBuffer. Throw if any portion of the requested memory is unavailable.
+            </summary>
+            <param name="targetRequestStart">target address in dump file to copy
+            destinationBufferSizeInBytes bytes from. </param>
+            <param name="destinationBuffer">pointer to copy the memory to.</param>
+            <param name="destinationBufferSizeInBytes">size of the destinationBuffer in bytes.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.ReadPartialMemory(System.UInt64,System.IntPtr,System.UInt32)">
+            <summary>
+            Read memory from target and copy it to the local buffer pointed to by destinationBuffer.
+            
+            </summary>
+            <param name="targetRequestStart">target address in dump file to copy
+            destinationBufferSizeInBytes bytes from. </param>
+            <param name="destinationBuffer">pointer to copy the memory to.</param>
+            <param name="destinationBufferSizeInBytes">size of the destinationBuffer in bytes.</param>
+            <returns>Number of contiguous bytes successfuly copied into the destination buffer.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.ToString">
+            <summary>
+            ToString override. 
+            </summary>
+            <returns>string description of the DumpReader.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="path">filename to open dump file</param>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.Dispose">
+            <summary>
+            Dispose method.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.GetStream(Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_STREAM_TYPE)">
+            <summary>
+            Get a DumpPointer for the given stream. That can then be used to further decode the stream.
+            </summary>
+            <param name="type">type of stream to lookup</param>
+            <returns>DumpPointer refering into the stream. </returns>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpReader.Version">
+            <summary>
+            Version numbers of OS that this dump was taken on.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpReader.OSVersion">
+            <summary>
+            Operating system that the dump was taken on.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpReader.OSVersionString">
+            <summary>
+            Friendly helper to get full OS version string (including CSDVersion) that the dump was taken on.
+            </summary>
+            <remarks>This is really just to compensate that public OperatingSystem's ctor doesn't let us
+            add the service pack string, so we need a special helper for that.</remarks>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpReader.ProcessorArchitecture">
+            <summary>
+            The processor architecture that this dump was taken on.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.GetThread(System.Int32)">
+            <summary>
+            Get the thread for the given thread Id.
+            </summary>
+            <param name="threadId">thread Id to lookup.</param>
+            <returns>a DumpThread object representing a thread in the dump whose thread id matches
+            the requested id.</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.EnumerateThreads">
+            <summary>
+            Enumerate all the native threads in the dump
+            </summary>
+            <returns>an enumerate of DumpThread objects</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.IsExceptionStream">
+            <summary>
+            Check on whether there's an exception stream in the dump
+            </summary>
+            <returns> true iff there is a MINIDUMP_EXCEPTION_STREAM in the dump. </returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.ExceptionStreamThreadId">
+            <summary>
+            Return the TID from the exception stream.
+            </summary>
+            <returns> The TID from the exception stream. </returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.LookupModule(System.String)">
+            <summary>
+            Lookup the first module in the target with a matching. 
+            </summary>
+            <param name="nameModule">The name can either be a matching full name, or just shortname</param>
+            <returns>The first DumpModule that has a matching name. </returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.TryLookupModuleByAddress(System.UInt64)">
+            <summary>
+            Return the module containing the target address, or null if no match.
+            </summary>
+            <param name="targetAddress">address in target</param>
+            <returns>Null if no match. Else a DumpModule such that the target address is in between the range specified
+            by the DumpModule's .BaseAddress and .Size property </returns>
+            <remarks>This can be useful for symbol lookups or for using module images to
+            supplement memory read requests for minidumps.</remarks>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpReader.EnumerateModules">
+            <summary>
+            Enumerate all the modules in the dump.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpModule">
+            <summary>
+            Represents a native module in a dump file. This is a flyweight object.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpModule.#ctor(Microsoft.Samples.Debugging.Native.DumpReader,Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_MODULE)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="owner">owning DumpReader</param>
+            <param name="raw">unmanaged dump structure describing the module</param>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpModule.FullName">
+            <summary>
+             Usually, the full filename of the module. Since the dump may not be captured on the local
+             machine, be careful of using this filename with the local file system.
+             In some cases, this could be a short filename, or unavailable.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpModule.BaseAddress">
+            <summary>
+            Base address within the target of where this module is loaded.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpModule.Size">
+            <summary>
+            Size of this module in bytes as loaded in the target.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpModule.Timestamp">
+            <summary>
+            UTC Time stamp of module. This is based off a 32-bit value and will overflow in 2038.
+            This is different than any of the filestamps. Call ToLocalTime() to convert from UTC.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpModule.RawTimestamp">
+            <summary>
+            Gets the raw 32 bit time stamp. Use the Timestamp property to get this as a System.DateTime.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpThread">
+            <summary>
+            Represents a thread from a minidump file. This is a flyweight object.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpThread.#ctor(Microsoft.Samples.Debugging.Native.DumpReader,Microsoft.Samples.Debugging.Native.DumpReader.NativeMethods.MINIDUMP_THREAD)">
+            <summary>
+            Constructor for DumpThread
+            </summary>
+            <param name="owner">owning DumpReader object</param>
+            <param name="raw">unmanaged structure in dump describing the thread</param>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpThread.ThreadId">
+            <summary>
+            The native OS Thread Id of this thread.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpThread.GetThreadContext">
+            <summary>
+            Safe way to get a thread's context
+            </summary>
+            <returns>a native context object representing the thread context</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpThread.GetThreadContext(System.IntPtr,System.Int32)">
+            <summary>
+            Get the raw thread context as a buffer or bytes. This is dangerous.
+            </summary>
+            <param name="buffer">pointer to buffer to get the context</param>
+            <param name="sizeBufferBytes">size of the buffer in bytes. Must be large enough to hold the
+            context. For variable-size contexts, caller may need to check context flags afterwards
+            to determine how large the context really is.</param>
+            <remarks>Context may not be available in the dump. </remarks>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DumpUtility">
+            <summary>
+            Utility class to provide various random Native debugging operations.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.DumpUtility.IMAGE_DOS_HEADER.IsValid">
+            <summary>
+            Determine if this is a valid DOS image. 
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpUtility.MarshalAt``1(System.Byte[],System.UInt32)">
+            <summary>
+            Marshal a structure from the given buffer. Effectively returns ((T*) &amp;buffer[offset]).
+            </summary>
+            <typeparam name="T">type of structure to marshal</typeparam>
+            <param name="buffer">array of bytes representing binary buffer to marshal</param>
+            <param name="offset">offset in buffer to marhsal from</param>
+            <returns>marshaled structure</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.DumpUtility.GetTimestamp(System.String)">
+            <summary>
+            Gets the raw compilation timestamp of a file. 
+            This can be matched with the timestamp of a module in a dump file.
+            NOTE: This is NOT the same as the file's creation or last-write time.
+            </summary>
+            <param name="file"></param>
+            <returns>0 for common failures like file not found or invalid format. Throws on gross
+            errors. Else returns the module's timestamp for comparison against the minidump
+            module's stamp.</returns>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.ReadMemoryFailureException">
+            <summary>
+            Thrown when failing to read memory from a target.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.ReadMemoryFailureException.#ctor(System.IntPtr,System.Int32)">
+            <summary>
+            Initialize a new exception
+            </summary>
+            <param name="address">address where read failed</param>
+            <param name="countBytes">size of read attempted</param>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.ReadMemoryFailureException.#ctor">
+            <summary>
+            Initializes a new instance of the ReadMemoryFailureException.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.ReadMemoryFailureException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the ReadMemoryFailureException with the specified error message.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.ReadMemoryFailureException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the ReadMemoryFailureException with the specified error message and inner Exception.
+            </summary>
+            <param name="message">The message that describes the error.</param>
+            <param name="innerException">The exception that is the cause of the current exception.</param>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.ReadMemoryFailureException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Initializes a new instance of the ReadMemoryFailureException class with serialized data.
+            </summary>
+            <param name="info">The SerializationInfo that holds the serialized object data about the exception being thrown.</param>
+            <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.IMemoryReader">
+            <summary>
+            Interface to provide access to target
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.IMemoryReader.ReadMemory(System.IntPtr,System.Byte[])">
+            <summary>
+            Read memory from the target process. Either reads all memory or throws.
+            </summary>
+            <param name="address">target address to read memory from</param>
+            <param name="buffer">buffer to fill with memory</param>
+            <exception cref="T:Microsoft.Samples.Debugging.Native.ReadMemoryFailureException">Throws if can't read all the memory</exception>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.AgnosticContextFlags">
+            <summary>
+            Platform agnostic flags used to extract platform-specific context flag values
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.NativeDebugEventCode">
+            <summary>
+            Native debug event Codes that are returned through NativeStop event
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.ExceptionCode">
+            <summary>
+            Common Exception codes
+            </summary>
+            <remarks>Users can define their own exception codes, so the code could be any value. 
+            The OS reserves bit 28 and may clear that for its own purposes</remarks>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.ExceptionCode.DBG_CONTROL_C">
+            <summary>
+            Fired when debuggee gets a Control-C. 
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.ExceptionRecordFlags">
+            <summary>
+            Flags for <see cref="T:Microsoft.Samples.Debugging.Native.EXCEPTION_RECORD"/>
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.ExceptionRecordFlags.None">
+            <summary>
+            No flags. 
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.ExceptionRecordFlags.EXCEPTION_NONCONTINUABLE">
+            <summary>
+            Exception can not be continued. Debugging services can still override this to continue the exception, but recommended to warn the user in this case.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.EXCEPTION_RECORD">
+            <summary>
+            Information about an exception
+            </summary>    
+            <remarks>This will default to the correct caller's platform</remarks>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.EXCEPTION_RECORD.IsNotContinuable">
+            <summary>
+            Based off ExceptionFlags, is the exception Non-continuable?
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.EXCEPTION_RECORD.ExceptionAddress">
+            <summary>
+            Address in the debuggee that the exception occured at.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.EXCEPTION_RECORD.NumberParameters">
+            <summary>
+            Number of parameters used in ExceptionInformation array.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.EXCEPTION_DEBUG_INFO">
+            <summary>
+            Information about an exception debug event.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.LOAD_DLL_DEBUG_INFO.ReadImageNameFromTarget(Microsoft.Samples.Debugging.Native.IMemoryReader)">
+            <summary>
+            Read the image name from the target.
+            </summary>
+            <param name="reader">access to target's memory</param>
+            <returns>String for full path to image. Null if name not available</returns>
+            <remarks>MSDN says this will never be provided for during Attach scenarios; nor for the first 1 or 2 dlls.</remarks>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.OUTPUT_DEBUG_STRING_INFO.ReadMessageFromTarget(Microsoft.Samples.Debugging.Native.IMemoryReader)">
+            <summary>
+            Read the log message from the target. 
+            </summary>
+            <param name="reader">interface to access debuggee memory</param>
+            <returns>string containing message or null if not available</returns>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DebugEvent32">
+            <summary>
+            Matches DEBUG_EVENT layout on 32-bit architecture
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.DebugEvent64">
+            <summary>
+            Matches DEBUG_EVENT layout on 64-bit architecture
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.NativeMethods.ContinueStatus">
+            <summary>
+            Values to pass to ContinueDebugEvent for ContinueStatus
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.NativeMethods.ContinueStatus.CONTINUED">
+            <summary>
+            This is our own "empty" value
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.NativeMethods.ContinueStatus.DBG_CONTINUE">
+            <summary>
+            Debugger consumes exceptions. Debuggee will never see the exception. Like "gh" in Windbg.
+            </summary>
+        </member>
+        <member name="F:Microsoft.Samples.Debugging.Native.NativeMethods.ContinueStatus.DBG_EXCEPTION_NOT_HANDLED">
+            <summary>
+            Debugger does not interfere with exception processing, this passes the exception onto the debuggee.
+            Like "gn" in Windbg.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.ContextAllocator">
+            <summary>
+            Serves as the global method for creating a platform-specific context
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.ContextAllocator.GenerateContext">
+            <summary>
+            Generates a new context object for the platform in which Mdbg is running.
+            </summary>
+            <returns>Newly allocated platform specific context</returns>
+            <exception cref="T:System.InvalidOperationException">Throws if running on an unsupported platform</exception>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.ContextAllocator.GetArchitectureFromPid(System.Int32)">
+            <summary>
+            Determines the platform architecture the OS is running a process in. Wow mode processes
+            will report INTEL (32bit) otherwise all processes run in the native system architecture
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.ContextAllocator.GenerateContext(Microsoft.Samples.Debugging.Native.ProcessorArchitecture)">
+            <summary>
+            Generates a new context object for the current platform.  This does NOT account for Wow mode processes.
+            This method should be primarily used for dump debugging.
+            </summary>
+            <param name="architecture">The architecture for which to create the context</param>
+            <returns>Newly allocated platform specific context.</returns>
+            <exception cref="T:System.InvalidOperationException">Throws if running on an unsupported platform</exception>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.IContextDirectAccessor">
+            <summary>
+            Exposes raw contents of the Context in IContext. This locks the buffer. Dispose this object to unlock the buffer
+            </summary>
+            <remarks>The implementation behind the interface has a variety of ways to ensure the memory is safe to write to.
+            The buffer may be in the native heap; or it may be to a pinned object in the managed heap
+            This is primarily intended for writing to the context (by passing the buffer out to a pinvoke),
+            but can also be a way to read the raw bytes.</remarks>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.IContextDirectAccessor.Size">
+            <summary>
+            The size of the buffer. This should be the same as INativeContext.Size.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.IContextDirectAccessor.RawBuffer">
+            <summary>
+            A pointer to the raw buffer. The memory is pinned until this object is disposed. Check the context Flags 
+            to know which raw bytes are valid to be read. 
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.ContextAccessor.Size">
+            <summary>
+            The size of the buffer. This should be the same as Context.Size.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.ContextAccessor.RawBuffer">
+            <summary>
+            A pointer to the raw buffer. The memory is pinned until this object is disposed. Check the context Flags 
+            to know which raw bytes are valid to be read. 
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.INativeContext">
+            <summary>
+            Interface to a context. This provides platform agnostic wrapper to a platform specific OS Context.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.INativeContext.OpenForDirectAccess">
+            <summary>
+            Used to lock the buffer and get a raw pointer to it. 
+            This is the only way to change the entire context at once. 
+            This is useful for pinvoking to native functions.
+            </summary>
+            <returns>context writer object</returns>
+            <remarks>
+            Expected usage would be (in C# syntax):
+            <example>
+               IContext c = NativeContextAllocator.Alloc();
+               using(IContextWriter w = c.OpenForDirectAccess) { // context buffer is now locked
+                  SomeNativeFunctionToGetThreadContext(w.RawBuffer, w.Size);
+               } // w is disposed, this unlocks the context buffer.
+            </example>
+            </remarks>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.INativeContext.Size">
+            <summary>
+            Get Size in bytes. Size could change depending on the flags.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.INativeContext.Flags">
+            <summary>
+            Get the flags associated with the context. 
+            </summary>
+            <remarks>Flags are platform specific and generally indicate which parts of the context are valid.
+            Flags will affect which registers are available (EnumerateRegisters), potentially the Size of the context,
+            and how contexts are compared.
+            Expanding the active flags means newly included registers have an uninitialized value.
+            A context could be completely constructed late-bound by setting the Flags and then calling
+            SetRegisterByName on each regsister
+            </remarks>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.INativeContext.GetPSFlags(Microsoft.Samples.Debugging.Native.AgnosticContextFlags)">
+            <summary>
+            This will return the context specific flags for the given AgnosticContextFlags
+            <param name="flags">the value (found in the enum) of the platform specific flags desired</param>
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.INativeContext.ClearContext">
+            <summary>
+            This will clear the context buffer.
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.INativeContext.InstructionPointer">
+            <summary>
+            Get or Set the instruction pointer
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.INativeContext.StackPointer">
+            <summary>
+            Get the stack pointer
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.INativeContext.SetSingleStepFlag(System.Boolean)">
+            <summary>
+            Enable or disable the single-step flag in the context. 
+            </summary>
+            <param name="enable">true to enable single-stepping, false to disable it</param>
+            <exception cref="T:System.InvalidOperationException">Throws if the architecture doesn't support single-stepping.</exception>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.INativeContext.IsSingleStepFlagEnabled">
+            <summary>
+            Is the single step flag enabled?
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.INativeContext.Clone">
+            <summary>
+            Create a new deep copy of this context. 
+            The copies are independent and can be modified without interfering with each other.
+            </summary>
+            <returns>copy of this context</returns>
+            <remarks>Contexts can be large, so copying excessively would be expensive.</remarks>
+            <example> 
+            INativeContext c1 = ...
+            INativeContext c2 = c1.Clone();
+              
+            Assert(c1 != c2); // true, Clone gives different instances
+            Assert(c1.Equals(c2)); // true
+            Assert(c2.Equals(c1)); // true
+            </example>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.INativeContext.Platform">
+            <summary>
+            Get a simple string description of the CPU the context is for. A implementation may also provide a ToString()
+            override to give more detail (eg, which flags are active)
+            </summary>
+        </member>
+        <member name="P:Microsoft.Samples.Debugging.Native.INativeContext.ImageFileMachine">
+            <summary>
+            Get the ImageFileMachine code.  This is used for getting an interop callstack for a machine.
+            Used by TraverseStack
+            </summary>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.INativeContext.EnumerateRegisters">
+            <summary>
+            Enumerate registers names (and their types) for late-bound access. Available registers depend on the flags.
+            </summary>
+            <returns>an enumeration of (name,type) pairs</returns>
+            <remarks>An implementation does not need to include all registers on the context.
+            The returned strings can be used with other by-name functions like <see cref="M:Microsoft.Samples.Debugging.Native.INativeContext.FindRegisterByName(System.String)"/>
+            and <see cref="M:Microsoft.Samples.Debugging.Native.INativeContext.SetRegisterByName(System.String,System.Object)"/>.</remarks>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.INativeContext.FindRegisterByName(System.String)">
+            <summary>
+            Get a register by name
+            </summary>
+            <param name="name">Name of the registers. Lookup is case insensitive</param>
+            <returns>value of register. Registers can be arbitrary types (uint32, double, long, etc), so this
+            returns an object. Throws if name is not currently valid</returns>
+        </member>
+        <member name="M:Microsoft.Samples.Debugging.Native.INativeContext.SetRegisterByName(System.String,System.Object)">
+            <summary>
+            Sets a register by name.
+            </summary>
+            <param name="name">Case-insensitive name of register to set. </param>
+            <param name="value">value of register to set. Type of value must be convertable to type of the register</param>
+            <exception cref="T:System.InvalidOperationException">Throws if no matching name or if register is not valid for the given Flags.</exception>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.ProcessorArchitecture">
+            <summary>
+            Describes the ProcessorArchitecture in a SYSTEM_INFO field.
+            This can also be reported by a dump file.
+            </summary>
+        </member>
+        <member name="T:Microsoft.Samples.Debugging.Native.PEReader">
+            <summary>
+            A very basic PE reader that can extract a few useful pieces of information
+            </summary>
+        </member>
+    </members>
+</doc>

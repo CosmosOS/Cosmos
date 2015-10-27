@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.TextManager.Interop.10.0</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.IVsFindManager">
+      <summary>Represents helper functions for Visual Studio shell find operations.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsFindManager.CurrentTarget(Microsoft.VisualStudio.TextManager.Interop.IVsFindTarget@)">
+      <summary>Gets the current find target, if it is available, by looking through different forms and documents.</summary>
+      <returns>If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If it fails, it returns an error code.</returns>
+      <param name="ppTarget">[out] The find target.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.IVsHiddenTextSessionEx2">
+      <summary>Provides additional methods for the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsHiddenTextSession" /> and <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsHiddenTextSessionEx2" /> interfaces. </summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsHiddenTextSessionEx2.EndBatch">
+      <summary>Tells the hidden text session to stop batching outlining changes.</summary>
+      <returns>If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If it fails, it returns an error code.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsHiddenTextSessionEx2.StartBatch">
+      <summary>Tells the hidden text session to start batching outlining changes.</summary>
+      <returns>If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If it fails, it returns an error code.</returns>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsHiddenTextSessionEx2.StartOutlining(System.Int32)">
+      <summary>Tells the editor to start outlining.</summary>
+      <returns>If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If it fails, it returns an error code.</returns>
+      <param name="fRemoveAdhoc">If true, removes ad-hoc regions.</param>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsHiddenTextSessionEx2.StopOutlining">
+      <summary>Tells the editor to stop outlining.</summary>
+      <returns>If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If it fails, it returns an error code.</returns>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.IVsMethodTipWindow3">
+      <summary>Provides additional methods for the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsMethodTipWindow" /> and <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsMethodTipWindow2" /> interfaces.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsMethodTipWindow3.GetMethodData(Microsoft.VisualStudio.TextManager.Interop.IVsMethodData@)">
+      <summary>Gets method data to display in the method tip window.</summary>
+      <returns>If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If it fails, it returns an error code.</returns>
+      <param name="pMethodData">[out] The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsMethodData" /> interface, which is used to set method and parameter information for the method tip window.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.IVsSmartTagTipWindow2">
+      <summary>Represents additional functionality for the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsSmartTagTipWindow" />.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsSmartTagTipWindow2.GetSmartTagData(Microsoft.VisualStudio.TextManager.Interop.IVsSmartTagData@)">
+      <summary>Gets the smart tag content.</summary>
+      <returns>If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If it fails, it returns an error code.</returns>
+      <param name="pSmartTagData">The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsSmartTagData" />.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextTipWindow2">
+      <summary>Provides additional methods for the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextTipWindow" /> interface.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.TextManager.Interop.IVsTextTipWindow2.GetTextTipData(Microsoft.VisualStudio.TextManager.Interop.IVsTextTipData@)">
+      <summary>Gets the text tip.</summary>
+      <returns>If the method succeeds, it returns <see cref="F:Microsoft.VisualStudio.VSConstants.S_OK" />. If it fails, it returns an error code.</returns>
+      <param name="pMethodData">The <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsTextTipData" /> object.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.SVsFindManager">
+      <summary>The service that provides an <see cref="T:Microsoft.VisualStudio.TextManager.Interop.IVsFindManager" />, which provides search functions for Visual Studio.</summary>
+    </member>
+    <member name="T:Microsoft.VisualStudio.TextManager.Interop.TextViewInitFlags3">
+      <summary>Provides additional members to the <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextViewInitFlags" /> and <see cref="T:Microsoft.VisualStudio.TextManager.Interop.TextViewInitFlags2" /> enumerations.</summary>
+    </member>
+    <member name="F:Microsoft.VisualStudio.TextManager.Interop.TextViewInitFlags3.VIF_NO_HWND_SUPPORT">
+      <summary>The view does not create an HWND host.</summary>
+    </member>
+  </members>
+</doc>

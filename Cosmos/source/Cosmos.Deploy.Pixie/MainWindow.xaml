@@ -1,0 +1,17 @@
+﻿<Window x:Class="Cosmos.Deploy.Pixie.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Height="520" Width="525" Loaded="Window_Loaded" Icon="/Cosmos.Deploy.Pixie;component/Cosmos.ico" ResizeMode="CanMinimize" Closing="Window_Closing">
+    <Grid>
+        <Label Content="Network Interface:" Height="28" HorizontalAlignment="Left" Margin="12,12,0,0" Name="label1" VerticalAlignment="Top" />
+        <Label Content="0.0.0.0" Height="28" HorizontalAlignment="Left" Margin="35,38,0,0" Name="lablNIC" VerticalAlignment="Top" Width="108" />
+        <Label Content="File Path:" Height="28" HorizontalAlignment="Left" Margin="12,64,0,0" Name="label2" VerticalAlignment="Top" />
+        <Label Content="[Path]" Height="28" Margin="35,89,12,0" Name="lablPath" VerticalAlignment="Top" />
+        <ListBox Margin="12,238,12,12" Name="lboxLog" />
+        <ProgressBar Height="23" Margin="35,199,12,0" Name="progFile" VerticalAlignment="Top" />
+        <Label Content="Current Transfer:" Height="28" HorizontalAlignment="Left" Margin="12,113,0,0" Name="label3" VerticalAlignment="Top" />
+        <Label Content="[File]" Height="28" Margin="35,140,12,0" Name="lablCurrentFile" VerticalAlignment="Top" />
+        <Label Content="[Size]" Height="28" Margin="35,165,12,0" Name="lablCurrentSize" VerticalAlignment="Top" />
+        <Label Content="Interface is unavailable. Waiting..." Height="28" HorizontalAlignment="Left" Margin="137,38,0,0" Name="lablWaiting" VerticalAlignment="Top" Foreground="Red" Visibility="Visible" />
+    </Grid>
+</Window>

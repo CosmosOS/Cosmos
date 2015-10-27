@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<doc>
+  <assembly>
+    <name>Microsoft.VisualStudio.ProjectAggregator</name>
+  </assembly>
+  <members>
+    <member name="T:Microsoft.VisualStudio.ProjectAggregator.CProjectAggregator"></member>
+    <member name="T:Microsoft.VisualStudio.ProjectAggregator.CProjectAggregatorClass">
+      <summary>Represents the project aggregator.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.ProjectAggregator.CProjectAggregatorClass.#ctor">
+      <summary>Initializes a new instance of the project aggregator class.</summary>
+    </member>
+    <member name="M:Microsoft.VisualStudio.ProjectAggregator.CProjectAggregatorClass.SetInner(System.Object)">
+      <summary>Sets the inner project.</summary>
+      <param name="punkInner">The inner project.</param>
+    </member>
+    <member name="T:Microsoft.VisualStudio.ProjectAggregator.IVSProjectAggregator"></member>
+    <member name="M:Microsoft.VisualStudio.ProjectAggregator.IVSProjectAggregator.SetInner(System.Object)"></member>
+  </members>
+</doc>
