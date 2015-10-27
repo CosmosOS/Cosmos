@@ -31,15 +31,11 @@ namespace DuNodes.System.Extensions
     /// <summary>
     /// Useful kernel extensions
     /// </summary>
-    public static partial class KernelExtensions
+    public static partial class KernelExtensionsSys
     {
-        public static void Reboot(this Cosmos.System.Kernel krnl) { ACPI.Reboot(); }
-        public static void Shutdown(this Cosmos.System.Kernel krnl) { ACPI.Shutdown(); }
+     
         public static void SleepSeconds(this Cosmos.System.Kernel krnl, uint value) { PIT.SleepSeconds(value); }
         public static void SleepMilliseconds(this Cosmos.System.Kernel krnl, uint value) {PIT.SleepMilliseconds(value); }
-
-        public static void ShowBootscreen(this Cosmos.System.Kernel krnl, string OSname, Bootscreen.Effect efx,
-            ConsoleColor color, int ticks = 10000000) { Bootscreen.Show(OSname, efx, color, ticks); }
 
     }
 }

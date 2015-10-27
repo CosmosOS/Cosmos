@@ -67,8 +67,7 @@
     <Compile Include="Console\Menu\Console.Menu.Themepack.cs" />
     <Compile Include="Core\Bluescreen.cs" />
     <Compile Include="Core\KeyLayout.cs" />
-    <Compile Include="Core\Random.cs" />
-    <Compile Include="Extensions\KernelExtensions.cs" />
+    <Compile Include="Extensions\KernelExtensionsSys.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

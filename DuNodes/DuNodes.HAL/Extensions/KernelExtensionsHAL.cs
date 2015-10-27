@@ -22,15 +22,17 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// Third Person ftw
-namespace DuNodes.System.Core
+using Cosmos.Core;
+
+namespace DuNodes.System.Extensions
 {
-    public class Random
+    /// <summary>
+    /// Useful kernel extensions
+    /// </summary>
+    public static partial class KernelExtensionsHAL
     {
-        public void Next(uint min, uint max)
-        {
-            // * Splitty will implement it soon
-            // * Splitty haves the plan in his mind
-        }
+        public static uint GetMemory() { return Cosmos.Core.CPU.GetAmountOfRAM() + 1; }
+        public static void AllocMemory(uint aLength) { Cosmos.Core.Heap.MemAlloc(aLength); }
+        public static void Reboot() { Cosmos.HAL.Power.Reboot(); }
     }
 }

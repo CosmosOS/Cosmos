@@ -42,9 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\ACPI.cs" />
     <Compile Include="Core\PIT.cs" />
-    <Compile Include="Extensions\KernelExtensions.cs" />
+    <Compile Include="Extensions\KernelExtensionsHAL.cs" />
     <Compile Include="Extensions\NumericExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RTC.cs" />

@@ -11,7 +11,7 @@ namespace DuNodes
     {
         protected override void BeforeRun()
         {
-            Init.Initialisation(this);
+            Init.Initialisation();
         }
 
         protected override void Run()

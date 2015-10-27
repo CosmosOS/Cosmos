@@ -25,6 +25,7 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using System;
 using DuNodes.HAL.Core;
+using DuNodes.System.Extensions;
 
 namespace DuNodes.System.Core
 {
@@ -76,7 +77,7 @@ namespace DuNodes.System.Core
                 Console.Console.WriteLineEx("If it doesn't work, press the RESET-button on your computer.", ConsoleColor.White, ConsoleColor.Blue);
                 Console.Console.CursorTop++;
                 Console.Console.ReadLine();
-                ACPI.Shutdown();
+                KernelExtensionsHAL.Reboot();
             }
         }
         public static void Init(Exception ex, bool critical = false)
@@ -116,7 +117,7 @@ namespace DuNodes.System.Core
                 Console.Console.WriteEx("If it doesn't work, press the RESET-button on your computer.", ConsoleColor.White, ConsoleColor.Blue);
                 Console.Console.CursorTop++;
                 Console.Console.ReadLine();
-                ACPI.Shutdown();
+                KernelExtensionsHAL.Reboot();
             }
         }
         private static void DrawOOPS()

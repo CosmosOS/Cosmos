@@ -13,17 +13,25 @@ namespace DuNodes.System.Console.CommandManager.Commands
             start = RTC.Now.Minute.ToString() + " " + RTC.Now.Second.ToString();
             //TODO: REAL PIEBENCH
             //For the moment it's just a ram tester
+            Console.ProgressBar pgBar = new Console.ProgressBar(0,true);
             ArrayList al = new ArrayList();
-            for (int i = 0; i < 100; i++)
+            int x = 0;
+            for (int i = 0; i < 1000; i++)
             {
                 al.Add("B1 => Hello I'm just here to take some ram #~##{{[[||`\\^^@@]]}}}}/*--*/¨£µ%");
+                x++;
+                if (x == 10)
+                {
+                    x = 0;
+                    pgBar.Increment();
+                }
 
             }
 
             Console.WriteLine("Testing availability of first var : " +al[0].ToString());
-            Console.WriteLine("Testing availability of middle var : " + al[50].ToString());
-          Console.WriteLine("Testing availability of end var : " + al[99].ToString());
-            Console.WriteLine("Count should be 100 : " + al.Count);
+            Console.WriteLine("Testing availability of middle var : " + al[500].ToString());
+          Console.WriteLine("Testing availability of end var : " + al[999].ToString());
+            Console.WriteLine("Count should be 1000 : " + al.Count);
 
             int manualCount = 0;
             for (int index = 0; index < al.Count; index++)
@@ -32,7 +40,7 @@ namespace DuNodes.System.Console.CommandManager.Commands
                 manualCount++;
             }
 
-            Console.WriteLine("Count should be 100 (manual) : " + manualCount);
+            Console.WriteLine("Count should be 1000 (manual) : " + manualCount);
             al.Clear();
 
             end = RTC.Now.Minute.ToString() + " " + RTC.Now.Second.ToString();
