@@ -22,6 +22,8 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+using System;
+
 namespace DuNodes.Kernel.Base.IO
 {
     public class BinaryWriter
@@ -37,37 +39,37 @@ namespace DuNodes.Kernel.Base.IO
         }
         public void Write(short dat)
         {
-            byte[] data = System.BitConverter.GetBytes(dat);
+            byte[] data = BitConverter.GetBytes(dat);
             for (int i = 0; i < data.Length; i++)
                 Write(data[i]);
         }
         public void Write(int dat)
         {
-            byte[] data = System.BitConverter.GetBytes(dat);
+            byte[] data = BitConverter.GetBytes(dat);
             for (int i = 0; i < data.Length; i++)
                 Write(data[i]);
         }
         public void Write(long dat)
         {
-            byte[] data = System.BitConverter.GetBytes(dat);
+            byte[] data = BitConverter.GetBytes(dat);
             for (int i = 0; i < data.Length; i++)
                 Write(data[i]);
         }
         public void Write(ushort dat)
         {
-            byte[] data = System.BitConverter.GetBytes(dat);
+            byte[] data = BitConverter.GetBytes(dat);
             for (int i = 0; i < data.Length; i++)
                 Write(data[i]);
         }
         public void Write(uint dat)
         {
-            byte[] data = System.BitConverter.GetBytes(dat);
+            byte[] data = BitConverter.GetBytes(dat);
             for (int i = 0; i < data.Length; i++)
                 Write(data[i]);
         }
         public void Write(ulong dat)
         {
-            byte[] data = System.BitConverter.GetBytes(dat);
+            byte[] data = BitConverter.GetBytes(dat);
             for (int i = 0; i < data.Length; i++)
                 Write(data[i]);
         }

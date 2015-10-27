@@ -6,15 +6,15 @@ using Cosmos.Common;
 // Les informations générales relatives à un assembly dépendent de 
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
 // associées à un assembly.
-[assembly: AssemblyTitle("DuNodes.Core")]
+[assembly: AssemblyTitle("DuNodes.HAL")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Capgemini")]
-[assembly: AssemblyProduct("DuNodes.Core")]
+[assembly: AssemblyProduct("DuNodes.HAL")]
 [assembly: AssemblyCopyright("Copyright © Capgemini 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: Ring(Ring.System)]
+[assembly: Ring(Ring.HAL)]
 
 // L'affectation de la valeur false à ComVisible rend les types invisibles dans cet assembly 
 // aux composants COM.  Si vous devez accéder à un type dans cet assembly à partir de 
@@ -22,7 +22,7 @@ using Cosmos.Common;
 [assembly: ComVisible(false)]
 
 // Le GUID suivant est pour l'ID de la typelib si ce projet est exposé à COM
-[assembly: Guid("3e42c2f4-b5ce-4c95-8400-5608f71cd2ae")]
+[assembly: Guid("af5226c3-4d22-45a3-9157-a079d87b4c33")]
 
 // Les informations de version pour un assembly se composent des quatre valeurs suivantes :
 //

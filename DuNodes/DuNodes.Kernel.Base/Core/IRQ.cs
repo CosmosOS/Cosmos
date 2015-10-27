@@ -24,6 +24,9 @@ THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // YOU CAN SEE ORIGINAL GRUNTYOS INFINITY CODE HERE!
 // DON'T WORRY, GRUNTY ALLOWED ME TO MAKE THE CODE PUBLIC AVAILABLE
+
+using DuNodes.Kernel.Base.IO;
+
 namespace DuNodes.Kernel.Base.Core
 {
     public class IRQ
@@ -42,8 +45,8 @@ namespace DuNodes.Kernel.Base.Core
                 port = 0xA0 + 1;
                 IRQline -= 8;
             }
-            value = (byte)(IO.PortIO.inb(port) | (1 << IRQline));
-            IO.PortIO.outb(port, value);
+            value = (byte)(PortIO.inb(port) | (1 << IRQline));
+            PortIO.outb(port, value);
         }
         public static void ClearMask(byte IRQline)
         {
@@ -59,8 +62,8 @@ namespace DuNodes.Kernel.Base.Core
                 port = 0xA0 + 1;
                 IRQline -= 8;
             }
-            value = (byte)(IO.PortIO.inb(port) & ~(1 << IRQline));
-            IO.PortIO.outb(port, value);
+            value = (byte)(PortIO.inb(port) & ~(1 << IRQline));
+            PortIO.outb(port, value);
         }
     }
 }

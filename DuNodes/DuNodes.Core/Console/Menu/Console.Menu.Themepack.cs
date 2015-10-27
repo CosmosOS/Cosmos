@@ -22,42 +22,30 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-// IDT code by Grunt
+using System;
 
-using DuNodes.Kernel.Base.IO;
-
-namespace DuNodes.Kernel.Base.Core
-{
-    public class IDT
+namespace DuNodes.System.Console { 
+    public static partial class Console
     {
-        public delegate void ISR();
-        public static ISR[] idt = new ISR[0xFF];
-        public static void Remap()
+        public partial class Menu
         {
-            PortIO.outb(0x20, 0x11);
-            PortIO.outb(0xA0, 0x11);
-            PortIO.outb(0x21, 0x20);
-            PortIO.outb(0xA1, 0x28);
-            PortIO.outb(0x21, 0x04);
-            PortIO.outb(0xA1, 0x02);
-            PortIO.outb(0x21, 0x01);
-            PortIO.outb(0xA1, 0x01);
-            PortIO.outb(0x21, 0x0);
-            PortIO.outb(0xA1, 0x0);
-        }
-        private void idt_handler()
-        {
-            int num = 0;
-            if (idt[num] != null)
+            public class Themepack
             {
-                idt[num]();
+                private ConsoleColor[] colors;
+                public Themepack(ConsoleColor fill, ConsoleColor box, ConsoleColor text, ConsoleColor highlighted, ConsoleColor arrow)
+                {
+                    colors = new ConsoleColor[5];
+                    colors[0] = fill;
+                    colors[1] = box;
+                    colors[2] = text;
+                    colors[3] = highlighted;
+                    colors[4] = arrow;
+                }
+                public void Apply()
+                {
+                    Menu.ApplyThemePack(colors);
+                }
             }
         }
-
-        public static void SetGate(byte int_num, ISR handler)
-        {
-            idt[int_num] = handler;
-        }
-
     }
 }
