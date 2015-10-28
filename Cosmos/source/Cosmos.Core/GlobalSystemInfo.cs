@@ -2,7 +2,7 @@
 
 namespace Cosmos.Core
 {
-    internal static unsafe class GlobalSystemInfo
+    public static unsafe class GlobalSystemInfo
     {
         private static volatile GlobalInformationTable* mGlobalInformationTable;
         public static GlobalInformationTable* GlobalInformationTable

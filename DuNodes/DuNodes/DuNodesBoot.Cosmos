@@ -14,7 +14,7 @@
     <!-- Looks like this was a mispelled attribute. Replaced by DebugEnabled below.
     <DebugEnable>true</DebugEnable>
     -->
-    <DebugEnabled>true</DebugEnabled>
+    <DebugEnabled>False</DebugEnabled>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <EnableGDB>False</EnableGDB>
@@ -30,7 +30,7 @@
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
     <VMware_Deployment>ISO</VMware_Deployment>
     <VMware_Launch>VMware</VMware_Launch>
-    <VMware_DebugEnabled>true</VMware_DebugEnabled>
+    <VMware_DebugEnabled>False</VMware_DebugEnabled>
     <VMware_DebugMode>Source</VMware_DebugMode>
     <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
     <VMware_VMwareEdition>Player</VMware_VMwareEdition>
@@ -39,6 +39,16 @@
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\DuNodes.Kernel.Base.Plugs\DuNodes.Kernel.Base.Plugs.csproj">
+      <Name>DuNodes.Kernel.Base.Plugs</Name>
+      <Project>{ec753032-98f0-4844-90b8-afcd2591cb4b}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\DuNodes.System.Plugs\DuNodes.System.Plugs.csproj">
+      <Name>DuNodes.System.Plugs</Name>
+      <Project>{594eff73-6d69-4239-a150-663ba3c55ece}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include=".\DuNodes.csproj">
       <Name>DuNodes</Name>
       <Project>{e842533c-a51f-49c3-a71d-731fc5352d87}</Project>

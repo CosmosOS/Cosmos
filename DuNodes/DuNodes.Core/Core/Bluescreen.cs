@@ -31,128 +31,45 @@ namespace DuNodes.System.Core
 {
     public static class Bluescreen
     {
-        /// <summary>
-        /// Initiates a Bluescreen.
-        /// </summary>
-        /// <param name="error">Error title or exception name</param>
-        /// <param name="description">Error description</param>
-        /// <param name="critical">Critical error?</param>
-        public static void Init(
-            string error = "Something went wrong!",
-            string description = "Unknown exception",
-            bool critical = false)
-        {
-            DrawOOPS();
-            if (description.Length + 33 < Console.Console.WindowHeight)
-            {
-                Console.Console.CursorTop = 2; Console.Console.CursorLeft = 33;
-                ConsoleColor errcolor = ConsoleColor.White;
-                if (critical) errcolor = ConsoleColor.Red;
-                Console.Console.WriteLineEx(error, errcolor, ConsoleColor.Blue);
-                Console.Console.CursorTop = 4; Console.Console.CursorLeft = 70;
-                Console.Console.WriteLineEx(description, ConsoleColor.White, ConsoleColor.Blue);
-            }
-            else
-            {
-                Console.Console.CursorTop = 12; Console.Console.CursorLeft = 2;
-                ConsoleColor errcolor = ConsoleColor.White;
-                if (critical) errcolor = ConsoleColor.Red;
-                Console.Console.WriteLineEx(error, errcolor, ConsoleColor.Blue);
-                Console.Console.CursorTop = 14; Console.Console.CursorLeft = 2;
-                Console.Console.WriteLineEx(description, ConsoleColor.White, ConsoleColor.Blue);
-            }
-            if (!critical)
-            {
-                Console.Console.CursorTop = Console.Console.WindowHeight - 1;
-                Console.Console.WriteEx("Press the [Enter]-key to resume", ConsoleColor.White, ConsoleColor.Blue);
-                Console.Console.CursorTop++;
-                Console.Console.ReadLine();
-                Console.Console.Clear();
-            }
-            else
-            {
-                Console.Console.CursorTop = Console.Console.WindowHeight - 4;
-                Console.Console.WriteLineEx("Press the [Enter]-key to shutdown", ConsoleColor.White, ConsoleColor.Blue);
-                Console.Console.CursorTop++;
-                Console.Console.WriteLineEx("If it doesn't work, press the RESET-button on your computer.", ConsoleColor.White, ConsoleColor.Blue);
-                Console.Console.CursorTop++;
-                Console.Console.ReadLine();
-                KernelExtensionsHAL.Reboot();
-            }
-        }
-        public static void Init(Exception ex, bool critical = false)
-        {
-            DrawOOPS();
-            if (ex.Message.Length + 33 < Console.Console.WindowHeight)
-            {
-                Console.Console.CursorTop = 2; Console.Console.CursorLeft = 33;
-                ConsoleColor errcolor = ConsoleColor.White;
-                if (critical) errcolor = ConsoleColor.Red;
-                Console.Console.WriteLineEx(ex.Source, errcolor, ConsoleColor.Blue);
-                Console.Console.CursorTop = 4; Console.Console.CursorLeft = 70;
-                Console.Console.WriteLineEx(ex.Message, ConsoleColor.White, ConsoleColor.Blue);
-            }
-            else
-            {
-                Console.Console.CursorTop = 12; Console.Console.CursorLeft = 2;
-                ConsoleColor errcolor = ConsoleColor.White;
-                if (critical) errcolor = ConsoleColor.Red;
-                Console.Console.WriteLineEx(ex.Source, errcolor, ConsoleColor.Blue);
-                Console.Console.CursorTop = 14; Console.Console.CursorLeft = 2;
-                Console.Console.WriteLineEx(ex.Message, ConsoleColor.White, ConsoleColor.Blue);
-            }
-            if (!critical)
-            {
-                Console.Console.CursorTop = Console.Console.WindowHeight - 3;
-                Console.Console.WriteEx("Press the [Enter]-key to resume", ConsoleColor.White, ConsoleColor.Blue);
-                Console.Console.CursorTop++;
-                Console.Console.ReadLine();
-                Console.Console.Clear();
-            }
-            else
-            {
-                Console.Console.CursorTop = Console.Console.WindowHeight - 4;
-                Console.Console.WriteEx("Press the [Enter]-key to shutdown", ConsoleColor.White, ConsoleColor.Blue);
-                Console.Console.CursorTop++;
-                Console.Console.WriteEx("If it doesn't work, press the RESET-button on your computer.", ConsoleColor.White, ConsoleColor.Blue);
-                Console.Console.CursorTop++;
-                Console.Console.ReadLine();
-                KernelExtensionsHAL.Reboot();
-            }
-        }
-        private static void DrawOOPS()
-        {
-            Console.Console.Fill(ConsoleColor.Blue);
-            string[] arrOOPS = new string[] {
-                "======  ======  =====  =====  =",
-                "=    =  =    =  =   =  =      =",
-                "=    =  =    =  =====  =====  =",
-                "=    =  =    =  =          =   ",
-                "======  ======  =      =====  ="};
-            Console.Console.CursorTop = 2;
-            foreach (string str in arrOOPS)
-            {
-                Console.Console.CursorLeft = 2;
-                Console.Console.WriteLineEx(str, ConsoleColor.White, ConsoleColor.Blue);
-            }
-        }
-        /// <summary>
-        /// Kernel Panic
-        /// </summary>
-        public static void Panic()
-        {
-            Console.Console.Clear();
-            Console.Console.Fill(ConsoleColor.Red);
-            Console.Console.CursorTop = 2;
-            Console.Console.WriteLineEx("KERNEL PANIC", ConsoleColor.White, ConsoleColor.Red, true);
-            Console.Console.WriteLine("\n");
-            string message = "CRITICAL KERNEL EXCEPTION\nPLEASE CONTACT YOUR SOFTWARE MANUFACTURER";
-            Console.Console.WriteLineEx(message, ConsoleColor.White, ConsoleColor.Red, true);
-            // Enter an infinite loop
-            while (true)
-            {
+//        public static void Panic(string error)
+//        {
+//            /* Old code
+//            Console.BackgroundColor = ConsoleColor.Blue;
+//            Console.Clear();
+//            Console.WriteLine();
+//            Extensions.Write2("FlowDOS", ConsoleColor.White, true, false);
+//            Console.WriteLine();
+//            Extensions.Write2("An error occured and FlowDOS has been shut down to prevent damage to your files.", ConsoleColor.White, true, false);
+//            Console.WriteLine();
+//            Extensions.Write2(error, ConsoleColor.White, true, false);
+//            Console.WriteLine();*/
 
-            }
-        }
+//            // From G-DOS
+//            Console.BackgroundColor = ConsoleColor.DarkBlue;
+//            Console.ForegroundColor = ConsoleColor.White;
+//            Console.Clear();
+//            // The cosmos console class sucks, I should have rewritten it like in Grunty OS
+//            // but using a different class for output would create confusion so I decieded
+//            // not too
+//            for (int i = 0; i < (80 * 26); i++)
+//                Console.Write(" ");
+//            Console.CursorLeft = 0;
+//            Console.CursorTop = 0;
+//            Console.WriteLine("A problem has been detected and FlowDOS has been shut down to prevent damage to your computer.\n");
+
+//            Console.WriteLine(error);
+//            Console.WriteLine(@"
+//If this is the first time you've seen this Stop error screen, 
+//restart you computer. If this screen appears again follow
+//these steps:
+
+//Check to make sure any new hardware is properly installed.
+//If this is a new installation, check your hardware to see if it is 
+//compatible with your computer's BIOS.
+
+//If problems continue, disable or remove any newly installed hardware. 
+//Disable BIOS memory options such as caching or shadowing.");
+//            while (true) ;
+//        }
     }
 }

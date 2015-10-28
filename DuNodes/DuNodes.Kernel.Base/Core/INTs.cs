@@ -33,139 +33,130 @@
 //    [Plug(Target = typeof(Cosmos.Core.INTs))]
 //    public partial class INTs
 //    {
-//        public delegate void IRQ0called();
-//        public static IRQ0called onCalled = delegate { PIT.called = true; };
-//        public static void HandleInterrupt_Default(ref IRQContext aContext)
+//static bool already = false;
+//private static string[] errs = new string[] { "DIVIDE_BY_ZERO", "SINGLE_STEP", "NON_MASKABLE_INTERRUPT", "BREAK_FLOW", "OVERFLOW", "NULL", "INVALID_OPCODE", "", "DOUBLE_FAULT_EXCEPTION", "INVALID_TSS", "SEGMENT_NOT_PRESENT", "STACK_EXCEPTION", "GENERAL_PROTECTION_FAULT" };
+
+//public static void HandleInterrupt_Default(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+
+//    API.HandleInt0x80(ref aContext);
+//    // Interrupts.Handlers[aContext.Interrupt](ref aContext);
+
+//}
+//public static void HandleInterrupt_00(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[0]);
+//}
+
+
+//public static void HandleInterrupt_01(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[1]);
+//}
+//public static void HandleInterrupt_02(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[2]);
+//}
+//public static void HandleInterrupt_03(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[3]);
+//}
+//public static void HandleInterrupt_04(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[4]);
+//}
+//public static void HandleInterrupt_05(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[5]);
+//}
+//public static void HandleInterrupt_06(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[6]);
+//}
+//public static void HandleInterrupt_07(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[7]);
+//}
+//public static void HandleInterrupt_08(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[8]);
+//}
+//public static void HandleInterrupt_09(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[9]);
+//}
+//public static void HandleInterrupt_0A(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[10]);
+//}
+//public static void HandleInterrupt_0B(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[11]);
+
+//}
+//public static void HandleInterrupt_0C(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[12]);
+//}
+//public static void HandleInterrupt_0D(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[13]);
+//}
+//public static void HandleInterrupt_0E(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[14]);
+//}
+//public static void HandleInterrupt_0F(ref Cosmos.Core.INTs.IRQContext aContext)
+//{
+//    FlowDOS.BSOD.Panic(errs[15]);
+//}
+//    }
+
+
+//public class API
+//{
+//    public static void STI()
+//    {
+//    }
+//    // Basically the way this works is a number is stored in EAX, this is the function
+//    // we want to use. All of these can be accessed through software interrupt 0x80
+//    public unsafe static void HandleInt0x80(ref Cosmos.Core.INTs.IRQContext aContext)
+//    {
+//        if (aContext.EAX == 1) // Print
 //        {
-//            if (aContext.Interrupt >= 0x20 && aContext.Interrupt <= 0x2F)
+//            byte* ptr = (byte*)aContext.ESI;
+//            for (int i = 0; ptr[i] != 0; i++)
 //            {
-//                if (aContext.Interrupt >= 0x28)
-//                {
-//                    Global.PIC.EoiSlave();
-//                }
-//                else
-//                {
-//                    Global.PIC.EoiMaster();
-//                }
+//                Console.Write((char)ptr[i]);
 //            }
 //        }
-
-//        public static void HandleInterrupt_00(ref IRQContext aContext)
+//        else if (aContext.EAX == 2) // Read
 //        {
-           
-//            //Bluescreen.Init("Divide by zero Exception", "YOU JUST CREATED A BLACK HOLE!", true); 
-//        }
+//            STIEnabler se = new STIEnabler();
+//            se.Enable();
+//            STI(); // We need to enable interrupts so we can read, but for some reason this does not work :(
 
-//        public static void HandleInterrupt_01(ref IRQContext aContext)
-//        {
-//            //Bluescreen.Init("Debug Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_02(ref IRQContext aContext)
-//        {
-//            //Bluescreen.Init("Non Maskable Interrupt Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_03(ref IRQContext aContext)
-//        {
-//           // Bluescreen.Init("Breakpoint Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_04(ref IRQContext aContext)
-//        {
-//            //Bluescreen.Init("Into Detected Overflow Exception", "" , true); 
-//        }
-
-//        public static void HandleInterrupt_05(ref IRQContext aContext)
-//        {
-//           // Bluescreen.Init("Out of Bounds Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_06(ref IRQContext aContext)
-//        {
-//            //  Bluescreen.Init("Invalid Opcode", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_07(ref IRQContext aContext)
-//        {
-//            //  Bluescreen.Init("No Coprocessor Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_08(ref IRQContext aContext)
-//        {
-//            //   Bluescreen.Init("Double Fault Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_09(ref IRQContext aContext)
-//        {
-//            //  Bluescreen.Init("Coprocessor Segment Overrun Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_0A(ref IRQContext aContext)
-//        {
-//            // Bluescreen.Init("Bad TSS Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_0B(ref IRQContext aContext)
-//        {
-//            // Bluescreen.Init("Segment not present", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_0C(ref IRQContext aContext)
-//        {
-//            // Bluescreen.Init("Stack Fault Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_0E(ref IRQContext aContext)
-//        {
-//            //  Bluescreen.Init("Page Fault Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_0F(ref IRQContext aContext)
-//        {
-//            //  Bluescreen.Init("Unknown Interrupt Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_10(ref IRQContext aContext)
-//        {
-//            //  Bluescreen.Init("Coprocessor Fault Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_11(ref IRQContext aContext)
-//        {
-//            //  Bluescreen.Init("Alignment Exception", " ", true); 
-//        }
-
-//        public static void HandleInterrupt_12(ref IRQContext aContext)
-//        {
-//            //   Bluescreen.Init("Machine Check Exception", " ", true); 
-//        }
-
-//        // IRQ0
-//        public static void HandleInterrupt_20(ref IRQContext aContext)
-//        {
-//            Global.PIC.EoiMaster();
-//            PortIO.outb(0x20, 0x20);
-//            onCalled();
+//            byte* ptr = (byte*)aContext.EDI; // Input buffer
+//            string str = Console.ReadLine();
+//            for (int i = 0; i < str.Length; i++)
+//                ptr[i] = (byte)str[i];
 //        }
 //    }
-
-
-
-
-//    public class STIEnabler
+//}
+//class STIEnabler
+//{
+//    public void Enable()
 //    {
-//        public void Enable()
-//        {
-
-//        }
 //    }
-//    [Plug(Target = typeof(STIEnabler))]
-//    public class Enable : AssemblerMethod
+//}
+//[Plug(Target = typeof(STIEnabler))]
+//public class Enable : AssemblerMethod
+//{
+//    public override void AssembleNew(object aAssembler, object aMethodInfo)
 //    {
-//        public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
-//        {
-//            new CPUx86.Sti();
-//        }
+//        new CPUx86.Sti();
+
 //    }
+//}
+
 //}

@@ -30,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cosmos.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
@@ -49,6 +50,9 @@
     <Compile Include="Base\Init.cs" />
     <Compile Include="Console\CommandManager\Command.cs" />
     <Compile Include="Console\CommandManager\CommandBase.cs" />
+    <Compile Include="Console\CommandManager\Commands\help.cs" />
+    <Compile Include="Console\CommandManager\Commands\shutdown.cs" />
+    <Compile Include="Console\CommandManager\Commands\reboot.cs" />
     <Compile Include="Console\CommandManager\Commands\bench.cs" />
     <Compile Include="Console\CommandManager\Commands\config.cs" />
     <Compile Include="Console\CommandManager\Commands\ping.cs" />
@@ -91,6 +95,10 @@
     <ProjectReference Include="..\..\Cosmos\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{c801f19c-a9d3-42d5-9a57-9ffdf9b4d05e}</Project>
       <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
+      <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
+      <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>
     <ProjectReference Include="..\DuNodes.HAL\DuNodes.HAL.csproj">
       <Project>{af5226c3-4d22-45a3-9157-a079d87b4c33}</Project>

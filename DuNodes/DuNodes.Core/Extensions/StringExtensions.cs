@@ -81,7 +81,7 @@ namespace DuNodes.System.Extensions
                 return str[null_based_index];
             else
             {
-               Bluescreen.Init("string._GetCharAt", "null_based_index must be >= 0 and <= the length of the string");
+             //  Bluescreen.Init("string._GetCharAt", "null_based_index must be >= 0 and <= the length of the string");
                 return char.MinValue;
             }
         }
@@ -102,7 +102,7 @@ namespace DuNodes.System.Extensions
             }
             else
             {
-                Bluescreen.Init("string._GetCharAt", "null_based_index must be >= 0 and <= the length of the string");
+               // Bluescreen.Init("string._GetCharAt", "null_based_index must be >= 0 and <= the length of the string");
                 return str;
             }
         }

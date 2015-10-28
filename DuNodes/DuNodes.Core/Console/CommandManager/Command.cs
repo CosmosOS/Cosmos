@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmos.IL2CPU;
 using DuNodes.System.Console.CommandManager.Commands;
 
 namespace DuNodes.System.Console.CommandManager
@@ -17,8 +18,9 @@ namespace DuNodes.System.Console.CommandManager
                 command = command.ToLower();
                 var cmd = new object();
                 //TODO: Need a plug for Reflector. In order to remove the switch case
-                //var commandType = Type.GetType("DuNodes_Core.Terminal.CommandManager.Commands." + command);
-               // Activator.CreateInstance(commandType); 
+                //Type commandType  = ReflectionUtilities.GetType("DuNodes.System", "Console.CommandManager.Commands." + command);
+                //var commandType = Type.GetType("DuNodes.System.Console.CommandManager.Commands." + command);
+                //cmd = Activator.CreateInstance(commandType); 
                 switch (command)
                 {
                     case "config":
@@ -27,31 +29,37 @@ namespace DuNodes.System.Console.CommandManager
 
                     case "top":
                         cmd = new top();
-                       break;
+                        break;
 
                     case "bench":
                         cmd = new bench();
                         break;
 
                     case "help":
-                        Console.WriteLine("Commands are : config - top - bench - rammanager");
+                        cmd = new help();
+                        break;
+
+                    case "reboot":
+                        cmd = new reboot();
+                        break;
+
+                    case "shutdown":
+                        cmd = new shutdown();
                         break;
 
                     default:
-                        Console.WriteLine("Unknown " + command + " command.");
+                        Console.Error.WriteLine("Unknown " + command + " command. Type help in order to know all available commands and option.");
                         break;
                 }
 
-               cmd = null;
+                cmd = null;
                
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Unknown " + command + " command.");
-                Console.WriteLine("Ex : " + ex.Message, ConsoleColor.Red);
+                Console.Error.WriteLine("Unknown " + command + " command.");
+                Console.Error.WriteLine("Ex : " + ex.Message);
             }
-
-            
         }
     }
 }

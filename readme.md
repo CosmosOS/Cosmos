@@ -16,7 +16,7 @@ Release Changelog
 Evolution
 ------------
 * Cosmos Source Code
-* Dewitcher library
+* Part of Dewitcher lib.
 * Some very basics. (bench, top, help, ...)
 * Beginning of process and thread system in order to manage memory.
 ... Nothing more at the moment.
@@ -29,9 +29,7 @@ To Come
 * Process and thread system
 * Basic user management
 * Basic environnement
-* Re-integrate new version of Cosmos, without breaking breakpoint.
 * Write some basic commands (ping, top, ...) (will need some plugs)
-* Update Command Engine of dewitcher in order to add special option supports
 * Enable console shortcuts
 * Basic integration of a FileSystem (own or others,...)
 * Make init of system with dewitcher's menu class

@@ -33,7 +33,7 @@ namespace DuNodes.System.Extensions
     /// </summary>
     public static partial class KernelExtensionsSys
     {
-     
+
         public static void SleepSeconds(this Cosmos.System.Kernel krnl, uint value) { PIT.SleepSeconds(value); }
         public static void SleepMilliseconds(this Cosmos.System.Kernel krnl, uint value) {PIT.SleepMilliseconds(value); }
 

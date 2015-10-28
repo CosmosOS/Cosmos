@@ -63,12 +63,12 @@ namespace DuNodes.System.Console
                     highlighted = colors[3];
                     arrow = colors[4];
                 }
-                else if (colors.Length < 5)
-                    Bluescreen.Init("INVALID_THEME_EXCEPTION",
-                    "Looks like your ConsoleColor-Array contains less than 5 entries");
-                else if (colors.Length > 5)
-                    Bluescreen.Init("INVALID_THEME_EXCEPTION",
-                    "Looks like your ConsoleColor-Array contains more than 5 entries");
+                //else if (colors.Length < 5)
+                //    Bluescreen.Init("INVALID_THEME_EXCEPTION",
+                //    "Looks like your ConsoleColor-Array contains less than 5 entries");
+                //else if (colors.Length > 5)
+                //    Bluescreen.Init("INVALID_THEME_EXCEPTION",
+                //    "Looks like your ConsoleColor-Array contains more than 5 entries");
             }
             public static void AddCategory(Category category) { cat.Add(category); }
             public static void Show()

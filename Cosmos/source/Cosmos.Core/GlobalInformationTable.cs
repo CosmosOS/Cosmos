@@ -3,7 +3,7 @@
 namespace Cosmos.Core
 {
     [StructLayout(LayoutKind.Explicit)]
-    internal unsafe struct GlobalInformationTable
+    public unsafe struct GlobalInformationTable
     {
         [FieldOffset(0)]
         public DataLookupTable* FirstDataLookupTable;

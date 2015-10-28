@@ -3,17 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Cosmos.Core;
 
-namespace Cosmos.HAL
+namespace DuNodes.HAL.Core
 {
     public class Power
     {
-        public static void Reboot()
+        public static void Halt()
         {
-            Core.Global.CPU.Reboot();
+            Cosmos.Core.Global.CPU.Halt();
         }
-
-        
     }
 }

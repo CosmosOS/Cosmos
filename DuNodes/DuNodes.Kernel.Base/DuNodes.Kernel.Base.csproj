@@ -42,10 +42,10 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\Heap.cs" />
     <Compile Include="Core\IDT.cs" />
     <Compile Include="Core\INTs.cs" />
     <Compile Include="Core\IRQ.cs" />
-    <Compile Include="Core\Memory.cs" />
     <Compile Include="IO\BinaryWriter.cs" />
     <Compile Include="IO\MemoryStream.cs" />
     <Compile Include="IO\PortIO.cs" />
