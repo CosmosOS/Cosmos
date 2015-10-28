@@ -122,7 +122,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuNodes.HAL", "DuNodes\DuNo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuNodes.System.Plugs", "DuNodes\DuNodes.System.Plugs\DuNodes.System.Plugs.csproj", "{594EFF73-6D69-4239-A150-663BA3C55ECE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuNodes.Kernel.Base.Plugs", "DuNodes.Kernel.Base.Plugs\DuNodes.Kernel.Base.Plugs.csproj", "{EC753032-98F0-4844-90B8-AFCD2591CB4B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DuNodes.Kernel.Base.Plugs", "DuNodes\DuNodes.Kernel.Base.Plugs\DuNodes.Kernel.Base.Plugs.csproj", "{EC753032-98F0-4844-90B8-AFCD2591CB4B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

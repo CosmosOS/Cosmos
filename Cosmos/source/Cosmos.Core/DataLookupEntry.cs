@@ -3,7 +3,7 @@
 namespace Cosmos.Core
 {
     [StructLayout(LayoutKind.Explicit)]
-    public unsafe struct DataLookupEntry
+    internal unsafe struct DataLookupEntry
     {
         [FieldOffset(0)]
         public void* DataBlock;

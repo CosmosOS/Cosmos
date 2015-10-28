@@ -10,6 +10,7 @@ namespace DuNodes.Kernel.Base.Core
 {
     public static unsafe partial class Heap
     {
+        
         public static uint GetTotalUsedMemory()
         {
             return 0;

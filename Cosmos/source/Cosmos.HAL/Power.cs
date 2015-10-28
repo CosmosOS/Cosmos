@@ -13,7 +13,5 @@ namespace Cosmos.HAL
         {
             Core.Global.CPU.Reboot();
         }
-
-        
     }
 }

@@ -4,7 +4,7 @@ namespace Cosmos.Core
 {
     // The DataLookupTable (DLT) basically is a linked list.
     [StructLayout(LayoutKind.Explicit)]
-    public unsafe struct DataLookupTable
+    internal unsafe struct DataLookupTable
     {
         public const int EntriesPerTable = 170;
 
