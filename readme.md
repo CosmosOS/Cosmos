@@ -9,6 +9,7 @@ The aim of the project is to provide an hypervisor that support spanning virtual
 You can still refer to cosmos project in order to have more informations.
 Documentation will be written later.
 
+[![Join the chat at https://gitter.im/Maldus0/DuNodes](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Maldus0/DuNodes?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Release Changelog
 ==================
