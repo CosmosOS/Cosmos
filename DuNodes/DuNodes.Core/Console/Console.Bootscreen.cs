@@ -1,3 +1,4 @@
+//TODO : rewrite class
 /*
 Copyright (c) 2012-2013, dewitcher Team
 All rights reserved.

@@ -44,19 +44,19 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos\source\Cosmos.Assembler\Cosmos.Assembler.csproj">
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130e-28e0-428a-a597-f4b3b676c0ca}</Project>
       <Name>Cosmos.Assembler</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos\source\Cosmos.Common\Cosmos.Common.csproj">
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.Common\Cosmos.Common.csproj">
       <Project>{1fac100c-d732-4ea4-b518-5af4baf64f2e}</Project>
       <Name>Cosmos.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos\source\Cosmos.Core\Cosmos.Core.csproj">
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.Core\Cosmos.Core.csproj">
       <Project>{5ac4773c-cb4e-4cd9-8d50-02e10a07dee6}</Project>
       <Name>Cosmos.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{c801f19c-a9d3-42d5-9a57-9ffdf9b4d05e}</Project>
       <Name>Cosmos.IL2CPU.Plugs</Name>
     </ProjectReference>

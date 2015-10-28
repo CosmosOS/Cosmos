@@ -24,16 +24,7 @@ Evolution
 
 To Come
 ------------
-* Garbage Collector
-* Basic configuration management
-* Process and thread system
-* Basic user management
-* Basic environnement
-* Write some basic commands (ping, top, ...) (will need some plugs)
-* Enable console shortcuts
-* Basic integration of a FileSystem (own or others,...)
-* Make init of system with dewitcher's menu class
-* Log System
+* See issues list ;)
 
 More and more to come, will release full todoList as soon as i have some time to spend !
 Joining DuNodes
