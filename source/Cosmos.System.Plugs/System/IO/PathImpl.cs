@@ -69,11 +69,11 @@ namespace SentinelKernel.System.Plugs.System.IO
         {
             if (aPath == null)
             {
-                throw new ArgumentNullException("aPath");
+                throw new Exception("Path can not be null.");
             }
             if (HasIllegalCharacters(aPath, aCheckAdditional))
             {
-                throw new ArgumentException("The path contains invalid characters.");
+                throw new Exception("The path contains invalid characters.");
             }
         }
 
@@ -84,11 +84,11 @@ namespace SentinelKernel.System.Plugs.System.IO
             {
                 if (xNum + 2 == aSearchPattern.Length)
                 {
-                    throw new ArgumentException("The search pattern is invalid.");
+                    throw new Exception("The search pattern is invalid.");
                 }
                 if (aSearchPattern[xNum + 2] == VFSManager.GetDirectorySeparatorChar() || aSearchPattern[xNum + 2] == VFSManager.GetAltDirectorySeparatorChar())
                 {
-                    throw new ArgumentException("The search pattern is invalid.");
+                    throw new Exception("The search pattern is invalid.");
                 }
                 aSearchPattern = aSearchPattern.Substring(xNum + 2);
             }
@@ -224,7 +224,7 @@ namespace SentinelKernel.System.Plugs.System.IO
         {
             if (aPath == null)
             {
-                throw new ArgumentNullException("aPath");
+                throw new Exception("Path can not be null.");
             }
             return NormalizePath(aPath, true);
         }
