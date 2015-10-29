@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Microsoft.Win32;
-using Cosmos.Build.Common;
 using Vestris.VMWareLib;
+using Cosmos.Build.Common;
+using Cosmos.Debug.Common;
 
-namespace Cosmos.Debug.VSDebugEngine.Host
-{
-    public class VMware : Base {
+namespace Cosmos.Debug.VSDebugEngine.Host {
+  public class VMware : Base {
     protected VMwareEdition mEdition;
     protected string mDir;
     protected string mVmxPath;

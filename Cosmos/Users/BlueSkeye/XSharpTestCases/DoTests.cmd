@@ -1,0 +1,1 @@
+..\..\..\..\XSharp\source\XSharp.Test\bin\Debug\XSharp.Test.exe -d .

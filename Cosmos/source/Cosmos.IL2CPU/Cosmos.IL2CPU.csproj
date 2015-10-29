@@ -398,6 +398,10 @@
     <Content Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Tests\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">
+      <Project>{E6D3B644-C487-472D-A978-C1A82D0C099B}</Project>
+      <Name>Cosmos.TestRunner.TestController</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common</Name>
@@ -410,9 +414,17 @@
       <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
+    <ProjectReference Include="..\XSharp.Nasm\XSharp.Nasm.csproj">
+      <Project>{841A734E-9606-4AAB-9C4A-74E7E303FF5D}</Project>
+      <Name>XSharp.Nasm</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XSharp.Compiler\XSharp.Compiler.csproj">
+      <Project>{A281A1B1-C718-4BCB-A7BE-ED840A70449A}</Project>
+      <Name>XSharp.Compiler</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>

@@ -13,6 +13,7 @@ namespace DuNodes.Kernel.Base.Core
         
         public static uint GetTotalUsedMemory()
         {
+            //TODO : On top of MemManagement 
             return 0;
         }
 

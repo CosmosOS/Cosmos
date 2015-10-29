@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{78304B1E-C323-4A78-9E7D-2578E58311B6}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Cosmos.TestRunner.Console</RootNamespace>
+    <AssemblyName>Cosmos.TestRunner.Console</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
+      <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
+      <Name>Cosmos.System</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Users\Sentinel\SentinelCore\SentinelCore.csproj">
+      <Project>{c296973c-63d7-4a29-95b1-9fc6f36a83ee}</Project>
+      <Name>SentinelCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Users\Sentinel\SentinelHAL\SentinelHAL.csproj">
+      <Project>{abe135d1-acf8-4c25-a5df-a96f013242c5}</Project>
+      <Name>SentinelHAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Users\Sentinel\SentinelKernel\SentinelKernel.csproj">
+      <Project>{3b0f484c-0a26-4cc2-b44d-ddda3a3e9381}</Project>
+      <Name>SentinelKernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Users\Sentinel\SentinelSystem\SentinelSystem.csproj">
+      <Project>{93d6ff56-6e23-4e80-98f6-730ac533f631}</Project>
+      <Name>SentinelSystem</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BoxingTests\BoxingTests.csproj">
+      <Project>{f8889473-5866-4913-86ac-8072a1a2558c}</Project>
+      <Name>BoxingTests</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.Kernel.csproj">
+      <Project>{BDC011BE-6041-4A58-A6E7-0F592E78CB27}</Project>
+      <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.csproj">
+      <Project>{57045fe8-b0fe-4fc1-810f-7c3914aef1de}</Project>
+      <Name>Cosmos.Compiler.Tests.SimpleWriteLine.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTest.csproj">
+      <Project>{3e28cfd9-25d4-4ebb-86e3-4a4a8a8936fe}</Project>
+      <Name>Cosmos.Compiler.Tests.SingleEchoTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj">
+      <Project>{a0893493-d4f0-4b9f-9826-86319e143d86}</Project>
+      <Name>Cosmos.Kernel.Tests.Fat</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj">
+      <Project>{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}</Project>
+      <Name>Cosmos.TestRunner.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj">
+      <Project>{839edc9d-6d2e-4892-a7f0-17861ba9fa0c}</Project>
+      <Name>SimpleStructsAndArraysTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VGACompilerCrash\VGACompilerCrash.csproj">
+      <Project>{21915a7e-cc84-4836-8b87-857b6149d496}</Project>
+      <Name>VGACompilerCrash</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

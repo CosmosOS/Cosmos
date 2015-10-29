@@ -9,6 +9,8 @@ using Cosmos.System.FileSystem.VFS;
 
 namespace SentinelKernel.System.Plugs.System.IO
 {
+    using Cosmos.System.FileSystem;
+
     [Plug(Target = typeof (IO::FileStream))]
     [PlugField(FieldId = "$$InnerStream$$", FieldType = typeof (IO::Stream))]
     public class FileStreamImpl
@@ -20,7 +22,8 @@ namespace SentinelKernel.System.Plugs.System.IO
         public static void Ctor(IO::FileStream aThis, string aPathname, IO::FileMode aMode,
             [FieldAccess(Name = "$$InnerStream$$")] ref IO::Stream innerStream)
         {
-            innerStream = VFSManager.GetFileStream(aPathname);
+            FatHelpers.Debug("In FileStream.Ctor");
+            innerStream = InitializeStream(aPathname, aMode);
         }
 
         public static void CCtor()
@@ -88,6 +91,20 @@ namespace SentinelKernel.System.Plugs.System.IO
         //static void Init(IO::FileStream aThis, string path, IO::FileMode mode, IO::FileAccess access, int rights, bool useRights, IO::FileShare share, int bufferSize
         //  , IO::FileOptions options, Microsoft.Win32.Win32Native.SECURITY_ATTRIBUTES secAttrs, string msgPath, bool bFromProxy) { }
 
-
+        private static Stream InitializeStream(string aPath, FileMode aMode)
+        {
+            FatHelpers.Debug("In FileStream.InitializeStream");
+            if (aPath == null)
+            {
+                FatHelpers.Debug("In FileStream.Ctor: Path == null is true");
+                throw new Exception("The file path cannot be null.");
+            }
+            if (aPath.Length == 0)
+            {
+                FatHelpers.Debug("In FileStream.Ctor: Path.Length == 0 is true");
+                throw new Exception("The file path cannot be empty.");
+            }
+            return VFSManager.GetFileStream(aPath);
+        }
     }
 }

@@ -70,7 +70,7 @@
     <Compile Include="Console\Menu\Console.Menu.Entry.cs" />
     <Compile Include="Console\Menu\Console.Menu.Themepack.cs" />
     <Compile Include="Core\Bluescreen.cs" />
-    <Compile Include="Core\KeyLayout.cs" />
+    <Compile Include="Core\KeyBoardLayout.cs" />
     <Compile Include="Extensions\KernelExtensionsSys.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Cosmos.Common;
 using Cosmos.IL2CPU.Plugs;
+using Cosmos.TestRunner;
 
 namespace Cosmos.IL2CPU
 {
@@ -41,7 +42,11 @@ namespace Cosmos.IL2CPU
                 return true;
             }
 
-          
+            if (assembly == typeof(TestController).Assembly)
+            {
+                return true;
+            }
+
             return false;
         }
 
