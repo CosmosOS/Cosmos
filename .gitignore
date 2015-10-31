@@ -44,3 +44,4 @@ Setup/Current.iss
 Cosmos.Assembler.Log
 UpgradeLog*.htm
 .sync/
+source/_ReSharper.Caches/
