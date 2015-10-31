@@ -186,7 +186,7 @@ namespace Cosmos.System
         {
             if (aFS == null)
             {
-                throw new ArgumentNullException("aFS");
+                throw new Exception("File system can not be null.");
             }
             FatHelpers.Debug("In SentinelVFS.DoGetDirectory");
             FatHelpers.Debug("Path = " + aPath);
