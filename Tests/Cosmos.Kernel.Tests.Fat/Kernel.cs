@@ -80,7 +80,7 @@ namespace Cosmos.Kernel.Tests.Fat
                 //mDebugger.Send("Contents retrieved after writing");
                 //mDebugger.Send(xContents);
                 //Assert.IsTrue(xContents == "Test FAT write.", "Contents of Kudzu.txt was written incorrectly!");
-
+                Console.Write("salam sajad");
                 TestController.Completed();
             }
             catch (Exception E)
