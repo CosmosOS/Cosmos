@@ -29,6 +29,7 @@ namespace Cosmos.Compiler.Tests.MultidimensionalArrays
             int[,] numbers = new int[10, 10];
             For(numbers,true);
             For(numbers,false);
+            TestController.Completed();
         }
     }
 }
