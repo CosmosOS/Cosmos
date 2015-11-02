@@ -9,26 +9,17 @@ namespace Cosmos.Compiler.Tests.MultidimensionalArrays
         {
             Console.WriteLine("Cosmos booted successfully. This is multidimensional test.");
         }
-        void For(int[,] x, bool Getin)
+        void For(int[,] x)
        {
-	for (int i = 0; i < 10; i++)
+        	for (int i = 0; i < 10; i++)
                 for (int o = 0; o < 10; o++)
-                {
-                      if(Getin=true)
-                      {
-                            x[i,o] = i * 10 + o;
-                      }
-                      else if(Getin=false)
-                      {
-                            Console.Write(x[i,o]+" ");
-                      }
-                }
+                    x[i,o] = i+1 * 10 + o;
        }
         protected override void Run()
         {
             int[,] numbers = new int[10, 10];
-            For(numbers,true);
-            For(numbers,false);
+            For(numbers);
+            Assert.AreEqual(10, numbers[0,0], "Wrong:Multdimensional arrays doesnt work!");
             TestController.Completed();
         }
     }
