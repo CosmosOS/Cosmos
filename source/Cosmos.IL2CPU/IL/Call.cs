@@ -133,6 +133,7 @@ namespace Cosmos.IL2CPU.X86.IL {
                          {
                              xResultSize += 4 - (xResultSize % 4);
                          }
+                         // cleanup result values
                          for (int i = 0; i < xResultSize / 4; i++)
                          {
                              new CPUx86.Add
