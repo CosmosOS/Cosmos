@@ -16,12 +16,26 @@ namespace DuNodes.System.Console.CommandManager.Commands
                         args[0] = "/";
                     }
 
-                    var dir = HAL.FileSystem.Base.FileSystem.Root.ListFiles(args[0]);
-                    if (!args[0].EndsWith("/"))
-                        args[0] += "/";
+                    var currDir = args[0];
+                    var finalDir = "";
+                    var currPath = ENV.currentPath;
+                    if (!currPath.EndsWith("/") && !currDir.StartsWith("/"))
+                        currPath += "/";
+
+                    if (currDir[0] == '/')
+                    {
+                        finalDir = currDir;
+                    }
+                    else
+                    {
+                        finalDir = currPath + args[0];
+                    }
+                    var dir = HAL.FileSystem.Base.FileSystem.Root.ListFiles(finalDir);
+                    if (!finalDir.EndsWith("/"))
+                        finalDir += "/";
 
 
-                    ENV.currentPath = args[0];
+                    ENV.currentPath = finalDir;
                 }
                 else
                 {

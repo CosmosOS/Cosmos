@@ -16,11 +16,7 @@ Release Changelog
 
 Evolution
 ------------
-* Cosmos Source Code
-* Part of Dewitcher lib.
-* Some very basics. (bench, top, help, ...)
-* Beginning of process and thread system in order to manage memory.
-... Nothing more at the moment.
+* See resolved issues list (FileSystem, command management, and much more)
 
 
 To Come
