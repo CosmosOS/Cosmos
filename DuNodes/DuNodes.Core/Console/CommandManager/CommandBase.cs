@@ -1,26 +1,15 @@
 ﻿namespace DuNodes.System.Console.CommandManager
 {
-    public class CommandBase
+    public abstract class CommandBase
     {
         //Method to override
-        public void launch()
-        {
-            
-        }
+        public abstract void launch(string[] args);
 
-        public void cancelled()
-        {
-            
-        }
+        public abstract void cancelled();
 
-        public void pause()
-        {
-            
-        }
 
-        public void finished()
-        {
-            
+        public abstract void pause();
+
+        public abstract void finished();
         }
-    }
 }

@@ -21,6 +21,10 @@ namespace DuNodes.System.FileSystem
 
                     if (DNFS.isGFS(((Partition)BlockDevice.Devices[i])))
                     {
+                        //TODO : Remove temp fix 
+                        Console.Console.WriteLine(" !!! Temp FIX : Format each startup !!!  ", ConsoleColor.DarkRed, true);
+                        new DNFS(((Partition)BlockDevice.Devices[i])).Format("DN");
+
                         DNFS fs = new DNFS(((Partition)BlockDevice.Devices[i]));
                         Devices.device dev = new Devices.device();
                         Console.Console.WriteLine("DNFS PARTITION FOUND", ConsoleColor.Blue, true);

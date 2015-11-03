@@ -15,7 +15,15 @@ namespace DuNodes.System.Console.CommandManager
         {
             try
             {
-                command = command.ToLower();
+                string[] commandSplit = command.Split(' ');
+                string[] args = new string[commandSplit.Length-1];
+                bool recognized = true;
+                command = commandSplit[0].ToLower();
+
+                for (int i = 1; i < commandSplit.Length; i++)
+                {
+                    args.SetValue(commandSplit[i], i - 1);
+                }
                 var cmd = new object();
                 //TODO: Need a plug for Reflector. In order to remove the switch case
                 //Type commandType  = ReflectionUtilities.GetType("DuNodes.System", "Console.CommandManager.Commands." + command);
@@ -53,9 +61,12 @@ namespace DuNodes.System.Console.CommandManager
 
                     default:
                         Console.Error.WriteLine("Unknown " + command + " command. Type help in order to know all available commands and option.");
+                        recognized = false;
                         break;
                 }
 
+                if(recognized)
+                    ((CommandBase)cmd).launch(args);
                 cmd = null;
                
             }

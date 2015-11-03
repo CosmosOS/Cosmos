@@ -42,5 +42,13 @@ namespace DuNodes.System.Configuration
 
             }
         }
+
+        public static void saveConfiguration()
+        {
+            var content = "";
+            content += "KeyLayout:" + ENV.currentMapKey + ";";
+            var contentByte = content.GetUtf8Bytes(0, (uint)content.Length);
+            HAL.FileSystem.Base.FileSystem.Root.saveFile(contentByte, "/DNSYS/Settings.sys", "DN");
+        }
     }
 }

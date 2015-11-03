@@ -8,13 +8,14 @@ namespace DuNodes.System.Console.CommandManager.Commands
     {
         private string start;
         private string end;
-        public bench()
+
+        public override void launch(string[] args)
         {
             start = RTC.Now.Minute.ToString() + " " + RTC.Now.Second.ToString();
             var cmd = new top();
             //TODO: REAL PIEBENCH
             //For the moment it's just a ram tester
-            Console.ProgressBar pgBar = new Console.ProgressBar(0,true);
+            Console.ProgressBar pgBar = new Console.ProgressBar(0, true);
             ArrayList al = new ArrayList();
             int x = 0;
             for (int i = 0; i < 10000000; i++)
@@ -29,9 +30,9 @@ namespace DuNodes.System.Console.CommandManager.Commands
 
             }
             Console.NewLine();
-            Console.WriteLine("Testing availability of first var : " +al[0].ToString());
+            Console.WriteLine("Testing availability of first var : " + al[0].ToString());
             Console.WriteLine("Testing availability of middle var : " + al[5000000].ToString());
-          Console.WriteLine("Testing availability of end var : " + al[9999999].ToString());
+            Console.WriteLine("Testing availability of end var : " + al[9999999].ToString());
             Console.NewLine();
             Console.WriteLine("Count should be 10000000 : " + al.Count);
 
@@ -43,12 +44,27 @@ namespace DuNodes.System.Console.CommandManager.Commands
             }
 
             Console.WriteLine("Count should be 10000000 (manual) : " + manualCount);
-         cmd = new top();
+            cmd = new top();
             al.Clear();
 
             end = RTC.Now.Minute.ToString() + " " + RTC.Now.Second.ToString();
             Console.WriteLine("Started : " + start + "    Ended : " + end, ConsoleColor.Blue);
             cmd = new top();
+        }
+
+        public override void cancelled()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void pause()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void finished()
+        {
+            throw new NotImplementedException();
         }
     }
 }

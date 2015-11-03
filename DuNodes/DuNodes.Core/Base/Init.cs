@@ -36,6 +36,10 @@ namespace DuNodes.System.Base
             Console.Console.WriteLine("..Settings Keyboard Layout + " + ENV.currentMapKey, ConsoleColor.Blue, true);
             KeyBoardLayout.SwitchKeyLayoutByString(ENV.currentMapKey);
 
+            //Set env
+            Console.Console.WriteLine("..Settings ENV var", ConsoleColor.Blue, true);
+            ENV.currentPath = "/";
+
             Console.Console.WriteLine("..RAM (32 MB min recommended): " + KernelExtensionsHAL.GetMemory() + "", ConsoleColor.Blue, true);
             Console.Console.WriteLine("....INIT OK.....", ConsoleColor.Blue, true);
         }

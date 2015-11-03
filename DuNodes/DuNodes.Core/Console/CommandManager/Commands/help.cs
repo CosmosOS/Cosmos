@@ -1,8 +1,12 @@
-﻿namespace DuNodes.System.Console.CommandManager.Commands
+﻿using System;
+
+namespace DuNodes.System.Console.CommandManager.Commands
 {
     public class help : CommandBase
     {
-        public help()
+
+
+        public override void launch(string[] args)
         {
             Console.NewLine();
             Console.WriteLine("Commands list : ");
@@ -12,8 +16,24 @@
             Console.WriteLine("shutdown - Shutdown the computer - Not implemented yet");
             Console.WriteLine("ping - Ping ip address on network - Not implemented yet");
             Console.WriteLine("reboot - Reboot the computer");
+            Console.WriteLine("clearcls - Clear console");
             Console.WriteLine("rammanager - Temp command - Not implemented yet");
             Console.NewLine();
+        }
+
+        public override void cancelled()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void pause()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void finished()
+        {
+            throw new NotImplementedException();
         }
     }
 }
