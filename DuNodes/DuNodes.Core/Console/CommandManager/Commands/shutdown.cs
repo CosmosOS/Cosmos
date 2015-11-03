@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using DuNodes.HAL;
+using DuNodes.HAL.Extensions;
 using DuNodes.System.Extensions;
 
 namespace DuNodes.System.Console.CommandManager.Commands

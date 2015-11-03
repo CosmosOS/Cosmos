@@ -47,6 +47,10 @@ namespace DuNodes.System.Console.CommandManager
                         cmd = new shutdown();
                         break;
 
+                    case "clearcls":
+                        cmd = new clearcls();
+                        break;
+
                     default:
                         Console.Error.WriteLine("Unknown " + command + " command. Type help in order to know all available commands and option.");
                         break;

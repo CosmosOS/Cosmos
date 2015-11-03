@@ -22,9 +22,7 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISI
 THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-using Cosmos.Core;
-
-namespace DuNodes.System.Extensions
+namespace DuNodes.HAL.Extensions
 {
     /// <summary>
     /// Useful kernel extensions

@@ -34,9 +34,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cosmos.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
-    <Reference Include="GLNFSLib">
-      <HintPath>.\GLNFSLib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -50,6 +47,7 @@
     <Compile Include="Base\Init.cs" />
     <Compile Include="Console\CommandManager\Command.cs" />
     <Compile Include="Console\CommandManager\CommandBase.cs" />
+    <Compile Include="Console\CommandManager\Commands\clearcls.cs" />
     <Compile Include="Console\CommandManager\Commands\help.cs" />
     <Compile Include="Console\CommandManager\Commands\shutdown.cs" />
     <Compile Include="Console\CommandManager\Commands\reboot.cs" />
@@ -71,8 +69,10 @@
     <Compile Include="Console\Menu\Console.Menu.Themepack.cs" />
     <Compile Include="Core\Bluescreen.cs" />
     <Compile Include="Core\KeyBoardLayout.cs" />
+    <Compile Include="ENV.cs" />
     <Compile Include="Extensions\KernelExtensionsSys.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="FileSystem\DNFS_Helper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -106,6 +106,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Compile Include="Configuration\Configuration.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

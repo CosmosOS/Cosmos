@@ -1,10 +1,17 @@
 ﻿
 using System;
+using System.IO;
+using System.Linq;
+using Cosmos.Common.Extensions;
 using Cosmos.System;
 using Cosmos.System.FileSystem.VFS;
+using DuNodes.HAL.Extensions;
+using DuNodes.HAL.FileSystem;
+using DuNodes.HAL.FileSystem.Base;
 using DuNodes.System.Console;
 using DuNodes.System.Core;
 using DuNodes.System.Extensions;
+using DuNodes.System.FileSystem;
 
 namespace DuNodes.System.Base
 {
@@ -17,29 +24,20 @@ namespace DuNodes.System.Base
            Console.Console.WriteLine("..Checking prerequisites", ConsoleColor.Blue, true);
 
             //Init FileSystem
-            Console.Console.WriteLine("..Mounting VFS FileSystem", ConsoleColor.Blue, true);
-            ENV.myVFS = new SentinelVFS();
-            VFSManager.RegisterVFS(myVFS);
+            Console.Console.WriteLine("..Mounting NFS lite FileSystem", ConsoleColor.Blue, true);
+            DNFS_Helper.DetectDrives();
+            Console.Console.WriteLine("..Mounted", ConsoleColor.Blue, true);
 
-            //            var volumes = VFS.GetVolumes();
-
-            //foreach (var directory in volumes)
-            //{
-            //    Console.Console.WriteLine(directory.Name, ConsoleColor.Blue, true);
-            //}
+            //Init Settings
+            Console.Console.WriteLine("..Init and Load Config", ConsoleColor.Blue, true);
+            Configuration.Configuration.LoadConfiguration();
 
             //Set KeyBoardLayout
-            KeyBoardLayout.SwitchKeyLayout(KeyBoardLayout.KeyLayouts.AZERTY);
+            Console.Console.WriteLine("..Settings Keyboard Layout + " + ENV.currentMapKey, ConsoleColor.Blue, true);
+            KeyBoardLayout.SwitchKeyLayoutByString(ENV.currentMapKey);
 
-            //Load settings
-            Console.Console.WriteLine("..Loading Settings", ConsoleColor.Blue, true);
-
-            Console.Console.WriteLine("..RAM (32 MB min recommended): " + Extensions.KernelExtensionsHAL.GetMemory() + "", ConsoleColor.Blue, true);
+            Console.Console.WriteLine("..RAM (32 MB min recommended): " + KernelExtensionsHAL.GetMemory() + "", ConsoleColor.Blue, true);
             Console.Console.WriteLine("....INIT OK.....", ConsoleColor.Blue, true);
-
-            
-           
-
         }
     }
 }

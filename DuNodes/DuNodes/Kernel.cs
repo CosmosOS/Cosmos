@@ -22,6 +22,7 @@ namespace DuNodes
                 Console.Write("DNodes # ");
                 var input = Console.ReadLine();
                 cmd.Handle(input);
+                input = null;
             }
         }
     }

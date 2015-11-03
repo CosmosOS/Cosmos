@@ -1,61 +1,57 @@
-/*
-Copyright (c) 2012-2013, dewitcher Team
-All rights reserved.
+﻿// Decompiled with JetBrains decompiler
+// Type: GruntyOS.IO.MemoryStream
+// Assembly: GLNFSLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: B3BB9CCA-702B-49B4-8298-3F149CD7972D
+// Assembly location: D:\Users\symura\Desktop\GLNFSLib.dll
 
-Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:
+using System;
 
-* Redistributions of source code must retain the above copyright notice
-   this list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
-IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
-THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-
-// Splitty was here
 namespace DuNodes.Kernel.Base.IO
 {
-    public unsafe class MemoryStream : Stream
+    public class MemoryStream : ioStream
     {
-        private bool eof;
-        public bool EOF { get { return eof; } }
-        private byte* data;
-        private uint length;
-        public MemoryStream(byte* dat)
+        private unsafe byte* pointer = (byte*)null;
+
+        public unsafe MemoryStream(int size)
         {
-            eof = false;
-            length = sizeof(uint);
-            data = dat;
+            this.pointer = (byte*)null;
+            this.init(size);
         }
-        public MemoryStream(byte[] dat)
+
+        public unsafe MemoryStream(byte[] dat)
         {
-            eof = false;
-            length = (uint)dat.Length;
-            fixed (byte* ptr = dat)
+            this.pointer = (byte*)null;
+            this.Data = dat;
+        }
+
+        public unsafe MemoryStream(byte* ptr)
+        {
+            this.pointer = ptr;
+        }
+
+        public override void Close()
+        {
+        }
+
+        public override unsafe void Write(byte i)
+        {
+            if ((IntPtr)this.pointer == IntPtr.Zero)
             {
-                data = ptr;
+                base.Write(i);
+            }
+            else
+            {
+                this.pointer[this.Position] = i;
+                ++this.Position;
             }
         }
-        internal override byte ReadByte(uint p)
+
+        public override unsafe byte Read()
         {
-            if (p > length) eof = true; else eof = false;
-            if (!eof) return data[p];
-            else return byte.MinValue;
-        }
-        internal override void WriteByte(uint p, byte b)
-        {
-            if (p > length) eof = true; else eof = false;
-            if (!eof) data[p] = b;
+            if ((IntPtr)this.pointer == IntPtr.Zero)
+                return base.Read();
+            ++this.Position;
+            return this.pointer[this.Position - 1];
         }
     }
 }

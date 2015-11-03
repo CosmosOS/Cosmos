@@ -24,6 +24,18 @@ namespace DuNodes.System.Core
              
             }
         }
-      
+
+        public static void SwitchKeyLayoutByString(string layout)
+        {
+            switch (layout)
+            {
+                case "1":
+                    Global.Keyboard.SetKeyLayout(new FR_Standard()); break;
+                case "0":
+                    Global.Keyboard.SetKeyLayout(new US_Standard()); break;
+
+            }
+        }
+
     }
 }

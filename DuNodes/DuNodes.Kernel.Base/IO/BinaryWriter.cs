@@ -1,26 +1,8 @@
-/*
-Copyright (c) 2012-2013, dewitcher Team
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without modification,
-are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright notice
-   this list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright notice,
-  this list of conditions and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR
-IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
-FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
-CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
-IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
-THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
+﻿// Decompiled with JetBrains decompiler
+// Type: GruntyOS.IO.BinaryWriter
+// Assembly: GLNFSLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+// MVID: B3BB9CCA-702B-49B4-8298-3F149CD7972D
+// Assembly location: D:\Users\symura\Desktop\GLNFSLib.dll
 
 using System;
 
@@ -28,70 +10,64 @@ namespace DuNodes.Kernel.Base.IO
 {
     public class BinaryWriter
     {
-        public Stream BaseStream;
-        public BinaryWriter(Stream stream)
+        public ioStream BaseStream;
+
+        public BinaryWriter(ioStream file)
         {
-            BaseStream = stream;
+            this.BaseStream = file;
         }
-        public void Write(byte dat)
+
+        public void Write(byte data)
         {
-            BaseStream.Write(dat);
+            this.BaseStream.Write(data);
         }
-        public void Write(short dat)
+
+        public void Write(char data)
         {
-            byte[] data = BitConverter.GetBytes(dat);
-            for (int i = 0; i < data.Length; i++)
-                Write(data[i]);
+            this.BaseStream.Write((byte)data);
         }
-        public void Write(int dat)
+
+        public void WriteBytes(string str)
         {
-            byte[] data = BitConverter.GetBytes(dat);
-            for (int i = 0; i < data.Length; i++)
-                Write(data[i]);
+            for (int index = 0; index < str.Length; ++index)
+                this.Write((byte)str[index]);
         }
-        public void Write(long dat)
+
+        public void Write(int data)
         {
-            byte[] data = BitConverter.GetBytes(dat);
-            for (int i = 0; i < data.Length; i++)
-                Write(data[i]);
+            foreach (byte i in BitConverter.GetBytes(data))
+                this.BaseStream.Write(i);
         }
-        public void Write(ushort dat)
+
+        public void Write(uint data)
         {
-            byte[] data = BitConverter.GetBytes(dat);
-            for (int i = 0; i < data.Length; i++)
-                Write(data[i]);
+            foreach (byte i in BitConverter.GetBytes(data))
+                this.BaseStream.Write(i);
         }
-        public void Write(uint dat)
+
+        public void Write(short data)
         {
-            byte[] data = BitConverter.GetBytes(dat);
-            for (int i = 0; i < data.Length; i++)
-                Write(data[i]);
+            foreach (byte i in BitConverter.GetBytes(data))
+                this.BaseStream.Write(i);
         }
-        public void Write(ulong dat)
+
+        public void Write(ushort data)
         {
-            byte[] data = BitConverter.GetBytes(dat);
-            for (int i = 0; i < data.Length; i++)
-                Write(data[i]);
+            foreach (byte i in BitConverter.GetBytes(data))
+                this.BaseStream.Write(i);
         }
-        public void Write(bool dat)
-        {
-            if (dat)
-                Write((byte)1);
-            else
-                Write((byte)0);
-        }
+
         public void Write(byte[] data)
         {
-            for (int i = 0; i < data.Length; i++)
-                Write(data[i]);
+            foreach (byte i in data)
+                this.BaseStream.Write(i);
         }
-        public void Write(string dat)
+
+        public void Write(string data)
         {
-            Write((ushort)dat.Length);
-            foreach (byte b in dat)
-            {
-                Write(b);
-            }
+            this.BaseStream.Write((byte)data.Length);
+            foreach (byte i in data)
+                this.BaseStream.Write(i);
         }
     }
 }

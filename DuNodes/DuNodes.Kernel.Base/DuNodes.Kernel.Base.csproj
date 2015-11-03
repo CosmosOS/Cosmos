@@ -36,9 +36,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GLNFSLib">
-      <HintPath>.\GLNFSLib.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -46,11 +43,11 @@
     <Compile Include="Core\IDT.cs" />
     <Compile Include="Core\INTs.cs" />
     <Compile Include="Core\IRQ.cs" />
+    <Compile Include="IO\BinaryReader.cs" />
     <Compile Include="IO\BinaryWriter.cs" />
+    <Compile Include="IO\ioStream.cs" />
     <Compile Include="IO\MemoryStream.cs" />
     <Compile Include="IO\PortIO.cs" />
-    <Compile Include="IO\Stream.cs" />
-    <Compile Include="IO\VideoStream.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
