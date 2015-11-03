@@ -1498,7 +1498,10 @@ namespace Cosmos.IL2CPU
                 // if not, we should somehow break here.
                 new Mov { DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP };
                 new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
-                new Add { DestinationReg = Registers.EAX, SourceValue = xStackDifference };
+                if (xStackDifference != 0)
+                {
+                    new Add { DestinationReg = Registers.EAX, SourceValue = xStackDifference };
+                }
                 new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".StackCorruptionCheck_End" };
                 new ClearInterruptFlag();

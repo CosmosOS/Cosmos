@@ -127,21 +127,45 @@ namespace Cosmos.IL2CPU.X86.IL {
       {
           EmitExceptionLogic(Assembler, aCurrentMethod, aCurrent, true,
                      delegate()
-                     {
-                         var xResultSize = xReturnSize;
+                         {
+                             var xStackOffsetBefore = aCurrent.StackOffsetBeforeExecution;
+
+                             uint xParmSize = 0;
+                             foreach (var parameter in aTargetMethod.GetParameters())
+                             {
+                                 xParmSize += Align(SizeOfType(parameter.ParameterType), 4);
+                             }
+
+                             var xResultSize = xReturnSize;
                          if (xResultSize % 4 != 0)
                          {
                              xResultSize += 4 - (xResultSize % 4);
                          }
-                         for (int i = 0; i < xResultSize / 4; i++)
-                         {
-                             new CPUx86.Add
+
+                             if (xStackOffsetBefore > (xParmSize + xResultSize))
                              {
-                                 DestinationReg = CPUx86.Registers.ESP,
-                                 SourceValue = 4
-                             };
-                         }
-                     }, nextLabel);
+                                 if (xResultSize > 0)
+                                 {
+                                     new Comment("Cleanup return");
+                                     // cleanup result values
+                                     for (int i = 0; i < xResultSize / 4; i++)
+                                     {
+                                         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                                     }
+                                 }
+
+                                 if (xParmSize > 0)
+                                 {
+                                     var xExtraStack = aCurrent.StackOffsetBeforeExecution - xParmSize - xResultSize;
+                                     new Comment("Cleanup extra stack");
+                                     // cleanup result values
+                                     for (int i = 0; i < xExtraStack / 4; i++)
+                                     {
+                                         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                                     }
+                                 }
+                             }
+                         }, nextLabel);
 
       }
       if (xMethodInfo == null || SizeOfType(xMethodInfo.ReturnType) == 0) {

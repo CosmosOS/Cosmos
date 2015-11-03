@@ -21,9 +21,9 @@ namespace Cosmos.TestRunner.Core
 
             // If you're working on the compiler (or other lower parts), you can choose to run the compiler in process
             // one thing to keep in mind though, is that this only works with 1 kernel at a time!
-            //engine.RunIL2CPUInProcess = true;
+            engine.RunIL2CPUInProcess = true;
 
-            engine.EnableStackCorruptionChecks = false;
+            engine.EnableStackCorruptionChecks = true;
             //engine.RunWithGDB = true;
 
             // Select kernels to be tested by adding them to the engine

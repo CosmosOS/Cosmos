@@ -315,10 +315,11 @@ namespace Cosmos.IL2CPU {
               select item.Offset + item.Size).FirstOrDefault();
     }
 
-    public static void EmitExceptionLogic(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup) {
-      EmitExceptionLogic(aAssembler, aMethodInfo, aCurrentOpCode, aDoTest, aCleanup, ILOp.GetLabel(aMethodInfo, aCurrentOpCode.NextPosition));
-    }
-    public static void EmitExceptionLogic(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException) {
+    public static void EmitExceptionLogic(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException = null) {
+      if (aJumpTargetNoException == null)
+      {
+        aJumpTargetNoException = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.NextPosition);
+      }
       string xJumpTo = null;
       if (aCurrentOpCode != null && aCurrentOpCode.CurrentExceptionHandler != null) {
         // todo add support for nested handlers, see comment in Engine.cs

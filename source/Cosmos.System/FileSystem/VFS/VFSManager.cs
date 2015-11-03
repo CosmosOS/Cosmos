@@ -141,9 +141,9 @@ namespace Cosmos.System.FileSystem.VFS
 
         public static Listing.File TryGetFile(string aPath)
         {
-            if (string.IsNullOrEmpty(aPath))
+            if (aPath == null)
             {
-                throw new ArgumentNullException("aPath");
+                throw new Exception("Path can not be null.");
             }
             FatHelpers.Debug("In VFSManager.TryGetFile");
             FatHelpers.Debug(aPath);
@@ -176,7 +176,7 @@ namespace Cosmos.System.FileSystem.VFS
         {
             if (string.IsNullOrEmpty(aPath))
             {
-                throw new ArgumentNullException("aPath");
+                throw new Exception("Path can not be null.");
             }
             FatHelpers.Debug("In VFSManager.TryGetFile");
             string xFileName = Path.GetFileName(aPath);
@@ -227,7 +227,7 @@ namespace Cosmos.System.FileSystem.VFS
         {
             if (string.IsNullOrEmpty(aPath))
             {
-                throw new ArgumentNullException("aPath");
+                throw new Exception("Path can not be null.");
             }
 
             return null;
@@ -252,7 +252,7 @@ namespace Cosmos.System.FileSystem.VFS
         {
             if (string.IsNullOrEmpty(aPath))
             {
-                throw new ArgumentNullException("aPath");
+                throw new Exception("Path can not be null.");
             }
             FatHelpers.Debug("In VFSManager.GetDirectory");
 
@@ -263,7 +263,7 @@ namespace Cosmos.System.FileSystem.VFS
         {
             if (string.IsNullOrEmpty(aPath))
             {
-                throw new ArgumentNullException("aPath");
+                throw new Exception("Path can not be null.");
             }
 
             return mVFS.GetDirectoryListing(aPath);
@@ -273,7 +273,7 @@ namespace Cosmos.System.FileSystem.VFS
         {
             if (string.IsNullOrEmpty(aVolume))
             {
-                throw new ArgumentNullException("aVolume");
+                throw new Exception("Path can not be null.");
             }
 
             return null;
