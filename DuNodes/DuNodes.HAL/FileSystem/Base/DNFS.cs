@@ -585,6 +585,7 @@ namespace DuNodes.HAL.FileSystem.Base
                 binaryReader.ReadString();
                 binaryReader.ReadInt32();
             }
+            
             throw new Exception("File not found :(");
         }
 
@@ -670,31 +671,43 @@ namespace DuNodes.HAL.FileSystem.Base
 
         public override string[] ListFiles(string dir)
         {
-            if (dir != "" && dir != FileSystem.Root.Seperator.ToString() && !this.CanRead(dir))
-                throw new Exception("Access Denied!");
-            List<string> list = new List<string>();
-            byte[] numArray = new byte[1024];
-            ((BlockDevice)this.part).ReadBlock((ulong)(uint)this.getNodeAddress(dir, 2), 2U, numArray);
-            dir = this.cleanName(dir);
-            MemoryStream memoryStream = new MemoryStream(1024);
-            memoryStream.Data = numArray;
-            BinaryReader binaryReader = new BinaryReader((ioStream)memoryStream);
-            int num = binaryReader.ReadInt32();
-            for (int index = 0; index < num; ++index)
+            try
             {
-                string str = binaryReader.ReadString();
-                binaryReader.ReadInt32();
-                binaryReader.ReadInt32();
-                binaryReader.BaseStream.Read();
-                binaryReader.BaseStream.Read();
-                binaryReader.BaseStream.Read();
-                binaryReader.BaseStream.Read();
-                binaryReader.ReadString();
-                binaryReader.ReadString();
-                binaryReader.ReadInt32();
-                list.Add(str);
+                if (dir != "" && dir != FileSystem.Root.Seperator.ToString() && !this.CanRead(dir))
+                    throw new Exception("Access Denied!");
+                List<string> list = new List<string>();
+                byte[] numArray = new byte[1024];
+                
+                var nodeAddress = this.getNodeAddress(dir, 2);
+                
+                ((BlockDevice) this.part).ReadBlock((ulong) (uint) nodeAddress, 2U, numArray);
+                dir = this.cleanName(dir);
+                MemoryStream memoryStream = new MemoryStream(1024);
+                memoryStream.Data = numArray;
+                BinaryReader binaryReader = new BinaryReader((ioStream) memoryStream);
+                int num = binaryReader.ReadInt32();
+                for (int index = 0; index < num; ++index)
+                {
+                    string str = binaryReader.ReadString();
+                    binaryReader.ReadInt32();
+                    binaryReader.ReadInt32();
+                    binaryReader.BaseStream.Read();
+                    binaryReader.BaseStream.Read();
+                    binaryReader.BaseStream.Read();
+                    binaryReader.BaseStream.Read();
+                    binaryReader.ReadString();
+                    binaryReader.ReadString();
+                    binaryReader.ReadInt32();
+                    list.Add(str);
+                }
+                return list.ToArray();
             }
-            return list.ToArray();
+            catch (Exception ex)
+            {
+                //An error occured, path maybe not existent or something like this
+                Console.WriteLine("Does not exist");
+                throw new Exception("Does not exist");
+            }
         }
 
         private string cleanName(string name)

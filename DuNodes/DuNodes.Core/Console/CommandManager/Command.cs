@@ -59,6 +59,26 @@ namespace DuNodes.System.Console.CommandManager
                         cmd = new clearcls();
                         break;
 
+                    case "cd":
+                        cmd = new cd();
+                        break;
+
+                    case "dir":
+                        cmd = new dir();
+                        break;
+
+                    case "mkdir":
+                        cmd = new mkdir();
+                        break;
+
+                    case "read":
+                        cmd = new read();
+                        break;
+
+                    case "touch":
+                        cmd = new touch();
+                        break;
+
                     default:
                         Console.Error.WriteLine("Unknown " + command + " command. Type help in order to know all available commands and option.");
                         recognized = false;

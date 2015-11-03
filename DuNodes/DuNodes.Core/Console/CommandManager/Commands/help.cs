@@ -18,6 +18,12 @@ namespace DuNodes.System.Console.CommandManager.Commands
             Console.WriteLine("reboot - Reboot the computer");
             Console.WriteLine("clearcls - Clear console");
             Console.WriteLine("rammanager - Temp command - Not implemented yet");
+            Console.WriteLine("cd 'path' - Navigate to path");
+            Console.WriteLine("dir '[path]' - List files and directory of current path, path is optionnal");
+            Console.WriteLine("mkdir 'name' - Create directory in the current path");
+            Console.WriteLine("read 'filename' - Read file ");
+            Console.WriteLine("touch 'filename' - Create the file");
+
             Console.NewLine();
         }
 
