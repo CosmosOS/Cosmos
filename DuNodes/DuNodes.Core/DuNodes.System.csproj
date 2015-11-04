@@ -63,7 +63,6 @@
     <Compile Include="Console\CommandManager\Commands\top.cs" />
     <Compile Include="Console\Console.Bootscreen.cs" />
     <Compile Include="Console\Console.cs" />
-    <Compile Include="Console\Console.Error.cs" />
     <Compile Include="Console\Console.ProgressBar.cs" />
     <Compile Include="Console\Menu\Console.Menu.cs" />
     <Compile Include="Console\Menu\Console.Menu.Entry.cs" />

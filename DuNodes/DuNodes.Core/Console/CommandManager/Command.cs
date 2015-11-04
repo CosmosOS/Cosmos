@@ -80,7 +80,7 @@ namespace DuNodes.System.Console.CommandManager
                         break;
 
                     default:
-                        Console.Error.WriteLine("Unknown " + command + " command. Type help in order to know all available commands and option.");
+                        Console.WriteLine("Unknown " + command + " command. Type help in order to know all available commands and option.");
                         recognized = false;
                         break;
                 }
@@ -92,8 +92,8 @@ namespace DuNodes.System.Console.CommandManager
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Unknown " + command + " command.");
-                Console.Error.WriteLine("Ex : " + ex.Message);
+                Console.WriteLine("Unknown " + command + " command.");
+                Console.WriteLine("Ex : " + ex.Message);
             }
         }
     }
