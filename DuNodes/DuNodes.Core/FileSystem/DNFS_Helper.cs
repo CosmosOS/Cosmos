@@ -27,7 +27,7 @@ namespace DuNodes.System.FileSystem
 
                         DNFS fs = new DNFS(((Partition)BlockDevice.Devices[i]));
                         Devices.device dev = new Devices.device();
-                        Console.Console.WriteLine("DNFS PARTITION FOUND", ConsoleColor.Blue, true);
+                        Console.Bootscreen.Show("DNFS PARTITION FOUND");
                         dev.name = @"?\\Harddrive\Partition" + i.ToString();
                         dev.dev = ((Partition)BlockDevice.Devices[i]);
                         Devices.dev.Add(dev);

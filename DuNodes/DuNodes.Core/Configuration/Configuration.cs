@@ -29,7 +29,7 @@ namespace DuNodes.System.Configuration
                             break;
                     }
                 }
-                Console.Console.WriteLine("...Settings.sys loaded", ConsoleColor.Blue, true);
+                Console.Bootscreen.Show("Settings.sys loaded");
 
             }
             else
@@ -38,7 +38,7 @@ namespace DuNodes.System.Configuration
                 var contentByte = content.GetUtf8Bytes(0, (uint)content.Length);
                 HAL.FileSystem.Base.FileSystem.Root.saveFile(contentByte, "/DNSYS/Settings.sys", "DN");
                 ENV.currentMapKey = "1";
-                Console.Console.WriteLine("...Settings.sys created", ConsoleColor.Blue, true);
+                Console.Bootscreen.Show("Settings.sys created");
 
             }
         }

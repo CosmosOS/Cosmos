@@ -20,28 +20,28 @@ namespace DuNodes.System.Base
         public static void Initialisation()
         {
             Console.Console.Clear();
-           Console.Console.WriteLine(".Booting DuNodes Alpha 0.1 R01", ConsoleColor.Blue, true);
-           Console.Console.WriteLine("..Checking prerequisites", ConsoleColor.Blue, true);
+            Console.Bootscreen.Show("Booting DuNodes Alpha 0.1 R01");
+            Console.Bootscreen.Show("Checking prerequisites");
 
             //Init FileSystem
-            Console.Console.WriteLine("..Mounting NFS lite FileSystem", ConsoleColor.Blue, true);
+            Console.Bootscreen.Show("Mounting NFS lite FileSystem");
             DNFS_Helper.DetectDrives();
-            Console.Console.WriteLine("..Mounted", ConsoleColor.Blue, true);
+            Console.Bootscreen.Show("Mounted");
 
             //Init Settings
-            Console.Console.WriteLine("..Init and Load Config", ConsoleColor.Blue, true);
+            Console.Bootscreen.Show("Init and Load Config");
             Configuration.Configuration.LoadConfiguration();
 
             //Set KeyBoardLayout
-            Console.Console.WriteLine("..Settings Keyboard Layout + " + ENV.currentMapKey, ConsoleColor.Blue, true);
+            Console.Bootscreen.Show("Settings Keyboard Layout");
             KeyBoardLayout.SwitchKeyLayoutByString(ENV.currentMapKey);
 
             //Set env
-            Console.Console.WriteLine("..Settings ENV var", ConsoleColor.Blue, true);
+            Console.Bootscreen.Show("Settings ENV var");
             ENV.currentPath = "/";
 
-            Console.Console.WriteLine("..RAM (32 MB min recommended): " + KernelExtensionsHAL.GetMemory() + "", ConsoleColor.Blue, true);
-            Console.Console.WriteLine("....INIT OK.....", ConsoleColor.Blue, true);
+            Console.Bootscreen.Show("RAM (32 MB min recommended):" + KernelExtensionsHAL.GetMemory());
+            Console.Bootscreen.Show("INIT OK");
         }
     }
 }
