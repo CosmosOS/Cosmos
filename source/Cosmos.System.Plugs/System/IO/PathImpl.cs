@@ -9,8 +9,9 @@ using Cosmos.System.FileSystem.VFS;
 
 namespace SentinelKernel.System.Plugs.System.IO
 {
-    [Plug(Target=typeof(Path))]
-    public static class PathImpl {
+    [Plug(Target = typeof(Path))]
+    public static class PathImpl
+    {
         public static void Cctor(
             [FieldAccess(Name = "System.Char System.IO.Path.AltDirectorySeparatorChar")] ref char aAltDirectorySeparatorChar,
             [FieldAccess(Name = "System.Char System.IO.Path.DirectorySeparatorChar")] ref char aDirectorySeparatorChar,

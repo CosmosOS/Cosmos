@@ -221,13 +221,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     //    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )xStackInt.Size };
                     //}
 
-                    uint xESPOffset = 0;
-                    foreach (var xParam in xParams)
-                    {
-                        xESPOffset += Align(SizeOfType(xParam.ParameterType), 4);
-                    }
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = xESPOffset };
-
                     new Comment(aAssembler, "[ Newobj.Execute cleanup end ]");
                     Jump_Exception(aMethod);
                     new Label(xNoErrorLabel);
