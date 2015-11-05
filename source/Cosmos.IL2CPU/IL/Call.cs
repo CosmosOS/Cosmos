@@ -130,10 +130,10 @@ namespace Cosmos.IL2CPU.X86.IL {
                          {
                              var xStackOffsetBefore = aCurrent.StackOffsetBeforeExecution;
 
-                             uint xParmSize = 0;
-                             foreach (var parameter in aTargetMethod.GetParameters())
+                             uint xPopSize = 0;
+                             foreach (var type in aCurrent.StackPopTypes)
                              {
-                                 xParmSize += Align(SizeOfType(parameter.ParameterType), 4);
+                                 xPopSize += Align(SizeOfType(type), 4);
                              }
 
                              var xResultSize = xReturnSize;
@@ -142,7 +142,7 @@ namespace Cosmos.IL2CPU.X86.IL {
                              xResultSize += 4 - (xResultSize % 4);
                          }
 
-                             if (xStackOffsetBefore > (xParmSize + xResultSize))
+                             if (xStackOffsetBefore > (xPopSize + xResultSize))
                              {
                                  if (xResultSize > 0)
                                  {
@@ -154,9 +154,9 @@ namespace Cosmos.IL2CPU.X86.IL {
                                      }
                                  }
 
-                                 if (xParmSize > 0)
+                                 if (xPopSize > 0)
                                  {
-                                     var xExtraStack = aCurrent.StackOffsetBeforeExecution - xParmSize - xResultSize;
+                                     var xExtraStack = xStackOffsetBefore - xPopSize - xResultSize;
                                      new Comment("Cleanup extra stack");
                                      // cleanup result values
                                      for (int i = 0; i < xExtraStack / 4; i++)
