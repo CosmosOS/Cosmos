@@ -11,8 +11,8 @@ namespace SentinelKernel.System.Plugs.System.IO
 {
     using Cosmos.System.FileSystem;
 
-    [Plug(Target = typeof (IO::FileStream))]
-    [PlugField(FieldId = "$$InnerStream$$", FieldType = typeof (IO::Stream))]
+    [Plug(Target = typeof(IO::FileStream))]
+    [PlugField(FieldId = "$$InnerStream$$", FieldType = typeof(IO::Stream))]
     public class FileStreamImpl
     {
         // This plug basically forwards all calls to the $$InnerStream$$ stream, which is supplied by the file system.

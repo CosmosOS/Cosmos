@@ -8,7 +8,7 @@ using Directory = Cosmos.System.FileSystem.Listing.Directory;
 
 namespace SentinelKernel.System.Plugs.System.IO
 {
-    [Plug(Target=typeof(DirectoryInfo))]
+    [Plug(Target = typeof(DirectoryInfo))]
     [PlugField(FieldId = "$$Storage$$", FieldType = typeof(Directory))]
     [PlugField(FieldId = "$$FullPath$$", FieldType = typeof(string))]
     public static class DirectoryInfoImpl
@@ -77,7 +77,7 @@ namespace SentinelKernel.System.Plugs.System.IO
             //}
 
             //return files;
-            */ 
+            */
         }
 
         public static string ToString([FieldAccess(Name = "$$Path$$")] ref string aPath)
