@@ -1,0 +1,447 @@
+<html>
+
+<head>
+<title>MDbg Iron Python Extension: Getting Started</title>
+<style>
+<!--
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0in;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;}
+p.listparagraph, li.listparagraph, div.listparagraph
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+p.listparagraphcxspfirst, li.listparagraphcxspfirst, div.listparagraphcxspfirst
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+p.listparagraphcxspmiddle, li.listparagraphcxspmiddle, div.listparagraphcxspmiddle
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+p.listparagraphcxsplast, li.listparagraphcxsplast, div.listparagraphcxsplast
+	{margin-top:0in;
+	margin-right:0in;
+	margin-bottom:0in;
+	margin-left:.5in;
+	margin-bottom:.0001pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+p.msonormalcxspmiddle, li.msonormalcxspmiddle, div.msonormalcxspmiddle
+	{margin-right:0in;
+	margin-left:0in;
+	font-size:12.0pt;
+	font-family:"Times New Roman";}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=EN-US link=blue vlink=purple>
+
+<div class=Section1>
+
+<p class=MsoNormal align=center style='text-align:center'><span
+style='font-size:18.0pt'>MDbg Iron Python Extension: Getting Started</span></p>
+
+<p class=MsoNormal align=center style='text-align:center'><span
+style='font-size:14.0pt'>&nbsp;</span></p>
+
+<p class=MsoNormal align=center style='text-align:center'><span
+style='font-size:14.0pt'>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span style='font-size:14.0pt'>&nbsp;</span></b></p>
+
+<p class=MsoNormal><b><span style='font-size:14.0pt'>Building the IronPython
+Extension: </span></b></p>
+
+<p class=MsoNormal><b><span style='font-size:14.0pt'>&nbsp;</span></b></p>
+
+<p class=MsoNormal>The IronPython extension project is not built by default.
+You would need to execute the </p>
+
+<p class=MsoNormal>following sequence of steps in order to build this
+extension.</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><b>1</b>- Download the binaries for IronPython from - <a
+href="http://www.codeplex.com/Wiki/View.aspx?ProjectName=IronPython">http://www.codeplex.com/Wiki/View.aspx?ProjectName=IronPython</a></p>
+
+<p class=MsoNormal><b>2</b>- Add a reference to IronPython.dll from the
+pythonExt project in this solution.</p>
+
+<p class=MsoNormal><b>3</b>- Finally, build the ironpython extension project
+(After adding reference to ironpython.dll, you can also have this </p>
+
+<p class=MsoNormal>project built by default. From the Visual Studio IDE, click
+on the Build menu and select the configuration manager. </p>
+
+<p class=MsoNormal>Click checkbox for PythonExt project).</p>
+
+<p class=MsoNormal><b>&nbsp;</b></p>
+
+<p class=MsoNormal><b>&nbsp;</b></p>
+
+<p class=MsoNormal><b><span style='font-size:14.0pt'>&nbsp;</span></b></p>
+
+<p class=MsoNormal><b><span style='font-size:14.0pt'>Basic commands for MDbg’s
+IronPython Extension: </span></b></p>
+
+<p class=MsoNormal><b>&nbsp;</b></p>
+
+<p class=MsoNormal><b><span style='font-size:11.0pt'>lo[ad]</span></b>:<span
+style='font-size:11.0pt'> </span>Loads an mdbg extension or python script file.</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><b><span style='font-size:11.0pt'>py[thon] </span></b>:
+Executes a single python command or expression.</p>
+
+<p class=MsoNormal style='margin-left:.25in'>Examples: </p>
+
+<p class=listparagraph style='margin-left:.75in;text-indent:-.25in'><span
+style='font-size:10.0pt;font-family:"Courier New"'>-&nbsp; py print 1+2</span></p>
+
+<p class=MsoNormal style='margin-left:.75in;text-indent:-.25in'><span
+style='font-size:10.0pt;font-family:"Courier New"'>-&nbsp;&nbsp;py def
+MyAdd(a,b): return a + b</span></p>
+
+<p class=MsoNormal style='margin-left:.75in;text-indent:-.25in'><span
+style='font-size:10.0pt;font-family:"Courier New"'>-&nbsp; py print MyAdd(1,2)</span></p>
+
+<p class=MsoNormal><b><span style='font-size:11.0pt'>&nbsp;</span></b></p>
+
+<p class=MsoNormal><b><span style='font-size:11.0pt'>pe[val] </span></b>:
+Evaluates a python expression and prints the result.</p>
+
+<p class=MsoNormal style='margin-left:.25in'>Examples:</p>
+
+<p class=listparagraph style='margin-left:.75in;text-indent:-.25in'><span
+style='font-size:10.0pt;font-family:"Courier New"'>-</span><span
+style='font-size:7.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;</span><span
+style='font-size:10.0pt;font-family:"Courier New"'>pe 1+2</span></p>
+
+<p class=MsoNormal style='margin-left:.75in;text-indent:-.25in'><span
+style='font-size:10.0pt;font-family:"Courier New"'>-</span><span
+style='font-size:7.0pt;font-family:"Courier New"'>&nbsp;&nbsp;&nbsp;</span><span
+style='font-size:10.0pt;font-family:"Courier New"'>pe MyAdd(1,2)</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><b><span style='font-size:11.0pt'>pyin[teractive] </span>: </b>Enters
+python interactive mode, which drops user to a python prompt. </p>
+
+<p class=MsoNormal>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; To exit python interactive mode,
+type 'pyout'.</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><b><span style='font-size:11.0pt'>pyr[efresh] </span>: </b>Reloads
+previously loaded and since modified python scripts.</p>
+
+<p class=listparagraph style='text-indent:-.25in'>-<span style='font-size:7.0pt'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span><span style='font-size:11.0pt'>pyr </span>: displays a numbered list of
+all previously loaded and since modified python scripts</p>
+
+<p class=MsoNormal style='margin-left:.5in;text-indent:-.25in'>-<span
+style='font-size:7.0pt'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+style='font-size:11.0pt'>pyr all </span>: reloads all previously loaded and
+since modified python scripts</p>
+
+<p class=MsoNormal style='margin-left:.5in;text-indent:-.25in'>-<span
+style='font-size:7.0pt'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span
+style='font-size:11.0pt'>pyr num [num [num ...]] </span>: reloads scripts
+corresponding to numbers (in the list displayed if no arguments are entered)</p>
+
+<p class=MsoNormal style='margin-left:.5in;text-indent:-.25in'>-<span
+style='font-size:7.0pt'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>example
+inputs: <span style='font-size:11.0pt'>pyr</span> ; <span style='font-size:
+11.0pt'>pyr all </span>; <span style='font-size:11.0pt'>pyr 2 </span>; <span
+style='font-size:11.0pt'>pyr 1 3 5</span></p>
+
+<p class=MsoNormal><b><span style='font-size:14.0pt'>&nbsp;</span></b></p>
+
+<p class=MsoNormal><b><span style='font-size:14.0pt'>&nbsp;</span></b></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><b><span style='font-size:14.0pt'>Python Interactive Mode</span></b></p>
+
+<p class=MsoNormal><b>&nbsp;</b></p>
+
+<p class=MsoNormal>The <b>pyin</b> command drops a user from the regular MDbg
+command line to a python prompt within MDbg. The prompt is a fully functional
+python prompt which also has access to the MDbg CommandBase class. This allows
+python code to access the MDbg object model. </p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>Example: To print the name of the current process, in python
+interactive mode you can execute the following code:</p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New";
+color:blue'>&gt;&gt;&gt; print CommandBase.Debugger.Processes.Active.Name</span></p>
+
+<p class=MsoNormal><span style='font-size:11.0pt'>&nbsp;</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>To execute a regular MDbg command from the python prompt:</p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New"'>&gt;&gt;&gt;
+CommandBase.ExecuteCommand(”&lt;CommandName&gt;”)</span></p>
+
+<p class=MsoNormal>e.g.:</p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New";
+color:blue'>&gt;&gt;&gt; CommandBase.ExecuteCommand(“go”)</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>Python is an interpreted language, so you can define
+variables, functions, etc … at the command line.</p>
+
+<p class=MsoNormal>Example: To print the callstack:</p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New";
+color:blue'>&gt;&gt;&gt; callstack =
+CommandBase.Debugger.Processes.Active.Threads.Active.Frames</span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New";
+color:blue'>&gt;&gt;&gt; for frame in callstack:</span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New";
+color:blue'>...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print frame</span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New";
+color:blue'>... </span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New";
+color:blue'>&gt;&gt;&gt;&nbsp;</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>This can also be done by defining a function at the command
+line to print the callstack:</p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New";
+color:blue'>&gt;&gt;&gt; def PrintStack():</span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New";
+color:blue'>...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; for frame in
+CommandBase.Debugger.Processes.Active.Threads.Active.Frame:</span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New";
+color:blue'>...&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; print
+frame</span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New";
+color:blue'>... </span></p>
+
+<p class=MsoNormal><span style='font-size:10.0pt;font-family:"Courier New";
+color:blue'>&gt;&gt;&gt; PrintStack()</span></p>
+
+<p class=MsoNormal><span style='font-size:11.0pt'>&nbsp;</span></p>
+
+<p class=MsoNormal><span style='font-size:11.0pt'>&nbsp;</span></p>
+
+<p class=MsoNormal><b><span style='font-size:14.0pt'>Loading Python Scripts</span></b></p>
+
+<p class=MsoNormal><span style='font-size:11.0pt'>&nbsp;</span></p>
+
+<p class=MsoNormal>Loading a python script is the equivalent of executing the
+code in that script in python interactive mode. Therefore, all code in scripts
+has access to the same variable, methods, etc… that python code executed in
+python interactive mode does. Once a script is loaded (executed), python code
+in python interactive mode and all other loaded scripts have access to the
+functions and classes defined in the newly loaded script, and vice versa. If a
+script is modified after it has been loaded, the user can reload the script
+using the <b><span style='font-size:11.0pt'>pyrefresh</span></b><span
+style='font-size:11.0pt'> </span>command.</p>
+
+<p class=MsoNormal><span style='font-size:11.0pt'>&nbsp;</span></p>
+
+<p class=MsoNormal>Steps to load a python script –</p>
+
+<p class=MsoNormal style='margin-left:.75in;text-indent:-.25in'><span
+style='font-size:11.0pt'>-</span><span style='font-size:7.0pt'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span>Load the python extension first<span style='font-size:11.0pt'> (</span><b><span
+style='font-size:10.0pt;font-family:"Courier New"'>load pythext</span></b><span
+style='font-size:11.0pt'>) </span></p>
+
+<p class=MsoNormal style='margin-left:.75in;text-indent:-.25in'>-<span
+style='font-size:7.0pt'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Load
+the python script. Please specify full path to the script (<b><span
+style='font-size:10.0pt;font-family:"Courier New"'>load [full path to python
+script]</span></b>)</p>
+
+<p class=MsoNormal><span style='font-size:11.0pt'>&nbsp;</span></p>
+
+<p class=MsoNormal>A sample script (pyfuncs.py) has been included in this
+package.</p>
+
+<p class=MsoNormal><span style='font-size:11.0pt'>&nbsp;</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><b><span style='font-size:14.0pt'>Tips for Writing Python
+Scripts</span></b></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>Using the IronPython implementation of the python language,
+python code can access all .NET libraries and use any CLS types. For example,
+if you want to access the <span style='font-size:11.0pt'>System.Int32.MaxValue </span>field,
+in a python script or at the MDbg python command line, enter this:</p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>from System import Int32</span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>maxval = Int32.MaxValue </span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>Once you have imported the <span style='font-size:11.0pt'>System.Int32</span>
+type, you can also call any static functions that type has:</p>
+
+<p class=MsoNormal style='text-indent:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>&nbsp;</span></p>
+
+<p class=MsoNormal style='text-indent:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>myint = Int32.Parse(“10”)</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>You can also instantiate objects of imported types:</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>from System.Collections import ArrayList</span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>mylist = ArrayList()</span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>mylist.Add(myobject)</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>Note that python does <i>not</i> use the <span
+style='font-size:11.0pt'>new </span>keyword to instantiate objects.</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>To import an entire namespace:</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal style='text-indent:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>from System.Collections import *</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>To add a directory to the python path:</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>import sys</span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>sys.path.append(“mydir”)</span></p>
+
+<p class=MsoNormal><span style='font-size:11.0pt;color:blue'>&nbsp;</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>To import a class library, mydir\mylib.dll :</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>import clr</span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>import sys</span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>&nbsp;</span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>sys.path.append(“mydir”)</span></p>
+
+<p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
+font-family:"Courier New";color:blue'>clr.AddReferenceToFile(&quot;mylib.dll&quot;)</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal><span style='font-size:10.0pt'>&nbsp;</span></p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;&nbsp;&nbsp; </p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+<p class=MsoNormal>&nbsp;</p>
+
+</div>
+
+</body>
+
+</html>

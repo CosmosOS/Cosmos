@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Microsoft.VisualStudio.Project.FileNode" Collapsed="true">
+    <Position X="2.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BolBCECAAgFAAIEAgBACZAAAAAAAAAAQyAQQAIRGQIA=</HashCode>
+      <FileName>FileNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.ProjectNode" Collapsed="true">
+    <Position X="0.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>PcP89b7sGr3/n1KfHv7+dr/f9h//71+3/xPdS+fRan4=</HashCode>
+      <FileName>ProjectNode.CopyPaste.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.HierarchyNode" Collapsed="true">
+    <Position X="3.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>NKl4K26oqqdRuqD4sdAKZLc0zKtxgtmgOJLYADLHccE=</HashCode>
+      <FileName>HierarchyNode.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.ProjectContainerNode" Collapsed="true">
+    <Position X="0.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABFCBAAAAYgAAAgQAAAAAAEQMABAAAATAWAAAABAAE=</HashCode>
+      <FileName>ProjectContainerNode.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.FolderNode" Collapsed="true">
+    <Position X="4" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BIAQEAKAAgFAAAAAgIACJAAABAICAAAACAAQAAACAQA=</HashCode>
+      <FileName>FolderNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.ReferenceNode" Collapsed="true">
+    <Position X="7.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIBAAGagAAFAAAAAgACiIAAAAAAQAAEAGAAQAABAAAA=</HashCode>
+      <FileName>ReferenceNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.ReferenceContainerNode" Collapsed="true">
+    <Position X="5.25" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABICACgAAUAAIAgggACIABAAAYQQAAAGEIQAABAARA=</HashCode>
+      <FileName>ReferenceContainerNode.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.ComReferenceNode" Collapsed="true">
+    <Position X="9.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACACCIAAAIAACQgQAAEBAQAgACAAAABCAgQAQACIAA=</HashCode>
+      <FileName>ComReferenceNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.ProjectReferenceNode" Collapsed="true">
+    <Position X="7.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CIACCFYCAgAAgAEgAIACBAQAAAAQABAACAAAAECACgA=</HashCode>
+      <FileName>ProjectReferenceNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Microsoft.VisualStudio.Project.AssemblyReferenceNode" Collapsed="true">
+    <Position X="5.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACCCJAACAACAAgEAoAAAACBABACIAIGAAAEACAABw=</HashCode>
+      <FileName>AssemblyReferenceNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{CB228BEA-C8C5-42BF-8664-8275D5C46BE4}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DuNodes.Kernel.Base</RootNamespace>
+    <AssemblyName>DuNodes.Kernel.Base</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Core\Heap.cs" />
+    <Compile Include="Core\IDT.cs" />
+    <Compile Include="Core\INTs.cs" />
+    <Compile Include="Core\IRQ.cs" />
+    <Compile Include="IO\BinaryReader.cs" />
+    <Compile Include="IO\BinaryWriter.cs" />
+    <Compile Include="IO\ioStream.cs" />
+    <Compile Include="IO\MemoryStream.cs" />
+    <Compile Include="IO\PortIO.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.Assembler\Cosmos.Assembler.csproj">
+      <Project>{1116130e-28e0-428a-a597-f4b3b676c0ca}</Project>
+      <Name>Cosmos.Assembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.Common\Cosmos.Common.csproj">
+      <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
+      <Name>Cosmos.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.Core\Cosmos.Core.csproj">
+      <Project>{5ac4773c-cb4e-4cd9-8d50-02e10a07dee6}</Project>
+      <Name>Cosmos.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{61607f1e-58f9-41cf-972f-128384f3e115}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.HAL\Cosmos.HAL.csproj">
+      <Project>{6a991d03-1435-4005-9809-b8bacdf3b021}</Project>
+      <Name>Cosmos.HAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+      <Project>{c801f19c-a9d3-42d5-9a57-9ffdf9b4d05e}</Project>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.System\Cosmos.System.csproj">
+      <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
+      <Name>Cosmos.System</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

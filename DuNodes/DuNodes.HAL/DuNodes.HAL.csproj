@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AF5226C3-4D22-45A3-9157-A079D87B4C33}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DuNodes.HAL</RootNamespace>
+    <AssemblyName>DuNodes.HAL</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Core\PIT.cs" />
+    <Compile Include="Core\Power.cs" />
+    <Compile Include="Extensions\KernelExtensionsHAL.cs" />
+    <Compile Include="Extensions\NumericExtensions.cs" />
+    <Compile Include="FileSystem\Base\Conversions.cs" />
+    <Compile Include="FileSystem\Crypto\Crc32.cs" />
+    <Compile Include="FileSystem\Crypto\Hash.cs" />
+    <Compile Include="FileSystem\Crypto\HashAlgorithm.cs" />
+    <Compile Include="FileSystem\Base\Devices.cs" />
+    <Compile Include="FileSystem\Base\FileStream.cs" />
+    <Compile Include="FileSystem\Base\FileSystem.cs" />
+    <Compile Include="FileSystem\Base\fsEntry.cs" />
+    <Compile Include="FileSystem\Base\DNFS.cs" />
+    <Compile Include="FileSystem\Base\MountPoint.cs" />
+    <Compile Include="FileSystem\Base\RootFilesystem.cs" />
+    <Compile Include="FileSystem\Base\StorageDevice.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RTC.cs" />
+    <Compile Include="FileSystem\Base\Util.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.Assembler\Cosmos.Assembler.csproj">
+      <Project>{1116130e-28e0-428a-a597-f4b3b676c0ca}</Project>
+      <Name>Cosmos.Assembler</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.Common\Cosmos.Common.csproj">
+      <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
+      <Name>Cosmos.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.Core\Cosmos.Core.csproj">
+      <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>
+      <Name>Cosmos.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos\source\Cosmos.HAL\Cosmos.HAL.csproj">
+      <Project>{6a991d03-1435-4005-9809-b8bacdf3b021}</Project>
+      <Name>Cosmos.HAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DuNodes.Kernel.Base\DuNodes.Kernel.Base.csproj">
+      <Project>{cb228bea-c8c5-42bf-8664-8275d5c46be4}</Project>
+      <Name>DuNodes.Kernel.Base</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
