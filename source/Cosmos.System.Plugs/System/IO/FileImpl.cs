@@ -40,7 +40,7 @@ namespace SentinelKernel.System.Plugs.System.IO
         {
             using (var xFS = new FileStream(aFile, FileMode.Create))
             {
-                var xBuff = aText.GetUtf8Bytes(0, (uint) aText.Length);
+                var xBuff = aText.GetUtf8Bytes(0, (uint)aText.Length);
                 xFS.Write(xBuff, 0, xBuff.Length);
             }
         }
