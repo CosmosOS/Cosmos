@@ -129,13 +129,10 @@ namespace Cosmos.Kernel.Tests.Fat
                 ////    mDebugger.Send(xBuff.GetUtf8String(0, (uint)xBuff.Length));
                 ////}
 
-
-<<<<<<< HEAD
                 //mDebugger.Send("Contents retrieved after writing");
                 //mDebugger.Send(xContents);
                 //Assert.IsTrue(xContents == "Test FAT write.", "Contents of Kudzu.txt was written incorrectly!");
                 Console.Write("salam sajad");
-=======
                 ////mDebugger.Send("Write to file now");
                 ////File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
                 ////mDebugger.Send("Text written");
@@ -144,8 +141,6 @@ namespace Cosmos.Kernel.Tests.Fat
                 ////mDebugger.Send("Contents retrieved after writing");
                 ////mDebugger.Send(xContents);
                 ////Assert.IsTrue(xContents == "Test FAT write.", "Contents of Kudzu.txt was written incorrectly!");
-
->>>>>>> 232ae18b943dac7eb48a6e8358b6008bab4dfef3
                 TestController.Completed();
             }
             catch (Exception E)
