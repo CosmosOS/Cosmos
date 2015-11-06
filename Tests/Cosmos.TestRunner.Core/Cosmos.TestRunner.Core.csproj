@@ -129,6 +129,10 @@
       <Project>{31e3f8e2-7cc0-426c-accb-77b3319af5d3}</Project>
       <Name>Cosmos.Compiler.Tests.Bcl</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj">
+      <Project>{9df5c0a9-b91c-4647-b939-e47513743a0c}</Project>
+      <Name>Cosmos.Compiler.Tests.Exceptions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.Kernel.csproj">
       <Project>{bdc011be-6041-4a58-a6e7-0f592e78cb27}</Project>
       <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>
