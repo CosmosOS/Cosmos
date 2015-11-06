@@ -137,10 +137,6 @@
       <Project>{bdc011be-6041-4a58-a6e7-0f592e78cb27}</Project>
       <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Compiler.Tests.MultidimensionalArrays\Cosmos.Compiler.Tests.MultidimensionalArrays.csproj">
-      <Project>{c885ada0-1015-4892-ad29-6b374a33751d}</Project>
-      <Name>Cosmos.Compiler.Tests.MultidimensionalArrays</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.csproj">
       <Project>{57045fe8-b0fe-4fc1-810f-7c3914aef1de}</Project>
       <Name>Cosmos.Compiler.Tests.SimpleWriteLine.Kernel</Name>
