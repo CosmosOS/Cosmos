@@ -66,8 +66,8 @@ namespace Cosmos.Compiler.Tests.Exceptions
             }
             mDebugger.Send("END:");
 
-            Assert.IsTrue(xCaught, "Did not reach catch block (1)");
-            //Assert.IsTrue(xInFinally, "Did not reach finally block (1)");
+            //Assert.IsTrue(xCaught, "Did not reach catch block (2)");
+            //Assert.IsTrue(xInFinally, "Did not reach finally block (2)");
             xCaught = false;
             xInFinally = false;
 
@@ -90,8 +90,8 @@ namespace Cosmos.Compiler.Tests.Exceptions
             }
             mDebugger.Send("END:");
 
-            Assert.IsTrue(xCaught, "Did not reach catch block (1)");
-            //Assert.IsTrue(xInFinally, "Did not reach finally block (1)");
+            Assert.IsTrue(xCaught, "Did not reach catch block (3)");
+            //Assert.IsTrue(xInFinally, "Did not reach finally block (3)");
 
             TestController.Completed();
         }
