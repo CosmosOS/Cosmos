@@ -18,13 +18,17 @@ flexibility.
 
 ###  Future
 
-Currently only the structure exists, no checking occurs but in the future will
-occur via attributes and other methods. Future checks to include:
+Currently only basic checking is implemented into the compiler. This means that some restrictions are implemented whilst some must be checked manually. 
+
+Currently only this is implemented:
+
+* Restriction of references list to higher levels only. ie HAL can reference Core
+but not vice versa. Also via attribute. That is an assembly level attribute to mark which level an assembly is.
+
+In the future both of these will also be implemented:
 
   1. Restriction of core level exclusive abilities at the assembly level by attribute.
-  2. Restriction of references list to higher levels only. ie HAL can reference Core
-but not vice versa. Also via attribute. That is an assembly level attribute to mark which level an assembly is.
-  3. Restrict access to BCL and other assemblies. ie Core should never need XML
+  2. Restrict access to BCL and other assemblies. ie Core should never need XML
  or other higher level services. Make a defined list of what is allowed and verify against it.
 
 For now we must be vigilant to watch these restrictions manually.
