@@ -33,6 +33,20 @@ In the future both of these will also be implemented:
 
 For now we must be vigilant to watch these restrictions manually.
 
+### Using rings
+It is not possible to run Hardware code in the kernel because it is in ring USER. This means that you cant access the display code in your kernel. To get around this one must create some code in ring 2 (SYSTEM) which allows you to interface between the two. To do this follow this guide:
+
+### Guide: 
+To do this right click on your solution on the right hand side and click Add->New Project. Then add a new COSMOS C# OS, call it Hardware. Now you need to both delete the NEW Cosmos boot project (called HardwareBoot) and the Kernel.cs file found within the main Hardware project.
+
+The next job is to allow this project to talk to the screen. To do this right click on the references section of the Hardware project->add references. Now search for cosmos and add all the references (by selecting them with shift-click then pressing ENTER)
+
+Now go into the AssemblyInfo.cs of the Hardware project file and add the lines bellow:
+
+using Cosmos.Common;
+[assembly: Ring(Ring.System)]
+Well done, you now have a project running in Ring 2.
+
 ###  Levels
 
 Many operating systems refer to their security "areas" as rings. ie Kernel
