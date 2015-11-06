@@ -35,6 +35,7 @@ namespace Cosmos.TestRunner.Core
 
             // Known bugs, therefore disabled for now:
             //engine.AddKernel(typeof(BoxingTests.Kernel).Assembly.Location);
+            //engine.AddKernel(typeof(Cosmos.Compiler.Tests.MultidimensionalArrays.Kernel).Assembly.Location);
 
             // Experimental stuff:
             //engine.AddKernel(typeof(Cosmos.Kernel.Tests.Fat.Kernel).Assembly.Location);
