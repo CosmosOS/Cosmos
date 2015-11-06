@@ -473,7 +473,7 @@ namespace Cosmos.HAL
             {
                 for (int x = 0; x < PixelWidth; x++)
                 {
-                    SetPixel(x, y, (uint) color);
+                    SetPixel((uint) x, (uint) y, (uint) color);
                 }
             }
         }
