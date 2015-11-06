@@ -1,4 +1,5 @@
 ﻿using System;
+using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 
 namespace Cosmos.Compiler.Tests.MultidimensionalArrays

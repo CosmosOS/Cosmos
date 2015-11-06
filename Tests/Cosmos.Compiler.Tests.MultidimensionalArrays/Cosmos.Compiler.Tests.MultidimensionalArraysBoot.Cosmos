@@ -21,7 +21,7 @@
     <StartCosmosGDB>false</StartCosmosGDB>
     <VMWareEdition>Player</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
-    <Name>Compiler.Tests.MultidimensionalArraysBoot</Name>
+    <Name>Cosmos.Compiler.Tests.MultidimensionalArraysBoot</Name>
     <Description>Use VMware Player or Workstation to deploy and debug.</Description>
     <Deployment>ISO</Deployment>
     <Launch>VMware</Launch>
@@ -33,7 +33,7 @@
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Compiler.Tests.MultidimensionalArrays\Cosmos.Compiler.Tests.MultidimensionalArrays.csproj">
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.MultidimensionalArrays\Cosmos.Compiler.Tests.MultidimensionalArrays.csproj">
       <Name>Cosmos.Compiler.Tests.MultidimensionalArrays</Name>
       <Project>{c885ada0-1015-4892-ad29-6b374a33751d}</Project>
       <Private>True</Private>
