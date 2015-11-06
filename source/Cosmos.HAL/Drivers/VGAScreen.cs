@@ -469,10 +469,13 @@ namespace Cosmos.HAL
 
         public void Clear(int color)
         {
-            var xSegment = GetFramebufferSegment();
-
-            for (uint i = 0; i < PixelHeight * PixelWidth; i++)            
-                xSegment[i] = (byte)(color & 0xFF);            
+            for (int y = 0; y < PixelHeight; y++)
+            {
+                for (int x = 0; x < PixelWidth; x++)
+                {
+                    SetPixel(x, y, (uint) color);
+                }
+            }
         }
         private Color[] _Palette = new Color[256];
         public Color GetPaletteEntry(int index)
