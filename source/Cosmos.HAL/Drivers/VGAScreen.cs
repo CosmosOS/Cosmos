@@ -294,15 +294,15 @@ namespace Cosmos.HAL
                     else throw new Exception("Unsupported color depth passed for specified screen size");
                     break;
                 case ScreenSize.Size720x480:
-                    if (aDepth == ColorDepth.BitDepth16)
+                    if (aDepth == ColorDepth.BitDepth4)
                     {
-                        WriteVGARegisters(g_720x480x16);
+                        WriteVGARegisters(g_720x480x4);
 
                         PixelWidth = 720;
                         PixelHeight = 480;
-                        Colors = 0xFFFF;
-                        //SetPixel = new SetPixelDelegate(SetPixel720x480x16);
-                        //GetPixel = new GetPixelDelegate(GetPixel720x480x16);
+                        Colors = 16;
+                        SetPixel = new SetPixelDelegate(SetPixel720x480x4);
+                        GetPixel = new GetPixelDelegate(GetPixel720x480x4);
                     }
                     else throw new Exception("Unsupported color depth passed for specified screen size");
                     break;
@@ -322,38 +322,106 @@ namespace Cosmos.HAL
         }
         //public void SetPixel640x480x2(uint x, uint y, uint c);
         //public uint GetPixel640x480x2(uint x, uint y);
+        
         public void SetPixel640x480x4(uint x, uint y, uint c)
         {
-            var xSegment = GetFramebufferSegment();
-            var xOffset = (y * 32) + x >> 1;
+            uint offset = (uint)(x / 8 + (PixelWidth / 8) * y);
 
-            c = c & 0xf;
+            x = (x & 7) * 1;
 
-            if ((x & 1) == 0)
+            uint mask = (byte)(0x80 >> (int)x);
+            uint pmask = 1;
+
+            for (byte p = 0; p < 4; p++)
             {
-                xSegment[xOffset] = (byte)((xSegment[xOffset] & 0xf) | (byte)(c << 4));
-            }
-            else
-            {
-                xSegment[xOffset] = (byte)((xSegment[xOffset] & 0xf0) | (byte)c);
+                SetPlane(p);
+
+                if ((pmask & c) != 0)
+                {
+                    mIO.VGAMemoryBlock[offset] = (byte)(mIO.VGAMemoryBlock[offset] | mask);
+                }
+
+                else
+                {
+                    mIO.VGAMemoryBlock[offset] = (byte)(mIO.VGAMemoryBlock[offset] & ~mask);
+                }
+
+                pmask <<= 1;
             }
         }
+        
         public uint GetPixel640x480x4(uint x, uint y)
         {
-            var xSegment = GetFramebufferSegment();
-            var xOffset = (y * 32) + x >> 1;
+            uint offset = (uint)(x / 8 + (PixelWidth / 8) * y);
 
-            if ((x & 1) == 0)
+            uint pmask = 1;
+
+            uint color = 0;
+
+            for (byte p = 0; p < 4; p++)
             {
-                return (byte)(xSegment[xOffset] & 0xf);
+                SetPlane(p);
+
+                if (mIO.VGAMemoryBlock[offset] == 255)
+                {
+                    color += pmask;
+                }
+
+                pmask <<= 1;
             }
-            else
+
+            return color;
+        }
+        
+        public void SetPixel720x480x4(uint x, uint y, uint c)
+        {
+            uint offset = (uint)(x / 8 + (PixelWidth / 8) * y);
+
+            x = (x & 7) * 1;
+
+            uint mask = (byte)(0x80 >> (int)x);
+            uint pmask = 1;
+
+            for (byte p = 0; p < 4; p++)
             {
-                return (byte)(xSegment[xOffset] & 0xf0);
+                SetPlane(p);
+
+                if ((pmask & c) != 0)
+                {
+                    mIO.VGAMemoryBlock[offset] = (byte)(mIO.VGAMemoryBlock[offset] | mask);
+                }
+
+                else
+                {
+                    mIO.VGAMemoryBlock[offset] = (byte)(mIO.VGAMemoryBlock[offset] & ~mask);
+                }
+
+                pmask <<= 1;
             }
         }
-        //public void SetPixel720x480x16(uint x, uint y, uint c);
-        //public uint GetPixel720x480x16(uint x, uint y);
+        
+        public uint GetPixel720x480x4(uint x, uint y)
+        {
+            uint offset = (uint)(x / 8 + (PixelWidth / 8) * y);
+
+            uint pmask = 1;
+
+            uint color = 0;
+
+            for (byte p = 0; p < 4; p++)
+            {
+                SetPlane(p);
+
+                if (mIO.VGAMemoryBlock[offset] == 255)
+                {
+                    color += pmask;
+                }
+
+                pmask <<= 1;
+            }
+
+            return color;
+        }
         
         private void SetPixelNoMode(uint x, uint y, uint c)
         {
@@ -401,10 +469,13 @@ namespace Cosmos.HAL
 
         public void Clear(int color)
         {
-            var xSegment = GetFramebufferSegment();
-
-            for (uint i = 0; i < PixelHeight * PixelWidth; i++)            
-                xSegment[i] = (byte)(color & 0xFF);            
+            for (int y = 0; y < PixelHeight; y++)
+            {
+                for (int x = 0; x < PixelWidth; x++)
+                {
+                    SetPixel((uint) x, (uint) y, (uint) color);
+                }
+            }
         }
         private Color[] _Palette = new Color[256];
         public Color GetPaletteEntry(int index)
@@ -1023,7 +1094,7 @@ namespace Cosmos.HAL
 	0x0C, 0x00, 0x0F, 0x08, 0x00,
 };
 
-        private static byte[] g_720x480x16 = new byte[]
+        private static byte[] g_720x480x4 = new byte[]
 {
 /* MISC */
 	0xE7,
