@@ -10,11 +10,11 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>Bochs</Profile>
+    <Profile>ISO</Profile>
     <!-- Looks like this was a mispelled attribute. Replaced by DebugEnabled below.
     <DebugEnable>true</DebugEnable>
     -->
-    <DebugEnabled>true</DebugEnabled>
+    <DebugEnabled>False</DebugEnabled>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <EnableGDB>False</EnableGDB>
@@ -22,10 +22,11 @@
     <VMWareEdition>Player</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
     <Name>Cosmos.Kernel.Tests.FatBoot</Name>
-    <Description>Use Bochs emulator to deploy and debug.</Description>
+    <Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</Description>
     <Deployment>ISO</Deployment>
-    <Launch>Bochs</Launch>
-    <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
+    <Launch>None</Launch>
+    <VisualStudioDebugPort>
+    </VisualStudioDebugPort>
     <VMware_Name>Cosmos.Kernel.Tests.FatBoot</VMware_Name>
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
     <VMware_Deployment>ISO</VMware_Deployment>
