@@ -21,17 +21,6 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Call)]
     public class Call: ILOp
     {
-        //         private string LabelName;
-        //         private uint mResultSize;
-        //         private uint? TotalArgumentSize = null;
-        //         private bool mIsDebugger_Break = false;
-        //         private uint[] ArgumentSizes = new uint[0];
-        //         private MethodInformation mMethodInfo;
-        //         private MethodInformation mTargetMethodInfo;
-        //         private string mNextLabelName;
-        //         private uint mCurrentILOffset;
-        //         private MethodBase mMethod;
-
         public Call(Cosmos.Assembler.Assembler aAsmblr)
             : base(aAsmblr)
         {
@@ -129,16 +118,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (xExtraStackSize > 0)
             {
-                new CPUx86.Sub
-                {
-                    DestinationReg = CPUx86.Registers.ESP,
-                    SourceValue = (uint)xExtraStackSize
-                };
+                new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xExtraStackSize };
             }
-            new CPUx86.Call
-            {
-                DestinationLabel = xNormalAddress
-            };
+            new CPUx86.Call { DestinationLabel = xNormalAddress };
 
             uint xReturnSize = 0;
             if (xMethodInfo != null)
@@ -175,10 +157,7 @@ namespace Cosmos.IL2CPU.X86.IL
                                                // cleanup result values
                                                for (int i = 0; i < xResultSize / 4; i++)
                                                {
-                                                   new CPUx86.Add
-                                                   {
-                                                       DestinationReg = CPUx86.Registers.ESP, SourceValue = 4
-                                                   };
+                                                   new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                                                }
                                            }
 
@@ -190,10 +169,7 @@ namespace Cosmos.IL2CPU.X86.IL
                                                // cleanup result values
                                                for (int i = 0; i < xStackOffsetBefore / 4; i++)
                                                {
-                                                   new CPUx86.Add
-                                                   {
-                                                       DestinationReg = CPUx86.Registers.ESP, SourceValue = 4
-                                                   };
+                                                   new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                                                }
                                            }
                                        }
