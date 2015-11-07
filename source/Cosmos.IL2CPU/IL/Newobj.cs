@@ -124,6 +124,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 // array length + 8
                 bool xHasCalcSize = false;
 
+                #region Special string handling
                 // try calculating size:
                 if (constructor.DeclaringType == typeof(string))
                 {
@@ -164,6 +165,8 @@ namespace Cosmos.IL2CPU.X86.IL
                         throw new NotImplementedException("In NewObj, a string ctor implementation is missing!");
                     }
                 }
+                #endregion Special string handling
+
                 uint xMemSize = GetStorageSize(objectType);
                 int xExtraSize = 12; // additional size for set values after alloc
                 new CPUx86.Push { DestinationValue = (uint)(xMemSize + xExtraSize) };
@@ -215,6 +218,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
 
                 new CPUx86.Call { DestinationLabel = LabelName.Get(constructor) };
+                // should the complete error handling happen by ILOp.EmitExceptionLogic?
                 if (aMethod != null)
                 {
                     // todo: only happening for real methods now, not for ctor's ?

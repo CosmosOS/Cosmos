@@ -1515,11 +1515,6 @@ namespace Cosmos.IL2CPU
                 new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
 
             }
-
-            if (xLabel == "SystemUInt32CosmosCorePlugsGCImplementionImplAllocNewObjectSystemUInt32.IL_0001")
-            {
-                //
-            }
         }
 
         protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, bool emitInt3NotNop, out bool INT3Emitted, out bool INT3PlaceholderEmitted, bool isNewSourcePoint)
