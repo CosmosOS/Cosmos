@@ -18,6 +18,15 @@ indent_size = 2
 [IL/*.cs]
 indent_size = 2
 
+[IL/Call.cs]
+indent_size = 4
+
+[IL/Callvirt.cs]
+indent_size = 4
+
+[IL/Newobj.cs]
+indent_size = 4
+
 [AppAssembler.cs]
 indent_size = 4
 

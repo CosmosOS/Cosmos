@@ -22,6 +22,8 @@ namespace Cosmos.Compiler.Tests.Exceptions
 
             TestSimpleException();
 
+            var xCaught = false;
+            var xInFinally = false;
             mDebugger.Send("START: Test throw Exception() in method and catch in caller.");
             try
             {
@@ -31,13 +33,19 @@ namespace Cosmos.Compiler.Tests.Exceptions
             {
                 Console.WriteLine("Caught exception.");
                 mDebugger.Send("EXCEPTION: " + ex.Message);
+                xCaught = true;
             }
             finally
             {
                 Console.WriteLine("Finally");
                 mDebugger.Send("EXCEPTION: Finally");
+                xInFinally = true;
             }
-            mDebugger.Send("END:");
+            mDebugger.Send("END");
+            Assert.IsTrue(xCaught, "Did not reach catch block (1)");
+            //Assert.IsTrue(xInFinally, "Did not reach finally block (1)");
+            xCaught = false;
+            xInFinally = false;
 
             mDebugger.Send("START: Test throw nested Exception() in method and catch in caller.");
             try
@@ -48,13 +56,42 @@ namespace Cosmos.Compiler.Tests.Exceptions
             {
                 Console.WriteLine("Caught exception.");
                 mDebugger.Send("EXCEPTION: " + ex.Message);
+                xCaught = true;
             }
             finally
             {
                 Console.WriteLine("Finally");
                 mDebugger.Send("EXCEPTION: Finally");
+                xInFinally = true;
             }
             mDebugger.Send("END:");
+
+            //Assert.IsTrue(xCaught, "Did not reach catch block (2)");
+            //Assert.IsTrue(xInFinally, "Did not reach finally block (2)");
+            xCaught = false;
+            xInFinally = false;
+
+            mDebugger.Send("START: Test throw exception in method, while using it as a second parameter for another call");
+            try
+            {
+                ThrowExceptionInMethodWithReturnValue();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Caught exception.");
+                mDebugger.Send("EXCEPTION: " + ex.Message);
+                xCaught = true;
+            }
+            finally
+            {
+                Console.WriteLine("Finally");
+                mDebugger.Send("EXCEPTION: Finally");
+                xInFinally = true;
+            }
+            mDebugger.Send("END:");
+
+            Assert.IsTrue(xCaught, "Did not reach catch block (3)");
+            //Assert.IsTrue(xInFinally, "Did not reach finally block (3)");
 
             TestController.Completed();
         }
@@ -99,6 +136,16 @@ namespace Cosmos.Compiler.Tests.Exceptions
                 Console.WriteLine("Caught exception.");
                 mDebugger.Send("EXCEPTION: " + ex.Message);
             }
+        }
+
+        private void ThrowExceptionInMethodWithReturnValue()
+        {
+            Console.WriteLine("A" + GetValueError());
+        }
+
+        private int GetValueError()
+        {
+            throw new Exception("Error occurred");
         }
 
         private void TestArgumentNullException(string arg)
