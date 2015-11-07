@@ -257,6 +257,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.Excep
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.ExceptionsBoot", "..\Tests\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.ExceptionsBoot.Cosmos", "{85E13410-C85A-4B0C-BEE5-F9A120ECC94E}"
 EndProject
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.MultidimensionalArraysBoot", "..\Tests\Cosmos.Compiler.Tests.MultidimensionalArrays\Cosmos.Compiler.Tests.MultidimensionalArraysBoot.Cosmos", "{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.MultidimensionalArrays", "..\Tests\Cosmos.Compiler.Tests.MultidimensionalArrays\Cosmos.Compiler.Tests.MultidimensionalArrays.csproj", "{C885ADA0-1015-4892-AD29-6B374A33751D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1374,6 +1378,36 @@ Global
 		{85E13410-C85A-4B0C-BEE5-F9A120ECC94E}.Release|Mixed Platforms.Build.0 = Debug|x86
 		{85E13410-C85A-4B0C-BEE5-F9A120ECC94E}.Release|x86.ActiveCfg = Debug|x86
 		{85E13410-C85A-4B0C-BEE5-F9A120ECC94E}.Release|x86.Build.0 = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Debug|Itanium.ActiveCfg = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Debug|x86.ActiveCfg = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Debug|x86.Build.0 = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Release|Any CPU.ActiveCfg = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Release|Any CPU.Build.0 = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Release|Itanium.ActiveCfg = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Release|Itanium.Build.0 = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Release|Mixed Platforms.ActiveCfg = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Release|Mixed Platforms.Build.0 = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Release|x86.ActiveCfg = Debug|x86
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD}.Release|x86.Build.0 = Debug|x86
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Debug|Itanium.Build.0 = Debug|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Debug|x86.Build.0 = Debug|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Release|Itanium.Build.0 = Release|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Release|x86.ActiveCfg = Release|Any CPU
+		{C885ADA0-1015-4892-AD29-6B374A33751D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1477,5 +1511,7 @@ Global
 		{C006CC79-7FFD-45F1-AD8C-57AC879CC29F} = {DC374FBC-4005-472F-BBF4-CEA608B86FB2}
 		{9DF5C0A9-B91C-4647-B939-E47513743A0C} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 		{85E13410-C85A-4B0C-BEE5-F9A120ECC94E} = {F104F6BC-EF8E-4408-A786-D570D7565231}
+		{1995B1DD-C504-48E3-972F-FB8A5FE1D8DD} = {F104F6BC-EF8E-4408-A786-D570D7565231}
+		{C885ADA0-1015-4892-AD29-6B374A33751D} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 	EndGlobalSection
 EndGlobal
