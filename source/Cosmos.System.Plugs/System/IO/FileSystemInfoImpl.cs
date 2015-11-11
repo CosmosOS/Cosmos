@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
-using System.IO;
+﻿using System.IO;
 
-namespace SentinelKernel.System.Plugs.System.IO
+using Cosmos.IL2CPU.Plugs;
+
+namespace Cosmos.System.Plugs.System.IO
 {
-    [Plug(Target = typeof(global::System.IO.FileSystemInfo))]
-    public static class FileSystemInfo
+    [Plug(Target = typeof(FileSystemInfo))]
+    public static class FileSystemInfoImpl
     {
-        public static string get_FullName(global::System.IO.FileSystemInfo aThis)
+        public static string get_FullName(FileSystemInfo aThis)
         {
             return "FullName not implemented yet in FileSystemInfo plug";
         }

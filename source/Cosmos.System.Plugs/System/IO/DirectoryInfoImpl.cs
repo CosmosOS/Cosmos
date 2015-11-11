@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
-using System.IO;
-using Directory = Cosmos.System.FileSystem.Listing.Directory;
+﻿using System.IO;
 
-namespace SentinelKernel.System.Plugs.System.IO
+using Cosmos.IL2CPU.Plugs;
+using Cosmos.System.FileSystem.Listing;
+
+namespace Cosmos.System.Plugs.System.IO
 {
     [Plug(Target = typeof(DirectoryInfo))]
-    [PlugField(FieldId = "$$Storage$$", FieldType = typeof(Directory))]
+    [PlugField(FieldId = "$$Storage$$", FieldType = typeof(DirectoryEntry))]
     [PlugField(FieldId = "$$FullPath$$", FieldType = typeof(string))]
     public static class DirectoryInfoImpl
     {
@@ -28,7 +25,7 @@ namespace SentinelKernel.System.Plugs.System.IO
             //aFullPath = aPath;
         }
 
-        public static bool get_Exists(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref Directory aStorage)
+        public static bool get_Exists(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
         {
             //TODO: actually test if it exists
             return (aStorage != null);
@@ -48,12 +45,12 @@ namespace SentinelKernel.System.Plugs.System.IO
         //    return aFullPath;
         //}
 
-        public static string get_Name(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref Directory aStorage)
+        public static string get_Name(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
         {
             return aStorage.Name;
         }
 
-        public static FileInfo[] GetFiles(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref Directory aStorage)
+        public static FileInfo[] GetFiles(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
         {
             return null;
 

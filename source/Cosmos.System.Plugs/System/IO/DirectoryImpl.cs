@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
+
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System.FileSystem.VFS;
 
-namespace SentinelKernel.System.Plugs.System.IO
+namespace Cosmos.System.Plugs.System.IO
 {
     [Plug(Target = typeof(Directory))]
     public static class DirectoryImpl
