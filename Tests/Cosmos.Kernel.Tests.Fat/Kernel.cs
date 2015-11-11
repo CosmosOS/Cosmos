@@ -12,28 +12,32 @@ namespace Cosmos.Kernel.Tests.Fat
     public class TestClass
     {
         private Stream xStream;
-        private global::Cosmos.Debug.Kernel.Debugger mDebugger = new global::Cosmos.Debug.Kernel.Debugger("User", "Test");
+        private static global::Cosmos.Debug.Kernel.Debugger mDebugger = new global::Cosmos.Debug.Kernel.Debugger("User", "Test");
 
         public TestClass(string aTest)
         {
-            mDebugger.Send("In TestClass::ctor(string)");
+         //   throw new Exception("Test can not be null.");
+            //throw new Exception();
+
+            //mDebugger.Send("In TestClass::ctor(string)");
+            Console.WriteLine("Before Initialize");
             xStream = Initialize(aTest);
         }
-
+        
         private Stream Initialize(string aTest)
         {
-            mDebugger.Send("In TestClass::Intialize(string)");
+            //mDebugger.Send("In TestClass::Intialize(string)");
             if (aTest == null)
             {
-                mDebugger.Send("In TestClass::Intialize(string). aTest is null.");
+            //    mDebugger.Send("In TestClass::Intialize(string). aTest is null.");
                 throw new ArgumentNullException("aTest", "Test can not be null.");
             }
 
-            if (aTest.Length == 0)
-            {
-                mDebugger.Send("In TestClass::Intialize(string). aTest is empty.");
-                throw new ArgumentException("Test can not be empty.");
-            }
+            //if (aTest.Length == 0)
+            //{
+            //    mDebugger.Send("In TestClass::Intialize(string). aTest is empty.");
+            //    throw new ArgumentException("Test can not be empty.");
+            //}
 
             return Stream.Null;
         }
@@ -60,6 +64,7 @@ namespace Cosmos.Kernel.Tests.Fat
 
                 string xString = null;
                 var x = new TestClass(xString);
+                //var x = new TestClass();
                 //string xContents;
                 //Assert.IsTrue(Path.GetDirectoryName(@"0:\test") == @"0:\", @"Path.GetDirectoryName(@'0:\test') == @'0:\'");
                 //Assert.IsTrue(Path.GetFileName(@"0:\test") == @"test", @"Path.GetFileName(@'0:\test') == @'test'");
