@@ -8,18 +8,18 @@ namespace Cosmos.System.FileSystem.FAT.Listing
     {
         public readonly ulong FirstClusterNum;
         public readonly uint EntryHeaderDataOffset;
-        public readonly FatDirectoryEntry Parent;
+        public new readonly FatDirectoryEntry Parent;
         public new readonly FatFileSystem FileSystem;
 
         // Size is UInt32 because FAT doesn't support bigger.
         // Don't change to UInt64
-        public FatDirectoryEntry(FatFileSystem aFileSystem, string aName, uint aSize, ulong aFirstClusterNum, FatDirectoryEntry aParent, uint aEntryHeaderDataOffset, DirectoryEntryTypeEnum aEntryType)
-            : base(aFileSystem, aName, aSize, aEntryType)
+        public FatDirectoryEntry(FatFileSystem aFileSystem, FatDirectoryEntry aParent, string aName, uint aSize, ulong aFirstClusterNum, uint aEntryHeaderDataOffset, DirectoryEntryTypeEnum aEntryType)
+            : base(aFileSystem, aParent, aName, aSize, aEntryType)
         {
             FileSystem = aFileSystem;
+            Parent = aParent;
             FirstClusterNum = aFirstClusterNum;
             EntryHeaderDataOffset = aEntryHeaderDataOffset;
-            Parent = aParent;
         }
 
         public override void SetName(string aName)

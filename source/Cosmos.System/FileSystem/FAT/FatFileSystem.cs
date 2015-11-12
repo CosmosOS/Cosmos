@@ -39,11 +39,9 @@ namespace Cosmos.System.FileSystem.FAT
 
         private readonly FatTypeEnum mFatType;
 
-        private readonly BlockDevice mDevice;
-
-        public FatFileSystem(BlockDevice aDevice)
+        public FatFileSystem(Partition aDevice, string aRootPath)
+            : base(aDevice, aRootPath)
         {
-            mDevice = aDevice;
             byte[] xBPB = mDevice.NewBlockArray(1);
 
             mDevice.ReadBlock(0UL, 1U, xBPB);
@@ -427,7 +425,7 @@ namespace Cosmos.System.FileSystem.FAT
                     {
                         continue;
                     }
-                    var xEntry = new FatDirectoryEntry(this, xName, xSize, xFirstCluster, aDirectory, i, DirectoryEntryTypeEnum.File);
+                    var xEntry = new FatDirectoryEntry(this, aDirectory, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.File);
                     xResult.Add(xEntry);
                     FatHelpers.Debug("Returning file '" + xEntry.Name + "', FirstCluster = " + xEntry.FirstClusterNum +
                                      ", Size = " + xEntry.Size);
@@ -435,7 +433,7 @@ namespace Cosmos.System.FileSystem.FAT
                 else if (xTest == FatDirectoryEntryAttributeConsts.Directory)
                 {
                     uint xSize = xData.ToUInt32(i + 28);
-                    var xEntry = new FatDirectoryEntry(this, xName, xSize, xFirstCluster, aDirectory, i, DirectoryEntryTypeEnum.Directory);
+                    var xEntry = new FatDirectoryEntry(this, aDirectory, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.Directory);
                     FatHelpers.Debug("Returning directory '" + xEntry.Name + "', FirstCluster = " +
                                      xEntry.FirstClusterNum + ", Size = " + xEntry.Size);
                     xResult.Add(xEntry);
@@ -506,10 +504,10 @@ namespace Cosmos.System.FileSystem.FAT
             return result;
         }
 
-        public override DirectoryEntry GetRootDirectory(string name)
+        public override DirectoryEntry GetRootDirectory()
         {
             //TODO: Get size.
-            return new FatDirectoryEntry(this, name, 0, RootCluster, null, 0, DirectoryEntryTypeEnum.Directory);
+            return new FatDirectoryEntry(this, null, mRootPath, 0, RootCluster, 0, DirectoryEntryTypeEnum.Directory);
         }
 
         public override Stream GetFileStream(DirectoryEntry fileInfo)
@@ -579,6 +577,16 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override DirectoryEntry CreateDirectory(string aPath)
         {
+            //if (string.IsNullOrWhiteSpace(aPath))
+            //{
+            //    throw new ArgumentException(aPath);
+            //}
+
+            //if (Path.GetPathRoot(aPath) == aPath)
+            //{
+            //    return GetRootDirectory();
+            //}
+
             return null;
         }
     }

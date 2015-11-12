@@ -2,9 +2,12 @@
 
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System.FileSystem.Listing;
+using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.Plugs.System.IO
 {
+    
+
     [Plug(Target = typeof(DirectoryInfo))]
     [PlugField(FieldId = "$$Storage$$", FieldType = typeof(DirectoryEntry))]
     [PlugField(FieldId = "$$FullPath$$", FieldType = typeof(string))]
@@ -27,8 +30,7 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static bool get_Exists(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
         {
-            //TODO: actually test if it exists
-            return (aStorage != null);
+            return VFSManager.DirectoryExists(aStorage);
         }
 
         //public static string FullName

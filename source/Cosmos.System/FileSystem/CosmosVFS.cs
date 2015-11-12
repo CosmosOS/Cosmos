@@ -35,12 +35,12 @@ namespace Cosmos.System.FileSystem
     public class CosmosVFS : VFSBase
     {
         private List<Partition> mPartitions;
-        private List<KVP<string, FileSystem>> mFileSystems;
+        private List<FileSystem> mFileSystems;
 
         public override void Initialize()
         {
             mPartitions = new List<Partition>();
-            mFileSystems = new List<KVP<string, FileSystem>>();
+            mFileSystems = new List<FileSystem>();
 
             InitializePartitions();
             if (mPartitions.Count > 0)
@@ -77,23 +77,44 @@ namespace Cosmos.System.FileSystem
 
         public override List<DirectoryEntry> GetDirectoryListing(DirectoryEntry aDirectory)
         {
-            return null;
-        }
+            DirectoryEntry xTempEntry = aDirectory;
+            string xFullPath = "";
+            while (xTempEntry.Parent != null)
+            {
+                xFullPath = Path.Combine(xTempEntry.Name, xFullPath);
+                xTempEntry = xTempEntry.Parent;
+            }
 
-        public override List<DirectoryEntry> GetVolumes()
-        {
-            return null;
+            return GetDirectoryListing(xFullPath);
         }
 
         public override DirectoryEntry GetDirectory(string aPath)
         {
-            var xFS = GetFileSystemFromPath(aPath);
+            var xFileSystem = GetFileSystemFromPath(aPath);
 
-            return DoGetDirectory(aPath, xFS);
+            return DoGetDirectory(aPath, xFileSystem);
+        }
+
+        public override List<DirectoryEntry> GetVolumes()
+        {
+            List<DirectoryEntry> xVolumes = new List<DirectoryEntry>();
+
+            for (int i = 0; i < mFileSystems.Count; i++)
+            {
+                xVolumes.Add(GetVolume(mFileSystems[i]));
+            }
+
+            return xVolumes;
         }
 
         public override DirectoryEntry GetVolume(string aVolume)
         {
+            var xFileSystem = GetFileSystemFromPath(aVolume);
+            if (xFileSystem != null)
+            {
+                return GetVolume(xFileSystem);
+            }
+
             return null;
         }
 
@@ -131,18 +152,18 @@ namespace Cosmos.System.FileSystem
                 switch (FileSystem.GetFileSystemType(mPartitions[i]))
                 {
                     case FileSystemType.FAT:
-                        mFileSystems.Add(new KVP<string, FileSystem>(xRootPath, new FatFileSystem(mPartitions[i])));
+                        mFileSystems.Add(new FatFileSystem(mPartitions[i], xRootPath));
                         break;
                     default:
                         global::System.Console.WriteLine("Unknown filesystem type!");
                         return;
                 }
 
-                if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].Key == xRootPath))
+                if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].mRootPath == xRootPath))
                 {
                     string xMessage = string.Concat("Initialized ", mFileSystems.Count, "filesystem(s)...");
                     global::System.Console.WriteLine(xMessage);
-                    mFileSystems[i].Value.DisplayFileSystemInfo();
+                    mFileSystems[i].DisplayFileSystemInfo();
                 }
                 else
                 {
@@ -157,10 +178,9 @@ namespace Cosmos.System.FileSystem
             string xPath = Path.GetPathRoot(aPath);
             for (int i = 0; i < mFileSystems.Count; i++)
             {
-                string xTest = mFileSystems[i].Key;
-                if (string.Equals(xTest, xPath))
+                if (mFileSystems[i].mRootPath == xPath)
                 {
-                    return mFileSystems[i].Value;
+                    return mFileSystems[i];
                 }
             }
             throw new Exception("Unable to determine filesystem for path: " + aPath);
@@ -176,7 +196,7 @@ namespace Cosmos.System.FileSystem
 
             if (xPathParts.Length == 1)
             {
-                return GetVolume(aFS, aPath);
+                return GetVolume(aFS);
             }
 
             DirectoryEntry xBaseDirectory = null;
@@ -213,9 +233,9 @@ namespace Cosmos.System.FileSystem
             return xBaseDirectory;
         }
 
-        private DirectoryEntry GetVolume(FileSystem aFS, string aVolume)
+        private DirectoryEntry GetVolume(FileSystem aFS)
         {
-            return aFS.GetRootDirectory(aVolume);
+            return aFS.GetRootDirectory();
         }
     }
 

@@ -22,10 +22,20 @@ namespace Cosmos.System.FileSystem
 
         public abstract List<DirectoryEntry> GetDirectoryListing(DirectoryEntry baseDirectory);
 
-        public abstract DirectoryEntry GetRootDirectory(string name);
+        public abstract DirectoryEntry GetRootDirectory();
 
         public abstract Stream GetFileStream(DirectoryEntry fileInfo);
 
         public abstract DirectoryEntry CreateDirectory(string aPath);
+
+        protected Partition mDevice { get; }
+
+        public string mRootPath { get; }
+
+        protected FileSystem(Partition aDevice, string aRootPath)
+        {
+            mDevice = aDevice;
+            mRootPath = aRootPath;
+        }
     }
 }

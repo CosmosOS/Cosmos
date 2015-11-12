@@ -293,12 +293,28 @@ namespace Cosmos.System.FileSystem.VFS
         {
             try
             {
-                return (VFSManager.GetFile(aPath) != null);
+                string xPath = Path.GetFullPath(aPath);
+                return GetFile(xPath) != null;
             }
-            catch (Exception E)
+            catch (Exception e)
             {
                 global::System.Console.Write("Exception occurred: ");
-                global::System.Console.WriteLine(E.Message);
+                global::System.Console.WriteLine(e.Message);
+                return false;
+            }
+        }
+
+        public static bool FileExists(DirectoryEntry aEntry)
+        {
+            try
+            {
+                string xPath = GetFullPath(aEntry);
+                return GetFile(xPath) != null;
+            }
+            catch (Exception e)
+            {
+                global::System.Console.Write("Exception occurred: ");
+                global::System.Console.WriteLine(e.Message);
                 return false;
             }
         }
@@ -307,18 +323,44 @@ namespace Cosmos.System.FileSystem.VFS
         {
             try
             {
-                FatHelpers.Debug("DirectoryExists. Path = '" + aPath + "'");
-                string xDir = string.Concat(aPath, VFSBase.DirectorySeparatorChar);
-                //xDir = Path.GetDirectoryName(xDir);
-                return (VFSManager.GetDirectory(xDir) != null);
+                string xPath = Path.GetFullPath(aPath);
+                return GetDirectory(xPath) != null;
             }
-            catch (Exception E)
+            catch (Exception e)
             {
                 global::System.Console.Write("Exception occurred: ");
-                global::System.Console.WriteLine(E.Message);
+                global::System.Console.WriteLine(e.Message);
                 return false;
             }
+        }
 
+        public static bool DirectoryExists(DirectoryEntry aEntry)
+        {
+            try
+            {
+                string xPath = GetFullPath(aEntry);
+                return GetDirectory(xPath) != null;
+            }
+            catch (Exception e)
+            {
+                global::System.Console.Write("Exception occurred: ");
+                global::System.Console.WriteLine(e.Message);
+                return false;
+            }
+        }
+
+        public static string GetFullPath(DirectoryEntry aEntry)
+        {
+            DirectoryEntry xEntry = aEntry;
+            string xPath = string.Empty;
+
+            while (xEntry != null)
+            {
+                xPath = xEntry + xEntry.Name;
+                xEntry = aEntry.Parent;
+            }
+
+            return Path.GetFullPath(xPath);
         }
 
         public static Stream GetFileStream(string aPathname)

@@ -15,14 +15,16 @@ namespace Cosmos.System.FileSystem.Listing
 
     public abstract class DirectoryEntry
     {
-        public readonly UInt64 Size;
+        public readonly ulong Size;
         public readonly string Name;
         public readonly FileSystem FileSystem;
+        public readonly DirectoryEntry Parent;
         public readonly DirectoryEntryTypeEnum EntryType;
 
-        protected DirectoryEntry(FileSystem aFileSystem, string aName, UInt64 aSize, DirectoryEntryTypeEnum aEntryType)
+        protected DirectoryEntry(FileSystem aFileSystem, DirectoryEntry aParent, string aName, ulong aSize, DirectoryEntryTypeEnum aEntryType)
         {
             FileSystem = aFileSystem;
+            Parent = aParent;
             EntryType = aEntryType;
             Name = aName;
             Size = aSize;
