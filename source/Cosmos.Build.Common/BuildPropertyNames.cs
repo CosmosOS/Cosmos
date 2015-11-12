@@ -28,10 +28,7 @@ namespace Cosmos.Build.Common
         public const string EnableGDBString = "EnableGDB";
         public const string StartCosmosGDBString = "StartCosmosGDB";
         public const string EnableBochsDebugString = "EnableBochsDebug";
-
-        /// <summary>
-        /// Name of the configuration property in the project file.
-        /// </summary>
+        public const string StartBochsDebugGui = "StartBochsDebugGui";
         public const string BinFormatString = "BinFormat";
     }
 }
