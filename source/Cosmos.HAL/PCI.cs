@@ -65,13 +65,17 @@ namespace Cosmos.HAL
         {
             string str = "";
             for (int i = 0; i < step; i++)
+            {
                 str += "     ";
+            }
             var xText = str + device.bus + ":" + device.slot + ":" + device.function + "   " + PCIDevice.DeviceClass.GetString(device);
             mDebugger.Send(xText);
             Console.WriteLine(xText);
             devices.Add(device);
             if (device is PCIDeviceBridge)
+            {
                 EnumerateBus(((PCIDeviceBridge)device).SecondaryBusNumber, step + 1);
+            }
         }
     }
 }

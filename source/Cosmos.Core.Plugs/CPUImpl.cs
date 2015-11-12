@@ -111,18 +111,19 @@ namespace Cosmos.Core.Plugs {
 	//    public static void Halt() { }
 
 		[PlugMethod(Assembler = typeof(DisableINTsAsm))]
-		public static void DisableInterrupts() {
+		public static void DoDisableInterrupts()
+		{
 		}
 
 		[PlugMethod(Assembler = typeof(EnableINTsAsm))]
-		public static void EnableInterrupts() {
+		public static void DoEnableInterrupts() {
 		}
 
 		public class DisableINTsAsm : AssemblerMethod
 		{
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
 			{
-				new CPUx86.ClrInterruptFlag();
+				new CPUx86.ClearInterruptFlag();
 			}
 		}
 

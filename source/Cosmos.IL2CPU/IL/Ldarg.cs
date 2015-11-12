@@ -156,7 +156,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     xArgType = aMethod.MethodBase.GetParameters()[aParam - 1].ParameterType;
                 }
             }
-            new Comment("Ldarg");
+
             new Comment("Arg idx = " + aParam);
             uint xArgRealSize = SizeOfType(xArgType);
             uint xArgSize = Align(xArgRealSize, 4);

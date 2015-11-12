@@ -1,43 +1,31 @@
-﻿//using Cosmos.HAL.BlockDevice;
-//using Cosmos.System.FileSystem.FAT;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
+﻿using System.Collections.Generic;
+using System.IO;
+using Cosmos.HAL.BlockDevice;
+using Cosmos.System.FileSystem.FAT;
+using Cosmos.System.FileSystem.Listing;
 
-//namespace Cosmos.System.FileSystem
-//{
-//    public enum FileSystemType
-//    {
-//        FAT,
-//        Unknown
-//    }
+namespace Cosmos.System.FileSystem
+{
+    public abstract class FileSystem
+    {
+        public static FileSystemType GetFileSystemType(Partition aDevice)
+        {
+            if (FatFileSystem.IsDeviceFAT(aDevice))
+            {
+                return FileSystemType.FAT;
+            }
 
-//    public class FileSystem
-//    {
-//        // Currently we map to the Windows scheme of single lettter: for drives. Cosmos will 
-//        // NOT do this in the future, but it will be able to map paths to things that look like
-//        // drive letters for compatibility with Windows code.
-//        // For now we use Dictionary for simplicity, but in future this will change.
-//        //static protected Dictionary<string, FileSystem> mMappings = new Dictionary<string, FileSystem>();
+            return FileSystemType.Unknown;
+        }
 
-//        static protected FileSystem mFS;
+        public abstract void DisplayFileSystemInfo();
 
-//        static public void AddMapping(string aPath, FileSystem aFileSystem)
-//        {
-//            //mMappings.Add(aPath.ToUpper(), aFileSystem);
-//            // Dictionary<> doesnt work yet, so for now we just hack this and support only one FS
-//            mFS = aFileSystem;
-//        }
+        public abstract List<DirectoryEntry> GetDirectoryListing(DirectoryEntry baseDirectory);
 
-//        public static FileSystemType GetFileSystemType(Partition aDevice)
-//        {
-//            if (FatFileSystem.IsDeviceFAT(aDevice))
-//            {
-//                return FileSystemType.FAT;
-//            }
+        public abstract DirectoryEntry GetRootDirectory(string name);
 
-//            return FileSystemType.Unknown;
-//        }
-//    }
-//}
+        public abstract Stream GetFileStream(DirectoryEntry fileInfo);
+
+        public abstract DirectoryEntry CreateDirectory(string aPath);
+    }
+}

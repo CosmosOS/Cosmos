@@ -85,7 +85,14 @@
     <Compile Include="RingAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="Cosmos.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

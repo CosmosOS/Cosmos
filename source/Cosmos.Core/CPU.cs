@@ -16,16 +16,6 @@ namespace Cosmos.Core {
         public static void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged
         public void Halt() { } // Plugged
 
-        public static void DisableInterrupts()
-        {
-            // plugged
-        }
-
-        public static void EnableInterrupts()
-        {
-            // plugged
-        }
-
         public void Reboot() {
             // Disable all interrupts
             DisableInterrupts();
@@ -36,6 +26,34 @@ namespace Cosmos.Core {
             }
             myPort.Byte = 0xFE;
             Halt(); // If it didn't work, Halt the CPU
+        }
+
+        private static void DoEnableInterrupts()
+        {
+
+        }
+
+        private static void DoDisableInterrupts()
+        {
+        }
+
+        public static bool mInterruptsEnabled;
+        public static void EnableInterrupts()
+        {
+            mInterruptsEnabled = true;
+            DoEnableInterrupts();
+        }
+
+        /// <summary>
+        /// Returns if the interrupts were actually enabled
+        /// </summary>
+        /// <returns></returns>
+        public static bool DisableInterrupts()
+        {
+            DoDisableInterrupts();
+            var xResult = mInterruptsEnabled;
+            mInterruptsEnabled = false;
+            return xResult;
         }
     }
 }

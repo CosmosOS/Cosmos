@@ -1,1 +1,1 @@
-install -USERKIT
+install-vs2015 -USERKIT

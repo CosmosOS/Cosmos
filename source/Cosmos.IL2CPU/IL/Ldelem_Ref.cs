@@ -33,7 +33,11 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Add {DestinationReg = CPUx86.Registers.EAX, SourceValue = aElementSize - 4};
             }
 
+            // pop the array
             new CPUx86.Pop {DestinationReg = CPUx86.Registers.EDX};
+            // convert to real memory address
+            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+
             new CPUx86.Add {DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EAX};
 
             var xSizeLeft = aElementSize;

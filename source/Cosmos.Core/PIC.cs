@@ -33,16 +33,16 @@ namespace Cosmos.Core {
             // Right now we mask all IRQs. We enable them as we add
             // support for them. The 0x08 on master MUST remain. IRQ7
             // has a problem of "spurious requests" and is therefore unreliable.
-            // It used for LPT2 (and sometimes old 8 bit sound blasters). We likely 
+            // It used for LPT2 (and sometimes old 8 bit sound blasters). We likely
             // won't need either of those for a very long time, so we just mask it
             // completely. For more info:
             // http://en.wikipedia.org/wiki/Intel_8259#Spurious_Interrupts
-            
+
             //Init(Master, 0x20, 4, 0xFD | 0x08);
             //Init(Slave, 0x28, 2, 0xFF);
-          //for now enable keyboard, mouse(ps2) and PIT
+            //for now enable keyboard, mouse(ps2)
             Remap(0x20, 0xF9 | 0x08, 0x28, 0xEF);
-          
+
         }
 
         private void Remap(byte masterStart, byte masterMask, byte slaveStart, byte slaveMask)
@@ -50,7 +50,7 @@ namespace Cosmos.Core {
             #region consts
             // source: osdev.org
 
-#pragma warning disable 
+#pragma warning disable
             const byte ICW1_ICW4 = 0x01; // ICW4 (not) needed
             const byte ICW1_SINGLE = 0x02; // Single (cascade) mode
             const byte ICW1_INTERVAL4 = 0x04; // Call address interval 4 (8)
@@ -91,8 +91,8 @@ namespace Cosmos.Core {
             // set masks:
             Master.Data.Byte = masterMask;
             IOPort.Wait();
-            //Slave.Data.Byte = slaveMask;
-            //IOPort.Wait();
+            Slave.Data.Byte = slaveMask;
+            IOPort.Wait();
         }
 
         protected void Init(IOGroup.PIC aPIC, byte aBase, byte aIDunno, byte aMask){

@@ -135,7 +135,13 @@ namespace Cosmos.HAL.BlockDevice
 	        mDebugger.Send("AtaPio debug: " + message);
 	    }
 
-		public AtaPio(Core.IOGroup.ATA aIO, Ata.ControllerIdEnum aControllerId, Ata.BusPositionEnum aBusPosition)
+	    private static void DebugHex(string message, uint number)
+	    {
+	        Debug(message);
+	        mDebugger.SendNumber(number);
+	    }
+
+        public AtaPio(Core.IOGroup.ATA aIO, Ata.ControllerIdEnum aControllerId, Ata.BusPositionEnum aBusPosition)
 		{
 			IO = aIO;
 			mControllerID = aControllerId;
@@ -228,7 +234,9 @@ namespace Cosmos.HAL.BlockDevice
 			if (aThrowOnError && (xStatus & Status.Error) != 0)
 			{
 				// TODO: Read error port
-                Debug("ATA Error in SendCmd. Cmd = " + (byte)aCmd + ", Status = " + (byte)xStatus);
+			    Debug("ATA Error in SendCmd.");
+			    DebugHex("Cmd", (byte)aCmd);
+			    DebugHex("Status", (byte)xStatus);
 				throw new Exception("ATA Error");
 			}
 			return xStatus;
@@ -354,5 +362,9 @@ namespace Cosmos.HAL.BlockDevice
 			SendCmd(Cmd.CacheFlush);
 		}
 
+	    public override string ToString()
+	    {
+	        return "AtaPio";
+	    }
 	}
 }

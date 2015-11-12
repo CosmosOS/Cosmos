@@ -22,7 +22,7 @@ namespace Cosmos.Debug.Common
         public DebugConnectorPipeServer(string aName)
         {
             mPipe = new NamedPipeServerStream(aName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte,
-                                              PipeOptions.None, 1, 1);
+                                              PipeOptions.None, 1024, 1);
             Start();
         }
 

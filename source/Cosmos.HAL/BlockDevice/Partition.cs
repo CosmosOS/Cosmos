@@ -32,6 +32,9 @@ namespace Cosmos.HAL.BlockDevice
 			mHost.WriteBlock(xHostBlockNo, aBlockCount, aData);
 		}
 
-
+	    public override string ToString()
+	    {
+	        return "Partition";
+	    }
 	}
 }

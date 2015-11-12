@@ -3,7 +3,6 @@ using HALVGAScreen = Cosmos.HAL.VGAScreen;
 
 namespace Cosmos.System
 {
-    [Obsolete("This class has not been properly converted to the final cosmos architecture!")]
     public class VGAScreen
     {
         public enum TextSize { Size40x25, Size40x50, Size80x25, Size80x50, Size90x30, Size90x60 };

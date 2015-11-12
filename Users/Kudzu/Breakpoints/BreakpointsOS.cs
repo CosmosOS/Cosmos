@@ -14,7 +14,7 @@ using Cosmos.HAL.BlockDevice;
 //using TheFatFile = Playground.Kudzu.BreakpointsKernel.FAT.Listing.MyFatFile;
 //using TheFatFileSystem = Playground.Kudzu.BreakpointsKernel.FAT.MyFatFileSystem;
 
-//using TheFatStream = Cosmos.System.FileSystem.FAT.FatStream;
+//using TheFatStream = Cosmos.System.FileSystem.FAT.FatFileStream;
 //using TheFatFile = Cosmos.System.FileSystem.FAT.Listing.FatFile;
 //using TheFatFileSystem = Cosmos.System.FileSystem.FAT.FatFileSystem;
 
@@ -241,7 +241,7 @@ namespace Kudzu.BreakpointsKernel
     //    //}
 
     //    //{
-    //    //  var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
+    //    //  var xStream = new Sys.Filesystem.FAT.FatFileStream(xRootFile);
     //    //  var xData = new byte[xRootFile.Size];
     //    //  xStream.Read(xData, 0, (int)xRootFile.Size);
     //    //  var xText = Encoding.ASCII.GetString(xData);
@@ -251,13 +251,13 @@ namespace Kudzu.BreakpointsKernel
     //    //{
     //    //  Console.WriteLine();
     //    //  Console.WriteLine("StreamReader");
-    //    //  var xStream = new Sys.Filesystem.FAT.FatStream(xRootFile);
+    //    //  var xStream = new Sys.Filesystem.FAT.FatFileStream(xRootFile);
     //    //  var xReader = new System.IO.StreamReader(xStream);
     //    //  string xText = xReader.ReadToEnd();
     //    //  Console.WriteLine(xText);
     //    //}
 
-    //    //var xKudzuStream = new Sys.Filesystem.FAT.FatStream(xKudzuFile);
+    //    //var xKudzuStream = new Sys.Filesystem.FAT.FatFileStream(xKudzuFile);
     //    //var xKudzuData = new byte[xKudzuFile.Size];
     //    //xKudzuStream.Read(xKudzuData, 0, (int)xKudzuFile.Size);
 

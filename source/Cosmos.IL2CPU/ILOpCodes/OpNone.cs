@@ -65,7 +65,9 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Conv_Ovf_U_Un:
           return 1;
         case Code.Add:
+        case Code.Add_Ovf:
         case Code.Mul:
+        case Code.Mul_Ovf_Un:
         case Code.Div:
         case Code.Div_Un:
         case Code.Sub:
@@ -195,7 +197,9 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Conv_Ovf_U_Un:
           return 1;
         case Code.Add:
+        case Code.Add_Ovf:
         case Code.Mul:
+        case Code.Mul_Ovf_Un:
         case Code.Div:
         case Code.Div_Un:
         case Code.Sub:
@@ -553,6 +557,13 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               aSituationChanged = true;
               return;
             }
+            if ((StackPopTypes[0] == typeof(IntPtr) && StackPopTypes[1] == typeof(uint))
+              || (StackPopTypes[0] == typeof(uint) && StackPopTypes[1] == typeof(IntPtr)))
+            {
+              StackPushTypes[0] = typeof(UIntPtr);
+              aSituationChanged = true;
+              return;
+            }
             if ((StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(UIntPtr))
               || (StackPopTypes[0] == typeof(UIntPtr) && StackPopTypes[1] == typeof(int)))
             {
@@ -630,6 +641,13 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               aSituationChanged = true;
               return;
             }
+            if ((StackPopTypes[0] == typeof(IntPtr) && StackPopTypes[1] == typeof(UIntPtr))
+             || (StackPopTypes[0] == typeof(UIntPtr) && StackPopTypes[1] == typeof(IntPtr)))
+            {
+              StackPushTypes[0] = typeof(UIntPtr);
+              aSituationChanged = true;
+              return;
+            }
             if (StackPopTypes[0] == typeof(IntPtr) && StackPopTypes[1] == typeof(IntPtr))
             {
               StackPushTypes[0] = typeof(uint);
@@ -655,6 +673,14 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               return;
             }
             if (StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(int))
+            {
+              StackPushTypes[0] = typeof(int);
+              aSituationChanged = true;
+              return;
+            }
+            if ((StackPopTypes[0] == typeof(int) && StackPopTypes[1] == typeof(bool))
+             || (StackPopTypes[0] == typeof(bool) && StackPopTypes[1] == typeof(int)))
+
             {
               StackPushTypes[0] = typeof(int);
               aSituationChanged = true;

@@ -194,6 +194,9 @@
     <Compile Include="RuntimeEngineRefs.cs" />
     <Compile Include="SkipList.cs" />
     <Compile Include="VTablesImpl.cs" />
+    <Compile Include="VTablesImpl.Debug.cs">
+      <DependentUpon>VTablesImpl.cs</DependentUpon>
+    </Compile>
     <Compile Include="VTablesImplRefs.cs" />
     <Compile Include="IL\Add.cs" />
     <Compile Include="IL\Add_Ovf.cs" />

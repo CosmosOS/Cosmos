@@ -112,12 +112,12 @@ namespace Cosmos.Debug.Kernel.Plugs {
       //new LiteralAssemblerCode("pushad");
       new Label(".BeforeArgumentsPrepare");
       // length: will be at EBP+12 in DebugStub_SendText
-      new LiteralAssemblerCode("mov eax, [ebp+8]");
-      new LiteralAssemblerCode("add eax, 12");
-      new LiteralAssemblerCode("push dword [eax]");
+      new LiteralAssemblerCode("mov ebx, [ebp+8]");
+      new LiteralAssemblerCode("mov ebx, [ebx]");
+      new LiteralAssemblerCode("push dword [ebx + 12]");
       // first char pointer, will be at EBP+8 in DebugStub_SendText
-      new LiteralAssemblerCode("add eax, 4");
-      new LiteralAssemblerCode("push eax");
+      new LiteralAssemblerCode("add ebx, 16");
+      new LiteralAssemblerCode("push dword ebx");
       new Label(".BeforeCall");
       new LiteralAssemblerCode("Call DebugStub_SendText");
       // for x#, we need to cleanup after a call:

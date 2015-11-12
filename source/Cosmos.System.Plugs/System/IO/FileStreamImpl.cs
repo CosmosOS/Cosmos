@@ -1,43 +1,106 @@
-﻿//using System;
-//using System.Collections.Generic;
-//using IO = System.IO;
-//using System.Linq;
-//using System.Text;
-//using Cosmos.IL2CPU.Plugs;
+﻿using global::System;
+using global::System.IO;
 
-//namespace Cosmos.System.Plugs.System.IO {
-//  [Plug(Target = typeof(IO::FileStream))]
-//  public class FileStreamImpl {
+using Cosmos.IL2CPU.Plugs;
+using Cosmos.System.FileSystem;
+using Cosmos.System.FileSystem.VFS;
 
-//            //[PlugField(FieldId = "$$Storage$$", FieldType = typeof(char[]))]
-//            //[PlugField(FieldId = "System.Char System.String.m_firstChar", IsExternalValue = true)]
-//            //public static class StringImpl {
-//            //  //[PlugMethod(Signature = "System_Void__System_String__ctor_System_Char____System_Int32__System_Int32_")]
-//            //  public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength,
-//            //    [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-//            //    [FieldAccess(Name = "System.Char System.String.m_firstChar")] ref char* aFirstChar) {
-//            //    Char[] newChars = new Char[aLength];
-//            //    Array.Copy(aChars, aStartIndex, newChars, 0, aLength);
-//            //    aStorage = newChars;
-//            //    aStringLength = newChars.Length;
-//            //    fixed (char* xFirstChar = &aStorage[0]) {
-//            //      aFirstChar = xFirstChar;
-//            //    }
-//            //  }
+namespace Cosmos.System.Plugs.System.IO
+{
+    [Plug(Target = typeof(FileStream))]
+    [PlugField(FieldId = "$$InnerStream$$", FieldType = typeof(Stream))]
+    public class FileStreamImpl
+    {
+        // This plug basically forwards all calls to the $$InnerStream$$ stream, which is supplied by the file system.
 
-//    static public void Ctor(IO::FileStream aThis, string aPathname, IO::FileMode aMode) {
-//    }
+        //  public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength,
 
-//    static public void CCtor() {
-//      // plug cctor as it (indirectly) uses Thread.MemoryBarrier()
-//    }
+        public static void Ctor(FileStream aThis, string aPathname, FileMode aMode,
+            [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+        {
+            FatHelpers.Debug("In FileStream.Ctor");
+            innerStream = InitializeStream(aPathname, aMode);
+        }
 
-//    static public int Read(IO::FileStream aThis, byte[] aBuffer, int aOffset, int aCount) {
-//      return 0;
-//    }
+        public static void CCtor()
+        {
+            // plug cctor as it (indirectly) uses Thread.MemoryBarrier()
+        }
 
-//    //static void Init(IO::FileStream aThis, string path, IO::FileMode mode, IO::FileAccess access, int rights, bool useRights, IO::FileShare share, int bufferSize
-//    //  , IO::FileOptions options, Microsoft.Win32.Win32Native.SECURITY_ATTRIBUTES secAttrs, string msgPath, bool bFromProxy) { }
+        public static int Read(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
+            [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+        {
+            return innerStream.Read(aBuffer, aOffset, aCount);
+        }
 
-//  }
-//}
+        public static void Write(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
+            [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+        {
+            innerStream.Write(aBuffer, aOffset, aCount);
+        }
+
+        public static long get_Length(FileStream aThis,
+            [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+        {
+            return innerStream.Length;
+        }
+
+        public static void SetLength(FileStream aThis, long aLength,
+            [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+        {
+            innerStream.SetLength(aLength);
+        }
+
+        public static void Dispose(FileStream aThis, bool disposing,
+            [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+        {
+            if (disposing)
+            {
+                innerStream.Dispose();
+            }
+        }
+
+        public static long Seek(FileStream aThis,
+                                [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream, long offset, SeekOrigin origin)
+        {
+            return innerStream.Seek(offset, origin);
+        }
+
+        public static void Flush(FileStream aThis,
+           [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+        {
+            innerStream.Flush();
+        }
+
+        public static long get_Position(FileStream aThis,
+                                        [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+        {
+            return innerStream.Position;
+        }
+
+        public static void set_Position(FileStream aThis,
+                                        [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream, long value)
+        {
+            innerStream.Position = value;
+        }
+
+        //static void Init(FileStream aThis, string path, FileMode mode, FileAccess access, int rights, bool useRights, FileShare share, int bufferSize
+        //  , FileOptions options, Microsoft.Win32.Win32Native.SECURITY_ATTRIBUTES secAttrs, string msgPath, bool bFromProxy) { }
+
+        private static Stream InitializeStream(string aPath, FileMode aMode)
+        {
+            FatHelpers.Debug("In FileStream.InitializeStream");
+            if (aPath == null)
+            {
+                FatHelpers.Debug("In FileStream.Ctor: Path == null is true");
+                throw new Exception("The file path cannot be null.");
+            }
+            if (aPath.Length == 0)
+            {
+                FatHelpers.Debug("In FileStream.Ctor: Path.Length == 0 is true");
+                throw new Exception("The file path cannot be empty.");
+            }
+            return VFSManager.GetFileStream(aPath);
+        }
+    }
+}
