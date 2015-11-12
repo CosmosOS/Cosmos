@@ -70,23 +70,23 @@ namespace Cosmos.Kernel.Tests.Fat
                 //mDebugger.Send(xContents);
                 //Assert.IsTrue(xContents == "Hello", "Contents of Kudzu.txt was read incorrectly!");
 
-                //using (var xFS = new FileStream(@"0:\Kudzu.txt", FileMode.Create))
-                //{
-                //    mDebugger.Send("Start writing");
-                //    var xStr = "Test FAT Write.";
-                //    var xBuff = xStr.GetUtf8Bytes(0, (uint)xStr.Length);
-                //    xFS.Write(xBuff, 0, xBuff.Length);
-                //    mDebugger.Send("---- Data written");
-                //    xFS.Position = 0;
-                //    xFS.Read(xBuff, 0, xBuff.Length);
-                //    mDebugger.Send(xBuff.GetUtf8String(0, (uint)xBuff.Length));
-                //}
+                using (var xFS = new FileStream(@"0:\Kudzu.txt", FileMode.Create))
+                {
+                    mDebugger.Send("Start writing");
+                    var xStr = "Test FAT Write.";
+                    var xBuff = xStr.GetUtf8Bytes(0, (uint)xStr.Length);
+                    xFS.Write(xBuff, 0, xBuff.Length);
+                    mDebugger.Send("---- Data written");
+                    xFS.Position = 0;
+                    xFS.Read(xBuff, 0, xBuff.Length);
+                    mDebugger.Send(xBuff.GetUtf8String(0, (uint)xBuff.Length));
+                }
 
-                mDebugger.Send("Write to file now");
-                File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
-                mDebugger.Send("Text written");
+                //mDebugger.Send("Write to file now");
+                //File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
+                //mDebugger.Send("Text written");
+
                 xContents = File.ReadAllText(@"0:\Kudzu.txt");
-
                 mDebugger.Send("Contents retrieved after writing");
                 mDebugger.Send(xContents);
                 Assert.IsTrue(xContents == "Test FAT write.", "Contents of Kudzu.txt was written incorrectly!");
