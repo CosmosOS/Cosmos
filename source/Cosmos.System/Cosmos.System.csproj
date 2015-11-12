@@ -72,23 +72,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console.cs" />
+    <Compile Include="FileSystem\CosmosVFS.cs" />
     <Compile Include="FileSystem\FatHelpers.cs" />
-    <Compile Include="FileSystem\FAT\BaseFatStream.cs" />
-    <Compile Include="FileSystem\FAT\DirectoryEntryAttributeConsts.cs" />
-    <Compile Include="FileSystem\FAT\FatDirectoryStream.cs" />
     <Compile Include="FileSystem\FAT\FatFileSystem.cs" />
-    <Compile Include="FileSystem\FAT\FatFileStream.cs" />
-    <Compile Include="FileSystem\FAT\Listing\FatDirectory.cs" />
-    <Compile Include="FileSystem\FAT\Listing\FatFile.cs" />
-    <Compile Include="FileSystem\FAT\TestFatDirectoryStream.cs" />
+    <Compile Include="FileSystem\FAT\FatStream.cs" />
+    <Compile Include="FileSystem\FAT\Listing\FatDirectoryEntryAttributeConsts.cs" />
+    <Compile Include="FileSystem\FAT\Listing\FatDirectoryEntryMetadata.cs" />
+    <Compile Include="FileSystem\FAT\Listing\FatDiretoryEntry.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
-    <Compile Include="FileSystem\Listing\Base.cs" />
-    <Compile Include="FileSystem\Listing\Directory.cs" />
-    <Compile Include="FileSystem\Listing\File.cs" />
+    <Compile Include="FileSystem\FileSystemType.cs" />
+    <Compile Include="FileSystem\Listing\DirectoryEntry.cs" />
     <Compile Include="FileSystem\VFS\VFSBase.cs" />
     <Compile Include="FileSystem\VFS\VFSManager.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Kernel.cs" />
+    <Compile Include="MathEx.cs" />
     <Compile Include="Network\ARP\ARPCache.cs" />
     <Compile Include="Network\ARP\ARPPacket.cs" />
     <Compile Include="Network\EthernetPacket.cs" />
@@ -105,7 +103,6 @@
     <Compile Include="Network\UdpClient.cs" />
     <Compile Include="Power.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SentinelVFS.cs" />
     <Compile Include="TestingHelpers.cs" />
     <Compile Include="VBEScreen.cs" />
     <Compile Include="VGAScreen.cs" />

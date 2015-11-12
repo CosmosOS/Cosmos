@@ -6,6 +6,8 @@ using Debugger = Cosmos.Debug.Kernel.Debugger;
 
 namespace Cosmos.System.FileSystem
 {
+    using Cosmos.Common.Extensions;
+
     public static class FatHelpers
     {
         private static Debugger mDebugger = new Debugger("FAT", "Debug");
@@ -20,6 +22,11 @@ namespace Cosmos.System.FileSystem
         public static void DebugNumber(uint value)
         {
             mDebugger.SendNumber(value);
+        }
+
+        public static void DebugNumber(ulong value)
+        {
+            mDebugger.Send(((uint)value).ToString() + ((uint)value >> 32).ToString());
         }
 
         //[Conditional("EXCLUDE")]

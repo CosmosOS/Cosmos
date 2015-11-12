@@ -1,21 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
-using System.IO;
-using Cosmos.System.FileSystem.VFS;
-using Directory = Cosmos.System.FileSystem.Listing.Directory;
-using File = Cosmos.System.FileSystem.Listing.File;
+﻿using global::System.IO;
 
-namespace SentinelKernel.System.Plugs.System.IO
+using Cosmos.IL2CPU.Plugs;
+using Cosmos.System.FileSystem.VFS;
+using Cosmos.System.FileSystem.Listing;
+
+//using Directory = Cosmos.System.FileSystem.Listing.Directory;
+//using File = Cosmos.System.FileSystem.Listing.File;
+
+namespace Cosmos.System.Plugs.System.IO
 {
+    
+
     [Plug(Target = typeof(FileInfo))]
-    [PlugField(FieldId = "$$Storage$$", FieldType = typeof(File))]
+    [PlugField(FieldId = "$$Storage$$", FieldType = typeof(DirectoryEntry))]
     public static class FileInfoImpl
     {
         //[PlugMethod(Signature = "System_Void__System_IO_FileInfo__ctor_System_String_")]
-        public static void Ctor(FileInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref Directory aStorage, string aFile)
+        public static void Ctor(FileInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage, string aFile)
         {
             /*
             //Determine if aFile is relative or absolute
@@ -34,12 +35,12 @@ namespace SentinelKernel.System.Plugs.System.IO
             */
         }
 
-        public static string get_Name([FieldAccess(Name = "$$Storage$$")] ref File aStorage)
+        public static string get_Name([FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
         {
             return "Filename" + aStorage.Name;
         }
 
-        public static bool get_Exists([FieldAccess(Name = "$$Storage$$")] ref File aStorage)
+        public static bool get_Exists([FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
         {
             return VFSManager.FileExists(aStorage.Name);
         }

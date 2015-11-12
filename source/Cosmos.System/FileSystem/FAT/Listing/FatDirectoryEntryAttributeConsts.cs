@@ -1,10 +1,6 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Cosmos.System.FileSystem.FAT
+namespace Cosmos.System.FileSystem.FAT.Listing
 {
-    public static class DirectoryEntryAttributeConsts
+    public static class FatDirectoryEntryAttributeConsts
     {
         public const int Test = 0x01;
         public const int Hidden = 0x02;

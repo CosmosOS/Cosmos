@@ -9,6 +9,8 @@ using Sys = Cosmos.System;
 
 namespace SentinelKernel
 {
+    using Cosmos.System.FileSystem;
+
     public class Kernel : Sys.Kernel
     {
         private VFSBase myVFS;
@@ -16,7 +18,7 @@ namespace SentinelKernel
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully.");
-            myVFS = new Sys.SentinelVFS();
+            myVFS = new CosmosVFS();
             VFSManager.RegisterVFS(myVFS);
         }
 
