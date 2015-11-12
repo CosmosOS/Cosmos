@@ -44,8 +44,3 @@ Setup/Current.iss
 Cosmos.Assembler.Log
 UpgradeLog*.htm
 .sync/
-ClassLibrary1/ClassLibrary1.sln
-ClassLibrary1/ClassLibrary1/Class1.cs
-ClassLibrary1/ClassLibrary1/ClassLibrary1.csproj
-ClassLibrary1/ClassLibrary1/Properties/AssemblyInfo.cs
-source/Cosmos.HAL/Drivers/VGAscreen2.cs
