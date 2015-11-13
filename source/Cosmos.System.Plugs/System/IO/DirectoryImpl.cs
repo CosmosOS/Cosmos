@@ -6,6 +6,8 @@ using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.Plugs.System.IO
 {
+    using Cosmos.System.FileSystem;
+
     [Plug(Target = typeof(Directory))]
     public static class DirectoryImpl
     {
@@ -13,21 +15,29 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetCurrentDirectory()
         {
+            FatHelpers.Debug("-- Directory.GetCurrentDirectory --");
+
             return mCurrentDirectory;
         }
 
         public static void SetCurrentDirectory(string aPath)
         {
+            FatHelpers.Debug("-- Directory.SetCurrentDirectory --");
+
             mCurrentDirectory = aPath;
         }
 
         public static bool Exists(string aPath)
         {
+            FatHelpers.Debug("-- Directory.Exists --");
+
             return VFSManager.DirectoryExists(aPath);
         }
 
         public static DirectoryInfo GetParent(string aPath)
         {
+            FatHelpers.Debug("-- Directory.GetParent --");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");

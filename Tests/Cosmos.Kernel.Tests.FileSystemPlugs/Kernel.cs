@@ -59,11 +59,8 @@ namespace Cosmos.Kernel.Tests.FileSystemPlugs
             RunEQTest(Path.GetDirectoryName(@"0:\test"), @"0:\", "Path.GetDirectoryName (directory no trailing directory separator) failed.");
             RunEQTest(Path.GetDirectoryName(@"0:\test\"), @"0:\", "Path.GetDirectoryName (directory with trailing directory separator) failed.");
             RunEQTest(Path.GetDirectoryName(@"0:\test\test2"), @"0:\test", "Path.GetDirectoryName (subdirectory no trailing directory separator) failed.");
-
-            // Broken
             RunEQTest(Path.GetDirectoryName(@"0:\test\test2\"), @"0:\test", "Path.GetDirectoryName (subdirectory with trailing directory separator) failed.");
             RunEQTest(Path.GetDirectoryName(@"0:\test\ ."), @"0:\test", "Path.GetDirectoryName (directory with trailing directory separator and invalid path) failed.");
-            //
 
             // Path.GetExtension(string)
             RunEQTest(Path.GetExtension(@"file"), string.Empty, "Path.GetExtension (file no extension) failed.");

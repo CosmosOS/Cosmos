@@ -32,6 +32,8 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string ChangeExtension(string aPath, string aExtension)
         {
+            FatHelpers.Debug("-- Path.ChangeExtension --");
+
             if (aPath != null)
             {
                 CheckInvalidPathChars(aPath, false);
@@ -65,6 +67,8 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static void CheckInvalidPathChars(string aPath, bool aCheckAdditional)
         {
+            FatHelpers.Debug("-- Path.CheckInvalidPathChars --");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -78,6 +82,8 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static void CheckSearchPattern(string aSearchPattern)
         {
+            FatHelpers.Debug("-- Path.CheckSearchPattern --");
+
             int xNum;
             while ((xNum = aSearchPattern.IndexOf("..", StringComparison.Ordinal)) != -1)
             {
@@ -86,7 +92,7 @@ namespace Cosmos.System.Plugs.System.IO
                     throw new ArgumentException("The search pattern is invalid.", aSearchPattern);
                 }
 
-                if (aSearchPattern[xNum + 2] == VFSManager.GetDirectorySeparatorChar() || aSearchPattern[xNum + 2] == VFSManager.GetAltDirectorySeparatorChar())
+                if (aSearchPattern[xNum + 2] == Path.DirectorySeparatorChar || aSearchPattern[xNum + 2] == Path.AltDirectorySeparatorChar)
                 {
                     throw new ArgumentException("The search pattern is invalid.", aSearchPattern);
                 }
@@ -97,6 +103,8 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string Combine(string aPath1, string aPath2)
         {
+            FatHelpers.Debug("-- Path.Combine --");
+
             if (aPath1 == null || aPath2 == null)
             {
                 throw new ArgumentNullException((aPath1 == null) ? "path1" : "path2");
@@ -109,6 +117,8 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string CombineNoChecks(string aPath1, string aPath2)
         {
+            FatHelpers.Debug("-- Path.CombineNoChecks --");
+
             if (aPath2.Length == 0)
             {
                 return aPath1;
@@ -119,13 +129,13 @@ namespace Cosmos.System.Plugs.System.IO
                 return aPath2;
             }
 
-            if (Path.IsPathRooted(aPath2))
+            if (IsPathRooted(aPath2))
             {
                 return aPath2;
             }
 
             char xC = aPath1[aPath1.Length - 1];
-            if (xC != VFSManager.GetDirectorySeparatorChar() && xC != VFSManager.GetAltDirectorySeparatorChar() && xC != VFSManager.GetVolumeSeparatorChar())
+            if (xC != Path.DirectorySeparatorChar && xC != Path.AltDirectorySeparatorChar && xC != Path.VolumeSeparatorChar)
             {
                 return aPath1 + "\\" + aPath2;
             }
@@ -135,6 +145,8 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetDirectoryName(string aPath)
         {
+            FatHelpers.Debug("-- Path.GetDirectoryName --");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -152,7 +164,7 @@ namespace Cosmos.System.Plugs.System.IO
                     return null;
                 }
 
-                while (xNum > xRootLength && xPath[--xNum] != VFSManager.GetDirectorySeparatorChar() && xPath[xNum] != VFSManager.GetAltDirectorySeparatorChar())
+                while (xNum > xRootLength && xPath[--xNum] != Path.DirectorySeparatorChar && xPath[xNum] != Path.AltDirectorySeparatorChar)
                 {
                 }
 
@@ -164,6 +176,8 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetExtension(string aPath)
         {
+            FatHelpers.Debug("-- Path.GetExtension --");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -185,7 +199,7 @@ namespace Cosmos.System.Plugs.System.IO
                     return string.Empty;
                 }
 
-                if (xC == VFSManager.GetDirectorySeparatorChar() || xC == VFSManager.GetAltDirectorySeparatorChar() || xC == VFSManager.GetVolumeSeparatorChar())
+                if (xC == Path.DirectorySeparatorChar || xC == Path.AltDirectorySeparatorChar || xC == Path.VolumeSeparatorChar)
                 {
                     break;
                 }
@@ -195,6 +209,8 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetFileName(string aPath)
         {
+            FatHelpers.Debug("-- Path.GetFileName --");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -206,7 +222,7 @@ namespace Cosmos.System.Plugs.System.IO
             while (--xNum >= 0)
             {
                 char xC = aPath[xNum];
-                if (xC == VFSManager.GetDirectorySeparatorChar() || xC == VFSManager.GetAltDirectorySeparatorChar() || xC == VFSManager.GetVolumeSeparatorChar())
+                if (xC == Path.DirectorySeparatorChar || xC == Path.AltDirectorySeparatorChar || xC == Path.VolumeSeparatorChar)
                 {
                     return aPath.Substring(xNum + 1, xLength - xNum - 1);
                 }
@@ -217,7 +233,9 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetFileNameWithoutExtension(string aPath)
         {
-            aPath = Path.GetFileName(aPath);
+            FatHelpers.Debug("-- Path.GetFileNameWithoutExtension --");
+
+            aPath = GetFileName(aPath);
             if (aPath == null)
             {
                 return null;
@@ -232,11 +250,15 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetFullPath(string aPath)
         {
+            FatHelpers.Debug("-- Path.GetFullPath --");
+
             return GetFullPathInternal(aPath);
         }
 
         public static string GetFullPathInternal(string aPath)
         {
+            FatHelpers.Debug("-- Path.GetFullPathInternal --");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -247,16 +269,22 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static char[] GetInvalidFileNameChars()
         {
+            FatHelpers.Debug("-- Path.GetInvalidFileNameChars --");
+
             return VFSManager.GetInvalidFileNameChars();
         }
 
         public static char[] GetInvalidPathChars()
         {
+            FatHelpers.Debug("-- Path.GetInvalidPathChars --");
+
             return VFSManager.GetRealInvalidPathChars();
         }
 
         public static string GetPathRoot(string aPath)
         {
+            FatHelpers.Debug("-- Path.GetPathRoot --");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -275,11 +303,15 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetRandomFileName()
         {
+            FatHelpers.Debug("-- Path.GetRandomFileName --");
+
             return "random.tmp";
         }
 
         public static int GetRootLength(string aPath)
         {
+            FatHelpers.Debug("-- Path.GetRootLength --");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -297,7 +329,7 @@ namespace Cosmos.System.Plugs.System.IO
                     int num = 2;
                     while (i < length)
                     {
-                        if ((aPath[i] == VFSManager.GetDirectorySeparatorChar() || aPath[i] == VFSManager.GetAltDirectorySeparatorChar()) && --num <= 0)
+                        if ((aPath[i] == Path.DirectorySeparatorChar || aPath[i] == Path.AltDirectorySeparatorChar) && --num <= 0)
                         {
                             break;
                         }
@@ -305,7 +337,7 @@ namespace Cosmos.System.Plugs.System.IO
                     }
                 }
             }
-            else if (length >= 2 && aPath[1] == VFSManager.GetVolumeSeparatorChar())
+            else if (length >= 2 && aPath[1] == Path.VolumeSeparatorChar)
             {
                 i = 2;
                 if (length >= 3 && IsDirectorySeparator(aPath[2]))
@@ -319,16 +351,22 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetTempFileName()
         {
+            FatHelpers.Debug("-- Path.GetTempFileName --");
+
             return "tempfile.tmp";
         }
 
         public static string GetTempPath()
         {
+            FatHelpers.Debug("-- Path.GetTempPath --");
+
             return @"\Temp";
         }
 
         public static bool HasExtension(string aPath)
         {
+            FatHelpers.Debug("-- Path.HasExtension --");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -344,7 +382,7 @@ namespace Cosmos.System.Plugs.System.IO
                     return xNum != aPath.Length - 1;
                 }
 
-                if (xC == VFSManager.GetDirectorySeparatorChar() || xC == VFSManager.GetAltDirectorySeparatorChar() || xC == VFSManager.GetVolumeSeparatorChar())
+                if (xC == Path.DirectorySeparatorChar || xC == Path.AltDirectorySeparatorChar || xC == Path.VolumeSeparatorChar)
                 {
                     break;
                 }
@@ -355,13 +393,19 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static bool HasIllegalCharacters(string aPath, bool aCheckAdditional)
         {
+            FatHelpers.Debug("-- Path.HasIllegalCharacters --");
+
             if (aPath == null)
             {
+                FatHelpers.Debug("-- Path.HasIllegalCharacters : Path is null --");
+
                 throw new ArgumentNullException("aPath");
             }
 
             if (aCheckAdditional)
             {
+                FatHelpers.Debug("-- Path.HasIllegalCharacters : Check additional --");
+
                 return aPath.IndexOfAny(VFSManager.GetInvalidPathCharsWithAdditionalChecks()) >= 0;
             }
 
@@ -370,11 +414,15 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static bool IsDirectorySeparator(char aC)
         {
-            return aC == VFSManager.GetDirectorySeparatorChar() || aC == VFSManager.GetAltDirectorySeparatorChar();
+            FatHelpers.Debug("-- Path.IsDirectorySeparator --");
+
+            return aC == Path.DirectorySeparatorChar || aC == Path.AltDirectorySeparatorChar;
         }
 
         public static bool IsPathRooted(string aPath)
         {
+            FatHelpers.Debug("-- Path.IsPathRooted --");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -382,7 +430,7 @@ namespace Cosmos.System.Plugs.System.IO
 
             CheckInvalidPathChars(aPath, false);
             int xLength = aPath.Length;
-            if ((xLength >= 1 && (aPath[0] == VFSManager.GetDirectorySeparatorChar() || aPath[0] == VFSManager.GetAltDirectorySeparatorChar())) || (xLength >= 2 && aPath[1] == VFSManager.GetVolumeSeparatorChar()))
+            if ((xLength >= 1 && (aPath[0] == Path.DirectorySeparatorChar || aPath[0] == Path.AltDirectorySeparatorChar)) || (xLength >= 2 && aPath[1] == Path.VolumeSeparatorChar))
             {
                 return true;
             }
@@ -392,16 +440,20 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static bool IsRelative(string aPath)
         {
+            FatHelpers.Debug("-- Path.IsRelative --");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
             }
 
-            return (aPath.Length < 3 || aPath[1] != VFSManager.GetVolumeSeparatorChar() || aPath[2] != VFSManager.GetDirectorySeparatorChar());
+            return (aPath.Length < 3 || aPath[1] != Path.VolumeSeparatorChar || aPath[2] != Path.DirectorySeparatorChar);
         }
 
         public static string NormalizePath(string aPath, bool aFullCheck)
         {
+            FatHelpers.Debug("-- Path.NormalizePath --");
+
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -409,10 +461,10 @@ namespace Cosmos.System.Plugs.System.IO
 
             if (IsRelative(aPath))
             {
-                return Directory.GetCurrentDirectory() + VFSManager.GetDirectorySeparatorChar() + aPath;
+                return Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + aPath;
             }
 
-            return aPath.TrimEnd(VFSManager.GetDirectorySeparatorChar(), VFSManager.GetAltDirectorySeparatorChar());
+            return aPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
         }
     }
 }
