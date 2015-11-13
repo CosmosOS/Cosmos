@@ -44,60 +44,75 @@ namespace Cosmos.Kernel.Tests.FileSystemPlugs
         {
             mDebugger.Send("-- START TestPathPlugs --");
 
-            string xResultString = string.Empty;
-            char[] xResultCharArray = new char[0];
+            // Path.ChangeExtension(string, string)
+            RunEQTest(Path.ChangeExtension(@"0:\Kudzu.txt", ".doc"), @"0:\Kudzu.doc", "Path.ChangeExtenstion (with dot) failed.");
+            RunEQTest(Path.ChangeExtension(@"0:\Kudzu.txt", "doc"), @"0:\Kudzu.doc", "Path.ChangeExtenstion (no dot) failed.");
 
-            xResultString = Path.ChangeExtension(@"0:\Kudzu.txt", ".doc");
-            Assert.IsTrue(xResultString == @"0:\Kudzu.doc", "Path.ChangeExtenstion (with dot) failed.");
+            // Path.Combine(string, string)
+            RunEQTest(Path.Combine(@"0:\", "test"), @"0:\test", "Path.Combine (root and directory) failed.");
+            RunEQTest(Path.Combine(@"0:\", "test.txt"), @"0:\test.txt", "Path.Combine (root and file) failed.");
+            RunEQTest(Path.Combine(@"0:\test", "test2"), @"0:\test\test2", "Path.Combine (directory and directory) failed.");
+            RunEQTest(Path.Combine(@"0:\test", "test2.txt"), @"0:\test\test2.txt", "Path.Combine (directory and file) failed.");
 
-            xResultString = Path.ChangeExtension(@"0:\Kudzu.txt", "doc");
-            Assert.IsTrue(xResultString == @"0:\Kudzu.doc", "Path.ChangeExtenstion (no dot) failed.");
+            // Path.GetDirectoryName(string)
+            RunEQTest(Path.GetDirectoryName(@"0:\"), null, "Path.GetDirectoryName (root) failed.");
+            RunEQTest(Path.GetDirectoryName(@"0:\test"), @"0:\", "Path.GetDirectoryName (directory no trailing directory separator) failed.");
+            RunEQTest(Path.GetDirectoryName(@"0:\test\"), @"0:\", "Path.GetDirectoryName (directory with trailing directory separator) failed.");
+            RunEQTest(Path.GetDirectoryName(@"0:\test\test2"), @"0:\test", "Path.GetDirectoryName (subdirectory no trailing directory separator) failed.");
 
+            // Broken
+            RunEQTest(Path.GetDirectoryName(@"0:\test\test2\"), @"0:\test", "Path.GetDirectoryName (subdirectory with trailing directory separator) failed.");
+            RunEQTest(Path.GetDirectoryName(@"0:\test\ ."), @"0:\test", "Path.GetDirectoryName (directory with trailing directory separator and invalid path) failed.");
+            //
 
-            xResultString = Path.Combine(@"0:\", "test");
-            Assert.IsTrue(xResultString == @"0:\test", "Path.Combine (root and directory) failed.");
+            // Path.GetExtension(string)
+            RunEQTest(Path.GetExtension(@"file"), string.Empty, "Path.GetExtension (file no extension) failed.");
+            RunEQTest(Path.GetExtension(@"file.txt"), "txt", "Path.GetExtension (file with extension) failed.");
 
-            xResultString = Path.Combine(@"0:\", "test.txt");
-            Assert.IsTrue(xResultString == @"0:\test.txt", "Path.Combine (root and file) failed.");
+            // Path.GetFileName(string aPath)
+            RunEQTest(Path.GetFileName(@"0:\file"), string.Empty, "Path.GetFileName (file no extension) failed.");
+            RunEQTest(Path.GetFileName(@"0:\file.txt"), "file.txt", "Path.GetFileName (file with extension) failed.");
+            RunEQTest(Path.GetFileName(@"0:\test\file"), string.Empty, "Path.GetFileName (directory and file no extension) failed.");
+            RunEQTest(Path.GetFileName(@"0:\test\file.txt"), "file.txt", "Path.GetFileName (directory and file with extension) failed.");
 
-            xResultString = Path.Combine(@"0:\test", "test2");
-            Assert.IsTrue(xResultString == @"0:\test\test2", "Path.Combine (directory and directory) failed.");
+            // Path.GetFileNameWithoutExtension(string aPath)
+            RunEQTest(Path.GetFileNameWithoutExtension(@"0:\file"), string.Empty, "Path.GetFileNameWithoutExtension (file no extension) failed.");
+            RunEQTest(Path.GetFileNameWithoutExtension(@"0:\file.txt"), "file", "Path.GetFileNameWithoutExtension (file with extension) failed.");
+            RunEQTest(Path.GetFileNameWithoutExtension(@"0:\test\file"), string.Empty, "Path.GetFileNameWithoutExtension (directory and file no extension) failed.");
+            RunEQTest(Path.GetFileNameWithoutExtension(@"0:\test\file.txt"), "file", "Path.GetFileNameWithoutExtension (directory and file with extension) failed.");
 
-            xResultString = Path.Combine(@"0:\test", "test2.txt");
-            Assert.IsTrue(xResultString == @"0:\test\test2.txt", "Path.Combine (directory and file) failed.");
+            // Path.GetFullPath(string)
 
-            //Path.GetDirectoryName(string aPath)
+            RunGTTest(Path.GetInvalidFileNameChars().Length, 0, "Path.GetInvalidFileNameChars failed.");
+            RunGTTest(Path.GetInvalidPathChars().Length, 0, "Path.GetInvalidPathChars failed.");
 
-            //Path.GetExtension(string aPath)
+            // Path.GetPathRoot(string)
 
-            //Path.GetFileName(string aPath)
+            RunEQTest(Path.GetRandomFileName(), "random.tmp", "Path.GetRandomFileName failed.");
+            RunEQTest(Path.GetTempFileName(), "tempfile.tmp", "Path.GetTempFileName failed.");
+            RunEQTest(Path.GetTempPath(), @"\Temp", "Path.GetTempPath failed.");
 
-            //Path.GetFileNameWithoutExtension(string aPath)
+            // Path.HasExtension(string)
 
-            //Path.GetFullPath(string aPath)
-
-            xResultCharArray = Path.GetInvalidFileNameChars();
-            Assert.IsTrue(xResultCharArray.Length > 0, "Path.GetInvalidFileNameChars failed.");
-
-            xResultCharArray = Path.GetInvalidPathChars();
-            Assert.IsTrue(xResultCharArray.Length > 0, "Path.GetInvalidPathChars failed.");
-
-            //Path.GetPathRoot(string aPath)
-
-            xResultString = Path.GetRandomFileName();
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(xResultString), "Path.GetRandomFileName failed.");
-
-            xResultString = Path.GetTempFileName();
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(xResultString), "Path.GetTempFileName failed.");
-
-            xResultString = Path.GetTempPath();
-            Assert.IsTrue(!string.IsNullOrWhiteSpace(xResultString), "Path.GetTempPath failed.");
-
-            //Path.HasExtension(string aPath)
-
-            //Path.IsPathRooted(string aPath)
+            // Path.IsPathRooted(string)
 
             mDebugger.Send("-- END TestPathPlugs --");
+        }
+
+        private void RunEQTest(string aActualTestResult, string aExpectedTestResult, string aTestFailedMessage)
+        {
+            bool xTestResult = aActualTestResult == aExpectedTestResult;
+            string xTestCompareString = aExpectedTestResult + " == " + aActualTestResult;
+            mDebugger.Send("Test = " + xTestCompareString);
+            Assert.IsTrue(xTestResult, aTestFailedMessage);
+        }
+
+        private void RunGTTest(int aActualTestResult, int aExpectedTestResult, string aTestFailedMessage)
+        {
+            bool xTestResult = aActualTestResult > aExpectedTestResult;
+            string xTestCompareString = aExpectedTestResult + " > " + aActualTestResult;
+            mDebugger.Send("Test: " + xTestCompareString);
+            Assert.IsTrue(xTestResult, aTestFailedMessage);
         }
     }
 }
