@@ -19,7 +19,7 @@ namespace Cosmos.Build.Builder {
   public class CosmosTask : Task {
     protected string mCosmosDir;
     protected string mOutputDir;
-    protected BuildState mBuildState; 
+    protected BuildState mBuildState;
     protected string mAppDataDir;
     protected int mReleaseNo;
     protected string mInnoFile;
@@ -85,12 +85,12 @@ namespace Cosmos.Build.Builder {
       if (!App.TestMode) {
         CheckPrereqs();                                 //Working
         // No point in continuing if Prerequisites are missing
-        // Could potentially add more State checks in the future, but for now 
+        // Could potentially add more State checks in the future, but for now
         // only the prerequisites are handled...
         if (mBuildState != BuildState.PrerequisiteMissing)
         {
             CleanupVSIPFolder();
-          
+
             CompileCosmos();                                //Working
             CopyTemplates();
 
@@ -109,7 +109,10 @@ namespace Cosmos.Build.Builder {
       } else {
         Section("Testing...");
         //Uncomment bits that you want to test...
-        CheckForInno(); //CheckPrereqs();                               //Working
+        //CheckForInno();
+        CheckPrereqs();                               //Working
+        if (mBuildState != BuildState.PrerequisiteMissing)
+          Echo("failed");
         //Cleanup();                                    //Working
 
         //CompileCosmos();                              //Working
@@ -162,8 +165,13 @@ namespace Cosmos.Build.Builder {
         using (var xKey = Registry.LocalMachine.OpenSubKey(aKey + xSubKey)) {
           string xValue = (string)xKey.GetValue(aValueName);
           if (xValue != null && xValue.ToUpper().Contains(xCheck)) {
-            mBuildState = BuildState.Running;
-                        return true;
+            if (mBuildState != BuildState.PrerequisiteMissing)
+            {
+              mBuildState = BuildState.Running;
+              return true;
+            }
+            else
+              return false;
           }
         }
       }
@@ -349,7 +357,7 @@ namespace Cosmos.Build.Builder {
                     return;
         }
         mInnoPath = (string)xKey.GetValue("InstallLocation");
-        if (string.IsNullOrWhiteSpace(mInnoPath)) {
+        if (string.IsNullOrEmpty(mInnoPath)) {
           mExceptionList.Add("Cannot find Inno Setup.");
                    mBuildState = BuildState.PrerequisiteMissing;
                     return;
@@ -457,6 +465,7 @@ namespace Cosmos.Build.Builder {
 
     void CreateSetup() {
       Section("Creating Setup");
+
 
       string xISCC = Path.Combine(mInnoPath, "ISCC.exe");
       if (!File.Exists(xISCC)) {
