@@ -387,6 +387,7 @@ namespace Cosmos.System.FileSystem.VFS
             {
                 xPath = xEntry + xEntry.Name;
                 xEntry = aEntry.Parent;
+                FatHelpers.Debug("-- VFSManager.GetFullPath : xPath = " + xPath + " --");
             }
 
             return Path.GetFullPath(xPath);

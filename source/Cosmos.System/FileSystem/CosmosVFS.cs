@@ -9,32 +9,10 @@ using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.FileSystem
 {
-    [Serializable]
-    public struct KVP<TKey, TValue>
-    {
-        private readonly TKey key;
-        private readonly TValue value;
-
-        public KVP(TKey key, TValue value)
-        {
-            this.key = key;
-            this.value = value;
-        }
-
-        public TKey Key
-        {
-            get { return key; }
-        }
-
-        public TValue Value
-        {
-            get { return value; }
-        }
-    }
-
     public class CosmosVFS : VFSBase
     {
         private List<Partition> mPartitions;
+
         private List<FileSystem> mFileSystems;
 
         public override void Initialize()
@@ -164,6 +142,7 @@ namespace Cosmos.System.FileSystem
                     string xMessage = string.Concat("Initialized ", mFileSystems.Count, "filesystem(s)...");
                     global::System.Console.WriteLine(xMessage);
                     mFileSystems[i].DisplayFileSystemInfo();
+                    Directory.SetCurrentDirectory(xRootPath);
                 }
                 else
                 {
@@ -237,6 +216,6 @@ namespace Cosmos.System.FileSystem
         {
             return aFS.GetRootDirectory();
         }
-    }
 
+    }
 }

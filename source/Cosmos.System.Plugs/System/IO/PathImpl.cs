@@ -250,13 +250,6 @@ namespace Cosmos.System.Plugs.System.IO
         {
             FatHelpers.Debug("-- Path.GetFullPath --");
 
-            return GetFullPathInternal(aPath);
-        }
-
-        public static string GetFullPathInternal(string aPath)
-        {
-            FatHelpers.Debug("-- Path.GetFullPathInternal --");
-
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
