@@ -34,13 +34,13 @@ namespace Cosmos.Kernel.Tests.Fat
                 bool xTest;
                 string xContents;
 
-                //mDebugger.Send("Get parent:");
-                //var xParent = Directory.GetParent(@"0:\test");
-                //Assert.IsTrue(xParent == null, "Failed to get directory parent.");
+                mDebugger.Send("Get parent:");
+                var xParent = Directory.GetParent(@"0:\test");
+                Assert.IsTrue(xParent == null, "Failed to get directory parent.");
 
-                //mDebugger.Send("Get parent:");
-                //xParent = Directory.GetParent(@"0:\test\");
-                //Assert.IsTrue(xParent == null, "Failed to get directory parent.");
+                mDebugger.Send("Get parent:");
+                xParent = Directory.GetParent(@"0:\test\");
+                Assert.IsTrue(xParent == null, "Failed to get directory parent.");
 
                 mDebugger.Send("Create directory:");
                 var xDirectory = Directory.CreateDirectory(@"0:\test2");

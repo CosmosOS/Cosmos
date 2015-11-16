@@ -36,13 +36,11 @@ namespace Cosmos.System.FileSystem
                 return xEntry;
             }
 
-            string xParentDirectory;
-            if (aPath.EndsWith(DirectorySeparatorChar.ToString()))
-            {
-                string xStripPath = aPath.Remove(aPath.Length - 1, 1);
-                xParentDirectory = xStripPath.Remove(xStripPath.IndexOf(DirectorySeparatorChar) - 1);
-            }
             var xFS = GetFileSystemFromPath(aPath);
+            if (xFS != null)
+            {
+                return xFS.CreateDirectory(aPath);
+            }
 
             return null;
         }

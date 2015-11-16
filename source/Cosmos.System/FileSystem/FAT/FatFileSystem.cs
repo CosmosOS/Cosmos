@@ -602,15 +602,20 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override DirectoryEntry CreateDirectory(string aPath)
         {
-            //if (string.IsNullOrWhiteSpace(aPath))
-            //{
-            //    throw new ArgumentException(aPath);
-            //}
+            if (aPath == null)
+            {
+                throw new ArgumentNullException("aPath");
+            }
 
-            //if (Path.GetPathRoot(aPath) == aPath)
-            //{
-            //    return GetRootDirectory();
-            //}
+            if (aPath.Length == 0)
+            {
+                throw new ArgumentException("aPath");
+            }
+
+            if (Path.GetPathRoot(aPath) == aPath)
+            {
+                return GetRootDirectory();
+            }
 
             return null;
         }
