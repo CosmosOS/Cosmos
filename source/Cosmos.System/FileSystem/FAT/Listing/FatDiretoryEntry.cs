@@ -16,6 +16,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         public FatDirectoryEntry(FatFileSystem aFileSystem, FatDirectoryEntry aParent, string aName, uint aSize, ulong aFirstClusterNum, uint aEntryHeaderDataOffset, DirectoryEntryTypeEnum aEntryType)
             : base(aFileSystem, aParent, aName, aSize, aEntryType)
         {
+            FatHelpers.Debug("-- FatDirectoryEntry.ctor : aParent.Name = " + aParent?.Name + ", aName = " + aName + ", aSize = " + aSize + " --");
             FileSystem = aFileSystem;
             Parent = aParent;
             FirstClusterNum = aFirstClusterNum;

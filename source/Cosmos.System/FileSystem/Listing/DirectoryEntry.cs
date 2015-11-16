@@ -17,7 +17,7 @@
 
         protected DirectoryEntry(FileSystem aFileSystem, DirectoryEntry aParent, string aName, ulong aSize, DirectoryEntryTypeEnum aEntryType)
         {
-            FatHelpers.Debug("-- DirectoryEntry.ctor : aaPrent.Name = " + aParent?.Name + ", aName = " + aName + ", aSize = " + aSize + " --");
+            FatHelpers.Debug("-- DirectoryEntry.ctor : aParent.Name = " + aParent?.Name + ", aName = " + aName + ", aSize = " + aSize + " --");
             FileSystem = aFileSystem;
             Parent = aParent;
             EntryType = aEntryType;

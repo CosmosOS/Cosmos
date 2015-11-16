@@ -8,6 +8,8 @@ using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System.FileSystem.FAT
 {
+    using Cosmos.System.FileSystem.VFS;
+
     public class FatFileSystem : FileSystem
     {
         public readonly uint BytesPerSector;
@@ -291,23 +293,32 @@ namespace Cosmos.System.FileSystem.FAT
             }
         }
 
-        private List<FatDirectoryEntry> GetDirectoryContents(FatDirectoryEntry directory)
+        private List<FatDirectoryEntry> GetDirectoryContents(FatDirectoryEntry aDirectory)
         {
-            FatHelpers.Debug("-- FatFileSystem.GetDirectoryContents --");
-            if (directory == null)
+            FatHelpers.Debug("-- FatFileSystem.GetDirectoryContents : aDirectory.Name = " + aDirectory?.Name + " --");
+            if (aDirectory == null)
             {
                 throw new ArgumentNullException("directory");
             }
 
-            byte[] xData = GetDirectoryEntryData(directory);
+            byte[] xData = GetDirectoryEntryData(aDirectory);
             // todo: what about larger directories?
 
-            return ReadDirectoryContents(xData, directory);
+            return ReadDirectoryContents(xData, aDirectory);
         }
 
         private List<FatDirectoryEntry> ReadDirectoryContents(byte[] xData, FatDirectoryEntry aDirectory)
         {
-            FatHelpers.Debug("-- FatFileSystem.ReadDirectoryContents --");
+            FatDirectoryEntry xParent;
+            if (aDirectory == null)
+            {
+                xParent = GetFatRootDirectory();
+            }
+            else
+            {
+                xParent = aDirectory;
+            }
+
             var xResult = new List<FatDirectoryEntry>();
             //TODO: Change xLongName to StringBuilder
             string xLongName = "";
@@ -430,7 +441,7 @@ namespace Cosmos.System.FileSystem.FAT
                     {
                         continue;
                     }
-                    var xEntry = new FatDirectoryEntry(this, aDirectory, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.File);
+                    var xEntry = new FatDirectoryEntry(this, xParent, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.File);
                     xResult.Add(xEntry);
                     FatHelpers.Debug("Returning file '" + xEntry.Name + "', FirstCluster = " + xEntry.FirstClusterNum +
                                      ", Size = " + xEntry.Size);
@@ -438,7 +449,7 @@ namespace Cosmos.System.FileSystem.FAT
                 else if (xTest == FatDirectoryEntryAttributeConsts.Directory)
                 {
                     uint xSize = xData.ToUInt32(i + 28);
-                    var xEntry = new FatDirectoryEntry(this, aDirectory, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.Directory);
+                    var xEntry = new FatDirectoryEntry(this, xParent, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.Directory);
                     FatHelpers.Debug("Returning directory '" + xEntry.Name + "', FirstCluster = " +
                                      xEntry.FirstClusterNum + ", Size = " + xEntry.Size);
                     xResult.Add(xEntry);
@@ -511,6 +522,13 @@ namespace Cosmos.System.FileSystem.FAT
         }
 
         public override DirectoryEntry GetRootDirectory()
+        {
+            FatHelpers.Debug("-- FatFileSystem.GetRootDirectory --");
+            //TODO: Get size.
+            return GetFatRootDirectory();
+        }
+
+        private FatDirectoryEntry GetFatRootDirectory()
         {
             FatHelpers.Debug("-- FatFileSystem.GetRootDirectory --");
             //TODO: Get size.

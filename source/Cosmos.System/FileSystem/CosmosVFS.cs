@@ -29,6 +29,7 @@ namespace Cosmos.System.FileSystem
 
         public override DirectoryEntry CreateDirectory(string aPath)
         {
+            FatHelpers.Debug("-- CosmosVFS.CreateDirectory : aPath = " + aPath + " --");
             var xEntry = GetDirectory(aPath);
             if (xEntry != null)
             {

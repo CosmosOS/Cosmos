@@ -17,7 +17,9 @@ namespace Cosmos.System.Plugs.System.IO
     [PlugField(FieldId = "$$Name$$", FieldType = typeof(string))]
     public static class DirectoryInfoImpl
     {
-        public static void Ctor(DirectoryInfo aThis, string aPath,
+        public static void Ctor(
+            DirectoryInfo aThis,
+            string aPath,
             [FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage,
             [FieldAccess(Name = "$$FullPath$$")] ref string aFullPath,
             [FieldAccess(Name = "$$Name$$")] ref string aName)
@@ -36,7 +38,7 @@ namespace Cosmos.System.Plugs.System.IO
             aStorage = VFSManager.GetDirectory(aPath);
             aFullPath = VFSManager.GetFullPath(aStorage);
             aName = Path.GetDirectoryName(aFullPath);
-            
+
         }
 
         public static string get_Name(DirectoryInfo aThis)
@@ -312,4 +314,3 @@ namespace Cosmos.System.Plugs.System.IO
 
     }
 }
-

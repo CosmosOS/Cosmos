@@ -534,6 +534,11 @@ namespace Cosmos.IL2CPU.CustomImplementation.System
 
         public static string ToString(string aThis)
         {
+            if (aThis == null)
+            {
+                return string.Empty;
+            }
+
             return aThis;
         }
 

@@ -81,17 +81,6 @@ namespace Cosmos.System.FileSystem.VFS
 
         public static string[] SplitPath(string aPath)
         {
-            string xResult = Path.GetDirectoryName(aPath);
-            FatHelpers.Debug("-- VFSManager.SplitPath : aPath = " + aPath + ", xResult = " + xResult + " --");
-
-            var xParent = Directory.GetParent(aPath);
-            while (xParent != null)
-            {
-                xResult = string.Concat(xParent.Name, xResult);
-                xParent = Directory.GetParent(xParent.FullName);
-                FatHelpers.Debug("-- VFSManager.SplitPath : aPath = " + aPath + ", xResult = " + xResult + " --");
-            }
-
             //TODO: This should call Path.GetDirectoryName() and then loop calling Directory.GetParent(), but those aren't implemented yet.
             return aPath.Split(GetDirectorySeparators(), StringSplitOptions.RemoveEmptyEntries);
         }
@@ -135,25 +124,22 @@ namespace Cosmos.System.FileSystem.VFS
 
         public static DirectoryInfo CreateDirectory(string aPath)
         {
-            FatHelpers.Debug("-- VFSManager.CreateDirectory --");
-
             if (string.IsNullOrEmpty(aPath))
             {
                 throw new ArgumentNullException("aPath");
             }
 
-
             bool xExists = Directory.Exists(aPath);
             if (!xExists)
             {
                 FatHelpers.Debug("-- VFSManager.CreateDirectory : " + aPath + " not found. Creating it. --");
-                var splitPath = SplitPath(aPath);
+                mVFS.CreateDirectory(aPath);
             }
             else
             {
                 FatHelpers.Debug("-- VFSManager.CreateDirectory : " + aPath + " found. Don't create it. --");
-                var info = new DirectoryInfo(aPath);
-                return info;
+                var xDirectoryInfo = new DirectoryInfo(aPath);
+                return xDirectoryInfo;
             }
             return null;
 
