@@ -26,106 +26,46 @@ namespace Cosmos.System.FileSystem.VFS
 
         public static char GetAltDirectorySeparatorChar()
         {
-            FatHelpers.Debug("-- VFSManager.GetAltDirectorySeparatorChar --");
-
             return '/';
         }
 
         public static char GetDirectorySeparatorChar()
         {
-            FatHelpers.Debug("-- VFSManager.GetDirectorySeparatorChar --");
-
             return '\\';
         }
 
         public static char[] GetInvalidFileNameChars()
         {
-            FatHelpers.Debug("-- VFSManager.GetInvalidFileNameChars --");
-
-            return new[]
-            {
-                '"',
-                '<',
-                '>',
-                '|',
-                '\0',
-                '\a',
-                '\b',
-                '\t',
-                '\n',
-                '\v',
-                '\f',
-                '\r',
-                ':',
-                '*',
-                '?',
-                '\\',
-                '/'
-            };
+            return new[] { '"', '<', '>', '|', '\0', '\a', '\b', '\t', '\n', '\v', '\f', '\r', ':', '*', '?', '\\', '/' };
         }
 
         public static char[] GetInvalidPathCharsWithAdditionalChecks()
         {
-            FatHelpers.Debug("-- VFSManager.GetInvalidPathCharsWithAdditionalChecks --");
-
-            return new[]
-            {
-                '"',
-                '<',
-                '>',
-                '|',
-                '\0',
-                '\a',
-                '\b',
-                '\t',
-                '\n',
-                '\v',
-                '\f',
-                '\r',
-                '*',
-                '?'
-            };
+            return new[] { '"', '<', '>', '|', '\0', '\a', '\b', '\t', '\n', '\v', '\f', '\r', '*', '?' };
         }
 
         public static char GetPathSeparator()
         {
-            FatHelpers.Debug("-- VFSManager.GetPathSeparator --");
-
             return ';';
         }
 
         public static char[] GetRealInvalidPathChars()
         {
-            FatHelpers.Debug("-- VFSManager.GetRealInvalidPathChars --");
+            return new[] { '"', '<', '>', '|', '\0', '\a', '\b', '\t', '\n', '\v', '\f', '\r' };
+        }
 
-            return new[]
-            {
-                '"',
-                '<',
-                '>',
-                '|',
-                '\0',
-                '\a',
-                '\b',
-                '\t',
-                '\n',
-                '\v',
-                '\f',
-                '\r'
-            };
+        public static char[] GetTrimEndChars()
+        {
+            return new[] { (char)0x9, (char)0xA, (char)0xB, (char)0xC, (char)0xD, (char)0x20, (char)0x85, (char)0xA0 };
         }
 
         public static char GetVolumeSeparatorChar()
         {
-            FatHelpers.Debug("-- VFSManager.GetVolumeSeparatorChar --");
-
             return ':';
         }
 
         public static int GetMaxPath()
         {
-            FatHelpers.Debug("-- VFSManager.GetMaxPath --");
-
             return 260;
         }
 
@@ -141,7 +81,16 @@ namespace Cosmos.System.FileSystem.VFS
 
         public static string[] SplitPath(string aPath)
         {
-            FatHelpers.Debug("-- VFSManager.SplitPath --");
+            string xResult = Path.GetDirectoryName(aPath);
+            FatHelpers.Debug("-- VFSManager.SplitPath : aPath = " + aPath + ", xResult = " + xResult + " --");
+
+            var xParent = Directory.GetParent(aPath);
+            while (xParent != null)
+            {
+                xResult = string.Concat(xParent.Name, xResult);
+                xParent = Directory.GetParent(xParent.FullName);
+                FatHelpers.Debug("-- VFSManager.SplitPath : aPath = " + aPath + ", xResult = " + xResult + " --");
+            }
 
             //TODO: This should call Path.GetDirectoryName() and then loop calling Directory.GetParent(), but those aren't implemented yet.
             return aPath.Split(GetDirectorySeparators(), StringSplitOptions.RemoveEmptyEntries);
@@ -149,8 +98,6 @@ namespace Cosmos.System.FileSystem.VFS
 
         private static char[] GetDirectorySeparators()
         {
-            FatHelpers.Debug("-- VFSManager.GetDirectorySeparators --");
-
             return new[] { GetDirectorySeparatorChar(), GetAltDirectorySeparatorChar() };
         }
 
@@ -195,14 +142,16 @@ namespace Cosmos.System.FileSystem.VFS
                 throw new ArgumentNullException("aPath");
             }
 
-            var entry = mVFS.GetDirectory(aPath);
-            if (entry == null)
+
+            bool xExists = Directory.Exists(aPath);
+            if (!xExists)
             {
+                FatHelpers.Debug("-- VFSManager.CreateDirectory : " + aPath + " not found. Creating it. --");
                 var splitPath = SplitPath(aPath);
-                
             }
-            if (entry != null)
+            else
             {
+                FatHelpers.Debug("-- VFSManager.CreateDirectory : " + aPath + " found. Don't create it. --");
                 var info = new DirectoryInfo(aPath);
                 return info;
             }
@@ -390,7 +339,8 @@ namespace Cosmos.System.FileSystem.VFS
                 FatHelpers.Debug("-- VFSManager.GetFullPath : xPath = " + xPath + " --");
             }
 
-            return Path.GetFullPath(xPath);
+            FatHelpers.Debug("-- VFSManager.GetFullPath : result = " + xPath + " --");
+            return xPath;
         }
 
         public static Stream GetFileStream(string aPathname)

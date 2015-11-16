@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Cosmos.System.FileSystem.Listing
+﻿namespace Cosmos.System.FileSystem.Listing
 {
     public enum DirectoryEntryTypeEnum
     {
@@ -23,6 +17,7 @@ namespace Cosmos.System.FileSystem.Listing
 
         protected DirectoryEntry(FileSystem aFileSystem, DirectoryEntry aParent, string aName, ulong aSize, DirectoryEntryTypeEnum aEntryType)
         {
+            FatHelpers.Debug("-- DirectoryEntry.ctor : aaPrent.Name = " + aParent?.Name + ", aName = " + aName + ", aSize = " + aSize + " --");
             FileSystem = aFileSystem;
             Parent = aParent;
             EntryType = aEntryType;
@@ -32,6 +27,6 @@ namespace Cosmos.System.FileSystem.Listing
 
         public abstract void SetName(string aName);
 
-        public abstract void SetSize(Int64 aSize);
+        public abstract void SetSize(long aSize);
     }
 }

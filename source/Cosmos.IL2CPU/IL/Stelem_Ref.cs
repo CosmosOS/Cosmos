@@ -4,7 +4,9 @@ using Cosmos.Assembler;
 using Cosmos.IL2CPU.IL.CustomImplementations.System;
 
 namespace Cosmos.IL2CPU.X86.IL {
-  [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stelem_Ref)]
+    using Cosmos.IL2CPU.CustomImplementation.System;
+
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stelem_Ref)]
   public class Stelem_Ref: ILOp {
     public Stelem_Ref(Cosmos.Assembler.Assembler aAsmblr)
       : base(aAsmblr) {

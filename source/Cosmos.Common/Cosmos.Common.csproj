@@ -83,6 +83,7 @@
     <Compile Include="NumberHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RingAttribute.cs" />
+    <Compile Include="StringHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

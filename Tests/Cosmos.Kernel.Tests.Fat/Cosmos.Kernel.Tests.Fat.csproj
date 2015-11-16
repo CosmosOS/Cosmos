@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\source\Cosmos.Common\Cosmos.Common.csproj">
-      <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
+      <Project>{1fac100c-d732-4ea4-b518-5af4baf64f2e}</Project>
       <Name>Cosmos.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">

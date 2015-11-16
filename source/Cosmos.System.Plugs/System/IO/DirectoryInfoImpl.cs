@@ -14,12 +14,15 @@ namespace Cosmos.System.Plugs.System.IO
     [Plug(Target = typeof(DirectoryInfo))]
     [PlugField(FieldId = "$$Storage$$", FieldType = typeof(DirectoryEntry))]
     [PlugField(FieldId = "$$FullPath$$", FieldType = typeof(string))]
+    [PlugField(FieldId = "$$Name$$", FieldType = typeof(string))]
     public static class DirectoryInfoImpl
     {
         public static void Ctor(DirectoryInfo aThis, string aPath,
             [FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage,
-            [FieldAccess(Name = "$$FullPath$$")] ref string aFullPath)
+            [FieldAccess(Name = "$$FullPath$$")] ref string aFullPath,
+            [FieldAccess(Name = "$$Name$$")] ref string aName)
         {
+            FatHelpers.Debug("-- DirectoryInfo.ctor : aPath = " + aPath + " --");
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath is null in DirectoryInfo ctor");
@@ -31,31 +34,36 @@ namespace Cosmos.System.Plugs.System.IO
             }
 
             aStorage = VFSManager.GetDirectory(aPath);
-            aFullPath = aPath;
+            aFullPath = VFSManager.GetFullPath(aStorage);
+            aName = Path.GetDirectoryName(aFullPath);
+            
         }
 
-        public static string get_Name(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
+        public static string get_Name(DirectoryInfo aThis)
         {
-            FatHelpers.Debug("-- DirectoryInfo.get_Name --");
-            throw new NotImplementedException();
+            FatHelpers.Debug("-- DirectoryInfo.get_Name : Nane = " + aThis.ToString() + " --");
+            return aThis.ToString();
         }
 
-        public static DirectoryInfo get_Parent(DirectoryInfo aThis)
+        public static DirectoryInfo get_Parent(DirectoryInfo aThis, [FieldAccess(Name = "$$FullPath")] ref string aFullPath)
         {
             FatHelpers.Debug("-- DirectoryInfo.get_Parent --");
-            throw new NotImplementedException();
+            var xParent = Directory.GetParent(aFullPath);
+            return xParent;
         }
 
-        public static DirectoryInfo get_Root(DirectoryInfo aThis)
+        public static DirectoryInfo get_Root(DirectoryInfo aThis, [FieldAccess(Name = "$$FullPath")] ref string aFullPath)
         {
             FatHelpers.Debug("-- DirectoryInfo.get_Root --");
-            throw new NotImplementedException();
+            string xRootPath = Path.GetPathRoot(aFullPath);
+            var xRoot = new DirectoryInfo(xRootPath);
+            return xRoot;
         }
 
-        public static bool get_Exists(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
+        public static bool get_Exists(DirectoryInfo aThis, [FieldAccess(Name = "$$FullPath$$")] ref string aFullPath)
         {
             FatHelpers.Debug("-- DirectoryInfo.get_Exists --");
-            return VFSManager.DirectoryExists(aStorage);
+            return VFSManager.DirectoryExists(aFullPath);
         }
 
         public static FileInfo[] GetFiles(DirectoryInfo aThis, string searchPattern, [FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
@@ -84,7 +92,7 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static FileInfo[] GetFiles(DirectoryInfo aThis, [FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
         {
-            return null;
+            throw new NotImplementedException();
         }
 
         public static DirectoryInfo CreateSubdirectory(DirectoryInfo aThis, string path, [FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
@@ -97,9 +105,9 @@ namespace Cosmos.System.Plugs.System.IO
             throw new NotImplementedException();
         }
 
-        public static string ToString([FieldAccess(Name = "$$Path$$")] ref string aPath)
+        public static string ToString([FieldAccess(Name = "$$Name$$")] ref string aName)
         {
-            return "DirectoryInfo.ToString() not yet implemented";
+            return aName;
         }
 
         //public static void Create()

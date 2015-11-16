@@ -7,7 +7,9 @@ using Cosmos.IL2CPU.IL.CustomImplementations.System;
 
 
 namespace Cosmos.IL2CPU.X86.Plugs.CustomImplementations.System {
-	public static class ObjectImplRefs {
+    using Cosmos.IL2CPU.CustomImplementation.System;
+
+    public static class ObjectImplRefs {
 		public static readonly Assembly RuntimeAssemblyDef;
 
 		static ObjectImplRefs() {

@@ -16,13 +16,13 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetCurrentDirectory()
         {
-            FatHelpers.Debug("-- Directory.GetCurrentDirectory --");
+            FatHelpers.Debug("-- Directory.GetCurrentDirectory : mCurrentDirectory = " + mCurrentDirectory + " --");
             return mCurrentDirectory;
         }
 
         public static void SetCurrentDirectory(string aPath)
         {
-            FatHelpers.Debug("-- Directory.SetCurrentDirectory --");
+            FatHelpers.Debug("-- Directory.SetCurrentDirectory : aPath = " + aPath + " --");
             mCurrentDirectory = aPath;
         }
 
@@ -56,25 +56,27 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static DirectoryInfo GetParent(string aPath)
         {
-            FatHelpers.Debug("-- Directory.GetParent --");
             if (aPath == null)
             {
+                FatHelpers.Debug("-- Directory.GetParent : aPath is null --");
                 throw new ArgumentNullException("aPath");
             }
 
             if (aPath.Length == 0)
             {
+                FatHelpers.Debug("-- Directory.GetParent : aPath is empty --");
                 throw new ArgumentException("Path must not be empty.", "aPath");
             }
 
             string xFullPath = Path.GetFullPath(aPath);
-            string xName = Path.GetDirectoryName(xFullPath);
-            if (xName == null)
+            string xParentDirectory = Path.GetDirectoryName(xFullPath);
+            if (xParentDirectory == null)
             {
+                FatHelpers.Debug("-- Directory.GetParent : xParentDirectory is null --");
                 return null;
             }
-
-            return new DirectoryInfo(xFullPath);
+            
+            return new DirectoryInfo(xParentDirectory);
         }
 
         public static string[] GetDirectories(string aPath)

@@ -36,7 +36,11 @@ namespace Cosmos.Kernel.Tests.Fat
 
                 mDebugger.Send("Get parent:");
                 var xParent = Directory.GetParent(@"0:\test");
-                Assert.IsTrue(xParent.Name == @"0:\", "Failed to get directory parent.");
+                Assert.IsTrue(xParent == null, "Failed to get directory parent.");
+
+                mDebugger.Send("Get parent:");
+                xParent = Directory.GetParent(@"0:\test\");
+                Assert.IsTrue(xParent == null, "Failed to get directory parent.");
 
                 mDebugger.Send("Create directory:");
                 var xDirectory = Directory.CreateDirectory(@"0:\test2");

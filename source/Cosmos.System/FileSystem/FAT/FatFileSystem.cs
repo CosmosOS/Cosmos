@@ -204,6 +204,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         private List<FatDirectoryEntry> GetRoot()
         {
+            FatHelpers.Debug("-- FatFileSystem.GetRoot --");
             byte[] xData;
             if (mFatType == FatTypeEnum.Fat32)
             {
@@ -220,6 +221,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         private byte[] GetDirectoryEntryData(FatDirectoryEntry aDirectoryEntry)
         {
+            FatHelpers.Debug("-- FatFileSystem.GetDirectoryEntryData --");
             byte[] xData;
             if (mFatType == FatTypeEnum.Fat32)
             {
@@ -250,6 +252,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         private void SetDirectoryEntryData(FatDirectoryEntry aDirectoryEntry, byte[] aData)
         {
+            FatHelpers.Debug("-- FatFileSystem.SetDirectoryEntryData --");
             if (aDirectoryEntry == null)
             {
                 throw new ArgumentNullException("aDirectoryEntry");
@@ -290,6 +293,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         private List<FatDirectoryEntry> GetDirectoryContents(FatDirectoryEntry directory)
         {
+            FatHelpers.Debug("-- FatFileSystem.GetDirectoryContents --");
             if (directory == null)
             {
                 throw new ArgumentNullException("directory");
@@ -303,6 +307,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         private List<FatDirectoryEntry> ReadDirectoryContents(byte[] xData, FatDirectoryEntry aDirectory)
         {
+            FatHelpers.Debug("-- FatFileSystem.ReadDirectoryContents --");
             var xResult = new List<FatDirectoryEntry>();
             //TODO: Change xLongName to StringBuilder
             string xLongName = "";
@@ -485,6 +490,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override List<DirectoryEntry> GetDirectoryListing(DirectoryEntry baseDirectory)
         {
+            FatHelpers.Debug("-- FatFileSystem.GetDirectoryListing --");
             List<DirectoryEntry> result = new List<DirectoryEntry>();
             List<FatDirectoryEntry> fatListing = new List<FatDirectoryEntry>();
             if (baseDirectory == null)
@@ -506,6 +512,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override DirectoryEntry GetRootDirectory()
         {
+            FatHelpers.Debug("-- FatFileSystem.GetRootDirectory --");
             //TODO: Get size.
             return new FatDirectoryEntry(this, null, mRootPath, 0, RootCluster, 0, DirectoryEntryTypeEnum.Directory);
         }
