@@ -11,8 +11,9 @@ namespace Cosmos.Build.Installer {
 
     public void Run() {
       var exceptions = new List<string>();
-      try{
-          exceptions = DoRun();
+      try
+      {
+          exceptions.AddRange(DoRun());
       }
       catch(Exception ex){
         exceptions.Add(ex.Message);
@@ -95,7 +96,7 @@ namespace Cosmos.Build.Installer {
     public void Start(string aExe, string aParams, bool aWait = true, bool aShowWindow = true) {
       Log.WriteLine("Starting: " + aExe);
       Log.WriteLine("  Params: " + aParams);
-        
+
       using (var xProcess = new Process()) {
         var xPSI = xProcess.StartInfo;
         xPSI.FileName = aExe;

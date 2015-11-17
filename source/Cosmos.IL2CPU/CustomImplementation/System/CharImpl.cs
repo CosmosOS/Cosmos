@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cosmos.IL2CPU.Plugs;
-
-namespace Cosmos.System.Plugs.System
+﻿namespace Cosmos.IL2CPU.CustomImplementation.System
 {
+    using Cosmos.Debug.Kernel;
+    using Cosmos.IL2CPU.Plugs;
+
     [Plug(Target = typeof(char))]
     public static class CharImpl
     {
         public static void Cctor()
         {
-            //
         }
 
         public static string ToString(ref char aThis)

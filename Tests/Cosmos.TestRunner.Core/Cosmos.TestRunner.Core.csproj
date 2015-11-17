@@ -149,6 +149,10 @@
       <Project>{a0893493-d4f0-4b9f-9826-86319e143d86}</Project>
       <Name>Cosmos.Kernel.Tests.Fat</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Kernel.Tests.FileSystemPlugs\Cosmos.Kernel.Tests.FileSystemPlugs.csproj">
+      <Project>{bc572d7b-f50a-4c7c-b2e3-62d113c04bf5}</Project>
+      <Name>Cosmos.Kernel.Tests.FileSystemPlugs</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">
       <Project>{E6D3B644-C487-472D-A978-C1A82D0C099B}</Project>
       <Name>Cosmos.TestRunner.TestController</Name>

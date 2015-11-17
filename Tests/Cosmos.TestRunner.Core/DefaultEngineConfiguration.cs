@@ -24,7 +24,9 @@ namespace Cosmos.TestRunner.Core
             //engine.RunIL2CPUInProcess = true;
 
             engine.EnableStackCorruptionChecks = true;
+
             //engine.RunWithGDB = true;
+            //engine.StartBochsDebugGui = true;
 
             // Select kernels to be tested by adding them to the engine
             //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
@@ -40,6 +42,7 @@ namespace Cosmos.TestRunner.Core
 
             // Experimental stuff:
             engine.AddKernel(typeof(Cosmos.Kernel.Tests.Fat.Kernel).Assembly.Location);
+            //engine.AddKernel(typeof(Cosmos.Kernel.Tests.FileSystemPlugs.Kernel).Assembly.Location);
 
             // end of known bugs
 

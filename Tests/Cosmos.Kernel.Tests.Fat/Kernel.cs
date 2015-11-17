@@ -33,6 +33,47 @@ namespace Cosmos.Kernel.Tests.Fat
 
                 bool xTest;
                 string xContents;
+
+                mDebugger.Send("Get parent:");
+                var xParent = Directory.GetParent(@"0:\test");
+                Assert.IsTrue(xParent == null, "Failed to get directory parent.");
+
+                mDebugger.Send("Get parent:");
+                xParent = Directory.GetParent(@"0:\test\");
+                Assert.IsTrue(xParent == null, "Failed to get directory parent.");
+
+                mDebugger.Send("Create directory:");
+                var xDirectory = Directory.CreateDirectory(@"0:\test2");
+                Assert.IsTrue(xDirectory != null, "Failed to create a new directory.");
+                bool xExists = Directory.Exists(@"0:\test2");
+                Assert.IsTrue(xExists, "Failed to create a new directory.");
+
+                //mDebugger.Send("Get files:");
+                //var xFiles = Directory.GetFiles(@"0:\");
+                //mDebugger.Send("Found " + xFiles.Length + " files.");
+                //if (xFiles.Length > 0)
+                //{
+                //    mDebugger.Send("-- File list --");
+                //    for (int i = 0; i < xFiles.Length; i++)
+                //    {
+                //        mDebugger.Send("File: " + xFiles[i]);
+                //    }
+                //}
+                //Assert.IsTrue(xFiles.Length > 0, "Failed to get files from the directory.");
+
+                //mDebugger.Send("Get directories:");
+                //var xDirectories = Directory.GetDirectories(@"0:\");
+                //mDebugger.Send("Found " + xDirectories.Length + " directories.");
+                //if (xDirectories.Length > 0)
+                //{
+                //    mDebugger.Send("-- Directory list --");
+                //    for (int i = 0; i < xDirectories.Length; i++)
+                //    {
+                //        mDebugger.Send("Directory: " + xDirectories[i]);
+                //    }
+                //}
+                //Assert.IsTrue(xDirectories.Length > 0, "Failed to get directories from the directory.");
+
                 //Assert.IsTrue(Path.GetDirectoryName(@"0:\test") == @"0:\", @"Path.GetDirectoryName(@'0:\test') == @'0:\'");
                 //Assert.IsTrue(Path.GetFileName(@"0:\test") == @"test", @"Path.GetFileName(@'0:\test') == @'test'");
 
@@ -82,14 +123,14 @@ namespace Cosmos.Kernel.Tests.Fat
                 //    mDebugger.Send(xBuff.GetUtf8String(0, (uint)xBuff.Length));
                 //}
 
-                mDebugger.Send("Write to file now");
-                File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
-                mDebugger.Send("Text written");
-                xContents = File.ReadAllText(@"0:\Kudzu.txt");
+                //mDebugger.Send("Write to file now");
+                //File.WriteAllText(@"0:\Kudzu.txt", "Test FAT write.");
+                //mDebugger.Send("Text written");
 
-                mDebugger.Send("Contents retrieved after writing");
-                mDebugger.Send(xContents);
-                Assert.IsTrue(xContents == "Test FAT write.", "Contents of Kudzu.txt was written incorrectly!");
+                //xContents = File.ReadAllText(@"0:\Kudzu.txt");
+                //mDebugger.Send("Contents retrieved after writing");
+                //mDebugger.Send(xContents);
+                //Assert.IsTrue(xContents == "Test FAT write.", "Contents of Kudzu.txt was written incorrectly!");
 
                 TestController.Completed();
             }

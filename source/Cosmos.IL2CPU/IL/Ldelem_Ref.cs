@@ -5,6 +5,8 @@ using Cosmos.IL2CPU.IL.CustomImplementations.System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
+    using Cosmos.IL2CPU.CustomImplementation.System;
+
     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldelem_Ref)]
     public class Ldelem_Ref: ILOp
     {
