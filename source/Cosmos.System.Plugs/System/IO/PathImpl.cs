@@ -151,6 +151,7 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetDirectoryName(string aPath)
         {
+            FatHelpers.Debug("PathImpl -- GetDirectoryName");
             if (aPath != null)
             {
                 CheckInvalidPathChars(aPath, false);
@@ -172,6 +173,7 @@ namespace Cosmos.System.Plugs.System.IO
 
                     string result = xPath.Substring(0, xNum);
                     FatHelpers.Debug("-- Path.GetDirectoryName : aPath = " + aPath + ", result = " + result + " --");
+                    return result;
                 }
             }
 
