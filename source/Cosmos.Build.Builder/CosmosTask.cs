@@ -357,7 +357,7 @@ namespace Cosmos.Build.Builder {
                     return;
         }
         mInnoPath = (string)xKey.GetValue("InstallLocation");
-        if (string.IsNullOrEmpty(mInnoPath)) {
+        if (string.IsNullOrWhiteSpace(mInnoPath)) {
           mExceptionList.Add("Cannot find Inno Setup.");
                    mBuildState = BuildState.PrerequisiteMissing;
                     return;
