@@ -381,7 +381,7 @@ namespace Cosmos.System.Plugs.System.IO
                 {
                     for (int j = 0; j < aPath.Length; j++)
                     {
-                        if (xInvalidWithAdditional[i] == aPath[i])
+                        if (xInvalidWithAdditional[i] == aPath[j])
                         {
                             return true;
                         }
@@ -394,7 +394,7 @@ namespace Cosmos.System.Plugs.System.IO
             {
                 for (int j = 0; j < aPath.Length; j++)
                 {
-                    if (xInvalid[i] == aPath[i])
+                    if (xInvalid[i] == aPath[j])
                     {
                         return true;
                     }
