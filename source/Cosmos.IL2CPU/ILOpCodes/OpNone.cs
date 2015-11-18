@@ -522,6 +522,15 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           if (!StackPopTypes.Contains(null))
           {
             // PopTypes set, but PushType not yet, so fill it.
+
+            if ((StackPopTypes[0] == typeof(bool) && StackPopTypes[1] == typeof(Int32)) ||
+              (StackPopTypes[0] == typeof(Int32) && StackPopTypes[1] == typeof(bool)))
+            {
+              StackPushTypes[0] = typeof(Int32);
+              aSituationChanged = true;
+              return;
+            }
+
             if ((StackPopTypes[0] == typeof (IntPtr) && StackPopTypes[1] == typeof (UInt32*))
               || (StackPopTypes[0] == typeof (uint*) && StackPopTypes[1] == typeof (IntPtr)))
             {
