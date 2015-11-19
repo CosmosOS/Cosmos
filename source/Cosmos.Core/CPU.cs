@@ -8,14 +8,22 @@ namespace Cosmos.Core {
     public class CPU {
         // Amount of RAM in MB's.
         // needs to be static, as Heap needs it before we can instantiate objects
+        /// <summary>
+        /// Gets amount of RAM.
+        /// </summary>
         public static uint GetAmountOfRAM() { return 0; } // Plugged
         // needs to be static, as Heap needs it before we can instantiate objects
         public static uint GetEndOfKernel() { return 0; } // Plugged
         public void UpdateIDT(bool aEnableInterruptsImmediately) { } // Plugged
         public void InitFloat() { } // Plugged
         public static void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged
+        /// <summary>
+        /// Halts the CPU.
+        /// </summary>
         public void Halt() { } // Plugged
-
+        /// <summary>
+        /// Reboots system safely.
+        /// </summary>
         public void Reboot() {
             // Disable all interrupts
             DisableInterrupts();
@@ -45,7 +53,7 @@ namespace Cosmos.Core {
         }
 
         /// <summary>
-        /// Returns if the interrupts were actually enabled
+        /// Disables the CPU Interrupts.
         /// </summary>
         /// <returns></returns>
         public static bool DisableInterrupts()
