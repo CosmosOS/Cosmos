@@ -29,17 +29,41 @@ namespace Cosmos.System.FileSystem
 
         public override DirectoryEntry CreateDirectory(string aPath)
         {
-            FatHelpers.Debug("-- CosmosVFS.CreateDirectory : aPath = " + aPath + " --");
-            var xEntry = GetDirectory(aPath);
-            if (xEntry != null)
+            if (aPath == null)
             {
-                return xEntry;
+                throw new ArgumentNullException("aPath");
             }
 
+            if (aPath.Length == 0)
+            {
+                throw new ArgumentException("aPath");
+            }
+
+            //FatHelpers.Debug("-- CosmosVFS.CreateDirectory : aPath = " + aPath + " --");
             var xFS = GetFileSystemFromPath(aPath);
             if (xFS != null)
             {
-                return xFS.CreateDirectory(aPath);
+                string xPath = aPath;
+                if (Directory.Exists(aPath))
+                {
+                    var xEntry = DoGetDirectory(aPath, xFS);
+                    if (xEntry != null)
+                    {
+                        return xEntry;
+                    }
+                }
+                else
+                {
+                    string xParentDirectory = Path.GetDirectoryName(xPath);
+                    string xDirectoryToCreate = Path.GetFileName(xPath);
+                    while (!Directory.Exists(xParentDirectory))
+                    {
+                        xParentDirectory = Path.GetDirectoryName(xPath);
+                        xDirectoryToCreate = Path.GetFileName(xPath);
+                    }
+                    var xParentEntry = DoGetDirectory(xParentDirectory, xFS);
+                    return xFS.CreateDirectory(xParentEntry, xDirectoryToCreate);
+                }
             }
 
             return null;
@@ -56,10 +80,10 @@ namespace Cosmos.System.FileSystem
         {
             DirectoryEntry xTempEntry = aDirectory;
             string xFullPath = "";
-            while (xTempEntry.Parent != null)
+            while (xTempEntry.mParent != null)
             {
-                xFullPath = Path.Combine(xTempEntry.Name, xFullPath);
-                xTempEntry = xTempEntry.Parent;
+                xFullPath = Path.Combine(xTempEntry.mName, xFullPath);
+                xTempEntry = xTempEntry.mParent;
             }
 
             return GetDirectoryListing(xFullPath);
@@ -68,7 +92,6 @@ namespace Cosmos.System.FileSystem
         public override DirectoryEntry GetDirectory(string aPath)
         {
             var xFileSystem = GetFileSystemFromPath(aPath);
-
             return DoGetDirectory(aPath, xFileSystem);
         }
 
@@ -189,9 +212,9 @@ namespace Cosmos.System.FileSystem
                 for (int j = 0; j < xListing.Count; j++)
                 {
                     var xListingItem = xListing[j];
-                    if (String.Equals(xListingItem.Name, xPathPart, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(xListingItem.mName, xPathPart, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (xListingItem.EntryType == DirectoryEntryTypeEnum.Directory)
+                        if (xListingItem.mEntryType == DirectoryEntryTypeEnum.Directory)
                         {
                             xBaseDirectory = xListingItem;
                             xPartFound = true;

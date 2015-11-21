@@ -81,5 +81,36 @@ namespace Cosmos.Common
             }
             return xResult;
         }
+
+        public static int GetStringToNumber(string aString)
+        {
+            int xNumber = 0;
+            if (!string.IsNullOrWhiteSpace(aString))
+            {
+                for (int i = aString.Length - 1; i >= 0; i--)
+                {
+                    char xC = aString[i];
+                    if (char.IsDigit(xC))
+                    {
+                        int xValue = xC - '0';
+                        xValue = xValue * (int)Math.Pow(10, i);
+                        xNumber += xValue;
+                    }
+                    else if (xC == '-')
+                    {
+                        xNumber *= -1;
+                    }
+                    else if (xC == '.')
+                    {
+                        return xNumber;
+                    }
+                    else
+                    {
+                        throw new FormatException("The string parameter is not a number and is invalid.");
+                    }
+                }
+            }
+            return xNumber;
+        }
     }
 }

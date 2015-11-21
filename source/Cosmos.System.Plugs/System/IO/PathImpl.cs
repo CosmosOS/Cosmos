@@ -61,7 +61,7 @@ namespace Cosmos.System.Plugs.System.IO
                     }
                     xText += aExtension;
                 }
-                FatHelpers.Debug("-- Path.ChangeExtension : aPath = " + aPath + ", aExtension = " + aExtension + ", result = " + xText + " --");
+                //FatHelpers.Debug("-- Path.ChangeExtension : aPath = " + aPath + ", aExtension = " + aExtension + ", result = " + xText + " --");
                 return xText;
             }
             return null;
@@ -110,7 +110,7 @@ namespace Cosmos.System.Plugs.System.IO
             CheckInvalidPathChars(aPath1, false);
             CheckInvalidPathChars(aPath2, false);
             string result = CombineNoChecks(aPath1, aPath2);
-            FatHelpers.Debug("-- Path.Combine : aPath1 = " + aPath1 + ", aPath2 = " + aPath2 + ", result = " + result + " --");
+            //FatHelpers.Debug("-- Path.Combine : aPath1 = " + aPath1 + ", aPath2 = " + aPath2 + ", result = " + result + " --");
             return result;
         }
 
@@ -118,19 +118,19 @@ namespace Cosmos.System.Plugs.System.IO
         {
             if (aPath2.Length == 0)
             {
-                FatHelpers.Debug("-- Path.CombineNoChecks : aPath2 has 0 length, result = " + aPath1 + " --");
+                //FatHelpers.Debug("-- Path.CombineNoChecks : aPath2 has 0 length, result = " + aPath1 + " --");
                 return aPath1;
             }
 
             if (aPath1.Length == 0)
             {
-                FatHelpers.Debug("-- Path.CombineNoChecks : aPath1 has 0 length, result = " + aPath2 + " --");
+                //FatHelpers.Debug("-- Path.CombineNoChecks : aPath1 has 0 length, result = " + aPath2 + " --");
                 return aPath2;
             }
 
             if (IsPathRooted(aPath2))
             {
-                FatHelpers.Debug("-- Path.CombineNoChecks : aPath2 is root, result = " + aPath2 + " --");
+                //FatHelpers.Debug("-- Path.CombineNoChecks : aPath2 is root, result = " + aPath2 + " --");
                 return aPath2;
             }
 
@@ -140,18 +140,17 @@ namespace Cosmos.System.Plugs.System.IO
                 && xC != Path.VolumeSeparatorChar)
             {
                 xResult = string.Concat(aPath1, "\\", aPath2);
-                FatHelpers.Debug("-- Path.CombineNoChecks : aPath1 = " + aPath1 + ", aPath2 = " + aPath2 + ", result = " + xResult + " --");
+                //FatHelpers.Debug("-- Path.CombineNoChecks : aPath1 = " + aPath1 + ", aPath2 = " + aPath2 + ", result = " + xResult + " --");
                 return xResult;
             }
 
             xResult = string.Concat(aPath1, aPath2);
-            FatHelpers.Debug("-- Path.CombineNoChecks : aPath1 = " + aPath1 + ", aPath2 = " + aPath2 + ", result = " + xResult + " --");
+            //FatHelpers.Debug("-- Path.CombineNoChecks : aPath1 = " + aPath1 + ", aPath2 = " + aPath2 + ", result = " + xResult + " --");
             return xResult;
         }
 
         public static string GetDirectoryName(string aPath)
         {
-            FatHelpers.Debug("PathImpl -- GetDirectoryName");
             if (aPath != null)
             {
                 CheckInvalidPathChars(aPath, false);
@@ -170,14 +169,13 @@ namespace Cosmos.System.Plugs.System.IO
                            && xPath[xNum] != Path.AltDirectorySeparatorChar)
                     {
                     }
-
-                    string result = xPath.Substring(0, xNum);
-                    FatHelpers.Debug("-- Path.GetDirectoryName : aPath = " + aPath + ", result = " + result + " --");
-                    return result;
                 }
+                string result = xPath.Substring(0, xNum);
+                //FatHelpers.Debug("-- Path.GetDirectoryName : aPath = " + aPath + ", result = " + result + " --");
+                return result;
             }
 
-            FatHelpers.Debug("-- Path.GetDirectoryName : aPath is null --");
+            //FatHelpers.Debug("-- Path.GetDirectoryName : aPath is null --");
             return null;
         }
 
@@ -253,12 +251,12 @@ namespace Cosmos.System.Plugs.System.IO
         {
             if (aPath == null)
             {
-                FatHelpers.Debug("-- Path.GetFullPath : aPath is null --");
+                //FatHelpers.Debug("-- Path.GetFullPath : aPath is null --");
                 throw new ArgumentNullException("aPath");
             }
 
             string result = NormalizePath(aPath, true);
-            FatHelpers.Debug("-- Path.GetFullPath : aPath = " + aPath + ", result = " + result + " --");
+            //FatHelpers.Debug("-- Path.GetFullPath : aPath = " + aPath + ", result = " + result + " --");
             return result;
         }
 
@@ -276,7 +274,7 @@ namespace Cosmos.System.Plugs.System.IO
         {
             if (aPath == null)
             {
-                FatHelpers.Debug("-- Path.GetPathRoot : aPath is null --");
+                //FatHelpers.Debug("-- Path.GetPathRoot : aPath is null --");
                 throw new ArgumentNullException("aPath");
             }
 
@@ -288,7 +286,7 @@ namespace Cosmos.System.Plugs.System.IO
                 xResult = string.Concat(xResult, Path.DirectorySeparatorChar.ToString());
             }
 
-            FatHelpers.Debug("-- Path.GetPathRoot : aPath = " + aPath + ", xResult = " + xResult + " --");
+            //FatHelpers.Debug("-- Path.GetPathRoot : aPath = " + aPath + ", xResult = " + xResult + " --");
             return xResult;
         }
 
@@ -301,7 +299,7 @@ namespace Cosmos.System.Plugs.System.IO
         {
             if (aPath == null)
             {
-                FatHelpers.Debug("-- Path.GetRootLength : aPath is null --");
+                //FatHelpers.Debug("-- Path.GetRootLength : aPath is null --");
                 throw new ArgumentNullException("aPath");
             }
 
@@ -335,7 +333,7 @@ namespace Cosmos.System.Plugs.System.IO
                 }
             }
 
-            FatHelpers.Debug("-- Path.GetRootLength : result = " + i.ToString() + " --");
+            //FatHelpers.Debug("-- Path.GetRootLength : result = " + i.ToString() + " --");
             return i;
         }
 
@@ -440,19 +438,22 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static bool IsRelative(string aPath)
         {
+            if (aPath == null)
+            {
+                throw new ArgumentNullException("aPath");
+            }
+
             if (aPath.Length < 3)
             {
                 return true;
             }
 
-            string xC = aPath[1].ToString();
-            if (xC != Path.VolumeSeparatorChar.ToString())
+            if (aPath[1] != Path.VolumeSeparatorChar)
             {
                 return true;
             }
 
-            xC = aPath[2].ToString();
-            if (xC != Path.DirectorySeparatorChar.ToString())
+            if (aPath[2] != Path.DirectorySeparatorChar)
             {
                 return true;
             }
@@ -790,24 +791,24 @@ namespace Cosmos.System.Plugs.System.IO
         {
             if (aPath == null)
             {
-                FatHelpers.Debug("-- Path.NormalizePath : aPath is null --");
+                //FatHelpers.Debug("-- Path.NormalizePath : aPath is null --");
                 throw new ArgumentNullException("aPath");
             }
 
             string result = aPath;
             if (IsRelative(result))
             {
-                result = string.Concat(Directory.GetCurrentDirectory(), Path.DirectorySeparatorChar.ToString(), result);
-                FatHelpers.Debug("-- Path.NormalizePath : aPath is relative, aPath = " + aPath + ", result = " + result + " --");
+                result = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar.ToString() + result;
+                //FatHelpers.Debug("-- Path.NormalizePath : aPath is relative, aPath = " + aPath + ", result = " + result + " --");
             }
 
             if (IsDirectorySeparator(result[result.Length - 1]))
             {
-                FatHelpers.Debug("Found directory seprator");
+                //FatHelpers.Debug("Found directory seprator");
                 result = result.Remove(result.Length - 1);
             }
 
-            FatHelpers.Debug("-- Path.NormalizePath : aPath = " + aPath + ", result = " + result + " --");
+            //FatHelpers.Debug("-- Path.NormalizePath : aPath = " + aPath + ", result = " + result + " --");
             return result;
         }
     }

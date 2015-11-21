@@ -8,6 +8,12 @@ namespace Cosmos.System.FileSystem
 {
     public abstract class FileSystem
     {
+        protected FileSystem(Partition aDevice, string aRootPath)
+        {
+            mDevice = aDevice;
+            mRootPath = aRootPath;
+        }
+
         public static FileSystemType GetFileSystemType(Partition aDevice)
         {
             if (FatFileSystem.IsDeviceFAT(aDevice))
@@ -24,18 +30,10 @@ namespace Cosmos.System.FileSystem
 
         public abstract DirectoryEntry GetRootDirectory();
 
-        public abstract Stream GetFileStream(DirectoryEntry fileInfo);
-
-        public abstract DirectoryEntry CreateDirectory(string aPath);
+        public abstract DirectoryEntry CreateDirectory(DirectoryEntry aParentDirectory, string aNewDirectory);
 
         protected Partition mDevice { get; }
 
         public string mRootPath { get; }
-
-        protected FileSystem(Partition aDevice, string aRootPath)
-        {
-            mDevice = aDevice;
-            mRootPath = aRootPath;
-        }
     }
 }

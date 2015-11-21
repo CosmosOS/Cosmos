@@ -24,7 +24,7 @@ namespace Cosmos.System.Plugs.System.IO
             [FieldAccess(Name = "$$FullPath$$")] ref string aFullPath,
             [FieldAccess(Name = "$$Name$$")] ref string aName)
         {
-            FatHelpers.Debug("-- DirectoryInfo.ctor : aPath = " + aPath + " --");
+            //FatHelpers.Debug("-- DirectoryInfo.ctor : aPath = " + aPath + " --");
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath is null in DirectoryInfo ctor");
@@ -43,20 +43,20 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string get_Name(DirectoryInfo aThis)
         {
-            FatHelpers.Debug("-- DirectoryInfo.get_Name : Nane = " + aThis.ToString() + " --");
+            //FatHelpers.Debug("-- DirectoryInfo.get_Name : Nane = " + aThis.ToString() + " --");
             return aThis.ToString();
         }
 
         public static DirectoryInfo get_Parent(DirectoryInfo aThis, [FieldAccess(Name = "$$FullPath")] ref string aFullPath)
         {
-            FatHelpers.Debug("-- DirectoryInfo.get_Parent --");
+            //FatHelpers.Debug("-- DirectoryInfo.get_Parent --");
             var xParent = Directory.GetParent(aFullPath);
             return xParent;
         }
 
         public static DirectoryInfo get_Root(DirectoryInfo aThis, [FieldAccess(Name = "$$FullPath")] ref string aFullPath)
         {
-            FatHelpers.Debug("-- DirectoryInfo.get_Root --");
+            //FatHelpers.Debug("-- DirectoryInfo.get_Root --");
             string xRootPath = Path.GetPathRoot(aFullPath);
             var xRoot = new DirectoryInfo(xRootPath);
             return xRoot;
@@ -64,7 +64,7 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static bool get_Exists(DirectoryInfo aThis, [FieldAccess(Name = "$$FullPath$$")] ref string aFullPath)
         {
-            FatHelpers.Debug("-- DirectoryInfo.get_Exists --");
+            //FatHelpers.Debug("-- DirectoryInfo.get_Exists --");
             return VFSManager.DirectoryExists(aFullPath);
         }
 

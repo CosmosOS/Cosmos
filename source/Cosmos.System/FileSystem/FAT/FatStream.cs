@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Cosmos.System.FileSystem.FAT.Listing;
 
 namespace Cosmos.System.FileSystem.FAT
 {
-    public class FatStream : Stream
+    internal class FatStream : Stream
     {
         protected readonly FatDirectoryEntry mDirectoryEntry;
 
@@ -23,22 +19,20 @@ namespace Cosmos.System.FileSystem.FAT
         // so we might consider a way to flush it and only keep parts.
         // Example, a 100 MB file will require 2MB for this structure. That is
         // probably acceptable for the mid term future.
-        protected List<UInt64> mFatTable;
+        protected ulong[] mFatTable;
 
-        protected UInt64? mReadBufferPosition;
+        protected ulong? mReadBufferPosition;
 
-        protected UInt64 mPosition;
+        protected ulong mPosition;
 
         private ulong mSize;
 
-        public FatStream(FatDirectoryEntry aFile)
+        public FatStream(FatDirectoryEntry aEntry)
         {
-            mDirectoryEntry = aFile;
-            mFS = mDirectoryEntry.FileSystem;
-            mReadBuffer = mDirectoryEntry.FileSystem.NewClusterArray();
-
-            mSize = this.mDirectoryEntry.Size;
-            if (mDirectoryEntry.Size > 0)
+            mDirectoryEntry = aEntry;
+            mFS = mDirectoryEntry.GetFileSystem();
+            mSize = mDirectoryEntry.mSize;
+            if (mDirectoryEntry.mSize > 0)
             {
                 mFatTable = mDirectoryEntry.GetFatTable();
             }
@@ -72,12 +66,13 @@ namespace Cosmos.System.FileSystem.FAT
         {
             get
             {
-                FatHelpers.Debug("Retrieving size from DirectoryEntry");
+                //FatHelpers.Debug("Retrieving size from DirectoryEntry");
                 if (mDirectoryEntry == null)
                 {
-                    FatHelpers.Debug("No DirectoryEntry!");
+                    throw new NullReferenceException("The stream does not currently have an open entry.");
+                    //FatHelpers.Debug("No DirectoryEntry!");
                 }
-                FatHelpers.DebugNumber(mSize);
+                //FatHelpers.DebugNumber(mSize);
                 return (long)mSize;
             }
         }
@@ -103,7 +98,7 @@ namespace Cosmos.System.FileSystem.FAT
             return Read(aBuffer, aOffset, aCount);
         }
 
-        protected int Read(byte[] aBuffer, Int64 aOffset, Int64 aCount)
+        protected int Read(byte[] aBuffer, long aOffset, long aCount)
         {
             if (aCount < 0)
             {
@@ -117,12 +112,12 @@ namespace Cosmos.System.FileSystem.FAT
             {
                 throw new ArgumentException("Invalid offset length!");
             }
-            if (mDirectoryEntry.FirstClusterNum == 0)
+            if (mFatTable.Length == 0 || mFatTable[0] == 0)
             {
                 // FirstSector can be 0 for 0 length files
                 return 0;
             }
-            if (mPosition == mDirectoryEntry.Size)
+            if (mPosition == mDirectoryEntry.mSize)
             {
                 // EOF
                 return 0;
@@ -130,7 +125,7 @@ namespace Cosmos.System.FileSystem.FAT
 
             // reduce count, so that no out of bound exception occurs if not existing
             // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
-            ulong xMaxReadableBytes = mDirectoryEntry.Size - mPosition;
+            ulong xMaxReadableBytes = mDirectoryEntry.mSize - mPosition;
             ulong xCount = (ulong)aCount;
             if (xCount > xMaxReadableBytes)
             {
@@ -138,13 +133,13 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             var xCluster = mFS.NewClusterArray();
-            UInt32 xClusterSize = mFS.BytesPerCluster;
+            uint xClusterSize = mFS.BytesPerCluster;
 
             while (xCount > 0)
             {
-                UInt64 xClusterIdx = mPosition / xClusterSize;
-                UInt64 xPosInCluster = mPosition % xClusterSize;
-                mFS.ReadCluster((ulong)mFatTable[(int)xClusterIdx], xCluster);
+                ulong xClusterIdx = mPosition / xClusterSize;
+                ulong xPosInCluster = mPosition % xClusterSize;
+                mFS.Read(mFatTable[(int)xClusterIdx], out xCluster);
                 long xReadSize;
                 if (xPosInCluster + xCount > xClusterSize)
                 {
@@ -178,27 +173,6 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override void SetLength(long value)
         {
-            var length = Length;
-            var bytesPerCluser = mFS.BytesPerCluster;
-            var xOldClusterTotal = length / bytesPerCluser;
-            var xNewClusterTotal = value / bytesPerCluser;
-
-            if (MathEx.Rem(length, bytesPerCluser) != 0)
-            {
-                xOldClusterTotal++;
-            }
-
-            if (MathEx.Rem(value, bytesPerCluser) != 0)
-            {
-                xNewClusterTotal++;
-            }
-
-            if (xNewClusterTotal != xOldClusterTotal)
-            {
-                throw new NotImplementedException(
-                    "Setting the stream length to a size that requires alllcating new clusters is not currently implemented.");
-            }
-
             mDirectoryEntry.SetSize(value);
             mSize = (ulong)value;
         }
@@ -225,7 +199,7 @@ namespace Cosmos.System.FileSystem.FAT
 
             ulong xCount = (ulong)aCount;
             var xCluster = mFS.NewClusterArray();
-            UInt32 xClusterSize = mFS.BytesPerCluster;
+            uint xClusterSize = mFS.BytesPerCluster;
 
             long xTotalLength = (long)(mPosition + xCount);
             if (xTotalLength > Length)
@@ -236,8 +210,8 @@ namespace Cosmos.System.FileSystem.FAT
             while (xCount > 0)
             {
                 long xWriteSize;
-                UInt64 xClusterIdx = mPosition / xClusterSize;
-                UInt64 xPosInCluster = mPosition % xClusterSize;
+                ulong xClusterIdx = mPosition / xClusterSize;
+                ulong xPosInCluster = mPosition % xClusterSize;
                 if (xPosInCluster + xCount > xClusterSize)
                 {
                     xWriteSize = (long)(xClusterSize - xPosInCluster - 1);
@@ -247,23 +221,22 @@ namespace Cosmos.System.FileSystem.FAT
                     xWriteSize = (long)xCount;
                 }
 
-                mFS.ReadCluster(xClusterIdx, xCluster);
+                mFS.Read(xClusterIdx, out xCluster);
 
-                FatHelpers.Debug("Writing to cluster idx");
-                FatHelpers.DebugNumber((uint)xClusterIdx);
-                FatHelpers.Debug("Writing to pos in cluster");
-                FatHelpers.DebugNumber((uint)xPosInCluster);
-                FatHelpers.Debug("Offset");
-                FatHelpers.DebugNumber((uint)aOffset);
-                FatHelpers.Debug("xWriteSize");
-                FatHelpers.DebugNumber((uint)xWriteSize);
-                FatHelpers.Debug("First byte");
-                FatHelpers.DebugNumber((uint)aBuffer[0]);
+                //FatHelpers.Debug("Writing to cluster idx");
+                //FatHelpers.DebugNumber((uint)xClusterIdx);
+                //FatHelpers.Debug("Writing to pos in cluster");
+                //FatHelpers.DebugNumber((uint)xPosInCluster);
+                //FatHelpers.Debug("Offset");
+                //FatHelpers.DebugNumber((uint)aOffset);
+                //FatHelpers.Debug("xWriteSize");
+                //FatHelpers.DebugNumber((uint)xWriteSize);
+                //FatHelpers.Debug("First byte");
+                //FatHelpers.DebugNumber((uint)aBuffer[0]);
 
-                //Array.Copy(aBuffer, (long)xPosInCluster, xCluster, aOffset, xWriteSize);
                 Array.Copy(aBuffer, aOffset, xCluster, (long)xPosInCluster, xWriteSize);
 
-                mFS.WriteCluster((ulong)mFatTable[(int)xClusterIdx], xCluster);
+                mFS.Write(mFatTable[(int)xClusterIdx], xCluster);
 
                 aOffset += xWriteSize;
                 xCount -= (ulong)xWriteSize;
