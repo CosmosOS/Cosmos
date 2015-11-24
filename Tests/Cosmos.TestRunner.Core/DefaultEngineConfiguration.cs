@@ -30,7 +30,7 @@ namespace Cosmos.TestRunner.Core
 
             // Select kernels to be tested by adding them to the engine
             //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
-            //engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);
+            engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
@@ -41,7 +41,7 @@ namespace Cosmos.TestRunner.Core
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.MultidimensionalArrays.Kernel).Assembly.Location);
 
             // Experimental stuff:
-            engine.AddKernel(typeof(Cosmos.Kernel.Tests.Fat.Kernel).Assembly.Location);
+            //engine.AddKernel(typeof(Cosmos.Kernel.Tests.Fat.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Kernel.Tests.FileSystemPlugs.Kernel).Assembly.Location);
 
             // end of known bugs
