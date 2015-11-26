@@ -20,7 +20,7 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string ReadAllText(string aFile)
         {
-            //FatHelpers.Debug("In FileImpl.ReadAllText");
+            FileSystemHelpers.Debug("In FileImpl.ReadAllText");
             using (var xFS = new FileStream(aFile, FileMode.Open))
             {
                 var xBuff = new byte[(int)xFS.Length];
@@ -29,9 +29,9 @@ namespace Cosmos.System.Plugs.System.IO
                 {
                     throw new Exception("Couldn't read complete file!");
                 }
-                //FatHelpers.Debug("Bytes read");
+                FileSystemHelpers.Debug("Bytes read");
                 var xResultStr = xBuff.GetUtf8String(0, (uint)xBuff.Length);
-                //FatHelpers.Debug("ResultString retrieved");
+                FileSystemHelpers.Debug("ResultString retrieved");
                 return xResultStr;
             }
         }
@@ -46,7 +46,7 @@ namespace Cosmos.System.Plugs.System.IO
         }
         public static byte[] ReadAllBytes(string aFile)
         {
-            //FatHelpers.Debug("In FileImpl.ReadAllText");
+            FileSystemHelpers.Debug("In FileImpl.ReadAllText");
             using (var xFS = new FileStream(aFile, FileMode.Open))
             {
                 var xBuff = new byte[(int)xFS.Length];
@@ -55,7 +55,7 @@ namespace Cosmos.System.Plugs.System.IO
                 {
                     throw new Exception("Couldn't read complete file!");
                 }
-                //FatHelpers.Debug("Bytes read");
+                FileSystemHelpers.Debug("Bytes read");
                 
                 return xBuff;
             }

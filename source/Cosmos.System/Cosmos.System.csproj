@@ -73,7 +73,7 @@
   <ItemGroup>
     <Compile Include="Console.cs" />
     <Compile Include="FileSystem\CosmosVFS.cs" />
-    <Compile Include="FileSystem\FatHelpers.cs" />
+    <Compile Include="FileSystem\FileSystemHelpers.cs" />
     <Compile Include="FileSystem\FAT\FatFileSystem.cs" />
     <Compile Include="FileSystem\FAT\FatStream.cs" />
     <Compile Include="FileSystem\FAT\Listing\FatDirectoryEntryAttributeConsts.cs" />

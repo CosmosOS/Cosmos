@@ -7,9 +7,9 @@ namespace Cosmos.System.FileSystem.FAT
 {
     internal class FatStream : Stream
     {
-        protected readonly FatDirectoryEntry mDirectoryEntry;
+        private readonly FatDirectoryEntry mDirectoryEntry;
 
-        protected readonly FatFileSystem mFS;
+        private readonly FatFileSystem mFS;
 
         protected byte[] mReadBuffer;
 
@@ -19,7 +19,7 @@ namespace Cosmos.System.FileSystem.FAT
         // so we might consider a way to flush it and only keep parts.
         // Example, a 100 MB file will require 2MB for this structure. That is
         // probably acceptable for the mid term future.
-        protected ulong[] mFatTable;
+        private ulong[] mFatTable;
 
         protected ulong? mReadBufferPosition;
 
@@ -66,13 +66,11 @@ namespace Cosmos.System.FileSystem.FAT
         {
             get
             {
-                //FatHelpers.Debug("Retrieving size from DirectoryEntry");
                 if (mDirectoryEntry == null)
                 {
                     throw new NullReferenceException("The stream does not currently have an open entry.");
-                    //FatHelpers.Debug("No DirectoryEntry!");
                 }
-                //FatHelpers.DebugNumber(mSize);
+                FileSystemHelpers.Debug("FatStream.get_Length", "Length = ", (long)mSize);
                 return (long)mSize;
             }
         }
@@ -81,6 +79,7 @@ namespace Cosmos.System.FileSystem.FAT
         {
             get
             {
+                FileSystemHelpers.Debug("FatStream.get_Position", "Position = ", (long)mPosition);
                 return (long)mPosition;
             }
             set
@@ -89,6 +88,7 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     throw new ArgumentOutOfRangeException("value");
                 }
+                FileSystemHelpers.Debug("FatStream.set_Position", "Position = ", (long)value);
                 mPosition = (ulong)value;
             }
         }
@@ -122,6 +122,8 @@ namespace Cosmos.System.FileSystem.FAT
                 // EOF
                 return 0;
             }
+
+            FileSystemHelpers.Debug("FatStream.Read", "aBuffer.Length = ", aBuffer.Length, ", aOffset = ", aOffset, ", aCount = ", aCount);
 
             // reduce count, so that no out of bound exception occurs if not existing
             // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
@@ -163,16 +165,19 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override void Flush()
         {
+            FileSystemHelpers.Debug("FatStream.Flush");
             throw new NotImplementedException();
         }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
+            FileSystemHelpers.Debug("FatStream.Seek", "aOffset = ", offset, ", origin = ", origin.ToString());
             throw new NotImplementedException();
         }
 
         public override void SetLength(long value)
         {
+            FileSystemHelpers.Debug("FatStream.SetLength", "value = ", value);
             mDirectoryEntry.SetSize(value);
             mSize = (ulong)value;
         }
@@ -197,6 +202,7 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentException("Invalid offset length!");
             }
 
+            FileSystemHelpers.Debug("FatStream.Write", "aBuffer.Length =", aBuffer.Length, ", aOffset = ", aOffset, ", aCount = ", aCount);
             ulong xCount = (ulong)aCount;
             var xCluster = mFS.NewClusterArray();
             uint xClusterSize = mFS.BytesPerCluster;
@@ -223,16 +229,10 @@ namespace Cosmos.System.FileSystem.FAT
 
                 mFS.Read(xClusterIdx, out xCluster);
 
-                //FatHelpers.Debug("Writing to cluster idx");
-                //FatHelpers.DebugNumber((uint)xClusterIdx);
-                //FatHelpers.Debug("Writing to pos in cluster");
-                //FatHelpers.DebugNumber((uint)xPosInCluster);
-                //FatHelpers.Debug("Offset");
-                //FatHelpers.DebugNumber((uint)aOffset);
-                //FatHelpers.Debug("xWriteSize");
-                //FatHelpers.DebugNumber((uint)xWriteSize);
-                //FatHelpers.Debug("First byte");
-                //FatHelpers.DebugNumber((uint)aBuffer[0]);
+                FileSystemHelpers.Debug("Writing to cluster idx", xClusterIdx);
+                FileSystemHelpers.Debug("Writing to pos in cluster", xPosInCluster);
+                FileSystemHelpers.Debug("Offset", aOffset);
+                FileSystemHelpers.Debug("First byte", aBuffer[0]);
 
                 Array.Copy(aBuffer, aOffset, xCluster, (long)xPosInCluster, xWriteSize);
 

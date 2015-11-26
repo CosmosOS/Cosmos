@@ -140,13 +140,10 @@
                     }
                     if (xCharArray[i] == '}')
                     {
-                        Debugger.DoSend(" -- String.FormatHelper : Found End Format Placeholder --");
                         int xParamIndex = StringHelper.GetStringToNumber(xParamNumber);
-                        Debugger.DoSend(" -- String.FormatHelper : " + "xParamIndex = " + xParamIndex + ", aArgs.Length = " + aArgs.Length + " --");
                         if ((xParamIndex < aArgs.Length - 1) && (aArgs[xParamIndex] != null))
                         {
                             string xParamValue = aArgs[xParamIndex].ToString();
-                            Debugger.DoSend(" -- String.FormatHelper : " + "xParamValue = " + xParamValue + " --");
                             xFormattedString = string.Concat(xFormattedString, xParamValue);
                         }
                         xFoundPlaceholder = false;
@@ -160,13 +157,11 @@
                     }
                     else if ((char.IsDigit(xCharArray[i])) && (!xParamNumberDone))
                     {
-                        Debugger.DoSend(" -- String.FormatHelper : Found Param Number --");
                         xParamNumber = string.Concat(xParamNumber, xCharArray[i]);
                     }
                 }
                 else if (xCharArray[i] == '{')
                 {
-                        Debugger.DoSend(" -- String.FormatHelper : Found Start Format Placeholder --");
                         xFoundPlaceholder = true;
                         xParamNumberDone = false;
                         xParamNumber = string.Empty;
@@ -187,14 +182,19 @@
         }
 
         //String concatenation plugs
-        public static string Concat(string str0, string str1, string str2)
+        public static string Concat(string str0)
         {
-            return Concat(new[] { str0, str1, str2 });
+            return str0;
         }
 
         public static string Concat(string str0, string str1)
         {
             return Concat(new[] { str0, str1 });
+        }
+
+        public static string Concat(string str0, string str1, string str2)
+        {
+            return Concat(new[] { str0, str1, str2 });
         }
 
         public static string Concat(string str0, string str1, string str2, string str3)
@@ -205,79 +205,91 @@
         //Object concatenation plugs
         public static string Concat(object obj0)
         {
-            return obj0.ToString();
+            return obj0?.ToString();
         }
 
         public static string Concat(object obj0, object obj1)
         {
-            return Concat(obj0.ToString(), obj1.ToString());
+            return Concat(obj0?.ToString(), obj1?.ToString());
         }
 
         public static string Concat(object obj0, object obj1, object obj2)
         {
-            return Concat(obj0.ToString(), obj1.ToString(), obj2.ToString());
+            return Concat(obj0?.ToString(), obj1?.ToString(), obj2?.ToString());
         }
 
         public static string Concat(object obj0, object obj1, object obj2, object obj3)
         {
-            return Concat(new[] { obj0, obj1, obj2, obj3 });
+            return Concat(new[] { obj0?.ToString(), obj1?.ToString(), obj2?.ToString(), obj3?.ToString() });
         }
 
         //Array concatenation plugs
         public static string Concat(params string[] values)
         {
-            int len = 0;
-            for (int i = 0; i < values.Length; i++)
+            if (values != null)
             {
-                string xValue = values[i];
-                if (xValue != null)
+                int len = 0;
+                for (int i = 0; i < values.Length; i++)
                 {
-                    len += values[i].Length;
+                    string xValue = values[i];
+                    if (xValue != null)
+                    {
+                        len += values[i].Length;
+                    }
                 }
+                return ConcatArray(values, len);
             }
-            return ConcatArray(values, len);
+            return string.Empty;
         }
 
         public static string Concat(params object[] args)
         {
-            var values = new string[args.Length];
-            for (int i = 0; i < args.Length; i++)
+            if (args != null)
             {
-                var xArg = args[i];
-                if (xArg != null)
+                var values = new string[args.Length];
+                for (int i = 0; i < args.Length; i++)
                 {
-                    string xStrArg = xArg as string;
-                    if (xStrArg != null)
+                    var xArg = args[i];
+                    if (xArg != null)
                     {
-                        values[i] = xStrArg;
-                    }
-                    else
-                    {
-                        values[i] = xArg.ToString();
+                        string xStrArg = xArg as string;
+                        if (xStrArg != null)
+                        {
+                            values[i] = xStrArg;
+                        }
+                        else
+                        {
+                            values[i] = xArg.ToString();
+                        }
                     }
                 }
+                return Concat(values);
             }
-            return Concat(values);
+            return string.Empty;
         }
 
         public static string ConcatArray(string[] values, int totalLength)
         {
-            var xResultChars = new char[totalLength];
-            int xCurPos = 0;
-            for (int i = 0; i < values.Length; i++)
+            if (values != null)
             {
-                string xStr = values[i];
-                if (xStr != null)
+                var xResultChars = new char[totalLength];
+                int xCurPos = 0;
+                for (int i = 0; i < values.Length; i++)
                 {
-                    for (int j = 0; j < xStr.Length; j++)
+                    string xStr = values[i];
+                    if (xStr != null)
                     {
-                        xResultChars[xCurPos] = xStr[j];
-                        xCurPos++;
+                        for (int j = 0; j < xStr.Length; j++)
+                        {
+                            xResultChars[xCurPos] = xStr[j];
+                            xCurPos++;
+                        }
                     }
                 }
+                string xResult = new string(xResultChars);
+                return xResult;
             }
-            string xResult = new string(xResultChars);
-            return xResult;
+            return string.Empty;
         }
 
         public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)

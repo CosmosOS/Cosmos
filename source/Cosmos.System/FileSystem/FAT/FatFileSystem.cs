@@ -1,16 +1,13 @@
-﻿using Cosmos.Common.Extensions;
+﻿using global::System;
+using global::System.Collections.Generic;
+
+using Cosmos.Common.Extensions;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT.Listing;
 using Cosmos.System.FileSystem.Listing;
 
-using Console = global::System.Console;
-using global::System.Collections.Generic;
-using global::System.IO;
-
 namespace Cosmos.System.FileSystem.FAT
 {
-    using global::System;
-
     internal class FatFileSystem : FileSystem
     {
         internal class Fat
@@ -25,56 +22,63 @@ namespace Cosmos.System.FileSystem.FAT
                 mFirstSector = aFirstSector;
             }
 
-            public ulong[] GetFatChain(ulong aFirstCluster, ulong aDataSize = 0)
+            public ulong[] GetFatChain(ulong aFirstCluster, uint aDataSize = 0)
             {
-                //while (xCurrentOffset < (uint)aData.Length)
-                //{
-                //    FatHelpers.Debug("-- FatFileSystem.Write : " + "xCurrentCluster = " + xCurrentCluster +
-                //                     ", xCurrentOffset = " + xCurrentOffset + " --");
-                //    uint xCurrentFatEntryValue;
-                //    GetFatEntry(xCurrentCluster, out xCurrentFatEntryValue);
-                //    byte[] xCluster = NewClusterArray();
+                FileSystemHelpers.Debug("Fat.GetFatChain", "aFirstCluster = ", aFirstCluster, ", aDataSize = ", aDataSize);
+                var xReturn = new ulong[0];
+                ulong xCurrentCluster = aFirstCluster;
+                ulong xValue;
 
-                //    if ((uint)aData.Length < BytesPerCluster)
-                //    {
-                //        FatHelpers.Debug("-- FatFileSystem.Write : Data length " + aData.Length +
-                //                         " < BytesPerCluster " + BytesPerCluster + " --");
-                //        // TODO: If a file uses less clusters than before we need to mark the unused clusters as free.
-                //        Array.Copy(aData, xCluster, aData.Length);
-                //        WriteCluster(xCurrentCluster, aData);
-                //    }
-                //    else
-                //    {
-                //        FatHelpers.Debug("-- FatFileSystem.Write : Data length " + aData.Length +
-                //                         " > BytesPerCluster " + BytesPerCluster + " --");
-                //        if (FatEntryIsEof(xCurrentFatEntryValue))
-                //        {
-                //            xCurrentFatEntryValue = GetNextUnallocatedFatEntry();
-                //            SetFatEntry(xCurrentCluster, xCurrentFatEntryValue);
-                //        }
-                //        else
-                //        {
-                //            GetFatEntry(xCurrentCluster, out xCurrentFatEntryValue);
-                //        }
-                //        Array.Copy(aData, xCluster, xCluster.Length);
-                //        WriteCluster(xCurrentCluster, aData);
-                //        xCurrentCluster = xCurrentFatEntryValue;
-                //    }
+                uint xClustersRequired = aDataSize / mFileSystem.BytesPerCluster;
+                if (aDataSize % mFileSystem.BytesPerCluster != 0)
+                {
+                    xClustersRequired++;
+                }
 
-                //    xCurrentOffset += BytesPerCluster;
-                //}
-                //uint xEofValue = (uint)FatEntryEofValue();
-                //SetFatEntry(xCurrentCluster, xEofValue);
+                GetFatEntry(xCurrentCluster, out xValue);
+                Array.Resize(ref xReturn, xReturn.Length + 1);
+                xReturn[xReturn.Length - 1] = xCurrentCluster;
+                FileSystemHelpers.Debug("Fat.GetFatChain", "xCurrentCluster =", xCurrentCluster, ", xValue =", xValue);
+                while (!FatEntryIsEof(xValue))
+                {
+                    xCurrentCluster = xValue;
+                    GetFatEntry(xCurrentCluster, out xValue);
+                    Array.Resize(ref xReturn, xReturn.Length + 1);
+                    if (!FatEntryIsEof(xValue))
+                    {
+                        xReturn[xReturn.Length - 1] = xValue;
+                    }
+                    else
+                    {
+                        xReturn[xReturn.Length - 1] = xCurrentCluster;
+                    }
+                    FileSystemHelpers.Debug("Fat.GetFatChain", "xCurrentCluster =", xCurrentCluster, ", xValue =", xValue);
+                }
 
-                return null;
+                if (xClustersRequired > xReturn.Length)
+                {
+                    ulong xNewClusters = (uint)xReturn.Length - xClustersRequired;
+                    FileSystemHelpers.Debug("Fat.GetFatChain", "Allocating ", xNewClusters, " new clusters.");
+                    for (ulong i = 0; i < xNewClusters; i++)
+                    {
+                        xCurrentCluster = GetNextUnallocatedFatEntry();
+                        ulong xLastFatEntry = xReturn[xReturn.Length - 1];
+                        SetFatEntry(xLastFatEntry, xCurrentCluster);
+                        SetFatEntry(xCurrentCluster, FatEntryEofValue());
+                        Array.Resize(ref xReturn, xReturn.Length + 1);
+                        xReturn[xReturn.Length - 1] = xCurrentCluster;
+                        FileSystemHelpers.Debug("Fat.GetFatChain", "xCurrentCluster =", xCurrentCluster);
+                    }
+                }
+
+                return xReturn;
             }
 
             public uint GetNextUnallocatedFatEntry()
             {
-                bool xFoundEmpty = false;
                 var xSector = new byte[mFileSystem.BytesPerSector];
-
                 uint xEntryNumber = 0;
+
                 for (uint i = 0; i < mFileSystem.FatSectorCount; i++)
                 {
                     ReadFatTableSector(i, xSector);
@@ -84,9 +88,7 @@ namespace Cosmos.System.FileSystem.FAT
                         xEntryNumber++;
                         if (xEntryValue == 0)
                         {
-                            //FatHelpers.Debug(
-                            //    "Found unallocated FAT Entry: " + xEntryNumber + " = " + xEntryValue + ", Offset = "
-                            //    + xEntryNumber * 4);
+                            FileSystemHelpers.Debug("Found unallocated FAT Entry", xEntryNumber, " = ", xEntryValue, ", Offset = ", xEntryNumber * 4);
                             return xEntryNumber;
                         }
                     }
@@ -98,15 +100,19 @@ namespace Cosmos.System.FileSystem.FAT
 
             private void ReadFatTableSector(ulong xSectorNum, byte[] aData)
             {
-                mFileSystem.mDevice.ReadBlock(xSectorNum, 1, aData);
+                FileSystemHelpers.Debug("Fat.ReadFatTableSector", "xSectorNum =", xSectorNum, ", aData.Length = ", aData.Length);
+                ulong xSectorToRead = mFirstSector + xSectorNum;
+                mFileSystem.mDevice.ReadBlock(xSectorToRead, 1, aData);
             }
 
             private void WriteFatTableSector(ulong xSectorNum, byte[] aData)
             {
-                mFileSystem.mDevice.WriteBlock(xSectorNum, 1, aData);
+                FileSystemHelpers.Debug("Fat.WriteFatTableSector", "xSectorNum =", xSectorNum, ", aData.Length = ", aData.Length);
+                ulong xSectorToRead = mFirstSector + xSectorNum;
+                mFileSystem.mDevice.WriteBlock(xSectorToRead, 1, aData);
             }
 
-            private void GetFatTableSector(ulong aClusterNum, out uint oSector, out uint oOffset)
+            private void GetFatTableSector(ulong aClusterNum, out ulong aSector, out ulong aOffset)
             {
                 ulong xOffset = 0;
                 if (mFileSystem.mFatType == FatTypeEnum.Fat12)
@@ -122,25 +128,27 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     xOffset = aClusterNum * 4;
                 }
-                oSector = (uint)(xOffset / mFileSystem.BytesPerSector);
-                oOffset = (uint)(xOffset % mFileSystem.BytesPerSector);
+                aSector = (xOffset / mFileSystem.BytesPerSector);
+                aOffset = (xOffset % mFileSystem.BytesPerSector);
             }
 
-            private void GetFatEntry(ulong aClusterNum, byte[] aFat, out uint aValue)
+            private void GetFatEntry(ulong aClusterNum, out ulong aValue)
             {
                 ulong xOffset = aClusterNum * 8;
-                // ulong xSectorNumber = xOffset / mFileSystem.BytesPerSector;
-                // ulong xSectorOffset = xSectorNumber * mFileSystem.BytesPerSector - xOffset;
-                // var xSector = new byte[mFileSystem.BytesPerSector];
+                ulong xSectorNumber = xOffset / mFileSystem.BytesPerSector;
+                ulong xSectorOffset = xSectorNumber * mFileSystem.BytesPerSector + xOffset;
+                var xSector = new byte[mFileSystem.BytesPerSector];
 
-                // ReadFatTableSector(xSectorNumber, xSector);
+                FileSystemHelpers.Debug("Fat.GetFatEntry", "aClusterNum =", aClusterNum, ", xOffset =", xOffset, ", xSectorNumber =", xSectorNumber, ", xSectorOffset =", xSectorOffset);
+
+                ReadFatTableSector(xSectorNumber, xSector);
                 switch (mFileSystem.mFatType)
                 {
                     case FatTypeEnum.Fat12:
                         // We now access the FAT entry as a WORD just as we do for FAT16, but if the cluster number is
                         // EVEN, we only want the low 12-bits of the 16-bits we fetch. If the cluster number is ODD
                         // we want the high 12-bits of the 16-bits we fetch.
-                        uint xResult = aFat.ToUInt16(xOffset);
+                        uint xResult = xSector.ToUInt16(xSectorOffset);
                         if ((aClusterNum & 0x01) == 0)
                         {
                             aValue = xResult & 0x0FFF; // Even
@@ -151,22 +159,19 @@ namespace Cosmos.System.FileSystem.FAT
                         }
                         break;
                     case FatTypeEnum.Fat16:
-                        aValue = aFat.ToUInt16(xOffset);
+                        aValue = xSector.ToUInt16(xSectorOffset);
                         break;
                     case FatTypeEnum.Fat32:
-                        aValue = aFat.ToUInt32(xOffset) & 0x0FFFFFFF;
+                        aValue = xSector.ToUInt32(xSectorOffset) & 0x0FFFFFFF;
                         break;
                     default:
                         throw new Exception("Unknown file system type.");
                 }
 
-                //FatHelpers.Debug("-- Fat.GetFatEntry : "
-                //    + "aClusterNum = " + aClusterNum
-                //    + "aFat.Length = " + aFat.Length
-                //    + "aValue = " + aValue);
+                FileSystemHelpers.Debug("Fat.GetFatEntry", "aValue =", aValue);
             }
 
-            private void SetFatEntry(ulong aClusterNum, uint aValue)
+            private void SetFatEntry(ulong aClusterNum, ulong aValue)
             {
                 ulong xOffset = aClusterNum * 8;
                 ulong xSectorNumber = xOffset / mFileSystem.BytesPerSector;
@@ -199,9 +204,10 @@ namespace Cosmos.System.FileSystem.FAT
                         xSector.SetUInt16(xSectorOffset, (ushort)aValue);
                         break;
                     default:
-                        xSector.SetUInt32(xSectorOffset, aValue);
+                        xSector.SetUInt32(xSectorOffset, (uint)aValue);
                         break;
                 }
+                FileSystemHelpers.Debug("Fat.SetFatEntry", "aClusterNum =", aClusterNum, ", aValue =", aValue);
                 WriteFatTableSector(xSectorNumber, xSector);
             }
 
@@ -301,10 +307,7 @@ namespace Cosmos.System.FileSystem.FAT
                 FatSectorCount = xBPB.ToUInt32(36);
             }
 
-            //Global.Dbg.Send("FAT Sector Count: " + FatSectorCount);
-
-            DataSectorCount = TotalSectorCount
-                              - (ReservedSectorCount + NumberOfFATs * FatSectorCount + ReservedSectorCount);
+            DataSectorCount = TotalSectorCount - (ReservedSectorCount + NumberOfFATs * FatSectorCount + ReservedSectorCount);
 
             // Computation rounds down.
             ClusterCount = DataSectorCount / SectorsPerCluster;
@@ -372,7 +375,7 @@ namespace Cosmos.System.FileSystem.FAT
                 mDevice.ReadBlock(aFirstCluster, RootSectorCount, aData);
             }
 
-            //FatHelpers.Debug("-- FatFileSystem.ReadInternal : " + "aFirstCluster = " + aFirstCluster + ", aData.Length = " + aData.Length + " --");
+            FileSystemHelpers.Debug("FatFileSystem.ReadInternal", "" + "aFirstCluster =", aFirstCluster, ", aData.Length =", aData.Length);
         }
 
         private void WriteInternal(ulong aFirstCluster, byte[] aData)
@@ -387,7 +390,7 @@ namespace Cosmos.System.FileSystem.FAT
                 mDevice.WriteBlock(aFirstCluster, RootSectorCount, aData);
             }
 
-            //FatHelpers.Debug("-- FatFileSystem.WriteInternal : " + "aFirstCluster = " + aFirstCluster + ", aData.Length = " + aData.Length + " --");
+            FileSystemHelpers.Debug("FatFileSystem.WriteInternal", "" + "aFirstCluster =", aFirstCluster, ", aData.Length =", aData.Length);
         }
 
         internal void Read(ulong aFirstCluster, out byte[] aData, ulong aSize = 0, ulong aOffset = 0)
@@ -440,28 +443,27 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override void DisplayFileSystemInfo()
         {
-            Console.WriteLine("-------File System--------");
-            Console.WriteLine("Bytes per Cluster: " + BytesPerCluster);
-            Console.WriteLine("Bytes per Sector: " + BytesPerSector);
-            Console.WriteLine("Cluster Count: " + ClusterCount);
-            Console.WriteLine("Data Sector: " + DataSector);
-            Console.WriteLine("Data Sector Count: " + DataSectorCount);
-            Console.WriteLine("FAT Sector Count: " + FatSectorCount);
-            Console.WriteLine("FAT Type: " + mFatType);
-            Console.WriteLine("Number of FATS: " + NumberOfFATs);
-            Console.WriteLine("Reserved Sector Count: " + ReservedSectorCount);
-            Console.WriteLine("Root Cluster: " + RootCluster);
-            Console.WriteLine("Root Entry Count: " + RootEntryCount);
-            Console.WriteLine("Root Sector: " + RootSector);
-            Console.WriteLine("Root Sector Count: " + RootSectorCount);
-            Console.WriteLine("Sectors per Cluster: " + SectorsPerCluster);
-            Console.WriteLine("Total Sector Count: " + TotalSectorCount);
+            global::System.Console.WriteLine("-------File System--------");
+            global::System.Console.WriteLine("Bytes per Cluster: " + BytesPerCluster);
+            global::System.Console.WriteLine("Bytes per Sector: " + BytesPerSector);
+            global::System.Console.WriteLine("Cluster Count: " + ClusterCount);
+            global::System.Console.WriteLine("Data Sector: " + DataSector);
+            global::System.Console.WriteLine("Data Sector Count: " + DataSectorCount);
+            global::System.Console.WriteLine("FAT Sector Count: " + FatSectorCount);
+            global::System.Console.WriteLine("FAT Type: " + mFatType);
+            global::System.Console.WriteLine("Number of FATS: " + NumberOfFATs);
+            global::System.Console.WriteLine("Reserved Sector Count: " + ReservedSectorCount);
+            global::System.Console.WriteLine("Root Cluster: " + RootCluster);
+            global::System.Console.WriteLine("Root Entry Count: " + RootEntryCount);
+            global::System.Console.WriteLine("Root Sector: " + RootSector);
+            global::System.Console.WriteLine("Root Sector Count: " + RootSectorCount);
+            global::System.Console.WriteLine("Sectors per Cluster: " + SectorsPerCluster);
+            global::System.Console.WriteLine("Total Sector Count: " + TotalSectorCount);
         }
 
         public override List<DirectoryEntry> GetDirectoryListing(DirectoryEntry baseDirectory)
         {
-            //FatHelpers.Debug("-- FatFileSystem.GetDirectoryListing : "
-            //    + "baseDirectory.Name = " + baseDirectory?.mName + " --");
+            FileSystemHelpers.Debug("FatFileSystem.GetDirectoryListing", "baseDirectory.Name =", baseDirectory?.mName);
 
             var result = new List<DirectoryEntry>();
             List<FatDirectoryEntry> fatListing;
@@ -486,7 +488,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override DirectoryEntry GetRootDirectory()
         {
-            //FatHelpers.Debug("-- FatFileSystem.GetRootDirectory : RootCluster = " + RootCluster + " --");
+            FileSystemHelpers.Debug("FatFileSystem.GetRootDirectory", "RootCluster =" + RootCluster);
             var xRootEntry = new FatDirectoryEntry(this, null, mRootPath, RootCluster);
             return xRootEntry;
         }
@@ -508,7 +510,7 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentException("The new directory must be specified.", "aNewDirectory");
             }
 
-            //FatHelpers.Debug("-- FatFileSystem.CreateDirectory : " + "aParentDirectory.Name = " + aParentDirectory?.mName + ", aNewDirectory = " + aNewDirectory + " --");
+            FileSystemHelpers.Debug("FatFileSystem.CreateDirectory", "aParentDirectory.Name =", aParentDirectory?.mName, ", aNewDirectory =", aNewDirectory);
             var xParentDirectory = (FatDirectoryEntry)aParentDirectory;
             var xDirectoryEntryToAdd = xParentDirectory.AddDirectoryEntry(aNewDirectory, DirectoryEntryTypeEnum.Directory);
             if (xDirectoryEntryToAdd != null)

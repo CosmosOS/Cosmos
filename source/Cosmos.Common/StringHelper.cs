@@ -12,23 +12,19 @@ namespace Cosmos.Common
     {
         public static string GetCharArrayString(char[] aArray)
         {
-            Debugger.DoSend("-- StringHelper.GetCharArrayString --");
             if (aArray == null)
             {
-                Debugger.DoSend("-- StringHelper.GetCharArrayString : aArray is null --");
                 return string.Empty;
             }
 
             if (aArray.Length == 0)
             {
-                Debugger.DoSend("-- StringHelper.GetCharArrayString : aArray is empty --");
                 return string.Empty;
             }
 
             string xString = string.Empty;
             for (int i = 0; i < aArray.Length; i++)
             {
-                Debugger.DoSend("-- StringHelper.GetCharArrayString : i = " + i + ", aArray[i] = " + aArray[i].ToString() + " --");
                 //xString = string.Concat(xString, aArray[i].ToString());
             }
 

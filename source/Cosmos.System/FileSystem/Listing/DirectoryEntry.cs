@@ -11,13 +11,13 @@
 
     public abstract class DirectoryEntry
     {
-        public readonly ulong mSize;
+        public readonly uint mSize;
         public readonly string mName;
         protected readonly FileSystem mFileSystem;
         public readonly DirectoryEntry mParent;
         public readonly DirectoryEntryTypeEnum mEntryType;
 
-        protected DirectoryEntry(FileSystem aFileSystem, DirectoryEntry aParent, string aName, ulong aSize, DirectoryEntryTypeEnum aEntryType)
+        protected DirectoryEntry(FileSystem aFileSystem, DirectoryEntry aParent, string aName, uint aSize, DirectoryEntryTypeEnum aEntryType)
         {
             mFileSystem = aFileSystem;
             mParent = aParent;

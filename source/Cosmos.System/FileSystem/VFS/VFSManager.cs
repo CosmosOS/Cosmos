@@ -1,19 +1,18 @@
-﻿namespace Cosmos.System.FileSystem.VFS
+﻿using global::System;
+using global::System.Collections.Generic;
+using global::System.IO;
+
+using Cosmos.System.FileSystem.Listing;
+
+namespace Cosmos.System.FileSystem.VFS
 {
-    using Cosmos.System.FileSystem.Listing;
-
-    using global::System;
-    using global::System.Collections.Generic;
-    using global::System.IO;
-
     public static class VFSManager
     {
         private static VFSBase mVFS;
 
         public static void RegisterVFS(VFSBase aVFS)
         {
-            //FatHelpers.Debug("-- VFSManager.RegisterVFS --");
-
+            FileSystemHelpers.Debug("VFSManager.RegisterVFS");
             if (mVFS != null)
             {
                 throw new Exception("Virtual File System Manager already initialized!");
@@ -30,7 +29,7 @@
                 throw new ArgumentNullException("aPath");
             }
 
-            //FatHelpers.Debug("-- VFSManager.GetFile : aPath = " + aPath + " --");
+            FileSystemHelpers.Debug("VFSManager.GetFile", "aPath = ", aPath);
 
             string xFileName = Path.GetFileName(aPath);
             string xDirectory = Path.GetDirectoryName(aPath);
@@ -61,7 +60,8 @@
                 throw new ArgumentNullException("aPath");
             }
 
-            //FatHelpers.Debug("-- VFSManager.CreateDirectory : aPath = " + aPath + " --");
+            FileSystemHelpers.Debug("VFSManager.CreateDirectory", "aPath = ", aPath);
+
             return mVFS.CreateDirectory(aPath);
         }
 
@@ -72,7 +72,8 @@
                 throw new ArgumentNullException("aPath");
             }
 
-            //FatHelpers.Debug("-- VFSManager.GetDirectory : aPath = " + aPath + " --");
+            FileSystemHelpers.Debug("VFSManager.GetDirectory", "aPath = ", aPath);
+
             return mVFS.GetDirectory(aPath);
         }
 
@@ -83,7 +84,8 @@
                 throw new ArgumentNullException("aPath");
             }
 
-            //FatHelpers.Debug("-- VFSManager.GetDirectoryListing : aPath = " + aPath + " --");
+            FileSystemHelpers.Debug("VFSManager.GetDirectoryListing", "aPath = ", aPath);
+
             return mVFS.GetDirectoryListing(aPath);
         }
 
@@ -94,21 +96,21 @@
                 throw new ArgumentNullException("aVolume");
             }
 
-            //FatHelpers.Debug("-- VFSManager.GetVolume : aVolume = " + aVolume + " --");
+            FileSystemHelpers.Debug("VFSManager.GetVolume", "aVolume =", aVolume);
 
             return mVFS.GetVolume(aVolume);
         }
 
         public static List<DirectoryEntry> GetVolumes()
         {
-            //FatHelpers.Debug("-- VFSManager.GetVolumes --");
+            FileSystemHelpers.Debug("VFSManager.GetVolumes");
 
             return mVFS.GetVolumes();
         }
 
         public static List<string> GetLogicalDrives()
         {
-            //FatHelpers.Debug("-- VFSManager.GetLogicalDrives --");
+            FileSystemHelpers.Debug("VFSManager.GetLogicalDrives");
 
             //TODO: Directory.GetLogicalDrives() will call this.
             return null;
@@ -130,7 +132,7 @@
             bool includeDirs,
             SearchOption searchOption)
         {
-            //FatHelpers.Debug("-- VFSManager.InternalGetFileDirectoryNames --");
+            FileSystemHelpers.Debug("VFSManager.InternalGetFileDirectoryNames");
 
             return null;
 
@@ -174,90 +176,88 @@
 
             try
             {
-                //FatHelpers.Debug("-- VFSManager.FileExists : aPath = " + aPath + " --");
+                FileSystemHelpers.Debug("VFSManager.FileExists", "aPath =" + aPath);
 
                 string xPath = Path.GetFullPath(aPath);
                 return GetFile(xPath) != null;
             }
             catch (Exception e)
             {
-                Console.Write("Exception occurred: ");
-                Console.WriteLine(e.Message);
+                global::System.Console.Write("Exception occurred: ");
+                global::System.Console.WriteLine(e.Message);
                 return false;
             }
         }
 
         public static bool FileExists(DirectoryEntry aEntry)
         {
-            //FatHelpers.Debug("-- VFSManager.FileExists --");
-
             try
             {
+                FileSystemHelpers.Debug("VFSManager.FileExists", "aEntry.mName =", aEntry?.mName);
                 string xPath = GetFullPath(aEntry);
                 return GetFile(xPath) != null;
             }
             catch (Exception e)
             {
-                Console.Write("Exception occurred: ");
-                Console.WriteLine(e.Message);
+                global::System.Console.Write("Exception occurred: ");
+                global::System.Console.WriteLine(e.Message);
                 return false;
             }
         }
 
         public static bool DirectoryExists(string aPath)
         {
-            //FatHelpers.Debug("-- VFSManager.DirectoryExists --");
-
             try
             {
+                FileSystemHelpers.Debug("VFSManager.DirectoryExists", "aPath =", aPath);
                 string xPath = Path.GetFullPath(aPath);
                 return GetDirectory(xPath) != null;
             }
             catch (Exception e)
             {
-                Console.Write("Exception occurred: ");
-                Console.WriteLine(e.Message);
+                global::System.Console.Write("Exception occurred: ");
+                global::System.Console.WriteLine(e.Message);
                 return false;
             }
         }
 
         public static bool DirectoryExists(DirectoryEntry aEntry)
         {
-            //FatHelpers.Debug("-- VFSManager.DirectoryExists --");
-
             try
             {
+                FileSystemHelpers.Debug("VFSManager.DirectoryExists", "aEntry.mName =", aEntry?.mName);
                 string xPath = GetFullPath(aEntry);
                 return GetDirectory(xPath) != null;
             }
             catch (Exception e)
             {
-                Console.Write("Exception occurred: ");
-                Console.WriteLine(e.Message);
+                global::System.Console.Write("Exception occurred: ");
+                global::System.Console.WriteLine(e.Message);
                 return false;
             }
         }
 
         public static string GetFullPath(DirectoryEntry aEntry)
         {
-            var xEntry = aEntry;
-            string xPath = string.Empty;
+            FileSystemHelpers.Debug("VFSManager.GetFullPath : aEntry.mName = " + aEntry?.mName);
+            var xEntry = aEntry?.mParent;
+            string xPath = aEntry?.mName;
 
             while (xEntry != null)
             {
-                xPath = xPath + xEntry.mName;
+                FileSystemHelpers.Debug("VFSManager.GetFullPath : xEntry is not null.");
+                xPath = string.Concat(xPath, xEntry.mName);
+                FileSystemHelpers.Debug("VFSManager.GetFullPath : xPath = " + xPath);
                 xEntry = aEntry.mParent;
-                //FatHelpers.Debug("-- VFSManager.GetFullPath : xPath = " + xPath + " --");
             }
 
-            //FatHelpers.Debug("-- VFSManager.GetFullPath : result = " + xPath + " --");
+            FileSystemHelpers.Debug("VFSManager.GetFullPath : xPath = " + xPath);
             return xPath;
         }
 
         public static Stream GetFileStream(string aPathname)
         {
-            //FatHelpers.Debug("-- VFSManager.GetFileStream --");
-
+            FileSystemHelpers.Debug("VFSManager.GetFileStream", "aPathname =", aPathname);
             var xFileInfo = GetFile(aPathname);
             if (xFileInfo == null)
             {

@@ -159,6 +159,7 @@
     <Compile Include="ElfHash.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="CompilerHelpers.cs" />
     <Compile Include="GCImplementation.cs" />
     <Compile Include="GCImplementationRefs.cs" />
     <Compile Include="Heap.cs" />
