@@ -61,7 +61,7 @@ namespace Cosmos.System.Plugs.System.IO
                     }
                     xText += aExtension;
                 }
-                FatHelpers.Debug("-- Path.ChangeExtension : aPath = " + aPath + ", aExtension = " + aExtension + ", result = " + xText + " --");
+                FileSystemHelpers.Debug("Path.ChangeExtension", "aPath =", aPath, ", aExtension =", aExtension, ", result =", xText);
                 return xText;
             }
             return null;
@@ -110,7 +110,7 @@ namespace Cosmos.System.Plugs.System.IO
             CheckInvalidPathChars(aPath1, false);
             CheckInvalidPathChars(aPath2, false);
             string result = CombineNoChecks(aPath1, aPath2);
-            FatHelpers.Debug("-- Path.Combine : aPath1 = " + aPath1 + ", aPath2 = " + aPath2 + ", result = " + result + " --");
+            FileSystemHelpers.Debug("Path.Combine", "aPath1 =", aPath1, ", aPath2 =", aPath2, ", result =", result);
             return result;
         }
 
@@ -118,19 +118,19 @@ namespace Cosmos.System.Plugs.System.IO
         {
             if (aPath2.Length == 0)
             {
-                FatHelpers.Debug("-- Path.CombineNoChecks : aPath2 has 0 length, result = " + aPath1 + " --");
+                FileSystemHelpers.Debug("Path.CombineNoChecks", "aPath2 has 0 length, result =", aPath1);
                 return aPath1;
             }
 
             if (aPath1.Length == 0)
             {
-                FatHelpers.Debug("-- Path.CombineNoChecks : aPath1 has 0 length, result = " + aPath2 + " --");
+                FileSystemHelpers.Debug("Path.CombineNoChecks", "aPath1 has 0 length, result =", aPath2);
                 return aPath2;
             }
 
             if (IsPathRooted(aPath2))
             {
-                FatHelpers.Debug("-- Path.CombineNoChecks : aPath2 is root, result = " + aPath2 + " --");
+                FileSystemHelpers.Debug("Path.CombineNoChecks", "aPath2 is root, result =", aPath2);
                 return aPath2;
             }
 
@@ -140,18 +140,17 @@ namespace Cosmos.System.Plugs.System.IO
                 && xC != Path.VolumeSeparatorChar)
             {
                 xResult = string.Concat(aPath1, "\\", aPath2);
-                FatHelpers.Debug("-- Path.CombineNoChecks : aPath1 = " + aPath1 + ", aPath2 = " + aPath2 + ", result = " + xResult + " --");
+                FileSystemHelpers.Debug("Path.CombineNoChecks", "aPath1 =", aPath1, ", aPath2 =", aPath2, ", result =", xResult);
                 return xResult;
             }
 
             xResult = string.Concat(aPath1, aPath2);
-            FatHelpers.Debug("-- Path.CombineNoChecks : aPath1 = " + aPath1 + ", aPath2 = " + aPath2 + ", result = " + xResult + " --");
+            FileSystemHelpers.Debug("Path.CombineNoChecks", "aPath1 =", aPath1, ", aPath2 =", aPath2, ", result =", xResult);
             return xResult;
         }
 
         public static string GetDirectoryName(string aPath)
         {
-            FatHelpers.Debug("PathImpl -- GetDirectoryName");
             if (aPath != null)
             {
                 CheckInvalidPathChars(aPath, false);
@@ -170,14 +169,13 @@ namespace Cosmos.System.Plugs.System.IO
                            && xPath[xNum] != Path.AltDirectorySeparatorChar)
                     {
                     }
-
-                    string result = xPath.Substring(0, xNum);
-                    FatHelpers.Debug("-- Path.GetDirectoryName : aPath = " + aPath + ", result = " + result + " --");
-                    return result;
                 }
+                string result = xPath.Substring(0, xNum);
+                FileSystemHelpers.Debug("Path.GetDirectoryName", "aPath =", aPath, ", result =", result);
+                return result;
             }
 
-            FatHelpers.Debug("-- Path.GetDirectoryName : aPath is null --");
+            FileSystemHelpers.Debug("Path.GetDirectoryName", "aPath is null");
             return null;
         }
 
@@ -253,12 +251,12 @@ namespace Cosmos.System.Plugs.System.IO
         {
             if (aPath == null)
             {
-                FatHelpers.Debug("-- Path.GetFullPath : aPath is null --");
+                FileSystemHelpers.Debug("Path.GetFullPath", "aPath is null");
                 throw new ArgumentNullException("aPath");
             }
 
             string result = NormalizePath(aPath, true);
-            FatHelpers.Debug("-- Path.GetFullPath : aPath = " + aPath + ", result = " + result + " --");
+            FileSystemHelpers.Debug("Path.GetFullPath", "aPath =", aPath, ", result =", result);
             return result;
         }
 
@@ -276,7 +274,7 @@ namespace Cosmos.System.Plugs.System.IO
         {
             if (aPath == null)
             {
-                FatHelpers.Debug("-- Path.GetPathRoot : aPath is null --");
+                FileSystemHelpers.Debug("Path.GetPathRoot", "aPath is null");
                 throw new ArgumentNullException("aPath");
             }
 
@@ -288,7 +286,7 @@ namespace Cosmos.System.Plugs.System.IO
                 xResult = string.Concat(xResult, Path.DirectorySeparatorChar.ToString());
             }
 
-            FatHelpers.Debug("-- Path.GetPathRoot : aPath = " + aPath + ", xResult = " + xResult + " --");
+            FileSystemHelpers.Debug("Path.GetPathRoot", "aPath =", aPath, ", xResult =", xResult);
             return xResult;
         }
 
@@ -301,7 +299,7 @@ namespace Cosmos.System.Plugs.System.IO
         {
             if (aPath == null)
             {
-                FatHelpers.Debug("-- Path.GetRootLength : aPath is null --");
+                FileSystemHelpers.Debug("Path.GetRootLength", "aPath is null");
                 throw new ArgumentNullException("aPath");
             }
 
@@ -335,7 +333,7 @@ namespace Cosmos.System.Plugs.System.IO
                 }
             }
 
-            FatHelpers.Debug("-- Path.GetRootLength : result = " + i.ToString() + " --");
+            FileSystemHelpers.Debug("Path.GetRootLength", "result =", i.ToString());
             return i;
         }
 
@@ -440,19 +438,22 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static bool IsRelative(string aPath)
         {
+            if (aPath == null)
+            {
+                throw new ArgumentNullException("aPath");
+            }
+
             if (aPath.Length < 3)
             {
                 return true;
             }
 
-            string xC = aPath[1].ToString();
-            if (xC != Path.VolumeSeparatorChar.ToString())
+            if (aPath[1] != Path.VolumeSeparatorChar)
             {
                 return true;
             }
 
-            xC = aPath[2].ToString();
-            if (xC != Path.DirectorySeparatorChar.ToString())
+            if (aPath[2] != Path.DirectorySeparatorChar)
             {
                 return true;
             }
@@ -460,354 +461,28 @@ namespace Cosmos.System.Plugs.System.IO
             return false;
         }
 
-        //public static string NormalizePath(string aPath, bool aFullCheck, int aMaxPathLength, bool aExpandShortPaths)
-        //{
-        //    FatHelpers.Debug("-- Path.NormalizePath : aPath = " + aPath + " --");
-        //    if (aPath == null)
-        //    {
-        //        throw new ArgumentNullException("aPath");
-        //    }
-
-        //    return aPath;
-
-        //    // TODO: Fix this.
-        //    // If we're doing a full path check, trim whitespace and look for illegal path characters.
-        //    if (aFullCheck)
-        //    {
-        //        aPath = aPath.TrimEnd(VFSManager.GetTrimEndChars());
-        //        CheckInvalidPathChars(aPath, false);
-        //    }
-
-        //    int index = 0;
-        //    string newBuffer = string.Empty;
-
-        //    uint numSpaces = 0;
-        //    uint numDots = 0;
-        //    bool fixupDirectorySeparator = false;
-        //    uint numSigChars = 0;
-        //    int lastSigChar = -1; // Index of last significant character.
-        //    bool startedWithVolumeSeparator = false;
-        //    bool firstSegment = true;
-        //    int lastDirectorySeparatorPos = 0;
-        //    char currentChar = aPath[0];
-        //    if (aPath.Length > 0 && (currentChar == Path.DirectorySeparatorChar || aPath[0] == Path.AltDirectorySeparatorChar))
-        //    {
-        //        newBuffer = string.Concat(newBuffer, "\\");
-        //        index++;
-        //        lastSigChar = 0;
-        //        FatHelpers.Debug("-- Path.NormalizePath : newBuffer = " + newBuffer + " --");
-        //    }
-
-        //    // Normalize the string, stripping out redundant dots, spaces, and slashes.
-        //    while (index < aPath.Length)
-        //    {
-        //        currentChar = aPath[index];
-        //        FatHelpers.Debug("-- Path.NormalizePath : index = " + index.ToString() + ", currentChar = " + currentChar.ToString() + " --");
-
-        //        // We handle both directory separators and dots specially. For directory separators, we consume consecutive appearances.  
-        //        // For dots, we consume all dots beyond the second in succession. All other characters are added as is.
-        //        // In addition we consume all spaces after the last other char in a directory name up until the directory separator.
-        //        if (currentChar == Path.DirectorySeparatorChar || currentChar == Path.AltDirectorySeparatorChar)
-        //        {
-        //            FatHelpers.Debug("-- Path.NormalizePath : currentChar is a directory separator or alt directory separator --");
-        //            if (numSigChars == 0)
-        //            {
-        //                FatHelpers.Debug("-- Path.NormalizePath : numSigChars = 0 --");
-        //                // Dot and space handling
-        //                if (numDots > 0)
-        //                {
-        //                    FatHelpers.Debug("-- Path.NormalizePath : numDots > 0 --");
-        //                    // Look for ".[space]*" or "..[space]*"
-        //                    int start = lastSigChar + 1;
-        //                    if (aPath[start] != '.')
-        //                    {
-        //                        throw new ArgumentException("Illegal path.", "aPath");
-        //                    }
-
-        //                    // Only allow "[dot]+[space]*", and normalize the legal ones to "." or ".."
-        //                    if (numDots >= 2)
-        //                    {
-        //                        FatHelpers.Debug("-- Path.NormalizePath : numDots >= 2 --");
-        //                        // Reject "C:..."
-        //                        if (startedWithVolumeSeparator && numDots > 2)
-        //                        {
-        //                            throw new ArgumentException("Illegal path.", "aPath");
-        //                        }
-
-        //                        if (aPath[start + 1] == '.')
-        //                        {
-        //                            // Search for a space in the middle of the dots and throw
-        //                            for (int i = start + 2; i < start + numDots; i++)
-        //                            {
-        //                                if (aPath[i] != '.')
-        //                                {
-        //                                    throw new ArgumentException("Illegal path.", "aPath");
-        //                                }
-        //                            }
-
-        //                            numDots = 2;
-        //                        }
-        //                        else
-        //                        {
-        //                            if (numDots > 1)
-        //                            {
-        //                                throw new ArgumentException("Illegal path.", "aPath");
-        //                            }
-        //                            numDots = 1;
-        //                        }
-        //                    }
-
-        //                    if (numDots == 2)
-        //                    {
-        //                        FatHelpers.Debug("-- Path.NormalizePath : numDots == 2 --");
-        //                        newBuffer = string.Concat(newBuffer, ".");
-        //                        index++;
-        //                        FatHelpers.Debug("-- Path.NormalizePath : newBuffer = " + newBuffer + " --");
-        //                    }
-
-        //                    newBuffer = string.Concat(newBuffer, ".");
-        //                    index++;
-        //                    FatHelpers.Debug("-- Path.NormalizePath : newBuffer = " + newBuffer + " --");
-        //                    fixupDirectorySeparator = false;
-
-        //                    // Continue in this case, potentially writing out '\'.
-        //                }
-
-        //                if (numSpaces > 0 && firstSegment)
-        //                {
-        //                    FatHelpers.Debug("-- Path.NormalizePath : numSpaces > 0 && firstSegment --");
-        //                    // Handle strings like " \\server\share".
-        //                    if (index + 1 < aPath.Length &&(aPath[index + 1] == Path.DirectorySeparatorChar || aPath[index + 1] == Path.AltDirectorySeparatorChar))
-        //                    {
-        //                        newBuffer = string.Concat(newBuffer, Path.DirectorySeparatorChar.ToString());
-        //                        index++;
-        //                        FatHelpers.Debug("-- Path.NormalizePath : newBuffer = " + newBuffer + " --");
-        //                    }
-        //                }
-        //            }
-        //            numDots = 0;
-        //            numSpaces = 0;  // Suppress trailing spaces
-
-        //            if (!fixupDirectorySeparator)
-        //            {
-        //                FatHelpers.Debug("-- Path.NormalizePath : fixupDirectorySeparator is false --");
-        //                fixupDirectorySeparator = true;
-        //                newBuffer = string.Concat(newBuffer, Path.DirectorySeparatorChar.ToString());
-        //                index++;
-        //                FatHelpers.Debug("-- Path.NormalizePath : newBuffer = " + newBuffer + " --");
-        //            }
-        //            numSigChars = 0;
-        //            lastSigChar = index;
-        //            startedWithVolumeSeparator = false;
-        //            firstSegment = false;
-
-        //            // For short file names, we must try to expand each of them as
-        //            // soon as possible.  We need to allow people to specify a file
-        //            // name that doesn't exist using a path with short file names
-        //            // in it, such as this for a temp file we're trying to create:
-        //            // C:\DOCUME~1\USERNA~1.RED\LOCALS~1\Temp\bg3ylpzp
-        //            // We could try doing this afterwards piece by piece, but it's
-        //            // probably a lot simpler to do it here.
-        //            //if (mightBeShortFileName)
-        //            //{
-        //            //    newBuffer.TryExpandShortFileName();
-        //            //    mightBeShortFileName = false;
-        //            //}
-
-        //            int thisPos = newBuffer.Length - 1;
-        //            if (thisPos - lastDirectorySeparatorPos > VFSManager.GetMaxPath())
-        //            {
-        //                throw new PathTooLongException("Path is too long.");
-        //            }
-        //            lastDirectorySeparatorPos = thisPos;
-        //        } // if (Found directory separator)
-        //        else if (currentChar == '.')
-        //        {
-        //            FatHelpers.Debug("-- Path.NormalizePath : currentChar == '.' --");
-        //            // Reduce only multiple .'s only after slash to 2 dots. For
-        //            // instance a...b is a valid file name.
-        //            numDots++;
-        //            // Don't flush out non-terminal spaces here, because they may in
-        //            // the end not be significant.  Turn "c:\ . .\foo" -> "c:\foo"
-        //            // which is the conclusion of removing trailing dots & spaces,
-        //            // as well as folding multiple '\' characters.
-        //        }
-        //        else if (currentChar == ' ')
-        //        {
-        //            FatHelpers.Debug("-- Path.NormalizePath : currentChar == ' ' --");
-        //            numSpaces++;
-        //        }
-        //        else
-        //        {  // Normal character logic
-        //            //if (currentChar == '~' && expandShortPaths)
-        //            //    mightBeShortFileName = true;
-
-        //            FatHelpers.Debug("-- Path.NormalizePath : currentChar == normal character --");
-        //            fixupDirectorySeparator = false;
-
-        //            // To reject strings like "C:...\foo" and "C  :\foo"
-        //            if (firstSegment && currentChar == Path.VolumeSeparatorChar)
-        //            {
-        //                // Only accept "C:", not "c :" or ":"
-        //                // Get a drive letter or ' ' if index is 0.
-        //                char driveLetter = (index > 0) ? aPath[index - 1] : ' ';
-        //                bool validPath = ((numDots == 0) && (numSigChars >= 1) && (driveLetter != ' '));
-        //                if (!validPath)
-        //                {
-        //                    throw new ArgumentException("Illegal path.");
-        //                }
-
-        //                startedWithVolumeSeparator = true;
-        //                // We need special logic to make " c:" work, we should not fix paths like "  foo::$DATA"
-        //                if (numSigChars > 1)
-        //                { // Common case, simply do nothing
-        //                    int spaceCount = 0; // How many spaces did we write out, numSpaces has already been reset.
-        //                    while ((spaceCount < newBuffer.Length) && newBuffer[spaceCount] == ' ')
-        //                    {
-        //                        spaceCount++;
-        //                    }
-        //                    if (numSigChars - spaceCount == 1)
-        //                    {
-        //                        index = 0;
-        //                        newBuffer = string.Empty;
-        //                        newBuffer = string.Concat(newBuffer, driveLetter.ToString()); // Overwrite spaces, we need a special case to not break "  foo" as a relative path.
-        //                        index++;
-        //                        FatHelpers.Debug("-- Path.NormalizePath : newBuffer = " + newBuffer + " --");
-        //                    }
-        //                }
-        //                numSigChars = 0;
-        //            }
-        //            else
-        //            {
-        //                numSigChars += 1 + numDots + numSpaces;
-        //                FatHelpers.Debug("-- Path.NormalizePath : numSigChars = " + numSigChars.ToString() + " --");
-        //            }
-
-        //            // Copy any spaces & dots since the last significant character
-        //            // to here.  Note we only counted the number of dots & spaces,
-        //            // and don't know what order they're in.  Hence the copy.
-        //            if (numDots > 0 || numSpaces > 0)
-        //            {
-        //                int numCharsToCopy = (lastSigChar >= 0) ? index - lastSigChar - 1 : index;
-        //                if (numCharsToCopy > 0)
-        //                {
-        //                    for (int i = 0; i < numCharsToCopy; i++)
-        //                    {
-        //                        newBuffer = string.Concat(newBuffer, aPath[lastSigChar + 1 + i].ToString());
-        //                        index++;
-        //                        FatHelpers.Debug("-- Path.NormalizePath : newBuffer = " + newBuffer + " --");
-        //                    }
-        //                }
-        //                numDots = 0;
-        //                numSpaces = 0;
-        //            }
-
-        //            newBuffer = string.Concat(newBuffer, currentChar.ToString());
-        //            index++;
-        //            FatHelpers.Debug("-- Path.NormalizePath : newBuffer = " + newBuffer + " --");
-        //            lastSigChar = index;
-        //        }
-
-        //        index++;
-        //    } // end while
-
-        //    // Drop any trailing dots and spaces from file & directory names, EXCEPT
-        //    // we MUST make sure that "C:\foo\.." is correctly handled.
-        //    // Also handle "C:\foo\." -> "C:\foo", while "C:\." -> "C:\"
-        //    if (numSigChars == 0)
-        //    {
-        //        if (numDots > 0)
-        //        {
-        //            // Look for ".[space]*" or "..[space]*"
-        //            int start = lastSigChar + 1;
-        //            if (aPath[start] != '.')
-        //            {
-        //                throw new ArgumentException("Illegal path.");
-        //            }
-
-        //            // Only allow "[dot]+[space]*", and normalize the legal ones to "." or ".."
-        //            if (numDots >= 2)
-        //            {
-        //                // Reject "C:..."
-        //                if (startedWithVolumeSeparator && numDots > 2)
-        //                {
-        //                    throw new ArgumentException("Illegal path.");
-        //                }
-
-        //                if (aPath[start + 1] == '.')
-        //                {
-        //                    // Search for a space in the middle of the dots and throw
-        //                    for (int i = start + 2; i < start + numDots; i++)
-        //                    {
-        //                        if (aPath[i] != '.')
-        //                        {
-        //                            throw new ArgumentException("Illegal path.");
-        //                        }
-        //                    }
-
-        //                    numDots = 2;
-        //                }
-        //                else
-        //                {
-        //                    if (numDots > 1)
-        //                    {
-        //                        throw new ArgumentException("Illegal path.");
-        //                    }
-        //                    numDots = 1;
-        //                }
-        //            }
-
-        //            if (numDots == 2)
-        //            {
-        //                newBuffer = string.Concat(newBuffer, ".");
-        //                index++;
-        //                FatHelpers.Debug("-- Path.NormalizePath : newBuffer = " + newBuffer + " --");
-        //            }
-
-        //            newBuffer = string.Concat(newBuffer, ".");
-        //            index++;
-        //            FatHelpers.Debug("-- Path.NormalizePath : newBuffer = " + newBuffer + " --");
-        //        }
-        //    } // if (numSigChars == 0)
-
-        //    // If we ended up eating all the characters, bail out.
-        //    if (newBuffer.Length == 0)
-        //    {
-        //        throw new ArgumentException("Illegal path.");
-        //    }
-
-        //    string returnVal = newBuffer.ToString();
-        //    FatHelpers.Debug("-- Path.NormalizePath : returnVal = " + returnVal + " --");
-        //    if (string.Equals(returnVal, aPath, StringComparison.Ordinal))
-        //    {
-        //        returnVal = aPath;
-        //    }
-        //    return returnVal;
-
-        //}
-
         public static string NormalizePath(string aPath, bool aFullCheck)
         {
             if (aPath == null)
             {
-                FatHelpers.Debug("-- Path.NormalizePath : aPath is null --");
+                FileSystemHelpers.Debug("Path.NormalizePath", "aPath is null");
                 throw new ArgumentNullException("aPath");
             }
 
             string result = aPath;
             if (IsRelative(result))
             {
-                result = string.Concat(Directory.GetCurrentDirectory(), Path.DirectorySeparatorChar.ToString(), result);
-                FatHelpers.Debug("-- Path.NormalizePath : aPath is relative, aPath = " + aPath + ", result = " + result + " --");
+                result = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar.ToString() + result;
+                FileSystemHelpers.Debug("Path.NormalizePath", "aPath is relative, aPath =", aPath, ", result =", result);
             }
 
             if (IsDirectorySeparator(result[result.Length - 1]))
             {
-                FatHelpers.Debug("Found directory seprator");
+                FileSystemHelpers.Debug("Found directory seprator");
                 result = result.Remove(result.Length - 1);
             }
 
-            FatHelpers.Debug("-- Path.NormalizePath : aPath = " + aPath + ", result = " + result + " --");
+            FileSystemHelpers.Debug("Path.NormalizePath", "aPath =", aPath, ", result =", result);
             return result;
         }
     }

@@ -18,7 +18,7 @@ namespace Cosmos.System.Plugs.System.IO
         public static void Ctor(FileStream aThis, string aPathname, FileMode aMode,
             [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
         {
-            FatHelpers.Debug("In FileStream.Ctor");
+            FileSystemHelpers.Debug("In FileStream.Ctor");
             innerStream = InitializeStream(aPathname, aMode);
         }
 
@@ -89,15 +89,15 @@ namespace Cosmos.System.Plugs.System.IO
 
         private static Stream InitializeStream(string aPath, FileMode aMode)
         {
-            FatHelpers.Debug("In FileStream.InitializeStream");
+            FileSystemHelpers.Debug("In FileStream.InitializeStream");
             if (aPath == null)
             {
-                FatHelpers.Debug("In FileStream.Ctor: Path == null is true");
+                FileSystemHelpers.Debug("In FileStream.Ctor: Path == null is true");
                 throw new Exception("The file path cannot be null.");
             }
             if (aPath.Length == 0)
             {
-                FatHelpers.Debug("In FileStream.Ctor: Path.Length == 0 is true");
+                FileSystemHelpers.Debug("In FileStream.Ctor: Path.Length == 0 is true");
                 throw new Exception("The file path cannot be empty.");
             }
             return VFSManager.GetFileStream(aPath);

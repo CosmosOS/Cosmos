@@ -37,12 +37,12 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string get_Name([FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
         {
-            return "Filename" + aStorage.Name;
+            return "Filename" + aStorage.mName;
         }
 
         public static bool get_Exists([FieldAccess(Name = "$$Storage$$")] ref DirectoryEntry aStorage)
         {
-            return VFSManager.FileExists(aStorage.Name);
+            return VFSManager.FileExists(aStorage.mName);
         }
 
         public static string ToString(FileInfo aThis)

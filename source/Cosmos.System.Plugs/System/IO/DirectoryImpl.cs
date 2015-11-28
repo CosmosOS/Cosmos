@@ -16,25 +16,29 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetCurrentDirectory()
         {
-            FatHelpers.Debug("-- Directory.GetCurrentDirectory : mCurrentDirectory = " + mCurrentDirectory + " --");
+            FileSystemHelpers.Debug("Directory.GetCurrentDirectory", "mCurrentDirectory =", mCurrentDirectory);
             return mCurrentDirectory;
         }
 
         public static void SetCurrentDirectory(string aPath)
         {
-            FatHelpers.Debug("-- Directory.SetCurrentDirectory : aPath = " + aPath + " --");
+            FileSystemHelpers.Debug("Directory.SetCurrentDirectory", "aPath =", aPath);
             mCurrentDirectory = aPath;
         }
 
         public static bool Exists(string aPath)
         {
-            FatHelpers.Debug("-- Directory.Exists --");
+            if (aPath == null)
+            {
+                return false;
+            }
+
+            FileSystemHelpers.Debug("Directory.Exists", "aPath =", aPath);
             return VFSManager.DirectoryExists(aPath);
         }
 
         public static DirectoryInfo CreateDirectory(string aPath)
         {
-            FatHelpers.Debug("-- Directory.CreateDirectory --");
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath");
@@ -45,6 +49,7 @@ namespace Cosmos.System.Plugs.System.IO
                 throw new ArgumentException("Path must not be empty.", "aPath");
             }
 
+            FileSystemHelpers.Debug("Directory.CreateDirectory", "aPath =", aPath);
             var xEntry = VFSManager.CreateDirectory(aPath);
             if (xEntry == null)
             {
@@ -58,13 +63,13 @@ namespace Cosmos.System.Plugs.System.IO
         {
             if (aPath == null)
             {
-                FatHelpers.Debug("-- Directory.GetParent : aPath is null --");
+                FileSystemHelpers.Debug("Directory.GetParent", "aPath is null");
                 throw new ArgumentNullException("aPath");
             }
 
             if (aPath.Length == 0)
             {
-                FatHelpers.Debug("-- Directory.GetParent : aPath is empty --");
+                FileSystemHelpers.Debug("Directory.GetParent", "aPath is empty");
                 throw new ArgumentException("Path must not be empty.", "aPath");
             }
 
@@ -72,7 +77,7 @@ namespace Cosmos.System.Plugs.System.IO
             string xParentDirectory = Path.GetDirectoryName(xFullPath);
             if (xParentDirectory == null)
             {
-                FatHelpers.Debug("-- Directory.GetParent : xParentDirectory is null --");
+                FileSystemHelpers.Debug("Directory.GetParent", "xParentDirectory is null");
                 return null;
             }
             
@@ -81,7 +86,7 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string[] GetDirectories(string aPath)
         {
-            FatHelpers.Debug("-- Directory.GetDirectories --");
+            FileSystemHelpers.Debug("Directory.GetDirectories");
             if (aPath == null)
             {
                 throw new ArgumentNullException(aPath);
@@ -91,9 +96,9 @@ namespace Cosmos.System.Plugs.System.IO
             var xEntries = VFSManager.GetDirectoryListing(aPath);
             for (int i = 0; i < xEntries.Count; i++)
             {
-                if (xEntries[i].EntryType == DirectoryEntryTypeEnum.Directory)
+                if (xEntries[i].mEntryType == DirectoryEntryTypeEnum.Directory)
                 {
-                    xDirectories.Add(xEntries[i].Name);
+                    xDirectories.Add(xEntries[i].mName);
                 }
             }
 
@@ -102,7 +107,7 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string[] GetFiles(string aPath)
         {
-            FatHelpers.Debug("-- Directory.GetFiles --");
+            FileSystemHelpers.Debug("Directory.GetFiles");
             if (aPath == null)
             {
                 throw new ArgumentNullException(aPath);
@@ -112,9 +117,9 @@ namespace Cosmos.System.Plugs.System.IO
             var xEntries = VFSManager.GetDirectoryListing(aPath);
             for (int i = 0; i < xEntries.Count; i++)
             {
-                if (xEntries[i].EntryType == DirectoryEntryTypeEnum.File)
+                if (xEntries[i].mEntryType == DirectoryEntryTypeEnum.File)
                 {
-                    xFiles.Add(xEntries[i].Name);
+                    xFiles.Add(xEntries[i].mName);
                 }
             }
             
