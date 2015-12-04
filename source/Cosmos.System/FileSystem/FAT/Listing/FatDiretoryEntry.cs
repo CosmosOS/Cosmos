@@ -32,26 +32,28 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         {
             if (aFileSystem == null)
             {
-                throw new ArgumentNullException("aFileSystem");
+                FileSystemHelpers.Debug("FatDirectoryEntry.ctor", "aFileSystem is null.");
+                throw new ArgumentNullException(nameof(aFileSystem));
             }
 
             if (aName == null)
             {
-                throw new ArgumentNullException("aName");
+                FileSystemHelpers.Debug("FatDirectoryEntry.ctor", "aName is null.");
+                throw new ArgumentNullException(nameof(aName));
             }
 
             if (aFirstCluster < 2)
             {
-                throw new ArgumentOutOfRangeException("aFirstCluster");
+                FileSystemHelpers.Debug("FatDirectoryEntry.ctor", "aFirstCluster is out of range.");
+                throw new ArgumentOutOfRangeException(nameof(aFirstCluster));
             }
+
+            FileSystemHelpers.Debug("FatDirectoryEntry.ctor", "aParent.Name =", aParent?.mName, ", aName =", aName, ", aSize = " + aSize, ", aFirstCluster =", aFirstCluster, ", aEntryHeaderDataOffset =", aEntryHeaderDataOffset);
 
             mFileSystem = aFileSystem;
             mParent = aParent;
             mFirstClusterNum = aFirstCluster;
             mEntryHeaderDataOffset = aEntryHeaderDataOffset;
-
-            FileSystemHelpers.Debug("FatDirectoryEntry.ctor", "aParent.Name =", aParent?.mName, ", aName =", aName, ", aSize = "
-                + aSize, ", aFirstCluster =", aFirstCluster, ", aEntryHeaderDataOffset =", aEntryHeaderDataOffset);
         }
 
         public FatDirectoryEntry(
@@ -63,18 +65,23 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         {
             if (aFileSystem == null)
             {
-                throw new ArgumentNullException("aFileSystem");
+                FileSystemHelpers.Debug("FatDirectoryEntry.ctor", "aFileSystem is null.");
+                throw new ArgumentNullException(nameof(aFileSystem));
             }
 
             if (aName == null)
             {
-                throw new ArgumentNullException("aName");
+                FileSystemHelpers.Debug("FatDirectoryEntry.ctor", "aName is null.");
+                throw new ArgumentNullException(nameof(aName));
             }
 
             if (aFirstCluster < 2)
             {
-                throw new ArgumentOutOfRangeException("aFirstCluster");
+                FileSystemHelpers.Debug("FatDirectoryEntry.ctor", "aFirstCluster is out of range.");
+                throw new ArgumentOutOfRangeException(nameof(aFirstCluster));
             }
+
+            FileSystemHelpers.Debug("FatDirectoryEntry.ctor", "aParent.Name =", aParent?.mName, ", aName =", aName, ", aFirstCluster =", aFirstCluster);
 
             mFileSystem = aFileSystem;
             mParent = aParent;
@@ -109,11 +116,23 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
         public override void SetName(string aName)
         {
+            if (mParent == null)
+            {
+                throw new Exception("Parent entry is null. The name cannot be set.");
+            }
+
+            FileSystemHelpers.Debug("FatDirectoryEntry.SetName", "mName =", mName, ", mSize =", mSize, ", aName =", aName);
             SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.ShortName, aName);
         }
 
         public override void SetSize(long aSize)
         {
+            if (mParent == null)
+            {
+                throw new Exception("Parent entry is null. The size cannot be set.");
+            }
+
+            FileSystemHelpers.Debug("FatDirectoryEntry.SetSize", "mName =", mName, ", mSize =", mSize, ", aSize =", aSize);
             SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.Size, (uint)aSize);
         }
 
@@ -157,8 +176,8 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         {
             FileSystemHelpers.Debug("FatDirectoryEntry.ReadDirectoryContents");
             var xData = GetDirectoryEntryData();
-            FatDirectoryEntry xParent = mParent;
             var xResult = new List<FatDirectoryEntry>();
+            FatDirectoryEntry xParent = (FatDirectoryEntry)(mParent ?? mFileSystem.GetRootDirectory());
 
             //TODO: Change xLongName to StringBuilder
             string xLongName = "";
@@ -177,7 +196,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                     FileSystemHelpers.Debug("Reading LFN with Seqnr " + xOrd, ", Type =", xType);
                     if (xOrd == 0xE5)
                     {
-                        FileSystemHelpers.Debug("<DELETED>");
+                        FileSystemHelpers.Debug("<DELETED>", "Attrib =", xAttrib, ", Status =", xStatus);
                         continue;
                     }
                     if (xType == 0)
@@ -212,7 +231,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                     xName = xLongName;
                     if (xStatus == 0x00)
                     {
-                        FileSystemHelpers.Debug("<EOF>");
+                        FileSystemHelpers.Debug("<EOF>", "Attrib =", xAttrib, ", Status =", xStatus);
                         break;
                     }
                     switch (xStatus)
@@ -288,16 +307,16 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 {
                     uint xSize = xData.ToUInt32(i + 28);
                     var xEntry = new FatDirectoryEntry(mFileSystem, xParent, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.Directory);
-                    FileSystemHelpers.Debug(xEntry.mName + " <DIR> " + xEntry.mSize + " bytes");
+                    FileSystemHelpers.Debug(xEntry.mName + " <DIR> " + xEntry.mSize + " bytes", "Attrib =", xAttrib, ", Status =", xStatus);
                     xResult.Add(xEntry);
                 }
                 else if (xTest == FatDirectoryEntryAttributeConsts.VolumeID)
                 {
-                    FileSystemHelpers.Debug("<VOLUME ID>");
+                    FileSystemHelpers.Debug("<VOLUME ID>", "Attrib =", xAttrib, ", Status =", xStatus);
                 }
                 else
                 {
-                    FileSystemHelpers.Debug("<INVALID ENTRY>");
+                    FileSystemHelpers.Debug("<INVALID ENTRY>", "Attrib =", xAttrib, ", Status =", xStatus);
                 }
             }
 
@@ -327,6 +346,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
         private byte[] GetDirectoryEntryData()
         {
+            FileSystemHelpers.Debug("FatDirectoryEntry.GetDirectoryEntryData");
             if (mEntryType != DirectoryEntryTypeEnum.Unknown)
             {
                 byte[] xData;
@@ -341,11 +361,13 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         {
             if (aData == null)
             {
+                FileSystemHelpers.Debug("FatDirectoryEntry.SetDirectoryEntryData", "aData is null.");
                 throw new ArgumentNullException("aData");
             }
 
             if (aData.Length == 0)
             {
+                FileSystemHelpers.Debug("FatDirectoryEntry.SetDirectoryEntryData", "aData length is 0.");
                 return;
             }
 
@@ -366,23 +388,30 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
         internal void SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata aEntryMetadata, uint aValue)
         {
-            var xData = mParent.GetDirectoryEntryData();
-            if (xData.Length > 0)
+            if (mParent != null)
             {
-                var xValue = new byte[aEntryMetadata.DataLength];
-                xValue.SetUInt32(0, aValue);
+                var xData = mParent.GetDirectoryEntryData();
+                if (xData.Length > 0)
+                {
+                    var xValue = new byte[aEntryMetadata.DataLength];
+                    xValue.SetUInt32(0, aValue);
 
-                uint offset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
+                    uint offset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
 
-                Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
+                    Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
 
-                FileSystemHelpers.Debug("SetDirectoryEntryMetadataValue: DataLength =", aEntryMetadata.DataLength);
-                FileSystemHelpers.Debug("SetDirectoryEntryMetadataValue: DataOffset =", aEntryMetadata.DataOffset);
-                FileSystemHelpers.Debug("SetDirectoryEntryMetadataValue: EntryHeaderDataOffset =", mEntryHeaderDataOffset);
-                FileSystemHelpers.Debug("SetDirectoryEntryMetadataValue: TotalOffset =", offset);
-                FileSystemHelpers.Debug("SetDirectoryEntryMetadataValue: aValue =", aValue);
+                    FileSystemHelpers.Debug("SetDirectoryEntryMetadataValue: DataLength =", aEntryMetadata.DataLength);
+                    FileSystemHelpers.Debug("SetDirectoryEntryMetadataValue: DataOffset =", aEntryMetadata.DataOffset);
+                    FileSystemHelpers.Debug("SetDirectoryEntryMetadataValue: EntryHeaderDataOffset =", mEntryHeaderDataOffset);
+                    FileSystemHelpers.Debug("SetDirectoryEntryMetadataValue: TotalOffset =", offset);
+                    FileSystemHelpers.Debug("SetDirectoryEntryMetadataValue: aValue =", aValue);
 
-                mParent.SetDirectoryEntryData(xData);
+                    mParent.SetDirectoryEntryData(xData);
+                }
+            }
+            else
+            {
+                throw new Exception("Root directory metadata can not be changed using the file stream.");
             }
         }
 

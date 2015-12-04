@@ -10,8 +10,6 @@ using Sys = Cosmos.System;
 
 namespace Cosmos.Kernel.Tests.Fat
 {
-    
-
     public class Kernel : Sys.Kernel
     {
         private VFSBase myVFS;

@@ -22,15 +22,18 @@ namespace Cosmos.System.FileSystem
                 aMessage = aMessage + " : ";
                 for (int i = 0; i < aParams.Length; i++)
                 {
-                    string xParam = aParams[i].ToString();
-                    if (!string.IsNullOrWhiteSpace(xParam))
+                    if (aParams[i] != null)
                     {
-                        aMessage = aMessage + " " + xParam;
+                        string xParam = aParams[i].ToString();
+                        if (!string.IsNullOrWhiteSpace(xParam))
+                        {
+                            xMessage = xMessage + " " + xParam;
+                        }
                     }
                 }
             }
 
-            mDebugger.Send("FileSystem Debug: " + aMessage);
+            mDebugger.Send("FileSystem Debug: " + xMessage);
         }
 
         [Conditional("COSMOSDEBUG")]
