@@ -513,11 +513,30 @@ namespace Cosmos.System.FileSystem.FAT
             FileSystemHelpers.Debug("FatFileSystem.CreateDirectory", "aParentDirectory.Name =", aParentDirectory?.mName, ", aNewDirectory =", aNewDirectory);
             var xParentDirectory = (FatDirectoryEntry)aParentDirectory;
             var xDirectoryEntryToAdd = xParentDirectory.AddDirectoryEntry(aNewDirectory, DirectoryEntryTypeEnum.Directory);
-            if (xDirectoryEntryToAdd != null)
+            return xDirectoryEntryToAdd;
+        }
+
+        public override DirectoryEntry CreateFile(DirectoryEntry aParentDirectory, string aNewFile)
+        {
+            if (aParentDirectory == null)
             {
-                return xDirectoryEntryToAdd;
+                throw new ArgumentNullException("aParentDirectory");
             }
-            return null;
+
+            if (aNewFile == null)
+            {
+                throw new ArgumentNullException("aNewFile");
+            }
+
+            if (string.IsNullOrWhiteSpace(aNewFile))
+            {
+                throw new ArgumentException("The new file must be specified.", "aNewFile");
+            }
+
+            FileSystemHelpers.Debug("FatFileSystem.CreateFile", "aParentDirectory.Name =", aParentDirectory?.mName, ", aNewFile =", aNewFile);
+            var xParentDirectory = (FatDirectoryEntry)aParentDirectory;
+            var xDirectoryEntryToAdd = xParentDirectory.AddDirectoryEntry(aNewFile, DirectoryEntryTypeEnum.File);
+            return xDirectoryEntryToAdd;
         }
 
         private enum FatTypeEnum

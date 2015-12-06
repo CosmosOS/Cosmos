@@ -11,8 +11,6 @@ namespace Cosmos.System.Plugs.System.IO
     [Plug(Target = typeof(File))]
     public static class FileImpl
     {
-        
-
         public static bool Exists(string aFile)
         {
             return VFSManager.FileExists(aFile);
@@ -44,6 +42,7 @@ namespace Cosmos.System.Plugs.System.IO
                 xFS.Write(xBuff, 0, xBuff.Length);
             }
         }
+
         public static byte[] ReadAllBytes(string aFile)
         {
             FileSystemHelpers.Debug("In FileImpl.ReadAllText");
@@ -70,6 +69,7 @@ namespace Cosmos.System.Plugs.System.IO
                 xFS.Write(xBuff, 0, xBuff.Length);
             }
         }
+
         public static void Copy(string srcFile, string destFile)
         {
             byte[] xBuff;
@@ -81,6 +81,28 @@ namespace Cosmos.System.Plugs.System.IO
                 yFS.Write(xBuff, 0, xBuff.Length);
 
             }
+        }
+
+        public static FileStream Create(string aFile)
+        {
+            if (aFile == null)
+            {
+                throw new ArgumentNullException("aFile");
+            }
+
+            if (aFile.Length == 0)
+            {
+                throw new ArgumentException("File path must not be empty.", "aFile");
+            }
+
+            FileSystemHelpers.Debug("File.Create", "aFile =", aFile);
+            var xEntry = VFSManager.CreateFile(aFile);
+            if (xEntry == null)
+            {
+                return null;
+            }
+
+            return new FileStream(aFile, FileMode.Open);
         }
     }
 }

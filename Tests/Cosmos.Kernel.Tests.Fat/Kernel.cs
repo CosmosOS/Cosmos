@@ -157,6 +157,13 @@ namespace Cosmos.Kernel.Tests.Fat
                 mDebugger.Send("END TEST");
                 mDebugger.Send("");
 
+                mDebugger.Send("START TEST: Create file:");
+                var xFile = File.Create(@"0:\test2.txt");
+                Assert.IsTrue(xFile != null, "Failed to create a new file.");
+                bool xFileExists = File.Exists(@"0:\test2.txt");
+                Assert.IsTrue(xFileExists, "Failed to create a new file.");
+                mDebugger.Send("END TEST");
+                mDebugger.Send("");
                 TestController.Completed();
             }
             catch (Exception E)

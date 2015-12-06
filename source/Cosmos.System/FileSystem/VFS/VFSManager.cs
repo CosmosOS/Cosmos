@@ -22,6 +22,18 @@ namespace Cosmos.System.FileSystem.VFS
             mVFS = aVFS;
         }
 
+        public static DirectoryEntry CreateFile(string aPath)
+        {
+            if (string.IsNullOrEmpty(aPath))
+            {
+                throw new ArgumentNullException("aPath");
+            }
+
+            FileSystemHelpers.Debug("VFSManager.CreateFile", "aPath = ", aPath);
+
+            return mVFS.CreateFile(aPath);
+        }
+
         public static DirectoryEntry GetFile(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))

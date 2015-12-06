@@ -139,8 +139,39 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         private void AllocateDirectoryEntry()
         {
             // TODO: Deal with short and long name.
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.ShortName, mName);
-            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.Attributes, FatDirectoryEntryAttributeConsts.Directory);
+            FileSystemHelpers.Debug("FatDirectoryEntry.AllocateDirectoryEntry", "mName =", mName);
+            char[] xName = new char[]
+                               {
+                                   (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20, (char)0x20,
+                                   (char)0x20, (char)0x20, (char)0x20
+                               };
+
+            int j = 0;
+            for (int i = 0; i < mName.Length; i++)
+            {
+                FileSystemHelpers.Debug("FatDirectoryEntry.AllocateDirectoryEntry", "mName[i] =", mName[i], "xName =", xName);
+
+                if (mName[i] == '.')
+                {
+                    i++;
+                    j = 8;
+                }
+                if (i > xName.Length)
+                {
+                    break;
+                }
+                xName[j] = mName[i];
+                j++;
+            }
+
+            string xNameString = new string(xName);
+            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.ShortName, xNameString);
+            if (mEntryType == DirectoryEntryTypeEnum.Directory)
+            {
+                SetDirectoryEntryMetadataValue(
+                    FatDirectoryEntryMetadata.Attributes,
+                    FatDirectoryEntryAttributeConsts.Directory);
+            }
             SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterHigh, (uint)(mFirstClusterNum >> 16));
             SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterLow, (uint)(mFirstClusterNum & 0xFFFF));
             byte[] xData = GetDirectoryEntryData();
@@ -149,25 +180,14 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
         public FatDirectoryEntry AddDirectoryEntry(string aName, DirectoryEntryTypeEnum aType)
         {
-            FileSystemHelpers.Debug("FatDirectoryEntry.AddDirectoryEntry", "aName =", aName, ", aType =", aType.ToString());
-            if (aType == DirectoryEntryTypeEnum.Directory)
+            FileSystemHelpers.Debug("FatDirectoryEntry.AddDirectoryEntry");
+            if ((aType == DirectoryEntryTypeEnum.Directory) || (aType == DirectoryEntryTypeEnum.File))
             {
                 uint xFirstCluster = mFileSystem.GetFat(0).GetNextUnallocatedFatEntry();
                 uint xEntryHeaderDataOffset = GetNextUnallocatedEntry();
-                var xNewEntry = new FatDirectoryEntry(
-                    mFileSystem,
-                    this,
-                    aName,
-                    0,
-                    xFirstCluster,
-                    xEntryHeaderDataOffset,
-                    aType);
+                var xNewEntry = new FatDirectoryEntry(mFileSystem, this, aName, 0, xFirstCluster, xEntryHeaderDataOffset, aType);
                 xNewEntry.AllocateDirectoryEntry();
                 return xNewEntry;
-            }
-            if (aType == DirectoryEntryTypeEnum.File)
-            {
-                throw new NotImplementedException("Creating new files is currently not implemented.");
             }
             throw new ArgumentOutOfRangeException("aType", "Unknown directory entry type.");
         }

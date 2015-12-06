@@ -32,6 +32,8 @@ namespace Cosmos.System.FileSystem
 
         public abstract DirectoryEntry CreateDirectory(DirectoryEntry aParentDirectory, string aNewDirectory);
 
+        public abstract DirectoryEntry CreateFile(DirectoryEntry aParentDirectory, string aNewFile);
+
         protected Partition mDevice { get; }
 
         public string mRootPath { get; }
