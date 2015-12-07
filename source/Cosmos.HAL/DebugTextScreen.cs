@@ -85,22 +85,22 @@ namespace Cosmos.HAL
 
         public override int GetCursorSize()
         {
-            return 0;
+            throw new Exception("Not implemented");
         }
+
         public override void SetCursorSize(int value)
         {
-
-
+            throw new Exception("Not implemented");
         }
 
         public override bool GetCursorVisible()
         {
-            return true;
+            throw new Exception("Not implemented");
         }
 
         public override void SetCursorVisible(bool value)
         {
- 
+            throw new Exception("Not implemented");
         }
     }
 }
