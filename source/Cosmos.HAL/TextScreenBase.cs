@@ -44,5 +44,12 @@ namespace Cosmos.HAL
             get;
             set;
         }
+
+        public abstract int GetCursorSize();
+        public abstract void SetCursorSize(int value);
+
+        public abstract bool GetCursorVisible();
+        public abstract void SetCursorVisible(bool value);
+
     }
 }
