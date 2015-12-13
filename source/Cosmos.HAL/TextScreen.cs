@@ -23,11 +23,11 @@ namespace Cosmos.HAL {
 
       if (this is TextScreen)
       {
-        Debugger.DoSend("this is TextScreen");
+        TextScreenHelpers.Debug("this is TextScreen");
       }
       else
       {
-        Debugger.DoSend("ERROR: This is not of type TextScreen!");
+        TextScreenHelpers.Debug("ERROR: This is not of type TextScreen!");
       }
       mRAM = IO.Memory.Bytes;
       // Set the Console default colors: White foreground on Black background, the default value of mClearCellValue is set there too as it is linked with the Color
@@ -36,15 +36,15 @@ namespace Cosmos.HAL {
       mScrollSize = (UInt32)(Cols * (Rows - 1) * 2);
       SetCursorSize(mCursorSize);
       SetCursorVisible(mCursorVisible);
-      Debugger.DoSend("End of TextScreen..ctor");
+      TextScreenHelpers.Debug("End of TextScreen..ctor");
     }
 
     public override UInt16 Rows { get { return 25; } }
     public override UInt16 Cols { get { return 80; } }
 
     public override void Clear() {
-        Debugger.DoSend("Clearing screen with value ");
-        Debugger.DoSendNumber(mClearCellValue);
+        TextScreenHelpers.Debug("Clearing screen with value ");
+        TextScreenHelpers.DebugNumber(mClearCellValue);
         IO.Memory.Fill(mClearCellValue);
     }
 
@@ -96,15 +96,13 @@ namespace Cosmos.HAL {
         public override void SetCursorSize(int value)
         {
             mCursorSize = value;
-            Debugger.DoSend("Changing cursor size to ");
-            Debugger.DoSendNumber((uint)value);
+            TextScreenHelpers.Debug("Changing cursor size to", value, "%");
             // We need to transform value from a percentage to a value from 15 to 0
             value = 16 - ((16 * value) / 100);
             // This is the case in which value is in reality 1% and a for a truncation error we get 16 (invalid value) 
             if (value >= 16)
                 value = 15;
-            Debugger.DoSend("verticalSize is ");
-            Debugger.DoSendNumber((uint)value);
+            TextScreenHelpers.Debug("verticalSize is", value);
             // Cursor Vertical Size Register here a value between 0x00 and 0x0F must be set with 0x00 meaning maximum size and 0x0F minimum
             IO.Idx3.Byte = 0x0A;
             IO.Data3.Byte = (byte)value;
@@ -135,6 +133,5 @@ namespace Cosmos.HAL {
             IO.Idx3.Byte = 0x0A;
             IO.Data3.Byte |= (byte) (cursorDisable << 5);
         }
-
     }
 }
