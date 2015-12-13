@@ -10,12 +10,6 @@ del source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.*
 if not exist source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe goto error1
 start source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe -bat -VS2015 %1 %2 %3 %4 %5 %6 %7 %8 %9
 
-@REM This is the message for the building successfuly completed.
-@echo -----------------------------------------
-@echo Building done. Press any key to close the window.
-@pause
-@exit
-
 @REM This is the message if the Cosmos Builder Tool does not exists
 :error1
 @echo -----------------------------------------
