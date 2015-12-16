@@ -12,23 +12,19 @@ namespace Cosmos.Common
     {
         public static string GetCharArrayString(char[] aArray)
         {
-            Debugger.DoSend("-- StringHelper.GetCharArrayString --");
             if (aArray == null)
             {
-                Debugger.DoSend("-- StringHelper.GetCharArrayString : aArray is null --");
                 return string.Empty;
             }
 
             if (aArray.Length == 0)
             {
-                Debugger.DoSend("-- StringHelper.GetCharArrayString : aArray is empty --");
                 return string.Empty;
             }
 
             string xString = string.Empty;
             for (int i = 0; i < aArray.Length; i++)
             {
-                Debugger.DoSend("-- StringHelper.GetCharArrayString : i = " + i + ", aArray[i] = " + aArray[i].ToString() + " --");
                 //xString = string.Concat(xString, aArray[i].ToString());
             }
 
@@ -80,6 +76,37 @@ namespace Cosmos.Common
                 return GetNumberString((uint)aValue, xIsNegative);
             }
             return xResult;
+        }
+
+        public static int GetStringToNumber(string aString)
+        {
+            int xNumber = 0;
+            if (!string.IsNullOrWhiteSpace(aString))
+            {
+                for (int i = aString.Length - 1; i >= 0; i--)
+                {
+                    char xC = aString[i];
+                    if (char.IsDigit(xC))
+                    {
+                        int xValue = xC - '0';
+                        xValue = xValue * (int)Math.Pow(10, i);
+                        xNumber += xValue;
+                    }
+                    else if (xC == '-')
+                    {
+                        xNumber *= -1;
+                    }
+                    else if (xC == '.')
+                    {
+                        return xNumber;
+                    }
+                    else
+                    {
+                        throw new FormatException("The string parameter is not a number and is invalid.");
+                    }
+                }
+            }
+            return xNumber;
         }
     }
 }
