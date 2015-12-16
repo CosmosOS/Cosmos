@@ -12,14 +12,10 @@
     <AssemblyName>Cosmos.System.Plugs</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkProfile />
@@ -86,7 +82,6 @@
     <Compile Include="System\IO\PathImpl.cs" />
     <Compile Include="System\IO\StreamReaderImpl.cs" />
     <Compile Include="System\RandomImpl.cs" />
-    <Compile Include="System\StringImpl.cs" />
     <Compile Include="System\Text\DecoderFallbackImpl.cs" />
     <Compile Include="System\Text\EncoderFallbackImpl.cs" />
     <Compile Include="System\Text\ASCIIEncodingImpl.cs" />
