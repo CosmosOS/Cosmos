@@ -82,5 +82,25 @@ namespace Cosmos.HAL
                 SendChar(new []{value});
             }
         }
+
+        public override int GetCursorSize()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SetCursorSize(int value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool GetCursorVisible()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void SetCursorVisible(bool value)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
