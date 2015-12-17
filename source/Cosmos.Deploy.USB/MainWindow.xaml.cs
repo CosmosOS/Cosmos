@@ -38,7 +38,10 @@ namespace Cosmos.Deploy.USB {
       var xDrives = DriveInfo.GetDrives().Where(q => q.DriveType == DriveType.Removable).ToArray();
 
       lboxTarget.Items.Clear();
-      foreach (var x in xDrives) {
+      foreach (var x in xDrives)
+      {
+        if (!x.IsReady)
+            continue;
         decimal xSize = x.TotalSize / (1000 * 1000 * 1000);
         lboxTarget.Items.Add(x.Name + "   " + xSize.ToString("0.0") + " GiB   " + x.DriveFormat + "   [" + x.VolumeLabel + "]");
       }
