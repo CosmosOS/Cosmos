@@ -1,33 +1,33 @@
 ﻿namespace Cosmos.VS.Package
 {
-	partial class CosmosPage
-	{
-		/// <summary> 
-		/// Required designer variable.
-		/// </summary>
-		private System.ComponentModel.IContainer components = null;
+    partial class CosmosPage
+    {
+        /// <summary> 
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
 
-		/// <summary> 
-		/// Clean up any resources being used.
-		/// </summary>
-		/// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-		protected override void Dispose(bool disposing)
-		{
-			if (disposing && (components != null))
-			{
-				components.Dispose();
-			}
-			base.Dispose(disposing);
-		}
+        /// <summary> 
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
 
-		#region Component Designer generated code
+        #region Component Designer generated code
 
-		/// <summary> 
-		/// Required method for Designer support - do not modify 
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
+        /// <summary> 
+        /// Required method for Designer support - do not modify 
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CosmosPage));
             this.panel1 = new System.Windows.Forms.Panel();
             this.lablCurrentProfile = new System.Windows.Forms.Label();
@@ -57,16 +57,21 @@
             this.tabDebug = new System.Windows.Forms.TabPage();
             this.chckEnableDebugStub = new System.Windows.Forms.CheckBox();
             this.panlDebugSettings = new System.Windows.Forms.Panel();
+            this.stackCorruptionDetectionGroupBox = new System.Windows.Forms.GroupBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.comboStackCorruptionDetectionLevel = new System.Windows.Forms.ComboBox();
             this.chkEnableStackCorruptionDetection = new System.Windows.Forms.CheckBox();
-            this.label4 = new System.Windows.Forms.Label();
-            this.cmboVisualStudioDebugPort = new System.Windows.Forms.ComboBox();
+            this.debugLevelGroupBox = new System.Windows.Forms.GroupBox();
             this.comboTraceMode = new System.Windows.Forms.ComboBox();
-            this.cmboCosmosDebugPort = new System.Windows.Forms.ComboBox();
-            this.comboDebugMode = new System.Windows.Forms.ComboBox();
-            this.label10 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.comboDebugMode = new System.Windows.Forms.ComboBox();
+            this.debugStubGroupBox = new System.Windows.Forms.GroupBox();
             this.checkIgnoreDebugStubAttribute = new System.Windows.Forms.CheckBox();
+            this.label9 = new System.Windows.Forms.Label();
+            this.cmboVisualStudioDebugPort = new System.Windows.Forms.ComboBox();
+            this.cmboCosmosDebugPort = new System.Windows.Forms.ComboBox();
+            this.label10 = new System.Windows.Forms.Label();
             this.tabDeployment = new System.Windows.Forms.TabPage();
             this.lboxDeployment = new System.Windows.Forms.ListBox();
             this.tabLaunch = new System.Windows.Forms.TabPage();
@@ -77,6 +82,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.cmboVMwareEdition = new System.Windows.Forms.ComboBox();
             this.tabBochs = new System.Windows.Forms.TabPage();
+            this.checkStartBochsDebugGui = new System.Windows.Forms.CheckBox();
             this.checkEnableBochsDebug = new System.Windows.Forms.CheckBox();
             this.tabPXE = new System.Windows.Forms.TabPage();
             this.textPxeInterface = new System.Windows.Forms.TextBox();
@@ -88,7 +94,7 @@
             this.tabSlave = new System.Windows.Forms.TabPage();
             this.cmboSlavePort = new System.Windows.Forms.ComboBox();
             this.label6 = new System.Windows.Forms.Label();
-            this.checkStartBochsDebugGui = new System.Windows.Forms.CheckBox();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.panel1.SuspendLayout();
             this.TabControl1.SuspendLayout();
             this.tabProfile.SuspendLayout();
@@ -98,6 +104,9 @@
             this.tabAssembler.SuspendLayout();
             this.tabDebug.SuspendLayout();
             this.panlDebugSettings.SuspendLayout();
+            this.stackCorruptionDetectionGroupBox.SuspendLayout();
+            this.debugLevelGroupBox.SuspendLayout();
+            this.debugStubGroupBox.SuspendLayout();
             this.tabDeployment.SuspendLayout();
             this.tabLaunch.SuspendLayout();
             this.tabVMware.SuspendLayout();
@@ -155,7 +164,7 @@
             this.TabControl1.Multiline = true;
             this.TabControl1.Name = "TabControl1";
             this.TabControl1.SelectedIndex = 0;
-            this.TabControl1.Size = new System.Drawing.Size(635, 413);
+            this.TabControl1.Size = new System.Drawing.Size(635, 512);
             this.TabControl1.TabIndex = 1;
             // 
             // tabProfile
@@ -166,8 +175,8 @@
             this.tabProfile.Controls.Add(this.lablBuildOnly);
             this.tabProfile.Location = new System.Drawing.Point(4, 22);
             this.tabProfile.Name = "tabProfile";
-            this.tabProfile.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabProfile.Size = new System.Drawing.Size(627, 387);
+            this.tabProfile.Padding = new System.Windows.Forms.Padding(3);
+            this.tabProfile.Size = new System.Drawing.Size(627, 486);
             this.tabProfile.TabIndex = 8;
             this.tabProfile.Text = "Profile";
             this.tabProfile.UseVisualStyleBackColor = true;
@@ -190,7 +199,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Left;
             this.panel2.Location = new System.Drawing.Point(3, 3);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(200, 381);
+            this.panel2.Size = new System.Drawing.Size(200, 480);
             this.panel2.TabIndex = 6;
             // 
             // lboxProfile
@@ -199,7 +208,7 @@
             this.lboxProfile.FormattingEnabled = true;
             this.lboxProfile.Location = new System.Drawing.Point(0, 27);
             this.lboxProfile.Name = "lboxProfile";
-            this.lboxProfile.Size = new System.Drawing.Size(200, 354);
+            this.lboxProfile.Size = new System.Drawing.Size(200, 453);
             this.lboxProfile.Sorted = true;
             this.lboxProfile.TabIndex = 3;
             // 
@@ -277,8 +286,8 @@
             this.tabCompile.Controls.Add(this.labelFramework);
             this.tabCompile.Location = new System.Drawing.Point(4, 22);
             this.tabCompile.Name = "tabCompile";
-            this.tabCompile.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabCompile.Size = new System.Drawing.Size(627, 387);
+            this.tabCompile.Padding = new System.Windows.Forms.Padding(3);
+            this.tabCompile.Size = new System.Drawing.Size(627, 486);
             this.tabCompile.TabIndex = 0;
             this.tabCompile.Text = "Compile";
             this.tabCompile.UseVisualStyleBackColor = true;
@@ -371,7 +380,7 @@
             this.tabAssembler.Controls.Add(this.labelInternalAssembler);
             this.tabAssembler.Location = new System.Drawing.Point(4, 22);
             this.tabAssembler.Name = "tabAssembler";
-            this.tabAssembler.Size = new System.Drawing.Size(627, 387);
+            this.tabAssembler.Size = new System.Drawing.Size(627, 486);
             this.tabAssembler.TabIndex = 10;
             this.tabAssembler.Text = "Assembler";
             this.tabAssembler.UseVisualStyleBackColor = true;
@@ -408,8 +417,8 @@
             this.tabDebug.Controls.Add(this.panlDebugSettings);
             this.tabDebug.Location = new System.Drawing.Point(4, 22);
             this.tabDebug.Name = "tabDebug";
-            this.tabDebug.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabDebug.Size = new System.Drawing.Size(627, 387);
+            this.tabDebug.Padding = new System.Windows.Forms.Padding(3);
+            this.tabDebug.Size = new System.Drawing.Size(627, 486);
             this.tabDebug.TabIndex = 2;
             this.tabDebug.Text = "Debug";
             this.tabDebug.UseVisualStyleBackColor = true;
@@ -417,7 +426,7 @@
             // chckEnableDebugStub
             // 
             this.chckEnableDebugStub.AutoSize = true;
-            this.chckEnableDebugStub.Location = new System.Drawing.Point(14, 17);
+            this.chckEnableDebugStub.Location = new System.Drawing.Point(14, 6);
             this.chckEnableDebugStub.Name = "chckEnableDebugStub";
             this.chckEnableDebugStub.Size = new System.Drawing.Size(154, 17);
             this.chckEnableDebugStub.TabIndex = 7;
@@ -426,25 +435,48 @@
             // 
             // panlDebugSettings
             // 
-            this.panlDebugSettings.Controls.Add(this.chkEnableStackCorruptionDetection);
-            this.panlDebugSettings.Controls.Add(this.label4);
-            this.panlDebugSettings.Controls.Add(this.cmboVisualStudioDebugPort);
-            this.panlDebugSettings.Controls.Add(this.comboTraceMode);
-            this.panlDebugSettings.Controls.Add(this.cmboCosmosDebugPort);
-            this.panlDebugSettings.Controls.Add(this.comboDebugMode);
-            this.panlDebugSettings.Controls.Add(this.label10);
-            this.panlDebugSettings.Controls.Add(this.label5);
-            this.panlDebugSettings.Controls.Add(this.label9);
-            this.panlDebugSettings.Controls.Add(this.checkIgnoreDebugStubAttribute);
-            this.panlDebugSettings.Location = new System.Drawing.Point(6, 51);
+            this.panlDebugSettings.Controls.Add(this.stackCorruptionDetectionGroupBox);
+            this.panlDebugSettings.Controls.Add(this.debugLevelGroupBox);
+            this.panlDebugSettings.Controls.Add(this.debugStubGroupBox);
+            this.panlDebugSettings.Location = new System.Drawing.Point(6, 29);
             this.panlDebugSettings.Name = "panlDebugSettings";
-            this.panlDebugSettings.Size = new System.Drawing.Size(280, 285);
+            this.panlDebugSettings.Size = new System.Drawing.Size(280, 400);
             this.panlDebugSettings.TabIndex = 33;
+            // 
+            // stackCorruptionDetectionGroupBox
+            // 
+            this.stackCorruptionDetectionGroupBox.Controls.Add(this.label12);
+            this.stackCorruptionDetectionGroupBox.Controls.Add(this.comboStackCorruptionDetectionLevel);
+            this.stackCorruptionDetectionGroupBox.Controls.Add(this.chkEnableStackCorruptionDetection);
+            this.stackCorruptionDetectionGroupBox.Location = new System.Drawing.Point(10, 10);
+            this.stackCorruptionDetectionGroupBox.Name = "stackCorruptionDetectionGroupBox";
+            this.stackCorruptionDetectionGroupBox.Size = new System.Drawing.Size(260, 90);
+            this.stackCorruptionDetectionGroupBox.TabIndex = 34;
+            this.stackCorruptionDetectionGroupBox.TabStop = false;
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(3, 42);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(85, 13);
+            this.label12.TabIndex = 30;
+            this.label12.Text = "Detection Level:";
+            // 
+            // comboStackCorruptionDetectionLevel
+            // 
+            this.comboStackCorruptionDetectionLevel.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboStackCorruptionDetectionLevel.FormattingEnabled = true;
+            this.comboStackCorruptionDetectionLevel.Location = new System.Drawing.Point(33, 58);
+            this.comboStackCorruptionDetectionLevel.Name = "comboStackCorruptionDetectionLevel";
+            this.comboStackCorruptionDetectionLevel.Size = new System.Drawing.Size(220, 21);
+            this.comboStackCorruptionDetectionLevel.TabIndex = 9;
+            this.comboStackCorruptionDetectionLevel.SelectedIndexChanged += new System.EventHandler(this.stackCorruptionDetectionLevelComboBox_SelectedIndexChanged);
             // 
             // chkEnableStackCorruptionDetection
             // 
             this.chkEnableStackCorruptionDetection.AutoSize = true;
-            this.chkEnableStackCorruptionDetection.Location = new System.Drawing.Point(8, 11);
+            this.chkEnableStackCorruptionDetection.Location = new System.Drawing.Point(6, 19);
             this.chkEnableStackCorruptionDetection.Name = "chkEnableStackCorruptionDetection";
             this.chkEnableStackCorruptionDetection.Size = new System.Drawing.Size(190, 17);
             this.chkEnableStackCorruptionDetection.TabIndex = 8;
@@ -452,16 +484,90 @@
             this.chkEnableStackCorruptionDetection.UseVisualStyleBackColor = true;
             this.chkEnableStackCorruptionDetection.CheckedChanged += new System.EventHandler(this.chkEnableStacckCorruptionDetection_CheckedChanged);
             // 
+            // debugLevelGroupBox
+            // 
+            this.debugLevelGroupBox.Controls.Add(this.comboTraceMode);
+            this.debugLevelGroupBox.Controls.Add(this.label5);
+            this.debugLevelGroupBox.Controls.Add(this.label4);
+            this.debugLevelGroupBox.Controls.Add(this.comboDebugMode);
+            this.debugLevelGroupBox.Location = new System.Drawing.Point(10, 110);
+            this.debugLevelGroupBox.Name = "debugLevelGroupBox";
+            this.debugLevelGroupBox.Size = new System.Drawing.Size(260, 125);
+            this.debugLevelGroupBox.TabIndex = 34;
+            this.debugLevelGroupBox.TabStop = false;
+            // 
+            // comboTraceMode
+            // 
+            this.comboTraceMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboTraceMode.FormattingEnabled = true;
+            this.comboTraceMode.Location = new System.Drawing.Point(34, 94);
+            this.comboTraceMode.Name = "comboTraceMode";
+            this.comboTraceMode.Size = new System.Drawing.Size(220, 21);
+            this.comboTraceMode.TabIndex = 10;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(3, 73);
+            this.label5.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(49, 15);
+            this.label5.TabIndex = 26;
+            this.label5.Text = "Tracing:";
+            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // label4
             // 
             this.label4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(5, 34);
+            this.label4.Location = new System.Drawing.Point(3, 19);
             this.label4.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(98, 21);
             this.label4.TabIndex = 24;
             this.label4.Text = "Debug Level:";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // comboDebugMode
+            // 
+            this.comboDebugMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboDebugMode.FormattingEnabled = true;
+            this.comboDebugMode.Location = new System.Drawing.Point(34, 46);
+            this.comboDebugMode.Name = "comboDebugMode";
+            this.comboDebugMode.Size = new System.Drawing.Size(220, 21);
+            this.comboDebugMode.TabIndex = 9;
+            // 
+            // debugStubGroupBox
+            // 
+            this.debugStubGroupBox.Controls.Add(this.checkIgnoreDebugStubAttribute);
+            this.debugStubGroupBox.Controls.Add(this.label9);
+            this.debugStubGroupBox.Controls.Add(this.cmboVisualStudioDebugPort);
+            this.debugStubGroupBox.Controls.Add(this.cmboCosmosDebugPort);
+            this.debugStubGroupBox.Controls.Add(this.label10);
+            this.debugStubGroupBox.Location = new System.Drawing.Point(10, 245);
+            this.debugStubGroupBox.Name = "debugStubGroupBox";
+            this.debugStubGroupBox.Size = new System.Drawing.Size(260, 140);
+            this.debugStubGroupBox.TabIndex = 31;
+            this.debugStubGroupBox.TabStop = false;
+            // 
+            // checkIgnoreDebugStubAttribute
+            // 
+            this.checkIgnoreDebugStubAttribute.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkIgnoreDebugStubAttribute.Location = new System.Drawing.Point(6, 19);
+            this.checkIgnoreDebugStubAttribute.Name = "checkIgnoreDebugStubAttribute";
+            this.checkIgnoreDebugStubAttribute.Size = new System.Drawing.Size(218, 20);
+            this.checkIgnoreDebugStubAttribute.TabIndex = 11;
+            this.checkIgnoreDebugStubAttribute.Text = "Ignore DebugStub Attribute Settings";
+            this.checkIgnoreDebugStubAttribute.UseVisualStyleBackColor = true;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(6, 42);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(69, 13);
+            this.label9.TabIndex = 29;
+            this.label9.Text = "Cosmos Port:";
             // 
             // cmboVisualStudioDebugPort
             // 
@@ -473,20 +579,11 @@
             "Serial Com2",
             "Serial Com3",
             "Serial Com4"});
-            this.cmboVisualStudioDebugPort.Location = new System.Drawing.Point(23, 256);
+            this.cmboVisualStudioDebugPort.Location = new System.Drawing.Point(34, 106);
             this.cmboVisualStudioDebugPort.Name = "cmboVisualStudioDebugPort";
-            this.cmboVisualStudioDebugPort.Size = new System.Drawing.Size(221, 21);
+            this.cmboVisualStudioDebugPort.Size = new System.Drawing.Size(220, 21);
             this.cmboVisualStudioDebugPort.Sorted = true;
             this.cmboVisualStudioDebugPort.TabIndex = 13;
-            // 
-            // comboTraceMode
-            // 
-            this.comboTraceMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboTraceMode.FormattingEnabled = true;
-            this.comboTraceMode.Location = new System.Drawing.Point(23, 109);
-            this.comboTraceMode.Name = "comboTraceMode";
-            this.comboTraceMode.Size = new System.Drawing.Size(221, 21);
-            this.comboTraceMode.TabIndex = 10;
             // 
             // cmboCosmosDebugPort
             // 
@@ -498,67 +595,27 @@
             "Serial Com2",
             "Serial Com3",
             "Serial Com4"});
-            this.cmboCosmosDebugPort.Location = new System.Drawing.Point(23, 208);
+            this.cmboCosmosDebugPort.Location = new System.Drawing.Point(34, 58);
             this.cmboCosmosDebugPort.Name = "cmboCosmosDebugPort";
-            this.cmboCosmosDebugPort.Size = new System.Drawing.Size(221, 21);
+            this.cmboCosmosDebugPort.Size = new System.Drawing.Size(220, 21);
             this.cmboCosmosDebugPort.Sorted = true;
             this.cmboCosmosDebugPort.TabIndex = 12;
-            // 
-            // comboDebugMode
-            // 
-            this.comboDebugMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboDebugMode.FormattingEnabled = true;
-            this.comboDebugMode.Location = new System.Drawing.Point(23, 61);
-            this.comboDebugMode.Name = "comboDebugMode";
-            this.comboDebugMode.Size = new System.Drawing.Size(221, 21);
-            this.comboDebugMode.TabIndex = 9;
             // 
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(9, 237);
+            this.label10.Location = new System.Drawing.Point(6, 90);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(93, 13);
             this.label10.TabIndex = 30;
             this.label10.Text = "Visual Studio Port:";
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(5, 88);
-            this.label5.Margin = new System.Windows.Forms.Padding(0, 3, 0, 3);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(49, 15);
-            this.label5.TabIndex = 26;
-            this.label5.Text = "Tracing:";
-            this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(9, 185);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(69, 13);
-            this.label9.TabIndex = 29;
-            this.label9.Text = "Cosmos Port:";
-            // 
-            // checkIgnoreDebugStubAttribute
-            // 
-            this.checkIgnoreDebugStubAttribute.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkIgnoreDebugStubAttribute.Location = new System.Drawing.Point(8, 150);
-            this.checkIgnoreDebugStubAttribute.Name = "checkIgnoreDebugStubAttribute";
-            this.checkIgnoreDebugStubAttribute.Size = new System.Drawing.Size(218, 20);
-            this.checkIgnoreDebugStubAttribute.TabIndex = 11;
-            this.checkIgnoreDebugStubAttribute.Text = "Ignore DebugStub Attribute Settings";
-            this.checkIgnoreDebugStubAttribute.UseVisualStyleBackColor = true;
             // 
             // tabDeployment
             // 
             this.tabDeployment.Controls.Add(this.lboxDeployment);
             this.tabDeployment.Location = new System.Drawing.Point(4, 22);
             this.tabDeployment.Name = "tabDeployment";
-            this.tabDeployment.Size = new System.Drawing.Size(627, 387);
+            this.tabDeployment.Size = new System.Drawing.Size(627, 486);
             this.tabDeployment.TabIndex = 11;
             this.tabDeployment.Text = "Deployment";
             this.tabDeployment.UseVisualStyleBackColor = true;
@@ -569,7 +626,7 @@
             this.lboxDeployment.FormattingEnabled = true;
             this.lboxDeployment.Location = new System.Drawing.Point(0, 0);
             this.lboxDeployment.Name = "lboxDeployment";
-            this.lboxDeployment.Size = new System.Drawing.Size(206, 387);
+            this.lboxDeployment.Size = new System.Drawing.Size(206, 486);
             this.lboxDeployment.Sorted = true;
             this.lboxDeployment.TabIndex = 15;
             // 
@@ -578,7 +635,7 @@
             this.tabLaunch.Controls.Add(this.lboxLaunch);
             this.tabLaunch.Location = new System.Drawing.Point(4, 22);
             this.tabLaunch.Name = "tabLaunch";
-            this.tabLaunch.Size = new System.Drawing.Size(627, 387);
+            this.tabLaunch.Size = new System.Drawing.Size(627, 486);
             this.tabLaunch.TabIndex = 12;
             this.tabLaunch.Text = "Launch";
             this.tabLaunch.UseVisualStyleBackColor = true;
@@ -589,7 +646,7 @@
             this.lboxLaunch.FormattingEnabled = true;
             this.lboxLaunch.Location = new System.Drawing.Point(0, 0);
             this.lboxLaunch.Name = "lboxLaunch";
-            this.lboxLaunch.Size = new System.Drawing.Size(206, 387);
+            this.lboxLaunch.Size = new System.Drawing.Size(206, 486);
             this.lboxLaunch.Sorted = true;
             this.lboxLaunch.TabIndex = 16;
             // 
@@ -601,8 +658,8 @@
             this.tabVMware.Controls.Add(this.cmboVMwareEdition);
             this.tabVMware.Location = new System.Drawing.Point(4, 22);
             this.tabVMware.Name = "tabVMware";
-            this.tabVMware.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabVMware.Size = new System.Drawing.Size(627, 387);
+            this.tabVMware.Padding = new System.Windows.Forms.Padding(3);
+            this.tabVMware.Size = new System.Drawing.Size(627, 486);
             this.tabVMware.TabIndex = 4;
             this.tabVMware.Text = "VMware";
             this.tabVMware.UseVisualStyleBackColor = true;
@@ -654,11 +711,22 @@
             this.tabBochs.Controls.Add(this.checkEnableBochsDebug);
             this.tabBochs.Location = new System.Drawing.Point(4, 22);
             this.tabBochs.Name = "tabBochs";
-            this.tabBochs.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabBochs.Size = new System.Drawing.Size(627, 387);
+            this.tabBochs.Padding = new System.Windows.Forms.Padding(3);
+            this.tabBochs.Size = new System.Drawing.Size(627, 486);
             this.tabBochs.TabIndex = 5;
             this.tabBochs.Text = "Bochs";
             this.tabBochs.UseVisualStyleBackColor = true;
+            // 
+            // checkStartBochsDebugGui
+            // 
+            this.checkStartBochsDebugGui.Enabled = false;
+            this.checkStartBochsDebugGui.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkStartBochsDebugGui.Location = new System.Drawing.Point(24, 43);
+            this.checkStartBochsDebugGui.Name = "checkStartBochsDebugGui";
+            this.checkStartBochsDebugGui.Size = new System.Drawing.Size(218, 20);
+            this.checkStartBochsDebugGui.TabIndex = 35;
+            this.checkStartBochsDebugGui.Text = "Use Bochs Debugger GUI";
+            this.checkStartBochsDebugGui.UseVisualStyleBackColor = true;
             // 
             // checkEnableBochsDebug
             // 
@@ -676,8 +744,8 @@
             this.tabPXE.Controls.Add(this.label1);
             this.tabPXE.Location = new System.Drawing.Point(4, 22);
             this.tabPXE.Name = "tabPXE";
-            this.tabPXE.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabPXE.Size = new System.Drawing.Size(627, 387);
+            this.tabPXE.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPXE.Size = new System.Drawing.Size(627, 486);
             this.tabPXE.TabIndex = 6;
             this.tabPXE.Text = "PXE";
             this.tabPXE.UseVisualStyleBackColor = true;
@@ -703,8 +771,8 @@
             this.tabUSB.Controls.Add(this.label7);
             this.tabUSB.Location = new System.Drawing.Point(4, 22);
             this.tabUSB.Name = "tabUSB";
-            this.tabUSB.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabUSB.Size = new System.Drawing.Size(627, 387);
+            this.tabUSB.Padding = new System.Windows.Forms.Padding(3);
+            this.tabUSB.Size = new System.Drawing.Size(627, 486);
             this.tabUSB.TabIndex = 7;
             this.tabUSB.Text = "USB";
             this.tabUSB.UseVisualStyleBackColor = true;
@@ -723,8 +791,8 @@
             this.tabISO.Controls.Add(this.label8);
             this.tabISO.Location = new System.Drawing.Point(4, 22);
             this.tabISO.Name = "tabISO";
-            this.tabISO.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabISO.Size = new System.Drawing.Size(627, 387);
+            this.tabISO.Padding = new System.Windows.Forms.Padding(3);
+            this.tabISO.Size = new System.Drawing.Size(627, 486);
             this.tabISO.TabIndex = 8;
             this.tabISO.Text = "ISO";
             this.tabISO.UseVisualStyleBackColor = true;
@@ -743,8 +811,8 @@
             this.tabSlave.Controls.Add(this.label6);
             this.tabSlave.Location = new System.Drawing.Point(4, 22);
             this.tabSlave.Name = "tabSlave";
-            this.tabSlave.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
-            this.tabSlave.Size = new System.Drawing.Size(627, 387);
+            this.tabSlave.Padding = new System.Windows.Forms.Padding(3);
+            this.tabSlave.Size = new System.Drawing.Size(627, 486);
             this.tabSlave.TabIndex = 13;
             this.tabSlave.Text = "Slave";
             this.tabSlave.UseVisualStyleBackColor = true;
@@ -774,17 +842,6 @@
             this.label6.TabIndex = 34;
             this.label6.Text = "Slave Port:";
             // 
-            // checkStartBochsDebugGui
-            // 
-            this.checkStartBochsDebugGui.Enabled = false;
-            this.checkStartBochsDebugGui.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.checkStartBochsDebugGui.Location = new System.Drawing.Point(24, 43);
-            this.checkStartBochsDebugGui.Name = "checkStartBochsDebugGui";
-            this.checkStartBochsDebugGui.Size = new System.Drawing.Size(218, 20);
-            this.checkStartBochsDebugGui.TabIndex = 35;
-            this.checkStartBochsDebugGui.Text = "Use Bochs Debugger GUI";
-            this.checkStartBochsDebugGui.UseVisualStyleBackColor = true;
-            // 
             // CosmosPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -792,7 +849,7 @@
             this.Controls.Add(this.TabControl1);
             this.Controls.Add(this.panel1);
             this.Name = "CosmosPage";
-            this.Size = new System.Drawing.Size(635, 456);
+            this.Size = new System.Drawing.Size(635, 555);
             this.Title = "Cosmos";
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
@@ -810,7 +867,12 @@
             this.tabDebug.ResumeLayout(false);
             this.tabDebug.PerformLayout();
             this.panlDebugSettings.ResumeLayout(false);
-            this.panlDebugSettings.PerformLayout();
+            this.stackCorruptionDetectionGroupBox.ResumeLayout(false);
+            this.stackCorruptionDetectionGroupBox.PerformLayout();
+            this.debugLevelGroupBox.ResumeLayout(false);
+            this.debugLevelGroupBox.PerformLayout();
+            this.debugStubGroupBox.ResumeLayout(false);
+            this.debugStubGroupBox.PerformLayout();
             this.tabDeployment.ResumeLayout(false);
             this.tabLaunch.ResumeLayout(false);
             this.tabVMware.ResumeLayout(false);
@@ -824,9 +886,9 @@
             this.tabSlave.PerformLayout();
             this.ResumeLayout(false);
 
-		}
+        }
 
-		#endregion
+        #endregion
 
     private System.Windows.Forms.Panel panel1;
     private System.Windows.Forms.Label lablCurrentProfile;
@@ -888,5 +950,11 @@
     private System.Windows.Forms.Label labelBinFormat;
     private System.Windows.Forms.ComboBox comboBinFormat;
         private System.Windows.Forms.CheckBox checkStartBochsDebugGui;
+        private System.Windows.Forms.GroupBox stackCorruptionDetectionGroupBox;
+        private System.Windows.Forms.ComboBox comboStackCorruptionDetectionLevel;
+        private System.Windows.Forms.GroupBox debugLevelGroupBox;
+        private System.Windows.Forms.GroupBox debugStubGroupBox;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
+        private System.Windows.Forms.Label label12;
     }
 }

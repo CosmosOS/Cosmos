@@ -39,6 +39,7 @@ namespace Cosmos.IL2CPU
         public TraceAssemblies TraceAssemblies;
         public bool DebugEnabled = false;
         public bool StackCorruptionDetection = false;
+        public StackCorruptionDetectionLevel StackCorruptionDetectionLevel;
         public DebugMode DebugMode;
         public bool IgnoreDebugStubAttribute;
         protected static HashSet<string> mDebugLines = new HashSet<string>();
@@ -1479,7 +1480,7 @@ namespace Cosmos.IL2CPU
                 DebugInfo.AddINT3Labels(mINT3Labels);
             }
 
-            if (DebugEnabled && StackCorruptionDetection)
+            if (DebugEnabled && StackCorruptionDetection && StackCorruptionDetectionLevel == StackCorruptionDetectionLevel.AllInstructions)
             {
                 // if debugstub is active, emit a stack corruption detection. at this point, the difference between EBP and ESP
                 // should be equal to the local variables sizes and the IL stack.

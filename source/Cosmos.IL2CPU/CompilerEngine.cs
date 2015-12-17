@@ -31,6 +31,7 @@ namespace Cosmos.IL2CPU
         public bool EnableLogging { get; set; }
         public bool EmitDebugSymbols { get; set; }
         public bool IgnoreDebugStubAttribute { get; set; }
+        public string StackCorruptionDetectionLevel { get; set; }
 
         protected void LogMessage(string aMsg)
         {
@@ -124,7 +125,7 @@ namespace Cosmos.IL2CPU
             mSearchDirs.Add(Path.GetDirectoryName(typeof(CompilerEngine).Assembly.Location));
             if (!EnsureCosmosPathsInitialization())
             {
-              return false;
+                return false;
             }
             mSearchDirs.Add(CosmosPaths.UserKit);
             mSearchDirs.Add(CosmosPaths.Kernel);
@@ -150,8 +151,9 @@ namespace Cosmos.IL2CPU
             //  }
             //}
 
+
             mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
-            if (String.IsNullOrEmpty(TraceAssemblies))
+            if (string.IsNullOrEmpty(TraceAssemblies))
             {
                 mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.User;
             }
@@ -165,11 +167,21 @@ namespace Cosmos.IL2CPU
                 mTraceAssemblies = (TraceAssemblies)Enum.Parse(typeof(TraceAssemblies), TraceAssemblies);
             }
 
+            if (string.IsNullOrEmpty(StackCorruptionDetectionLevel))
+            {
+                mStackCorruptionDetectionLevel = Cosmos.Build.Common.StackCorruptionDetectionLevel.MethodFooters;
+            }
+            else
+            {
+                mStackCorruptionDetectionLevel = (StackCorruptionDetectionLevel)Enum.Parse(typeof(StackCorruptionDetectionLevel), StackCorruptionDetectionLevel);
+            }
+
             return true;
         }
 
         public bool DebugEnabled = false;
         public bool StackCorruptionDetectionEnabled = false;
+        protected StackCorruptionDetectionLevel mStackCorruptionDetectionLevel = Cosmos.Build.Common.StackCorruptionDetectionLevel.MethodFooters;
         protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.Source;
         protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
 
@@ -211,6 +223,7 @@ namespace Cosmos.IL2CPU
                         xAsm.DebugInfo = xDebugInfo;
                         xAsm.DebugEnabled = DebugEnabled;
                         xAsm.StackCorruptionDetection = StackCorruptionDetectionEnabled;
+                        xAsm.StackCorruptionDetectionLevel = mStackCorruptionDetectionLevel;
                         xAsm.DebugMode = mDebugMode;
                         xAsm.TraceAssemblies = mTraceAssemblies;
                         xAsm.IgnoreDebugStubAttribute = IgnoreDebugStubAttribute;
@@ -240,7 +253,7 @@ namespace Cosmos.IL2CPU
 
                             AppAssemblerRingsCheck.Execute(xScanner, xInitMethod.DeclaringType.Assembly);
 
-                            using (var xOut = new StreamWriter(OutputFilename, false, Encoding.ASCII , 128*1024))
+                            using (var xOut = new StreamWriter(OutputFilename, false, Encoding.ASCII, 128 * 1024))
                             {
                                 //if (EmitDebugSymbols) {
                                 xAsm.Assembler.FlushText(xOut);
@@ -339,34 +352,34 @@ namespace Cosmos.IL2CPU
             mLoadedExtensions = new List<CompilerExtensionBase>();
             foreach (var xRef in References)
             {
-              if (File.Exists(xRef))
-              {
-                var xAssembly = Assembly.LoadFrom(xRef);
-                foreach (var xType in xAssembly.GetExportedTypes())
+                if (File.Exists(xRef))
                 {
-                  if (!xType.IsGenericTypeDefinition
-                      && !xType.IsAbstract)
-                  {
-                    if (xType.IsSubclassOf(typeof(Kernel)))
+                    var xAssembly = Assembly.LoadFrom(xRef);
+                    foreach (var xType in xAssembly.GetExportedTypes())
                     {
-                      // found kernel?
-                      if (xKernelType != null)
-                      {
-                        // already a kernel found, which is not supported.
-                        LogError(string.Format("Two kernels found! '{0}' and '{1}'", xType.AssemblyQualifiedName, xKernelType.AssemblyQualifiedName));
-                        return null;
-                      }
-                      xKernelType = xType;
+                        if (!xType.IsGenericTypeDefinition
+                            && !xType.IsAbstract)
+                        {
+                            if (xType.IsSubclassOf(typeof(Kernel)))
+                            {
+                                // found kernel?
+                                if (xKernelType != null)
+                                {
+                                    // already a kernel found, which is not supported.
+                                    LogError(string.Format("Two kernels found! '{0}' and '{1}'", xType.AssemblyQualifiedName, xKernelType.AssemblyQualifiedName));
+                                    return null;
+                                }
+                                xKernelType = xType;
+                            }
+                        }
                     }
-                  }
-                }
 
-                var xCompilerExtensionsMetas = xAssembly.GetCustomAttributes<CompilerExtensionAttribute>();
-                foreach (var xMeta in xCompilerExtensionsMetas)
-                {
-                  mLoadedExtensions.Add((CompilerExtensionBase)Activator.CreateInstance(xMeta.Type));
+                    var xCompilerExtensionsMetas = xAssembly.GetCustomAttributes<CompilerExtensionAttribute>();
+                    foreach (var xMeta in xCompilerExtensionsMetas)
+                    {
+                        mLoadedExtensions.Add((CompilerExtensionBase)Activator.CreateInstance(xMeta.Type));
+                    }
                 }
-              }
             }
             if (xKernelType == null)
             {
