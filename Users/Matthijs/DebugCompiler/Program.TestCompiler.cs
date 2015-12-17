@@ -46,6 +46,7 @@ namespace DebugCompiler
                 var xTask = new CompilerEngine();
                 xTask.DebugEnabled = true;
                 xTask.StackCorruptionDetectionEnabled = true;
+                xTask.StackCorruptionDetectionLevel = "AllInstructions";
                 xTask.DebugMode = "Source";
                 xTask.TraceAssemblies = "All";
                 xTask.DebugCom = 1;
@@ -89,7 +90,7 @@ namespace DebugCompiler
 
         //static void Main()
         //{
-        //    var di = new DebugInfo(Path.Combine(CosmosRoot, @"source2\Demos\Guess\bin\Debug\Guess.cdb"));
+        //    var di = new DebugInfo(Path.Combine(CosmosRoot, @"Demos\Guess\bin\Debug\Guess.cdb"));
         //    di.LoadLookups();
         //    var addr = (uint)1;
         //    var q = new SQLinq<Label>()

@@ -1,5 +1,6 @@
-﻿﻿using System;
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using Cosmos.Build.Common;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -24,6 +25,7 @@ namespace Cosmos.TestRunner.Core
             //engine.RunIL2CPUInProcess = true;
 
             engine.EnableStackCorruptionChecks = true;
+            engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters.ToString();
 
             //engine.RunWithGDB = true;
             //engine.StartBochsDebugGui = true;

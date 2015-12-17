@@ -49,6 +49,7 @@ namespace Cosmos.Compiler.TestsBase
             var xTask = new CompilerEngine();
             xTask.DebugEnabled = false;
             xTask.StackCorruptionDetectionEnabled = false;
+            xTask.StackCorruptionDetectionLevel = "MethodFooters";
             xTask.DebugMode = "Source";
             xTask.TraceAssemblies = "User";
             xTask.DebugCom = 1;

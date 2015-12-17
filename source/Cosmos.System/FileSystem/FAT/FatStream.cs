@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define COSMOSDEBUG
+
+using System;
 using System.IO;
 
 using Cosmos.System.FileSystem.FAT.Listing;

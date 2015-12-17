@@ -241,6 +241,18 @@ namespace Cosmos.Build.Common
             }
         }
 
+        public StackCorruptionDetectionLevel StackCorruptionDetectionLevel
+        {
+            get
+            {
+                return GetProperty(BuildPropertyNames.StackCorruptionDetectionLevelString, StackCorruptionDetectionLevel.MethodFooters);
+            }
+            set
+            {
+                SetProperty(BuildPropertyNames.StackCorruptionDetectionLevelString, value);
+            }
+        }
+
         public DebugMode DebugMode
         {
             get

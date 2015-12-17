@@ -61,7 +61,7 @@ namespace Cosmos.VS.Package {
     /// not sited yet inside Visual Studio environment. The place to do all the other 
     /// initialization is the Initialize method.
     public VSProject() {
-      LogUtility.LogString("Cosmos.VS.Package.VSProject instanciated");
+      LogUtility.LogString("Cosmos.VS.Package.VSProject instantiated");
     }
 
     // This is used in the MSBuild files to locate Cosmos tasks
@@ -70,7 +70,7 @@ namespace Cosmos.VS.Package {
       // MtW: we can just use typeof(VSProject).Assembly.Location
       //Trace.WriteLine("Todo: implement set cosmos var, or find something else for it..");
       //string xPath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-      //int xPos = xPath.LastIndexOf(@"\source2\", StringComparison.InvariantCultureIgnoreCase);
+      //int xPos = xPath.LastIndexOf(@"\source\", StringComparison.InvariantCultureIgnoreCase);
       //xPath = xPath.Substring(0, xPos);
 
       //  var xPath = @"E:\Cosmos";

@@ -1,6 +1,8 @@
 <?xml version="1.0"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4">
 
+<!--EXTERNAL_PROPERTIES: DebugMode;DebugEnabled;StackCorruptionDetectionEnabled;StackCorruptionDetectionLevel;IgnoreDebugStubAttribute;TraceAssemblies-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4">
   <PropertyGroup>
     <CosmosDir Condition="$(CosmosDir) == ''">$([MSBuild]::GetRegistryValue("HKEY_LOCAL_MACHINE\Software\Cosmos", "UserKit"))</CosmosDir>
     <BuildToolsDir Condition="$(BuildToolsDir) == ''">$(CosmosDir)\Build\Tools</BuildToolsDir>
@@ -8,14 +10,15 @@
     <NasmFile>$(BuildToolsDir)\Nasm\nasm.exe</NasmFile>
     <PlatformTarget>x86</PlatformTarget>
     <BinFormat Condition="$(BinFormat) == ''">bin</BinFormat>
+    <CosmosBuildTaskAssemblyFile>$(VSIPDir)\Cosmos.Build.MSBuild.dll</CosmosBuildTaskAssemblyFile>
   </PropertyGroup>
 
-  <UsingTask TaskName="Cosmos.Build.MSBuild.IL2CPU" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
-  <UsingTask TaskName="Cosmos.Build.MSBuild.NAsm" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
-  <UsingTask TaskName="Cosmos.Build.MSBuild.MakeISO" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
-  <UsingTask TaskName="Cosmos.Build.MSBuild.Ld" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
-  <UsingTask TaskName="Cosmos.Build.MSBuild.ReadNAsmMapToDebugInfo" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
-  <UsingTask TaskName="Cosmos.Build.MSBuild.ExtractMapFromElfFile" AssemblyFile="$(VSIPDir)\Cosmos.Build.MSBuild.dll" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.IL2CPU" AssemblyFile="$(CosmosBuildTaskAssemblyFile)" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.NAsm" AssemblyFile="$(CosmosBuildTaskAssemblyFile)" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.MakeISO" AssemblyFile="$(CosmosBuildTaskAssemblyFile)" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.Ld" AssemblyFile="$(CosmosBuildTaskAssemblyFile)" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.ReadNAsmMapToDebugInfo" AssemblyFile="$(CosmosBuildTaskAssemblyFile)" />
+  <UsingTask TaskName="Cosmos.Build.MSBuild.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTaskAssemblyFile)" />
 
   <Target Name="CoreCompile">
     <Error Text="File %(Compile.Identity) is set to compile, but .Cosmos projects don't compile any source themselves!"
@@ -28,64 +31,27 @@
       <Output PropertyName="IsELF" TaskParameter="Value"/>
     </CreateProperty>
 
-    <IL2CPU  DebugMode="$(DebugMode)"
-             DebugEnabled="$(DebugEnabled)"
-             StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)"
-             TraceAssemblies="$(TraceAssemblies)"
-             IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)"
-             DebugCom="1"
-             UseNAsm="true"
-             References="@(ReferencePath)"
-             OutputFilename="$(TargetDir)$(MSBuildProjectName).asm"
-             EnableLogging="true"
-             EmitDebugSymbols="$(DebugSymbols)"
-             CosmosBuildDir="$(CosmosDir)\Build"
-             WorkingDir="$(TargetDir)"/>
+    <Cosmos.Build.MSBuild.IL2CPU DebugMode="$(DebugMode)" DebugEnabled="$(DebugEnabled)" StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)" StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)" TraceAssemblies="$(TraceAssemblies)" IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)" DebugCom="1" UseNAsm="true" References="@(ReferencePath)" OutputFilename="$(TargetDir)$(MSBuildProjectName).asm" EnableLogging="true" EmitDebugSymbols="$(DebugSymbols)" CosmosBuildDir="$(CosmosDir)\Build" WorkingDir="$(TargetDir)" />
+    <Cosmos.Build.MSBuild.NAsm InputFile="$(TargetDir)$(MSBuildProjectName).asm" OutputFile="$(TargetDir)$(MSBuildProjectName).obj" IsELF="$(IsELF)" ExePath="$(NasmFile)" />
 
-    <NAsm    InputFile="$(TargetDir)$(MSBuildProjectName).asm"
-             OutputFile="$(TargetDir)$(MSBuildProjectName).obj"
-             IsELF="$(IsELF)"
-             ExePath="$(NasmFile)" />
-
-    <!--ELF only-->
-    <!-- 16 MB 0x1000000 as per hpa (syslinux) is a good spot.
-    For now just put some dummy values. 16 and 32 MB. Later size better.-->
-    <Ld      CosmosBuildDir="$(CosmosDir)\Build"
-             WorkingDir="$(TargetDir)"
-             Arguments="-Ttext 0x2000000 -Tdata 0x1000000 -e Kernel_Start -o '$(TargetDir)$(MSBuildProjectName).bin' '$(TargetDir)$(MSBuildProjectName).obj'"
-             Condition="$(IsELF) == 'true'"/>
-
-    <ExtractMapFromElfFile  InputFile="$(TargetDir)$(MSBuildProjectName).bin"
-                            DebugInfoFile="$(TargetDir)$(MSBuildProjectName).cdb"
-                            WorkingDir="$(TargetDir)"
-                            CosmosBuildDir="$(CosmosDir)\Build"
-                            Condition="$(IsELF) == 'true'"/>
-
+    <!-- ELF only -->
+    <!-- 16 MB 0x1000000 as per hpa (syslinux) is a good spot. For now just put some dummy values. 16 and 32 MB. Later size better. -->
+    <Cosmos.Build.MSBuild.Ld CosmosBuildDir="$(CosmosDir)\Build" WorkingDir="$(TargetDir)" Arguments="-Ttext 0x2000000 -Tdata 0x1000000 -e Kernel_Start -o '$(TargetDir)$(MSBuildProjectName).bin' '$(TargetDir)$(MSBuildProjectName).obj'" Condition="$(IsELF) == 'true'" />
+    <Cosmos.Build.MSBuild.ExtractMapFromElfFile InputFile="$(TargetDir)$(MSBuildProjectName).bin" DebugInfoFile="$(TargetDir)$(MSBuildProjectName).cdb" WorkingDir="$(TargetDir)" CosmosBuildDir="$(CosmosDir)\Build" Condition="$(IsELF) == 'true'" />
     <CreateItem Include="$(TargetDir)$(MSBuildProjectName).bin" Condition="$(IsELF) == 'true'">
-      <Output TaskParameter="Include"
-              ItemName="TempFilesToCopy"/>
+      <Output TaskParameter="Include" ItemName="TempFilesToCopy"/>
     </CreateItem>
-
     <!--End of ELF only-->
 
     <!--binary only-->
-    <ReadNAsmMapToDebugInfo InputBaseDir="$(TargetDir)"
-                            DebugInfoFile="$(TargetDir)$(MSBuildProjectName).cdb"
-                            Condition="$(IsELF) == 'false'"/>
-
-    <Move SourceFiles="$(TargetDir)$(MSBuildProjectName).obj" DestinationFiles="$(TargetDir)$(MSBuildProjectName).bin"
-          Condition="$(IsELF) == 'false'"/>
-
+    <Cosmos.Build.MSBuild.ReadNAsmMapToDebugInfo InputBaseDir="$(TargetDir)" DebugInfoFile="$(TargetDir)$(MSBuildProjectName).cdb" Condition="$(IsELF) == 'false'"/>
+    <Move SourceFiles="$(TargetDir)$(MSBuildProjectName).obj" DestinationFiles="$(TargetDir)$(MSBuildProjectName).bin" Condition="$(IsELF) == 'false'"/>
     <!--end of binary only-->
-
 
     <!--todo: update cxdb to cxdbg-->
 
-    <!-- We dont build ISO in MSBuild any more because not all targets need it and it takes time.
-    But we do delete it, so we dont have out of date outputs. -->
-    <!-- <MakeISO InputFile="$(TargetDir)$(MSBuildProjectName).bin"
-             OutputFile="$(TargetDir)$(MSBuildProjectName).iso"
-             CosmosBuildDir="$(CosmosDir)\Build" /> -->
+    <!-- We dont build ISO in MSBuild any more because not all targets need it and it takes time. But we do delete it, so we dont have out of date outputs. -->
+    <!-- <MakeISO InputFile="$(TargetDir)$(MSBuildProjectName).bin" OutputFile="$(TargetDir)$(MSBuildProjectName).iso" CosmosBuildDir="$(CosmosDir)\Build" /> -->
     <Delete Files="$(TargetDir)$(MSBuildProjectName).iso" />
   </Target>
 
@@ -97,7 +63,6 @@
 
   <Target Name="CopyFilesToOutputDirectory">
     <!-- copy <AssemblyName>.exe from obj\Debug to bin\Debug-->
-    <!--  <Copy SourceFiles="Cosmos.bxrc"
-            DestinationFolder="$(TargetDir)"/>-->
+    <!-- <Copy SourceFiles="Cosmos.bxrc" DestinationFolder="$(TargetDir)"/> -->
   </Target>
 </Project>

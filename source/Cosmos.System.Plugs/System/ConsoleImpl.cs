@@ -71,14 +71,26 @@ namespace Cosmos.System.Plugs.System {
       xConsole.X = x;
 		}
 
-		public static int get_CursorSize() {
-			WriteLine("Not implemented: get_CursorSize");
-			return -1;
-		}
+
+        public static int get_CursorSize() {
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return 0;
+            }
+            return xConsole.CursorSize;
+        }
 
 		public static void set_CursorSize(int aSize) {
-			WriteLine("Not implemented: set_CursorSize");
-		}
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
+            xConsole.CursorSize = aSize;
+        }
 
 		public static int get_CursorTop() {
       var xConsole = GetConsole();
@@ -100,21 +112,34 @@ namespace Cosmos.System.Plugs.System {
             GetConsole().Y = y;
 		}
 
-		public static bool get_CursorVisible() {
-			WriteLine("Not implemented: get_CursorVisible");
-			return false;
-		}
+        public static bool get_CursorVisible()
+        {
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return true;
+            }
+            return xConsole.CursorVisible;
+        }
 
-		public static void set_CursorVisible(bool value) {
-			WriteLine("Not implemented: set_CursorVisible");
-		}
+        public static void set_CursorVisible(bool value) {
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
+            xConsole.CursorVisible = value;
+        }
 
-		//public static TextWriter get_Error() {
-		//    WriteLine("Not implemented: get_Error");
-		//    return null;
-		//}
 
-		public static ConsoleColor get_ForegroundColor() {
+        //public static TextWriter get_Error() {
+        //    WriteLine("Not implemented: get_Error");
+        //    return null;
+        //}
+
+        public static ConsoleColor get_ForegroundColor() {
 			return mForeground;
 		}
 
@@ -460,7 +485,7 @@ namespace Cosmos.System.Plugs.System {
 			WriteLine("Not implemented: SetWindowSize");
 		}
 
-        #region Write
+#region Write
 
 		public static void Write(bool aBool) {
 			Write(aBool.ToString());
@@ -567,9 +592,9 @@ namespace Cosmos.System.Plugs.System {
         //    Write(aByte.ToString());
         //}
 
-        #endregion
+#endregion
 
-        #region WriteLine
+#region WriteLine
 
         public static void WriteLine() {
           var xConsole = GetConsole();
@@ -710,6 +735,6 @@ namespace Cosmos.System.Plugs.System {
 		public static void WriteLine(string format, object arg0, object arg1, object arg2, object arg3) {
 			WriteLine("Not implemented: WriteLine");
 		}
-        #endregion
+#endregion
     }
 }

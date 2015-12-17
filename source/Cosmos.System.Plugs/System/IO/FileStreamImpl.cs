@@ -1,4 +1,6 @@
-﻿using global::System;
+﻿#define COSMOSDEBUG
+
+using global::System;
 using global::System.IO;
 
 using Cosmos.IL2CPU.Plugs;
