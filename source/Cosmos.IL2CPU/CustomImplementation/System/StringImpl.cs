@@ -177,21 +177,8 @@
 
         public static bool StartsWith(string aThis, string aSubstring, StringComparison aComparison)
         {
-            Char[] di = aThis.ToCharArray();
-            Char[] ci = aSubstring.ToCharArray();
-            if (aSubstring.Length > aThis.Length)
-            {
-                return false;
-            }
-            for (int i = 0; i < ci.Length; i++)
-            {
-                if (di[i] != ci[i])
-                {
-                    return false;
-
-                }
-            }
-            return true;
+            Console.WriteLine("String.StartsWith not working!");
+            throw new NotImplementedException();
         }
 
         //String concatenation plugs
@@ -572,36 +559,11 @@
 
         public static bool Contains(string aThis, string value)
         {
-            Char[] di = aThis.ToCharArray();
-            Char[] ci = value.ToCharArray();
-            if (value.Length == aThis.Length)
+            if (aThis.IndexOf(value) != -1)
             {
-                if (value == aThis)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return true;
             }
-            else if (!(value.Length > aThis.Length) && (value.Length != aThis.Length))
-            {
-                for (int i = 0; i < aThis.Length; i++)
-                {
-                    if (di[i] == ci[0])
-                    {
-                        for (int j = 1; j < value.Length; j++)
-                        {
-                            if (di[i + j] != ci[j])
-                            {
-                                return false;
-                            }
-                        }
-                        return true;
-                    }
-                }
-            }
+
             return false;
         }
 
@@ -612,31 +574,30 @@
 
         public static bool EndsWith(string aThis, string aSubStr, StringComparison aComparison)
         {
-            Char[] di = aThis.ToCharArray();
-            Char[] ci = aSubStr.ToCharArray();
-            if (aThis.Length == aSubStr.Length)
+            if (aSubStr == null)
             {
-                if (aThis == aSubStr)
-                {
-                    return true;
-                }
-                return false;
+                throw new ArgumentNullException("aSubStr");
             }
-            else if (aThis.Length > aSubStr.Length)
+
+            if (aThis == aSubStr)
             {
-                return false;
-            }
-            else
-            {
-                for (int i = aThis.Length - aSubStr.Length; i < aThis.Length; i++)
-                {
-                    if (di[aThis.Length - aSubStr.Length + i] != ci[i])
-                    {
-                        return false;
-                    }
-                }
                 return true;
             }
+
+            if (aSubStr.Length == 0)
+            {
+                return true;
+            }
+
+            int xLastIdx = aThis.Length - aSubStr.Length;
+            for (int i = 0; i < aSubStr.Length; i++)
+            {
+                if (aThis[xLastIdx + i] != aSubStr[i])
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         //        System.Int32  System.String.IndexOf(System.String, System.Int32, System.Int32, System.StringComparison)
@@ -728,18 +689,11 @@
 
         public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, CultureInfo aCulture)
         {
-            Char[] di = aThis.ToCharArray();
-            Char[] ci = aSubStr.ToCharArray();
-            if (aSubStr.Length > aThis.Length)
+            for (int i = 0; i < aSubStr.Length; i++)
             {
-                return false;
-            }
-            for (int i = 0; i < ci.Length; i++)
-            {
-                if (di[i] != ci[i])
+                if (aThis[i] != aSubStr[i])
                 {
                     return false;
-
                 }
             }
             return true;
@@ -805,53 +759,6 @@
         {
             return new string(new char[length]);
         }
-
-        public static string dTrimStart(string aThis, string aSubStr)
-        {
-            char[] ci = aThis.ToCharArray();
-            char[] di = aSubStr.ToCharArray();
-
-            if(aThis.StartsWith(aSubStr))
-            {
-                if(!(aThis == aSubStr))
-                {
-                    char[] oi = new char[ci.Length - di.Length];
-                    for(int i=0; i < ci.Length - di.Length; i++)
-                    {
-                        oi[i] = ci[i + di.Length];
-                    }
-                    return oi.ToString();
-                }
-                else
-                {
-                    return "";
-                }
-            }
-            else
-            {
-                throw new ArgumentNullException();
-            }
-
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         /*public int IndexOf(char c)
        {
