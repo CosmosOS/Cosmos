@@ -1,4 +1,6 @@
-﻿using global::System;
+﻿#define COSMOSDEBUG
+
+using global::System;
 using global::System.Collections.Generic;
 
 using Cosmos.Common.Extensions;

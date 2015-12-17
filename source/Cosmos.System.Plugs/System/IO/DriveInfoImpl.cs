@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿#define COSMOSDEBUG
+
+using System.IO;
 
 using Cosmos.IL2CPU.Plugs;
 

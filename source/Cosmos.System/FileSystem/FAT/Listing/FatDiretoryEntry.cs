@@ -1,4 +1,6 @@
-﻿using Cosmos.Common.Extensions;
+﻿#define COSMOSDEBUG
+
+using Cosmos.Common.Extensions;
 using Cosmos.System.FileSystem.Listing;
 
 using global::System;

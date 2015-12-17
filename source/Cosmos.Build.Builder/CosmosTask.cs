@@ -432,7 +432,7 @@ namespace Cosmos.Build.Builder {
 
       // XSC can do all files in path, but we do it on our own currently for better status updates.
       // When we get xsproj files we can build directly.
-      var xFiles = Directory.GetFiles(mCosmosDir + @"source2\Compiler\Cosmos.Compiler.DebugStub\", "*.xs");
+      var xFiles = Directory.GetFiles(mCosmosDir + @"source\Cosmos.Debug.DebugStub\", "*.xs");
       foreach (var xFile in xFiles) {
         Echo("Compiling " + Path.GetFileName(xFile));
         string xDest = Path.ChangeExtension(xFile, ".cs");
