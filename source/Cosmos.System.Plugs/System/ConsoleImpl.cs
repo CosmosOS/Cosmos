@@ -7,7 +7,7 @@ using Plug = Cosmos.IL2CPU.Plugs.PlugAttribute;
 
 namespace Cosmos.System.Plugs.System
 {
-    [Plug(Target = typeof(global::System.Console))]
+    [Plug(Target = typeof (global::System.Console))]
     public static class ConsoleImpl
     {
         private static ConsoleColor mForeground = ConsoleColor.White;
@@ -63,24 +63,24 @@ namespace Cosmos.System.Plugs.System
 
         public static int get_CursorLeft()
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return 0;
-      }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return 0;
+            }
             return GetConsole().X;
         }
 
         public static void set_CursorLeft(int x)
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return;
-      }
-      xConsole.X = x;
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
+            xConsole.X = x;
         }
 
         public static int get_CursorSize()
@@ -90,39 +90,45 @@ namespace Cosmos.System.Plugs.System
             {
                 // for now:
                 return 0;
-        }
+            }
             return xConsole.CursorSize;
         }
 
-        public static void set_CursorSize(int aSize) {
-            WriteLine("Not implemented: set_CursorSize");
-        }
+        public static void set_CursorSize(int aSize)
+        {
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
             xConsole.CursorSize = aSize;
         }
 
         public static int get_CursorTop()
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return 0;
-      }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return 0;
+            }
             return GetConsole().Y;
         }
 
         public static void set_CursorTop(int y)
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return;
-      }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
             GetConsole().Y = y;
         }
 
-        public static bool get_CursorVisible() {
+        public static bool get_CursorVisible()
+        {
             WriteLine("Not implemented: get_CursorVisible");
             return false;
         }
@@ -237,12 +243,12 @@ namespace Cosmos.System.Plugs.System
 
         public static int get_WindowHeight()
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return 25;
-      }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return 25;
+            }
             return GetConsole().Rows;
         }
 
@@ -275,12 +281,12 @@ namespace Cosmos.System.Plugs.System
 
         public static int get_WindowWidth()
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return 85;
-      }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return 85;
+            }
             return GetConsole().Cols;
         }
 
@@ -315,18 +321,19 @@ namespace Cosmos.System.Plugs.System
         //TODO: Console uses TextWriter - intercept and plug it instead
         public static void Clear()
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return;
-      }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
             GetConsole().Clear();
         }
 
         //  MoveBufferArea(int, int, int, int, int, int) is pure CIL
 
-        public static void MoveBufferArea(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight, int targetLeft, int targetTop, Char sourceChar, ConsoleColor sourceForeColor, ConsoleColor sourceBackColor)
+        public static void MoveBufferArea(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight,
+            int targetLeft, int targetTop, Char sourceChar, ConsoleColor sourceForeColor, ConsoleColor sourceBackColor)
         {
             WriteLine("Not implemented: MoveBufferArea");
         }
@@ -358,23 +365,23 @@ namespace Cosmos.System.Plugs.System
         public static int Read()
         {
             // TODO special cases, if needed, that returns -1
-      KeyEvent xResult;
+            KeyEvent xResult;
 
-          if (HAL.Global.Keyboard.TryReadKey(out xResult))
-          {
-            return xResult.KeyChar;
-          }
-          else
-          {
-            return -1;
-          }
+            if (HAL.Global.Keyboard.TryReadKey(out xResult))
+            {
+                return xResult.KeyChar;
+            }
+            else
+            {
+                return -1;
+            }
         }
 
         // ReadKey() pure CIL
 
         public static KeyEvent ReadKey(Boolean intercept)
         {
-      var key = Cosmos.HAL.Global.Keyboard.ReadKey();
+            var key = Cosmos.HAL.Global.Keyboard.ReadKey();
 
             if (false == intercept && key.KeyChar != '\0')
             {
@@ -385,12 +392,12 @@ namespace Cosmos.System.Plugs.System
 
         public static String ReadLine()
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return null;
-      }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return null;
+            }
             List<char> chars = new List<char>(32);
             KeyEvent current;
             int currentCount = 0;
@@ -398,14 +405,14 @@ namespace Cosmos.System.Plugs.System
             while ((current = HAL.Global.Keyboard.ReadKey()).Key != ConsoleKeyEx.Enter)
             {
                 if (current.Key == ConsoleKeyEx.NumEnter) break;
-        //Check for "special" keys
+                //Check for "special" keys
                 if (current.Key == ConsoleKeyEx.Backspace) // Backspace
                 {
-                  if (currentCount > 0)
-                  {
-                    int curCharTemp = GetConsole().X;
-                      chars.RemoveAt(currentCount - 1);
-                      GetConsole().X = GetConsole().X - 1;
+                    if (currentCount > 0)
+                    {
+                        int curCharTemp = GetConsole().X;
+                        chars.RemoveAt(currentCount - 1);
+                        GetConsole().X = GetConsole().X - 1;
 
                         //Move characters to the left
                         for (int x = currentCount - 1; x < chars.Count; x++)
@@ -415,7 +422,7 @@ namespace Cosmos.System.Plugs.System
 
                         Write(' ');
 
-                      GetConsole().X = curCharTemp - 1;
+                        GetConsole().X = curCharTemp - 1;
 
                         currentCount--;
                     }
@@ -425,7 +432,7 @@ namespace Cosmos.System.Plugs.System
                 {
                     if (currentCount > 0)
                     {
-            GetConsole().X = GetConsole().X - 1;
+                        GetConsole().X = GetConsole().X - 1;
                         currentCount--;
                     }
                     continue;
@@ -434,7 +441,7 @@ namespace Cosmos.System.Plugs.System
                 {
                     if (currentCount < chars.Count)
                     {
-                      GetConsole().X = GetConsole().X + 1;
+                        GetConsole().X = GetConsole().X + 1;
                         currentCount++;
                     }
                     continue;
@@ -445,7 +452,7 @@ namespace Cosmos.System.Plugs.System
                 //Write the character to the screen
                 if (currentCount == chars.Count)
                 {
-          chars.Add(current.KeyChar);
+                    chars.Add(current.KeyChar);
                     Write(current.KeyChar);
                     currentCount++;
                 }
@@ -460,7 +467,7 @@ namespace Cosmos.System.Plugs.System
                     {
                         if (x == currentCount)
                         {
-              temp.Add(current.KeyChar);
+                            temp.Add(current.KeyChar);
                         }
 
                         temp.Add(chars[x]);
@@ -474,7 +481,7 @@ namespace Cosmos.System.Plugs.System
                         Write(chars[x]);
                     }
 
-                  GetConsole().X -= (chars.Count - currentCount) - 1;
+                    GetConsole().X -= (chars.Count - currentCount) - 1;
                     currentCount++;
                 }
             }
@@ -530,12 +537,12 @@ namespace Cosmos.System.Plugs.System
 
         public static void Write(char aChar)
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return;
-      }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
             GetConsole().WriteChar(aChar);
         }
 
@@ -578,12 +585,12 @@ namespace Cosmos.System.Plugs.System
 
         public static void Write(string aText)
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return;
-      }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
             GetConsole().Write(aText);
         }
 
@@ -657,47 +664,47 @@ namespace Cosmos.System.Plugs.System
 
         public static void WriteLine()
         {
-          var xConsole = GetConsole();
-          if (xConsole == null)
-          {
-            // for now:
-            return;
-          }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
             GetConsole().NewLine();
         }
 
         public static void WriteLine(bool aBool)
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return;
-      }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
             Write(aBool.ToString());
             GetConsole().NewLine();
         }
 
         public static void WriteLine(char aChar)
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return;
-      }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
             Write(aChar);
             GetConsole().NewLine();
         }
 
         public static void WriteLine(char[] aBuffer)
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return;
-      }
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
             Write(aBuffer, 0, aBuffer.Length);
             GetConsole().NewLine();
         }
@@ -735,51 +742,51 @@ namespace Cosmos.System.Plugs.System
         {
             if (value != null)
             {
-        var xConsole = GetConsole();
-        if (xConsole == null)
-        {
-          // for now:
-          return;
-        }
+                var xConsole = GetConsole();
+                if (xConsole == null)
+                {
+                    // for now:
+                    return;
+                }
                 Write(value.ToString());
-        xConsole.NewLine();
+                xConsole.NewLine();
             }
         }
 
         public static void WriteLine(string aText)
         {
-          var xConsole = GetConsole();
-          if (xConsole == null)
-          {
-            // for now:
-            return;
-          }
-          xConsole.Write(aText);
-      xConsole.NewLine();
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
+            xConsole.Write(aText);
+            xConsole.NewLine();
         }
 
         public static void WriteLine(uint aInt)
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return;
-      }
-      Write(aInt.ToString());
-      xConsole.NewLine();
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
+            Write(aInt.ToString());
+            xConsole.NewLine();
         }
 
         public static void WriteLine(ulong aLong)
         {
-      var xConsole = GetConsole();
-      if (xConsole == null)
-      {
-        // for now:
-        return;
-      }
-      Write(aLong.ToString());
-      xConsole.NewLine();
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                // for now:
+                return;
+            }
+            Write(aLong.ToString());
+            xConsole.NewLine();
         }
 
         public static void WriteLine(string format, object arg0)
@@ -812,6 +819,7 @@ namespace Cosmos.System.Plugs.System
         {
             WriteLine("Not implemented: WriteLine");
         }
+
         #endregion
     }
 }
