@@ -4,81 +4,111 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 
-namespace Cosmos.Build.Common {
+namespace Cosmos.Build.Common
+{
 
-  public enum DeploymentType {
-    [Description("ISO Image")]
-    ISO,
-    [Description("USB Device")]
-    USB,
-    [Description("PXE Network Boot")]
-    PXE,
-    BinaryImage
-  }
+    public enum DeploymentType
+    {
+        [Description("ISO Image")] ISO,
+        [Description("USB Device")] USB,
+        [Description("PXE Network Boot")] PXE,
+        BinaryImage
+    }
 
-  public enum LaunchType {
-    [Description("None")]
-    None,
-    [Description("VMware")]
-    VMware,
-    [Description("Attached Slave (CanaKit)")]
-    Slave,
-    [Description("Bochs")]
-    Bochs,
-    IntelEdison,
-  }
+    public enum LaunchType
+    {
+        [Description("None")] None,
+        [Description("VMware")] VMware,
+        [Description("Attached Slave (CanaKit)")] Slave,
+        [Description("Bochs")] Bochs,
+        [Description("Intel Edison")] IntelEdison,
+    }
 
-  public enum VMwareEdition {
-    Workstation,
-    Player
-  }
+    public enum VMwareEdition
+    {
+        Workstation,
+        Player
+    }
 
-  public enum Architecture {
-    x86 //, x64
-  }
+    public enum Architecture
+    {
+        x86 //, x64
+    }
 
-  public enum Framework {
-    [Description("Microsoft .NET")]
-    MicrosoftNET,
-    Mono
-  }
+    public enum Framework
+    {
+        [Description("Microsoft .NET")] MicrosoftNET,
+        Mono
+    }
 
-  public enum LogSeverityEnum : byte {
-    Warning = 0, Error = 1, Informational = 2, Performance = 3
-  }
-  public enum TraceAssemblies { All, Cosmos, User };
-  public enum DebugMode { IL, Source }
+    public enum LogSeverityEnum : byte
+    {
+        Warning = 0,
+        Error = 1,
+        Informational = 2,
+        Performance = 3
+    }
 
-  public sealed class DescriptionAttribute : Attribute {
-    public static String GetDescription(object value) {
-      Type valueType = value.GetType();
-      MemberInfo[] valueMemberInfo;
-      Object[] valueMemberAttribute;
+    public enum TraceAssemblies
+    {
+        All,
+        Cosmos,
+        User
+    };
 
-      if (valueType.IsEnum) {
-        valueMemberInfo = valueType.GetMember(value.ToString());
+    public enum DebugMode
+    {
+        IL,
+        Source
+    }
 
-        if ((valueMemberInfo != null) && (valueMemberInfo.Length > 0)) {
-          valueMemberAttribute = valueMemberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false);
-          if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0)) {
-            return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
-          }
+    public enum StackCorruptionDetectionLevel
+    {
+        [Description("All Instructions")] AllInstructions,
+        [Description("Method Footers Only")] MethodFooters
+    }
+
+    public sealed class DescriptionAttribute : Attribute
+    {
+        public static String GetDescription(object value)
+        {
+            Type valueType = value.GetType();
+            MemberInfo[] valueMemberInfo;
+            Object[] valueMemberAttribute;
+
+            if (valueType.IsEnum)
+            {
+                valueMemberInfo = valueType.GetMember(value.ToString());
+
+                if ((valueMemberInfo != null) && (valueMemberInfo.Length > 0))
+                {
+                    valueMemberAttribute = valueMemberInfo[0].GetCustomAttributes(typeof (DescriptionAttribute), false);
+                    if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0))
+                    {
+                        return ((DescriptionAttribute) valueMemberAttribute[0]).Description;
+                    }
+                }
+            }
+
+            valueMemberAttribute = valueType.GetCustomAttributes(typeof (DescriptionAttribute), false);
+            if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0))
+            {
+                return ((DescriptionAttribute) valueMemberAttribute[0]).Description;
+            }
+
+            return value.ToString();
         }
-      }
 
-      valueMemberAttribute = valueType.GetCustomAttributes(typeof(DescriptionAttribute), false);
-      if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0)) {
-        return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
-      }
+        private string emDescription;
 
-      return value.ToString();
+        public DescriptionAttribute(String description)
+        {
+            emDescription = description;
+        }
+
+        public String Description
+        {
+            get { return emDescription; }
+        }
     }
-
-    private string emDescription;
-    public DescriptionAttribute(String description) {
-      emDescription = description;
-    }
-
-    public String Description { get { return emDescription; } }
-  }
 }

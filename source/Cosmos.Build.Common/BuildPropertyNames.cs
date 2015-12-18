@@ -7,6 +7,7 @@ namespace Cosmos.Build.Common
     public static class BuildPropertyNames
     {
         public const string StackCorruptionDetectionEnabledString = "StackCorruptionDetectionEnabled";
+        public const string StackCorruptionDetectionLevelString = "StackCorruptionDetectionLevel";
         public const string ProfileString = "Profile";
         public const string NameString = "Name";
         public const string DescriptionString = "Description";
@@ -28,10 +29,7 @@ namespace Cosmos.Build.Common
         public const string EnableGDBString = "EnableGDB";
         public const string StartCosmosGDBString = "StartCosmosGDB";
         public const string EnableBochsDebugString = "EnableBochsDebug";
-
-        /// <summary>
-        /// Name of the configuration property in the project file.
-        /// </summary>
+        public const string StartBochsDebugGui = "StartBochsDebugGui";
         public const string BinFormatString = "BinFormat";
     }
 }

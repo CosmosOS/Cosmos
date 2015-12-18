@@ -49,7 +49,7 @@ namespace Cosmos.Build.Common {
       using (var xReg = Registry.CurrentUser.OpenSubKey(@"Software\Cosmos", false)) {
         if (xReg != null) {
           DevKit = (string)xReg.GetValue("DevKit");
-          try { DebugStubSrc = CheckPath(DevKit, @"source2\Compiler\Cosmos.Compiler.DebugStub"); }
+          try { DebugStubSrc = CheckPath(DevKit, @"source\Cosmos.Debug.DebugStub"); }
           catch { }
         }
       }

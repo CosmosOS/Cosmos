@@ -9,7 +9,9 @@ using Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-  [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldstr)]
+    using Cosmos.IL2CPU.CustomImplementation.System;
+
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldstr)]
   public class LdStr: ILOp
   {
 	public LdStr(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr)

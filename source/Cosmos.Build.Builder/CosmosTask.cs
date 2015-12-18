@@ -19,7 +19,7 @@ namespace Cosmos.Build.Builder {
   public class CosmosTask : Task {
     protected string mCosmosDir;
     protected string mOutputDir;
-    protected BuildState mBuildState; 
+    protected BuildState mBuildState;
     protected string mAppDataDir;
     protected int mReleaseNo;
     protected string mInnoFile;
@@ -85,12 +85,12 @@ namespace Cosmos.Build.Builder {
       if (!App.TestMode) {
         CheckPrereqs();                                 //Working
         // No point in continuing if Prerequisites are missing
-        // Could potentially add more State checks in the future, but for now 
+        // Could potentially add more State checks in the future, but for now
         // only the prerequisites are handled...
         if (mBuildState != BuildState.PrerequisiteMissing)
         {
             CleanupVSIPFolder();
-          
+
             CompileCosmos();                                //Working
             CopyTemplates();
 
@@ -109,7 +109,10 @@ namespace Cosmos.Build.Builder {
       } else {
         Section("Testing...");
         //Uncomment bits that you want to test...
-        CheckForInno(); //CheckPrereqs();                               //Working
+        //CheckForInno();
+        CheckPrereqs();                               //Working
+        if (mBuildState != BuildState.PrerequisiteMissing)
+          Echo("all checks suceeded");
         //Cleanup();                                    //Working
 
         //CompileCosmos();                              //Working
@@ -162,8 +165,13 @@ namespace Cosmos.Build.Builder {
         using (var xKey = Registry.LocalMachine.OpenSubKey(aKey + xSubKey)) {
           string xValue = (string)xKey.GetValue(aValueName);
           if (xValue != null && xValue.ToUpper().Contains(xCheck)) {
-            mBuildState = BuildState.Running;
-                        return true;
+            if (mBuildState != BuildState.PrerequisiteMissing)
+            {
+              mBuildState = BuildState.Running;
+              return true;
+            }
+            else
+              return false;
           }
         }
       }
@@ -184,6 +192,7 @@ namespace Cosmos.Build.Builder {
       }
       if (!xInstalled) {
         NotFound(".NET 3.5 SP1");
+        mBuildState = BuildState.PrerequisiteMissing;
       }
     }
 
@@ -285,7 +294,8 @@ namespace Cosmos.Build.Builder {
           throw new NotImplementedException();
       }
 
-      //works also without, only close of VMWare is not working! CheckNet35Sp1(); // Required by VMWareLib
+      //works also without, only close of VMWare is not working!
+      CheckNet35Sp1(); // Required by VMWareLib and other stuff
       CheckNet403();
       CheckForInno();
       bool vmWareInstalled = true;
@@ -422,7 +432,7 @@ namespace Cosmos.Build.Builder {
 
       // XSC can do all files in path, but we do it on our own currently for better status updates.
       // When we get xsproj files we can build directly.
-      var xFiles = Directory.GetFiles(mCosmosDir + @"source2\Compiler\Cosmos.Compiler.DebugStub\", "*.xs");
+      var xFiles = Directory.GetFiles(mCosmosDir + @"source\Cosmos.Debug.DebugStub\", "*.xs");
       foreach (var xFile in xFiles) {
         Echo("Compiling " + Path.GetFileName(xFile));
         string xDest = Path.ChangeExtension(xFile, ".cs");
@@ -457,6 +467,7 @@ namespace Cosmos.Build.Builder {
 
     void CreateSetup() {
       Section("Creating Setup");
+
 
       string xISCC = Path.Combine(mInnoPath, "ISCC.exe");
       if (!File.Exists(xISCC)) {

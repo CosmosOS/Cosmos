@@ -315,10 +315,49 @@ namespace Cosmos.IL2CPU {
               select item.Offset + item.Size).FirstOrDefault();
     }
 
-    public static void EmitExceptionLogic(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup) {
-      EmitExceptionLogic(aAssembler, aMethodInfo, aCurrentOpCode, aDoTest, aCleanup, ILOp.GetLabel(aMethodInfo, aCurrentOpCode.NextPosition));
+
+    /// <summary>
+    /// Emits cleanup code for when an exception occurred inside a method call.
+    /// </summary>
+    public static void EmitExceptionCleanupAfterCall(Assembler.Assembler aAssembler, uint aReturnSize, uint aStackSizeBeforeCall, uint aTotalArgumentSizeOfMethod)
+    {
+      new Comment("aStackSizeBeforeCall = " + aStackSizeBeforeCall);
+      new Comment("aTotalArgumentSizeOfMethod = " + aTotalArgumentSizeOfMethod);
+      new Comment("aReturnSize = " + aReturnSize);
+
+      if (aReturnSize != 0)
+      {
+        // at least pop return size:
+        new Comment("Cleanup return");
+
+        // cleanup result values
+        for (int i = 0; i < aReturnSize / 4; i++)
+        {
+          new CPU.Add { DestinationReg = CPU.Registers.ESP, SourceValue = 4 };
+        }
+      }
+
+      if (aStackSizeBeforeCall > (aTotalArgumentSizeOfMethod))
+      {
+        if (aTotalArgumentSizeOfMethod > 0)
+        {
+          var xExtraStack = aStackSizeBeforeCall - aTotalArgumentSizeOfMethod;
+          new Comment("Cleanup extra stack");
+
+          // cleanup result values
+          for (int i = 0; i < xExtraStack / 4; i++)
+          {
+            new CPU.Add { DestinationReg = CPU.Registers.ESP, SourceValue = 4 };
+          }
+        }
+      }
     }
-    public static void EmitExceptionLogic(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException) {
+
+    public static void EmitExceptionLogic(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException = null) {
+      if (aJumpTargetNoException == null)
+      {
+        aJumpTargetNoException = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.NextPosition);
+      }
       string xJumpTo = null;
       if (aCurrentOpCode != null && aCurrentOpCode.CurrentExceptionHandler != null) {
         // todo add support for nested handlers, see comment in Engine.cs

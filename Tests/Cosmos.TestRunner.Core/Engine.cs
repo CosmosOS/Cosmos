@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cosmos.Build.Common;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -14,7 +15,9 @@ namespace Cosmos.TestRunner.Core
         // configuration: in process eases debugging, but means certain errors (like stack overflow) kill the test runner.
         public bool RunIL2CPUInProcess = false;
         public bool RunWithGDB = false;
+        public bool StartBochsDebugGui = false;
         public bool EnableStackCorruptionChecks = true;
+        public string StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters.ToString();
 
         public IEnumerable<string> KernelsToRun
         {

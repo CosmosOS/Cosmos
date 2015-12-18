@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System.FileSystem.VFS
@@ -10,17 +7,23 @@ namespace Cosmos.System.FileSystem.VFS
     {
         public abstract void Initialize();
 
-        public abstract Directory GetDirectory(string aPath);
+        public abstract DirectoryEntry CreateFile(string aPath);
 
-        public abstract List<Base> GetDirectoryListing(string aPath);
+        public abstract DirectoryEntry CreateDirectory(string aPath);
 
-        public abstract List<Base> GetDirectoryListing(Directory aEntry);
+        public abstract DirectoryEntry GetDirectory(string aPath);
 
-        public abstract Directory GetVolume(string aVolume);
+        public abstract DirectoryEntry GetFile(string aPath);
 
-        public abstract List<Directory> GetVolumes();
+        public abstract List<DirectoryEntry> GetDirectoryListing(string aPath);
 
-        public static char DirectorySeparatorChar => '\\';
+        public abstract List<DirectoryEntry> GetDirectoryListing(DirectoryEntry aEntry);
+
+        public abstract DirectoryEntry GetVolume(string aVolume);
+
+        public abstract List<DirectoryEntry> GetVolumes();
+
+        public static char DirectorySeparatorChar { get { return '\\'; } }
 
         public static char AltDirectorySeparatorChar { get { return '/'; } }
 

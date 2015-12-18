@@ -47,6 +47,7 @@
     <Compile Include="System\Collections\Generic\QueueTest.cs" />
     <Compile Include="System\DelegatesTest.cs" />
     <Compile Include="System\StringTest.cs" />
+    <Compile Include="System\UInt64Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">

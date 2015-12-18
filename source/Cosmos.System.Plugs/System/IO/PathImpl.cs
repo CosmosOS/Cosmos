@@ -1,35 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#define COSMOSDEBUG
+
+using System;
 using System.IO;
-using System.Linq;
-using System.Text;
+
+using Cosmos.Common;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 
-namespace SentinelKernel.System.Plugs.System.IO
+namespace Cosmos.System.Plugs.System.IO
 {
-    [Plug(Target=typeof(Path))]
-    public static class PathImpl {
+    [Plug(Target = typeof(Path))]
+    public static class PathImpl
+    {
         public static void Cctor(
-            [FieldAccess(Name = "System.Char System.IO.Path.AltDirectorySeparatorChar")] ref char aAltDirectorySeparatorChar,
-            [FieldAccess(Name = "System.Char System.IO.Path.DirectorySeparatorChar")] ref char aDirectorySeparatorChar,
             //[FieldAccess(Name = "System.Char[] System.IO.Path.InvalidFileNameChars")] ref char[] aInvalidFileNameChars,
             //[FieldAccess(Name = "System.Char[] System.IO.Path.InvalidPathCharsWithAdditionalChecks")] ref char[] aInvalidPathCharsWithAdditionalChecks,
             //[FieldAccess(Name = "System.Char System.IO.Path.PathSeparator")] ref char aPathSeparator,
             //[FieldAccess(Name = "System.Char[] System.IO.Path.RealInvalidPathChars")] ref char[] aRealInvalidPathChars,
-            [FieldAccess(Name = "System.Char System.IO.Path.VolumeSeparatorChar")] ref char aVolumeSeparatorChar
             //[FieldAccess(Name = "System.Int32 System.IO.Path.MaxPath")] ref int aMaxPath
-            )
+            [FieldAccess(Name = "System.Char System.IO.Path.AltDirectorySeparatorChar")] ref char
+                aAltDirectorySeparatorChar,
+            [FieldAccess(Name = "System.Char System.IO.Path.DirectorySeparatorChar")] ref char aDirectorySeparatorChar,
+            [FieldAccess(Name = "System.Char System.IO.Path.VolumeSeparatorChar")] ref char aVolumeSeparatorChar)
         {
-            aAltDirectorySeparatorChar = VFSManager.GetAltDirectorySeparatorChar();
-            aDirectorySeparatorChar = VFSManager.GetDirectorySeparatorChar();
             //aInvalidFileNameChars = VFSManager.GetInvalidFileNameChars();
             //aInvalidPathCharsWithAdditionalChecks = VFSManager.GetInvalidPathCharsWithAdditionalChecks();
             //aPathSeparator = VFSManager.GetPathSeparator();
             //aRealInvalidPathChars = VFSManager.GetRealInvalidPathChars();
-            aVolumeSeparatorChar = VFSManager.GetVolumeSeparatorChar();
             //aMaxPath = VFSManager.GetMaxPath();
+            aAltDirectorySeparatorChar = VFSManager.GetAltDirectorySeparatorChar();
+            aDirectorySeparatorChar = VFSManager.GetDirectorySeparatorChar();
+            aVolumeSeparatorChar = VFSManager.GetVolumeSeparatorChar();
         }
 
         public static string ChangeExtension(string aPath, string aExtension)
@@ -47,7 +49,8 @@ namespace SentinelKernel.System.Plugs.System.IO
                         xText = aPath.Substring(0, xNum);
                         break;
                     }
-                    if (xC == Path.DirectorySeparatorChar || xC == Path.AltDirectorySeparatorChar || xC == Path.VolumeSeparatorChar)
+                    if (xC == Path.DirectorySeparatorChar || xC == Path.AltDirectorySeparatorChar
+                        || xC == Path.VolumeSeparatorChar)
                     {
                         break;
                     }
@@ -60,6 +63,7 @@ namespace SentinelKernel.System.Plugs.System.IO
                     }
                     xText += aExtension;
                 }
+                FileSystemHelpers.Debug("Path.ChangeExtension", "aPath =", aPath, ", aExtension =", aExtension, ", result =", xText);
                 return xText;
             }
             return null;
@@ -71,9 +75,10 @@ namespace SentinelKernel.System.Plugs.System.IO
             {
                 throw new ArgumentNullException("aPath");
             }
+
             if (HasIllegalCharacters(aPath, aCheckAdditional))
             {
-                throw new ArgumentException("The path contains invalid characters.");
+                throw new ArgumentException("The path contains invalid characters.", "aPath");
             }
         }
 
@@ -84,12 +89,15 @@ namespace SentinelKernel.System.Plugs.System.IO
             {
                 if (xNum + 2 == aSearchPattern.Length)
                 {
-                    throw new ArgumentException("The search pattern is invalid.");
+                    throw new ArgumentException("The search pattern is invalid.", aSearchPattern);
                 }
-                if (aSearchPattern[xNum + 2] == VFSManager.GetDirectorySeparatorChar() || aSearchPattern[xNum + 2] == VFSManager.GetAltDirectorySeparatorChar())
+
+                if (aSearchPattern[xNum + 2] == Path.DirectorySeparatorChar
+                    || aSearchPattern[xNum + 2] == Path.AltDirectorySeparatorChar)
                 {
-                    throw new ArgumentException("The search pattern is invalid.");
+                    throw new ArgumentException("The search pattern is invalid.", aSearchPattern);
                 }
+
                 aSearchPattern = aSearchPattern.Substring(xNum + 2);
             }
         }
@@ -100,31 +108,47 @@ namespace SentinelKernel.System.Plugs.System.IO
             {
                 throw new ArgumentNullException((aPath1 == null) ? "path1" : "path2");
             }
+
             CheckInvalidPathChars(aPath1, false);
             CheckInvalidPathChars(aPath2, false);
-            return CombineNoChecks(aPath1, aPath2);
+            string result = CombineNoChecks(aPath1, aPath2);
+            FileSystemHelpers.Debug("Path.Combine", "aPath1 =", aPath1, ", aPath2 =", aPath2, ", result =", result);
+            return result;
         }
 
         public static string CombineNoChecks(string aPath1, string aPath2)
         {
             if (aPath2.Length == 0)
             {
+                FileSystemHelpers.Debug("Path.CombineNoChecks", "aPath2 has 0 length, result =", aPath1);
                 return aPath1;
             }
+
             if (aPath1.Length == 0)
             {
+                FileSystemHelpers.Debug("Path.CombineNoChecks", "aPath1 has 0 length, result =", aPath2);
                 return aPath2;
             }
-            if (Path.IsPathRooted(aPath2))
+
+            if (IsPathRooted(aPath2))
             {
+                FileSystemHelpers.Debug("Path.CombineNoChecks", "aPath2 is root, result =", aPath2);
                 return aPath2;
             }
+
+            string xResult = string.Empty; 
             char xC = aPath1[aPath1.Length - 1];
-            if (xC != VFSManager.GetDirectorySeparatorChar() && xC != VFSManager.GetAltDirectorySeparatorChar() && xC != VFSManager.GetVolumeSeparatorChar())
+            if (xC != Path.DirectorySeparatorChar && xC != Path.AltDirectorySeparatorChar
+                && xC != Path.VolumeSeparatorChar)
             {
-                return aPath1 + "\\" + aPath2;
+                xResult = string.Concat(aPath1, "\\", aPath2);
+                FileSystemHelpers.Debug("Path.CombineNoChecks", "aPath1 =", aPath1, ", aPath2 =", aPath2, ", result =", xResult);
+                return xResult;
             }
-            return aPath1 + aPath2;
+
+            xResult = string.Concat(aPath1, aPath2);
+            FileSystemHelpers.Debug("Path.CombineNoChecks", "aPath1 =", aPath1, ", aPath2 =", aPath2, ", result =", xResult);
+            return xResult;
         }
 
         public static string GetDirectoryName(string aPath)
@@ -142,12 +166,18 @@ namespace SentinelKernel.System.Plugs.System.IO
                     {
                         return null;
                     }
-                    while (xNum > xRootLength && xPath[--xNum] != VFSManager.GetDirectorySeparatorChar() && xPath[xNum] != VFSManager.GetAltDirectorySeparatorChar())
+
+                    while (xNum > xRootLength && xPath[--xNum] != Path.DirectorySeparatorChar
+                           && xPath[xNum] != Path.AltDirectorySeparatorChar)
                     {
                     }
-                    return xPath.Substring(0, xNum);
                 }
+                string result = xPath.Substring(0, xNum);
+                FileSystemHelpers.Debug("Path.GetDirectoryName", "aPath =", aPath, ", result =", result);
+                return result;
             }
+
+            FileSystemHelpers.Debug("Path.GetDirectoryName", "aPath is null");
             return null;
         }
 
@@ -157,6 +187,7 @@ namespace SentinelKernel.System.Plugs.System.IO
             {
                 return null;
             }
+
             CheckInvalidPathChars(aPath, false);
             int xLength = aPath.Length;
             int xNum = xLength;
@@ -169,10 +200,12 @@ namespace SentinelKernel.System.Plugs.System.IO
                     {
                         return aPath.Substring(xNum, xLength - xNum);
                     }
+
                     return string.Empty;
                 }
 
-                if (xC == VFSManager.GetDirectorySeparatorChar() || xC == VFSManager.GetAltDirectorySeparatorChar() || xC == VFSManager.GetVolumeSeparatorChar())
+                if (xC == Path.DirectorySeparatorChar || xC == Path.AltDirectorySeparatorChar
+                    || xC == Path.VolumeSeparatorChar)
                 {
                     break;
                 }
@@ -190,18 +223,20 @@ namespace SentinelKernel.System.Plugs.System.IO
                 while (--xNum >= 0)
                 {
                     char xC = aPath[xNum];
-                    if (xC == VFSManager.GetDirectorySeparatorChar() || xC == VFSManager.GetAltDirectorySeparatorChar() || xC == VFSManager.GetVolumeSeparatorChar())
+                    if (xC == Path.DirectorySeparatorChar || xC == Path.AltDirectorySeparatorChar
+                        || xC == Path.VolumeSeparatorChar)
                     {
                         return aPath.Substring(xNum + 1, xLength - xNum - 1);
                     }
                 }
             }
+
             return aPath;
         }
 
         public static string GetFileNameWithoutExtension(string aPath)
         {
-            aPath = Path.GetFileName(aPath);
+            aPath = GetFileName(aPath);
             if (aPath == null)
             {
                 return null;
@@ -216,17 +251,15 @@ namespace SentinelKernel.System.Plugs.System.IO
 
         public static string GetFullPath(string aPath)
         {
-            string xFullPathInternal = GetFullPathInternal(aPath);
-            return xFullPathInternal;
-        }
-
-        public static string GetFullPathInternal(string aPath)
-        {
             if (aPath == null)
             {
+                FileSystemHelpers.Debug("Path.GetFullPath", "aPath is null");
                 throw new ArgumentNullException("aPath");
             }
-            return NormalizePath(aPath, true);
+
+            string result = NormalizePath(aPath, true);
+            FileSystemHelpers.Debug("Path.GetFullPath", "aPath =", aPath, ", result =", result);
+            return result;
         }
 
         public static char[] GetInvalidFileNameChars()
@@ -243,20 +276,19 @@ namespace SentinelKernel.System.Plugs.System.IO
         {
             if (aPath == null)
             {
-                return null;
+                FileSystemHelpers.Debug("Path.GetPathRoot", "aPath is null");
+                throw new ArgumentNullException("aPath");
             }
-            FatHelpers.Debug("In PathImpl.GetPathRoot");
+
             aPath = NormalizePath(aPath, false);
-            FatHelpers.Debug("Path normalized");
-            var xRootLength = GetRootLength(aPath);
-            FatHelpers.Debug("RootLength retrieved");
-            FatHelpers.Debug("Value: " + xRootLength);
-            var xResult = aPath.Substring(0, xRootLength);
+            int xRootLength = GetRootLength(aPath);
+            string xResult = aPath.Substring(0, xRootLength);
             if (xResult[xResult.Length - 1] != Path.DirectorySeparatorChar)
             {
-                FatHelpers.Debug("Adding directory separator");
-                xResult = String.Concat(xResult, Path.DirectorySeparatorChar);
+                xResult = string.Concat(xResult, Path.DirectorySeparatorChar.ToString());
             }
+
+            FileSystemHelpers.Debug("Path.GetPathRoot", "aPath =", aPath, ", xResult =", xResult);
             return xResult;
         }
 
@@ -267,10 +299,13 @@ namespace SentinelKernel.System.Plugs.System.IO
 
         public static int GetRootLength(string aPath)
         {
-            FatHelpers.Debug("In PathImpl.GetRootLength");
+            if (aPath == null)
+            {
+                FileSystemHelpers.Debug("Path.GetRootLength", "aPath is null");
+                throw new ArgumentNullException("aPath");
+            }
+
             CheckInvalidPathChars(aPath, false);
-            FatHelpers.Debug("Checked for invalid path characters");
-            FatHelpers.Debug("String length = " + aPath.Length);
             int i = 0;
             int length = aPath.Length;
             if (length >= 1 && IsDirectorySeparator(aPath[0]))
@@ -282,7 +317,8 @@ namespace SentinelKernel.System.Plugs.System.IO
                     int num = 2;
                     while (i < length)
                     {
-                        if ((aPath[i] == VFSManager.GetDirectorySeparatorChar() || aPath[i] == VFSManager.GetAltDirectorySeparatorChar()) && --num <= 0)
+                        if ((aPath[i] == Path.DirectorySeparatorChar || aPath[i] == Path.AltDirectorySeparatorChar)
+                            && --num <= 0)
                         {
                             break;
                         }
@@ -290,18 +326,16 @@ namespace SentinelKernel.System.Plugs.System.IO
                     }
                 }
             }
-            else
+            else if (length >= 2 && aPath[1] == Path.VolumeSeparatorChar)
             {
-                if (length >= 2 && aPath[1] == VFSManager.GetVolumeSeparatorChar())
+                i = 2;
+                if (length >= 3 && IsDirectorySeparator(aPath[2]))
                 {
-                    FatHelpers.Debug("Taking the '2' path");
-                    i = 2;
-                    if (length >= 3 && IsDirectorySeparator(aPath[2]))
-                    {
-                        i++;
-                    }
+                    i++;
                 }
             }
+
+            FileSystemHelpers.Debug("Path.GetRootLength", "result =", i.ToString());
             return i;
         }
 
@@ -328,12 +362,15 @@ namespace SentinelKernel.System.Plugs.System.IO
                     {
                         return xNum != aPath.Length - 1;
                     }
-                    if (xC == VFSManager.GetDirectorySeparatorChar() || xC == VFSManager.GetAltDirectorySeparatorChar() || xC == VFSManager.GetVolumeSeparatorChar())
+
+                    if (xC == Path.DirectorySeparatorChar || xC == Path.AltDirectorySeparatorChar
+                        || xC == Path.VolumeSeparatorChar)
                     {
                         break;
                     }
                 }
             }
+
             return false;
         }
 
@@ -341,14 +378,47 @@ namespace SentinelKernel.System.Plugs.System.IO
         {
             if (aCheckAdditional)
             {
-                return aPath.IndexOfAny(VFSManager.GetInvalidPathCharsWithAdditionalChecks()) >= 0;
+                char[] xInvalidWithAdditional = VFSManager.GetInvalidPathCharsWithAdditionalChecks();
+                for (int i = 0; i < xInvalidWithAdditional.Length; i++)
+                {
+                    for (int j = 0; j < aPath.Length; j++)
+                    {
+                        if (xInvalidWithAdditional[i] == aPath[j])
+                        {
+                            return true;
+                        }
+                    }
+                }
             }
-            return aPath.IndexOfAny(VFSManager.GetRealInvalidPathChars()) >= 0;
+
+            char[] xInvalid = VFSManager.GetRealInvalidPathChars();
+            for (int i = 0; i < xInvalid.Length; i++)
+            {
+                for (int j = 0; j < aPath.Length; j++)
+                {
+                    if (xInvalid[i] == aPath[j])
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public static bool IsDirectorySeparator(char aC)
         {
-            return aC == VFSManager.GetDirectorySeparatorChar() || aC == VFSManager.GetAltDirectorySeparatorChar();
+            if (aC.ToString() == Path.DirectorySeparatorChar.ToString())
+            {
+                return true;
+            }
+
+            if (aC.ToString() == Path.AltDirectorySeparatorChar.ToString())
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public static bool IsPathRooted(string aPath)
@@ -357,27 +427,65 @@ namespace SentinelKernel.System.Plugs.System.IO
             {
                 CheckInvalidPathChars(aPath, false);
                 int xLength = aPath.Length;
-                if ((xLength >= 1 && (aPath[0] == VFSManager.GetDirectorySeparatorChar() || aPath[0] == VFSManager.GetAltDirectorySeparatorChar())) || (xLength >= 2 && aPath[1] == VFSManager.GetVolumeSeparatorChar()))
+                if ((xLength >= 1
+                     && (aPath[0] == Path.DirectorySeparatorChar || aPath[0] == Path.AltDirectorySeparatorChar))
+                    || (xLength >= 2 && aPath[1] == Path.VolumeSeparatorChar))
                 {
                     return true;
                 }
             }
+
             return false;
         }
 
         public static bool IsRelative(string aPath)
         {
-            return (aPath.Length < 3 || aPath[1] != VFSManager.GetVolumeSeparatorChar() || aPath[2] != VFSManager.GetDirectorySeparatorChar());
+            if (aPath == null)
+            {
+                throw new ArgumentNullException("aPath");
+            }
+
+            if (aPath.Length < 3)
+            {
+                return true;
+            }
+
+            if (aPath[1] != Path.VolumeSeparatorChar)
+            {
+                return true;
+            }
+
+            if (aPath[2] != Path.DirectorySeparatorChar)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public static string NormalizePath(string aPath, bool aFullCheck)
         {
-            if (IsRelative(aPath))
+            if (aPath == null)
             {
-                return Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + aPath;
+                FileSystemHelpers.Debug("Path.NormalizePath", "aPath is null");
+                throw new ArgumentNullException("aPath");
             }
 
-            return aPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            string result = aPath;
+            if (IsRelative(result))
+            {
+                result = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar.ToString() + result;
+                FileSystemHelpers.Debug("Path.NormalizePath", "aPath is relative, aPath =", aPath, ", result =", result);
+            }
+
+            if (IsDirectorySeparator(result[result.Length - 1]))
+            {
+                FileSystemHelpers.Debug("Found directory seprator");
+                result = result.Remove(result.Length - 1);
+            }
+
+            FileSystemHelpers.Debug("Path.NormalizePath", "aPath =", aPath, ", result =", result);
+            return result;
         }
     }
 }

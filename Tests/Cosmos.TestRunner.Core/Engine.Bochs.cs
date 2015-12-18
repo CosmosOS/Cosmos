@@ -23,7 +23,7 @@ namespace Cosmos.TestRunner.Core
             xParams.Add("ISOFile", iso);
             xParams.Add(BuildPropertyNames.VisualStudioDebugPortString, "Pipe: Cosmos\\Serial");
             xParams.Add(BuildPropertyNames.EnableBochsDebugString, RunWithGDB.ToString());
-
+            xParams.Add(BuildPropertyNames.StartBochsDebugGui, StartBochsDebugGui.ToString());
             var xDebugConnector = new DebugConnectorPipeServer(DebugConnectorPipeServer.DefaultCosmosPipeName);
             InitializeDebugConnector(xDebugConnector);
 

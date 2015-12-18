@@ -39,6 +39,7 @@ namespace Cosmos.IL2CPU
         public TraceAssemblies TraceAssemblies;
         public bool DebugEnabled = false;
         public bool StackCorruptionDetection = false;
+        public StackCorruptionDetectionLevel StackCorruptionDetectionLevel;
         public DebugMode DebugMode;
         public bool IgnoreDebugStubAttribute;
         protected static HashSet<string> mDebugLines = new HashSet<string>();
@@ -1479,7 +1480,7 @@ namespace Cosmos.IL2CPU
                 DebugInfo.AddINT3Labels(mINT3Labels);
             }
 
-            if (DebugEnabled && StackCorruptionDetection)
+            if (DebugEnabled && StackCorruptionDetection && StackCorruptionDetectionLevel == StackCorruptionDetectionLevel.AllInstructions)
             {
                 // if debugstub is active, emit a stack corruption detection. at this point, the difference between EBP and ESP
                 // should be equal to the local variables sizes and the IL stack.
@@ -1498,7 +1499,10 @@ namespace Cosmos.IL2CPU
                 // if not, we should somehow break here.
                 new Mov { DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP };
                 new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
-                new Add { DestinationReg = Registers.EAX, SourceValue = xStackDifference };
+                if (xStackDifference != 0)
+                {
+                    new Add { DestinationReg = Registers.EAX, SourceValue = xStackDifference };
+                }
                 new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".StackCorruptionCheck_End" };
                 new ClearInterruptFlag();
@@ -1511,11 +1515,6 @@ namespace Cosmos.IL2CPU
                 new Halt();
                 new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
 
-            }
-
-            if (xLabel == "SystemUInt32CosmosCorePlugsGCImplementionImplAllocNewObjectSystemUInt32.IL_0001")
-            {
-                //
             }
         }
 

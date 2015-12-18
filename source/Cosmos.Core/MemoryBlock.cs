@@ -67,9 +67,29 @@ namespace Cosmos.Core
                 xDest++;
             }
         }
+
         public void Fill(byte aData)
         {
             Fill(0, Size, aData);
+        }
+
+        public void Fill(UInt16 aData)
+        {
+            Fill(0, Size / 2, aData);
+        }
+
+        [DebugStub(Off = true)]
+        public unsafe void Fill(UInt32 aStart, UInt32 aCount, UInt16 aData)
+        {
+            //TODO: before next step can at least check bounds here and do the addition just once to 
+            //start the loop.
+            //TODO - When asm can check count against size just one time and use a native fill asm op
+            UInt16* xDest = (UInt16*)(this.Base + aStart);
+            for (UInt32 i = 0; i < aCount; i++)
+            {
+                *xDest = aData;
+                xDest++;
+            }
         }
 
         [DebugStub(Off = true)]

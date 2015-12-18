@@ -7,6 +7,8 @@ using Cosmos.IL2CPU.IL.CustomImplementations.System;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
+    using Cosmos.IL2CPU.CustomImplementation.System;
+
     /// <summary>
     /// Pushes an object reference to a new zero-based, one-dimensional array whose elements are of a specific type onto the evaluation stack.
     /// </summary>

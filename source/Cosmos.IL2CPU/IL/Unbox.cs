@@ -8,6 +8,8 @@ using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
+    using Cosmos.IL2CPU.CustomImplementation.System;
+
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Unbox )]
     public class Unbox : ILOp
     {

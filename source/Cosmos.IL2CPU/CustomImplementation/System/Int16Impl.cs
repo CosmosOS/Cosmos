@@ -1,23 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
+
+using Cosmos.Common;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
-	[Plug(Target=typeof(short))]
-	public static class Int16Impl {
-		//[PlugMethod(Signature = "System_String___System_Int16_ToString____")]
-		public static string ToString(ref short aThis) {
-			return Int32Impl2.GetNumberString(aThis);
-		}
+namespace Cosmos.IL2CPU.IL.CustomImplementations.System
+{
+    [Plug(Target = typeof(short))]
+    public static class Int16Impl
+    {
+        //[PlugMethod(Signature = "System_String___System_Int16_ToString____")]
+        public static string ToString(ref short aThis)
+        {
+            return StringHelper.GetNumberString(aThis);
+        }
 
-        public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out short result) {
+        public static bool TryParse(string s, NumberStyles style, IFormatProvider provider, out short result)
+        {
             throw new NotImplementedException();
         }
 
-	    public static Int16 Parse(string s)
+        public static Int16 Parse(string s)
         {
             const string digits = "0123456789";
             Int16 result = 0;
@@ -27,8 +30,7 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
 
             if (s.Length >= 1)
             {
-                if (s[0] == '+')
-                    z = 1;
+                if (s[0] == '+') z = 1;
                 if (s[0] == '-')
                 {
                     z = 1;
@@ -49,8 +51,7 @@ namespace Cosmos.IL2CPU.IL.CustomImplementations.System {
                 result = (Int16)((result * 10) + ind);
             }
 
-            if (neg)
-                result *= -1;
+            if (neg) result *= -1;
 
             return result;
         }

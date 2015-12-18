@@ -110,6 +110,7 @@
     <Compile Include="CustomImplementation\System\ArrayImplRefs.cs" />
     <Compile Include="CustomImplementation\System\BooleanImpl.cs" />
     <Compile Include="CustomImplementation\System\ByteImpl.cs" />
+    <Compile Include="CustomImplementation\System\CharImpl.cs" />
     <Compile Include="CustomImplementation\System\DelegateHelper.cs" />
     <Compile Include="CustomImplementation\System\DelegateImpl.cs" />
     <Compile Include="CustomImplementation\System\DoubleImpl.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="ElfHash.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="CompilerHelpers.cs" />
     <Compile Include="GCImplementation.cs" />
     <Compile Include="GCImplementationRefs.cs" />
     <Compile Include="Heap.cs" />
@@ -370,7 +372,6 @@
     <Compile Include="Plugs\Diagnostics\DebugImpl.cs" />
     <Compile Include="Plugs\Diagnostics\DebugImplRefs.cs" />
     <Compile Include="Plugs\MS\System\MathImpl.cs" />
-    <Compile Include="Plugs\MS\System\StringImpl.cs" />
     <Compile Include="Plugs\NEW_PLUGS\CtorImplAssembler.cs" />
     <Compile Include="Plugs\NEW_PLUGS\DelegateImpl.cs" />
     <Compile Include="Plugs\NEW_PLUGS\DoubleImpl.cs" />
