@@ -135,6 +135,7 @@
     <Compile Include="Drivers\USB\USBHostOHCI.cs" />
     <Compile Include="Drivers\USB\USBHostOHCIRegisters.cs" />
     <Compile Include="TextScreenBase.cs" />
+    <Compile Include="TextScreenHelpers.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
