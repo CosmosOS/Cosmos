@@ -1,6 +1,4 @@
-﻿#define COSMOSDEBUG
-
-using global::System;
+﻿using global::System;
 using global::System.Collections.Generic;
 using global::System.IO;
 

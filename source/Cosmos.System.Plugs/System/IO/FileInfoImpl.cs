@@ -1,6 +1,4 @@
-﻿#define COSMOSDEBUG
-
-using global::System.IO;
+﻿using global::System.IO;
 
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System.FileSystem.VFS;
