@@ -377,7 +377,7 @@
       <Name>Cosmos.Debug.Kernel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.System\Cosmos.System.csproj">
-      <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
+      <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
     <ProjectReference Include="..\XSharp.Nasm\XSharp.Nasm.csproj">
