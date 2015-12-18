@@ -69,9 +69,28 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="System\Security\CodeAccessSecurityEngineImpl.cs" />
+    <Compile Include="System\Security\Cryptography\Utils.cs" />
+    <Compile Include="System\Drawing\ColorImpl.cs" />
+    <Compile Include="System\Drawing\SRImpl.cs" />
+    <Compile Include="System\Net\IPAddressImpl.cs" />
+    <Compile Include="System\Net\SocketAddressImpl.cs" />
+    <Compile Include="System\SByteImpl.cs" />
+    <Compile Include="System\SingleImpl.cs" />
+    <Compile Include="System\SRImpl.cs" />
+    <Compile Include="System\BooleanImpl.cs" />
+    <Compile Include="System\ByteImpl.cs" />
+    <Compile Include="System\CharImpl.cs" />
     <Compile Include="System\DictionaryImpl.cs" />
+    <Compile Include="System\DoubleImpl.cs" />
+    <Compile Include="System\EnumImpl.cs" />
+    <Compile Include="System\Int16Impl.cs" />
+    <Compile Include="System\Int32Impl.cs" />
+    <Compile Include="System\Int64Impl.cs" />
+    <Compile Include="System\IntPtrImpl.cs" />
     <Compile Include="System\IO\DirectoryImpl.cs" />
     <Compile Include="System\IO\DirectoryInfoImpl.cs" />
     <Compile Include="System\IO\DriveInfoImpl.cs" />
@@ -81,6 +100,7 @@
     <Compile Include="System\IO\FileSystemInfoImpl.cs" />
     <Compile Include="System\IO\PathImpl.cs" />
     <Compile Include="System\IO\StreamReaderImpl.cs" />
+    <Compile Include="System\NumberImpl.cs" />
     <Compile Include="System\RandomImpl.cs" />
     <Compile Include="System\Text\DecoderFallbackImpl.cs" />
     <Compile Include="System\Text\EncoderFallbackImpl.cs" />
@@ -88,9 +108,14 @@
     <Compile Include="System\ConsoleImpl.cs" />
     <Compile Include="System\MathImpl.cs" />
     <Compile Include="System\Text\InternalDecoderBestFitFallbackBufferImpl.cs" />
+    <Compile Include="System\Text\StringBuilderImpl.cs" />
     <Compile Include="System\Threading\MonitorImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="System\TypeImpl.cs" />
+    <Compile Include="System\UInt16Impl.cs" />
+    <Compile Include="System\UInt32Impl.cs" />
+    <Compile Include="System\UInt64Impl.cs" />
+    <Compile Include="System\UIntPtrImpl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">

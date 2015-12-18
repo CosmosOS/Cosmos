@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.System;
 
 namespace Cosmos.System.Plugs.System
 {
@@ -455,15 +453,15 @@ namespace Cosmos.System.Plugs.System
             }
 
 
-            const double c1 =  4130240.588996024013440146267;
-            const double c2 =-  349781.8562517381616631012487;
-            const double c3 =     6170.317758142494245331944348;
-            const double c4 =-      27.94920941380194872760036319;
-            const double c5 =        0.0175143807040383602666563058;
-            const double c6 =  5258785.647179987798541780825;
-            const double c7 =- 1526650.549072940686776259893;
-            const double c8 =    54962.51616062905361152230566;
-            const double c9 =-     497.495460280917265024506937;
+            const double c1 = 4130240.588996024013440146267;
+            const double c2 = -349781.8562517381616631012487;
+            const double c3 = 6170.317758142494245331944348;
+            const double c4 = -27.94920941380194872760036319;
+            const double c5 = 0.0175143807040383602666563058;
+            const double c6 = 5258785.647179987798541780825;
+            const double c7 = -1526650.549072940686776259893;
+            const double c8 = 54962.51616062905361152230566;
+            const double c9 = -497.495460280917265024506937;
             double x2 = x * x;
             if (octant == 0 || octant == 4)
             {

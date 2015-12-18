@@ -1,18 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Reflection;
 
-namespace Cosmos.IL2CPU {
-	public static class ObjectImplRefs {
-		static ObjectImplRefs() {
-			Type xType = typeof(object);
-			Object_Ctor = xType.GetMethod("Ctor", new Type[] { typeof(IntPtr) });
-			if (Object_Ctor == null)
-				throw new Exception("Implementation of Object_Ctor not found!");
-		}
+namespace Cosmos.IL2CPU.CustomImplementation.System
+{
+    public static class ObjectImplRefs
+    {
+        public static readonly MethodBase ObjectCtor;
 
-		public static readonly MethodBase Object_Ctor;
-	}
+        public static readonly Assembly RuntimeAssemblyDef;
+
+        static ObjectImplRefs()
+        {
+            Type xType = typeof(object);
+            ObjectCtor = xType.GetMethod("Ctor", new Type[] { typeof(IntPtr) });
+            if (ObjectCtor == null)
+            {
+                throw new Exception("Implementation of ObjectCtor not found!");
+            }
+
+
+            xType = typeof(ObjectImpl);
+            foreach (FieldInfo xField in typeof(ObjectImplRefs).GetFields())
+            {
+                if (xField.Name.EndsWith("Ref"))
+                {
+                    MethodBase xTempMethod = xType.GetMethod(
+                        xField.Name.Substring(0, xField.Name.Length - "Ref".Length));
+                    if (xTempMethod == null)
+                    {
+                        throw new Exception(
+                            "Method '" + xField.Name.Substring(0, xField.Name.Length - "Ref".Length)
+                            + "' not found on RuntimeEngine!");
+                    }
+                    xField.SetValue(null, xTempMethod);
+                }
+            }
+        }
+    }
 }
