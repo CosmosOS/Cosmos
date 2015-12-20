@@ -45,188 +45,189 @@ namespace Cosmos.Kernel.Tests.Fat
 
         public void TestPath()
         {
-            string message;
-            object result, expectedResult;
+            string xMessage;
+            string xStringResult, xStringExpectedResult;
+            int xIntResult, xIntExpectedResult;
 
             // Path.ChangeExtension(string, string)
             mDebugger.Send("START TEST");
-            result = Path.ChangeExtension(@"0:\Kudzu.txt", ".doc");
-            expectedResult = @"0:\Kudzu.doc";
-            message = "Path.ChangeExtenstion (no dot) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.ChangeExtension(@"0:\Kudzu.txt", ".doc");
+            xStringExpectedResult = @"0:\Kudzu.doc";
+            xMessage = "Path.ChangeExtenstion (no dot) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.ChangeExtension(@"0:\Kudzu.txt", "doc");
-            expectedResult = @"0:\Kudzu.doc";
-            message = "Path.ChangeExtenstion (no dot) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.ChangeExtension(@"0:\Kudzu.txt", "doc");
+            xStringExpectedResult = @"0:\Kudzu.doc";
+            xMessage = "Path.ChangeExtenstion (no dot) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             // Path.Combine(string, string)
             mDebugger.Send("START TEST");
-            result = Path.Combine(@"0:\", "test");
-            expectedResult = @"0:\test";
-            message = "Path.Combine (root and directory) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.Combine(@"0:\", "test");
+            xStringExpectedResult = @"0:\test";
+            xMessage = "Path.Combine (root and directory) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.Combine(@"0:\", "test.txt");
-            expectedResult = @"0:\test.txt";
-            message = "Path.Combine (root and file) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.Combine(@"0:\", "test.txt");
+            xStringExpectedResult = @"0:\test.txt";
+            xMessage = "Path.Combine (root and file) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.Combine(@"0:\test", "test2");
-            expectedResult = @"0:\test\test2";
-            message = "Path.Combine (directory and directory) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.Combine(@"0:\test", "test2");
+            xStringExpectedResult = @"0:\test\test2";
+            xMessage = "Path.Combine (directory and directory) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.Combine(@"0:\test", "test2.txt");
-            expectedResult = @"0:\test\test2.txt";
-            message = "Path.Combine (directory and file) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.Combine(@"0:\test", "test2.txt");
+            xStringExpectedResult = @"0:\test\test2.txt";
+            xMessage = "Path.Combine (directory and file) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             // Path.GetDirectoryName(string)
             mDebugger.Send("START TEST");
-            result = Path.GetDirectoryName(@"0:\");
-            expectedResult = null;
-            message = "Path.GetDirectoryName (root) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetDirectoryName(@"0:\");
+            xStringExpectedResult = null;
+            xMessage = "Path.GetDirectoryName (root) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.GetDirectoryName(@"0:\test");
-            expectedResult = @"0:\";
-            message = "Path.GetDirectoryName (directory no trailing directory separator) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetDirectoryName(@"0:\test");
+            xStringExpectedResult = @"0:\";
+            xMessage = "Path.GetDirectoryName (directory no trailing directory separator) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.GetDirectoryName(@"0:\test\");
-            expectedResult = @"0:\";
-            message = "Path.GetDirectoryName (directory with trailing directory separator) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetDirectoryName(@"0:\test\");
+            xStringExpectedResult = @"0:\";
+            xMessage = "Path.GetDirectoryName (directory with trailing directory separator) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.GetDirectoryName(@"0:\test\test2");
-            expectedResult = @"0:\test";
-            message = "Path.GetDirectoryName (subdirectory no trailing directory separator) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetDirectoryName(@"0:\test\test2");
+            xStringExpectedResult = @"0:\test";
+            xMessage = "Path.GetDirectoryName (subdirectory no trailing directory separator) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.GetDirectoryName(@"0:\test\test2\");
-            expectedResult = @"0:\test";
-            message = "Path.GetDirectoryName (subdirectory with trailing directory separator) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetDirectoryName(@"0:\test\test2\");
+            xStringExpectedResult = @"0:\test";
+            xMessage = "Path.GetDirectoryName (subdirectory with trailing directory separator) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.GetDirectoryName(@"0:\test\ .");
-            expectedResult = @"0:\test";
-            message = "Path.GetDirectoryName (directory with trailing directory separator and invalid path) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetDirectoryName(@"0:\test\ .");
+            xStringExpectedResult = @"0:\test";
+            xMessage = "Path.GetDirectoryName (directory with trailing directory separator and invalid path) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             // Path.GetExtension(string)
             mDebugger.Send("START TEST");
-            result = Path.GetExtension(@"file");
-            expectedResult = string.Empty;
-            message = "Path.GetExtension (file no extension) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetExtension(@"file");
+            xStringExpectedResult = string.Empty;
+            xMessage = "Path.GetExtension (file no extension) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.GetExtension(@"file.txt");
-            expectedResult = "txt";
-            message = "Path.GetExtension (file with extension) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetExtension(@"file.txt");
+            xStringExpectedResult = "txt";
+            xMessage = "Path.GetExtension (file with extension) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             // Path.GetFileName(string aPath)
             mDebugger.Send("START TEST");
-            result = Path.GetFileName(@"0:\file");
-            expectedResult = string.Empty;
-            message = "Path.GetFileName (file no extension) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetFileName(@"0:\file");
+            xStringExpectedResult = string.Empty;
+            xMessage = "Path.GetFileName (file no extension) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.GetFileName(@"0:\file.txt");
-            expectedResult = "file.txt";
-            message = "Path.GetFileName (file with extension) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetFileName(@"0:\file.txt");
+            xStringExpectedResult = "file.txt";
+            xMessage = "Path.GetFileName (file with extension) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.GetFileName(@"0:\test\file");
-            expectedResult = string.Empty;
-            message = "Path.GetFileName (directory and file no extension) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetFileName(@"0:\test\file");
+            xStringExpectedResult = string.Empty;
+            xMessage = "Path.GetFileName (directory and file no extension) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.GetFileName(@"0:\test\file.txt");
-            expectedResult = "file.txt";
-            message = "Path.GetFileName (directory and file with extension) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetFileName(@"0:\test\file.txt");
+            xStringExpectedResult = "file.txt";
+            xMessage = "Path.GetFileName (directory and file with extension) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             // Path.GetFileNameWithoutExtension(string aPath)
             mDebugger.Send("START TEST");
-            result = Path.GetFileNameWithoutExtension(@"0:\file");
-            expectedResult = string.Empty;
-            message = "Path.GetFileNameWithoutExtension (file no extension) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetFileNameWithoutExtension(@"0:\file");
+            xStringExpectedResult = string.Empty;
+            xMessage = "Path.GetFileNameWithoutExtension (file no extension) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.GetFileNameWithoutExtension(@"0:\file.txt");
-            expectedResult = "file";
-            message = "Path.GetFileNameWithoutExtension (file with extension) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetFileNameWithoutExtension(@"0:\file.txt");
+            xStringExpectedResult = "file";
+            xMessage = "Path.GetFileNameWithoutExtension (file with extension) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.GetFileNameWithoutExtension(@"0:\test\file");
-            expectedResult = string.Empty;
-            message = "Path.GetFileNameWithoutExtension (directory and file no extension) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetFileNameWithoutExtension(@"0:\test\file");
+            xStringExpectedResult = string.Empty;
+            xMessage = "Path.GetFileNameWithoutExtension (directory and file no extension) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
-            result = Path.GetFileNameWithoutExtension(@"0:\test\file.txt");
-            expectedResult = "file";
-            message = "Path.GetFileNameWithoutExtension (directory and file with extension) failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetFileNameWithoutExtension(@"0:\test\file.txt");
+            xStringExpectedResult = "file";
+            xMessage = "Path.GetFileNameWithoutExtension (directory and file with extension) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
@@ -234,19 +235,19 @@ namespace Cosmos.Kernel.Tests.Fat
 
             // Path.GetInvalidFileNameChars()
             mDebugger.Send("START TEST");
-            result = Path.GetInvalidFileNameChars().Length;
-            expectedResult = 0;
-            message = "Path.GetInvalidFileNameChars failed.";
-            Assert.IsFalse(result == expectedResult, message);
+            xIntResult = Path.GetInvalidFileNameChars().Length;
+            xIntExpectedResult = 0;
+            xMessage = "Path.GetInvalidFileNameChars failed.";
+            Assert.IsFalse(xIntResult == xIntExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             // Path.GetInvalidPathChars()
             mDebugger.Send("START TEST");
-            result = Path.GetInvalidPathChars().Length;
-            expectedResult = 0;
-            message = "Path.GetInvalidPathChars failed.";
-            Assert.IsFalse(result == expectedResult, message);
+            xIntResult = Path.GetInvalidPathChars().Length;
+            xIntExpectedResult = 0;
+            xMessage = "Path.GetInvalidPathChars failed.";
+            Assert.IsFalse(xIntResult == xIntExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
@@ -254,28 +255,28 @@ namespace Cosmos.Kernel.Tests.Fat
 
             // Path.GetRandomFileName()
             mDebugger.Send("START TEST");
-            result = Path.GetRandomFileName();
-            expectedResult = "random.tmp";
-            message = "Path.GetRandomFileName failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetRandomFileName();
+            xStringExpectedResult = "random.tmp";
+            xMessage = "Path.GetRandomFileName failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             // Path.GetTempFileName()
             mDebugger.Send("START TEST");
-            result = Path.GetTempFileName();
-            expectedResult = "tempfile.tmp";
-            message = "Path.GetTempFileName failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetTempFileName();
+            xStringExpectedResult = "tempfile.tmp";
+            xMessage = "Path.GetTempFileName failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             // Path.GetTempPath();
             mDebugger.Send("START TEST");
-            result = Path.GetTempPath();
-            expectedResult = @"\Temp";
-            message = "Path.GetTempPath failed.";
-            Assert.IsTrue(result == expectedResult, message);
+            xStringResult = Path.GetTempPath();
+            xStringExpectedResult = @"\Temp";
+            xMessage = "Path.GetTempPath failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
