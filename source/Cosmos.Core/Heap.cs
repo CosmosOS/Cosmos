@@ -70,12 +70,13 @@ namespace Cosmos.Core
                         {
                             DebugAndHalt("Wrong handle returned!");
                         }
-                        mLastTableIndex = xCurrentTableIdx;
                         return xResult;
                     }
                     xCurrentTableIdx ++;
                     xPreviousTable = xCurrentTable;
                     xCurrentTable = xCurrentTable->Next;
+                    mLastTableIndex = xCurrentTableIdx;
+                    mLastEntryIndex = 0;
                 }
 
                 // no tables found, lets create a new one, and use that
