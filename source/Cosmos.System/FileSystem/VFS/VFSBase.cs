@@ -7,9 +7,13 @@ namespace Cosmos.System.FileSystem.VFS
     {
         public abstract void Initialize();
 
+        public abstract DirectoryEntry CreateFile(string aPath);
+
         public abstract DirectoryEntry CreateDirectory(string aPath);
 
         public abstract DirectoryEntry GetDirectory(string aPath);
+
+        public abstract DirectoryEntry GetFile(string aPath);
 
         public abstract List<DirectoryEntry> GetDirectoryListing(string aPath);
 

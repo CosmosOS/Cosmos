@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Cosmos.Common.Extensions;
+using Cosmos.Debug.Kernel;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 using Cosmos.TestRunner;
@@ -10,8 +9,6 @@ using Sys = Cosmos.System;
 
 namespace Cosmos.Kernel.Tests.Fat
 {
-    
-
     public class Kernel : Sys.Kernel
     {
         private VFSBase myVFS;
@@ -23,7 +20,7 @@ namespace Cosmos.Kernel.Tests.Fat
             VFSManager.RegisterVFS(myVFS);
         }
 
-        private global::Cosmos.Debug.Kernel.Debugger mDebugger = new global::Cosmos.Debug.Kernel.Debugger("User", "Test");
+        private Debugger mDebugger = new Debugger("User", "Test");
 
         protected override void Run()
         {
@@ -81,12 +78,6 @@ namespace Cosmos.Kernel.Tests.Fat
                 mDebugger.Send("");
 
                 Assert.IsTrue(Path.GetFileName(@"0:\test") == @"test", @"Path.GetFileName(@'0:\test') == @'test'");
-                mDebugger.Send("END TEST");
-                mDebugger.Send("");
-
-                mDebugger.Send("File exist check:");
-                xTest = File.Exists(@"0:\Kudzu.txt");
-                Assert.IsTrue(xTest, @"\Kudzu.txt not found!");
                 mDebugger.Send("END TEST");
                 mDebugger.Send("");
 
@@ -159,12 +150,19 @@ namespace Cosmos.Kernel.Tests.Fat
                 mDebugger.Send("END TEST");
                 mDebugger.Send("");
 
+                mDebugger.Send("START TEST: Create file:");
+                var xFile = File.Create(@"0:\test2.txt");
+                Assert.IsTrue(xFile != null, "Failed to create a new file.");
+                bool xFileExists = File.Exists(@"0:\test2.txt");
+                Assert.IsTrue(xFileExists, "Failed to create a new file.");
+                mDebugger.Send("END TEST");
+                mDebugger.Send("");
                 TestController.Completed();
             }
-            catch (Exception E)
+            catch (Exception e)
             {
-                mDebugger.Send("Exception occurred");
-                mDebugger.Send(E.Message);
+                Console.WriteLine("Exception occurred");
+                Console.WriteLine(e.Message);
                 TestController.Failed();
             }
         }

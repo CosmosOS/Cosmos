@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cosmos.Build.Common;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -16,6 +17,7 @@ namespace Cosmos.TestRunner.Core
         public bool RunWithGDB = false;
         public bool StartBochsDebugGui = false;
         public bool EnableStackCorruptionChecks = true;
+        public string StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters.ToString();
 
         public IEnumerable<string> KernelsToRun
         {

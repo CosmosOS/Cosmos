@@ -1,7 +1,7 @@
 
 ###  Prerequisites
 
-* (Free) source code of Devkit from [Cosmos on GitHub](https://github.com/CosmosOS/Cosmos)
+* (Free) source code of Devloppement Kit from [Cosmos on GitHub](https://github.com/CosmosOS/Cosmos)
    * You must clone the repository using Git. For a detailed walkthrough, [see here](https://help.github.com/articles/fork-a-repo/).
    * When following the tutorial, replace *OctoCat* with *CosmosOS* and *Spoon-Knife* with *Cosmos*.
 * (Free) [Visual Studio 2013 Community](http://go.microsoft.com/fwlink/?LinkId=517284)  
@@ -13,10 +13,10 @@
 ###  Installation
 
 * Look in the downloaded sources and run **install.bat** with admin privileges (UAC will ask for permission), needed for install in system directories.
-* After installation is complete, Visual Studio will automatically open and you may begin programming with your new, modified copy of Cosmos.
+* When the installation is complete, Visual Studio will automatically open and you may begin programming with your new, modified copy of Cosmos.
 
-## Parameters to the install.bat
-The `install.bat` accepts following parameters
+## Arguments for the 'install.bat' file
+The `install.bat` accepts the following parameters :
 
 - `-USERKIT` Run installer for the User Kit only. By default installer build and install Dev Kit.
 - `-RESETHIVE` Reset Visual Studio Experimental Hive after installation.

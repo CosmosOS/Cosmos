@@ -16,7 +16,7 @@ namespace Cosmos.Core
         [FieldOffset(8)]
         public DataLookupEntry FirstEntry;
 
-        public unsafe DataLookupEntry* GetEntry(int index)
+        public unsafe DataLookupEntry* GetEntry(uint index)
         {
             fixed (DataLookupEntry* xFirstEntryPtr = &FirstEntry)
             {

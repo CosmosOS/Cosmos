@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\HKSplayground\HKSplayground.csproj">
-      <Name>HKSplayground (source2\Users\HKSplayground\HKSplayground)</Name>
+      <Name>HKSplayground (users\HKSplayground\HKSplayground)</Name>
       <Project>{79d1c0ae-bb85-4f85-accd-8aedd8d7b395}</Project>
       <Private>True</Private>
     </ProjectReference>

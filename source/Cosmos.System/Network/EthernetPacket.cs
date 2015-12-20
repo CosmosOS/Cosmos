@@ -80,7 +80,7 @@ namespace Cosmos.System.Network
             return this.mRawData;
         }
 
-        internal byte[] RawData
+        public byte[] RawData
         {
             get { return this.mRawData; }
         }

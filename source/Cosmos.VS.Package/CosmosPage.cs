@@ -14,6 +14,7 @@ using Cosmos.Build.Common;
 using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio;
 using Microsoft.VisualBasic;
+using DebugMode = Cosmos.Build.Common.DebugMode;
 
 namespace Cosmos.VS.Package
 {
@@ -75,7 +76,7 @@ namespace Cosmos.VS.Package
 
         protected bool mShowTabSlave;
 
-        protected bool FreezeEvents = false;
+        protected bool FreezeEvents;
 
         public override void ApplyChanges()
         {
@@ -237,6 +238,8 @@ namespace Cosmos.VS.Package
             cmboVMwareEdition.SelectedItem = EnumValue.Find(cmboVMwareEdition.Items, mProps.VMwareEdition);
             chckEnableDebugStub.Checked = mProps.DebugEnabled;
             chkEnableStackCorruptionDetection.Checked = mProps.StackCorruptionDetectionEnabled;
+            comboStackCorruptionDetectionLevel.SelectedItem = EnumValue.Find(comboStackCorruptionDetectionLevel.Items, mProps.StackCorruptionDetectionLevel);
+
             panlDebugSettings.Enabled = mProps.DebugEnabled;
             cmboCosmosDebugPort.SelectedIndex = cmboCosmosDebugPort.Items.IndexOf(mProps.CosmosDebugPort);
             if (!String.IsNullOrWhiteSpace(mProps.VisualStudioDebugPort))
@@ -799,8 +802,9 @@ namespace Cosmos.VS.Package
             FillComPorts(cmboVisualStudioDebugPort.Items);
             mVMwareAndBochsDebugPipe = cmboVisualStudioDebugPort.Items.Add(@"Pipe: Cosmos\Serial");
 
-            comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(Cosmos.Build.Common.DebugMode), false));
+            comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(DebugMode), false));
             comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies), false));
+            comboStackCorruptionDetectionLevel.Items.AddRange(EnumValue.GetEnumValues(typeof(StackCorruptionDetectionLevel), true));
 
             #endregion
 
@@ -876,9 +880,25 @@ namespace Cosmos.VS.Package
 
         private void chkEnableStacckCorruptionDetection_CheckedChanged(object sender, EventArgs e)
         {
-            if (FreezeEvents) return;
-            IsDirty = true;
-            mProps.StackCorruptionDetectionEnabled = chkEnableStackCorruptionDetection.Checked;
+            if (!FreezeEvents)
+            {
+                IsDirty = true;
+                mProps.StackCorruptionDetectionEnabled = chkEnableStackCorruptionDetection.Checked;
+                comboStackCorruptionDetectionLevel.Enabled = mProps.StackCorruptionDetectionEnabled;
+            }
+        }
+
+        private void stackCorruptionDetectionLevelComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (!FreezeEvents)
+            {
+                var x = (StackCorruptionDetectionLevel)((EnumValue) comboStackCorruptionDetectionLevel.SelectedItem).Value;
+                if (x != mProps.StackCorruptionDetectionLevel)
+                {
+                    mProps.StackCorruptionDetectionLevel = x;
+                    IsDirty = true;
+                }
+            }
         }
     }
 }

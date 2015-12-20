@@ -14,8 +14,14 @@ namespace Cosmos.Core
     {
         private static uint mEndOfRam;
 
+        private static uint mLastTableIndex = 0u;
+
+        private static uint mLastEntryIndex = 0u;
+
         private static void DoInitialize(uint aEndOfRam)
         {
+            mLastTableIndex = 0u;
+            mLastEntryIndex = 0u;
             mEndOfRam = aEndOfRam;
             //
         }
@@ -48,7 +54,7 @@ namespace Cosmos.Core
             {
                 EnsureIsInitialized();
 
-                var xCurrentTableIdx = 0u;
+                var xCurrentTableIdx = mLastTableIndex;
                 DataLookupTable* xCurrentTable = GlobalSystemInfo.GlobalInformationTable->FirstDataLookupTable;
                 DataLookupTable* xPreviousTable = null;
                 uint xResult;
@@ -69,6 +75,8 @@ namespace Cosmos.Core
                     xCurrentTableIdx ++;
                     xPreviousTable = xCurrentTable;
                     xCurrentTable = xCurrentTable->Next;
+                    mLastTableIndex = xCurrentTableIdx;
+                    mLastEntryIndex = 0;
                 }
 
                 // no tables found, lets create a new one, and use that
@@ -93,6 +101,8 @@ namespace Cosmos.Core
                 }
                 DebugHex("Returning handle", xResult);
                 DebugHex("For dataobject size", aLength);
+                mLastTableIndex = xCurrentTableIdx;
+                mLastEntryIndex = 0;
                 return xResult;
             }
             finally
@@ -111,7 +121,7 @@ namespace Cosmos.Core
         private static bool ScanDataLookupTable(uint aTableIdx, DataLookupTable* aTable, uint aSize, out uint aHandle)
         {
             DataLookupEntry* xPreviousEntry = null;
-            for (int i = 0; i < DataLookupTable.EntriesPerTable; i++)
+            for (uint i = mLastEntryIndex; i < DataLookupTable.EntriesPerTable; i++)
             {
                 var xCurrentEntry = aTable->GetEntry(i);
 
@@ -165,6 +175,7 @@ namespace Cosmos.Core
                     {
                         Debug("Last known one");
                     }
+                    mLastEntryIndex = i;
                     return true;
                 }
 
@@ -180,6 +191,7 @@ namespace Cosmos.Core
                         xCurrentEntry->Refcount = 1;
                         aHandle = (uint)xCurrentEntry;
                         DebugHex("Returning reused handle ", aHandle);
+                        mLastEntryIndex = i;
                         return true;
                     }
                 }

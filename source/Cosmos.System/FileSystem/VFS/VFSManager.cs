@@ -22,6 +22,18 @@ namespace Cosmos.System.FileSystem.VFS
             mVFS = aVFS;
         }
 
+        public static DirectoryEntry CreateFile(string aPath)
+        {
+            if (string.IsNullOrEmpty(aPath))
+            {
+                throw new ArgumentNullException("aPath");
+            }
+
+            FileSystemHelpers.Debug("VFSManager.CreateFile", "aPath = ", aPath);
+
+            return mVFS.CreateFile(aPath);
+        }
+
         public static DirectoryEntry GetFile(string aPath)
         {
             if (string.IsNullOrEmpty(aPath))
@@ -240,15 +252,14 @@ namespace Cosmos.System.FileSystem.VFS
         public static string GetFullPath(DirectoryEntry aEntry)
         {
             FileSystemHelpers.Debug("VFSManager.GetFullPath : aEntry.mName = " + aEntry?.mName);
-            var xEntry = aEntry?.mParent;
+            var xParent = aEntry?.mParent;
             string xPath = aEntry?.mName;
 
-            while (xEntry != null)
-            {
-                FileSystemHelpers.Debug("VFSManager.GetFullPath : xEntry is not null.");
-                xPath = string.Concat(xPath, xEntry.mName);
+            while (xParent != null)
+            { 
+                xPath = xParent.mName + xPath;
                 FileSystemHelpers.Debug("VFSManager.GetFullPath : xPath = " + xPath);
-                xEntry = aEntry.mParent;
+                xParent = xParent.mParent;
             }
 
             FileSystemHelpers.Debug("VFSManager.GetFullPath : xPath = " + xPath);

@@ -112,7 +112,7 @@ namespace Cosmos.Build.Builder {
         //CheckForInno();
         CheckPrereqs();                               //Working
         if (mBuildState != BuildState.PrerequisiteMissing)
-          Echo("failed");
+          Echo("all checks suceeded");
         //Cleanup();                                    //Working
 
         //CompileCosmos();                              //Working
@@ -192,6 +192,7 @@ namespace Cosmos.Build.Builder {
       }
       if (!xInstalled) {
         NotFound(".NET 3.5 SP1");
+        mBuildState = BuildState.PrerequisiteMissing;
       }
     }
 
@@ -293,7 +294,8 @@ namespace Cosmos.Build.Builder {
           throw new NotImplementedException();
       }
 
-      //works also without, only close of VMWare is not working! CheckNet35Sp1(); // Required by VMWareLib
+      //works also without, only close of VMWare is not working!
+      CheckNet35Sp1(); // Required by VMWareLib and other stuff
       CheckNet403();
       CheckForInno();
       bool vmWareInstalled = true;
@@ -430,7 +432,7 @@ namespace Cosmos.Build.Builder {
 
       // XSC can do all files in path, but we do it on our own currently for better status updates.
       // When we get xsproj files we can build directly.
-      var xFiles = Directory.GetFiles(mCosmosDir + @"source2\Compiler\Cosmos.Compiler.DebugStub\", "*.xs");
+      var xFiles = Directory.GetFiles(mCosmosDir + @"source\Cosmos.Debug.DebugStub\", "*.xs");
       foreach (var xFile in xFiles) {
         Echo("Compiling " + Path.GetFileName(xFile));
         string xDest = Path.ChangeExtension(xFile, ".cs");
