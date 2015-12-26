@@ -27,8 +27,8 @@ namespace Cosmos.HAL.Drivers
             vbe_write(0x2, yres);
             //SetDisplay bpp
             vbe_write(0x3, bpp);
-            //Enable Display
-            vbe_write(0x4, (ushort)(0x01 | 0x00));
+            //Enable Display and LFB           
+            vbe_write(0x4, (ushort)(0x01 | 0x40));
         }
 
         public void set_vram(uint index, byte value)
