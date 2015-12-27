@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.IL;
 using SR = System.Reflection;
 using Cosmos.Assembler;
 using System.Reflection.Emit;
@@ -307,7 +306,7 @@ namespace Cosmos.IL2CPU
                     {
                         var xLogItemText = LogItemText(xList.Key);
 
-                         mLogWriter.WriteLine("<hr>");
+                        mLogWriter.WriteLine("<hr>");
 
                         // Emit bookmarks above source, so when clicking links user doesn't need
                         // to constantly scroll up.
@@ -644,7 +643,7 @@ namespace Cosmos.IL2CPU
                 }
                 if (!aType.IsGenericParameter && xVirt.DeclaringType.IsInterface)
                 {
-                  if ((!aType.IsInterface) && (aType.GetInterfaces().Contains(xVirt.DeclaringType)))
+                    if ((!aType.IsInterface) && (aType.GetInterfaces().Contains(xVirt.DeclaringType)))
                     {
                         var xIntfMapping = aType.GetInterfaceMap(xVirt.DeclaringType);
                         if (xIntfMapping.InterfaceMethods != null && xIntfMapping.TargetMethods != null)
