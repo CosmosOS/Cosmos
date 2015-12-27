@@ -12,9 +12,11 @@ namespace Cosmos.Core.Plugs.System
         public static unsafe void Ctor(
             string aThis,
             char[] aChars,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
+            aStringEmpty = "";
             aStringLength = aChars.Length;
             for (int i = 0; i < aChars.Length; i++)
             {
@@ -27,9 +29,11 @@ namespace Cosmos.Core.Plugs.System
             char[] aChars,
             int start,
             int length,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
+            aStringEmpty = "";
             aStringLength = length;
             for (int i = 0; i < length; i++)
             {
@@ -41,9 +45,11 @@ namespace Cosmos.Core.Plugs.System
             string aThis,
             char aChar,
             int aLength,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
+            aStringEmpty = "";
             aStringLength = aLength;
             for (int i = 0; i < aLength; i++)
             {
