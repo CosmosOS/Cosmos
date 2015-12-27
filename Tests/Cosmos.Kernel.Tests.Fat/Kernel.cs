@@ -217,7 +217,6 @@ namespace Cosmos.Kernel.Tests.Fat
 
             mDebugger.Send("START TEST");
             xStringResult = Path.GetFileNameWithoutExtension(@"0:\file.txt");
-            mDebugger.Send("xStringResult is " + xStringResult);
             xStringExpectedResult = "file";
             xMessage = "Path.GetFileNameWithoutExtension (file with extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
@@ -442,8 +441,10 @@ namespace Cosmos.Kernel.Tests.Fat
                 xFS.Position = 0;
                 Byte[] xReadBuff = new byte[xWriteBuff.Length];
                 xFS.Read(xReadBuff, 0, xWriteBuff.Length);
-
-                Assert.IsTrue(xWriteBuff.ToString() == xReadBuff.ToString(), "Failed to write and read file");
+                mDebugger.Send("xWriteBuff " + xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length) + " xReadBuff " + xReadBuff.GetUtf8String(0, (uint)xWriteBuff.Length));
+                String xWriteBuffAsString = xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length);
+                String xReadBuffAsString = xReadBuff.GetUtf8String(0, (uint)xReadBuff.Length);
+                Assert.IsTrue(xWriteBuffAsString == xReadBuffAsString, "Failed to write and read file");
                 mDebugger.Send("END TEST");
             }
         }
