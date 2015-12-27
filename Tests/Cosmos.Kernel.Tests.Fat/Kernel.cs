@@ -167,9 +167,9 @@ namespace Cosmos.Kernel.Tests.Fat
 
             // Path.GetFileName(string aPath)
             mDebugger.Send("START TEST");
-            xStringResult = Path.GetFileName(@"0:\file");
+            xStringResult = Path.GetFileName(@"0:\");
             xStringExpectedResult = string.Empty;
-            xMessage = "Path.GetFileName (file no extension) failed.";
+            xMessage = "Path.GetFileName (root directory) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
@@ -184,7 +184,7 @@ namespace Cosmos.Kernel.Tests.Fat
 
             mDebugger.Send("START TEST");
             xStringResult = Path.GetFileName(@"0:\test\file");
-            xStringExpectedResult = string.Empty;
+            xStringExpectedResult = "file";
             xMessage = "Path.GetFileName (directory and file no extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
@@ -198,10 +198,18 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetFileName(@"0:\test\dir\");
+            xStringExpectedResult = String.Empty;
+            xMessage = "Path.GetFileName (two directories and no file) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
+
             // Path.GetFileNameWithoutExtension(string aPath)
             mDebugger.Send("START TEST");
             xStringResult = Path.GetFileNameWithoutExtension(@"0:\file");
-            xStringExpectedResult = string.Empty;
+            xStringExpectedResult = "file";
             xMessage = "Path.GetFileNameWithoutExtension (file no extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
@@ -209,6 +217,7 @@ namespace Cosmos.Kernel.Tests.Fat
 
             mDebugger.Send("START TEST");
             xStringResult = Path.GetFileNameWithoutExtension(@"0:\file.txt");
+            mDebugger.Send("xStringResult is " + xStringResult);
             xStringExpectedResult = "file";
             xMessage = "Path.GetFileNameWithoutExtension (file with extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
@@ -217,7 +226,7 @@ namespace Cosmos.Kernel.Tests.Fat
 
             mDebugger.Send("START TEST");
             xStringResult = Path.GetFileNameWithoutExtension(@"0:\test\file");
-            xStringExpectedResult = string.Empty;
+            xStringExpectedResult = "file";
             xMessage = "Path.GetFileNameWithoutExtension (directory and file no extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
@@ -227,6 +236,14 @@ namespace Cosmos.Kernel.Tests.Fat
             xStringResult = Path.GetFileNameWithoutExtension(@"0:\test\file.txt");
             xStringExpectedResult = "file";
             xMessage = "Path.GetFileNameWithoutExtension (directory and file with extension) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetFileNameWithoutExtension(@"0:\test\dir\");
+            xStringExpectedResult = String.Empty;
+            xMessage = "Path.GetFileNameWithoutExtension (two directories and no file) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
@@ -287,6 +304,11 @@ namespace Cosmos.Kernel.Tests.Fat
 
         private void TestFile()
         {
+            // Moved this test here because if not the test can be executed only a time!
+            //  mDebugger.Send("Write to file now");
+            File.WriteAllText(@"0:\Kudzu.txt", "Hello Cosmos");
+            mDebugger.Send("Text written");
+
             //
             mDebugger.Send("File contents of Kudzu.txt: ");
             string xContents = File.ReadAllText(@"0:\Kudzu.txt");
@@ -409,17 +431,21 @@ namespace Cosmos.Kernel.Tests.Fat
 
         private void TestFileStream()
         {
-            //using (var xFS = new FileStream(@"0:\Kudzu.txt", FileMode.Create))
-            //{
-            //    mDebugger.Send("Start writing");
-            //    var xStr = "Test FAT Write.";
-            //    var xBuff = xStr.GetUtf8Bytes(0, (uint)xStr.Length);
-            //    xFS.Write(xBuff, 0, xBuff.Length);
-            //    mDebugger.Send("---- Data written");
-            //    xFS.Position = 0;
-            //    xFS.Read(xBuff, 0, xBuff.Length);
-            //    mDebugger.Send(xBuff.GetUtf8String(0, (uint)xBuff.Length));
-            //}
+            using (var xFS = new FileStream(@"0:\Kudzu.txt", FileMode.Create))
+            {
+                mDebugger.Send("START TEST: Filestream:");
+                mDebugger.Send("Start writing");
+                var xStr = "Test FAT Write.";
+                Byte[] xWriteBuff = xStr.GetUtf8Bytes(0, (uint)xStr.Length);
+                xFS.Write(xWriteBuff, 0, xWriteBuff.Length);
+                mDebugger.Send("---- Data written");
+                xFS.Position = 0;
+                Byte[] xReadBuff = new byte[xWriteBuff.Length];
+                xFS.Read(xReadBuff, 0, xWriteBuff.Length);
+
+                Assert.IsTrue(xWriteBuff.ToString() == xReadBuff.ToString(), "Failed to write and read file");
+                mDebugger.Send("END TEST");
+            }
         }
     }
 }
