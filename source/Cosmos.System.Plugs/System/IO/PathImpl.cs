@@ -157,14 +157,17 @@ namespace Cosmos.System.Plugs.System.IO
                 string xPath = NormalizePath(aPath, false);
                 int xRootLength = GetRootLength(xPath);
                 int xNum = xPath.Length;
+                FileSystemHelpers.Debug("GetDirectoryName of ", aPath,  " xRootLength ", xRootLength,  "xPathLenght " + xNum);
+
+                // If lenght of aPath is the same of the lenght of the Root Path is the root Path itself!
+                if (xNum == xRootLength)
+                {
+                    FileSystemHelpers.Debug("Path.GetDirectoryName", "aPath =", aPath, " is the root directory");
+                    return null;
+                }
+
                 if (xNum > xRootLength)
                 {
-                    xNum = xPath.Length;
-                    if (xNum == xRootLength)
-                    {
-                        return null;
-                    }
-
                     while (xNum > xRootLength && xPath[--xNum] != Path.DirectorySeparatorChar
                            && xPath[xNum] != Path.AltDirectorySeparatorChar)
                     {
@@ -196,7 +199,7 @@ namespace Cosmos.System.Plugs.System.IO
                 {
                     if (xNum != xLength - 1)
                     {
-                        return aPath.Substring(xNum, xLength - xNum);
+                        return aPath.Substring(xNum + 1, xLength - xNum);
                     }
 
                     return string.Empty;
@@ -224,11 +227,14 @@ namespace Cosmos.System.Plugs.System.IO
                     if (xC == Path.DirectorySeparatorChar || xC == Path.AltDirectorySeparatorChar
                         || xC == Path.VolumeSeparatorChar)
                     {
+                        //String result = aPath.Substring(xNum + 1, xLength - xNum - 1);
+                        //FileSystemHelpers.Debug("Path.GetFileName", "result is ", result);
                         return aPath.Substring(xNum + 1, xLength - xNum - 1);
                     }
                 }
             }
 
+            FileSystemHelpers.Debug("Returning aPath ", aPath);
             return aPath;
         }
 
