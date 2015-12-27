@@ -3,16 +3,16 @@ using System.Linq;
 using Cosmos.Assembler;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU.IL.CustomImplementations.System;
 using System.Reflection;
+
+using Cosmos.IL2CPU.Plugs.System;
+
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-    using Cosmos.IL2CPU.CustomImplementation.System;
-
     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Newobj)]
-    public class Newobj: ILOp
+    public class Newobj : ILOp
     {
         public Newobj(Cosmos.Assembler.Assembler aAsmblr)
             : base(aAsmblr)

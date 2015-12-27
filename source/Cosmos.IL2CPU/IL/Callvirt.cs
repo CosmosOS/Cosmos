@@ -6,15 +6,15 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
 using System.Reflection;
-using Cosmos.IL2CPU.IL.CustomImplementations.System;
+
+using Cosmos.IL2CPU.Plugs.System;
+
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-    using Cosmos.IL2CPU.CustomImplementation.System;
-
     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Callvirt)]
-    public class Callvirt: ILOp
+    public class Callvirt : ILOp
     {
         public Callvirt(Cosmos.Assembler.Assembler aAsmblr)
             : base(aAsmblr)
@@ -174,7 +174,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new Label(xCurrentMethodLabel + ".AfterNotBoxedThis");
             }
             ILOp.EmitExceptionLogic(Assembler, aMethod, aOp, true,
-                                    delegate()
+                                    delegate ()
                                     {
                                         var xStackOffsetBefore = aOp.StackOffsetBeforeExecution.Value;
 

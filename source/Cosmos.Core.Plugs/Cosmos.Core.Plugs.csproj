@@ -98,20 +98,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CPUImpl.cs" />
+    <Compile Include="IOPortImpl.cs" />
     <Compile Include="System\ArrayImpl.cs" />
+    <Compile Include="Assemblers\DisableInterruptsAssembler.cs" />
+    <Compile Include="Assemblers\EnableInterruptsAssembler.cs" />
     <Compile Include="System\Assemblers\Array_get_Length.cs" />
     <Compile Include="System\Assemblers\Array_InternalCopy.cs" />
     <Compile Include="System\Assemblers\Buffer_BlockCopy.cs" />
-    <Compile Include="Assemblers\DisableInterruptsAssembler.cs" />
-    <Compile Include="Assemblers\EnableInterruptsAssembler.cs" />
     <Compile Include="System\Assemblers\MulticastDelegate_Invoke.cs" />
     <Compile Include="System\Buffer.cs" />
-    <Compile Include="UpdateIDT.cs" />
-    <Compile Include="CPUImpl.cs" />
+    <Compile Include="System\StringImpl.cs" />
     <Compile Include="GCImplementionImpl.cs" />
-    <Compile Include="IOPortImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RuntimeHelpersImpl.cs" />
+    <Compile Include="Assemblers\UpdateIDT.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj">
@@ -121,6 +121,10 @@
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{61607f1e-58f9-41cf-972f-128384f3e115}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>

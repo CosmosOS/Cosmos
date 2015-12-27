@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Cosmos.IL2CPU.Plugs;
-
-namespace Cosmos.IL2CPU.X86.PlugsLinqTest.CustomImplementations.System.Diagnostics {
+﻿namespace Cosmos.IL2CPU.Plugs.Diagnostics {
 	[Plug(Target = typeof(global::System.Diagnostics.Debugger))]
 	public static class DebuggerImpl {
 		public static void Break() {
