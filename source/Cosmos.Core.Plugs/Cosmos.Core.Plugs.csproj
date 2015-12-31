@@ -106,8 +106,14 @@
     <Compile Include="System\Assemblers\Array_get_Length.cs" />
     <Compile Include="System\Assemblers\Array_InternalCopy.cs" />
     <Compile Include="System\Assemblers\Buffer_BlockCopy.cs" />
+    <Compile Include="System\Assemblers\DelegateImpl.cs" />
+    <Compile Include="System\Assemblers\GetMulticastInvokeAssembler.cs" />
+    <Compile Include="System\Assemblers\InvokeImplAssembler.cs" />
     <Compile Include="System\Assemblers\MulticastDelegate_Invoke.cs" />
     <Compile Include="System\Buffer.cs" />
+    <Compile Include="System\DelegateImpl.cs" />
+    <Compile Include="System\MulticastDelegateImpl.cs" />
+    <Compile Include="System\NormalDelegateImpl.cs" />
     <Compile Include="System\StringImpl.cs" />
     <Compile Include="GCImplementionImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

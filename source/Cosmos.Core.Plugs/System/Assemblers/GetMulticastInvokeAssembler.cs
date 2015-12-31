@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Reflection;
 
-using CPUx86 = Cosmos.Assembler.x86;
+using Cosmos.IL2CPU;
+using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.IL2CPU.Plugs.Assemblers
+using CPUx86 = Cosmos.Assembler.x86;
+using MethodInfo = Cosmos.IL2CPU.MethodInfo;
+
+namespace Cosmos.Core.Plugs.System.Assemblers
 {
-    public class GetMulticastInvokeAssembler: AssemblerMethod
+    public class GetMulticastInvokeAssembler : AssemblerMethod
     {
         public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
         {
