@@ -36,11 +36,42 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static void WriteAllText(string aFile, string aText)
         {
+            FileSystemHelpers.Debug("Creating stream with file " + aFile);
             using (var xFS = new FileStream(aFile, FileMode.Create))
             {
+                FileSystemHelpers.Debug("Converting " + aText + " to UFT8");
                 var xBuff = aText.GetUtf8Bytes(0, (uint)aText.Length);
+                FileSystemHelpers.Debug("Writing bytes");
                 xFS.Write(xBuff, 0, xBuff.Length);
+                FileSystemHelpers.Debug("Bytes written");
             }
+        }
+
+        public static void AppendAllText(string aFile, string aText)
+        {
+            FileSystemHelpers.Debug("Creating stream in Append Mode with file  " + aFile);
+            using (var xFS = new FileStream(aFile, FileMode.Append))
+            {
+                FileSystemHelpers.Debug("Converting " + aText + " to UFT8");
+                var xBuff = aText.GetUtf8Bytes(0, (uint)aText.Length);
+                FileSystemHelpers.Debug("Writing bytes");
+                xFS.Write(xBuff, 0, xBuff.Length);
+                FileSystemHelpers.Debug("Bytes written");
+            }
+        }
+
+        public static void WriteAllLines(string path, string[] contents)
+        {
+            String text = String.Empty;
+
+            for (int i = 0; i < contents.Length; i++)
+            {
+                text += contents[i];
+                text += '\n';
+            }
+
+            FileSystemHelpers.Debug("Writing contents\n" + text);
+            WriteAllText(path, text);
         }
 
         public static byte[] ReadAllBytes(string aFile)
@@ -64,9 +95,10 @@ namespace Cosmos.System.Plugs.System.IO
         {
             using (var xFS = new FileStream(aFile, FileMode.Create))
             {
-                var xBuff = aBytes;
+                // This variable is not needed 'aBytes' is already a Byte[]
+                //var xBuff = aBytes;
                 
-                xFS.Write(xBuff, 0, xBuff.Length);
+                xFS.Write(aBytes, 0, aBytes.Length);
             }
         }
 
