@@ -88,7 +88,6 @@ namespace Cosmos.System {
             for (int i = 0; i < aText.Length; i++) {
                 if (aText[i] == '\n') {
                     NewLine();
-                    WriteChar('\n');
                 } else if (aText[i] == '\r') {
                 } else if (aText[i] == '\t') {
                     Write("    ");
