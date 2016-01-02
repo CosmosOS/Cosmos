@@ -3,24 +3,33 @@ using HALVGAScreen = Cosmos.HAL.VGAScreen;
 
 namespace Cosmos.System
 {
+    /// <summary>
+        /// Class for VGA Screen Mode.
+    /// </summary>
     public class VGAScreen
     {
         public enum TextSize { Size40x25, Size40x50, Size80x25, Size80x50, Size90x30, Size90x60 };
-
+        /// <summary>
+        /// Resolutions of screen.
+        /// </summary>
         public enum ScreenSize
         {
             Size640x480,
             Size720x480,
             Size320x200
         };
-
+        /// <summary>
+        /// How much colors are allowed in screen.
+        /// </summary>
         public enum ColorDepth
         {
             BitDepth2, BitDepth4, BitDepth8, BitDepth16
         };
 
         private static HALVGAScreen mScreen = new HALVGAScreen();
-
+        /// <summary>
+        /// Changes and sets the new graphics mode specified.
+        /// </summary>
         public static void SetGraphicsMode(ScreenSize screenSize, ColorDepth colorDepth)
         {
             HALVGAScreen.ScreenSize ScrSize = HALVGAScreen.ScreenSize.Size320x200;
@@ -61,12 +70,16 @@ namespace Cosmos.System
 
             mScreen.SetGraphicsMode(ScrSize, ClrDepth);
         }
-
+        /// <summary>
+        /// Draws a pixel to screen.
+        /// </summary>
         public static void SetPixel(uint X, uint Y, uint Color)
         {
             mScreen.SetPixel(X, Y, Color);
         }
-        
+        /// <summary>
+        /// Clears the video memory.
+        /// </summary>
         public static void Clear(int Color)
         {
             mScreen.Clear(Color);
@@ -86,12 +99,16 @@ namespace Cosmos.System
         {
             mScreen.SetPaletteEntry(Index, R, G, B);
         }
-
+        /// <summary>
+        /// Gets specified pixel drawn on monitor.
+        /// </summary>
         public static uint GetPixel(uint X, uint Y)
         {
             return mScreen.GetPixel(X, Y);
         }
-    
+        /// <summary>
+        /// Sets the console size.
+        /// </summary>
         public static void SetTextMode(TextSize Size)
         {
             switch (Size)

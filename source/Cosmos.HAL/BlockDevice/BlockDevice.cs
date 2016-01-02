@@ -15,7 +15,9 @@ namespace Cosmos.HAL.BlockDevice
 	{
 		// TODO: Need to protect this from changes except by Hardware ring 
 		static public List<BlockDevice> Devices = new List<BlockDevice>();
-
+        /// <summary>
+        /// Creates empty data block.
+        /// </summary>
 		public byte[] NewBlockArray(UInt32 aBlockCount)
 		{
 			return new byte[aBlockCount * mBlockSize];
@@ -36,7 +38,13 @@ namespace Cosmos.HAL.BlockDevice
 		// Only allow reading and writing whole blocks becuase many of the hardware
 		// command work that way and we dont want to add complexity at the BlockDevice level.
 		// public abstract void ReadBlock(UInt64 aBlockNo, UInt32 aBlockCount, byte[] aData);
+		/// <summary>
+        /// Reads the data block specified.
+        /// </summary>
 		public abstract void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, byte[] aData);
+		/// <summary>
+        /// Writes the data block specified.
+        /// </summary>
 		public abstract void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount, byte[] aData);
 
 		protected void CheckDataSize(byte[] aData, UInt64 aBlockCount)
