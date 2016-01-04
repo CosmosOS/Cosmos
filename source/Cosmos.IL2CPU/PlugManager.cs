@@ -650,6 +650,7 @@ namespace Cosmos.IL2CPU
             {
                 if (Queue != null)
                 {
+                    CompilerHelpers.Debug("Queueing Plug:", xResult.DeclaringType, "::", xResult.Name);
                     Queue(xResult, null, "Plug Method");
                 }
             }

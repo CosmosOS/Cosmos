@@ -44,8 +44,8 @@ namespace Cosmos.IL2CPU.Plugs.Assemblers {
       Stfld.DoExecute(xAssembler, xMethodInfo, "$$ArgSize$$", xMethodInfo.MethodBase.DeclaringType, true, false);
 
 
-          //public static void Ctor(Delegate aThis, object aObject, IntPtr aMethod, 
-      //[FieldAccess(Name = "System.Object System.Delegate._target")] ref object aFldTarget, 
+          //public static void Ctor(Delegate aThis, object aObject, IntPtr aMethod,
+      //[FieldAccess(Name = "System.Object System.Delegate._target")] ref object aFldTarget,
       //[FieldAccess(Name = "System.IntPtr System.Delegate._methodPtr")] ref IntPtr aFldMethod) {
     }
   }

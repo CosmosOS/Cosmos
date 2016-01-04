@@ -105,7 +105,6 @@
     <Compile Include="CompilerExtensionAttribute.cs" />
     <Compile Include="CompilerExtensionBase.cs" />
     <Compile Include="Plugs\AssemblerImpl.cs" />
-    <Compile Include="Plugs\System\ArrayImpl.cs" />
     <Compile Include="Plugs\System\EnvironmentImpl.cs">
       <SubType>
       </SubType>
@@ -339,15 +338,9 @@
     <Compile Include="Plugs\Diagnostics\DebuggerImpl.cs" />
     <Compile Include="Plugs\Diagnostics\DebugImpl.cs" />
     <Compile Include="Plugs\Assemblers\CtorImplAssembler.cs" />
-    <Compile Include="Plugs\Assemblers\DelegateImpl.cs" />
-    <Compile Include="Plugs\Assemblers\GetMulticastInvokeAssembler.cs" />
-    <Compile Include="Plugs\Assemblers\InvokeImplAssembler.cs" />
-    <Compile Include="Plugs\System\NormalDelegateImpl.cs" />
     <Compile Include="Plugs\System\Runtime\CompilerServices\RuntimeHelpersImpl.cs" />
-    <Compile Include="Plugs\System\DelegateImpl.cs" />
     <Compile Include="Plugs\System\EventHandlerImpl.cs" />
     <Compile Include="Plugs\System\ExceptionImpl.cs" />
-    <Compile Include="Plugs\System\MulticastDelegateImpl.cs" />
     <Compile Include="Plugs\System\OutOfMemoryExceptionImpl.cs" />
   </ItemGroup>
   <ItemGroup>
