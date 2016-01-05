@@ -22,6 +22,14 @@ namespace Cosmos.IL2CPU.Plugs.System
             {
                 return "Argument {0} out of range!";
             }
+            if (aResource == "ArgumentOutOfRange_NegativeCount")
+            {
+                return "Argument {0} out of range. It must not be negative.";
+            }
+            if (aResource == "Arg_EnumIllegalVal")
+            {
+                return "Argument {0} contains an illegal enum value.";
+            }
             //Console.Write("Getting resource: '");
             //Console.Write(aResource);
             //Console.WriteLine("'");
