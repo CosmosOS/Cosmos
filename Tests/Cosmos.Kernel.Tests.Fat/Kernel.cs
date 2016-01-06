@@ -28,10 +28,10 @@ namespace Cosmos.Kernel.Tests.Fat
             {
                 mDebugger.Send("Run");
 
-                //TestPath();
-                //TestDirectory();
+                TestPath();
+                TestDirectory();
                 TestFile();
-                //TestFileStream();
+                TestFileStream();
 
                 TestController.Completed();
             }
