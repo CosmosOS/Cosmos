@@ -8,6 +8,7 @@ using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.Plugs.System.IO
 {
+    // TODO A lot of these methods should be implemented using StreamReader / StreamWriter
     [Plug(Target = typeof(File))]
     public static class FileImpl
     {
@@ -41,6 +42,14 @@ namespace Cosmos.System.Plugs.System.IO
             {
                 FileSystemHelpers.Debug("Converting " + aText + " to UFT8");
                 var xBuff = aText.GetUtf8Bytes(0, (uint)aText.Length);
+
+#if COSMOSDEBUG
+                for (int i = 0; i < xBuff.Length; i++)
+                {
+                    FileSystemHelpers.Debug("xBuff is", xBuff[i].ToString("0:x2"));
+                }
+#endif
+
                 FileSystemHelpers.Debug("Writing bytes");
                 xFS.Write(xBuff, 0, xBuff.Length);
                 FileSystemHelpers.Debug("Bytes written");
@@ -56,22 +65,42 @@ namespace Cosmos.System.Plugs.System.IO
                 var xBuff = aText.GetUtf8Bytes(0, (uint)aText.Length);
                 FileSystemHelpers.Debug("Writing bytes");
                 xFS.Write(xBuff, 0, xBuff.Length);
+
                 FileSystemHelpers.Debug("Bytes written");
             }
         }
 
-        public static void WriteAllLines(string path, string[] contents)
+        public static string[] ReadAllLines(string aFile)
         {
-            String text = String.Empty;
+            String text = ReadAllText(aFile);
+
+            FileSystemHelpers.Debug("Read content");
+            FileSystemHelpers.Debug("\n", text);
+
+            String []result = text.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+            FileSystemHelpers.Debug("content as array of lines:");
+#if COSMOSDEBUG
+            for (int i = 0; i < result.Length; i++)
+                FileSystemHelpers.Debug(result[i]);
+#endif
+
+            return result;
+        }
+
+        public static void WriteAllLines(string aFile, string[] contents)
+        {
+            String text = null;
 
             for (int i = 0; i < contents.Length; i++)
             {
-                text += contents[i];
-                text += '\n';
+                text = String.Concat(text, contents[i], Environment.NewLine);
             }
 
-            FileSystemHelpers.Debug("Writing contents\n" + text);
-            WriteAllText(path, text);
+            FileSystemHelpers.Debug("Writing contents");
+            FileSystemHelpers.Debug("\n" + text);
+
+            WriteAllText(aFile, text);
         }
 
         public static byte[] ReadAllBytes(string aFile)

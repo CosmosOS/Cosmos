@@ -29,15 +29,20 @@ namespace Cosmos.System.FileSystem.FAT
 
         public FatStream(FatDirectoryEntry aEntry)
         {
-            FileSystemHelpers.Debug("FatStream with entry " + aEntry);
+            FileSystemHelpers.Debug("FatStream Ctor");
 
             mDirectoryEntry = aEntry;
             mFS = mDirectoryEntry.GetFileSystem();
             mSize = mDirectoryEntry.mSize;
-            if (mDirectoryEntry.mSize > 0)
-            {
-                mFatTable = mDirectoryEntry.GetFatTable();
-            }
+
+            FileSystemHelpers.Debug("FatStream with mSize", mSize);
+
+            FileSystemHelpers.Debug("Getting FatTable");
+            // We get always the FatTable if the file is empty too
+            mFatTable = mDirectoryEntry.GetFatTable();
+            // What to do if this should happen? Throw exception?
+            if (mFatTable == null)
+                FileSystemHelpers.Debug("FatTable got but it is null!");
         }
 
         public override bool CanSeek
@@ -191,6 +196,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         protected void Write(byte[] aBuffer, long aOffset, long aCount)
         {
+            FileSystemHelpers.Debug("Write() called aCount ", aCount, ", aOffset", aOffset);
             if (aCount < 0)
             {
                 throw new ArgumentOutOfRangeException("aCount");
@@ -239,6 +245,7 @@ namespace Cosmos.System.FileSystem.FAT
                 Array.Copy(aBuffer, aOffset, xCluster, (long)xPosInCluster, xWriteSize);
 
                 mFS.Write(mFatTable[(int)xClusterIdx], xCluster);
+                FileSystemHelpers.Debug("Data written");
 
                 aOffset += xWriteSize;
                 xCount -= (ulong)xWriteSize;
