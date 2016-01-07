@@ -30,6 +30,8 @@ namespace Cosmos.System.FileSystem.FAT
 
         public FatStream(FatDirectoryEntry aEntry)
         {
+            Global.mFileSystemDebugger.SendInternal("FatStream with entry " + aEntry);
+
             mDirectoryEntry = aEntry;
             mFS = mDirectoryEntry.GetFileSystem();
             mSize = mDirectoryEntry.mSize;

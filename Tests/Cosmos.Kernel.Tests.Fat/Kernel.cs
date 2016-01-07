@@ -39,8 +39,41 @@ namespace Cosmos.Kernel.Tests.Fat
             {
                 Console.WriteLine("Exception occurred");
                 Console.WriteLine(e.Message);
+                mDebugger.Send("Exception occurred: " + e.Message);
                 TestController.Failed();
             }
+        }
+
+        // Utility method to test Byte Array equality if Generics would have worked it could have been done universal
+        public bool byteArrayAreEquals(byte[] a1, byte[] a2)
+        {
+            if (ReferenceEquals(a1, a2))
+            {
+                mDebugger.Send("byte Array a1 and a2 are the same Object");
+                return true;
+            }
+
+            if (a1 == null || a2 == null)
+            {
+                mDebugger.Send("a1 or a2 is null so are different");
+                return false;
+            }
+
+            if (a1.Length != a2.Length) {
+                mDebugger.Send("a1.Length != a2.Length so are different");
+                return false;
+            }
+
+            for (int i = 0; i < a1.Length; i++)
+            {
+                if (a1[i] != a2[i])
+                {
+                    mDebugger.Send("In position " + i + " a byte is different");
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public void TestPath()
@@ -356,12 +389,104 @@ namespace Cosmos.Kernel.Tests.Fat
 
             //
             mDebugger.Send("START TEST: Create file:");
-            var xFile = File.Create(@"0:\test2.txt");
-            Assert.IsTrue(xFile != null, "Failed to create a new file.");
-            bool xFileExists = File.Exists(@"0:\test2.txt");
-            Assert.IsTrue(xFileExists, "Failed to create a new file.");
+            // Attention! File.Create() returns a FileStream that should be Closed / Disposed on Windows trying to write to the file next gives "File in Use" exception!
+            using (var xFile = File.Create(@"0:\test2.txt"))
+            {
+                Assert.IsTrue(xFile != null, "Failed to create a new file.");
+                bool xFileExists = File.Exists(@"0:\test2.txt");
+                Assert.IsTrue(xFileExists, "Failed to create a new file.");
+                mDebugger.Send("END TEST");
+                mDebugger.Send("");
+            }
+
+            // Possible issue: writing to another file in the same directory, the data are mixed with the other files
+            mDebugger.Send("Write to another file now");
+            File.WriteAllText(@"0:\test2.txt", "123");
+            mDebugger.Send("Text written");
+            xContents = File.ReadAllText(@"0:\test2.txt");
+            mDebugger.Send("Contents retrieved after writing");
+            mDebugger.Send(xContents);
+            Assert.IsTrue(xContents == "123", "Contents of test2.txt was written incorrectly!");
             mDebugger.Send("END TEST");
             mDebugger.Send("");
+
+            // Now we write in test2.txt using WriteAllLines()
+            mDebugger.Send("START TEST: WriteAllLines:");
+            using (var xFile = File.Create(@"0:\test3.txt"))
+            {
+                Assert.IsTrue(xFile != null, "Failed to create a new file.");
+                bool xFileExists = File.Exists(@"0:\test3.txt");
+                Assert.IsTrue(xFileExists, "Failed to create a new file.");
+                mDebugger.Send("END TEST");
+                mDebugger.Send("");
+            }
+
+            String[] contents = { "One", "Two", "Three" };
+            File.WriteAllLines(@"0:\test3.txt", contents);
+            mDebugger.Send("Text written");
+            // TODO maybe the more correct test is to implement ReadAllLines and then check that two arrays are equals
+            xContents = File.ReadAllText(@"0:\test3.txt");
+            mDebugger.Send("Contents retrieved after writing");
+            mDebugger.Send(xContents);
+            Assert.IsTrue(xContents == "One\nTwo\nThree", "Contents of test3.txt was written incorrectly!");
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
+
+            //
+            mDebugger.Send("START TEST: Write binary data to file now:");
+            using (var xFile = File.Create(@"0:\test.dat")) {
+                Assert.IsTrue(xFile != null, "Failed to create a new file.");
+            }
+            byte[] dataWritten = new byte[] { 0x01, 0x02, 0x03 };
+            File.WriteAllBytes(@"0:\test.dat", dataWritten);
+            mDebugger.Send("Text written");
+            byte[] dataRead = File.ReadAllBytes(@"0:\test.dat");
+   
+            Assert.IsTrue(byteArrayAreEquals(dataWritten, dataRead), "Failed to write binary data to a file.");
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST: Append text to file:");
+            string appendedText = "Yet other text.";
+            File.AppendAllText(@"0:\Kudzu.txt", appendedText);
+            mDebugger.Send("Text appended");
+            xContents = File.ReadAllText(@"0:\Kudzu.txt");
+            mDebugger.Send("Contents retrieved after writing");
+            mDebugger.Send(xContents);
+            Assert.IsTrue(xContents == "Test FAT write.\nYet other text.", "Contents of Kudzu.txt was appended incorrectly!");
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
+
+            // This creates a loop? Nothing is printed when VFSManager.CreateStream() method is reached...
+            mDebugger.Send("START TEST: Create a new directory with a file inside (filestream):");
+            var xDirectory = Directory.CreateDirectory(@"0:\testdir");
+            Assert.IsTrue(xDirectory != null, "Failed to create a new directory.");
+            using (var xFile2 = File.Create(@"0:\testdir\file.txt"))
+            {
+                String wText = "This a test";
+                Byte[] xWriteBuff = wText.GetUtf8Bytes(0, (uint)wText.Length);
+                xFile2.Write(xWriteBuff, 0, xWriteBuff.Length);
+                mDebugger.Send("---- Data written");
+                xFile2.Position = 0;
+                Byte[] xReadBuff = new byte[xWriteBuff.Length];
+                xFile2.Read(xReadBuff, 0, xWriteBuff.Length);
+                mDebugger.Send("xWriteBuff " + xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length) + " xReadBuff " + xReadBuff.GetUtf8String(0, (uint)xWriteBuff.Length));
+                String xWriteBuffAsString = xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length);
+                String xReadBuffAsString = xReadBuff.GetUtf8String(0, (uint)xReadBuff.Length);
+                Assert.IsTrue(xWriteBuffAsString == xReadBuffAsString, "Failed to write and read file");
+                mDebugger.Send("END TEST");
+            }
+
+            mDebugger.Send("START TEST: Create a new directory with a file inside (File):");
+            var xDirectory2 = Directory.CreateDirectory(@"0:\testdir");
+            Assert.IsTrue(xDirectory2 != null, "Failed to create a new directory.");
+            String WrittenText = "This a test";
+            File.WriteAllText(@"0:\testdir\file.txt", WrittenText);
+            mDebugger.Send("Text written");
+            // now read it
+            xContents = File.ReadAllText(@"0:\testdir\file.txt");
+            mDebugger.Send("Contents retrieved");
+            Assert.IsTrue(xContents == WrittenText, "Failed to read from file");
         }
 
         private void TestDirectory()
