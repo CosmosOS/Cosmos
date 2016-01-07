@@ -1,4 +1,6 @@
-﻿using global::System;
+﻿using Cosmos.Debug.Kernel;
+
+using global::System;
 using global::System.IO;
 
 using Cosmos.IL2CPU.Plugs;
@@ -18,7 +20,7 @@ namespace Cosmos.System.Plugs.System.IO
         public static void Ctor(FileStream aThis, string aPathname, FileMode aMode,
             [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
         {
-            FileSystemHelpers.Debug("In FileStream.Ctor");
+            Global.mFileSystemDebugger.SendInternal("In FileStream.Ctor");
             innerStream = InitializeStream(aPathname, aMode);
         }
 
@@ -89,15 +91,15 @@ namespace Cosmos.System.Plugs.System.IO
 
         private static Stream InitializeStream(string aPath, FileMode aMode)
         {
-            FileSystemHelpers.Debug("In FileStream.InitializeStream");
+            Global.mFileSystemDebugger.SendInternal("In FileStream.InitializeStream");
             if (aPath == null)
             {
-                FileSystemHelpers.Debug("In FileStream.Ctor: Path == null is true");
+                Global.mFileSystemDebugger.SendInternal("In FileStream.Ctor: Path == null is true");
                 throw new Exception("The file path cannot be null.");
             }
             if (aPath.Length == 0)
             {
-                FileSystemHelpers.Debug("In FileStream.Ctor: Path.Length == 0 is true");
+                Global.mFileSystemDebugger.SendInternal("In FileStream.Ctor: Path.Length == 0 is true");
                 throw new Exception("The file path cannot be empty.");
             }
             return VFSManager.GetFileStream(aPath);

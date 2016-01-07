@@ -2,6 +2,7 @@
 using global::System.IO;
 
 using Cosmos.Common.Extensions;
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
@@ -18,7 +19,7 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string ReadAllText(string aFile)
         {
-            FileSystemHelpers.Debug("In FileImpl.ReadAllText");
+            Global.mFileSystemDebugger.SendInternal("In FileImpl.ReadAllText");
             using (var xFS = new FileStream(aFile, FileMode.Open))
             {
                 var xBuff = new byte[(int)xFS.Length];
@@ -27,9 +28,9 @@ namespace Cosmos.System.Plugs.System.IO
                 {
                     throw new Exception("Couldn't read complete file!");
                 }
-                FileSystemHelpers.Debug("Bytes read");
+                Global.mFileSystemDebugger.SendInternal("Bytes read");
                 var xResultStr = xBuff.GetUtf8String(0, (uint)xBuff.Length);
-                FileSystemHelpers.Debug("ResultString retrieved");
+                Global.mFileSystemDebugger.SendInternal("ResultString retrieved");
                 return xResultStr;
             }
         }
@@ -45,7 +46,7 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static byte[] ReadAllBytes(string aFile)
         {
-            FileSystemHelpers.Debug("In FileImpl.ReadAllText");
+            Global.mFileSystemDebugger.SendInternal("In FileImpl.ReadAllText");
             using (var xFS = new FileStream(aFile, FileMode.Open))
             {
                 var xBuff = new byte[(int)xFS.Length];
@@ -54,8 +55,8 @@ namespace Cosmos.System.Plugs.System.IO
                 {
                     throw new Exception("Couldn't read complete file!");
                 }
-                FileSystemHelpers.Debug("Bytes read");
-                
+                Global.mFileSystemDebugger.SendInternal("Bytes read");
+
                 return xBuff;
             }
         }
@@ -65,7 +66,7 @@ namespace Cosmos.System.Plugs.System.IO
             using (var xFS = new FileStream(aFile, FileMode.Create))
             {
                 var xBuff = aBytes;
-                
+
                 xFS.Write(xBuff, 0, xBuff.Length);
             }
         }
@@ -95,7 +96,7 @@ namespace Cosmos.System.Plugs.System.IO
                 throw new ArgumentException("File path must not be empty.", "aFile");
             }
 
-            FileSystemHelpers.Debug("File.Create", "aFile =", aFile);
+            Global.mFileSystemDebugger.SendInternal($"File.Create : aFile = {aFile}");
             var xEntry = VFSManager.CreateFile(aFile);
             if (xEntry == null)
             {

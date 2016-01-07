@@ -310,7 +310,6 @@ namespace Cosmos.Core
 
         public static void HandleInterrupt_35(ref IRQContext aContext)
         {
-            Global.Dbg.SendMessage("Interrupts", "Interrupt 35 handler");
             aContext.EAX *= 2;
             aContext.EBX *= 2;
             aContext.ECX *= 2;
@@ -532,7 +531,7 @@ namespace Cosmos.Core
 
             }
 
-          // lock up
+            // lock up
             while (true)
             {
             }

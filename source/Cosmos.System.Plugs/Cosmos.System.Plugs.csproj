@@ -72,6 +72,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="System\EnumImpl.cs" />
     <Compile Include="System\Security\CodeAccessSecurityEngineImpl.cs" />
     <Compile Include="System\Security\Cryptography\Utils.cs" />
     <Compile Include="System\Drawing\ColorImpl.cs" />
@@ -86,7 +87,6 @@
     <Compile Include="System\CharImpl.cs" />
     <Compile Include="System\DictionaryImpl.cs" />
     <Compile Include="System\DoubleImpl.cs" />
-    <Compile Include="System\EnumImpl.cs" />
     <Compile Include="System\Int16Impl.cs" />
     <Compile Include="System\Int32Impl.cs" />
     <Compile Include="System\Int64Impl.cs" />
@@ -108,7 +108,6 @@
     <Compile Include="System\ConsoleImpl.cs" />
     <Compile Include="System\MathImpl.cs" />
     <Compile Include="System\Text\InternalDecoderBestFitFallbackBufferImpl.cs" />
-    <Compile Include="System\Text\StringBuilderImpl.cs" />
     <Compile Include="System\Threading\MonitorImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="System\TypeImpl.cs" />
@@ -121,6 +120,10 @@
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.HAL\Cosmos.HAL.csproj">
       <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>

@@ -73,7 +73,6 @@
   <ItemGroup>
     <Compile Include="Console.cs" />
     <Compile Include="FileSystem\CosmosVFS.cs" />
-    <Compile Include="FileSystem\FileSystemHelpers.cs" />
     <Compile Include="FileSystem\FAT\FatFileSystem.cs" />
     <Compile Include="FileSystem\FAT\FatStream.cs" />
     <Compile Include="FileSystem\FAT\Listing\FatDirectoryEntryAttributeConsts.cs" />
@@ -104,8 +103,8 @@
     <Compile Include="Power.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestingHelpers.cs" />
-    <Compile Include="VBEScreen.cs" />
-    <Compile Include="VGAScreen.cs" />
+    <Compile Include="Graphics\VBEScreen.cs" />
+    <Compile Include="Graphics\VGAScreen.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Console.html" />

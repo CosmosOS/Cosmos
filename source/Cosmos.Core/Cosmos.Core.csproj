@@ -81,9 +81,6 @@
     <Compile Include="DataLookupTable.cs" />
     <Compile Include="GlobalInformationTable.cs" />
     <Compile Include="GlobalSystemInfo.cs" />
-    <Compile Include="Heap.Debug.cs">
-      <DependentUpon>Heap.cs</DependentUpon>
-    </Compile>
     <Compile Include="IOGroup\COM.cs" />
     <Compile Include="IOGroup\Network\AMDPCNetIIIOGroup.cs" />
     <Compile Include="IOGroup\PCSpeaker.cs" />

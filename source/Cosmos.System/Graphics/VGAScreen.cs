@@ -66,7 +66,7 @@ namespace Cosmos.System
         {
             mScreen.SetPixel(X, Y, Color);
         }
-        
+
         public static void Clear(int Color)
         {
             mScreen.Clear(Color);
@@ -91,7 +91,7 @@ namespace Cosmos.System
         {
             return mScreen.GetPixel(X, Y);
         }
-    
+
         public static void SetTextMode(TextSize Size)
         {
             switch (Size)
