@@ -1,15 +1,31 @@
 ﻿<Window x:Class="Cosmos.Deploy.USB.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="307" Width="460" ResizeMode="CanMinimize" Icon="/Cosmos.Deploy.USB;component/Cosmos.ico">
+        Title="USB Builder" Height="269" Width="460" ResizeMode="NoResize" Icon="/Cosmos.Deploy.USB;component/Cosmos.ico">
     <Grid>
-        <Label Content=".obj file:" Height="28" HorizontalAlignment="Left" Margin="12,12,0,0" Name="label1" VerticalAlignment="Top" />
-        <TextBox Height="23" Margin="31,46,15,0" Name="tboxObjFile" VerticalAlignment="Top" IsReadOnly="True" />
-        <Button Content="Create" Height="23" HorizontalAlignment="Left" Margin="259,230,0,0" Name="butnCreate" VerticalAlignment="Top" Width="75" IsDefault="True" Click="butnCreate_Click" />
-        <Button Content="Cancel" Height="23" HorizontalAlignment="Left" Margin="348,230,0,0" Name="butnCancel" VerticalAlignment="Top" Width="75" IsCancel="True" Click="butnCancel_Click" />
-        <ListBox Height="100" Margin="31,109,15,0" Name="lboxTarget" VerticalAlignment="Top" />
-        <Label Content="Target drive:" Height="28" HorizontalAlignment="Left" Margin="12,75,0,0" Name="label2" VerticalAlignment="Top" />
-        <Button Content="Refresh" Height="23" HorizontalAlignment="Left" Margin="31,230,0,0" Name="butnRefresh" VerticalAlignment="Top" Width="75" Click="butnRefresh_Click" />
-        <Label Content="*Only removable drives are listed." Height="27" Margin="0,84,15,0" Name="label3" VerticalAlignment="Top" HorizontalAlignment="Right" Width="199" FontStyle="Italic" FontSize="11" HorizontalContentAlignment="Right" VerticalContentAlignment="Bottom" Foreground="Blue" />
+        <Label Content=".obj file:" Height="28" HorizontalAlignment="Left" Margin="5,31,0,0" Name="label1" VerticalAlignment="Top" />
+        <TextBox Height="23" Margin="26,64,20,0" Name="tboxObjFile" VerticalAlignment="Top" IsReadOnly="True" />
+        <ListBox Height="100" Margin="26,126,20,0" Name="lboxTarget" VerticalAlignment="Top" />
+        <Label Content="Target drive:" Height="28" HorizontalAlignment="Left" Margin="5,93,0,0" Name="label2" VerticalAlignment="Top" />
+        <Label Content="*Only removable drives are listed." Height="27" Margin="0,92,20,0" Name="label3" VerticalAlignment="Top" HorizontalAlignment="Right" Width="199" FontStyle="Italic" FontSize="11" HorizontalContentAlignment="Right" VerticalContentAlignment="Bottom" Foreground="Blue" />
+        <ToolBarTray HorizontalAlignment="Right" Height="24" VerticalAlignment="Top" Width="454">
+            <ToolBar x:Name="toolBar" Margin="0,0,1,7" Height="22" VerticalAlignment="Bottom">
+                <Button Width="19" VerticalAlignment="Top" Height="19" Click="butnCreate_Click">
+                    <Button.Background>
+                        <ImageBrush ImageSource="Create.ico"/>
+                    </Button.Background>
+                </Button>
+                <Button Width="19" VerticalAlignment="Top" Height="19" Click="butnCancel_Click">
+                    <Button.Background>
+                        <ImageBrush ImageSource="Cancel.ico"/>
+                    </Button.Background>
+                </Button>
+                <Button Width="19" VerticalAlignment="Top" Height="19" Click="butnRefresh_Click">
+                    <Button.Background>
+                        <ImageBrush ImageSource="Refresh.ico"/>
+                    </Button.Background>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
     </Grid>
 </Window>
