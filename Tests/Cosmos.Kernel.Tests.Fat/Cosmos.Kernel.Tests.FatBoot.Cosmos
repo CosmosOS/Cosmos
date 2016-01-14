@@ -14,7 +14,7 @@
     <!-- Looks like this was a mispelled attribute. Replaced by DebugEnabled below.
     <DebugEnable>true</DebugEnable>
     -->
-    <DebugEnabled>True</DebugEnabled>
+    <DebugEnabled>False</DebugEnabled>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <EnableGDB>False</EnableGDB>
@@ -41,7 +41,7 @@
     <Bochs_Description>Use Bochs emulator to deploy and debug.</Bochs_Description>
     <Bochs_Deployment>ISO</Bochs_Deployment>
     <Bochs_Launch>Bochs</Bochs_Launch>
-    <Bochs_DebugEnabled>True</Bochs_DebugEnabled>
+    <Bochs_DebugEnabled>False</Bochs_DebugEnabled>
     <Bochs_DebugMode>Source</Bochs_DebugMode>
     <Bochs_VisualStudioDebugPort>Pipe: Cosmos\Serial</Bochs_VisualStudioDebugPort>
     <Bochs_VMwareEdition>Player</Bochs_VMwareEdition>

@@ -22,21 +22,6 @@ namespace GuessKernel
     protected override void BeforeRun()
     {
             //Cosmos.Core.HMI.Init();
-            Console.WriteLine("Cursor size is " + Console.CursorSize);
-            //Console.CursorSize = 75;
-#if false
-            try {
-                Console.CursorSize = 101;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Excpeption caugt: " + e.Message);
-            }
-#endif
-            
-            //Console.CursorVisible = false;
-            Console.WriteLine("The cursor is " + ((Console.CursorVisible == true) ? "visible" : "not visible"));
-            Console.WriteLine("Guess Demo");
       Console.WriteLine("Please guess a number from 1 to 100.");
     }
 
