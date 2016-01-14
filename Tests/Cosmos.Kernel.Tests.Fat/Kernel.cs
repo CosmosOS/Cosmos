@@ -49,7 +49,7 @@ namespace Cosmos.Kernel.Tests.Fat
         {
             if (ReferenceEquals(a1, a2))
             {
-                mDebugger.Send("byte Array a1 and a2 are the same Object");
+                mDebugger.Send("a1 and a2 are the same Object");
                 return true;
             }
 
@@ -69,6 +69,39 @@ namespace Cosmos.Kernel.Tests.Fat
                 if (a1[i] != a2[i])
                 {
                     mDebugger.Send("In position " + i + " a byte is different");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // Utility method to test String Array equality if Generics would have worked it could have been done universal
+        public bool StringArrayAreEquals(String[] a1, String[] a2)
+        {
+            if (ReferenceEquals(a1, a2))
+            {
+                mDebugger.Send("a1 and a2 are the same Object");
+                return true;
+            }
+
+            if (a1 == null || a2 == null)
+            {
+                mDebugger.Send("a1 or a2 is null so are different");
+                return false;
+            }
+
+            if (a1.Length != a2.Length)
+            {
+                mDebugger.Send("a1.Length != a2.Length so are different");
+                return false;
+            }
+
+            for (int i = 0; i < a1.Length; i++)
+            {
+                if (a1[i] != a2[i])
+                {
+                    mDebugger.Send("In position " + i + " a String is different");
                     return false;
                 }
             }
@@ -390,11 +423,12 @@ namespace Cosmos.Kernel.Tests.Fat
             //
             mDebugger.Send("START TEST: Create file:");
             // Attention! File.Create() returns a FileStream that should be Closed / Disposed on Windows trying to write to the file next gives "File in Use" exception!
+
             using (var xFile = File.Create(@"0:\test2.txt"))
             {
                 Assert.IsTrue(xFile != null, "Failed to create a new file.");
                 bool xFileExists = File.Exists(@"0:\test2.txt");
-                Assert.IsTrue(xFileExists, "Failed to create a new file.");
+                Assert.IsTrue(xFileExists, "Failed to check existence of the new file.");
                 mDebugger.Send("END TEST");
                 mDebugger.Send("");
             }
@@ -410,25 +444,37 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
-            // Now we write in test2.txt using WriteAllLines()
+            // Now we write in test3.txt using WriteAllLines()
             mDebugger.Send("START TEST: WriteAllLines:");
             using (var xFile = File.Create(@"0:\test3.txt"))
             {
                 Assert.IsTrue(xFile != null, "Failed to create a new file.");
                 bool xFileExists = File.Exists(@"0:\test3.txt");
-                Assert.IsTrue(xFileExists, "Failed to create a new file.");
+                Assert.IsTrue(xFileExists, "Failed to check existence of the new file.");
                 mDebugger.Send("END TEST");
                 mDebugger.Send("");
             }
 
+
             String[] contents = { "One", "Two", "Three" };
             File.WriteAllLines(@"0:\test3.txt", contents);
             mDebugger.Send("Text written");
+            mDebugger.Send("Now reading with ReadAllLines()");
+            String[] readLines = File.ReadAllLines(@"0:\test3.txt");
+            mDebugger.Send("Contents retrieved after writing");
+            for (int i = 0; i < readLines.Length; i++) {
+                mDebugger.Send(readLines[i]);
+            }
+            Assert.IsTrue(StringArrayAreEquals(contents, readLines), "Contents of test3.txt was written incorrectly!");
+#if false
             // TODO maybe the more correct test is to implement ReadAllLines and then check that two arrays are equals
-            xContents = File.ReadAllText(@"0:\test3.txt");
+            var xContents = File.ReadAllText(@"0:\test3.txt");
             mDebugger.Send("Contents retrieved after writing");
             mDebugger.Send(xContents);
-            Assert.IsTrue(xContents == "One\nTwo\nThree", "Contents of test3.txt was written incorrectly!");
+            String expectedResult = String.Concat("One", Environment.NewLine, "Two", Environment.NewLine, "Three");
+            mDebugger.Send("expectedResult: " + expectedResult);
+            Assert.IsTrue(xContents == expectedResult, "Contents of test3.txt was written incorrectly!");
+#endif
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
@@ -443,17 +489,6 @@ namespace Cosmos.Kernel.Tests.Fat
             byte[] dataRead = File.ReadAllBytes(@"0:\test.dat");
    
             Assert.IsTrue(byteArrayAreEquals(dataWritten, dataRead), "Failed to write binary data to a file.");
-            mDebugger.Send("END TEST");
-            mDebugger.Send("");
-
-            mDebugger.Send("START TEST: Append text to file:");
-            string appendedText = "Yet other text.";
-            File.AppendAllText(@"0:\Kudzu.txt", appendedText);
-            mDebugger.Send("Text appended");
-            xContents = File.ReadAllText(@"0:\Kudzu.txt");
-            mDebugger.Send("Contents retrieved after writing");
-            mDebugger.Send(xContents);
-            Assert.IsTrue(xContents == "Test FAT write.\nYet other text.", "Contents of Kudzu.txt was appended incorrectly!");
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
@@ -487,6 +522,18 @@ namespace Cosmos.Kernel.Tests.Fat
             xContents = File.ReadAllText(@"0:\testdir\file.txt");
             mDebugger.Send("Contents retrieved");
             Assert.IsTrue(xContents == WrittenText, "Failed to read from file");
+
+            mDebugger.Send("START TEST: Append text to file:");
+            string appendedText = "Yet other text.";
+            File.AppendAllText(@"0:\Kudzu.txt", appendedText);
+            mDebugger.Send("Text appended");
+            xContents = File.ReadAllText(@"0:\Kudzu.txt");
+            mDebugger.Send("Contents retrieved after writing");
+            mDebugger.Send(xContents);
+            // XXX Use String.Concat() with Enviroment.NewLine this not Linux there are is '\n'!
+            Assert.IsTrue(xContents == "Test FAT write.\nYet other text.", "Contents of Kudzu.txt was appended incorrectly!");
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
         }
 
         private void TestDirectory()

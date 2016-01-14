@@ -15,7 +15,7 @@ namespace Cosmos.System.FileSystem.FAT
         protected byte[] mReadBuffer;
 
         //TODO: In future we might read this in as needed rather than
-        // all at once. This structure will also consume 2% of file size in RAM
+        // all at once. This structure will also consume 2% of file size in RAM 
         // (for default cluster size of 2kb, ie 4 bytes per cluster)
         // so we might consider a way to flush it and only keep parts.
         // Example, a 100 MB file will require 2MB for this structure. That is
@@ -35,9 +35,16 @@ namespace Cosmos.System.FileSystem.FAT
             mDirectoryEntry = aEntry;
             mFS = mDirectoryEntry.GetFileSystem();
             mSize = mDirectoryEntry.mSize;
-            if (mDirectoryEntry.mSize > 0)
-            {
+
+            Global.mFileSystemDebugger.SendInternal("FatStream with mSize", mSize);
+
+            Global.mFileSystemDebugger.SendInternal("Getting FatTable");
+            // We get always the FatTable if the file is empty too
                 mFatTable = mDirectoryEntry.GetFatTable();
+            // What to do if this should happen? Throw exception?
+            if (mFatTable == null)
+            {
+                Global.mFileSystemDebugger.SendInternal("FatTable got but it is null!");
             }
         }
 
@@ -192,6 +199,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         protected void Write(byte[] aBuffer, long aOffset, long aCount)
         {
+            Global.mFileSystemDebugger.SendInternal("Write() called aCount ", aCount, ", aOffset", aOffset);
             if (aCount < 0)
             {
                 throw new ArgumentOutOfRangeException("aCount");
@@ -240,6 +248,7 @@ namespace Cosmos.System.FileSystem.FAT
                 Array.Copy(aBuffer, aOffset, xCluster, (long)xPosInCluster, xWriteSize);
 
                 mFS.Write(mFatTable[(int)xClusterIdx], xCluster);
+                Global.mFileSystemDebugger.SendInternal("Data written");
 
                 aOffset += xWriteSize;
                 xCount -= (ulong)xWriteSize;

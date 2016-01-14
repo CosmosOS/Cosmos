@@ -9,6 +9,7 @@ using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.Plugs.System.IO
 {
+    // TODO A lot of these methods should be implemented using StreamReader / StreamWriter
     [Plug(Target = typeof(File))]
     public static class FileImpl
     {
@@ -58,21 +59,37 @@ namespace Cosmos.System.Plugs.System.IO
                 Global.mFileSystemDebugger.SendInternal("Writing bytes");
                 xFS.Write(xBuff, 0, xBuff.Length);
                 Global.mFileSystemDebugger.SendInternal("Bytes written");
-            }
         }
 
-        public static void WriteAllLines(string path, string[] contents)
+        public static string[] ReadAllLines(string aFile)
         {
-            String text = String.Empty;
+            String text = ReadAllText(aFile);
+
+            Global.mFileSystemDebugger.SendInternal(("Read content");
+            Global.mFileSystemDebugger.SendInternal(("\n", text);
+
+            String []result = text.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+
+            Global.mFileSystemDebugger.SendInternal(("content as array of lines:");
+#if COSMOSDEBUG
+            for (int i = 0; i < result.Length; i++)
+                Global.mFileSystemDebugger.SendInternal((result[i]);
+#endif
+
+            return result;
+        }
+
+        public static void WriteAllLines(string aFile, string[] contents)
+        {
+            String text = null;
 
             for (int i = 0; i < contents.Length; i++)
             {
-                text += contents[i];
-                text += '\n';
+                text = String.Concat(text, contents[i], Environment.NewLine);
             }
 
             Global.mFileSystemDebugger.SendInternal("Writing contents\n" + text);
-            WriteAllText(path, text);
+            WriteAllText(aFile, text);
         }
 
         public static byte[] ReadAllBytes(string aFile)
@@ -87,7 +104,7 @@ namespace Cosmos.System.Plugs.System.IO
                     throw new Exception("Couldn't read complete file!");
                 }
                 Global.mFileSystemDebugger.SendInternal("Bytes read");
-
+                
                 return xBuff;
             }
         }
@@ -98,7 +115,7 @@ namespace Cosmos.System.Plugs.System.IO
             {
                 // This variable is not needed 'aBytes' is already a Byte[]
                 //var xBuff = aBytes;
-
+                
                 xFS.Write(aBytes, 0, aBytes.Length);
             }
         }
