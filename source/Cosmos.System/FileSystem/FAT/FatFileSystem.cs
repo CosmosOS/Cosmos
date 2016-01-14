@@ -414,7 +414,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         internal void Write(ulong aFirstCluster, byte[] aData, ulong aSize = 0, ulong aOffset = 0)
         {
-            Global.mFileSystemDebugger.SendInternal("low level Write() called");
+            FileSystemHelpers.Debug("low level Write() called");
             if (aSize == 0)
             {
                 aSize = BytesPerCluster;
