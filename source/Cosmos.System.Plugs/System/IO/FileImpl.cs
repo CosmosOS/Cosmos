@@ -43,16 +43,7 @@ namespace Cosmos.System.Plugs.System.IO
             {
                 Global.mFileSystemDebugger.SendInternal("Converting " + aText + " to UFT8");
                 var xBuff = aText.GetUtf8Bytes(0, (uint)aText.Length);
-
-#if COSMOSDEBUG
-                for (int i = 0; i < xBuff.Length; i++)
-                {
-                    Global.mFileSystemDebugger.SendInternal("xBuff is", xBuff[i].ToString("0:x2"));
-                }
-#endif
-
                 Global.mFileSystemDebugger.SendInternal("Writing bytes");
-
                 xFS.Write(xBuff, 0, xBuff.Length);
                 Global.mFileSystemDebugger.SendInternal("Bytes written");
             }
@@ -64,7 +55,7 @@ namespace Cosmos.System.Plugs.System.IO
             using (var xFS = new FileStream(aFile, FileMode.Append))
             {
                 Global.mFileSystemDebugger.SendInternal("Converting " + aText + " to UFT8");
-                var xBuff = aText.GetUtf8Bytes(0, (uint)aText.Length);
+                var xBuff = aText.GetUtf8Bytes(0, (uint) aText.Length);
                 Global.mFileSystemDebugger.SendInternal("Writing bytes");
                 xFS.Write(xBuff, 0, xBuff.Length);
                 Global.mFileSystemDebugger.SendInternal("Bytes written");
@@ -75,12 +66,13 @@ namespace Cosmos.System.Plugs.System.IO
         {
             String text = ReadAllText(aFile);
 
-            Global.mFileSystemDebugger.SendInternal("Read content\n" + text);
+            Global.mFileSystemDebugger.SendInternal("Read contents");
+            Global.mFileSystemDebugger.SendInternal(text);
 
             String []result = text.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
-#if COSMOSDEBUG
             Global.mFileSystemDebugger.SendInternal("content as array of lines:");
+#if COSMOSDEBUG
             for (int i = 0; i < result.Length; i++)
                 Global.mFileSystemDebugger.SendInternal(result[i]);
 #endif
@@ -97,7 +89,8 @@ namespace Cosmos.System.Plugs.System.IO
                 text = String.Concat(text, contents[i], Environment.NewLine);
             }
 
-            Global.mFileSystemDebugger.SendInternal("Writing contents\n" + text);
+            Global.mFileSystemDebugger.SendInternal("Writing contents");
+            Global.mFileSystemDebugger.SendInternal(text);
 
             WriteAllText(aFile, text);
         }
@@ -114,7 +107,7 @@ namespace Cosmos.System.Plugs.System.IO
                     throw new Exception("Couldn't read complete file!");
                 }
                 Global.mFileSystemDebugger.SendInternal("Bytes read");
-
+                
                 return xBuff;
             }
         }
@@ -125,7 +118,7 @@ namespace Cosmos.System.Plugs.System.IO
             {
                 // This variable is not needed 'aBytes' is already a Byte[]
                 //var xBuff = aBytes;
-
+                
                 xFS.Write(aBytes, 0, aBytes.Length);
             }
         }

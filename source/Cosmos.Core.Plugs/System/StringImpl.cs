@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
 
-using Cosmos.Common;
-using Cosmos.Debug.Kernel;
-using Cosmos.IL2CPU.Plugs;
+    using Cosmos.Common;
+    using Cosmos.Debug.Kernel;
+    using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core.Plugs.System
 {
@@ -178,7 +178,6 @@ namespace Cosmos.Core.Plugs.System
             bool xParamNumberDone = true;
             for (int i = 0; i < xCharArray.Length; i++)
             {
-                mDebugger.Send(aFormat[i].ToString());
                 if (xFoundPlaceholder)
                 {
                     if (xCharArray[i] == '{')
@@ -213,9 +212,9 @@ namespace Cosmos.Core.Plugs.System
                 else if (xCharArray[i] == '{')
                 {
                     mDebugger.SendInternal("Found opening placeholder");
-                    xFoundPlaceholder = true;
-                    xParamNumberDone = false;
-                    xParamNumber = string.Empty;
+                        xFoundPlaceholder = true;
+                        xParamNumberDone = false;
+                        xParamNumber = string.Empty;
                 }
                 else
                 {
@@ -228,7 +227,21 @@ namespace Cosmos.Core.Plugs.System
 
         public static bool StartsWith(string aThis, string aSubstring, StringComparison aComparison)
         {
-            throw new NotImplementedException();
+            Char[] di = aThis.ToCharArray();
+            Char[] ci = aSubstring.ToCharArray();
+            if (aSubstring.Length > aThis.Length)
+            {
+                return false;
+        }
+            for (int i = 0; i < ci.Length; i++)
+            {
+                if (di[i] != ci[i])
+                {
+                    return false;
+
+                }
+            }
+            return true;
         }
 
         public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)
@@ -464,11 +477,36 @@ namespace Cosmos.Core.Plugs.System
 
         public static bool Contains(string aThis, string value)
         {
-            if (aThis.IndexOf(value) != -1)
+            Char[] di = aThis.ToCharArray();
+            Char[] ci = value.ToCharArray();
+            if (value.Length == aThis.Length)
             {
+                if (value == aThis)
+                {
                 return true;
             }
-
+                else
+                {
+            return false;
+        }
+            }
+            else if (!(value.Length > aThis.Length) && (value.Length != aThis.Length))
+            {
+                for (int i = 0; i < aThis.Length; i++)
+                {
+                    if (di[i] == ci[0])
+                    {
+                        for (int j = 1; j < value.Length; j++)
+                        {
+                            if (di[i + j] != ci[j])
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                }
+            }
             return false;
         }
 
@@ -479,30 +517,31 @@ namespace Cosmos.Core.Plugs.System
 
         public static bool EndsWith(string aThis, string aSubStr, StringComparison aComparison)
         {
-            if (aSubStr == null)
+            Char[] di = aThis.ToCharArray();
+            Char[] ci = aSubStr.ToCharArray();
+            if (aThis.Length == aSubStr.Length)
             {
-                throw new ArgumentNullException("aSubStr");
-            }
-
             if (aThis == aSubStr)
             {
                 return true;
             }
-
-            if (aSubStr.Length == 0)
-            {
-                return true;
+                return false;
             }
-
-            int xLastIdx = aThis.Length - aSubStr.Length;
-            for (int i = 0; i < aSubStr.Length; i++)
+            else if (aThis.Length > aSubStr.Length)
             {
-                if (aThis[xLastIdx + i] != aSubStr[i])
+                return false;
+            }
+            else
+            {
+                for (int i = aThis.Length - aSubStr.Length; i < aThis.Length; i++)
+            {
+                    if (di[aThis.Length - aSubStr.Length + i] != ci[i])
                 {
                     return false;
                 }
             }
             return true;
+        }
         }
 
         //        System.Int32  System.String.IndexOf(System.String, System.Int32, System.Int32, System.StringComparison)
@@ -604,15 +643,15 @@ namespace Cosmos.Core.Plugs.System
             {
                 mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA is null");
                 if (aStrB == null)
-                {
+            {
                     mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is null");
                     mDebugger.SendInternal($"nativeCompareOrdinalEx : returning 0");
-                    return 0;
-                }
+                return 0;
+            }
                 mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is not null");
                 mDebugger.SendInternal($"nativeCompareOrdinalEx : returning -1");
-                return -1;
-            }
+            return -1;
+        }
             if (aStrB == null)
             {
                 mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA is not null");
@@ -652,11 +691,18 @@ namespace Cosmos.Core.Plugs.System
 
         public static bool StartsWith(string aThis, string aSubStr, bool aIgnoreCase, CultureInfo aCulture)
         {
-            for (int i = 0; i < aSubStr.Length; i++)
+            Char[] di = aThis.ToCharArray();
+            Char[] ci = aSubStr.ToCharArray();
+            if (aSubStr.Length > aThis.Length)
             {
-                if (aThis[i] != aSubStr[i])
+                return false;
+            }
+            for (int i = 0; i < ci.Length; i++)
+            {
+                if (di[i] != ci[i])
                 {
                     return false;
+
                 }
             }
             return true;
@@ -722,5 +768,29 @@ namespace Cosmos.Core.Plugs.System
         {
             return new string(new char[length]);
         }
+
+        public static string TrimStart(string aThis, string aSubStr)
+        {
+            char[] ci = aThis.ToCharArray();
+            char[] di = aSubStr.ToCharArray();
+
+            if(aThis.StartsWith(aSubStr))
+            {
+                if(aThis != aSubStr)
+                {
+                    char[] oi = new char[ci.Length - di.Length];
+                    for(int i=0; i < ci.Length - di.Length; i++)
+                    {
+                        oi[i] = ci[i + di.Length];
+                    }
+                    return oi.ToString();
+                }
+
+                return string.Empty;
+            }
+
+            throw new ArgumentNullException();
+        }
+      
     }
 }
