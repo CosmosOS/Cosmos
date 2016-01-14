@@ -244,67 +244,6 @@ namespace Cosmos.Core.Plugs.System
             return true;
         }
 
-        //String concatenation plugs
-        public static string Concat(string str0)
-        {
-            return str0;
-        }
-
-        public static string Concat(string str0, string str1)
-        {
-            return Concat(new[] { str0, str1 });
-        }
-
-        public static string Concat(string str0, string str1, string str2)
-        {
-            return Concat(new[] { str0, str1, str2 });
-        }
-
-        public static string Concat(string str0, string str1, string str2, string str3)
-        {
-            return Concat(new[] { str0, str1, str2, str3 });
-        }
-
-        //Object concatenation plugs
-        public static string Concat(object obj0)
-        {
-            return obj0?.ToString();
-        }
-
-        public static string Concat(object obj0, object obj1)
-        {
-            return Concat(obj0?.ToString(), obj1?.ToString());
-        }
-
-        public static string Concat(object obj0, object obj1, object obj2)
-        {
-            return Concat(obj0?.ToString(), obj1?.ToString(), obj2?.ToString());
-        }
-
-        public static string Concat(object obj0, object obj1, object obj2, object obj3)
-        {
-            return Concat(new[] { obj0?.ToString(), obj1?.ToString(), obj2?.ToString(), obj3?.ToString() });
-        }
-
-        //Array concatenation plugs
-        public static string Concat(params string[] values)
-        {
-            if (values != null)
-            {
-                int len = 0;
-                for (int i = 0; i < values.Length; i++)
-                {
-                    string xValue = values[i];
-                    if (xValue != null)
-                    {
-                        len += values[i].Length;
-                    }
-                }
-                return ConcatArray(values, len);
-            }
-            return string.Empty;
-        }
-
         public static string PadHelper(string aThis, int totalWidth, char paddingChar, bool isRightPadded)
         {
             var cs = new char[totalWidth];
