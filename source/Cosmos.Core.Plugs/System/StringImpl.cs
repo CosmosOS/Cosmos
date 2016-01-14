@@ -178,7 +178,6 @@ namespace Cosmos.Core.Plugs.System
             bool xParamNumberDone = true;
             for (int i = 0; i < xCharArray.Length; i++)
             {
-                mDebugger.Send(aFormat[i].ToString());
                 if (xFoundPlaceholder)
                 {
                     if (xCharArray[i] == '{')

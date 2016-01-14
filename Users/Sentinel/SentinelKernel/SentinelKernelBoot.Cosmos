@@ -43,7 +43,7 @@
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
-    <EnableBochsDebug>True</EnableBochsDebug>
+    <EnableBochsDebug>False</EnableBochsDebug>
     <Bochs_Name>SentinelKernelBoot</Bochs_Name>
     <Bochs_Description>Use Bochs emulator to deploy and debug.</Bochs_Description>
     <Bochs_Deployment>ISO</Bochs_Deployment>
@@ -56,9 +56,9 @@
     <Bochs_OutputPath>bin\Debug\</Bochs_OutputPath>
     <Bochs_EnableGDB>False</Bochs_EnableGDB>
     <Bochs_StartCosmosGDB>false</Bochs_StartCosmosGDB>
-    <Bochs_EnableBochsDebug>True</Bochs_EnableBochsDebug>
+    <Bochs_EnableBochsDebug>False</Bochs_EnableBochsDebug>
     <VMware_EnableBochsDebug>True</VMware_EnableBochsDebug>
-    <TraceAssemblies>All</TraceAssemblies>
+    <TraceAssemblies>User</TraceAssemblies>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <IntelEdison_Name>SentinelKernelBoot</IntelEdison_Name>
     <IntelEdison_Description>Connect to Intel Edison device to deploy and debug.</IntelEdison_Description>
@@ -102,7 +102,7 @@
     <USB_EnableGDB>True</USB_EnableGDB>
     <USB_StartCosmosGDB>True</USB_StartCosmosGDB>
     <USB_EnableBochsDebug>True</USB_EnableBochsDebug>
-    <Bochs_TraceAssemblies>All</Bochs_TraceAssemblies>
+    <Bochs_TraceAssemblies>User</Bochs_TraceAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
