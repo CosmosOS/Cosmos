@@ -21,10 +21,8 @@ namespace GuessKernel
 
     protected override void BeforeRun()
     {
-            Console.WriteLine("Guess Demo");
             //Cosmos.Core.HMI.Init();
-
-            Console.WriteLine("Please guess a number from 1 to 100.");
+      Console.WriteLine("Please guess a number from 1 to 100.");
     }
 
     private Debugger mDebugger = new Debugger("User", "Guess");
