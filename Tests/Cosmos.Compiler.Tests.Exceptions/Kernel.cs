@@ -104,7 +104,7 @@ namespace Cosmos.Compiler.Tests.Exceptions
             {
                 TestReturnSimpleException();
             }
-            catch (Exception ex) where (xShouldCatch == true)
+            catch (Exception ex) when (xShouldCatch == true)
             {
                 Console.WriteLine("Caught filtered exception.");
                 mDebugger.Send("EXCEPTION: " + ex.Message);
@@ -136,7 +136,7 @@ namespace Cosmos.Compiler.Tests.Exceptions
             {
                 TestReturnSimpleException();
             }
-            catch (Exception ex) where (xShouldCatch == true)
+            catch (Exception ex) when (xShouldCatch == true)
             {
                 Console.WriteLine("Caught filtered exception.");
                 mDebugger.Send("EXCEPTION: " + ex.Message);
