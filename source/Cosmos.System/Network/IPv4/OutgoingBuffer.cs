@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
 using Cosmos.HAL.Network;
 using Cosmos.System.Network.ARP;
@@ -7,6 +9,8 @@ namespace Cosmos.System.Network.IPv4
 {
     internal static class OutgoingBuffer
     {
+        internal static Debugger mDebugger = new Debugger("System", "Networking");
+
         private class BufferEntry
         {
             public enum EntryStatus { ADDED, ARP_SENT, ROUTE_ARP_SENT, JUST_SEND, DONE };
@@ -123,7 +127,7 @@ namespace Cosmos.System.Network.IPv4
                     i++;
                 }
             }
-           Global.Dbg.Send("Number of packages in queue: " + i.ToString());
+            mDebugger.SendInternal($"Number of packages in queue: {i}");
         }
 
         internal static void ARPCache_Update(ARPReply_Ethernet arp_reply)

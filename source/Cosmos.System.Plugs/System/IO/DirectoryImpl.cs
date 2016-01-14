@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.Listing;
@@ -16,13 +17,13 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetCurrentDirectory()
         {
-            FileSystemHelpers.Debug("Directory.GetCurrentDirectory", "mCurrentDirectory =", mCurrentDirectory);
+            Global.mFileSystemDebugger.SendInternal($"Directory.GetCurrentDirectory : mCurrentDirectory = {mCurrentDirectory}");
             return mCurrentDirectory;
         }
 
         public static void SetCurrentDirectory(string aPath)
         {
-            FileSystemHelpers.Debug("Directory.SetCurrentDirectory", "aPath =", aPath);
+            Global.mFileSystemDebugger.SendInternal($"Directory.SetCurrentDirectory : aPath = {aPath}");
             mCurrentDirectory = aPath;
         }
 
@@ -33,7 +34,7 @@ namespace Cosmos.System.Plugs.System.IO
                 return false;
             }
 
-            FileSystemHelpers.Debug("Directory.Exists", "aPath =", aPath);
+            Global.mFileSystemDebugger.SendInternal($"Directory.Exists : aPath = {aPath}");
             return VFSManager.DirectoryExists(aPath);
         }
 
@@ -49,7 +50,7 @@ namespace Cosmos.System.Plugs.System.IO
                 throw new ArgumentException("Path must not be empty.", "aPath");
             }
 
-            FileSystemHelpers.Debug("Directory.CreateDirectory", "aPath =", aPath);
+            Global.mFileSystemDebugger.SendInternal($"Directory.CreateDirectory : aPath = {aPath}");
             var xEntry = VFSManager.CreateDirectory(aPath);
             if (xEntry == null)
             {
@@ -63,13 +64,13 @@ namespace Cosmos.System.Plugs.System.IO
         {
             if (aPath == null)
             {
-                FileSystemHelpers.Debug("Directory.GetParent", "aPath is null");
+                Global.mFileSystemDebugger.SendInternal("Directory.GetParent : aPath is null");
                 throw new ArgumentNullException("aPath");
             }
 
             if (aPath.Length == 0)
             {
-                FileSystemHelpers.Debug("Directory.GetParent", "aPath is empty");
+                Global.mFileSystemDebugger.SendInternal("Directory.GetParent : aPath is empty");
                 throw new ArgumentException("Path must not be empty.", "aPath");
             }
 
@@ -77,16 +78,16 @@ namespace Cosmos.System.Plugs.System.IO
             string xParentDirectory = Path.GetDirectoryName(xFullPath);
             if (xParentDirectory == null)
             {
-                FileSystemHelpers.Debug("Directory.GetParent", "xParentDirectory is null");
+                Global.mFileSystemDebugger.SendInternal("Directory.GetParent : xParentDirectory is null");
                 return null;
             }
-            
+
             return new DirectoryInfo(xParentDirectory);
         }
 
         public static string[] GetDirectories(string aPath)
         {
-            FileSystemHelpers.Debug("Directory.GetDirectories");
+            Global.mFileSystemDebugger.SendInternal("Directory.GetDirectories");
             if (aPath == null)
             {
                 throw new ArgumentNullException(aPath);
@@ -107,7 +108,7 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string[] GetFiles(string aPath)
         {
-            FileSystemHelpers.Debug("Directory.GetFiles");
+            Global.mFileSystemDebugger.SendInternal("Directory.GetFiles");
             if (aPath == null)
             {
                 throw new ArgumentNullException(aPath);
@@ -122,7 +123,7 @@ namespace Cosmos.System.Plugs.System.IO
                     xFiles.Add(xEntries[i].mName);
                 }
             }
-            
+
             return xFiles.ToArray();
         }
 

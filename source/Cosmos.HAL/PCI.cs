@@ -9,11 +9,10 @@ namespace Cosmos.HAL
     public class PCI
     {
         private static List<PCIDevice> devices;
-        private static Debugger mDebugger;
+        internal static Debugger mDebugger = new Debugger("HAL", "PCI");
 
         public static void Setup()
         {
-            mDebugger = Global.Dbg;
             EnumerateDevices();
         }
 

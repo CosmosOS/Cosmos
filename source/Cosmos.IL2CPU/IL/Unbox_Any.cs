@@ -21,22 +21,19 @@ namespace Cosmos.IL2CPU.X86.IL
     {
       DoNullReferenceCheck(Assembler, DebugEnabled, 0);
       OpType xType = (OpType)aOpCode;
-      string BaseLabel = GetLabel(aMethod, aOpCode) + ".";
-
+      string xBaseLabel = GetLabel(aMethod, aOpCode) + ".";
       string xTypeID = GetTypeIDLabel(xType.Value);
+      uint xTypeSize = SizeOfType(xType.Value);
+      string mReturnNullLabel = xBaseLabel + "_ReturnNull";
 
-      var xTypeSize = SizeOfType(xType.Value);
-
-      string mReturnNullLabel = BaseLabel + "_ReturnNull";
       new CPUx86.Compare { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceValue = 0 };
       new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
       new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
       new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New(xTypeID), DestinationIsIndirect = true };
-      SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.Int32", "System.Int32");
-      new Call(Assembler).Execute(aMethod, new OpMethod(ILOpCode.Code.Call, 0, 0, xMethodIsInstance, aOpCode.CurrentExceptionHandler));
-
-      new Label(BaseLabel + "_After_IsInstance_Call");
+      SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.UInt32", "System.UInt32");
+      Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, GetLabel(aMethod, aOpCode), xBaseLabel + "_After_IsInstance_Call", DebugEnabled);
+      new Label(xBaseLabel + "_After_IsInstance_Call");
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
       new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
       new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };

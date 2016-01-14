@@ -1,5 +1,6 @@
 ﻿using System.IO;
 
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
@@ -24,7 +25,7 @@ namespace Cosmos.System.Plugs.System.IO
             [FieldAccess(Name = "$$FullPath$$")] ref string aFullPath,
             [FieldAccess(Name = "$$Name$$")] ref string aName)
         {
-            FileSystemHelpers.Debug("DirectoryInfo.ctor", "aPath =", aPath);
+            Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.ctor : aPath = = {aPath}");
             if (aPath == null)
             {
                 throw new ArgumentNullException("aPath is null in DirectoryInfo ctor");
@@ -43,20 +44,20 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string get_Name(DirectoryInfo aThis)
         {
-            FileSystemHelpers.Debug("DirectoryInfo.get_Name", "Nane =", aThis.ToString());
+            Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.get_Name : Nane = {aThis}");
             return aThis.ToString();
         }
 
         public static DirectoryInfo get_Parent(DirectoryInfo aThis, [FieldAccess(Name = "$$FullPath")] ref string aFullPath)
         {
-            FileSystemHelpers.Debug("DirectoryInfo.get_Parent");
+            Global.mFileSystemDebugger.SendInternal("DirectoryInfo.get_Parent");
             var xParent = Directory.GetParent(aFullPath);
             return xParent;
         }
 
         public static DirectoryInfo get_Root(DirectoryInfo aThis, [FieldAccess(Name = "$$FullPath")] ref string aFullPath)
         {
-            FileSystemHelpers.Debug("DirectoryInfo.get_Root");
+            Global.mFileSystemDebugger.SendInternal("DirectoryInfo.get_Root");
             string xRootPath = Path.GetPathRoot(aFullPath);
             var xRoot = new DirectoryInfo(xRootPath);
             return xRoot;
@@ -64,7 +65,7 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static bool get_Exists(DirectoryInfo aThis, [FieldAccess(Name = "$$FullPath$$")] ref string aFullPath)
         {
-            FileSystemHelpers.Debug("DirectoryInfo.get_Exists");
+            Global.mFileSystemDebugger.SendInternal("DirectoryInfo.get_Exists");
             return VFSManager.DirectoryExists(aFullPath);
         }
 

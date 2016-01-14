@@ -30,6 +30,7 @@ namespace Cosmos.Debug.Kernel.Plugs {
 
     [PlugMethod(Assembler = typeof(DebugSendChannelCommandNoData))]
     public static unsafe void SendChannelCommand(byte aChannel, byte aCommand) { }
+
     //[PlugMethod(Assembler = typeof(DebugTraceOff))]
     //public static void TraceOff() { }
 
@@ -99,7 +100,7 @@ namespace Cosmos.Debug.Kernel.Plugs {
   public class DebugBreak : AssemblerMethod {
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
-     new LiteralAssemblerCode("mov dword [DebugBreakOnNextTrace], 1");
+     new LiteralAssemblerCode("mov dword [DebugStub_DebugBreakOnNextTrace], 1");
      new LiteralAssemblerCode("%endif");
     }
   }

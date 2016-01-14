@@ -153,7 +153,7 @@ namespace Cosmos.System
         /// <param name="y">Y coordinate</param>
         /// <param name="color">Color in hex</param>
         public void SetPixel(uint x, uint y, uint color)
-        {           
+        {
             uint where = x * ((uint)ScreenBpp  / 8) + y * (uint)(ScreenWidth * ((uint)ScreenBpp / 8));
             _vbe.set_vram(where, (byte)(color & 255));              // BLUE
             _vbe.set_vram(where + 1, (byte)((color >> 8) & 255));   // GREEN

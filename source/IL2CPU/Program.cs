@@ -73,7 +73,7 @@ namespace IL2CPU
                 logMessage("Loaded : DebugMode");
                 xTask.StackCorruptionDetectionLevel = CmdOptions["StackCorruptionDetectionLevel".ToLower()];
                 logMessage("Loaded : StackCorruptionDetectionLevel");
-                xTask.TraceAssemblies = null;
+                xTask.TraceAssemblies = CmdOptions["TraceAssemblies".ToLower()];
                 logMessage("Loaded : TraceAssemblies");
                 xTask.DebugCom = Convert.ToByte(CmdOptions["DebugCom".ToLower()]);
                 logMessage("Loaded : DebugCom");

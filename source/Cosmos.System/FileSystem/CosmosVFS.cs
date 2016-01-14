@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
+using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.Listing;
@@ -39,17 +40,17 @@ namespace Cosmos.System.FileSystem
                 throw new ArgumentException("aPath");
             }
 
-            FileSystemHelpers.Debug("CosmosVFS.CreateFile", "aPath =", aPath);
+            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateFile : aPath = {aPath}");
             if (File.Exists(aPath))
             {
-                FileSystemHelpers.Debug("CosmosVFS.CreateFile", "aPath =", aPath, "already exists.");
+                Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateFile : Path already exists.");
                 return GetFile(aPath);
             }
 
-            FileSystemHelpers.Debug("CosmosVFS.CreateFile", "aPath =", aPath, "doesn't exist.");
+            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateFile : Path doesn't exist.");
             string xParentDirectory = Path.GetDirectoryName(aPath);
             string xFileToCreate = Path.GetFileName(aPath);
-            FileSystemHelpers.Debug("CosmosVFS.CreateFile", "xParentDirectory =", xParentDirectory, "xFileToCreate =", xFileToCreate);
+            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateFile : xParentDirectory = {xParentDirectory}, xFileToCreate = {xFileToCreate}");
             if (xParentDirectory != null)
             {
                 if (Directory.Exists(xParentDirectory))
@@ -74,24 +75,24 @@ namespace Cosmos.System.FileSystem
                 throw new ArgumentException("aPath");
             }
 
-            FileSystemHelpers.Debug("CosmosVFS.CreateDirectory", "aPath =", aPath);
+            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateDirectory : aPath = {aPath}");
             if (Directory.Exists(aPath))
             {
-                FileSystemHelpers.Debug("CosmosVFS.CreateDirectory", "aPath =", aPath, "already exists.");
+                Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateDirectory : Path already exists.");
                 return GetDirectory(aPath);
             }
 
-            FileSystemHelpers.Debug("CosmosVFS.CreateDirectory", "aPath =", aPath, "doesn't exist.");
+            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateDirectory : Path doesn't exist.");
             string xParentDirectory = Path.GetDirectoryName(aPath);
             string xDirectoryToCreate = Path.GetFileName(aPath);
-            FileSystemHelpers.Debug("CosmosVFS.CreateDirectory", "xParentDirectory =", xParentDirectory, "xDirectoryToCreate =", xDirectoryToCreate);
+            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateDirectory : xParentDirectory = {xParentDirectory}, xDirectoryToCreate = {xDirectoryToCreate}");
             if (xParentDirectory != null)
             {
                 while (!Directory.Exists(xParentDirectory))
                 {
                     xParentDirectory = Path.GetDirectoryName(aPath);
                     xDirectoryToCreate = Path.GetFileName(aPath);
-                    FileSystemHelpers.Debug("CosmosVFS.CreateDirectory", "xParentDirectory =", xParentDirectory, "xDirectoryToCreate =", xDirectoryToCreate);
+                    Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateDirectory : xParentDirectory = {xParentDirectory}, xDirectoryToCreate = {xDirectoryToCreate}");
                 }
 
 
@@ -239,14 +240,14 @@ namespace Cosmos.System.FileSystem
 
         private FileSystem GetFileSystemFromPath(string aPath)
         {
-            FileSystemHelpers.Debug("CosmosVFS.GetFileSystemFromPath", "aPath =", aPath);
+            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.GetFileSystemFromPath : aPath = {aPath}");
             string xPath = Path.GetPathRoot(aPath);
-            FileSystemHelpers.Debug("CosmosVFS.GetFileSystemFromPath", "xPath =", xPath);
+            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.GetFileSystemFromPath : xPath = {xPath}");
             for (int i = 0; i < mFileSystems.Count; i++)
             {
                 if (mFileSystems[i].mRootPath == xPath)
                 {
-                    FileSystemHelpers.Debug("CosmosVFS.GetFileSystemFromPath", "Found filesystem.");
+                    Global.mFileSystemDebugger.SendInternal($"CosmosVFS.GetFileSystemFromPath : Found filesystem.");
                     return mFileSystems[i];
                 }
             }
