@@ -30,13 +30,13 @@ namespace Cosmos.System.FileSystem.FAT
 
         public FatStream(FatDirectoryEntry aEntry)
         {
-            Global.mFileSystemDebugger.SendInternal("FatStream with entry " + aEntry);
+            Global.mFileSystemDebugger.SendInternal($"FatStream with entry {aEntry}");
 
             mDirectoryEntry = aEntry;
             mFS = mDirectoryEntry.GetFileSystem();
             mSize = mDirectoryEntry.mSize;
 
-            Global.mFileSystemDebugger.SendInternal("FatStream with mSize", mSize);
+            Global.mFileSystemDebugger.SendInternal("FatStream with mSize {mSize}");
 
             Global.mFileSystemDebugger.SendInternal("Getting FatTable");
             // We get always the FatTable if the file is empty too
@@ -199,7 +199,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         protected void Write(byte[] aBuffer, long aOffset, long aCount)
         {
-            Global.mFileSystemDebugger.SendInternal("Write() called aCount ", aCount, ", aOffset", aOffset);
+            Global.mFileSystemDebugger.SendInternal($"Write() called aCount = {aCount}, aOffset = {aOffset}");
             if (aCount < 0)
             {
                 throw new ArgumentOutOfRangeException("aCount");

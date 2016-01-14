@@ -55,25 +55,26 @@ namespace Cosmos.System.Plugs.System.IO
             using (var xFS = new FileStream(aFile, FileMode.Append))
             {
                 Global.mFileSystemDebugger.SendInternal("Converting " + aText + " to UFT8");
-                var xBuff = aText.GetUtf8Bytes(0, (uint)aText.Length);
+                var xBuff = aText.GetUtf8Bytes(0, (uint) aText.Length);
                 Global.mFileSystemDebugger.SendInternal("Writing bytes");
                 xFS.Write(xBuff, 0, xBuff.Length);
                 Global.mFileSystemDebugger.SendInternal("Bytes written");
+            }
         }
 
         public static string[] ReadAllLines(string aFile)
         {
             String text = ReadAllText(aFile);
 
-            Global.mFileSystemDebugger.SendInternal(("Read content");
-            Global.mFileSystemDebugger.SendInternal(("\n", text);
+            Global.mFileSystemDebugger.SendInternal("Read contents");
+            Global.mFileSystemDebugger.SendInternal(text);
 
             String []result = text.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
-            Global.mFileSystemDebugger.SendInternal(("content as array of lines:");
+            Global.mFileSystemDebugger.SendInternal("content as array of lines:");
 #if COSMOSDEBUG
             for (int i = 0; i < result.Length; i++)
-                Global.mFileSystemDebugger.SendInternal((result[i]);
+                Global.mFileSystemDebugger.SendInternal(result[i]);
 #endif
 
             return result;
@@ -88,7 +89,9 @@ namespace Cosmos.System.Plugs.System.IO
                 text = String.Concat(text, contents[i], Environment.NewLine);
             }
 
-            Global.mFileSystemDebugger.SendInternal("Writing contents\n" + text);
+            Global.mFileSystemDebugger.SendInternal("Writing contents");
+            Global.mFileSystemDebugger.SendInternal(text);
+
             WriteAllText(aFile, text);
         }
 
