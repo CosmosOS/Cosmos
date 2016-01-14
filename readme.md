@@ -5,18 +5,18 @@
 
 Cosmos is an operating system "construction kit", built from the ground up around the IL2CPU compiler in C# and our home-brewed language called X#.
 
-It's current stage is only usable for academic work. Some day Cosmos will be ready for production work, but to reach that stage we need more developers. Specifically, we need a few more low level developers to help the few core developers who are currently overwhelmed with work.
+It's current stage is only usable for academic work. Some day Cosmos will be ready for production work, but to reach that stage we need more developers. Specifically, we need a few more low-level developers to help the few core developers who are currently overwhelmed with work.
 
 
-Downloads anvailables :
+Downloads:
 ---------
 
-Cosmos is available in two types of "constructions kits":
-* **User Kit** - The User Kit is used to develop your operating system in Visual Basic. 
+Cosmos is available in two flavors:
+* **User Kit** - The User Kit is used to develop your operating system in Visual Studio.
   If you are new to Cosmos, you can learn [here](https://github.com/CosmosOS/Cosmos/wiki). [Latest Release anvailable](https://github.com/CosmosOS/Cosmos/releases/latest)
-* **Devloppement Kit** - The Devloppement Kit is the full Cosmos source comming with build tools. 
-  If you need to modify the Cosmos core functions or modify built-in drivers, boot, compiler, etc.. you will need to use Devloppement Kit.
-  [Tutorial for building the Devloppement Kit](https://github.com/CosmosOS/Cosmos/wiki/Devkit) - Building from the source is easy with our automated builder.
+* **Development Kit** - The Development Kit is the full Cosmos source and build tools.
+  If you need to modify the Cosmos core functions or modify built-in drivers, boot, compiler, etc.. you will need to use Development Kit.
+  [Tutorial for building the Development Kit](https://github.com/CosmosOS/Cosmos/wiki/Devkit) - Building from the source is easy with our automated builder.
 
 
 Getting Started
@@ -31,8 +31,8 @@ Getting Started
 Joining and helping Cosmos
 ---------
 
-* [Gitter.im](https://gitter.im/CosmosOS/Cosmos) - The Live Chat: Click the green `Join Chat` badge at the top of this file. As with the IRC and CodePlex chatroom, please be patient if we don't respond immediately (no pinging).
-* [Yahoo Group](https://tech.groups.yahoo.com/group/Cosmos-Dev) - Email Discussion List: To prevent spambots from spamming, we ask you introduce yourself to join. Please mention something specific to Cosmos. For example: "Hey, I want to join" and will won't get you in....
+* [Gitter.im](https://gitter.im/CosmosOS/Cosmos) - The Live Chat: Click the green `Join Chat` badge at the top of this file. As with the IRC and CodePlex chat, please be patient if we don't respond immediately (no pinging).
+* [Yahoo Group](https://tech.groups.yahoo.com/group/Cosmos-Dev) - Email Discussion List: To prevent spam-bots from spamming, we ask you introduce yourself to join. Please mention something specific to Cosmos. For example: "Hey, I want to join" and will won't get you in....
 * [Facebook](http://www.facebook.com/pages/Cosmos-Operating-System/10235842745) - Like us to see frequent updates of what is going on with Cosmos.
 * [YouTube Channel](https://www.youtube.com/channel/UCsSKtqjfpSR0B3Ov4cBIarQ/) - Follow to see useful videos and help you programming your operating system.
 * [Resources](https://github.com/CosmosOS/Cosmos/wiki/Resources) - More Cosmos related links.
@@ -53,7 +53,7 @@ Articles and Resources
 Publicity
 ---------
 
-* [Mary Jo Foley - Cosmos: An open-source .Net-based microkernel OS is born](http://www.zdnet.com/blog/microsoft/cosmos-an-open-source-net-based-microkernel-os-is-born/1162)
+* [Mary Jo Foley - Cosmos: An open-source .Net-based micro-kernel OS is born](http://www.zdnet.com/blog/microsoft/cosmos-an-open-source-net-based-microkernel-os-is-born/1162)
 * [Scott Hanselman - Tiny Managed Operating System Edition](http://www.hanselman.com/blog/TheWeeklySourceCode15TinyManagedOperatingSystemEdition.aspx)
 
 
