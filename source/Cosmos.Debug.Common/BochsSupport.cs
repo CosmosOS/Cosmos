@@ -52,7 +52,6 @@ namespace Cosmos.Debug.Common
                 {
                     using (var writer = new StreamWriter(xOutputFile))
                     {
-                        Console.WriteLine($"Exporting symbols for Bochs: {xInputFile} -> {xOutputFile}");
                         bool startSymbolTable = false;
                         while (!reader.EndOfStream)
                         {
@@ -71,13 +70,11 @@ namespace Cosmos.Debug.Common
                                 startSymbolTable = true;
                             }
                         }
-                        Console.WriteLine($"Exported {i} symbols.");
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
             }
         }
 
