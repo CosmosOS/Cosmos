@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
-using Cosmos.Debug.Common;
 using System.IO;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace Cosmos.Debug.Common
 {
@@ -35,6 +32,8 @@ namespace Cosmos.Debug.Common
         public Action<UInt32> CmdStackCorruptionOccurred;
         public Action<UInt32> CmdNullReferenceOccurred;
         public Action<UInt32> CmdSimpleNumber;
+        public Action<float> CmdComplexSingleNumber;
+        public Action<double> CmdComplexDoubleNumber;
         public Action<Exception> Error;
 
         protected byte mCurrentMsgType;
@@ -82,6 +81,7 @@ namespace Cosmos.Debug.Common
         {
             // even when this method doesn't do anything, DON'T REMOVE IT
             // it's used when debugging the DebugConnector, as it provides insights to what happens
+            System.Diagnostics.Debug.WriteLine(message);
         }
 
         protected void DoDebugMsg(string aMsg, bool aOnlyIfConnected)
@@ -117,15 +117,24 @@ namespace Cosmos.Debug.Common
             SetBreakpoint(aID, 0);
         }
 
+        protected float GetSingle(byte[] aBytes, int aOffset)
+        {
+            return BitConverter.ToSingle(aBytes, aOffset);
+        }
+
+        protected double GetDouble(byte[] aBytes, int aOffset)
+        {
+            return BitConverter.ToDouble(aBytes, aOffset);
+        }
+
         protected UInt32 GetUInt32(byte[] aBytes, int aOffset)
         {
-            return (UInt32)((aBytes[aOffset + 3] << 24) | (aBytes[aOffset + 2] << 16)
-               | (aBytes[aOffset + 1] << 8) | aBytes[aOffset + 0]);
+            return BitConverter.ToUInt32(aBytes, aOffset);
         }
 
         protected UInt16 GetUInt16(byte[] aBytes, int aOffset)
         {
-            return (UInt16)((aBytes[aOffset + 1] << 8) | aBytes[aOffset + 0]);
+            return BitConverter.ToUInt16(aBytes, aOffset);
         }
 
         protected void PacketMsg(byte[] aPacket)
@@ -232,6 +241,16 @@ namespace Cosmos.Debug.Common
                 case Ds2Vs.SimpleNumber:
                     DebugLog("DC Recv: SimpleNumber");
                     Next(4, PacketSimpleNumber);
+                    break;
+
+                case Ds2Vs.ComplexSingleNumber:
+                    DebugLog("DC Recv: ComplexSingleNumber");
+                    Next(4, PacketComplexSingleNumber);
+                    break;
+
+                case Ds2Vs.ComplexDoubleNumber:
+                    DebugLog("DC Recv: ComplexDoubleNumber");
+                    Next(8, PacketComplexDoubleNumber);
                     break;
 
                 default:

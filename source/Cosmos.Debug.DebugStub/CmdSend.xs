@@ -1,18 +1,18 @@
 ﻿namespace DebugStub
 
 function SendRegisters {
-	// Send the actual started signal
+    // Send the actual started signal
     AL = #Ds2Vs_Registers
-	ComWriteAL()
+    ComWriteAL()
 
     ESI = .PushAllPtr
     ECX = 32
     ComWriteX()
 
-	ESI = @.CallerESP
+    ESI = @.CallerESP
     ComWrite32()
 
-	ESI = @.CallerEIP
+    ESI = @.CallerEIP
     ComWrite32()
 }
 
@@ -24,7 +24,7 @@ function SendFrame {
     ComWriteAX()
 
     ESI = .CallerEBP
-	// Dont transmit EIP or old EBP
+    // Dont transmit EIP or old EBP
     ESI + 8
     ECX = 32
     ComWriteX()
@@ -52,10 +52,10 @@ function SendCommandOnChannel{
 
   // now ECX contains size of data (count)
     // ESI contains address
-	while ECX != 0 {
-		ComWrite8()
-		ECX--
-	}
+    while ECX != 0 {
+        ComWrite8()
+        ECX--
+    }
 }
 
 function SendStack {
@@ -73,8 +73,8 @@ function SendStack {
     // Need to reload ESI, WriteAXToCompPort modifies it
     ESI = .CallerESP
     while ESI != .CallerEBP {
-		ComWrite8()
-	}
+        ComWrite8()
+    }
 }
 
 // sends a stack value
@@ -82,30 +82,30 @@ function SendStack {
 //  1: x32 - offset relative to EBP
 //  2: x32 - size of data to send
 function SendMethodContext {
-	+All
+    +All
 
     AL = #Ds2Vs_MethodContext
     ComWriteAL()
 
     ESI = .CallerEBP
 
-	// offset relative to ebp
+    // offset relative to ebp
     // size of data to send
     ComReadEAX()
     ESI + EAX
     ComReadEAX()
-	ECX = EAX
+    ECX = EAX
 
     // now ECX contains size of data (count)
     // ESI contains relative to EBP
 
-	while ECX != 0 {
-		ComWrite8()
-		ECX--
-	}
+    while ECX != 0 {
+        ComWrite8()
+        ECX--
+    }
 
 Exit:
-	-All
+    -All
 }
 
 // none
@@ -117,9 +117,9 @@ Exit:
 //  1: x32 - address
 //  2: x32 - size of data to send
 function SendMemory {
-	+All
+    +All
 
-	AL = #Ds2Vs_MemoryData
+    AL = #Ds2Vs_MemoryData
     ComWriteAL()
 
     ComReadEAX()
@@ -129,23 +129,23 @@ function SendMemory {
 
     // now ECX contains size of data (count)
     // ESI contains address
-	while ECX != 0 {
-		ComWrite8()
-		ECX--
-	}
+    while ECX != 0 {
+        ComWrite8()
+        ECX--
+    }
 
 Exit:
-	-All
+    -All
 }
 
 // Modifies: EAX, ESI
 function SendTrace {
     AL = #Ds2Vs_BreakPoint
-	// If we are running, its a tracepoint, not a breakpoint.
-	// In future, maybe separate these into 2 methods
-	if dword .DebugStatus = #Status_Run {
-	    AL = #Ds2Vs_TracePoint
-	}
+    // If we are running, its a tracepoint, not a breakpoint.
+    // In future, maybe separate these into 2 methods
+    if dword .DebugStatus = #Status_Run {
+        AL = #Ds2Vs_TracePoint
+    }
     ComWriteAL()
 
     // Send Calling EIP.
@@ -159,12 +159,12 @@ function SendTrace {
 function SendText {
 +EBP
 EBP = ESP
-	+All
-	// Write the type
+    +All
+    // Write the type
     AL = #Ds2Vs_Message
     ComWriteAL()
 
-	// Write Length
+    // Write Length
     ESI = EBP
     ESI + 12
     ECX = ESI[0]
@@ -179,18 +179,18 @@ WriteChar:
     // We are storing as 16 bits, but for now I will transmit 8 bits
     // So we inc again to skip the 0
     ESI++
-	goto WriteChar
+    goto WriteChar
 
     ////test
     // Write Length
     //ESI = EBP
     //ESI + 12
     //ECX = ESI[0]
-	//
+    //
     //// Address of string
     //ESI = EBP[8]
 Finalize:
-	-All
+    -All
   -EBP
 }
 
@@ -200,16 +200,58 @@ Finalize:
 function SendSimpleNumber {
 +EBP
 EBP = ESP
-	+All
-	// Write the type
+    +All
+    // Write the type
     AL = #Ds2Vs_SimpleNumber
     ComWriteAL()
 
-	// Write Length
+    // Write value
     EAX = EBP[8]
     ComWriteEAX()
 
-	-All
+    -All
+  -EBP
+}
+
+// Input: Stack
+// Output: None
+// Modifies: EAX, ECX, EDX, ESI
+function SendComplexSingleNumber {
+  +EBP
+  EBP = ESP
+  +All
+
+  // Write the type
+  AL = #Ds2Vs_ComplexSingleNumber
+  ComWriteAL()
+
+  // Write value
+  EAX = EBP[8]
+  ComWriteEAX()
+
+  -All
+  -EBP
+}
+
+// Input: Stack
+// Output: None
+// Modifies: EAX, ECX, EDX, ESI
+function SendComplexDoubleNumber {
+  +EBP
+  EBP = ESP
+  +All
+
+  // Write the type
+  AL = #Ds2Vs_ComplexDoubleNumber
+  ComWriteAL()
+
+  // Write value
+  EAX = EBP[8]
+  ComWriteEAX()
+  EAX = EBP[12]
+  ComWriteEAX()
+
+  -All
   -EBP
 }
 
@@ -256,7 +298,7 @@ function SendNullReferenceOccurred {
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
 function SendMessageBox {
-	// Write the type
+    // Write the type
     AL = #Ds2Vs_MessageBox
     ComWriteAL()
 

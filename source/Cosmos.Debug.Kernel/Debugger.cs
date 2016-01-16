@@ -37,7 +37,27 @@ namespace Cosmos.Debug.Kernel
             // plugged
         }
 
+        internal static void DoSendNumber(float aNumber)
+        {
+            // plugged
+        }
+
+        internal static void DoSendNumber(double aNumber)
+        {
+            // plugged
+        }
+
         public void SendNumber(uint aNumber)
+        {
+            DoSendNumber(aNumber);
+        }
+
+        public void SendNumber(float aNumber)
+        {
+            DoSendNumber(aNumber);
+        }
+
+        public void SendNumber(double aNumber)
         {
             DoSendNumber(aNumber);
         }
