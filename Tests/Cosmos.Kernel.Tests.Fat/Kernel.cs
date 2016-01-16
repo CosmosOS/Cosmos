@@ -59,7 +59,8 @@ namespace Cosmos.Kernel.Tests.Fat
                 return false;
             }
 
-            if (a1.Length != a2.Length) {
+            if (a1.Length != a2.Length)
+            {
                 mDebugger.Send("a1.Length != a2.Length so are different");
                 return false;
             }
@@ -462,7 +463,8 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("Now reading with ReadAllLines()");
             String[] readLines = File.ReadAllLines(@"0:\test3.txt");
             mDebugger.Send("Contents retrieved after writing");
-            for (int i = 0; i < readLines.Length; i++) {
+            for (int i = 0; i < readLines.Length; i++)
+            {
                 mDebugger.Send(readLines[i]);
             }
             Assert.IsTrue(StringArrayAreEquals(contents, readLines), "Contents of test3.txt was written incorrectly!");
@@ -480,14 +482,15 @@ namespace Cosmos.Kernel.Tests.Fat
 
             //
             mDebugger.Send("START TEST: Write binary data to file now:");
-            using (var xFile = File.Create(@"0:\test.dat")) {
+            using (var xFile = File.Create(@"0:\test.dat"))
+            {
                 Assert.IsTrue(xFile != null, "Failed to create a new file.");
             }
             byte[] dataWritten = new byte[] { 0x01, 0x02, 0x03 };
             File.WriteAllBytes(@"0:\test.dat", dataWritten);
             mDebugger.Send("Text written");
             byte[] dataRead = File.ReadAllBytes(@"0:\test.dat");
-   
+
             Assert.IsTrue(byteArrayAreEquals(dataWritten, dataRead), "Failed to write binary data to a file.");
             mDebugger.Send("END TEST");
             mDebugger.Send("");

@@ -22,6 +22,7 @@ namespace SentinelKernel
 
             string xItem = string.Join("|", xArray);
             Console.WriteLine(xItem);
+            mDebugger.Send($"xItem = {xItem}");
         }
     }
 }
