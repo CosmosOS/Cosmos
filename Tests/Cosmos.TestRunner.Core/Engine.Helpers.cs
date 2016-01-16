@@ -44,7 +44,7 @@ namespace Cosmos.TestRunner.Core
                                  "StackCorruptionDetectionEnabled:" + EnableStackCorruptionChecks,
                                  "StackCorruptionDetectionLevel:" + StackCorruptionChecksLevel,
                                  "DebugMode:Source",
-                                 "TraceAssemblies:",
+                                 "TraceAssemblies:" + TraceAssembliesLevel,
                                  "DebugCom:1",
                                  "UseNAsm:True",
                                  "OutputFilename:" + outputFile,
