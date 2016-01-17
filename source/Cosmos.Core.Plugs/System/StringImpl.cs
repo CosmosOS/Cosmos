@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 
-    using Cosmos.Common;
-    using Cosmos.Debug.Kernel;
-    using Cosmos.IL2CPU.Plugs;
+using Cosmos.Common;
+using Cosmos.Debug.Kernel;
+using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core.Plugs.System
 {
@@ -14,50 +15,201 @@ namespace Cosmos.Core.Plugs.System
 
         public static unsafe void Ctor(
             string aThis,
-            char[] aChars,
+            char* aChars,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
-            aStringEmpty = "";
-            aStringLength = aChars.Length;
-            for (int i = 0; i < aChars.Length; i++)
+            int xLength = 0;
+            while (aChars[xLength] != '\0')
             {
-                aFirstChar[i] = aChars[i];
+                xLength++;
             }
+            char[] xCharArray = new char[xLength];
+            fixed (char* xFirstChar = xCharArray)
+            {
+                for (int i = 0; i < xLength; i++)
+                {
+                    xCharArray[i] = aChars[i];
+                }
+                aFirstChar = xFirstChar;
+            }
+            aStringEmpty = "";
+            aStringLength = xLength;
         }
 
         public static unsafe void Ctor(
             string aThis,
-            char[] aChars,
-            int start,
-            int length,
-            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
-        {
-            aStringEmpty = "";
-            aStringLength = length;
-            for (int i = 0; i < length; i++)
-            {
-                aFirstChar[i] = aChars[start + i];
-            }
-        }
-
-        public static unsafe void Ctor(
-            string aThis,
-            char aChar,
+            char* aChars,
+            int aStartIndex,
             int aLength,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
+            int xLength = 0;
+            while (aChars[xLength] != '\0')
+            {
+                xLength++;
+            }
+            char[] xCharArray = new char[aLength];
+            fixed (char* xFirstChar = xCharArray)
+            {
+                for (int i = 0, j = aStartIndex; i < aLength; i++, j++)
+                {
+                    xCharArray[i] = aChars[j];
+                }
+                aFirstChar = xFirstChar;
+            }
             aStringEmpty = "";
             aStringLength = aLength;
-            for (int i = 0; i < aLength; i++)
+        }
+
+        public static unsafe void Ctor(
+            string aThis,
+            sbyte* aBytes,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+        {
+            int xLength = 0;
+            while (aBytes[xLength] != '\0')
             {
-                aFirstChar[i] = aChar;
+                xLength++;
             }
+            char[] xCharArray = new char[xLength];
+            fixed (char* xFirstChar = xCharArray)
+            {
+                for (int i = 0; i < xLength; i++)
+                {
+                    xCharArray[i] = (char)aBytes[i];
+                }
+                aFirstChar = xFirstChar;
+            }
+            aStringEmpty = "";
+            aStringLength = xLength;
+        }
+
+        public static unsafe void Ctor(
+            string aThis,
+            sbyte* aBytes,
+            int aStartIndex,
+            int aLength,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+        {
+            int xLength = 0;
+            while (aBytes[xLength] != '\0')
+            {
+                xLength++;
+            }
+            char[] xCharArray = new char[aLength];
+            fixed (char* xFirstChar = xCharArray)
+            {
+                for (int i = 0, j = aStartIndex; i < aLength; i++, j++)
+                {
+                    xCharArray[i] = (char)aBytes[j];
+                }
+                aFirstChar = xFirstChar;
+            }
+            aStringEmpty = "";
+            aStringLength = aLength;
+        }
+
+        //TODO: Handle encoding.
+        public static unsafe void Ctor(
+            string aThis,
+            sbyte* aBytes,
+            int aStartIndex,
+            int aLength,
+            Encoding aEncoding,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+        {
+            int xLength = 0;
+            while (aBytes[xLength] != '\0')
+            {
+                xLength++;
+            }
+            char[] xCharArray = new char[aLength];
+            fixed (char* xFirstChar = xCharArray)
+            {
+                for (int i = 0, j = aStartIndex; i < aLength; i++, j++)
+                {
+                    xCharArray[i] = (char)aBytes[j];
+                }
+                aFirstChar = xFirstChar;
+            }
+            aStringEmpty = "";
+            aStringLength = aLength;
+        }
+
+        public static unsafe void Ctor(
+            string aThis,
+            char[] aChars,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+        {
+            char[] xCharArray = new char[aChars.Length];
+            fixed (char* xFirstChar = xCharArray)
+            {
+                for (int i = 0; i < aChars.Length; i++)
+                {
+                    xCharArray[i] = aChars[i];
+                }
+                aFirstChar = xFirstChar;
+            }
+            aStringEmpty = "";
+            aStringLength = aChars.Length;
+        }
+
+        public static unsafe void Ctor(
+            string aThis,
+            char[] aChars,
+            int aStartIndex,
+            int aLength,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+        {
+            char[] xCharArray = new char[aLength];
+            fixed (char* xFirstChar = xCharArray)
+            {
+                for (int i = 0, j = aStartIndex; i < aLength; i++, j++)
+                {
+                    xCharArray[i] = aChars[j];
+                }
+                aFirstChar = xFirstChar;
+            }
+            aStringEmpty = "";
+            aStringLength = aLength;
+        }
+
+        public static unsafe void Ctor(
+            string aThis,
+            char aChar,
+            int aCount,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+        {
+            if (aCount > 0)
+            {
+                char[] xCharArray = new char[aCount];
+                fixed (char* xFirstChar = xCharArray)
+                {
+                    for (int i = 0; i < aCount; i++)
+                    {
+                        xCharArray[i] = aChar;
+                    }
+                    aFirstChar = xFirstChar;
+                }
+            }
+            aStringEmpty = "";
+            aStringLength = aCount;
         }
 
         public static unsafe int get_Length(
@@ -67,14 +219,12 @@ namespace Cosmos.Core.Plugs.System
             return aLength;
         }
 
-        public static unsafe char get_Chars(uint* aThis, int aIndex)
+        public static unsafe char get_Chars(
+            uint* aThis,
+            int aIndex,
+            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
-            // todo: change to use a FieldAccessAttribute, to get the pointer to the first character and go from there
-
-            // we first need to dereference the handle to a pointer.
-            uint xActualThis = aThis[0];
-            var xCharIdx = (char*)(xActualThis + 16);
-            return xCharIdx[aIndex];
+            return *(aFirstChar + aIndex);
         }
 
         public static bool IsAscii(string aThis)
@@ -172,10 +322,10 @@ namespace Cosmos.Core.Plugs.System
         internal static string FormatHelper(IFormatProvider aFormatProvider, string aFormat, params object[] aArgs)
         {
             char[] xCharArray = aFormat.ToCharArray();
-            string xFormattedString = string.Empty;
-            bool xFoundPlaceholder = false;
-            string xParamNumber = string.Empty;
-            bool xParamNumberDone = true;
+            string xFormattedString = string.Empty, xStaticString;
+            bool xFoundPlaceholder = false, xParamNumberDone = true;
+            int xStartParamNumber = -1, xEndParamNumber = -1, xLastPlaceHolder = 0;
+
             for (int i = 0; i < xCharArray.Length; i++)
             {
                 if (xFoundPlaceholder)
@@ -187,40 +337,53 @@ namespace Cosmos.Core.Plugs.System
                     if (xCharArray[i] == '}')
                     {
                         mDebugger.SendInternal("Found closing placeholder.");
+                        if (xEndParamNumber < 0)
+                        {
+                            xEndParamNumber = i;
+                        }
+                        string xParamNumber = aFormat.Substring(xStartParamNumber, xEndParamNumber - xStartParamNumber);
+                        mDebugger.SendInternal("Calling StringHelper.GetStringToNumber");
+                        mDebugger.SendInternal(xParamNumber);
                         int xParamIndex = StringHelper.GetStringToNumber(xParamNumber);
                         mDebugger.SendInternal("Converted paramindex to a number.");
-                        if ((xParamIndex < aArgs.Length - 1) && (aArgs[xParamIndex] != null))
+                        if ((xParamIndex < aArgs.Length) && (aArgs[xParamIndex] != null))
                         {
                             string xParamValue = aArgs[xParamIndex].ToString();
                             xFormattedString = string.Concat(xFormattedString, xParamValue);
                         }
                         xFoundPlaceholder = false;
                         xParamNumberDone = true;
-                        xParamNumber = string.Empty;
+                        xStartParamNumber = -1;
+                        xEndParamNumber = -1;
+                        xLastPlaceHolder = i + 1;
                     }
                     else if (xCharArray[i] == ':')
                     {
                         xParamNumberDone = true;
+                        xEndParamNumber = i;
                         // TODO: Need to handle different formats. (X, N, etc)
                     }
                     else if ((char.IsDigit(xCharArray[i])) && (!xParamNumberDone))
                     {
-                        mDebugger.SendInternal("Getting param numberr.");
-                        xParamNumber = string.Concat(xParamNumber, xCharArray[i]);
+                        mDebugger.SendInternal("Getting param number.");
+                        if (xStartParamNumber < 0)
+                        {
+                            xStartParamNumber = i;
+                        }
                     }
                 }
                 else if (xCharArray[i] == '{')
                 {
                     mDebugger.SendInternal("Found opening placeholder");
-                        xFoundPlaceholder = true;
-                        xParamNumberDone = false;
-                        xParamNumber = string.Empty;
-                }
-                else
-                {
-                    xFormattedString = string.Concat(xFormattedString, xCharArray[i]);
+                    xStaticString = aFormat.Substring(xLastPlaceHolder, i - xLastPlaceHolder);
+                    xFormattedString = string.Concat(xFormattedString, xStaticString);
+                    xFoundPlaceholder = true;
+                    xParamNumberDone = false;
                 }
             }
+
+            xStaticString = aFormat.Substring(xLastPlaceHolder, aFormat.Length - xLastPlaceHolder);
+            xFormattedString = string.Concat(xFormattedString, xStaticString);
 
             return xFormattedString;
         }
@@ -232,7 +395,7 @@ namespace Cosmos.Core.Plugs.System
             if (aSubstring.Length > aThis.Length)
             {
                 return false;
-        }
+            }
             for (int i = 0; i < ci.Length; i++)
             {
                 if (di[i] != ci[i])
@@ -483,12 +646,12 @@ namespace Cosmos.Core.Plugs.System
             {
                 if (value == aThis)
                 {
-                return true;
-            }
+                    return true;
+                }
                 else
                 {
-            return false;
-        }
+                    return false;
+                }
             }
             else if (!(value.Length > aThis.Length) && (value.Length != aThis.Length))
             {
@@ -521,10 +684,10 @@ namespace Cosmos.Core.Plugs.System
             Char[] ci = aSubStr.ToCharArray();
             if (aThis.Length == aSubStr.Length)
             {
-            if (aThis == aSubStr)
-            {
-                return true;
-            }
+                if (aThis == aSubStr)
+                {
+                    return true;
+                }
                 return false;
             }
             else if (aThis.Length > aSubStr.Length)
@@ -534,14 +697,14 @@ namespace Cosmos.Core.Plugs.System
             else
             {
                 for (int i = aThis.Length - aSubStr.Length; i < aThis.Length; i++)
-            {
-                    if (di[aThis.Length - aSubStr.Length + i] != ci[i])
                 {
-                    return false;
+                    if (di[aThis.Length - aSubStr.Length + i] != ci[i])
+                    {
+                        return false;
+                    }
                 }
+                return true;
             }
-            return true;
-        }
         }
 
         //        System.Int32  System.String.IndexOf(System.String, System.Int32, System.Int32, System.StringComparison)
@@ -643,15 +806,15 @@ namespace Cosmos.Core.Plugs.System
             {
                 mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA is null");
                 if (aStrB == null)
-            {
+                {
                     mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is null");
                     mDebugger.SendInternal($"nativeCompareOrdinalEx : returning 0");
-                return 0;
-            }
+                    return 0;
+                }
                 mDebugger.SendInternal($"nativeCompareOrdinalEx : aStrB is not null");
                 mDebugger.SendInternal($"nativeCompareOrdinalEx : returning -1");
-            return -1;
-        }
+                return -1;
+            }
             if (aStrB == null)
             {
                 mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA is not null");
@@ -774,12 +937,12 @@ namespace Cosmos.Core.Plugs.System
             char[] ci = aThis.ToCharArray();
             char[] di = aSubStr.ToCharArray();
 
-            if(aThis.StartsWith(aSubStr))
+            if (aThis.StartsWith(aSubStr))
             {
-                if(aThis != aSubStr)
+                if (aThis != aSubStr)
                 {
                     char[] oi = new char[ci.Length - di.Length];
-                    for(int i=0; i < ci.Length - di.Length; i++)
+                    for (int i = 0; i < ci.Length - di.Length; i++)
                     {
                         oi[i] = ci[i + di.Length];
                     }
@@ -791,6 +954,6 @@ namespace Cosmos.Core.Plugs.System
 
             throw new ArgumentNullException();
         }
-      
+
     }
 }

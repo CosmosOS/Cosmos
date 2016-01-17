@@ -10,6 +10,8 @@ namespace Cosmos.Common
 
     public static class StringHelper
     {
+        internal static Debugger mDebugger = new Debugger("Common", "String Helpers");
+
         public static string GetCharArrayString(char[] aArray)
         {
             if (aArray == null)
@@ -80,25 +82,31 @@ namespace Cosmos.Common
 
         public static int GetStringToNumber(string aString)
         {
+            bool xIsNegative = false;
             int xNumber = 0;
             if (!string.IsNullOrWhiteSpace(aString))
             {
-                for (int i = aString.Length - 1; i >= 0; i--)
+                char[] xCharArray = aString.ToCharArray();
+                for (int i = 0; i < xCharArray.Length; i++)
                 {
-                    char xC = aString[i];
-                    if (char.IsDigit(xC))
+                    if (char.IsDigit(xCharArray[i]))
                     {
-                        int xValue = xC - '0';
-                        xValue = xValue * (int)Math.Pow(10, i);
+                        int xValue = xCharArray[i] - '0';
+                        int xMax = xCharArray.Length - 1;
+                        for (int j = 0; j < xMax - i; i++)
+                        {
+                            xValue *= 10;
+                        }
+
                         xNumber += xValue;
                     }
-                    else if (xC == '-')
+                    else if (xCharArray[i] == '-')
                     {
-                        xNumber *= -1;
+                        xIsNegative = true;
                     }
-                    else if (xC == '.')
+                    else if (xCharArray[i] == '.')
                     {
-                        return xNumber;
+                        break;
                     }
                     else
                     {
@@ -106,6 +114,12 @@ namespace Cosmos.Common
                     }
                 }
             }
+
+            if (xIsNegative)
+            {
+                xNumber *= -1;
+            }
+
             return xNumber;
         }
     }
