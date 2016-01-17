@@ -33,50 +33,59 @@ namespace Cosmos.Common
             return xString;
         }
 
-        public static string GetNumberString(uint aValue, bool aIsNegative)
+        public static string GetNumberString(uint aValue)
         {
+            string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+            string xResult = string.Empty;
+
             if (aValue == 0)
             {
-                if (aIsNegative)
-                {
-                    return "-0";
-                }
-                else
-                {
-                    return "0";
-                }
+                xResult = "0";
             }
-            const string xDigits = "0123456789";
-            char[] xResultChars = new char[11];
-            int xCurrentPos = 10;
-            while (aValue > 0)
+            else
             {
-                byte xPos = (byte)(aValue % 10);
-                aValue /= 10;
-                xResultChars[xCurrentPos] = xDigits[xPos];
-                xCurrentPos -= 1;
+                uint xValue = aValue;
+                while (xValue > 0)
+                {
+                    uint xValue2 = xValue % 10;
+                    xResult = string.Concat(xChars[xValue2], xResult);
+                    xValue /= 10;
+                }
             }
-            if (aIsNegative)
-            {
-                xResultChars[xCurrentPos] = '-';
-                xCurrentPos -= 1;
-            }
-            return new string(xResultChars, xCurrentPos + 1, 10 - xCurrentPos);
+
+            return xResult;
         }
 
         public static string GetNumberString(int aValue)
         {
-            bool xIsNegative = false;
+            string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+            string xResult = string.Empty;
+            int xValue = aValue;
+
             if (aValue < 0)
             {
-                xIsNegative = true;
-                aValue *= -1;
+                xValue *= -1;
             }
-            var xResult = GetNumberString((uint)aValue, xIsNegative);
-            if (xResult == null)
+
+            if (aValue == 0)
             {
-                return GetNumberString((uint)aValue, xIsNegative);
+                xResult = string.Concat(xResult, "0");
             }
+            else
+            {
+                while (xValue > 0)
+                {
+                    int xValue2 = xValue % 10;
+                    xResult = string.Concat(xChars[xValue2], xResult);
+                    xValue /= 10;
+                }
+            }
+
+            if (aValue < 0)
+            {
+                xResult = string.Concat("-", xResult);
+            }
+
             return xResult;
         }
 
