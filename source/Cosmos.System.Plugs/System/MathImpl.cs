@@ -1,12 +1,14 @@
 ﻿using System;
 
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System
 {
-    [Plug(Target = typeof(global::System.Math))]
-    public class MathImpl
+    [Plug(Target = typeof(Math))]
+    public static class MathImpl
     {
+        internal static Debugger mDebugger = new Debugger("System", "Math Plugs");
 
         #region Internal Constants
         private const double sq2p1 = 2.414213562373095048802e0F;
@@ -399,7 +401,7 @@ namespace Cosmos.System.Plugs.System
             }
 
             x1 = i;
-            // this originally used another variable here, 
+            // this originally used another variable here,
             // but the use of i was done, thus it's faster
             // to re-use the variable.
             for (i = 0; i < 10; i++)
@@ -588,7 +590,5 @@ namespace Cosmos.System.Plugs.System
         #endregion
 
         #endregion
-
-
     }
 }

@@ -15,13 +15,10 @@ namespace SentinelKernel
 
         protected override void Run()
         {
-            var xList = new List<string> { "A", "B" };
-
-            string[] xArray = new[] { "A", "B" };
-            // var xItem = xList.First(); // mkrefany
-
-            string xItem = string.Join("|", xArray);
-            Console.WriteLine(xItem);
+            string a = "test";
+            double b = 1.25;
+            Console.WriteLine($"{a} = {b}");
+            mDebugger.Send($"{a} = {b}");
         }
     }
 }

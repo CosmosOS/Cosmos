@@ -11,14 +11,7 @@ namespace Cosmos.System.Plugs.System
     {
         public static string FormatInt32(int aInt, string aStr, NumberFormatInfo aFormat)
         {
-            bool xIsNegative = false;
-            if (aInt < 0)
-            {
-                xIsNegative = true;
-                aInt *= -1;
-            }
-            var xResult = StringHelper.GetNumberString((uint)aInt, xIsNegative);
-            return xResult;
+            return StringHelper.GetNumberString(aInt);
         }
 
         public static string FormatDouble(double aInt, string aStr, NumberFormatInfo aFormat)

@@ -1,6 +1,7 @@
 ﻿//#define VMT_DEBUG
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Linq;
@@ -1564,49 +1565,42 @@ namespace Cosmos.IL2CPU
             {
                 // Check options for Debug Level
                 // Set based on TracedAssemblies
-                if (TraceAssemblies == TraceAssemblies.Cosmos || TraceAssemblies == TraceAssemblies.User)
+                if (TraceAssemblies > TraceAssemblies.None)
                 {
-                    if (aNamespace.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase))
+                    if (TraceAssemblies < TraceAssemblies.All)
                     {
-                        return;
+                        if (aNamespace.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            return;
+                        }
+                        if (aNamespace.ToLower() == "system")
+                        {
+                            return;
+                        }
+                        if (aNamespace.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            return;
+                        }
                     }
-                    else if (aNamespace.ToLower() == "system")
-                    {
-                        return;
-                    }
-                    else if (aNamespace.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return;
-                    }
-                    if (TraceAssemblies == TraceAssemblies.User)
+
+                    if (TraceAssemblies < TraceAssemblies.Cosmos)
                     {
                         //TODO: Maybe an attribute that could be used to turn tracing on and off
-                        //TODO: This doesnt match Cosmos.Kernel exact vs Cosmos.Kernel., so a user
-                        // could do Cosmos.KernelMine and it will fail. Need to fix this
-                        if (aNamespace.StartsWith("Cosmos.Kernel", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            return;
-                        }
-                        else if (aNamespace.StartsWith("Cosmos.System", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            return;
-                        }
-                        else if (aNamespace.StartsWith("Cosmos.HAL", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            return;
-                        }
-                        else if (aNamespace.StartsWith("Cosmos.Core", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            return;
-                        }
-                        else if (aNamespace.StartsWith("Cosmos.IL2CPU", StringComparison.InvariantCultureIgnoreCase))
+                        if (aNamespace.StartsWith("Cosmos.", StringComparison.InvariantCultureIgnoreCase))
                         {
                             return;
                         }
                     }
                 }
+                else
+                {
+                    return;
+                }
             }
-
+            else
+            {
+                return;
+            }
             // If we made it this far without a return, emit the Tracer
             // We used to emit an INT3, but this meant the DS would brwak after every C# line
             // Breaking that frequently is of course, pointless and slow.

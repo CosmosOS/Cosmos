@@ -10,7 +10,7 @@ namespace Cosmos.System.Plugs.System
     {
         public static string ToString(ref uint aThis)
         {
-            return StringHelper.GetNumberString(aThis, false);
+            return StringHelper.GetNumberString(aThis);
         }
     }
 }
