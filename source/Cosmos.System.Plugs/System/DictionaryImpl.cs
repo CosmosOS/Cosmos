@@ -1,12 +1,11 @@
 ﻿using System;
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System
 {
-    [Plug(Target=typeof(Dictionary<int, string>))]
+    [Plug(Target = typeof(Dictionary<int, string>))]
     public static class DictionaryImpl
     {
 
@@ -16,7 +15,7 @@ namespace Cosmos.System.Plugs.System
             {
                 throw new Exception("Capacity != 0 not supported yet!");
             }
-            
+
         }
 
     }

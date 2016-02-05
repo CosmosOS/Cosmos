@@ -102,7 +102,10 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-
+          if (xPopType.IsInterface)
+          {
+            return;
+          }
           // ECMA apparently sees a boolean on the stack as a native int. We push as boolean, so acccept that as well
           if (xPopType == typeof (bool))
           {

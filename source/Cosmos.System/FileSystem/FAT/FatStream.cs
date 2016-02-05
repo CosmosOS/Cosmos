@@ -1,8 +1,7 @@
-﻿#define COSMOSDEBUG
-
-using System;
+﻿using System;
 using System.IO;
 
+using Cosmos.Debug.Kernel;
 using Cosmos.System.FileSystem.FAT.Listing;
 
 namespace Cosmos.System.FileSystem.FAT
@@ -31,12 +30,21 @@ namespace Cosmos.System.FileSystem.FAT
 
         public FatStream(FatDirectoryEntry aEntry)
         {
+            Global.mFileSystemDebugger.SendInternal($"FatStream with entry {aEntry}");
+
             mDirectoryEntry = aEntry;
             mFS = mDirectoryEntry.GetFileSystem();
             mSize = mDirectoryEntry.mSize;
-            if (mDirectoryEntry.mSize > 0)
-            {
+
+            Global.mFileSystemDebugger.SendInternal("FatStream with mSize {mSize}");
+
+            Global.mFileSystemDebugger.SendInternal("Getting FatTable");
+            // We get always the FatTable if the file is empty too
                 mFatTable = mDirectoryEntry.GetFatTable();
+            // What to do if this should happen? Throw exception?
+            if (mFatTable == null)
+            {
+                Global.mFileSystemDebugger.SendInternal("FatTable got but it is null!");
             }
         }
 
@@ -72,7 +80,7 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     throw new NullReferenceException("The stream does not currently have an open entry.");
                 }
-                FileSystemHelpers.Debug("FatStream.get_Length", "Length = ", (long)mSize);
+                Global.mFileSystemDebugger.SendInternal($"FatStream.get_Length : Length = {(long)mSize}");
                 return (long)mSize;
             }
         }
@@ -81,7 +89,7 @@ namespace Cosmos.System.FileSystem.FAT
         {
             get
             {
-                FileSystemHelpers.Debug("FatStream.get_Position", "Position = ", (long)mPosition);
+                Global.mFileSystemDebugger.SendInternal($"FatStream.get_Position : Position = {(long)mPosition}");
                 return (long)mPosition;
             }
             set
@@ -90,7 +98,7 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     throw new ArgumentOutOfRangeException("value");
                 }
-                FileSystemHelpers.Debug("FatStream.set_Position", "Position = ", (long)value);
+                Global.mFileSystemDebugger.SendInternal($"FatStream.set_Position : Position = {(long)value}");
                 mPosition = (ulong)value;
             }
         }
@@ -125,7 +133,7 @@ namespace Cosmos.System.FileSystem.FAT
                 return 0;
             }
 
-            FileSystemHelpers.Debug("FatStream.Read", "aBuffer.Length = ", aBuffer.Length, ", aOffset = ", aOffset, ", aCount = ", aCount);
+            Global.mFileSystemDebugger.SendInternal($"FatStream.Read : aBuffer.Length = {aBuffer.Length}, aOffset = {aOffset}, aCount = {aCount}");
 
             // reduce count, so that no out of bound exception occurs if not existing
             // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
@@ -167,19 +175,19 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override void Flush()
         {
-            FileSystemHelpers.Debug("FatStream.Flush");
+            Global.mFileSystemDebugger.SendInternal($"FatStream.Flush");
             throw new NotImplementedException();
         }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            FileSystemHelpers.Debug("FatStream.Seek", "aOffset = ", offset, ", origin = ", origin.ToString());
+            Global.mFileSystemDebugger.SendInternal($"FatStream.Seek : aOffset = {offset}, origin = {origin}");
             throw new NotImplementedException();
         }
 
         public override void SetLength(long value)
         {
-            FileSystemHelpers.Debug("FatStream.SetLength", "value = ", value);
+            Global.mFileSystemDebugger.SendInternal($"FatStream.SetLength : value = {value}");
             mDirectoryEntry.SetSize(value);
             mSize = (ulong)value;
         }
@@ -191,6 +199,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         protected void Write(byte[] aBuffer, long aOffset, long aCount)
         {
+            Global.mFileSystemDebugger.SendInternal($"Write() called aCount = {aCount}, aOffset = {aOffset}");
             if (aCount < 0)
             {
                 throw new ArgumentOutOfRangeException("aCount");
@@ -204,7 +213,7 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentException("Invalid offset length!");
             }
 
-            FileSystemHelpers.Debug("FatStream.Write", "aBuffer.Length =", aBuffer.Length, ", aOffset = ", aOffset, ", aCount = ", aCount);
+            Global.mFileSystemDebugger.SendInternal($"FatStream.Write : aBuffer.Length = {aBuffer.Length}, aOffset = {aOffset}, aCount = {aCount}");
             ulong xCount = (ulong)aCount;
             var xCluster = mFS.NewClusterArray();
             uint xClusterSize = mFS.BytesPerCluster;
@@ -231,14 +240,15 @@ namespace Cosmos.System.FileSystem.FAT
 
                 mFS.Read(xClusterIdx, out xCluster);
 
-                FileSystemHelpers.Debug("Writing to cluster idx", xClusterIdx);
-                FileSystemHelpers.Debug("Writing to pos in cluster", xPosInCluster);
-                FileSystemHelpers.Debug("Offset", aOffset);
-                FileSystemHelpers.Debug("First byte", aBuffer[0]);
+                Global.mFileSystemDebugger.SendInternal($"Writing to cluster idx {xClusterIdx}");
+                Global.mFileSystemDebugger.SendInternal($"Writing to pos in cluster {xPosInCluster}");
+                Global.mFileSystemDebugger.SendInternal($"Offset {aOffset}");
+                Global.mFileSystemDebugger.SendInternal($"First byte {aBuffer[0]}");
 
                 Array.Copy(aBuffer, aOffset, xCluster, (long)xPosInCluster, xWriteSize);
 
                 mFS.Write(mFatTable[(int)xClusterIdx], xCluster);
+                Global.mFileSystemDebugger.SendInternal("Data written");
 
                 aOffset += xWriteSize;
                 xCount -= (ulong)xWriteSize;

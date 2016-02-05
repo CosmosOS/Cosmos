@@ -51,9 +51,10 @@ namespace Cosmos.Build.Common
 
     public enum TraceAssemblies
     {
-        All,
-        Cosmos,
-        User
+        None = 0,
+        User = 1,
+        Cosmos = 2,
+        All = 3
     };
 
     public enum DebugMode

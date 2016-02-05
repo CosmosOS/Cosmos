@@ -91,6 +91,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
         /// <summary>Initialize and start the Bochs process.</summary>
         public override void Start()
         {
+            BochsSupport.ExtractBochsDebugSymbols(Path.ChangeExtension(mParams["ISOFile"], "map"), Path.ChangeExtension(mParams["ISOFile"], "sym"));
             _bochsProcess = new Process();
             ProcessStartInfo _bochsStartInfo = _bochsProcess.StartInfo;
             _bochsStartInfo.FileName = (_useDebugVersion && BochsSupport.BochsDebugExe.Exists)

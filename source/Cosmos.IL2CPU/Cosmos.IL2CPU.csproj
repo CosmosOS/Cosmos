@@ -104,58 +104,25 @@
     <Compile Include="CompilerEngine.cs" />
     <Compile Include="CompilerExtensionAttribute.cs" />
     <Compile Include="CompilerExtensionBase.cs" />
-    <Compile Include="CustomImplementation\AssemblerImpl.cs" />
-    <Compile Include="CustomImplementation\Microsoft\Win32\RegistryKeyImpl.cs" />
-    <Compile Include="CustomImplementation\System\ArrayImpl.cs" />
-    <Compile Include="CustomImplementation\System\ArrayImplRefs.cs" />
-    <Compile Include="CustomImplementation\System\BooleanImpl.cs" />
-    <Compile Include="CustomImplementation\System\ByteImpl.cs" />
-    <Compile Include="CustomImplementation\System\CharImpl.cs" />
-    <Compile Include="CustomImplementation\System\DelegateHelper.cs" />
-    <Compile Include="CustomImplementation\System\DelegateImpl.cs" />
-    <Compile Include="CustomImplementation\System\DoubleImpl.cs" />
-    <Compile Include="CustomImplementation\System\Drawing1\ColorImpl.cs" />
-    <Compile Include="CustomImplementation\System\Drawing1\SRImpl.cs" />
-    <Compile Include="CustomImplementation\System\EnumImpl.cs" />
-    <Compile Include="CustomImplementation\System\EnvironmentImpl.cs">
+    <Compile Include="Plugs\AssemblerImpl.cs" />
+    <Compile Include="Plugs\System\EnvironmentImpl.cs">
       <SubType>
       </SubType>
     </Compile>
-    <Compile Include="CustomImplementation\System\GCImpl.cs" />
-    <Compile Include="CustomImplementation\System\Globalization\CultureInfoImpl.cs" />
-    <Compile Include="CustomImplementation\System\Globalization\NumberFormatInfoImpl.cs" />
-    <Compile Include="CustomImplementation\System\Int16Impl.cs" />
-    <Compile Include="CustomImplementation\System\Int32Impl.cs" />
-    <Compile Include="CustomImplementation\System\Int64Impl.cs" />
-    <Compile Include="CustomImplementation\System\IntPtrImpl.cs" />
-    <Compile Include="CustomImplementation\System\MulticastDelegateImpl.cs" />
-    <Compile Include="CustomImplementation\System\Net\IPAddressImpl.cs" />
-    <Compile Include="CustomImplementation\System\Net\SocketAddressImpl.cs" />
-    <Compile Include="CustomImplementation\System\NumberImpl.cs" />
-    <Compile Include="CustomImplementation\System\ObjectImpl.cs">
+    <Compile Include="Plugs\System\GCImpl.cs" />
+    <Compile Include="Plugs\System\Globalization\CultureInfoImpl.cs" />
+    <Compile Include="Plugs\System\Globalization\NumberFormatInfoImpl.cs" />
+    <Compile Include="Plugs\System\ObjectImpl.cs">
       <SubType>
       </SubType>
     </Compile>
-    <Compile Include="CustomImplementation\System\ObjectImplRefs.cs" />
-    <Compile Include="CustomImplementation\System\Resource\ResourceManager.cs" />
-    <Compile Include="CustomImplementation\System\RuntimeType.cs" />
-    <Compile Include="CustomImplementation\System\RuntimeType.RuntimeTypeCache.cs" />
-    <Compile Include="CustomImplementation\System\RuntimeTypeHandle.cs" />
-    <Compile Include="CustomImplementation\System\Security\CodeAccessSecurityEngineImpl.cs" />
-    <Compile Include="CustomImplementation\System\Runtime\CompilerServices\RuntimeHelpers.cs" />
-    <Compile Include="CustomImplementation\System\Runtime\InteropServices\SafeHandleImpl.cs" />
-    <Compile Include="CustomImplementation\System\SByteImpl.cs" />
-    <Compile Include="CustomImplementation\System\Security\Cryptography\Utils.cs" />
-    <Compile Include="CustomImplementation\System\SingleImpl.cs" />
-    <Compile Include="CustomImplementation\System\SRImpl.cs" />
-    <Compile Include="CustomImplementation\System\StringImpl.cs" />
-    <Compile Include="CustomImplementation\System\StringImplRefs.cs" />
-    <Compile Include="CustomImplementation\System\Text\StringBuilderImpl.cs" />
-    <Compile Include="CustomImplementation\System\Threading\Interlocked.cs" />
-    <Compile Include="CustomImplementation\System\UInt16Impl.cs" />
-    <Compile Include="CustomImplementation\System\UInt32Impl.cs" />
-    <Compile Include="CustomImplementation\System\UInt64Impl.cs" />
-    <Compile Include="CustomImplementation\System\UIntPtrImpl.cs" />
+    <Compile Include="Plugs\System\Resource\ResourceManager.cs" />
+    <Compile Include="Plugs\System\RuntimeType.cs" />
+    <Compile Include="Plugs\System\RuntimeType.RuntimeTypeCache.cs" />
+    <Compile Include="Plugs\System\RuntimeTypeHandle.cs" />
+    <Compile Include="Plugs\System\Runtime\CompilerServices\RuntimeHelpers.cs" />
+    <Compile Include="Plugs\System\Runtime\InteropServices\SafeHandleImpl.cs" />
+    <Compile Include="Plugs\System\Threading\Interlocked.cs" />
     <Compile Include="ElfHash.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="Extensions.cs" />
@@ -367,32 +334,13 @@
     <Compile Include="IL\Volatile.cs" />
     <Compile Include="IL\Xor.cs" />
     <Compile Include="Optimizer.cs" />
-    <Compile Include="Plugs\Diagnostics\BreakAssembler.cs" />
+    <Compile Include="Plugs\Assemblers\BreakAssembler.cs" />
     <Compile Include="Plugs\Diagnostics\DebuggerImpl.cs" />
     <Compile Include="Plugs\Diagnostics\DebugImpl.cs" />
-    <Compile Include="Plugs\Diagnostics\DebugImplRefs.cs" />
-    <Compile Include="Plugs\MS\System\MathImpl.cs" />
-    <Compile Include="Plugs\NEW_PLUGS\CtorImplAssembler.cs" />
-    <Compile Include="Plugs\NEW_PLUGS\DelegateImpl.cs" />
-    <Compile Include="Plugs\NEW_PLUGS\DoubleImpl.cs" />
-    <Compile Include="Plugs\NEW_PLUGS\GetMulticastInvokeAssembler.cs" />
-    <Compile Include="Plugs\NEW_PLUGS\InvokeImplAssembler.cs" />
-    <Compile Include="Plugs\NEW_PLUGS\NormalDelegateImpl.cs" />
-    <Compile Include="Plugs\System.Runtime.CompilerServices\RuntimeHelpersImpl.cs" />
-    <Compile Include="Plugs\System\ArrayImpl.cs" />
-    <Compile Include="Plugs\System\Assemblers\Array_get_Length.cs" />
-    <Compile Include="Plugs\System\Assemblers\Array_InternalCopy.cs" />
-    <Compile Include="Plugs\System\Assemblers\Buffer_BlockCopy.cs" />
-    <Compile Include="Plugs\System\Assemblers\MulticastDelegate_Invoke.cs" />
-    <Compile Include="Plugs\System\Buffer.cs" />
-    <Compile Include="Plugs\System\DelegateImpl.cs" />
-    <Compile Include="Plugs\System\EnumImpl.cs" />
+    <Compile Include="Plugs\Assemblers\CtorImplAssembler.cs" />
+    <Compile Include="Plugs\System\Runtime\CompilerServices\RuntimeHelpersImpl.cs" />
     <Compile Include="Plugs\System\EventHandlerImpl.cs" />
-    <Compile Include="Plugs\System\EventHandlerImplRefs.cs" />
     <Compile Include="Plugs\System\ExceptionImpl.cs" />
-    <Compile Include="Plugs\System\MulticastDelegateImpl.cs" />
-    <Compile Include="Plugs\System\MulticastDelegateImplRefs.cs" />
-    <Compile Include="Plugs\System\ObjectImplRefs.cs" />
     <Compile Include="Plugs\System\OutOfMemoryExceptionImpl.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -412,7 +360,7 @@
       <Name>Cosmos.Debug.Kernel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.System\Cosmos.System.csproj">
-      <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
+      <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
     <ProjectReference Include="..\XSharp.Nasm\XSharp.Nasm.csproj">
@@ -452,15 +400,9 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="CustomImplementation\System\Security\Permissions\" />
-    <Folder Include="Plugs\Generic\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

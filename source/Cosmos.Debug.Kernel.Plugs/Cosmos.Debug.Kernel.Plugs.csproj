@@ -79,16 +79,12 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj">
-      <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
+      <Project>{1116130e-28e0-428a-a597-f4b3b676c0ca}</Project>
       <Name>Cosmos.Assembler</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
       <Name>Cosmos.IL2CPU.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
-      <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
-      <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
       <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>

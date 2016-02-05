@@ -9,7 +9,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 namespace Cosmos.Core.Plugs {
 	[Plug(Target = typeof(Core.CPU))]
 	public class CPUImpl {
-		[PlugMethod(Assembler = typeof(Assemblers.UpdateIDT))]
+		[PlugMethod(Assembler = typeof(UpdateIDT))]
 	  public static void UpdateIDT(CPU aThis, bool aEnableInterruptsImmediately) {
 		}
 

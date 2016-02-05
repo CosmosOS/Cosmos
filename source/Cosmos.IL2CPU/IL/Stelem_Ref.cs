@@ -1,15 +1,16 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
-using Cosmos.IL2CPU.IL.CustomImplementations.System;
+using Cosmos.IL2CPU.Plugs.System;
 
-namespace Cosmos.IL2CPU.X86.IL {
-    using Cosmos.IL2CPU.CustomImplementation.System;
-
-    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stelem_Ref)]
-  public class Stelem_Ref: ILOp {
+namespace Cosmos.IL2CPU.X86.IL
+{
+  [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stelem_Ref)]
+  public class Stelem_Ref : ILOp
+  {
     public Stelem_Ref(Cosmos.Assembler.Assembler aAsmblr)
-      : base(aAsmblr) {
+      : base(aAsmblr)
+    {
     }
 
     public static void Assemble(Cosmos.Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
@@ -19,7 +20,8 @@ namespace Cosmos.IL2CPU.X86.IL {
       // stack - 2 == the index
       // stack - 1 == the new value
       uint xStackSize = aElementSize;
-      if (xStackSize % 4 != 0) {
+      if (xStackSize % 4 != 0)
+      {
         xStackSize += 4 - xStackSize % 4;
       }
       //new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStackSize + 4) };
@@ -48,26 +50,31 @@ namespace Cosmos.IL2CPU.X86.IL {
       Add.DoExecute(4, false);
 
       new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-      for (int i = (int)(aElementSize / 4) - 1; i >= 0; i -= 1) {
+      for (int i = (int)(aElementSize / 4) - 1; i >= 0; i -= 1)
+      {
         new Comment(aAssembler, "Start 1 dword");
         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
         new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
         new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = 4 };
       }
-      switch (aElementSize % 4) {
-        case 1: {
+      switch (aElementSize % 4)
+      {
+        case 1:
+          {
             new Comment(aAssembler, "Start 1 byte");
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.BL };
             break;
           }
-        case 2: {
+        case 2:
+          {
             new Comment(aAssembler, "Start 1 word");
             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.BX };
             break;
           }
-        case 0: {
+        case 0:
+          {
             break;
           }
         default:
@@ -76,7 +83,8 @@ namespace Cosmos.IL2CPU.X86.IL {
       }
       new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 0x8 };
     }
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    {
       Assemble(Assembler, 4, aMethod, aOpCode, DebugEnabled);
     }
   }

@@ -9,8 +9,6 @@ namespace Cosmos.TestRunner
 {
     public static class TestController
     {
-        private static Debugger mDebugger;
-
         internal static Debugger Debugger
         {
             get

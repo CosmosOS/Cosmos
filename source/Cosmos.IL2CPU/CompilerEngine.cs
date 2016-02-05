@@ -236,7 +236,7 @@ namespace Cosmos.IL2CPU
                         using (var xScanner = new ILScanner(xAsm))
                         {
                             xScanner.LogException = LogException;
-                            xScanner.TempDebug += x => LogMessage(x);
+                            CompilerHelpers.DebugEvent += LogMessage;
                             if (EnableLogging)
                             {
                                 var xLogFile = xOutputFilename + ".log.html";
