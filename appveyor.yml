@@ -1,0 +1,7 @@
+version: 0.20150918.{build}
+
+clone_folder: c:\Cosmos
+
+build:
+  msbuild "source\Build.sln" /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+  msbuild "source\Cosmos.sln" /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
