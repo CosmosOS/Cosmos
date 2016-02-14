@@ -42,7 +42,7 @@ namespace Cosmos.TestRunner.Core
 
         public OutputHandlerBasic OutputHandler;
 
-        public void Execute()
+        public bool Execute()
         {
             if (OutputHandler == null)
             {
@@ -62,6 +62,7 @@ namespace Cosmos.TestRunner.Core
                     OutputHandler.RunConfigurationStart(xConfig);
                     try
                     {
+                        var xResult = true;
                         foreach (var xAssemblyFile in mKernelsToRun)
                         {
                             mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
@@ -71,8 +72,9 @@ namespace Cosmos.TestRunner.Core
                             }
                             Directory.CreateDirectory(mBaseWorkingDirectory);
 
-                            ExecuteKernel(xAssemblyFile, xConfig);
+                            xResult &= ExecuteKernel(xAssemblyFile, xConfig);
                         }
+                        return xResult;
                     }
                     catch (Exception e)
                     {

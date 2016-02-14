@@ -17,9 +17,8 @@ namespace DebugCompiler
             xEngine.KernelsToRun.Add(kernelToRun.Assembly.Location);
             xEngine.OutputHandler = new TestOutputHandler();
 
+            Assert.IsTrue(xEngine.Execute());
 
-            Assert.IsNotNull(kernelToRun);
-            Assert.Fail("Cannot run kernel '" + kernelToRun.FullName + "'!");
         }
 
         private class TestOutputHandler: OutputHandlerFullTextBase
