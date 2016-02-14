@@ -11,21 +11,15 @@ namespace SentinelKernel
     {
         protected override void BeforeRun()
         {
-            char comma = ':';
-            Console.WriteLine($"comma= {comma}");
-            mDebugger.Send($"comma= {comma}");
+
         }
 
         protected override void Run()
         {
-#if false
             string a = "test";
             double b = 1.25;
             Console.WriteLine($"{a} = {b}");
             mDebugger.Send($"{a} = {b}");
-#endif
-
- 
         }
     }
 }
