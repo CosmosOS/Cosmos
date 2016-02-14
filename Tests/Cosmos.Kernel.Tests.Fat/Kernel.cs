@@ -179,13 +179,15 @@ namespace Cosmos.Kernel.Tests.Fat
             xStringResult = Path.GetDirectoryName(@"0:\test");
             xStringExpectedResult = @"0:\";
             xMessage = "Path.GetDirectoryName (directory no trailing directory separator) failed.";
+
+            mDebugger.Send("xStringResult is '" + xStringResult + "'");
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
             xStringResult = Path.GetDirectoryName(@"0:\test\");
-            xStringExpectedResult = @"0:\";
+            xStringExpectedResult = @"0:\test";
             xMessage = "Path.GetDirectoryName (directory with trailing directory separator) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
@@ -195,13 +197,15 @@ namespace Cosmos.Kernel.Tests.Fat
             xStringResult = Path.GetDirectoryName(@"0:\test\test2");
             xStringExpectedResult = @"0:\test";
             xMessage = "Path.GetDirectoryName (subdirectory no trailing directory separator) failed.";
+            
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
             xStringResult = Path.GetDirectoryName(@"0:\test\test2\");
-            xStringExpectedResult = @"0:\test";
+            xStringExpectedResult = @"0:\test\test2";
+            mDebugger.Send("xStringResult " + xStringResult + " instead of " + xStringExpectedResult);
             xMessage = "Path.GetDirectoryName (subdirectory with trailing directory separator) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
@@ -226,7 +230,7 @@ namespace Cosmos.Kernel.Tests.Fat
 
             mDebugger.Send("START TEST");
             xStringResult = Path.GetExtension(@"file.txt");
-            xStringExpectedResult = "txt";
+            xStringExpectedResult = ".txt";
             xMessage = "Path.GetExtension (file with extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");

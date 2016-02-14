@@ -74,7 +74,7 @@
   <ItemGroup>
     <Compile Include="System\EnumImpl.cs" />
     <Compile Include="System\Security\CodeAccessSecurityEngineImpl.cs" />
-    <Compile Include="System\Security\Permissions\FileIOPermissionImpl.cs" />
+    <!--Compile Include="System\Security\Permissions\FileIOPermissionImpl.cs" /-->
     <Compile Include="System\Security\Cryptography\Utils.cs" />
     <Compile Include="System\Drawing\ColorImpl.cs" />
     <Compile Include="System\Drawing\SRImpl.cs" />

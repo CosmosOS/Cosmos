@@ -14,6 +14,29 @@ namespace Cosmos.System.Plugs.System.IO
     [Plug(Target = typeof(Path))]
     public static class PathImpl
     {
+#if false
+        public static void Cctor(
+      //[FieldAccess(Name = "System.Char[] System.IO.Path.InvalidFileNameChars")] ref char[] aInvalidFileNameChars,
+      //[FieldAccess(Name = "System.Char[] System.IO.Path.InvalidPathCharsWithAdditionalChecks")] ref char[] aInvalidPathCharsWithAdditionalChecks,
+      //[FieldAccess(Name = "System.Char System.IO.Path.PathSeparator")] ref char aPathSeparator,
+      //[FieldAccess(Name = "System.Char[] System.IO.Path.RealInvalidPathChars")] ref char[] aRealInvalidPathChars,
+      //[FieldAccess(Name = "System.Int32 System.IO.Path.MaxPath")] ref int aMaxPath
+      [FieldAccess(Name = "System.Char System.IO.Path.AltDirectorySeparatorChar")] ref char
+          aAltDirectorySeparatorChar,
+      [FieldAccess(Name = "System.Char System.IO.Path.DirectorySeparatorChar")] ref char aDirectorySeparatorChar,
+      [FieldAccess(Name = "System.Char System.IO.Path.VolumeSeparatorChar")] ref char aVolumeSeparatorChar)
+        {
+            //aInvalidFileNameChars = VFSManager.GetInvalidFileNameChars();
+            //aInvalidPathCharsWithAdditionalChecks = VFSManager.GetInvalidPathCharsWithAdditionalChecks();
+            //aPathSeparator = VFSManager.GetPathSeparator();
+            //aRealInvalidPathChars = VFSManager.GetRealInvalidPathChars();
+            //aMaxPath = VFSManager.GetMaxPath();
+            aAltDirectorySeparatorChar = VFSManager.GetAltDirectorySeparatorChar();
+            aDirectorySeparatorChar = VFSManager.GetDirectorySeparatorChar();
+            aVolumeSeparatorChar = VFSManager.GetVolumeSeparatorChar();
+        }
+#endif
+
         public static string NormalizePath(string aPath, bool aFullCheck)
         {
             // For now let's return the Path not normalized
@@ -27,31 +50,34 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetTempPath()
         {
-            
-            throw new NotImplementedException("Path.GetTempPath()");
+            return @"\Temp";
         }
 
         public static char[] GetInvalidFileNameChars()
         {
-            // TODO implement System.Object.MemberwiseClone() should permit to unplug this method
-            throw new NotImplementedException("Path.GetInvalidFileNameChars()");
+            return VFSManager.GetInvalidFileNameChars();
         }
 
         public static char[] GetInvalidPathChars()
         {
-            // TODO implement System.Object.MemberwiseClone() should permit to unplug this this method
-            throw new NotImplementedException("Path.GetInvalidPathChars()");
+            return VFSManager.GetRealInvalidPathChars();
         }
 
         public static string GetTempFileName()
         {
-            throw new NotImplementedException("Path.GetTempFileName()");
+            // We return always the same value for now we need Random to work to get real random values
+            return "tempfile.tmp";
         }
 
         public static string GetRandomFileName()
         {
-            // TODO this method needs Random to work
-            throw new NotImplementedException("Path.GetRandomFileName()");
+            // We return always the same value for now we need Random to work to get real random values
+            return "random.tmp";
+        }
+
+        public static string GetFullPath(string path)
+        {
+            return NormalizePath(path, true);
         }
 
     }

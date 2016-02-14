@@ -14,7 +14,7 @@
     <SccLocalPath>SAK</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>Bochs</Profile>
+    <Profile>VMware</Profile>
     <!-- Looks like this was a mispelled attribute. Replaced by DebugEnabled below.
     <DebugEnable>true</DebugEnable>
     -->
@@ -22,15 +22,15 @@
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <EnableGDB>False</EnableGDB>
-    <StartCosmosGDB>false</StartCosmosGDB>
-    <VMWareEdition>Player</VMWareEdition>
+    <StartCosmosGDB>False</StartCosmosGDB>
+    <VMWareEdition>Workstation</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
     <Name>SentinelKernelBoot</Name>
-    <Description>Use Bochs emulator to deploy and debug.</Description>
+    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
     <Deployment>ISO</Deployment>
-    <Launch>Bochs</Launch>
+    <Launch>VMware</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <StackCorruptionDetectionEnabled>False</StackCorruptionDetectionEnabled>
     <VMware_Name>SentinelKernelBoot</VMware_Name>
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
     <VMware_Deployment>ISO</VMware_Deployment>
@@ -58,7 +58,7 @@
     <Bochs_StartCosmosGDB>false</Bochs_StartCosmosGDB>
     <Bochs_EnableBochsDebug>True</Bochs_EnableBochsDebug>
     <VMware_EnableBochsDebug>True</VMware_EnableBochsDebug>
-    <TraceAssemblies>Cosmos</TraceAssemblies>
+    <TraceAssemblies>All</TraceAssemblies>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <IntelEdison_Name>SentinelKernelBoot</IntelEdison_Name>
     <IntelEdison_Description>Connect to Intel Edison device to deploy and debug.</IntelEdison_Description>
@@ -105,6 +105,7 @@
     <Bochs_TraceAssemblies>Cosmos</Bochs_TraceAssemblies>
     <StartBochsDebugGui>False</StartBochsDebugGui>
     <Bochs_StartBochsDebugGui>False</Bochs_StartBochsDebugGui>
+    <VMware_StartBochsDebugGui>False</VMware_StartBochsDebugGui>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">

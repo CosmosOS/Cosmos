@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
+using Cosmos.Common.Extensions;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
@@ -125,6 +126,7 @@ namespace Cosmos.System.FileSystem
 
         public override DirectoryEntry GetDirectory(string aPath)
         {
+            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.GetDirectory : aPath = {aPath}");
             try
             {
                 var xFileSystem = GetFileSystemFromPath(aPath);
@@ -136,6 +138,7 @@ namespace Cosmos.System.FileSystem
             }
             catch (Exception ex)
             {
+                Global.mFileSystemDebugger.SendInternal($"CosmosVFS.GetDirectory exception occured: {ex.Message}");
                 return null;
             }
             throw new Exception($"{aPath} was found, but is not a directory.");
@@ -212,7 +215,10 @@ namespace Cosmos.System.FileSystem
         {
             for (int i = 0; i < mPartitions.Count; i++)
             {
+                Global.mFileSystemDebugger.SendInternal($"CosmosVFS.InitializeFileSystems creating path with directory id {i}");
                 string xRootPath = string.Concat(i, VolumeSeparatorChar, DirectorySeparatorChar);
+                Global.mFileSystemDebugger.SendInternal($"CosmosVFS.InitializeFileSystems xRootPath = '{xRootPath}'");
+
                 switch (FileSystem.GetFileSystemType(mPartitions[i]))
                 {
                     case FileSystemType.FAT:
@@ -245,6 +251,15 @@ namespace Cosmos.System.FileSystem
             Global.mFileSystemDebugger.SendInternal($"CosmosVFS.GetFileSystemFromPath : xPath = {xPath}");
             for (int i = 0; i < mFileSystems.Count; i++)
             {
+                Global.mFileSystemDebugger.SendInternal($"CosmosVFS.GetFileSystemFromPath : mFileSystems[{i}].mRootPath = {mFileSystems[i].mRootPath}");
+
+                // Low level test of bytes to check no Char.ToStrin() issue, could be removed in future
+#if COSMOSDEBUG
+                var xBuff = mFileSystems[i].mRootPath.GetUtf8Bytes(0, (uint)mFileSystems[i].mRootPath.Length);
+                for (int j = 0; j < xBuff.Length; j++)
+                    Global.mFileSystemDebugger.SendNumber(xBuff[j]);
+#endif
+
                 if (mFileSystems[i].mRootPath == xPath)
                 {
                     Global.mFileSystemDebugger.SendInternal($"CosmosVFS.GetFileSystemFromPath : Found filesystem.");

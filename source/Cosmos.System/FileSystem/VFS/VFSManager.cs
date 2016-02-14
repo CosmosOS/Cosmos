@@ -1,4 +1,5 @@
-﻿using Cosmos.Debug.Kernel;
+﻿#define COSMOSDEBUG
+using Cosmos.Debug.Kernel;
 
 using global::System;
 using global::System.Collections.Generic;

@@ -99,6 +99,7 @@ namespace Cosmos.Compiler.Tests.Exceptions
             xShouldCatch = false;
             xCaught = false;
             xInFinally = false;
+#if false
             mDebugger.Send("START: Test throw Exception() in method and catch in caller without filter.");
             try
             {
@@ -122,6 +123,7 @@ namespace Cosmos.Compiler.Tests.Exceptions
                 mDebugger.Send("EXCEPTION: Finally");
                 xInFinally = true;
             }
+
             mDebugger.Send("END");
             Assert.IsFalse(xFilter, "Should not reach filter block (4)");
             Assert.IsTrue(xCaught, "Did not reach catch block (4)");
@@ -131,6 +133,7 @@ namespace Cosmos.Compiler.Tests.Exceptions
             xShouldCatch = true;
             xCaught = false;
             xInFinally = false;
+
             mDebugger.Send("START: Test throw Exception() in method and catch in caller with filter.");
             try
             {
@@ -151,6 +154,7 @@ namespace Cosmos.Compiler.Tests.Exceptions
             mDebugger.Send("END");
             Assert.IsTrue(xFilter, "Did not reach filter block (5)");
             Assert.IsTrue(xInFinally, "Did not reach finally block (5)");
+#endif
 
             TestController.Completed();
         }

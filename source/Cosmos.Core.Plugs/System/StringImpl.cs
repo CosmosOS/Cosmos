@@ -14,203 +14,53 @@ namespace Cosmos.Core.Plugs.System
         internal static Debugger mDebugger = new Debugger("Core", "String Plugs");
 
         public static unsafe void Ctor(
-            string aThis,
-            char* aChars,
-            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+                    string aThis,
+                    char[] aChars,
+                    [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+                    [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
+                    [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
-            int xLength = 0;
-            while (aChars[xLength] != '\0')
-            {
-                xLength++;
-            }
-            char[] xCharArray = new char[xLength];
-            fixed (char* xFirstChar = xCharArray)
-            {
-                for (int i = 0; i < xLength; i++)
-                {
-                    xCharArray[i] = aChars[i];
-                }
-                aFirstChar = xFirstChar;
-            }
-            aStringEmpty = "";
-            aStringLength = xLength;
-        }
-
-        public static unsafe void Ctor(
-            string aThis,
-            char* aChars,
-            int aStartIndex,
-            int aLength,
-            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
-        {
-            int xLength = 0;
-            while (aChars[xLength] != '\0')
-            {
-                xLength++;
-            }
-            char[] xCharArray = new char[aLength];
-            fixed (char* xFirstChar = xCharArray)
-            {
-                for (int i = 0, j = aStartIndex; i < aLength; i++, j++)
-                {
-                    xCharArray[i] = aChars[j];
-                }
-                aFirstChar = xFirstChar;
-            }
-            aStringEmpty = "";
-            aStringLength = aLength;
-        }
-
-        public static unsafe void Ctor(
-            string aThis,
-            sbyte* aBytes,
-            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
-        {
-            int xLength = 0;
-            while (aBytes[xLength] != '\0')
-            {
-                xLength++;
-            }
-            char[] xCharArray = new char[xLength];
-            fixed (char* xFirstChar = xCharArray)
-            {
-                for (int i = 0; i < xLength; i++)
-                {
-                    xCharArray[i] = (char)aBytes[i];
-                }
-                aFirstChar = xFirstChar;
-            }
-            aStringEmpty = "";
-            aStringLength = xLength;
-        }
-
-        public static unsafe void Ctor(
-            string aThis,
-            sbyte* aBytes,
-            int aStartIndex,
-            int aLength,
-            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
-        {
-            int xLength = 0;
-            while (aBytes[xLength] != '\0')
-            {
-                xLength++;
-            }
-            char[] xCharArray = new char[aLength];
-            fixed (char* xFirstChar = xCharArray)
-            {
-                for (int i = 0, j = aStartIndex; i < aLength; i++, j++)
-                {
-                    xCharArray[i] = (char)aBytes[j];
-                }
-                aFirstChar = xFirstChar;
-            }
-            aStringEmpty = "";
-            aStringLength = aLength;
-        }
-
-        //TODO: Handle encoding.
-        public static unsafe void Ctor(
-            string aThis,
-            sbyte* aBytes,
-            int aStartIndex,
-            int aLength,
-            Encoding aEncoding,
-            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
-        {
-            int xLength = 0;
-            while (aBytes[xLength] != '\0')
-            {
-                xLength++;
-            }
-            char[] xCharArray = new char[aLength];
-            fixed (char* xFirstChar = xCharArray)
-            {
-                for (int i = 0, j = aStartIndex; i < aLength; i++, j++)
-                {
-                    xCharArray[i] = (char)aBytes[j];
-                }
-                aFirstChar = xFirstChar;
-            }
-            aStringEmpty = "";
-            aStringLength = aLength;
-        }
-
-        public static unsafe void Ctor(
-            string aThis,
-            char[] aChars,
-            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
-        {
-            char[] xCharArray = new char[aChars.Length];
-            fixed (char* xFirstChar = xCharArray)
-            {
-                for (int i = 0; i < aChars.Length; i++)
-                {
-                    xCharArray[i] = aChars[i];
-                }
-                aFirstChar = xFirstChar;
-            }
             aStringEmpty = "";
             aStringLength = aChars.Length;
+            for (int i = 0; i < aChars.Length; i++)
+            {
+                aFirstChar[i] = aChars[i];
+            }
         }
 
         public static unsafe void Ctor(
             string aThis,
             char[] aChars,
-            int aStartIndex,
-            int aLength,
+            int start,
+            int length,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
-            char[] xCharArray = new char[aLength];
-            fixed (char* xFirstChar = xCharArray)
-            {
-                for (int i = 0, j = aStartIndex; i < aLength; i++, j++)
-                {
-                    xCharArray[i] = aChars[j];
-                }
-                aFirstChar = xFirstChar;
-            }
             aStringEmpty = "";
-            aStringLength = aLength;
+            aStringLength = length;
+            for (int i = 0; i < length; i++)
+            {
+                aFirstChar[i] = aChars[start + i];
+            }
         }
 
         public static unsafe void Ctor(
             string aThis,
             char aChar,
-            int aCount,
+            int aLength,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
-            if (aCount > 0)
-            {
-                char[] xCharArray = new char[aCount];
-                fixed (char* xFirstChar = xCharArray)
-                {
-                    for (int i = 0; i < aCount; i++)
-                    {
-                        xCharArray[i] = aChar;
-                    }
-                    aFirstChar = xFirstChar;
-                }
-            }
             aStringEmpty = "";
-            aStringLength = aCount;
+            aStringLength = aLength;
+            for (int i = 0; i < aLength; i++)
+            {
+                aFirstChar[i] = aChar;
+            }
         }
+
 
         public static unsafe int get_Length(
             int* aThis,
