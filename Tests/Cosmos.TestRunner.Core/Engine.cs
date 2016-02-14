@@ -57,12 +57,12 @@ namespace Cosmos.TestRunner.Core
             OutputHandler.ExecutionStart();
             try
             {
+                var xResult = true;
                 foreach (var xConfig in GetRunConfigurations())
                 {
                     OutputHandler.RunConfigurationStart(xConfig);
                     try
                     {
-                        var xResult = true;
                         foreach (var xAssemblyFile in mKernelsToRun)
                         {
                             mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
@@ -74,7 +74,6 @@ namespace Cosmos.TestRunner.Core
 
                             xResult &= ExecuteKernel(xAssemblyFile, xConfig);
                         }
-                        return xResult;
                     }
                     catch (Exception e)
                     {
@@ -85,10 +84,12 @@ namespace Cosmos.TestRunner.Core
                         OutputHandler.RunConfigurationEnd(xConfig);
                     }
                 }
+                return xResult;
             }
             catch (Exception E)
             {
                 OutputHandler.UnhandledException(E);
+                return false;
             }
             finally
             {
