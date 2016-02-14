@@ -40,7 +40,7 @@ namespace Cosmos.TestRunner.Core
 
         private string mBaseWorkingDirectory;
 
-        public OutputHandlerBase OutputHandler;
+        public OutputHandlerBasic OutputHandler;
 
         public void Execute()
         {
