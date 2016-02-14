@@ -20,7 +20,7 @@ namespace Cosmos.TestRunner.Core
         public TraceAssemblies TraceAssembliesLevel = TraceAssemblies.User;
         public StackCorruptionDetectionLevel StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
 
-        public IEnumerable<string> KernelsToRun
+        public List<string> KernelsToRun
         {
             get
             {
@@ -40,7 +40,7 @@ namespace Cosmos.TestRunner.Core
 
         private string mBaseWorkingDirectory;
 
-        public OutputHandlerBasic OutputHandler;
+        public OutputHandlerBase OutputHandler;
 
         public void Execute()
         {

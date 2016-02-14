@@ -64,6 +64,8 @@
     <Compile Include="OutputHandlerBasic.cs" />
     <Compile Include="OutputHandlerFullConsole.cs" />
     <Compile Include="OutputHandlerConsole.cs" />
+    <Compile Include="OutputHandlerFullTextBase.cs" />
+    <Compile Include="OutputHandlerTextBase.cs" />
     <Compile Include="OutputHandlerXml.cs" />
     <Compile Include="OutputHandlerXml.Helpers.cs">
       <DependentUpon>OutputHandlerXml.cs</DependentUpon>
