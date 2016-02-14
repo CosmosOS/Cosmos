@@ -9,9 +9,9 @@
 
 [Oo]bj/
 [Bb]in
-[Dd]ebug*/
-[Rr]elease*/
-[Pp]ackages*/
+[Dd]ebug/
+[Rr]elease/
+[Pp]ackages/
 
 *.[Oo]bj
 *.suo
