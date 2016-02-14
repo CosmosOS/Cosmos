@@ -67,6 +67,12 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Tests\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj">
+      <Project>{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}</Project>
+      <Name>Cosmos.TestRunner.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
