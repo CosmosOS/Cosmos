@@ -261,6 +261,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System.Tests", "Cosm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core.Tests", "Cosmos.Core.Tests\Cosmos.Core.Tests.csproj", "{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosdotPeekPlugin", "Tools\CosmosdotPeekPlugin\CosmosdotPeekPlugin.csproj", "{52185E9D-A621-4651-825C-C2437E8AA2CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1418,6 +1420,22 @@ Global
 		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|x86.ActiveCfg = Release|Any CPU
 		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|x86.Build.0 = Release|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Debug|Itanium.ActiveCfg = Debug|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Debug|Itanium.Build.0 = Debug|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Debug|x86.Build.0 = Debug|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Release|Itanium.ActiveCfg = Release|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Release|Itanium.Build.0 = Release|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Release|x86.ActiveCfg = Release|Any CPU
+		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1523,5 +1541,6 @@ Global
 		{7E1D6676-36CC-44C1-A70C-29F7D818152A} = {DC374FBC-4005-472F-BBF4-CEA608B86FB2}
 		{AAA0328F-60E1-442D-B949-A13DD34BD0AD} = {056A94C1-6C75-4730-B62A-675779CD07FB}
 		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D} = {360A9DE9-F8CF-4A38-9593-3699648DA616}
+		{52185E9D-A621-4651-825C-C2437E8AA2CD} = {B521E2A2-81E4-4B2D-A471-7AB550E9551E}
 	EndGlobalSection
 EndGlobal

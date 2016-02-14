@@ -4,7 +4,7 @@ using Cosmos.IL2CPU.Plugs;
 namespace Cosmos.System.Plugs.System.Security
 {
     [Plug(TargetName = "System.Security.CodeAccessSecurityEngine, mscorlib", IsMicrosoftdotNETOnly = true)]
-    public class CodeAccessSecurityEngine
+    public class CodeAccessSecurityEngineImpl
     {
 
         //TODO check if ref is linked right

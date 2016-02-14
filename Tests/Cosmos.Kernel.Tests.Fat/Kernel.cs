@@ -29,9 +29,9 @@ namespace Cosmos.Kernel.Tests.Fat
                 mDebugger.Send("Run");
 
                 TestPath();
-                TestDirectory();
-                TestFile();
-                TestFileStream();
+                //TestDirectory();
+                //TestFile();
+                //TestFileStream();
 
                 TestController.Completed();
             }
@@ -118,7 +118,7 @@ namespace Cosmos.Kernel.Tests.Fat
 
             // Path.ChangeExtension(string, string)
             mDebugger.Send("START TEST");
-            xStringResult = Path.ChangeExtension(@"0:\Kudzu.txt", ".doc");
+            xStringResult = ""; //Path.ChangeExtension(@"0:\Kudzu.txt", ".doc");
             xStringExpectedResult = @"0:\Kudzu.doc";
             xMessage = "Path.ChangeExtenstion (no dot) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);

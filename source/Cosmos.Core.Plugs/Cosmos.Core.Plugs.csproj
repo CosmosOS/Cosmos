@@ -111,8 +111,10 @@
     <Compile Include="System\Assemblers\InvokeImplAssembler.cs" />
     <Compile Include="System\Buffer.cs" />
     <Compile Include="System\DelegateImpl.cs" />
+    <Compile Include="System\IO\PathHelperImpl.cs" />
     <Compile Include="System\MulticastDelegateImpl.cs" />
     <Compile Include="System\NormalDelegateImpl.cs" />
+    <Compile Include="System\Runtime\InteropServices\MarshalImpl.cs" />
     <Compile Include="System\StringImpl.cs" />
     <Compile Include="GCImplementionImpl.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

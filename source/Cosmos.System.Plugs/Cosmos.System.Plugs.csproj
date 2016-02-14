@@ -73,13 +73,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="System\EnumImpl.cs" />
+    <Compile Include="System\IO\ErrorImpl.cs" />
+    <Compile Include="System\Security\SecurityElementImpl.cs" />
     <Compile Include="System\Security\CodeAccessSecurityEngineImpl.cs" />
-    <Compile Include="System\Security\Cryptography\Utils.cs" />
+    <Compile Include="System\Security\Cryptography\UtilsImpl.cs" />
     <Compile Include="System\Drawing\ColorImpl.cs" />
     <Compile Include="System\Drawing\SRImpl.cs" />
     <Compile Include="System\Net\IPAddressImpl.cs" />
     <Compile Include="System\Net\SocketAddressImpl.cs" />
     <Compile Include="System\SByteImpl.cs" />
+    <Compile Include="System\Security\Permissions\FileIOPermissionImpl.cs" />
     <Compile Include="System\SingleImpl.cs" />
     <Compile Include="System\SRImpl.cs" />
     <Compile Include="System\BooleanImpl.cs" />
