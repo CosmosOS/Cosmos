@@ -101,6 +101,7 @@ namespace Cosmos.TestRunner.Core
         }
 
         private volatile bool mKernelResultSet;
+        private volatile bool mKernelResult;
         private int mSucceededAssertions;
 
         private void ChannelPacketReceived(byte arg1, byte arg2, byte[] arg3)

@@ -36,7 +36,6 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MyKeyboard.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Kernel.cs" />
   </ItemGroup>
@@ -44,10 +43,6 @@
     <ProjectReference Include="..\..\..\source\Cosmos.Common\Cosmos.Common.csproj">
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.HAL\Cosmos.HAL.csproj">
-      <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
-      <Name>Cosmos.HAL</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\source\Cosmos.System\Cosmos.System.csproj">
       <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
