@@ -21,7 +21,7 @@ namespace Cosmos.Compiler.Tests.Bcl
             System.Collections.Generic.ListTest.Execute();
             System.Collections.Generic.QueueTest.Execute();
             System.DelegatesTest.Execute();
-            System.UInt64Test.Execute();
+            //System.UInt64Test.Execute();
             TestController.Completed();
         }
     }
