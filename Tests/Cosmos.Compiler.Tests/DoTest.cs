@@ -8,7 +8,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Cosmos.Compiler.Tests
 {
     [TestClass]
-    [UseReporter(typeof(VisualStudioReporter))]
     public class DoTest : BaseTest
     {
         [TestMethod]
