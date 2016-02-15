@@ -3,8 +3,9 @@ using System.Globalization;
 using System.Text;
 
 using Cosmos.Common;
-using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
+
+using Debugger = Cosmos.Debug.Kernel.Debugger;
 
 namespace Cosmos.Core.Plugs.System
 {
@@ -20,13 +21,15 @@ namespace Cosmos.Core.Plugs.System
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
-            int length = 0;
             aStringEmpty = "";
-            aFirstChar = aChars;
             while (*aChars != '\0')
             {
                 aChars++;
                 aStringLength++;
+            }
+            for (int i = 0; i < aStringLength; i++)
+            {
+                aFirstChar[i] = aChars[i];
             }
         }
 
@@ -44,58 +47,6 @@ namespace Cosmos.Core.Plugs.System
             for (int i = 0; i < length; i++)
             {
                 aFirstChar[i] = aChars[start + i];
-            }
-        }
-
-        public static unsafe void Ctor(
-            string aThis,
-            sbyte* aBytes,
-            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
-        {
-            aStringEmpty = "";
-            aFirstChar = (char*)aBytes;
-
-            while (*aBytes != '\0')
-            {
-                aBytes++;
-                aStringLength++;
-            }
-        }
-
-        public static unsafe void Ctor(
-            string aThis,
-            sbyte* aBytes,
-            int start,
-            int length,
-            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
-        {
-            aStringEmpty = "";
-            aStringLength = length;
-            for (int i = 0; i < length; i++)
-            {
-                aFirstChar[i] = (char)aBytes[start + i];
-            }
-        }
-
-        public static unsafe void Ctor(
-            string aThis,
-            sbyte* aBytes,
-            int start,
-            int length,
-            Encoding encoding,
-            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
-        {
-            aStringEmpty = "";
-            aStringLength = length;
-            for (int i = 0; i < length; i++)
-            {
-                aFirstChar[i] = (char)aBytes[start + i];
             }
         }
 

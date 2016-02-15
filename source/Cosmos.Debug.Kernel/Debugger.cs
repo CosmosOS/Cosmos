@@ -107,7 +107,7 @@ namespace Cosmos.Debug.Kernel
         [Conditional("COSMOSDEBUG")]
         public void SendInternal(string aText)
         {
-            Send(aText);
+            DoSend(aText);
         }
 
         //public void OldSend(string aText) {
