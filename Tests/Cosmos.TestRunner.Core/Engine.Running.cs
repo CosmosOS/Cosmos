@@ -141,12 +141,15 @@ namespace Cosmos.TestRunner.Core
         {
             OutputHandler.SetKernelTestResult(false, "Test failed");
             mKernelResultSet = true;
+            mKernelResult = false;
             mKernelRunning = false;
         }
 
         private void KernelTestCompleted()
         {
             Thread.Sleep(50);
+            mKernelResultSet = true;
+            mKernelResult = true;
             mKernelRunning = false;
             Console.WriteLine("Test completed");
         }
