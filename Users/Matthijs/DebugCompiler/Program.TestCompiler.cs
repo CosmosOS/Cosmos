@@ -113,10 +113,10 @@ namespace DebugCompiler
             return new string[]
             {
                 KernelFile,
-                CosmosRoot + @"\source\Cosmos.Core.Plugs\bin\x86\Debug\Cosmos.Core.Plugs.dll",
-                CosmosRoot + @"\source\Cosmos.Debug.Kernel.Plugs\bin\x86\Debug\Cosmos.Debug.Kernel.Plugs.dll",
-                CosmosRoot + @"\source\Cosmos.HAL\bin\x86\Debug\Cosmos.HAL.dll",
-                CosmosRoot + @"\source\Cosmos.System.Plugs\bin\x86\Debug\Cosmos.System.Plugs.dll",
+                CosmosRoot + @"\source\Cosmos.Core.Plugs\bin\Debug\Cosmos.Core.Plugs.dll",
+                CosmosRoot + @"\source\Cosmos.Debug.Kernel.Plugs\bin\Debug\Cosmos.Debug.Kernel.Plugs.dll",
+                CosmosRoot + @"\source\Cosmos.HAL\bin\Debug\Cosmos.HAL.dll",
+                CosmosRoot + @"\source\Cosmos.System.Plugs\bin\Debug\Cosmos.System.Plugs.dll",
                 CosmosRoot + @"\Users\Sentinel209\SentinelSystemLib\bin\Debug\SentinelSystemLib.dll",
             };
         }
