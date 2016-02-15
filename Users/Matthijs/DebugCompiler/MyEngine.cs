@@ -27,10 +27,7 @@ namespace DebugCompiler
             xEngine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
 
             // Select kernels to be tested by adding them to the engine
-            foreach (var xType in TestKernelSets.GetStableKernelTypes())
-            {
-                xEngine.AddKernel(xType.Assembly.Location);
-            }
+            xEngine.AddKernel(kernelToRun.Assembly.Location);
 
             xEngine.OutputHandler = new TestOutputHandler();
 
