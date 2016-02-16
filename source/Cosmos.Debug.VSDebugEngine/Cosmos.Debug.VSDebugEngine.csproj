@@ -133,7 +133,6 @@
     <Compile Include="AD7.Impl\AD7Expression.cs" />
     <Compile Include="AD7.Impl\AD7Port.cs" />
     <Compile Include="AD7.Impl\AD7PortSupplier.cs" />
-    <Compile Include="AD7.Impl\AD7Process.CosmosDebugger.cs" />
     <Compile Include="AD7.Impl\AD7Process.cs" />
     <Compile Include="AD7.Impl\AD7ProgramProvider.cs" />
     <Compile Include="AD7.Impl\AD7StackFrame.cs" />
