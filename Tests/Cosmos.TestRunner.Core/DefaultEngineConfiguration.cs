@@ -48,7 +48,6 @@ namespace Cosmos.TestRunner.Core
 
             // Experimental stuff:
             engine.AddKernel(typeof(Cosmos.Kernel.Tests.Fat.Kernel).Assembly.Location);
-            //engine.AddKernel(typeof(Cosmos.Kernel.Tests.FileSystemPlugs.Kernel).Assembly.Location);
 
             // end of known bugs
 
