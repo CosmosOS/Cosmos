@@ -6,61 +6,65 @@ using System.Threading.Tasks;
 using System.Windows;
 using ICSharpCode.ILSpy;
 using ICSharpCode.ILSpy.TreeNodes;
+using Mono.Cecil;
 
 namespace Cosmos.ILSpyPlugs.Plugin
 {
     [ExportContextMenuEntry(Header = "Cosmos Plug: Generate plug")]
-    public class GenerateTypePlugEntry: BaseContextMenuEntry
+    public class GenerateTypePlugEntry : BaseContextMenuEntry
     {
         public override bool IsVisible(TextViewContext context)
         {
-            if (context.SelectedTreeNodes.Length != 1)
+            if (context?.SelectedTreeNodes != null)
             {
-                return false;
+                foreach (var node in context.SelectedTreeNodes)
+                {
+                    var xCurrentType = node as TypeTreeNode;
+                    if (xCurrentType != null)
+                    {
+                        return true;
+                    }
+                }
             }
-            var xCurrentType = context.SelectedTreeNodes[0] as TypeTreeNode;
-            if (xCurrentType == null)
-            {
-                return false;
-            }
-            return true;
+            return false;
         }
 
         public override void Execute(TextViewContext context)
         {
-            if (context.SelectedTreeNodes.Length != 1)
-            {
-                throw new Exception("SelectedTreeNodes = " + context.SelectedTreeNodes.Length);
-            }
-            var xCurrentType = context.SelectedTreeNodes[0] as TypeTreeNode;
-            if (xCurrentType == null)
-            {
-                throw new Exception("Current TreeNode is not a Type!");
-            }
-
             if (MessageBox.Show("Do you want to generate plug code to your clipboard?", "Cosmos Plug tool", MessageBoxButton.YesNo) == MessageBoxResult.No)
             {
                 return;
             }
 
-            var xSB = new StringBuilder();
-            if (xCurrentType.TypeDefinition.IsPublic)
+            var xString = new StringBuilder();
+            foreach (var node in context.SelectedTreeNodes)
             {
-                xSB.AppendFormat("[Plug(Target = typeof(global::{0}))]", Utilities.GetCSharpTypeName(xCurrentType.TypeDefinition));
+                var xCurrentType = node as TypeTreeNode;
+                if (xCurrentType != null)
+                {
+                    xString.Append(GenerateType(xCurrentType.TypeDefinition));
+                    xString.AppendLine();
+                }
             }
-            else
-            {
-                xSB.AppendFormat("[Plug(TargetName = \"{0}\")]", Utilities.GetCSharpTypeName(xCurrentType.TypeDefinition));
-            }
-            xSB.AppendLine();
-            xSB.AppendFormat("public static class {0}Plug", xCurrentType.Name);
-            xSB.AppendLine();
-            xSB.AppendLine("{");
-            xSB.AppendLine("}");
 
-            Clipboard.SetText(xSB.ToString());
+            Clipboard.SetText(xString.ToString());
 
             MessageBox.Show("Done", "Cosmos Plug tool");
+        }
+
+        public string GenerateType(TypeDefinition type)
+        {
+            var xString = new StringBuilder();
+            xString.AppendFormat(
+                type.IsPublic
+                    ? "[Plug(Target = typeof(global::{0}))]"
+                    : "[Plug(TargetName = \"{0}\")]", Utilities.GetCSharpTypeName(type));
+            xString.AppendLine();
+            xString.AppendFormat("public static class {0}Impl", type.Name);
+            xString.AppendLine();
+            xString.AppendLine("{");
+            xString.AppendLine("}");
+            return xString.ToString();
         }
     }
 }

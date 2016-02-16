@@ -16,37 +16,36 @@ namespace Cosmos.ILSpyPlugs.Plugin
     {
         public override bool IsVisible(TextViewContext context)
         {
-            if (context.SelectedTreeNodes.Length != 1)
+            if (context?.SelectedTreeNodes != null)
             {
-                return false;
+                foreach (var node in context.SelectedTreeNodes)
+                {
+                    var xCurrentMethod = node as MethodTreeNode;
+                    if (xCurrentMethod != null)
+                    {
+                        return true;
+                    }
+                }
             }
-            var xCurrentMethod = context.SelectedTreeNodes[0] as MethodTreeNode;
-            if (xCurrentMethod == null)
-            {
-                return false;
-            }
-            return true;
+            return false;
         }
 
         public override void Execute(TextViewContext context)
         {
-            if (context.SelectedTreeNodes.Length != 1)
-            {
-                throw new Exception("SelectedTreeNodes = " + context.SelectedTreeNodes.Length);
-            }
-            var xCurrentMethod = context.SelectedTreeNodes[0] as MethodTreeNode;
-            if (xCurrentMethod == null)
-            {
-                throw new Exception("Current TreeNode is not a Method!");
-            }
-
             if (MessageBox.Show("Do you want to generate plug code to your clipboard?", "Cosmos Plug tool", MessageBoxButton.YesNo) == MessageBoxResult.No)
             {
                 return;
             }
 
-            var xSB = GenerateMethod(xCurrentMethod.MethodDefinition);
-            Clipboard.SetText(xSB);
+            StringBuilder xString = new StringBuilder();
+            foreach (var node in context.SelectedTreeNodes)
+            {
+                var xCurrentMethod = node as MethodTreeNode;
+                xString.Append(GenerateMethod(xCurrentMethod.MethodDefinition));
+                xString.AppendLine();
+            }
+
+            Clipboard.SetText(xString.ToString());
 
             MessageBox.Show("Done", "Cosmos Plug tool");
         }
@@ -55,11 +54,7 @@ namespace Cosmos.ILSpyPlugs.Plugin
         {
             var xSB = new StringBuilder();
             
-            xSB.Append("public static ");
-            xSB.Append(Utilities.GetCSharpTypeName(method.ReturnType));
-            xSB.Append(" ");
-            xSB.Append(Utilities.GetMethodName(method));
-            xSB.Append("(");
+            xSB.Append($"public static {Utilities.GetCSharpTypeName(method.ReturnType)} {Utilities.GetMethodName(method)}(");
             var xAddComma = false;
 
             if (!method.IsStatic)

@@ -245,8 +245,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.System.Tests", "Cosm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Core.Tests", "Cosmos.Core.Tests\Cosmos.Core.Tests.csproj", "{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CosmosdotPeekPlugin", "Tools\CosmosdotPeekPlugin\CosmosdotPeekPlugin.csproj", "{52185E9D-A621-4651-825C-C2437E8AA2CD}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -800,11 +798,6 @@ Global
 		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|x64.Build.0 = Debug|x86
 		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|x86.ActiveCfg = Debug|x86
 		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D}.Release|x86.Build.0 = Debug|x86
-		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Debug|x64.ActiveCfg = Debug|x86
-		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Debug|x86.ActiveCfg = Debug|x86
-		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Debug|x86.Build.0 = Debug|x86
-		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Release|x64.ActiveCfg = Debug|x86
-		{52185E9D-A621-4651-825C-C2437E8AA2CD}.Release|x86.ActiveCfg = Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -902,6 +895,5 @@ Global
 		{85E13410-C85A-4B0C-BEE5-F9A120ECC94E} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 		{AAA0328F-60E1-442D-B949-A13DD34BD0AD} = {056A94C1-6C75-4730-B62A-675779CD07FB}
 		{6BAD532A-7DD4-4BAC-834A-10BA6497E19D} = {360A9DE9-F8CF-4A38-9593-3699648DA616}
-		{52185E9D-A621-4651-825C-C2437E8AA2CD} = {B521E2A2-81E4-4B2D-A471-7AB550E9551E}
 	EndGlobalSection
 EndGlobal
