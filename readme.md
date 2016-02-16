@@ -1,5 +1,6 @@
 ### Cosmos (C# Open Source Managed Operating System)
 
+[![Build status](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true)](https://ci.appveyor.com/project/CosmosOS/cosmos/branch/master)
 [![Join the chat at https://gitter.im/CosmosOS/Cosmos](https://img.shields.io/badge/GITTER-Join%20Chat-brightgreen.svg)](https://gitter.im/CosmosOS/Cosmos?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![GitHub release](https://img.shields.io/github/release/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/releases)
 
