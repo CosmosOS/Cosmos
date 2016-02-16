@@ -1,7 +1,4 @@
-﻿
-#define COSMOSDEBUG
-
-using System;
+﻿using System;
 using System.IO;
 
 using Cosmos.Common;
@@ -15,21 +12,21 @@ namespace Cosmos.System.Plugs.System.IO
     [Plug(Target = typeof(Path))]
     public static class PathImpl
     {
+        private static readonly Debugger mDebugger = new Debugger("System", "Path Plugs");
         public static void Cctor(
             //[FieldAccess(Name = "System.Char[] System.IO.Path.InvalidFileNameChars")] ref char[] aInvalidFileNameChars,
-            //[FieldAccess(Name = "System.Char[] System.IO.Path.InvalidPathCharsWithAdditionalChecks")] ref char[] aInvalidPathCharsWithAdditionalChecks,
+            [FieldAccess(Name = "System.Char[] System.IO.Path.InvalidPathCharsWithAdditionalChecks")] ref char[] aInvalidPathCharsWithAdditionalChecks,
             //[FieldAccess(Name = "System.Char System.IO.Path.PathSeparator")] ref char aPathSeparator,
-            //[FieldAccess(Name = "System.Char[] System.IO.Path.RealInvalidPathChars")] ref char[] aRealInvalidPathChars,
+            [FieldAccess(Name = "System.Char[] System.IO.Path.RealInvalidPathChars")] ref char[] aRealInvalidPathChars,
             //[FieldAccess(Name = "System.Int32 System.IO.Path.MaxPath")] ref int aMaxPath
-            [FieldAccess(Name = "System.Char System.IO.Path.AltDirectorySeparatorChar")] ref char
-                aAltDirectorySeparatorChar,
+            [FieldAccess(Name = "System.Char System.IO.Path.AltDirectorySeparatorChar")] ref char aAltDirectorySeparatorChar,
             [FieldAccess(Name = "System.Char System.IO.Path.DirectorySeparatorChar")] ref char aDirectorySeparatorChar,
             [FieldAccess(Name = "System.Char System.IO.Path.VolumeSeparatorChar")] ref char aVolumeSeparatorChar)
         {
             //aInvalidFileNameChars = VFSManager.GetInvalidFileNameChars();
-            //aInvalidPathCharsWithAdditionalChecks = VFSManager.GetInvalidPathCharsWithAdditionalChecks();
+            aInvalidPathCharsWithAdditionalChecks = VFSManager.GetInvalidPathCharsWithAdditionalChecks();
             //aPathSeparator = VFSManager.GetPathSeparator();
-            //aRealInvalidPathChars = VFSManager.GetRealInvalidPathChars();
+            aRealInvalidPathChars = VFSManager.GetRealInvalidPathChars();
             //aMaxPath = VFSManager.GetMaxPath();
             aAltDirectorySeparatorChar = VFSManager.GetAltDirectorySeparatorChar();
             aDirectorySeparatorChar = VFSManager.GetDirectorySeparatorChar();
@@ -362,6 +359,11 @@ namespace Cosmos.System.Plugs.System.IO
         public static string GetTempPath()
         {
             return @"\Temp";
+        }
+
+        public static string RemoveLongPathPrefix(string aPath)
+        {
+            return aPath;
         }
 
         //public static bool HasExtension(string aPath)
