@@ -58,7 +58,7 @@
     <Bochs_StartCosmosGDB>false</Bochs_StartCosmosGDB>
     <Bochs_EnableBochsDebug>True</Bochs_EnableBochsDebug>
     <VMware_EnableBochsDebug>True</VMware_EnableBochsDebug>
-    <TraceAssemblies>All</TraceAssemblies>
+    <TraceAssemblies>Cosmos</TraceAssemblies>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
     <IntelEdison_Name>SentinelKernelBoot</IntelEdison_Name>
     <IntelEdison_Description>Connect to Intel Edison device to deploy and debug.</IntelEdison_Description>
@@ -102,17 +102,14 @@
     <USB_EnableGDB>True</USB_EnableGDB>
     <USB_StartCosmosGDB>True</USB_StartCosmosGDB>
     <USB_EnableBochsDebug>True</USB_EnableBochsDebug>
-    <Bochs_TraceAssemblies>All</Bochs_TraceAssemblies>
+    <Bochs_TraceAssemblies>Cosmos</Bochs_TraceAssemblies>
+    <StartBochsDebugGui>False</StartBochsDebugGui>
+    <Bochs_StartBochsDebugGui>False</Bochs_StartBochsDebugGui>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
       <Name>Cosmos.Core.Plugs</Name>
       <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
-      <Name>Cosmos.Debug.Kernel.Plugs</Name>
-      <Project>{b97a2956-c363-47f2-a6aa-b4fccff4d315}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">

@@ -1,15 +1,15 @@
-﻿using System;
+﻿#define COSMOSDEBUG
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using Cosmos.IL2CPU;
+
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.IL;
 using SR = System.Reflection;
 using Cosmos.Assembler;
-using System.Reflection.Emit;
+
 using _MemberInfo = System.Runtime.InteropServices._MemberInfo;
 using SysReflection = System.Reflection;
 
@@ -141,19 +141,6 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        public event Action<string> TempDebug;
-        private void DoTempDebug(string message)
-        {
-            if (TempDebug != null)
-            {
-                TempDebug(message);
-            }
-            else
-            {
-                global::System.Diagnostics.Debug.WriteLine(message);
-            }
-        }
-
         public void Execute(SysReflection.MethodBase aStartMethod)
         {
             if (aStartMethod == null)
@@ -216,7 +203,7 @@ namespace Cosmos.IL2CPU
             mPlugManager.ScanFoundPlugs();
             foreach (var xPlug in mPlugManager.PlugImpls)
             {
-                DoTempDebug(String.Format("Plug found: '{0}'", xPlug.Key.FullName));
+                CompilerHelpers.Debug($"Plug found: '{xPlug.Key.FullName}'");
             }
 
             ILOp.mPlugManager = mPlugManager;
@@ -307,7 +294,7 @@ namespace Cosmos.IL2CPU
                     {
                         var xLogItemText = LogItemText(xList.Key);
 
-                         mLogWriter.WriteLine("<hr>");
+                        mLogWriter.WriteLine("<hr>");
 
                         // Emit bookmarks above source, so when clicking links user doesn't need
                         // to constantly scroll up.
@@ -644,7 +631,7 @@ namespace Cosmos.IL2CPU
                 }
                 if (!aType.IsGenericParameter && xVirt.DeclaringType.IsInterface)
                 {
-                  if ((!aType.IsInterface) && (aType.GetInterfaces().Contains(xVirt.DeclaringType)))
+                    if ((!aType.IsInterface) && (aType.GetInterfaces().Contains(xVirt.DeclaringType)))
                     {
                         var xIntfMapping = aType.GetInterfaceMap(xVirt.DeclaringType);
                         if (xIntfMapping.InterfaceMethods != null && xIntfMapping.TargetMethods != null)

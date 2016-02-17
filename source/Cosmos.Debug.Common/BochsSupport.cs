@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 using Microsoft.Win32;
@@ -19,11 +20,11 @@ namespace Cosmos.Debug.Common
         /// <summary>Get a flag that tell whether Bochs is enabled on this system.</summary>
         public static bool BochsEnabled
         {
-          get
-          {
-            return (null != BochsExe);
-            //return false;
-          }
+            get
+            {
+                return (null != BochsExe);
+                //return false;
+            }
         }
 
         /// <summary>Get a descriptor for the Bochs emulator with debugger support program. The return value
@@ -40,6 +41,41 @@ namespace Cosmos.Debug.Common
         {
             get;
             private set;
+        }
+
+        public static void ExtractBochsDebugSymbols(string xInputFile, string xOutputFile)
+        {
+            try
+            {
+                int i = 0;
+                using (var reader = new StreamReader(xInputFile))
+                {
+                    using (var writer = new StreamWriter(xOutputFile))
+                    {
+                        bool startSymbolTable = false;
+                        while (!reader.EndOfStream)
+                        {
+                            string line = reader.ReadLine();
+                            if (startSymbolTable)
+                            {
+                                string[] items = line.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+                                if (items.Length > 1)
+                                {
+                                    writer.WriteLine($"{items.First()} {items.Last()}");
+                                    i++;
+                                }
+                            }
+                            else if (line.Trim().ToUpper().Contains("SYMBOL TABLE"))
+                            {
+                                startSymbolTable = true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
         /// <summary>Retrieve installation path for Bochs and initialize the <see cref="BochsExe"/> property.

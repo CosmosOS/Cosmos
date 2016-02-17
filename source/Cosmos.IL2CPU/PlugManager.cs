@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text;
 using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.IL;
 using SR = System.Reflection;
 using Cosmos.Assembler;
 using System.Reflection.Emit;
@@ -182,7 +181,7 @@ namespace Cosmos.IL2CPU
                             else
                             {
                                 //Skip checking methods related to fields because it's just too messy...
-                                if (xMethod.GetParameters().Where(delegate(ParameterInfo x)
+                                if (xMethod.GetParameters().Where(delegate (ParameterInfo x)
                                 {
                                     return x.GetCustomAttributes(typeof(FieldAccessAttribute)).Count() > 0;
                                 }).Count() > 0)
@@ -191,7 +190,7 @@ namespace Cosmos.IL2CPU
                                 }
                                 else
                                 {
-                                    var xParamTypes = xMethod.GetParameters().Select(delegate(ParameterInfo x)
+                                    var xParamTypes = xMethod.GetParameters().Select(delegate (ParameterInfo x)
                                     {
                                         var result = x.ParameterType;
                                         if (result.IsByRef)
@@ -213,7 +212,7 @@ namespace Cosmos.IL2CPU
                                         // If static, no this param
                                         // Otherwise, take into account first param is this param
                                         //This param is either of declaring type, or ref to declaring type or pointer
-                                        var posMethParamTypes = posInf.GetParameters().Select(delegate(ParameterInfo x)
+                                        var posMethParamTypes = posInf.GetParameters().Select(delegate (ParameterInfo x)
                                         {
                                             var result = x.ParameterType;
                                             if (result.IsByRef)
@@ -651,6 +650,7 @@ namespace Cosmos.IL2CPU
             {
                 if (Queue != null)
                 {
+                    CompilerHelpers.Debug("Queueing Plug:", xResult.DeclaringType, "::", xResult.Name);
                     Queue(xResult, null, "Plug Method");
                 }
             }

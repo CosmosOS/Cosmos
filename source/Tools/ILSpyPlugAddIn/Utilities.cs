@@ -23,7 +23,7 @@ namespace Cosmos.ILSpyPlugs.Plugin
             {
                 if (method.IsStatic)
                 {
-                    return "CCtor";
+                    return "Cctor";
                 }
                 else
                 {

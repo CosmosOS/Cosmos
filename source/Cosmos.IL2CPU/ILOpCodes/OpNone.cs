@@ -67,6 +67,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Add:
         case Code.Add_Ovf:
         case Code.Mul:
+        case Code.Mul_Ovf:
         case Code.Mul_Ovf_Un:
         case Code.Div:
         case Code.Div_Un:
@@ -199,6 +200,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         case Code.Add:
         case Code.Add_Ovf:
         case Code.Mul:
+        case Code.Mul_Ovf:
         case Code.Mul_Ovf_Un:
         case Code.Div:
         case Code.Div_Un:
@@ -507,6 +509,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       {
         case Code.Add:
         case Code.Mul:
+        case Code.Mul_Ovf:
+        case Code.Mul_Ovf_Un:
         case Code.Div:
         case Code.Div_Un:
         case Code.Sub:
@@ -765,6 +769,10 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             throw new NotImplementedException(string.Format("{0} on types '{1}' and '{2}' not yet implemented!", OpCode, StackPopTypes[0], StackPopTypes[1]));
           }
           break;
+        case Code.Localloc:
+          StackPushTypes[0] = typeof(void*);
+          aSituationChanged = true;
+          return;
         case Code.Stelem_I2:
           var xTypeValue = StackPopTypes[0];
           if (xTypeValue == null)

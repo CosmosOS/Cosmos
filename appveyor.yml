@@ -1,0 +1,53 @@
+version: 0.20150918.{build}
+configuration: Debug
+platform: x86
+shallow_clone: true
+clone_folder: c:\Cosmos
+build_script:
+- cmd: >-
+    rem %APPVEYOR_BUILD_FOLDER%
+
+
+    msbuild "source\Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform=x86 /p:Configuration=Debug /p:DeployExtension=false
+
+
+    msbuild "source\Build.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform=x86 /p:Configuration=Debug /p:OutputPath="%APPVEYOR_BUILD_FOLDER%\Build\VSIP" /p:DeployExtension=false
+
+
+    xcopy /Y "%APPVEYOR_BUILD_FOLDER%\Build\VSIP\Cosmos.targets" "%ProgramFiles(x86)%\MSBuild\Cosmos\"
+
+    xcopy /Y "c:\Cosmos\Build\VSIP" "c:\CosmosRun\Build\IL2CPU\"
+
+    xcopy /Y "c:\Cosmos\Build\VSIP" "c:\CosmosRun\Kernel\"
+
+    xcopy /Y "c:\Cosmos\Build\VSIP" "c:\CosmosRun\Build\VSIP\"
+
+    xcopy /Y /S "c:\Cosmos\Build\ISO" "c:\CosmosRun\Build\ISO\"
+
+    xcopy /Y "c:\Cosmos\Build\*.*" "c:\CosmosRun\Build\ISO\"
+
+    xcopy /Y /S "c:\Cosmos\Build\VMware\*" "c:\CosmosRun\Build\VMware\"
+
+    xcopy /Y /S "c:\Cosmos\Build\Tools" "c:\CosmosRun\Build\Tools\"
+
+    xcopy /Y "c:\Cosmos\source\Cosmos.Debug.DebugStub\*.xs" "c:\CosmosRun\XSharp\DebugStub\"
+
+    xcopy /Y /S "c:\Cosmos\Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
+
+
+    reg add HKLM\SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.5\AssemblyFoldersEx\Cosmos /ve /d c:\CosmosRun\Build\VSIP\
+
+    reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d c:\CosmosRun\
+
+    reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
+
+
+    msbuild "source\Cosmos.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform=x86 /p:Configuration=Debug /p:DeployExtension=false
+notifications:
+- provider: Webhook
+  url: https://webhooks.gitter.im/e/a0ff70f4ffc77a2d07a0
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
+matrix:
+  fast_finish: true

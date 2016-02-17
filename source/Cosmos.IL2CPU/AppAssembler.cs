@@ -1,6 +1,7 @@
 ﻿//#define VMT_DEBUG
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.SymbolStore;
 using System.IO;
 using System.Linq;
@@ -103,11 +104,11 @@ namespace Cosmos.IL2CPU
                     }
 
                     var xParams = aMethod.MethodBase.GetParameters();
-                    var xParamCount = (ushort) xParams.Length;
+                    var xParamCount = (ushort)xParams.Length;
 
                     for (ushort i = 0; i < xParamCount; i++)
                     {
-                        var xOffset = X86.IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort) (i + xIdxOffset));
+                        var xOffset = X86.IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset));
                         var xSize = X86.IL.Ldarg.SizeOfType(xParams[i].ParameterType);
                         // if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
                         new Comment(String.Format("Argument[{3}] {0} at EBP+{1}, size = {2}", xParams[i].Name, xOffset, xSize, (xIdxOffset + i)));
@@ -309,9 +310,9 @@ namespace Cosmos.IL2CPU
                 new Comment("Following code is for debugging. Adjust accordingly!");
                 new Mov
                 {
-                  DestinationRef = ElementReference.New("static_field__Cosmos_Core_INTs_mLastKnownAddress"),
-                  DestinationIsIndirect = true,
-                  SourceRef = ElementReference.New(xMethodLabel + EndOfMethodLabelNameNormal)
+                    DestinationRef = ElementReference.New("static_field__Cosmos_Core_INTs_mLastKnownAddress"),
+                    DestinationIsIndirect = true,
+                    SourceRef = ElementReference.New(xMethodLabel + EndOfMethodLabelNameNormal)
                 };
             }
 
@@ -405,16 +406,16 @@ namespace Cosmos.IL2CPU
             {
                 // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
                 // if not, we should somehow break here.
-              new Mov {DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP};
-              new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
-                new Compare {SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX};
+                new Mov { DestinationReg = Registers.EAX, SourceReg = RegistersEnum.ESP };
+                new Mov { DestinationReg = Registers.EBX, SourceReg = RegistersEnum.EBP };
+                new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabelExc + "__2" };
                 new ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location" };
                 new Assembler.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
-                new Pop {DestinationReg = RegistersEnum.EAX};
-                new Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX};
+                new Pop { DestinationReg = RegistersEnum.EAX };
+                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
                 new Halt();
             }
@@ -560,7 +561,7 @@ namespace Cosmos.IL2CPU
             var xFirstInstruction = true;
             foreach (var xOpCode in aCurrentGroup)
             {
-                ushort xOpCodeVal = (ushort) xOpCode.OpCode;
+                ushort xOpCodeVal = (ushort)xOpCode.OpCode;
                 ILOp xILOp;
                 if (xOpCodeVal <= 0xFF)
                 {
@@ -691,7 +692,7 @@ namespace Cosmos.IL2CPU
             while (xNeedsInterpreting)
             {
                 ILOpCode.ILInterpretationDebugLine(() => String.Format("--------- New Interpretation iteration (xIteration = {0})", xIteration));
-                xIteration ++;
+                xIteration++;
                 if (xIteration > 20)
                 {
                     // Situation not resolved. Now give error with first offset needing types:
@@ -856,7 +857,7 @@ namespace Cosmos.IL2CPU
             }
 
             ILOp.EmitExceptionLogic(Assembler, aMethod, null, true,
-                     delegate()
+                     delegate ()
                      {
                          var xResultSize = xReturnsize;
                          if (xResultSize % 4 != 0)
@@ -881,7 +882,7 @@ namespace Cosmos.IL2CPU
 
         protected void Ldflda(MethodInfo aMethod, X86.IL.FieldInfo aFieldInfo)
         {
-          X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldInfo, false, false);
+            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldInfo, false, false);
         }
 
         protected void Ldsflda(MethodInfo aMethod, X86.IL.FieldInfo aFieldInfo)
@@ -952,14 +953,20 @@ namespace Cosmos.IL2CPU
                 {
                     if (aMethodsSet.Contains(xMethod))
                     { //) && !xMethod.IsAbstract) {
-                        xEmittedMethods.Add(xMethod, false);
+                        if (!xEmittedMethods.ContainsKey(xMethod))
+                        {
+                            xEmittedMethods.Add(xMethod, false);
+                        }
                     }
                 }
                 foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
                 {
                     if (aMethodsSet.Contains(xCtor))
                     { // && !xCtor.IsAbstract) {
-                        xEmittedMethods.Add(xCtor, false);
+                        if (!xEmittedMethods.ContainsKey(xCtor))
+                        {
+                            xEmittedMethods.Add(xCtor, false);
+                        }
                     }
                 }
                 foreach (var xIntf in xType.GetInterfaces())
@@ -1039,10 +1046,7 @@ namespace Cosmos.IL2CPU
                 }
                 if (!xType.IsInterface)
                 {
-                    if (!xType.IsInterface)
-                    {
-                        Push(aGetTypeID(xType));
-                    }
+                    Push(aGetTypeID(xType));
                     Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(
                         new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { (int)aGetTypeID(xType) }));
@@ -1235,7 +1239,7 @@ namespace Cosmos.IL2CPU
                             try
                             {
                                 Type xTyp = xValue.GetType();
-                                if(xTyp.IsEnum)
+                                if (xTyp.IsEnum)
                                 {
                                     xValue = Convert.ChangeType(xValue, Enum.GetUnderlyingType(xTyp));
                                 }
@@ -1381,7 +1385,7 @@ namespace Cosmos.IL2CPU
                 {
                     Assembler.WriteDebugVideo(".");
                 }
-                xMemberId ++;
+                xMemberId++;
                 new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = Registers.EAX };
             }
             Assembler.WriteDebugVideo("Done");
@@ -1561,45 +1565,42 @@ namespace Cosmos.IL2CPU
             {
                 // Check options for Debug Level
                 // Set based on TracedAssemblies
-                if (TraceAssemblies == TraceAssemblies.Cosmos || TraceAssemblies == TraceAssemblies.User)
+                if (TraceAssemblies > TraceAssemblies.None)
                 {
-                    if (aNamespace.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase))
+                    if (TraceAssemblies < TraceAssemblies.All)
                     {
-                        return;
+                        if (aNamespace.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            return;
+                        }
+                        if (aNamespace.ToLower() == "system")
+                        {
+                            return;
+                        }
+                        if (aNamespace.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            return;
+                        }
                     }
-                    else if (aNamespace.ToLower() == "system")
-                    {
-                        return;
-                    }
-                    else if (aNamespace.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        return;
-                    }
-                    if (TraceAssemblies == TraceAssemblies.User)
+
+                    if (TraceAssemblies < TraceAssemblies.Cosmos)
                     {
                         //TODO: Maybe an attribute that could be used to turn tracing on and off
-                        //TODO: This doesnt match Cosmos.Kernel exact vs Cosmos.Kernel., so a user
-                        // could do Cosmos.KernelMine and it will fail. Need to fix this
-                        if (aNamespace.StartsWith("Cosmos.Kernel", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            return;
-                        }
-                        else if (aNamespace.StartsWith("Cosmos.System", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            return;
-                        }
-                        else if (aNamespace.StartsWith("Cosmos.HAL", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            return;
-                        }
-                        else if (aNamespace.StartsWith("Cosmos.IL2CPU", StringComparison.InvariantCultureIgnoreCase))
+                        if (aNamespace.StartsWith("Cosmos.", StringComparison.InvariantCultureIgnoreCase))
                         {
                             return;
                         }
                     }
                 }
+                else
+                {
+                    return;
+                }
             }
-
+            else
+            {
+                return;
+            }
             // If we made it this far without a return, emit the Tracer
             // We used to emit an INT3, but this meant the DS would brwak after every C# line
             // Breaking that frequently is of course, pointless and slow.

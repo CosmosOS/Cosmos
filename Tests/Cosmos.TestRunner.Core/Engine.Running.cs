@@ -19,48 +19,37 @@ namespace Cosmos.TestRunner.Core
             debugConnector.OnDebugMsg = s => OutputHandler.LogDebugMessage(s);
             debugConnector.CmdChannel = ChannelPacketReceived;
             debugConnector.CmdStarted = () =>
-            {
-                OutputHandler.LogMessage("DC: Started");
-                debugConnector.SendCmd(Vs2Ds.BatchEnd);
-            };
+                {
+                    OutputHandler.LogMessage("DC: Started");
+                    debugConnector.SendCmd(Vs2Ds.BatchEnd);
+                };
             debugConnector.Error = e =>
-            {
-                OutputHandler.LogMessage("DC Error: " + e.ToString());
-                OutputHandler.SetKernelTestResult(false, "DC Error");
-                mKernelResultSet = true;
-                mKernelRunning = false;
-            };
-            debugConnector.CmdText += s =>
-            {
-                OutputHandler.LogMessage("Text from kernel: " + s);
-            };
-            debugConnector.CmdSimpleNumber += n =>
-                                              {
-                                                  OutputHandler.LogMessage("Number from kernel: 0x" + n.ToString("X8").ToUpper());
-                                              };
-            debugConnector.CmdMessageBox = s =>
-                                           {
-                                               OutputHandler.LogMessage("MessageBox from kernel: " + s);
-                                           };
-            debugConnector.CmdTrace = t =>
-            {
-            };
-            debugConnector.CmdBreak = t =>
-            {
-            };
-            debugConnector.CmdStackCorruptionOccurred =
-                a =>
+                {
+                    OutputHandler.LogMessage("DC Error: " + e.ToString());
+                    OutputHandler.SetKernelTestResult(false, "DC Error");
+                    mKernelResultSet = true;
+                    mKernelRunning = false;
+                };
+            debugConnector.CmdText += s => OutputHandler.LogMessage("Text from kernel: " + s);
+            debugConnector.CmdSimpleNumber += n => OutputHandler.LogMessage("Number from kernel: 0x" + n.ToString("X8").ToUpper());
+            debugConnector.CmdComplexSingleNumber += f => OutputHandler.LogMessage("Number from kernel: " + f);
+            debugConnector.CmdComplexDoubleNumber += d => OutputHandler.LogMessage("Number from kernel: " + d);
+            debugConnector.CmdMessageBox = s => OutputHandler.LogMessage("MessageBox from kernel: " + s);
+            debugConnector.CmdTrace = t => { };
+            debugConnector.CmdBreak = t => { };
+            debugConnector.CmdStackCorruptionOccurred = a =>
                 {
                     OutputHandler.LogMessage("Stackcorruption occurred at: 0x" + a.ToString("X8"));
                     OutputHandler.SetKernelTestResult(false, "Stackcorruption occurred at: 0x" + a.ToString("X8"));
                     mKernelResultSet = true;
                     mKernelRunning = false;
                 };
-            debugConnector.CmdNullReferenceOccurred =
-                a =>
+            debugConnector.CmdNullReferenceOccurred = a =>
                 {
                     OutputHandler.LogMessage("Null Reference Exception occurred at: 0x" + a.ToString("X8"));
-                    OutputHandler.SetKernelTestResult(false, "Null Reference Exception occurred at: 0x" + a.ToString("X8"));
+                    OutputHandler.SetKernelTestResult(
+                        false,
+                        "Null Reference Exception occurred at: 0x" + a.ToString("X8"));
                     mKernelResultSet = true;
                     mKernelRunning = false;
                 };
@@ -112,6 +101,7 @@ namespace Cosmos.TestRunner.Core
         }
 
         private volatile bool mKernelResultSet;
+        private volatile bool mKernelResult;
         private int mSucceededAssertions;
 
         private void ChannelPacketReceived(byte arg1, byte arg2, byte[] arg3)
@@ -125,13 +115,13 @@ namespace Cosmos.TestRunner.Core
             {
                 switch (arg2)
                 {
-                    case (byte) TestChannelCommandEnum.TestCompleted:
+                    case (byte)TestChannelCommandEnum.TestCompleted:
                         KernelTestCompleted();
                         break;
-                    case (byte) TestChannelCommandEnum.TestFailed:
+                    case (byte)TestChannelCommandEnum.TestFailed:
                         KernelTestFailed();
                         break;
-                    case (byte) TestChannelCommandEnum.AssertionSucceeded:
+                    case (byte)TestChannelCommandEnum.AssertionSucceeded:
                         KernelAssertionSucceeded();
                         break;
                 }
@@ -151,12 +141,15 @@ namespace Cosmos.TestRunner.Core
         {
             OutputHandler.SetKernelTestResult(false, "Test failed");
             mKernelResultSet = true;
+            mKernelResult = false;
             mKernelRunning = false;
         }
 
         private void KernelTestCompleted()
         {
             Thread.Sleep(50);
+            mKernelResultSet = true;
+            mKernelResult = true;
             mKernelRunning = false;
             Console.WriteLine("Test completed");
         }

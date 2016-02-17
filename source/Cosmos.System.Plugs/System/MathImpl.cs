@@ -1,14 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.System;
 
 namespace Cosmos.System.Plugs.System
 {
-    [Plug(Target = typeof(global::System.Math))]
-    public class MathImpl
+    [Plug(Target = typeof(Math))]
+    public static class MathImpl
     {
+        internal static Debugger mDebugger = new Debugger("System", "Math Plugs");
 
         #region Internal Constants
         private const double sq2p1 = 2.414213562373095048802e0F;
@@ -401,7 +401,7 @@ namespace Cosmos.System.Plugs.System
             }
 
             x1 = i;
-            // this originally used another variable here, 
+            // this originally used another variable here,
             // but the use of i was done, thus it's faster
             // to re-use the variable.
             for (i = 0; i < 10; i++)
@@ -455,15 +455,15 @@ namespace Cosmos.System.Plugs.System
             }
 
 
-            const double c1 =  4130240.588996024013440146267;
-            const double c2 =-  349781.8562517381616631012487;
-            const double c3 =     6170.317758142494245331944348;
-            const double c4 =-      27.94920941380194872760036319;
-            const double c5 =        0.0175143807040383602666563058;
-            const double c6 =  5258785.647179987798541780825;
-            const double c7 =- 1526650.549072940686776259893;
-            const double c8 =    54962.51616062905361152230566;
-            const double c9 =-     497.495460280917265024506937;
+            const double c1 = 4130240.588996024013440146267;
+            const double c2 = -349781.8562517381616631012487;
+            const double c3 = 6170.317758142494245331944348;
+            const double c4 = -27.94920941380194872760036319;
+            const double c5 = 0.0175143807040383602666563058;
+            const double c6 = 5258785.647179987798541780825;
+            const double c7 = -1526650.549072940686776259893;
+            const double c8 = 54962.51616062905361152230566;
+            const double c9 = -497.495460280917265024506937;
             double x2 = x * x;
             if (octant == 0 || octant == 4)
             {
@@ -590,7 +590,5 @@ namespace Cosmos.System.Plugs.System
         #endregion
 
         #endregion
-
-
     }
 }

@@ -1,42 +1,41 @@
-### C# Open Source Managed Operating System
+### Cosmos (C# Open Source Managed Operating System)
 
+[![Build status](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true)](https://ci.appveyor.com/project/CosmosOS/cosmos/branch/master)
 [![Join the chat at https://gitter.im/CosmosOS/Cosmos](https://img.shields.io/badge/GITTER-Join%20Chat-brightgreen.svg)](https://gitter.im/CosmosOS/Cosmos?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![GitHub release](https://img.shields.io/github/release/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/releases)
 
-[We are currently migrating from codeplex](http://cosmos.codeplex.com/)
-
 Cosmos is an operating system "construction kit", built from the ground up around the IL2CPU compiler in C# and our home-brewed language called X#.
 
-It's current stage is only usable for academic work. Some day Cosmos will be ready for production work, but to reach that stage we need more developers. Specifically, we need a few more low level developers to help the few core developers who are currently overwhelmed with work.
+It's current stage is only usable for academic work. Some day Cosmos will be ready for production work, but to reach that stage we need more developers. Specifically, we need a few more low-level developers to help the few core developers who are currently overwhelmed with work.
 
 
-Download
+Downloads:
 ---------
 
-Cosmos is available in two forms:
-* **User Kit** - User Kit allows you to develop your own custom operating system in Visual Studio. 
-  If you are new to Cosmos, [start here](https://github.com/CosmosOS/Cosmos/wiki). [Latest Release](https://github.com/CosmosOS/Cosmos/releases/latest)
-* **Dev Kit** - Dev Kit is the full Cosmos source with build tools. 
-  If you need to modify core Cosmos functions or modify built in drivers, boot, compiler, etc then you will need to use Dev Kit.
-  [How to build the Dev Kit](https://github.com/CosmosOS/Cosmos/wiki/Devkit) - Building from source is easy with our automated builder.
+Cosmos is available in two flavors:
+* **User Kit** - The User Kit is used to develop your operating system in Visual Studio.
+  If you are new to Cosmos, you can learn [here](https://github.com/CosmosOS/Cosmos/wiki). [Latest Release anvailable](https://github.com/CosmosOS/Cosmos/releases/latest)
+* **Development Kit** - The Development Kit is the full Cosmos source and build tools.
+  If you need to modify the Cosmos core functions or modify built-in drivers, boot, compiler, etc.. you will need to use Development Kit.
+  [Tutorial for building the Development Kit](https://github.com/CosmosOS/Cosmos/wiki/Devkit) - Building from the source is easy with our automated builder.
 
 
 Getting Started
 ---------
 
-* [Cosmos Documentation](https://github.com/CosmosOS/Cosmos/wiki)
-* Video: [Using VS Express Editions](https://www.youtube.com/watch?v=NNl8S2xOtdo)
-* [FAQ](https://github.com/CosmosOS/Cosmos/wiki/FAQ)
+* [Documentation for Cosmos](https://github.com/CosmosOS/Cosmos/wiki)
+* Video Tutorial for [using Visual Studio Express Editions](https://www.youtube.com/watch?v=NNl8S2xOtdo)
+* [FAQ (Frequently Asked Questions)](https://github.com/CosmosOS/Cosmos/wiki/FAQ)
 * [Low Hanging Fruit](https://github.com/CosmosOS/Cosmos/issues?q=is%3Aopen+is%3Aissue+label%3Acomplexity_low+sort%3Acreated-asc) - Looking for something easy to do and prove your worth in Cosmos? Here are a few easy tasks we have on our to do list that are also of importance to us.
 
 
-Joining Cosmos
+Joining and helping Cosmos
 ---------
 
-* [Gitter.im](https://gitter.im/CosmosOS/Cosmos) - Live chat. Click the green `Join Chat` badge at the top of this file. As with the IRC and CodePlex chatroom, please be patient if we don't respond immediately (no pinging).
-* [Yahoo Group](https://tech.groups.yahoo.com/group/Cosmos-Dev) - Email Discussion List. To prevent spambots from spamming our list we ask you introduce yourself to join. Please mention something specific to Cosmos. "Hey I want to join" won't get you in....
+* [Gitter.im](https://gitter.im/CosmosOS/Cosmos) - The Live Chat: Click the green `Join Chat` badge at the top of this file. As with the IRC and CodePlex chat, please be patient if we don't respond immediately (no pinging).
+* [Yahoo Group](https://tech.groups.yahoo.com/group/Cosmos-Dev) - Email Discussion List: To prevent spam-bots from spamming, we ask you introduce yourself to join. Please mention something specific to Cosmos. For example: "Hey, I want to join" and will won't get you in....
 * [Facebook](http://www.facebook.com/pages/Cosmos-Operating-System/10235842745) - Like us to see frequent updates of what is going on with Cosmos.
-* [YouTube Channel](https://www.youtube.com/channel/UCsSKtqjfpSR0B3Ov4cBIarQ/) - Follow use to see useful videos.
+* [YouTube Channel](https://www.youtube.com/channel/UCsSKtqjfpSR0B3Ov4cBIarQ/) - Follow to see useful videos and help you programming your operating system.
 * [Resources](https://github.com/CosmosOS/Cosmos/wiki/Resources) - More Cosmos related links.
 
 
@@ -48,14 +47,14 @@ Articles and Resources
 * [Intro to Plugs](https://github.com/CosmosOS/Cosmos/wiki/Intro-to-Plugs)
 * [X86 Assembly Debugger Preview](https://github.com/CosmosOS/Cosmos/wiki/Visual-Studio-X86-Assembly-Debugger)
 * [Making a Remote PC Slave for Debugging or Fun](http://www.codeproject.com/Articles/413942/Making-a-Remote-PC-Slave-for-Debugging-or-Fun) (old article, code deprecated)
-* [Cosmos Tutorials](https://int0x10.com/forums/forum-22.html)
-* [Cosmos Projects](https://github.com/CosmosOS/Cosmos/wiki/Cosmos-Projects)
+* [Tutorials for Cosmos](https://int0x10.com/forums/forum-22.html)
+* [Projects for Cosmos](https://github.com/CosmosOS/Cosmos/wiki/Cosmos-Projects)
 
 
 Publicity
 ---------
 
-* [Mary Jo Foley - Cosmos: An open-source .Net-based microkernel OS is born](http://www.zdnet.com/blog/microsoft/cosmos-an-open-source-net-based-microkernel-os-is-born/1162)
+* [Mary Jo Foley - Cosmos: An open-source .Net-based micro-kernel OS is born](http://www.zdnet.com/blog/microsoft/cosmos-an-open-source-net-based-microkernel-os-is-born/1162)
 * [Scott Hanselman - Tiny Managed Operating System Edition](http://www.hanselman.com/blog/TheWeeklySourceCode15TinyManagedOperatingSystemEdition.aspx)
 
 

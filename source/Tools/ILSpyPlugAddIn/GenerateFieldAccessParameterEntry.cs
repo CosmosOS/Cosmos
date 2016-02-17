@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using ICSharpCode.ILSpy;
 using ICSharpCode.ILSpy.TreeNodes;
+using Mono.Cecil;
 
 namespace Cosmos.ILSpyPlugs.Plugin
 {
@@ -14,46 +15,48 @@ namespace Cosmos.ILSpyPlugs.Plugin
     {
         public override bool IsVisible(TextViewContext context)
         {
-            if (context.SelectedTreeNodes.Length != 1)
+            if (context?.SelectedTreeNodes != null)
             {
-                return false;
+                foreach (var node in context.SelectedTreeNodes)
+                {
+                    var xCurrentField = node as FieldTreeNode;
+                    if ((xCurrentField != null) && !xCurrentField.FieldDefinition.HasConstant)
+                    {
+                        return true;
+                    }
+                }
             }
-            var xCurrentField = context.SelectedTreeNodes[0] as FieldTreeNode;
-            if (xCurrentField == null)
-            {
-                return false;
-            }
-            if (xCurrentField.FieldDefinition.HasConstant)
-            {
-                return false;
-            }
-            return true;
+            return false;
         }
 
         public override void Execute(TextViewContext context)
         {
-            if (context.SelectedTreeNodes.Length != 1)
-            {
-                throw new Exception("SelectedTreeNodes = " + context.SelectedTreeNodes.Length);
-            }
-            var xCurrentField = context.SelectedTreeNodes[0] as FieldTreeNode;
-            if (xCurrentField == null)
-            {
-                throw new Exception("Current TreeNode is not a Field!");
-            }
-
             if (MessageBox.Show("Do you want to generate FieldAccess code to your clipboard?", "Cosmos Plug tool", MessageBoxButton.YesNo) == MessageBoxResult.No)
             {
                 return;
             }
 
+            StringBuilder xString = new StringBuilder();
+            foreach (var node in context.SelectedTreeNodes)
+            {
+                var xCurrentField = node as FieldTreeNode;
+                if (xCurrentField != null)
+                {
+                    xString.Append(GenerateField(xCurrentField.FieldDefinition));
+                    xString.AppendLine();
+                }
+            }
 
-            Clipboard.SetText(String.Format("[FieldAccess(Name = \"{0} {1}.{2}\")] ref {3} field{2}",
-                                            xCurrentField.FieldDefinition.FieldType.FullName,
-                                            xCurrentField.FieldDefinition.DeclaringType.FullName,
-                                            xCurrentField.FieldDefinition.Name,
-                                            Utilities.GetCSharpTypeName(xCurrentField.FieldDefinition.FieldType)));
+            Clipboard.SetText(xString.ToString());
+
             MessageBox.Show("Done", "Cosmos Plug tool");
+        }
+
+        public string GenerateField(FieldDefinition field)
+        {
+            StringBuilder xString = new StringBuilder();
+            xString.Append($"[FieldAccess(Name = \"{field.FieldType.FullName} {field.DeclaringType.FullName}.{field.Name}\")] ref {Utilities.GetCSharpTypeName(field.FieldType)} field{field.Name}");
+            return xString.ToString();
         }
     }
 }

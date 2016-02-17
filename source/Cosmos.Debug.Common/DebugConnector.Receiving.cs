@@ -102,6 +102,24 @@ namespace Cosmos.Debug.Common
             WaitForMessage();
         }
 
+        protected void PacketComplexSingleNumber(byte[] aPacket)
+        {
+            if (CmdComplexSingleNumber != null)
+            {
+                CmdComplexSingleNumber(GetSingle(aPacket, 0));
+            }
+            WaitForMessage();
+        }
+
+        protected void PacketComplexDoubleNumber(byte[] aPacket)
+        {
+            if (CmdComplexDoubleNumber != null)
+            {
+                CmdComplexDoubleNumber(GetDouble(aPacket, 0));
+            }
+            WaitForMessage();
+        }
+
         protected void PacketStackCorruptionOccurred(byte[] aPacket)
         {
             if (CmdStackCorruptionOccurred != null)
