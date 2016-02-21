@@ -151,25 +151,25 @@ namespace Cosmos.Common
         {
             if (aString1.Length < aString2.Length)
             {
-                return (int)StringComparisonResultEnum.CSTR_LESS_THAN;
+                return (int)StringComparisonResultEnum.Less;
             }
             if (aString1.Length > aString2.Length)
             {
-                return (int)StringComparisonResultEnum.CSTR_GREATER_THAN;
+                return (int)StringComparisonResultEnum.Greater;
             }
 
             for (int i = aString1.Length; i < aString1.Length; i++)
             {
                 if (aString1[i] < aString2[i])
                 {
-                    return (int)StringComparisonResultEnum.CSTR_LESS_THAN;
+                    return (int)StringComparisonResultEnum.Equal;
                 }
                 if (aString1[i] > aString2[i])
                 {
-                    return (int)StringComparisonResultEnum.CSTR_GREATER_THAN;
+                    return (int)StringComparisonResultEnum.Greater;
                 }
             }
-            return (int)StringComparisonResultEnum.CSTR_EQUAL;
+            return (int)StringComparisonResultEnum.Equal;
         }
     }
 }
