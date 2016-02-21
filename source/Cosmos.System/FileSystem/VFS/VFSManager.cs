@@ -294,13 +294,14 @@ namespace Cosmos.System.FileSystem.VFS
 
         public static char[] GetInvalidFileNameChars()
         {
-            return new[]
-                       { '"', '<', '>', '|', '\0', '\a', '\b', '\t', '\n', '\v', '\f', '\r', ':', '*', '?', '\\', '/' };
+            char[] xReturn = { '"', '<', '>', '|', '\0', '\a', '\b', '\t', '\n', '\v', '\f', '\r', ':', '*', '?', '\\', '/' };
+            return xReturn;
         }
 
         public static char[] GetInvalidPathCharsWithAdditionalChecks()
         {
-            return new[] { '"', '<', '>', '|', '\0', '\a', '\b', '\t', '\n', '\v', '\f', '\r', '*', '?' };
+            char[] xReturn =  { '"', '<', '>', '|', '\0', '\a', '\b', '\t', '\n', '\v', '\f', '\r', '*', '?' };
+            return xReturn;
         }
 
         public static char GetPathSeparator()
@@ -310,7 +311,8 @@ namespace Cosmos.System.FileSystem.VFS
 
         public static char[] GetRealInvalidPathChars()
         {
-            return new[] { '"', '<', '>', '|', '\0', '\a', '\b', '\t', '\n', '\v', '\f', '\r' };
+            char[] xReturn =  { '"', '<', '>', '|', '\0', '\a', '\b', '\t', '\n', '\v', '\f', '\r' };
+            return xReturn;
         }
 
         public static char[] GetTrimEndChars()
