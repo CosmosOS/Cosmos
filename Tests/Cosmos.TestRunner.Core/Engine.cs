@@ -20,7 +20,7 @@ namespace Cosmos.TestRunner.Core
         public TraceAssemblies TraceAssembliesLevel = TraceAssemblies.User;
         public StackCorruptionDetectionLevel StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
 
-        public IEnumerable<string> KernelsToRun
+        public List<string> KernelsToRun
         {
             get
             {
@@ -42,7 +42,7 @@ namespace Cosmos.TestRunner.Core
 
         public OutputHandlerBasic OutputHandler;
 
-        public void Execute()
+        public bool Execute()
         {
             if (OutputHandler == null)
             {
@@ -57,6 +57,7 @@ namespace Cosmos.TestRunner.Core
             OutputHandler.ExecutionStart();
             try
             {
+                var xResult = true;
                 foreach (var xConfig in GetRunConfigurations())
                 {
                     OutputHandler.RunConfigurationStart(xConfig);
@@ -71,7 +72,7 @@ namespace Cosmos.TestRunner.Core
                             }
                             Directory.CreateDirectory(mBaseWorkingDirectory);
 
-                            ExecuteKernel(xAssemblyFile, xConfig);
+                            xResult &= ExecuteKernel(xAssemblyFile, xConfig);
                         }
                     }
                     catch (Exception e)
@@ -83,10 +84,12 @@ namespace Cosmos.TestRunner.Core
                         OutputHandler.RunConfigurationEnd(xConfig);
                     }
                 }
+                return xResult;
             }
             catch (Exception E)
             {
                 OutputHandler.UnhandledException(E);
+                return false;
             }
             finally
             {

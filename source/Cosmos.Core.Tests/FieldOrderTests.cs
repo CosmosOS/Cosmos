@@ -3,12 +3,11 @@ using System.Linq;
 
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Cosmos.Core.Tests
 {
-    [TestClass]
+    [TestFixture]
     public class FieldOrderTests
     {
         // the memory stuff requires DataLookupEntry.DataBlock to be the first field

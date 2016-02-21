@@ -6,9 +6,9 @@ using Playground.Kudzu.BreakpointsKernel;
 //using Playground.Kudzu.BreakpointsKernel.FAT;
 //using Playground.Kudzu.BreakpointsKernel.FAT.Listing;
 using Sys = Cosmos.System;
-using Cosmos.Debug.Kernel;
-using Cosmos.Common;
-using Cosmos.HAL.BlockDevice;
+//using Cosmos.Debug.Kernel;
+//using Cosmos.Common;
+//using Cosmos.HAL.BlockDevice;
 
 //using TheFatStream = Playground.Kudzu.BreakpointsKernel.FAT.MyFatStream;
 //using TheFatFile = Playground.Kudzu.BreakpointsKernel.FAT.Listing.MyFatFile;
@@ -29,42 +29,42 @@ namespace Kudzu.BreakpointsKernel
 
     protected override void Run()
     {
-      Test xTest;
+      //Test xTest;
 
-      var xATA = new Cosmos.HAL.BlockDevice.AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1
-        , Cosmos.HAL.BlockDevice.Ata.ControllerIdEnum.Primary
-        , Cosmos.HAL.BlockDevice.Ata.BusPositionEnum.Master);
-      UInt64 xBlockSize = xATA.BlockSize;
+      //var xATA = new Cosmos.HAL.BlockDevice.AtaPio(Cosmos.Core.Global.BaseIOGroups.ATA1
+      //  , Cosmos.HAL.BlockDevice.Ata.ControllerIdEnum.Primary
+      //  , Cosmos.HAL.BlockDevice.Ata.BusPositionEnum.Master);
+      //UInt64 xBlockSize = xATA.BlockSize;
 
-      Console.WriteLine("Running FieldInitTest");
-      xTest = new FieldInitTest();
-      xTest.Run();
+      //Console.WriteLine("Running FieldInitTest");
+      //xTest = new FieldInitTest();
+      //xTest.Run();
 
-      Console.WriteLine("Running ListTest");
-      xTest = new ListTest();
-      xTest.Run();
-      Console.WriteLine("Running NullableTest");
-      xTest = new NullableTest();
-      xTest.Run();
+      //Console.WriteLine("Running ListTest");
+      //xTest = new ListTest();
+      //xTest.Run();
+      //Console.WriteLine("Running NullableTest");
+      //xTest = new NullableTest();
+      //xTest.Run();
 
-      Console.WriteLine("Running Int64Test");
-      xTest = new Int64Test();
-      xTest.Run();
+      //Console.WriteLine("Running Int64Test");
+      //xTest = new Int64Test();
+      //xTest.Run();
 
-      Console.WriteLine("Running Trace1");
-      Trace1();
-      Console.WriteLine("Running TestSB");
-      TestSB();
-      Console.WriteLine("Running TestStringCtor");
-      TestStringCtor();
-      Console.WriteLine("Running TestCompare");
-      TestCompare();
+      //Console.WriteLine("Running Trace1");
+      //Trace1();
+      //Console.WriteLine("Running TestSB");
+      //TestSB();
+      //Console.WriteLine("Running TestStringCtor");
+      //TestStringCtor();
+      //Console.WriteLine("Running TestCompare");
+      //TestCompare();
 
-      Console.WriteLine("Running TestATA");
-      //TestATA();
+      //Console.WriteLine("Running TestATA");
+      ////TestATA();
 
-      Console.WriteLine("Press enter.");
-      Console.ReadLine();
+      //Console.WriteLine("Press enter.");
+      //Console.ReadLine();
       Stop();
     }
 
@@ -143,29 +143,29 @@ namespace Kudzu.BreakpointsKernel
       Console.WriteLine(xString.Length);
     }
 
-    public void Format(Partition p)
-    {
-      byte[] aData = p.NewBlockArray(1);
-      p.ReadBlock(0, 1U, aData);
+    //public void Format(Partition p)
+    //{
+    //  byte[] aData = p.NewBlockArray(1);
+    //  p.ReadBlock(0, 1U, aData);
 
-      aData[510] = 0xAA;
-      aData[511] = 0x55;
+    //  aData[510] = 0xAA;
+    //  aData[511] = 0x55;
 
-      //The number of Bytes per sector (remember, all numbers are in the little-endian format).
-      aData[11] = 0x01;
-      aData[12] = 0xCA;
-      aData[13] = 0x08; //Number of sectors per cluster.
-      aData[14] = 0x01;
-      aData[15] = 0xFF; //Number of reserved sectors. The boot record sectors are included in this value
-      aData[16] = 0x02; //Number of File Allocation Tables (FAT's) on the storage media. Often this value is 2.
-      aData[17] = 0x00;
-      aData[18] = 0x0f; //Number of directory entries (must be set so that the root directory occupies entire sectors).
-      aData[19] = 0xFF;
-      aData[20] = 0xFF; //The total sectors in the logical volume. If this value is 0, it means there are more than 65535 sectors in the volume, and the actual count is stored in "Large Sectors (bytes 32-35).
-      aData[22] = 0x0F;
-      aData[23] = 0xFF; //Number of sectors per FAT. FAT12/FAT16 only.
-      p.WriteBlock(0, 1U, aData);
-    }
+    //  //The number of Bytes per sector (remember, all numbers are in the little-endian format).
+    //  aData[11] = 0x01;
+    //  aData[12] = 0xCA;
+    //  aData[13] = 0x08; //Number of sectors per cluster.
+    //  aData[14] = 0x01;
+    //  aData[15] = 0xFF; //Number of reserved sectors. The boot record sectors are included in this value
+    //  aData[16] = 0x02; //Number of File Allocation Tables (FAT's) on the storage media. Often this value is 2.
+    //  aData[17] = 0x00;
+    //  aData[18] = 0x0f; //Number of directory entries (must be set so that the root directory occupies entire sectors).
+    //  aData[19] = 0xFF;
+    //  aData[20] = 0xFF; //The total sectors in the logical volume. If this value is 0, it means there are more than 65535 sectors in the volume, and the actual count is stored in "Large Sectors (bytes 32-35).
+    //  aData[22] = 0x0F;
+    //  aData[23] = 0xFF; //Number of sectors per FAT. FAT12/FAT16 only.
+    //  p.WriteBlock(0, 1U, aData);
+    //}
 
     /// <summary>
     /// - Gets the first AtaPio device found

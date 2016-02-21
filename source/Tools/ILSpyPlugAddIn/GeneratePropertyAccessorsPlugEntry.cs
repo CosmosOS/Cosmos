@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using ICSharpCode.ILSpy;
 using ICSharpCode.ILSpy.TreeNodes;
+using Mono.Cecil;
 
 namespace Cosmos.ILSpyPlugs.Plugin
 {
@@ -14,51 +15,57 @@ namespace Cosmos.ILSpyPlugs.Plugin
     {
         public override bool IsVisible(TextViewContext context)
         {
-            if (context.SelectedTreeNodes.Length != 1)
+            if (context?.SelectedTreeNodes != null)
             {
-                return false;
+                foreach (var node in context.SelectedTreeNodes)
+                {
+                    var xCurrentProperty = node as PropertyTreeNode;
+                    if (xCurrentProperty != null)
+                    {
+                        return true;
+                    }
+                }
             }
-            var xCurrentProperty = context.SelectedTreeNodes[0] as PropertyTreeNode;
-            if (xCurrentProperty == null)
-            {
-                return false;
-            }
-            return true;
+            return false;
         }
 
         public override void Execute(TextViewContext context)
         {
-            if (context.SelectedTreeNodes.Length != 1)
-            {
-                throw new Exception("SelectedTreeNodes = " + context.SelectedTreeNodes.Length);
-            }
-            var xCurrentProperty = context.SelectedTreeNodes[0] as PropertyTreeNode;
-            if (xCurrentProperty == null)
-            {
-                throw new Exception("Current TreeNode is not a Property!");
-            }
-
             if (MessageBox.Show("Do you want to generate plug code to your clipboard?", "Cosmos Plug tool", MessageBoxButton.YesNo) == MessageBoxResult.No)
             {
                 return;
             }
 
-            var xProp = xCurrentProperty.PropertyDefinition;
-            var xSB = new StringBuilder();
-            if (xProp.GetMethod != null)
+            var xString = new StringBuilder();
+            foreach (var node in context.SelectedTreeNodes)
             {
-                xSB.AppendLine(GenerateMethodPlugEntry.GenerateMethod(xProp.GetMethod));
-                xSB.AppendLine();
-            }
-            if (xProp.SetMethod != null)
-            {
-                xSB.AppendLine(GenerateMethodPlugEntry.GenerateMethod(xProp.SetMethod));
-                xSB.AppendLine();
+                var xCurrentProperty = node as PropertyTreeNode;
+                if (node != null)
+                {
+                    xString.Append(GenerateProperty(xCurrentProperty.PropertyDefinition));
+                    xString.AppendLine();
+                }
             }
 
-            Clipboard.SetText(xSB.ToString().Trim());
+            Clipboard.SetText(xString.ToString().Trim());
 
             MessageBox.Show("Done", "Cosmos Plug tool");
+        }
+
+        public string GenerateProperty(PropertyDefinition property)
+        {
+            StringBuilder xString = new StringBuilder();
+            if (property.GetMethod != null)
+            {
+                xString.AppendLine(GenerateMethodPlugEntry.GenerateMethod(property.GetMethod));
+                xString.AppendLine();
+            }
+            if (property.SetMethod != null)
+            {
+                xString.AppendLine(GenerateMethodPlugEntry.GenerateMethod(property.SetMethod));
+                xString.AppendLine();
+            }
+            return xString.ToString();
         }
     }
 }

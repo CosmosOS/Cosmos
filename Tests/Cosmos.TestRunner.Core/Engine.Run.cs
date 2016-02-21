@@ -17,8 +17,9 @@ namespace Cosmos.TestRunner.Core
         public int AllowedSecondsInKernel = 30;
         public List<RunTargetEnum> RunTargets = new List<RunTargetEnum>();
 
-        private void ExecuteKernel(string assemblyFileName, RunConfiguration configuration)
+        private bool ExecuteKernel(string assemblyFileName, RunConfiguration configuration)
         {
+            var xResult = true;
             OutputHandler.ExecuteKernelStart(assemblyFileName);
             try
             {
@@ -58,17 +59,21 @@ namespace Cosmos.TestRunner.Core
                 if (!mKernelResultSet)
                 {
                     OutputHandler.SetKernelTestResult(false, e.ToString());
+                    mKernelResult = false;
                 }
                 if (e is TaskFailedException)
                 {
-                    return;
+                    return mKernelResult;
                 }
                 OutputHandler.UnhandledException(e);
             }
             finally
             {
                 OutputHandler.ExecuteKernelEnd(assemblyFileName);
+
             }
+            xResult = mKernelResult;
+            return xResult;
         }
 
 

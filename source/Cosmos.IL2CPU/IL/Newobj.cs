@@ -144,7 +144,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     }
                     else if (xParams.Length == 3
-                             && xParams[0].ParameterType == typeof(char[])
+                             && (xParams[0].ParameterType == typeof(char[]) || xParams[0].ParameterType == typeof(char*))
                              && xParams[1].ParameterType == typeof(int)
                              && xParams[2].ParameterType == typeof(int))
                     {

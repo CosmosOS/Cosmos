@@ -8,13 +8,13 @@ using System.Reflection.Emit;
 namespace Cosmos.IL2CPU {
   public class ILReader {
     // We split this into two arrays since we have to read
-    // a byte at a time anways. In the future if we need to 
-    // back to a unifed array, instead of 64k entries 
+    // a byte at a time anways. In the future if we need to
+    // back to a unifed array, instead of 64k entries
     // we can change it to a signed int, and then add x0200 to the value.
     // This will reduce array size down to 768 entries.
     protected OpCode[] mOpCodesLo = new OpCode[256];
     protected OpCode[] mOpCodesHi = new OpCode[256];
-    
+
     public ILReader() {
       LoadOpCodes();
     }
@@ -67,7 +67,7 @@ namespace Cosmos.IL2CPU {
           {
               if (xHandler.TryOffset > 0)
               {
-                  if (xHandler.TryOffset <= xPos && (xHandler.TryLength + xHandler.TryOffset + 1) > xPos) // + 1 because index should be less than the try
+                  if (xHandler.TryOffset <= xPos && (xHandler.TryLength + xHandler.TryOffset ) > xPos)
                   {
                       if (xCurrentHandler == null)
                       {
@@ -84,7 +84,7 @@ namespace Cosmos.IL2CPU {
               }
               if (xHandler.HandlerOffset > 0)
               {
-                  if (xHandler.HandlerOffset <= xPos && (xHandler.HandlerOffset + xHandler.HandlerLength + 1) > xPos)
+                  if (xHandler.HandlerOffset <= xPos && (xHandler.HandlerOffset + xHandler.HandlerLength) > xPos)
                   {
                       if (xCurrentHandler == null)
                       {

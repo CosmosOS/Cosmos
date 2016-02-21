@@ -101,6 +101,7 @@ namespace Cosmos.TestRunner.Core
         }
 
         private volatile bool mKernelResultSet;
+        private volatile bool mKernelResult;
         private int mSucceededAssertions;
 
         private void ChannelPacketReceived(byte arg1, byte arg2, byte[] arg3)
@@ -140,12 +141,15 @@ namespace Cosmos.TestRunner.Core
         {
             OutputHandler.SetKernelTestResult(false, "Test failed");
             mKernelResultSet = true;
+            mKernelResult = false;
             mKernelRunning = false;
         }
 
         private void KernelTestCompleted()
         {
             Thread.Sleep(50);
+            mKernelResultSet = true;
+            mKernelResult = true;
             mKernelRunning = false;
             Console.WriteLine("Test completed");
         }

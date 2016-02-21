@@ -18,7 +18,7 @@ namespace Cosmos.TestRunner
         }
 
         public const byte TestChannel = 255;
-        public static unsafe void Completed()
+        public static void Completed()
         {
             Console.WriteLine("Sending test completed now");
             Debugger.SendChannelCommand(TestChannel, (byte)TestChannelCommandEnum.TestCompleted);
