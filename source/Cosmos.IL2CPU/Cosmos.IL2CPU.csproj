@@ -110,6 +110,8 @@
       </SubType>
     </Compile>
     <Compile Include="Plugs\System\GCImpl.cs" />
+    <Compile Include="Plugs\System\Globalization\CultureInfoImpl.cs" />
+    <Compile Include="Plugs\System\Globalization\NumberFormatInfoImpl.cs" />
     <Compile Include="Plugs\System\ObjectImpl.cs">
       <SubType>
       </SubType>

@@ -86,10 +86,6 @@
     <Compile Include="System\Assemblers\InvokeImplAssembler.cs" />
     <Compile Include="System\Buffer.cs" />
     <Compile Include="System\DelegateImpl.cs" />
-    <Compile Include="System\Globalization\CompareInfoImpl.cs" />
-    <Compile Include="System\Globalization\CultureInfoImpl.cs" />
-    <Compile Include="System\Globalization\NumberFormatInfoImpl.cs" />
-    <Compile Include="System\Globalization\TextInfoImpl.cs" />
     <Compile Include="System\IO\PathHelperImpl.cs" />
     <Compile Include="System\MulticastDelegateImpl.cs" />
     <Compile Include="System\NormalDelegateImpl.cs" />
@@ -134,7 +130,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

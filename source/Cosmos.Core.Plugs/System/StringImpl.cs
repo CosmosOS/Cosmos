@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 
 using Cosmos.Common;
 using Cosmos.IL2CPU.Plugs;
@@ -50,11 +51,11 @@ namespace Cosmos.Core.Plugs.System
         }
 
         public static unsafe void Ctor(
-            string aThis,
-            char[] aChars,
-            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+                    string aThis,
+                    char[] aChars,
+                    [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+                    [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
+                    [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
             aStringEmpty = "";
             aStringLength = aChars.Length;
@@ -594,6 +595,8 @@ namespace Cosmos.Core.Plugs.System
             }
         }
 
+        //        System.Int32  System.String.IndexOf(System.String, System.Int32, System.Int32, System.StringComparison)
+
         public static bool Equals(string aThis, string aThat, StringComparison aComparison)
         {
 #warning TODO: implement
@@ -606,23 +609,9 @@ namespace Cosmos.Core.Plugs.System
             return EqualsHelper(aThis, aThat);
         }
 
-        public static bool EqualsHelper(string strA, string strB)
+        public static bool EqualsHelper(string aStrA, string aStrB)
         {
-            int xLength1 = strA.Length;
-            int xLength2 = strB.Length;
-
-            if (xLength1 != xLength2)
-            {
-                return false;
-            }
-            for (int i = 0; i < xLength1; i++)
-            {
-                if (strA[i] != strB[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            return aStrA.CompareTo(aStrB) == 0;
         }
 
         private static bool CharArrayContainsChar(char[] aArray, char aChar)

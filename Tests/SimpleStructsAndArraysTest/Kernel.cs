@@ -7,7 +7,7 @@ using Sys = Cosmos.System;
 
 namespace SimpleStructsAndArraysTest
 {
-    public class Kernel : Sys.Kernel
+    public class Kernel: Sys.Kernel
     {
         protected override void BeforeRun()
         {
@@ -53,13 +53,13 @@ namespace SimpleStructsAndArraysTest
             //Console.Write("Char: ");
             //Console.WriteLine(xResult.KeyChar);
             var xItem = new MyStruct
-            {
-                A = 1,
-                B = 2,
-                C = 3,
-                D = 4,
-                E = 5
-            };
+                        {
+                            A = 1,
+                            B = 2,
+                            C = 3,
+                            D = 4,
+                            E = 5
+                        };
 
             var xArray = new MyStruct[1];
             xArray[0] = xItem;
@@ -216,8 +216,8 @@ namespace SimpleStructsAndArraysTest
             var xListClasses = new OurList<KVPClass>();
             var xListStructs = new OurList<KVPStruct>();
 
-            xListClasses.Add(new KVPClass { Key = 1, Value = 2 });
-            xListClasses.Add(new KVPClass { Key = 2, Value = 5 });
+            xListClasses.Add(new KVPClass {Key = 1, Value = 2});
+            xListClasses.Add(new KVPClass {Key = 2, Value = 5});
 
             OurList<KVPClass>.ExpectedIndex = 0;
             var xListItem = xListClasses[0];
@@ -225,11 +225,11 @@ namespace SimpleStructsAndArraysTest
             Assert.AreEqual(2, xListItem.Value, "xListClasses[0].Value == 2");
             OurList<KVPClass>.ExpectedIndex = 1;
             xListItem = xListClasses[1];
-            Assert.AreEqual(2, xListItem.Key, "xListClasses[1].Key == 2");
+            Assert.AreEqual(2, xListItem.Key,   "xListClasses[1].Key == 2");
             Assert.AreEqual(5, xListItem.Value, "xListClasses[1].Value == 5");
 
-            xListStructs.Add(new KVPStruct { Key = 1, Value = 2 });
-            xListStructs.Add(new KVPStruct { Key = 2, Value = 5 });
+            xListStructs.Add(new KVPStruct {Key = 1, Value = 2});
+            xListStructs.Add(new KVPStruct {Key = 2, Value = 5});
 
             OurList<KVPStruct>.ExpectedIndex = 0;
             var xStructItem = xListStructs[0];
@@ -268,32 +268,6 @@ namespace SimpleStructsAndArraysTest
             Assert.AreEqual(5, xStructItem.Value, "xListStructs[1].Value == 5");
         }
 
-        private interface ITestMutate
-        {
-            void Mutate();
-        }
-
-        private struct TestMutateStruct : ITestMutate
-        {
-            int a;
-
-            public void Mutate()
-            {
-                a++;
-            }
-        }
-
-        private void DoMutate<T>(ref T x) where T : ITestMutate
-        {
-            x.Mutate();
-        }
-
-        private void MutateStructTest()
-        {
-            TestMutateStruct a = new TestMutateStruct();
-            DoMutate(ref a);
-        }
-
         protected override void Run()
         {
             TestStep1();
@@ -301,8 +275,6 @@ namespace SimpleStructsAndArraysTest
             Assert.IsTrue(true, "After TestOurList");
             TestStandardList();
             Assert.IsTrue(true, "After TestStandardList");
-            MutateStructTest();
-            Assert.IsTrue(true, "After MutateTestStruct");
             TestController.Completed();
         }
     }
