@@ -134,7 +134,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Cosmos.snk" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
