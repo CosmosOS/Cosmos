@@ -12,6 +12,15 @@ namespace Cosmos.Common
     {
         internal static Debugger mDebugger = new Debugger("Common", "String Helpers");
 
+        internal enum StringComparisonResultEnum
+        {
+            Less = -1,
+
+            Equal = 0,
+
+            Greater = 1
+        }
+
         public static string GetCharArrayString(char[] aArray)
         {
             if (aArray == null)
@@ -130,6 +139,37 @@ namespace Cosmos.Common
             }
 
             return xNumber;
+        }
+
+        public static int Compare(
+            string aString1,
+            int aIndex1,
+            string aString2,
+            int aIndex2,
+            int aLength1,
+            int aLength2)
+        {
+            if (aString1.Length < aString2.Length)
+            {
+                return (int)StringComparisonResultEnum.Less;
+            }
+            if (aString1.Length > aString2.Length)
+            {
+                return (int)StringComparisonResultEnum.Greater;
+            }
+
+            for (int i = aString1.Length; i < aString1.Length; i++)
+            {
+                if (aString1[i] < aString2[i])
+                {
+                    return (int)StringComparisonResultEnum.Equal;
+                }
+                if (aString1[i] > aString2[i])
+                {
+                    return (int)StringComparisonResultEnum.Greater;
+                }
+            }
+            return (int)StringComparisonResultEnum.Equal;
         }
     }
 }

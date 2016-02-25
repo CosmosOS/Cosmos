@@ -423,20 +423,20 @@ namespace Cosmos.System.Plugs.System.IO
         //    return false;
         //}
 
-        //public static bool IsDirectorySeparator(char aC)
-        //{
-        //    if (aC.ToString() == Path.DirectorySeparatorChar.ToString())
-        //    {
-        //        return true;
-        //    }
+        public static bool IsDirectorySeparator(char aC)
+        {
+            if (aC.ToString() == Path.DirectorySeparatorChar.ToString())
+            {
+                return true;
+            }
 
-        //    if (aC.ToString() == Path.AltDirectorySeparatorChar.ToString())
-        //    {
-        //        return true;
-        //    }
+            if (aC.ToString() == Path.AltDirectorySeparatorChar.ToString())
+            {
+                return true;
+            }
 
-        //    return false;
-        //}
+            return false;
+        }
 
         //public static bool IsPathRooted(string aPath)
         //{
@@ -455,54 +455,54 @@ namespace Cosmos.System.Plugs.System.IO
         //    return false;
         //}
 
-        //private static bool IsRelative(string aPath)
-        //{
-        //    if (aPath == null)
-        //    {
-        //        throw new ArgumentNullException("aPath");
-        //    }
+        private static bool IsRelative(string aPath)
+        {
+            if (aPath == null)
+            {
+                throw new ArgumentNullException("aPath");
+            }
 
-        //    if (aPath.Length < 3)
-        //    {
-        //        return true;
-        //    }
+            if (aPath.Length < 3)
+            {
+                return true;
+            }
 
-        //    if (aPath[1] != Path.VolumeSeparatorChar)
-        //    {
-        //        return true;
-        //    }
+            if (aPath[1] != Path.VolumeSeparatorChar)
+            {
+                return true;
+            }
 
-        //    if (aPath[2] != Path.DirectorySeparatorChar)
-        //    {
-        //        return true;
-        //    }
+            if (aPath[2] != Path.DirectorySeparatorChar)
+            {
+                return true;
+            }
 
-        //    return false;
-        //}
+            return false;
+        }
 
-        //public static string NormalizePath(string aPath, bool aFullCheck)
-        //{
-        //    if (aPath == null)
-        //    {
-        //        Global.mFileSystemDebugger.SendInternal($"Path.NormalizePath : aPath is null");
-        //        throw new ArgumentNullException("aPath");
-        //    }
+        public static string NormalizePath(string aPath, bool aFullCheck)
+        {
+            if (aPath == null)
+            {
+                Global.mFileSystemDebugger.SendInternal($"Path.NormalizePath : aPath is null");
+                throw new ArgumentNullException("aPath");
+            }
 
-        //    string result = aPath;
-        //    if (IsRelative(result))
-        //    {
-        //        result = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + result;
-        //        Global.mFileSystemDebugger.SendInternal($"Path.NormalizePath : aPath is relative, aPath = {aPath}, result = {result}");
-        //    }
+            string result = aPath;
+            if (IsRelative(result))
+            {
+                result = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar + result;
+                Global.mFileSystemDebugger.SendInternal($"Path.NormalizePath : aPath is relative, aPath = {aPath}, result = {result}");
+            }
 
-        //    if (IsDirectorySeparator(result[result.Length - 1]))
-        //    {
-        //        Global.mFileSystemDebugger.SendInternal($"Path.NormalizePath : Found directory seprator");
-        //        result = result.Remove(result.Length - 1);
-        //    }
+            if (IsDirectorySeparator(result[result.Length - 1]))
+            {
+                Global.mFileSystemDebugger.SendInternal($"Path.NormalizePath : Found directory seprator");
+                result = result.Remove(result.Length - 1);
+            }
 
-        //    Global.mFileSystemDebugger.SendInternal($"Path.NormalizePath : aPath = {aPath}, returning {result}");
-        //    return result;
-        //}
+            Global.mFileSystemDebugger.SendInternal($"Path.NormalizePath : aPath = {aPath}, returning {result}");
+            return result;
+        }
     }
 }

@@ -95,6 +95,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
             }
             xArgIndexCorrection = -1;
           }
+          string x = aMethod.Name;
           var xParams = aMethod.GetParameters();
           StackPushTypes[0] = xParams[Value + xArgIndexCorrection].ParameterType;
           if (StackPushTypes[0].IsEnum)
@@ -102,8 +103,6 @@ namespace Cosmos.IL2CPU.ILOpCodes
             StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
           }
           return;
-        default:
-          break;
       }
     }
   }
