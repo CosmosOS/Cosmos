@@ -51,5 +51,13 @@ namespace Cosmos.System.Plugs.System
 
             return false;
         }
+
+        public static int GetHashCode(ref bool aThis)
+        {
+            if (aThis == true)
+                return 1;
+
+            return 0;
+        }
     }
 }

@@ -13,5 +13,10 @@ namespace Cosmos.System.Plugs.System
             return "<UIntPtr>";
         }
         //}
+
+        public static int GetHashCode(ref UIntPtr aThis)
+        {
+            return (int)aThis;
+        }
     }
 }

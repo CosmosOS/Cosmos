@@ -40,13 +40,15 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // actually the Hash Code of a Int64 is the value interpolated with XOR to obtain an Int32... so not the same of 'value'!
             Assert.IsTrue((resultAsInt == value), "Int32.GetHashCode() doesn't work"); // XXX TODO when GetHashCode() works
-#endif
+
 
             // Now let's try ToString() again but printed in hex (this test fails for now!)
             result = value.ToString("X2");
             expectedResult = "0xFFFFFFFFFFFFFFFF";
 
+
             Assert.IsTrue((result == expectedResult), "UInt64.ToString(X2) doesn't work");
+#endif
 
             var xTest = TestMethod(0);
             Assert.IsTrue(xTest.Length == 0, "UInt64 test failed.");

@@ -66,5 +66,11 @@ namespace Cosmos.IL2CPU.Plugs.System
         {
             return null;
         }
+
+        public static int GetHashCode(object aThis)
+        {
+            return (int)aThis;
+        }
+
     }
 }

@@ -843,5 +843,9 @@ namespace Cosmos.Core.Plugs.System
             throw new ArgumentNullException();
         }
 
+        public static int GetHashCode(ref String aThis)
+        {
+            throw new NotImplementedException("String.GetHashCode()");
+        }
     }
 }

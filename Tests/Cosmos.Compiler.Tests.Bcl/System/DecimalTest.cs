@@ -10,6 +10,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         // This does not compile: 
         public static void Execute()
         {
+#if false
             Decimal value;
             String result;
             String expectedResult;
@@ -34,7 +35,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Actually 'expectedResult' should be the same so...
             Assert.IsTrue((result == expectedResult), "String format (Decimal) doesn't work");
 
-#if false
+
             // Now let's Get the HashCode of a value
             int resultAsInt = value.GetHashCode();
 

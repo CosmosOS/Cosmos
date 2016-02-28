@@ -5,16 +5,20 @@ using Cosmos.IL2CPU.Plugs;
 namespace Cosmos.System.Plugs.System
 {
     [Plug(Target = typeof(ValueType))]
-    class ValueTypeImp
+    public static class ValueTypeImp
     {
-#if false
         public static int GetHashCode(ValueType aThis)
         {
             if (aThis is byte)
                 return (int)aThis;
 
-            return -1;
+            return -1; 
         }
-#endif
+
+        public static int GetHashCodeOfPtr(IntPtr ptr)
+        {
+            throw new NotImplementedException("ValueType.GetHashCodeOfPtr()");
+        }
+
     }
 }
