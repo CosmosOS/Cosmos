@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define COSMOSDEBUG
+
+using System;
 using System.IO;
 
 using Cosmos.Common;
@@ -261,18 +263,18 @@ namespace Cosmos.System.Plugs.System.IO
         //    return xResult;
         //}
 
-        //public static string GetFullPath(string aPath)
-        //{
-        //    if (aPath == null)
-        //    {
-        //        Global.mFileSystemDebugger.SendInternal($"Path.GetFullPath : aPath is null");
-        //        throw new ArgumentNullException("aPath");
-        //    }
+        public static string GetFullPath(string aPath)
+        {
+            if (aPath == null)
+            {
+                Global.mFileSystemDebugger.SendInternal($"Path.GetFullPath : aPath is null");
+                throw new ArgumentNullException("aPath");
+            }
 
-        //    string result = NormalizePath(aPath, true);
-        //    Global.mFileSystemDebugger.SendInternal($"Path.GetFullPath : aPath = {aPath}, returning {result}");
-        //    return result;
-        //}
+            string result = NormalizePath(aPath, true);
+            Global.mFileSystemDebugger.SendInternal($"Path.GetFullPath : aPath = {aPath}, returning {result}");
+            return result;
+        }
 
         public static char[] GetInvalidFileNameChars()
         {
@@ -498,7 +500,10 @@ namespace Cosmos.System.Plugs.System.IO
             if (IsDirectorySeparator(result[result.Length - 1]))
             {
                 Global.mFileSystemDebugger.SendInternal($"Path.NormalizePath : Found directory seprator");
-                result = result.Remove(result.Length - 1);
+                if (result.Length > 3)
+                {
+                    result = result.Remove(result.Length - 1);
+                }
             }
 
             Global.mFileSystemDebugger.SendInternal($"Path.NormalizePath : aPath = {aPath}, returning {result}");

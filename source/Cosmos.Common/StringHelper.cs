@@ -98,6 +98,39 @@ namespace Cosmos.Common
             return xResult;
         }
 
+        public static string GetNumberString(long aValue)
+        {
+            string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+            string xResult = string.Empty;
+            long xValue = aValue;
+
+            if (aValue < 0)
+            {
+                xValue *= -1;
+            }
+
+            if (aValue == 0)
+            {
+                xResult = string.Concat(xResult, "0");
+            }
+            else
+            {
+                while (xValue > 0)
+                {
+                    long xValue2 = xValue % 10;
+                    xResult = string.Concat(xChars[xValue2], xResult);
+                    xValue /= 10;
+                }
+            }
+
+            if (aValue < 0)
+            {
+                xResult = string.Concat("-", xResult);
+            }
+
+            return xResult;
+        }
+
         public static int GetStringToNumber(string aString)
         {
             bool xIsNegative = false;

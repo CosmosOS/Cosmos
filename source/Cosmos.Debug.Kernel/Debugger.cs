@@ -110,6 +110,12 @@ namespace Cosmos.Debug.Kernel
             DoSend(aText);
         }
 
+        [Conditional("COSMOSDEBUG")]
+        public void SendInternal(uint aCount)
+        {
+            DoSendNumber(aCount);
+        }
+
         //public void OldSend(string aText) {
         //    // TODO: Need to fix this so it can send empty strings.
         //    // Sending empty strings locks it up right now

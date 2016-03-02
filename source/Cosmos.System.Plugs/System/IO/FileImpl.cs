@@ -1,4 +1,6 @@
-﻿using global::System;
+﻿//#define COSMOSDEBUG
+
+using global::System;
 using global::System.IO;
 
 using Cosmos.Common.Extensions;
@@ -6,6 +8,7 @@ using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
+using JetBrains.Annotations;
 
 namespace Cosmos.System.Plugs.System.IO
 {
@@ -13,14 +16,31 @@ namespace Cosmos.System.Plugs.System.IO
     [Plug(Target = typeof(File))]
     public static class FileImpl
     {
-        public static bool Exists(string aFile)
+        public static bool Exists([NotNull] string aFile)
         {
+            Global.mFileSystemDebugger.SendInternal("File.Exists:");
+
+            if (string.IsNullOrEmpty(aFile))
+            {
+                throw new ArgumentException("Argument is null or empty", nameof(aFile));
+            }
+            Global.mFileSystemDebugger.SendInternal("aFile =");
+            Global.mFileSystemDebugger.SendInternal(aFile);
+
             return VFSManager.FileExists(aFile);
         }
 
-        public static string ReadAllText(string aFile)
+        public static string ReadAllText([NotNull] string aFile)
         {
-            Global.mFileSystemDebugger.SendInternal("In FileImpl.ReadAllText");
+            Global.mFileSystemDebugger.SendInternal("File.ReadAllText:");
+
+            if (string.IsNullOrEmpty(aFile))
+            {
+                throw new ArgumentException("Argument is null or empty", nameof(aFile));
+            }
+            Global.mFileSystemDebugger.SendInternal("aFile =");
+            Global.mFileSystemDebugger.SendInternal(aFile);
+
             using (var xFS = new FileStream(aFile, FileMode.Open))
             {
                 var xBuff = new byte[(int)xFS.Length];
@@ -36,16 +56,40 @@ namespace Cosmos.System.Plugs.System.IO
             }
         }
 
-        public static void WriteAllText(string aFile, string aText)
+        public static void WriteAllText([NotNull] string aFile, [NotNull] string aText)
         {
             Global.mFileSystemDebugger.SendInternal("Creating stream with file " + aFile);
+
+            if (string.IsNullOrEmpty(aFile))
+            {
+                throw new ArgumentException("Argument is null or empty", nameof(aFile));
+            }
+            Global.mFileSystemDebugger.SendInternal("aFile =");
+            Global.mFileSystemDebugger.SendInternal(aFile);
+
+            if (string.IsNullOrEmpty(aText))
+            {
+                throw new ArgumentException("Argument is null or empty", nameof(aText));
+            }
+            Global.mFileSystemDebugger.SendInternal("aText =");
+            Global.mFileSystemDebugger.SendInternal(aText);
+
             using (var xFS = new FileStream(aFile, FileMode.Create))
             {
                 Global.mFileSystemDebugger.SendInternal("Converting " + aText + " to UFT8");
                 var xBuff = aText.GetUtf8Bytes(0, (uint)aText.Length);
-                Global.mFileSystemDebugger.SendInternal("Writing bytes");
-                xFS.Write(xBuff, 0, xBuff.Length);
-                Global.mFileSystemDebugger.SendInternal("Bytes written");
+                if ((xBuff != null) && (xBuff.Length > 0))
+                {
+                    Global.mFileSystemDebugger.SendInternal("xBuff.Length =");
+                    Global.mFileSystemDebugger.SendInternal((uint) xBuff.Length);
+                    Global.mFileSystemDebugger.SendInternal("Writing bytes");
+                    xFS.Write(xBuff, 0, xBuff.Length);
+                    Global.mFileSystemDebugger.SendInternal("Bytes written");
+                }
+                else
+                {
+                    throw new Exception("No text data to write.");
+                }
             }
         }
 
@@ -69,12 +113,14 @@ namespace Cosmos.System.Plugs.System.IO
             Global.mFileSystemDebugger.SendInternal("Read contents");
             Global.mFileSystemDebugger.SendInternal(text);
 
-            String []result = text.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            string []result = text.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
             Global.mFileSystemDebugger.SendInternal("content as array of lines:");
 #if COSMOSDEBUG
             for (int i = 0; i < result.Length; i++)
+            {
                 Global.mFileSystemDebugger.SendInternal(result[i]);
+            }
 #endif
 
             return result;
@@ -107,7 +153,7 @@ namespace Cosmos.System.Plugs.System.IO
                     throw new Exception("Couldn't read complete file!");
                 }
                 Global.mFileSystemDebugger.SendInternal("Bytes read");
-                
+
                 return xBuff;
             }
         }
@@ -116,39 +162,31 @@ namespace Cosmos.System.Plugs.System.IO
         {
             using (var xFS = new FileStream(aFile, FileMode.Create))
             {
-                // This variable is not needed 'aBytes' is already a Byte[]
-                //var xBuff = aBytes;
-                
                 xFS.Write(aBytes, 0, aBytes.Length);
             }
         }
 
         public static void Copy(string srcFile, string destFile)
         {
-            byte[] xBuff;
             using (var xFS = new FileStream(srcFile, FileMode.Open))
             {
-                xBuff = new byte[(int)xFS.Length];
-                var s1 = xFS.Read(xBuff, 0, xBuff.Length);
+                var xBuff = new byte[(int)xFS.Length];
                 var yFS = new FileStream(destFile, FileMode.Create);
                 yFS.Write(xBuff, 0, xBuff.Length);
 
             }
         }
 
-        public static FileStream Create(string aFile)
+        public static FileStream Create([NotNull] string aFile)
         {
-            if (aFile == null)
+            Global.mFileSystemDebugger.SendInternal("File.Create:");
+
+            if (string.IsNullOrEmpty(aFile))
             {
-                throw new ArgumentNullException("aFile");
+                throw new ArgumentException("Argument is null or empty", nameof(aFile));
             }
 
-            if (aFile.Length == 0)
-            {
-                throw new ArgumentException("File path must not be empty.", "aFile");
-            }
-
-            Global.mFileSystemDebugger.SendInternal($"File.Create : aFile = {aFile}");
+            
             var xEntry = VFSManager.CreateFile(aFile);
             if (xEntry == null)
             {
