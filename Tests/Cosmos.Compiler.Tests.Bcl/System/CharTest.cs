@@ -35,17 +35,18 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Now let's Get the HashCode of a value
             int resultAsInt = value.GetHashCode();
-
-            // actually the Hash Code of a Int32 is the same value
-            Assert.IsTrue((resultAsInt == value), "Int32.GetHashCode() doesn't work");
+            // actually the Hash Code of a Char is a strange XOR trick...
+            int expectedResultAsInt = (int)value | ((int)value << 16);
+                      
+            Assert.IsTrue((resultAsInt == expectedResultAsInt), "Char.GetHashCode() doesn't work");
 
 #if false
             // Now let's try ToString() again but printed in hex (this test fails for now!)
             result = value.ToString("X2");
             expectedResult = "0x7FFFFFFF";
-#endif
 
             Assert.IsTrue((result == expectedResult), "Int32.ToString(X2) doesn't work");
+#endif
         }
     }
 }

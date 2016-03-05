@@ -45,10 +45,5 @@ namespace Cosmos.System.Plugs.System
 
             return result;
         }
-
-        public static int GetHashCode(ref Int32 aThis)
-        {
-            return aThis;
-        }
     }
 }

@@ -72,7 +72,10 @@
   <ItemGroup>
     <Compile Include="System\DecimalImpl.cs" />
     <Compile Include="System\EnumImpl.cs" />
+    <Compile Include="System\Globalization\CultureInfoImpl.cs" />
     <Compile Include="System\IO\ErrorImpl.cs" />
+    <Compile Include="System\RuntimeTypeImpl.cs" />
+    <Compile Include="System\Runtime\Compilerservices\runtimehelpersImpl.cs" />
     <Compile Include="System\Security\SecurityElementImpl.cs" />
     <Compile Include="System\Security\CodeAccessSecurityEngineImpl.cs" />
     <Compile Include="System\Security\Cryptography\UtilsImpl.cs" />

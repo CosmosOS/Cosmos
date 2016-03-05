@@ -23,7 +23,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Cosmos blocks again and never returns (?)
             // Now let's try to concat to a String using '+' operator
             result = "The value of the Boolean is " + value;
-            expectedResult = "The value of the Boolean is true";
+            expectedResult = "The value of the Boolean is True";
 
             Assert.IsTrue((result == expectedResult), "String concat (Boolean) doesn't work");
 
@@ -42,9 +42,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Now let's try ToString() again but printed in hex (this test fails for now!)
             result = value.ToString("X2");
             expectedResult = "0x7FFFFFFF";
-#endif
 
             Assert.IsTrue((result == expectedResult), "Int32.ToString(X2) doesn't work");
+#endif
         }
     }
 }

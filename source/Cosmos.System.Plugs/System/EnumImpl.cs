@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reflection;
 
 using Cosmos.IL2CPU.Plugs;
 
@@ -26,16 +25,9 @@ namespace Cosmos.System.Plugs.System
             //			return UInt32Impl.ToString(ref aThis);
         }
 
-        public static int GetHashCode(ref Enum aThis)
+        public static int GetHashCode(Enum aThis)
         {
             throw new NotImplementedException("Enum.GetHashCode()");
         }
-
-#if false
-        public static CorElementType InternalGetCorElementType(Enum aThis)
-        {
-            throw new NotImplementedException("Enum.GetHashCode()");
-        }
-#endif
     }
 }

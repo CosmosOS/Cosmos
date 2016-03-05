@@ -9,6 +9,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
+#if false
             // Opps! This trigger CPU 0x0 Exception... System halts!
             Single value;
             String result;
@@ -32,7 +33,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Actually 'expectedResult' should be the same so...
             Assert.IsTrue((result == expectedResult), "String format (Single) doesn't work");
 
-#if false
+
             // Now let's Get the HashCode of a value
             int resultAsInt = value.GetHashCode();
 

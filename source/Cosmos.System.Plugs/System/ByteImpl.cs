@@ -11,10 +11,5 @@ namespace Cosmos.System.Plugs.System
         {
             return StringHelper.GetNumberString(aThis);
         }
-
-        public static int GetHashCode(ref byte aThis)
-        {
-            return aThis;
-        }
     }
 }

@@ -47,12 +47,6 @@ namespace Cosmos.System.Plugs.System
 
             return result;
         }
-
-        // The value of the lower 32 bits XORed with the uppper 32 bits.
-        public static int GetHashCode(ref Int64 aThis)
-        {
-            return (unchecked((int)((long)aThis)) ^ (int)(aThis >> 32));
-        }
     }
 
     // See note in UInt32Impl2

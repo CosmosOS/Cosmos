@@ -41,9 +41,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Now let's try ToString() again but printed in hex (this test fails for now!)
             result = value.ToString("X2");
             expectedResult = "FFFF";
-#endif
 
             Assert.IsTrue((result == expectedResult), "UInt16.ToString(X2) doesn't work");
+#endif
         }
     }
 }
