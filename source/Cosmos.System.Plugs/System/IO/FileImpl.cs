@@ -8,7 +8,6 @@ using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
-using JetBrains.Annotations;
 
 namespace Cosmos.System.Plugs.System.IO
 {
@@ -16,7 +15,7 @@ namespace Cosmos.System.Plugs.System.IO
     [Plug(Target = typeof(File))]
     public static class FileImpl
     {
-        public static bool Exists([NotNull] string aFile)
+        public static bool Exists(string aFile)
         {
             Global.mFileSystemDebugger.SendInternal("File.Exists:");
 
@@ -30,7 +29,7 @@ namespace Cosmos.System.Plugs.System.IO
             return VFSManager.FileExists(aFile);
         }
 
-        public static string ReadAllText([NotNull] string aFile)
+        public static string ReadAllText(string aFile)
         {
             Global.mFileSystemDebugger.SendInternal("File.ReadAllText:");
 
@@ -56,7 +55,7 @@ namespace Cosmos.System.Plugs.System.IO
             }
         }
 
-        public static void WriteAllText([NotNull] string aFile, [NotNull] string aText)
+        public static void WriteAllText(string aFile, string aText)
         {
             Global.mFileSystemDebugger.SendInternal("Creating stream with file " + aFile);
 
@@ -81,7 +80,7 @@ namespace Cosmos.System.Plugs.System.IO
                 if ((xBuff != null) && (xBuff.Length > 0))
                 {
                     Global.mFileSystemDebugger.SendInternal("xBuff.Length =");
-                    Global.mFileSystemDebugger.SendInternal((uint) xBuff.Length);
+                    Global.mFileSystemDebugger.SendInternal((uint)xBuff.Length);
                     Global.mFileSystemDebugger.SendInternal("Writing bytes");
                     xFS.Write(xBuff, 0, xBuff.Length);
                     Global.mFileSystemDebugger.SendInternal("Bytes written");
@@ -99,7 +98,7 @@ namespace Cosmos.System.Plugs.System.IO
             using (var xFS = new FileStream(aFile, FileMode.Append))
             {
                 Global.mFileSystemDebugger.SendInternal("Converting " + aText + " to UFT8");
-                var xBuff = aText.GetUtf8Bytes(0, (uint) aText.Length);
+                var xBuff = aText.GetUtf8Bytes(0, (uint)aText.Length);
                 Global.mFileSystemDebugger.SendInternal("Writing bytes");
                 xFS.Write(xBuff, 0, xBuff.Length);
                 Global.mFileSystemDebugger.SendInternal("Bytes written");
@@ -113,7 +112,7 @@ namespace Cosmos.System.Plugs.System.IO
             Global.mFileSystemDebugger.SendInternal("Read contents");
             Global.mFileSystemDebugger.SendInternal(text);
 
-            string []result = text.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            string[] result = text.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
             Global.mFileSystemDebugger.SendInternal("content as array of lines:");
 #if COSMOSDEBUG
@@ -177,7 +176,7 @@ namespace Cosmos.System.Plugs.System.IO
             }
         }
 
-        public static FileStream Create([NotNull] string aFile)
+        public static FileStream Create(string aFile)
         {
             Global.mFileSystemDebugger.SendInternal("File.Create:");
 
@@ -186,7 +185,7 @@ namespace Cosmos.System.Plugs.System.IO
                 throw new ArgumentException("Argument is null or empty", nameof(aFile));
             }
 
-            
+
             var xEntry = VFSManager.CreateFile(aFile);
             if (xEntry == null)
             {

@@ -6,8 +6,6 @@ using global::System.IO;
 
 using Cosmos.System.FileSystem.Listing;
 
-using JetBrains.Annotations;
-
 namespace Cosmos.System.FileSystem.VFS
 {
     public static class VFSManager
@@ -265,7 +263,7 @@ namespace Cosmos.System.FileSystem.VFS
             }
         }
 
-        public static bool DirectoryExists([NotNull] string aPath)
+        public static bool DirectoryExists(string aPath)
         {
             if (String.IsNullOrEmpty(aPath))
             {
@@ -508,7 +506,7 @@ namespace Cosmos.System.FileSystem.VFS
         /// <returns>The parent directory entry.</returns>
         /// <exception cref="ArgumentException">Argument is null or empty</exception>
         /// <exception cref="NotImplementedException"></exception>
-        public static DirectoryEntry GetParent([NotNull]string aPath)
+        public static DirectoryEntry GetParent(string aPath)
         {
             Global.mFileSystemDebugger.SendInternal("VFSManager.GetParent:");
 

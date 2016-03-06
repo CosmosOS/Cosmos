@@ -7,8 +7,6 @@ using Cosmos.Common;
 using Cosmos.Debug.Kernel;
 using Cosmos.System.FileSystem.FAT.Listing;
 
-using JetBrains.Annotations;
-
 namespace Cosmos.System.FileSystem.FAT
 {
     internal class FatStream : Stream
@@ -148,11 +146,11 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             Global.mFileSystemDebugger.SendInternal("aBuffer.Length =");
-            Global.mFileSystemDebugger.SendInternal((uint) aBuffer.Length);
+            Global.mFileSystemDebugger.SendInternal((uint)aBuffer.Length);
             Global.mFileSystemDebugger.SendInternal("aOffset =");
-            Global.mFileSystemDebugger.SendInternal((uint) aOffset);
+            Global.mFileSystemDebugger.SendInternal((uint)aOffset);
             Global.mFileSystemDebugger.SendInternal("aCount = ");
-            Global.mFileSystemDebugger.SendInternal((uint) aCount);
+            Global.mFileSystemDebugger.SendInternal((uint)aCount);
 
             // reduce count, so that no out of bound exception occurs if not existing
             // entry is used in line mFS.ReadCluster(mFatTable[(int)xClusterIdx], xCluster);
@@ -232,7 +230,7 @@ namespace Cosmos.System.FileSystem.FAT
             Write(aBuffer, aOffset, aCount);
         }
 
-        protected void Write([NotNull] byte[] aBuffer, long aOffset, long aCount)
+        protected void Write(byte[] aBuffer, long aOffset, long aCount)
         {
             Global.mFileSystemDebugger.SendInternal("FatStream.Write:");
 
@@ -250,11 +248,11 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             Global.mFileSystemDebugger.SendInternal("aBuffer.Length =");
-            Global.mFileSystemDebugger.SendInternal((uint) aBuffer.Length);
+            Global.mFileSystemDebugger.SendInternal((uint)aBuffer.Length);
             Global.mFileSystemDebugger.SendInternal("aOffset =");
-            Global.mFileSystemDebugger.SendInternal((uint) aOffset);
+            Global.mFileSystemDebugger.SendInternal((uint)aOffset);
             Global.mFileSystemDebugger.SendInternal("aCount =");
-            Global.mFileSystemDebugger.SendInternal((uint) aCount);
+            Global.mFileSystemDebugger.SendInternal((uint)aCount);
 
             ulong xCount = (ulong)aCount;
             var xCluster = mFS.NewClusterArray();

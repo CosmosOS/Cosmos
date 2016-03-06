@@ -1414,7 +1414,7 @@ namespace Cosmos.IL2CPU
 
             if (ShouldOptimize)
             {
-                Orvid.Optimizer.Optimize(Assembler);
+                Optimizer.Optimize(Assembler);
             }
         }
 

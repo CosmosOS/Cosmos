@@ -9,8 +9,6 @@ using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
 
-using JetBrains.Annotations;
-
 namespace Cosmos.System.FileSystem
 {
     // ReSharper disable once InconsistentNaming
@@ -20,13 +18,13 @@ namespace Cosmos.System.FileSystem
     /// <seealso cref="Cosmos.System.FileSystem.VFS.VFSBase" />
     public class CosmosVFS : VFSBase
     {
-        [NotNull]
+
         private List<Partition> mPartitions;
 
-        [NotNull]
+
         private List<FileSystem> mFileSystems;
 
-        [NotNull]
+
         private FileSystem mCurrentFileSystem;
 
         /// <summary>
@@ -138,7 +136,7 @@ namespace Cosmos.System.FileSystem
             Global.mFileSystemDebugger.SendInternal("xParentDirectory =");
             Global.mFileSystemDebugger.SendInternal(xParentDirectory);
 
-            DirectoryEntry xParentEntry = GetDirectory(xParentDirectory); ;
+            DirectoryEntry xParentEntry = GetDirectory(xParentDirectory);
             if (xParentEntry == null)
             {
                 Global.mFileSystemDebugger.SendInternal("Parent directory doesn't exist.");
@@ -197,7 +195,7 @@ namespace Cosmos.System.FileSystem
                     return xEntry;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -221,7 +219,7 @@ namespace Cosmos.System.FileSystem
                     return xEntry;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
@@ -333,7 +331,7 @@ namespace Cosmos.System.FileSystem
         /// <param name="aPath">The path.</param>
         /// <returns>The file system for the path.</returns>
         /// <exception cref="Exception">Unable to determine filesystem for path:  + aPath</exception>
-        private FileSystem GetFileSystemFromPath([NotNull]string aPath)
+        private FileSystem GetFileSystemFromPath(string aPath)
         {
             Global.mFileSystemDebugger.SendInternal("CosmosVFS.GetFileSystemFromPath:");
 
@@ -375,7 +373,7 @@ namespace Cosmos.System.FileSystem
         /// <returns>A directory entry for the path.</returns>
         /// <exception cref="ArgumentNullException">aFS</exception>
         /// <exception cref="Exception">Path part ' + xPathPart + ' not found!</exception>
-        private DirectoryEntry DoGetDirectoryEntry([NotNull]string aPath, [NotNull]FileSystem aFS)
+        private DirectoryEntry DoGetDirectoryEntry(string aPath, FileSystem aFS)
         {
             Global.mFileSystemDebugger.SendInternal("CosmosVFS.DoGetDirectoryEntry:");
 
@@ -441,7 +439,7 @@ namespace Cosmos.System.FileSystem
         /// </summary>
         /// <param name="aFS">The file system containing the volume.</param>
         /// <returns>A directory entry for the volume.</returns>
-        private DirectoryEntry GetVolume([NotNull] FileSystem aFS)
+        private DirectoryEntry GetVolume(FileSystem aFS)
         {
             Global.mFileSystemDebugger.SendInternal("CosmosVFS.GetVolume:");
 

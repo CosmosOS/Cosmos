@@ -17,6 +17,9 @@ namespace Cosmos.Compiler.Tests.Bcl
 
         protected override void Run()
         {
+            char x = 'a';
+            string y = "a";
+            Assert.IsTrue(x.ToString() == y, "x.ToString() == y");
             System.StringTest.Execute();
             System.Collections.Generic.ListTest.Execute();
             System.Collections.Generic.QueueTest.Execute();
