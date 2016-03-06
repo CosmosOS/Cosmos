@@ -74,6 +74,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="System\ValueTypeImpl.cs" />
     <Compile Include="System\EnumImpl.cs" />
     <Compile Include="System\IO\ErrorImpl.cs" />
     <Compile Include="System\Security\SecurityElementImpl.cs" />

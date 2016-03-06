@@ -6,12 +6,15 @@ using System.Text;
 using Cosmos.IL2CPU.X86.IL;
 using FieldInfo = System.Reflection.FieldInfo;
 
-namespace Cosmos.IL2CPU.ILOpCodes {
-  public class OpField : ILOpCode {
+namespace Cosmos.IL2CPU.ILOpCodes
+{
+  public class OpField : ILOpCode
+  {
     public readonly FieldInfo Value;
 
     public OpField(Code aOpCode, int aPos, int aNextPos, FieldInfo aValue, ExceptionHandlingClause aCurrentExceptionHandler)
-      : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
+      : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler)
+    {
       Value = aValue;
     }
 
@@ -62,7 +65,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       base.DoInitStackAnalysis(aMethod);
 
       switch (OpCode)
-      { case Code.Ldsfld:
+      {
+        case Code.Ldsfld:
           StackPushTypes[0] = Value.FieldType;
           if (StackPushTypes[0].IsEnum)
           {
@@ -70,7 +74,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           }
           return;
         case Code.Ldsflda:
-          StackPushTypes[0] = typeof (IntPtr);
+          StackPushTypes[0] = typeof(IntPtr);
           return;
         case Code.Ldfld:
           StackPushTypes[0] = Value.FieldType;
@@ -89,15 +93,12 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             StackPopTypes[0] = StackPopTypes[0].GetEnumUnderlyingType();
           }
-          if (StackPopTypes[0].IsValueType &&
-              !StackPopTypes[0].IsPrimitive)
+          if (StackPopTypes[0].IsValueType && !StackPopTypes[0].IsPrimitive)
           {
-            StackPopTypes[0] = typeof(void*);
+            StackPopTypes[0] = StackPopTypes[0].MakePointerType();
           }
-          StackPushTypes[0] = typeof (IntPtr);
+          StackPushTypes[0] = typeof(IntPtr);
           return;
-        default:
-          break;
       }
     }
 
@@ -182,7 +183,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             return;
           }
           throw new Exception("Wrong Poptype encountered! (Type = " + StackPopTypes[0].FullName + ", expected = " + expectedType.FullName + ")");
-          // throw new Exception("Wrong Poptype encountered!");
+        // throw new Exception("Wrong Poptype encountered!");
         case Code.Stsfld:
           if (StackPopTypes[0] == null)
           {

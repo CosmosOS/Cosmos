@@ -22,11 +22,6 @@ namespace Cosmos.IL2CPU.Plugs.System
     {
         public static string ToString(object aThis)
         {
-            if (aThis is char[])
-            {
-                return "System.Char[]";
-            }
-
             //try
             //{
             //    return (string)aThis;
