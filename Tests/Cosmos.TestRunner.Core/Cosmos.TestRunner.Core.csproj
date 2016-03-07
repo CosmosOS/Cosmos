@@ -48,6 +48,24 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Utilities.v4.0" />
@@ -169,6 +187,10 @@
     <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj">
       <Project>{a0893493-d4f0-4b9f-9826-86319e143d86}</Project>
       <Name>Cosmos.Kernel.Tests.Fat</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Kernel.Tests.LinqTests\Cosmos.Kernel.Tests.LinqTests.csproj">
+      <Project>{85b11f78-39bc-4cfc-9033-fc84ab14cd03}</Project>
+      <Name>Cosmos.Kernel.Tests.LinqTests</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">
       <Project>{E6D3B644-C487-472D-A978-C1A82D0C099B}</Project>

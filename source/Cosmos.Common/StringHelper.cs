@@ -12,6 +12,15 @@ namespace Cosmos.Common
     {
         internal static Debugger mDebugger = new Debugger("Common", "String Helpers");
 
+        internal enum StringComparisonResultEnum
+        {
+            Less = -1,
+
+            Equal = 0,
+
+            Greater = 1
+        }
+
         public static string GetCharArrayString(char[] aArray)
         {
             if (aArray == null)
@@ -89,6 +98,39 @@ namespace Cosmos.Common
             return xResult;
         }
 
+        public static string GetNumberString(long aValue)
+        {
+            string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+            string xResult = string.Empty;
+            long xValue = aValue;
+
+            if (aValue < 0)
+            {
+                xValue *= -1;
+            }
+
+            if (aValue == 0)
+            {
+                xResult = string.Concat(xResult, "0");
+            }
+            else
+            {
+                while (xValue > 0)
+                {
+                    long xValue2 = xValue % 10;
+                    xResult = string.Concat(xChars[xValue2], xResult);
+                    xValue /= 10;
+                }
+            }
+
+            if (aValue < 0)
+            {
+                xResult = string.Concat("-", xResult);
+            }
+
+            return xResult;
+        }
+
         public static int GetStringToNumber(string aString)
         {
             bool xIsNegative = false;
@@ -130,6 +172,37 @@ namespace Cosmos.Common
             }
 
             return xNumber;
+        }
+
+        public static int Compare(
+            string aString1,
+            int aIndex1,
+            string aString2,
+            int aIndex2,
+            int aLength1,
+            int aLength2)
+        {
+            if (aString1.Length < aString2.Length)
+            {
+                return (int)StringComparisonResultEnum.Less;
+            }
+            if (aString1.Length > aString2.Length)
+            {
+                return (int)StringComparisonResultEnum.Greater;
+            }
+
+            for (int i = aString1.Length; i < aString1.Length; i++)
+            {
+                if (aString1[i] < aString2[i])
+                {
+                    return (int)StringComparisonResultEnum.Equal;
+                }
+                if (aString1[i] > aString2[i])
+                {
+                    return (int)StringComparisonResultEnum.Greater;
+                }
+            }
+            return (int)StringComparisonResultEnum.Equal;
         }
     }
 }

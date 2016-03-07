@@ -1,8 +1,9 @@
-﻿using System;
+﻿//#define COSMOSDEBUG
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 
-using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.Listing;
@@ -10,12 +11,25 @@ using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.FileSystem
 {
+    // ReSharper disable once InconsistentNaming
+    /// <summary>
+    /// Cosmos default virtual file system.
+    /// </summary>
+    /// <seealso cref="Cosmos.System.FileSystem.VFS.VFSBase" />
     public class CosmosVFS : VFSBase
     {
+
         private List<Partition> mPartitions;
+
 
         private List<FileSystem> mFileSystems;
 
+
+        private FileSystem mCurrentFileSystem;
+
+        /// <summary>
+        /// Initializes the virtual file system.
+        /// </summary>
         public override void Initialize()
         {
             mPartitions = new List<Partition>();
@@ -28,11 +42,20 @@ namespace Cosmos.System.FileSystem
             }
         }
 
+        /// <summary>
+        /// Creates a new file.
+        /// </summary>
+        /// <param name="aPath">The full path including the file to create.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException">aPath</exception>
         public override DirectoryEntry CreateFile(string aPath)
         {
+            Global.mFileSystemDebugger.SendInternal("CosmosVFS.CreateFile:");
+
             if (aPath == null)
             {
-                throw new ArgumentNullException("aPath");
+                throw new ArgumentNullException(nameof(aPath));
             }
 
             if (aPath.Length == 0)
@@ -40,34 +63,52 @@ namespace Cosmos.System.FileSystem
                 throw new ArgumentException("aPath");
             }
 
-            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateFile : aPath = {aPath}");
+            Global.mFileSystemDebugger.SendInternal("aPath =");
+            Global.mFileSystemDebugger.SendInternal(aPath);
+
             if (File.Exists(aPath))
             {
-                Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateFile : Path already exists.");
+                Global.mFileSystemDebugger.SendInternal("File already exists.");
                 return GetFile(aPath);
             }
+            Global.mFileSystemDebugger.SendInternal("File doesn't exist.");
 
-            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateFile : Path doesn't exist.");
-            string xParentDirectory = Path.GetDirectoryName(aPath);
             string xFileToCreate = Path.GetFileName(aPath);
-            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateFile : xParentDirectory = {xParentDirectory}, xFileToCreate = {xFileToCreate}");
-            if (xParentDirectory != null)
+            Global.mFileSystemDebugger.SendInternal("After GetFileName");
+            Global.mFileSystemDebugger.SendInternal("xFileToCreate =");
+            Global.mFileSystemDebugger.SendInternal(xFileToCreate);
+
+            string xParentDirectory = aPath.Remove(aPath.Length - xFileToCreate.Length);
+            Global.mFileSystemDebugger.SendInternal("After removing last path part");
+            Global.mFileSystemDebugger.SendInternal("xParentDirectory =");
+            Global.mFileSystemDebugger.SendInternal(xParentDirectory);
+
+            DirectoryEntry xParentEntry = GetDirectory(xParentDirectory);
+            if (xParentEntry == null)
             {
-                if (Directory.Exists(xParentDirectory))
-                {
-                    var xFS = GetFileSystemFromPath(xParentDirectory);
-                    var xParentEntry = GetDirectory(xParentDirectory);
-                    return xFS.CreateFile(xParentEntry, xFileToCreate);
-                }
+                Global.mFileSystemDebugger.SendInternal("Parent directory doesn't exist.");
+                xParentEntry = CreateDirectory(xParentDirectory);
             }
-            return null;
+            Global.mFileSystemDebugger.SendInternal("Parent directory exists.");
+
+            var xFS = GetFileSystemFromPath(xParentDirectory);
+            return xFS.CreateFile(xParentEntry, xFileToCreate);
         }
 
+        /// <summary>
+        /// Creates a directory.
+        /// </summary>
+        /// <param name="aPath">The full path including the directory to create.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException">aPath</exception>
         public override DirectoryEntry CreateDirectory(string aPath)
         {
+            Global.mFileSystemDebugger.SendInternal("CosmosVFS.CreateDirectory:");
+
             if (aPath == null)
             {
-                throw new ArgumentNullException("aPath");
+                throw new ArgumentNullException(nameof(aPath));
             }
 
             if (aPath.Length == 0)
@@ -75,34 +116,43 @@ namespace Cosmos.System.FileSystem
                 throw new ArgumentException("aPath");
             }
 
-            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateDirectory : aPath = {aPath}");
+            Global.mFileSystemDebugger.SendInternal("aPath =");
+            Global.mFileSystemDebugger.SendInternal(aPath);
+
             if (Directory.Exists(aPath))
             {
-                Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateDirectory : Path already exists.");
+                Global.mFileSystemDebugger.SendInternal("Path already exists.");
                 return GetDirectory(aPath);
             }
+            Global.mFileSystemDebugger.SendInternal("Path doesn't exist.");
 
-            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateDirectory : Path doesn't exist.");
-            string xParentDirectory = Path.GetDirectoryName(aPath);
             string xDirectoryToCreate = Path.GetFileName(aPath);
-            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateDirectory : xParentDirectory = {xParentDirectory}, xDirectoryToCreate = {xDirectoryToCreate}");
-            if (xParentDirectory != null)
+            Global.mFileSystemDebugger.SendInternal("After GetFileName");
+            Global.mFileSystemDebugger.SendInternal("xDirectoryToCreate =");
+            Global.mFileSystemDebugger.SendInternal(xDirectoryToCreate);
+
+            string xParentDirectory = aPath.Remove(aPath.Length - xDirectoryToCreate.Length);
+            Global.mFileSystemDebugger.SendInternal("After removing last path part");
+            Global.mFileSystemDebugger.SendInternal("xParentDirectory =");
+            Global.mFileSystemDebugger.SendInternal(xParentDirectory);
+
+            DirectoryEntry xParentEntry = GetDirectory(xParentDirectory);
+            if (xParentEntry == null)
             {
-                while (!Directory.Exists(xParentDirectory))
-                {
-                    xParentDirectory = Path.GetDirectoryName(aPath);
-                    xDirectoryToCreate = Path.GetFileName(aPath);
-                    Global.mFileSystemDebugger.SendInternal($"CosmosVFS.CreateDirectory : xParentDirectory = {xParentDirectory}, xDirectoryToCreate = {xDirectoryToCreate}");
-                }
-
-
-                var xFS = GetFileSystemFromPath(xDirectoryToCreate);
-                var xParentEntry = GetDirectory(xParentDirectory);
-                return xFS.CreateDirectory(xParentEntry, xDirectoryToCreate);
+                Global.mFileSystemDebugger.SendInternal("Parent directory doesn't exist.");
+                xParentEntry = CreateDirectory(xParentDirectory);
             }
-            return null;
+            Global.mFileSystemDebugger.SendInternal("Parent directory exists.");
+
+            var xFS = GetFileSystemFromPath(xParentDirectory);
+            return xFS.CreateDirectory(xParentEntry, xDirectoryToCreate);
         }
 
+        /// <summary>
+        /// Gets the directory listing for a path.
+        /// </summary>
+        /// <param name="aPath">The full path.</param>
+        /// <returns></returns>
         public override List<DirectoryEntry> GetDirectoryListing(string aPath)
         {
             var xFS = GetFileSystemFromPath(aPath);
@@ -110,6 +160,11 @@ namespace Cosmos.System.FileSystem
             return xFS.GetDirectoryListing(xDirectory);
         }
 
+        /// <summary>
+        /// Gets the directory listing for a directory entry.
+        /// </summary>
+        /// <param name="aDirectory">The directory entry.</param>
+        /// <returns></returns>
         public override List<DirectoryEntry> GetDirectoryListing(DirectoryEntry aDirectory)
         {
             DirectoryEntry xTempEntry = aDirectory;
@@ -123,6 +178,12 @@ namespace Cosmos.System.FileSystem
             return GetDirectoryListing(xFullPath);
         }
 
+        /// <summary>
+        /// Gets the directory entry for a directory.
+        /// </summary>
+        /// <param name="aPath">The full path path.</param>
+        /// <returns>A directory entry for the directory.</returns>
+        /// <exception cref="Exception"></exception>
         public override DirectoryEntry GetDirectory(string aPath)
         {
             try
@@ -134,13 +195,19 @@ namespace Cosmos.System.FileSystem
                     return xEntry;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
-            throw new Exception($"{aPath} was found, but is not a directory.");
+            throw new Exception(aPath + " was found, but is not a directory.");
         }
 
+        /// <summary>
+        /// Gets the directory entry for a file.
+        /// </summary>
+        /// <param name="aPath">The full path.</param>
+        /// <returns>A directory entry for the file.</returns>
+        /// <exception cref="Exception"></exception>
         public override DirectoryEntry GetFile(string aPath)
         {
             try
@@ -152,13 +219,17 @@ namespace Cosmos.System.FileSystem
                     return xEntry;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
-            throw new Exception($"{aPath} was found, but is not a file.");
+            throw new Exception(aPath + " was found, but is not a file.");
         }
 
+        /// <summary>
+        /// Gets the volumes for all registered file systems.
+        /// </summary>
+        /// <returns>A list of directory entries for all volumes.</returns>
         public override List<DirectoryEntry> GetVolumes()
         {
             List<DirectoryEntry> xVolumes = new List<DirectoryEntry>();
@@ -171,9 +242,19 @@ namespace Cosmos.System.FileSystem
             return xVolumes;
         }
 
-        public override DirectoryEntry GetVolume(string aVolume)
+        /// <summary>
+        /// Gets the directory entry for a volume.
+        /// </summary>
+        /// <param name="aPath">The volume root path.</param>
+        /// <returns>A directory entry for the volume.</returns>
+        public override DirectoryEntry GetVolume(string aPath)
         {
-            var xFileSystem = GetFileSystemFromPath(aVolume);
+            if (string.IsNullOrEmpty(aPath))
+            {
+                return null;
+            }
+
+            var xFileSystem = GetFileSystemFromPath(aPath);
             if (xFileSystem != null)
             {
                 return GetVolume(xFileSystem);
@@ -182,6 +263,9 @@ namespace Cosmos.System.FileSystem
             return null;
         }
 
+        /// <summary>
+        /// Initializes the partitions for all block devices.
+        /// </summary>
         protected virtual void InitializePartitions()
         {
             for (int i = 0; i < BlockDevice.Devices.Count; i++)
@@ -208,6 +292,9 @@ namespace Cosmos.System.FileSystem
             }
         }
 
+        /// <summary>
+        /// Initializes the file system for all partitions.
+        /// </summary>
         protected virtual void InitializeFileSystems()
         {
             for (int i = 0; i < mPartitions.Count; i++)
@@ -238,32 +325,76 @@ namespace Cosmos.System.FileSystem
             }
         }
 
+        /// <summary>
+        /// Gets the file system from a path.
+        /// </summary>
+        /// <param name="aPath">The path.</param>
+        /// <returns>The file system for the path.</returns>
+        /// <exception cref="Exception">Unable to determine filesystem for path:  + aPath</exception>
         private FileSystem GetFileSystemFromPath(string aPath)
         {
-            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.GetFileSystemFromPath : aPath = {aPath}");
+            Global.mFileSystemDebugger.SendInternal("CosmosVFS.GetFileSystemFromPath:");
+
+            if (String.IsNullOrEmpty(aPath))
+            {
+                throw new ArgumentException("Argument is null or empty", nameof(aPath));
+            }
+
+            Global.mFileSystemDebugger.SendInternal("aPath =");
+            Global.mFileSystemDebugger.SendInternal(aPath);
+
             string xPath = Path.GetPathRoot(aPath);
-            Global.mFileSystemDebugger.SendInternal($"CosmosVFS.GetFileSystemFromPath : xPath = {xPath}");
+            Global.mFileSystemDebugger.SendInternal("xPath after GetPathRoot =");
+            Global.mFileSystemDebugger.SendInternal(xPath);
+
+            if ((mCurrentFileSystem != null) && (xPath == mCurrentFileSystem.mRootPath))
+            {
+                Global.mFileSystemDebugger.SendInternal("Returning current file system.");
+                return mCurrentFileSystem;
+            }
+
             for (int i = 0; i < mFileSystems.Count; i++)
             {
                 if (mFileSystems[i].mRootPath == xPath)
                 {
-                    Global.mFileSystemDebugger.SendInternal($"CosmosVFS.GetFileSystemFromPath : Found filesystem.");
-                    return mFileSystems[i];
+                    Global.mFileSystemDebugger.SendInternal("Found filesystem.");
+                    mCurrentFileSystem = mFileSystems[i];
+                    return mCurrentFileSystem;
                 }
             }
             throw new Exception("Unable to determine filesystem for path: " + aPath);
         }
 
+        /// <summary>
+        /// Attempts to get a directory entry for a path in a file system.
+        /// </summary>
+        /// <param name="aPath">The path.</param>
+        /// <param name="aFS">The file system.</param>
+        /// <returns>A directory entry for the path.</returns>
+        /// <exception cref="ArgumentNullException">aFS</exception>
+        /// <exception cref="Exception">Path part ' + xPathPart + ' not found!</exception>
         private DirectoryEntry DoGetDirectoryEntry(string aPath, FileSystem aFS)
         {
+            Global.mFileSystemDebugger.SendInternal("CosmosVFS.DoGetDirectoryEntry:");
+
+            if (String.IsNullOrEmpty(aPath))
+            {
+                throw new ArgumentException("Argument is null or empty", nameof(aPath));
+            }
+
             if (aFS == null)
             {
-                throw new ArgumentNullException("aFS");
+                throw new ArgumentNullException(nameof(aFS));
             }
+
+            Global.mFileSystemDebugger.SendInternal("aPath =");
+            Global.mFileSystemDebugger.SendInternal(aPath);
+
             string[] xPathParts = VFSManager.SplitPath(aPath);
 
             if (xPathParts.Length == 1)
             {
+                Global.mFileSystemDebugger.SendInternal("Returning the volume.");
                 return GetVolume(aFS);
             }
 
@@ -272,15 +403,24 @@ namespace Cosmos.System.FileSystem
             // start at index 1, because 0 is the volume
             for (int i = 1; i < xPathParts.Length; i++)
             {
-                var xPathPart = xPathParts[i];
+                var xPathPart = xPathParts[i].ToLower();
+                Global.mFileSystemDebugger.SendInternal("xPathPart =");
+                Global.mFileSystemDebugger.SendInternal(xPathPart);
+
                 var xPartFound = false;
                 var xListing = aFS.GetDirectoryListing(xBaseDirectory);
 
                 for (int j = 0; j < xListing.Count; j++)
                 {
                     var xListingItem = xListing[j];
-                    if (string.Equals(xListingItem.mName, xPathPart, StringComparison.OrdinalIgnoreCase))
+                    string xListingItemName = xListingItem.mName.ToLower();
+                    xPathPart = xPathPart.ToLower();
+                    Global.mFileSystemDebugger.SendInternal("xListingItemName =");
+                    Global.mFileSystemDebugger.SendInternal(xListingItemName);
+
+                    if (xListingItemName == xPathPart)
                     {
+                        Global.mFileSystemDebugger.SendInternal("Found path part.");
                         xBaseDirectory = xListingItem;
                         xPartFound = true;
                     }
@@ -294,10 +434,22 @@ namespace Cosmos.System.FileSystem
             return xBaseDirectory;
         }
 
+        /// <summary>
+        /// Gets the root directory entry for a volume in a file system.
+        /// </summary>
+        /// <param name="aFS">The file system containing the volume.</param>
+        /// <returns>A directory entry for the volume.</returns>
         private DirectoryEntry GetVolume(FileSystem aFS)
         {
+            Global.mFileSystemDebugger.SendInternal("CosmosVFS.GetVolume:");
+
+            if (aFS == null)
+            {
+                Global.mFileSystemDebugger.SendInternal("File system is null.");
+                throw new ArgumentNullException(nameof(aFS));
+            }
+
             return aFS.GetRootDirectory();
         }
-
     }
 }

@@ -1,6 +1,4 @@
-﻿#define COSMOSDEBUG
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -464,7 +462,7 @@ namespace Cosmos.IL2CPU
                         if (mItemsList[i] is Type)
                         {
                             var xType = (Type)mItemsList[i];
-                            if (xType.IsSubclassOf(xVirtMethod.DeclaringType))
+                            if ((xType.IsSubclassOf(xVirtMethod.DeclaringType)) || ((xVirtMethod.DeclaringType.IsInterface) && (xVirtMethod.DeclaringType.IsAssignableFrom(xType))))
                             {
                                 var xNewMethod = xType.GetMethod(aMethod.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, xParamTypes, null);
                                 if (xNewMethod != null)

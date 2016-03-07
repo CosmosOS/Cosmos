@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define COSMOSDEBUG
+
+using System;
 using System.IO;
 using System.Collections.Generic;
 
@@ -62,6 +64,8 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static DirectoryInfo GetParent(string aPath)
         {
+            Global.mFileSystemDebugger.SendInternal("Directory.GetParent:");
+
             if (aPath == null)
             {
                 Global.mFileSystemDebugger.SendInternal("Directory.GetParent : aPath is null");
@@ -73,6 +77,9 @@ namespace Cosmos.System.Plugs.System.IO
                 Global.mFileSystemDebugger.SendInternal("Directory.GetParent : aPath is empty");
                 throw new ArgumentException("Path must not be empty.", "aPath");
             }
+
+            Global.mFileSystemDebugger.SendInternal("aPath =");
+            Global.mFileSystemDebugger.SendInternal(aPath);
 
             string xFullPath = Path.GetFullPath(aPath);
             string xParentDirectory = Path.GetDirectoryName(xFullPath);

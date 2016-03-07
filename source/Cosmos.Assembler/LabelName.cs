@@ -66,6 +66,7 @@ namespace Cosmos.Assembler
               xSB.Replace(c.ToString(), "");
             }*/
             xName = xName.Replace("[]", "array");
+            xName = xName.Replace("[,]", "array");
             xName = xName.Replace("*", "pointer");
             xName = IllegalCharsReplace.Replace(xName, string.Empty);
 

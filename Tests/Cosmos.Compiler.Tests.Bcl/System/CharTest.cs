@@ -39,7 +39,6 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             int expectedResultAsInt = (int)value | ((int)value << 16);
                       
             Assert.IsTrue((resultAsInt == expectedResultAsInt), "Char.GetHashCode() doesn't work");
-
 #if false
             // Now let's try ToString() again but printed in hex (this test fails for now!)
             result = value.ToString("X2");

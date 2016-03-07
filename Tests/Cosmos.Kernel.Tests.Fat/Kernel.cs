@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Cosmos.Common.Extensions;
-using Cosmos.Debug.Kernel;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 using Cosmos.TestRunner;
@@ -9,19 +8,27 @@ using Sys = Cosmos.System;
 
 namespace Cosmos.Kernel.Tests.Fat
 {
+    /// <summary>
+    /// The kernel implementation.
+    /// </summary>
+    /// <seealso cref="Cosmos.System.Kernel" />
     public class Kernel : Sys.Kernel
     {
-        private VFSBase myVFS;
+        private VFSBase mVFS;
 
+        /// <summary>
+        /// Pre-run events
+        /// </summary>
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully, now start testing");
-            myVFS = new CosmosVFS();
-            VFSManager.RegisterVFS(myVFS);
+            mVFS = new CosmosVFS();
+            VFSManager.RegisterVFS(mVFS);
         }
 
-        private readonly Debugger mDebugger = new Debugger("User", "Test");
-
+        /// <summary>
+        /// Main kernel loop
+        /// </summary>
         protected override void Run()
         {
             try
@@ -44,85 +51,21 @@ namespace Cosmos.Kernel.Tests.Fat
             }
         }
 
-        //Utility method to test Byte Array equality if Generics would have worked it could have been done universal
-        public bool byteArrayAreEquals(byte[] a1, byte[] a2)
+        #region System.IO.Path Tests
+
+        /// <summary>
+        /// Tests System.IO.Path plugs.
+        /// </summary>
+        private void TestPath()
         {
-            if (ReferenceEquals(a1, a2))
-            {
-                mDebugger.Send("a1 and a2 are the same Object");
-                return true;
-            }
-
-            if (a1 == null || a2 == null)
-            {
-                mDebugger.Send("a1 or a2 is null so are different");
-                return false;
-            }
-
-            if (a1.Length != a2.Length)
-            {
-                mDebugger.Send("a1.Length != a2.Length so are different");
-                return false;
-            }
-
-            for (int i = 0; i < a1.Length; i++)
-            {
-                if (a1[i] != a2[i])
-                {
-                    mDebugger.Send("In position " + i + " a byte is different");
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        //Utility method to test String Array equality if Generics would have worked it could have been done universal
-        public bool StringArrayAreEquals(String[] a1, String[] a2)
-        {
-            if (ReferenceEquals(a1, a2))
-            {
-                mDebugger.Send("a1 and a2 are the same Object");
-                return true;
-            }
-
-            if (a1 == null || a2 == null)
-            {
-                mDebugger.Send("a1 or a2 is null so are different");
-                return false;
-            }
-
-            if (a1.Length != a2.Length)
-            {
-                mDebugger.Send("a1.Length != a2.Length so are different");
-                return false;
-            }
-
-            for (int i = 0; i < a1.Length; i++)
-            {
-                if (a1[i] != a2[i])
-                {
-                    mDebugger.Send("In position " + i + " a String is different");
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public void TestPath()
-        {
-            string xMessage;
-            string xStringResult, xStringExpectedResult;
-            int xIntResult, xIntExpectedResult;
-
             //Path.ChangeExtension(string, string)
             mDebugger.Send("START TEST");
-            xStringResult = Path.ChangeExtension(@"0:\Kudzu.txt", ".doc");
-            xStringExpectedResult = @"0:\Kudzu.doc";
-            xMessage = "Path.ChangeExtenstion (no dot) failed.";
+            string xStringResult = Path.ChangeExtension(@"0:\Kudzu.txt", ".doc");
+            string xStringExpectedResult = @"0:\Kudzu.doc";
+            string xMessage = "Path.ChangeExtenstion (no dot) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
@@ -131,6 +74,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.ChangeExtenstion (no dot) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             // Path.Combine(string, string)
@@ -140,6 +84,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.Combine (root and directory) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
@@ -148,6 +93,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.Combine (root and file) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
@@ -156,6 +102,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.Combine (directory and directory) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
@@ -164,56 +111,62 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.Combine (directory and file) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             // Path.GetDirectoryName(string)
-            //mDebugger.Send("START TEST");
-            //xStringResult = Path.GetDirectoryName(@"0:\");
-            //xStringExpectedResult = null;
-            //xMessage = "Path.GetDirectoryName (root) failed.";
-            //Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
-            //mDebugger.Send("END TEST");
-            //mDebugger.Send("");
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetDirectoryName(@"0:\");
+            xMessage = "Path.GetDirectoryName (root) failed.";
+            Assert.IsTrue(xStringResult == null, xMessage);
+            mDebugger.Send("END TEST");
 
-            //mDebugger.Send("START TEST");
-            //xStringResult = Path.GetDirectoryName(@"0:\test");
-            //xStringExpectedResult = @"0:\";
-            //xMessage = "Path.GetDirectoryName (directory no trailing directory separator) failed.";
-            //Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
-            //mDebugger.Send("END TEST");
-            //mDebugger.Send("");
+            mDebugger.Send("");
 
-            //mDebugger.Send("START TEST");
-            //xStringResult = Path.GetDirectoryName(@"0:\test\");
-            //xStringExpectedResult = @"0:\";
-            //xMessage = "Path.GetDirectoryName (directory with trailing directory separator) failed.";
-            //Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
-            //mDebugger.Send("END TEST");
-            //mDebugger.Send("");
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetDirectoryName(@"0:\test");
+            xStringExpectedResult = @"0:\";
+            xMessage = "Path.GetDirectoryName (directory no trailing directory separator) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
 
-            //mDebugger.Send("START TEST");
-            //xStringResult = Path.GetDirectoryName(@"0:\test\test2");
-            //xStringExpectedResult = @"0:\test";
-            //xMessage = "Path.GetDirectoryName (subdirectory no trailing directory separator) failed.";
-            //Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
-            //mDebugger.Send("END TEST");
-            //mDebugger.Send("");
+            mDebugger.Send("");
 
-            //mDebugger.Send("START TEST");
-            //xStringResult = Path.GetDirectoryName(@"0:\test\test2\");
-            //xStringExpectedResult = @"0:\test";
-            //xMessage = "Path.GetDirectoryName (subdirectory with trailing directory separator) failed.";
-            //Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
-            //mDebugger.Send("END TEST");
-            //mDebugger.Send("");
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetDirectoryName(@"0:\test\");
+            xStringExpectedResult = @"0:\";
+            xMessage = "Path.GetDirectoryName (directory with trailing directory separator) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
 
-            //mDebugger.Send("START TEST");
-            //xStringResult = Path.GetDirectoryName(@"0:\test\ .");
-            //xStringExpectedResult = @"0:\test";
-            //xMessage = "Path.GetDirectoryName (directory with trailing directory separator and invalid path) failed.";
-            //Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
-            //mDebugger.Send("END TEST");
-            //mDebugger.Send("");
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetDirectoryName(@"0:\test\test2");
+            xStringExpectedResult = @"0:\test";
+            xMessage = "Path.GetDirectoryName (subdirectory no trailing directory separator) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetDirectoryName(@"0:\test\test2\");
+            xStringExpectedResult = @"0:\test";
+            xMessage = "Path.GetDirectoryName (subdirectory with trailing directory separator) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetDirectoryName(@"0:\test\ .");
+            xStringExpectedResult = @"0:\test";
+            xMessage = "Path.GetDirectoryName (directory with trailing directory separator and invalid path) failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
 
             // Path.GetExtension(string)
             mDebugger.Send("START TEST");
@@ -222,6 +175,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetExtension (file no extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
@@ -230,6 +184,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetExtension (file with extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             // Path.GetFileName(string aPath)
@@ -239,6 +194,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetFileName (root directory) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
@@ -247,6 +203,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetFileName (file with extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
@@ -255,6 +212,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetFileName (directory and file no extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
@@ -263,14 +221,16 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetFileName (directory and file with extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
             xStringResult = Path.GetFileName(@"0:\test\dir\");
-            xStringExpectedResult = String.Empty;
+            xStringExpectedResult = string.Empty;
             xMessage = "Path.GetFileName (two directories and no file) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             // Path.GetFileNameWithoutExtension(string aPath)
@@ -280,6 +240,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetFileNameWithoutExtension (file no extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
@@ -288,6 +249,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetFileNameWithoutExtension (file with extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
@@ -296,6 +258,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetFileNameWithoutExtension (directory and file no extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
@@ -304,25 +267,28 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetFileNameWithoutExtension (directory and file with extension) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             mDebugger.Send("START TEST");
             xStringResult = Path.GetFileNameWithoutExtension(@"0:\test\dir\");
-            xStringExpectedResult = String.Empty;
+            xStringExpectedResult = string.Empty;
             xMessage = "Path.GetFileNameWithoutExtension (two directories and no file) failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             // Path.GetFullPath(string)
 
             // Path.GetInvalidFileNameChars()
             mDebugger.Send("START TEST");
-            xIntResult = Path.GetInvalidFileNameChars().Length;
-            xIntExpectedResult = 0;
+            int xIntResult = Path.GetInvalidFileNameChars().Length;
+            int xIntExpectedResult = 0;
             xMessage = "Path.GetInvalidFileNameChars failed.";
             Assert.IsFalse(xIntResult == xIntExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             // Path.GetInvalidPathChars()
@@ -332,9 +298,54 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetInvalidPathChars failed.";
             Assert.IsFalse(xIntResult == xIntExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             // Path.GetPathRoot(string)
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetPathRoot(@"0:\");
+            xStringExpectedResult = @"0:\";
+            xMessage = "Path.GetPathRoot failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetPathRoot(@"0:\test");
+            xStringExpectedResult = @"0:\";
+            xMessage = "Path.GetPathRoot failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetPathRoot(@"0:\test.txt");
+            xStringExpectedResult = @"0:\";
+            xMessage = "Path.GetPathRoot failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetPathRoot(@"0:\test\test2");
+            xStringExpectedResult = @"0:\";
+            xMessage = "Path.GetPathRoot failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            xStringResult = Path.GetPathRoot(@"0:\test\test2.txt");
+            xStringExpectedResult = @"0:\";
+            xMessage = "Path.GetPathRoot failed.";
+            Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
 
             // Path.GetRandomFileName()
             mDebugger.Send("START TEST");
@@ -343,6 +354,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetRandomFileName failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             // Path.GetTempFileName()
@@ -352,6 +364,7 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetTempFileName failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             // Path.GetTempPath();
@@ -361,23 +374,152 @@ namespace Cosmos.Kernel.Tests.Fat
             xMessage = "Path.GetTempPath failed.";
             Assert.IsTrue(xStringResult == xStringExpectedResult, xMessage);
             mDebugger.Send("END TEST");
+
             mDebugger.Send("");
 
             // Path.HasExtension(string)
+            mDebugger.Send("START TEST");
+            bool xBooleanResult = Path.HasExtension("test.txt");
+            bool xBooleanExpectedResult = true;
+            xMessage = "Path.HasExtension failed.";
+            Assert.IsTrue(xBooleanResult == xBooleanExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            xBooleanResult = Path.HasExtension("test");
+            xBooleanExpectedResult = false;
+            xMessage = "Path.HasExtension failed.";
+            Assert.IsTrue(xBooleanResult == xBooleanExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            xBooleanResult = Path.HasExtension(@"0:\test.txt");
+            xBooleanExpectedResult = true;
+            xMessage = "Path.HasExtension failed.";
+            Assert.IsTrue(xBooleanResult == xBooleanExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            xBooleanResult = Path.HasExtension(@"0:\test");
+            xBooleanExpectedResult = false;
+            xMessage = "Path.HasExtension failed.";
+            Assert.IsTrue(xBooleanResult == xBooleanExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            xBooleanResult = Path.HasExtension(@"0:\test\");
+            xBooleanExpectedResult = false;
+            xMessage = "Path.HasExtension failed.";
+            Assert.IsTrue(xBooleanResult == xBooleanExpectedResult, xMessage);
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
 
             // Path.IsPathRooted(string)
         }
 
+        #endregion
+
+        #region System.IO.Directory Tests
+
+        /// <summary>
+        /// Tests System.IO.Directory plugs.
+        /// </summary>
+        private void TestDirectory()
+        {
+            mDebugger.Send("START TEST: Get parent:");
+            var xParent = Directory.GetParent(@"0:\test");
+            Assert.IsTrue(xParent != null, "Failed to get directory parent.");
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            //
+            mDebugger.Send("START TEST: Get parent:");
+            xParent = Directory.GetParent(@"0:\test\");
+            Assert.IsTrue(xParent != null, "Failed to get directory parent.");
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            //
+            mDebugger.Send("Get files:");
+            var xFiles = Directory.GetFiles(@"0:\");
+            mDebugger.Send("Found " + xFiles.Length + " files.");
+            if (xFiles.Length > 0)
+            {
+                mDebugger.Send("-- File list");
+                for (int i = 0; i < xFiles.Length; i++)
+                {
+                    mDebugger.Send("File: " + xFiles[i]);
+                }
+            }
+            Assert.IsTrue(xFiles.Length > 0, "Failed to get files from the directory.");
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            //
+            mDebugger.Send("Get directories:");
+            var xDirectories = Directory.GetDirectories(@"0:\");
+            mDebugger.Send("Found " + xDirectories.Length + " directories.");
+            if (xDirectories.Length > 0)
+            {
+                mDebugger.Send("-- Directory list");
+                for (int i = 0; i < xDirectories.Length; i++)
+                {
+                    mDebugger.Send("Directory: " + xDirectories[i]);
+                }
+            }
+            Assert.IsTrue(xDirectories.Length > 0, "Failed to get directories from the directory.");
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            //
+            mDebugger.Send("Directory exist check:");
+            var xTest = Directory.Exists(@"0:\test");
+            Assert.IsTrue(xTest, "Folder does not exist!");
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST");
+            var xDirectory = Directory.CreateDirectory(@"0:\test2");
+            Assert.IsTrue(xDirectory != null, "Directory.CreateDirectory failed: Directory is null");
+            bool xExists = Directory.Exists(@"0:\test2");
+            Assert.IsTrue(xExists, "Directory.CreateDirectory failed: Directory is doesn't exist after create call");
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+        }
+
+        #endregion
+
+        #region System.IO.File Tests
+
+        /// <summary>
+        /// Tests System.IO.File plugs.
+        /// </summary>
         private void TestFile()
         {
+            string xContents;
             // Moved this test here because if not the test can be executed only a time!
-            //  mDebugger.Send("Write to file now");
+            mDebugger.Send("Write to file now");
             File.WriteAllText(@"0:\Kudzu.txt", "Hello Cosmos");
             mDebugger.Send("Text written");
 
-            //
+
             mDebugger.Send("File contents of Kudzu.txt: ");
-            string xContents = File.ReadAllText(@"0:\Kudzu.txt");
+            xContents = File.ReadAllText(@"0:\Kudzu.txt");
             mDebugger.Send("Contents retrieved");
             mDebugger.Send(xContents);
             Assert.IsTrue(xContents == "Hello Cosmos", "Contents of Kudzu.txt was read incorrectly!");
@@ -457,11 +599,11 @@ namespace Cosmos.Kernel.Tests.Fat
             }
 
 
-            String[] contents = { "One", "Two", "Three" };
+            string[] contents = {"One", "Two", "Three"};
             File.WriteAllLines(@"0:\test3.txt", contents);
             mDebugger.Send("Text written");
             mDebugger.Send("Now reading with ReadAllLines()");
-            String[] readLines = File.ReadAllLines(@"0:\test3.txt");
+            string[] readLines = File.ReadAllLines(@"0:\test3.txt");
             mDebugger.Send("Contents retrieved after writing");
             for (int i = 0; i < readLines.Length; i++)
             {
@@ -469,7 +611,7 @@ namespace Cosmos.Kernel.Tests.Fat
             }
             Assert.IsTrue(StringArrayAreEquals(contents, readLines), "Contents of test3.txt was written incorrectly!");
 #if false
-            // TODO maybe the more correct test is to implement ReadAllLines and then check that two arrays are equals
+    // TODO maybe the more correct test is to implement ReadAllLines and then check that two arrays are equals
             var xContents = File.ReadAllText(@"0:\test3.txt");
             mDebugger.Send("Contents retrieved after writing");
             mDebugger.Send(xContents);
@@ -486,31 +628,34 @@ namespace Cosmos.Kernel.Tests.Fat
             {
                 Assert.IsTrue(xFile != null, "Failed to create a new file.");
             }
-            byte[] dataWritten = new byte[] { 0x01, 0x02, 0x03 };
+            byte[] dataWritten = new byte[] {0x01, 0x02, 0x03};
             File.WriteAllBytes(@"0:\test.dat", dataWritten);
             mDebugger.Send("Text written");
             byte[] dataRead = File.ReadAllBytes(@"0:\test.dat");
 
-            Assert.IsTrue(byteArrayAreEquals(dataWritten, dataRead), "Failed to write binary data to a file.");
+            Assert.IsTrue(ByteArrayAreEquals(dataWritten, dataRead), "Failed to write binary data to a file.");
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
-            // This creates a loop? Nothing is printed when VFSManager.CreateStream() method is reached...
+            //This creates a loop? Nothing is printed when VFSManager.CreateStream() method is reached...
             mDebugger.Send("START TEST: Create a new directory with a file inside (filestream):");
             var xDirectory = Directory.CreateDirectory(@"0:\testdir");
             Assert.IsTrue(xDirectory != null, "Failed to create a new directory.");
             using (var xFile2 = File.Create(@"0:\testdir\file.txt"))
             {
-                String wText = "This a test";
-                Byte[] xWriteBuff = wText.GetUtf8Bytes(0, (uint)wText.Length);
+                string wText = "This a test";
+                byte[] xWriteBuff = wText.GetUtf8Bytes(0, (uint) wText.Length);
                 xFile2.Write(xWriteBuff, 0, xWriteBuff.Length);
                 mDebugger.Send("---- Data written");
                 xFile2.Position = 0;
-                Byte[] xReadBuff = new byte[xWriteBuff.Length];
+                byte[] xReadBuff = new byte[xWriteBuff.Length];
                 xFile2.Read(xReadBuff, 0, xWriteBuff.Length);
-                mDebugger.Send("xWriteBuff " + xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length) + " xReadBuff " + xReadBuff.GetUtf8String(0, (uint)xWriteBuff.Length));
-                String xWriteBuffAsString = xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length);
-                String xReadBuffAsString = xReadBuff.GetUtf8String(0, (uint)xReadBuff.Length);
+                mDebugger.Send("xWriteBuff=" + xWriteBuff.GetUtf8String(0, (uint) xWriteBuff.Length));
+                mDebugger.Send("xReadBuff =" + xReadBuff.GetUtf8String(0, (uint) xReadBuff.Length));
+                string xWriteBuffAsString = xWriteBuff.GetUtf8String(0, (uint) xWriteBuff.Length);
+                string xReadBuffAsString = xReadBuff.GetUtf8String(0, (uint) xReadBuff.Length);
+                mDebugger.Send("xWriteBuffAsString=" + xWriteBuffAsString);
+                mDebugger.Send("xReadBuffAsString =" + xReadBuffAsString);
                 Assert.IsTrue(xWriteBuffAsString == xReadBuffAsString, "Failed to write and read file");
                 mDebugger.Send("END TEST");
             }
@@ -518,7 +663,7 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("START TEST: Create a new directory with a file inside (File):");
             var xDirectory2 = Directory.CreateDirectory(@"0:\testdir");
             Assert.IsTrue(xDirectory2 != null, "Failed to create a new directory.");
-            String WrittenText = "This a test";
+            string WrittenText = "This a test";
             File.WriteAllText(@"0:\testdir\file.txt", WrittenText);
             mDebugger.Send("Text written");
             // now read it
@@ -534,75 +679,19 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("Contents retrieved after writing");
             mDebugger.Send(xContents);
             // XXX Use String.Concat() with Enviroment.NewLine this not Linux there are is '\n'!
-            Assert.IsTrue(xContents == "Test FAT write.\nYet other text.", "Contents of Kudzu.txt was appended incorrectly!");
+            Assert.IsTrue(xContents == "Test FAT write.\nYet other text.",
+                "Contents of Kudzu.txt was appended incorrectly!");
             mDebugger.Send("END TEST");
             mDebugger.Send("");
         }
 
-        private void TestDirectory()
-        {
-            mDebugger.Send("START TEST: Get parent:");
-            var xParent = Directory.GetParent(@"0:\test");
-            Assert.IsTrue(xParent != null, "Failed to get directory parent.");
-            mDebugger.Send("END TEST");
-            mDebugger.Send("");
+        #endregion
 
-            //
-            mDebugger.Send("START TEST: Get parent:");
-            xParent = Directory.GetParent(@"0:\test\");
-            Assert.IsTrue(xParent != null, "Failed to get directory parent.");
-            mDebugger.Send("END TEST");
-            mDebugger.Send("");
+        #region System.IO.FileStream Tests
 
-            //
-            mDebugger.Send("Get files:");
-            var xFiles = Directory.GetFiles(@"0:\");
-            mDebugger.Send("Found " + xFiles.Length + " files.");
-            if (xFiles.Length > 0)
-            {
-                mDebugger.Send("-- File list");
-                for (int i = 0; i < xFiles.Length; i++)
-                {
-                    mDebugger.Send("File: " + xFiles[i]);
-                }
-            }
-            Assert.IsTrue(xFiles.Length > 0, "Failed to get files from the directory.");
-            mDebugger.Send("END TEST");
-            mDebugger.Send("");
-
-            //
-            mDebugger.Send("Get directories:");
-            var xDirectories = Directory.GetDirectories(@"0:\");
-            mDebugger.Send("Found " + xDirectories.Length + " directories.");
-            if (xDirectories.Length > 0)
-            {
-                mDebugger.Send("-- Directory list");
-                for (int i = 0; i < xDirectories.Length; i++)
-                {
-                    mDebugger.Send("Directory: " + xDirectories[i]);
-                }
-            }
-            Assert.IsTrue(xDirectories.Length > 0, "Failed to get directories from the directory.");
-            mDebugger.Send("END TEST");
-            mDebugger.Send("");
-
-            //
-            mDebugger.Send("Directory exist check:");
-            var xTest = Directory.Exists(@"0:\test");
-            Assert.IsTrue(xTest, "Folder does not exist!");
-            mDebugger.Send("END TEST");
-            mDebugger.Send("");
-
-            //
-            mDebugger.Send("START TEST: Create directory:");
-            var xDirectory = Directory.CreateDirectory(@"0:\test2");
-            Assert.IsTrue(xDirectory != null, "Failed to create a new directory.");
-            bool xExists = Directory.Exists(@"0:\test2");
-            Assert.IsTrue(xExists, "Failed to create a new directory.");
-            mDebugger.Send("END TEST");
-            mDebugger.Send("");
-        }
-
+        /// <summary>
+        /// Tests System.IO.FileStream plugs.
+        /// </summary>
         private void TestFileStream()
         {
             using (var xFS = new FileStream(@"0:\Kudzu.txt", FileMode.Create))
@@ -610,18 +699,102 @@ namespace Cosmos.Kernel.Tests.Fat
                 mDebugger.Send("START TEST: Filestream:");
                 mDebugger.Send("Start writing");
                 var xStr = "Test FAT Write.";
-                Byte[] xWriteBuff = xStr.GetUtf8Bytes(0, (uint)xStr.Length);
+                byte[] xWriteBuff = xStr.GetUtf8Bytes(0, (uint) xStr.Length);
                 xFS.Write(xWriteBuff, 0, xWriteBuff.Length);
                 mDebugger.Send("---- Data written");
                 xFS.Position = 0;
-                Byte[] xReadBuff = new byte[xWriteBuff.Length];
+                byte[] xReadBuff = new byte[xWriteBuff.Length];
                 xFS.Read(xReadBuff, 0, xWriteBuff.Length);
-                mDebugger.Send("xWriteBuff " + xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length) + " xReadBuff " + xReadBuff.GetUtf8String(0, (uint)xWriteBuff.Length));
-                String xWriteBuffAsString = xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length);
-                String xReadBuffAsString = xReadBuff.GetUtf8String(0, (uint)xReadBuff.Length);
+                mDebugger.Send("xWriteBuff " + xWriteBuff.GetUtf8String(0, (uint) xWriteBuff.Length) + " xReadBuff " +
+                               xReadBuff.GetUtf8String(0, (uint) xWriteBuff.Length));
+                string xWriteBuffAsString = xWriteBuff.GetUtf8String(0, (uint) xWriteBuff.Length);
+                string xReadBuffAsString = xReadBuff.GetUtf8String(0, (uint) xReadBuff.Length);
                 Assert.IsTrue(xWriteBuffAsString == xReadBuffAsString, "Failed to write and read file");
                 mDebugger.Send("END TEST");
             }
         }
+
+        #endregion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Utility method to test Byte[] equality.
+        /// </summary>
+        /// <param name="a1">Byte array.</param>
+        /// <param name="a2">Byte array.</param>
+        /// <returns>True if the elements in the arrays are equal otherwise false.</returns>
+        private bool ByteArrayAreEquals(byte[] a1, byte[] a2)
+        {
+            if (ReferenceEquals(a1, a2))
+            {
+                mDebugger.Send("a1 and a2 are the same Object");
+                return true;
+            }
+
+            if (a1 == null || a2 == null)
+            {
+                mDebugger.Send("a1 or a2 is null so are different");
+                return false;
+            }
+
+            if (a1.Length != a2.Length)
+            {
+                mDebugger.Send("a1.Length != a2.Length so are different");
+                return false;
+            }
+
+            for (int i = 0; i < a1.Length; i++)
+            {
+                if (a1[i] != a2[i])
+                {
+                    mDebugger.Send("In position " + i + " a byte is different");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Utility method to test string[] equality.
+        /// </summary>
+        /// <param name="a1">String array.</param>
+        /// <param name="a2">String array.</param>
+        /// <returns>True if the elements in the arrays are equal otherwise false.</returns>
+        private bool StringArrayAreEquals(string[] a1, string[] a2)
+        {
+            if (ReferenceEquals(a1, a2))
+            {
+                mDebugger.Send("a1 and a2 are the same Object");
+                return true;
+            }
+
+            if (a1 == null || a2 == null)
+            {
+                mDebugger.Send("a1 or a2 is null so are different");
+                return false;
+            }
+
+            if (a1.Length != a2.Length)
+            {
+                mDebugger.Send("a1.Length != a2.Length so are different");
+                return false;
+            }
+
+            for (int i = 0; i < a1.Length; i++)
+            {
+                if (a1[i] != a2[i])
+                {
+                    mDebugger.Send("In position " + i + " a String is different");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        #endregion
+
     }
 }

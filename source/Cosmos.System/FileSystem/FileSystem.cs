@@ -16,7 +16,7 @@ namespace Cosmos.System.FileSystem
 
         public static FileSystemType GetFileSystemType(Partition aDevice)
         {
-            if (FatFileSystem.IsDeviceFAT(aDevice))
+            if (FatFileSystem.IsDeviceFat(aDevice))
             {
                 return FileSystemType.FAT;
             }

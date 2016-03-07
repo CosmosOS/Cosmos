@@ -1,17 +1,17 @@
-﻿using System.IO;
+﻿//#define COSMOSDEBUG
+
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
+using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
 
 namespace Cosmos.System.Plugs.System.IO
 {
-    using Cosmos.System.FileSystem;
-
-    using global::System;
-    using global::System.Collections.Generic;
-
     [Plug(Target = typeof(DirectoryInfo))]
     [PlugField(FieldId = "$$Storage$$", FieldType = typeof(DirectoryEntry))]
     [PlugField(FieldId = "$$FullPath$$", FieldType = typeof(string))]
@@ -25,21 +25,19 @@ namespace Cosmos.System.Plugs.System.IO
             [FieldAccess(Name = "$$FullPath$$")] ref string aFullPath,
             [FieldAccess(Name = "$$Name$$")] ref string aName)
         {
-            Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.ctor : aPath = = {aPath}");
-            if (aPath == null)
+            Global.mFileSystemDebugger.SendInternal("DirectoryInfo.ctor:");
+
+            if (string.IsNullOrEmpty(aPath))
             {
-                throw new ArgumentNullException("aPath is null in DirectoryInfo ctor");
+                throw new ArgumentNullException(nameof(aPath));
             }
 
-            if (!VFSManager.DirectoryExists(aPath))
-            {
-                throw new DirectoryNotFoundException("Unable to find directory " + aPath);
-            }
+            Global.mFileSystemDebugger.SendInternal("aPath =");
+            Global.mFileSystemDebugger.SendInternal(aPath);
 
             aStorage = VFSManager.GetDirectory(aPath);
-            aFullPath = VFSManager.GetFullPath(aStorage);
-            aName = Path.GetDirectoryName(aFullPath);
-
+            aFullPath = aStorage.mFullPath;
+            aName = aStorage.mName;
         }
 
         public static string get_Name(DirectoryInfo aThis)

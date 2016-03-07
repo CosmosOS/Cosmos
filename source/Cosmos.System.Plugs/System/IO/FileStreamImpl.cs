@@ -1,4 +1,4 @@
-﻿using Cosmos.Debug.Kernel;
+﻿//#define COSMOSDEBUG
 
 using global::System;
 using global::System.IO;
@@ -20,7 +20,8 @@ namespace Cosmos.System.Plugs.System.IO
         public static void Ctor(FileStream aThis, string aPathname, FileMode aMode,
             [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
         {
-            Global.mFileSystemDebugger.SendInternal("In FileStream.Ctor");
+            Global.mFileSystemDebugger.SendInternal("FileStream.Ctor:");
+
             innerStream = InitializeStream(aPathname, aMode);
         }
 
@@ -32,12 +33,16 @@ namespace Cosmos.System.Plugs.System.IO
         public static int Read(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
             [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
         {
+            Global.mFileSystemDebugger.SendInternal("FileStream.Read:");
+
             return innerStream.Read(aBuffer, aOffset, aCount);
         }
 
         public static void Write(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
             [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
         {
+            Global.mFileSystemDebugger.SendInternal("FileStream.Write:");
+
             innerStream.Write(aBuffer, aOffset, aCount);
         }
 

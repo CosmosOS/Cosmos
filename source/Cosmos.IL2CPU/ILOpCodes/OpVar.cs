@@ -57,6 +57,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
       switch (OpCode)
       {
         case Code.Ldloc:
+        case Code.Ldloca:
           var xBody = aMethod.GetMethodBody();
           if (xBody != null)
           {
@@ -65,15 +66,14 @@ namespace Cosmos.IL2CPU.ILOpCodes
             {
               StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
             }
+            else if ((OpCode == Code.Ldloca) && (!StackPushTypes[0].IsValueType))
+            {
+              StackPushTypes[0] = StackPushTypes[0].MakePointerType();
+            }
           }
           return;
-        case Code.Ldloca:
-          StackPushTypes[0] = typeof(void*);
-          return;
-        case Code.Ldarga:
-          StackPushTypes[0] = typeof (void*);
-          return;
         case Code.Ldarg:
+        case Code.Ldarga:
           var xArgIndexCorrection = 0;
           if (!aMethod.IsStatic)
           {
@@ -84,12 +84,9 @@ namespace Cosmos.IL2CPU.ILOpCodes
               {
                 StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
               }
-              else
+              else if ((OpCode == Code.Ldarga) || ((OpCode == Code.Ldarg) && (StackPushTypes[0].IsValueType)))
               {
-                if (StackPushTypes[0].IsValueType)
-                {
-                  StackPushTypes[0] = typeof (void*);
-                }
+                StackPushTypes[0] = StackPushTypes[0].MakePointerType();
               }
               return;
             }
@@ -101,9 +98,11 @@ namespace Cosmos.IL2CPU.ILOpCodes
           {
             StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
           }
+          else if (OpCode == Code.Ldarga)
+          {
+            StackPushTypes[0] = StackPushTypes[0].MakePointerType();
+          }
           return;
-        default:
-          break;
       }
     }
   }
