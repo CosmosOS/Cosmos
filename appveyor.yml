@@ -1,6 +1,6 @@
 version: 0.20150918.{build}
 configuration: Debug
-platform: x86
+platform: Any CPU
 shallow_clone: true
 clone_folder: c:\Cosmos
 build_script:
