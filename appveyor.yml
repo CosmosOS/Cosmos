@@ -1,6 +1,6 @@
 version: 0.20150918.{build}
 configuration: Debug
-platform: x86
+platform: Any CPU
 shallow_clone: true
 clone_folder: c:\Cosmos
 build_script:
@@ -8,10 +8,10 @@ build_script:
     rem %APPVEYOR_BUILD_FOLDER%
 
 
-    msbuild "source\Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform=x86 /p:Configuration=Debug /p:DeployExtension=false
+    msbuild "source\Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
 
 
-    msbuild "source\Build.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform=x86 /p:Configuration=Debug /p:OutputPath="%APPVEYOR_BUILD_FOLDER%\Build\VSIP" /p:DeployExtension=false
+    msbuild "source\Build.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:OutputPath="%APPVEYOR_BUILD_FOLDER%\Build\VSIP" /p:DeployExtension=false
 
 
     xcopy /Y "%APPVEYOR_BUILD_FOLDER%\Build\VSIP\Cosmos.targets" "%ProgramFiles(x86)%\MSBuild\Cosmos\"
@@ -42,7 +42,7 @@ build_script:
     reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
 
 
-    msbuild "source\Cosmos.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform=x86 /p:Configuration=Debug /p:DeployExtension=false
+    msbuild "source\Cosmos.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
 notifications:
 - provider: Webhook
   url: https://webhooks.gitter.im/e/a0ff70f4ffc77a2d07a0
