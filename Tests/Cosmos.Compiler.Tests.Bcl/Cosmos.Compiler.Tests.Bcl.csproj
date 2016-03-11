@@ -79,10 +79,22 @@
   <ItemGroup>
     <Compile Include="Kernel.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="System\BooleanTest.cs" />
+    <Compile Include="System\ByteTest.cs" />
+    <Compile Include="System\CharTest.cs" />
     <Compile Include="System\Collections\Generic\ListTest.cs" />
     <Compile Include="System\Collections\Generic\QueueTest.cs" />
+    <Compile Include="System\DecimalTest.cs" />
     <Compile Include="System\DelegatesTest.cs" />
+    <Compile Include="System\DoubleTest.cs" />
+    <Compile Include="System\Int16Test.cs" />
+    <Compile Include="System\Int32Test.cs" />
+    <Compile Include="System\Int64Test.cs" />
+    <Compile Include="System\SByteTest.cs" />
+    <Compile Include="System\SingleTest.cs" />
     <Compile Include="System\StringTest.cs" />
+    <Compile Include="System\UInt16Test.cs" />
+    <Compile Include="System\UInt32Test.cs" />
     <Compile Include="System\UInt64Test.cs" />
   </ItemGroup>
   <ItemGroup>

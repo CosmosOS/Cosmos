@@ -88,9 +88,13 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="System\DecimalImpl.cs" />
     <Compile Include="System\ValueTypeImpl.cs" />
     <Compile Include="System\EnumImpl.cs" />
+    <Compile Include="System\Globalization\CultureInfoImpl.cs" />
     <Compile Include="System\IO\ErrorImpl.cs" />
+    <Compile Include="System\RuntimeTypeImpl.cs" />
+    <Compile Include="System\Runtime\Compilerservices\runtimehelpersImpl.cs" />
     <Compile Include="System\Security\SecurityElementImpl.cs" />
     <Compile Include="System\Security\CodeAccessSecurityEngineImpl.cs" />
     <Compile Include="System\Security\Cryptography\UtilsImpl.cs" />
@@ -135,6 +139,7 @@
     <Compile Include="System\UInt32Impl.cs" />
     <Compile Include="System\UInt64Impl.cs" />
     <Compile Include="System\UIntPtrImpl.cs" />
+    <Compile Include="System\ValueTypeImp.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
