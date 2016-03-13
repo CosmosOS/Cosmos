@@ -24,5 +24,10 @@ namespace Cosmos.System.Plugs.System
             return "<Enum.ToString> not implemented";
             //			return UInt32Impl.ToString(ref aThis);
         }
+
+        public static int GetHashCode(Enum aThis)
+        {
+            throw new NotImplementedException("Enum.GetHashCode()");
+        }
     }
 }

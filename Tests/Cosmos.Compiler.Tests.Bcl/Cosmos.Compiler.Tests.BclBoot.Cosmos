@@ -10,7 +10,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>VMware</Profile>
+    <Profile>Bochs</Profile>
     <!-- Looks like this was a mispelled attribute. Replaced by DebugEnabled below.
     <DebugEnable>true</DebugEnable>
     -->
@@ -22,10 +22,32 @@
     <VMWareEdition>Player</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
     <Name>Cosmos.Compiler.Tests.BclBoot</Name>
-    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
+    <Description>Use Bochs emulator to deploy and debug.</Description>
     <Deployment>ISO</Deployment>
-    <Launch>VMware</Launch>
+    <Launch>Bochs</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
+    <VMware_Name>Cosmos.Compiler.Tests.BclBoot</VMware_Name>
+    <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
+    <VMware_Deployment>ISO</VMware_Deployment>
+    <VMware_Launch>VMware</VMware_Launch>
+    <VMware_DebugEnabled>true</VMware_DebugEnabled>
+    <VMware_DebugMode>Source</VMware_DebugMode>
+    <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
+    <VMware_VMwareEdition>Player</VMware_VMwareEdition>
+    <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_StartCosmosGDB>false</VMware_StartCosmosGDB>
+    <Bochs_Name>Cosmos.Compiler.Tests.BclBoot</Bochs_Name>
+    <Bochs_Description>Use Bochs emulator to deploy and debug.</Bochs_Description>
+    <Bochs_Deployment>ISO</Bochs_Deployment>
+    <Bochs_Launch>Bochs</Bochs_Launch>
+    <Bochs_DebugEnabled>true</Bochs_DebugEnabled>
+    <Bochs_DebugMode>Source</Bochs_DebugMode>
+    <Bochs_VisualStudioDebugPort>Pipe: Cosmos\Serial</Bochs_VisualStudioDebugPort>
+    <Bochs_VMwareEdition>Player</Bochs_VMwareEdition>
+    <Bochs_OutputPath>bin\Debug\</Bochs_OutputPath>
+    <Bochs_EnableGDB>False</Bochs_EnableGDB>
+    <Bochs_StartCosmosGDB>false</Bochs_StartCosmosGDB>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
