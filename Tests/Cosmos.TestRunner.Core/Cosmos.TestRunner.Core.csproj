@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.TestRunner.Core</RootNamespace>
     <AssemblyName>Cosmos.TestRunner.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -188,9 +189,9 @@
       <Project>{a0893493-d4f0-4b9f-9826-86319e143d86}</Project>
       <Name>Cosmos.Kernel.Tests.Fat</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Kernel.Tests.LinqTests\Cosmos.Kernel.Tests.LinqTests.csproj">
+    <ProjectReference Include="..\Cosmos.Kernel.Tests.LinqTests\Cosmos.Compiler.Tests.LinqTests.csproj">
       <Project>{85b11f78-39bc-4cfc-9033-fc84ab14cd03}</Project>
-      <Name>Cosmos.Kernel.Tests.LinqTests</Name>
+      <Name>Cosmos.Compiler.Tests.LinqTests</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">
       <Project>{E6D3B644-C487-472D-A978-C1A82D0C099B}</Project>
@@ -204,6 +205,9 @@
       <Project>{21915a7e-cc84-4836-8b87-857b6149d496}</Project>
       <Name>VGACompilerCrash</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

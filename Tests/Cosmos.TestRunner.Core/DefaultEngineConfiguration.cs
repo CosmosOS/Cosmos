@@ -22,7 +22,7 @@ namespace Cosmos.TestRunner.Core
 
             // If you're working on the compiler (or other lower parts), you can choose to run the compiler in process
             // one thing to keep in mind though, is that this only works with 1 kernel at a time!
-            //engine.RunIL2CPUInProcess = true;
+            engine.RunIL2CPUInProcess = true;
             engine.TraceAssembliesLevel = TraceAssemblies.User;
             engine.EnableStackCorruptionChecks = true;
             engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
@@ -31,10 +31,10 @@ namespace Cosmos.TestRunner.Core
             //engine.StartBochsDebugGui = true;
 
             // Select kernels to be tested by adding them to the engine
-            foreach (var xType in TestKernelSets.GetStableKernelTypes())
-            {
-                engine.AddKernel(xType.Assembly.Location);
-            }
+            //foreach (var xType in TestKernelSets.GetStableKernelTypes())
+            //{
+            //    engine.AddKernel(xType.Assembly.Location);
+            //}
             //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel).Assembly.Location);

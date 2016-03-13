@@ -11,7 +11,8 @@
     <RootNamespace>Cosmos.Compiler.Tests.SingleEchoTest</RootNamespace>
     <AssemblyName>Cosmos.Compiler.Tests.SingleEchoTest</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>

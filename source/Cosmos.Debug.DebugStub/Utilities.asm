@@ -1,3 +1,5 @@
+; Generated at 3/12/2016 8:37:32 PM
+
 
 
 DebugStub_CheckStack:
@@ -15,5 +17,6 @@ DebugStub_CheckStack_halt:
 Jmp DebugStub_CheckStack_halt
 DebugStub_CheckStack_Block1_End:
 DebugStub_CheckStack_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_CheckStack_Exit
 Ret
 

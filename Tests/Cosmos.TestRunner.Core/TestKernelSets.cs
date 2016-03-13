@@ -13,6 +13,7 @@ namespace Cosmos.TestRunner.Core
             yield return typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel);
             yield return typeof(SimpleStructsAndArraysTest.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.Exceptions.Kernel);
+            yield return typeof(Cosmos.Compiler.Tests.LinqTests.Kernel);
         }
     }
 }

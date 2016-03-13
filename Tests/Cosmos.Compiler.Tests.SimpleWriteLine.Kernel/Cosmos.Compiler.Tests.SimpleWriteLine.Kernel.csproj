@@ -11,7 +11,8 @@
     <RootNamespace>Cosmos.Compiler.Tests.SimpleWriteLine.Kernel</RootNamespace>
     <AssemblyName>Cosmos.Compiler.Tests.SimpleWriteLine.Kernel</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>

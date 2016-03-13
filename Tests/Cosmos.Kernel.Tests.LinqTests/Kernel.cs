@@ -7,7 +7,7 @@ using Cosmos.TestRunner;
 
 using Sys = Cosmos.System;
 
-namespace Cosmos.Kernel.Tests.LinqTests
+namespace Cosmos.Compiler.Tests.LinqTests
 {
     public class Kernel : Sys.Kernel
     {

@@ -11,7 +11,8 @@
     <RootNamespace>Cosmos.Compiler.Tests.Interfaces.Kernel</RootNamespace>
     <AssemblyName>Cosmos.Compiler.Tests.Interfaces.Kernel</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
