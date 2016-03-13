@@ -111,7 +111,7 @@ Type: filesandordirs; Name: "{code:GetCSharpExpress2013ProjectTemplatePath}\*Cos
 
 [Files]
 ; Cecil dll, pdb
-#define MonoCecilPath ".\source\packages\Mono.Cecil.0.9.6.1\lib\net45"
+#define MonoCecilPath ".\Resources\Dependencies\Mono.Cecil.0.9.6.1"
 Source: "{#MonoCecilPath}\Mono.Cecil.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: "{#MonoCecilPath}\Mono.Cecil.Pdb.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: "{#MonoCecilPath}\Mono.Cecil.Rocks.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
