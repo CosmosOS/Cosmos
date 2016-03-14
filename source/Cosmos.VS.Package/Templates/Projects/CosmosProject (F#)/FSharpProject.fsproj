@@ -11,7 +11,7 @@
 		<RootNamespace>$safeprojectname$</RootNamespace>
 		<AssemblyName>$safeprojectname$</AssemblyName>
 		<FileAlignment>512</FileAlignment>
-		<TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+		<TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<Reference Include="mscorlib" />

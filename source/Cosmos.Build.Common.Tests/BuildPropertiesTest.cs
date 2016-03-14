@@ -10,16 +10,16 @@ namespace Cosmos.Build.Common.Tests
         public void TestParsing()
         {
             var properties = new BuildProperties();
-            properties.SetProperty(BuildProperties.StackCorruptionDetectionEnabledString, "False");
+            properties.SetProperty(BuildPropertyNames.StackCorruptionDetectionEnabledString, "False");
             Assert.AreEqual(
-                false, 
-                properties.GetProperty<bool>(BuildProperties.StackCorruptionDetectionEnabledString, true));
+                false,
+                properties.GetProperty<bool>(BuildPropertyNames.StackCorruptionDetectionEnabledString, true));
             Assert.AreEqual(
                 false,
                 properties.StackCorruptionDetectionEnabled);
             Assert.AreEqual(
                 "False",
-                properties.GetProperty(BuildProperties.StackCorruptionDetectionEnabledString));
+                properties.GetProperty(BuildPropertyNames.StackCorruptionDetectionEnabledString));
         }
     }
 }
