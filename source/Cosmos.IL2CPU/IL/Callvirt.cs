@@ -94,14 +94,12 @@ namespace Cosmos.IL2CPU.X86.IL
              * $esp + mThisOffset   This
              */
                 Type xPopType = aOp.StackPopTypes[0];
-                if (xPopType.HasElementType)
+                if ((xPopType.IsPointer || xPopType.IsByRef) && typeof(ValueType).IsAssignableFrom(xPopType.GetElementType()))
                 {
                     xPopType = xPopType.GetElementType();
-                }
-                if ((typeof(ValueType).IsAssignableFrom(xPopType)) && (!xPopType.IsPrimitive))
-                {
                     string xTypeId = GetTypeIDLabel(xPopType);
                     new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New(xTypeId), DestinationIsIndirect = true };
+
                 }
                 else
                 {
