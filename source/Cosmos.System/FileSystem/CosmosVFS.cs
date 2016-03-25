@@ -392,13 +392,13 @@ namespace Cosmos.System.FileSystem
 
             string[] xPathParts = VFSManager.SplitPath(aPath);
 
+            DirectoryEntry xBaseDirectory = GetVolume(aFS);
+
             if (xPathParts.Length == 1)
             {
                 Global.mFileSystemDebugger.SendInternal("Returning the volume.");
-                return GetVolume(aFS);
+                return xBaseDirectory;
             }
-
-            DirectoryEntry xBaseDirectory = null;
 
             // start at index 1, because 0 is the volume
             for (int i = 1; i < xPathParts.Length; i++)

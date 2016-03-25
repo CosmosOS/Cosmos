@@ -608,12 +608,15 @@ namespace Cosmos.System.FileSystem.FAT
         {
             Global.mFileSystemDebugger.SendInternal("FatFileSystem.GetDirectoryListing:");
 
-            var result = new List<DirectoryEntry>();
-            List<FatDirectoryEntry> fatListing;
+            if (baseDirectory == null)
             {
-                var xEntry = (FatDirectoryEntry)baseDirectory;
-                fatListing = xEntry.ReadDirectoryContents();
+                throw new ArgumentNullException(nameof(baseDirectory));
             }
+
+            var result = new List<DirectoryEntry>();
+            var xEntry = (FatDirectoryEntry)baseDirectory;
+            var fatListing = xEntry.ReadDirectoryContents();
+            Global.mFileSystemDebugger.SendInternal("After ReadDirectoryContents");
 
             for (int i = 0; i < fatListing.Count; i++)
             {

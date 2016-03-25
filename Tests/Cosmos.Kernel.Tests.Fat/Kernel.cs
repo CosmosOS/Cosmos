@@ -36,9 +36,9 @@ namespace Cosmos.Kernel.Tests.Fat
                 mDebugger.Send("Run");
 
                 TestPath();
-                //TestDirectory();
-                //TestFile();
-                //TestFileStream();
+                TestDirectory();
+                TestFile();
+                TestFileStream();
 
                 TestController.Completed();
             }
