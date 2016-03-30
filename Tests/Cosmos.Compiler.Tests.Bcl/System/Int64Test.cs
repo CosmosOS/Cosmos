@@ -37,7 +37,13 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // actually the Hash Code of a Int64 is the value interpolated with XOR to obtain an Int32... so not the same of 'value'!
             int expectedResultAsInt = (unchecked((int)((long)value)) ^ (int)(value >> 32));
   
-            Assert.IsTrue((resultAsInt == expectedResultAsInt), "Int64.GetHashCode() doesn't work"); // XXX TODO when GetHashCode() works
+            Assert.IsTrue((resultAsInt == expectedResultAsInt), "Int64.GetHashCode() doesn't work"); 
+
+            // Let's try to convert a Long in a ULong
+            Int64 val2 = 42;
+            UInt64 val2AsULong = (ulong)val2;
+
+            Assert.IsTrue((val2AsULong == 42), "Int64 to UInt64 conversion does not work");
 
 #if false
             // Now let's try ToString() again but printed in hex (this test fails for now!)
