@@ -39,7 +39,17 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((result == expectedResult), "BitConverter.ToString(ulongBytes) doesn't work: result " + result + " != " + expectedResult);
 
-            // This test fails bytes are screwed!
+            // These tests fails bytes are screwed!
+
+            float aFloat = 1.0f;
+
+            byte[] floatBytes = BitConverter.GetBytes(aFloat);
+
+            result = BitConverter.ToString(floatBytes, 0);
+            expectedResult = "00-00-80-3F";
+
+            Assert.IsTrue((result == expectedResult), "BitConverter.ToString(floatBytes) doesn't work: result " + result + " != " + expectedResult);
+
             double aDouble = 1.0;
 
             byte[] doubleBytes = BitConverter.GetBytes(aDouble);
@@ -48,6 +58,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             expectedResult = "00-00-00-00-00-00-F0-3F";
 
             Assert.IsTrue((result == expectedResult), "BitConverter.ToString(doubleBytes) doesn't work: result " + result + " != " + expectedResult);
+
+
         }
     }
 }
