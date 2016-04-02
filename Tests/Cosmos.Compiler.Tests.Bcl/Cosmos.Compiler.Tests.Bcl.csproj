@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="Kernel.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="System\BitConverterTest.cs" />
     <Compile Include="System\BooleanTest.cs" />
     <Compile Include="System\ByteTest.cs" />
     <Compile Include="System\CharTest.cs" />
