@@ -38,8 +38,9 @@ namespace Cosmos.Debug.Common
         public const byte MessageBox = 16;
         public const byte NullReferenceOccurred = 17;
         public const byte SimpleNumber = 18;
-        public const byte ComplexSingleNumber = 19;
-        public const byte ComplexDoubleNumber = 20;
+        public const byte SimpleLongNumber = 19;
+        public const byte ComplexNumber = 20;
+        public const byte ComplexLongNumber = 21;
     }
 
     // Messages from Host (VS) to Guest (Cosmos)

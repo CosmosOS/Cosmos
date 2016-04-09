@@ -95,28 +95,25 @@ namespace Cosmos.Debug.Common
 
         protected void PacketSimpleNumber(byte[] aPacket)
         {
-            if (CmdSimpleNumber != null)
-            {
-                CmdSimpleNumber(GetUInt32(aPacket, 0));
-            }
+            CmdSimpleNumber?.Invoke(GetUInt32(aPacket, 0));
             WaitForMessage();
         }
 
-        protected void PacketComplexSingleNumber(byte[] aPacket)
+        protected void PacketSimpleLongNumber(byte[] aPacket)
         {
-            if (CmdComplexSingleNumber != null)
-            {
-                CmdComplexSingleNumber(GetSingle(aPacket, 0));
-            }
+            CmdSimpleLongNumber?.Invoke(GetUInt64(aPacket, 0));
             WaitForMessage();
         }
 
-        protected void PacketComplexDoubleNumber(byte[] aPacket)
+        protected void PacketComplexNumber(byte[] aPacket)
         {
-            if (CmdComplexDoubleNumber != null)
-            {
-                CmdComplexDoubleNumber(GetDouble(aPacket, 0));
-            }
+            CmdComplexNumber?.Invoke(GetSingle(aPacket, 0));
+            WaitForMessage();
+        }
+
+        protected void PacketComplexLongNumber(byte[] aPacket)
+        {
+            CmdComplexLongNumber?.Invoke(GetDouble(aPacket, 0));
             WaitForMessage();
         }
 

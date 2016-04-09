@@ -335,8 +335,9 @@ namespace Cosmos.Debug.VSDebugEngine
             mDbgConnector.CmdTrace += new Action<UInt32>(DbgCmdTrace);
             mDbgConnector.CmdText += new Action<string>(DbgCmdText);
             mDbgConnector.CmdSimpleNumber += new Action<uint>(DbgCmdSimpleNumber);
-            mDbgConnector.CmdComplexSingleNumber += new Action<float>(DbgCmdComplexSingleNumber);
-            mDbgConnector.CmdComplexDoubleNumber += new Action<double>(DbgCmdComplexDoubleNumber);
+            mDbgConnector.CmdSimpleLongNumber += new Action<ulong>(DbgCmdSimpleLongNumber);
+            mDbgConnector.CmdComplexNumber += new Action<float>(DbgCmdComplexNumber);
+            mDbgConnector.CmdComplexLongNumber += new Action<double>(DbgCmdComplexLongNumber);
             mDbgConnector.CmdStarted += new Action(DbgCmdStarted);
             mDbgConnector.OnDebugMsg += new Action<string>(DebugMsg);
             mDbgConnector.ConnectionLost += new Action<Exception>(DbgConnector_ConnectionLost);
@@ -532,12 +533,17 @@ namespace Cosmos.Debug.VSDebugEngine
             mCallback.OnOutputStringUser("0x" + nr.ToString("X8").ToUpper() + "\r\n");
         }
 
-        void DbgCmdComplexSingleNumber(float nr)
+        void DbgCmdSimpleLongNumber(ulong nr)
+        {
+            mCallback.OnOutputStringUser("0x" + nr.ToString("X8").ToUpper() + "\r\n");
+        }
+
+        void DbgCmdComplexNumber(float nr)
         {
             mCallback.OnOutputStringUser(nr + "\r\n");
         }
 
-        void DbgCmdComplexDoubleNumber(double nr)
+        void DbgCmdComplexLongNumber(double nr)
         {
             mCallback.OnOutputStringUser(nr + "\r\n");
         }

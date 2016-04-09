@@ -216,13 +216,35 @@ EBP = ESP
 // Input: Stack
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
-function SendComplexSingleNumber {
+function SendSimpleLongNumber {
   +EBP
   EBP = ESP
   +All
 
   // Write the type
-  AL = #Ds2Vs_ComplexSingleNumber
+  AL = #Ds2Vs_SimpleLongNumber
+  ComWriteAL()
+
+  // Write value
+  EAX = EBP[8]
+  ComWriteEAX()
+  EAX = EBP[12]
+  ComWriteEAX()
+
+  -All
+  -EBP
+}
+
+// Input: Stack
+// Output: None
+// Modifies: EAX, ECX, EDX, ESI
+function SendComplexNumber {
+  +EBP
+  EBP = ESP
+  +All
+
+  // Write the type
+  AL = #Ds2Vs_ComplexNumber
   ComWriteAL()
 
   // Write value
@@ -236,13 +258,13 @@ function SendComplexSingleNumber {
 // Input: Stack
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
-function SendComplexDoubleNumber {
+function SendComplexLongNumber {
   +EBP
   EBP = ESP
   +All
 
   // Write the type
-  AL = #Ds2Vs_ComplexDoubleNumber
+  AL = #Ds2Vs_ComplexLongNumber
   ComWriteAL()
 
   // Write value

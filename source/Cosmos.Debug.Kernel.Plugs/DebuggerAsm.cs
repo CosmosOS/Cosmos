@@ -21,10 +21,13 @@ namespace Cosmos.Debug.Kernel.Plugs
     [PlugMethod(Assembler = typeof(DebugDoSendNumber))]
     public static void DoSendNumber(uint aNumber) { }
 
-    [PlugMethod(Assembler = typeof(DebugDoSendComplexSingleNumber))]
+    [PlugMethod(Assembler = typeof(DebugDoSendLongNumber))]
+    public static void DoSendNumber(ulong aNumber) { }
+
+    [PlugMethod(Assembler = typeof(DebugDoSendComplexNumber))]
     public static void DoSendNumber(float aNumber) { }
 
-    [PlugMethod(Assembler = typeof(DebugDoSendComplexDoubleNumber))]
+    [PlugMethod(Assembler = typeof(DebugDoSendComplexLongNumber))]
     public static void DoSendNumber(double aNumber) { }
 
     [PlugMethod(Assembler = typeof(DebugSendMessageBox))]
@@ -166,26 +169,39 @@ namespace Cosmos.Debug.Kernel.Plugs
     }
   }
 
-  public class DebugDoSendComplexSingleNumber : AssemblerMethod
-  {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
-    {
-      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
-      new LiteralAssemblerCode("push dword [EBP + 8]");
-      new LiteralAssemblerCode("Call DebugStub_SendComplexSingleNumber");
-      new LiteralAssemblerCode("add ESP, 4");
-      new LiteralAssemblerCode("%endif");
-    }
-  }
-
-  public class DebugDoSendComplexDoubleNumber : AssemblerMethod
+  public class DebugDoSendLongNumber : AssemblerMethod
   {
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("push dword [EBP + 12]");
       new LiteralAssemblerCode("push dword [EBP + 8]");
-      new LiteralAssemblerCode("Call DebugStub_SendComplexDoubleNumber");
+      new LiteralAssemblerCode("Call DebugStub_SendSimpleLongNumber");
+      new LiteralAssemblerCode("add ESP, 8");
+      new LiteralAssemblerCode("%endif");
+    }
+  }
+
+  public class DebugDoSendComplexNumber : AssemblerMethod
+  {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    {
+      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+      new LiteralAssemblerCode("push dword [EBP + 8]");
+      new LiteralAssemblerCode("Call DebugStub_SendComplexNumber");
+      new LiteralAssemblerCode("add ESP, 4");
+      new LiteralAssemblerCode("%endif");
+    }
+  }
+
+  public class DebugDoSendComplexLongNumber : AssemblerMethod
+  {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    {
+      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+      new LiteralAssemblerCode("push dword [EBP + 12]");
+      new LiteralAssemblerCode("push dword [EBP + 8]");
+      new LiteralAssemblerCode("Call DebugStub_SendComplexLongNumber");
       new LiteralAssemblerCode("add ESP, 8");
       new LiteralAssemblerCode("%endif");
     }

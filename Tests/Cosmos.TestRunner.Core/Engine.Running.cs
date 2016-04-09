@@ -32,8 +32,9 @@ namespace Cosmos.TestRunner.Core
                 };
             debugConnector.CmdText += s => OutputHandler.LogMessage("Text from kernel: " + s);
             debugConnector.CmdSimpleNumber += n => OutputHandler.LogMessage("Number from kernel: 0x" + n.ToString("X8").ToUpper());
-            debugConnector.CmdComplexSingleNumber += f => OutputHandler.LogMessage("Number from kernel: " + f);
-            debugConnector.CmdComplexDoubleNumber += d => OutputHandler.LogMessage("Number from kernel: " + d);
+            debugConnector.CmdSimpleLongNumber += n => OutputHandler.LogMessage("Number from kernel: 0x" + n.ToString("X8").ToUpper());
+            debugConnector.CmdComplexNumber += f => OutputHandler.LogMessage("Number from kernel: " + f);
+            debugConnector.CmdComplexLongNumber += d => OutputHandler.LogMessage("Number from kernel: " + d);
             debugConnector.CmdMessageBox = s => OutputHandler.LogMessage("MessageBox from kernel: " + s);
             debugConnector.CmdTrace = t => { };
             debugConnector.CmdBreak = t => { };

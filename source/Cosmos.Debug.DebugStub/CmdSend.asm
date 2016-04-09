@@ -1,4 +1,4 @@
-; Generated at 3/12/2016 8:37:32 PM
+; Generated at 3/27/2016 7:18:47 PM
 
 
 
@@ -193,29 +193,12 @@ DebugStub_SendSimpleNumber_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendSimpleNumber_Exit
 Ret
 
-DebugStub_SendComplexSingleNumber:
+DebugStub_SendSimpleLongNumber:
 Push EBP
 Mov EBP, ESP
 Pushad
 
-Mov AL, DebugStub_Const_Ds2Vs_ComplexSingleNumber
-Call DebugStub_ComWriteAL
-
-Mov EAX, [EBP + 8]
-Call DebugStub_ComWriteEAX
-
-Popad
-Pop EBP
-DebugStub_SendComplexSingleNumber_Exit:
-mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendComplexSingleNumber_Exit
-Ret
-
-DebugStub_SendComplexDoubleNumber:
-Push EBP
-Mov EBP, ESP
-Pushad
-
-Mov AL, DebugStub_Const_Ds2Vs_ComplexDoubleNumber
+Mov AL, DebugStub_Const_Ds2Vs_SimpleLongNumber
 Call DebugStub_ComWriteAL
 
 Mov EAX, [EBP + 8]
@@ -225,8 +208,44 @@ Call DebugStub_ComWriteEAX
 
 Popad
 Pop EBP
-DebugStub_SendComplexDoubleNumber_Exit:
-mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendComplexDoubleNumber_Exit
+DebugStub_SendSimpleLongNumber_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendSimpleLongNumber_Exit
+Ret
+
+DebugStub_SendComplexNumber:
+Push EBP
+Mov EBP, ESP
+Pushad
+
+Mov AL, DebugStub_Const_Ds2Vs_ComplexNumber
+Call DebugStub_ComWriteAL
+
+Mov EAX, [EBP + 8]
+Call DebugStub_ComWriteEAX
+
+Popad
+Pop EBP
+DebugStub_SendComplexNumber_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendComplexNumber_Exit
+Ret
+
+DebugStub_SendComplexLongNumber:
+Push EBP
+Mov EBP, ESP
+Pushad
+
+Mov AL, DebugStub_Const_Ds2Vs_ComplexLongNumber
+Call DebugStub_ComWriteAL
+
+Mov EAX, [EBP + 8]
+Call DebugStub_ComWriteEAX
+Mov EAX, [EBP + 12]
+Call DebugStub_ComWriteEAX
+
+Popad
+Pop EBP
+DebugStub_SendComplexLongNumber_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendComplexLongNumber_Exit
 Ret
 
 DebugStub_SendPtr:
