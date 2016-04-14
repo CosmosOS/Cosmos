@@ -16,9 +16,12 @@ namespace SentinelKernel
 
         protected override void Run()
         {
-            string[] a = { "a", "b" };
-            string b = a[0];
+            byte[] a = { 0x01, 0x02 };
+            char[] b = { 'a', 'b' };
+            string[] c = { "a", "b" };
+            byte a1 = a[0];
+            char b1 = b[0];
+            string c1 = c[0];
         }
     }
 }
-

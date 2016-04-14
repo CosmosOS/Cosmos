@@ -92,7 +92,10 @@ namespace Cosmos.Debug.VSDebugEngine
         {
             byte[] xData;
 
+            // Get handle
             xData = mProcess.mDbgConnector.GetStackData(OFFSET, 4);
+            // Get actual pointer
+            xData = mProcess.mDbgConnector.GetMemoryData(BitConverter.ToUInt32(xData, 0), 4);
             if (xData == null)
             {
                 propertyInfo.bstrValue = String.Format("Error! Stack data received was null!");
