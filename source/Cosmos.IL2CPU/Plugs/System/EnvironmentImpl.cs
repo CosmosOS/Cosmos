@@ -2,7 +2,7 @@
 
 namespace Cosmos.IL2CPU.Plugs.System
 {
-    [Plug(Target=typeof(Environment))]
+    [Plug(Target = typeof(Environment))]
     public static class EnvironmentImpl
     {
         [PlugMethod(Signature = "System_Environment_OSName__System_Environment_get_OSInfo__")]
@@ -77,6 +77,10 @@ namespace Cosmos.IL2CPU.Plugs.System
             if (aResource == "Arg_ArgumentException")
             {
                 return "Value does not fall within the expected range.";
+            }
+            if (aResource == "Arg_ArgumentOutOfRangeException")
+            {
+                return "Specified argument was out of the range of valid values.";
             }
             if (aResource == "Arg_DirectoryNotFoundException")
             {

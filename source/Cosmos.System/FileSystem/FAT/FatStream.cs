@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 
 using System;
 using System.IO;
@@ -83,7 +83,9 @@ namespace Cosmos.System.FileSystem.FAT
                 {
                     throw new NullReferenceException("The stream does not currently have an open entry.");
                 }
-                Global.mFileSystemDebugger.SendInternal($"FatStream.get_Length : Length = {(long)mSize}");
+                Global.mFileSystemDebugger.SendInternal("FatStream.get_Length:");
+                Global.mFileSystemDebugger.SendInternal("Length =");
+                Global.mFileSystemDebugger.SendInternal(mSize.ToString());
                 return (long)mSize;
             }
         }
@@ -113,8 +115,6 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override int Read(byte[] aBuffer, int aOffset, int aCount)
         {
-            Global.mFileSystemDebugger.SendInternal("FatStream.Read:");
-
             return Read(aBuffer, aOffset, aCount);
         }
 
@@ -212,21 +212,6 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override void Write(byte[] aBuffer, int aOffset, int aCount)
         {
-            Global.mFileSystemDebugger.SendInternal("FatStream.Write:");
-
-            if (aCount < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(aCount));
-            }
-            if (aOffset < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(aOffset));
-            }
-            if (aBuffer == null || aBuffer.Length - aOffset < aCount)
-            {
-                throw new ArgumentException("Invalid offset length!");
-            }
-
             Write(aBuffer, aOffset, aCount);
         }
 
@@ -248,17 +233,27 @@ namespace Cosmos.System.FileSystem.FAT
             }
 
             Global.mFileSystemDebugger.SendInternal("aBuffer.Length =");
-            Global.mFileSystemDebugger.SendInternal((uint)aBuffer.Length);
+            Global.mFileSystemDebugger.SendInternal(aBuffer.Length);
             Global.mFileSystemDebugger.SendInternal("aOffset =");
-            Global.mFileSystemDebugger.SendInternal((uint)aOffset);
+            Global.mFileSystemDebugger.SendInternal(aOffset);
             Global.mFileSystemDebugger.SendInternal("aCount =");
-            Global.mFileSystemDebugger.SendInternal((uint)aCount);
+            Global.mFileSystemDebugger.SendInternal(aCount);
+            Global.mFileSystemDebugger.SendInternal("mPosition =");
+            Global.mFileSystemDebugger.SendInternal(mPosition);
 
             ulong xCount = (ulong)aCount;
+            Global.mFileSystemDebugger.SendInternal("xCount =");
+            Global.mFileSystemDebugger.SendInternal(xCount);
+
             var xCluster = mFS.NewClusterArray();
             uint xClusterSize = mFS.BytesPerCluster;
 
             long xTotalLength = (long)(mPosition + xCount);
+            Global.mFileSystemDebugger.SendInternal("xTotalLength =");
+            Global.mFileSystemDebugger.SendInternal(xTotalLength);
+            Global.mFileSystemDebugger.SendInternal("Length =");
+            Global.mFileSystemDebugger.SendInternal(Length);
+
             if (xTotalLength > Length)
             {
                 SetLength(xTotalLength);

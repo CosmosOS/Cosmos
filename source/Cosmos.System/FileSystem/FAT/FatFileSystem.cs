@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -586,21 +586,52 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override void DisplayFileSystemInfo()
         {
+            Global.mFileSystemDebugger.SendInternal(nameof(DisplayFileSystemInfo));
             global::System.Console.WriteLine("-------File System--------");
+            Global.mFileSystemDebugger.SendInternal("Bytes per Cluster:");
+            Global.mFileSystemDebugger.SendInternal(BytesPerCluster);
             global::System.Console.WriteLine("Bytes per Cluster: " + BytesPerCluster);
+            Global.mFileSystemDebugger.SendInternal("Bytes per Sector:");
+            Global.mFileSystemDebugger.SendInternal(BytesPerSector);
             global::System.Console.WriteLine("Bytes per Sector: " + BytesPerSector);
+            Global.mFileSystemDebugger.SendInternal("Cluster Count:");
+            Global.mFileSystemDebugger.SendInternal(ClusterCount);
             global::System.Console.WriteLine("Cluster Count: " + ClusterCount);
+            Global.mFileSystemDebugger.SendInternal("Data Sector:");
+            Global.mFileSystemDebugger.SendInternal(DataSector);
             global::System.Console.WriteLine("Data Sector: " + DataSector);
+            Global.mFileSystemDebugger.SendInternal("Data Sector Count:");
+            Global.mFileSystemDebugger.SendInternal(DataSectorCount);
             global::System.Console.WriteLine("Data Sector Count: " + DataSectorCount);
+            Global.mFileSystemDebugger.SendInternal("FAT Sector Count:");
+            Global.mFileSystemDebugger.SendInternal(FatSectorCount);
             global::System.Console.WriteLine("FAT Sector Count: " + FatSectorCount);
-            global::System.Console.WriteLine("FAT Type: " + mFatType);
+            Global.mFileSystemDebugger.SendInternal("FAT Type:");
+            Global.mFileSystemDebugger.SendInternal((uint)mFatType);
+            global::System.Console.WriteLine("FAT Type: " + (uint)mFatType);
+            Global.mFileSystemDebugger.SendInternal("Number of FATS:");
+            Global.mFileSystemDebugger.SendInternal(NumberOfFATs);
             global::System.Console.WriteLine("Number of FATS: " + NumberOfFATs);
+            Global.mFileSystemDebugger.SendInternal("Reserved Sector Count:");
+            Global.mFileSystemDebugger.SendInternal(ReservedSectorCount);
             global::System.Console.WriteLine("Reserved Sector Count: " + ReservedSectorCount);
+            Global.mFileSystemDebugger.SendInternal("Root Cluster:");
+            Global.mFileSystemDebugger.SendInternal(RootCluster);
             global::System.Console.WriteLine("Root Cluster: " + RootCluster);
+            Global.mFileSystemDebugger.SendInternal("Root Entry Count:");
+            Global.mFileSystemDebugger.SendInternal(RootEntryCount);
             global::System.Console.WriteLine("Root Entry Count: " + RootEntryCount);
+            Global.mFileSystemDebugger.SendInternal("Root Sector:");
+            Global.mFileSystemDebugger.SendInternal(RootSector);
             global::System.Console.WriteLine("Root Sector: " + RootSector);
+            Global.mFileSystemDebugger.SendInternal("Root Sector Count:");
+            Global.mFileSystemDebugger.SendInternal(RootSectorCount);
             global::System.Console.WriteLine("Root Sector Count: " + RootSectorCount);
+            Global.mFileSystemDebugger.SendInternal("Sectors per Cluster:");
+            Global.mFileSystemDebugger.SendInternal(SectorsPerCluster);
             global::System.Console.WriteLine("Sectors per Cluster: " + SectorsPerCluster);
+            Global.mFileSystemDebugger.SendInternal("Total Sector Count:");
+            Global.mFileSystemDebugger.SendInternal(TotalSectorCount);
             global::System.Console.WriteLine("Total Sector Count: " + TotalSectorCount);
         }
 

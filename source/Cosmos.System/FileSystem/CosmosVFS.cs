@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+﻿#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -281,8 +281,17 @@ namespace Cosmos.System.FileSystem
             {
                 for (int i = 0; i < mPartitions.Count; i++)
                 {
+                    Global.mFileSystemDebugger.SendInternal("Partition #:");
+                    Global.mFileSystemDebugger.SendInternal(i + 1);
                     global::System.Console.WriteLine("Partition #: " + (i + 1));
+                    Global.mFileSystemDebugger.SendInternal("Block Size:");
+                    Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockSize);
                     global::System.Console.WriteLine("Block Size: " + mPartitions[i].BlockSize + " bytes");
+                    Global.mFileSystemDebugger.SendInternal("Block Count:");
+                    Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockCount);
+                    global::System.Console.WriteLine("Block Count: " + mPartitions[i].BlockCount);
+                    Global.mFileSystemDebugger.SendInternal("Size:");
+                    Global.mFileSystemDebugger.SendInternal(mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024);
                     global::System.Console.WriteLine("Size: " + mPartitions[i].BlockCount * mPartitions[i].BlockSize / 1024 / 1024 + " MB");
                 }
             }
