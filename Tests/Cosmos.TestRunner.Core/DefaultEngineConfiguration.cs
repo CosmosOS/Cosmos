@@ -25,7 +25,7 @@ namespace Cosmos.TestRunner.Core
             //engine.RunIL2CPUInProcess = true;
             engine.TraceAssembliesLevel = TraceAssemblies.User;
             engine.EnableStackCorruptionChecks = true;
-            engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
+            engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
 
             //engine.RunWithGDB = true;
             //engine.StartBochsDebugGui = true;
@@ -42,6 +42,7 @@ namespace Cosmos.TestRunner.Core
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.Exceptions.Kernel).Assembly.Location);
+            //engine.AddKernel(typeof(Cosmos.Compiler.Tests.MethodTests.Kernel).Assembly.Location);
 
             // Known bugs, therefore disabled for now:
             //engine.AddKernel(typeof(BoxingTests.Kernel).Assembly.Location);

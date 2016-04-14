@@ -10,8 +10,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
     {
         public readonly UInt16 Value;
 
-        public OpVar(Code aOpCode, int aPos, int aNextPos, UInt16 aValue,
-            ExceptionHandlingClause aCurrentExceptionHandler)
+        public OpVar(Code aOpCode, int aPos, int aNextPos, UInt16 aValue, ExceptionHandlingClause aCurrentExceptionHandler)
             : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler)
         {
             Value = aValue;
@@ -73,7 +72,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
                 case Code.Ldloca:
                     if (xBody != null)
                     {
-                        StackPushTypes[0] = xBody.LocalVariables[Value].LocalType.MakePointerType();
+                        StackPushTypes[0] = xBody.LocalVariables[Value].LocalType.MakeByRefType();
                     }
                     return;
                 case Code.Ldarg:
@@ -88,7 +87,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
                             }
                             else if (StackPushTypes[0].IsValueType)
                             {
-                                StackPushTypes[0] = StackPushTypes[0].MakePointerType();
+                                StackPushTypes[0] = StackPushTypes[0].MakeByRefType();
                             }
                             return;
                         }
@@ -107,14 +106,14 @@ namespace Cosmos.IL2CPU.ILOpCodes
                         {
                             if (StackPushTypes[0].IsValueType)
                             {
-                                StackPushTypes[0] = StackPushTypes[0].MakePointerType();
+                                StackPushTypes[0] = StackPushTypes[0].MakeByRefType();
                             }
                             return;
                         }
                         xArgIndexCorrection = -1;
                     }
                     StackPushTypes[0] = xParams[Value + xArgIndexCorrection].ParameterType;
-                    StackPushTypes[0] = StackPushTypes[0].MakePointerType();
+                    StackPushTypes[0] = StackPushTypes[0].MakeByRefType();
                     return;
             }
         }

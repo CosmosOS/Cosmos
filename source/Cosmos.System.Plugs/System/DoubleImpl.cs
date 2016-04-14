@@ -4,7 +4,7 @@ using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System
 {
-    [Plug(Target = typeof(Double))]
+    [Plug(Target = typeof (double))]
     public static class DoubleImpl
     {
         public static string ToString(ref double aThis)
@@ -16,23 +16,22 @@ namespace Cosmos.System.Plugs.System
 
             double val = aThis;
 
-            byte[] doubleBytes = BitConverter.GetBytes(val);
-            Int64 hexVal = BitConverter.ToInt64(doubleBytes, 0);
-            Int64 mantissa, intPart = 0, fracPart = 0;
-            Int32 exp2;
-
-            exp2 = (int)((hexVal >> 52) & 0x07FF) - 1023;
-            mantissa = (hexVal & 0x1FFFFFFFFFFFFF) | 0x10000000000000;
+            long hexVal = BitConverter.DoubleToInt64Bits(val);
+            long mantissa = (hexVal & 0x1FFFFFFFFFFFFF) | 0x10000000000000;
+            int exp2 = (int) (((hexVal >> 52) & 0x07FF) - 1023);
+            long intPart = 0, fracPart = 0;
 
             if (exp2 >= 63)
             {
                 return "Double Overrange";
             }
-            else if (exp2 < -52)
+
+            if (exp2 < -52)
             {
                 return "Double Underrange";
             }
-            else if (exp2 >= 52)
+
+            if (exp2 >= 52)
             {
                 intPart = mantissa << (exp2 - 52);
             }
@@ -51,34 +50,34 @@ namespace Cosmos.System.Plugs.System
             {
                 result += "-";
             }
-            result += ((UInt64)intPart).ToString();
-            int used_digits = ((UInt64)intPart).ToString().Length;
+            result += intPart.ToString();
+            int usedDigits = result.Length;
             if (fracPart == 0)
             {
                 return result;
             }
             result += ".";
 
-            if (used_digits >= 15)
+            if (usedDigits >= 15)
             {
-                used_digits = 14;
+                usedDigits = 14;
             }
-            for (int m = used_digits; m < 15; m++)
+            for (int m = usedDigits; m < 15; m++)
             {
                 fracPart = (fracPart << 3) + (fracPart << 1);
-                char p = (char)(((fracPart >> 53) & 0xFF) + '0');
+                char p = (char) (((fracPart >> 53) & 0xFF) + '0');
                 result += p;
 
                 fracPart &= 0x1FFFFFFFFFFFFF;
             }
             fracPart = (fracPart << 3) + (fracPart << 1);
-            char remain = (char)((fracPart >> 53) + '0');
+            char remain = (char) ((fracPart >> 53) + '0');
             if ((remain > '5') && (result[result.Length - 1] > '0'))
             {
                 char[] answer = result.ToCharArray();
                 int digitPos = answer.Length - 1;
                 char digit = result[digitPos];
-                answer[digitPos] = (char)(digit + 1);
+                answer[digitPos] = (char) (digit + 1);
                 while (answer[digitPos] > '9')
                 {
                     answer[digitPos] = '0';
@@ -89,10 +88,10 @@ namespace Cosmos.System.Plugs.System
                         digitPos--;
                         digit = result[digitPos];
                     }
-                    answer[digitPos] = (char)(digit + 1);
+                    answer[digitPos] = (char) (digit + 1);
                 }
 
-                result = new String(answer);
+                result = new string(answer);
             }
 
             while (result[result.Length - 1] == '0')

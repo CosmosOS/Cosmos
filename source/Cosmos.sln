@@ -245,6 +245,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Tests", "Unit Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Common.Tests", "Cosmos.Build.Common.Tests\Cosmos.Build.Common.Tests.csproj", "{C1D525C4-B072-4F2F-94BF-4862E6727C4B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.MethodTests", "..\Tests\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTests.csproj", "{FE8B9F39-7C96-4866-9A18-386735895CEE}"
+EndProject
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.MethodTestsBoot", "..\Tests\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTestsBoot.Cosmos", "{0FEE977D-AE52-4381-B513-71C5C1982ED4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1038,6 +1042,26 @@ Global
 		{C1D525C4-B072-4F2F-94BF-4862E6727C4B}.Release|x64.Build.0 = Release|x64
 		{C1D525C4-B072-4F2F-94BF-4862E6727C4B}.Release|x86.ActiveCfg = Release|x86
 		{C1D525C4-B072-4F2F-94BF-4862E6727C4B}.Release|x86.Build.0 = Release|x86
+		{FE8B9F39-7C96-4866-9A18-386735895CEE}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{FE8B9F39-7C96-4866-9A18-386735895CEE}.Debug|x64.ActiveCfg = Debug|x86
+		{FE8B9F39-7C96-4866-9A18-386735895CEE}.Debug|x86.ActiveCfg = Debug|x86
+		{FE8B9F39-7C96-4866-9A18-386735895CEE}.Debug|x86.Build.0 = Debug|x86
+		{FE8B9F39-7C96-4866-9A18-386735895CEE}.Release|Any CPU.ActiveCfg = Release|x86
+		{FE8B9F39-7C96-4866-9A18-386735895CEE}.Release|x64.ActiveCfg = Release|x86
+		{FE8B9F39-7C96-4866-9A18-386735895CEE}.Release|x86.ActiveCfg = Release|x86
+		{FE8B9F39-7C96-4866-9A18-386735895CEE}.Release|x86.Build.0 = Release|x86
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4}.Debug|Any CPU.Build.0 = Debug|x86
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4}.Debug|x64.ActiveCfg = Debug|x86
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4}.Debug|x64.Build.0 = Debug|x86
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4}.Debug|x86.ActiveCfg = Debug|x86
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4}.Debug|x86.Build.0 = Debug|x86
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4}.Release|Any CPU.ActiveCfg = Debug|x86
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4}.Release|Any CPU.Build.0 = Debug|x86
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4}.Release|x64.ActiveCfg = Debug|x86
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4}.Release|x64.Build.0 = Debug|x86
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4}.Release|x86.ActiveCfg = Debug|x86
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4}.Release|x86.Build.0 = Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1135,5 +1159,7 @@ Global
 		{BA23CC1E-ACA2-4E1E-B10F-FD543393BEE6} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 		{9637A680-F8E9-4925-A4E4-00045205EC04} = {A06B122A-4AB7-4090-B41A-35028A293450}
 		{C1D525C4-B072-4F2F-94BF-4862E6727C4B} = {9637A680-F8E9-4925-A4E4-00045205EC04}
+		{FE8B9F39-7C96-4866-9A18-386735895CEE} = {F104F6BC-EF8E-4408-A786-D570D7565231}
+		{0FEE977D-AE52-4381-B513-71C5C1982ED4} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 	EndGlobalSection
 EndGlobal

@@ -96,12 +96,10 @@ namespace Cosmos.IL2CPU.ILOpCodes
                     if (StackPopTypes[0].IsValueType &&
                         !StackPopTypes[0].IsPrimitive)
                     {
-                        StackPopTypes[0] = StackPopTypes[0].MakePointerType();
+                        StackPopTypes[0] = StackPopTypes[0].MakeByRefType();
                     }
                     StackPushTypes[0] = typeof(IntPtr);
                     return;
-                default:
-                    break;
             }
         }
 

@@ -4,7 +4,7 @@ using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System
 {
-    [Plug(Target = typeof(Single))]
+    [Plug(Target = typeof(float))]
     public static class SingleImpl
     {
         public static string ToString(ref float aThis)
@@ -14,23 +14,26 @@ namespace Cosmos.System.Plugs.System
                 return "0";
             }
 
-            byte[] singleBytes = BitConverter.GetBytes(aThis);
-            Int32 hexVal = BitConverter.ToInt32(singleBytes, 0);
-            Int32 mantissa, intPart = 0, fracPart = 0;
-            Int32 exp2;
+            float xValue = aThis;
 
-            exp2 = ((hexVal >> 23) & 0xFF) - 127;
-            mantissa = (hexVal & 0xFFFFFF) | 0x800000;
+            var singleBytes = BitConverter.GetBytes(xValue);
+            int hexVal = BitConverter.ToInt32(singleBytes, 0);
+            int intPart = 0, fracPart = 0;
+
+            int exp2 = ((hexVal >> 23) & 0xFF) - 127;
+            int mantissa = (hexVal & 0xFFFFFF) | 0x800000;
 
             if (exp2 >= 31)
             {
                 return "Single Overrange";
             }
-            else if (exp2 < -23)
+
+            if (exp2 < -23)
             {
                 return "Single Underrange";
             }
-            else if (exp2 >= 23)
+
+            if (exp2 >= 23)
             {
                 intPart = mantissa << (exp2 - 23);
             }
@@ -49,19 +52,19 @@ namespace Cosmos.System.Plugs.System
             {
                 result += "-";
             }
-            result += ((UInt32)intPart).ToString();
-            int used_digits = ((UInt32)intPart).ToString().Length;
+            result += ((uint)intPart).ToString();
+            int usedDigits = ((uint)intPart).ToString().Length;
             if (fracPart == 0)
             {
                 return result;
             }
             result += ".";
 
-            if (used_digits >= 7)
+            if (usedDigits >= 7)
             {
-                used_digits = 6;
+                usedDigits = 6;
             }
-            for (int m = used_digits; m < 7; m++)
+            for (int m = usedDigits; m < 7; m++)
             {
                 fracPart = (fracPart << 3) + (fracPart << 1);
                 char p = (char)((fracPart >> 24) + '0');
@@ -90,7 +93,7 @@ namespace Cosmos.System.Plugs.System
                     answer[digitPos] = (char)(digit + 1);
                 }
 
-                result = new String(answer);
+                result = new string(answer);
             }
 
             while (result[result.Length - 1] == '0')

@@ -177,6 +177,10 @@
       <Project>{bdc011be-6041-4a58-a6e7-0f592e78cb27}</Project>
       <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTests.csproj">
+      <Project>{fe8b9f39-7c96-4866-9a18-386735895cee}</Project>
+      <Name>Cosmos.Compiler.Tests.MethodTests</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.csproj">
       <Project>{57045fe8-b0fe-4fc1-810f-7c3914aef1de}</Project>
       <Name>Cosmos.Compiler.Tests.SimpleWriteLine.Kernel</Name>

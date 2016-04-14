@@ -37,7 +37,7 @@ namespace Cosmos.IL2CPU.X86.IL
     /// This is typically checked when Microsoft Intermediate Language (MSIL) instructions are converted to native code, not at run time.
     /// </remarks>
     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldfld)]
-    public class Ldfld: ILOp
+    public class Ldfld : ILOp
     {
         public Ldfld(Cosmos.Assembler.Assembler aAsmblr)
             : base(aAsmblr)
@@ -94,7 +94,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 switch (xFieldInfo.Size)
                 {
                     case 1:
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.ESP, SourceDisplacement=xOffset, SourceIsIndirect = true };
+                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.ESP, SourceDisplacement = xOffset, SourceIsIndirect = true };
                         break;
 
                     case 2:
@@ -115,7 +115,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
 
                 // now remove the struct from the stack
-                new CPUx86.Add {DestinationReg = CPUx86.Registers.ESP, SourceValue = Align(GetStorageSize(aDeclaringType), 4)};
+                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = Align(GetStorageSize(aDeclaringType), 4) };
 
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
 
@@ -123,26 +123,26 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             DoNullReferenceCheck(Assembler, debugEnabled, 0);
 
-            new CPUx86.Pop {DestinationReg = CPUx86.Registers.ECX};
+            new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
 
             // pushed size is always 4 or 8
             var xSize = xFieldInfo.Size;
-            if (!aTypeOnStack.IsPointer)
+            if ((!aTypeOnStack.IsPointer) && (aDeclaringType.IsClass))
             {
-              // convert to real memory address
-              new CPUx86.Mov {DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true};
+                // convert to real memory address
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
             }
-            new CPUx86.Add {DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xOffset)};
+            new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(xOffset) };
 
             if (xFieldInfo.IsExternalValue && aDerefExternalField)
             {
-                new CPUx86.Mov {DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true};
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
             }
 
             for (int i = 1; i <= (xSize / 4); i++)
             {
-                new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (int)(xSize - (i * 4))};
-                new CPUx86.Push {DestinationReg = CPUx86.Registers.EAX};
+                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true, SourceDisplacement = (int)(xSize - (i * 4)) };
+                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             }
 
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
@@ -150,25 +150,25 @@ namespace Cosmos.IL2CPU.X86.IL
             switch (xSize % 4)
             {
                 case 1:
-                    new CPUx86.Mov {DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true};
-                    new CPUx86.Push {DestinationReg = CPUx86.Registers.EAX};
+                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     break;
 
                 case 2:
-                    new CPUx86.Mov {DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true};
-                    new CPUx86.Push {DestinationReg = CPUx86.Registers.EAX};
+                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     break;
 
                 case 3: //For Release
-                    new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true};
-                    new CPUx86.ShiftRight {DestinationReg = CPUx86.Registers.EAX, SourceValue = 8};
-                    new CPUx86.Push {DestinationReg = CPUx86.Registers.EAX};
+                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+                    new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
                     break;
 
                 case 0:
-                {
-                    break;
-                }
+                    {
+                        break;
+                    }
                 default:
                     throw new Exception(string.Format("Remainder size {0:D} {1:D} not supported!", xFieldInfo.FieldType.ToString(), xSize));
             }

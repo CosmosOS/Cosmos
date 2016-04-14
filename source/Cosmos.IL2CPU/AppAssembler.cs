@@ -357,21 +357,15 @@ namespace Cosmos.IL2CPU
             if (xReturnSize > 0)
             {
                 var xOffset = GetResultCodeOffset(xReturnSize, (uint)xTotalArgsSize);
-                for (int i = 0; i < xReturnSize / 4; i++)
+                for (int i = ((int)(xReturnSize/4)) - 1; i >= 0; i--)
                 {
                     new Pop { DestinationReg = Registers.EAX };
-                    new Mov
-                    {
-                        DestinationReg = Registers.EBP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = (int)(xOffset + ((i + 0) * 4)),
-                        SourceReg = Registers.EAX
-                    };
+                    new Mov { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + ((i + 0) * 4)), SourceReg = Registers.EAX };
                 }
                 // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
             }
             var xLabelExc = xMethodLabel + EndOfMethodLabelNameException;
-            new Cosmos.Assembler.Label(xLabelExc);
+            new Assembler.Label(xLabelExc);
             if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
             {
                 var xBody = aMethod.MethodBase.GetMethodBody();
@@ -930,7 +924,7 @@ namespace Cosmos.IL2CPU
             Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Handle", ElementReference.New(xTheName + "__Contents")));
             Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName, Cosmos.Assembler.ElementReference.New(xTheName + "__Handle")));
 #if VMT_DEBUG
-        using (var xVmtDebugOutput = XmlWriter.Create(@"c:\data\vmt_debug.xml"))
+        using (var xVmtDebugOutput = XmlWriter.Create(@"vmt_debug.xml"))
         {
             xVmtDebugOutput.WriteStartDocument();
             xVmtDebugOutput.WriteStartElement("VMT");

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 // using System.Collections.Generic;
 // using System.Linq;
 using CPU = Cosmos.Assembler.x86;
@@ -93,13 +94,12 @@ namespace Cosmos.IL2CPU.X86.IL
              * $esp                 Params
              * $esp + mThisOffset   This
              */
-                Type xPopType = aOp.StackPopTypes[0];
-                if ((xPopType.IsPointer || xPopType.IsByRef) && typeof(ValueType).IsAssignableFrom(xPopType.GetElementType()))
+                Type xPopType = aOp.StackPopTypes.Last();
+                if ((xPopType.IsPointer) || (xPopType.IsByRef))
                 {
                     xPopType = xPopType.GetElementType();
                     string xTypeId = GetTypeIDLabel(xPopType);
-                    new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New(xTypeId), DestinationIsIndirect = true };
-
+                    new CPUx86.Push { DestinationRef = ElementReference.New(xTypeId), DestinationIsIndirect = true };
                 }
                 else
                 {
@@ -113,6 +113,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     xThisOffset -= xExtraStackSize;
                 }
+
                 /*
              * On the stack now:
              * $esp                 Params

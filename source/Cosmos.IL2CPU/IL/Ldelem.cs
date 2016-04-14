@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       var xSize = SizeOfType(xOpType.Value);
       if (xOpType.Value.IsValueType && !xOpType.Value.IsPrimitive)
       {
-        Ldelema.Assemble(Assembler, xSize, DebugEnabled);
+        Ldelema.Assemble(Assembler, xOpType, xSize, DebugEnabled);
         Ldobj.DoAssemble(xOpType.Value);
         return;
       }
