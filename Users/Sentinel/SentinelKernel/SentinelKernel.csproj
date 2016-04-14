@@ -10,15 +10,25 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SentinelKernel</RootNamespace>
     <AssemblyName>SentinelKernel</AssemblyName>
-    <FileAlignment>512</FileAlignment>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Cosmos.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
     <Reference Include="Cosmos.Debug.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
+    <Reference Include="Cosmos.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=x86" />
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -26,18 +36,6 @@
     <Compile Include="AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Common\Cosmos.Common.csproj">
-      <Project>{1fac100c-d732-4ea4-b518-5af4baf64f2e}</Project>
-      <Name>Cosmos.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.HAL\Cosmos.HAL.csproj">
-      <Project>{6A991D03-1435-4005-9809-B8BACDF3B021}</Project>
-      <Name>Cosmos.HAL</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.System\Cosmos.System.csproj">
-      <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
-      <Name>Cosmos.System</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SentinelSystem\SentinelSystem.csproj">
       <Project>{93D6FF56-6E23-4E80-98F6-730AC533F631}</Project>
       <Name>SentinelSystem</Name>

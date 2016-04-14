@@ -43,7 +43,7 @@
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
-    <EnableBochsDebug>True</EnableBochsDebug>
+    <EnableBochsDebug>False</EnableBochsDebug>
     <Bochs_Name>SentinelKernelBoot</Bochs_Name>
     <Bochs_Description>Use Bochs emulator to deploy and debug.</Bochs_Description>
     <Bochs_Deployment>ISO</Bochs_Deployment>
@@ -56,7 +56,7 @@
     <Bochs_OutputPath>bin\Debug\</Bochs_OutputPath>
     <Bochs_EnableGDB>False</Bochs_EnableGDB>
     <Bochs_StartCosmosGDB>false</Bochs_StartCosmosGDB>
-    <Bochs_EnableBochsDebug>True</Bochs_EnableBochsDebug>
+    <Bochs_EnableBochsDebug>False</Bochs_EnableBochsDebug>
     <VMware_EnableBochsDebug>True</VMware_EnableBochsDebug>
     <TraceAssemblies>Cosmos</TraceAssemblies>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
@@ -107,16 +107,6 @@
     <Bochs_StartBochsDebugGui>False</Bochs_StartBochsDebugGui>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
-      <Name>Cosmos.Core.Plugs</Name>
-      <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
-      <Name>Cosmos.System.Plugs</Name>
-      <Project>{7c64b97f-516d-4a6d-b9e1-3fe48f561409}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\SentinelCore\SentinelCore.csproj">
       <Name>SentinelCore</Name>
       <Project>{c296973c-63d7-4a29-95b1-9fc6f36a83ee}</Project>
@@ -137,6 +127,26 @@
       <Project>{93d6ff56-6e23-4e80-98f6-730ac533f631}</Project>
       <Private>True</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983">
+      <Name>Cosmos.Core.Plugs</Name>
+      <AssemblyName>Cosmos.Core.Plugs.dll</AssemblyName>
+      <HintPath>..\..\..\..\..\..\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.Core.Plugs.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983">
+      <Name>Cosmos.Debug.Kernel.Plugs</Name>
+      <AssemblyName>Cosmos.Debug.Kernel.Plugs.dll</AssemblyName>
+      <HintPath>..\..\..\..\..\..\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.Debug.Kernel.Plugs.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Cosmos.System.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983">
+      <Name>Cosmos.System.Plugs</Name>
+      <AssemblyName>Cosmos.System.Plugs.dll</AssemblyName>
+      <HintPath>..\..\..\..\..\..\AppData\Roaming\Cosmos User Kit\Kernel\Cosmos.System.Plugs.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <!--<ItemGroup>
     <Content Include="Cosmos.bxrc">
