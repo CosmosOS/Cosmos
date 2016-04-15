@@ -357,7 +357,7 @@ namespace Cosmos.IL2CPU
             if (xReturnSize > 0)
             {
                 var xOffset = GetResultCodeOffset(xReturnSize, (uint)xTotalArgsSize);
-                for (int i = ((int)(xReturnSize/4)) - 1; i >= 0; i--)
+                for (int i = 0; i < ((int)(xReturnSize/4)); i++)
                 {
                     new Pop { DestinationReg = Registers.EAX };
                     new Mov { DestinationReg = Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + ((i + 0) * 4)), SourceReg = Registers.EAX };
