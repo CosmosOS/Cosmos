@@ -1,7 +1,6 @@
-﻿using System;
-
+﻿using Cosmos.IL2CPU.Plugs;
+using System;
 using System.Collections.Generic;
-using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System
 {
@@ -15,7 +14,7 @@ namespace Cosmos.System.Plugs.System
             {
                 throw new Exception("Capacity != 0 not supported yet!");
             }
-            z
+
         }
 
     }
