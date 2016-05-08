@@ -8,7 +8,7 @@ using Sys = Cosmos.System;
 namespace Cosmos.Compiler.Tests.Bcl
 {
     using Cosmos.Compiler.Tests.Bcl.System;
-    
+
     public class Kernel : Sys.Kernel
     {
         protected override void BeforeRun()
@@ -27,7 +27,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 StringTest.Execute();
                 ByteTest.Execute();
                 SByteTest.Execute();
-                Int16Test.Execute();      
+                Int16Test.Execute();
                 UInt16Test.Execute();
                 Int32Test.Execute();
                 UInt32Test.Execute();
@@ -40,6 +40,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 DoubleTest.Execute();
                 DecimalTest.Execute();
                 System.Collections.Generic.ListTest.Execute();
+                System.Collections.Generic.DictionaryTest.Execute();
                 System.Collections.Generic.QueueTest.Execute();
                 System.DelegatesTest.Execute();
                 System.UInt64Test.Execute();

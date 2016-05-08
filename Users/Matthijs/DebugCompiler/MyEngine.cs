@@ -1,7 +1,7 @@
-﻿using System;
-using Cosmos.Build.Common;
+﻿using Cosmos.Build.Common;
 using Cosmos.TestRunner.Core;
 using NUnit.Framework;
+using System;
 
 namespace DebugCompiler
 {
@@ -21,7 +21,7 @@ namespace DebugCompiler
 
             // If you're working on the compiler (or other lower parts), you can choose to run the compiler in process
             // one thing to keep in mind though, is that this only works with 1 kernel at a time!
-            xEngine.RunIL2CPUInProcess = false;
+            xEngine.RunIL2CPUInProcess = true;
             xEngine.TraceAssembliesLevel = TraceAssemblies.User;
             xEngine.EnableStackCorruptionChecks = true;
             xEngine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
@@ -35,7 +35,7 @@ namespace DebugCompiler
 
         }
 
-        private class TestOutputHandler: OutputHandlerFullTextBase
+        private class TestOutputHandler : OutputHandlerFullTextBase
         {
             protected override void Log(string message)
             {

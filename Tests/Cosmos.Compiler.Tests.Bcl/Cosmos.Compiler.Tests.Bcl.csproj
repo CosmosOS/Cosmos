@@ -84,6 +84,7 @@
     <Compile Include="System\BooleanTest.cs" />
     <Compile Include="System\ByteTest.cs" />
     <Compile Include="System\CharTest.cs" />
+    <Compile Include="System\Collections\Generic\DictionaryTest.cs" />
     <Compile Include="System\Collections\Generic\ListTest.cs" />
     <Compile Include="System\Collections\Generic\QueueTest.cs" />
     <Compile Include="System\DecimalTest.cs" />
