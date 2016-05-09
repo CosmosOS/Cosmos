@@ -7,11 +7,6 @@ namespace Cosmos.System.Plugs.System.Collections.Generic
     [Plug(Target = typeof(EqualityComparer<>))]
     public static class EqualityComparerImpl<T>
     {
-        public static EqualityComparer<T> get_Default()
-        {
-            throw new NotImplementedException();
-        }
-
         public static EqualityComparer<T> CreateComparer()
         {
             throw new NotImplementedException();

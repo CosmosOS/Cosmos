@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.IL2CPU.Plugs;
+using System;
 
 namespace Cosmos.System.Plugs.System
 {
@@ -16,6 +11,10 @@ namespace Cosmos.System.Plugs.System
             return "<ValueType.ToString not yet implemented!>";
         }
 
+        public new static bool Equals(object aThis, object obj)
+        {
+            return (uint)aThis == (uint)obj;
+        }
     }
 
 }

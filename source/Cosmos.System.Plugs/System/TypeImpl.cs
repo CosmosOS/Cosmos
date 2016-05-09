@@ -1,6 +1,5 @@
-﻿using System;
-
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.IL2CPU.Plugs;
+using System;
 
 namespace Cosmos.System.Plugs.System
 {
@@ -29,6 +28,15 @@ namespace Cosmos.System.Plugs.System
             // for now, type info is the type id.
             return left == right;
         }
+
+        [PlugMethod(Signature = "System_Boolean__System_Type_op_Inequality_System_Type__System_Type_")]
+        public static bool op_Inequality(uint left, uint right)
+        {
+            // for now, type info is the type id.
+            return left != right;
+        }
+
+
 
         //System.Type  System.Type.GetTypeFromHandle(System.RuntimeTypeHandle)
     }

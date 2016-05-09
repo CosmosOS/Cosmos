@@ -389,7 +389,7 @@ namespace Cosmos.IL2CPU
                     aParamTypes.CopyTo(xParamTypes, 1);
                 }
                 xParamTypes[0] = aTargetType;
-            }       
+            }
 
             PlugMethodAttribute xAttrib = null;
             foreach (var xImpl in aImpls)
@@ -724,6 +724,16 @@ namespace Cosmos.IL2CPU
                                 break;
                             }
                         }
+                    }
+                }
+
+                // Check for generic version of the plugs now
+                List<Type> xGenImpls;
+                if (xResult == null && aMethod.DeclaringType.IsGenericType)
+                {
+                    if (mPlugImpls.TryGetValue(aMethod.DeclaringType.GetGenericTypeDefinition(), out xGenImpls))
+                    {
+                        xResult = ResolvePlug(aMethod.DeclaringType.GetGenericTypeDefinition(), xGenImpls, aMethod, aParamTypes);
                     }
                 }
 

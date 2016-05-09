@@ -90,7 +90,11 @@
   <ItemGroup>
     <Compile Include="System\Collections\Generic\EqualityComparerImpl.cs" />
     <Compile Include="System\Collections\Generic\GenericEqualityComparerImpl.cs" />
+    <Compile Include="System\Collections\Generic\RandomizedStringEqualityComparerImpl.cs" />
+    <Compile Include="System\Collections\HashHelpersImpl.cs" />
+    <Compile Include="System\ConfigTreeParserImpl.cs" />
     <Compile Include="System\DecimalImpl.cs" />
+    <Compile Include="System\Security\Cryptography\CryptoConfigImpl.cs" />
     <Compile Include="System\ValueTypeImpl.cs" />
     <Compile Include="System\EnumImpl.cs" />
     <Compile Include="System\Globalization\CultureInfoImpl.cs" />

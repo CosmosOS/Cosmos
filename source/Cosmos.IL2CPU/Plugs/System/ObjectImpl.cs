@@ -1,6 +1,5 @@
-﻿using System;
-
-using Cosmos.Debug.Kernel;
+﻿using Cosmos.Debug.Kernel;
+using System;
 
 namespace Cosmos.IL2CPU.Plugs.System
 {
@@ -32,6 +31,11 @@ namespace Cosmos.IL2CPU.Plugs.System
             //}
             Debugger.DoSend("<Object.ToString not yet implemented!>");
             return "<Object.ToString not yet implemented!>";
+        }
+
+        public new static bool Equals(object aThis, object obj)
+        {
+            return (uint) aThis == (uint) obj;
         }
 
         //public static bool InternalEquals(object a, object b) {
