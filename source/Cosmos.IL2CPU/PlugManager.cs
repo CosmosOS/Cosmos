@@ -729,11 +729,18 @@ namespace Cosmos.IL2CPU
 
                 // Check for generic version of the plugs now
                 List<Type> xGenImpls;
+                List<Type> xGenTypes = new List<Type>();
                 if (xResult == null && aMethod.DeclaringType.IsGenericType)
                 {
-                    if (mPlugImpls.TryGetValue(aMethod.DeclaringType.GetGenericTypeDefinition(), out xGenImpls))
+                    var xGenTypeDef = aMethod.DeclaringType.GetGenericTypeDefinition();
+
+                    if (mPlugImpls.TryGetValue(xGenTypeDef, out xGenImpls))
                     {
-                        xResult = ResolvePlug(aMethod.DeclaringType.GetGenericTypeDefinition(), xGenImpls, aMethod, aParamTypes);
+                        var xGenType = xGenTypeDef.MakeGenericType(aMethod.DeclaringType.GetGenericArguments());
+
+                        xGenTypes.AddRange(xGenImpls.Select(xType => xType.MakeGenericType(aMethod.DeclaringType.GetGenericArguments())));
+
+                        xResult = ResolvePlug(xGenType, xGenTypes, aMethod, aParamTypes);
                     }
                 }
 

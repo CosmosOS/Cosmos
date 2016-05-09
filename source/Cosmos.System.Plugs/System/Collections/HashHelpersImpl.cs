@@ -1,4 +1,6 @@
 ﻿using Cosmos.IL2CPU.Plugs;
+using System;
+using System.Collections;
 
 namespace Cosmos.System.Plugs.System.Collections
 {
@@ -8,6 +10,11 @@ namespace Cosmos.System.Plugs.System.Collections
         public static bool IsWellKnownEqualityComparer(object comparer)
         {
             return false;
+        }
+
+        public static IEqualityComparer GetRandomizedEqualityComparer(object comparer)
+        {
+            throw new NotImplementedException();
         }
     }
 }

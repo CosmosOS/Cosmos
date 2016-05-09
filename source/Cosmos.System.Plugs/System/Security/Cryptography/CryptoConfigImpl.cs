@@ -7,12 +7,12 @@ using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System.Security.Cryptography
 {
-    [Plug(TargetName = "System.Security.Cryptography.CryptoConfig")]
-    public static class CryptoConfigImpl
-    {
-        public static object get_InternalSyncObject()
-        {
-            return new object();
-        }
-    }
+    //[Plug(TargetName = "System.Security.Cryptography.CryptoConfig")]
+    //public static class CryptoConfigImpl
+    //{
+    //    public static object get_InternalSyncObject()
+    //    {
+    //        return new object();
+    //    }
+    //}
 }
