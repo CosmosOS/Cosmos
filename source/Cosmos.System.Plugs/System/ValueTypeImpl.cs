@@ -10,11 +10,6 @@ namespace Cosmos.System.Plugs.System
         {
             return "<ValueType.ToString not yet implemented!>";
         }
-
-        public new static bool Equals(object aThis, object obj)
-        {
-            return (uint)aThis == (uint)obj;
-        }
     }
 
 }

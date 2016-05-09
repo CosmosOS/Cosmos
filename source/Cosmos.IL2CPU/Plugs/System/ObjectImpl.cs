@@ -33,10 +33,10 @@ namespace Cosmos.IL2CPU.Plugs.System
             return "<Object.ToString not yet implemented!>";
         }
 
-        public new static bool Equals(object aThis, object obj)
-        {
-            return (uint) aThis == (uint) obj;
-        }
+        //public new static bool Equals(object aThis, object obj)
+        //{
+        //    return (uint) aThis == (uint) obj;
+        //}
 
         //public static bool InternalEquals(object a, object b) {
         //    return false;
