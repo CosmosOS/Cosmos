@@ -371,6 +371,8 @@ namespace Cosmos.IL2CPU
 
         public MethodBase ResolvePlug(Type aTargetType, List<Type> aImpls, MethodBase aMethod, Type[] aParamTypes)
         {
+
+
             //TODO: This method is "reversed" from old - remember that when porting
             MethodBase xResult = null;
 
