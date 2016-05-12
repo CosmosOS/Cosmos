@@ -16,8 +16,6 @@ namespace Cosmos.Compiler.Tests.Bcl
             Console.WriteLine("Cosmos booted successfully. Starting BCL tests now please wait...");
         }
 
-        public readonly Debugger mDebugger = new Debugger("User", "Test");
-
         protected override void Run()
         {
             try

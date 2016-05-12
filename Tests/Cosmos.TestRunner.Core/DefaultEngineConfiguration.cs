@@ -31,10 +31,10 @@ namespace Cosmos.TestRunner.Core
             //engine.StartBochsDebugGui = true;
 
             // Select kernels to be tested by adding them to the engine
-            foreach (var xType in TestKernelSets.GetStableKernelTypes())
-            {
-                engine.AddKernel(xType.Assembly.Location);
-            }
+            //foreach (var xType in TestKernelSets.GetStableKernelTypes())
+            //{
+            //    engine.AddKernel(xType.Assembly.Location);
+            //}
 
             //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);

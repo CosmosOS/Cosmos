@@ -30,8 +30,8 @@ namespace Cosmos.System.Plugs.System.IO
             //aPathSeparator = VFSManager.GetPathSeparator();
             aRealInvalidPathChars = VFSManager.GetRealInvalidPathChars();
             //aMaxPath = VFSManager.GetMaxPath();
-            aAltDirectorySeparatorChar = VFSManager.GetAltDirectorySeparatorChar();
-            aDirectorySeparatorChar = VFSManager.GetDirectorySeparatorChar();
+            aAltDirectorySeparatorChar = VFSManager.GetAltDirectorySeparatorChar()[0];
+            aDirectorySeparatorChar = VFSManager.GetDirectorySeparatorChar()[0];
             aVolumeSeparatorChar = VFSManager.GetVolumeSeparatorChar();
         }
 
