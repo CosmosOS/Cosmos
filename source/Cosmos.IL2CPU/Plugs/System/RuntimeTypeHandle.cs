@@ -10,8 +10,14 @@ namespace Cosmos.IL2CPU.Plugs.System
         {
         }
 
-        public static void Cctor() {
-          //
+        public static void Cctor()
+        {
+            //
+        }
+
+        public static object CreateInstanceForAnotherGenericParameter(object type, object genericParameter)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Globalization;
-using System.Text;
-
-using Cosmos.Common;
+﻿using Cosmos.Common;
 using Cosmos.IL2CPU.Plugs;
-
+using System;
+using System.Globalization;
 using Debugger = Cosmos.Debug.Kernel.Debugger;
 
 namespace Cosmos.Core.Plugs.System
@@ -843,9 +840,16 @@ namespace Cosmos.Core.Plugs.System
             throw new ArgumentNullException();
         }
 
+        public static bool UseRandomizedHashing()
+        {
+            return false;
+        }
+
+
+
         public static int GetHashCode(ref String aThis)
         {
-            throw new NotImplementedException("String.GetHashCode()");
+            return (int)((object) aThis)*5831;
         }
     }
 }
