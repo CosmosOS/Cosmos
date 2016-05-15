@@ -25,7 +25,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 StringTest.Execute();
                 ByteTest.Execute();
                 SByteTest.Execute();
-                Int16Test.Execute();      
+                Int16Test.Execute();
                 UInt16Test.Execute();
                 Int32Test.Execute();
                 UInt32Test.Execute();
@@ -33,10 +33,10 @@ namespace Cosmos.Compiler.Tests.Bcl
                 UInt64Test.Execute();
                 CharTest.Execute();
                 BooleanTest.Execute();
-                SingleTest.Execute();
-                BitConverterTest.Execute();
-                DoubleTest.Execute();
-                DecimalTest.Execute();
+                //SingleTest.Execute();
+                //BitConverterTest.Execute();
+                //DoubleTest.Execute();
+                //DecimalTest.Execute();
                 System.Collections.Generic.ListTest.Execute();
                 System.Collections.Generic.QueueTest.Execute();
                 System.DelegatesTest.Execute();
