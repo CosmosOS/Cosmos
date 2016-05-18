@@ -67,16 +67,16 @@
     <ISO_TraceAssemblies>All</ISO_TraceAssemblies>
     <ISO_EnableGDB>False</ISO_EnableGDB>
     <ISO_StartCosmosGDB>false</ISO_StartCosmosGDB>
-    <EnableBochsDebug>True</EnableBochsDebug>
+    <EnableBochsDebug>False</EnableBochsDebug>
     <StartBochsDebugGui>False</StartBochsDebugGui>
-    <Bochs_EnableBochsDebug>True</Bochs_EnableBochsDebug>
+    <Bochs_EnableBochsDebug>False</Bochs_EnableBochsDebug>
     <Bochs_StartBochsDebugGui>False</Bochs_StartBochsDebugGui>
     <ISO_EnableBochsDebug>False</ISO_EnableBochsDebug>
     <ISO_StartBochsDebugGui>False</ISO_StartBochsDebugGui>
     <VMware_EnableBochsDebug>False</VMware_EnableBochsDebug>
     <VMware_StartBochsDebugGui>False</VMware_StartBochsDebugGui>
-    <StackCorruptionDetectionLevel>MethodFooters</StackCorruptionDetectionLevel>
-    <Bochs_StackCorruptionDetectionLevel>MethodFooters</Bochs_StackCorruptionDetectionLevel>
+    <StackCorruptionDetectionLevel>AllInstructions</StackCorruptionDetectionLevel>
+    <Bochs_StackCorruptionDetectionLevel>AllInstructions</Bochs_StackCorruptionDetectionLevel>
     <VMware_StackCorruptionDetectionLevel>MethodFooters</VMware_StackCorruptionDetectionLevel>
   </PropertyGroup>
   <ItemGroup>

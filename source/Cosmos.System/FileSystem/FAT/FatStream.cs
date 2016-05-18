@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 
 using System;
 using System.IO;
@@ -11,9 +11,9 @@ namespace Cosmos.System.FileSystem.FAT
     {
         protected byte[] mReadBuffer;
 
-        protected ulong? mReadBufferPosition;
+        protected long? mReadBufferPosition;
 
-        protected ulong mPosition;
+        protected long mPosition;
 
         private readonly FatDirectoryEntry mDirectoryEntry;
 
@@ -25,9 +25,9 @@ namespace Cosmos.System.FileSystem.FAT
         // so we might consider a way to flush it and only keep parts.
         // Example, a 100 MB file will require 2MB for this structure. That is
         // probably acceptable for the mid term future.
-        private readonly ulong[] mFatTable;
+        private readonly uint[] mFatTable;
 
-        private ulong mSize;
+        private long mSize;
 
         public FatStream(FatDirectoryEntry aEntry)
         {
@@ -101,7 +101,7 @@ namespace Cosmos.System.FileSystem.FAT
                 Global.mFileSystemDebugger.SendInternal("-- FatStream.set_Position --");
                 Global.mFileSystemDebugger.SendInternal("Position =");
                 Global.mFileSystemDebugger.SendInternal(mPosition);
-                mPosition = (ulong)value;
+                mPosition = value;
             }
         }
 
@@ -122,24 +122,13 @@ namespace Cosmos.System.FileSystem.FAT
             Global.mFileSystemDebugger.SendInternal(value);
 
             mDirectoryEntry.SetSize(value);
-            mSize = (ulong)value;
+            mSize = value;
         }
 
         public override int Read(byte[] aBuffer, int aOffset, int aCount)
         {
-            return Read(aBuffer, aOffset, aCount);
-        }
-
-        public override void Write(byte[] aBuffer, int aOffset, int aCount)
-        {
-            Write(aBuffer, aOffset, aCount);
-        }
-
-        protected int Read(byte[] aBuffer, long aOffset, long aCount)
-        {
             Global.mFileSystemDebugger.SendInternal("-- FatStream.Read --");
             Global.mFileSystemDebugger.SendInternal("aBuffer.Length =");
-            Global.mFileSystemDebugger.SendInternal(aBuffer.Length);
             Global.mFileSystemDebugger.SendInternal("aOffset =");
             Global.mFileSystemDebugger.SendInternal(aOffset);
             Global.mFileSystemDebugger.SendInternal("aCount =");
@@ -170,42 +159,44 @@ namespace Cosmos.System.FileSystem.FAT
                 return 0;
             }
 
-            ulong xMaxReadableBytes = mDirectoryEntry.mSize - mPosition;
-            ulong xCount = (ulong)aCount;
+            long xMaxReadableBytes = mDirectoryEntry.mSize - mPosition;
+            long xCount = aCount;
+            long xOffset = aOffset;
+
             if (xCount > xMaxReadableBytes)
             {
                 xCount = xMaxReadableBytes;
             }
 
-            uint xClusterSize = mFS.BytesPerCluster;
+            long xClusterSize = mFS.BytesPerCluster;
 
             while (xCount > 0)
             {
-                ulong xClusterIdx = mPosition / xClusterSize;
-                ulong xPosInCluster = mPosition % xClusterSize;
+                long xClusterIdx = mPosition / xClusterSize;
+                long xPosInCluster = mPosition % xClusterSize;
                 byte[] xCluster;
                 mFS.Read(mFatTable[(int)xClusterIdx], out xCluster);
                 long xReadSize;
                 if (xPosInCluster + xCount > xClusterSize)
                 {
-                    xReadSize = (long)(xClusterSize - xPosInCluster - 1);
+                    xReadSize = (xClusterSize - xPosInCluster - 1);
                 }
                 else
                 {
-                    xReadSize = (long)xCount;
+                    xReadSize = xCount;
                 }
 
-                Array.Copy(xCluster, (long)xPosInCluster, aBuffer, aOffset, xReadSize);
+                Array.Copy(xCluster, xPosInCluster, aBuffer, xOffset, xReadSize);
 
-                aOffset += xReadSize;
-                xCount -= (ulong)xReadSize;
+                xOffset += xReadSize;
+                xCount -= xReadSize;
             }
 
-            mPosition += (ulong)aOffset;
-            return (int)aOffset;
+            mPosition += xOffset;
+            return (int)xOffset;
         }
 
-        protected void Write(byte[] aBuffer, long aOffset, long aCount)
+        public override void Write(byte[] aBuffer, int aOffset, int aCount)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatStream.Write --");
             Global.mFileSystemDebugger.SendInternal("aBuffer.Length =");
@@ -230,10 +221,11 @@ namespace Cosmos.System.FileSystem.FAT
                 throw new ArgumentException("Invalid offset length.");
             }
 
-            ulong xCount = (ulong)aCount;
-            uint xClusterSize = mFS.BytesPerCluster;
+            long xCount = aCount;
+            long xClusterSize = mFS.BytesPerCluster;
+            long xOffset = aOffset;
 
-            long xTotalLength = (long)(mPosition + xCount);
+            long xTotalLength = (mPosition + xCount);
             if (xTotalLength > Length)
             {
                 SetLength(xTotalLength);
@@ -242,26 +234,26 @@ namespace Cosmos.System.FileSystem.FAT
             while (xCount > 0)
             {
                 long xWriteSize;
-                ulong xClusterIdx = mPosition / xClusterSize;
-                ulong xPosInCluster = mPosition % xClusterSize;
+                long xClusterIdx = mPosition / xClusterSize;
+                long xPosInCluster = mPosition % xClusterSize;
                 if (xPosInCluster + xCount > xClusterSize)
                 {
-                    xWriteSize = (long)(xClusterSize - xPosInCluster - 1);
+                    xWriteSize = xClusterSize - xPosInCluster - 1;
                 }
                 else
                 {
-                    xWriteSize = (long)xCount;
+                    xWriteSize = xCount;
                 }
 
                 byte[] xCluster;
                 mFS.Read(xClusterIdx, out xCluster);
-                Array.Copy(aBuffer, aOffset, xCluster, (long)xPosInCluster, xWriteSize);
-                mFS.Write(mFatTable[(int)xClusterIdx], xCluster);
-                aOffset += xWriteSize;
-                xCount -= (ulong)xWriteSize;
+                Array.Copy(aBuffer, aOffset, xCluster, xPosInCluster, xWriteSize);
+                mFS.Write(mFatTable[xClusterIdx], xCluster);
+                xOffset += xWriteSize;
+                xCount -= xWriteSize;
             }
 
-            mPosition += (ulong)aOffset;
+            mPosition += xOffset;
         }
     }
 }
