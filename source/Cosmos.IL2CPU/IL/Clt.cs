@@ -34,14 +34,22 @@ namespace Cosmos.IL2CPU.X86.IL
             string LabelFalse = BaseLabel + "False";
             if( xStackItemSize > 4 )
             {
-				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
-				// esi = 1
-				new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
-				// edi = 0
+
 				if (xStackItemIsFloat)
 				{
-					// value 2
-					new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                    // Please note that SSE supports double operations only from version 2
+                    new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+                    new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+                    new CPUx86.SSE.CompareSD { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.XMM0, pseudoOpcode = (byte)CPUx86.SSE.ComparePseudoOpcodes.LessThan };
+                    new CPUx86.MoveD { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.XMM1 };
+                    new CPUx86.And { DestinationReg = CPUx86.Registers.EBX, SourceValue = 1 };
+                    // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
+                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                    new CPUx86.Mov { SourceReg = CPUx86.Registers.EBX, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+#if false
+                    // value 2
+                    new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
 					// value 1
 					new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationDisplacement = 8, DestinationIsIndirect = true };
 					new CPUx86.x87.FloatCompareAndSet { DestinationReg = Registers.ST1 };
@@ -51,9 +59,15 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ST0 };
 					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ST0 };
 					new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 16 };
+#endif
                 }
                 else
                 {
+                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
+                    // esi = 1
+                    new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
+                    // edi = 0
+
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
                     //value2: EDX:EAX
@@ -64,8 +78,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
                     //result = value1 - value2
 					new CPUx86.ConditionalMove { Condition = CPUx86.ConditionalTestEnum.LessThan, DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESI };
+                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI };
                 }
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI };
             }
             else
             {

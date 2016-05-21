@@ -29,7 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       }
       else if (xSize <= 4) 
       {
-        if (xStackItemIsFloat)
+        if (xStackItemIsFloat) // float
         {
           new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
           new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
@@ -39,7 +39,7 @@ namespace Cosmos.IL2CPU.X86.IL {
           new CPUx86.And { DestinationReg = CPUx86.Registers.EBX, SourceValue = 1 };
           new CPUx86.Mov { SourceReg = CPUx86.Registers.EBX, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
         }
-        else 
+        else // integer XXX this seems more code that should be needed! Maybe using MMX PQMxxx could be better?
         {
           new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
           new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
@@ -59,7 +59,17 @@ namespace Cosmos.IL2CPU.X86.IL {
       {
         if (xStackItemIsFloat) 
         {
-          new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
+           // Please note that SSE supports double operations only from version 2
+           new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+           new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+           new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+           new CPUx86.SSE.CompareSD { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.XMM0, pseudoOpcode = (byte)CPUx86.SSE.ComparePseudoOpcodes.Equal };
+           new CPUx86.MoveD { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.XMM1 };
+           new CPUx86.And { DestinationReg = CPUx86.Registers.EBX, SourceValue = 1 };
+           // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
+           new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+           new CPUx86.Mov { SourceReg = CPUx86.Registers.EBX, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+#if false
           // esi = 1
           new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
           // edi = 0
@@ -75,7 +85,8 @@ namespace Cosmos.IL2CPU.X86.IL {
           new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ST0 };
           new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ST0 };
           new CPUx86.Add { DestinationReg = Registers.ESP, SourceValue = 16 };
-          new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI };
+          new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI }; 
+#endif
         }
         else 
         {

@@ -19,6 +19,7 @@ namespace Cosmos.TestRunner.Core
 
             // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are run.
             engine.RunTargets.Add(RunTargetEnum.Bochs);
+            //engine.RunTargets.Add(RunTargetEnum.VMware);
 
             // If you're working on the compiler (or other lower parts), you can choose to run the compiler in process
             // one thing to keep in mind though, is that this only works with 1 kernel at a time!
@@ -37,7 +38,7 @@ namespace Cosmos.TestRunner.Core
             }
 
             //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
-            //engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);
+            engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);

@@ -38,7 +38,8 @@ namespace Cosmos.Debug.VSDebugEngine.Host
                                        + "ata1-master: type=disk, path=\"%HARDDISKPATH%\", mode=vmware4, cylinders=0, heads=0, spt=0, model=\"Generic 1234\", biosdetect=auto, translation=auto\n"
                                        + "ata2: enabled=0\n" + "ata3: enabled=0\n" + "pci: enabled=1, chipset=i440fx\n"
                                        + "vga: extension=vbe, update_freq=5, realtime=1\n"
-                                       + "cpu: count=1, ips=4000000, model=bx_generic, reset_on_triple_fault=1, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n"
+                                       //+ "cpu: count=1, ips=4000000, model=bx_generic, reset_on_triple_fault=1, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n"
+                                       + "cpu: count=1, ips=4000000, model=p4_prescott_celeron_336, reset_on_triple_fault=1, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n"
                                        + "print_timestamps: enabled=0\n" + "port_e9_hack: enabled=0\n"
                                        + "private_colormap: enabled=0\n" + "clock: sync=none, time0=local, rtc_sync=0\n"
                                        + "# no cmosimage\n" + "# no loader\n" + "log: -\n" + "logprefix: %t%e%d\n"
@@ -50,7 +51,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
                                        + "speaker: enabled=1, mode=sound\n" + "parport1: enabled=1, file=none\n"
                                        + "parport2: enabled=0\n" + "com1: enabled=1, mode=pipe-client, dev=\""
                                        + @"\\.\pipe\" + "%PIPESERVERNAME%\"\n" + "com2: enabled=0\n"
-                                       + "com3: enabled=0\n" + "com4: enabled=0";
+                                       + "com3: enabled=0\n" + "com4: enabled=0\n";
         string[] Keys = default_configuration.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i < Keys.Length; i++)
         {

@@ -26,6 +26,35 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xStackContentIsFloat)
                 {
+                    new CPUx86.SSE.MoveSD
+                    {
+                        DestinationReg = CPUx86.Registers.XMM0,
+                        SourceReg = CPUx86.Registers.ESP,
+                        SourceIsIndirect = true
+                    };
+                    new CPUx86.Add
+                    {
+                        DestinationReg = CPUx86.Registers.ESP,
+                        SourceValue = 8
+                    };
+                    new CPUx86.SSE.MoveSD
+                    {
+                        DestinationReg = CPUx86.Registers.XMM1,
+                        SourceReg = CPUx86.Registers.ESP,
+                        SourceIsIndirect = true
+                    };
+                    new CPUx86.SSE.MulSD
+                    {
+                        DestinationReg = CPUx86.Registers.XMM1,
+                        SourceReg = CPUx86.Registers.XMM0
+                    };
+                    new CPUx86.SSE.MoveSD
+                    {
+                        DestinationReg = CPUx86.Registers.ESP,
+                        DestinationIsIndirect = true,
+                        SourceReg = CPUx86.Registers.XMM1
+                    };
+#if false
                     new CPUx86.x87.FloatLoad
                     {
                         DestinationReg = CPUx86.Registers.ESP,
@@ -49,6 +78,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         Size = 64,
                         DestinationIsIndirect = true
                     };
+#endif
                 }
                 else
                 {
