@@ -1,5 +1,5 @@
 ﻿using System;
-
+using Cosmos.IL2CPU.Plugs;
 namespace Cosmos.Core
 {
     public abstract class IOPortBase
@@ -29,12 +29,17 @@ namespace Cosmos.Core
         }
 
         //TODO: Reads and writes can use this to get port instead of argument
+        [PlugMethod(PlugRequired = true)]
         static protected void Write8(UInt16 aPort, byte aData) { } // Plugged
+        [PlugMethod(PlugRequired = true)]
         static protected void Write16(UInt16 aPort, UInt16 aData) { } // Plugged
+        [PlugMethod(PlugRequired = true)]
         static protected void Write32(UInt16 aPort, UInt32 aData) { } // Plugged
-
+        [PlugMethod(PlugRequired = true)]
         static protected byte Read8(UInt16 aPort) { return 0; } // Plugged
+        [PlugMethod(PlugRequired = true)]
         static protected UInt16 Read16(UInt16 aPort) { return 0; } // Plugged
+        [PlugMethod(PlugRequired = true)]
         static protected UInt32 Read32(UInt16 aPort) { return 0; } // Plugged
 
         //TODO: Plug these Reads with asm to read directly to RAM
