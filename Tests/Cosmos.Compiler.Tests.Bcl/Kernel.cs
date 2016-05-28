@@ -16,8 +16,6 @@ namespace Cosmos.Compiler.Tests.Bcl
             Console.WriteLine("Cosmos booted successfully. Starting BCL tests now please wait...");
         }
 
-        public readonly Debugger mDebugger = new Debugger("User", "Test");
-
         protected override void Run()
         {
             try
@@ -27,7 +25,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 StringTest.Execute();
                 ByteTest.Execute();
                 SByteTest.Execute();
-                Int16Test.Execute();      
+                Int16Test.Execute();
                 UInt16Test.Execute();
                 Int32Test.Execute();
                 UInt32Test.Execute();
@@ -40,6 +38,8 @@ namespace Cosmos.Compiler.Tests.Bcl
 #if false
                 BitConverterTest.Execute();
                 DecimalTest.Execute();
+                //BitConverterTest.Execute();
+                //DecimalTest.Execute();
                 System.Collections.Generic.ListTest.Execute();
                 System.Collections.Generic.QueueTest.Execute();
                 System.DelegatesTest.Execute();
