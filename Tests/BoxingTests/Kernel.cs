@@ -14,8 +14,6 @@ namespace BoxingTests
             Console.WriteLine("Cosmos booted successfully.");
         }
 
-        private Debugger mDebugger = new Debugger("User", "Boxing Test");
-
         protected override void Run()
         {
             Assert.IsTrue(TestBoxingCharToString(), "Boxing char to string test failed.");

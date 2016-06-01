@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
             // translate it to actual memory
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
 
-            if (aOpType.StackPopTypes.Last().IsClass)
+            if (aOpType.StackPopTypes.Last().GetElementType().IsClass)
             {
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
             }

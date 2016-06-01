@@ -9,8 +9,6 @@ namespace Cosmos.Compiler.Tests.Exceptions
 
     public class Kernel : Sys.Kernel
     {
-        private global::Cosmos.Debug.Kernel.Debugger mDebugger = new global::Cosmos.Debug.Kernel.Debugger("User", "Test");
-
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully, now start testing");

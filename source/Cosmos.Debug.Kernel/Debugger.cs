@@ -116,19 +116,13 @@ namespace Cosmos.Debug.Kernel
 
         public void Send(string aText)
         {
-            if (aText != null)
-            {
-                DoSend(aText);
-            }
+            DoSend(aText);
         }
 
         [Conditional("COSMOSDEBUG")]
         public void SendInternal(string aText)
         {
-            if (aText != null)
-            {
-                DoSend(aText);
-            }
+            DoSend(aText);
         }
 
         [Conditional("COSMOSDEBUG")]
@@ -155,6 +149,17 @@ namespace Cosmos.Debug.Kernel
             DoSendNumber(aNumber);
         }
 
+        [Conditional("COSMOSDEBUG")]
+        public void SendInternal(float aNumber)
+        {
+            DoSendNumber(aNumber);
+        }
+
+        [Conditional("COSMOSDEBUG")]
+        public void SendInternal(double aNumber)
+        {
+            DoSendNumber(aNumber);
+        }
         //public void OldSend(string aText) {
         //    // TODO: Need to fix this so it can send empty strings.
         //    // Sending empty strings locks it up right now

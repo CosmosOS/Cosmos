@@ -30,9 +30,9 @@ namespace Cosmos.System.FileSystem.Listing
     /// </summary>
     public abstract class DirectoryEntry
     {
-        public readonly uint mSize;
-        public readonly string mFullPath;
-        public readonly string mName;
+        public long mSize;
+        public string mFullPath;
+        public string mName;
         protected readonly FileSystem mFileSystem;
         public readonly DirectoryEntry mParent;
         public readonly DirectoryEntryTypeEnum mEntryType;
@@ -52,7 +52,7 @@ namespace Cosmos.System.FileSystem.Listing
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// </exception>
-        protected DirectoryEntry(FileSystem aFileSystem, DirectoryEntry aParent, string aFullPath, string aName, uint aSize, DirectoryEntryTypeEnum aEntryType)
+        protected DirectoryEntry(FileSystem aFileSystem, DirectoryEntry aParent, string aFullPath, string aName, long aSize, DirectoryEntryTypeEnum aEntryType)
         {
             if (aFileSystem == null)
             {

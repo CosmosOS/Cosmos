@@ -15,6 +15,7 @@ namespace Cosmos.TestRunner.Core
             yield return typeof(Cosmos.Compiler.Tests.Exceptions.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.LinqTests.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.MethodTests.Kernel);
+            yield return typeof(Cosmos.Kernel.Tests.Fat.Kernel);
         }
     }
 }
