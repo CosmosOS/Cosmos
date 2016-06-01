@@ -31,7 +31,7 @@ namespace Cosmos.Kernal.Test.Collections
             mDebugger.Send("Making Hashtable");
             Hashtable a = new Hashtable();
             Hashtable aa = new Hashtable();
-
+            #region "Core Tests"
             // add key test
             mDebugger.Send("Hashtable add key test");
             try
@@ -79,6 +79,7 @@ namespace Cosmos.Kernal.Test.Collections
             {
                 mDebugger.Send("Hashtable failed");
             }
+            #endregion
 
 
 

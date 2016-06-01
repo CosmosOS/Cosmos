@@ -249,9 +249,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.Metho
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.MethodTestsBoot", "..\Tests\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTestsBoot.Cosmos", "{0FEE977D-AE52-4381-B513-71C5C1982ED4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernal.Test.Collections", "..\Tests\Cosmos.Kernal.Test.Collections\Cosmos.Kernal.Test.Collections.csproj", "{A9AA44FF-2804-464C-A99A-BFD30AD20731}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Test.Collections", "..\Tests\Cosmos.Kernal.Test.Collections\Cosmos.Kernel.Test.Collections.csproj", "{A9AA44FF-2804-464C-A99A-BFD30AD20731}"
 EndProject
-Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Kernal.Test.CollectionsBoot", "..\Tests\Cosmos.Kernal.Test.Collections\Cosmos.Kernal.Test.CollectionsBoot.Cosmos", "{532B7F8D-913E-42B6-A0C1-9E3F2EA36D50}"
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Kernel.Test.CollectionsBoot", "..\Tests\Cosmos.Kernal.Test.Collections\Cosmos.Kernel.Test.CollectionsBoot.Cosmos", "{532B7F8D-913E-42B6-A0C1-9E3F2EA36D50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

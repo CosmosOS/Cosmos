@@ -19,7 +19,7 @@
     <StartCosmosGDB>false</StartCosmosGDB>
     <VMWareEdition>Player</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
-    <Name>Cosmos.Kernal.Test.CollectionsBoot</Name>
+    <Name>Cosmos.Kernel.Test.CollectionsBoot</Name>
     <Description>Use VMware Player or Workstation to deploy and debug.</Description>
     <Deployment>ISO</Deployment>
     <Launch>VMware</Launch>
@@ -35,8 +35,8 @@
       <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Kernal.Test.Collections\Cosmos.Kernal.Test.Collections.csproj">
-      <Name>Cosmos.Kernal.Test.Collections</Name>
+    <ProjectReference Include="..\Cosmos.Kernal.Test.Collections\Cosmos.Kernel.Test.Collections.csproj">
+      <Name>Cosmos.Kernel.Test.Collections</Name>
       <Project>{a9aa44ff-2804-464c-a99a-bfd30ad20731}</Project>
       <Private>True</Private>
     </ProjectReference>
