@@ -25,6 +25,12 @@ namespace Cosmos.IL2CPU.Plugs
       public Type Target { get; set; }
 
       public string TargetName { get; set; }
+
+      public bool IsOptional
+      {
+          get;
+          set;
+      }
       
       public bool Inheritable = false;
       public bool IsMonoOnly = false;

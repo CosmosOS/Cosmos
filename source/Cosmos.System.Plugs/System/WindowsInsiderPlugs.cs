@@ -5,7 +5,7 @@ using Cosmos.IL2CPU.Plugs;
 namespace Cosmos.System.Plugs.System
 {
     // plugs introduced for Windows Insider preview 14342. Needs reviewing and merged into other classes in case of RTM of the windows version.
-    [Plug(TargetName = "System.Security.CodeAccessSecurityEngine, mscorlib", IsMicrosoftdotNETOnly = true)]
+    [Plug(TargetName = "System.Security.CodeAccessSecurityEngine, mscorlib", IsMicrosoftdotNETOnly = true, IsOptional = true)]
     public class CodeAccessSecurityEngineImpl
     {
         public static bool QuickCheckForAllDemands()
@@ -19,7 +19,7 @@ namespace Cosmos.System.Plugs.System
         }
     }
 
-    [Plug(TargetName = "System.IO.LongPathHelper, mscorlib", IsMicrosoftdotNETOnly = true)]
+    [Plug(TargetName = "System.IO.LongPathHelper, mscorlib", IsMicrosoftdotNETOnly = true, IsOptional = true)]
     public static class LongPathHelperImpl
     {
         public static string GetLongPathName(string path)
@@ -38,7 +38,7 @@ namespace Cosmos.System.Plugs.System
         }
     }
 
-    [Plug(TargetName = "System.AppContextDefaultValues, mscorlib")]
+    [Plug(TargetName = "System.AppContextDefaultValues, mscorlib", IsOptional=true)]
     public static class AppContextDefaultValuesImpl
     {
         public static void CCtor()
@@ -58,7 +58,7 @@ namespace Cosmos.System.Plugs.System
 
     }
 
-    [Plug(TargetName = "System.AppContext, mscorlib")]
+    [Plug(TargetName = "System.AppContext, mscorlib", IsOptional = true)]
     public static class AppContextImpl
     {
         public static bool TryGetSwitch(string key, ref bool value)
