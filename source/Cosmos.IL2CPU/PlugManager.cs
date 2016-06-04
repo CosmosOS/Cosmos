@@ -120,6 +120,7 @@ namespace Cosmos.IL2CPU
                                     {
                                         throw new Exception("Error", ex);
                                     }
+                                    continue;
                                 }
                             }
                             // Only keep this plug if its for MS.NET.
