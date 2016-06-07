@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Cosmos.HAL;
 
-namespace Cosmos.HAL.ScanMaps
+namespace Cosmos.System.ScanMaps
 {
     public class US_Standard : ScanMapBase
     {
+        public US_Standard()
+        {
+        }
+
         protected override void InitKeys()
         {
             _keys = new List<KeyMapping>(100);

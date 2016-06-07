@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Debug.Kernel;
-using Cosmos.HAL.ScanMaps;
 
 namespace Cosmos.HAL {
     public abstract class Keyboard : Device {
-        protected Keyboard()
+        protected Keyboard(ScanMapBase scanMap)
         {
             if (mQueuedKeys != null)
             {
@@ -15,7 +14,7 @@ namespace Cosmos.HAL {
             }
             mQueuedKeys = new Queue<KeyEvent>();
             Debugger.DoSend("mQueuedKeys created");
-            SetKeyLayout(new US_Standard());
+            SetKeyLayout(scanMap);
             Debugger.DoSend("Keylayout set");
             Initialize();
             Debugger.DoSend("Initialized");

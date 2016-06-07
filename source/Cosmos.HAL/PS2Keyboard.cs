@@ -10,8 +10,8 @@ namespace Cosmos.HAL
     {
         protected Core.IOGroup.Keyboard IO = Core.Global.BaseIOGroups.Keyboard;
 
-        public PS2Keyboard()
-        {           
+        public PS2Keyboard(ScanMapBase scanMap): base(scanMap)
+        {
         }
 
         protected override void Initialize()

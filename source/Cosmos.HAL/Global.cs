@@ -126,7 +126,7 @@ namespace Cosmos.HAL
       if (keyboard == null)
       {
         mDebugger.Send("No keyboard specified!");
-        Keyboard = new PS2Keyboard();
+        throw new SystemException("No keyboard specified!");
       }
       else
       {

@@ -1,6 +1,7 @@
 ﻿using System;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL;
+using Cosmos.System.ScanMaps;
 
 namespace Cosmos.System
 {
@@ -25,9 +26,9 @@ namespace Cosmos.System
             return null;
         }
 
-        protected virtual Keyboard GetKeyboard()
+        protected virtual ScanMapBase GetKeyboardScanMap()
         {
-            return null;
+            return new US_Standard();
         }
 
 
@@ -55,7 +56,7 @@ namespace Cosmos.System
                 HAL.Bootstrap.Init();
 
                 Global.mDebugger.Send("Global Init");
-                Global.Init(GetTextScreen(), GetKeyboard());
+                Global.Init(GetTextScreen(), new PS2Keyboard(GetKeyboardScanMap()));
 
                 // Provide the user with a clear screen if they requested it
                 if (ClearScreen)
