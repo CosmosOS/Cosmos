@@ -1,0 +1,1 @@
+﻿On initialization of the kernel, a GlobalInformationTable is setup. This contains the address of the first DataLookupEntry

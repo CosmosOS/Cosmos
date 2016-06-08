@@ -2,7 +2,7 @@
 
 namespace Cosmos.Core
 {
-    // The DataLookupTable (DLT) basically is a linked list.
+    // The DataLookupTable (DLT) basically is a double linked list.
     [StructLayout(LayoutKind.Explicit)]
     internal unsafe struct DataLookupTable
     {
