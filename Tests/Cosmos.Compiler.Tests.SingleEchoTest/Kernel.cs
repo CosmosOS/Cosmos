@@ -37,6 +37,15 @@ namespace Cosmos.Compiler.Tests.SingleEchoTest
             Assert.AreEqual(97, (int) input[0], "First char of returned string is not a!");
             Assert.AreEqual(98, (int)input[1], "Second char of returned string is not b!");
             Assert.AreEqual(99, (int)input[2], "Third char of returned string is not c!");
+
+            // now test ReadKey:
+
+            //// fake a
+            //Sys.TestingHelpers.KeyboardAddFakeScanCode(0x1E, false);
+            //Sys.TestingHelpers.KeyboardAddFakeScanCode(0x1E, true);
+
+            //var xKey = Console.ReadKey();
+            //Assert.IsTrue(xKey.Key == ConsoleKey.A, "ReadKey didn't return key A!");
             TestController.Completed();
         }
     }
