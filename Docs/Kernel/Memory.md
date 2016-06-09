@@ -1,17 +1,60 @@
 ﻿# Layout
 
+```
 F..F
+
 Stack
   Currently only one stack as we don't have threads yet. Stack resides at top of RAM and grows down. 
+  In future each process will have its own stack in DATA. And Stack master section will be eliminated.
 ....
+
 Data
+  -Heap
+  Global heap for all processes since compiler enforces references.
 
 Text
-  Syslinux Boot Code
-  Cosmos Boot Code
-  Kernel
-  Apps (Monolithic currently)
+  All sections are fixed in size and are stacked.
+  -Syslinux Boot Code
+  -Cosmos Boot Code
+  -Kernel
+  -Apps (Monolithic currently, will move to DATA later)
+  -Legacy GDT
+  -IDT
+  -Page Tables
+
 0..0
+```
+
+```
+MM API
+-Allocate new item
+-Add/remove ref
+-Lock/unlock an item
+-Force a compact
+
+Implicit
+-Get pointer
+
+Internal
+-Compact
+-Relocate items
+
+Properties
+-Ref count
+-Lock status
+-Size
+
+Handles
+-Use indirect pointers via a lookup table. Handle is ptr to table. Global table to save space.
+  -No way to compact tables? 
+  -use linked list of tables to allow some compaction? 
+  -Allocate tables to processes so they will go away 100% when process goes way since its not fully shrinkable.
+  -Keep in data space in future?
+  -Small tables increase compaction opportunities
+-Points to actual data
+-Properties are before pointer
+-In atomic ops (IL emit groups) - pointer can be grabbed and stored
+```
 
 # OLD BELOW THIS POINT
 
