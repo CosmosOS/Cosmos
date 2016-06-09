@@ -379,7 +379,7 @@ namespace Cosmos.System.Plugs.System
 
         // ReadKey() pure CIL
 
-        public static KeyEvent ReadKey(Boolean intercept)
+        public static ConsoleKeyInfo ReadKey(Boolean intercept)
         {
             var key = Cosmos.HAL.Global.Keyboard.ReadKey();
 
@@ -387,7 +387,8 @@ namespace Cosmos.System.Plugs.System
             {
                 Write(key.KeyChar);
             }
-            return key;
+            // todo: add support for modifiers (ctrl, alt, etc)
+            return new ConsoleKeyInfo(key.KeyChar, key.Key.ToConsoleKey(), false, false, false);
         }
 
         public static String ReadLine()

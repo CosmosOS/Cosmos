@@ -40,12 +40,12 @@ namespace Cosmos.Compiler.Tests.SingleEchoTest
 
             // now test ReadKey:
 
-            //// fake a
-            //Sys.TestingHelpers.KeyboardAddFakeScanCode(0x1E, false);
-            //Sys.TestingHelpers.KeyboardAddFakeScanCode(0x1E, true);
+            // fake a
+            Sys.TestingHelpers.KeyboardAddFakeScanCode(0x1E, false);
+            Sys.TestingHelpers.KeyboardAddFakeScanCode(0x1E, true);
 
-            //var xKey = Console.ReadKey();
-            //Assert.IsTrue(xKey.Key == ConsoleKey.A, "ReadKey didn't return key A!");
+            var xKey = Console.ReadKey();
+            Assert.IsTrue(xKey.Key == ConsoleKey.A, "ReadKey didn't return key A!");
             TestController.Completed();
         }
     }
