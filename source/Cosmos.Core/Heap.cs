@@ -63,6 +63,7 @@ namespace Cosmos.Core
                 DataLookupTable* xCurrentTable = GlobalSystemInfo.GlobalInformationTable->FirstDataLookupTable;
                 DataLookupTable* xPreviousTable = null;
                 uint xResult;
+                #region Loop through existing tables and see if we find a free spot
                 while (xCurrentTable != null)
                 {
                     mDebugger.SendInternal($"Scanning DataLookupTable {xCurrentTableIdx}");
@@ -86,6 +87,7 @@ namespace Cosmos.Core
                     mLastTableIndex = xCurrentTableIdx;
                     mLastEntryIndex = 0;
                 }
+                #endregion Loop through existing tables and see if we find a free spot
 
                 // no tables found, lets create a new one, and use that
                 if (xPreviousTable == null)
@@ -143,6 +145,7 @@ namespace Cosmos.Core
                 //mDebugger.Trace($"Item.Refcount", xCurrentEntry->Refcount);
                 if (xCurrentEntry->Size == 0)
                 {
+                    #region Found an uninitialized entry
                     mDebugger.SendInternal($"Found an entry at position {(uint)i}");
                     // found an entry now. Let's set it
                     if (aTable->Next != null)
@@ -188,11 +191,8 @@ namespace Cosmos.Core
 
                     aHandle = (uint)xCurrentEntry;
                     //mDebugger.Trace($"Returning handle ", aHandle);
-                    if (aHandle == 0x0213D185)
-                    {
-                        mDebugger.SendInternal("Last known one");
-                    }
                     mLastEntryIndex = i;
+                    #endregion Found an uninitialized entry
                     return true;
                 }
 
