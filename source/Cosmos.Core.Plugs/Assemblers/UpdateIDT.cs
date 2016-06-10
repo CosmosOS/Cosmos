@@ -117,7 +117,8 @@ namespace Cosmos.Core.Plugs
                 }
                 new CPUx86.Push { DestinationValue = (uint)j };
                 new CPUx86.Pushad();
-
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = (uint?)j };
+                new CPUx86.Call { DestinationLabel = "DebugStub_SendInterruptOccurred" };
                 new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP }; // preserve old stack address for passing to interrupt handler
 

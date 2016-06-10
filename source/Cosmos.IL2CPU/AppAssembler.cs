@@ -134,6 +134,7 @@ namespace Cosmos.IL2CPU
                 xMethodLabel = LabelName.Get(aMethod.MethodBase);
             }
             new Cosmos.Assembler.Label(xMethodLabel);
+
             //Assembler.WriteDebugVideo("Method " + aMethod.UID);
 
             // We could use same GUID as MethodLabelStart, but its better to keep GUIDs unique globaly for items
@@ -147,6 +148,24 @@ namespace Cosmos.IL2CPU
 
             mCurrentMethodLabel = "METHOD_" + xLabelGuid.ToString();
             Cosmos.Assembler.Label.LastFullLabel = mCurrentMethodLabel;
+
+            if (DebugEnabled && StackCorruptionDetection)
+            {
+                // if StackCorruption detection is active, we're also going to emit a stack overflow detection
+                new Mov { DestinationReg = RegistersEnum.EAX, SourceRef= ElementReference.New("Before_Kernel_Stack") };
+                new Compare { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP };
+                new ConditionalJump { Condition = ConditionalTestEnum.LessThan, DestinationLabel = mCurrentMethodLabel + ".StackOverflowCheck_End" };
+                new ClearInterruptFlag();
+                // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
+                new Call { DestinationLabel = mCurrentMethodLabel + ".StackOverflowCheck_GetAddress" };
+                new Assembler.Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
+                new Pop { DestinationReg = RegistersEnum.EAX };
+                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
+                new Call { DestinationLabel = "DebugStub_SendStackOverflowOccurred" };
+                new Halt();
+                new Assembler.Label(mCurrentMethodLabel + ".StackOverflowCheck_End");
+                
+            }
 
             mCurrentMethodLabelEndGuid = DebugInfo.CreateId();
 

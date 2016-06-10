@@ -128,6 +128,10 @@
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Core.Memory\Cosmos.Core.Memory.csproj">
+      <Project>{25F2A2F4-2632-4E32-9128-77C27CB5C856}</Project>
+      <Name>Cosmos.Core.Memory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
       <Project>{61607f1e-58f9-41cf-972f-128384f3e115}</Project>
       <Name>Cosmos.Debug.Kernel</Name>

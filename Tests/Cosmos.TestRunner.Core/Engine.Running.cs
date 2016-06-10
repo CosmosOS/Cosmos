@@ -45,6 +45,13 @@ namespace Cosmos.TestRunner.Core
                     mKernelResultSet = true;
                     mKernelRunning = false;
                 };
+            debugConnector.CmdStackOverflowOccurred = a =>
+                                                      {
+                                                          OutputHandler.LogMessage("Stack overflow occurred at: 0x" + a.ToString("X8"));
+                                                          OutputHandler.SetKernelTestResult(false, "Stack overflow occurred at: 0x" + a.ToString("X8"));
+                                                          mKernelResultSet = true;
+                                                          mKernelRunning = false;
+                                                      };
             debugConnector.CmdNullReferenceOccurred = a =>
                 {
                     OutputHandler.LogMessage("Null Reference Exception occurred at: 0x" + a.ToString("X8"));
@@ -54,6 +61,13 @@ namespace Cosmos.TestRunner.Core
                     mKernelResultSet = true;
                     mKernelRunning = false;
                 };
+            if (RunWithGDB)
+            {
+                debugConnector.CmdInterruptOccurred = a =>
+                                                      {
+                                                          OutputHandler.LogMessage($"Interrupt {a} occurred");
+                                                      };
+            }
         }
 
         private void HandleRunning(DebugConnector debugConnector, Base host)

@@ -126,6 +126,24 @@ namespace Cosmos.Debug.Common
             WaitForMessage();
         }
 
+        protected void PacketStackOverflowOccurred(byte[] aPacket)
+        {
+            if (CmdStackOverflowOccurred != null)
+            {
+                CmdStackOverflowOccurred(GetUInt32(aPacket, 0));
+            }
+            WaitForMessage();
+        }
+
+        protected void PacketInterruptOccurred(byte[] aPacket)
+        {
+            if (CmdInterruptOccurred != null)
+            {
+                CmdInterruptOccurred(GetUInt32(aPacket, 0));
+            }
+            WaitForMessage();
+        }
+
         protected void PacketStack(byte[] aPacket)
         {
             if (CmdStack != null)

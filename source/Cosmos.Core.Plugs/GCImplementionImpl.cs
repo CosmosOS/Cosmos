@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Core.Memory;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core.Plugs
@@ -19,6 +20,7 @@ namespace Cosmos.Core.Plugs
             //{
             //    return Managed_Memory_System.ManagedMemory.KernelMemAlloc(aSize);
             //}
+            GlobalSystemInfo.EnsureInitialized();
             return Heap.MemAlloc(aSize);
         }
 
