@@ -19,6 +19,7 @@ namespace Cosmos.Core.Plugs
             //{
             //    return Managed_Memory_System.ManagedMemory.KernelMemAlloc(aSize);
             //}
+            GlobalSystemInfo.EnsureInitialized();
             return Heap.MemAlloc(aSize);
         }
 

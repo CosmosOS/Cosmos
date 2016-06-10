@@ -23,11 +23,7 @@ namespace Cosmos.Core {
             PIC = new PIC();
             CPU.UpdateIDT(true);
             CPU.InitFloat();
-
-            // Not sure if this is necessary, heap is already used before we get here
-            // and it seems to be fully (or at least partially) self initializing
-            Heap.EnsureIsInitialized();
-
+            
            // Managed_Memory_System.ManagedMemory.Initialize();
            // Managed_Memory_System.ManagedMemory.SetUpMemoryArea();
         }

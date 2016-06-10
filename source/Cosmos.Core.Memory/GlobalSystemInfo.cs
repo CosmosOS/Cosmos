@@ -14,7 +14,7 @@ namespace Cosmos.Core
             }
         }
 
-        private static unsafe void EnsureInitialized()
+        internal static unsafe void EnsureInitialized()
         {
             if (mGlobalInformationTable == null)
             {
