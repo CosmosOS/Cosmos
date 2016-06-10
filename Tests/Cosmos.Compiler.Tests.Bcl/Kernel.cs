@@ -22,6 +22,8 @@ namespace Cosmos.Compiler.Tests.Bcl
             {
                 mDebugger.Send("Run");
 
+                CSharp.WhileLoopTests.Execute();
+
                 StringTest.Execute();
                 ByteTest.Execute();
                 SByteTest.Execute();
