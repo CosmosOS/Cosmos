@@ -55,4 +55,4 @@ notifications:
 matrix:
   fast_finish: true
 artifacts:
-  - path: source\TestResults\TestResult.xml
+  - path: '**\TestResult.xml'
