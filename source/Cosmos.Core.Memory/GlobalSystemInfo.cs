@@ -33,7 +33,7 @@ namespace Cosmos.Core.Memory
                 mGlobalInformationTable->FirstDataLookupTable = (DataLookupTable*)xFirstDataLookupLocation;
                 Debugger.DoSend("FirstDataLookupTable was set to ");
                 Debugger.DoSendNumber((uint)mGlobalInformationTable->FirstDataLookupTable);
-                Heap.
+                Heap.DoInitialize(CPU.GetAmountOfRAM() - (1024 * 1024));
             }
         }
 
