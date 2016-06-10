@@ -1,4 +1,4 @@
-; Generated at 3/27/2016 7:18:47 PM
+; Generated at 10-6-2016 10:37:51
 
 
 
@@ -266,6 +266,28 @@ Mov ESI, DebugStub_CallerEIP
 Call DebugStub_ComWrite32
 DebugStub_SendStackCorruptionOccurred_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendStackCorruptionOccurred_Exit
+Ret
+
+DebugStub_SendStackOverflowOccurred:
+Mov AL, DebugStub_Const_Ds2Vs_StackOverflowOccurred
+Call DebugStub_ComWriteAL
+
+Mov ESI, DebugStub_CallerEIP
+Call DebugStub_ComWrite32
+DebugStub_SendStackOverflowOccurred_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendStackOverflowOccurred_Exit
+Ret
+
+DebugStub_SendInterruptOccurred:
+Push EAX
+
+Mov AL, DebugStub_Const_Ds2Vs_InterruptOccurred
+Call DebugStub_ComWriteAL
+
+Pop EAX
+Call DebugStub_ComWriteEAX
+DebugStub_SendInterruptOccurred_Exit:
+mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendInterruptOccurred_Exit
 Ret
 
 DebugStub_SendNullReferenceOccurred:

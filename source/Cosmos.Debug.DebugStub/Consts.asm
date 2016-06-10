@@ -1,4 +1,4 @@
-; Generated at 3/27/2016 7:24:32 PM
+; Generated at 10-6-2016 10:34:30
 
 
 
@@ -60,4 +60,6 @@ DebugStub_Const_Ds2Vs_SimpleNumber equ 18
 DebugStub_Const_Ds2Vs_SimpleLongNumber equ 19
 DebugStub_Const_Ds2Vs_ComplexNumber equ 20
 DebugStub_Const_Ds2Vs_ComplexLongNumber equ 21
+DebugStub_Const_Ds2Vs_StackOverflowOccurred equ 22
+DebugStub_Const_Ds2Vs_InterruptOccurred equ 23
 

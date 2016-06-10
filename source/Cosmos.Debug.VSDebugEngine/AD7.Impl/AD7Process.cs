@@ -346,6 +346,7 @@ namespace Cosmos.Debug.VSDebugEngine
             mDbgConnector.CmdStack += new Action<byte[]>(DbgCmdStack);
             mDbgConnector.CmdPong += new Action<byte[]>(DbgCmdPong);
             mDbgConnector.CmdStackCorruptionOccurred += DbgCmdStackCorruptionOccurred;
+            mDbgConnector.CmdStackOverflowOccurred += DbgCmdStackOverflowOccurred;
             mDbgConnector.CmdNullReferenceOccurred += DbgCmdNullReferenceOccurred;
             mDbgConnector.CmdMessageBox += DbgCmdMessageBox;
             mDbgConnector.CmdChannel += DbgCmdChannel;
@@ -359,6 +360,11 @@ namespace Cosmos.Debug.VSDebugEngine
         private void DbgCmdStackCorruptionOccurred(uint lastEIPAddress)
         {
             MessageBox.Show(String.Format("Stack corruption occurred at address 0x{0:X8}! Halting now.", lastEIPAddress));
+        }
+
+        private void DbgCmdStackOverflowOccurred(uint lastEIPAddress)
+        {
+            MessageBox.Show(String.Format("Stack overflow occurred at address 0x{0:X8}! Halting now.", lastEIPAddress));
         }
 
         private void DbgCmdNullReferenceOccurred(uint lastEIPAddress)

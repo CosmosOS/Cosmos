@@ -62,3 +62,5 @@ const Ds2Vs_SimpleNumber = 18
 const Ds2Vs_SimpleLongNumber = 19
 const Ds2Vs_ComplexNumber = 20
 const Ds2Vs_ComplexLongNumber = 21
+const Ds2Vs_StackOverflowOccurred = 22
+const Ds2Vs_InterruptOccurred = 23
