@@ -54,3 +54,5 @@ notifications:
   on_build_status_changed: true
 matrix:
   fast_finish: true
+artifacts:
+  - path: source\TestResults\TestResult.xml
