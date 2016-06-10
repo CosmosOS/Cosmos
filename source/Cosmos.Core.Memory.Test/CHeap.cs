@@ -5,6 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cosmos.Core.Memory.Test {
-  static public class CRAM {
+  static public class CHeap {
   }
 }
