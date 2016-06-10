@@ -8,6 +8,9 @@ build_script:
     rem %APPVEYOR_BUILD_FOLDER%
 
 
+    nuget restore "source\Cosmos.sln"
+
+
     msbuild "source\Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform=x86 /p:Configuration=Debug /p:DeployExtension=false
 
 
