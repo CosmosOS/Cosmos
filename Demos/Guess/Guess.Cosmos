@@ -31,7 +31,7 @@
     <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
     <Deployment>ISO</Deployment>
     <Launch>Bochs</Launch>
-    <DebugEnabled>False</DebugEnabled>
+    <DebugEnabled>True</DebugEnabled>
     <TraceAssemblies>All</TraceAssemblies>
     <PXE_Deployment>PXE</PXE_Deployment>
     <PXE_Launch>None</PXE_Launch>
@@ -136,7 +136,7 @@
     <Bochs_Deployment>ISO</Bochs_Deployment>
     <Bochs_Launch>Bochs</Bochs_Launch>
     <Bochs_ShowLaunchConsole>False</Bochs_ShowLaunchConsole>
-    <Bochs_DebugEnabled>False</Bochs_DebugEnabled>
+    <Bochs_DebugEnabled>True</Bochs_DebugEnabled>
     <Bochs_StackCorruptionDetectionEnabled>True</Bochs_StackCorruptionDetectionEnabled>
     <Bochs_DebugMode>IL</Bochs_DebugMode>
     <Bochs_IgnoreDebugStubAttribute>False</Bochs_IgnoreDebugStubAttribute>
@@ -179,6 +179,8 @@
     <User001_EnableBochsDebug>False</User001_EnableBochsDebug>
     <USB_StackCorruptionDetectionEnabled>False</USB_StackCorruptionDetectionEnabled>
     <USB_EnableBochsDebug>False</USB_EnableBochsDebug>
+    <StackCorruptionDetectionLevel>AllInstructions</StackCorruptionDetectionLevel>
+    <Bochs_StackCorruptionDetectionLevel>AllInstructions</Bochs_StackCorruptionDetectionLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Profile>Bochs</Profile>
@@ -197,7 +199,7 @@
     <IgnoreDebugStubAttribute>False</IgnoreDebugStubAttribute>
     <Deployment>ISO</Deployment>
     <Launch>Bochs</Launch>
-    <DebugEnabled>False</DebugEnabled>
+    <DebugEnabled>True</DebugEnabled>
     <TraceAssemblies>All</TraceAssemblies>
     <PXE_Deployment>PXE</PXE_Deployment>
     <PXE_Launch>None</PXE_Launch>
@@ -308,7 +310,7 @@
     <Bochs_Deployment>ISO</Bochs_Deployment>
     <Bochs_Launch>Bochs</Bochs_Launch>
     <Bochs_ShowLaunchConsole>False</Bochs_ShowLaunchConsole>
-    <Bochs_DebugEnabled>False</Bochs_DebugEnabled>
+    <Bochs_DebugEnabled>True</Bochs_DebugEnabled>
     <Bochs_StackCorruptionDetectionEnabled>True</Bochs_StackCorruptionDetectionEnabled>
     <Bochs_DebugMode>IL</Bochs_DebugMode>
     <Bochs_IgnoreDebugStubAttribute>False</Bochs_IgnoreDebugStubAttribute>
@@ -351,6 +353,8 @@
     <User001_EnableBochsDebug>False</User001_EnableBochsDebug>
     <USB_StackCorruptionDetectionEnabled>False</USB_StackCorruptionDetectionEnabled>
     <USB_EnableBochsDebug>False</USB_EnableBochsDebug>
+    <StackCorruptionDetectionLevel>AllInstructions</StackCorruptionDetectionLevel>
+    <Bochs_StackCorruptionDetectionLevel>AllInstructions</Bochs_StackCorruptionDetectionLevel>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Cosmos.bxrc">
