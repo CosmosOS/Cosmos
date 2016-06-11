@@ -108,7 +108,7 @@ namespace Cosmos.Kernal.Test.Collections
         private void DictionaryTest()
         {
             mDebugger.Send("Making Dictionary");
-             Dictionary<string, string> a = new Dictionary<string, string>();
+            Dictionary<string, string> a = new Dictionary<string, string>();
             Dictionary<string, string> aa = new Dictionary<string, string>();
 
             // add key test
