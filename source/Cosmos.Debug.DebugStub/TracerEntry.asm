@@ -1,4 +1,4 @@
-; Generated at 6/11/2016 12:59:50 PM
+; Generated at 6/11/2016 4:16:44 PM
 
 
 
@@ -16,7 +16,7 @@ Mov EBX, EAX
 MOV EAX, DR6
 And EAX, 0x4000
 Cmp EAX, 0x4000
-JE DebugStub_TracerEntry_Block1_End
+JE near DebugStub_TracerEntry_Block1_End
 Dec EBX
 
 DebugStub_TracerEntry_Block1_End:

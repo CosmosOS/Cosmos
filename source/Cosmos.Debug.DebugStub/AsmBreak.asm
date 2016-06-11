@@ -1,4 +1,4 @@
-; Generated at 6/11/2016 12:59:50 PM
+; Generated at 6/11/2016 4:16:44 PM
 
 DebugStub_AsmBreakEIP dd 0
 DebugStub_AsmOrigByte dd 0
@@ -34,7 +34,7 @@ Ret
 DebugStub_ClearAsmBreak:
 Mov EDI, [DebugStub_AsmBreakEIP]
 Cmp EDI, 0
-JE DebugStub_ClearAsmBreak_Exit
+JE near DebugStub_ClearAsmBreak_Exit
 Mov AL, [DebugStub_AsmOrigByte]
 Mov [EDI + 0], AL
 Mov dword [DebugStub_AsmBreakEIP], 0

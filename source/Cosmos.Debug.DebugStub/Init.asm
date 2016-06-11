@@ -1,4 +1,4 @@
-; Generated at 6/11/2016 12:59:50 PM
+; Generated at 6/11/2016 4:16:44 PM
 
 DebugStub_MaxBPId dd 0
 
@@ -21,7 +21,7 @@ Mov EBX, 0
 
 DebugStub_WaitForSignature_Block1_Begin:
 Cmp EBX, DebugStub_Const_Signature
-JE DebugStub_WaitForSignature_Block1_End
+JE near DebugStub_WaitForSignature_Block1_End
 Call DebugStub_ComReadAL
 Mov BL, AL
 ROR EBX, 8

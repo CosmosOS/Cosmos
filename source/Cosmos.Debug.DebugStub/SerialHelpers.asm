@@ -1,4 +1,4 @@
-; Generated at 6/11/2016 12:59:50 PM
+; Generated at 6/11/2016 4:16:44 PM
 
 
 
@@ -107,7 +107,7 @@ DebugStub_ComWriteX:
 DebugStub_ComWriteX_More:
 Call DebugStub_ComWrite8
 Dec ECX
-JNE DebugStub_ComWriteX_More
+JNE near DebugStub_ComWriteX_More
 
 DebugStub_ComWriteX_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ComWriteX_Exit

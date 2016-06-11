@@ -1,4 +1,4 @@
-; Generated at 6/11/2016 12:59:50 PM
+; Generated at 6/11/2016 4:16:44 PM
 
 DebugWaitMsg db 96, 87, 97, 105, 116, 105, 110, 103, 32, 102, 111, 114, 32, 100, 101, 98, 117, 103, 103, 101, 114, 32, 99, 111, 110, 110, 101, 99, 116, 105, 111, 110, 46, 46, 46, 96, 0
 
@@ -10,7 +10,7 @@ Mov ESI, DebugStub_Const_VidBase
 
 DebugStub_Cls_Block1_Begin:
 Cmp ESI, 0xB8FA0
-JNB DebugStub_Cls_Block1_End
+JNB near DebugStub_Cls_Block1_End
 Mov dword [ESI + 0], 0x00
 Inc ESI
 Mov dword [ESI + 0], 0x0A
@@ -31,7 +31,7 @@ Add EDI, 1640
 
 DebugStub_DisplayWaitMsg_Block1_Begin:
 Cmp byte [ESI + 0], 0
-JE DebugStub_DisplayWaitMsg_Block1_End
+JE near DebugStub_DisplayWaitMsg_Block1_End
 Mov AL, [ESI + 0]
 Mov [EDI + 0], AL
 Inc ESI

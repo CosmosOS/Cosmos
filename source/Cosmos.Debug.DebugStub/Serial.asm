@@ -1,4 +1,4 @@
-; Generated at 6/11/2016 12:59:50 PM
+; Generated at 6/11/2016 4:16:44 PM
 
 
 %ifndef Exclude_IOPort_Based_SerialInit
@@ -37,7 +37,7 @@ Mov DX, 5
 DebugStub_ComReadAL_Wait:
 Call DebugStub_ReadRegister
 Test AL, 0x01
-JE DebugStub_ComReadAL_Wait
+JE near DebugStub_ComReadAL_Wait
 Mov DX, 0
 Call DebugStub_ReadRegister
 
@@ -52,7 +52,7 @@ Mov DX, 5
 DebugStub_ComWrite8_Wait:
 Call DebugStub_ReadRegister
 Test AL, 0x20
-JE DebugStub_ComWrite8_Wait
+JE near DebugStub_ComWrite8_Wait
 Mov DX, 0
 Mov AL, [ESI + 0]
 Call DebugStub_WriteRegister
