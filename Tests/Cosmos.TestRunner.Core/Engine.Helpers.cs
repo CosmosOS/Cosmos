@@ -9,6 +9,7 @@ using Cosmos.Build.Common;
 using Cosmos.Build.MSBuild;
 using Cosmos.Core.Plugs;
 using Cosmos.Debug.Kernel.Plugs;
+using Cosmos.IL2CPU;
 using Cosmos.System.Plugs.System;
 using IL2CPU;
 using Microsoft.Win32;
@@ -64,7 +65,7 @@ namespace Cosmos.TestRunner.Core
                     throw new Exception("Cannot run multiple kernels with in-process compilation!");
                 }
                 // ensure we're using the referenced (= solution) version
-                Assembler.Assembler.ReadDebugStubFromDisk = false;
+                CosmosAssembler.ReadDebugStubFromDisk = false;
                 var xResult = Program.Run(xArguments, OutputHandler.LogMessage, OutputHandler.LogError);
                 if (xResult != 0)
                 {

@@ -294,21 +294,9 @@
     <None Include=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\XSharp.Nasm\XSharp.Nasm.csproj">
-      <Project>{841A734E-9606-4AAB-9C4A-74E7E303FF5D}</Project>
-      <Name>XSharp.Nasm</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\XSharp.Compiler\XSharp.Compiler.csproj">
-      <Project>{A281A1B1-C718-4BCB-A7BE-ED840A70449A}</Project>
-      <Name>XSharp.Compiler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Debug.DebugStub\Cosmos.Debug.DebugStub.csproj">
-      <Project>{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}</Project>
-      <Name>Cosmos.Debug.DebugStub</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -13,7 +13,7 @@ namespace Cosmos.Assembler.x86 {
 
         public override void WriteText( Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput )
         {
-            mMnemonic = String.Intern("j" + Condition.GetMnemonic() + " near");
+            mMnemonic = "J" + Condition.GetMnemonic().ToUpperInvariant() + " near";
             base.WriteText(aAssembler, aOutput);
         }
     }

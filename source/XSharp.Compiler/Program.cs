@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Cosmos.Assembler;
 
 namespace XSharp.Compiler {
   class Program {
@@ -12,16 +13,24 @@ namespace XSharp.Compiler {
 
         var xGenerator = new AsmGenerator();
         string[] xFiles;
-        if (Directory.Exists(xSrc)) {
+        if (Directory.Exists(xSrc))
+        {
           xFiles = Directory.GetFiles(xSrc, "*.xs");
-        } else {
+        }
+        else
+        {
           xFiles = new string[] { xSrc };
         }
-        foreach (var xFile in xFiles) {
+        foreach (var xFile in xFiles)
+        {
           xGenerator.GenerateToFiles(xFile);
         }
+        //var xAsm = new Assembler();
+        //var xStreamReader= new StringReader("ESI[0] = $00");
+        //var xResult = xGenerator.Generate(xStreamReader);
+        //Console.WriteLine("done");
       } catch (Exception ex) {
-        Console.WriteLine(ex.Message);
+        Console.WriteLine(ex.ToString());
         Environment.Exit(1);
       }
     }

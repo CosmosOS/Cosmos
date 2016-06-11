@@ -1,20 +1,15 @@
-; Generated at 10-6-2016 10:34:30
-
+; Generated at 6/11/2016 12:59:50 PM
 
 
 DebugStub_Const_Signature equ 0x19740807
-
 DebugStub_Const_Tracing_Off equ 0
 DebugStub_Const_Tracing_On equ 1
-
 DebugStub_Const_Status_Run equ 0
 DebugStub_Const_Status_Break equ 1
-
 DebugStub_Const_StepTrigger_None equ 0
 DebugStub_Const_StepTrigger_Into equ 1
 DebugStub_Const_StepTrigger_Over equ 2
 DebugStub_Const_StepTrigger_Out equ 3
-
 DebugStub_Const_Vs2Ds_Noop equ 0
 DebugStub_Const_Vs2Ds_TraceOff equ 1
 DebugStub_Const_Vs2Ds_TraceOn equ 2
@@ -37,7 +32,6 @@ DebugStub_Const_Vs2Ds_AsmStepInto equ 18
 DebugStub_Const_Vs2Ds_SetINT3 equ 19
 DebugStub_Const_Vs2Ds_ClearINT3 equ 20
 DebugStub_Const_Vs2Ds_Max equ 21
-
 DebugStub_Const_Ds2Vs_Noop equ 0
 DebugStub_Const_Ds2Vs_TracePoint equ 1
 DebugStub_Const_Ds2Vs_Message equ 192
@@ -62,4 +56,3 @@ DebugStub_Const_Ds2Vs_ComplexNumber equ 20
 DebugStub_Const_Ds2Vs_ComplexLongNumber equ 21
 DebugStub_Const_Ds2Vs_StackOverflowOccurred equ 22
 DebugStub_Const_Ds2Vs_InterruptOccurred equ 23
-

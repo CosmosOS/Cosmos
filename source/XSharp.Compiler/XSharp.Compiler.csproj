@@ -99,6 +99,7 @@
     <Compile Include="Token.cs" />
     <Compile Include="TokenList.cs" />
     <Compile Include="TokenPatterns.cs" />
+    <Compile Include="XS.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Cosmos.snk">
@@ -106,6 +107,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj">
+      <Project>{1116130e-28e0-428a-a597-f4b3b676c0ca}</Project>
+      <Name>Cosmos.Assembler</Name>
+    </ProjectReference>
     <ProjectReference Include="..\XSharp.Nasm\XSharp.Nasm.csproj">
       <Project>{841A734E-9606-4AAB-9C4A-74E7E303FF5D}</Project>
       <Name>XSharp.Nasm</Name>

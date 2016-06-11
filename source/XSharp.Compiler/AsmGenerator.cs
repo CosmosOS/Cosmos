@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
-using XSharp.Nasm;
+using Cosmos.Assembler;
 
 namespace XSharp.Compiler {
   // This class performs the translation from X# source code into a target
@@ -32,7 +33,7 @@ namespace XSharp.Compiler {
     /// <param name="aReader">X# source code reader.</param>
     /// <returns>The resulting target assembler content. The returned object contains
     /// a code and a data block.</returns>
-    public Assembler Generate(StreamReader aReader)
+    public Assembler Generate(TextReader aReader)
     {
       if (aReader == null)
       {
@@ -41,22 +42,27 @@ namespace XSharp.Compiler {
       mPatterns.EmitUserComments = EmitUserComments;
       mLineNo = 0;
       var xResult = new Assembler();
-      // Read one X# source code line at a time and process it.
-      while (true)
+      try
       {
-        mLineNo++;
-        string xLine = aReader.ReadLine();
-        if (xLine == null)
+        // Read one X# source code line at a time and process it.
+        while (true)
         {
-          break;
-        }
+          mLineNo++;
+          string xLine = aReader.ReadLine();
+          if (xLine == null)
+          {
+            break;
+          }
 
-        var xAsm = ProcessLine(xLine, mLineNo);
-        xResult.Data.AddRange(xAsm.Data);
-        xResult.Code.AddRange(xAsm.Code);
+          ProcessLine(xLine, mLineNo);
+        }
+        AssertLastFunctionComplete();
+        return xResult;
       }
-      AssertLastFunctionComplete();
-      return xResult;
+      finally
+      {
+        Assembler.ClearCurrentInstance();
+      }
     }
 
     /// <summary>Parse the input X# source code file and generate the matching target assembly
@@ -85,12 +91,22 @@ namespace XSharp.Compiler {
     /// <param name="aSrcPathname">X# source code file.</param>
     public void GenerateToFiles(string aSrcPathname) {
       mPathname = Path.GetFileName(aSrcPathname);
-      using (var xInput = new StreamReader(aSrcPathname)) {
-        using (var xOutputCode = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".asm"))) {
-          using (var xOutputData = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".asmdata"))) {
-            Generate(xInput, xOutputData, xOutputCode);
+      new Assembler(false);
+      try
+      {
+        using (var xInput = new StreamReader(aSrcPathname))
+        {
+          using (var xOutput = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".asm")))
+          {
+            xOutput.WriteLine("; Generated at {0}", DateTime.Now.ToString(new CultureInfo("en-US")));
+
+            Generate(xInput, xOutput);
           }
         }
+      }
+      finally
+      {
+        Assembler.ClearCurrentInstance();
       }
     }
 
@@ -99,7 +115,7 @@ namespace XSharp.Compiler {
     /// <param name="aInput">A reader to acquire X# source code from.</param>
     /// <param name="aOutputData">A writer that will receive target assembler data.</param>
     /// <param name="aOutputCode">A writer that will receive target assembler code.</param>
-    public void Generate(TextReader aInput, TextWriter aOutputData, TextWriter aOutputCode) {
+    public void Generate(TextReader aInput, TextWriter aOutput) {
       mPatterns.EmitUserComments = EmitUserComments;
       mLineNo = 0;
       // Read one X# source code line at a time and process it.
@@ -110,14 +126,10 @@ namespace XSharp.Compiler {
           break;
         }
 
-        var xAsm = ProcessLine(xLine, mLineNo);
-        foreach (var x in xAsm.Data) {
-          aOutputData.WriteLine(x);
-        }
-        foreach (var x in xAsm.Code) {
-          aOutputCode.WriteLine(x);
-        }
+        ProcessLine(xLine, mLineNo);
+
       }
+      Assembler.CurrentInstance.FlushText(aOutput);
       AssertLastFunctionComplete();
     }
 
@@ -127,20 +139,17 @@ namespace XSharp.Compiler {
     /// <param name="lineNumber">Line number for debugging and diagnostic messages.</param>
     /// <returns>The resulting target assembler content. The returned object contains
     /// a code and a data block.</returns>
-    protected Assembler ProcessLine(string aLine, int lineNumber) {
+    protected void ProcessLine(string aLine, int lineNumber) {
       Assembler xAsm;
 
       aLine = aLine.Trim();
       if (String.IsNullOrEmpty(aLine) || aLine == "//") {
-        xAsm = new Assembler();
-        xAsm += "";
-        return xAsm;
+        return;
       }
 
       // Currently we use a new assembler for every line.
       // If we dont it could create a really large in memory object.
-      xAsm = mPatterns.GetCode(aLine, lineNumber);
-      if (xAsm == null) {
+      if (!mPatterns.GetCode(aLine, lineNumber)) {
         var xMsg = new StringBuilder();
         if (mPathname != "") {
           xMsg.Append("File " + mPathname + ", ");
@@ -149,7 +158,6 @@ namespace XSharp.Compiler {
         xMsg.Append("Parsing error: " + aLine);
         throw new Exception(xMsg.ToString());
       }
-      return xAsm;
     }
   }
 }

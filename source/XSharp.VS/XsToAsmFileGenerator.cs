@@ -25,21 +25,17 @@ namespace XSharp.VS {
     public int Generate(string aInputFilePath, string aInputFileContents, string aDefaultNamespace, IntPtr[] aOutputFileContents, out uint oPcbOutput, IVsGeneratorProgress aGenerateProgress) {
       string xResult;
       using (var xInput = new StringReader(aInputFileContents)) {
-        using (var xOutData = new StringWriter()) {
-          using (var xOutCode = new StringWriter()) {
+        using (var xOut = new StringWriter()) {
             try {
               var xGen = new XSharp.Compiler.AsmGenerator();
-              xGen.Generate(xInput, xOutData, xOutCode);
+              xGen.Generate(xInput, xOut);
               xResult =
                 "; Generated at " + DateTime.Now.ToString() + "\r\n"
                  + "\r\n"
-                + xOutData.ToString() + "\r\n"
-                + xOutCode.ToString() + "\r\n";
+                + xOut.ToString() + "\r\n";
             } catch (Exception ex) {
               var xSB = new StringBuilder();
-              xSB.Append(xOutData);
-              xSB.AppendLine();
-              xSB.Append(xOutCode);
+              xSB.Append(xOut);
               xSB.AppendLine();
 
               for (Exception e = ex; e != null; e = e.InnerException) {
@@ -48,7 +44,6 @@ namespace XSharp.VS {
               xResult = xSB.ToString();
             }
           }
-        }
       }
 
       aOutputFileContents[0] = IntPtr.Zero;

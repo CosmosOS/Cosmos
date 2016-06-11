@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using XSharp.Nasm;
+using Cosmos.Assembler;
+using Cosmos.Assembler.x86;
+using Instruction = Cosmos.Assembler.Instruction;
 
 namespace XSharp.Compiler {
   /// <summary>This class is able to translate a single X# source code line into one or more
@@ -19,11 +21,13 @@ namespace XSharp.Compiler {
       public readonly TokenList Tokens;
       public readonly int Hash;
       public readonly CodeFunc Code;
+      public readonly string PatternString;
 
-      public Pattern(TokenList aTokens, CodeFunc aCode) {
+      public Pattern(TokenList aTokens, CodeFunc aCode, string patternString) {
         Tokens = aTokens;
         Hash = aTokens.GetHashCode();
         Code = aCode;
+        PatternString = patternString;
       }
     }
 
@@ -47,28 +51,36 @@ namespace XSharp.Compiler {
         mCurrentLabelID++;
         xBlock.LabelID = mCurrentLabelID;
         xBlock.StartTokens = aTokens;
-        if (aIsCollector || (Count > 0 && Current().Contents != null)) {
-          xBlock.Contents = new List<string>();
-        }
+
         // Last because we use Current() above
         Add(xBlock);
+        xBlock.ParentAssembler = Assembler.CurrentInstance;
+        new Assembler();
       }
 
-      public void End() {
+      public void End()
+      {
+        Assembler.ClearCurrentInstance();
         RemoveAt(Count - 1);
       }
     }
     protected class Block {
       public TokenList StartTokens;
-      public List<string> Contents;
       public int LabelID;
+
+      public Assembler ParentAssembler;
+
+      public void AddContentsToParentAssembler()
+      {
+        ParentAssembler.Instructions.AddRange(Assembler.CurrentInstance.Instructions);
+      }
     }
 
     protected string mFuncName = null;
     protected bool mFuncExitFound = false;
 
     public bool EmitUserComments = true;
-    public delegate void CodeFunc(TokenList aTokens, Assembler aAsm);
+    public delegate void CodeFunc(TokenList aTokens);
     protected List<Pattern> mPatterns = new List<Pattern>();
     protected bool mInIntHandler;
     protected string[] mCompareOps;
@@ -116,21 +128,6 @@ namespace XSharp.Compiler {
 
       AddPatterns();
     }
-
-    // BlueSkeye : Seems to be unused. Quoted out.
-    //protected string Quoted(string aString) {
-    //  return "\"" + aString + "\"";
-    //}
-
-    // BlueSkeye : Seems to be unused. Quoted out.
-    //protected int IntValue(Token aToken)
-    //{
-    //  if (aToken.Value.StartsWith("0x")) {
-    //    return int.Parse(aToken.Value.Substring(2), NumberStyles.AllowHexSpecifier);
-    //  } else {
-    //    return int.Parse(aToken.Value);
-    //  }
-    //}
 
     /// <summary>Builds a label that is suitable to denote a constant which name is given by the
     /// token.</summary>
@@ -212,61 +209,33 @@ namespace XSharp.Compiler {
     /// keyword might have been used in function X# code. This keyword requires an exit label to
     /// be defined at function level. This method also automatically insert an IRET or RET instruction
     /// depending on whether the function is an interrupt handler or a standard function.</summary>
-    /// <param name="aAsm"></param>
-    protected void EndFunc(Assembler aAsm) {
+    protected void EndFunc() {
       if (null == mFuncName) {
         throw new Exception("Found a closing curly brace that doesn't match an opening curly brace.");
       }
       if (!mFuncExitFound) {
-        aAsm += GetNamespace() + "_" + mFuncName + "_Exit:";
+        XS.Label(GetNamespace() + "_" + mFuncName + "_Exit");
       }
       if (mInIntHandler) {
-        aAsm += "IRet";
+        XS.InterruptReturn();
       } else {
-        aAsm += "mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], " + GetNamespace() + "_" + mFuncName + "_Exit";
-        aAsm += "Ret";
+        XS.Set("static_field__Cosmos_Core_INTs_mLastKnownAddress", GetNamespace() + "_" + mFuncName + "_Exit");
+        XS.Return();
       }
       mFuncName = null;
     }
 
-    // BlueSkeye : Seems to be unused. Commented out.
-    //protected string GetDestRegister(TokenList aTokens, int aIdx) {
-    //  return GetRegister("Destination", aTokens, aIdx);
-    //}
+    protected string GetSimpleRef(Token aToken) {
+      var xIdx = 0;
+      var xList = new List<Token>();
+      xList.Add(aToken);
+      return GetRef(xList, ref xIdx, true);
+    }
 
-    // BlueSkeye : Seems to be unused. Commented out.
-    //protected string GetSrcRegister(TokenList aTokens, int aIdx) {
-    //  return GetRegister("Source", aTokens, aIdx);
-    //}
-
-    // BlueSkeye : Seems to be unused. Commented out.
-    //protected string GetRegister(string aPrefix, TokenList aTokens, int aIdx)
-    //{
-    //  var xToken = aTokens[aIdx].Type;
-    //  Token xNext = null;
-    //  if (aIdx + 1 < aTokens.Count) {
-    //    xNext = aTokens[aIdx + 1];
-    //  }
-
-    //  string xResult = aPrefix + "Reg = RegistersEnum." + aTokens[aIdx].Value;
-    //  if (xNext != null) {
-    //    if (xNext.Value == "[") {
-    //      string xDisplacement;
-    //      if (aTokens[aIdx + 2].Value == "-") {
-    //        xDisplacement = "-" + aTokens[aIdx + 2].Value;
-    //      } else {
-    //        xDisplacement = aTokens[aIdx + 2].Value;
-    //      }
-    //      xResult = xResult + ", " + aPrefix + "IsIndirect = true, " + aPrefix + "Displacement = " + xDisplacement;
-    //    }
-    //  }
-    //  return xResult;
-    //}
-
-    protected string GetRef(TokenList aTokens, ref int rIdx) {
+    protected string GetRef(List<Token> aTokens, ref int rIdx, bool onlySingleTokenRefs = false) {
       var xToken1 = aTokens[rIdx];
       Token xToken2 = null;
-      if (rIdx + 1 < aTokens.Count) {
+      if (rIdx + 1 < aTokens.Count && !onlySingleTokenRefs) {
         xToken2 = aTokens[rIdx + 1];
       }
       if (xToken1.Type == TokenType.Register) {
@@ -301,7 +270,8 @@ namespace XSharp.Compiler {
       }
     }
 
-    protected void DoCompare(Assembler aAsm, TokenList aTokens, ref int rStart, out Token aComparison) {
+    protected void DoCompare(TokenList aTokens, ref int rStart, out Token aComparison)
+    {
       string xSize = "";
       if (aTokens[rStart].Type == TokenType.Keyword) {
         xSize = aTokens[rStart];
@@ -314,15 +284,42 @@ namespace XSharp.Compiler {
       rStart++;
 
       string xRight = GetRef(aTokens, ref rStart);
-
-      aAsm.Cmp(xSize, xLeft, xRight);
+      XS.CompareLiteral(xSize, xLeft, xRight);
     }
 
-    protected string GetJump(string aComparison) {
+    protected void DoSimpleCompare(Token left, Token right, Token size = null)
+    {
+      var xTokens = new List<Token>(new[]{ left, right });
+      var xIdx = 0;
+      string xRight = GetRef(xTokens, ref xIdx, true);
+      DoSimpleCompare(left, xRight, size);
+    }
+
+    protected void DoSimpleCompare(Token left, string right, Token size = null)
+    {
+      string xSize = "";
+
+      var xIdx = 0;
+      var xTokens = new List<Token>(new[] { left });
+      string xLeft = GetRef(xTokens, ref xIdx, true);
+      XS.CompareLiteral(xSize, xLeft, right);
+    }
+
+    protected void DoSimpleTest(Token left, string right, Token size = null)
+    {
+      string xSize = "";
+
+      var xIdx = 0;
+      var xTokens = new List<Token>(new[] { left });
+      string xLeft = GetRef(xTokens, ref xIdx, true);
+      XS.TestLiteral(xSize, xLeft, right);
+    }
+
+    protected ConditionalTestEnum GetJump(string aComparison) {
       return GetJump(aComparison, false);
     }
 
-    protected string GetJump(string aComparison, bool aInvert) {
+    protected ConditionalTestEnum GetJump(string aComparison, bool aInvert) {
       if (aInvert) {
         if (aComparison == "<") {
           aComparison = ">=";
@@ -348,34 +345,34 @@ namespace XSharp.Compiler {
       }
 
       if (aComparison == "<") {
-        return "JB";  // unsigned
+        return ConditionalTestEnum.Below;  // unsigned
       } else if (aComparison == ">") {
-        return "JA";  // unsigned
+        return ConditionalTestEnum.Above;  // unsigned
       } else if (aComparison == "=") {
-        return "JE";
+        return ConditionalTestEnum.Equal;
       } else if (aComparison == "0") {
         // Same as JE, but implies intent in .asm better
-        return "JZ";
+        return ConditionalTestEnum.Zero;
       } else if (aComparison == "!=") {
-        return "JNE";
+        return ConditionalTestEnum.NotEqual;
       } else if (aComparison == "!0") {
         // Same as JNE, but implies intent in .asm better
-        return "JNZ";
+        return ConditionalTestEnum.NotZero;
       } else if (aComparison == "<=") {
-        return "JBE"; // unsigned
+        return ConditionalTestEnum.BelowOrEqual; // unsigned
       } else if (aComparison == ">=") {
-        return "JAE"; // unsigned
+        return ConditionalTestEnum.AboveOrEqual; // unsigned
       } else {
         throw new Exception("Unrecognized symbol in conditional: " + aComparison);
       }
     }
 
-    protected void HandleIf(Assembler aAsm, TokenList aTokens, string xComparison) {
+    protected void HandleIf(TokenList aTokens, string xComparison) {
       string xLabel;
       var xLast = aTokens.Last();
       if (xLast.Value == "{") {
         mBlocks.Start(aTokens, false);
-        aAsm += GetJump(xComparison, true) + " " + BlockLabel("End");
+        XS.Jump(GetJump(xComparison, true), BlockLabel("End"));
       } else {
         if (xLast.Matches("return")) {
           xLabel = FuncLabel("Exit");
@@ -383,18 +380,20 @@ namespace XSharp.Compiler {
           xLabel = GetLabel(xLast);
         }
 
-        aAsm += GetJump(xComparison) + " " + xLabel;
+        XS.Jump(GetJump(xComparison), xLabel);
       }
     }
 
     protected void AddPatterns() {
-      AddPattern("! Mov EAX, 0", "{0}");
+      AddPattern("! Mov EAX, 0", delegate (TokenList aTokens) {
+        XS.LiteralCode(aTokens[0].Value);
+      });
 
-      AddPattern("// Comment", delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("// Comment", delegate(TokenList aTokens) {
         if (EmitUserComments) {
           string xValue = aTokens[0].Value;
           xValue = xValue.Replace("\"", "\\\"");
-          aAsm += "; " + xValue;
+          XS.Comment(xValue);
         }
       });
 
@@ -407,19 +406,19 @@ namespace XSharp.Compiler {
 
       // The Exit label is a special one that is used as a target for the return instruction.
       // It deserve special handling.
-      AddPattern("Exit:", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += GetLabel(aTokens[0]) + ":";
+      AddPattern("Exit:", delegate(TokenList aTokens) {
+        XS.Label(GetLabel(aTokens[0]));
         mFuncExitFound = true;
       });
       // Regular label recognition.
-      AddPattern("_ABC:", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += GetLabel(aTokens[0]) + ":";
+      AddPattern("_ABC:", delegate(TokenList aTokens) {
+        XS.Label(GetLabel(aTokens[0]));
       });
 
-      AddPattern("Call _ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "Call " + GetLabel(aTokens[1]);
+      AddPattern("Call _ABC", delegate(TokenList aTokens) {
+        XS.Call(GetLabel(aTokens[1]));
       });
-      AddPattern("_PCALL", delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("_PCALL", delegate(TokenList aTokens) {
         if (aTokens.Count != 1 || aTokens[0].Type != TokenType.Call) {
           throw new Exception("Error occured in parametrized call parsing");
         }  else {
@@ -470,42 +469,50 @@ namespace XSharp.Compiler {
             idx = 0;
             val = GetRef(xParser.Tokens, ref idx);
             if (val != "@ret_on_stack@") {
-              aAsm += "Push " + val;
+              XS.PushLiteral(val);
             } else {
-              aAsm += GetPatternCode(xParser.Tokens).GetCode(false);
+              //aAsm += GetPatternCode(xParser.Tokens).GetCode(false);
+              throw new NotImplementedException("Didn't get converted yet!");
             }
           }
-          aAsm += "Call " + GroupLabel(fname);
+          XS.Call(GroupLabel(fname));
         }
       });
 
-      AddPattern("Goto _ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "Jmp " + GetLabel(aTokens[1]);
+      AddPattern("Goto _ABC", delegate(TokenList aTokens) {
+        XS.Jump(GetLabel(aTokens[1]));
       });
 
 
       // Defines a constant having the given name and initial value.
-      AddPattern("const _ABC = 123", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += ConstLabel(aTokens[1]) + " equ " + aTokens[3];
+      AddPattern("const _ABC = 123", delegate(TokenList aTokens) {
+        XS.Const(ConstLabel(aTokens[1]), aTokens[3]);
       });
 
       // Declare a double word variable having the given name and initialized to 0. The
       // variable is declared at namespace level.
-      AddPattern("var _ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm.Data.Add(GetLabel(aTokens[1]) + " dd 0");
+      AddPattern("var _ABC", delegate(TokenList aTokens) {
+        XS.DataMember(GetLabel(aTokens[1]));
       });
       // Declare a doubleword variable having the given name and an explicit initial value. The
       // variable is declared at namespace level.
-      AddPattern("var _ABC = 123", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm.Data.Add(GetLabel(aTokens[1]) + " dd " + aTokens[3].Value);
+      AddPattern("var _ABC = 123", delegate(TokenList aTokens)
+                                   {
+        uint xValue;
+        if (aTokens[3].Value.StartsWith("0x")) {
+          xValue = Convert.ToUInt32(aTokens[3].Value, 16);
+        } else {
+          xValue = UInt32.Parse(aTokens[3].Value);
+        }
+        XS.DataMember(GetLabel(aTokens[1]), xValue);
       });
       // Declare a textual variable having the given name and value. The variable is defined at
       // namespace level and a null terminating byte is automatically added after the textual
       // value.
-      AddPattern("var _ABC = 'Text'", delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("var _ABC = 'Text'", delegate(TokenList aTokens) {
         // Fix issue #15660 by using backquotes for string surrounding and escaping embedded
         // back quotes.
-        aAsm.Data.Add(GetLabel(aTokens[1]) + " db `" + EscapeBackQuotes(aTokens[3].Value) + "`, 0");
+        XS.DataMember(GetLabel(aTokens[1]), EscapeBackQuotes(aTokens[3].Value));
       });
       // Declare a one-dimension array of bytes, words or doublewords. All members are initialized to 0.
       // _ABC is array name. 123 is the total number of items in the array.
@@ -513,7 +520,7 @@ namespace XSharp.Compiler {
         "var _ABC byte[123]",
         "var _ABC word[123]",
         "var _ABC dword[123]"
-      }, delegate(TokenList aTokens, Assembler aAsm) {
+      }, delegate(TokenList aTokens) {
         string xSize;
         if (aTokens[2].Matches("byte")) {
           xSize = "db";
@@ -524,178 +531,239 @@ namespace XSharp.Compiler {
         } else {
           throw new Exception("Unknown size specified");
         }
-        aAsm.Data.Add(GetLabel(aTokens[1]) + " TIMES " + aTokens[4].Value + " " + xSize + " 0");
+        XS.DataMember(GetLabel(aTokens[1]), UInt32.Parse(aTokens[4].Value), xSize, "0");
       });
 
       foreach (var xCompare in mCompares) {
         //          0         1  2   3     4
-        AddPattern("while " + xCompare + " {", delegate(TokenList aTokens, Assembler aAsm) {
+        AddPattern("while " + xCompare + " {", delegate(TokenList aTokens) {
           mBlocks.Start(aTokens, false);
-          aAsm += BlockLabel("Begin") + ":";
+          XS.Label(BlockLabel("Begin"));
 
           int xIdx = 1;
           Token xComparison;
-          DoCompare(aAsm, aTokens, ref xIdx, out xComparison);
+          DoCompare(aTokens, ref xIdx, out xComparison);
 
-          aAsm += GetJump(xComparison, true) + " " + BlockLabel("End");
+          XS.Jump(GetJump(xComparison, true), BlockLabel("End"));
         });
       }
 
-      foreach (var xTail in "goto _ABC|return|{".Split("|".ToCharArray())) {
+      foreach (var xTail in "goto _ABC|return|{".Split('|')) {
         // if 0 exit, etc
         foreach (var xComparison in mCompareOps) {
-          AddPattern("if " + xComparison + " " + xTail, delegate(TokenList aTokens, Assembler aAsm) {
+          AddPattern("if " + xComparison + " " + xTail, delegate(TokenList aTokens) {
             string xOp = aTokens[1];
             // !0 is 2 tokens
             if (aTokens[1] + aTokens[2] == "!0") {
               xOp = "!0";
             }
 
-            HandleIf(aAsm, aTokens, xOp);
+            HandleIf(aTokens, xOp);
           });
         }
 
         // if reg = x exit, etc
         foreach (var xCompare in mCompares) {
           //          0      1  2   3          4
-          AddPattern("if " + xCompare + " " + xTail, delegate(TokenList aTokens, Assembler aAsm) {
+          AddPattern("if " + xCompare + " " + xTail, delegate(TokenList aTokens) {
             int xIdx = 1;
             Token xComparison;
-            DoCompare(aAsm, aTokens, ref xIdx, out xComparison);
+            DoCompare(aTokens, ref xIdx, out xComparison);
 
-            HandleIf(aAsm, aTokens, xComparison);
+            HandleIf(aTokens, xComparison);
           });
         }
       }
 
-      AddPattern("_REG ?= 123", "Cmp {0}, {2}");
-      AddPattern("_REG ?= _ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "Cmp {0}, " + GetLabel(aTokens[2]);
+      AddPattern("_REG ?= 123", delegate (TokenList aTokens) {
+        XS.CompareLiteral("", GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
       });
-      AddPattern("_REG ?= #_ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "Cmp {0}, " + ConstLabel(aTokens[3]);
+      AddPattern("_REG ?= _ABC", delegate(TokenList aTokens) {
+        DoSimpleCompare(aTokens[0], aTokens[2]);
       });
-
-      AddPattern("_REG ?& 123", "Test {0}, {2}");
-      AddPattern("_REG ?& _ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "Test {0}, " + GetLabel(aTokens[2]);
-      });
-      AddPattern("_REG ?& #_ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "Test {0}, " + ConstLabel(aTokens[3]);
+      AddPattern("_REG ?= #_ABC", delegate(TokenList aTokens) {
+        DoSimpleCompare(aTokens[0], ConstLabel(aTokens[3]));
       });
 
-      AddPattern("_REG ~> 123", "ROR {0}, {2}");
-      AddPattern("_REG <~ 123", "ROL {0}, {2}");
-      AddPattern("_REG >> 123", "SHR {0}, {2}");
-      AddPattern("_REG << 123", "SHL {0}, {2}");
-
-      AddPattern("_REG = 123", "Mov {0}, {2}");
-      AddPattern("_REGADDR[1] = 123", "Mov dword [{0} + {2}], {5}");
-      AddPattern("_REGADDR[-1] = 123", "Mov dword [{0} - {2}], {5}");
-
-      AddPattern("_REG = #_ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "Mov {0}, " + ConstLabel(aTokens[3]);
+      AddPattern("_REG ?& 123", delegate (TokenList aTokens) {
+        DoSimpleTest(aTokens[0], aTokens[2]);
       });
-      AddPattern("_REGADDR[1] = #_ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm.Mov("dword", "[{0} + {2}]", ConstLabel(aTokens[5]));
+      AddPattern("_REG ?& _ABC", delegate(TokenList aTokens) {
+        DoSimpleTest(aTokens[0], GetLabel(aTokens[2]));
       });
-      AddPattern("_REGADDR[-1] = #_ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm.Mov("dword", "[{0} - {2}]", ConstLabel(aTokens[5]));
+      AddPattern("_REG ?& #_ABC", delegate(TokenList aTokens) {
+        DoSimpleTest(aTokens[0], ConstLabel(aTokens[3]));
       });
 
-      AddPattern("_REG = _REG", "Mov {0}, {2}");
-      AddPattern("_REGADDR[1] = _REG", "Mov [{0} + {2}], {5}");
-      AddPattern("_REGADDR[-1] = _REG", "Mov [{0} - {2}], {5}");
-      AddPattern("_REG = _REGADDR[1]", "Mov {0}, [{2} + {4}]");
-      AddPattern("_REG = _REGADDR[-1]", "Mov {0}, [{2} - {4}]");
+      AddPattern("_REG ~> 123", delegate (TokenList aTokens) {
+        XS.RotateRight(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      });
+      AddPattern("_REG <~ 123", delegate (TokenList aTokens) {
+        XS.RotateLeft(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      });
+      AddPattern("_REG >> 123", delegate (TokenList aTokens) {
+        XS.ShiftRight(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      });
+      AddPattern("_REG << 123", delegate (TokenList aTokens) {
+        XS.ShiftLeft(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      });
 
-      AddPattern("_REG = [_REG]", "Mov {0}, [{3}]");
-      AddPattern("_REG = [_REG + 1]", "Mov {0}, [{3} + {5}]");
-      AddPattern("_REG = [_REG - 1]", "Mov {0}, [{3} - {5}]");
-      AddPattern("[_REG] = _REG", "Mov [{1}], {4}");
-      AddPattern("[_REG + 1] = _REG", "Mov [{1} + {3}], {4}");
-      AddPattern("[_REG - 1] = _REG", "Mov [{1} - {3}], {4}");
+      AddPattern("_REG = 123", delegate (TokenList aTokens) {
+        XS.SetLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      });
+      AddPattern("_REGADDR[1] = 123", delegate (TokenList aTokens) {
+        XS.SetLiteral("dword", "[" + GetSimpleRef(aTokens[0]) + " + " + GetSimpleRef(aTokens[2]) + "]", GetSimpleRef(aTokens[5]));
+      });
+      AddPattern("_REGADDR[-1] = 123", delegate (TokenList aTokens) {
+        XS.SetLiteral("dword", "[" + GetSimpleRef(aTokens[0]) + " - " + GetSimpleRef(aTokens[2]) + "]", GetSimpleRef(aTokens[5]));
+      });
 
-      AddPattern("_REG = _ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm.Mov(aTokens[0], "[" + GetLabel(aTokens[2]) + "]");
+      AddPattern("_REG = #_ABC", delegate(TokenList aTokens) {
+        XS.SetLiteral(GetSimpleRef(aTokens[0]), ConstLabel(aTokens[3]));
+      });
+      AddPattern("_REGADDR[1] = #_ABC", delegate(TokenList aTokens) {
+        var xFirst = GetSimpleRef(aTokens[0]);
+        var xSecond = GetSimpleRef(aTokens[2]);
+        XS.SetLiteral("dword [" + xFirst + " + " + xSecond + "]", ConstLabel(aTokens[5]));
+      });
+      AddPattern("_REGADDR[-1] = #_ABC", delegate(TokenList aTokens) {
+        var xFirst = GetSimpleRef(aTokens[0]);
+        var xSecond = GetSimpleRef(aTokens[2]);
+        XS.SetLiteral("dword [" + xFirst + " - " + xSecond + "]", ConstLabel(aTokens[5]));
+      });
+
+      AddPattern("_REG = _REG", delegate(TokenList aTokens) {
+        XS.SetLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      });
+      AddPattern("_REGADDR[1] = _REG", delegate (TokenList aTokens) {
+        XS.SetLiteral("[" + GetSimpleRef(aTokens[0]) + " + " + GetSimpleRef(aTokens[2]) + "]", GetSimpleRef(aTokens[5]));
+      });
+      AddPattern("_REGADDR[-1] = _REG", delegate (TokenList aTokens) {
+        XS.SetLiteral("[" + GetSimpleRef(aTokens[0]) + " - " + GetSimpleRef(aTokens[2]) + "]", GetSimpleRef(aTokens[5]));
+      });
+      AddPattern("_REG = _REGADDR[1]", delegate (TokenList aTokens) {
+        XS.SetLiteral( GetSimpleRef(aTokens[0]), "[" + GetSimpleRef(aTokens[2]) + " + " + GetSimpleRef(aTokens[4]) + "]");
+      });
+      AddPattern("_REG = _REGADDR[-1]", delegate (TokenList aTokens) {
+        XS.SetLiteral(GetSimpleRef(aTokens[0]), "[" + GetSimpleRef(aTokens[2]) + " - " + GetSimpleRef(aTokens[4]) + "]");
+      });
+
+      AddPattern("_REG = [_REG]", delegate (TokenList aTokens) {
+        XS.SetLiteral(GetSimpleRef(aTokens[0]), "[" + GetSimpleRef(aTokens[3]) + "]");
+      });
+      AddPattern("_REG = [_REG + 1]", delegate(TokenList aTokens) {
+        XS.SetLiteral(GetSimpleRef(aTokens[0]), "[" + GetSimpleRef(aTokens[3]) + " + " + GetSimpleRef(aTokens[5]));
+      });
+      AddPattern("_REG = [_REG - 1]", delegate (TokenList aTokens) {
+        XS.SetLiteral(GetSimpleRef(aTokens[0]), "[" + GetSimpleRef(aTokens[3]) + " - " + GetSimpleRef(aTokens[5]));
+      });
+      AddPattern("[_REG] = _REG", delegate(TokenList aTokens) {
+        XS.SetLiteral("[" + GetSimpleRef(aTokens[1]) + "]", GetSimpleRef(aTokens[4]));
+      });
+      AddPattern("[_REG + 1] = _REG", delegate(TokenList aTokens) {
+        XS.SetLiteral("[" + GetSimpleRef(aTokens[1]) + " + " + GetSimpleRef(aTokens[3]) + "]", GetSimpleRef(aTokens[4]));
+      });
+      AddPattern("[_REG - 1] = _REG", delegate (TokenList aTokens) {
+        XS.SetLiteral("[" + GetSimpleRef(aTokens[1]) + " - " + GetSimpleRef(aTokens[3]) + "]", GetSimpleRef(aTokens[4]));
+      });
+
+      AddPattern("_REG = _ABC", delegate(TokenList aTokens) {
+        var xFirst = GetSimpleRef(aTokens[0]);
+        XS.SetLiteral(xFirst, "[" + GetLabel(aTokens[2]) + "]");
       });
       // why not [var] like registers? Because its less frequent to access the ptr
       // and it is like a reg.. without [] to get the value...
-      AddPattern("_REG = @_ABC", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm.Mov(aTokens[0], GetLabel(aTokens[3]));
+      AddPattern("_REG = @_ABC", delegate(TokenList aTokens) {
+        var xFirst = GetSimpleRef(aTokens[0]);
+        XS.SetLiteral(xFirst, GetLabel(aTokens[3]));
       });
 
-      AddPattern(new string[] { 
-          "Port[DX] = AL", 
-          "Port[DX] = AX", 
+      AddPattern(new string[] {
+          "Port[DX] = AL",
+          "Port[DX] = AX",
           "Port[DX] = EAX"
-        },
-        "Out DX, {5}"
-      );
-      AddPattern(new string[] { 
-        "AL = Port[DX]", 
-        "AX = Port[DX]", 
-        "EAX = Port[DX]"},
-        //
-        "In {0}, DX"
-      );
+        }, delegate(TokenList aTokens) {
+          XS.WriteLiteralToPortDX(GetSimpleRef(aTokens[5]));
+      });
+      AddPattern(new string[] {
+        "AL = Port[DX]",
+        "AX = Port[DX]",
+        "EAX = Port[DX]"}, delegate (TokenList aTokens) {
+          XS.ReadLiteralFromPortDX(GetSimpleRef(aTokens[0]));
+        });
 
-      AddPattern("+123", "Push dword {1}");
+      AddPattern("+123", delegate(TokenList aTokens) {
+        XS.PushLiteral(GetSimpleRef(aTokens[0]));
+      });
       AddPattern(new string[] {
         "+123 as byte",
         "+123 as word",
         "+123 as dword"
-      }, "Push {3} {1}");
-      AddPattern("+_REG", "Push {1}");
+      }, delegate(TokenList aTokens) {
+        XS.PushLiteral(GetSimpleRef(aTokens[3]) + " " + GetSimpleRef(aTokens[1]));
+      });
+      AddPattern("+_REG", delegate(TokenList aTokens) {
+        XS.PushLiteral(GetSimpleRef(aTokens[1]));
+      });
       AddPattern(new string[] {
         //0  1  2   3
         "+#_ABC",
         "+#_ABC as byte",
         "+#_ABC as word",
         "+#_ABC as dword"
-        }, delegate(TokenList aTokens, Assembler aAsm) {
+        }, delegate(TokenList aTokens) {
         string xSize = "dword ";
         if (aTokens.Count > 2) {
           xSize = aTokens[3].Value + " ";
         }
-        aAsm += "Push " + xSize + ConstLabel(aTokens[1]);
+        XS.PushLiteral(xSize + ConstLabel(aTokens[1]));
+        });
+      AddPattern("+All", delegate(TokenList aTokens) {
+        XS.PushAllGeneralRegisters();
       });
-      AddPattern("+All", "Pushad");
-      AddPattern("-All", "Popad");
-      AddPattern("-_REG", "Pop {1}");
+      AddPattern("-All", delegate (TokenList aTokens) {
+        XS.PopAllGeneralRegisters();
+      });
+      AddPattern("-_REG", delegate(TokenList aTokens) {
+        XS.PopLiteral(GetSimpleRef(aTokens[1]));
+      });
 
       AddPattern("_ABC = _REG",
-        delegate(TokenList aTokens, Assembler aAsm) {
-          aAsm.Mov("[" + GetLabel(aTokens[0]) + "]", aTokens[2]);
+        delegate(TokenList aTokens) {
+          XS.SetLiteral("["+GetLabel(aTokens[0]) + "]", GetSimpleRef(aTokens[2]));
         });
       AddPattern("_ABC = #_ABC",
-        delegate(TokenList aTokens, Assembler aAsm) {
-          aAsm.Mov("dword", "[" + GetLabel(aTokens[0]) + "]", ConstLabel(aTokens[3]));
+        delegate(TokenList aTokens) {
+          XS.SetLiteral("dword", "[" + GetLabel(aTokens[0]) + "]", ConstLabel(aTokens[3]));
         });
-      AddPattern("_ABC = 123", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm.Mov("dword", "[" + GetLabel(aTokens[0]) + "]", aTokens[2]);
+      AddPattern("_ABC = 123", delegate(TokenList aTokens) {
+        XS.SetLiteral("dword", "[" + GetLabel(aTokens[0]) + "]", aTokens[2]);
       });
       AddPattern(new string[] {
         "_ABC = 123 as byte",
         "_ABC = 123 as word",
         "_ABC = 123 as dword"},
-        delegate(TokenList aTokens, Assembler aAsm) {
-          aAsm += "Mov {4} [" + GetLabel(aTokens[0]) + "], {2}";
+        delegate(TokenList aTokens) {
+          XS.SetLiteral(GetSimpleRef(aTokens[4]), GetLabel(aTokens[0]), GetSimpleRef(aTokens[2]));
         });
 
       // TODO: Allow asm to optimize these to Inc/Dec
       AddPattern(new string[] {
         "_REG + 1",
         "_REG + _REG"
-      }, "Add {0}, {2}");
+      }, delegate(TokenList aTokens) {
+        XS.AddLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      });
       AddPattern(new string[] {
         "_REG - 1",
         "_REG - _REG"
-      }, "Sub {0}, {2}");
+      }, delegate(TokenList aTokens) {
+        XS.SubLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      });
       AddPattern(new string[] {
         "_REG * 1",
         "_REG * _REG"
-      }, delegate(TokenList aTokens, Assembler aAsm) {
+      }, delegate(TokenList aTokens) {
         int targetRegisterSize = 0;
         for (int index = 0; index < 2; index++) {
           Token scannedToken = (0 == index) ? aTokens[0] : aTokens[2];
@@ -720,82 +788,97 @@ namespace XSharp.Compiler {
             }
           }
         }
-        aAsm += string.Format("Imul {0}, {1}", aTokens[0], aTokens[2]);
+
+        XS.IntegerMultiplyLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
       });
-      AddPattern("_REG++", "Inc {0}");
-      AddPattern("_REG--", "Dec {0}");
+      AddPattern("_REG++", delegate(TokenList aTokens) {
+        XS.IncrementLiteral(GetSimpleRef(aTokens[0]));
+      });
+      AddPattern("_REG--", delegate(TokenList aTokens) {
+        XS.DecrementLiteral(GetSimpleRef(aTokens[0]));
+      });
 
       AddPattern(new string[] {
         "_REG & 1",
         "_REG & _REG"
-      }, "And {0}, {2}");
+      }, delegate(TokenList aTokens) {
+        XS.AndLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      });
       AddPattern(new string[] {
         "_REG | 1",
         "_REG | _REG"
-      }, "Or {0}, {2}");
+      }, delegate(TokenList aTokens) {
+        XS.OrLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      });
       AddPattern(new string[] {
         "_REG ^ 1",
         "_REG ^ _REG"
-      }, "Xor {0}, {2}");
+      }, delegate(TokenList aTokens) {
+        XS.XorLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      });
 
       // End block. This handle both terminating a standard block as well as a function or an
       // interrupt handler.
-      AddPattern("}", delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("}", delegate(TokenList aTokens) {
         if (mBlocks.Count == 0) {
-          EndFunc(aAsm);
+          EndFunc();
         } else {
           var xBlock = mBlocks.Current();
           var xToken1 = xBlock.StartTokens[0];
           if (xToken1.Matches("repeat")) {
             int xCount = int.Parse(xBlock.StartTokens[1]);
             for (int i = 1; i <= xCount; i++) {
-              aAsm.Code.AddRange(xBlock.Contents);
+              xBlock.AddContentsToParentAssembler();
             }
-
           } else if (xToken1.Matches("while")) {
-            aAsm += "jmp " + BlockLabel("Begin");
-            aAsm += BlockLabel("End") + ":";
-
+            XS.Jump(BlockLabel("Begin"));
+            XS.Label(BlockLabel("End"));
+            xBlock.AddContentsToParentAssembler();
           } else if (xToken1.Matches("if")) {
-            aAsm += BlockLabel("End") + ":";
-
-          } else {
+            XS.Label(BlockLabel("End"));
+            xBlock.AddContentsToParentAssembler();
+          }
+          else {
             throw new Exception("Unknown block starter.");
           }
           mBlocks.End();
         }
       });
 
-      AddPattern("namespace _ABC", delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("namespace _ABC", delegate(TokenList aTokens) {
         mNamespace = aTokens[1].Value;
       });
 
-      AddPattern("Return", delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += "Jmp " + FuncLabel("Exit");
+      AddPattern("Return", delegate {
+        XS.Jump(FuncLabel("Exit"));
       });
 
-      AddPattern("Repeat 4 times {", delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("Repeat 4 times {", delegate(TokenList aTokens) {
         mBlocks.Start(aTokens, true);
       });
 
-      AddPattern("Interrupt _ABC {", delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("Interrupt _ABC {", delegate(TokenList aTokens) {
         StartFunc(aTokens[1].Value);
         mInIntHandler = true;
-        aAsm += GetNamespace() + "_{1}:";
+        XS.Label(GetNamespace() + "_" + aTokens[1].Value);
       });
 
       // This needs to be different from return.
       // return jumps to exit, ret does raw x86 ret
-      AddPattern("Ret", "Ret");
-      AddPattern("IRet", "IRet");
-
-      AddPattern("Function _ABC {", delegate(TokenList aTokens, Assembler aAsm) {
-        StartFunc(aTokens[1].Value);
-        mInIntHandler = false;
-        aAsm += GetNamespace() + "_{1}:";
+      AddPattern("Ret", delegate(TokenList aTokens) {
+        XS.Return();
+      });
+      AddPattern("IRet", delegate(TokenList aTokens) {
+        XS.InterruptReturn();
       });
 
-      AddPattern("Checkpoint 'Text'", delegate(TokenList aTokens, Assembler aAsm) {
+      AddPattern("Function _ABC {", delegate(TokenList aTokens) {
+        StartFunc(aTokens[1].Value);
+        mInIntHandler = false;
+        XS.Label(GetNamespace() + "_" + aTokens[1].Value);
+      });
+
+      AddPattern("Checkpoint 'Text'", delegate(TokenList aTokens) {
         // This method emits a lot of ASM, but thats what we want becuase
         // at this point we need ASM as simple as possible and completely transparent.
         // No stack changes, no register mods, no calls, no jumps, etc.
@@ -805,13 +888,14 @@ namespace XSharp.Compiler {
         var xPreBootLogging = true;
         if (xPreBootLogging) {
           UInt32 xVideo = 0xB8000;
-          for (UInt32 i = xVideo; i < xVideo + 80 * 2; i = i + 2) {
-            aAsm += "mov byte [0x" + i.ToString("X") + "], 0";
-            aAsm += "mov byte [0x" + (i + 1).ToString("X") + "], 0x02";
+          for (UInt32 i = xVideo; i < xVideo + 80 * 2; i = i + 2)
+          {
+            XS.SetByte(i, 0);
+            XS.SetByte(i+1, 2);
           }
 
           foreach (var xChar in aTokens[1].Value) {
-            aAsm += "mov byte [0x" + xVideo.ToString("X") + "], " + (byte)xChar;
+            XS.SetByte(xVideo, (byte)xChar);
             xVideo = xVideo + 2;
           }
         }
@@ -848,7 +932,7 @@ namespace XSharp.Compiler {
 
     protected Pattern FindMatch(TokenList aTokens) {
       int xHash = aTokens.GetPatternHashCode();
-      // Get a list of matching hashes, but then we have to 
+      // Get a list of matching hashes, but then we have to
       // search for exact pattern match because it is possible
       // to have duplicate hashes. Hashes just provide us a quick way
       // to reduce the search.
@@ -860,33 +944,30 @@ namespace XSharp.Compiler {
       return null;
     }
 
-    public Assembler GetPatternCode(TokenList aTokens) {
+    public bool GetPatternCode(TokenList aTokens) {
       var xPattern = FindMatch(aTokens);
       if (xPattern == null) {
-        return null;
+        return false;
       }
 
-      var xResult = new Assembler();
-      xPattern.Code(aTokens, xResult);
+      xPattern.Code(aTokens);
 
-      // Apply {0} etc into string
-      // This happens twice for block code, but its ok because the first pass
-      // strips out all tags.
-      for (int i = 0; i < xResult.Code.Count; i++) {
-        xResult.Code[i] = string.Format(xResult.Code[i], aTokens.ToArray());
-      }
-
-      return xResult;
+      //// Apply {0} etc into string
+      //// This happens twice for block code, but its ok because the first pass
+      //// strips out all tags.
+      //for (int i = 0; i < xResult.Code.Count; i++) {
+      //  xResult.Code[i] = string.Format(xResult.Code[i], aTokens.ToArray());
+      //}
+      return true;
     }
 
-    public Assembler GetNonPatternCode(TokenList aTokens) {
+    public bool GetNonPatternCode(TokenList aTokens) {
       if (aTokens.Count == 0) {
-        return null;
+        return false;
       }
 
       var xFirst = aTokens[0];
       var xLast = aTokens[aTokens.Count - 1];
-      var xResult = new Assembler();
 
       // Find match and emit X#
       if (aTokens.Count == 2
@@ -894,29 +975,25 @@ namespace XSharp.Compiler {
         && xLast.Matches("()")
         ) {
         // () could be handled by pattern, but best to keep in one place for future
-        xResult += "Call " + GroupLabel(aTokens[0].Value);
-
-      } else {
-        // No matches
-        return null;
+        //xResult += "Call " + GroupLabel(aTokens[0].Value);
+          XS.Call(GroupLabel(aTokens[0].Value));
       }
-
-      return xResult;
+      return true;
     }
 
-    public Assembler GetCode(string aLine, int lineNumber) {
+    public bool GetCode(string aLine, int lineNumber) {
       var xParser = new Parser(aLine, lineNumber, false, false);
       var xTokens = xParser.Tokens;
+
       var xResult = GetPatternCode(xTokens);
-      if (xResult == null) {
-        xResult = GetNonPatternCode(xTokens);
+      if (!xResult) {
+        if (!GetNonPatternCode(xTokens))
+        {
+          return false;
+        }
       }
 
-      if (mBlocks.Count > 0 && mBlocks.Current().Contents != null) {
-        mBlocks.Current().Contents.AddRange(xResult.Code);
-        xResult.Code.Clear();
-      }
-      return xResult;
+      return true;
     }
 
     /// <summary>Register a single pattern with its associated transformation handler.</summary>
@@ -928,7 +1005,7 @@ namespace XSharp.Compiler {
       try { xParser = new Parser(aPattern, 1, false, true); } catch (Exception e) {
         throw new Exception(string.Format("Invalid pattern '{0}'", aPattern ?? "NULL"), e);
       }
-      var xPattern = new Pattern(xParser.Tokens, aCode);
+      var xPattern = new Pattern(xParser.Tokens, aCode, aPattern);
       mPatterns.Add(xPattern);
     }
 
@@ -939,28 +1016,6 @@ namespace XSharp.Compiler {
     /// <param name="aCode">The code transformation handler that is common abmongst all the
     /// patterns from the collection.</param>
     protected void AddPattern(string[] aPatterns, CodeFunc aCode) {
-      foreach (var xPattern in aPatterns) {
-        AddPattern(xPattern, aCode);
-      }
-    }
-
-    /// <summary>Register a single pattern with a fixed transformation result.</summary>
-    /// <param name="aPattern">A single line of X# code that define the pattern optionally using
-    /// pattern reserved syntax.</param>
-    /// <param name="aCode">The constant transformation result.</param>
-    protected void AddPattern(string aPattern, string aCode) {
-      AddPattern(aPattern, delegate(TokenList aTokens, Assembler aAsm) {
-        aAsm += aCode;
-      });
-    }
-
-    /// <summary>Register a collection of patterns that share a single constant transformation
-    /// handler.</summary>
-    /// <param name="aPatterns">A collection of X# lines of code. Each line of code define a
-    /// pattern optionally using the pattern reserved syntax.</param>
-    /// <param name="aCode">The constant transformation resultthat is common abmongst all the
-    /// patterns from the collection.
-    protected void AddPattern(string[] aPatterns, string aCode) {
       foreach (var xPattern in aPatterns) {
         AddPattern(xPattern, aCode);
       }
