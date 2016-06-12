@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:42:10 AM
+; Generated at 6/12/2016 9:54:11 AM
 
 
 
@@ -24,7 +24,7 @@ Call DebugStub_ComWriteAL
 mov dword EAX, 0x20
 Call DebugStub_ComWriteAX
 Mov ESI, [DebugStub_CallerEBP]
-Add ESI, 8
+add dword ESI, 0x8
 mov dword ECX, 0x20
 Call DebugStub_ComWriteX
 
@@ -50,7 +50,7 @@ DebugStub_SendCommandOnChannel_Block1_Begin:
 Cmp ECX, 0
 JE near DebugStub_SendCommandOnChannel_Block1_End
 Call DebugStub_ComWrite8
-Dec ECX
+dec dword ECX
 Jmp DebugStub_SendCommandOnChannel_Block1_Begin
 
 DebugStub_SendCommandOnChannel_Block1_End:
@@ -88,7 +88,7 @@ Mov AL, DebugStub_Const_Ds2Vs_MethodContext
 Call DebugStub_ComWriteAL
 Mov ESI, [DebugStub_CallerEBP]
 Call DebugStub_ComReadEAX
-Add ESI, EAX
+add dword ESI, EAX
 Call DebugStub_ComReadEAX
 Mov ECX, EAX
 
@@ -96,7 +96,7 @@ DebugStub_SendMethodContext_Block1_Begin:
 Cmp ECX, 0
 JE near DebugStub_SendMethodContext_Block1_End
 Call DebugStub_ComWrite8
-Dec ECX
+dec dword ECX
 Jmp DebugStub_SendMethodContext_Block1_Begin
 
 DebugStub_SendMethodContext_Block1_End:
@@ -120,7 +120,7 @@ DebugStub_SendMemory_Block1_Begin:
 Cmp ECX, 0
 JE near DebugStub_SendMemory_Block1_End
 Call DebugStub_ComWrite8
-Dec ECX
+dec dword ECX
 Jmp DebugStub_SendMemory_Block1_Begin
 
 DebugStub_SendMemory_Block1_End:
@@ -154,7 +154,7 @@ Pushad
 Mov AL, DebugStub_Const_Ds2Vs_Message
 Call DebugStub_ComWriteAL
 Mov ESI, EBP
-Add ESI, 12
+add dword ESI, 0xC
 Mov ECX, [ESI + 0]
 Call DebugStub_ComWrite16
 Mov ESI, [EBP + 8]
@@ -163,13 +163,13 @@ DebugStub_SendText_WriteChar:
 Cmp ECX, 0
 JE near DebugStub_SendText_Finalize
 Call DebugStub_ComWrite8
-Dec ECX
-Inc ESI
+dec dword ECX
+inc dword ESI
 Jmp DebugStub_SendText_WriteChar
 
 DebugStub_SendText_Finalize:
 Popad
-Pop EBP
+pop dword EBP
 
 DebugStub_SendText_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendText_Exit
@@ -185,7 +185,7 @@ Call DebugStub_ComWriteAL
 Mov EAX, [EBP + 8]
 Call DebugStub_ComWriteEAX
 Popad
-Pop EBP
+pop dword EBP
 
 DebugStub_SendSimpleNumber_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendSimpleNumber_Exit
@@ -203,7 +203,7 @@ Call DebugStub_ComWriteEAX
 Mov EAX, [EBP + 12]
 Call DebugStub_ComWriteEAX
 Popad
-Pop EBP
+pop dword EBP
 
 DebugStub_SendSimpleLongNumber_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendSimpleLongNumber_Exit
@@ -219,7 +219,7 @@ Call DebugStub_ComWriteAL
 Mov EAX, [EBP + 8]
 Call DebugStub_ComWriteEAX
 Popad
-Pop EBP
+pop dword EBP
 
 DebugStub_SendComplexNumber_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendComplexNumber_Exit
@@ -237,7 +237,7 @@ Call DebugStub_ComWriteEAX
 Mov EAX, [EBP + 12]
 Call DebugStub_ComWriteEAX
 Popad
-Pop EBP
+pop dword EBP
 
 DebugStub_SendComplexLongNumber_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendComplexLongNumber_Exit
@@ -281,7 +281,7 @@ DebugStub_SendInterruptOccurred:
 push dword EAX
 Mov AL, DebugStub_Const_Ds2Vs_InterruptOccurred
 Call DebugStub_ComWriteAL
-Pop EAX
+pop dword EAX
 Call DebugStub_ComWriteEAX
 
 DebugStub_SendInterruptOccurred_Exit:
@@ -304,7 +304,7 @@ DebugStub_SendMessageBox:
 Mov AL, DebugStub_Const_Ds2Vs_MessageBox
 Call DebugStub_ComWriteAL
 Mov ESI, EBP
-Add ESI, 12
+add dword ESI, 0xC
 Mov ECX, [ESI + 0]
 Call DebugStub_ComWrite16
 Mov ESI, [EBP + 8]
@@ -313,8 +313,8 @@ DebugStub_SendMessageBox_WriteChar:
 Cmp ECX, 0
 JE near DebugStub_SendMessageBox_Exit
 Call DebugStub_ComWrite8
-Dec ECX
-Inc ESI
+dec dword ECX
+inc dword ESI
 Jmp DebugStub_SendMessageBox_WriteChar
 
 DebugStub_SendMessageBox_Exit:

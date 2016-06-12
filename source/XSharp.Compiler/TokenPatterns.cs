@@ -752,7 +752,7 @@ namespace XSharp.Compiler {
         XS.PopAllGeneralRegisters();
       });
       AddPattern("-_REG", delegate(TokenList aTokens) {
-        XS.PopLiteral(GetSimpleRef(aTokens[1]));
+        XS.Pop(aTokens[1].Register);
       });
 
       AddPattern("_ABC = _REG",
@@ -774,12 +774,16 @@ namespace XSharp.Compiler {
           XS.SetLiteral(GetSimpleRef(aTokens[4]), GetLabel(aTokens[0]), GetSimpleRef(aTokens[2]));
         });
 
-      // TODO: Allow asm to optimize these to Inc/Dec
       AddPattern(new string[] {
         "_REG + 1",
+      }, delegate (TokenList aTokens) {
+        XS.Add(aTokens[0].Register, aTokens[2].IntValue);
+      });
+
+      AddPattern(new string[] {
         "_REG + _REG"
       }, delegate(TokenList aTokens) {
-        XS.AddLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+        XS.Add(aTokens[0].Register, aTokens[2].Register);
       });
       AddPattern(new string[] {
         "_REG - 1",
@@ -817,10 +821,10 @@ namespace XSharp.Compiler {
         XS.IntegerMultiplyLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
       });
       AddPattern("_REG++", delegate(TokenList aTokens) {
-        XS.IncrementLiteral(GetSimpleRef(aTokens[0]));
+        XS.Increment(aTokens[0].Register);
       });
       AddPattern("_REG--", delegate(TokenList aTokens) {
-        XS.DecrementLiteral(GetSimpleRef(aTokens[0]));
+        XS.Decrement(aTokens[0].Register);
       });
 
       AddPattern(new string[] {

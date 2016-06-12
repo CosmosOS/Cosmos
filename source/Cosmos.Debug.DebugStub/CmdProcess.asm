@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:42:10 AM
+; Generated at 6/12/2016 9:54:11 AM
 
 
 
@@ -97,7 +97,7 @@ Jmp DebugStub_ProcessCommand_Exit
 DebugStub_ProcessCommand_Block12_End:
 
 DebugStub_ProcessCommand_Exit:
-Pop EAX
+pop dword EAX
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ProcessCommand_Exit
 Ret
 

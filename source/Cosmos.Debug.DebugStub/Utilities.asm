@@ -1,11 +1,11 @@
-; Generated at 6/12/2016 9:42:10 AM
+; Generated at 6/12/2016 9:54:11 AM
 
 
 
 DebugStub_CheckStack:
-Add eax, 4
+add dword EAX, 0x4
 Mov EBX, EBP
-Add EBX, EAX
+add dword EBX, EAX
 Cmp EBX, ESP
 JE near DebugStub_CheckStack_Block1_End
 Mov EAX, [ESP + 0]

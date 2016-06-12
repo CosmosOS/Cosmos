@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:42:10 AM
+; Generated at 6/12/2016 9:54:11 AM
 
 DebugStub_AsmBreakEIP dd 0
 DebugStub_AsmOrigByte dd 0
@@ -52,8 +52,8 @@ Sub EBP, 4
 Mov EAX, [EBP]
 Or EAX, 0x0100
 Mov [EBP], EAX
-Pop EAX
-Pop EBP
+pop dword EAX
+pop dword EBP
 
 DebugStub_SetINT1_TrapFLAG_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SetINT1_TrapFLAG_Exit
@@ -68,8 +68,8 @@ Sub EBP, 4
 Mov EAX, [EBP]
 And EAX, 0xFEFF
 Mov [EBP], EAX
-Pop EAX
-Pop EBP
+pop dword EAX
+pop dword EBP
 
 DebugStub_ResetINT1_TrapFLAG_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ResetINT1_TrapFLAG_Exit

@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:42:10 AM
+; Generated at 6/12/2016 9:54:11 AM
 
 
 %ifndef Exclude_IOPort_Based_SerialInit
@@ -56,7 +56,7 @@ JE near DebugStub_ComWrite8_Wait
 mov word DX, 0x0
 Mov AL, [ESI + 0]
 Call DebugStub_WriteRegister
-Inc ESI
+inc dword ESI
 
 DebugStub_ComWrite8_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ComWrite8_Exit

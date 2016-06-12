@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:42:10 AM
+; Generated at 6/12/2016 9:54:11 AM
 
 DebugStub_CallerEBP dd 0
 DebugStub_CallerEIP dd 0
@@ -20,7 +20,7 @@ Call DebugStub_ComReadAL
 push dword EAX
 Mov EBX, DebugStub_DebugBPs
 shl dword EAX, 0x2
-Add EBX, EAX
+add dword EBX, EAX
 Cmp ECX, 0
 JNE near DebugStub_BreakOnAddress_Block1_End
 Mov EDI, [EBX + 0]
@@ -35,19 +35,19 @@ mov byte AL, 0xCC
 Mov [EDI + 0], AL
 
 DebugStub_BreakOnAddress_DontSetBP:
-Pop EAX
+pop dword EAX
 mov dword ECX, 0x100
 
 DebugStub_BreakOnAddress_FindBPLoop:
-Dec ECX
+dec dword ECX
 Mov EBX, DebugStub_DebugBPs
 Mov EAX, ECX
 shl dword EAX, 0x2
-Add EBX, EAX
+add dword EBX, EAX
 Mov EAX, [EBX + 0]
 Cmp EAX, 0
 JE near DebugStub_BreakOnAddress_Block2_End
-Inc ECX
+inc dword ECX
 Mov [DebugStub_MaxBPId], ECX
 Jmp DebugStub_BreakOnAddress_Continue
 

@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:42:10 AM
+; Generated at 6/12/2016 9:54:11 AM
 
 DebugStub_ComAddr dd 1016
 
@@ -6,9 +6,9 @@ DebugStub_ComAddr dd 1016
 
 DebugStub_WriteRegister:
 push dword EDX
-Add DX, 0x03F8
+add word DX, 0x3F8
 out DX, AL
-Pop EDX
+pop dword EDX
 
 DebugStub_WriteRegister_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_WriteRegister_Exit
@@ -17,9 +17,9 @@ Ret
 
 DebugStub_ReadRegister:
 push dword EDX
-Add DX, 0x03F8
+add word DX, 0x3F8
 in byte AL, DX
-Pop EDX
+pop dword EDX
 
 DebugStub_ReadRegister_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ReadRegister_Exit

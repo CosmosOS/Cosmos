@@ -184,5 +184,38 @@ namespace XSharp.Compiler
       };
     }
 
+    public static void Increment(Register value)
+    {
+      new INC()
+      {
+        DestinationReg = value.RegEnum
+      };
+    }
+
+    public static void Decrement(Register value)
+    {
+      new Dec()
+      {
+        DestinationReg = value.RegEnum
+      };
+    }
+
+    public static void Add(Register register, uint valueToAdd)
+    {
+      new Add
+      {
+        DestinationReg = register.RegEnum,
+        SourceValue = valueToAdd
+      };
+    }
+
+    public static void Add(Register register, Register valueToAdd)
+    {
+      new Add
+      {
+        DestinationReg = register.RegEnum,
+        SourceReg = valueToAdd.RegEnum
+      };
+    }
   }
 }

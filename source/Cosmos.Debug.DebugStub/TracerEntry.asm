@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:42:10 AM
+; Generated at 6/12/2016 9:54:11 AM
 
 
 
@@ -8,16 +8,16 @@ Pushad
 Mov [DebugStub_PushAllPtr], ESP
 Mov [DebugStub_CallerEBP], EBP
 Mov EBP, ESP
-Add EBP, 32
+add dword EBP, 0x20
 Mov EAX, [EBP + 0]
-Add EBP, 12
+add dword EBP, 0xC
 Mov [DebugStub_CallerESP], EBP
 Mov EBX, EAX
 MOV EAX, DR6
 And EAX, 0x4000
 Cmp EAX, 0x4000
 JE near DebugStub_TracerEntry_Block1_End
-Dec EBX
+dec dword EBX
 
 DebugStub_TracerEntry_Block1_End:
 Mov EAX, EBX

@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:42:10 AM
+; Generated at 6/12/2016 9:54:11 AM
 
 
 
@@ -20,7 +20,7 @@ Ret
 DebugStub_ComRead8:
 Call DebugStub_ComReadAL
 Mov [EDI + 0], AL
-Add EDI, 1
+add dword EDI, 0x1
 
 DebugStub_ComRead8_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ComRead8_Exit
@@ -52,8 +52,8 @@ push dword ESI
 push dword EAX
 Mov ESI, ESP
 Call DebugStub_ComWrite8
-Pop EAX
-Pop ESI
+pop dword EAX
+pop dword ESI
 
 DebugStub_ComWriteAL_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ComWriteAL_Exit
@@ -64,7 +64,7 @@ DebugStub_ComWriteAX:
 push dword EAX
 Mov ESI, ESP
 Call DebugStub_ComWrite16
-Pop EAX
+pop dword EAX
 
 DebugStub_ComWriteAX_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ComWriteAX_Exit
@@ -75,7 +75,7 @@ DebugStub_ComWriteEAX:
 push dword EAX
 Mov ESI, ESP
 Call DebugStub_ComWrite32
-Pop EAX
+pop dword EAX
 
 DebugStub_ComWriteEAX_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ComWriteEAX_Exit
@@ -106,7 +106,7 @@ DebugStub_ComWriteX:
 
 DebugStub_ComWriteX_More:
 Call DebugStub_ComWrite8
-Dec ECX
+dec dword ECX
 JNE near DebugStub_ComWriteX_More
 
 DebugStub_ComWriteX_Exit:

@@ -21,16 +21,6 @@ namespace XSharp.Compiler
       LiteralCode("Sub " + left + ", " + right);
     }
 
-    public static void IncrementLiteral(string value)
-    {
-      LiteralCode("Inc " + value);
-    }
-
-    public static void DecrementLiteral(string value)
-    {
-      LiteralCode("Dec " + value);
-    }
-
     public static void AndLiteral(string left, string right)
     {
       LiteralCode("And " + left + ", " + right);
@@ -44,11 +34,6 @@ namespace XSharp.Compiler
     public static void XorLiteral(string left, string right)
     {
       LiteralCode("xor " + left + ", " + right);
-    }
-
-    public static void PopLiteral(string value)
-    {
-      LiteralCode("Pop " + value);
     }
 
     public static void IntegerMultiplyLiteral(string left, string right)
