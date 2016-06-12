@@ -638,10 +638,10 @@ namespace XSharp.Compiler {
         XS.Set(aTokens[0].Register, aTokens[2].IntValue);
       });
       AddPattern("_REGADDR[1] = 123", delegate (TokenList aTokens) {
-        XS.SetLiteral("dword", "[" + GetSimpleRef(aTokens[0]) + " + " + GetSimpleRef(aTokens[2]) + "]", GetSimpleRef(aTokens[5]));
+        XS.Set(aTokens[0].Register, aTokens[5].IntValue, destinationDisplacement: (int)aTokens[2].IntValue, size: RegisterSize.Int32);
       });
       AddPattern("_REGADDR[-1] = 123", delegate (TokenList aTokens) {
-        XS.SetLiteral("dword", "[" + GetSimpleRef(aTokens[0]) + " - " + GetSimpleRef(aTokens[2]) + "]", GetSimpleRef(aTokens[5]));
+        XS.Set(aTokens[0].Register, aTokens[5].IntValue, destinationDisplacement: - (int)aTokens[2].IntValue, size: RegisterSize.Int32);
       });
 
       AddPattern("_REG = #_ABC", delegate(TokenList aTokens) {

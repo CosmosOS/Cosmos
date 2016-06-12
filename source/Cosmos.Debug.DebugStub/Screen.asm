@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 12:07:42 PM
+; Generated at 6/12/2016 12:28:04 PM
 
 DebugWaitMsg db 96, 87, 97, 105, 116, 105, 110, 103, 32, 102, 111, 114, 32, 100, 101, 98, 117, 103, 103, 101, 114, 32, 99, 111, 110, 110, 101, 99, 116, 105, 111, 110, 46, 46, 46, 96, 0
 
@@ -11,9 +11,9 @@ mov dword ESI, DebugStub_Const_VidBase
 DebugStub_Cls_Block1_Begin:
 Cmp ESI, 0xB8FA0
 JNB near DebugStub_Cls_Block1_End
-Mov dword [ESI + 0], 0x00
+mov dword [ESI], 0x0
 inc dword ESI
-Mov dword [ESI + 0], 0x0A
+mov dword [ESI], 0xA
 inc dword ESI
 Jmp DebugStub_Cls_Block1_Begin
 

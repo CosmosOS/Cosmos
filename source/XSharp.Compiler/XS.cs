@@ -84,26 +84,38 @@ namespace XSharp.Compiler
       };
     }
 
-    public static void Set(Register destination, int destinationDisplacement, string sourceLabel, bool sourceIsIndirect = false)
+    public static void Set(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, RegisterSize? size = null)
     {
-      new Mov
+      if (destinationDisplacement != null)
       {
-        Size = (byte)destination.Size,
-        DestinationReg = destination.RegEnum,
-        DestinationIsIndirect = true,
-        SourceRef = ElementReference.New(sourceLabel),
-        SourceIsIndirect = sourceIsIndirect
-      };
-    }
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
 
-    public static void Set(Register destination, uint value, bool sourceIsIndirect = false)
-    {
-      new Mov
+      if (size == null)
       {
-        Size = (byte)destination.Size,
+        if (destinationIsIndirect)
+        {
+          throw new Exception("No size specified!");
+        }
+
+        size = destination.Size;
+      }
+
+      var xInstruction = new Mov
+      {
+        Size = (byte)size,
         DestinationReg = destination.RegEnum,
+        DestinationIsIndirect = destinationIsIndirect,
         SourceValue = value,
       };
+      if (destinationDisplacement.HasValue)
+      {
+        xInstruction.DestinationDisplacement = destinationDisplacement.Value;
+      }
     }
 
     public static void Set(Register destination,

@@ -11,16 +11,6 @@ namespace XSharp.Compiler
       new LiteralAssemblerCode(code);
     }
 
-    private static void SetLiteral(string destination, string source)
-    {
-      LiteralCode("Mov " + destination + ", " + source);
-    }
-
-    public static void SetLiteral(string size, string destination, string source)
-    {
-      LiteralCode("Mov " + size + " " + destination + ", " + source);
-    }
-
     public static void CompareLiteral(string size, string destination, string source)
     {
       if (string.IsNullOrWhiteSpace(size))
