@@ -222,7 +222,7 @@ namespace XSharp.Compiler {
             Register xRegister;
             if (Registers.TryGetValue(xUpper, out xRegister)) {
               xToken.Type = TokenType.Register;
-              xToken.Register = xRegister;
+              xToken.SetRegister(xRegister);
             } else if (mKeywords.Contains(xUpper))
             {
               xToken.Type = TokenType.Keyword;

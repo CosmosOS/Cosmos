@@ -497,7 +497,7 @@ namespace Cosmos.IL2CPU
                                                {
                                                    DestinationReg = RegistersEnum.EAX, SourceValue = value
                                                };
-                                               new Out
+                                               new OutToDX
                                                {
                                                    DestinationReg = RegistersEnum.AL
                                                };

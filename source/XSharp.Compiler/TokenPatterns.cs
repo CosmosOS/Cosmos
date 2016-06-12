@@ -220,7 +220,7 @@ namespace XSharp.Compiler {
       if (mInIntHandler) {
         XS.InterruptReturn();
       } else {
-        XS.Set("static_field__Cosmos_Core_INTs_mLastKnownAddress", GetNamespace() + "_" + mFuncName + "_Exit");
+        XS.Set32("static_field__Cosmos_Core_INTs_mLastKnownAddress", GetNamespace() + "_" + mFuncName + "_Exit");
         XS.Return();
       }
       mFuncName = null;
@@ -694,13 +694,13 @@ namespace XSharp.Compiler {
           "Port[DX] = AX",
           "Port[DX] = EAX"
         }, delegate(TokenList aTokens) {
-          XS.WriteLiteralToPortDX(GetSimpleRef(aTokens[5]));
+          XS.WriteToPortDX(aTokens[5].Register);
       });
       AddPattern(new string[] {
         "AL = Port[DX]",
         "AX = Port[DX]",
         "EAX = Port[DX]"}, delegate (TokenList aTokens) {
-          XS.ReadLiteralFromPortDX(GetSimpleRef(aTokens[0]));
+          XS.ReadFromPortDX(aTokens[0].Register);
         });
 
       AddPattern("+123", delegate(TokenList aTokens) {

@@ -33,12 +33,29 @@ namespace XSharp.Compiler {
     }
 
     private uint? mIntValue;
+    private XSRegisters.Register mRegister;
 
     public void SetIntValue(uint value)
     {
       mIntValue = value;
     }
-    public XSRegisters.Register Register;
+
+    public XSRegisters.Register Register
+    {
+      get
+      {
+        if (mRegister == null)
+        {
+          throw new InvalidOperationException();
+        }
+        return mRegister;
+      }
+    }
+
+    public void SetRegister(XSRegisters.Register register)
+    {
+      mRegister = register;
+    }
 
     /// <summary>Get line number this token belongs to.</summary>
     public int LineNumber { get; private set; }

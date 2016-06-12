@@ -22,7 +22,7 @@ namespace Cosmos.Core.Plugs
                 // emit a single out instruction
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceDisplacement = 0x0C, SourceIsIndirect = true };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceDisplacement = 0x08, SourceIsIndirect = true };
-                new CPUx86.Out { DestinationReg = CPUx86.Registers.AL };
+                new CPUx86.OutToDX { DestinationReg = CPUx86.Registers.AL };
             }
         }
         [PlugMethod(Assembler=typeof(Write8Assembler))]
@@ -36,7 +36,7 @@ namespace Cosmos.Core.Plugs
             {
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x0C };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
-                new CPUx86.Out { DestinationReg = CPUx86.Registers.AX };
+                new CPUx86.OutToDX { DestinationReg = CPUx86.Registers.AX };
             }
         }
         [PlugMethod(Assembler = typeof(Write16Assembler))]
@@ -50,7 +50,7 @@ namespace Cosmos.Core.Plugs
             {
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x0C };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
-                new CPUx86.Out { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.OutToDX { DestinationReg = CPUx86.Registers.EAX };
             }
         }
         [PlugMethod(Assembler = typeof(Write32Assembler))]
@@ -66,7 +66,7 @@ namespace Cosmos.Core.Plugs
                 //TODO: Do we need to clear rest of EAX first?
                 //    MTW: technically not, as in other places, it _should_ be working with AL too..
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                new CPUx86.IN { DestinationReg = CPUx86.Registers.AL };
+                new CPUx86.InFromDX { DestinationReg = CPUx86.Registers.AL };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             }
         }
@@ -81,7 +81,7 @@ namespace Cosmos.Core.Plugs
             {
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                new CPUx86.IN { DestinationReg = CPUx86.Registers.AX };
+                new CPUx86.InFromDX { DestinationReg = CPUx86.Registers.AX };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             }
         }
@@ -95,7 +95,7 @@ namespace Cosmos.Core.Plugs
             public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
             {
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
-                new CPUx86.IN { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.InFromDX { DestinationReg = CPUx86.Registers.EAX };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
             }
         }

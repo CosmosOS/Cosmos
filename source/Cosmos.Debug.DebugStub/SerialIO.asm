@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:03:31 AM
+; Generated at 6/12/2016 9:24:33 AM
 
 DebugStub_ComAddr dd 1016
 
@@ -18,7 +18,7 @@ Ret
 DebugStub_ReadRegister:
 Push EDX
 Add DX, 0x03F8
-IN AL, DX
+in byte AL, DX
 Pop EDX
 
 DebugStub_ReadRegister_Exit:

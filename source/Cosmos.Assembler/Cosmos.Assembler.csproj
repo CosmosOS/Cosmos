@@ -128,7 +128,7 @@
     <Compile Include="x86\ExternalLabel.cs" />
     <Compile Include="x86\Halt.cs" />
     <Compile Include="x86\IDivide.cs" />
-    <Compile Include="x86\IN.cs" />
+    <Compile Include="x86\InFromDX.cs" />
     <Compile Include="x86\INC.cs" />
     <Compile Include="x86\INT.cs" />
     <Compile Include="x86\INT1.cs" />
@@ -152,7 +152,7 @@
     <Compile Include="x86\Noop.cs" />
     <Compile Include="x86\Not.cs" />
     <Compile Include="x86\Or.cs" />
-    <Compile Include="x86\Out.cs" />
+    <Compile Include="x86\OutToDX.cs" />
     <Compile Include="x86\Pop.cs" />
     <Compile Include="x86\Popad.cs" />
     <Compile Include="x86\Popfd.cs" />
