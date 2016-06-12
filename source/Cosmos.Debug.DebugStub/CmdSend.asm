@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:24:33 AM
+; Generated at 6/12/2016 9:42:10 AM
 
 
 
@@ -148,7 +148,7 @@ Ret
 
 
 DebugStub_SendText:
-Push EBP
+push dword EBP
 Mov EBP, ESP
 Pushad
 Mov AL, DebugStub_Const_Ds2Vs_Message
@@ -177,7 +177,7 @@ Ret
 
 
 DebugStub_SendSimpleNumber:
-Push EBP
+push dword EBP
 Mov EBP, ESP
 Pushad
 Mov AL, DebugStub_Const_Ds2Vs_SimpleNumber
@@ -193,7 +193,7 @@ Ret
 
 
 DebugStub_SendSimpleLongNumber:
-Push EBP
+push dword EBP
 Mov EBP, ESP
 Pushad
 Mov AL, DebugStub_Const_Ds2Vs_SimpleLongNumber
@@ -211,7 +211,7 @@ Ret
 
 
 DebugStub_SendComplexNumber:
-Push EBP
+push dword EBP
 Mov EBP, ESP
 Pushad
 Mov AL, DebugStub_Const_Ds2Vs_ComplexNumber
@@ -227,7 +227,7 @@ Ret
 
 
 DebugStub_SendComplexLongNumber:
-Push EBP
+push dword EBP
 Mov EBP, ESP
 Pushad
 Mov AL, DebugStub_Const_Ds2Vs_ComplexLongNumber
@@ -278,7 +278,7 @@ Ret
 
 
 DebugStub_SendInterruptOccurred:
-Push EAX
+push dword EAX
 Mov AL, DebugStub_Const_Ds2Vs_InterruptOccurred
 Call DebugStub_ComWriteAL
 Pop EAX

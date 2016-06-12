@@ -1,4 +1,5 @@
-﻿using Cosmos.Assembler;
+﻿using System;
+using Cosmos.Assembler;
 using static XSharp.Compiler.XSRegisters;
 
 namespace XSharp.Compiler
@@ -9,7 +10,6 @@ namespace XSharp.Compiler
     {
       new LiteralAssemblerCode(code);
     }
-
 
     public static void AddLiteral(string left, string right)
     {
@@ -46,40 +46,35 @@ namespace XSharp.Compiler
       LiteralCode("xor " + left + ", " + right);
     }
 
-    public static void PushLiteral(string value)
-    {
-      new LiteralAssemblerCode("Push " + value);
-    }
-
     public static void PopLiteral(string value)
     {
-      new LiteralAssemblerCode("Pop " + value);
+      LiteralCode("Pop " + value);
     }
 
     public static void IntegerMultiplyLiteral(string left, string right)
     {
-      new LiteralAssemblerCode("imul " + left + ", " + right);
+      LiteralCode("imul " + left + ", " + right);
     }
 
     public static void SetLiteral(string destination, string source)
     {
-      new LiteralAssemblerCode("Mov " + destination + ", " + source);
+      LiteralCode("Mov " + destination + ", " + source);
     }
 
     public static void SetLiteral(string size, string destination, string source)
     {
-      new LiteralAssemblerCode("Mov " + size + " " + destination + ", " + source);
+      LiteralCode("Mov " + size + " " + destination + ", " + source);
     }
 
     public static void CompareLiteral(string size, string destination, string source)
     {
       if (string.IsNullOrWhiteSpace(size))
       {
-        new LiteralAssemblerCode($"Cmp {destination}, {source}");
+        LiteralCode($"Cmp {destination}, {source}");
       }
       else
       {
-        new LiteralAssemblerCode($"Cmp {size} {destination}, {source}");
+        LiteralCode($"Cmp {size} {destination}, {source}");
       }
     }
 
@@ -87,15 +82,12 @@ namespace XSharp.Compiler
     {
       if (string.IsNullOrWhiteSpace(size))
       {
-        new LiteralAssemblerCode($"Test {destination}, {source}");
+        LiteralCode($"Test {destination}, {source}");
       }
       else
       {
-        new LiteralAssemblerCode($"Test {size} {destination}, {source}");
+        LiteralCode($"Test {size} {destination}, {source}");
       }
     }
-
-
-
   }
 }

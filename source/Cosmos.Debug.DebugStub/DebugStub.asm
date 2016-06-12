@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:24:33 AM
+; Generated at 6/12/2016 9:42:10 AM
 
 DebugStub_CallerEBP dd 0
 DebugStub_CallerEIP dd 0
@@ -17,7 +17,7 @@ Call DebugStub_ComReadEAX
 Mov ECX, EAX
 mov dword EAX, 0x0
 Call DebugStub_ComReadAL
-Push EAX
+push dword EAX
 Mov EBX, DebugStub_DebugBPs
 shl dword EAX, 0x2
 Add EBX, EAX

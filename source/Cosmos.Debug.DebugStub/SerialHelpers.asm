@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:24:33 AM
+; Generated at 6/12/2016 9:42:10 AM
 
 
 
@@ -48,8 +48,8 @@ Ret
 
 
 DebugStub_ComWriteAL:
-Push ESI
-Push EAX
+push dword ESI
+push dword EAX
 Mov ESI, ESP
 Call DebugStub_ComWrite8
 Pop EAX
@@ -61,7 +61,7 @@ Ret
 
 
 DebugStub_ComWriteAX:
-Push EAX
+push dword EAX
 Mov ESI, ESP
 Call DebugStub_ComWrite16
 Pop EAX
@@ -72,7 +72,7 @@ Ret
 
 
 DebugStub_ComWriteEAX:
-Push EAX
+push dword EAX
 Mov ESI, ESP
 Call DebugStub_ComWrite32
 Pop EAX

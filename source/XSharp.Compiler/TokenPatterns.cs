@@ -233,6 +233,20 @@ namespace XSharp.Compiler {
       return GetRef(xList, ref xIdx, true);
     }
 
+    private RegisterSize GetSize(Token aToken)
+    {
+      switch (aToken.RawValue)
+      {
+        case "byte":
+          return RegisterSize.Int32;
+        case "word":
+          return RegisterSize.Short16;
+        case "dword":
+          return RegisterSize.Int32;
+        default:
+          throw new Exception($"Invalid size '{aToken.RawValue}'");
+      }
+    }
     protected string GetRef(List<Token> aTokens, ref int rIdx, bool onlySingleTokenRefs = false) {
       var xToken1 = aTokens[rIdx];
       Token xToken2 = null;
@@ -486,7 +500,8 @@ namespace XSharp.Compiler {
             idx = 0;
             val = GetRef(xParser.Tokens, ref idx);
             if (val != "@ret_on_stack@") {
-              XS.PushLiteral(val);
+              //XS.PushLiteral(val);
+              throw new Exception();
             } else {
               //aAsm += GetPatternCode(xParser.Tokens).GetCode(false);
               throw new NotImplementedException("Didn't get converted yet!");
@@ -704,17 +719,18 @@ namespace XSharp.Compiler {
         });
 
       AddPattern("+123", delegate(TokenList aTokens) {
-        XS.PushLiteral(GetSimpleRef(aTokens[0]));
+        XS.Push(aTokens[0].IntValue, RegisterSize.Int32);
       });
       AddPattern(new string[] {
         "+123 as byte",
         "+123 as word",
         "+123 as dword"
       }, delegate(TokenList aTokens) {
-        XS.PushLiteral(GetSimpleRef(aTokens[3]) + " " + GetSimpleRef(aTokens[1]));
+        var xSize = GetSize(aTokens[1]);
+        XS.Push(aTokens[1].IntValue, xSize);
       });
       AddPattern("+_REG", delegate(TokenList aTokens) {
-        XS.PushLiteral(GetSimpleRef(aTokens[1]));
+        XS.Push(aTokens[1].Register);
       });
       AddPattern(new string[] {
         //0  1  2   3
@@ -723,11 +739,11 @@ namespace XSharp.Compiler {
         "+#_ABC as word",
         "+#_ABC as dword"
         }, delegate(TokenList aTokens) {
-        string xSize = "dword ";
+        RegisterSize xSize = RegisterSize.Int32;
         if (aTokens.Count > 2) {
-          xSize = aTokens[3].RawValue + " ";
+          xSize = GetSize(aTokens[3]);
         }
-        XS.PushLiteral(xSize + ConstLabel(aTokens[1]));
+        XS.Push(ConstLabel(aTokens[1]), size: xSize);
         });
       AddPattern("+All", delegate(TokenList aTokens) {
         XS.PushAllGeneralRegisters();

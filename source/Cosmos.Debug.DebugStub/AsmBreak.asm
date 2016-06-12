@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:24:33 AM
+; Generated at 6/12/2016 9:42:10 AM
 
 DebugStub_AsmBreakEIP dd 0
 DebugStub_AsmOrigByte dd 0
@@ -45,8 +45,8 @@ Ret
 
 
 DebugStub_SetINT1_TrapFLAG:
-Push EBP
-Push EAX
+push dword EBP
+push dword EAX
 Mov EBP, [DebugStub_CallerESP]
 Sub EBP, 4
 Mov EAX, [EBP]
@@ -61,8 +61,8 @@ Ret
 
 
 DebugStub_ResetINT1_TrapFLAG:
-Push EBP
-Push EAX
+push dword EBP
+push dword EAX
 Mov EBP, [DebugStub_CallerESP]
 Sub EBP, 4
 Mov EAX, [EBP]

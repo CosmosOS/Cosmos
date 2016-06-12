@@ -149,6 +149,40 @@ namespace XSharp.Compiler
       };
     }
 
+    public static void Push(Register value)
+    {
+      new Push
+      {
+        DestinationReg = value.RegEnum
+      };
+    }
+
+    public static void Push(uint value, RegisterSize size)
+    {
+      new Push
+      {
+        DestinationValue = value,
+        Size = (byte)size
+      };
+    }
+
+    public static void Push(string label, bool isIndirect = false, RegisterSize size = RegisterSize.Int32)
+    {
+      new Push
+      {
+        DestinationRef = ElementReference.New(label),
+        DestinationIsIndirect = isIndirect,
+        Size = (byte)size
+      };
+    }
+
+    public static void Pop(Register value)
+    {
+      new Pop
+      {
+        DestinationReg = value.RegEnum
+      };
+    }
 
   }
 }

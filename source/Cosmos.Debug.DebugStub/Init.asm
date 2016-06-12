@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:24:33 AM
+; Generated at 6/12/2016 9:42:10 AM
 
 DebugStub_MaxBPId dd 0
 
@@ -41,7 +41,6 @@ mov byte AL, 0x0
 Call DebugStub_ComWriteAL
 mov byte AL, 0x0
 Call DebugStub_ComWriteAL
-Push dword DebugStub_Const_Signature
 Mov ESI, ESP
 Call DebugStub_ComWrite32
 Pop EAX

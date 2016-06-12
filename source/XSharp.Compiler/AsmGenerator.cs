@@ -140,8 +140,6 @@ namespace XSharp.Compiler {
     /// <returns>The resulting target assembler content. The returned object contains
     /// a code and a data block.</returns>
     protected void ProcessLine(string aLine, int lineNumber) {
-      Assembler xAsm;
-
       aLine = aLine.Trim();
       if (String.IsNullOrEmpty(aLine) || aLine == "//") {
         return;

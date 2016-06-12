@@ -1,11 +1,11 @@
-; Generated at 6/12/2016 9:24:33 AM
+; Generated at 6/12/2016 9:42:10 AM
 
 DebugStub_ComAddr dd 1016
 
 %ifndef Exclude_IOPort_Based_Serial
 
 DebugStub_WriteRegister:
-Push EDX
+push dword EDX
 Add DX, 0x03F8
 out DX, AL
 Pop EDX
@@ -16,7 +16,7 @@ Ret
 
 
 DebugStub_ReadRegister:
-Push EDX
+push dword EDX
 Add DX, 0x03F8
 in byte AL, DX
 Pop EDX
