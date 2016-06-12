@@ -11,31 +11,6 @@ namespace XSharp.Compiler
       new LiteralAssemblerCode(code);
     }
 
-    public static void AddLiteral(string left, string right)
-    {
-      LiteralCode("Add " + left + ", " + right);
-    }
-
-    public static void SubLiteral(string left, string right)
-    {
-      LiteralCode("Sub " + left + ", " + right);
-    }
-
-    public static void AndLiteral(string left, string right)
-    {
-      LiteralCode("And " + left + ", " + right);
-    }
-
-    public static void OrLiteral(string left, string right)
-    {
-      LiteralCode("Or " + left + ", " + right);
-    }
-
-    public static void XorLiteral(string left, string right)
-    {
-      LiteralCode("xor " + left + ", " + right);
-    }
-
     public static void IntegerMultiplyLiteral(string left, string right)
     {
       LiteralCode("imul " + left + ", " + right);

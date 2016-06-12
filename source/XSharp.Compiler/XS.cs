@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
+using Cosmos.Assembler.x86.x87;
 using static XSharp.Compiler.XSRegisters;
 
 namespace XSharp.Compiler
@@ -212,6 +213,78 @@ namespace XSharp.Compiler
     public static void Add(Register register, Register valueToAdd)
     {
       new Add
+      {
+        DestinationReg = register.RegEnum,
+        SourceReg = valueToAdd.RegEnum
+      };
+    }
+
+    public static void Sub(Register register, uint valueToAdd)
+    {
+      new Sub
+      {
+        DestinationReg = register.RegEnum,
+        SourceValue = valueToAdd
+      };
+    }
+
+    public static void Sub(Register register, Register valueToAdd)
+    {
+      new Sub
+      {
+        DestinationReg = register.RegEnum,
+        SourceReg = valueToAdd.RegEnum
+      };
+    }
+
+    public static void And(Register register, uint valueToAdd)
+    {
+      new And
+      {
+        DestinationReg = register.RegEnum,
+        SourceValue = valueToAdd
+      };
+    }
+
+    public static void And(Register register, Register valueToAdd)
+    {
+      new And
+      {
+        DestinationReg = register.RegEnum,
+        SourceReg = valueToAdd.RegEnum
+      };
+    }
+
+    public static void Or(Register register, uint valueToAdd)
+    {
+      new Or
+      {
+        DestinationReg = register.RegEnum,
+        SourceValue = valueToAdd
+      };
+    }
+
+    public static void Or(Register register, Register valueToAdd)
+    {
+      new Or
+      {
+        DestinationReg = register.RegEnum,
+        SourceReg = valueToAdd.RegEnum
+      };
+    }
+
+    public static void Xor(Register register, uint valueToAdd)
+    {
+      new Xor
+      {
+        DestinationReg = register.RegEnum,
+        SourceValue = valueToAdd
+      };
+    }
+
+    public static void Xor(Register register, Register valueToAdd)
+    {
+      new Xor
       {
         DestinationReg = register.RegEnum,
         SourceReg = valueToAdd.RegEnum

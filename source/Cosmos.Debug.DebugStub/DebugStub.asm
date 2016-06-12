@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:54:11 AM
+; Generated at 6/12/2016 10:15:07 AM
 
 DebugStub_CallerEBP dd 0
 DebugStub_CallerEIP dd 0
@@ -98,10 +98,10 @@ Ret
 
 DebugStub_Executing:
 MOV EAX, DR6
-And EAX, 0x4000
+and dword EAX, 0x4000
 Cmp EAX, 0x4000
 JNE near DebugStub_Executing_Block1_End
-And EAX, 0xBFFF
+and dword EAX, 0xBFFF
 MOV DR6, EAX
 Call DebugStub_ResetINT1_TrapFLAG
 Call DebugStub_Break

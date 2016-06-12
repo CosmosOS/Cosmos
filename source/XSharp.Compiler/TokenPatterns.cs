@@ -787,9 +787,13 @@ namespace XSharp.Compiler {
       });
       AddPattern(new string[] {
         "_REG - 1",
+      }, delegate (TokenList aTokens) {
+        XS.Sub(aTokens[0].Register, aTokens[2].IntValue);
+      });
+      AddPattern(new string[] {
         "_REG - _REG"
-      }, delegate(TokenList aTokens) {
-        XS.SubLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      }, delegate (TokenList aTokens) {
+        XS.Sub(aTokens[0].Register, aTokens[2].Register);
       });
       AddPattern(new string[] {
         "_REG * 1",
@@ -829,21 +833,33 @@ namespace XSharp.Compiler {
 
       AddPattern(new string[] {
         "_REG & 1",
-        "_REG & _REG"
       }, delegate(TokenList aTokens) {
-        XS.AndLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+        XS.And(aTokens[0].Register, aTokens[2].IntValue);
+      });
+      AddPattern(new string[] {
+        "_REG & _REG"
+      }, delegate (TokenList aTokens) {
+        XS.And(aTokens[0].Register, aTokens[2].Register);
       });
       AddPattern(new string[] {
         "_REG | 1",
-        "_REG | _REG"
       }, delegate(TokenList aTokens) {
-        XS.OrLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+        XS.Or(aTokens[0].Register, aTokens[2].IntValue);
+      });
+      AddPattern(new string[] {
+        "_REG | _REG"
+      }, delegate (TokenList aTokens) {
+        XS.Or(aTokens[0].Register, aTokens[2].Register);
       });
       AddPattern(new string[] {
         "_REG ^ 1",
-        "_REG ^ _REG"
       }, delegate(TokenList aTokens) {
-        XS.XorLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+        XS.Xor(aTokens[0].Register, aTokens[2].IntValue);
+      });
+      AddPattern(new string[] {
+        "_REG ^ _REG"
+      }, delegate (TokenList aTokens) {
+        XS.Xor(aTokens[0].Register, aTokens[2].Register);
       });
 
       // End block. This handle both terminating a standard block as well as a function or an

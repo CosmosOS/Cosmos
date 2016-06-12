@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 9:54:11 AM
+; Generated at 6/12/2016 10:15:07 AM
 
 
 
@@ -65,7 +65,7 @@ Mov AL, DebugStub_Const_Ds2Vs_Stack
 Call DebugStub_ComWriteAL
 Mov ESI, [DebugStub_CallerESP]
 Mov EAX, [DebugStub_CallerEBP]
-Sub EAX, ESI
+sub dword EAX, ESI
 Call DebugStub_ComWriteAX
 Mov ESI, [DebugStub_CallerESP]
 
