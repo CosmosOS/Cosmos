@@ -11,11 +11,6 @@ namespace XSharp.Compiler
       new LiteralAssemblerCode(code);
     }
 
-    public static void IntegerMultiplyLiteral(string left, string right)
-    {
-      LiteralCode("imul " + left + ", " + right);
-    }
-
     public static void SetLiteral(string destination, string source)
     {
       LiteralCode("Mov " + destination + ", " + source);

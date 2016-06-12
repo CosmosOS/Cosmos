@@ -797,32 +797,13 @@ namespace XSharp.Compiler {
       });
       AddPattern(new string[] {
         "_REG * 1",
+        }, delegate(TokenList aTokens) {
+        XS.IntegerMultiply(aTokens[0].Register, aTokens[2].IntValue);
+      });
+      AddPattern(new string[] {
         "_REG * _REG"
-      }, delegate(TokenList aTokens) {
-        RegisterSize targetRegisterSize = 0;
-        for (int index = 0; index < 2; index++) {
-          Token scannedToken = (0 == index) ? aTokens[0] : aTokens[2];
-
-          if (TokenType.Register != scannedToken.Type) { continue; }
-
-          if (Parser.Registers8.ContainsKey(scannedToken.RawValue.ToUpper())) {
-            throw new Exception(string.Format(
-                "Multiplication is not supported on byte sized register '{0}' at line {1}, col {2}",
-                scannedToken.RawValue, scannedToken.LineNumber, scannedToken.SrcPosStart));
-          }
-          if (0 == index) {
-            targetRegisterSize = scannedToken.Register.Size;
-          } else {
-            var sourceRegisterSize = scannedToken.Register.Size;
-
-            if (sourceRegisterSize != targetRegisterSize) {
-              throw new Exception(string.Format("Register '{0}' and '{1}' must be of the same size for multiplication on line {2}.",
-                  aTokens[0], aTokens[2], aTokens[0].LineNumber));
-            }
-          }
-        }
-
-        XS.IntegerMultiplyLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+      }, delegate (TokenList aTokens) {
+        XS.IntegerMultiply(aTokens[0].Register, aTokens[2].Register);
       });
       AddPattern("_REG++", delegate(TokenList aTokens) {
         XS.Increment(aTokens[0].Register);

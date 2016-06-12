@@ -128,6 +128,7 @@
     <Compile Include="x86\ExternalLabel.cs" />
     <Compile Include="x86\Halt.cs" />
     <Compile Include="x86\IDivide.cs" />
+    <Compile Include="x86\Imul.cs" />
     <Compile Include="x86\InFromDX.cs" />
     <Compile Include="x86\INC.cs" />
     <Compile Include="x86\INT.cs" />

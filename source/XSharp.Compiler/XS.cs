@@ -290,5 +290,27 @@ namespace XSharp.Compiler
         SourceReg = valueToAdd.RegEnum
       };
     }
+
+    public static void IntegerMultiply(Register register, uint valueToAdd)
+    {
+      new Imul
+      {
+        DestinationReg = register.RegEnum,
+        SourceValue = valueToAdd
+      };
+    }
+
+    public static void IntegerMultiply(Register register, Register valueToAdd)
+    {
+      if (register.Size != valueToAdd.Size)
+      {
+        throw new Exception("Registers need to be the same size!");
+      }
+      new Imul
+      {
+        DestinationReg = register.RegEnum,
+        SourceReg = valueToAdd.RegEnum
+      };
+    }
   }
 }
