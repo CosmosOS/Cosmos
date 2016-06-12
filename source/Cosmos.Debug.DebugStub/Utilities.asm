@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 12:28:04 PM
+; Generated at 6/12/2016 3:23:24 PM
 
 
 
@@ -6,7 +6,7 @@ DebugStub_CheckStack:
 add dword EAX, 0x4
 mov dword EBX, EBP
 add dword EBX, EAX
-Cmp EBX, ESP
+cmp dword EBX, ESP
 JE near DebugStub_CheckStack_Block1_End
 mov dword EAX, [ESP]
 mov dword [DebugStub_CallerEIP], EAX

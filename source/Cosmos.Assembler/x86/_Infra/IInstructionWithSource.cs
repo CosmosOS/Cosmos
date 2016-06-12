@@ -27,7 +27,7 @@ namespace Cosmos.Assembler.x86 {
             set;
         }
 
-        int SourceDisplacement {
+        int? SourceDisplacement {
             get;
             set;
         }

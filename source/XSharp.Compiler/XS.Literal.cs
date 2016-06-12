@@ -11,17 +11,17 @@ namespace XSharp.Compiler
       new LiteralAssemblerCode(code);
     }
 
-    public static void CompareLiteral(string size, string destination, string source)
-    {
-      if (string.IsNullOrWhiteSpace(size))
-      {
-        LiteralCode($"Cmp {destination}, {source}");
-      }
-      else
-      {
-        LiteralCode($"Cmp {size} {destination}, {source}");
-      }
-    }
+    //public static void CompareLiteral(string size, string destination, string source)
+    //{
+    //  if (string.IsNullOrWhiteSpace(size))
+    //  {
+    //    LiteralCode($"Cmp {destination}, {source}");
+    //  }
+    //  else
+    //  {
+    //    LiteralCode($"Cmp {size} {destination}, {source}");
+    //  }
+    //}
 
     public static void TestLiteral(string size, string destination, string source)
     {

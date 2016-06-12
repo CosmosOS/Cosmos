@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 12:28:04 PM
+; Generated at 6/12/2016 3:23:24 PM
 
 
 
@@ -15,7 +15,7 @@ mov dword [DebugStub_CallerESP], EBP
 mov dword EBX, EAX
 MOV EAX, DR6
 and dword EAX, 0x4000
-Cmp EAX, 0x4000
+cmp dword EAX, 0x4000
 JE near DebugStub_TracerEntry_Block1_End
 dec dword EBX
 

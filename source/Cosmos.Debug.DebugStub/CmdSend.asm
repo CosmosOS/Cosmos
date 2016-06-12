@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 12:28:04 PM
+; Generated at 6/12/2016 3:23:24 PM
 
 
 
@@ -47,7 +47,7 @@ Call DebugStub_ComWriteEAX
 Popad
 
 DebugStub_SendCommandOnChannel_Block1_Begin:
-Cmp ECX, 0
+cmp dword ECX, 0x0
 JE near DebugStub_SendCommandOnChannel_Block1_End
 Call DebugStub_ComWrite8
 dec dword ECX
@@ -70,7 +70,7 @@ Call DebugStub_ComWriteAX
 mov dword ESI, [DebugStub_CallerESP]
 
 DebugStub_SendStack_Block1_Begin:
-Cmp ESI, [DebugStub_CallerEBP]
+cmp dword ESI, [DebugStub_CallerEBP]
 JE near DebugStub_SendStack_Block1_End
 Call DebugStub_ComWrite8
 Jmp DebugStub_SendStack_Block1_Begin
@@ -93,7 +93,7 @@ Call DebugStub_ComReadEAX
 mov dword ECX, EAX
 
 DebugStub_SendMethodContext_Block1_Begin:
-Cmp ECX, 0
+cmp dword ECX, 0x0
 JE near DebugStub_SendMethodContext_Block1_End
 Call DebugStub_ComWrite8
 dec dword ECX
@@ -117,7 +117,7 @@ Call DebugStub_ComReadEAX
 mov dword ECX, EAX
 
 DebugStub_SendMemory_Block1_Begin:
-Cmp ECX, 0
+cmp dword ECX, 0x0
 JE near DebugStub_SendMemory_Block1_End
 Call DebugStub_ComWrite8
 dec dword ECX
@@ -133,7 +133,7 @@ Ret
 
 DebugStub_SendTrace:
 mov byte AL, DebugStub_Const_Ds2Vs_BreakPoint
-Cmp dword [DebugStub_DebugStatus], DebugStub_Const_Status_Run
+cmp dword [DebugStub_DebugStatus], DebugStub_Const_Status_Run
 JNE near DebugStub_SendTrace_Block1_End
 mov byte AL, DebugStub_Const_Ds2Vs_TracePoint
 
@@ -160,7 +160,7 @@ Call DebugStub_ComWrite16
 mov dword ESI, [EBP + 8]
 
 DebugStub_SendText_WriteChar:
-Cmp ECX, 0
+cmp dword ECX, 0x0
 JE near DebugStub_SendText_Finalize
 Call DebugStub_ComWrite8
 dec dword ECX
@@ -310,7 +310,7 @@ Call DebugStub_ComWrite16
 mov dword ESI, [EBP + 8]
 
 DebugStub_SendMessageBox_WriteChar:
-Cmp ECX, 0
+cmp dword ECX, 0x0
 JE near DebugStub_SendMessageBox_Exit
 Call DebugStub_ComWrite8
 dec dword ECX
