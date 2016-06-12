@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 10:25:12 AM
+; Generated at 6/12/2016 12:07:42 PM
 
 
 %ifndef Exclude_IOPort_Based_SerialInit
@@ -54,7 +54,7 @@ Call DebugStub_ReadRegister
 Test AL, 0x20
 JE near DebugStub_ComWrite8_Wait
 mov word DX, 0x0
-Mov AL, [ESI + 0]
+mov byte AL, [ESI]
 Call DebugStub_WriteRegister
 inc dword ESI
 

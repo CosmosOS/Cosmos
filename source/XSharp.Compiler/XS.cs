@@ -49,6 +49,53 @@ namespace XSharp.Compiler
       };
     }
 
+    public static void Set(string destination, Register source, bool destinationIsIndirect = false, bool sourceIsIndirect = false)
+    {
+      new Mov
+      {
+        Size = (byte)source.Size,
+        DestinationRef = ElementReference.New(destination),
+        DestinationIsIndirect = destinationIsIndirect,
+        SourceReg = source.RegEnum,
+        SourceIsIndirect = sourceIsIndirect,
+      };
+    }
+
+    public static void Set(RegisterSize size, string destination, string source, bool destinationIsIndirect = false, bool sourceIsIndirect = false)
+    {
+      new Mov
+      {
+        Size = (byte)size,
+        DestinationRef = ElementReference.New(destination),
+        DestinationIsIndirect = destinationIsIndirect,
+        SourceRef = ElementReference.New(source),
+        SourceIsIndirect = sourceIsIndirect
+      };
+    }
+
+    public static void Set(string destination, UInt32 value, bool destinationIsIndirect = false, RegisterSize size = RegisterSize.Int32)
+    {
+      new Mov
+      {
+        Size = (byte)size,
+        DestinationRef = ElementReference.New(destination),
+        DestinationIsIndirect = destinationIsIndirect,
+        SourceValue = value
+      };
+    }
+
+    public static void Set(Register destination, int destinationDisplacement, string sourceLabel, bool sourceIsIndirect = false)
+    {
+      new Mov
+      {
+        Size = (byte)destination.Size,
+        DestinationReg = destination.RegEnum,
+        DestinationIsIndirect = true,
+        SourceRef = ElementReference.New(sourceLabel),
+        SourceIsIndirect = sourceIsIndirect
+      };
+    }
+
     public static void Set(Register destination, uint value, bool sourceIsIndirect = false)
     {
       new Mov
@@ -56,6 +103,60 @@ namespace XSharp.Compiler
         Size = (byte)destination.Size,
         DestinationReg = destination.RegEnum,
         SourceValue = value,
+      };
+    }
+
+    public static void Set(Register destination,
+                           Register source,
+                           bool destinationIsIndirect = false,
+                           int? destinationDisplacement = null,
+                           bool sourceIsIndirect = false,
+                           int? sourceDisplacement = null)
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+      if (!(destinationIsIndirect || sourceIsIndirect)
+          && destination.Size != source.Size)
+      {
+        throw new Exception("Register sizes must match!");
+      }
+      if (destinationIsIndirect && sourceIsIndirect)
+      {
+        throw new Exception("Both destination and source cannot be indirect!");
+      }
+      RegisterSize xSize;
+      if (!destinationIsIndirect)
+      {
+        xSize = destination.Size;
+      }
+      else
+      {
+        xSize = source.Size;
+      }
+
+      new Mov
+      {
+        Size = (byte)xSize,
+        DestinationReg = destination.RegEnum,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement.GetValueOrDefault(),
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement.GetValueOrDefault(),
+        SourceReg = source.RegEnum
       };
     }
 

@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 10:25:11 AM
+; Generated at 6/12/2016 12:07:41 PM
 
 
 
@@ -9,8 +9,8 @@ Cmp AL, DebugStub_Const_Vs2Ds_Noop
 JE near DebugStub_ProcessCommand_Exit
 mov dword EAX, 0x0
 Call DebugStub_ComReadAL
-Mov [DebugStub_CommandID], EAX
-Mov EAX, [ESP + 0]
+mov dword [DebugStub_CommandID], EAX
+mov dword EAX, [ESP]
 Cmp AL, DebugStub_Const_Vs2Ds_TraceOff
 JNE near DebugStub_ProcessCommand_Block1_End
 Call DebugStub_TraceOff
@@ -103,9 +103,9 @@ Ret
 
 
 DebugStub_AckCommand:
-Mov AL, DebugStub_Const_Ds2Vs_CmdCompleted
+mov byte AL, DebugStub_Const_Ds2Vs_CmdCompleted
 Call DebugStub_ComWriteAL
-Mov EAX, [DebugStub_CommandID]
+mov dword EAX, [DebugStub_CommandID]
 Call DebugStub_ComWriteAL
 
 DebugStub_AckCommand_Exit:

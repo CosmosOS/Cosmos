@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 10:25:12 AM
+; Generated at 6/12/2016 12:07:42 PM
 
 
 
@@ -19,7 +19,7 @@ Ret
 
 DebugStub_ComRead8:
 Call DebugStub_ComReadAL
-Mov [EDI + 0], AL
+mov byte [EDI], AL
 add dword EDI, 0x1
 
 DebugStub_ComRead8_Exit:
@@ -50,7 +50,7 @@ Ret
 DebugStub_ComWriteAL:
 push dword ESI
 push dword EAX
-Mov ESI, ESP
+mov dword ESI, ESP
 Call DebugStub_ComWrite8
 pop dword EAX
 pop dword ESI
@@ -62,7 +62,7 @@ Ret
 
 DebugStub_ComWriteAX:
 push dword EAX
-Mov ESI, ESP
+mov dword ESI, ESP
 Call DebugStub_ComWrite16
 pop dword EAX
 
@@ -73,7 +73,7 @@ Ret
 
 DebugStub_ComWriteEAX:
 push dword EAX
-Mov ESI, ESP
+mov dword ESI, ESP
 Call DebugStub_ComWrite32
 pop dword EAX
 

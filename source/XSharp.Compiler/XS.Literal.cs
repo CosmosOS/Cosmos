@@ -11,7 +11,7 @@ namespace XSharp.Compiler
       new LiteralAssemblerCode(code);
     }
 
-    public static void SetLiteral(string destination, string source)
+    private static void SetLiteral(string destination, string source)
     {
       LiteralCode("Mov " + destination + ", " + source);
     }

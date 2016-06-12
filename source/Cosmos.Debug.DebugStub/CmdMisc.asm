@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 10:25:11 AM
+; Generated at 6/12/2016 12:07:41 PM
 
 
 
@@ -12,7 +12,7 @@ Ret
 
 
 DebugStub_TraceOn:
-Mov dword [DebugStub_TraceMode], 1
+mov dword [DebugStub_TraceMode], 0x1
 
 DebugStub_TraceOn_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_TraceOn_Exit
@@ -20,7 +20,7 @@ Ret
 
 
 DebugStub_TraceOff:
-Mov dword [DebugStub_TraceMode], 0
+mov dword [DebugStub_TraceMode], 0x0
 
 DebugStub_TraceOff_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_TraceOff_Exit

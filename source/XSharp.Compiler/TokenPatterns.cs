@@ -557,7 +557,7 @@ namespace XSharp.Compiler {
         } else {
           throw new Exception("Unknown size specified");
         }
-        XS.DataMember(GetLabel(aTokens[1]), UInt32.Parse(aTokens[4].RawValue), xSize, "0");
+        XS.DataMember(GetLabel(aTokens[1]), aTokens[4].IntValue, xSize, "0");
       });
 
       foreach (var xCompare in mCompares) {
@@ -645,63 +645,61 @@ namespace XSharp.Compiler {
       });
 
       AddPattern("_REG = #_ABC", delegate(TokenList aTokens) {
-        XS.SetLiteral(GetSimpleRef(aTokens[0]), ConstLabel(aTokens[3]));
+        XS.Set(aTokens[0].Register, ConstLabel(aTokens[3]));
       });
       AddPattern("_REGADDR[1] = #_ABC", delegate(TokenList aTokens) {
-        var xFirst = GetSimpleRef(aTokens[0]);
-        var xSecond = GetSimpleRef(aTokens[2]);
-        XS.SetLiteral("dword [" + xFirst + " + " + xSecond + "]", ConstLabel(aTokens[5]));
+        //XS.Set(RegisterSize.Int32, aTokens[0].IntValue, aTokens[2].IntValue, ConstLabel(aTokens[5]));
+        throw new NotImplementedException("");
       });
       AddPattern("_REGADDR[-1] = #_ABC", delegate(TokenList aTokens) {
         var xFirst = GetSimpleRef(aTokens[0]);
         var xSecond = GetSimpleRef(aTokens[2]);
-        XS.SetLiteral("dword [" + xFirst + " - " + xSecond + "]", ConstLabel(aTokens[5]));
+        //XS.SetLiteral("dword [" + xFirst + " - " + xSecond + "]", ConstLabel(aTokens[5]));
+        throw new NotImplementedException("");
       });
 
       AddPattern("_REG = _REG", delegate(TokenList aTokens) {
-        XS.SetLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+        XS.Set(aTokens[0].Register, aTokens[2].Register);
       });
       AddPattern("_REGADDR[1] = _REG", delegate (TokenList aTokens) {
-        XS.SetLiteral("[" + GetSimpleRef(aTokens[0]) + " + " + GetSimpleRef(aTokens[2]) + "]", GetSimpleRef(aTokens[5]));
+        XS.Set(aTokens[0].Register, aTokens[5].Register, destinationDisplacement: (int)aTokens[2].IntValue);
       });
       AddPattern("_REGADDR[-1] = _REG", delegate (TokenList aTokens) {
-        XS.SetLiteral("[" + GetSimpleRef(aTokens[0]) + " - " + GetSimpleRef(aTokens[2]) + "]", GetSimpleRef(aTokens[5]));
+        XS.Set(aTokens[0].Register, aTokens[5].Register, destinationDisplacement: - (int)aTokens[2].IntValue);
       });
       AddPattern("_REG = _REGADDR[1]", delegate (TokenList aTokens) {
-        XS.SetLiteral( GetSimpleRef(aTokens[0]), "[" + GetSimpleRef(aTokens[2]) + " + " + GetSimpleRef(aTokens[4]) + "]");
+        XS.Set(aTokens[0].Register, aTokens[2].Register, sourceDisplacement: (int)aTokens[4].IntValue);
       });
       AddPattern("_REG = _REGADDR[-1]", delegate (TokenList aTokens) {
-        XS.SetLiteral(GetSimpleRef(aTokens[0]), "[" + GetSimpleRef(aTokens[2]) + " - " + GetSimpleRef(aTokens[4]) + "]");
+        XS.Set(aTokens[0].Register, aTokens[2].Register, sourceDisplacement: - (int)aTokens[4].IntValue);
       });
 
       AddPattern("_REG = [_REG]", delegate (TokenList aTokens) {
-        XS.SetLiteral(GetSimpleRef(aTokens[0]), "[" + GetSimpleRef(aTokens[3]) + "]");
+        XS.Set(aTokens[0].Register, aTokens[3].Register, sourceIsIndirect: true);
       });
       AddPattern("_REG = [_REG + 1]", delegate(TokenList aTokens) {
-        XS.SetLiteral(GetSimpleRef(aTokens[0]), "[" + GetSimpleRef(aTokens[3]) + " + " + GetSimpleRef(aTokens[5]));
+        XS.Set(aTokens[0].Register, aTokens[3].Register, sourceDisplacement: (int?)aTokens[5].IntValue);
       });
       AddPattern("_REG = [_REG - 1]", delegate (TokenList aTokens) {
-        XS.SetLiteral(GetSimpleRef(aTokens[0]), "[" + GetSimpleRef(aTokens[3]) + " - " + GetSimpleRef(aTokens[5]));
+        XS.Set(aTokens[0].Register, aTokens[3].Register, sourceDisplacement: - (int)aTokens[5].IntValue);
       });
       AddPattern("[_REG] = _REG", delegate(TokenList aTokens) {
-        XS.SetLiteral("[" + GetSimpleRef(aTokens[1]) + "]", GetSimpleRef(aTokens[4]));
+        XS.Set(aTokens[1].Register, aTokens[4].Register, destinationIsIndirect: true);
       });
       AddPattern("[_REG + 1] = _REG", delegate(TokenList aTokens) {
-        XS.SetLiteral("[" + GetSimpleRef(aTokens[1]) + " + " + GetSimpleRef(aTokens[3]) + "]", GetSimpleRef(aTokens[4]));
+        XS.Set(aTokens[0].Register, aTokens[3].Register, destinationDisplacement: (int)aTokens[5].IntValue);
       });
       AddPattern("[_REG - 1] = _REG", delegate (TokenList aTokens) {
-        XS.SetLiteral("[" + GetSimpleRef(aTokens[1]) + " - " + GetSimpleRef(aTokens[3]) + "]", GetSimpleRef(aTokens[4]));
+        XS.Set(aTokens[0].Register, aTokens[3].Register, destinationDisplacement: - (int)aTokens[5].IntValue);
       });
 
       AddPattern("_REG = _ABC", delegate(TokenList aTokens) {
-        var xFirst = GetSimpleRef(aTokens[0]);
-        XS.SetLiteral(xFirst, "[" + GetLabel(aTokens[2]) + "]");
+        XS.Set(aTokens[0].Register, GetLabel(aTokens[2]), sourceIsIndirect: true);
       });
       // why not [var] like registers? Because its less frequent to access the ptr
       // and it is like a reg.. without [] to get the value...
       AddPattern("_REG = @_ABC", delegate(TokenList aTokens) {
-        var xFirst = GetSimpleRef(aTokens[0]);
-        XS.SetLiteral(xFirst, GetLabel(aTokens[3]));
+        XS.Set(aTokens[0].Register, GetLabel(aTokens[3]));
       });
 
       AddPattern(new string[] {
@@ -757,21 +755,21 @@ namespace XSharp.Compiler {
 
       AddPattern("_ABC = _REG",
         delegate(TokenList aTokens) {
-          XS.SetLiteral("["+GetLabel(aTokens[0]) + "]", GetSimpleRef(aTokens[2]));
+          XS.Set(GetLabel(aTokens[0]), aTokens[2].Register, destinationIsIndirect: true);
         });
       AddPattern("_ABC = #_ABC",
         delegate(TokenList aTokens) {
-          XS.SetLiteral("dword", "[" + GetLabel(aTokens[0]) + "]", ConstLabel(aTokens[3]));
+          XS.Set(RegisterSize.Int32, GetLabel(aTokens[0]), ConstLabel(aTokens[3]), destinationIsIndirect: true);
         });
       AddPattern("_ABC = 123", delegate(TokenList aTokens) {
-        XS.SetLiteral("dword", "[" + GetLabel(aTokens[0]) + "]", aTokens[2].RawValue);
+        XS.Set(GetLabel(aTokens[0]), aTokens[2].IntValue, destinationIsIndirect: true);
       });
       AddPattern(new string[] {
         "_ABC = 123 as byte",
         "_ABC = 123 as word",
         "_ABC = 123 as dword"},
         delegate(TokenList aTokens) {
-          XS.SetLiteral(GetSimpleRef(aTokens[4]), GetLabel(aTokens[0]), GetSimpleRef(aTokens[2]));
+          XS.Set(GetLabel(aTokens[0]), aTokens[2].IntValue, size: GetSize(aTokens[4]));
         });
 
       AddPattern(new string[] {

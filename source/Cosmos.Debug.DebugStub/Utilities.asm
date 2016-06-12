@@ -1,15 +1,15 @@
-; Generated at 6/12/2016 10:25:12 AM
+; Generated at 6/12/2016 12:07:42 PM
 
 
 
 DebugStub_CheckStack:
 add dword EAX, 0x4
-Mov EBX, EBP
+mov dword EBX, EBP
 add dword EBX, EAX
 Cmp EBX, ESP
 JE near DebugStub_CheckStack_Block1_End
-Mov EAX, [ESP + 0]
-Mov [DebugStub_CallerEIP], EAX
+mov dword EAX, [ESP]
+mov dword [DebugStub_CallerEIP], EAX
 Call DebugStub_SendStackCorruptionOccurred
 
 DebugStub_CheckStack_halt:

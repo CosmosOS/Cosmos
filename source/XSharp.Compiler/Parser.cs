@@ -5,6 +5,14 @@ using System.Text;
 using static XSharp.Compiler.XSRegisters;
 
 namespace XSharp.Compiler {
+  /// <summary>
+  /// Parser recognizes the following tokens:
+  /// - _123      -> Number
+  /// - _REG      -> All registers
+  /// - _REGADDR  -> All 32-bit registers
+  /// - 1         -> Number as well
+  /// - _ABC      -> Random label
+  /// </summary>
   public class Parser {
     /// <summary>Index in <see cref="mData"/> of the first yet unconsumed character.</summary>
     protected int mStart = 0;
@@ -63,12 +71,12 @@ namespace XSharp.Compiler {
       Registers8 = new Dictionary<string, Register>(){
         {"AL", AL },
         {"AH", AH },
-        {"BL", AL },
-        {"BH", AH },
-        {"CL", AL },
-        {"CH", AH },
-        {"DL", AL },
-        {"DH", AH },
+        {"BL", BL },
+        {"BH", BH },
+        {"CL", CL },
+        {"CH", CH },
+        {"DL", DL },
+        {"DH", DH },
                  };
 
       Registers16 = new Dictionary<string, Register>()

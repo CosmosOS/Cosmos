@@ -1,18 +1,18 @@
-; Generated at 6/12/2016 10:25:12 AM
+; Generated at 6/12/2016 12:07:42 PM
 
 
 
 DebugStub_TracerEntry:
 cli
 Pushad
-Mov [DebugStub_PushAllPtr], ESP
-Mov [DebugStub_CallerEBP], EBP
-Mov EBP, ESP
+mov dword [DebugStub_PushAllPtr], ESP
+mov dword [DebugStub_CallerEBP], EBP
+mov dword EBP, ESP
 add dword EBP, 0x20
-Mov EAX, [EBP + 0]
+mov dword EAX, [EBP]
 add dword EBP, 0xC
-Mov [DebugStub_CallerESP], EBP
-Mov EBX, EAX
+mov dword [DebugStub_CallerESP], EBP
+mov dword EBX, EAX
 MOV EAX, DR6
 and dword EAX, 0x4000
 Cmp EAX, 0x4000
@@ -20,8 +20,8 @@ JE near DebugStub_TracerEntry_Block1_End
 dec dword EBX
 
 DebugStub_TracerEntry_Block1_End:
-Mov EAX, EBX
-Mov [DebugStub_CallerEIP], EAX
+mov dword EAX, EBX
+mov dword [DebugStub_CallerEIP], EAX
 Call DebugStub_Executing
 Popad
 sti
