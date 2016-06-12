@@ -1,16 +1,16 @@
-; Generated at 6/11/2016 4:16:44 PM
+; Generated at 6/12/2016 9:03:31 AM
 
 
 
 DebugStub_ComReadEAX:
 Call DebugStub_ComReadAL
-ROR EAX, 8
+ror dword EAX, 0x8
 Call DebugStub_ComReadAL
-ROR EAX, 8
+ror dword EAX, 0x8
 Call DebugStub_ComReadAL
-ROR EAX, 8
+ror dword EAX, 0x8
 Call DebugStub_ComReadAL
-ROR EAX, 8
+ror dword EAX, 0x8
 
 DebugStub_ComReadEAX_Exit:
 mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_ComReadEAX_Exit

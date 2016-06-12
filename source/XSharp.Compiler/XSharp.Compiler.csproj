@@ -93,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsmGenerator.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -100,6 +101,7 @@
     <Compile Include="TokenList.cs" />
     <Compile Include="TokenPatterns.cs" />
     <Compile Include="XS.cs" />
+    <Compile Include="XSRegisters.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Cosmos.snk">

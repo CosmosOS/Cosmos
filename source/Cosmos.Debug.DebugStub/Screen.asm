@@ -1,9 +1,9 @@
-; Generated at 6/11/2016 4:16:44 PM
+; Generated at 6/12/2016 9:03:31 AM
 
 DebugWaitMsg db 96, 87, 97, 105, 116, 105, 110, 103, 32, 102, 111, 114, 32, 100, 101, 98, 117, 103, 103, 101, 114, 32, 99, 111, 110, 110, 101, 99, 116, 105, 111, 110, 46, 46, 46, 96, 0
 
 %ifndef Exclude_Memory_Based_Console
-DebugStub_Const_VidBase equ 0xB8000
+DebugStub_Const_VidBase equ 753664
 
 DebugStub_Cls:
 Mov ESI, DebugStub_Const_VidBase

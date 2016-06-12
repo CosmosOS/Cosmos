@@ -1,29 +1,29 @@
-; Generated at 6/11/2016 4:16:44 PM
+; Generated at 6/12/2016 9:03:31 AM
 
 
 %ifndef Exclude_IOPort_Based_SerialInit
 
 DebugStub_InitSerial:
-Mov DX, 1
-Mov AL, 0
+mov word DX, 0x1
+mov byte AL, 0x0
 Call DebugStub_WriteRegister
-Mov DX, 3
-Mov AL, 0x80
+mov word DX, 0x3
+mov byte AL, 0x80
 Call DebugStub_WriteRegister
-Mov DX, 0
-Mov AL, 0x01
+mov word DX, 0x0
+mov byte AL, 0x1
 Call DebugStub_WriteRegister
-Mov DX, 1
-Mov AL, 0x00
+mov word DX, 0x1
+mov byte AL, 0x0
 Call DebugStub_WriteRegister
-Mov DX, 3
-Mov AL, 0x03
+mov word DX, 0x3
+mov byte AL, 0x3
 Call DebugStub_WriteRegister
-Mov DX, 2
-Mov AL, 0xC7
+mov word DX, 0x2
+mov byte AL, 0xC7
 Call DebugStub_WriteRegister
-Mov DX, 4
-Mov AL, 0x03
+mov word DX, 0x4
+mov byte AL, 0x3
 Call DebugStub_WriteRegister
 
 DebugStub_InitSerial_Exit:
@@ -32,13 +32,13 @@ Ret
 
 
 DebugStub_ComReadAL:
-Mov DX, 5
+mov word DX, 0x5
 
 DebugStub_ComReadAL_Wait:
 Call DebugStub_ReadRegister
 Test AL, 0x01
 JE near DebugStub_ComReadAL_Wait
-Mov DX, 0
+mov word DX, 0x0
 Call DebugStub_ReadRegister
 
 DebugStub_ComReadAL_Exit:
@@ -47,13 +47,13 @@ Ret
 
 
 DebugStub_ComWrite8:
-Mov DX, 5
+mov word DX, 0x5
 
 DebugStub_ComWrite8_Wait:
 Call DebugStub_ReadRegister
 Test AL, 0x20
 JE near DebugStub_ComWrite8_Wait
-Mov DX, 0
+mov word DX, 0x0
 Mov AL, [ESI + 0]
 Call DebugStub_WriteRegister
 Inc ESI

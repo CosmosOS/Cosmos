@@ -27,7 +27,7 @@ namespace DebugCompiler
             xEngine.RunIL2CPUInProcess = true;
             xEngine.TraceAssembliesLevel = TraceAssemblies.User;
 
-            xEngine.EnableStackCorruptionChecks = false;
+            xEngine.EnableStackCorruptionChecks = true;
             xEngine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
 
             // Select kernels to be tested by adding them to the engine

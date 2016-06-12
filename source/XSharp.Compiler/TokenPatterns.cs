@@ -6,6 +6,7 @@ using System.Text;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Instruction = Cosmos.Assembler.Instruction;
+using static XSharp.Compiler.XSRegisters;
 
 namespace XSharp.Compiler {
   /// <summary>This class is able to translate a single X# source code line into one or more
@@ -167,7 +168,7 @@ namespace XSharp.Compiler {
         throw new Exception("Label must be AlphaNum.");
       }
 
-      string xValue = aToken;
+      string xValue = aToken.RawValue;
       if (!InFunctionBody) {
         if (xValue.StartsWith(".")) {
           return xValue.Substring(1);
@@ -239,8 +240,8 @@ namespace XSharp.Compiler {
         xToken2 = aTokens[rIdx + 1];
       }
       if (xToken1.Type == TokenType.Register) {
-        if (xToken2 != null && xToken2.Value == "[") {
-          if (aTokens[rIdx + 2].Value == "-") {
+        if (xToken2 != null && xToken2.RawValue == "[") {
+          if (aTokens[rIdx + 2].RawValue == "-") {
             rIdx += 5;
             return "[" + xToken1 + " - " + aTokens[rIdx - 2] + "]";
           }
@@ -248,7 +249,7 @@ namespace XSharp.Compiler {
           return "[" + xToken1 + " + " + aTokens[rIdx - 2] + "]";
         }
         rIdx += 1;
-        return xToken1;
+        return xToken1.RawValue;
 
       } else if (xToken1.Type == TokenType.AlphaNum) {
         rIdx += 1;
@@ -256,12 +257,12 @@ namespace XSharp.Compiler {
 
       } else if (xToken1.Type == TokenType.ValueInt) {
         rIdx += 1;
-        return xToken1;
+        return xToken1.RawValue;
 
       } else if (xToken1.Type == TokenType.Call) {
         rIdx += 1;
         return "@ret_on_stack@";
-      } else if (xToken1.Value == "#") {
+      } else if (xToken1.RawValue == "#") {
         rIdx += 2;
         return ConstLabel(xToken2);
 
@@ -272,9 +273,25 @@ namespace XSharp.Compiler {
 
     protected void DoCompare(TokenList aTokens, ref int rStart, out Token aComparison)
     {
-      string xSize = "";
+      RegisterSize? xSize = null;
+      string xSizeStr = "";
       if (aTokens[rStart].Type == TokenType.Keyword) {
-        xSize = aTokens[rStart];
+        xSizeStr = aTokens[rStart].RawValue;
+        if (xSizeStr == "dword")
+        {
+          xSize = RegisterSize.Int32;
+        }
+        else if (xSizeStr == "word")
+        {
+          xSize = RegisterSize.Short16;
+        }else if (xSizeStr == "byte")
+        {
+          xSize = RegisterSize.Byte8;
+        }
+        else
+        {
+          throw new Exception("Size " + xSizeStr + " not recognized");
+        }
         rStart++;
       }
 
@@ -284,7 +301,7 @@ namespace XSharp.Compiler {
       rStart++;
 
       string xRight = GetRef(aTokens, ref rStart);
-      XS.CompareLiteral(xSize, xLeft, xRight);
+      XS.CompareLiteral(xSizeStr, xLeft, xRight);
     }
 
     protected void DoSimpleCompare(Token left, Token right, Token size = null)
@@ -370,7 +387,7 @@ namespace XSharp.Compiler {
     protected void HandleIf(TokenList aTokens, string xComparison) {
       string xLabel;
       var xLast = aTokens.Last();
-      if (xLast.Value == "{") {
+      if (xLast.RawValue == "{") {
         mBlocks.Start(aTokens, false);
         XS.Jump(GetJump(xComparison, true), BlockLabel("End"));
       } else {
@@ -386,12 +403,12 @@ namespace XSharp.Compiler {
 
     protected void AddPatterns() {
       AddPattern("! Mov EAX, 0", delegate (TokenList aTokens) {
-        XS.LiteralCode(aTokens[0].Value);
+        XS.LiteralCode(aTokens[0].RawValue);
       });
 
       AddPattern("// Comment", delegate(TokenList aTokens) {
         if (EmitUserComments) {
-          string xValue = aTokens[0].Value;
+          string xValue = aTokens[0].RawValue;
           xValue = xValue.Replace("\"", "\\\"");
           XS.Comment(xValue);
         }
@@ -422,19 +439,19 @@ namespace XSharp.Compiler {
         if (aTokens.Count != 1 || aTokens[0].Type != TokenType.Call) {
           throw new Exception("Error occured in parametrized call parsing");
         }  else {
-          List<string> mparts = aTokens[0].Value.Remove(aTokens[0].Value.Length - 1).Split('(').ToList();
+          List<string> mparts = aTokens[0].RawValue.Remove(aTokens[0].RawValue.Length - 1).Split('(').ToList();
           if (mparts.Count < 2) {
             throw new Exception("Error occured in parametrized call parsing");
           }
           string fname = mparts[0];
           mparts.RemoveAt(0);
-          aTokens[0].Value = String.Join("(", mparts).Trim();
+          aTokens[0].RawValue = String.Join("(", mparts).Trim();
           string val = "";
           int idx;
 
           var xParams = new List<string>();
           int level = 0;
-          foreach (char c in aTokens[0].Value) {
+          foreach (char c in aTokens[0].RawValue) {
             switch (c) {
               case ',':
                 if (level == 0) {
@@ -486,7 +503,7 @@ namespace XSharp.Compiler {
 
       // Defines a constant having the given name and initial value.
       AddPattern("const _ABC = 123", delegate(TokenList aTokens) {
-        XS.Const(ConstLabel(aTokens[1]), aTokens[3]);
+        XS.Const(ConstLabel(aTokens[1]), aTokens[3].IntValue.ToString());
       });
 
       // Declare a double word variable having the given name and initialized to 0. The
@@ -498,13 +515,7 @@ namespace XSharp.Compiler {
       // variable is declared at namespace level.
       AddPattern("var _ABC = 123", delegate(TokenList aTokens)
                                    {
-        uint xValue;
-        if (aTokens[3].Value.StartsWith("0x")) {
-          xValue = Convert.ToUInt32(aTokens[3].Value, 16);
-        } else {
-          xValue = UInt32.Parse(aTokens[3].Value);
-        }
-        XS.DataMember(GetLabel(aTokens[1]), xValue);
+        XS.DataMember(GetLabel(aTokens[1]), aTokens[3].IntValue);
       });
       // Declare a textual variable having the given name and value. The variable is defined at
       // namespace level and a null terminating byte is automatically added after the textual
@@ -512,7 +523,7 @@ namespace XSharp.Compiler {
       AddPattern("var _ABC = 'Text'", delegate(TokenList aTokens) {
         // Fix issue #15660 by using backquotes for string surrounding and escaping embedded
         // back quotes.
-        XS.DataMember(GetLabel(aTokens[1]), EscapeBackQuotes(aTokens[3].Value));
+        XS.DataMember(GetLabel(aTokens[1]), EscapeBackQuotes(aTokens[3].RawValue));
       });
       // Declare a one-dimension array of bytes, words or doublewords. All members are initialized to 0.
       // _ABC is array name. 123 is the total number of items in the array.
@@ -531,7 +542,7 @@ namespace XSharp.Compiler {
         } else {
           throw new Exception("Unknown size specified");
         }
-        XS.DataMember(GetLabel(aTokens[1]), UInt32.Parse(aTokens[4].Value), xSize, "0");
+        XS.DataMember(GetLabel(aTokens[1]), UInt32.Parse(aTokens[4].RawValue), xSize, "0");
       });
 
       foreach (var xCompare in mCompares) {
@@ -544,7 +555,7 @@ namespace XSharp.Compiler {
           Token xComparison;
           DoCompare(aTokens, ref xIdx, out xComparison);
 
-          XS.Jump(GetJump(xComparison, true), BlockLabel("End"));
+          XS.Jump(GetJump(xComparison.RawValue, true), BlockLabel("End"));
         });
       }
 
@@ -552,9 +563,9 @@ namespace XSharp.Compiler {
         // if 0 exit, etc
         foreach (var xComparison in mCompareOps) {
           AddPattern("if " + xComparison + " " + xTail, delegate(TokenList aTokens) {
-            string xOp = aTokens[1];
+            string xOp = aTokens[1].RawValue;
             // !0 is 2 tokens
-            if (aTokens[1] + aTokens[2] == "!0") {
+            if (aTokens[1].RawValue + aTokens[2].RawValue == "!0") {
               xOp = "!0";
             }
 
@@ -570,7 +581,7 @@ namespace XSharp.Compiler {
             Token xComparison;
             DoCompare(aTokens, ref xIdx, out xComparison);
 
-            HandleIf(aTokens, xComparison);
+            HandleIf(aTokens, xComparison.RawValue);
           });
         }
       }
@@ -586,7 +597,7 @@ namespace XSharp.Compiler {
       });
 
       AddPattern("_REG ?& 123", delegate (TokenList aTokens) {
-        DoSimpleTest(aTokens[0], aTokens[2]);
+        DoSimpleTest(aTokens[0], aTokens[2].RawValue);
       });
       AddPattern("_REG ?& _ABC", delegate(TokenList aTokens) {
         DoSimpleTest(aTokens[0], GetLabel(aTokens[2]));
@@ -596,20 +607,20 @@ namespace XSharp.Compiler {
       });
 
       AddPattern("_REG ~> 123", delegate (TokenList aTokens) {
-        XS.RotateRight(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+        XS.RotateRight(aTokens[0].Register, aTokens[2].IntValue);
       });
       AddPattern("_REG <~ 123", delegate (TokenList aTokens) {
-        XS.RotateLeft(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+        XS.RotateLeft(aTokens[0].Register, aTokens[2].IntValue);
       });
       AddPattern("_REG >> 123", delegate (TokenList aTokens) {
-        XS.ShiftRight(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+        XS.ShiftRight(aTokens[0].Register, aTokens[2].IntValue);
       });
       AddPattern("_REG << 123", delegate (TokenList aTokens) {
-        XS.ShiftLeft(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+        XS.ShiftLeft(aTokens[0].Register, aTokens[2].IntValue);
       });
 
       AddPattern("_REG = 123", delegate (TokenList aTokens) {
-        XS.SetLiteral(GetSimpleRef(aTokens[0]), GetSimpleRef(aTokens[2]));
+        XS.Set(aTokens[0].Register, aTokens[2].IntValue);
       });
       AddPattern("_REGADDR[1] = 123", delegate (TokenList aTokens) {
         XS.SetLiteral("dword", "[" + GetSimpleRef(aTokens[0]) + " + " + GetSimpleRef(aTokens[2]) + "]", GetSimpleRef(aTokens[5]));
@@ -714,7 +725,7 @@ namespace XSharp.Compiler {
         }, delegate(TokenList aTokens) {
         string xSize = "dword ";
         if (aTokens.Count > 2) {
-          xSize = aTokens[3].Value + " ";
+          xSize = aTokens[3].RawValue + " ";
         }
         XS.PushLiteral(xSize + ConstLabel(aTokens[1]));
         });
@@ -737,7 +748,7 @@ namespace XSharp.Compiler {
           XS.SetLiteral("dword", "[" + GetLabel(aTokens[0]) + "]", ConstLabel(aTokens[3]));
         });
       AddPattern("_ABC = 123", delegate(TokenList aTokens) {
-        XS.SetLiteral("dword", "[" + GetLabel(aTokens[0]) + "]", aTokens[2]);
+        XS.SetLiteral("dword", "[" + GetLabel(aTokens[0]) + "]", aTokens[2].RawValue);
       });
       AddPattern(new string[] {
         "_ABC = 123 as byte",
@@ -764,23 +775,21 @@ namespace XSharp.Compiler {
         "_REG * 1",
         "_REG * _REG"
       }, delegate(TokenList aTokens) {
-        int targetRegisterSize = 0;
+        RegisterSize targetRegisterSize = 0;
         for (int index = 0; index < 2; index++) {
           Token scannedToken = (0 == index) ? aTokens[0] : aTokens[2];
 
           if (TokenType.Register != scannedToken.Type) { continue; }
-          string canonicScannedTokenValue = scannedToken.Value.ToUpper();
 
-          if (Parser.Registers8.Contains<string>(scannedToken.Value.ToUpper())) {
+          if (Parser.Registers8.ContainsKey(scannedToken.RawValue.ToUpper())) {
             throw new Exception(string.Format(
                 "Multiplication is not supported on byte sized register '{0}' at line {1}, col {2}",
-                scannedToken.Value, scannedToken.LineNumber, scannedToken.SrcPosStart));
+                scannedToken.RawValue, scannedToken.LineNumber, scannedToken.SrcPosStart));
           }
           if (0 == index) {
-            if (Parser.Registers16.Contains<string>(canonicScannedTokenValue)) { targetRegisterSize = 16; } else if (Parser.Registers32.Contains<string>(canonicScannedTokenValue)) { targetRegisterSize = 32; } else { throw new Exception("Algorithmic error."); }
+            targetRegisterSize = scannedToken.Register.Size;
           } else {
-            int sourceRegisterSize;
-            if (Parser.Registers16.Contains<string>(canonicScannedTokenValue)) { sourceRegisterSize = 16; } else if (Parser.Registers32.Contains<string>(canonicScannedTokenValue)) { sourceRegisterSize = 32; } else { throw new Exception("Algorithmic error."); }
+            var sourceRegisterSize = scannedToken.Register.Size;
 
             if (sourceRegisterSize != targetRegisterSize) {
               throw new Exception(string.Format("Register '{0}' and '{1}' must be of the same size for multiplication on line {2}.",
@@ -826,8 +835,8 @@ namespace XSharp.Compiler {
           var xBlock = mBlocks.Current();
           var xToken1 = xBlock.StartTokens[0];
           if (xToken1.Matches("repeat")) {
-            int xCount = int.Parse(xBlock.StartTokens[1]);
-            for (int i = 1; i <= xCount; i++) {
+            var xCount = xBlock.StartTokens[1].IntValue;
+            for (var i = 1; i <= xCount; i++) {
               xBlock.AddContentsToParentAssembler();
             }
           } else if (xToken1.Matches("while")) {
@@ -846,7 +855,7 @@ namespace XSharp.Compiler {
       });
 
       AddPattern("namespace _ABC", delegate(TokenList aTokens) {
-        mNamespace = aTokens[1].Value;
+        mNamespace = aTokens[1].RawValue;
       });
 
       AddPattern("Return", delegate {
@@ -858,9 +867,9 @@ namespace XSharp.Compiler {
       });
 
       AddPattern("Interrupt _ABC {", delegate(TokenList aTokens) {
-        StartFunc(aTokens[1].Value);
+        StartFunc(aTokens[1].RawValue);
         mInIntHandler = true;
-        XS.Label(GetNamespace() + "_" + aTokens[1].Value);
+        XS.Label(GetNamespace() + "_" + aTokens[1].RawValue);
       });
 
       // This needs to be different from return.
@@ -873,9 +882,9 @@ namespace XSharp.Compiler {
       });
 
       AddPattern("Function _ABC {", delegate(TokenList aTokens) {
-        StartFunc(aTokens[1].Value);
+        StartFunc(aTokens[1].RawValue);
         mInIntHandler = false;
-        XS.Label(GetNamespace() + "_" + aTokens[1].Value);
+        XS.Label(GetNamespace() + "_" + aTokens[1].RawValue);
       });
 
       AddPattern("Checkpoint 'Text'", delegate(TokenList aTokens) {
@@ -894,7 +903,7 @@ namespace XSharp.Compiler {
             XS.SetByte(i+1, 2);
           }
 
-          foreach (var xChar in aTokens[1].Value) {
+          foreach (var xChar in aTokens[1].RawValue) {
             XS.SetByte(xVideo, (byte)xChar);
             xVideo = xVideo + 2;
           }
@@ -976,7 +985,7 @@ namespace XSharp.Compiler {
         ) {
         // () could be handled by pattern, but best to keep in one place for future
         //xResult += "Call " + GroupLabel(aTokens[0].Value);
-          XS.Call(GroupLabel(aTokens[0].Value));
+          XS.Call(GroupLabel(aTokens[0].RawValue));
       }
       return true;
     }

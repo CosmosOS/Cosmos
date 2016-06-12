@@ -1,4 +1,4 @@
-; Generated at 6/11/2016 4:16:44 PM
+; Generated at 6/12/2016 9:03:31 AM
 
 DebugStub_MaxBPId dd 0
 
@@ -17,14 +17,14 @@ Ret
 
 
 DebugStub_WaitForSignature:
-Mov EBX, 0
+mov dword EBX, 0x0
 
 DebugStub_WaitForSignature_Block1_Begin:
 Cmp EBX, DebugStub_Const_Signature
 JE near DebugStub_WaitForSignature_Block1_End
 Call DebugStub_ComReadAL
 Mov BL, AL
-ROR EBX, 8
+ror dword EBX, 0x8
 Jmp DebugStub_WaitForSignature_Block1_Begin
 
 DebugStub_WaitForSignature_Block1_End:
@@ -35,11 +35,11 @@ Ret
 
 
 DebugStub_WaitForDbgHandshake:
-Mov AL, 0
+mov byte AL, 0x0
 Call DebugStub_ComWriteAL
-Mov AL, 0
+mov byte AL, 0x0
 Call DebugStub_ComWriteAL
-Mov AL, 0
+mov byte AL, 0x0
 Call DebugStub_ComWriteAL
 Push dword DebugStub_Const_Signature
 Mov ESI, ESP

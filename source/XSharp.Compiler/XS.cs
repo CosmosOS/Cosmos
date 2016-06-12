@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
 
 namespace XSharp.Compiler
 {
+  [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
   public static class XS
   {
     public static void Label(string labelName)
@@ -21,9 +24,38 @@ namespace XSharp.Compiler
       new IRET();
     }
 
-    public static void Set(string destinationLabel, string sourceLabel)
+    public static void Set(string destination, string sourceLabel, bool sourceIsIndirect = false)
     {
-      new Mov { DestinationRef = ElementReference.New(destinationLabel), DestinationIsIndirect = true, SourceRef = ElementReference.New(sourceLabel) };
+      new Mov
+      {
+        Size = 32,
+        DestinationRef = ElementReference.New(destination),
+        DestinationIsIndirect = true,
+        SourceRef = ElementReference.New(sourceLabel),
+        SourceIsIndirect = sourceIsIndirect
+      };
+    }
+
+    public static void Set(Register destination, string sourceLabel, bool destinationIsIndirect = false, bool sourceIsIndirect = false)
+    {
+      new Mov
+      {
+        Size = (byte)destination.Size,
+        DestinationReg = destination.RegEnum,
+        DestinationIsIndirect = destinationIsIndirect,
+        SourceRef = ElementReference.New(sourceLabel),
+        SourceIsIndirect = sourceIsIndirect
+      };
+    }
+
+    public static void Set(Register destination, uint value, bool sourceIsIndirect = false)
+    {
+      new Mov
+      {
+        Size = (byte)destination.Size,
+        DestinationReg = destination.RegEnum,
+        SourceValue = value,
+      };
     }
 
     public static void SetByte(uint address, byte value)
@@ -125,24 +157,24 @@ namespace XSharp.Compiler
       new LiteralAssemblerCode(code);
     }
 
-    public static void RotateRight(string left, string right)
+    public static void RotateRight(Register register, uint bitCount)
     {
-      LiteralCode("ROR " + left + ", " + right);
+      new RotateRight { DestinationReg = register.RegEnum, SourceValue = bitCount, Size = (byte)register.Size };
     }
 
-    public static void RotateLeft(string left, string right)
+    public static void RotateLeft(Register register, uint bitCount)
     {
-      LiteralCode("ROL " + left + ", " + right);
+      new RotateLeft { DestinationReg = register.RegEnum, SourceValue = bitCount, Size = (byte)register.Size };
     }
 
-    public static void ShiftRight(string left, string right)
+    public static void ShiftRight(Register register, uint bitCount)
     {
-      LiteralCode("SHR " + left + ", " + right);
+      new ShiftRight { DestinationReg = register.RegEnum, SourceValue = bitCount, Size = (byte)register.Size };
     }
 
-    public static void ShiftLeft(string left, string right)
+    public static void ShiftLeft(Register register, uint bitCount)
     {
-      LiteralCode("SHL " + left + ", " + right);
+      new ShiftLeft { DestinationReg = register.RegEnum, SourceValue = bitCount, Size = (byte)register.Size };
     }
 
     public static void WriteLiteralToPortDX(string value)

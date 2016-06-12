@@ -1,4 +1,4 @@
-; Generated at 6/11/2016 4:16:44 PM
+; Generated at 6/12/2016 9:03:31 AM
 
 
 
@@ -7,7 +7,7 @@ Call DebugStub_ComReadAL
 Push EAX
 Cmp AL, DebugStub_Const_Vs2Ds_Noop
 JE near DebugStub_ProcessCommand_Exit
-Mov EAX, 0
+mov dword EAX, 0x0
 Call DebugStub_ComReadAL
 Mov [DebugStub_CommandID], EAX
 Mov EAX, [ESP + 0]

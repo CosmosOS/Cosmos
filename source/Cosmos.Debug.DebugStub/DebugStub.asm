@@ -1,4 +1,4 @@
-; Generated at 6/11/2016 4:16:44 PM
+; Generated at 6/12/2016 9:03:31 AM
 
 DebugStub_CallerEBP dd 0
 DebugStub_CallerEIP dd 0
@@ -15,34 +15,34 @@ DebugStub_BreakOnAddress:
 Pushad
 Call DebugStub_ComReadEAX
 Mov ECX, EAX
-Mov EAX, 0
+mov dword EAX, 0x0
 Call DebugStub_ComReadAL
 Push EAX
 Mov EBX, DebugStub_DebugBPs
-SHL EAX, 2
+shl dword EAX, 0x2
 Add EBX, EAX
 Cmp ECX, 0
 JNE near DebugStub_BreakOnAddress_Block1_End
 Mov EDI, [EBX + 0]
-Mov AL, 0x90
+mov byte AL, 0x90
 Mov [EDI + 0], AL
 Jmp DebugStub_BreakOnAddress_DontSetBP
 
 DebugStub_BreakOnAddress_Block1_End:
 Mov [EBX + 0], ECX
 Mov EDI, [EBX + 0]
-Mov AL, 0xCC
+mov byte AL, 0xCC
 Mov [EDI + 0], AL
 
 DebugStub_BreakOnAddress_DontSetBP:
 Pop EAX
-Mov ECX, 256
+mov dword ECX, 0x100
 
 DebugStub_BreakOnAddress_FindBPLoop:
 Dec ECX
 Mov EBX, DebugStub_DebugBPs
 Mov EAX, ECX
-SHL EAX, 2
+shl dword EAX, 0x2
 Add EBX, EAX
 Mov EAX, [EBX + 0]
 Cmp EAX, 0
@@ -74,7 +74,7 @@ DebugStub_SetINT3:
 Pushad
 Call DebugStub_ComReadEAX
 Mov EDI, EAX
-Mov AL, 0xCC
+mov byte AL, 0xCC
 Mov [EDI + 0], AL
 
 DebugStub_SetINT3_Exit:
@@ -87,7 +87,7 @@ DebugStub_ClearINT3:
 Pushad
 Call DebugStub_ComReadEAX
 Mov EDI, EAX
-Mov AL, 0x90
+mov byte AL, 0x90
 Mov [EDI + 0], AL
 
 DebugStub_ClearINT3_Exit:
@@ -168,7 +168,7 @@ Call DebugStub_SendTrace
 DebugStub_Executing_Block10_End:
 
 DebugStub_Executing_CheckForCmd:
-Mov DX, 5
+mov word DX, 0x5
 Call DebugStub_ReadRegister
 Test AL, 1
 JE near DebugStub_Executing_Block11_End

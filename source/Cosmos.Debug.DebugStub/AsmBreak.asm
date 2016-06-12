@@ -1,4 +1,4 @@
-; Generated at 6/11/2016 4:16:44 PM
+; Generated at 6/12/2016 9:03:31 AM
 
 DebugStub_AsmBreakEIP dd 0
 DebugStub_AsmOrigByte dd 0
@@ -23,7 +23,7 @@ Mov [DebugStub_AsmBreakEIP], EAX
 Mov EDI, EAX
 Mov AL, [EDI + 0]
 Mov [DebugStub_AsmOrigByte], AL
-Mov AL, 0xCC
+mov byte AL, 0xCC
 Mov [EDI + 0], AL
 
 DebugStub_SetAsmBreak_Exit:

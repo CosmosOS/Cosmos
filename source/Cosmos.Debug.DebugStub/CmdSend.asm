@@ -1,4 +1,4 @@
-; Generated at 6/11/2016 4:16:44 PM
+; Generated at 6/12/2016 9:03:31 AM
 
 
 
@@ -6,7 +6,7 @@ DebugStub_SendRegisters:
 Mov AL, DebugStub_Const_Ds2Vs_Registers
 Call DebugStub_ComWriteAL
 Mov ESI, [DebugStub_PushAllPtr]
-Mov ECX, 32
+mov dword ECX, 0x20
 Call DebugStub_ComWriteX
 Mov ESI, DebugStub_CallerESP
 Call DebugStub_ComWrite32
@@ -21,11 +21,11 @@ Ret
 DebugStub_SendFrame:
 Mov AL, DebugStub_Const_Ds2Vs_Frame
 Call DebugStub_ComWriteAL
-Mov EAX, 32
+mov dword EAX, 0x20
 Call DebugStub_ComWriteAX
 Mov ESI, [DebugStub_CallerEBP]
 Add ESI, 8
-Mov ECX, 32
+mov dword ECX, 0x20
 Call DebugStub_ComWriteX
 
 DebugStub_SendFrame_Exit:

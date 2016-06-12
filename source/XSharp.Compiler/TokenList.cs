@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using static XSharp.Compiler.XSRegisters;
 
 namespace XSharp.Compiler {
   public class TokenList : List<Token> {
@@ -43,11 +44,11 @@ namespace XSharp.Compiler {
       return xResult;
     }
 
-    protected bool RegistersMatch(string aThisUpper, string aThatUpper, string aPattern, string[] aRegisters) {
+    protected bool RegistersMatch(string aThisUpper, string aThatUpper, string aPattern, IDictionary<string, Register> aRegisters) {
       // ONLY check if its our pattern. We need to return true to continue other pattern checks
       // if not current pattern.
       if (aThisUpper == aPattern || aThatUpper == aPattern) {
-        if (aRegisters.Contains(aThatUpper) || aRegisters.Contains(aThisUpper)) {
+        if (aRegisters.ContainsKey(aThatUpper) || aRegisters.ContainsKey(aThisUpper)) {
           return true;
         }
         return false;
@@ -76,13 +77,13 @@ namespace XSharp.Compiler {
         if (xThis.Type != xThat.Type) {
           return false;
         } else if (xThis.Type == TokenType.AlphaNum || xThis.Type == TokenType.Keyword || xThis.Type == TokenType.Operator || xThis.Type == TokenType.Delimiter) {
-          if (xThis.Value == null || aObj[i].Value == null) {
-          } else if (string.Compare(xThis.Value, xThat.Value, true) != 0) {
+          if (xThis.RawValue == null || aObj[i].RawValue == null) {
+          } else if (string.Compare(xThis.RawValue, xThat.RawValue, true) != 0) {
             return false;
           }
         } else if (xThis.Type == TokenType.Register) {
-          string xThisUpper = xThis.Value.ToUpper();
-          string xThatUpper = xThat.Value.ToUpper();
+          string xThisUpper = xThis.RawValue.ToUpper();
+          string xThatUpper = xThat.RawValue.ToUpper();
 
           if (xThisUpper == "_REG" || xThatUpper == "_REG") {
             // true, ie continue
@@ -99,7 +100,7 @@ namespace XSharp.Compiler {
           }
         }
       }
-     
+
       return true;
     }
 
