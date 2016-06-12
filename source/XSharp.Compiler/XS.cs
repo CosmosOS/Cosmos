@@ -588,5 +588,29 @@ namespace XSharp.Compiler
         SourceDisplacement = sourceDisplacement,
       };
     }
+
+    public static void LiteralCode(string code)
+    {
+      new LiteralAssemblerCode(code);
+    }
+
+    public static void Test(Register destination, uint source)
+    {
+      new Test
+      {
+        DestinationReg = destination.RegEnum,
+        SourceValue = source
+      };
+    }
+
+    public static void Test(Register destination, string sourceRef, bool sourceIsIndirect = false)
+    {
+      new Test
+      {
+        DestinationReg = destination.RegEnum,
+        SourceRef = ElementReference.New(sourceRef),
+        SourceIsIndirect = sourceIsIndirect
+      };
+    }
   }
 }

@@ -1,4 +1,4 @@
-; Generated at 6/12/2016 3:23:24 PM
+; Generated at 6/12/2016 3:34:04 PM
 
 DebugStub_CallerEBP dd 0
 DebugStub_CallerEIP dd 0
@@ -170,7 +170,7 @@ DebugStub_Executing_Block10_End:
 DebugStub_Executing_CheckForCmd:
 mov word DX, 0x5
 Call DebugStub_ReadRegister
-Test AL, 1
+test byte AL, 0x1
 JE near DebugStub_Executing_Block11_End
 Call DebugStub_ProcessCommand
 Jmp DebugStub_Executing_CheckForCmd

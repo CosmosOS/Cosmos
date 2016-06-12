@@ -315,25 +315,7 @@ namespace XSharp.Compiler {
       }
     }
 
-    protected void DoSimpleTest(Token left, string right, Token size = null)
-    {
-      string xSize = "";
-
-      var xIdx = 0;
-      var xTokens = new List<Token>(new[]
-                                    {
-                                      left
-                                    });
-      string xLeft = GetRef(xTokens, ref xIdx, true);
-      XS.TestLiteral(xSize, xLeft, right);
-    }
-
-    protected ConditionalTestEnum GetJump(string aComparison)
-    {
-      return GetJump(aComparison, false);
-    }
-
-    protected ConditionalTestEnum GetJump(string aComparison, bool aInvert)
+    protected ConditionalTestEnum GetJump(string aComparison, bool aInvert = false)
     {
       if (aInvert)
       {
@@ -871,15 +853,15 @@ namespace XSharp.Compiler {
 
       AddPattern("_REG ?& 123", delegate(TokenList aTokens)
                                 {
-                                  DoSimpleTest(aTokens[0], aTokens[2].RawValue);
+                                  XS.Test(aTokens[0].Register, aTokens[2].IntValue);
                                 });
       AddPattern("_REG ?& _ABC", delegate(TokenList aTokens)
                                  {
-                                   DoSimpleTest(aTokens[0], GetLabel(aTokens[2]));
+                                   XS.Test(aTokens[0].Register, GetLabel(aTokens[2]), sourceIsIndirect: true);
                                  });
       AddPattern("_REG ?& #_ABC", delegate(TokenList aTokens)
                                   {
-                                    DoSimpleTest(aTokens[0], ConstLabel(aTokens[3]));
+                                    XS.Test(aTokens[0].Register, GetLabel(aTokens[2]), sourceIsIndirect: true);
                                   });
 
       AddPattern("_REG ~> 123", delegate(TokenList aTokens)
