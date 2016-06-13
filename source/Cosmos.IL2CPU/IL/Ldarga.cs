@@ -3,6 +3,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler.x86;
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 
@@ -21,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
             var xOpVar = (OpVar)aOpCode;
             var xDisplacement = Ldarg.GetArgumentDisplacement(aMethod, xOpVar.Value);
             new Mov {DestinationReg=RegistersEnum.EBX, SourceValue = (uint)(xDisplacement) };
-            new Mov{DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBP };
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.EBP));
             new CPUx86.Add { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBX };
             new CPUx86.Push { DestinationReg = RegistersEnum.EAX };
 

@@ -1,5 +1,5 @@
 ﻿using Cosmos.IL2CPU.Plugs;
-
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.Core.Plugs.System.Assemblers
@@ -53,7 +53,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
             new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = LengthDisplacement };
             new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
+            XS.Set(XSRegisters.OldToNewRegister(CPUx86.Registers.ECX), XSRegisters.OldToNewRegister(CPUx86.Registers.EAX));
             new CPUx86.Movs { Size = 8, Prefixes = CPUx86.InstructionPrefixes.Repeat };
         }
     }

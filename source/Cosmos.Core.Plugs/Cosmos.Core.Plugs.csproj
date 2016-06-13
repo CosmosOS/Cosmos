@@ -148,6 +148,10 @@
       <Project>{239e33a7-f0c3-4801-85ca-4d8f89a31dc0}</Project>
       <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>
+    <ProjectReference Include="..\XSharp.Compiler\XSharp.Compiler.csproj">
+      <Project>{a281a1b1-c718-4bcb-a7be-ed840a70449a}</Project>
+      <Name>XSharp.Compiler</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="ReadMe.html" />

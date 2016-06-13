@@ -3,7 +3,7 @@
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.IL2CPU.X86.IL;
-
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 using MethodBase = System.Reflection.MethodBase;
 
@@ -68,38 +68,38 @@ namespace Cosmos.Core.Plugs.System.Assemblers
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThanOrEqualTo, DestinationLabel = ".END_OF_INVOKE_" };//then we better stop
                 new CPUx86.Pushad();
                 new Assembler.Comment("esi points to where we will copy the methods argumetns from");
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESP };
-                new Assembler.Comment("edi = ptr to delegate object");
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.Registers.ESI), XSRegisters.OldToNewRegister(CPUx86.Registers.ESP));
+                new Comment("edi = ptr to delegate object");
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0) };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true }; // dereference handle
-                new Assembler.Comment("edi = ptr to delegate object should be a pointer to the delgates context ie (this) for the methods ");
+                new Comment("edi = ptr to delegate object should be a pointer to the delgates context ie (this) for the methods ");
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true, SourceDisplacement = Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target") };
                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDI, SourceValue = 0 };
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".NO_THIS" };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI };
 
-                new Assembler.Label(".NO_THIS");
+                new Label(".NO_THIS");
 
-                new Assembler.Comment("make space for us to copy the arguments too");
+                new Comment("make space for us to copy the arguments too");
                 new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.ECX };
-                new Assembler.Comment("move the current delegate to edi");
+                new Comment("move the current delegate to edi");
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true }; // dereference
-                new Assembler.Comment("move the methodptr from that delegate to edi ");
+                new Comment("move the methodptr from that delegate to edi ");
                 new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true, SourceDisplacement = Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.IntPtr System.Delegate._methodPtr") };//
-                new Assembler.Comment("save methodptr on the stack");
+                new Comment("save methodptr on the stack");
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI };
-                new Assembler.Comment("move location to copy args to");
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESP };
+                new Comment("move location to copy args to");
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.Registers.EDI), XSRegisters.OldToNewRegister(CPUx86.Registers.ESP));
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.EDI, SourceValue = 4 };
                 //new CPU.Comment("get above the saved methodptr");
                 //new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
                 //we allocated the argsize on the stack once, and it we need to get above the original args
-                new Assembler.Comment("we allocated argsize on the stack once");
-                new Assembler.Comment("add 32 for the Pushad + 16 for the current stack + 4 for the return value");
+                new Comment("we allocated argsize on the stack once");
+                new Comment("add 32 for the Pushad + 16 for the current stack + 4 for the return value");
                 //uint xToAdd = 32; // skip pushad data
                 //xToAdd += 4; // method pointer
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.EBP };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.Registers.ESI), XSRegisters.OldToNewRegister(CPUx86.Registers.EBP));
                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 8 }; // ebp+8 is first argument
                 new CPUx86.Movs { Size = 8, Prefixes = CPUx86.InstructionPrefixes.Repeat };
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDI };
