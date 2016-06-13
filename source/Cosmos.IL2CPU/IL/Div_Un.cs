@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 using Label = Cosmos.Assembler.Label;
 
@@ -101,15 +102,15 @@ namespace Cosmos.IL2CPU.X86.IL
 					new Label(LabelNoLoop);
 
 					//save high dividend
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX };
+					XS.Set(XSRegisters.OldToNewRegister(CPUx86.Registers.ECX), XSRegisters.OldToNewRegister(CPUx86.Registers.EAX));
+					XS.Set(XSRegisters.OldToNewRegister(CPUx86.Registers.EAX), XSRegisters.OldToNewRegister(CPUx86.Registers.EDX));
 					// zero EDX, so that high part is zero -> reduce overflow case
 					new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
 					// divide high part
 					new CPUx86.Divide { DestinationReg = CPUx86.Registers.ESI };
 					// save high result
 					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX };
+					XS.Set(XSRegisters.OldToNewRegister(CPUx86.Registers.EAX), XSRegisters.OldToNewRegister(CPUx86.Registers.ECX));
 					// divide low part
 					new CPUx86.Divide { DestinationReg = CPUx86.Registers.ESI };
 					// save low result

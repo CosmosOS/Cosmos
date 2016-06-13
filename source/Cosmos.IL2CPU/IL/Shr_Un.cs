@@ -2,6 +2,8 @@ using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using XSharp.Compiler;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Shr_Un )]
@@ -26,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // shift amount
                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX }; // value
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.CL, SourceReg = CPUx86.Registers.AL };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.Registers.CL), XSRegisters.OldToNewRegister(CPUx86.Registers.AL));
                 new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.CL };
                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
                 return;

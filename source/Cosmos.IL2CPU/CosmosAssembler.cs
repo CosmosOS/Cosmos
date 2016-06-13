@@ -4,6 +4,7 @@ using System.IO;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Debug.DebugStub;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU
 {
@@ -96,26 +97,11 @@ namespace Cosmos.IL2CPU
             {
                 DestinationReg = Registers.EAX, SourceValue = mGdData
             };
-            new Mov
-            {
-                DestinationReg = Registers.DS, SourceReg = Registers.EAX
-            };
-            new Mov
-            {
-                DestinationReg = Registers.ES, SourceReg = Registers.EAX
-            };
-            new Mov
-            {
-                DestinationReg = Registers.FS, SourceReg = Registers.EAX
-            };
-            new Mov
-            {
-                DestinationReg = Registers.GS, SourceReg = Registers.EAX
-            };
-            new Mov
-            {
-                DestinationReg = Registers.SS, SourceReg = Registers.EAX
-            };
+            XS.Set(XSRegisters.OldToNewRegister(Registers.DS), XSRegisters.OldToNewRegister(Registers.EAX));
+            XS.Set(XSRegisters.OldToNewRegister(Registers.ES), XSRegisters.OldToNewRegister(Registers.EAX));
+            XS.Set(XSRegisters.OldToNewRegister(Registers.FS), XSRegisters.OldToNewRegister(Registers.EAX));
+            XS.Set(XSRegisters.OldToNewRegister(Registers.GS), XSRegisters.OldToNewRegister(Registers.EAX));
+            XS.Set(XSRegisters.OldToNewRegister(Registers.SS), XSRegisters.OldToNewRegister(Registers.EAX));
 
             new Comment("Force reload of code segment");
             new JumpToSegment

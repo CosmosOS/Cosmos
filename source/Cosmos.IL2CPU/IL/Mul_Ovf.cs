@@ -1,6 +1,8 @@
 using System;
 
 using Cosmos.Assembler;
+using Cosmos.Assembler.x86;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -84,11 +86,7 @@ namespace Cosmos.IL2CPU.X86.IL
             Size = 32
           };
         // save result of LEFT_LOW * RIGHT_HIGH
-        new Assembler.x86.Mov
-          {
-            DestinationReg = Cosmos.Assembler.x86.Registers.ECX,
-            SourceReg = Cosmos.Assembler.x86.Registers.EAX
-          };
+        XS.Set(XSRegisters.OldToNewRegister(Registers.ECX), XSRegisters.OldToNewRegister(Registers.EAX));
 
         //mov RIGHT_LOW to eax
         new Assembler.x86.Mov
