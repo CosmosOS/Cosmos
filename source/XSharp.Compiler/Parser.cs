@@ -11,7 +11,8 @@ namespace XSharp.Compiler {
   /// - _REG      -> All registers
   /// - _REGADDR  -> All 32-bit registers
   /// - 1         -> Number as well
-  /// - _ABC      -> Random label
+  /// - _ABC      -> Random label, used indirectly (ie, used as a field)
+  /// - #_ABC     -> Random label, used for the value (ie, pointer to the field)
   /// </summary>
   public class Parser {
     /// <summary>Index in <see cref="mData"/> of the first yet unconsumed character.</summary>

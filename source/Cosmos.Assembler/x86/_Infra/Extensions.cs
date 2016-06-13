@@ -8,8 +8,8 @@ namespace Cosmos.Assembler.x86 {
     public static class InfraExtensions {
         public static string GetDestinationAsString(this IInstructionWithDestination aThis) {
             string xDest = string.Empty;
-            if((aThis.DestinationValue.HasValue ||aThis.DestinationRef != null) && 
-                aThis.DestinationIsIndirect && 
+            if((aThis.DestinationValue.HasValue ||aThis.DestinationRef != null) &&
+                aThis.DestinationIsIndirect &&
                 aThis.DestinationReg!=null && aThis.DestinationDisplacement > 0) {
                 throw new Exception("[Scale*index+base] style addressing not supported at the moment");
             }
@@ -23,11 +23,11 @@ namespace Cosmos.Assembler.x86 {
                         xDest = "0x" + aThis.DestinationValue.GetValueOrDefault().ToString("X").ToUpperInvariant();
                 }
             }
-            if (aThis.DestinationDisplacement != 0) {
+            if (aThis.DestinationDisplacement != null && aThis.DestinationDisplacement != 0) {
                 if (aThis.DestinationDisplacement > 255) {
-                    xDest += " + 0x" + aThis.DestinationDisplacement.ToString("X");
+                    xDest += " + 0x" + aThis.DestinationDisplacement.Value.ToString("X");
                 } else {
-                  xDest += (aThis.DestinationDisplacement < 0 ? " - " : " + ") + Math.Abs(aThis.DestinationDisplacement);
+                  xDest += (aThis.DestinationDisplacement < 0 ? " - " : " + ") + Math.Abs(aThis.DestinationDisplacement.Value);
                 }
             }
             if (aThis.DestinationIsIndirect) {

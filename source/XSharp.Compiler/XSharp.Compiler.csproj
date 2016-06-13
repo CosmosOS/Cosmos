@@ -101,7 +101,6 @@
     <Compile Include="TokenList.cs" />
     <Compile Include="TokenPatterns.cs" />
     <Compile Include="XS.cs" />
-    <Compile Include="XS.Literal.cs" />
     <Compile Include="XSRegisters.cs" />
   </ItemGroup>
   <ItemGroup>

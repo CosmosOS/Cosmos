@@ -1,16 +1,25 @@
 ﻿# Layout
-
 ```
-F..F
+Top of Ram (F..F in a full system)
 
 Stack
-  Currently only one stack as we don't have threads yet. Stack resides at top of RAM and grows down. 
-  In future each process will have its own stack in DATA. And Stack master section will be eliminated.
+  Currently only one stack as we don't have threads yet.
+  Stack resides at top of RAM and grows down. 
+  In future each process will have its own stack in DATA. 
+  And Stack master section will be eliminated.
+  Because of this we currently treat the stack as a fixed size so the heap has a fixed top.
+  In the future everything will be movable and thus individual stacks could even be moved, grown, or shrunk.
 ....
 
 Data
-  -Heap
-  Global heap for all processes since compiler enforces references.
+  ALL items in data *must be movable* to allow very long up times of the system.
+  Can relocate by moving page with in virtmem and changing refs.
+  -Heap: Global heap for all processes since compiler enforces references.
+  -Stacks (future)
+  -Code (Future)
+  -Disk Cache (Future)
+  -RAT
+  -All single blocks go on bottom, multi page blocks on top. Will help reduce fragmentation greatly.
 
 Text
   All sections are fixed in size and are stacked.
@@ -25,12 +34,80 @@ Text
 0..0
 ```
 
+### Notes
+```
+TODO
+-Get some heap statistics, average size etc
+
+Heap Containers
+All meta data is identical and inline with data. Exists before handle pointer. Keeping
+inline increases block size, but makes it faster to find metadata and keeps it uniform.
+Could have a single pointer to another record elsewhere, but increases complexity and does not provide
+major benefit.
+-Data (handle pointer points here)
+-64 Ref count
+-64 Ptr to first ref
+-Optional - Stacked and single only
+  -64 Size (always need, cant interpolate even from slotted as may be smaller than slot)
+    -Always allocate bigger to word align (or page align for large?). Wont bother .NET, it never needs size from heap.
+    -If need actual size - could add 3 and mask lower 2 bits to round up.
+
+-Small (Tables)
+Fixed sizes, max size one page. 
+Keeping to one page maximizes movability.
+MetaData integrated into page.
+Page allocated at bottom (as with all single page items)
+
+-Medium (Stacked)
+Contains items end to end in a linked list.
+Metadata storage? Prob external at bottom
+Could span mult pages, but better if kept in single ones for movability. 
+Faster compacting as well. 
+Or at least define a default size which is a group of pages.
+
+-Large (Single)
+For large items that are close to page size or larger
+Metadata is grouped from mult containers into one table to avoid excessive rewriting of references
+and easy scanning of all items in system.
+Could group metadata by process in future, or sort table from time to time?
+Use linked list of single page tables in bottom and each item has a link back to the table so compacting is easy
+Item
+-Handle points directly to data
+
+Heap Index
+-Sections containing entries which
+  -Point to first ref
+  -Ref count
+  -Other metadata about item in heap
+  -Table also contains specific info about the page, largest free, smallest free, etc.
+  Info could be on a delayed update
+
+Heap pages come in several types
+-Slotted - predefined sizes. 64, 256 etc... anything that sizes or smaller goes in a table
+-Stacked - ie end to end wtih markers. 
+-Single - large ones.. items bigger than a page. Possibly same as stacked, but with only one item. and a handle
+from a grouped table rather than one table for the page.
+
+Guest OSes can grow or release RAM as needed to host.
+
+Allocate small and medium containers on bottom, large on top for distribution and easier reuse.
+
+Heap items can grow by adding pages, extending size, or expanding into the slot.
+
+DATA less likely to fragment much becuase the various container sizes aggregate and collect smaller items
+together.
+
+Is portable and simple. Can even be used without VirtMem, but increases time during page moves.
+```
+
 ```
 MM API
 -Allocate new item
 -Add/remove ref
 -Lock/unlock an item
 -Force a compact
+-Resize a heap item - now way to integrate .NET as it doesnt resize ever (copies instead), but may be useful internally.
+Could also plug stringbuilder resize, etc. Possibly even special strings when used internally?
 
 Implicit
 -Get pointer

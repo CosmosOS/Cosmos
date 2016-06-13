@@ -425,5 +425,192 @@ namespace XSharp.Compiler
         SourceReg = valueToAdd.RegEnum
       };
     }
+
+    public static void Compare(Register register, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+
+      var xInstruction = new Compare
+      {
+        DestinationReg = register.RegEnum,
+        DestinationIsIndirect = destinationIsIndirect,
+        SourceValue = value
+      };
+
+      if (destinationDisplacement != null)
+      {
+        xInstruction.DestinationDisplacement = destinationDisplacement.Value;
+      }
+    }
+
+    public static void Compare(string destinationRef, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+
+      new Compare
+      {
+        DestinationRef = ElementReference.New(destinationRef),
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceReg = source.RegEnum,
+      };
+    }
+
+    public static void Compare(string destinationRef, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+
+      new Compare
+      {
+        DestinationRef = ElementReference.New(destinationRef),
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceValue = value,
+      };
+    }
+
+    public static void Compare(Register register, string sourceRef, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+
+      new Compare
+      {
+        DestinationReg = register.RegEnum,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceRef = ElementReference.New(sourceRef),
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement,
+      };
+    }
+
+    public static void Compare(string destinationRef, string sourceRef, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+
+      if (destinationIsIndirect && sourceIsIndirect)
+      {
+        throw new Exception("Only 1 operand can be indirect!");
+      }
+
+      new Compare
+      {
+        DestinationRef = ElementReference.New(destinationRef),
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceRef = ElementReference.New(sourceRef),
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement,
+      };
+    }
+
+    public static void Compare(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+      if (sourceIsIndirect && destinationIsIndirect)
+      {
+        throw new Exception("Both operands cannot be indirect!");
+      }
+
+      new Compare
+      {
+        DestinationReg = destination.RegEnum,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceReg = source.RegEnum,
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement,
+      };
+    }
+
+    public static void LiteralCode(string code)
+    {
+      new LiteralAssemblerCode(code);
+    }
+
+    public static void Test(Register destination, uint source)
+    {
+      new Test
+      {
+        DestinationReg = destination.RegEnum,
+        SourceValue = source
+      };
+    }
+
+    public static void Test(Register destination, string sourceRef, bool sourceIsIndirect = false)
+    {
+      new Test
+      {
+        DestinationReg = destination.RegEnum,
+        SourceRef = ElementReference.New(sourceRef),
+        SourceIsIndirect = sourceIsIndirect
+      };
+    }
   }
 }

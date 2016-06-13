@@ -7,7 +7,7 @@ namespace Cosmos.Assembler.x86 {
     public abstract class InstructionWithDestination : Instruction, IInstructionWithDestination{
         public InstructionWithDestination()
         {
-            
+
         }
 
         public InstructionWithDestination(string mnemonic):base(mnemonic)
@@ -37,7 +37,7 @@ namespace Cosmos.Assembler.x86 {
             set;
         }
 
-        public int DestinationDisplacement {
+        public int? DestinationDisplacement {
             get;
             set;
         }
