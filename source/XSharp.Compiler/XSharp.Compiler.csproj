@@ -124,6 +124,7 @@
     <Content Include="Docs\Old.html" />
     <Content Include="Docs\ToDo.html" />
     <Content Include="Docs\XSharp.htm" />
+    <Content Include="XSTemplate.DestinationSourceSize.txt" />
     <None Include=".editorconfig" />
     <None Include="app.config" />
     <None Include="XSharp.ico" />
