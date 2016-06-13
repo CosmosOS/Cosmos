@@ -10,8 +10,13 @@ namespace Cosmos.Core.Memory.Test {
       var xRAM = new byte[128 * 1024 * 1024];
       xRAM[0] = 1;
       fixed (byte* xPtr = xRAM) {
-        Heap.Init(xPtr, (UInt32)xRAM.LongLength);
-        Native xFreePages = Heap.GetPageCount(Heap.PageType.Empty);
+        RAT.Debug = true;
+        RAT.Init(xPtr, (UInt32)xRAM.LongLength);
+
+        Native xRatPages = RAT.GetPageCount(RAT.PageType.RAT);
+        Assert.IsTrue(xRatPages > 0);
+        
+        Native xFreePages = RAT.GetPageCount(RAT.PageType.Empty);
       }
     }
   }
