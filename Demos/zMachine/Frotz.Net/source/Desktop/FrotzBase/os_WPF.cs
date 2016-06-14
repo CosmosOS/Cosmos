@@ -22,9 +22,22 @@ namespace Frotz
 
     public static class os_
     {
+        public static bool debug_mode = false;
         private static int _historyPos = 0;
         // TODO This really needs to get wired up when a new game is started
         private static List<String> _history = new List<string>();
+
+        private static void debug(string text)
+        {
+            if (debug_mode)
+            {
+                List<string> debugtext = new List<string>();
+                if (File.Exists("debug.log"))
+                    debugtext = new List<string>(File.ReadAllLines("debug.log"));
+                debugtext.Add(text);
+                File.WriteAllLines("debug.log", debugtext.ToArray());
+            }
+        }
 
         // TODO Rename these
         private static long makeid(byte a, byte b, byte c, byte d)
@@ -63,10 +76,12 @@ namespace Frotz
         static void _screen_KeyPressed(object sender, ZKeyPressEventArgs e)
         {
             entries.Enqueue(e.KeyPressed);
+            debug($"Queued character \"{e.KeyPressed}\"");
         }
         private static void OnFatalError(String Message)
         {
             _screen.HandleFatalError(Message);
+            debug($"[FATAL ERROR] {Message}");
         }
 
         private static void enqueue_word(String word)
@@ -138,6 +153,7 @@ namespace Frotz
             {
                 _screen.DisplayChar((char)c);
             }
+            debug($"Displaying char {(char)c}.");
         }
 
         /*
@@ -638,7 +654,7 @@ namespace Frotz
                     else if (c == CharCodes.ZC_ARROW_RIGHT)
                     {
                     }
-                    else if (c == CharCodes.ZC_RETURN)
+                    else if (c == CharCodes.ZC_RETURN || c == '\n' || c == '\r')
                     {
                         var sb = new System.Text.StringBuilder();
 
