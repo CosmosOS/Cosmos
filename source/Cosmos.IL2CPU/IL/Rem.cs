@@ -1,6 +1,7 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using Cosmos.Assembler.x86.SSE;
 using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -51,12 +52,12 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 12 };
 
 				// set flags
-				new CPUx86.Or { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI };
+				XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
 				// if high dword of divisor is already zero, we dont need the loop
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = LabelNoLoop };
 
 				// set ecx to zero for counting the shift operations
-				new CPUx86.Xor { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX };
+				XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 
 				new Label(LabelShiftRight);
 
@@ -68,14 +69,14 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPUx86.INC { DestinationReg = CPUx86.RegistersEnum.ECX };
 
 				// set flags
-				new CPUx86.Or { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI };
+				XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
 				// loop while high dword of divisor till it is zero
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelShiftRight };
 
 				// shift the divident now in one step
 				// shift divident CL bits right
 				new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EDX, ArgumentReg = CPUx86.RegistersEnum.CL };
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.CL };
+				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.CL);
 
 				// so we shifted both, so we have near the same relation as original values
 				// divide this
@@ -111,20 +112,20 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             if (TypeIsFloat(xStackItem))
             {
-                new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                new MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
                 new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
-                new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                new MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
                 new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
-                new CPUx86.SSE.XorPS { DestinationReg = CPUx86.RegistersEnum.XMM2, SourceReg = CPUx86.RegistersEnum.XMM2 };
-                new CPUx86.SSE.DivSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.XMM1 };
+                new XorPS { DestinationReg = CPUx86.RegistersEnum.XMM2, SourceReg = CPUx86.RegistersEnum.XMM2 };
+                new DivSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.XMM1 };
                 new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
-                new CPUx86.SSE.MoveSS { SourceReg = CPUx86.RegistersEnum.XMM2, DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
+                new MoveSS { SourceReg = CPUx86.RegistersEnum.XMM2, DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
             }
             else
             {
                 new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
                 new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX }; // gets devised by ecx
-                new CPUx86.Xor { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX };
+                XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 
                 new CPUx86.Divide { DestinationReg = CPUx86.RegistersEnum.ECX }; // => EAX / ECX
                 new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EDX };

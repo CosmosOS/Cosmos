@@ -62,12 +62,12 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 8 };
 
 					// set flags
-					new CPUx86.Or { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI };
+					XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
 					// if high dword of divisor is already zero, we dont need the loop
 					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = LabelNoLoop };
 
 					// set ecx to zero for counting the shift operations
-					new CPUx86.Xor { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX};
+					XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 
 					new Label(LabelShiftRight);
 
@@ -79,14 +79,14 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.INC { DestinationReg = CPUx86.RegistersEnum.ECX};
 
 					// set flags
-					new CPUx86.Or { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI };
+					XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
 					// loop while high dword of divisor till it is zero
 					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelShiftRight };
 
 					// shift the divident now in one step
 					// shift divident CL bits right
 					new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EDX, ArgumentReg = CPUx86.RegistersEnum.CL };
-					new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.CL };
+					XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.CL);
 
 					// so we shifted both, so we have near the same relation as original values
 					// divide this

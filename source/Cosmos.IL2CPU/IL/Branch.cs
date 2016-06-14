@@ -133,9 +133,9 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         case ConditionalTestEnum.Zero: // Equal
                         case ConditionalTestEnum.NotEqual: // NotZero
-                            new CPU.Xor {DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ECX};
+                            XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ECX));
                             new ConditionalJump {Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            new CPU.Xor {DestinationReg = RegistersEnum.EBX, SourceReg = RegistersEnum.EDX};
+                            XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EDX));
                             new ConditionalJump {Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             break;
                         case ConditionalTestEnum.GreaterThanOrEqualTo:

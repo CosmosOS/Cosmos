@@ -32,7 +32,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 16 };
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = SourceArrayDisplacement };
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, SourceReg = CPUx86.RegistersEnum.ESI, SourceIsIndirect = true }; // dereference memory handle to pointer
-            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESI, SourceReg = CPUx86.RegistersEnum.EAX }; // source ptr
+            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // source ptr
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = DestinationArrayDisplacement };
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true }; // dereference memory handle to pointer
             new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EDX };
@@ -44,7 +44,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 16 };
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = DestinationArrayDisplacement };
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI, SourceIsIndirect = true }; // dereference handle to pointer
-            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EAX };
+            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
             // calculate byte count to copy
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = DestinationArrayDisplacement };

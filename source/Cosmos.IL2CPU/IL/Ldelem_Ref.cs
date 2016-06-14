@@ -2,6 +2,7 @@ using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs.System;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -38,7 +39,7 @@ namespace Cosmos.IL2CPU.X86.IL
       // convert to real memory address
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
 
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EAX };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
       var xSizeLeft = aElementSize;
       while (xSizeLeft > 0)

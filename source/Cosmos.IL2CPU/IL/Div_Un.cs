@@ -1,4 +1,5 @@
 using System;
+using Cosmos.Assembler.x86.SSE;
 using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 using Label = Cosmos.Assembler.Label;
@@ -61,12 +62,12 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 16 };
 
 					// set flags
-					new CPUx86.Or { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI };
+					XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
 					// if high dword of divisor is already zero, we dont need the loop
 					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = LabelNoLoop };
 
 					// set ecx to zero for counting the shift operations
-					new CPUx86.Xor { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX };
+					XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 
 					new Label(LabelShiftRight);
 
@@ -78,14 +79,14 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.INC { DestinationReg = CPUx86.RegistersEnum.ECX };
 
 					// set flags
-					new CPUx86.Or { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI };
+					XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
 					// loop while high dword of divisor till it is zero
 					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelShiftRight };
 
 					// shift the divident now in one step
 					// shift divident CL bits right
 					new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EDX, ArgumentReg = CPUx86.RegistersEnum.CL };
-					new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.CL };
+					XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.CL);
 
 					// so we shifted both, so we have near the same relation as original values
 					// divide this
@@ -105,7 +106,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 					// zero EDX, so that high part is zero -> reduce overflow case
-					new CPUx86.Xor { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX };
+					XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 					// divide high part
 					new CPUx86.Divide { DestinationReg = CPUx86.RegistersEnum.ESI };
 					// save high result
@@ -123,15 +124,15 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (TypeIsFloat(xStackItem))
                 {
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                    new MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
                     new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-                    new CPUx86.SSE.MulSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.XMM0 };
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.XMM1 };
+                    new MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                    new MulSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.XMM0 };
+                    new MoveSS { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.XMM1 };
                 }
                 else
                 {
-                    new CPUx86.Xor { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX };
+                    XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
                     new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
                     new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
                     new CPUx86.Divide { DestinationReg = CPUx86.RegistersEnum.ECX };

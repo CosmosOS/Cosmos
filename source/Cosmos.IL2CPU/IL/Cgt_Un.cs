@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, SourceValue = 1 };
 				// esi = 1
-				new CPUx86.Xor { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI };
+				XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EDI), XSRegisters.OldToNewRegister(RegistersEnum.EDI));
 				// edi = 0
 				if (xStackItemIsFloat)
 				{

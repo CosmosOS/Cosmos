@@ -1,6 +1,7 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -71,11 +72,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         {
                             DestinationReg = CPUx86.RegistersEnum.EAX
                         };
-                        new CPUx86.Sub
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.EAX,
-                            SourceReg = CPUx86.RegistersEnum.ECX
-                        };
+                        XS.Sub(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ECX));
                         new CPUx86.Push
                         {
                             DestinationReg = CPUx86.RegistersEnum.EAX

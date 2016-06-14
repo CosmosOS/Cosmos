@@ -891,11 +891,19 @@ namespace XSharp.Compiler {
                                 });
       AddPattern("_REG >> 123", delegate(TokenList aTokens)
                                 {
-                                  XS.ShiftRight(aTokens[0].Register, aTokens[2].IntValue);
+                                  if (aTokens[2].IntValue > 255)
+                                  {
+                                    throw new IndexOutOfRangeException("Value is too large to be used as bitcount!");
+                                  }
+                                  XS.ShiftRight(aTokens[0].Register, (byte)aTokens[2].IntValue);
                                 });
       AddPattern("_REG << 123", delegate(TokenList aTokens)
                                 {
-                                  XS.ShiftLeft(aTokens[0].Register, aTokens[2].IntValue);
+                                  if (aTokens[2].IntValue > 255)
+                                  {
+                                    throw new IndexOutOfRangeException("Value is too large to be used as bitcount!");
+                                  }
+                                  XS.ShiftLeft(aTokens[0].Register, (byte)aTokens[2].IntValue);
                                 });
 
       AddPattern("_REG = 123", delegate(TokenList aTokens)

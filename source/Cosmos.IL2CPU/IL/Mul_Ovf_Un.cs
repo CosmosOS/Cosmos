@@ -104,33 +104,25 @@ namespace Cosmos.IL2CPU.X86.IL
             Size = 32
           };
         // add result of LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH
-        new Assembler.x86.Add
-          {
-            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ECX,
-            SourceReg = Cosmos.Assembler.x86.RegistersEnum.EAX
-          };
+        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
 
         //mov RIGHT_LOW to eax
-        new Assembler.x86.Mov
+        new Mov
           {
-            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX,
-            SourceReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
+            DestinationReg = RegistersEnum.EAX,
+            SourceReg = RegistersEnum.ESP,
             SourceIsIndirect = true
           };
         // multiply with LEFT_LOW
-        new Assembler.x86.Multiply
+        new Multiply
           {
-            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
+            DestinationReg = RegistersEnum.ESP,
             DestinationIsIndirect = true,
             DestinationDisplacement = 8,
             Size = 32
           };
         // add LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH to high dword of last result
-        new Assembler.x86.Add
-          {
-            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EDX,
-            SourceReg = Cosmos.Assembler.x86.RegistersEnum.ECX
-          };
+        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.ECX));
 
         new Assembler.x86.Jump { DestinationLabel = MoveReturnValue };
 

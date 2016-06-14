@@ -397,13 +397,31 @@ namespace XSharp.Compiler
       Do<RotateLeft>(register, bitCount);
     }
 
-    public static void ShiftRight(Register register, uint bitCount)
+    public static void ShiftRight(Register register, byte bitCount)
     {
       Do<ShiftRight>(register, bitCount);
     }
 
-    public static void ShiftLeft(Register register, uint bitCount)
+    public static void ShiftRight(Register register, Register8 bitCount)
     {
+      if (bitCount != CL)
+      {
+        throw new InvalidOperationException();
+      }
+      Do<ShiftRight>(register, bitCount);
+    }
+
+    public static void ShiftLeft(Register register, byte bitCount)
+    {
+      Do<ShiftLeft>(register, bitCount);
+    }
+
+    public static void ShiftLeft(Register register, Register8 bitCount)
+    {
+      if (bitCount != CL)
+      {
+        throw new InvalidOperationException();
+      }
       Do<ShiftLeft>(register, bitCount);
     }
 
@@ -481,6 +499,16 @@ namespace XSharp.Compiler
     public static void Sub(Register register, Register valueToAdd)
     {
       Do<Sub>(register, valueToAdd);
+    }
+
+    public static void SubWithCarry(Register register, uint valueToAdd)
+    {
+      Do<SubWithCarry>(register, valueToAdd);
+    }
+
+    public static void SubWithCarry(Register register, Register valueToAdd)
+    {
+      Do<SubWithCarry>(register, valueToAdd);
     }
 
     public static void And(Register register, uint value)

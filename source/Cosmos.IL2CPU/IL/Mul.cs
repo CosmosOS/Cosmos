@@ -129,11 +129,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         Size = 32
                     };
                     // add result of LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH
-                    new CPUx86.Add
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.ECX,
-                        SourceReg = CPUx86.RegistersEnum.EAX
-                    };
+                    XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
                     //mov RIGHT_LOW to eax
                     new CPUx86.Mov
@@ -151,11 +147,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         Size = 32
                     };
                     // add LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH to high dword of last result
-                    new CPUx86.Add
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.EDX,
-                        SourceReg = CPUx86.RegistersEnum.ECX
-                    };
+                    XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 
                     new CPUx86.Jump
                     {

@@ -60,14 +60,14 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             new Assembler.Comment("ecx points to the size of the delegated methods arguments");
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true, SourceDisplacement = Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "$$ArgSize$$") };//the size of the arguments to the method? + 12??? -- 12 is the size of the current call stack.. i think
-            new CPUx86.Xor { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX };
+            XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
             ;//make sure edx is 0
-            new Assembler.Label(".BEGIN_OF_LOOP");
+            new Label(".BEGIN_OF_LOOP");
             {
                 XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));//are we at the end of this list
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThanOrEqualTo, DestinationLabel = ".END_OF_INVOKE_" };//then we better stop
                 new CPUx86.Pushad();
-                new Assembler.Comment("esi points to where we will copy the methods argumetns from");
+                new Comment("esi points to where we will copy the methods argumetns from");
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP));
                 new Comment("edi = ptr to delegate object");
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = Ldarg.GetArgumentDisplacement(xMethodInfo, 0) };
@@ -81,7 +81,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
                 new Label(".NO_THIS");
 
                 new Comment("make space for us to copy the arguments too");
-                new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.ESP, SourceReg = CPUx86.RegistersEnum.ECX };
+                XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
                 new Comment("move the current delegate to edi");
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI, SourceIsIndirect = true }; // dereference

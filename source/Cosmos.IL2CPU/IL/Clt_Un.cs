@@ -3,6 +3,9 @@ using CPUx86 = Cosmos.Assembler.x86;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using Cosmos.Assembler.x86.x87;
+using XSharp.Compiler;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Clt_Un )]
@@ -29,32 +32,32 @@ namespace Cosmos.IL2CPU.X86.IL
             {
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, SourceValue = 1 };
 				// esi = 1
-				new CPUx86.Xor { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI };
+				XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EDI), XSRegisters.OldToNewRegister(RegistersEnum.EDI));
 				// edi = 0
                 if (xStackItemIsFloat)
                 {
 					// value 2
-					new CPUx86.x87.FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
+					new FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
 					// value 1
-					new CPUx86.x87.FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationDisplacement = 8, DestinationIsIndirect = true };
-					new CPUx86.x87.FloatCompareAndSet { DestinationReg = RegistersEnum.ST1 };
+					new FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationDisplacement = 8, DestinationIsIndirect = true };
+					new FloatCompareAndSet { DestinationReg = RegistersEnum.ST1 };
 					// if carry is set, ST(0) < ST(i)
-					new CPUx86.ConditionalMove { Condition = CPUx86.ConditionalTestEnum.Below, DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.ESI };
+					new ConditionalMove { Condition = ConditionalTestEnum.Below, DestinationReg = RegistersEnum.EDI, SourceReg = RegistersEnum.ESI };
 					// pops fpu stack
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ST0 };
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ST0 };
+					new FloatStoreAndPop { DestinationReg = RegistersEnum.ST0 };
+					new FloatStoreAndPop { DestinationReg = RegistersEnum.ST0 };
 					new CPUx86.Add { DestinationReg = RegistersEnum.ESP, SourceValue = 16 };
 				}
                 else
                 {
-                    new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-                    new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EDX };
+                    new CPUx86.Pop { DestinationReg = RegistersEnum.EAX };
+                    new CPUx86.Pop { DestinationReg = RegistersEnum.EDX };
                     //value2: EDX:EAX
-                    new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EBX };
-                    new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
+                    new CPUx86.Pop { DestinationReg = RegistersEnum.EBX };
+                    new CPUx86.Pop { DestinationReg = RegistersEnum.ECX };
                     //value1: ECX:EBX
-                    new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.EBX, SourceReg = CPUx86.RegistersEnum.EAX };
-                    new CPUx86.SubWithCarry { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EDX };
+                    XS.Sub(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                    XS.SubWithCarry(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EDX));
                     //result = value1 - value2
 					new CPUx86.ConditionalMove { Condition = CPUx86.ConditionalTestEnum.Below, DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.ESI };
                 }

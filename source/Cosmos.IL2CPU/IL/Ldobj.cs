@@ -2,6 +2,8 @@ using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
+using XSharp.Compiler;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldobj )]
@@ -32,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 case 1:
                 {
-                    new CPUx86.Xor {DestinationReg = CPUx86.RegistersEnum.EBX, SourceReg = CPUx86.RegistersEnum.EBX};
+                    XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
                     new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.BL, SourceIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX, SourceDisplacement = (int)(xObjSize - 1)};
                     //new CPUx86.ShiftLeft { DestinationReg = CPUx86.Registers.EBX, SourceValue = 24 };
                     new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EBX};
@@ -40,7 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 case 2:
                 {
-                    new CPUx86.Xor {DestinationReg = CPUx86.RegistersEnum.EBX, SourceReg = CPUx86.RegistersEnum.EBX};
+                    XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
                     new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.BX, SourceIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX, SourceDisplacement = (int)(xObjSize - 2)};
                     //new CPUx86.ShiftLeft {DestinationReg = CPUx86.Registers.EBX, SourceValue = 16};
                     new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EBX};
