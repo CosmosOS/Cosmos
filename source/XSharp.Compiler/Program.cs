@@ -13,28 +13,27 @@ namespace XSharp.Compiler {
 
         var xGenerator = new AsmGenerator();
 
-        string[] xFiles;
-        if (Directory.Exists(xSrc))
-        {
-          xFiles = Directory.GetFiles(xSrc, "*.xs");
-        }
-        else
-        {
-          xFiles = new string[] { xSrc };
-        }
-        foreach (var xFile in xFiles)
-        {
-          xGenerator.GenerateToFiles(xFile);
-        }
-
-        //    var xAsm = new Assembler();
-        //    var xStreamReader = new StringReader(@"namespace Test
-        //    var CallerEBP
-        //        while ESI != .CallerEBP {
-        //    ! nop
+        //string[] xFiles;
+        //if (Directory.Exists(xSrc))
+        //{
+        //  xFiles = Directory.GetFiles(xSrc, "*.xs");
         //}
-        //    ");
-        //    var xResult = xGenerator.Generate(xStreamReader);
+        //else
+        //{
+        //  xFiles = new string[] { xSrc };
+        //}
+        //foreach (var xFile in xFiles)
+        //{
+        //  xGenerator.GenerateToFiles(xFile);
+        //}
+
+        var xAsm = new Assembler();
+        var xStreamReader = new StringReader(@"namespace Test
+            while byte ESI[0] != 0 {
+              ! nop
+            }
+            ");
+        var xResult = xGenerator.Generate(xStreamReader);
         Console.WriteLine("done");
       } catch (Exception ex) {
         Console.WriteLine(ex.ToString());
