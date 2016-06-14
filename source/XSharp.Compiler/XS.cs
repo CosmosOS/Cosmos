@@ -379,7 +379,7 @@ namespace XSharp.Compiler
 
     public static void DataMember(string name, string value)
     {
-      Assembler.CurrentInstance.DataMembers.Add(new DataMember(name, "`" + value + "`"));
+      Assembler.CurrentInstance.DataMembers.Add(new DataMember(name, value));
     }
 
     public static void DataMember(string name, uint elementCount, string size, string value)

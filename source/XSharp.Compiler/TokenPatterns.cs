@@ -240,7 +240,7 @@ namespace XSharp.Compiler {
       switch (value)
       {
         case "byte":
-          return RegisterSize.Int32;
+          return RegisterSize.Byte8;
         case "word":
           return RegisterSize.Short16;
         case "dword":
@@ -450,12 +450,6 @@ namespace XSharp.Compiler {
       #region Handle all comparisons
       foreach (var xSize in xSizes)
       {
-        RegisterSize? xTypedSize = null;
-        if (xSize != "")
-        {
-          xTypedSize = GetSize(xSize);
-        }
-
         foreach (var xComparison in mCompareOps)
         {
           var xComparisonToken = new Token(-1);
@@ -467,8 +461,10 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
+                            RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
                             XS.Compare(tokenList[xOffset + 0].Register, tokenList[xOffset + 2].IntValue, size: xTypedSize);
@@ -478,8 +474,10 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
+                            RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
                             XS.Compare(tokenList[xOffset + 0].Register, tokenList[xOffset + 2].Register);
@@ -533,8 +531,10 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
+                            RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
                             XS.Compare(tokenList[xOffset + 0].Register, tokenList[xOffset + 5].IntValue, destinationDisplacement: (int)tokenList[xOffset + 2].IntValue, size: xTypedSize);
@@ -544,8 +544,10 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
+                            RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
                             XS.Compare(tokenList[xOffset + 0].Register, tokenList[xOffset + 2].IntValue, destinationDisplacement: -(int)tokenList[xOffset + 1].IntValue, size: xTypedSize);
@@ -577,8 +579,10 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
+                            RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
                             XS.Compare(tokenList[xOffset + 0].Register, ConstLabel(tokenList[xOffset + 2]), destinationDisplacement: (int)tokenList[xOffset + 1].IntValue, sourceIsIndirect: true, size: xTypedSize);
@@ -588,8 +592,10 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
+                            RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
                             XS.Compare(tokenList[xOffset + 0].Register, ConstLabel(tokenList[xOffset + 2]), destinationDisplacement: (int)tokenList[xOffset + 1].IntValue, size: xTypedSize);
@@ -599,8 +605,10 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
-                            if (tokenList[xOffset + 2].Type != TokenType.Register)
+                            RegisterSize? xTypedSize = null;
+                            if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
                             XS.Compare(GetLabel(tokenList[xOffset + 0]), tokenList[xOffset + 2].IntValue, destinationIsIndirect: true, size: xTypedSize.GetValueOrDefault(RegisterSize.Int32));
@@ -621,8 +629,10 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
-                            if (tokenList[xOffset + 2].Type != TokenType.Register)
+                            RegisterSize? xTypedSize = null;
+                            if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
                             XS.Compare(GetSimpleRef(tokenList[xOffset + 0]), ConstLabel(tokenList[xOffset + 3]), destinationIsIndirect: true, size: xTypedSize.GetValueOrDefault(RegisterSize.Int32));

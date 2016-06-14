@@ -8,7 +8,7 @@ const VidBase = $B8000
 
 function Cls {
     ESI = #VidBase
-    
+
 	// End of Video Area
 	// VidBase + 25 * 80 * 2 = B8FA0
 	while ESI < $B8FA0 {
