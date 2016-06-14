@@ -97,6 +97,8 @@ Heap items can grow by adding pages, extending size, or expanding into the slot.
 DATA less likely to fragment much becuase the various container sizes aggregate and collect smaller items
 together.
 
+Code can be relocated and even split into various blocks.
+
 Is portable and simple. Can even be used without VirtMem, but increases time during page moves.
 ```
 

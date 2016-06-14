@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio;
 using System.Runtime.InteropServices;
 using System.IO;
+using Cosmos.Assembler;
 
 namespace XSharp.VS {
   // This class generates .asm files from .xs files.
@@ -26,13 +27,22 @@ namespace XSharp.VS {
       string xResult;
       using (var xInput = new StringReader(aInputFileContents)) {
         using (var xOut = new StringWriter()) {
-            try {
-              var xGen = new XSharp.Compiler.AsmGenerator();
-              xGen.Generate(xInput, xOut);
-              xResult =
-                "; Generated at " + DateTime.Now.ToString() + "\r\n"
-                 + "\r\n"
-                + xOut.ToString() + "\r\n";
+            try
+            {
+              new Assembler();
+              try
+              {
+                var xGen = new XSharp.Compiler.AsmGenerator();
+                xGen.Generate(xInput, xOut);
+                xResult =
+                  "; Generated at " + DateTime.Now.ToString() + "\r\n"
+                  + "\r\n"
+                  + xOut.ToString() + "\r\n";
+              }
+              finally
+              {
+                Assembler.ClearCurrentInstance();
+              }
             } catch (Exception ex) {
               var xSB = new StringBuilder();
               xSB.Append(xOut);

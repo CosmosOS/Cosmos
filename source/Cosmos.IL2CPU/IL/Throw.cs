@@ -17,10 +17,10 @@ namespace Cosmos.IL2CPU.X86.IL
         {
 #warning TODO: Implement exception
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+            new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
             new CPUx86.Call { DestinationLabel = "SystemExceptionOccurred" };
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
+            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 3 };
             Call.EmitExceptionLogic( Assembler,aMethod, aOpCode, false, null );
 
         }

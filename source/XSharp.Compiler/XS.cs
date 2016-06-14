@@ -25,66 +25,10 @@ namespace XSharp.Compiler
       new IRET();
     }
 
-    public static void Set32(string destination, string sourceLabel, bool sourceIsIndirect = false)
-    {
-      new Mov
-      {
-        Size = 32,
-        DestinationRef = ElementReference.New(destination),
-        DestinationIsIndirect = true,
-        SourceRef = ElementReference.New(sourceLabel),
-        SourceIsIndirect = sourceIsIndirect
-      };
-    }
+    #region InstructionWithDestinationAndSourceAndSize
 
-    public static void Set(Register destination, string sourceLabel, bool destinationIsIndirect = false, bool sourceIsIndirect = false)
-    {
-      new Mov
-      {
-        Size = (byte)destination.Size,
-        DestinationReg = destination.RegEnum,
-        DestinationIsIndirect = destinationIsIndirect,
-        SourceRef = ElementReference.New(sourceLabel),
-        SourceIsIndirect = sourceIsIndirect
-      };
-    }
-
-    public static void Set(string destination, Register source, bool destinationIsIndirect = false, bool sourceIsIndirect = false)
-    {
-      new Mov
-      {
-        Size = (byte)source.Size,
-        DestinationRef = ElementReference.New(destination),
-        DestinationIsIndirect = destinationIsIndirect,
-        SourceReg = source.RegEnum,
-        SourceIsIndirect = sourceIsIndirect,
-      };
-    }
-
-    public static void Set(RegisterSize size, string destination, string source, bool destinationIsIndirect = false, bool sourceIsIndirect = false)
-    {
-      new Mov
-      {
-        Size = (byte)size,
-        DestinationRef = ElementReference.New(destination),
-        DestinationIsIndirect = destinationIsIndirect,
-        SourceRef = ElementReference.New(source),
-        SourceIsIndirect = sourceIsIndirect
-      };
-    }
-
-    public static void Set(string destination, UInt32 value, bool destinationIsIndirect = false, RegisterSize size = RegisterSize.Int32)
-    {
-      new Mov
-      {
-        Size = (byte)size,
-        DestinationRef = ElementReference.New(destination),
-        DestinationIsIndirect = destinationIsIndirect,
-        SourceValue = value
-      };
-    }
-
-    public static void Set(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, RegisterSize? size = null)
+    private static void Do<T>(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+      where T : InstructionWithDestinationAndSourceAndSize, new()
     {
       if (destinationDisplacement != null)
       {
@@ -92,6 +36,164 @@ namespace XSharp.Compiler
         if (destinationDisplacement == 0)
         {
           destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+      if (destinationIsIndirect && sourceIsIndirect)
+      {
+        throw new Exception("Both destination and source cannot be indirect!");
+      }
+
+      new T
+      {
+        Size = (byte)source.Size,
+        DestinationRef = ElementReference.New(destination),
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceReg = source.RegEnum,
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement
+      };
+    }
+
+    private static void Do<T>(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+      where T : InstructionWithDestinationAndSourceAndSize, new()
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+      if (destinationIsIndirect && sourceIsIndirect)
+      {
+        throw new Exception("Both destination and source cannot be indirect!");
+      }
+
+      new T
+      {
+        Size = (byte)size,
+        DestinationRef = ElementReference.New(destination),
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceValue = value,
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement,
+      };
+    }
+
+    private static void Do<T>(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+      where T : InstructionWithDestinationAndSourceAndSize, new()
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+      if (destinationIsIndirect && sourceIsIndirect)
+      {
+        throw new Exception("Both destination and source cannot be indirect!");
+      }
+
+      new T
+      {
+        Size = (byte)size,
+        DestinationRef = ElementReference.New(destination),
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceRef = ElementReference.New(source),
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement,
+      };
+    }
+
+    private static void Do<T>(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+      where T: InstructionWithDestinationAndSourceAndSize, new()
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+
+      if (size == null)
+      {
+        if (destinationIsIndirect)
+        {
+          throw new Exception("No size specified!");
+        }
+        size = destination.Size;
+      }
+
+      new T
+      {
+        Size = (byte)size.Value,
+        DestinationReg = destination.RegEnum,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceRef = ElementReference.New(sourceLabel),
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement
+      };
+    }
+
+    private static void Do<T>(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+      where T: InstructionWithDestinationAndSourceAndSize, new()
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
         }
       }
 
@@ -105,25 +207,25 @@ namespace XSharp.Compiler
         size = destination.Size;
       }
 
-      var xInstruction = new Mov
+      new T
       {
         Size = (byte)size,
         DestinationReg = destination.RegEnum,
         DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
         SourceValue = value,
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement,
       };
-      if (destinationDisplacement.HasValue)
-      {
-        xInstruction.DestinationDisplacement = destinationDisplacement.Value;
-      }
     }
 
-    public static void Set(Register destination,
-                           Register source,
-                           bool destinationIsIndirect = false,
-                           int? destinationDisplacement = null,
-                           bool sourceIsIndirect = false,
-                           int? sourceDisplacement = null)
+    private static void Do<T>(Register destination,
+                              Register source,
+                              bool destinationIsIndirect = false,
+                              int? destinationDisplacement = null,
+                              bool sourceIsIndirect = false,
+                              int? sourceDisplacement = null)
+      where T : InstructionWithDestinationAndSourceAndSize, new()
     {
       if (destinationDisplacement != null)
       {
@@ -160,22 +262,90 @@ namespace XSharp.Compiler
         xSize = source.Size;
       }
 
-      new Mov
+      new T
       {
         Size = (byte)xSize,
         DestinationReg = destination.RegEnum,
         DestinationIsIndirect = destinationIsIndirect,
-        DestinationDisplacement = destinationDisplacement.GetValueOrDefault(),
+        DestinationDisplacement = destinationDisplacement,
         SourceIsIndirect = sourceIsIndirect,
-        SourceDisplacement = sourceDisplacement.GetValueOrDefault(),
+        SourceDisplacement = sourceDisplacement,
         SourceReg = source.RegEnum
       };
+    }
+
+    #endregion InstructionWithDestinationAndSourceAndSize
+
+    #region InstructionWithDestinationAndSize
+    private static void Do<T>(uint destinationValue, RegisterSize size = RegisterSize.Int32)
+      where T: InstructionWithDestinationAndSize, new()
+    {
+      new T
+      {
+        DestinationValue = destinationValue,
+        Size = (byte)size
+      };
+    }
+
+    private static void Do<T>(Register register)
+      where T: InstructionWithDestinationAndSize, new()
+    {
+      new T
+      {
+        DestinationReg = register.RegEnum
+      };
+    }
+
+    private static void Do<T>(string label, bool isIndirect = false, RegisterSize size = RegisterSize.Int32)
+      where T: InstructionWithDestinationAndSize, new()
+    {
+      new T
+      {
+        DestinationRef = ElementReference.New(label),
+        DestinationIsIndirect = isIndirect,
+        Size = (byte)size
+      };
+    }
+
+    #endregion InstructionWithDestinationAndSize
+
+    #region Mov
+    public static void Set(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+      Do<Mov>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void Set(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<Mov>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void Set(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<Mov>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void Set(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+      Do<Mov>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void Set(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+      Do<Mov>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void Set(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      Do<Mov>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
     }
 
     public static void SetByte(uint address, byte value)
     {
       new Mov { DestinationValue = address, DestinationIsIndirect = true, SourceValue = value };
     }
+
+    #endregion Mov
 
     public static void Jump(ConditionalTestEnum condition, string label)
     {
@@ -209,7 +379,7 @@ namespace XSharp.Compiler
 
     public static void DataMember(string name, string value)
     {
-      Assembler.CurrentInstance.DataMembers.Add(new DataMember(name, "`" + value + "`"));
+      Assembler.CurrentInstance.DataMembers.Add(new DataMember(name, value));
     }
 
     public static void DataMember(string name, uint elementCount, string size, string value)
@@ -219,22 +389,22 @@ namespace XSharp.Compiler
 
     public static void RotateRight(Register register, uint bitCount)
     {
-      new RotateRight { DestinationReg = register.RegEnum, SourceValue = bitCount, Size = (byte)register.Size };
+      Do<RotateRight>(register, bitCount);
     }
 
     public static void RotateLeft(Register register, uint bitCount)
     {
-      new RotateLeft { DestinationReg = register.RegEnum, SourceValue = bitCount, Size = (byte)register.Size };
+      Do<RotateLeft>(register, bitCount);
     }
 
     public static void ShiftRight(Register register, uint bitCount)
     {
-      new ShiftRight { DestinationReg = register.RegEnum, SourceValue = bitCount, Size = (byte)register.Size };
+      Do<ShiftRight>(register, bitCount);
     }
 
     public static void ShiftLeft(Register register, uint bitCount)
     {
-      new ShiftLeft { DestinationReg = register.RegEnum, SourceValue = bitCount, Size = (byte)register.Size };
+      Do<ShiftLeft>(register, bitCount);
     }
 
     public static void PushAllGeneralRegisters()
@@ -265,329 +435,127 @@ namespace XSharp.Compiler
 
     public static void Push(Register value)
     {
-      new Push
-      {
-        DestinationReg = value.RegEnum
-      };
+      Do<Push>(value);
     }
 
     public static void Push(uint value, RegisterSize size)
     {
-      new Push
-      {
-        DestinationValue = value,
-        Size = (byte)size
-      };
+      Do<Push>(value, size);
     }
 
     public static void Push(string label, bool isIndirect = false, RegisterSize size = RegisterSize.Int32)
     {
-      new Push
-      {
-        DestinationRef = ElementReference.New(label),
-        DestinationIsIndirect = isIndirect,
-        Size = (byte)size
-      };
+      Do<Push>(label, isIndirect, size);
     }
 
     public static void Pop(Register value)
     {
-      new Pop
-      {
-        DestinationReg = value.RegEnum
-      };
+      Do<Pop>(value);
     }
 
     public static void Increment(Register value)
     {
-      new INC()
-      {
-        DestinationReg = value.RegEnum
-      };
+      Do<INC>(value);
     }
 
     public static void Decrement(Register value)
     {
-      new Dec()
-      {
-        DestinationReg = value.RegEnum
-      };
+      Do<Dec>(value);
     }
 
     public static void Add(Register register, uint valueToAdd)
     {
-      new Add
-      {
-        DestinationReg = register.RegEnum,
-        SourceValue = valueToAdd
-      };
+      Do<Add>(register, valueToAdd);
     }
 
     public static void Add(Register register, Register valueToAdd)
     {
-      new Add
-      {
-        DestinationReg = register.RegEnum,
-        SourceReg = valueToAdd.RegEnum
-      };
+      Do<Add>(register, valueToAdd);
     }
 
     public static void Sub(Register register, uint valueToAdd)
     {
-      new Sub
-      {
-        DestinationReg = register.RegEnum,
-        SourceValue = valueToAdd
-      };
+      Do<Sub>(register, valueToAdd);
     }
 
     public static void Sub(Register register, Register valueToAdd)
     {
-      new Sub
-      {
-        DestinationReg = register.RegEnum,
-        SourceReg = valueToAdd.RegEnum
-      };
+      Do<Sub>(register, valueToAdd);
     }
 
-    public static void And(Register register, uint valueToAdd)
+    public static void And(Register register, uint value)
     {
-      new And
-      {
-        DestinationReg = register.RegEnum,
-        SourceValue = valueToAdd
-      };
+      Do<And>(register, value);
     }
 
-    public static void And(Register register, Register valueToAdd)
+    public static void And(Register register, Register value)
     {
-      new And
-      {
-        DestinationReg = register.RegEnum,
-        SourceReg = valueToAdd.RegEnum
-      };
+      Do<And>(register, value);
     }
 
-    public static void Or(Register register, uint valueToAdd)
+    public static void Or(Register register, uint value)
     {
-      new Or
-      {
-        DestinationReg = register.RegEnum,
-        SourceValue = valueToAdd
-      };
+      Do<Or>(register, value);
     }
 
-    public static void Or(Register register, Register valueToAdd)
+    public static void Or(Register register, Register value)
     {
-      new Or
-      {
-        DestinationReg = register.RegEnum,
-        SourceReg = valueToAdd.RegEnum
-      };
+      Do<Or>(register, value);
     }
 
-    public static void Xor(Register register, uint valueToAdd)
+    public static void Xor(Register register, uint value)
     {
-      new Xor
-      {
-        DestinationReg = register.RegEnum,
-        SourceValue = valueToAdd
-      };
+      Do<Xor>(register, value);
     }
 
-    public static void Xor(Register register, Register valueToAdd)
+    public static void Xor(Register register, Register value)
     {
-      new Xor
-      {
-        DestinationReg = register.RegEnum,
-        SourceReg = valueToAdd.RegEnum
-      };
+      Do<Xor>(register, value);
     }
 
     public static void IntegerMultiply(Register register, uint valueToAdd)
     {
-      new Imul
-      {
-        DestinationReg = register.RegEnum,
-        SourceValue = valueToAdd
-      };
+      Do<Imul>(register, valueToAdd);
     }
 
-    public static void IntegerMultiply(Register register, Register valueToAdd)
+    public static void IntegerMultiply(Register register, Register registerToAdd)
     {
-      if (register.Size != valueToAdd.Size)
-      {
-        throw new Exception("Registers need to be the same size!");
-      }
-      new Imul
-      {
-        DestinationReg = register.RegEnum,
-        SourceReg = valueToAdd.RegEnum
-      };
+      Do<Imul>(register, registerToAdd);
     }
 
-    public static void Compare(Register register, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    #region Compare
+
+    public static void Compare(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
     {
-      if (destinationDisplacement != null)
-      {
-        destinationIsIndirect = true;
-        if (destinationDisplacement == 0)
-        {
-          destinationDisplacement = null;
-        }
-      }
-
-      var xInstruction = new Compare
-      {
-        DestinationReg = register.RegEnum,
-        DestinationIsIndirect = destinationIsIndirect,
-        SourceValue = value
-      };
-
-      if (destinationDisplacement != null)
-      {
-        xInstruction.DestinationDisplacement = destinationDisplacement.Value;
-      }
+      Do<Compare>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
     }
 
-    public static void Compare(string destinationRef, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    public static void Compare(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
     {
-      if (destinationDisplacement != null)
-      {
-        destinationIsIndirect = true;
-        if (destinationDisplacement == 0)
-        {
-          destinationDisplacement = null;
-        }
-      }
-
-      new Compare
-      {
-        DestinationRef = ElementReference.New(destinationRef),
-        DestinationIsIndirect = destinationIsIndirect,
-        DestinationDisplacement = destinationDisplacement,
-        SourceReg = source.RegEnum,
-      };
+      Do<Compare>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
     }
 
-    public static void Compare(string destinationRef, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    public static void Compare(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
     {
-      if (destinationDisplacement != null)
-      {
-        destinationIsIndirect = true;
-        if (destinationDisplacement == 0)
-        {
-          destinationDisplacement = null;
-        }
-      }
-
-      new Compare
-      {
-        DestinationRef = ElementReference.New(destinationRef),
-        DestinationIsIndirect = destinationIsIndirect,
-        DestinationDisplacement = destinationDisplacement,
-        SourceValue = value,
-      };
+      Do<Compare>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
     }
 
-    public static void Compare(Register register, string sourceRef, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    public static void Compare(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
     {
-      if (destinationDisplacement != null)
-      {
-        destinationIsIndirect = true;
-        if (destinationDisplacement == 0)
-        {
-          destinationDisplacement = null;
-        }
-      }
-      if (sourceDisplacement != null)
-      {
-        sourceIsIndirect = true;
-        if (sourceDisplacement == 0)
-        {
-          sourceDisplacement = null;
-        }
-      }
-
-      new Compare
-      {
-        DestinationReg = register.RegEnum,
-        DestinationIsIndirect = destinationIsIndirect,
-        DestinationDisplacement = destinationDisplacement,
-        SourceRef = ElementReference.New(sourceRef),
-        SourceIsIndirect = sourceIsIndirect,
-        SourceDisplacement = sourceDisplacement,
-      };
+      Do<Compare>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
     }
 
-    public static void Compare(string destinationRef, string sourceRef, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    public static void Compare(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
     {
-      if (destinationDisplacement != null)
-      {
-        destinationIsIndirect = true;
-        if (destinationDisplacement == 0)
-        {
-          destinationDisplacement = null;
-        }
-      }
-      if (sourceDisplacement != null)
-      {
-        sourceIsIndirect = true;
-        if (sourceDisplacement == 0)
-        {
-          sourceDisplacement = null;
-        }
-      }
-
-      if (destinationIsIndirect && sourceIsIndirect)
-      {
-        throw new Exception("Only 1 operand can be indirect!");
-      }
-
-      new Compare
-      {
-        DestinationRef = ElementReference.New(destinationRef),
-        DestinationIsIndirect = destinationIsIndirect,
-        DestinationDisplacement = destinationDisplacement,
-        SourceRef = ElementReference.New(sourceRef),
-        SourceIsIndirect = sourceIsIndirect,
-        SourceDisplacement = sourceDisplacement,
-      };
+      Do<Compare>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
     }
 
     public static void Compare(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
     {
-      if (destinationDisplacement != null)
-      {
-        destinationIsIndirect = true;
-        if (destinationDisplacement == 0)
-        {
-          destinationDisplacement = null;
-        }
-      }
-      if (sourceDisplacement != null)
-      {
-        sourceIsIndirect = true;
-        if (sourceDisplacement == 0)
-        {
-          sourceDisplacement = null;
-        }
-      }
-      if (sourceIsIndirect && destinationIsIndirect)
-      {
-        throw new Exception("Both operands cannot be indirect!");
-      }
-
-      new Compare
-      {
-        DestinationReg = destination.RegEnum,
-        DestinationIsIndirect = destinationIsIndirect,
-        DestinationDisplacement = destinationDisplacement,
-        SourceReg = source.RegEnum,
-        SourceIsIndirect = sourceIsIndirect,
-        SourceDisplacement = sourceDisplacement,
-      };
+      Do<Compare>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
     }
+
+    #endregion Compare
 
     public static void LiteralCode(string code)
     {

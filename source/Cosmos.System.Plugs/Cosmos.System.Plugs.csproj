@@ -89,6 +89,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="System\DecimalImpl.cs" />
+    <Compile Include="System\Security\Cryptography\CryptoConfigImpl.cs" />
     <Compile Include="System\ValueTypeImpl.cs" />
     <Compile Include="System\EnumImpl.cs" />
     <Compile Include="System\Globalization\CultureInfoImpl.cs" />

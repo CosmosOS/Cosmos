@@ -25,8 +25,8 @@ namespace Cosmos.IL2CPU.X86.IL
 			{
 				for (int i = 0; i < xStackCount; i++)
 				{
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - (xEBPOffset + (i * 4))) };
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+					new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - (xEBPOffset + (i * 4))) };
+					new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
 				}
 			}
 			else
@@ -38,15 +38,15 @@ namespace Cosmos.IL2CPU.X86.IL
 						{
 							bool signed = IsIntegerSigned(xVar.LocalType);
 							if (signed)
-								new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
+								new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
 							else
-								new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.Registers.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
-							new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+								new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
+							new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
 							break;
 						}
 					case 4:
 						{
-							new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0 - xEBPOffset };
+							new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement = 0 - xEBPOffset };
 							break;
 						}
 				}

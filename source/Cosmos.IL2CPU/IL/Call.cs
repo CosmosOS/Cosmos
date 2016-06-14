@@ -118,7 +118,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (xExtraStackSize > 0)
             {
-                new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xExtraStackSize };
+                new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = (uint)xExtraStackSize };
             }
             new CPUx86.Call { DestinationLabel = xNormalAddress };
 

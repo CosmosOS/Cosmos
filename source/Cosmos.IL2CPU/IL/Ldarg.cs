@@ -164,8 +164,8 @@ namespace Cosmos.IL2CPU.X86.IL
             new Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
             if (xArgRealSize < 4)
             {
-                new CPUx86.MoveSignExtend {DestinationReg = CPUx86.Registers.EAX, Size = (byte)(xArgRealSize * 8), SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = xDisplacement};
-                new CPUx86.Push {DestinationReg = CPUx86.Registers.EAX};
+                new CPUx86.MoveSignExtend {DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xArgRealSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = xDisplacement};
+                new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EAX};
             }
             else
             {
@@ -173,7 +173,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     new Push
                     {
-                        DestinationReg = Registers.EBP,
+                        DestinationReg = RegistersEnum.EBP,
                         DestinationIsIndirect = true,
                         DestinationDisplacement = xDisplacement - (i * 4)
                     };

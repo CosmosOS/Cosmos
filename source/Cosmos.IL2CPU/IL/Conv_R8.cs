@@ -20,22 +20,22 @@ namespace Cosmos.IL2CPU.X86.IL
             case 4:
 				if (TypeIsFloat(xSource))
 				{
-					new CPUx86.SSE.ConvertSS2SD { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+					new CPUx86.SSE.ConvertSS2SD { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
 				}
 				else
 				{
-					new CPUx86.SSE.ConvertSI2SD { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+					new CPUx86.SSE.ConvertSI2SD { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
 				}
 				// expand stack, that moved data is valid stack
-				new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-				new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.XMM0 };
+				new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+				new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.XMM0 };
 				break;
             case 8:
                 {
 					if (!TypeIsFloat(xSource))
 					{
-						new CPUx86.x87.IntLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
-						new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true};
+						new CPUx86.x87.IntLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
+						new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true};
 					}
                     break;
                 }

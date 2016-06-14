@@ -1,4 +1,7 @@
-﻿using Cosmos.Assembler.x86;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using Cosmos.Assembler.x86;
 
 namespace XSharp.Compiler
 {
@@ -25,6 +28,27 @@ namespace XSharp.Compiler
       }
     }
 
+    private static readonly Dictionary<string, Register> mRegisters;
+
+    static XSRegisters()
+    {
+      mRegisters = new Dictionary<string, Register>();
+      foreach (var xField in typeof(XSRegisters).GetFields(BindingFlags.Static | BindingFlags.Public))
+      {
+        mRegisters.Add(xField.Name, (Register)xField.GetValue(null));
+      }
+    }
+
+    public static Register OldToNewRegister(RegistersEnum register)
+    {
+      Register xResult;
+      if (!mRegisters.TryGetValue(register.ToString(), out xResult))
+      {
+        throw new NotImplementedException($"Register {register} not yet implemented!");
+      }
+      return xResult;
+    }
+
     public class Register8: Register
     {
       public Register8(string name, RegistersEnum regEnum) : base(name, regEnum, RegisterSize.Byte8)
@@ -42,6 +66,13 @@ namespace XSharp.Compiler
     public class Register32 : Register
     {
       public Register32(string name, RegistersEnum regEnum) : base(name, regEnum, RegisterSize.Int32)
+      {
+      }
+    }
+
+    public class RegisterSegment: Register
+    {
+      public RegisterSegment(string name, RegistersEnum regEnum): base(name, regEnum, RegisterSize.Int32)
       {
       }
     }
@@ -70,5 +101,13 @@ namespace XSharp.Compiler
     public static readonly Register ESP = new Register32(nameof(ESP), RegistersEnum.ESP);
     public static readonly Register ESI = new Register32(nameof(ESI), RegistersEnum.ESI);
     public static readonly Register EDI = new Register32(nameof(EDI), RegistersEnum.EDI);
+
+    // Segment registers
+    public static readonly RegisterSegment CS = new RegisterSegment(nameof(CS), RegistersEnum.CS);
+    public static readonly RegisterSegment DS = new RegisterSegment(nameof(DS), RegistersEnum.DS);
+    public static readonly RegisterSegment ES = new RegisterSegment(nameof(ES), RegistersEnum.ES);
+    public static readonly RegisterSegment FS = new RegisterSegment(nameof(FS), RegistersEnum.FS);
+    public static readonly RegisterSegment GS = new RegisterSegment(nameof(GS), RegistersEnum.GS);
+    public static readonly RegisterSegment SS = new RegisterSegment(nameof(SS), RegistersEnum.SS);
   }
 }

@@ -220,32 +220,33 @@ namespace XSharp.Compiler {
       if (mInIntHandler) {
         XS.InterruptReturn();
       } else {
-        XS.Set32("static_field__Cosmos_Core_INTs_mLastKnownAddress", GetNamespace() + "_" + mFuncName + "_Exit");
+        XS.Set("static_field__Cosmos_Core_INTs_mLastKnownAddress", GetNamespace() + "_" + mFuncName + "_Exit", destinationIsIndirect: true, size: RegisterSize.Int32);
         XS.Return();
       }
       mFuncName = null;
     }
 
     protected string GetSimpleRef(Token aToken) {
-      //var xIdx = 0;
-      //var xList = new List<Token>();
-      //xList.Add(aToken);
-      //return GetRef(xList, ref xIdx, true);
       return GetLabel(aToken);
     }
 
     private static RegisterSize GetSize(Token aToken)
     {
-      switch (aToken.RawValue)
+      return GetSize(aToken.RawValue);
+    }
+
+    private static RegisterSize GetSize(string value)
+    {
+      switch (value)
       {
         case "byte":
-          return RegisterSize.Int32;
+          return RegisterSize.Byte8;
         case "word":
           return RegisterSize.Short16;
         case "dword":
           return RegisterSize.Int32;
         default:
-          throw new Exception($"Invalid size '{aToken.RawValue}'");
+          throw new Exception($"Invalid size '{value}'");
       }
     }
 
@@ -460,19 +461,23 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
+                            RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
-                            XS.Compare(tokenList[xOffset + 0].Register, tokenList[xOffset + 2].IntValue);
+                            XS.Compare(tokenList[xOffset + 0].Register, tokenList[xOffset + 2].IntValue, size: xTypedSize);
                             return xComparisonToken;
                           });
             xCompares.Add(xSize + " _REG " + xComparison + " _REG",
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
+                            RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
                             XS.Compare(tokenList[xOffset + 0].Register, tokenList[xOffset + 2].Register);
@@ -526,22 +531,26 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
+                            RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
-                            XS.Compare(tokenList[xOffset + 0].Register, tokenList[xOffset + 5].IntValue, destinationDisplacement: (int)tokenList[xOffset + 2].IntValue);
+                            XS.Compare(tokenList[xOffset + 0].Register, tokenList[xOffset + 5].IntValue, destinationDisplacement: (int)tokenList[xOffset + 2].IntValue, size: xTypedSize);
                             return xComparisonToken;
                           });
             xCompares.Add(xSize + " _REGADDR[-1] " + xComparison + " 123",
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
+                            RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
-                            XS.Compare(tokenList[xOffset + 0].Register, tokenList[xOffset + 2].IntValue, destinationDisplacement: -(int)tokenList[xOffset + 1].IntValue);
+                            XS.Compare(tokenList[xOffset + 0].Register, tokenList[xOffset + 2].IntValue, destinationDisplacement: -(int)tokenList[xOffset + 1].IntValue, size: xTypedSize);
                             return xComparisonToken;
                           });
             xCompares.Add(xSize + " _REGADDR[1] " + xComparison + " _REG",
@@ -570,33 +579,39 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
+                            RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
-                            XS.Compare(tokenList[xOffset + 0].Register, ConstLabel(tokenList[xOffset + 2]), destinationDisplacement: (int)tokenList[xOffset + 1].IntValue, sourceIsIndirect: true);
+                            XS.Compare(tokenList[xOffset + 0].Register, ConstLabel(tokenList[xOffset + 2]), destinationDisplacement: (int)tokenList[xOffset + 1].IntValue, sourceIsIndirect: true, size: xTypedSize);
                             return xComparisonToken;
                           });
             xCompares.Add(xSize + " _REGADDR[-1] " + xComparison + " #_ABC",
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
+                            RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
-                            XS.Compare(tokenList[xOffset + 0].Register, ConstLabel(tokenList[xOffset + 2]), destinationDisplacement: (int)tokenList[xOffset + 1].IntValue);
+                            XS.Compare(tokenList[xOffset + 0].Register, ConstLabel(tokenList[xOffset + 2]), destinationDisplacement: (int)tokenList[xOffset + 1].IntValue, size: xTypedSize);
                             return xComparisonToken;
                           });
             xCompares.Add(xSize + " _ABC " + xComparison + " 123",
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
-                            if (tokenList[xOffset + 2].Type != TokenType.Register)
+                            RegisterSize? xTypedSize = null;
+                            if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
-                            XS.Compare(GetLabel(tokenList[xOffset + 0]), tokenList[xOffset + 2].IntValue, destinationIsIndirect: true);
+                            XS.Compare(GetLabel(tokenList[xOffset + 0]), tokenList[xOffset + 2].IntValue, destinationIsIndirect: true, size: xTypedSize.GetValueOrDefault(RegisterSize.Int32));
                             return xComparisonToken;
                           });
             xCompares.Add(xSize + " _ABC " + xComparison + " _REG",
@@ -614,11 +629,13 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
-                            if (tokenList[xOffset + 2].Type != TokenType.Register)
+                            RegisterSize? xTypedSize = null;
+                            if (tokenList[xOffset].Type != TokenType.Register)
                             {
+                              xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
-                            XS.Compare(GetSimpleRef(tokenList[xOffset + 0]), ConstLabel(tokenList[xOffset + 3]), destinationIsIndirect: true);
+                            XS.Compare(GetSimpleRef(tokenList[xOffset + 0]), ConstLabel(tokenList[xOffset + 3]), destinationIsIndirect: true, size: xTypedSize.GetValueOrDefault(RegisterSize.Int32));
                             return xComparisonToken;
                           });
           }
@@ -1033,7 +1050,7 @@ namespace XSharp.Compiler {
                                 });
       AddPattern("_ABC = #_ABC", delegate(TokenList aTokens)
                                  {
-                                   XS.Set(RegisterSize.Int32, GetLabel(aTokens[0]), ConstLabel(aTokens[3]), destinationIsIndirect: true);
+                                   XS.Set(GetLabel(aTokens[0]), ConstLabel(aTokens[3]), destinationIsIndirect: true, size: RegisterSize.Int32);
                                  });
       AddPattern("_ABC = 123", delegate(TokenList aTokens)
                                {

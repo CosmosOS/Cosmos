@@ -28,15 +28,15 @@ namespace Cosmos.IL2CPU.X86.IL
 
       //new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
 
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xStackSize }; // the index
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xStackSize + 4 }; // the array
+      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xStackSize }; // the index
+      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xStackSize + 4 }; // the array
       // now convert the array handle to an actual memory address
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
 
-      new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(ObjectImpl.FieldDataOffset + 4) };
+      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = (uint)(ObjectImpl.FieldDataOffset + 4) };
 
       new CPUx86.Push { DestinationValue = aElementSize };
-      new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
+      new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EBX };
 
 
       //Multiply( aAssembler, aServiceProvider, aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
@@ -44,33 +44,33 @@ namespace Cosmos.IL2CPU.X86.IL
 
       Mul.DoExecute(4, false, xBaseLabel);
 
-      new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
+      new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ECX };
 
       //Add( aAssembler, aServiceProvider, aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
       Add.DoExecute(4, false);
 
-      new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+      new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
       for (int i = (int)(aElementSize / 4) - 1; i >= 0; i -= 1)
       {
         new Comment(aAssembler, "Start 1 dword");
-        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
-        new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = 4 };
+        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EBX };
+        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
+        new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 4 };
       }
       switch (aElementSize % 4)
       {
         case 1:
           {
             new Comment(aAssembler, "Start 1 byte");
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.BL };
+            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EBX };
+            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.BL };
             break;
           }
         case 2:
           {
             new Comment(aAssembler, "Start 1 word");
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.BX };
+            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EBX };
+            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.BX };
             break;
           }
         case 0:
@@ -81,7 +81,7 @@ namespace Cosmos.IL2CPU.X86.IL
           throw new Exception("Remainder size " + (aElementSize % 4) + " not supported!");
 
       }
-      new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 0x8 };
+      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 0x8 };
     }
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {

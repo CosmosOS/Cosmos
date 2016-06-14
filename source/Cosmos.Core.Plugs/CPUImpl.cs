@@ -15,12 +15,12 @@ namespace Cosmos.Core.Plugs {
 
 		public class GetAmountOfRAMAsm : AssemblerMethod {
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-				new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
-				new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
-				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceValue = 1024 };
-				new CPUx86.Divide { DestinationReg = CPUx86.Registers.ECX };
-				new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
-				new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceRef = CPUAll.ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
+				new CPUx86.Xor { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX };
+				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 1024 };
+				new CPUx86.Divide { DestinationReg = CPUx86.RegistersEnum.ECX };
+				new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 1 };
+				new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
 			}
 		}
 
@@ -41,15 +41,15 @@ namespace Cosmos.Core.Plugs {
 		public class ZeroFillAsm : AssemblerMethod {
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
 				new CPUx86.ClrDirFlag();
-				new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; //address
-				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 }; //length
+				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; //address
+				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 }; //length
 				// set EAX to value of fill (zero)
-				new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX };
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ECX, SourceValue = 1 };
+				new CPUx86.Xor { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX };
+				new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 1 };
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotBelow, DestinationLabel = ".step2" };
 				new CPUx86.StoreByteInString();
 				new CPUAll.Label(".step2");
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ECX, SourceValue = 1 };
+				new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 1 };
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotBelow, DestinationLabel = ".step3" };
 				new CPUx86.StoreWordInString();
 				new CPUAll.Label(".step3");

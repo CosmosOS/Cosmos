@@ -8,7 +8,7 @@ using Sys = Cosmos.System;
 namespace Cosmos.Compiler.Tests.Bcl
 {
     using Cosmos.Compiler.Tests.Bcl.System;
-    
+
     public class Kernel : Sys.Kernel
     {
         protected override void BeforeRun()
@@ -23,7 +23,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 mDebugger.Send("Run");
 
                 CSharp.WhileLoopTests.Execute();
-
+                ObjectTests.Execute();
                 StringTest.Execute();
                 ByteTest.Execute();
                 SByteTest.Execute();

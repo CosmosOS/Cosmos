@@ -17,24 +17,24 @@ namespace Cosmos.IL2CPU.X86.IL
             var xRoundedSize = Align(xFieldSize, 4);
             DoNullReferenceCheck(Assembler, DebugEnabled, xRoundedSize);
             
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = checked((int)xRoundedSize) };
+            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = checked((int)xRoundedSize) };
             for( int i = 0; i < ( xFieldSize / 4 ); i++ )
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
+                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.RegistersEnum.EAX };
             }
             switch( xFieldSize % 4 )
             {
                 case 1:
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = checked((int)( xFieldSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AL };
+                        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = checked((int)( xFieldSize / 4 ) * 4 ), SourceReg = CPUx86.RegistersEnum.AL };
                         break;
                     }
                 case 2:
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, DestinationDisplacement = checked((int)( xFieldSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AX };
+                        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = checked((int)( xFieldSize / 4 ) * 4 ), SourceReg = CPUx86.RegistersEnum.AX };
                         break;
                     }
                 case 0:
@@ -44,7 +44,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                     throw new Exception( "Remainder size " + ( xFieldSize % 4 ) + " not supported!" );
             }
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
         }
     }
 }

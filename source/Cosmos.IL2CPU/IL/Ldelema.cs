@@ -22,23 +22,23 @@ namespace Cosmos.IL2CPU.X86.IL
 
             DoNullReferenceCheck(aAssembler, debugEnabled, 4);
             // calculate element offset into array memory (including header)
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };
-            new CPUx86.Multiply { DestinationReg = CPUx86.Registers.EDX };
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = (uint)(ObjectImpl.FieldDataOffset + 4) };
+            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceValue = aElementSize };
+            new CPUx86.Multiply { DestinationReg = CPUx86.RegistersEnum.EDX };
+            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = (uint)(ObjectImpl.FieldDataOffset + 4) };
 
             // pop the array now
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
+            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EDX };
             // translate it to actual memory
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
 
             if (aOpType.StackPopTypes.Last().GetElementType().IsClass)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
             }
 
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EAX };
-            new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
+            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EAX };
+            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EDX };
         }
 
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
