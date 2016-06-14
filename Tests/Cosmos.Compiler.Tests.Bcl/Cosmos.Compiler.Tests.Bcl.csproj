@@ -93,6 +93,7 @@
     <Compile Include="System\Int16Test.cs" />
     <Compile Include="System\Int32Test.cs" />
     <Compile Include="System\Int64Test.cs" />
+    <Compile Include="System\ObjectTests.cs" />
     <Compile Include="System\SByteTest.cs" />
     <Compile Include="System\SingleTest.cs" />
     <Compile Include="System\StringTest.cs" />
