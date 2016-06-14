@@ -333,7 +333,7 @@ namespace Cosmos.IL2CPU {
         // cleanup result values
         for (int i = 0; i < aReturnSize / 4; i++)
         {
-          new CPU.Add { DestinationReg = CPU.Registers.ESP, SourceValue = 4 };
+          new CPU.Add { DestinationReg = CPU.RegistersEnum.ESP, SourceValue = 4 };
         }
       }
 
@@ -347,7 +347,7 @@ namespace Cosmos.IL2CPU {
           // cleanup result values
           for (int i = 0; i < xExtraStack / 4; i++)
           {
-            new CPU.Add { DestinationReg = CPU.Registers.ESP, SourceValue = 4 };
+            new CPU.Add { DestinationReg = CPU.RegistersEnum.ESP, SourceValue = 4 };
           }
         }
       }
@@ -389,7 +389,7 @@ namespace Cosmos.IL2CPU {
         }
 
       } else {
-        new CPU.Test { DestinationReg = CPU.Registers.ECX, SourceValue = 2 };
+        new CPU.Test { DestinationReg = CPU.RegistersEnum.ECX, SourceValue = 2 };
 
         if (aCleanup != null) {
           new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Equal, DestinationLabel = aJumpTargetNoException };

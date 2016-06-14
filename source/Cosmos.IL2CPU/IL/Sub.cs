@@ -34,51 +34,51 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         new CPUx86.SSE.MoveSS
                         {
-                            DestinationReg = CPUx86.Registers.XMM0,
-                            SourceReg = CPUx86.Registers.ESP,
+                            DestinationReg = CPUx86.RegistersEnum.XMM0,
+                            SourceReg = CPUx86.RegistersEnum.ESP,
                             SourceIsIndirect = true
                         };
                         new CPUx86.Add
                         {
-                            DestinationReg = CPUx86.Registers.ESP,
+                            DestinationReg = CPUx86.RegistersEnum.ESP,
                             SourceValue = 4
                         };
                         new CPUx86.SSE.MoveSS
                         {
-                            DestinationReg = CPUx86.Registers.XMM1,
-                            SourceReg = CPUx86.Registers.ESP,
+                            DestinationReg = CPUx86.RegistersEnum.XMM1,
+                            SourceReg = CPUx86.RegistersEnum.ESP,
                             SourceIsIndirect = true
                         };
                         new CPUx86.SSE.SubSS
                         {
-                            DestinationReg = CPUx86.Registers.XMM1,
-                            SourceReg = CPUx86.Registers.XMM0
+                            DestinationReg = CPUx86.RegistersEnum.XMM1,
+                            SourceReg = CPUx86.RegistersEnum.XMM0
                         };
                         new CPUx86.SSE.MoveSS
                         {
-                            DestinationReg = CPUx86.Registers.ESP,
+                            DestinationReg = CPUx86.RegistersEnum.ESP,
                             DestinationIsIndirect = true,
-                            SourceReg = CPUx86.Registers.XMM1
+                            SourceReg = CPUx86.RegistersEnum.XMM1
                         };
                     }
                     else
                     {
                         new CPUx86.Pop
                         {
-                            DestinationReg = CPUx86.Registers.ECX
+                            DestinationReg = CPUx86.RegistersEnum.ECX
                         };
                         new CPUx86.Pop
                         {
-                            DestinationReg = CPUx86.Registers.EAX
+                            DestinationReg = CPUx86.RegistersEnum.EAX
                         };
                         new CPUx86.Sub
                         {
-                            DestinationReg = CPUx86.Registers.EAX,
-                            SourceReg = CPUx86.Registers.ECX
+                            DestinationReg = CPUx86.RegistersEnum.EAX,
+                            SourceReg = CPUx86.RegistersEnum.ECX
                         };
                         new CPUx86.Push
                         {
-                            DestinationReg = CPUx86.Registers.EAX
+                            DestinationReg = CPUx86.RegistersEnum.EAX
                         };
                     }
                     break;
@@ -87,25 +87,25 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         new CPUx86.x87.FloatLoad
                         {
-                            DestinationReg = Registers.ESP,
+                            DestinationReg = RegistersEnum.ESP,
                             Size = 64,
                             DestinationIsIndirect = true,
                             DestinationDisplacement = 8
                         };
                         new CPUx86.x87.FloatSub
                         {
-                            DestinationReg = CPUx86.Registers.ESP,
+                            DestinationReg = CPUx86.RegistersEnum.ESP,
                             DestinationIsIndirect = true,
                             Size = 64
                         };
                         new CPUx86.Add
                         {
                             SourceValue = 8,
-                            DestinationReg = Registers.ESP
+                            DestinationReg = RegistersEnum.ESP
                         };
                         new CPUx86.x87.FloatStoreAndPop
                         {
-                            DestinationReg = Registers.ESP,
+                            DestinationReg = RegistersEnum.ESP,
                             Size = 64,
                             DestinationIsIndirect = true
                         };
@@ -114,24 +114,24 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         new CPUx86.Pop
                         {
-                            DestinationReg = CPUx86.Registers.EAX
+                            DestinationReg = CPUx86.RegistersEnum.EAX
                         };
                         new CPUx86.Pop
                         {
-                            DestinationReg = CPUx86.Registers.EDX
+                            DestinationReg = CPUx86.RegistersEnum.EDX
                         };
                         new CPUx86.Sub
                         {
-                            DestinationReg = CPUx86.Registers.ESP,
+                            DestinationReg = CPUx86.RegistersEnum.ESP,
                             DestinationIsIndirect = true,
-                            SourceReg = CPUx86.Registers.EAX
+                            SourceReg = CPUx86.RegistersEnum.EAX
                         };
                         new CPUx86.SubWithCarry
                         {
-                            DestinationReg = CPUx86.Registers.ESP,
+                            DestinationReg = CPUx86.RegistersEnum.ESP,
                             DestinationIsIndirect = true,
                             DestinationDisplacement = 4,
-                            SourceReg = CPUx86.Registers.EDX
+                            SourceReg = CPUx86.RegistersEnum.EDX
                         };
                     }
                     break;

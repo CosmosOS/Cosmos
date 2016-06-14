@@ -24,8 +24,8 @@ namespace Cosmos.IL2CPU.X86.IL
             new Comment("EBPOffset = " + xEBPOffset);
 			for (int i = (int)GetStackCountForLocal(aMethod, xFieldInfo) - 1; i >= 0; i--)
 			{
-				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-				new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement =(int)((0 - (xEBPOffset + (i * 4)))), SourceReg = CPUx86.Registers.EAX };
+				new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement =(int)((0 - (xEBPOffset + (i * 4)))), SourceReg = CPUx86.RegistersEnum.EAX };
 			}
 		}
 

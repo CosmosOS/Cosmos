@@ -15,7 +15,7 @@ namespace Cosmos.Assembler.x86 {
         BH,
         BL,
         ECX,
-        CX, 
+        CX,
         CH,
         CL,
         EDX,
@@ -60,64 +60,13 @@ namespace Cosmos.Assembler.x86 {
         EIP,
     }
     public static class Registers {
-        public const RegistersEnum EAX = RegistersEnum.EAX;
-        public const RegistersEnum AX = RegistersEnum.AX;
-        public const RegistersEnum AH = RegistersEnum.AH;
-        public const RegistersEnum AL = RegistersEnum.AL;
-        public const RegistersEnum EBX = RegistersEnum.EBX;
-        public const RegistersEnum BX = RegistersEnum.BX;
-        public const RegistersEnum BH = RegistersEnum.BH;
-        public const RegistersEnum BL = RegistersEnum.BL;
-        public const RegistersEnum ECX = RegistersEnum.ECX;
-        public const RegistersEnum CX = RegistersEnum.CX;
-        public const RegistersEnum CH = RegistersEnum.CH;
-        public const RegistersEnum CL = RegistersEnum.CL;
-        public const RegistersEnum EDX = RegistersEnum.EDX;
-        public const RegistersEnum DX = RegistersEnum.DX;
-        public const RegistersEnum DH = RegistersEnum.DH;
-        public const RegistersEnum DL = RegistersEnum.DL;
-        public const RegistersEnum CS = RegistersEnum.CS;
-        public const RegistersEnum DS = RegistersEnum.DS;
-        public const RegistersEnum ES = RegistersEnum.ES;
-        public const RegistersEnum FS = RegistersEnum.FS;
-        public const RegistersEnum GS = RegistersEnum.GS;
-        public const RegistersEnum SS = RegistersEnum.SS;
-        public const RegistersEnum ESP = RegistersEnum.ESP;
-        public const RegistersEnum SP = RegistersEnum.SP;
-        public const RegistersEnum EBP = RegistersEnum.EBP;
-        public const RegistersEnum BP = RegistersEnum.BP;
-        public const RegistersEnum ESI = RegistersEnum.ESI;
-        public const RegistersEnum SI = RegistersEnum.SI;
-        public const RegistersEnum EDI = RegistersEnum.EDI;
-        public const RegistersEnum DI = RegistersEnum.DI;
-        public const RegistersEnum CR0 = RegistersEnum.CR0;
-        public const RegistersEnum CR1 = RegistersEnum.CR1;
-        public const RegistersEnum CR2 = RegistersEnum.CR2;
-        public const RegistersEnum CR3 = RegistersEnum.CR3;
-        public const RegistersEnum CR4 = RegistersEnum.CR4;
-        public const RegistersEnum XMM0 = RegistersEnum.XMM0;
-        public const RegistersEnum XMM1 = RegistersEnum.XMM1;
-        public const RegistersEnum XMM2 = RegistersEnum.XMM2;
-        public const RegistersEnum XMM3 = RegistersEnum.XMM3;
-        public const RegistersEnum XMM4 = RegistersEnum.XMM4;
-        public const RegistersEnum XMM5 = RegistersEnum.XMM5;
-        public const RegistersEnum XMM6 = RegistersEnum.XMM6;
-        public const RegistersEnum XMM7 = RegistersEnum.XMM7;
-        public const RegistersEnum ST0 = RegistersEnum.ST0;
-        public const RegistersEnum ST1 = RegistersEnum.ST1;
-        public const RegistersEnum ST2 = RegistersEnum.ST2;
-        public const RegistersEnum ST3 = RegistersEnum.ST3;
-        public const RegistersEnum ST4 = RegistersEnum.ST4;
-        public const RegistersEnum ST5 = RegistersEnum.ST5;
-        public const RegistersEnum ST6 = RegistersEnum.ST6;
-        public const RegistersEnum ST7 = RegistersEnum.ST7;
         /// <summary>
         /// Key = 32bit (eg EAX), value = 16 bit (eg AX)
         /// </summary>
         private static Dictionary<RegistersEnum, RegistersEnum> m32BitTo16BitMapping = new Dictionary<RegistersEnum, RegistersEnum>();
         /// <summary>
-        /// Key = 32bit (eg EAX), value = 16 bit (eg AL). 
-        /// 
+        /// Key = 32bit (eg EAX), value = 16 bit (eg AL).
+        ///
         /// </summary>
         private static Dictionary<RegistersEnum, RegistersEnum> m32BitTo8BitMapping = new Dictionary<RegistersEnum, RegistersEnum>();
         private static Dictionary<RegistersEnum, RegistersEnum> m16BitTo8BitMapping = new Dictionary<RegistersEnum, RegistersEnum>();
@@ -126,129 +75,129 @@ namespace Cosmos.Assembler.x86 {
         private static Dictionary<string, RegistersEnum> mNameToReg=new Dictionary<string, RegistersEnum>();
 
         static Registers() {
-            m32BitTo16BitMapping.Add(EAX, AX);
-            m32BitTo16BitMapping.Add(EBX, BX);
-            m32BitTo16BitMapping.Add(ECX, CX);
-            m32BitTo16BitMapping.Add(EDX, DX);
-            m32BitTo16BitMapping.Add(ESI, SI);
-            m32BitTo16BitMapping.Add(EDI, DI);
-            m32BitTo16BitMapping.Add(EBP, BP);
-            m32BitTo16BitMapping.Add(ESP, SP);
+            m32BitTo16BitMapping.Add(RegistersEnum.EAX, RegistersEnum.AX);
+            m32BitTo16BitMapping.Add(RegistersEnum.EBX, RegistersEnum.BX);
+            m32BitTo16BitMapping.Add(RegistersEnum.ECX, RegistersEnum.CX);
+            m32BitTo16BitMapping.Add(RegistersEnum.EDX, RegistersEnum.DX);
+            m32BitTo16BitMapping.Add(RegistersEnum.ESI, RegistersEnum.SI);
+            m32BitTo16BitMapping.Add(RegistersEnum.EDI, RegistersEnum.DI);
+            m32BitTo16BitMapping.Add(RegistersEnum.EBP, RegistersEnum.BP);
+            m32BitTo16BitMapping.Add(RegistersEnum.ESP, RegistersEnum.SP);
 
-            m32BitTo8BitMapping.Add(EAX, AL );
-            m32BitTo8BitMapping.Add(EBX, BL );
-            m32BitTo8BitMapping.Add(ECX, CL );
-            m32BitTo8BitMapping.Add(EDX, DL );
+            m32BitTo8BitMapping.Add(RegistersEnum.EAX, RegistersEnum.AL);
+            m32BitTo8BitMapping.Add(RegistersEnum.EBX, RegistersEnum.BL);
+            m32BitTo8BitMapping.Add(RegistersEnum.ECX, RegistersEnum.CL);
+            m32BitTo8BitMapping.Add(RegistersEnum.EDX, RegistersEnum.DL);
 
-            m16BitTo8BitMapping.Add(AX, AL);
-            m16BitTo8BitMapping.Add(BX, BL);
-            m16BitTo8BitMapping.Add(CX, CL);
-            m16BitTo8BitMapping.Add(DX, DL);
+            m16BitTo8BitMapping.Add(RegistersEnum.AX, RegistersEnum.AL);
+            m16BitTo8BitMapping.Add(RegistersEnum.BX, RegistersEnum.BL);
+            m16BitTo8BitMapping.Add(RegistersEnum.CX, RegistersEnum.CL);
+            m16BitTo8BitMapping.Add(RegistersEnum.DX, RegistersEnum.DL);
 
-            mRegToName.Add(EAX, "EAX");
-            mRegToName.Add(AX, "AX");
-            mRegToName.Add(AH, "AH");
-            mRegToName.Add(AL, "AL");
-            mRegToName.Add(EBX, "EBX");
-            mRegToName.Add(BX, "BX");
-            mRegToName.Add(BH, "BH");
-            mRegToName.Add(BL, "BL");
-            mRegToName.Add(ECX, "ECX");
-            mRegToName.Add(CX, "CX");
-            mRegToName.Add(CH, "CH");
-            mRegToName.Add(CL, "CL");
-            mRegToName.Add(EDX, "EDX");
-            mRegToName.Add(DX, "DX");
-            mRegToName.Add(DH, "DH");
-            mRegToName.Add(DL, "DL");
-            mRegToName.Add(CS, "CS");
-            mRegToName.Add(DS, "DS");
-            mRegToName.Add(ES, "ES");
-            mRegToName.Add(FS, "FS");
-            mRegToName.Add(GS, "GS");
-            mRegToName.Add(SS, "SS");
-            mRegToName.Add(ESP, "ESP");
-            mRegToName.Add(SP, "SP");
-            mRegToName.Add(EBP, "EBP");
-            mRegToName.Add(BP, "BP");
-            mRegToName.Add(ESI, "ESI");
-            mRegToName.Add(SI, "SI");
-            mRegToName.Add(EDI, "EDI");
-            mRegToName.Add(DI, "DI");
-            mRegToName.Add(CR0, "CR0");
-            mRegToName.Add(CR1, "CR1");
-            mRegToName.Add(CR2, "CR2");
-            mRegToName.Add(CR3, "CR3");
-            mRegToName.Add(CR4, "CR4");
-            mRegToName.Add(XMM0, "XMM0");
-            mRegToName.Add(XMM1, "XMM1");
-            mRegToName.Add(XMM2, "XMM2");
-            mRegToName.Add(XMM3, "XMM3");
-            mRegToName.Add(XMM4, "XMM4");
-            mRegToName.Add(XMM5, "XMM5");
-            mRegToName.Add(XMM6, "XMM6");
-            mRegToName.Add(XMM7, "XMM7");
-            mRegToName.Add(ST0, "ST0");
-            mRegToName.Add(ST1, "ST1");
-            mRegToName.Add(ST2, "ST");
-            mRegToName.Add(ST3, "ST3");
-            mRegToName.Add(ST4, "ST4");
-            mRegToName.Add(ST5, "ST5");
-            mRegToName.Add(ST6, "ST6");
-            mRegToName.Add(ST7, "ST7");
+            mRegToName.Add(RegistersEnum.EAX, "EAX");
+            mRegToName.Add(RegistersEnum.AX, "AX");
+            mRegToName.Add(RegistersEnum.AH, "AH");
+            mRegToName.Add(RegistersEnum.AL, "AL");
+            mRegToName.Add(RegistersEnum.EBX, "EBX");
+            mRegToName.Add(RegistersEnum.BX, "BX");
+            mRegToName.Add(RegistersEnum.BH, "BH");
+            mRegToName.Add(RegistersEnum.BL, "BL");
+            mRegToName.Add(RegistersEnum.ECX, "ECX");
+            mRegToName.Add(RegistersEnum.CX, "CX");
+            mRegToName.Add(RegistersEnum.CH, "CH");
+            mRegToName.Add(RegistersEnum.CL, "CL");
+            mRegToName.Add(RegistersEnum.EDX, "EDX");
+            mRegToName.Add(RegistersEnum.DX, "DX");
+            mRegToName.Add(RegistersEnum.DH, "DH");
+            mRegToName.Add(RegistersEnum.DL, "DL");
+            mRegToName.Add(RegistersEnum.CS, "CS");
+            mRegToName.Add(RegistersEnum.DS, "DS");
+            mRegToName.Add(RegistersEnum.ES, "ES");
+            mRegToName.Add(RegistersEnum.FS, "FS");
+            mRegToName.Add(RegistersEnum.GS, "GS");
+            mRegToName.Add(RegistersEnum.SS, "SS");
+            mRegToName.Add(RegistersEnum.ESP, "ESP");
+            mRegToName.Add(RegistersEnum.SP, "SP");
+            mRegToName.Add(RegistersEnum.EBP, "EBP");
+            mRegToName.Add(RegistersEnum.BP, "BP");
+            mRegToName.Add(RegistersEnum.ESI, "ESI");
+            mRegToName.Add(RegistersEnum.SI, "SI");
+            mRegToName.Add(RegistersEnum.EDI, "EDI");
+            mRegToName.Add(RegistersEnum.DI, "DI");
+            mRegToName.Add(RegistersEnum.CR0, "CR0");
+            mRegToName.Add(RegistersEnum.CR1, "CR1");
+            mRegToName.Add(RegistersEnum.CR2, "CR2");
+            mRegToName.Add(RegistersEnum.CR3, "CR3");
+            mRegToName.Add(RegistersEnum.CR4, "CR4");
+            mRegToName.Add(RegistersEnum.XMM0, "XMM0");
+            mRegToName.Add(RegistersEnum.XMM1, "XMM1");
+            mRegToName.Add(RegistersEnum.XMM2, "XMM2");
+            mRegToName.Add(RegistersEnum.XMM3, "XMM3");
+            mRegToName.Add(RegistersEnum.XMM4, "XMM4");
+            mRegToName.Add(RegistersEnum.XMM5, "XMM5");
+            mRegToName.Add(RegistersEnum.XMM6, "XMM6");
+            mRegToName.Add(RegistersEnum.XMM7, "XMM7");
+            mRegToName.Add(RegistersEnum.ST0, "ST0");
+            mRegToName.Add(RegistersEnum.ST1, "ST1");
+            mRegToName.Add(RegistersEnum.ST2, "ST");
+            mRegToName.Add(RegistersEnum.ST3, "ST3");
+            mRegToName.Add(RegistersEnum.ST4, "ST4");
+            mRegToName.Add(RegistersEnum.ST5, "ST5");
+            mRegToName.Add(RegistersEnum.ST6, "ST6");
+            mRegToName.Add(RegistersEnum.ST7, "ST7");
             mRegToName.Add(RegistersEnum.EIP, "EIP");
             mNameToReg.Add("EIP", RegistersEnum.EIP);
-            mNameToReg.Add("EAX", EAX);
-            mNameToReg.Add("AX", AX);
-            mNameToReg.Add("AH", AH);
-            mNameToReg.Add("AL", AL);
-            mNameToReg.Add("EBX", EBX);
-            mNameToReg.Add("BX", BX);
-            mNameToReg.Add("BH", BH);
-            mNameToReg.Add("BL", BL);
-            mNameToReg.Add("ECX", ECX);
-            mNameToReg.Add("CX", CX);
-            mNameToReg.Add("CH", CH);
-            mNameToReg.Add("CL", CL);
-            mNameToReg.Add("EDX", EDX);
-            mNameToReg.Add("DX", DX);
-            mNameToReg.Add("DH", DH);
-            mNameToReg.Add("DL", DL);
-            mNameToReg.Add("CS", CS);
-            mNameToReg.Add("DS", DS);
-            mNameToReg.Add("ES", ES);
-            mNameToReg.Add("FS", FS);
-            mNameToReg.Add("GS", GS);
-            mNameToReg.Add("SS", SS);
-            mNameToReg.Add("ESP", ESP);
-            mNameToReg.Add("SP", SP);
-            mNameToReg.Add("EBP", EBP);
-            mNameToReg.Add("BP", BP);
-            mNameToReg.Add("ESI", ESI);
-            mNameToReg.Add("SI", SI);
-            mNameToReg.Add("EDI", EDI);
-            mNameToReg.Add("DI", DI);
-            mNameToReg.Add("CR0", CR0);
-            mNameToReg.Add("CR1", CR1);
-            mNameToReg.Add("CR2", CR2);
-            mNameToReg.Add("CR3", CR3);
-            mNameToReg.Add("CR4", CR4);
-            mNameToReg.Add("XMM0", XMM0);
-            mNameToReg.Add("XMM1", XMM1);
-            mNameToReg.Add("XMM2", XMM2);
-            mNameToReg.Add("XMM3", XMM3);
-            mNameToReg.Add("XMM4", XMM4);
-            mNameToReg.Add("XMM5", XMM5);
-            mNameToReg.Add("XMM6", XMM6);
-            mNameToReg.Add("XMM7", XMM7);
-            mNameToReg.Add("ST0", ST0);
-            mNameToReg.Add("ST1", ST1);
-            mNameToReg.Add("ST2", ST2);
-            mNameToReg.Add("ST3", ST3);
-            mNameToReg.Add("ST4", ST4);
-            mNameToReg.Add("ST5", ST5);
-            mNameToReg.Add("ST6", ST6);
-            mNameToReg.Add("ST7", ST7);
+            mNameToReg.Add("EAX", RegistersEnum.EAX);
+            mNameToReg.Add("AX",  RegistersEnum.AX);
+            mNameToReg.Add("AH",  RegistersEnum.AH);
+            mNameToReg.Add("AL",  RegistersEnum.AL);
+            mNameToReg.Add("EBX", RegistersEnum.EBX);
+            mNameToReg.Add("BX",  RegistersEnum.BX);
+            mNameToReg.Add("BH",  RegistersEnum.BH);
+            mNameToReg.Add("BL",  RegistersEnum.BL);
+            mNameToReg.Add("ECX", RegistersEnum.ECX);
+            mNameToReg.Add("CX",  RegistersEnum.CX);
+            mNameToReg.Add("CH",  RegistersEnum.CH);
+            mNameToReg.Add("CL",  RegistersEnum.CL);
+            mNameToReg.Add("EDX", RegistersEnum.EDX);
+            mNameToReg.Add("DX",  RegistersEnum.DX);
+            mNameToReg.Add("DH", RegistersEnum.DH);
+            mNameToReg.Add("DL", RegistersEnum.DL);
+            mNameToReg.Add("CS", RegistersEnum.CS);
+            mNameToReg.Add("DS", RegistersEnum.DS);
+            mNameToReg.Add("ES", RegistersEnum.ES);
+            mNameToReg.Add("FS", RegistersEnum.FS);
+            mNameToReg.Add("GS", RegistersEnum.GS);
+            mNameToReg.Add("SS", RegistersEnum.SS);
+            mNameToReg.Add("ESP", RegistersEnum.ESP);
+            mNameToReg.Add("SP",  RegistersEnum.SP);
+            mNameToReg.Add("EBP", RegistersEnum.EBP);
+            mNameToReg.Add("BP",  RegistersEnum.BP);
+            mNameToReg.Add("ESI", RegistersEnum.ESI);
+            mNameToReg.Add("SI",  RegistersEnum.SI);
+            mNameToReg.Add("EDI", RegistersEnum.EDI);
+            mNameToReg.Add("DI",  RegistersEnum.DI);
+            mNameToReg.Add("CR0", RegistersEnum.CR0);
+            mNameToReg.Add("CR1", RegistersEnum.CR1);
+            mNameToReg.Add("CR2", RegistersEnum.CR2);
+            mNameToReg.Add("CR3", RegistersEnum.CR3);
+            mNameToReg.Add("CR4", RegistersEnum.CR4);
+            mNameToReg.Add("XMM0", RegistersEnum.XMM0);
+            mNameToReg.Add("XMM1", RegistersEnum.XMM1);
+            mNameToReg.Add("XMM2", RegistersEnum.XMM2);
+            mNameToReg.Add("XMM3", RegistersEnum.XMM3);
+            mNameToReg.Add("XMM4", RegistersEnum.XMM4);
+            mNameToReg.Add("XMM5", RegistersEnum.XMM5);
+            mNameToReg.Add("XMM6", RegistersEnum.XMM6);
+            mNameToReg.Add("XMM7", RegistersEnum.XMM7);
+            mNameToReg.Add("ST0", RegistersEnum.ST0);
+            mNameToReg.Add("ST1", RegistersEnum.ST1);
+            mNameToReg.Add("ST2", RegistersEnum.ST2);
+            mNameToReg.Add("ST3", RegistersEnum.ST3);
+            mNameToReg.Add("ST4", RegistersEnum.ST4);
+            mNameToReg.Add("ST5", RegistersEnum.ST5);
+            mNameToReg.Add("ST6", RegistersEnum.ST6);
+            mNameToReg.Add("ST7", RegistersEnum.ST7);
         }
 
         public static RegistersEnum? Get8BitRegistersForRegister(RegistersEnum aReg)
@@ -273,7 +222,7 @@ namespace Cosmos.Assembler.x86 {
 
         public static bool IsCR(RegistersEnum aReg)
         {
-            return aReg == CR0 ||aReg == CR1 ||aReg == CR2 ||aReg == CR3 ||aReg == CR4;
+            return aReg == RegistersEnum.CR0 ||aReg == RegistersEnum.CR1 ||aReg == RegistersEnum.CR2 ||aReg == RegistersEnum.CR3 ||aReg == RegistersEnum.CR4;
         }
 
         public static RegistersEnum? Get16BitRegisterForRegister(RegistersEnum aReg)
@@ -347,51 +296,51 @@ namespace Cosmos.Assembler.x86 {
 
         public static bool Is8Bit(RegistersEnum aRegister)
         {
-            return 
-                aRegister == AL ||
-                aRegister == AH ||
-                aRegister == BL ||
-                aRegister == BH ||
-                aRegister == CL ||
-                aRegister == CH ||
-                aRegister == DL ||
-                aRegister == DH;
+            return
+                aRegister == RegistersEnum.AL ||
+                aRegister == RegistersEnum.AH ||
+                aRegister == RegistersEnum.BL ||
+                aRegister == RegistersEnum.BH ||
+                aRegister == RegistersEnum.CL ||
+                aRegister == RegistersEnum.CH ||
+                aRegister == RegistersEnum.DL ||
+                aRegister == RegistersEnum.DH;
         }
 
-        //public static Guid Get 
+        //public static Guid Get
 
 		public static bool Is80Bit(RegistersEnum aRegister)
 		{
 			return
-				aRegister == ST0 ||
-				aRegister == ST1 ||
-				aRegister == ST2 ||
-				aRegister == ST3 ||
-				aRegister == ST4 ||
-				aRegister == ST5 ||
-				aRegister == ST6 ||
-				aRegister == ST7;
+				aRegister == RegistersEnum.ST0 ||
+				aRegister == RegistersEnum.ST1 ||
+				aRegister == RegistersEnum.ST2 ||
+				aRegister == RegistersEnum.ST3 ||
+				aRegister == RegistersEnum.ST4 ||
+				aRegister == RegistersEnum.ST5 ||
+				aRegister == RegistersEnum.ST6 ||
+				aRegister == RegistersEnum.ST7;
 		}
 
         public static bool Is128Bit(RegistersEnum aRegister)
         {
-            return aRegister == XMM0 || aRegister == XMM1 || aRegister == XMM2 || aRegister == XMM3 || aRegister == XMM4 || aRegister == XMM5 || aRegister == XMM6 || aRegister == XMM7;
+            return aRegister == RegistersEnum.XMM0 || aRegister == RegistersEnum.XMM1 || aRegister == RegistersEnum.XMM2 || aRegister == RegistersEnum.XMM3 || aRegister == RegistersEnum.XMM4 || aRegister == RegistersEnum.XMM5 || aRegister == RegistersEnum.XMM6 || aRegister == RegistersEnum.XMM7;
         }
 
         public static bool IsSegment(RegistersEnum aRegister)
         {
-            return aRegister == CS || aRegister == DS || aRegister == ES || aRegister == FS || aRegister == GS || aRegister == SS;
+            return aRegister == RegistersEnum.CS || aRegister == RegistersEnum.DS || aRegister == RegistersEnum.ES || aRegister == RegistersEnum.FS || aRegister == RegistersEnum.GS || aRegister == RegistersEnum.SS;
         }
 
         public static bool Is32Bit(RegistersEnum aRegister)
         {
-            return aRegister == EAX || aRegister == EBX || aRegister == ECX || aRegister == EDX || aRegister == ESP || aRegister == EBP || aRegister == ESI || aRegister == EDI || aRegister == CR0 || aRegister == CR1 || aRegister == CR2 || aRegister == CR3 || aRegister == CR4
+            return aRegister == RegistersEnum.EAX || aRegister == RegistersEnum.EBX || aRegister == RegistersEnum.ECX || aRegister == RegistersEnum.EDX || aRegister == RegistersEnum.ESP || aRegister == RegistersEnum.EBP || aRegister == RegistersEnum.ESI || aRegister == RegistersEnum.EDI || aRegister == RegistersEnum.CR0 || aRegister == RegistersEnum.CR1 || aRegister == RegistersEnum.CR2 || aRegister == RegistersEnum.CR3 || aRegister == RegistersEnum.CR4
                 || aRegister == RegistersEnum.EIP;
         }
 
         public static bool Is16Bit(RegistersEnum aRegister)
         {
-            return aRegister == AX || aRegister == BX || aRegister == CX || aRegister == DX || aRegister == CS || aRegister == DS || aRegister == ES || aRegister == FS || aRegister == GS || aRegister == SS || aRegister == SI || aRegister == DI || aRegister == SP || aRegister == BP;
+            return aRegister == RegistersEnum.AX || aRegister == RegistersEnum.BX || aRegister == RegistersEnum.CX || aRegister == RegistersEnum.DX || aRegister == RegistersEnum.CS || aRegister == RegistersEnum.DS || aRegister == RegistersEnum.ES || aRegister == RegistersEnum.FS || aRegister == RegistersEnum.GS || aRegister == RegistersEnum.SS || aRegister == RegistersEnum.SI || aRegister == RegistersEnum.DI || aRegister == RegistersEnum.SP || aRegister == RegistersEnum.BP;
         }
 
         public static List<RegistersEnum> GetRegisters()
@@ -441,38 +390,38 @@ namespace Cosmos.Assembler.x86 {
         public static List<RegistersEnum> GetCRs()
         {
             var registers = new List<RegistersEnum>();
-            registers.Add(CR0);
-            registers.Add(CR1);
-            registers.Add(CR2);
-            registers.Add(CR3);
-            registers.Add(CR4);
+            registers.Add(RegistersEnum.CR0);
+            registers.Add(RegistersEnum.CR1);
+            registers.Add(RegistersEnum.CR2);
+            registers.Add(RegistersEnum.CR3);
+            registers.Add(RegistersEnum.CR4);
             return registers;
         }
         public static List<RegistersEnum> getXMMs()
         {
             var registers = new List<RegistersEnum>();
-            registers.Add(XMM0);
-            registers.Add(XMM1);
-            registers.Add(XMM2);
-            registers.Add(XMM3);
-            registers.Add(XMM4);
-            registers.Add(XMM5);
-            registers.Add(XMM6);
-            registers.Add(XMM7);
+            registers.Add(RegistersEnum.XMM0);
+            registers.Add(RegistersEnum.XMM1);
+            registers.Add(RegistersEnum.XMM2);
+            registers.Add(RegistersEnum.XMM3);
+            registers.Add(RegistersEnum.XMM4);
+            registers.Add(RegistersEnum.XMM5);
+            registers.Add(RegistersEnum.XMM6);
+            registers.Add(RegistersEnum.XMM7);
             return registers;
         }
 
         public static List<RegistersEnum> getSTs()
         {
             var registers = new List<RegistersEnum>();
-            registers.Add(ST0);
-            registers.Add(ST1);
-            registers.Add(ST2);
-            registers.Add(ST3);
-            registers.Add(ST4);
-            registers.Add(ST5);
-            registers.Add(ST6);
-            registers.Add(ST7);
+            registers.Add(RegistersEnum.ST0);
+            registers.Add(RegistersEnum.ST1);
+            registers.Add(RegistersEnum.ST2);
+            registers.Add(RegistersEnum.ST3);
+            registers.Add(RegistersEnum.ST4);
+            registers.Add(RegistersEnum.ST5);
+            registers.Add(RegistersEnum.ST6);
+            registers.Add(RegistersEnum.ST7);
             return registers;
         }
     }

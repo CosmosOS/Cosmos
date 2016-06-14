@@ -23,16 +23,16 @@ namespace Cosmos.IL2CPU.X86.IL
       string xTypeID = GetTypeIDLabel(xType.Value);
       new CPUx86.Push { DestinationValue = (ObjectImpl.FieldDataOffset + xSize) };
       new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.AllocNewObjectRef) };
-      new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New(xTypeID), SourceIsIndirect = true };
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.BoxedValueType, Size = 32 };
+      new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
+      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceRef = Cosmos.Assembler.ElementReference.New(xTypeID), SourceIsIndirect = true };
+      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
+      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.BoxedValueType, Size = 32 };
       new Comment(Assembler, "xSize is " + xSize);
       for (int i = 0; i < (xSize / 4); i++)
       {
-        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
-        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, DestinationIsIndirect = true, DestinationDisplacement = (ObjectImpl.FieldDataOffset + (i * 4)), SourceReg = CPUx86.Registers.EDX, Size = 32 };
+        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EDX };
+        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, DestinationIsIndirect = true, DestinationDisplacement = (ObjectImpl.FieldDataOffset + (i * 4)), SourceReg = CPUx86.RegistersEnum.EDX, Size = 32 };
       }
       new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
     }

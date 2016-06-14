@@ -14,9 +14,9 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-            new CPUx86.MoveSignExtend { DestinationReg = CPUx86.Registers.EAX, Size = 16, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
-            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
+            new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = 16, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
+            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
         }
     }
 }

@@ -48,15 +48,15 @@ namespace Cosmos.IL2CPU.X86.IL
         //mov RIGHT_HIGH to eax, is useable on Full 64 multiply
         new Assembler.x86.Mov
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.EAX,
-            SourceReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX,
+            SourceReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             SourceIsIndirect = true,
             SourceDisplacement = 4
           };
         new Assembler.x86.Or
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.EAX,
-            SourceReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX,
+            SourceReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             SourceIsIndirect = true,
             SourceDisplacement = 12
           };
@@ -71,8 +71,8 @@ namespace Cosmos.IL2CPU.X86.IL
         //TODO is there an opcode that does OR without change EAX?
         new Assembler.x86.Mov
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.EAX,
-            SourceReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX,
+            SourceReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             SourceIsIndirect = true,
             SourceDisplacement = 4
           };
@@ -80,25 +80,25 @@ namespace Cosmos.IL2CPU.X86.IL
         // multiply with LEFT_LOW
         new Assembler.x86.Multiply
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             DestinationIsIndirect = true,
             DestinationDisplacement = 8,
             Size = 32
           };
         // save result of LEFT_LOW * RIGHT_HIGH
-        XS.Set(XSRegisters.OldToNewRegister(Registers.ECX), XSRegisters.OldToNewRegister(Registers.EAX));
+        XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
 
         //mov RIGHT_LOW to eax
         new Assembler.x86.Mov
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.EAX,
-            SourceReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX,
+            SourceReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             SourceIsIndirect = true
           };
         // multiply with LEFT_HIGH
         new Assembler.x86.Multiply
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             DestinationIsIndirect = true,
             DestinationDisplacement = 12,
             Size = 32
@@ -106,21 +106,21 @@ namespace Cosmos.IL2CPU.X86.IL
         // add result of LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH
         new Assembler.x86.Add
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.ECX,
-            SourceReg = Cosmos.Assembler.x86.Registers.EAX
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ECX,
+            SourceReg = Cosmos.Assembler.x86.RegistersEnum.EAX
           };
 
         //mov RIGHT_LOW to eax
         new Assembler.x86.Mov
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.EAX,
-            SourceReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX,
+            SourceReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             SourceIsIndirect = true
           };
         // multiply with LEFT_LOW
         new Assembler.x86.Multiply
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             DestinationIsIndirect = true,
             DestinationDisplacement = 8,
             Size = 32
@@ -128,8 +128,8 @@ namespace Cosmos.IL2CPU.X86.IL
         // add LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH to high dword of last result
         new Assembler.x86.Add
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.EDX,
-            SourceReg = Cosmos.Assembler.x86.Registers.ECX
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EDX,
+            SourceReg = Cosmos.Assembler.x86.RegistersEnum.ECX
           };
 
         new Assembler.x86.Jump { DestinationLabel = MoveReturnValue };
@@ -138,14 +138,14 @@ namespace Cosmos.IL2CPU.X86.IL
         //mov RIGHT_LOW to eax
         new Assembler.x86.Mov
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.EAX,
-            SourceReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX,
+            SourceReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             SourceIsIndirect = true
           };
         // multiply with LEFT_LOW
         new Assembler.x86.Multiply
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             DestinationIsIndirect = true,
             DestinationDisplacement = 8,
             Size = 32
@@ -155,33 +155,33 @@ namespace Cosmos.IL2CPU.X86.IL
         // move high result to left high
         new Assembler.x86.Mov
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             DestinationIsIndirect = true,
             DestinationDisplacement = 12,
-            SourceReg = Cosmos.Assembler.x86.Registers.EDX
+            SourceReg = Cosmos.Assembler.x86.RegistersEnum.EDX
           };
         // move low result to left low
         new Assembler.x86.Mov
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             DestinationIsIndirect = true,
             DestinationDisplacement = 8,
-            SourceReg = Cosmos.Assembler.x86.Registers.EAX
+            SourceReg = Cosmos.Assembler.x86.RegistersEnum.EAX
           };
         // pop right 64 value
-        new Assembler.x86.Add { DestinationReg = Cosmos.Assembler.x86.Registers.ESP, SourceValue = 8 };
+        new Assembler.x86.Add { DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP, SourceValue = 8 };
       }
       else
       {
-        new Assembler.x86.Pop { DestinationReg = Cosmos.Assembler.x86.Registers.EAX };
+        new Assembler.x86.Pop { DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX };
         new Assembler.x86.Multiply
           {
-            DestinationReg = Cosmos.Assembler.x86.Registers.ESP,
+            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
             DestinationIsIndirect = true,
             Size = 32
           };
-        new Assembler.x86.Add { DestinationReg = Cosmos.Assembler.x86.Registers.ESP, SourceValue = 4 };
-        new Assembler.x86.Push { DestinationReg = Cosmos.Assembler.x86.Registers.EAX };
+        new Assembler.x86.Add { DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP, SourceValue = 4 };
+        new Assembler.x86.Push { DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX };
       }
     }
   }

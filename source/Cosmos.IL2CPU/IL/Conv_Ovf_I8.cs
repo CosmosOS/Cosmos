@@ -21,10 +21,10 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 1:
                 case 2:
                 case 4:
-                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                    new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
                     new CPUx86.SignExtendAX { Size = 32 };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                    new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EDX };
+                    new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
                     break;
                 case 8:
                     new CPUx86.Noop();

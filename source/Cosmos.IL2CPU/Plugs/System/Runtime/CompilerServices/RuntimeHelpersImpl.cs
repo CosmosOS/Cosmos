@@ -16,26 +16,26 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
 		public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle) {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; // array
-		    new CPUx86.Mov {DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true};
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };// aFieldHandle
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.EDI, SourceValue = 8 };
-		    new CPUx86.Push {DestinationReg = CPUx86.Registers.EDI, DestinationIsIndirect = true};
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.EDI, SourceValue = 4 };
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDI, SourceIsIndirect = true };
-		    new CPUx86.Multiply {DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 32};
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.Registers.ECX), XSRegisters.OldToNewRegister(CPUx86.Registers.EAX));
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.EDI, SourceValue = 4 };
+            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; // array
+		    new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI, SourceIsIndirect = true};
+            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };// aFieldHandle
+            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EDI, SourceValue = 8 };
+		    new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EDI, DestinationIsIndirect = true};
+            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EDI, SourceValue = 4 };
+            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EDI, SourceIsIndirect = true };
+		    new CPUx86.Multiply {DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 32};
+            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
+            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
+            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EDI, SourceValue = 4 };
 
 			new Label(".StartLoop");
-			new CPUx86.Mov { DestinationReg = CPUx86.Registers.DL, SourceReg = CPUx86.Registers.ESI, SourceIsIndirect = true };
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.DL };
-			new CPUx86.Add{DestinationReg = CPUx86.Registers.EAX, SourceValue=1};
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.EDI, SourceValue = 1 };
-			new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX };
+			new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.DL, SourceReg = CPUx86.RegistersEnum.ESI, SourceIsIndirect = true };
+            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.DL };
+			new CPUx86.Add{DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue=1};
+            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESI, SourceValue = 1 };
+            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EDI, SourceValue = 1 };
+			new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ECX };
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".EndLoop" };
             new CPUx86.Jump { DestinationLabel = ".StartLoop" };
 

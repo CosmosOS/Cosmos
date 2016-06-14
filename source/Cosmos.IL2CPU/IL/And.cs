@@ -36,17 +36,17 @@ namespace Cosmos.IL2CPU.X86.IL
 				// [ESP + 4] is high part
 				// [ESP + 8] is low part
 				// [ESP + 12] is high part
-				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-				new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
+				new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+				new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EDX };
 				// [ESP] is low part
 				// [ESP + 4] is high part
-				new CPUx86.And { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
-				new CPUx86.And { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EDX };
+				new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
+				new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.RegistersEnum.EDX };
 			}
 			else
 			{
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.And { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
 			}
 		}
 	}

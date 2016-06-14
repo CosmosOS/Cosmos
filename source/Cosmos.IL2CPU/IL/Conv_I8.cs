@@ -28,23 +28,23 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 4:
 					if (xSourceIsFloat)
 					{
-						new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 32 };
-						new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-						new CPUx86.x87.IntStoreWithTrunc { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
+						new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 32 };
+						new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+						new CPUx86.x87.IntStoreWithTrunc { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 64 };
 					}
 					else
 					{
-						new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+						new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
 						new CPUx86.SignExtendAX { Size = 32 };
-						new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
-                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+						new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EDX };
+                        new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
 					}
                     break;
                 case 8:
 					if (xSourceIsFloat)
 					{
-						new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
-						new CPUx86.x87.IntStoreWithTrunc { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
+						new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 64 };
+						new CPUx86.x87.IntStoreWithTrunc { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 64 };
 					}
                     break;
                 default:

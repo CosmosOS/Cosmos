@@ -20,34 +20,34 @@ namespace Cosmos.IL2CPU.X86.IL
 			{
 				if (xStackContentIsFloat)
 				{
-					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
+					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
 					new CPUx86.x87.FloatNegate { };
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
+					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
 				}
 				else
 				{
-					new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX }; // low
-					new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // high
-					new CPUx86.Neg { DestinationReg = CPUx86.Registers.EBX }; // set carry if EBX != 0
-					new CPUx86.AddWithCarry { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-					new CPUx86.Neg { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
+					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EBX }; // low
+					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX }; // high
+					new CPUx86.Neg { DestinationReg = CPUx86.RegistersEnum.EBX }; // set carry if EBX != 0
+					new CPUx86.AddWithCarry { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
+					new CPUx86.Neg { DestinationReg = CPUx86.RegistersEnum.EAX };
+					new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+					new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EBX };
 				}
 			}
 			else
 			{
 				if (xStackContentIsFloat)
 				{
-					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 32, DestinationIsIndirect = true };
+					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
 					new CPUx86.x87.FloatNegate { };
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 32, DestinationIsIndirect = true };
+					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
 				}
 				else
 				{
-					new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.Neg { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+					new CPUx86.Neg { DestinationReg = CPUx86.RegistersEnum.EAX };
+					new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
 				}
 			}
 		}

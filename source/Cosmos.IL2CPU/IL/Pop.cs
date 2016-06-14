@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
             var xSize = SizeOfType(aOpCode.StackPopTypes[0]);
             new CPUx86.Add
             {
-                DestinationReg = CPUx86.Registers.ESP,
+                DestinationReg = CPUx86.RegistersEnum.ESP,
                 SourceValue = ILOp.Align((uint)xSize, 4)
             };
         }

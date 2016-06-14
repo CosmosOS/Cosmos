@@ -26,15 +26,15 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         if (TypeIsFloat(xSource))
                         {
-                            new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 32, DestinationIsIndirect = true };
-                            new CPUx86.Sub { DestinationReg = Registers.ESP, SourceValue = 4 };
-                            new CPUx86.x87.IntStoreWithTrunc { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                            new CPUx86.x87.FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
+                            new CPUx86.Sub { DestinationReg = RegistersEnum.ESP, SourceValue = 4 };
+                            new CPUx86.x87.IntStoreWithTrunc { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
                         }
                         else
                         {
-                            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+                            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
                             new CPUx86.Push { DestinationValue = 0 };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
                         }
                         break;
                     }
@@ -42,9 +42,9 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         if (TypeIsFloat(xSource))
                         {
-                            new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                            new CPUx86.x87.FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
                             new CPUx86.x87.FloatABS();
-                            new CPUx86.x87.IntStoreWithTrunc { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                            new CPUx86.x87.IntStoreWithTrunc { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
                         }
                         //Else it's already an Int64, or UInt64
                         break;
