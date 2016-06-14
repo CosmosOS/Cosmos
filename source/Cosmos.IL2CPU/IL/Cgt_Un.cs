@@ -3,6 +3,8 @@ using CPUx86 = Cosmos.Assembler.x86;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
+using XSharp.Compiler;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Cgt_Un )]
@@ -55,10 +57,10 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
                     //value1: ECX:EBX
 
-					new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EDX };
-					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Above, DestinationLabel = LabelTrue };
-					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Below, DestinationLabel = LabelFalse };
-					new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EBX, SourceReg = CPUx86.RegistersEnum.EAX };
+					XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EDX));
+					new ConditionalJump { Condition = ConditionalTestEnum.Above, DestinationLabel = LabelTrue };
+					new ConditionalJump { Condition = ConditionalTestEnum.Below, DestinationLabel = LabelFalse };
+					XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
 					new Label(LabelTrue);
 					new CPUx86.ConditionalMove { Condition = CPUx86.ConditionalTestEnum.Above, DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.ESI };
 					new Label(LabelFalse);
@@ -90,7 +92,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
                     new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-                
+
                     new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Below, DestinationLabel = LabelTrue };
                     new CPUx86.Jump { DestinationLabel = LabelFalse };
                     new Label( LabelTrue );
@@ -106,12 +108,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
 
         // using System;
-        // 
+        //
         // using CPUx86 = Cosmos.Assembler.x86;
         // using CPU = Cosmos.Assembler.x86;
         // using Cosmos.IL2CPU.X86;
         // using Cosmos.IL2CPU.X86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Cgt_Un)]
         // 	public class Cgt_Un: Op {
@@ -127,7 +129,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             mMethodInfo = aMethodInfo;
         //             mCurrentOffset = aReader.Position;
         //         }
-        // 
+        //
         // 	    public override void DoAssemble()
         // 		{
         // 			var xStackItem = Assembler.Stack.Pop();
@@ -162,14 +164,14 @@ namespace Cosmos.IL2CPU.X86.IL
         // 				//result = value1 - value2
         // 				//new CPUx86.ConditionalMove(Condition.Above, "edi", "esi");
         //                 //new CPUx86.Push { DestinationReg = Registers.EDI };
-        // 
+        //
         //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Above, DestinationLabel = LabelTrue };
         //                 new CPUx86.Push { DestinationValue = 0 };
         //                 new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
-        // 
+        //
         // 				new Label(LabelTrue);
         // 				new CPUx86.Push{DestinationValue=1};
-        // 
+        //
         // 			} else
         // 			{
         //                 new CPUx86.Pop{DestinationReg=CPUx86.Registers.EAX};

@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
 			new CPUx86.Add{DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue=1};
             new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESI, SourceValue = 1 };
             new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EDI, SourceValue = 1 };
-			new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ECX };
+			XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".EndLoop" };
             new CPUx86.Jump { DestinationLabel = ".StartLoop" };
 

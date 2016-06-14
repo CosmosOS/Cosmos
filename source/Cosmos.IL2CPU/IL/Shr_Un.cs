@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EDX };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
                 new Label( xBaseLabel + "__StartLoop" );
-                new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EAX };
+                XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xBaseLabel + "__EndLoop" };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 1 };

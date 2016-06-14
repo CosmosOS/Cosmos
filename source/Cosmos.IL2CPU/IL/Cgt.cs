@@ -3,6 +3,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -57,10 +58,10 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EBX };
 					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
 					//value1: ECX:EBX
-					new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EDX };
-					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
-					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.LessThan, DestinationLabel = LabelFalse };
-					new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EBX, SourceReg = CPUx86.RegistersEnum.EAX };
+					XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EDX));
+					new ConditionalJump { Condition = ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
+					new ConditionalJump { Condition = ConditionalTestEnum.LessThan, DestinationLabel = LabelFalse };
+					XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
 					new Label(LabelTrue);
 					new CPUx86.ConditionalMove { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.ESI };
 					new Label(LabelFalse);

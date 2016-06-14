@@ -64,7 +64,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             ;//make sure edx is 0
             new Assembler.Label(".BEGIN_OF_LOOP");
             {
-                new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBX };//are we at the end of this list
+                XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));//are we at the end of this list
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThanOrEqualTo, DestinationLabel = ".END_OF_INVOKE_" };//then we better stop
                 new CPUx86.Pushad();
                 new Assembler.Comment("esi points to where we will copy the methods argumetns from");

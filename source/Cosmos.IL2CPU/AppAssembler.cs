@@ -161,17 +161,17 @@ namespace Cosmos.IL2CPU
             {
                 // if StackCorruption detection is active, we're also going to emit a stack overflow detection
                 new Mov { DestinationReg = RegistersEnum.EAX, SourceRef= ElementReference.New("Before_Kernel_Stack") };
-                new Compare { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP };
+                XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP));
                 new ConditionalJump { Condition = ConditionalTestEnum.LessThan, DestinationLabel = mCurrentMethodLabel + ".StackOverflowCheck_End" };
                 new ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = mCurrentMethodLabel + ".StackOverflowCheck_GetAddress" };
-                new Assembler.Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
+                new Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
                 new Pop { DestinationReg = RegistersEnum.EAX };
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 new Call { DestinationLabel = "DebugStub_SendStackOverflowOccurred" };
                 new Halt();
-                new Assembler.Label(mCurrentMethodLabel + ".StackOverflowCheck_End");
+                new Label(mCurrentMethodLabel + ".StackOverflowCheck_End");
 
             }
 
@@ -183,14 +183,14 @@ namespace Cosmos.IL2CPU
                 var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + LabelName.GetFullName(aMethod.MethodBase.DeclaringType));
                 var xAsmMember = new DataMember(xName, (byte)0);
                 Assembler.DataMembers.Add(xAsmMember);
-                new Compare { DestinationRef = Cosmos.Assembler.ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
+                new Compare { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = ".BeforeQuickReturn" };
-                new Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
+                new Mov { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
                 new Jump { DestinationLabel = ".AfterCCTorAlreadyCalledCheck" };
-                new Cosmos.Assembler.Label(".BeforeQuickReturn");
+                new Label(".BeforeQuickReturn");
                 new Mov { DestinationReg = RegistersEnum.ECX, SourceValue = 0 };
                 new Return { };
-                new Cosmos.Assembler.Label(".AfterCCTorAlreadyCalledCheck");
+                new Label(".AfterCCTorAlreadyCalledCheck");
             }
 
             new Push { DestinationReg = RegistersEnum.EBP };
@@ -429,7 +429,7 @@ namespace Cosmos.IL2CPU
                 // if not, we should somehow break here.
                 XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP));
                 XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EBP));
-                new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
+                XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabelExc + "__2" };
                 new ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
@@ -1528,7 +1528,7 @@ namespace Cosmos.IL2CPU
                 {
                     new Add { DestinationReg = RegistersEnum.EAX, SourceValue = xStackDifference };
                 }
-                new Compare { SourceReg = RegistersEnum.EAX, DestinationReg = RegistersEnum.EBX };
+                XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".StackCorruptionCheck_End" };
                 new ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
