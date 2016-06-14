@@ -362,6 +362,7 @@ namespace Frotz.Generic
 
             if (c == CharCodes.ZC_INDENT && cwp.x_cursor != cwp.left + 1)
                 c = ' ';
+            
 
             if (units_left() < (width = os_.char_width(c)))
             {
