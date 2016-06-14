@@ -17,6 +17,7 @@ namespace Cosmos.Core.Memory.Test {
         Assert.IsTrue(xRatPages > 0);
         
         Native xFreePages = RAT.GetPageCount(RAT.PageType.Empty);
+        Assert.IsTrue(xFreePages > 0);
       }
     }
   }

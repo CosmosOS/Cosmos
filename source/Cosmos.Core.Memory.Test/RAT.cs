@@ -9,8 +9,16 @@ namespace Cosmos.Core.Memory.Test {
   unsafe static public class RAT {
     static public class PageType {
       public const byte Empty = 0;
-      public const byte RAT = 1;
+
       // Data Types from 1, special meanings from 255 down.
+      public const byte RAT = 1;
+      public const byte HeapSmall = 2;
+      public const byte HeapMedium = 3;
+      public const byte HeapLarge = 4;
+      // Code
+      // Stack
+      // Disk Cache
+
       // Extension of previous page.
       public const byte Extension = 255;
     }
@@ -80,7 +88,7 @@ namespace Cosmos.Core.Memory.Test {
       return xResult;
     }
 
-    static private byte* Alloc(byte aType, Native aCount = 1) {
+    static public byte* Alloc(byte aType, Native aPageCount = 1) {
       Native? xPos = null;
 
       // Could combine with an external method or delegate, but will slow things down
@@ -88,11 +96,11 @@ namespace Cosmos.Core.Memory.Test {
       //
       // Alloc single blocks at bottom, larger blocks at top to help reduce fragmentation.
       Native xCount = 0;
-      if (aCount == 1) {
+      if (aPageCount == 1) {
         for (Native i = 0; i < mPageCount; i++) {
           if (mRAT[i] == PageType.Empty) {
             xCount++;
-            if (xCount == aCount) {
+            if (xCount == aPageCount) {
               xPos = i - xCount - 1;
               break;
             }
@@ -104,7 +112,7 @@ namespace Cosmos.Core.Memory.Test {
         for (Native i = mPageCount - 1; i >= 0; i--) {
           if (mRAT[i] == PageType.Empty) {
             xCount++;
-            if (xCount == aCount) {
+            if (xCount == aPageCount) {
               xPos = i;
               break;
             }

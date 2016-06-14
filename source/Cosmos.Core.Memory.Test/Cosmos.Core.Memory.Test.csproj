@@ -52,6 +52,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Heap.cs" />
+    <Compile Include="HeapItemLarge.cs" />
+    <Compile Include="HeapItemMedium.cs" />
+    <Compile Include="HeapItemSmall.cs" />
     <Compile Include="RAT.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
