@@ -2,6 +2,7 @@ using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs.System;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -33,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
       // now convert the array handle to an actual memory address
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
 
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = (uint)(ObjectImpl.FieldDataOffset + 4) };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), (uint)(ObjectImpl.FieldDataOffset + 4));
 
       new CPUx86.Push { DestinationValue = aElementSize };
       new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EBX };

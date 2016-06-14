@@ -3,6 +3,7 @@ using System.Linq;
 using SysReflection = System.Reflection;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stfld)]
@@ -46,7 +47,7 @@ namespace Cosmos.IL2CPU.X86.IL {
         new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.ECX};
         new CPUx86.Pop {DestinationReg = CPUx86.RegistersEnum.ECX};
       }
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = (uint)(xActualOffset) };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), (uint)(xActualOffset));
       //TODO: Can't we use an x86 op to do a byte copy instead and be faster?
       for (int i = 0; i < (xSize / 4); i++) {
         new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };

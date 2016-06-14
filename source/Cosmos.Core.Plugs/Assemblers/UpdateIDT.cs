@@ -122,7 +122,7 @@ namespace Cosmos.Core.Plugs
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP)); // preserve old stack address for passing to interrupt handler
 
                 // store floating point data
-                new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 0xfffffff0 }; // fxsave needs to be 16-byte alligned
+                XS.And(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 0xfffffff0); // fxsave needs to be 16-byte alligned
                 new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 512 }; // fxsave needs 512 bytes
                 new FXSave { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true }; // save the registers
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.ESP };

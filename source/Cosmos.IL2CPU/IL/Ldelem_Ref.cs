@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
       //}
 
       new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceValue = aElementSize };
+      XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), aElementSize);
       new CPUx86.Multiply { DestinationReg = CPUx86.RegistersEnum.EDX };
 
       new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = (ObjectImpl.FieldDataOffset + 4) };
@@ -31,7 +31,7 @@ namespace Cosmos.IL2CPU.X86.IL
       if (aElementSize > 4)
       {
         // we start copying the last bytes
-        new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = aElementSize - 4 };
+        XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), aElementSize - 4);
       }
 
       // pop the array

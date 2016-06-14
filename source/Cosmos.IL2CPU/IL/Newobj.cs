@@ -6,7 +6,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using System.Reflection;
 
 using Cosmos.IL2CPU.Plugs.System;
-
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -89,11 +89,11 @@ namespace Cosmos.IL2CPU.X86.IL
                 new Comment("Shift: " + xShift);
                 if (xShift < 0)
                 {
-                    new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = (uint)Math.Abs(xShift) };
+                    XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), (uint)Math.Abs(xShift));
                 }
                 else if (xShift > 0)
                 {
-                    new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = (uint)xShift };
+                    XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), (uint)xShift);
                 }
 
                 // push struct ptr
@@ -201,7 +201,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceRef = Cosmos.Assembler.ElementReference.New(strTypeId), SourceIsIndirect = true };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceRef = ElementReference.New(strTypeId), SourceIsIndirect = true };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };
@@ -271,16 +271,16 @@ namespace Cosmos.IL2CPU.X86.IL
             }
         }
 
-        private static void PushAlignedParameterSize(SysReflection.MethodBase aMethod)
+        private static void PushAlignedParameterSize(MethodBase aMethod)
         {
-            SysReflection.ParameterInfo[] xParams = aMethod.GetParameters();
+            ParameterInfo[] xParams = aMethod.GetParameters();
 
             uint xSize;
             new Comment("[ Newobj.PushAlignedParameterSize start count = " + xParams.Length.ToString() + " ]");
             for (int i = 0; i < xParams.Length; i++)
             {
                 xSize = SizeOfType(xParams[i].ParameterType);
-                new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = Align(xSize, 4) };
+                XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), Align(xSize, 4));
             }
             new Comment("[ Newobj.PushAlignedParameterSize end ]");
         }

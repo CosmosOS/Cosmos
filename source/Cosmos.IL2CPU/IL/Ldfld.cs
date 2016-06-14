@@ -7,6 +7,7 @@ using System.Linq;
 // using System.Reflection;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -115,7 +116,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
 
                 // now remove the struct from the stack
-                new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = Align(GetStorageSize(aDeclaringType), 4) };
+                XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), Align(GetStorageSize(aDeclaringType), 4));
 
                 new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
 
@@ -132,7 +133,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 // convert to real memory address
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
             }
-            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = (uint)(xOffset) };
+            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), (uint)(xOffset));
 
             if (xFieldInfo.IsExternalValue && aDerefExternalField)
             {

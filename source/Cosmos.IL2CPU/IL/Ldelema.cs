@@ -24,9 +24,9 @@ namespace Cosmos.IL2CPU.X86.IL
             DoNullReferenceCheck(aAssembler, debugEnabled, 4);
             // calculate element offset into array memory (including header)
             new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceValue = aElementSize };
+            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), aElementSize);
             new CPUx86.Multiply { DestinationReg = CPUx86.RegistersEnum.EDX };
-            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = (uint)(ObjectImpl.FieldDataOffset + 4) };
+            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), (uint)(ObjectImpl.FieldDataOffset + 4));
 
             // pop the array now
             new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EDX };

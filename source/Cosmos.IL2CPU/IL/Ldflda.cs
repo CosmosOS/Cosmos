@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -60,7 +61,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     // eax contains the handle now, lets convert it to the real memory address
                     new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
                 }
-                new CPUx86.Add {DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = (uint)(xActualOffset)};
+                XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), (uint)(xActualOffset));
                 new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EAX};
             }
         }

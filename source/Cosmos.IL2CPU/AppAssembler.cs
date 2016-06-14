@@ -415,11 +415,7 @@ namespace Cosmos.IL2CPU
                     }
                     if (xLocalsSize > 0)
                     {
-                        new Add
-                        {
-                            DestinationReg = RegistersEnum.ESP,
-                            SourceValue = xLocalsSize
-                        };
+                        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), xLocalsSize);
                     }
                 }
             }
@@ -866,7 +862,7 @@ namespace Cosmos.IL2CPU
             var xSize = X86.IL.Call.GetStackSizeToReservate(aTargetMethod.MethodBase);
             if (xSize > 0)
             {
-                new Sub { DestinationReg = RegistersEnum.ESP, SourceValue = xSize };
+                XS.Sub(XSRegisters.OldToNewRegister(RegistersEnum.ESP), xSize);
             }
             new Call { DestinationLabel = ILOp.GetMethodLabel(aTargetMethod) };
             var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;

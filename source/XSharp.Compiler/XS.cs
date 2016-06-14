@@ -224,7 +224,8 @@ namespace XSharp.Compiler
                               bool destinationIsIndirect = false,
                               int? destinationDisplacement = null,
                               bool sourceIsIndirect = false,
-                              int? sourceDisplacement = null)
+                              int? sourceDisplacement = null,
+                              bool skipSizeCheck = false)
       where T : InstructionWithDestinationAndSourceAndSize, new()
     {
       if (destinationDisplacement != null)
@@ -243,7 +244,8 @@ namespace XSharp.Compiler
           sourceDisplacement = null;
         }
       }
-      if (!(destinationIsIndirect || sourceIsIndirect)
+      if (!skipSizeCheck
+        && !(destinationIsIndirect || sourceIsIndirect)
           && destination.Size != source.Size)
       {
         throw new Exception("Register sizes must match!");
@@ -408,7 +410,7 @@ namespace XSharp.Compiler
       {
         throw new InvalidOperationException();
       }
-      Do<ShiftRight>(register, bitCount);
+      Do<ShiftRight>(register, bitCount, skipSizeCheck: true);
     }
 
     public static void ShiftLeft(Register register, byte bitCount)
@@ -422,7 +424,7 @@ namespace XSharp.Compiler
       {
         throw new InvalidOperationException();
       }
-      Do<ShiftLeft>(register, bitCount);
+      Do<ShiftLeft>(register, bitCount, skipSizeCheck: true);
     }
 
     public static void PushAllGeneralRegisters()

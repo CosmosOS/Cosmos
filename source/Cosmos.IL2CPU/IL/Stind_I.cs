@@ -1,6 +1,8 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using XSharp.Compiler;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stind_I )]
@@ -55,7 +57,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                     throw new Exception( "Error, shouldn't occur" );
             }
-            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = ( uint )( xStorageSize + 4 ) };
+            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), ( uint )( xStorageSize + 4 ));
         }
 
       public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
@@ -66,11 +68,11 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // using System.IO;
-        // 
-        // 
+        //
+        //
         // using CPU = Cosmos.Assembler.x86;
         // using CPUx86 = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stind_I)]
         // 	public class Stind_I: Op {
@@ -116,7 +118,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			aAssembler.Stack.Pop();
         // 			aAssembler.Stack.Pop();
         // 		}
-        // 
+        //
         // 		public override void DoAssemble() {
         // 			Assemble(Assembler, 4);
         // 		}
