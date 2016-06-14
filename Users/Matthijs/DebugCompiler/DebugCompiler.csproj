@@ -94,9 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MyEngine.cs" />
-    <Compile Include="MyEngineAttribute.cs" />
     <Compile Include="MySource.cs" />
-    <Compile Include="MyTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
