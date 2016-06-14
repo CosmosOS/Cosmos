@@ -9,8 +9,8 @@ namespace DebugCompiler
     [TestFixture]
     public class RunKernels
     {
-        [Test]
-        public void Test([ValueSource(typeof(MySource), nameof(MySource.ProvideData))] Type kernelToRun)
+        [TestCaseSource(typeof(MySource), nameof(MySource.ProvideData))]
+        public void Test(Type kernelToRun)
         {
             Environment.CurrentDirectory = Path.GetDirectoryName(typeof(RunKernels).Assembly.Location);
 
