@@ -70,7 +70,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.ConditionalJump { Condition = ConditionalTestEnum.NoOverflow, DestinationLabel = xSuccessLabel };
 					ThrowOverflowException();
 				}
-				new Label(xSuccessLabel);
+				XS.Label(xSuccessLabel);
             }
         }
     }

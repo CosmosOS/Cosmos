@@ -47,7 +47,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
             // push nothing now, as we should return the object instance pointer.
             new CPUx86.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
-            new Label( mReturnNullLabel );
+            XS.Label(mReturnNullLabel );
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
             new CPUx86.Push { DestinationValue = 0 };
         }

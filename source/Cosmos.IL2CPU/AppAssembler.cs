@@ -142,7 +142,7 @@ namespace Cosmos.IL2CPU
             {
                 xMethodLabel = LabelName.Get(aMethod.MethodBase);
             }
-            new Label(xMethodLabel);
+            XS.Label(xMethodLabel);
 
             //Assembler.WriteDebugVideo("Method " + aMethod.UID);
 
@@ -167,12 +167,12 @@ namespace Cosmos.IL2CPU
                 new ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = mCurrentMethodLabel + ".StackOverflowCheck_GetAddress" };
-                new Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
+                XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
                 XS.Pop(OldToNewRegister(RegistersEnum.EAX));
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 new Call { DestinationLabel = "DebugStub_SendStackOverflowOccurred" };
                 new Halt();
-                new Label(mCurrentMethodLabel + ".StackOverflowCheck_End");
+                XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_End");
 
             }
 
@@ -188,10 +188,10 @@ namespace Cosmos.IL2CPU
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = ".BeforeQuickReturn" };
                 XS.Set(xName, 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
                 new Jump { DestinationLabel = ".AfterCCTorAlreadyCalledCheck" };
-                new Label(".BeforeQuickReturn");
+                XS.Label(".BeforeQuickReturn");
                 XS.Set(OldToNewRegister(RegistersEnum.ECX), 0);
-                new Return { };
-                new Label(".AfterCCTorAlreadyCalledCheck");
+                XS.Return();
+                XS.Label(".AfterCCTorAlreadyCalledCheck");
             }
 
             XS.Push(OldToNewRegister(RegistersEnum.EBP));
@@ -333,7 +333,7 @@ namespace Cosmos.IL2CPU
             //if (aMethod.PlugMethod == null
             //    && !aMethod.IsInlineAssembler)
             {
-                new Label(xMethodLabel + EndOfMethodLabelNameNormal);
+                XS.Label(xMethodLabel + EndOfMethodLabelNameNormal);
 
                 XS.Comment("Following code is for debugging. Adjust accordingly!");
                 new Mov
@@ -393,7 +393,7 @@ namespace Cosmos.IL2CPU
                 // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
             }
             var xLabelExc = xMethodLabel + EndOfMethodLabelNameException;
-            new Label(xLabelExc);
+            XS.Label(xLabelExc);
             if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
             {
                 var xBody = aMethod.MethodBase.GetMethodBody();
@@ -427,13 +427,13 @@ namespace Cosmos.IL2CPU
                 new ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location" };
-                new Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
+                XS.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
                 XS.Pop(OldToNewRegister(RegistersEnum.EAX));
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
                 new Halt();
             }
-            new Label(xLabelExc + "__2");
+            XS.Label(xLabelExc + "__2");
             XS.Pop(OldToNewRegister(RegistersEnum.EBP));
             var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);
             if (xRetSize < 0)
@@ -909,7 +909,7 @@ namespace Cosmos.IL2CPU
         public virtual void GenerateVMTCode(HashSet<Type> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<Type, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID)
         {
             XS.Comment("---------------------------------------------------------");
-            new Label(InitVMTCodeLabel);
+            XS.Label(InitVMTCodeLabel);
             XS.Push(OldToNewRegister(RegistersEnum.EBP));
             XS.Set(OldToNewRegister(RegistersEnum.EBP), OldToNewRegister(RegistersEnum.ESP));
             mSequences = new DebugInfo.SequencePoint[0];
@@ -1166,9 +1166,9 @@ namespace Cosmos.IL2CPU
         }
 #endif
 
-            new Label("_END_OF_" + InitVMTCodeLabel);
+            XS.Label("_END_OF_" + InitVMTCodeLabel);
             XS.Pop(OldToNewRegister(RegistersEnum.EBP));
-            new Return();
+            XS.Return();
         }
 
         public void ProcessField(SysReflection.FieldInfo aField)
@@ -1373,7 +1373,7 @@ namespace Cosmos.IL2CPU
         {
             // at the time the datamembers for literal strings are created, the type id for string is not yet determined.
             // for now, we fix this at runtime.
-            new Label(InitStringIDsLabel);
+            XS.Label(InitStringIDsLabel);
             XS.Push(OldToNewRegister(RegistersEnum.EBP));
             XS.Set(OldToNewRegister(RegistersEnum.EBP), OldToNewRegister(RegistersEnum.ESP));
             new Mov { DestinationReg = RegistersEnum.EAX, SourceRef = ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect = true };
@@ -1400,9 +1400,9 @@ namespace Cosmos.IL2CPU
             }
             Assembler.WriteDebugVideo("Done");
             XS.Pop(OldToNewRegister(RegistersEnum.EBP));
-            new Return();
+            XS.Return();
 
-            new Label(CosmosAssembler.EntryPointName);
+            XS.Label(CosmosAssembler.EntryPointName);
             XS.Push(OldToNewRegister(RegistersEnum.EBP));
             XS.Set(OldToNewRegister(RegistersEnum.EBP), OldToNewRegister(RegistersEnum.ESP));
             new Call { DestinationLabel = InitVMTCodeLabel };
@@ -1411,16 +1411,16 @@ namespace Cosmos.IL2CPU
             Assembler.WriteDebugVideo("Done initializing string IDs");
             // we now need to do "newobj" on the entry point, and after that, call .Start on it
             var xCurLabel = CosmosAssembler.EntryPointName + ".CreateEntrypoint";
-            new Label(xCurLabel);
+            XS.Label(xCurLabel);
             Assembler.WriteDebugVideo("Now create the kernel class");
             Newobj.Assemble(Cosmos.Assembler.Assembler.CurrentInstance, null, null, xCurLabel, aEntrypoint.DeclaringType, aEntrypoint);
             Assembler.WriteDebugVideo("Kernel class created");
             xCurLabel = CosmosAssembler.EntryPointName + ".CallStart";
-            new Label(xCurLabel);
+            XS.Label(xCurLabel);
             X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart", DebugEnabled);
-            new Label(CosmosAssembler.EntryPointName + ".AfterStart");
+            XS.Label(CosmosAssembler.EntryPointName + ".AfterStart");
             XS.Pop(OldToNewRegister(RegistersEnum.EBP));
-            new Return();
+            XS.Return();
 
             if (ShouldOptimize)
             {
@@ -1436,7 +1436,7 @@ namespace Cosmos.IL2CPU
         {
             string xLabel = TmpPosLabel(aMethod, aOpCode);
             Assembler.CurrentIlLabel = xLabel;
-            new Label(xLabel);
+            XS.Label(xLabel);
 
             if (aMethod.MethodBase.DeclaringType != typeof(VTablesImpl))
             {
@@ -1522,7 +1522,7 @@ namespace Cosmos.IL2CPU
                 new ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = xLabel + ".StackCorruptionCheck_GetAddress" };
-                new Label(xLabel + ".StackCorruptionCheck_GetAddress");
+                XS.Label(xLabel + ".StackCorruptionCheck_GetAddress");
                 XS.Pop(OldToNewRegister(RegistersEnum.EAX));
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };

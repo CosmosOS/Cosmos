@@ -196,7 +196,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         default:
                             throw new Exception("Unknown OpCode for conditional branch in 64-bit.");
                     }
-                    new Label(xNoJump);
+                    XS.Label(xNoJump);
                     //}
                 }
             }

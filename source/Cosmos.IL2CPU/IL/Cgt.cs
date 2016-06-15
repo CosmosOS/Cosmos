@@ -64,17 +64,17 @@ namespace Cosmos.IL2CPU.X86.IL
 					new ConditionalJump { Condition = ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
 					new ConditionalJump { Condition = ConditionalTestEnum.LessThan, DestinationLabel = LabelFalse };
 					XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-					new Label(LabelTrue);
+					XS.Label(LabelTrue);
 					new ConditionalMove { Condition = ConditionalTestEnum.GreaterThan, DestinationReg = RegistersEnum.EDI, SourceReg = RegistersEnum.ESI };
-					new Label(LabelFalse);
+					XS.Label(LabelFalse);
 				}
 				XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EDI));
 				/*
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
-				new Label(LabelFalse);
+				XS.Label(LabelFalse);
 				new CPUx86.Push { DestinationValue = 0 };
 				new CPUx86.Jump { DestinationLabel = xNextLabel };
-				new Label( LabelTrue );
+				XS.Label(LabelTrue );
 				new CPUx86.Push { DestinationValue = 1 };*/
 			}
 			else
@@ -94,11 +94,11 @@ namespace Cosmos.IL2CPU.X86.IL
 					new Compare { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
 					new ConditionalJump { Condition = ConditionalTestEnum.LessThan, DestinationLabel = LabelTrue };
 					new Jump { DestinationLabel = LabelFalse };
-					new Label( LabelTrue );
+					XS.Label(LabelTrue );
 					XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
 					new Push { DestinationValue = 1 };
 					new Jump { DestinationLabel = xNextLabel };
-					new Label( LabelFalse );
+					XS.Label(LabelFalse );
 					XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
 					new CPUx86.Push { DestinationValue = 0 };
 				}

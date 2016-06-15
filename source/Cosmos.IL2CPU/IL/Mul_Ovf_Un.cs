@@ -90,7 +90,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         new Jump { DestinationLabel = MoveReturnValue };
 
-        new Label(Simple32Multiply);
+        XS.Label(Simple32Multiply);
         //mov RIGHT_LOW to eax
         new Mov
           {
@@ -101,7 +101,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // multiply with LEFT_LOW
         XS.Multiply(XSRegisters.OldToNewRegister(RegistersEnum.ESP), displacement: 8);
 
-        new Label(MoveReturnValue);
+        XS.Label(MoveReturnValue);
         // move high result to left high
         new Assembler.x86.Mov
           {

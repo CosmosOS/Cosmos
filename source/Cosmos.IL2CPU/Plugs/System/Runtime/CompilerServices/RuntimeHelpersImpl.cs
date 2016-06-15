@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Cosmos.Assembler;
 using XSharp.Compiler;
@@ -29,7 +29,7 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 4);
 
-			new Label(".StartLoop");
+			XS.Label(".StartLoop");
 			new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.DL, SourceReg = CPUx86.RegistersEnum.ESI, SourceIsIndirect = true };
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.DL };
 			XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
@@ -39,7 +39,7 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".EndLoop" };
             new CPUx86.Jump { DestinationLabel = ".StartLoop" };
 
-			new Label(".EndLoop");
+			XS.Label(".EndLoop");
 		}
 	}
 }

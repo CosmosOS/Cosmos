@@ -31,7 +31,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 new CPUx86.Call { DestinationLabel = LabelName.Get(xCctor) };
                 ILOp.EmitExceptionLogic(Assembler, aMethod, aOpCode, true, null, ".AfterCCTorExceptionCheck");
-                new Label(".AfterCCTorExceptionCheck");
+                XS.Label(".AfterCCTorExceptionCheck");
             }
 
             //Assembler.Stack.Pop();

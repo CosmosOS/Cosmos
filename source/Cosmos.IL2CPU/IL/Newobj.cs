@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         DestinationLabel = LabelName.Get(xCctor)
                     };
                     ILOp.EmitExceptionLogic(aAssembler, aMethod, xMethod, true, null, ".AfterCCTorExceptionCheck");
-                    new Label(".AfterCCTorExceptionCheck");
+                    XS.Label(".AfterCCTorExceptionCheck");
                 }
             }
 
@@ -180,7 +180,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 // todo: probably we want to check for exceptions after calling Alloc
                 new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.AllocNewObjectRef) };
-                new Label(".AfterAlloc");
+                XS.Label(".AfterAlloc");
                 new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
 
@@ -251,7 +251,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     new Comment(aAssembler, "[ Newobj.Execute cleanup end ]");
                     Jump_Exception(aMethod);
-                    new Label(xNoErrorLabel);
+                    XS.Label(xNoErrorLabel);
                 }
                 XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 

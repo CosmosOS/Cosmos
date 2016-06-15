@@ -4,6 +4,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using System.Reflection;
 using System.Linq;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -35,7 +36,7 @@ namespace Cosmos.IL2CPU.X86.IL
         if (aCurrentOpCode != null)
         {
           ILOp.EmitExceptionLogic(assembler, aMethod, aCurrentOpCode, true, null, ".AfterCCTorExceptionCheck");
-          new Label(".AfterCCTorExceptionCheck");
+          XS.Label(".AfterCCTorExceptionCheck");
         }
       }
       string xDataName = field;

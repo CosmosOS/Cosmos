@@ -48,11 +48,11 @@ namespace Cosmos.IL2CPU.X86.IL {
           new Compare { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
           new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = Label.LastFullLabel + ".True" };
           new Jump { DestinationLabel = Label.LastFullLabel + ".False" };
-          new Label(".True");
+          XS.Label(".True");
           XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
           new Push { DestinationValue = 1 };
           new Jump { DestinationLabel = xNextLabel };
-          new Label(".False");
+          XS.Label(".False");
           XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
           new Push { DestinationValue = 0 };
           new Jump { DestinationLabel = xNextLabel };
@@ -94,7 +94,7 @@ namespace Cosmos.IL2CPU.X86.IL {
           XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 1);
           XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
           new Jump { DestinationLabel = xNextLabel };
-          new Label(Label.LastFullLabel + ".False");
+          XS.Label(Label.LastFullLabel + ".False");
           //eax = 0
           XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 8);
           XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));

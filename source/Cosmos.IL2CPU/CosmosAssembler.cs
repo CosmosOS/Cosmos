@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Cosmos.Assembler;
@@ -103,7 +103,7 @@ namespace Cosmos.IL2CPU
             {
                 Segment = mGdCode, DestinationLabel = "Boot_FlushCsGDT"
             };
-            new Label("Boot_FlushCsGDT");
+            XS.Label("Boot_FlushCsGDT");
             new Comment(this, "END - Create GDT");
         }
 
@@ -202,7 +202,7 @@ namespace Cosmos.IL2CPU
                     DestinationReg = RegistersEnum.EAX, DestinationIsIndirect = true
                 };
             }
-            new Label("AfterCreateIDT");
+            XS.Label("AfterCreateIDT");
             new Comment(this, "END - Create IDT");
         }
 
@@ -358,7 +358,7 @@ namespace Cosmos.IL2CPU
             };
 
             new Comment(this, "Kernel done - loop till next IRQ");
-            new Label(".loop");
+            XS.Label(".loop");
             new ClearInterruptFlag();
             new Halt();
             new Jump
@@ -418,8 +418,8 @@ namespace Cosmos.IL2CPU
             }
             else
             {
-                new Label("DebugStub_Step");
-                new Return();
+                XS.Label("DebugStub_Step");
+                XS.Return();
             }
 
             // Start emitting assembly labels

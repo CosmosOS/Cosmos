@@ -37,7 +37,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
-                new Label( xBaseLabel + "__StartLoop" );
+                XS.Label(xBaseLabel + "__StartLoop" );
                 XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xBaseLabel + "__EndLoop" };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
                 new CPUx86.Jump { DestinationLabel = xBaseLabel + "__StartLoop" };
 
-                new Label( xBaseLabel + "__EndLoop" );
+                XS.Label(xBaseLabel + "__EndLoop" );
                 return;
             }
         }

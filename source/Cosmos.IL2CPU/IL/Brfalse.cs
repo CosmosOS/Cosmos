@@ -55,7 +55,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EBX };
         //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelFalse };
         //                 new CPUx86.Jump { DestinationLabel = TargetLabel };
-        // 				new Label(LabelFalse);
+        // 				XS.Label(LabelFalse);
         // 			} else
         // 			{
         //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };

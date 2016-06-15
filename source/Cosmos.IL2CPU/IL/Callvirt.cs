@@ -128,7 +128,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //                        xEmitCleanup );
                 XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ECX));
 
-                new Label(xCurrentMethodLabel + ".AfterAddressCheck");
+                XS.Label(xCurrentMethodLabel + ".AfterAddressCheck");
                 if (xMethodInfo.DeclaringType == typeof(object))
                 {
 
@@ -176,13 +176,13 @@ namespace Cosmos.IL2CPU.X86.IL
                * ECX contains the method to call
                */
                 }
-                new Label(xCurrentMethodLabel + ".NotBoxedThis");
+                XS.Label(xCurrentMethodLabel + ".NotBoxedThis");
                 if (xExtraStackSize > 0)
                 {
                     XS.Sub(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), xExtraStackSize);
                 }
                 XS.Call(XSRegisters.ECX);
-                new Label(xCurrentMethodLabel + ".AfterNotBoxedThis");
+                XS.Label(xCurrentMethodLabel + ".AfterNotBoxedThis");
             }
             ILOp.EmitExceptionLogic(Assembler, aMethod, aOp, true,
                                     delegate ()
@@ -203,7 +203,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                                         ILOp.EmitExceptionCleanupAfterCall(Assembler, xResultSize, xStackOffsetBefore, xPopSize);
                                     });
-            new Label(xCurrentMethodLabel + ".NoExceptionAfterCall");
+            XS.Label(xCurrentMethodLabel + ".NoExceptionAfterCall");
             new Comment(Assembler, "Argument Count = " + xParameters.Length.ToString());
         }
     }

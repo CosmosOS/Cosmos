@@ -119,7 +119,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         DestinationLabel = MoveReturnValue
                     };
 
-                    new Label(Simple32Multiply);
+                    XS.Label(Simple32Multiply);
                     //mov RIGHT_LOW to eax
                     new CPUx86.Mov
                     {
@@ -130,7 +130,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     // multiply with LEFT_LOW
                     XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), displacement: 8);
 
-                    new Label(MoveReturnValue);
+                    XS.Label(MoveReturnValue);
                     // move high result to left high
                     new CPUx86.Mov
                     {

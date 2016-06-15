@@ -63,7 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					// set ecx to zero for counting the shift operations
 					XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 
-					new Label(LabelShiftRight);
+					XS.Label(LabelShiftRight);
 
 					// shift divisor 1 bit right
 					new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.RegistersEnum.ESI, SourceReg = CPUx86.RegistersEnum.EDI, ArgumentValue = 1 };
@@ -94,7 +94,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					new CPUx86.Jump { DestinationLabel = LabelEnd };
 
-					new Label(LabelNoLoop);
+					XS.Label(LabelNoLoop);
 
 					//save high dividend
 					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
@@ -110,7 +110,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.Push { DestinationValue = 0 };
 					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 
-					new Label(LabelEnd);
+					XS.Label(LabelEnd);
                 }
             }
             else
