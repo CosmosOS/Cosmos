@@ -2,6 +2,7 @@ using System;
 using CPU = Cosmos.Assembler.x86;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -52,7 +53,7 @@ namespace Cosmos.IL2CPU.X86.IL
             //  xOffset += xSize;
             //}
             for (int i = 0; i < (xCurArgSize / 4); i++) {
-              new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+              XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
               new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + /*xCurArgSize -*/ ((i/* + 1*/) * 4)), SourceReg = CPUx86.RegistersEnum.EAX };
             }
         }

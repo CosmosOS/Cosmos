@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -19,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             var xSource = aOpCode.StackPopTypes[0];
             var xSourceSize = SizeOfType(xSource);
-            var xSourceIsFloat = TypeIsFloat(xSource); 
+            var xSourceIsFloat = TypeIsFloat(xSource);
             switch (xSourceSize)
             {
                 case 1:
@@ -44,16 +45,16 @@ namespace Cosmos.IL2CPU.X86.IL
                             new CPUx86.SSE.ConvertSD2SIAndTruncate { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.XMM0 };
 							new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, SourceReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
 						}
-						
-                        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-                        new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
-                        new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+
+                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
+                        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                         break;
 
                     }
                 default:
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I4: SourceSize " + xSource + " not yet supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-                    throw new NotImplementedException(); 
+                    throw new NotImplementedException();
             }
         }
     }

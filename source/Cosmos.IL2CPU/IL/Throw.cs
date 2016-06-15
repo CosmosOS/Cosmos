@@ -2,6 +2,7 @@ using System;
 using CPU = Cosmos.Assembler.x86;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -17,10 +18,10 @@ namespace Cosmos.IL2CPU.X86.IL
         {
 #warning TODO: Implement exception
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
-            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+            XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
             new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
             new CPUx86.Call { DestinationLabel = "SystemExceptionOccurred" };
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 3 };
+            XS.Set(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ECX), 3);
             Call.EmitExceptionLogic( Assembler,aMethod, aOpCode, false, null );
 
         }

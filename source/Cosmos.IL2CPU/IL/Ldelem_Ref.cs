@@ -2,6 +2,7 @@ using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs.System;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -21,24 +22,24 @@ namespace Cosmos.IL2CPU.X86.IL
       //    throw new Exception("Unsupported size for Ldelem_Ref: " + aElementSize);
       //}
 
-      new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceValue = aElementSize };
-      new CPUx86.Multiply { DestinationReg = CPUx86.RegistersEnum.EDX };
+      XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+      XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), aElementSize);
+      XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = (ObjectImpl.FieldDataOffset + 4) };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), (ObjectImpl.FieldDataOffset + 4));
 
       if (aElementSize > 4)
       {
         // we start copying the last bytes
-        new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = aElementSize - 4 };
+        XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), aElementSize - 4);
       }
 
       // pop the array
-      new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EDX };
+      XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
       // convert to real memory address
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
 
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EAX };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
       var xSizeLeft = aElementSize;
       while (xSizeLeft > 0)
@@ -60,7 +61,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
               new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 8, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
             }
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ECX };
+            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
             break;
           case 2:
             if (isSigned)
@@ -71,12 +72,12 @@ namespace Cosmos.IL2CPU.X86.IL
             {
               new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 16, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
             }
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ECX };
+            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
             break;
           case 4:
             // copy a full dword
             new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EDX, DestinationIsIndirect = true };
-            new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.EDX, SourceValue = 4 }; // move to previous 4 bytes
+            XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), 4); // move to previous 4 bytes
             break;
             //case 8:
             //    new CPUx86.Push {DestinationReg = CPUx86.Registers.EDX, DestinationDisplacement = 4, DestinationIsIndirect = true};

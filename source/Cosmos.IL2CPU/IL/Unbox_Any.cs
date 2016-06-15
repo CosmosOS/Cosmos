@@ -4,7 +4,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs.System;
-
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -34,10 +34,10 @@ namespace Cosmos.IL2CPU.X86.IL
       SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.UInt32", "System.UInt32");
       Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, GetLabel(aMethod, aOpCode), xBaseLabel + "_After_IsInstance_Call", DebugEnabled);
       new Label(xBaseLabel + "_After_IsInstance_Call");
-      new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-      new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
-      new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
-      new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+      XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
+      XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
+      new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
+      XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
       uint xSize = xTypeSize;
       if (xSize % 4 > 0)
       {
@@ -46,11 +46,11 @@ namespace Cosmos.IL2CPU.X86.IL
       int xItems = (int)xSize / 4;
       for (int i = xItems - 1; i >= 0; i--)
       {
-        new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ((i * 4) + ObjectImpl.FieldDataOffset) };
+        new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ((i * 4) + ObjectImpl.FieldDataOffset) };
       }
-      new CPUx86.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
+      new CPU.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
       new Label(mReturnNullLabel);
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+      XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), 4);
       new CPUx86.Push { DestinationValue = 0 };
     }
   }

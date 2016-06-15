@@ -1,6 +1,8 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
+using Cosmos.Assembler.x86.x87;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -38,11 +40,7 @@ namespace Cosmos.IL2CPU.X86.IL
                             SourceReg = CPUx86.RegistersEnum.ESP,
                             SourceIsIndirect = true
                         };
-                        new CPUx86.Add
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.ESP,
-                            SourceValue = 4
-                        };
+                        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
                         new CPUx86.SSE.MoveSS
                         {
                             DestinationReg = CPUx86.RegistersEnum.XMM1,
@@ -63,38 +61,25 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                     else
                     {
-                        new CPUx86.Pop
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.ECX
-                        };
-                        new CPUx86.Pop
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.EAX
-                        };
-                        new CPUx86.Sub
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.EAX,
-                            SourceReg = CPUx86.RegistersEnum.ECX
-                        };
-                        new CPUx86.Push
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.EAX
-                        };
+                        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.ECX));
+                        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                        XS.Sub(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ECX));
+                        XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
                     }
                     break;
                 case 8:
                     if (xStackTopIsFloat)
                     {
-                        new CPUx86.x87.FloatLoad
+                        new FloatLoad
                         {
                             DestinationReg = RegistersEnum.ESP,
                             Size = 64,
                             DestinationIsIndirect = true,
                             DestinationDisplacement = 8
                         };
-                        new CPUx86.x87.FloatSub
+                        new FloatSub
                         {
-                            DestinationReg = CPUx86.RegistersEnum.ESP,
+                            DestinationReg = RegistersEnum.ESP,
                             DestinationIsIndirect = true,
                             Size = 64
                         };
@@ -103,7 +88,7 @@ namespace Cosmos.IL2CPU.X86.IL
                             SourceValue = 8,
                             DestinationReg = RegistersEnum.ESP
                         };
-                        new CPUx86.x87.FloatStoreAndPop
+                        new FloatStoreAndPop
                         {
                             DestinationReg = RegistersEnum.ESP,
                             Size = 64,
@@ -112,14 +97,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                     else
                     {
-                        new CPUx86.Pop
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.EAX
-                        };
-                        new CPUx86.Pop
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.EDX
-                        };
+                        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EDX));
                         new CPUx86.Sub
                         {
                             DestinationReg = CPUx86.RegistersEnum.ESP,

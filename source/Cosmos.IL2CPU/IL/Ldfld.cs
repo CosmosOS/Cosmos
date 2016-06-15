@@ -7,6 +7,7 @@ using System.Linq;
 // using System.Reflection;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -74,12 +75,12 @@ namespace Cosmos.IL2CPU.X86.IL
             var xFieldInfo = (from item in xFields
                               where item.Id == xFieldId
                               select item).Single();
-            new Comment("Field: " + xFieldInfo.Id);
-            new Comment("Type: " + xFieldInfo.FieldType.ToString());
-            new Comment("Size: " + xFieldInfo.Size);
-            new Comment("DeclaringType: " + aDeclaringType.FullName);
-            new Comment("TypeOnStack: " + aTypeOnStack.FullName);
-            new Comment("Offset: " + xOffset + " (includes object header)");
+            XS.Comment("Field: " + xFieldInfo.Id);
+            XS.Comment("Type: " + xFieldInfo.FieldType.ToString());
+            XS.Comment("Size: " + xFieldInfo.Size);
+            XS.Comment("DeclaringType: " + aDeclaringType.FullName);
+            XS.Comment("TypeOnStack: " + aTypeOnStack.FullName);
+            XS.Comment("Offset: " + xOffset + " (includes object header)");
 
             if (aDeclaringType.IsValueType && aTypeOnStack == aDeclaringType)
             {
@@ -89,7 +90,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     throw new Exception("For now, loading fields with sizes > 4 bytes from structs on the stack is not possible!");
                 }
 
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
 
                 switch (xFieldInfo.Size)
                 {
@@ -103,7 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     case 3: //For Release
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceDisplacement = xOffset, SourceIsIndirect = true };
-                        new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 8 };
+                        XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 8);
                         break;
 
                     case 4:
@@ -115,15 +116,15 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
 
                 // now remove the struct from the stack
-                new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = Align(GetStorageSize(aDeclaringType), 4) };
+                XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), Align(GetStorageSize(aDeclaringType), 4));
 
-                new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
                 return;
             }
             DoNullReferenceCheck(Assembler, debugEnabled, 0);
 
-            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
+            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 
             // pushed size is always 4 or 8
             var xSize = xFieldInfo.Size;
@@ -132,7 +133,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 // convert to real memory address
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
             }
-            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = (uint)(xOffset) };
+            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), (uint)(xOffset));
 
             if (xFieldInfo.IsExternalValue && aDerefExternalField)
             {
@@ -142,27 +143,27 @@ namespace Cosmos.IL2CPU.X86.IL
             for (int i = 1; i <= (xSize / 4); i++)
             {
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true, SourceDisplacement = (int)(xSize - (i * 4)) };
-                new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             }
 
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
+            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
 
             switch (xSize % 4)
             {
                 case 1:
                     new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AL, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
-                    new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     break;
 
                 case 2:
                     new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
-                    new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     break;
 
                 case 3: //For Release
                     new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
-                    new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 8 };
-                    new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                    XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 8);
+                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     break;
 
                 case 0:

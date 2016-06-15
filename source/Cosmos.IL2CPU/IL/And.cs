@@ -1,5 +1,6 @@
 using System;
 using Cosmos.IL2CPU.X86;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -18,8 +19,8 @@ namespace Cosmos.IL2CPU.X86.IL
 		    var xStackContentSize = SizeOfType(xStackContent);
             var xStackContent2 = aOpCode.StackPopTypes[1];
             var xStackContent2Size = SizeOfType(xStackContent2);
-            
-			
+
+
 			var xSize = Math.Max( xStackContentSize, xStackContent2Size);
 			if (ILOp.Align(xStackContentSize, 4u) != ILOp.Align(xStackContent2Size, 4u))
 			{
@@ -36,8 +37,8 @@ namespace Cosmos.IL2CPU.X86.IL
 				// [ESP + 4] is high part
 				// [ESP + 8] is low part
 				// [ESP + 12] is high part
-				new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-				new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EDX };
+				XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+				XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 				// [ESP] is low part
 				// [ESP + 4] is high part
 				new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
@@ -45,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			}
 			else
 			{
-                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
 			}
 		}

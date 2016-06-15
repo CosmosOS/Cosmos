@@ -21,15 +21,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
             // xAddress contains full size of locals, excluding the actual local
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP));
-            new CPUx86.Sub
-            {
-                DestinationReg = CPUx86.RegistersEnum.EAX,
-                SourceValue = xAddress
-            };
-            new CPUx86.Push
-            {
-                DestinationReg = CPUx86.RegistersEnum.EAX,
-            };
+            XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), xAddress);
+            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
         }
     }
 }

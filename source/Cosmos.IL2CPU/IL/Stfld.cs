@@ -3,6 +3,7 @@ using System.Linq;
 using SysReflection = System.Reflection;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stfld)]
@@ -25,51 +26,51 @@ namespace Cosmos.IL2CPU.X86.IL {
                         select item).Single();
       var xActualOffset = Ldfld.GetFieldOffset(aDeclaringObject, aFieldId);
       var xSize = xFieldInfo.Size;
-      new Comment("Field: " + xFieldInfo.Id);
-      new Comment("Type: " + xFieldInfo.FieldType.ToString());
-      new Comment("Size: " + xFieldInfo.Size);
-      new Comment("Offset: " + xActualOffset + " (includes object header)");
+      XS.Comment("Field: " + xFieldInfo.Id);
+      XS.Comment("Type: " + xFieldInfo.FieldType.ToString());
+      XS.Comment("Size: " + xFieldInfo.Size);
+      XS.Comment("Offset: " + xActualOffset + " (includes object header)");
 
       uint xRoundedSize = Align(xSize, 4);
       DoNullReferenceCheck(aAssembler, debugEnabled, xRoundedSize);
-      new Comment("After Nullref check");
+      XS.Comment("After Nullref check");
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
       // ECX contains the object pointer now
       if (aNeedsGC)
       {
         // for reference types (or boxed types), ECX actually contains the handle now, so we need to convert it to a memory address
-        new Comment("Dereference memory handle now");
+        XS.Comment("Dereference memory handle now");
         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
       }
       if (debugEnabled)
       {
-        new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.ECX};
-        new CPUx86.Pop {DestinationReg = CPUx86.RegistersEnum.ECX};
+        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
+        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
       }
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = (uint)(xActualOffset) };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), (uint)(xActualOffset));
       //TODO: Can't we use an x86 op to do a byte copy instead and be faster?
       for (int i = 0; i < (xSize / 4); i++) {
-        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((i * 4)), SourceReg = CPUx86.RegistersEnum.EAX };
       }
 
       switch (xSize % 4) {
         case 1: {
-            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AL };
             break;
           }
         case 2: {
-            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AX };
             break;
           }
 		case 3: {
-				new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+				XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 				// move 2 lower bytes
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AX };
 				// shift third byte to lowest
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 16 };
+				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 16);
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4) + 2, SourceReg = CPUx86.RegistersEnum.AL };
 				break;
 			}
@@ -82,13 +83,13 @@ namespace Cosmos.IL2CPU.X86.IL {
 
 #if! SKIP_GC_CODE
           if (aNeedsGC) {
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ECX };
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
+            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.DecRefCountRef) };
             new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.DecRefCountRef) };
           }
 #endif
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
     }
 
     public static void DoExecute(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethod, SysReflection.FieldInfo aField, bool debugEnabled)

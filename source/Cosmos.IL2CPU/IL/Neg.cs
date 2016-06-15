@@ -1,4 +1,6 @@
 using System;
+using Cosmos.Assembler.x86.x87;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -26,28 +28,28 @@ namespace Cosmos.IL2CPU.X86.IL
 				}
 				else
 				{
-					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EBX }; // low
-					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX }; // high
-					new CPUx86.Neg { DestinationReg = CPUx86.RegistersEnum.EBX }; // set carry if EBX != 0
-					new CPUx86.AddWithCarry { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
-					new CPUx86.Neg { DestinationReg = CPUx86.RegistersEnum.EAX };
-					new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
-					new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EBX };
+					XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX)); // low
+					XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // high
+					XS.Negate(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX)); // set carry if EBX != 0
+					XS.AddWithCarry(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+					XS.Negate(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
 				}
 			}
 			else
 			{
 				if (xStackContentIsFloat)
 				{
-					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
-					new CPUx86.x87.FloatNegate { };
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
+					new FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
+					new FloatNegate { };
+					new FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
 				}
 				else
 				{
-					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-					new CPUx86.Neg { DestinationReg = CPUx86.RegistersEnum.EAX };
-					new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+					XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+					XS.Negate(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 				}
 			}
 		}

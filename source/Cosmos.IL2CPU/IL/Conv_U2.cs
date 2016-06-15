@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -37,23 +38,23 @@ namespace Cosmos.IL2CPU.X86.IL
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_U2.cs->Unknown size of floating point value.");
                 }
             }
-            else { 
+            else {
                 switch( xSourceSize )
                 {
                     case 2:
                         break;
                     case 1:
                     case 4:
-						    new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+						    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 						    new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.AX, Size = 16 };
-                            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 						    break;
                     case 8:
                         {
-                            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-                            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
+                            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
                             new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.AX, Size = 16 };
-                            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                             break;
                         }
                     default:

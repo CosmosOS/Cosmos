@@ -10,6 +10,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.X86.IL;
 using System.Runtime.InteropServices;
+using XSharp.Compiler;
 using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
 using Label = Cosmos.Assembler.Label;
 
@@ -321,19 +322,19 @@ namespace Cosmos.IL2CPU {
     /// </summary>
     public static void EmitExceptionCleanupAfterCall(Assembler.Assembler aAssembler, uint aReturnSize, uint aStackSizeBeforeCall, uint aTotalArgumentSizeOfMethod)
     {
-      new Comment("aStackSizeBeforeCall = " + aStackSizeBeforeCall);
-      new Comment("aTotalArgumentSizeOfMethod = " + aTotalArgumentSizeOfMethod);
-      new Comment("aReturnSize = " + aReturnSize);
+      XS.Comment("aStackSizeBeforeCall = " + aStackSizeBeforeCall);
+      XS.Comment("aTotalArgumentSizeOfMethod = " + aTotalArgumentSizeOfMethod);
+      XS.Comment("aReturnSize = " + aReturnSize);
 
       if (aReturnSize != 0)
       {
         // at least pop return size:
-        new Comment("Cleanup return");
+        XS.Comment("Cleanup return");
 
         // cleanup result values
         for (int i = 0; i < aReturnSize / 4; i++)
         {
-          new CPU.Add { DestinationReg = CPU.RegistersEnum.ESP, SourceValue = 4 };
+          XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), 4);
         }
       }
 
@@ -342,35 +343,35 @@ namespace Cosmos.IL2CPU {
         if (aTotalArgumentSizeOfMethod > 0)
         {
           var xExtraStack = aStackSizeBeforeCall - aTotalArgumentSizeOfMethod;
-          new Comment("Cleanup extra stack");
+          XS.Comment("Cleanup extra stack");
 
           // cleanup result values
           for (int i = 0; i < xExtraStack / 4; i++)
           {
-            new CPU.Add { DestinationReg = CPU.RegistersEnum.ESP, SourceValue = 4 };
+            XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), 4);
           }
         }
       }
     }
 
-    public static void EmitExceptionLogic(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException = null) {
+    public static void EmitExceptionLogic(Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException = null) {
       if (aJumpTargetNoException == null)
       {
-        aJumpTargetNoException = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.NextPosition);
+        aJumpTargetNoException = GetLabel(aMethodInfo, aCurrentOpCode.NextPosition);
       }
       string xJumpTo = null;
       if (aCurrentOpCode != null && aCurrentOpCode.CurrentExceptionHandler != null) {
         // todo add support for nested handlers, see comment in Engine.cs
         //if (!((aMethodInfo.CurrentHandler.HandlerOffset < aCurrentOpOffset) || (aMethodInfo.CurrentHandler.HandlerLength + aMethodInfo.CurrentHandler.HandlerOffset) <= aCurrentOpOffset)) {
-        new Comment(String.Format("CurrentOffset = {0}, HandlerStartOffset = {1}", aCurrentOpCode.Position, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset));
+        XS.Comment(String.Format("CurrentOffset = {0}, HandlerStartOffset = {1}", aCurrentOpCode.Position, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset));
         if (aCurrentOpCode.CurrentExceptionHandler.HandlerOffset > aCurrentOpCode.Position) {
           switch (aCurrentOpCode.CurrentExceptionHandler.Flags) {
             case ExceptionHandlingClauseOptions.Clause: {
-                xJumpTo = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
+                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
                 break;
               }
             case ExceptionHandlingClauseOptions.Finally: {
-                xJumpTo = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
+                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
                 break;
               }
             default: {
@@ -389,7 +390,7 @@ namespace Cosmos.IL2CPU {
         }
 
       } else {
-        new CPU.Test { DestinationReg = CPU.RegistersEnum.ECX, SourceValue = 2 };
+        XS.Test(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ECX), 2);
 
         if (aCleanup != null) {
           new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Equal, DestinationLabel = aJumpTargetNoException };
@@ -436,7 +437,7 @@ namespace Cosmos.IL2CPU {
         // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
         new CPU.Call {DestinationLabel = ".NullCheck_GetCurrAddress"};
         new Assembler.Label(".NullCheck_GetCurrAddress");
-        new CPU.Pop {DestinationReg = CPU.RegistersEnum.EAX};
+        XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
         new CPU.Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = CPU.RegistersEnum.EAX};
         new CPU.Call {DestinationLabel = "DebugStub_SendNullReferenceOccurred"};
         new CPU.Halt();

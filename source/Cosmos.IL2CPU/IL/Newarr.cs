@@ -5,6 +5,7 @@ using Cosmos.Assembler;
 using System.Reflection;
 
 using Cosmos.IL2CPU.Plugs.System;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -32,8 +33,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
       new Comment(Assembler, "Element Size = " + xSize);
       // element count is on the stack
-      new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ESI };
-      new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESI };
+      XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
+      XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
       //Assembler.StackSizes.Push(xElementCountSize);
       new CPUx86.Push { DestinationValue = xSize };
       new Mul(Assembler).Execute(aMethod, aOpCode);
@@ -46,15 +47,15 @@ namespace Cosmos.IL2CPU.X86.IL
       new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
       // it's on the stack 3 times now, once from the return value, twice from the pushes;
 
-      new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+      XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceRef = Cosmos.Assembler.ElementReference.New(xTypeID), SourceIsIndirect = true };
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 4 };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceValue = (uint)InstanceTypeEnum.Array, Size = 32 };
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 4 };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.ESI, Size = 32 };
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 4 };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceValue = (uint)xSize, Size = 32 };
       new CPUx86.Call { DestinationLabel = xCtorName };
     }

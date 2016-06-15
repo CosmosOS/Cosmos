@@ -6,7 +6,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using System.Reflection;
 
 using Cosmos.IL2CPU.Plugs.System;
-
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 #region Valuetypes
 
-                new Comment("ValueType");
+                XS.Comment("ValueType");
                 /*
                  * Current sitation on stack:
                  *   $ESP       Arg
@@ -68,7 +68,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 // Size of return value - we need to make room for this on the stack.
                 uint xStorageSize = Align(SizeOfType(objectType), 4);
-                new Comment("StorageSize: " + xStorageSize);
+                XS.Comment("StorageSize: " + xStorageSize);
                 if (xStorageSize == 0)
                 {
                     throw new Exception("ValueType storage size cannot be 0.");
@@ -82,22 +82,22 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     xArgSize = xArgSize + Align(SizeOfType(xParam.ParameterType), 4);
                 }
-                new Comment("ArgSize: " + xArgSize);
+                XS.Comment("ArgSize: " + xArgSize);
 
                 // Set ESP so we can push the struct ptr
                 int xShift = (int)(xArgSize - xStorageSize);
-                new Comment("Shift: " + xShift);
+                XS.Comment("Shift: " + xShift);
                 if (xShift < 0)
                 {
-                    new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = (uint)Math.Abs(xShift) };
+                    XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), (uint)Math.Abs(xShift));
                 }
                 else if (xShift > 0)
                 {
-                    new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = (uint)xShift };
+                    XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), (uint)xShift);
                 }
 
                 // push struct ptr
-                new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP };
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP));
 
                 // Shift args
                 foreach (var xParam in xParameterList)
@@ -139,9 +139,9 @@ namespace Cosmos.IL2CPU.X86.IL
                         // EAX contains a memory handle now, lets dereference it to a pointer
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true, SourceDisplacement = 8 };
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceValue = 2 };
-                        new CPUx86.Multiply { DestinationReg = CPUx86.RegistersEnum.EDX };
-                        new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                        XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), 2);
+                        XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
+                        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     }
                     else if (xParams.Length == 3
                              && (xParams[0].ParameterType == typeof(char[]) || xParams[0].ParameterType == typeof(char*))
@@ -150,8 +150,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         xHasCalcSize = true;
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-                        new CPUx86.ShiftLeft { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 1 };
-                        new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                        XS.ShiftLeft(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
+                        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     }
                     else if (xParams.Length == 2
                              && xParams[0].ParameterType == typeof(char)
@@ -159,8 +159,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         xHasCalcSize = true;
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-                        new CPUx86.ShiftLeft { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 1 };
-                        new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                        XS.ShiftLeft(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
+                        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     }
                     else
                     {
@@ -174,7 +174,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.Push { DestinationValue = (uint)(xMemSize + xExtraSize) };
                 if (xHasCalcSize)
                 {
-                    new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
                 }
 
@@ -199,9 +199,9 @@ namespace Cosmos.IL2CPU.X86.IL
                 // todo: use a cleaner approach here. this class shouldnt assemble the string
                 string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
-                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceRef = Cosmos.Assembler.ElementReference.New(strTypeId), SourceIsIndirect = true };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceRef = ElementReference.New(strTypeId), SourceIsIndirect = true };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };
@@ -224,7 +224,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 if (aMethod != null)
                 {
                     // todo: only happening for real methods now, not for ctor's ?
-                    new CPUx86.Test { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 2 };
+                    XS.Test(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 2);
                     string xNoErrorLabel = currentLabel + ".NoError" + LabelName.LabelCount.ToString();
                     new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xNoErrorLabel };
 
@@ -241,7 +241,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     PushAlignedParameterSize(constructor);
 
                     // an exception occurred, we need to cleanup the stack, and jump to the exit
-                    new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+                    XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
 
                     //new Comment(aAssembler, "[ Newobj.Execute cleanup start count = " + aAssembler.Stack.Count.ToString() + " ]");
                     //foreach( var xStackInt in Assembler.Stack )
@@ -253,7 +253,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     Jump_Exception(aMethod);
                     new Label(xNoErrorLabel);
                 }
-                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
                 //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
                 //{
@@ -267,22 +267,22 @@ namespace Cosmos.IL2CPU.X86.IL
                 //}
                 PushAlignedParameterSize(constructor);
 
-                new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             }
         }
 
-        private static void PushAlignedParameterSize(SysReflection.MethodBase aMethod)
+        private static void PushAlignedParameterSize(MethodBase aMethod)
         {
-            SysReflection.ParameterInfo[] xParams = aMethod.GetParameters();
+            ParameterInfo[] xParams = aMethod.GetParameters();
 
             uint xSize;
-            new Comment("[ Newobj.PushAlignedParameterSize start count = " + xParams.Length.ToString() + " ]");
+            XS.Comment("[ Newobj.PushAlignedParameterSize start count = " + xParams.Length.ToString() + " ]");
             for (int i = 0; i < xParams.Length; i++)
             {
                 xSize = SizeOfType(xParams[i].ParameterType);
-                new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = Align(xSize, 4) };
+                XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), Align(xSize, 4));
             }
-            new Comment("[ Newobj.PushAlignedParameterSize end ]");
+            XS.Comment("[ Newobj.PushAlignedParameterSize end ]");
         }
     }
 }
