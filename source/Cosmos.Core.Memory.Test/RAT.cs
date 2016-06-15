@@ -134,5 +134,31 @@ namespace Cosmos.Core.Memory.Test {
 
       return null;
     }
+
+    static public Native GetFirstRAT(void* aPtr) {
+      var xPos = (Native)((byte*)aPtr - mRamStart) / RAT.PageSize;
+      for (Native i = xPos; i != Native.MaxValue; i--) {
+        if (mRAT[i] != PageType.Extension) {
+          return i;
+        }
+      }
+      throw new Exception("Page type not found. Likely RAT is rotten.");
+    }
+
+    static public byte GetPageType(void* aPtr) {
+      return mRAT[GetFirstRAT(aPtr)];
+    }
+
+    static public void Free(Native aPageIdx) {
+      byte xType = mRAT[aPageIdx];
+      mRAT[aPageIdx] = PageType.Empty;
+
+      for (Native i = aPageIdx + 1; i < mPageCount; i++) {
+        if (mRAT[i] != PageType.Extension) {
+          break;
+        }
+        mRAT[i] = PageType.Empty;
+      }
+    }
   }
 }

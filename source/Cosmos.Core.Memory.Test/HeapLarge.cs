@@ -20,5 +20,12 @@ namespace Cosmos.Core.Memory.Test {
 
       return (byte*)xPtr + PrefixBytes;
     }
+
+    static public void Free(void* aPtr) {
+      // TODO - Should check the page type before freeing to make sure it is a Large?
+      // or just trust the caller to avoid adding overhead?
+      var xPageIdx = RAT.GetFirstRAT(aPtr);
+      RAT.Free(xPageIdx);
+    }
   }
 }
