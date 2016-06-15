@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
             string xTypeID = GetTypeIDLabel(xType.Value);
             string mReturnNullLabel = GetLabel( aMethod, aOpCode ) + "_ReturnNull";
 
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+            XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
 
             XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
