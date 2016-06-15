@@ -45,12 +45,18 @@ inline increases block size, but makes it faster to find metadata and keeps it u
 Could have a single pointer to another record elsewhere, but increases complexity and does not provide
 major benefit.
 -Data (handle pointer points here)
--64 Ref count
--64 Ptr to first ref
--Optional - Stacked and single only
-  -64 Size (always need, cant interpolate even from slotted as may be smaller than slot)
-    -Always allocate bigger to word align (or page align for large?). Wont bother .NET, it never needs size from heap.
-    -If need actual size - could add 3 and mask lower 2 bits to round up.
+-32/64 Ptr to first ref
+using 32 below saves space on small/med objects. slightly increases access time, but access to these fields is not time critical
+-32 (64 to align on large) Ref count
+-32 (64 for large) Size (always need, cant interpolate even from slotted as may be smaller than slot)
+  -Always allocate bigger to word align (or page align for large?). Wont bother .NET, it never needs size from heap.
+  -If need align - could add 3 and mask lower 2 bits to round up.
+-Optional
+  -32/64 Size allocated - may be bigger and not needed for slotted etc.
+
+-Tiny 
+If needed can make tiny types too with only ref and ptr, no need for size. But check heap and
+see if such small ones are common. Probably not, likely only for boxing etc.
 
 -Small (Tables)
 Fixed sizes, max size one page. 
@@ -104,7 +110,7 @@ Is portable and simple. Can even be used without VirtMem, but increases time dur
 
 ```
 MM API
--Allocate new item
++Allocate new item
 -Add/remove ref
 -Lock/unlock an item
 -Force a compact
@@ -112,7 +118,7 @@ MM API
 Could also plug stringbuilder resize, etc. Possibly even special strings when used internally?
 
 Implicit
--Get pointer
++Get pointer
 
 Internal
 -Compact

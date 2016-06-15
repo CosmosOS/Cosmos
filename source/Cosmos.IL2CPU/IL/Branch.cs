@@ -2,6 +2,7 @@ using System;
 using Cosmos.IL2CPU.X86;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
+using XSharp.Compiler;
 using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -106,10 +107,10 @@ namespace Cosmos.IL2CPU.X86.IL
                     //}
                     //else
                     //{
-                    new CPU.Pop {DestinationReg = CPU.Registers.EAX};
-                    new CPU.Pop {DestinationReg = CPU.Registers.EBX};
-                    new CPU.Compare {DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EAX};
-                    new CPU.ConditionalJump {Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                    XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                    new ConditionalJump {Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                     //}
                 }
                 else
@@ -123,74 +124,74 @@ namespace Cosmos.IL2CPU.X86.IL
                     var xNoJump = GetLabel(aMethod, aOpCode) + "__NoBranch";
 
                     // value 2  EBX:EAX
-                    new CPU.Pop {DestinationReg = CPU.Registers.EAX};
-                    new CPU.Pop {DestinationReg = CPU.Registers.EBX};
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EBX));
                     // value 1  EDX:ECX
-                    new CPU.Pop {DestinationReg = CPU.Registers.ECX};
-                    new CPU.Pop {DestinationReg = CPU.Registers.EDX};
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.ECX));
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EDX));
                     switch (xTestOp)
                     {
                         case ConditionalTestEnum.Zero: // Equal
                         case ConditionalTestEnum.NotEqual: // NotZero
-                            new CPU.Xor {DestinationReg = CPU.Registers.EAX, SourceReg = CPU.Registers.ECX};
-                            new CPU.ConditionalJump {Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            new CPU.Xor {DestinationReg = CPU.Registers.EBX, SourceReg = CPU.Registers.EDX};
-                            new CPU.ConditionalJump {Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ECX));
+                            new ConditionalJump {Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EDX));
+                            new ConditionalJump {Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             break;
                         case ConditionalTestEnum.GreaterThanOrEqualTo:
-                            new CPU.Compare {DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = xNoJump};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            new CPU.Compare {DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = xNoJump};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.LessThan, DestinationLabel = xNoJump};
+                            new ConditionalJump {Condition = ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.Below, DestinationLabel = xNoJump};
                             break;
                         case ConditionalTestEnum.GreaterThan:
-                            new CPU.Compare {DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = xNoJump};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            new CPU.Compare {DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.BelowOrEqual, DestinationLabel = xNoJump};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.LessThan, DestinationLabel = xNoJump};
+                            new ConditionalJump {Condition = ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.BelowOrEqual, DestinationLabel = xNoJump};
                             break;
                         case ConditionalTestEnum.LessThanOrEqualTo:
-                            new CPU.Compare {DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.GreaterThan, DestinationLabel = xNoJump};
-                            new CPU.Compare {DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.BelowOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.LessThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            new ConditionalJump {Condition = ConditionalTestEnum.GreaterThan, DestinationLabel = xNoJump};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.BelowOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             break;
                         case ConditionalTestEnum.LessThan:
-                            new CPU.Compare {DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.LessThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.GreaterThan, DestinationLabel = xNoJump};
-                            new CPU.Compare {DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.LessThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            new ConditionalJump {Condition = ConditionalTestEnum.GreaterThan, DestinationLabel = xNoJump};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.Below, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             break;
                         // from here all unsigned
                         case ConditionalTestEnum.AboveOrEqual:
-                            new CPU.Compare {DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            new CPU.Compare {DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = xNoJump};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.Below, DestinationLabel = xNoJump};
                             break;
                         case ConditionalTestEnum.Above:
-                            new CPU.Compare {DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            new CPU.Compare {DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.BelowOrEqual, DestinationLabel = xNoJump};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.BelowOrEqual, DestinationLabel = xNoJump};
                             break;
                         case ConditionalTestEnum.BelowOrEqual:
-                            new CPU.Compare {DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = xNoJump};
-                            new CPU.Compare {DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            new ConditionalJump {Condition = ConditionalTestEnum.Below, DestinationLabel = xNoJump};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             break;
                         case ConditionalTestEnum.Below:
-                            new CPU.Compare {DestinationReg = CPU.Registers.EDX, SourceReg = CPU.Registers.EBX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.Below, DestinationLabel = xNoJump};
-                            new CPU.Compare {DestinationReg = CPU.Registers.ECX, SourceReg = CPU.Registers.EAX};
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.AboveOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            new ConditionalJump {Condition = ConditionalTestEnum.Below, DestinationLabel = xNoJump};
+                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            new ConditionalJump {Condition = ConditionalTestEnum.AboveOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             break;
                         default:
                             throw new Exception("Unknown OpCode for conditional branch in 64-bit.");
@@ -210,16 +211,16 @@ namespace Cosmos.IL2CPU.X86.IL
                 // todo: improve code clarity
                 if (xStackContentSize <= 4)
                 {
-                    new CPU.Pop {DestinationReg = CPU.Registers.EAX};
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
                     if (xTestOp == ConditionalTestEnum.Zero)
                     {
-                        new CPU.Compare {DestinationReg = CPU.Registers.EAX, SourceValue = 0};
-                        new CPU.ConditionalJump {Condition = ConditionalTestEnum.Equal, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                        XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 0);
+                        new ConditionalJump {Condition = ConditionalTestEnum.Equal, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                     }
                     else if (xTestOp == ConditionalTestEnum.NotZero)
                     {
-                        new CPU.Compare {DestinationReg = CPU.Registers.EAX, SourceValue = 0};
-                        new CPU.ConditionalJump {Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                        XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 0);
+                        new ConditionalJump {Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                     }
                     else
                     {
@@ -228,15 +229,15 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else
                 {
-                    new CPU.Pop {DestinationReg = CPU.Registers.EAX};
-                    new CPU.Pop {DestinationReg = CPU.Registers.EBX};
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EBX));
                     switch (xTestOp)
                     {
                         case ConditionalTestEnum.Zero: // Equal
                         case ConditionalTestEnum.NotZero: // NotEqual
-                            new CPU.Xor { DestinationReg = CPU.Registers.EAX, SourceValue = 0 };
-                            new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
-                            new CPU.Xor { DestinationReg = CPU.Registers.EBX, SourceValue = 0 };
+                            XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 0);
+                            new ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
+                            XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 0);
                             new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             break;
                         default:

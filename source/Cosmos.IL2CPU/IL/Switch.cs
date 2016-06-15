@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -13,11 +14,11 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            ILOpCodes.OpSwitch OpSw = ( ILOpCodes.OpSwitch )aOpCode; 
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+            ILOpCodes.OpSwitch OpSw = ( ILOpCodes.OpSwitch )aOpCode;
+            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             for( int i = 0; i < OpSw.BranchLocations.Length; i++ )
             {
-                new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = ( uint )i };
+                XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), ( uint )i);
                 //string DestLabel = AssemblerNasm.TmpBranchLabel( aMethod, new ILOpCodes.OpBranch( ILOpCode.Code.Jmp, aOpCode.Position, OpSw.BranchLocations[ i ] ) );
                 string xDestLabel = AppAssembler.TmpPosLabel(aMethod, OpSw.BranchLocations[i]);
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal
@@ -28,9 +29,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
 
         // using System;
-        // 
+        //
         // using CPUx86 = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Switch)]
         // 	public class Switch: Op {
@@ -43,7 +44,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			    mLabels[i] = GetInstructionLabel(xCases[i]);
         // 			}
         // 		}
-        // 
+        //
         // 		public override void DoAssemble() {
         //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
         // 			for(int i = 0; i < mLabels.Length; i++){

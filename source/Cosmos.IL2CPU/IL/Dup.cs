@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             for (int i = StackSize; i > 0; i--)
             {
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)((StackSize - 1) * 4) };
+                new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)((StackSize - 1) * 4) };
             }
         }
 
