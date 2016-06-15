@@ -80,9 +80,9 @@ namespace Cosmos.IL2CPU.X86.IL
 			else
 			{
 				if (xStackItemIsFloat){
-					new MoveSS { DestinationReg = RegistersEnum.XMM0, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
+					XS.SSE.MoveSS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
 					XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
-					new MoveSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
+					XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
 					new CompareSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.XMM0, pseudoOpcode = (byte)ComparePseudoOpcodes.NotLessThanOrEqualTo };
 					XS.SSE2.MoveD(XSRegisters.XMM1, XSRegisters.EBX);
 					XS.And(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 1);
@@ -91,7 +91,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 				else{
 					XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-					new Compare { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
+					XS.Compare(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
 					XS.Jump(ConditionalTestEnum.LessThan, LabelTrue);
 					XS.Jump(LabelFalse);
 					XS.Label(LabelTrue );
