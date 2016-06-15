@@ -376,14 +376,14 @@ namespace Cosmos.System.FileSystem.VFS
 
         #region Helpers
 
-        public static string GetAltDirectorySeparatorChar()
+        public static char GetAltDirectorySeparatorChar()
         {
-            return "/";
+            return '/';
         }
 
-        public static string GetDirectorySeparatorChar()
+        public static char GetDirectorySeparatorChar()
         {
-            return "\\";
+            return '\\';
         }
 
         public static char[] GetInvalidFileNameChars()
@@ -492,7 +492,7 @@ namespace Cosmos.System.FileSystem.VFS
             return aPath.Split(GetDirectorySeparators(), StringSplitOptions.RemoveEmptyEntries);
         }
 
-        private static string[] GetDirectorySeparators()
+        private static char[] GetDirectorySeparators()
         {
             return new[] { GetDirectorySeparatorChar(), GetAltDirectorySeparatorChar() };
         }

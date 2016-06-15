@@ -9,23 +9,17 @@ namespace Cosmos.Core.Memory.Test {
 
   unsafe static public class Heap {
     static public void Init() {
-
     }
 
-    static public void* New(Native aSize) {
-      return null;
+    static public byte* Alloc(Native aSize) {
+      //TODO - Dont use medium if its close to the page size - does'nt make sense to make a medium page
+      // with only enough free space for something that would be small anyway.
+      if (aSize <= RAT.PageSize - HeapMedium.PrefixBytes) {
+        return HeapLarge.Alloc(aSize);
+      } else {
+        return HeapLarge.Alloc(aSize);
+      }
     }
 
-    static private void* NewBlock(int aSize) {
-      // size is inclusive? final sizse important when we get to vm
-
-      // Block Status - 1 byte of 4
-      //    -Has Data
-      //    -Empty (Can be removed or merged)
-      // Next Block - Pointer to data. 0 if this is current last.
-      // Data Size - Native - Size of data, not including header.
-      // Data
-      return null;
-    }
   }
 }

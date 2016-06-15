@@ -9,8 +9,16 @@ namespace Cosmos.Core.Memory.Test {
   unsafe static public class RAT {
     static public class PageType {
       public const byte Empty = 0;
-      public const byte RAT = 1;
+
       // Data Types from 1, special meanings from 255 down.
+      public const byte RAT = 1;
+      public const byte HeapSmall = 2;
+      public const byte HeapMedium = 3;
+      public const byte HeapLarge = 4;
+      // Code
+      // Stack
+      // Disk Cache
+
       // Extension of previous page.
       public const byte Extension = 255;
     }
@@ -18,7 +26,6 @@ namespace Cosmos.Core.Memory.Test {
     // Used to bypass certain checks that will fail during tests and debugging.
     static public bool Debug = false;
 
-    static private Native PtrSize = sizeof(Native);
     // Native Intel page size
     // x86 Page Size: 4k, 2m (PAE only), 4m
     // x64 Page Size: 4k, 2m
@@ -46,17 +53,18 @@ namespace Cosmos.Core.Memory.Test {
       mRamSize = aSize;
       mPageCount = aSize / PageSize;
 
-      mRAT = mRamStart;
-      // Clear RAT
-      for (Native i = 0; i < mPageCount; i++) {
-        mRAT[i] = PageType.Empty;
-      }
-
       // We need one status byte for each block.
       // Intel blocks are 4k (10 bits). So for 4GB, this means
       // 32 - 12 = 20 bits, 1 MB for a RAT for 4GB. 0.025%
-      Native xRatPageCount = mPageCount / PageSize;
-      Alloc(PageType.RAT, xRatPageCount);
+      Native xRatPageCount = (mPageCount - 1) / PageSize + 1;
+      Native xRatPageBytes = xRatPageCount * PageSize;
+      mRAT = mRamStart + mRamSize - xRatPageBytes;
+      for (Native i = 0; i < xRatPageBytes - xRatPageCount; i++) {
+        mRAT[i] = PageType.Empty;
+      }
+      for (Native i = xRatPageBytes - xRatPageCount; i < xRatPageBytes; i++) {
+        mRAT[i] = PageType.RAT;
+      }
 
       Heap.Init();
     }
@@ -80,7 +88,7 @@ namespace Cosmos.Core.Memory.Test {
       return xResult;
     }
 
-    static private byte* Alloc(byte aType, Native aCount = 1) {
+    static public byte* Alloc(byte aType, Native aPageCount = 1) {
       Native? xPos = null;
 
       // Could combine with an external method or delegate, but will slow things down
@@ -88,12 +96,12 @@ namespace Cosmos.Core.Memory.Test {
       //
       // Alloc single blocks at bottom, larger blocks at top to help reduce fragmentation.
       Native xCount = 0;
-      if (aCount == 1) {
+      if (aPageCount == 1) {
         for (Native i = 0; i < mPageCount; i++) {
           if (mRAT[i] == PageType.Empty) {
             xCount++;
-            if (xCount == aCount) {
-              xPos = i - xCount - 1;
+            if (xCount == aPageCount) {
+              xPos = i - xCount + 1;
               break;
             }
           } else {
@@ -101,10 +109,10 @@ namespace Cosmos.Core.Memory.Test {
           }
         }
       } else {
-        for (Native i = mPageCount - 1; i >= 0; i--) {
+        for (Native i = mPageCount - 1; i != Native.MaxValue; i--) {
           if (mRAT[i] == PageType.Empty) {
             xCount++;
-            if (xCount == aCount) {
+            if (xCount == aPageCount) {
               xPos = i;
               break;
             }

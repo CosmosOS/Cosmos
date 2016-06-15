@@ -11,12 +11,17 @@ namespace Cosmos.Core.Memory.Test {
       xRAM[0] = 1;
       fixed (byte* xPtr = xRAM) {
         RAT.Debug = true;
-        RAT.Init(xPtr, (UInt32)xRAM.LongLength);
+        RAT.Init(xPtr, (Native)xRAM.LongLength);
 
         Native xRatPages = RAT.GetPageCount(RAT.PageType.RAT);
         Assert.IsTrue(xRatPages > 0);
         
-        Native xFreePages = RAT.GetPageCount(RAT.PageType.Empty);
+        var xFreePages = RAT.GetPageCount(RAT.PageType.Empty);
+        Assert.IsTrue(xFreePages > 0);
+
+        var x1 = (Int32*)Heap.Alloc(sizeof(Int32));
+        var xFreePages2 = RAT.GetPageCount(RAT.PageType.Empty);
+        Assert.IsTrue(xFreePages - xFreePages2 == 1);
       }
     }
   }
