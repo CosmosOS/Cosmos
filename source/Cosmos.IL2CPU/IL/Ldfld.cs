@@ -75,12 +75,12 @@ namespace Cosmos.IL2CPU.X86.IL
             var xFieldInfo = (from item in xFields
                               where item.Id == xFieldId
                               select item).Single();
-            new Comment("Field: " + xFieldInfo.Id);
-            new Comment("Type: " + xFieldInfo.FieldType.ToString());
-            new Comment("Size: " + xFieldInfo.Size);
-            new Comment("DeclaringType: " + aDeclaringType.FullName);
-            new Comment("TypeOnStack: " + aTypeOnStack.FullName);
-            new Comment("Offset: " + xOffset + " (includes object header)");
+            XS.Comment("Field: " + xFieldInfo.Id);
+            XS.Comment("Type: " + xFieldInfo.FieldType.ToString());
+            XS.Comment("Size: " + xFieldInfo.Size);
+            XS.Comment("DeclaringType: " + aDeclaringType.FullName);
+            XS.Comment("TypeOnStack: " + aTypeOnStack.FullName);
+            XS.Comment("Offset: " + xOffset + " (includes object header)");
 
             if (aDeclaringType.IsValueType && aTypeOnStack == aDeclaringType)
             {

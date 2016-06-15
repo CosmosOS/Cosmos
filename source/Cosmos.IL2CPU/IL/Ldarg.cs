@@ -158,11 +158,11 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
             }
 
-            new Comment("Arg idx = " + aParam);
+            XS.Comment("Arg idx = " + aParam);
             uint xArgRealSize = SizeOfType(xArgType);
             uint xArgSize = Align(xArgRealSize, 4);
-            new Comment("Arg type = " + xArgType.ToString());
-            new Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
+            XS.Comment("Arg type = " + xArgType.ToString());
+            XS.Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
             if (xArgRealSize < 4)
             {
                 new CPUx86.MoveSignExtend {DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xArgRealSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = xDisplacement};

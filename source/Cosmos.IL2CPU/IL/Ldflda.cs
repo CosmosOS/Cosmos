@@ -29,7 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, FieldInfo aField, bool aDerefValue, bool aDebugEnabled)
         {
-            new Comment("Field: " + aField.Id);
+            XS.Comment("Field: " + aField.Id);
             int xExtraOffset = 0;
             var xType = aMethod.MethodBase.DeclaringType;
             bool xNeedsGC = aDeclaringType.IsClass && !aDeclaringType.IsValueType;

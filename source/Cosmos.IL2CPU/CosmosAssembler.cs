@@ -71,7 +71,7 @@ namespace Cosmos.IL2CPU
             xGDT.AddRange(GdtDescriptor(0x00000000, 0xFFFFFFFF, false));
             DataMembers.Add(new DataMember("_NATIVE_GDT_Contents", xGDT.ToArray()));
 
-            new Comment("Tell CPU about GDT");
+            XS.Comment("Tell CPU about GDT");
             var xGdtPtr = new UInt16[3];
 
             // Size of GDT Table - 1
@@ -79,21 +79,21 @@ namespace Cosmos.IL2CPU
             DataMembers.Add(new DataMember("_NATIVE_GDT_Pointer", xGdtPtr));
             new Mov
             {
-                DestinationRef = Cosmos.Assembler.ElementReference.New("_NATIVE_GDT_Pointer"),
+                DestinationRef = ElementReference.New("_NATIVE_GDT_Pointer"),
                 DestinationIsIndirect = true,
                 DestinationDisplacement = 2,
-                SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_GDT_Contents")
+                SourceRef = ElementReference.New("_NATIVE_GDT_Contents")
             };
             new Mov
             {
-                DestinationReg = RegistersEnum.EAX, SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_GDT_Pointer")
+                DestinationReg = RegistersEnum.EAX, SourceRef = ElementReference.New("_NATIVE_GDT_Pointer")
             };
             new Lgdt
             {
                 DestinationReg = RegistersEnum.EAX, DestinationIsIndirect = true
             };
 
-            new Comment("Set data segments");
+            XS.Comment("Set data segments");
             XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), mGdData);
             XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.DS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
             XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.ES), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
@@ -101,7 +101,7 @@ namespace Cosmos.IL2CPU
             XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.GS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
             XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.SS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
 
-            new Comment("Force reload of code segment");
+            XS.Comment("Force reload of code segment");
             new JumpToSegment
             {
                 Segment = mGdCode, DestinationLabel = "Boot_FlushCsGDT"

@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 #region Valuetypes
 
-                new Comment("ValueType");
+                XS.Comment("ValueType");
                 /*
                  * Current sitation on stack:
                  *   $ESP       Arg
@@ -68,7 +68,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 // Size of return value - we need to make room for this on the stack.
                 uint xStorageSize = Align(SizeOfType(objectType), 4);
-                new Comment("StorageSize: " + xStorageSize);
+                XS.Comment("StorageSize: " + xStorageSize);
                 if (xStorageSize == 0)
                 {
                     throw new Exception("ValueType storage size cannot be 0.");
@@ -82,11 +82,11 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     xArgSize = xArgSize + Align(SizeOfType(xParam.ParameterType), 4);
                 }
-                new Comment("ArgSize: " + xArgSize);
+                XS.Comment("ArgSize: " + xArgSize);
 
                 // Set ESP so we can push the struct ptr
                 int xShift = (int)(xArgSize - xStorageSize);
-                new Comment("Shift: " + xShift);
+                XS.Comment("Shift: " + xShift);
                 if (xShift < 0)
                 {
                     XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), (uint)Math.Abs(xShift));
@@ -276,13 +276,13 @@ namespace Cosmos.IL2CPU.X86.IL
             ParameterInfo[] xParams = aMethod.GetParameters();
 
             uint xSize;
-            new Comment("[ Newobj.PushAlignedParameterSize start count = " + xParams.Length.ToString() + " ]");
+            XS.Comment("[ Newobj.PushAlignedParameterSize start count = " + xParams.Length.ToString() + " ]");
             for (int i = 0; i < xParams.Length; i++)
             {
                 xSize = SizeOfType(xParams[i].ParameterType);
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), Align(xSize, 4));
             }
-            new Comment("[ Newobj.PushAlignedParameterSize end ]");
+            XS.Comment("[ Newobj.PushAlignedParameterSize end ]");
         }
     }
 }

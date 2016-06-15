@@ -69,7 +69,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 if (xStackItemIsFloat)
                 {
                 	#warning THIS NEEDS TO BE TESTED!!!
-					new Comment("TEST TODO");
+					XS.Comment("TEST TODO");
                     new MoveSS { DestinationReg = RegistersEnum.XMM0, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
                     new CPUx86.Add { DestinationReg = RegistersEnum.ESP, SourceValue = 4 };
                     new MoveSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };

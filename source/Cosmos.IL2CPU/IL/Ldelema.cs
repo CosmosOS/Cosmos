@@ -18,8 +18,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void Assemble(Cosmos.Assembler.Assembler aAssembler, OpType aOpType, uint aElementSize, bool debugEnabled)
         {
-            new Comment("Arraytype: " + aOpType.StackPopTypes.Last().FullName);
-            new Comment("Size: " + aElementSize);
+            XS.Comment("Arraytype: " + aOpType.StackPopTypes.Last().FullName);
+            XS.Comment("Size: " + aElementSize);
 
             DoNullReferenceCheck(aAssembler, debugEnabled, 4);
             // calculate element offset into array memory (including header)

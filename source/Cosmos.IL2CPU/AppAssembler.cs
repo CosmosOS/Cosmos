@@ -84,11 +84,11 @@ namespace Cosmos.IL2CPU
 
         protected void MethodBegin(MethodInfo aMethod)
         {
-            new Comment("---------------------------------------------------------");
-            new Comment("Assembly: " + aMethod.MethodBase.DeclaringType.Assembly.FullName);
-            new Comment("Type: " + aMethod.MethodBase.DeclaringType.ToString());
-            new Comment("Name: " + aMethod.MethodBase.Name);
-            new Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
+            XS.Comment("---------------------------------------------------------");
+            XS.Comment("Assembly: " + aMethod.MethodBase.DeclaringType.Assembly.FullName);
+            XS.Comment("Type: " + aMethod.MethodBase.DeclaringType.ToString());
+            XS.Comment("Name: " + aMethod.MethodBase.Name);
+            XS.Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
             // for now:
             var shouldIncludeArgAndLocalsComment = true;
             if (shouldIncludeArgAndLocalsComment)
@@ -101,13 +101,13 @@ namespace Cosmos.IL2CPU
                     {
                         foreach (var localVariable in xBody.LocalVariables)
                         {
-                            new Comment(String.Format("Local {0} at EBP-{1}", localVariable.LocalIndex, ILOp.GetEBPOffsetForLocal(aMethod, localVariable.LocalIndex)));
+                            XS.Comment(String.Format("Local {0} at EBP-{1}", localVariable.LocalIndex, ILOp.GetEBPOffsetForLocal(aMethod, localVariable.LocalIndex)));
                         }
                     }
                     var xIdxOffset = 0u;
                     if (!aMethod.MethodBase.IsStatic)
                     {
-                        new Comment(String.Format("Argument[0] $this at EBP+{0}, size = {1}", X86.IL.Ldarg.GetArgumentDisplacement(aMethod, 0), ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4)));
+                        XS.Comment(String.Format("Argument[0] $this at EBP+{0}, size = {1}", X86.IL.Ldarg.GetArgumentDisplacement(aMethod, 0), ILOp.Align(ILOp.SizeOfType(aMethod.MethodBase.DeclaringType), 4)));
                         xIdxOffset++;
                     }
 
@@ -119,14 +119,14 @@ namespace Cosmos.IL2CPU
                         var xOffset = X86.IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset));
                         var xSize = X86.IL.Ldarg.SizeOfType(xParams[i].ParameterType);
                         // if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
-                        new Comment(String.Format("Argument[{3}] {0} at EBP+{1}, size = {2}", xParams[i].Name, xOffset, xSize, (xIdxOffset + i)));
+                        XS.Comment(String.Format("Argument[{3}] {0} at EBP+{1}, size = {2}", xParams[i].Name, xOffset, xSize, (xIdxOffset + i)));
                     }
 
                     var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
                     if (xMethodInfo != null)
                     {
                         var xSize = ILOp.Align(ILOp.SizeOfType(xMethodInfo.ReturnType), 4);
-                        new Comment(String.Format("Return size: {0}", xSize));
+                        XS.Comment(String.Format("Return size: {0}", xSize));
                     }
                 }
             }
@@ -141,7 +141,7 @@ namespace Cosmos.IL2CPU
             {
                 xMethodLabel = LabelName.Get(aMethod.MethodBase);
             }
-            new Cosmos.Assembler.Label(xMethodLabel);
+            new Label(xMethodLabel);
 
             //Assembler.WriteDebugVideo("Method " + aMethod.UID);
 
@@ -152,10 +152,10 @@ namespace Cosmos.IL2CPU
             // We issue a second label for GUID. This is increases label count, but for now we need a master label first.
             // We issue a GUID label to reduce amount of work and time needed to construct debugging DB.
             var xLabelGuid = DebugInfo.CreateId();
-            new Cosmos.Assembler.Label("GUID_" + xLabelGuid.ToString());
+            new Label("GUID_" + xLabelGuid.ToString());
 
             mCurrentMethodLabel = "METHOD_" + xLabelGuid.ToString();
-            Cosmos.Assembler.Label.LastFullLabel = mCurrentMethodLabel;
+            Label.LastFullLabel = mCurrentMethodLabel;
 
             if (DebugEnabled && StackCorruptionDetection)
             {
@@ -179,7 +179,7 @@ namespace Cosmos.IL2CPU
 
             if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo)
             {
-                new Comment("Static constructor. See if it has been called already, return if so.");
+                XS.Comment("Static constructor. See if it has been called already, return if so.");
                 var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + LabelName.GetFullName(aMethod.MethodBase.DeclaringType));
                 var xAsmMember = new DataMember(xName, (byte)0);
                 Assembler.DataMembers.Add(xAsmMember);
@@ -254,7 +254,7 @@ namespace Cosmos.IL2CPU
                         mLocals_Arguments_Infos.Add(xInfo);
 
                         var xSize = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4);
-                        new Comment(String.Format("Local {0}, Size {1}", xLocal.LocalIndex, xSize));
+                        XS.Comment(String.Format("Local {0}, Size {1}", xLocal.LocalIndex, xSize));
                         for (int i = 0; i < xSize / 4; i++)
                         {
                             new Push { DestinationValue = 0 };
@@ -320,7 +320,7 @@ namespace Cosmos.IL2CPU
 
         protected void MethodEnd(MethodInfo aMethod)
         {
-            new Comment("End Method: " + aMethod.MethodBase.Name);
+            XS.Comment("End Method: " + aMethod.MethodBase.Name);
 
             uint xReturnSize = 0;
             var xMethInfo = aMethod.MethodBase as SysReflection.MethodInfo;
@@ -334,7 +334,7 @@ namespace Cosmos.IL2CPU
             {
                 new Label(xMethodLabel + EndOfMethodLabelNameNormal);
 
-                new Comment("Following code is for debugging. Adjust accordingly!");
+                XS.Comment("Following code is for debugging. Adjust accordingly!");
                 new Mov
                 {
                     DestinationRef = ElementReference.New("static_field__Cosmos_Core_INTs_mLastKnownAddress"),
@@ -598,7 +598,7 @@ namespace Cosmos.IL2CPU
                 // - This is because TracePoints for NOP are automatically ignored in code called below this
                 emitINT3 = (emitINT3 && !INT3Emitted) || xILOp is Nop;
 
-                new Comment(xILOp.ToString());
+                XS.Comment(xILOp.ToString());
                 var xNextPosition = xOpCode.Position + 1;
 
                 #region Exception handling support code
@@ -915,7 +915,7 @@ namespace Cosmos.IL2CPU
         public const string InitVMTCodeLabel = "___INIT__VMT__CODE____";
         public virtual void GenerateVMTCode(HashSet<Type> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<Type, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID)
         {
-            new Comment("---------------------------------------------------------");
+            XS.Comment("---------------------------------------------------------");
             new Label(InitVMTCodeLabel);
             XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EBP));
             XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EBP), XSRegisters.OldToNewRegister(RegistersEnum.ESP));
@@ -1329,7 +1329,7 @@ namespace Cosmos.IL2CPU
                     if (xFieldAccessAttrib != null)
                     {
                         // field access
-                        new Comment("Loading address of field '" + xFieldAccessAttrib.Name + "'");
+                        XS.Comment("Loading address of field '" + xFieldAccessAttrib.Name + "'");
                         var xFieldInfo = ResolveField(aFrom, xFieldAccessAttrib.Name, false);
                         if (xFieldInfo.IsStatic)
                         {
@@ -1344,7 +1344,7 @@ namespace Cosmos.IL2CPU
                     else
                     {
                         // normal field access
-                        new Comment("Loading parameter " + xCurParamIdx);
+                        XS.Comment("Loading parameter " + xCurParamIdx);
                         Ldarg(aFrom, xCurParamIdx);
                         xCurParamIdx++;
                     }
@@ -1514,7 +1514,7 @@ namespace Cosmos.IL2CPU
                     xStackDifference += aOpCode.StackOffsetBeforeExecution;
                 }
 
-                new Comment("Stack difference = " + xStackDifference);
+                XS.Comment("Stack difference = " + xStackDifference);
 
                 // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
                 // if not, we should somehow break here.

@@ -322,14 +322,14 @@ namespace Cosmos.IL2CPU {
     /// </summary>
     public static void EmitExceptionCleanupAfterCall(Assembler.Assembler aAssembler, uint aReturnSize, uint aStackSizeBeforeCall, uint aTotalArgumentSizeOfMethod)
     {
-      new Comment("aStackSizeBeforeCall = " + aStackSizeBeforeCall);
-      new Comment("aTotalArgumentSizeOfMethod = " + aTotalArgumentSizeOfMethod);
-      new Comment("aReturnSize = " + aReturnSize);
+      XS.Comment("aStackSizeBeforeCall = " + aStackSizeBeforeCall);
+      XS.Comment("aTotalArgumentSizeOfMethod = " + aTotalArgumentSizeOfMethod);
+      XS.Comment("aReturnSize = " + aReturnSize);
 
       if (aReturnSize != 0)
       {
         // at least pop return size:
-        new Comment("Cleanup return");
+        XS.Comment("Cleanup return");
 
         // cleanup result values
         for (int i = 0; i < aReturnSize / 4; i++)
@@ -343,7 +343,7 @@ namespace Cosmos.IL2CPU {
         if (aTotalArgumentSizeOfMethod > 0)
         {
           var xExtraStack = aStackSizeBeforeCall - aTotalArgumentSizeOfMethod;
-          new Comment("Cleanup extra stack");
+          XS.Comment("Cleanup extra stack");
 
           // cleanup result values
           for (int i = 0; i < xExtraStack / 4; i++)
@@ -354,16 +354,16 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    public static void EmitExceptionLogic(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException = null) {
+    public static void EmitExceptionLogic(Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException = null) {
       if (aJumpTargetNoException == null)
       {
-        aJumpTargetNoException = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.NextPosition);
+        aJumpTargetNoException = GetLabel(aMethodInfo, aCurrentOpCode.NextPosition);
       }
       string xJumpTo = null;
       if (aCurrentOpCode != null && aCurrentOpCode.CurrentExceptionHandler != null) {
         // todo add support for nested handlers, see comment in Engine.cs
         //if (!((aMethodInfo.CurrentHandler.HandlerOffset < aCurrentOpOffset) || (aMethodInfo.CurrentHandler.HandlerLength + aMethodInfo.CurrentHandler.HandlerOffset) <= aCurrentOpOffset)) {
-        new Comment(String.Format("CurrentOffset = {0}, HandlerStartOffset = {1}", aCurrentOpCode.Position, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset));
+        XS.Comment(String.Format("CurrentOffset = {0}, HandlerStartOffset = {1}", aCurrentOpCode.Position, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset));
         if (aCurrentOpCode.CurrentExceptionHandler.HandlerOffset > aCurrentOpCode.Position) {
           switch (aCurrentOpCode.CurrentExceptionHandler.Flags) {
             case ExceptionHandlingClauseOptions.Clause: {

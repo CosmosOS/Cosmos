@@ -401,7 +401,7 @@ namespace XSharp.Compiler
 
     public static void Comment(string comment)
     {
-      new Comment(comment);
+      Comment(comment);
     }
 
     public static void Call(string target)

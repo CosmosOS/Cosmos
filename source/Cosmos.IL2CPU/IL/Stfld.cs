@@ -26,20 +26,20 @@ namespace Cosmos.IL2CPU.X86.IL {
                         select item).Single();
       var xActualOffset = Ldfld.GetFieldOffset(aDeclaringObject, aFieldId);
       var xSize = xFieldInfo.Size;
-      new Comment("Field: " + xFieldInfo.Id);
-      new Comment("Type: " + xFieldInfo.FieldType.ToString());
-      new Comment("Size: " + xFieldInfo.Size);
-      new Comment("Offset: " + xActualOffset + " (includes object header)");
+      XS.Comment("Field: " + xFieldInfo.Id);
+      XS.Comment("Type: " + xFieldInfo.FieldType.ToString());
+      XS.Comment("Size: " + xFieldInfo.Size);
+      XS.Comment("Offset: " + xActualOffset + " (includes object header)");
 
       uint xRoundedSize = Align(xSize, 4);
       DoNullReferenceCheck(aAssembler, debugEnabled, xRoundedSize);
-      new Comment("After Nullref check");
+      XS.Comment("After Nullref check");
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xRoundedSize };
       // ECX contains the object pointer now
       if (aNeedsGC)
       {
         // for reference types (or boxed types), ECX actually contains the handle now, so we need to convert it to a memory address
-        new Comment("Dereference memory handle now");
+        XS.Comment("Dereference memory handle now");
         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
       }
       if (debugEnabled)
