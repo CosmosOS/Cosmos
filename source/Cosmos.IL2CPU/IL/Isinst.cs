@@ -31,9 +31,9 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
 
             // EAX contains a memory handle now. Lets convert it to a pointer
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
+            XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
 
-            //new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true};
+            //XS.Mov(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
             new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
             new CPUx86.Push { DestinationRef = ElementReference.New( xTypeID ), DestinationIsIndirect = true };
 
