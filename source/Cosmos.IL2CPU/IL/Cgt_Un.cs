@@ -155,17 +155,17 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
         //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI};
         // 				//esi = 1
-        //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-        //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
+        //                 XS.Pop(XSRegisters.EAX);
+        //                 XS.Pop(XSRegisters.EDX);
         //                 //value2: EDX:EAX
-        //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-        //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+        //                 XS.Pop(XSRegisters.EBX);
+        //                 XS.Pop(XSRegisters.ECX);
         //                 //value1: ECX:EBX
         //                 new CPUx86.Sub { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
         //                 new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
         // 				//result = value1 - value2
         // 				//new CPUx86.ConditionalMove(Condition.Above, "edi", "esi");
-        //                 //new CPUx86.Push { DestinationReg = Registers.EDI };
+        //                 //XS.Push(XSRegisters.EDI);
         //
         //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Above, DestinationLabel = LabelTrue };
         //                 new CPUx86.Push { DestinationValue = 0 };
@@ -176,7 +176,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //
         // 			} else
         // 			{
-        //                 new CPUx86.Pop{DestinationReg=CPUx86.Registers.EAX};
+        //                 XS.Pop(XSRegisters.EAX);
         //                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
         //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Below, DestinationLabel = LabelTrue };
         //                 new CPUx86.Jump { DestinationLabel = LabelFalse };

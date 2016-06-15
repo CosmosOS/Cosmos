@@ -174,7 +174,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
         //      new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(xGetInvocationListMethod) };
         //      new CPU.Comment("get address from return value -> eax");
-        //      new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //      XS.Pop(XSRegisters.EAX);
         //      ;//list
         //      new CPU.Comment("eax+=8 is where the offset where an array's count is");
         //      new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };//addrof list.count??
@@ -186,12 +186,12 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      new CPU.Comment("ecx = ptr to delegate object");
 
         ////      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
-        //      new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+        //      XS.Push(XSRegisters.EAX);
         //      // make ecx point to the size of arguments
         //      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
         //      Ldfld.DoExecute(xAssembler, xMethodInfo.MethodBase.DeclaringType, "$$ArgSize$$");
-        //      new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-        //      new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //      XS.Pop(XSRegisters.ECX);
+        //      XS.Pop(XSRegisters.EAX);
         //      new CPU.Comment("ecx points to the size of the delegated methods arguments");
         //      new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
         //      ;//make sure edx is 0
@@ -211,11 +211,11 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      new CPUx86.Pushad();
         //      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
         //      Ldfld.DoExecute(xAssembler, xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target");
-        //      new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDI };
+        //      XS.Pop(XSRegisters.EDI);
         //      new CPUx86.Popad();
         //      new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDI, SourceValue = 0 };
         //      new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".NO_THIS" };
-        //      new CPUx86.Push { DestinationReg = CPUx86.Registers.EDI };
+        //      XS.Push(XSRegisters.EDI);
 
         //      new CPU.Label(".NO_THIS");
 
@@ -236,8 +236,8 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      new CPU.Comment("add 32 for the Pushad + 16 for the current stack + 4 for the return value");
         //      new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 52 };
         //      new CPUx86.Movs { Size = 8, Prefixes = CPUx86.InstructionPrefixes.Repeat };
-        //      new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDI };
-        //      new CPUx86.Call { DestinationReg = CPUx86.Registers.EDI };
+        //      XS.Pop(XSRegisters.EDI);
+        //      XS.Call(XSRegisters.EDI);
         //      new CPU.Comment("store return -- return stored into edi after popad");
         //      //new CPUx86.Move("edx", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");//addrof the delegate
         //      //new CPUx86.Move("edx", "[edx+" + (MethodInfo.Arguments[0].TypeInfo.Fields["$$ReturnsValue$$"].Offset + 12) + "]");
@@ -249,7 +249,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
         //      Ldfld.DoExecute(xAssembler, xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target");
         //      // edi contains $this now
-        //      new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDI };
+        //      XS.Pop(XSRegisters.EDI);
         //      //new CPUx86.Compare ("edi", "0");
         //      //new CPUx86.JumpIfEqual(".noTHIStoPop");
         //      //new CPUx86.Move("edx", "[" + MethodInfo.Arguments[0].VirtualAddresses[0] + "]");//addrof the delegate
@@ -267,7 +267,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      //new CPUx86.Move("[esp]", "edi");
         //      new CPU.Label(".noTHIStoPop");
         //      new CPUx86.Popad();
-        //      new CPUx86.Inc { DestinationReg = CPUx86.Registers.EDX };
+        //      XS.INC(XSRegisters.EDX);
         //      new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };
         //      new CPUx86.Jump { DestinationLabel = ".BEGIN_OF_LOOP" };
         //      new CPU.Label(".END_OF_INVOKE_");
@@ -278,7 +278,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      //new CPUx86.Pop("eax");
         //      //Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
         //      //Ldfld.DoExecute(xAssembler, xMethodInfo.MethodBase.DeclaringType, "$$ReturnsValue$$");
-        //      //new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
+        //      //XS.Pop(XSRegisters.EDX);
         //      //if(xMethodInfo.
         //      //new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDX, SourceValue = 0 };
         //      //new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".noReturn" };
@@ -286,7 +286,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      //new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceReg = CPUx86.Registers.EDX };
         //      //new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EDX };
         //      //new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EDX };
-        //      //new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };//ebp
+        //      //XS.Push(XSRegisters.EDX);//ebp
         //      //new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 12, SourceReg = CPUx86.Registers.EDI };
         //      new CPU.Label(".noReturn");
         //      //            new CPUx86.Sti();

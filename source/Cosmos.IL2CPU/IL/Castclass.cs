@@ -134,7 +134,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			xOp.Assemble();
         // 		    XS.Label(mThisLabel + "_After_IsInstance_Call");
         // 			Assembler.Stack.Pop();
-        //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //             XS.Pop(XSRegisters.EAX);
         //             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
         //             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = mNextOpLabel };
         // 			XS.Label(mReturnNullLabel);

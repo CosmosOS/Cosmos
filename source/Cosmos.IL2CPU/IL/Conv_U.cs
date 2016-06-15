@@ -29,9 +29,9 @@ namespace Cosmos.IL2CPU.X86.IL
     //                    throw new Exception("The size {0:D} could not exist, because always is pushed Int32 or Int64!");
     //                case 8:
     //                    {
-    //                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-    //                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
-    //                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+    //                        XS.Pop(XSRegisters.EAX);
+    //                        XS.Pop(XSRegisters.EDX);
+    //                        XS.Push(XSRegisters.EAX);
     //                        break;
     //                    }
     //                case 4:

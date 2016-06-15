@@ -69,20 +69,14 @@ namespace Cosmos.Hardware
                     SourceValue = 0x60
                 };
 
-                new Push
-                {
-                    DestinationReg = RegistersEnum.EAX
-                };
+                XS.Push(XSRegisters.EAX);
 
                 new Call
                 {
                     DestinationLabel = "send_mouse_cmd"
                 };
 
-                new Pop
-                {
-                    DestinationReg = RegistersEnum.EAX
-                };
+                XS.Pop(XSRegisters.EAX);
 
                 new Call
                 {
@@ -121,15 +115,9 @@ namespace Cosmos.Hardware
         #region mouse_read
                 XS.Label("mouse_read");
                 {
-                    new Push
-                    {
-                        DestinationReg = RegistersEnum.ECX
-                    };
+                    XS.Push(XSRegisters.ECX);
 
-                    new Push
-                    {
-                        DestinationReg = RegistersEnum.EDX
-                    };
+                    XS.Push(XSRegisters.EDX);
 
                     new Move
                     {
@@ -170,10 +158,7 @@ namespace Cosmos.Hardware
 
                     XS.Label("mouse_read_ready");
                     {
-                        new Push
-                        {
-                            DestinationReg = RegistersEnum.ECX
-                        };
+                        XS.Push(XSRegisters.ECX);
 
                         new Move
                         {
@@ -189,10 +174,7 @@ namespace Cosmos.Hardware
                             DestinationLabel = "mouse_read_delay"
                         };
 
-                        new Pop
-                        {
-                            DestinationReg = RegistersEnum.ECX
-                        };
+                        XS.Pop(XSRegisters.ECX);
 
                         new In2Port
                         {
@@ -210,15 +192,9 @@ namespace Cosmos.Hardware
 
                     XS.Label("mouse_read_exit");
                     {
-                        new Pop
-                        {
-                            DestinationReg = RegistersEnum.EDX
-                        };
+                        XS.Pop(XSRegisters.EDX);
 
-                        new Pop
-                        {
-                            DestinationReg = RegistersEnum.ECX
-                        };
+                        XS.Pop(XSRegisters.ECX);
 
                         XS.Return();
                     }
@@ -228,15 +204,9 @@ namespace Cosmos.Hardware
         #region mouse_write
                 XS.Label("mouse_write");
                 {
-                    new Push
-                    {
-                        DestinationReg = RegistersEnum.ECX
-                    };
+                    XS.Push(XSRegisters.ECX);
 
-                    new Push
-                    {
-                        DestinationReg = RegistersEnum.EDX
-                    };
+                    XS.Push(XSRegisters.EDX);
 
                     new Move
                     {
@@ -421,10 +391,7 @@ namespace Cosmos.Hardware
                             DestinationLabel = "mouse_write_loop5"
                         };
 
-                        new Dec
-                        {
-                            DestinationReg = RegistersEnum.AH
-                        };
+                        XS.Dec(XSRegisters.AH);
 
                         XS.Jump(ConditionalTestEnum.NotZero, "mouse_write_loop4");
                     }
@@ -440,15 +407,9 @@ namespace Cosmos.Hardware
 
                     XS.Label("mouse_write_exit");
                     {
-                        new Pop
-                        {
-                            DestinationReg = RegistersEnum.EDX
-                        };
+                        XS.Pop(XSRegisters.EDX);
 
-                        new Pop
-                        {
-                            DestinationReg = RegistersEnum.ECX
-                        };
+                        XS.Pop(XSRegisters.ECX);
 
                         XS.Return();
                     }

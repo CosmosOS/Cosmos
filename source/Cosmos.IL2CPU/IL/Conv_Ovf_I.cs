@@ -43,10 +43,10 @@ namespace Cosmos.IL2CPU.X86.IL
         //            }
         //        case 8:
         //            {
-        //                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //                XS.Pop(XSRegisters.EAX);
         //                new CPUx86.SignExtendAX { Size = 32 };
         //                //all bits of EDX == sign (EAX)
-        //                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
+        //                XS.Pop(XSRegisters.EBX);
         //                //must be equal to EDX
         //                new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EDX };
         //                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = AssemblerNasm.TmpPosLabel( aMethod, aNextOpCode ) };
@@ -98,10 +98,10 @@ namespace Cosmos.IL2CPU.X86.IL
         // 				}
         // 			case 8:
         // 				{
-        //                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //                     XS.Pop(XSRegisters.EAX);
         //                     new CPUx86.SignExtendAX { Size = 32 };
         // 					//all bits of EDX == sign (EAX)
-        //                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
+        //                     XS.Pop(XSRegisters.EBX);
         // 					//must be equal to EDX
         //                     new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EDX };
         //                     new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = NextInstructionLabel };

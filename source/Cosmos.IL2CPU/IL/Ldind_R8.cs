@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			: base(aReader, aMethodInfo) {
         // 		}
         // 		public override void DoAssemble() {
-        // 			new CPUx86.Pop{DestinationReg=CPUx86.Registers.EAX};
+        // 			XS.Pop(XSRegisters.EAX);
         // 			Assembler.Stack.Pop();
         //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4 };
         //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true};

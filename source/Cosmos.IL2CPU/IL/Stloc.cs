@@ -58,7 +58,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                 new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
 		// 			}
 		// 			foreach (int i in mLocal.VirtualAddresses.Reverse()) {
-		//                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; ;
+		//                 XS.Pop(XSRegisters.EAX); ;
 		//                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = i, SourceReg = CPUx86.Registers.EAX };
 		// 			}
 		// 			// no need to inc again, items on the transient stack are also counted

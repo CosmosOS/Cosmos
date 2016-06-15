@@ -119,7 +119,7 @@ namespace Cosmos.IL2CPU.X86.IL
       }
       else
       {
-        new Assembler.x86.Pop { DestinationReg = RegistersEnum.EAX };
+        XS.Pop(XSRegisters.EAX);
         new Multiply
           {
             DestinationReg = RegistersEnum.ESP,
