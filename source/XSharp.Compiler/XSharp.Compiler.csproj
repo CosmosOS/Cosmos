@@ -102,6 +102,7 @@
     <Compile Include="TokenPatterns.cs" />
     <Compile Include="XS.cs" />
     <Compile Include="XS.FPU.cs" />
+    <Compile Include="XS.Temp.cs" />
     <Compile Include="XSRegisters.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -334,7 +334,7 @@ namespace Cosmos.IL2CPU {
         // cleanup result values
         for (int i = 0; i < aReturnSize / 4; i++)
         {
-          new CPU.Add { DestinationReg = CPU.RegistersEnum.ESP, SourceValue = 4 };
+          XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), 4);
         }
       }
 
@@ -348,7 +348,7 @@ namespace Cosmos.IL2CPU {
           // cleanup result values
           for (int i = 0; i < xExtraStack / 4; i++)
           {
-            new CPU.Add { DestinationReg = CPU.RegistersEnum.ESP, SourceValue = 4 };
+            XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), 4);
           }
         }
       }
@@ -367,11 +367,11 @@ namespace Cosmos.IL2CPU {
         if (aCurrentOpCode.CurrentExceptionHandler.HandlerOffset > aCurrentOpCode.Position) {
           switch (aCurrentOpCode.CurrentExceptionHandler.Flags) {
             case ExceptionHandlingClauseOptions.Clause: {
-                xJumpTo = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
+                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
                 break;
               }
             case ExceptionHandlingClauseOptions.Finally: {
-                xJumpTo = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
+                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
                 break;
               }
             default: {
@@ -390,7 +390,7 @@ namespace Cosmos.IL2CPU {
         }
 
       } else {
-        new CPU.Test { DestinationReg = CPU.RegistersEnum.ECX, SourceValue = 2 };
+        XS.Test(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ECX), 2);
 
         if (aCleanup != null) {
           new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Equal, DestinationLabel = aJumpTargetNoException };

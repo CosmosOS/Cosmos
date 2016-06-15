@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
       string xDataName = GetContentsArrayName(xOpString.Value);
       new Comment(Assembler, "String Value: " + xOpString.Value.Replace("\r", "\\r").Replace("\n", "\\n"));
       var xRefName = GetFakeHandleForLiteralArray(xDataName);
-      new Mov { DestinationReg = RegistersEnum.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(xRefName) };
+      XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), xRefName);
       XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering.
       // if that changes, we need to change the code below!

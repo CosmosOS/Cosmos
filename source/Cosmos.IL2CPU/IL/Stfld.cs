@@ -70,7 +70,7 @@ namespace Cosmos.IL2CPU.X86.IL {
 				// move 2 lower bytes
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AX };
 				// shift third byte to lowest
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 16 };
+				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 16);
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4) + 2, SourceReg = CPUx86.RegistersEnum.AL };
 				break;
 			}
@@ -89,7 +89,7 @@ namespace Cosmos.IL2CPU.X86.IL {
             new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.DecRefCountRef) };
           }
 #endif
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
     }
 
     public static void DoExecute(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethod, SysReflection.FieldInfo aField, bool debugEnabled)

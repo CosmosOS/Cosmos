@@ -160,7 +160,7 @@ namespace Cosmos.IL2CPU
             if (DebugEnabled && StackCorruptionDetection)
             {
                 // if StackCorruption detection is active, we're also going to emit a stack overflow detection
-                new Mov { DestinationReg = RegistersEnum.EAX, SourceRef= ElementReference.New("Before_Kernel_Stack") };
+                XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), "Before_Kernel_Stack");
                 XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP));
                 new ConditionalJump { Condition = ConditionalTestEnum.LessThan, DestinationLabel = mCurrentMethodLabel + ".StackOverflowCheck_End" };
                 new ClearInterruptFlag();
@@ -188,7 +188,7 @@ namespace Cosmos.IL2CPU
                 new Mov { DestinationRef = ElementReference.New(xName), DestinationIsIndirect = true, Size = 8, SourceValue = 1 };
                 new Jump { DestinationLabel = ".AfterCCTorAlreadyCalledCheck" };
                 new Label(".BeforeQuickReturn");
-                new Mov { DestinationReg = RegistersEnum.ECX, SourceValue = 0 };
+                XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.ECX), 0);
                 new Return { };
                 new Label(".AfterCCTorAlreadyCalledCheck");
             }
@@ -343,7 +343,7 @@ namespace Cosmos.IL2CPU
                 };
             }
 
-            new Mov { DestinationReg = RegistersEnum.ECX, SourceValue = 0 };
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.ECX), 0);
             var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
                                   select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
             if (!aMethod.MethodBase.IsStatic)
@@ -405,11 +405,7 @@ namespace Cosmos.IL2CPU
 
                         if (xLocalsSize >= 256)
                         {
-                            new Add
-                            {
-                                DestinationReg = RegistersEnum.ESP,
-                                SourceValue = 255
-                            };
+                            XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 255);
                             xLocalsSize -= 255;
                         }
                     }
@@ -883,11 +879,7 @@ namespace Cosmos.IL2CPU
                          }
                          for (int i = 0; i < xResultSize / 4; i++)
                          {
-                             new Add
-                             {
-                                 DestinationReg = RegistersEnum.ESP,
-                                 SourceValue = 4
-                             };
+                             XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
                          }
                      }, aNextLabel);
         }
@@ -1522,7 +1514,7 @@ namespace Cosmos.IL2CPU
                 XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EBP));
                 if (xStackDifference != 0)
                 {
-                    new Add { DestinationReg = RegistersEnum.EAX, SourceValue = xStackDifference };
+                    XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EAX), xStackDifference.Value);
                 }
                 XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = xLabel + ".StackCorruptionCheck_End" };

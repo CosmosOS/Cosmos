@@ -51,11 +51,11 @@ namespace Cosmos.IL2CPU.X86.IL
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceRef = Cosmos.Assembler.ElementReference.New(xTypeID), SourceIsIndirect = true };
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 4 };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceValue = (uint)InstanceTypeEnum.Array, Size = 32 };
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 4 };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.ESI, Size = 32 };
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 4 };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceValue = (uint)xSize, Size = 32 };
       new CPUx86.Call { DestinationLabel = xCtorName };
     }

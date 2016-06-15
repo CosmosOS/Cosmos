@@ -17,12 +17,12 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
         {
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 24 };
-            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESI, SourceValue = 16 };
+            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), 16);
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 20 };
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 16 };
-            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EDI, SourceValue = 16 };
+            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 16);
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 12 };
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 

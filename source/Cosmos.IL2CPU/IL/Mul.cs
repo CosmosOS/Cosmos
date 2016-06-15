@@ -1,4 +1,5 @@
 using System;
+using Cosmos.Assembler.x86.SSE;
 using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 using Label = Cosmos.Assembler.Label;
@@ -189,40 +190,32 @@ namespace Cosmos.IL2CPU.X86.IL
                         SourceReg = CPUx86.RegistersEnum.EAX
                     };
                     // pop right 64 value
-                    new CPUx86.Add
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.ESP,
-                        SourceValue = 8
-                    };
+                    XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
                 }
             }
             else
             {
                 if (xStackContentIsFloat)
                 {
-                    new CPUx86.SSE.MoveSS
+                    new MoveSS
                     {
                         DestinationReg = CPUx86.RegistersEnum.XMM0,
                         SourceReg = CPUx86.RegistersEnum.ESP,
                         SourceIsIndirect = true
                     };
-                    new CPUx86.Add
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.ESP,
-                        SourceValue = 4
-                    };
-                    new CPUx86.SSE.MoveSS
+                    XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
+                    new MoveSS
                     {
                         DestinationReg = CPUx86.RegistersEnum.XMM1,
                         SourceReg = CPUx86.RegistersEnum.ESP,
                         SourceIsIndirect = true
                     };
-                    new CPUx86.SSE.MulSS
+                    new MulSS
                     {
                         DestinationReg = CPUx86.RegistersEnum.XMM1,
                         SourceReg = CPUx86.RegistersEnum.XMM0
                     };
-                    new CPUx86.SSE.MoveSS
+                    new MoveSS
                     {
                         DestinationReg = CPUx86.RegistersEnum.ESP,
                         DestinationIsIndirect = true,
@@ -238,11 +231,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         DestinationIsIndirect = true,
                         Size = 32
                     };
-                    new CPUx86.Add
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.ESP,
-                        SourceValue = 4
-                    };
+                    XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
                     XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 }
             }

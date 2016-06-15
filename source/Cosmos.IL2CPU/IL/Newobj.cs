@@ -139,7 +139,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         // EAX contains a memory handle now, lets dereference it to a pointer
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true, SourceDisplacement = 8 };
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceValue = 2 };
+                        XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), 2);
                         XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
                         XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     }
@@ -150,7 +150,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         xHasCalcSize = true;
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-                        new CPUx86.ShiftLeft { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 1 };
+                        XS.ShiftLeft(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
                         XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     }
                     else if (xParams.Length == 2
@@ -159,7 +159,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         xHasCalcSize = true;
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-                        new CPUx86.ShiftLeft { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 1 };
+                        XS.ShiftLeft(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
                         XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     }
                     else
@@ -224,7 +224,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 if (aMethod != null)
                 {
                     // todo: only happening for real methods now, not for ctor's ?
-                    new CPUx86.Test { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 2 };
+                    XS.Test(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 2);
                     string xNoErrorLabel = currentLabel + ".NoError" + LabelName.LabelCount.ToString();
                     new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xNoErrorLabel };
 
@@ -241,7 +241,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     PushAlignedParameterSize(constructor);
 
                     // an exception occurred, we need to cleanup the stack, and jump to the exit
-                    new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+                    XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
 
                     //new Comment(aAssembler, "[ Newobj.Execute cleanup start count = " + aAssembler.Stack.Count.ToString() + " ]");
                     //foreach( var xStackInt in Assembler.Stack )

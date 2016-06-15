@@ -90,7 +90,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     throw new Exception("For now, loading fields with sizes > 4 bytes from structs on the stack is not possible!");
                 }
 
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
 
                 switch (xFieldInfo.Size)
                 {
@@ -104,7 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     case 3: //For Release
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceDisplacement = xOffset, SourceIsIndirect = true };
-                        new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 8 };
+                        XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 8);
                         break;
 
                     case 4:
@@ -146,7 +146,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             }
 
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
+            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
 
             switch (xSize % 4)
             {
@@ -162,7 +162,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 case 3: //For Release
                     new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
-                    new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 8 };
+                    XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 8);
                     XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     break;
 

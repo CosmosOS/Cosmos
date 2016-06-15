@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
 						new CPUx86.SSE.ConvertSD2SIAndTruncate { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.XMM0, };
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, SourceReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
                         XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                        new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+                        XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
                         XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                         break;
 					}

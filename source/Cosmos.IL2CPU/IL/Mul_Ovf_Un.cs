@@ -161,7 +161,7 @@ namespace Cosmos.IL2CPU.X86.IL
             SourceReg = Cosmos.Assembler.x86.RegistersEnum.EAX
           };
         // pop right 64 value
-        new Assembler.x86.Add { DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP, SourceValue = 8 };
+        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 8);
       }
       else
       {
@@ -172,7 +172,7 @@ namespace Cosmos.IL2CPU.X86.IL
             DestinationIsIndirect = true,
             Size = 32
           };
-        new Assembler.x86.Add { DestinationReg = RegistersEnum.ESP, SourceValue = 4 };
+        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
         XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
       }
     }

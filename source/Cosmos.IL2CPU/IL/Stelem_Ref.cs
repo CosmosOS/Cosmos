@@ -56,7 +56,7 @@ namespace Cosmos.IL2CPU.X86.IL
         new Comment(aAssembler, "Start 1 dword");
         XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
-        new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 4 };
+        XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 4);
       }
       switch (aElementSize % 4)
       {
@@ -82,7 +82,7 @@ namespace Cosmos.IL2CPU.X86.IL
           throw new Exception("Remainder size " + (aElementSize % 4) + " not supported!");
 
       }
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 0x8 };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 0x8);
     }
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {

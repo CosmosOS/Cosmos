@@ -40,11 +40,7 @@ namespace Cosmos.IL2CPU.X86.IL
                             SourceReg = CPUx86.RegistersEnum.ESP,
                             SourceIsIndirect = true
                         };
-                        new CPUx86.Add
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.ESP,
-                            SourceValue = 4
-                        };
+                        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
                         new CPUx86.SSE.MoveSS
                         {
                             DestinationReg = CPUx86.RegistersEnum.XMM1,

@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), aElementSize);
       XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 
-      new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = (ObjectImpl.FieldDataOffset + 4) };
+      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), (ObjectImpl.FieldDataOffset + 4));
 
       if (aElementSize > 4)
       {
@@ -77,7 +77,7 @@ namespace Cosmos.IL2CPU.X86.IL
           case 4:
             // copy a full dword
             new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EDX, DestinationIsIndirect = true };
-            new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.EDX, SourceValue = 4 }; // move to previous 4 bytes
+            XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), 4); // move to previous 4 bytes
             break;
             //case 8:
             //    new CPUx86.Push {DestinationReg = CPUx86.Registers.EDX, DestinationDisplacement = 4, DestinationIsIndirect = true};

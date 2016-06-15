@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -27,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.SSE.ConvertSI2SD { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
 				}
 				// expand stack, that moved data is valid stack
-				new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+				XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
 				new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.XMM0 };
 				break;
             case 8:

@@ -18,9 +18,9 @@ namespace Cosmos.Core.Plugs {
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceRef = CPUAll.ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
 				XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 1024 };
+				XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1024);
 				XS.Divide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
-				new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 1 };
+				XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
 				XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 			}
 		}
@@ -46,11 +46,11 @@ namespace Cosmos.Core.Plugs {
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 }; //length
 				// set EAX to value of fill (zero)
 				XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 1 };
+				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1);
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotBelow, DestinationLabel = ".step2" };
 				new CPUx86.StoreByteInString();
 				new CPUAll.Label(".step2");
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 1 };
+				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1);
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotBelow, DestinationLabel = ".step3" };
 				new CPUx86.StoreWordInString();
 				new CPUAll.Label(".step3");

@@ -31,7 +31,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX)); // low
 					XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // high
 					XS.Negate(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX)); // set carry if EBX != 0
-					new CPUx86.AddWithCarry { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
+					XS.AddWithCarry(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
 					XS.Negate(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));

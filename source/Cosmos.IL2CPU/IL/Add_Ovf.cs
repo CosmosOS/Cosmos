@@ -54,7 +54,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
 						//TODO overflow check
                         new MoveSS { DestinationReg = RegistersEnum.XMM0, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
-                        new CPUx86.Add { DestinationReg = RegistersEnum.ESP, SourceValue = 4 };
+                        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
                         new MoveSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
                         new AddSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.XMM0 };
                         new MoveSS { DestinationReg = RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = RegistersEnum.XMM1 };

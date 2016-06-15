@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                     throw new Exception( "Remainder size " + ( xFieldSize % 4 ) + " not supported!" );
             }
-            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
         }
     }
 }

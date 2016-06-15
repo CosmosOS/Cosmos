@@ -30,23 +30,23 @@ namespace Cosmos.IL2CPU.X86.IL
             // todo: throw an exception when the class does not support the cast!
             string mReturnNullLabel = xCurrentMethodLabel + "_ReturnNull";
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-            new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
-            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
+            XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
+            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
 
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
-            new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New( xTypeID ), DestinationIsIndirect = true };
-            SysReflection.MethodBase xMethodIsInstance = VTablesImplRefs.IsInstanceRef;
+            new CPU.Mov { DestinationReg = CPU.RegistersEnum.EAX, SourceReg = CPU.RegistersEnum.EAX, SourceIsIndirect = true };
+            new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
+            new CPU.Push { DestinationRef = ElementReference.New( xTypeID ), DestinationIsIndirect = true };
+            MethodBase xMethodIsInstance = VTablesImplRefs.IsInstanceRef;
             // new OpMethod( ILOpCode.Code.Call, 0, 0, xMethodIsInstance, aOpCode.CurrentExceptionHandler ) );
-            IL.Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, xCurrentMethodLabel, xCurrentMethodLabel + "_After_IsInstance_Call", DebugEnabled);
+            Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, xCurrentMethodLabel, xCurrentMethodLabel + "_After_IsInstance_Call", DebugEnabled);
             new Label( xCurrentMethodLabel + "_After_IsInstance_Call" );
             XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
-            new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
-            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
-            new CPUx86.Jump { DestinationLabel = ILOp.GetLabel(aMethod, aOpCode.NextPosition) };
+            XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
+            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
+            new CPU.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
 
             new Label( mReturnNullLabel );
-            new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+            XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), 4);
             string xAllocInfoLabelName = LabelName.Get( GCImplementationRefs.AllocNewObjectRef );
 #warning TODO: Emit new exceptions
             //new Newobj( Assembler ).Execute( aMethod, aOpCode );

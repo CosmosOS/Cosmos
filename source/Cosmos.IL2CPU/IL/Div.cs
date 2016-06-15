@@ -36,7 +36,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					// override value 1
 					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
 					// pop value 2
-					new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 8 };
+					XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
                 }
                 else
                 {
@@ -52,7 +52,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 
 					// pop both 8 byte values
-					new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 8 };
+					XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
 
 					//dividend
 					// low
@@ -60,7 +60,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					//high
 					new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
 
-                    new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 8 };
+                    XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
 
 					// set flags
 					XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
@@ -74,7 +74,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					// shift divisor 1 bit right
 					new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.RegistersEnum.ESI, SourceReg = CPUx86.RegistersEnum.EDI, ArgumentValue = 1 };
-					new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.EDI, SourceValue = 1 };
+					XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 1);
 
 					// increment shift counter
 					XS.Increment(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
@@ -128,7 +128,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				if (TypeIsFloat(xStackItem))
                 {
                     new MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-                    new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+                    XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
                     new MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
                     new DivSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.XMM0 };
                     new MoveSS { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.XMM1 };

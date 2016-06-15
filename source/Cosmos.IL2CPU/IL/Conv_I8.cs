@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					if (xSourceIsFloat)
 					{
 						new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 32 };
-						new CPUx86.Sub { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
+						XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
 						new CPUx86.x87.IntStoreWithTrunc { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 64 };
 					}
 					else

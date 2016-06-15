@@ -36,17 +36,17 @@ namespace Cosmos.IL2CPU.X86.IL
             if( xStackItem_Value_Size <= 8 )
             {
                 XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
                 new Label( xBaseLabel + "__StartLoop" );
                 XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xBaseLabel + "__EndLoop" };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 1 };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.CL), 1);
                 XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.CL);
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 1 };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.CL), 1);
                 new CPUx86.RotateThroughCarryRight { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, Size = 32, SourceReg = CPUx86.RegistersEnum.CL };
-                new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 1 };
+                XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
                 new CPUx86.Jump { DestinationLabel = xBaseLabel + "__StartLoop" };
 
                 new Label( xBaseLabel + "__EndLoop" );

@@ -214,12 +214,12 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
                     if (xTestOp == ConditionalTestEnum.Zero)
                     {
-                        new Compare {DestinationReg = RegistersEnum.EAX, SourceValue = 0};
+                        XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 0);
                         new ConditionalJump {Condition = ConditionalTestEnum.Equal, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                     }
                     else if (xTestOp == ConditionalTestEnum.NotZero)
                     {
-                        new Compare {DestinationReg = RegistersEnum.EAX, SourceValue = 0};
+                        XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 0);
                         new ConditionalJump {Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                     }
                     else
@@ -235,9 +235,9 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         case ConditionalTestEnum.Zero: // Equal
                         case ConditionalTestEnum.NotZero: // NotEqual
-                            new CPU.Xor { DestinationReg = CPU.RegistersEnum.EAX, SourceValue = 0 };
-                            new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
-                            new CPU.Xor { DestinationReg = CPU.RegistersEnum.EBX, SourceValue = 0 };
+                            XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 0);
+                            new ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
+                            XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 0);
                             new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             break;
                         default:

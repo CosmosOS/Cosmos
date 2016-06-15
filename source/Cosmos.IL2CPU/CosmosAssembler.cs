@@ -84,10 +84,7 @@ namespace Cosmos.IL2CPU
                 DestinationDisplacement = 2,
                 SourceRef = ElementReference.New("_NATIVE_GDT_Contents")
             };
-            new Mov
-            {
-                DestinationReg = RegistersEnum.EAX, SourceRef = ElementReference.New("_NATIVE_GDT_Pointer")
-            };
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), "_NATIVE_GDT_Pointer");
             new Lgdt
             {
                 DestinationReg = RegistersEnum.EAX, DestinationIsIndirect = true
@@ -113,10 +110,7 @@ namespace Cosmos.IL2CPU
         protected void SetIdtDescriptor(int aNo, string aLabel, bool aDisableInts)
         {
             int xOffset = aNo * 8;
-            new Mov
-            {
-                DestinationReg = RegistersEnum.EAX, SourceRef = ElementReference.New(aLabel)
-            };
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), aLabel);
             var xIDT = ElementReference.New("_NATIVE_IDT_Contents");
             new Mov
             {
@@ -126,10 +120,7 @@ namespace Cosmos.IL2CPU
             {
                 DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 1, SourceReg = RegistersEnum.AH
             };
-            new ShiftRight
-            {
-                DestinationReg = RegistersEnum.EAX, SourceValue = 16
-            };
+            XS.ShiftRight(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 16);
             new Mov
             {
                 DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 6, SourceReg = RegistersEnum.AL
@@ -198,10 +189,7 @@ namespace Cosmos.IL2CPU
                 SourceRef = ElementReference.New("_NATIVE_IDT_Contents")
             };
 
-            new Mov
-            {
-                DestinationReg = RegistersEnum.EAX, SourceRef = ElementReference.New("_NATIVE_IDT_Pointer")
-            };
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), "_NATIVE_IDT_Pointer");
 
             if (mComPort > 0)
             {
@@ -266,11 +254,7 @@ namespace Cosmos.IL2CPU
 
             // This is our first entry point. Multiboot uses this as Cosmos entry point.
             new Label("Kernel_Start", isGlobal: true);
-            new Mov
-            {
-                DestinationReg = RegistersEnum.ESP,
-                SourceRef = ElementReference.New("Kernel_Stack")
-            };
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.ESP), "Kernel_Stack");
 
             // Displays "Cosmos" in top left. Used to make sure Cosmos is booted in case of hang.
             // ie bootloader debugging. This must be the FIRST code, even before setup so we know
@@ -297,10 +281,7 @@ namespace Cosmos.IL2CPU
             {
                 DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EBX
             };
-            new Add
-            {
-                DestinationReg = RegistersEnum.EBX, SourceValue = 4
-            };
+            XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 4);
             new Mov
             {
                 DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBX, SourceIsIndirect = true
@@ -309,10 +290,7 @@ namespace Cosmos.IL2CPU
             {
                 DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX
             };
-            new Add
-            {
-                DestinationReg = RegistersEnum.EBX, SourceValue = 4
-            };
+            XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 4);
             new Mov
             {
                 DestinationReg = RegistersEnum.EAX,

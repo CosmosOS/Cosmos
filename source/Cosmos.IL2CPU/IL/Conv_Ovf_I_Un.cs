@@ -33,7 +33,7 @@ namespace Cosmos.IL2CPU.X86.IL
 						// EBX is high part and should be zero for unsigned, so we test it on zero
 						{
 							XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
-							new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EBX, SourceValue = 0 };
+							XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), 0);
 							new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = NoOverflowLabel };
 							ThrowNotImplementedException("Conv_Ovf_I_Un throws an overflow exception, which is not implemented!");
 						}
