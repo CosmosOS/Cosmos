@@ -47,7 +47,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					// divisor
 					//low
-					XS.Mov(XSRegisters.ESI, XSRegisters.ESP, sourceIsIndirect: true);
+					XS.Set(XSRegisters.ESI, XSRegisters.ESP, sourceIsIndirect: true);
 					//high
 					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 4);
 
@@ -56,7 +56,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					//dividend
 					// low
-					XS.Mov(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
+					XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
 					//high
 					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 4);
 
@@ -127,9 +127,9 @@ namespace Cosmos.IL2CPU.X86.IL
             {
 				if (TypeIsFloat(xStackItem))
                 {
-                    XS.MoveSS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
+                    XS.SSE.MoveSS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
-                    XS.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
+                    XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.SSE.DivSS(XSRegisters.XMM0, XSRegisters.XMM1);
                     new MoveSS { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.XMM1 };
                 }

@@ -21,11 +21,11 @@ namespace Cosmos.IL2CPU.X86.IL
             case 4:
 				if (TypeIsFloat(xSource))
 				{
-					XS.ConvertSS2SD(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
+					XS.SSE.ConvertSS2SD(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
 				}
 				else
 				{
-					XS.ConvertSI2SD(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
+					XS.SSE.ConvertSI2SD(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
 				}
 				// expand stack, that moved data is valid stack
 				XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);

@@ -31,11 +31,11 @@ namespace Cosmos.IL2CPU.X86.IL
             // pop the array now
             XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
             // translate it to actual memory
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+            XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true);
 
             if (aOpType.StackPopTypes.Last().GetElementType().IsClass)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+                XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true);
             }
 
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
