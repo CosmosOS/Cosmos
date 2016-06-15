@@ -11,27 +11,15 @@ namespace Cosmos.Core.Memory.Test {
     static public void Init() {
     }
 
-    static public void* New(Native aSize) {
-      return null;
+    static public byte* Alloc(Native aSize) {
+      //TODO - Dont use medium if its close to the page size - does'nt make sense to make a medium page
+      // with only enough free space for something that would be small anyway.
+      if (aSize <= RAT.PageSize - HeapMedium.PrefixBytes) {
+        return HeapLarge.Alloc(aSize);
+      } else {
+        return HeapLarge.Alloc(aSize);
+      }
     }
 
-    static private void* NewBlock(Native aSize) {
-      return NewBlockLarge(aSize);
-    }
-
-    static private void* NewBlockLarge(Native aSize) {
-      const Native xPrefixWordsLarge = 4;
-      const Native xPrefixSizeLarge = xPrefixWordsLarge * sizeof(Native);
-
-      Native xPages = (Native)((aSize + xPrefixSizeLarge) / RAT.PageSize);
-      var xPtr = (Native*)RAT.Alloc(RAT.PageType.HeapLarge, xPages);
-
-      xPtr[0] = xPages * RAT.PageSize - xPrefixSizeLarge; // Allocated data size
-      xPtr[1] = aSize; // Actual data size
-      xPtr[2] = 0; // Ref count
-      xPtr[3] = 0; // Ptr to first
-
-      return xPtr + xPrefixWordsLarge;
-    }
   }
 }

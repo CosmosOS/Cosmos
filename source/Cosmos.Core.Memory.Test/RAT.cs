@@ -26,7 +26,6 @@ namespace Cosmos.Core.Memory.Test {
     // Used to bypass certain checks that will fail during tests and debugging.
     static public bool Debug = false;
 
-    static private Native PtrSize = sizeof(Native);
     // Native Intel page size
     // x86 Page Size: 4k, 2m (PAE only), 4m
     // x64 Page Size: 4k, 2m
@@ -54,17 +53,20 @@ namespace Cosmos.Core.Memory.Test {
       mRamSize = aSize;
       mPageCount = aSize / PageSize;
 
-      mRAT = mRamStart;
-      // Clear RAT
-      for (Native i = 0; i < mPageCount; i++) {
-        mRAT[i] = PageType.Empty;
-      }
-
       // We need one status byte for each block.
       // Intel blocks are 4k (10 bits). So for 4GB, this means
       // 32 - 12 = 20 bits, 1 MB for a RAT for 4GB. 0.025%
-      Native xRatPageCount = mPageCount / PageSize;
-      Alloc(PageType.RAT, xRatPageCount);
+      Native xRatPageCount = mPageCount / (PageSize - 1) + 1;
+      Native xRatPageBytes = xRatPageCount * PageSize;
+      mRAT = mRamStart + mRamSize - xRatPageBytes;
+      for (Native i = 0; i < xRatPageBytes - xRatPageCount; i++) {
+        mRAT[i] = PageType.Empty;
+      }
+      for (Native i = xRatPageBytes - xRatPageCount; i < xRatPageBytes; i++) {
+        mRAT[i] = PageType.RAT;
+      }
+
+      mRAT = Alloc(PageType.RAT, xRatPageCount);
 
       Heap.Init();
     }
@@ -101,7 +103,7 @@ namespace Cosmos.Core.Memory.Test {
           if (mRAT[i] == PageType.Empty) {
             xCount++;
             if (xCount == aPageCount) {
-              xPos = i - xCount - 1;
+              xPos = i - xCount + 1;
               break;
             }
           } else {
@@ -109,7 +111,7 @@ namespace Cosmos.Core.Memory.Test {
           }
         }
       } else {
-        for (Native i = mPageCount - 1; i >= 0; i--) {
+        for (Native i = mPageCount - 1; i != Native.MaxValue; i--) {
           if (mRAT[i] == PageType.Empty) {
             xCount++;
             if (xCount == aPageCount) {
