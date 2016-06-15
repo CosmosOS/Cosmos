@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -28,27 +29,27 @@ namespace Cosmos.IL2CPU.X86.IL
 				case 4:
 					if (TypeIsFloat(xSource))
 					{
-						new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-						new CPUx86.SSE.ConvertSS2SIAndTruncate { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.XMM0, };
-						new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+						new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+						new CPUx86.SSE.ConvertSS2SIAndTruncate { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.XMM0, };
+						new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, SourceReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
 					}
 					break;
                 case 8:
 					if (TypeIsFloat(xSource))
 					{
-                        new CPUx86.SSE.MoveDoubleAndDupplicate { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-						new CPUx86.SSE.ConvertSD2SIAndTruncate { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.XMM0, };
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                        new CPUx86.SSE.MoveDoubleAndDupplicate { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+						new CPUx86.SSE.ConvertSD2SIAndTruncate { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.XMM0, };
+                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, SourceReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
+                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
+                        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                         break;
 					}
 					else
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
+                        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                         break;
                     }
                 default:
