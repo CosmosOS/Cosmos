@@ -91,24 +91,14 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
                     //mov RIGHT_LOW to eax
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.EAX,
-                        SourceReg = CPUx86.RegistersEnum.ESP,
-                        SourceIsIndirect = true
-                    };
+                    XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
                     // multiply with LEFT_HIGH
                     XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), displacement: 12);
                     // add result of LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
                     //mov RIGHT_LOW to eax
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.EAX,
-                        SourceReg = CPUx86.RegistersEnum.ESP,
-                        SourceIsIndirect = true
-                    };
+                    XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
                     // multiply with LEFT_LOW
                     XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), displacement: 8);
                     // add LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH to high dword of last result
@@ -121,12 +111,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     XS.Label(Simple32Multiply);
                     //mov RIGHT_LOW to eax
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.EAX,
-                        SourceReg = CPUx86.RegistersEnum.ESP,
-                        SourceIsIndirect = true
-                    };
+                    XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
                     // multiply with LEFT_LOW
                     XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), displacement: 8);
 
@@ -155,19 +140,9 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xStackContentIsFloat)
                 {
-                    new MoveSS
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.XMM0,
-                        SourceReg = CPUx86.RegistersEnum.ESP,
-                        SourceIsIndirect = true
-                    };
+                    XS.SSE.MoveSS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
-                    new MoveSS
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.XMM1,
-                        SourceReg = CPUx86.RegistersEnum.ESP,
-                        SourceIsIndirect = true
-                    };
+                    XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.SSE.MulSS(XSRegisters.XMM0, XSRegisters.XMM1);
                     new MoveSS
                     {

@@ -104,7 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 else
                 {
                     XS.Set(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: (int)xThisOffset);
-                    new CPU.Mov { DestinationReg = CPU.RegistersEnum.EAX, SourceReg = CPU.RegistersEnum.EAX, SourceIsIndirect = true };
+                    XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
                     new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
                 }
                 new CPU.Push { DestinationValue = aTargetMethodUID };
@@ -143,7 +143,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     //new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = ( ( uint )InstanceTypeEnum.BoxedValueType ), Size = 32 };
 
                     // EAX contains the handle now, lets dereference it
-                    new CPU.Mov { DestinationReg = CPU.RegistersEnum.EAX, SourceReg = CPU.RegistersEnum.EAX, SourceIsIndirect = true };
+                    XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
 
                     new CPU.Compare { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (int)InstanceTypeEnum.BoxedValueType, Size = 32 };
 

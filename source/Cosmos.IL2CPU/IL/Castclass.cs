@@ -29,11 +29,11 @@ namespace Cosmos.IL2CPU.X86.IL
             //mTypeId = GetService<IMetaDataInfoService>().GetTypeIdLabel( mCastAsType );
             // todo: throw an exception when the class does not support the cast!
             string mReturnNullLabel = xCurrentMethodLabel + "_ReturnNull";
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+            XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
             XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
 
-            new CPU.Mov { DestinationReg = CPU.RegistersEnum.EAX, SourceReg = CPU.RegistersEnum.EAX, SourceIsIndirect = true };
+            XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
             new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
             new CPU.Push { DestinationRef = ElementReference.New( xTypeID ), DestinationIsIndirect = true };
             MethodBase xMethodIsInstance = VTablesImplRefs.IsInstanceRef;
@@ -120,7 +120,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             mTypeId = GetService<IMetaDataInfoService>().GetTypeIdLabel(mCastAsType);
         // 			// todo: throw an exception when the class does not support the cast!
         // 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
-        //             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+        //             XS.Mov(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
         //             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
         //             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
         //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };

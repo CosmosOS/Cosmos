@@ -282,21 +282,13 @@ namespace Cosmos.IL2CPU
                 DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EBX
             };
             XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 4);
-            new Mov
-            {
-                DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBX, SourceIsIndirect = true
-            };
+            XS.Set(XSRegisters.EAX, XSRegisters.EBX, sourceIsIndirect: true);
             new Mov
             {
                 DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX
             };
             XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 4);
-            new Mov
-            {
-                DestinationReg = RegistersEnum.EAX,
-                SourceReg = RegistersEnum.EBX,
-                SourceIsIndirect = true
-            };
+            XS.Set(XSRegisters.EAX, XSRegisters.EBX, sourceIsIndirect: true);
             new Mov
             {
                 DestinationRef = ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX

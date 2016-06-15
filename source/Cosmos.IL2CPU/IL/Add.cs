@@ -52,9 +52,9 @@ namespace Cosmos.IL2CPU.X86.IL
           {
             if (xIsFloat) //float
             {
-              new MoveSS { DestinationReg = RegistersEnum.XMM0, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
+              XS.SSE.MoveSS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
               XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
-              new MoveSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
+              XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
               XS.SSE.AddSS(XSRegisters.XMM0, XSRegisters.XMM1);
               new MoveSS { DestinationReg = RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = RegistersEnum.XMM1 };
             }
