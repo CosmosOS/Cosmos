@@ -12,7 +12,8 @@ namespace XSharp.Compiler
       Byte8 = 8,
       Short16 = 16,
       Int32 = 32,
-        FPU = 128,
+      FPU = 128,
+      XMM = 128,
     }
 
     public abstract class Register
@@ -26,6 +27,11 @@ namespace XSharp.Compiler
         Size = size;
         Name = name;
         RegEnum = regEnum;
+      }
+
+      public static implicit operator RegistersEnum(Register register)
+      {
+        return register.RegEnum;
       }
     }
 
@@ -78,9 +84,16 @@ namespace XSharp.Compiler
       }
     }
 
+    public class RegisterXMM : Register
+    {
+      public RegisterXMM(string name, RegistersEnum regEnum) : base(name, regEnum, RegisterSize.XMM)
+      {
+      }
+    }
+
     public class RegisterSegment: Register
     {
-      public RegisterSegment(string name, RegistersEnum regEnum): base(name, regEnum, RegisterSize.Int32)
+      public RegisterSegment(string name, RegistersEnum regEnum): base(name, regEnum, RegisterSize.Short16)
       {
       }
     }
@@ -126,5 +139,15 @@ namespace XSharp.Compiler
     public static readonly RegisterFPU ST5 = new RegisterFPU(nameof(ST5), RegistersEnum.ST5);
     public static readonly RegisterFPU ST6 = new RegisterFPU(nameof(ST6), RegistersEnum.ST6);
     public static readonly RegisterFPU ST7 = new RegisterFPU(nameof(ST7), RegistersEnum.ST7);
+
+    public static readonly RegisterXMM XMM0 = new RegisterXMM(nameof(XMM0), RegistersEnum.XMM0);
+    public static readonly RegisterXMM XMM1 = new RegisterXMM(nameof(XMM1), RegistersEnum.XMM1);
+    public static readonly RegisterXMM XMM2 = new RegisterXMM(nameof(XMM2), RegistersEnum.XMM2);
+    public static readonly RegisterXMM XMM3 = new RegisterXMM(nameof(XMM3), RegistersEnum.XMM3);
+    public static readonly RegisterXMM XMM4 = new RegisterXMM(nameof(XMM4), RegistersEnum.XMM4);
+    public static readonly RegisterXMM XMM5 = new RegisterXMM(nameof(XMM5), RegistersEnum.XMM5);
+    public static readonly RegisterXMM XMM6 = new RegisterXMM(nameof(XMM6), RegistersEnum.XMM6);
+    public static readonly RegisterXMM XMM7 = new RegisterXMM(nameof(XMM7), RegistersEnum.XMM7);
+
   }
 }

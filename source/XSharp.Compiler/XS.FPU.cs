@@ -1,4 +1,5 @@
-﻿using Cosmos.Assembler.x86.x87;
+﻿using Cosmos.Assembler.x86.SSE;
+using Cosmos.Assembler.x86.x87;
 using static XSharp.Compiler.XSRegisters;
 
 namespace XSharp.Compiler

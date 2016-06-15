@@ -84,7 +84,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
 					new MoveSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
 					new CompareSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.XMM0, pseudoOpcode = (byte)ComparePseudoOpcodes.NotLessThanOrEqualTo };
-					new MoveD { DestinationReg = RegistersEnum.EBX, SourceReg = RegistersEnum.XMM1 };
+					XS.SSE2.MoveD(XSRegisters.XMM1, XSRegisters.EBX);
 					XS.And(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 1);
 					new Mov { SourceReg = RegistersEnum.EBX, DestinationReg = RegistersEnum.ESP, DestinationIsIndirect = true };
 				}
