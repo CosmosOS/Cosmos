@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				// [ESP + 4] is high part
 
 				// move low part to eax
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+				XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
 
 				new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 32, Size = 8 };
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.AboveOrEqual, DestinationLabel = LowPartIsZero };

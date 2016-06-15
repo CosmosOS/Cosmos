@@ -335,12 +335,7 @@ namespace Cosmos.IL2CPU
                 XS.Label(xMethodLabel + EndOfMethodLabelNameNormal);
 
                 XS.Comment("Following code is for debugging. Adjust accordingly!");
-                new Mov
-                {
-                    DestinationRef = ElementReference.New("static_field__Cosmos_Core_INTs_mLastKnownAddress"),
-                    DestinationIsIndirect = true,
-                    SourceRef = ElementReference.New(xMethodLabel + EndOfMethodLabelNameNormal)
-                };
+                XS.Set("static_field__Cosmos_Core_INTs_mLastKnownAddress", xMethodLabel + EndOfMethodLabelNameNormal, destinationIsIndirect: true);
             }
 
             XS.Set(OldToNewRegister(RegistersEnum.ECX), 0);

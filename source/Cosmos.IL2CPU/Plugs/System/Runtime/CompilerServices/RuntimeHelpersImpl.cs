@@ -17,12 +17,12 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0xC); // array
-		    new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI, SourceIsIndirect = true};
+		    XS.Set(XSRegisters.EDI, XSRegisters.EDI, sourceIsIndirect: true);
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 8);// aFieldHandle
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 8);
 		    new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EDI, DestinationIsIndirect = true};
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 4);
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EDI, SourceIsIndirect = true };
+            XS.Set(XSRegisters.EAX, XSRegisters.EDI, sourceIsIndirect: true);
 		    new CPUx86.Multiply {DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 32};
             XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 4);
 
 			XS.Label(".StartLoop");
-			new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.DL, SourceReg = CPUx86.RegistersEnum.ESI, SourceIsIndirect = true };
+			XS.Set(XSRegisters.DL, XSRegisters.ESI, sourceIsIndirect: true);
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.DL };
 			XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), 1);

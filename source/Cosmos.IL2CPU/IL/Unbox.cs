@@ -28,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
       XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
       new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
-      new CPU.Mov { DestinationReg = CPU.RegistersEnum.EAX, SourceReg = CPU.RegistersEnum.EAX, SourceIsIndirect = true };
+      XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
       new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
       new CPU.Push { DestinationRef = ElementReference.New(xTypeID), DestinationIsIndirect = true };
       SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.UInt32", "System.UInt32");

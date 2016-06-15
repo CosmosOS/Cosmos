@@ -40,7 +40,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Label(xBaseLabel + "__StartLoop" );
                 XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xBaseLabel + "__EndLoop" };
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                XS.Set(XSRegisters.EBX, XSRegisters.ESP, sourceIsIndirect: true);
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.CL), 1);
                 XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.CL);
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };

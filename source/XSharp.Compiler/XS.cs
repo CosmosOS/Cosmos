@@ -878,6 +878,23 @@ namespace XSharp.Compiler
       };
     }
 
+    public static void Test(Register destination, Register sourceReg, bool sourceIsIndirect = false)
+    {
+      if (!sourceIsIndirect)
+      {
+        if (destination.Size != sourceReg.Size)
+        {
+          throw new InvalidOperationException("Register sizes don't match!");
+        }
+      }
+      new Test
+      {
+        DestinationReg = destination.RegEnum,
+        SourceReg = sourceReg,
+        SourceIsIndirect = sourceIsIndirect
+      };
+    }
+
     public static void Divide(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
     {
       Do<Divide>(destinationValue, isIndirect, displacement, size);

@@ -40,7 +40,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       {
         // for reference types (or boxed types), ECX actually contains the handle now, so we need to convert it to a memory address
         XS.Comment("Dereference memory handle now");
-        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
+        XS.Set(XSRegisters.ECX, XSRegisters.ECX, sourceIsIndirect: true);
       }
       if (debugEnabled)
       {
