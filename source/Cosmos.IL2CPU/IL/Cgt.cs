@@ -93,11 +93,11 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
 					new Compare { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
 					new ConditionalJump { Condition = ConditionalTestEnum.LessThan, DestinationLabel = LabelTrue };
-					new Jump { DestinationLabel = LabelFalse };
+					XS.Jump(LabelFalse);
 					XS.Label(LabelTrue );
 					XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
 					new Push { DestinationValue = 1 };
-					new Jump { DestinationLabel = xNextLabel };
+					XS.Jump(xNextLabel);
 					XS.Label(LabelFalse );
 					XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
 					new CPUx86.Push { DestinationValue = 0 };

@@ -169,10 +169,7 @@ namespace Cosmos.Hardware
                             SourceValue = 1
                         };
 
-                        new Jump
-                        {
-                            DestinationLabel = "mouse_read_exit"
-                        };
+                        XS.Jump("mouse_read_exit");
                     }
 
                     XS.Label("mouse_read_ready");
@@ -289,10 +286,7 @@ namespace Cosmos.Hardware
                             SourceValue = 1
                         };
 
-                        new Jump
-                        {
-                            DestinationLabel = "mouse_write_exit"
-                        };
+                        XS.Jump("mouse_write_exit");
                     }
 
                     XS.Label("mouse_write_ok1");
@@ -343,10 +337,7 @@ namespace Cosmos.Hardware
                             SourceValue = 1
                         };
 
-                        new Jump
-                        {
-                            DestinationLabel = "mouse_write_exit"
-                        };
+                        XS.Jump("mouse_write_exit");
                     }
 
                     XS.Label("mouse_write_ok");
@@ -403,10 +394,7 @@ namespace Cosmos.Hardware
                             SourceValue = 1
                         };
 
-                        new Jump
-                        {
-                            DestinationLabel = "mouse_write_exit"
-                        };
+                        XS.Jump("mouse_write_exit");
                     }
 
                     XS.Label("mouse_write_ok3");
@@ -523,10 +511,7 @@ namespace Cosmos.Hardware
                         {
                             DestinationLabel = "mouse_cmd_wait"
                         };
-                        new Jump
-                        {
-                            DestinationLabel = "mouse_cmd_error"
-                        };
+                        XS.Jump("mouse_cmd_error");
                     }
 
                     XS.Label("mouse_cmd_send");
@@ -585,10 +570,7 @@ namespace Cosmos.Hardware
                             DestinationReg = RegistersEnum.AH,
                             SourceValue = 0x01
                         };
-                        new Jump
-                        {
-                            DestinationLabel = "mouse_cmd_exit"
-                        };
+                        XS.Jump("mouse_cmd_exit");
                     }
 
                     XS.Label("mouse_cmd_ok");

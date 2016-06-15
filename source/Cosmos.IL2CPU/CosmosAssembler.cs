@@ -361,10 +361,7 @@ namespace Cosmos.IL2CPU
             XS.Label(".loop");
             new ClearInterruptFlag();
             new Halt();
-            new Jump
-            {
-                DestinationLabel = ".loop"
-            };
+            XS.Jump(".loop");
 
             if (mComPort > 0)
             {

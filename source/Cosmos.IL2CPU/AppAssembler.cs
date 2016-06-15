@@ -187,7 +187,7 @@ namespace Cosmos.IL2CPU
                 XS.Compare(xName, 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
                 new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = ".BeforeQuickReturn" };
                 XS.Set(xName, 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
-                new Jump { DestinationLabel = ".AfterCCTorAlreadyCalledCheck" };
+                XS.Jump(".AfterCCTorAlreadyCalledCheck");
                 XS.Label(".BeforeQuickReturn");
                 XS.Set(OldToNewRegister(RegistersEnum.ECX), 0);
                 XS.Return();
@@ -838,10 +838,7 @@ namespace Cosmos.IL2CPU
 
         protected void Jump(string aLabelName)
         {
-            new Jump
-            {
-                DestinationLabel = aLabelName
-            };
+            XS.Jump(aLabelName);
         }
 
         protected FieldInfo ResolveField(MethodInfo method, string fieldId, bool aOnlyInstance)
