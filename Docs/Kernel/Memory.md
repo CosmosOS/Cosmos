@@ -110,7 +110,7 @@ Is portable and simple. Can even be used without VirtMem, but increases time dur
 
 ```
 MM API
--Allocate new item
++Allocate new item
 -Add/remove ref
 -Lock/unlock an item
 -Force a compact
@@ -118,7 +118,7 @@ MM API
 Could also plug stringbuilder resize, etc. Possibly even special strings when used internally?
 
 Implicit
--Get pointer
++Get pointer
 
 Internal
 -Compact

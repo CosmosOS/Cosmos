@@ -56,7 +56,7 @@ namespace Cosmos.Core.Memory.Test {
       // We need one status byte for each block.
       // Intel blocks are 4k (10 bits). So for 4GB, this means
       // 32 - 12 = 20 bits, 1 MB for a RAT for 4GB. 0.025%
-      Native xRatPageCount = mPageCount / (PageSize - 1) + 1;
+      Native xRatPageCount = (mPageCount - 1) / PageSize + 1;
       Native xRatPageBytes = xRatPageCount * PageSize;
       mRAT = mRamStart + mRamSize - xRatPageBytes;
       for (Native i = 0; i < xRatPageBytes - xRatPageCount; i++) {
@@ -65,8 +65,6 @@ namespace Cosmos.Core.Memory.Test {
       for (Native i = xRatPageBytes - xRatPageCount; i < xRatPageBytes; i++) {
         mRAT[i] = PageType.RAT;
       }
-
-      mRAT = Alloc(PageType.RAT, xRatPageCount);
 
       Heap.Init();
     }
