@@ -50,11 +50,11 @@ namespace Cosmos.IL2CPU.X86.IL {
           XS.Jump(Label.LastFullLabel + ".False");
           XS.Label(".True");
           XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
-          new Push { DestinationValue = 1 };
+          XS.Push(1);
           XS.Jump(xNextLabel);
           XS.Label(".False");
           XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
-          new Push { DestinationValue = 0 };
+          XS.Push(0);
           XS.Jump(xNextLabel);
         }
       }

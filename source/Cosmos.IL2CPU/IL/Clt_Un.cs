@@ -87,7 +87,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Jump(LabelFalse);
                     XS.Label(LabelTrue );
                     XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
-                    new Push { DestinationValue = 1 };
+                    XS.Push(1);
                     new Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
                     XS.Label(LabelFalse );
                     XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);

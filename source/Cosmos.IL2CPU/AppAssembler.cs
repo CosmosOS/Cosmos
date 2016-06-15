@@ -257,7 +257,7 @@ namespace Cosmos.IL2CPU
                         XS.Comment(String.Format("Local {0}, Size {1}", xLocal.LocalIndex, xSize));
                         for (int i = 0; i < xSize / 4; i++)
                         {
-                            new Push { DestinationValue = 0 };
+                            XS.Push(0);
                         }
                         aMethod.LocalVariablesSize += xSize;
                         //new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
@@ -812,10 +812,7 @@ namespace Cosmos.IL2CPU
 
         protected void Push(uint aValue)
         {
-            new Push
-            {
-                DestinationValue = aValue
-            };
+            XS.Push(aValue);
         }
 
         protected void Push(string aLabelName, bool isIndirect = false)
