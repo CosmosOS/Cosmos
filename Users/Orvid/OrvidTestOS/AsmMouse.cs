@@ -152,11 +152,7 @@ namespace Cosmos.Hardware
                             SourceValue = 1
                         };
 
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.NotZero,
-                            DestinationLabel = "mouse_read_ready"
-                        };
+                        XS.Jump(ConditionalTestEnum.NotZero, "mouse_read_ready");
 
                         new Loop
                         {
@@ -269,11 +265,7 @@ namespace Cosmos.Hardware
                             SourceValue = 32
                         };
 
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.Zero,
-                            DestinationLabel = "mouse_write_ok1"
-                        };
+                        XS.Jump(ConditionalTestEnum.Zero, "mouse_write_ok1");
 
                         new Loop
                         {
@@ -320,11 +312,7 @@ namespace Cosmos.Hardware
                             SourceValue = 2
                         };
 
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.Zero,
-                            DestinationLabel = "mouse_write_ok"
-                        };
+                        XS.Jump(ConditionalTestEnum.Zero, "mouse_write_ok");
 
                         new Loop
                         {
@@ -377,11 +365,7 @@ namespace Cosmos.Hardware
                             SourceValue = 2
                         };
 
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.Zero,
-                            DestinationLabel = "mouse_write_ok3"
-                        };
+                        XS.Jump(ConditionalTestEnum.Zero, "mouse_write_ok3");
 
                         new Loop
                         {
@@ -430,11 +414,7 @@ namespace Cosmos.Hardware
                             SourceValue = 1
                         };
 
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.NotZero,
-                            DestinationLabel = "mouse_write_ok4"
-                        };
+                        XS.Jump(ConditionalTestEnum.NotZero, "mouse_write_ok4");
 
                         new Loop
                         {
@@ -446,11 +426,7 @@ namespace Cosmos.Hardware
                             DestinationReg = RegistersEnum.AH
                         };
 
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.NotZero,
-                            DestinationLabel = "mouse_write_loop4"
-                        };
+                        XS.Jump(ConditionalTestEnum.NotZero, "mouse_write_loop4");
                     }
 
                     XS.Label("mouse_write_ok4");
@@ -502,11 +478,7 @@ namespace Cosmos.Hardware
                             DestinationReg = RegistersEnum.AL,
                             SourceValue = 2
                         };
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.Zero,
-                            DestinationLabel = "mouse_cmd_send"
-                        };
+                        XS.Jump(ConditionalTestEnum.Zero, "mouse_cmd_send");
                         new Loop
                         {
                             DestinationLabel = "mouse_cmd_wait"
@@ -552,11 +524,7 @@ namespace Cosmos.Hardware
                             DestinationReg = RegistersEnum.AL,
                             SourceValue = 0x02
                         };
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.Zero,
-                            DestinationLabel = "mouse_cmd_ok"
-                        };
+                        XS.Jump(ConditionalTestEnum.Zero, "mouse_cmd_ok");
                         new Loop
                         {
                             DestinationLabel = "mouse_cmd_accept"

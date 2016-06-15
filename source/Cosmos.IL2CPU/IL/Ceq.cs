@@ -46,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL {
         {
           XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
           new Compare { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
-          new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = Label.LastFullLabel + ".True" };
+          XS.Jump(ConditionalTestEnum.Equal, Label.LastFullLabel + ".True");
           XS.Jump(Label.LastFullLabel + ".False");
           XS.Label(".True");
           XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
@@ -85,9 +85,9 @@ namespace Cosmos.IL2CPU.X86.IL {
           XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
           XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
           XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-          new ConditionalJump { Condition = ConditionalTestEnum.NotEqual, DestinationLabel = Label.LastFullLabel + ".False" };
+          XS.Jump(ConditionalTestEnum.NotEqual, Label.LastFullLabel + ".False");
           XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
-          new ConditionalJump { Condition = ConditionalTestEnum.NotZero, DestinationLabel = Label.LastFullLabel + ".False" };
+          XS.Jump(ConditionalTestEnum.NotZero, Label.LastFullLabel + ".False");
 
           //they are equal, eax == 0
           XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 8);

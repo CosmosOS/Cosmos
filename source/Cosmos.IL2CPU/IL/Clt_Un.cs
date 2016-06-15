@@ -83,7 +83,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
                     XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.ECX));
                     new Compare { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
-                    new ConditionalJump { Condition = ConditionalTestEnum.Below, DestinationLabel = LabelTrue };
+                    XS.Jump(ConditionalTestEnum.Below, LabelTrue);
                     XS.Jump(LabelFalse);
                     XS.Label(LabelTrue );
                     XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);

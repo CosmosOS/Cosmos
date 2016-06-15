@@ -48,11 +48,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //mov RIGHT_HIGH to eax, is useable on Full 64 multiply
         XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
         XS.Or(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 12);
-        new ConditionalJump
-          {
-            Condition = ConditionalTestEnum.Zero,
-            DestinationLabel = Simple32Multiply
-          };
+        XS.Jump(ConditionalTestEnum.Zero, Simple32Multiply);
         // Full 64 Multiply
 
         // copy again, or could change EAX
