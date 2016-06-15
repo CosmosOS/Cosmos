@@ -31,7 +31,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else if (xSourceSize == 8)
                 {
-                    new MoveDoubleAndDupplicate { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                    XS.MoveDoubleAndDupplicate(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.SSE2.ConvertSD2SIAndTruncate(XSRegisters.EAX, XSRegisters.XMM0);
                     new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, SourceReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
                 }
