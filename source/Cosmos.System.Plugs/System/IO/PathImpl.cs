@@ -1,4 +1,4 @@
-﻿//define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 
 using System;
 using System.IO;
@@ -15,24 +15,23 @@ namespace Cosmos.System.Plugs.System.IO
     //[PlugField(FieldId = "System.Char[] System.IO.Path.RealInvalidPathChars", FieldType = typeof(char[]))]
     public static class PathImpl
     {
-        private static readonly Debugger mDebugger = new Debugger("System", "Path Plugs");
         public static void Cctor(
             //[FieldAccess(Name = "System.Char[] System.IO.Path.InvalidFileNameChars")] ref char[] aInvalidFileNameChars,
             //[FieldAccess(Name = "System.Char[] System.IO.Path.InvalidPathCharsWithAdditionalChecks")] ref char[] aInvalidPathCharsWithAdditionalChecks,
             //[FieldAccess(Name = "System.Char System.IO.Path.PathSeparator")] ref char aPathSeparator,
             //[FieldAccess(Name = "System.Char[] System.IO.Path.RealInvalidPathChars")] ref char[] aRealInvalidPathChars,
-            //[FieldAccess(Name = "System.Int32 System.IO.Path.MaxPath")] ref int aMaxPath
+            //[FieldAccess(Name = "System.Int32 System.IO.Path.MaxPath")] ref int aMaxPath,
             [FieldAccess(Name = "System.Char System.IO.Path.AltDirectorySeparatorChar")] ref char aAltDirectorySeparatorChar,
             [FieldAccess(Name = "System.Char System.IO.Path.DirectorySeparatorChar")] ref char aDirectorySeparatorChar,
             [FieldAccess(Name = "System.Char System.IO.Path.VolumeSeparatorChar")] ref char aVolumeSeparatorChar)
         {
             //aInvalidFileNameChars = VFSManager.GetInvalidFileNameChars();
-      //      aInvalidPathCharsWithAdditionalChecks = VFSManager.GetInvalidPathCharsWithAdditionalChecks();
+            //aInvalidPathCharsWithAdditionalChecks = VFSManager.GetInvalidPathCharsWithAdditionalChecks();
             //aPathSeparator = VFSManager.GetPathSeparator();
             //aRealInvalidPathChars = VFSManager.GetRealInvalidPathChars();
             //aMaxPath = VFSManager.GetMaxPath();
-            aAltDirectorySeparatorChar = VFSManager.GetAltDirectorySeparatorChar()[0];
-            aDirectorySeparatorChar = VFSManager.GetDirectorySeparatorChar()[0];
+            aAltDirectorySeparatorChar = VFSManager.GetAltDirectorySeparatorChar();
+            aDirectorySeparatorChar = VFSManager.GetDirectorySeparatorChar();
             aVolumeSeparatorChar = VFSManager.GetVolumeSeparatorChar();
         }
 
@@ -287,72 +286,30 @@ namespace Cosmos.System.Plugs.System.IO
             return VFSManager.GetRealInvalidPathChars();
         }
 
-        //public static string GetPathRoot(string aPath)
-        //{
-        //    if (aPath == null)
-        //    {
-        //        Global.mFileSystemDebugger.SendInternal($"Path.GetPathRoot : aPath is null");
-        //        throw new ArgumentNullException("aPath");
-        //    }
+        public static string GetPathRoot(string aPath)
+        {
+            if (aPath == null)
+            {
+                Global.mFileSystemDebugger.SendInternal($"Path.GetPathRoot : aPath is null");
+                throw new ArgumentNullException("aPath");
+            }
 
-        //    aPath = NormalizePath(aPath, false);
-        //    int xRootLength = GetRootLength(aPath);
-        //    string xResult = aPath.Substring(0, xRootLength);
-        //    if (xResult[xResult.Length - 1] != Path.DirectorySeparatorChar)
-        //    {
-        //        xResult = string.Concat(xResult, Path.DirectorySeparatorChar.ToString());
-        //    }
+            aPath = NormalizePath(aPath, false);
+            int xRootLength = GetRootLength(aPath);
+            string xResult = aPath.Substring(0, xRootLength);
+            if (xResult[xResult.Length - 1] != Path.DirectorySeparatorChar)
+            {
+                xResult = string.Concat(xResult, Path.DirectorySeparatorChar.ToString());
+            }
 
-        //    Global.mFileSystemDebugger.SendInternal($"Path.GetPathRoot : aPath = {aPath}, xResult = {xResult}");
-        //    return xResult;
-        //}
+            Global.mFileSystemDebugger.SendInternal($"Path.GetPathRoot : aPath = {aPath}, xResult = {xResult}");
+            return xResult;
+        }
 
         public static string GetRandomFileName()
         {
             return "random.tmp";
         }
-
-        //public static int GetRootLength(string aPath)
-        //{
-        //    if (aPath == null)
-        //    {
-        //        Global.mFileSystemDebugger.SendInternal($"Path.GetRootLength : aPath is null");
-        //        throw new ArgumentNullException("aPath");
-        //    }
-
-        //    CheckInvalidPathChars(aPath, false);
-        //    int i = 0;
-        //    int length = aPath.Length;
-        //    if (length >= 1 && IsDirectorySeparator(aPath[0]))
-        //    {
-        //        i = 1;
-        //        if (length >= 2 && IsDirectorySeparator(aPath[1]))
-        //        {
-        //            i = 2;
-        //            int num = 2;
-        //            while (i < length)
-        //            {
-        //                if ((aPath[i] == Path.DirectorySeparatorChar || aPath[i] == Path.AltDirectorySeparatorChar)
-        //                    && --num <= 0)
-        //                {
-        //                    break;
-        //                }
-        //                i++;
-        //            }
-        //        }
-        //    }
-        //    else if (length >= 2 && aPath[1] == Path.VolumeSeparatorChar)
-        //    {
-        //        i = 2;
-        //        if (length >= 3 && IsDirectorySeparator(aPath[2]))
-        //        {
-        //            i++;
-        //        }
-        //    }
-
-        //    Global.mFileSystemDebugger.SendInternal($"Path.GetRootLength : returning {i}");
-        //    return i;
-        //}
 
         public static string GetTempFileName()
         {
@@ -481,6 +438,120 @@ namespace Cosmos.System.Plugs.System.IO
             }
 
             return false;
+        }
+
+        internal static void CheckInvalidPathChars(string aPath, bool aCheckAdditional = false)
+        {
+            Global.mFileSystemDebugger.SendInternal("Path.CheckInvalidPathChars");
+
+            if (aPath == null)
+            {
+                throw new ArgumentNullException("aPath");
+            }
+
+            Global.mFileSystemDebugger.SendInternal("aPath =");
+            Global.mFileSystemDebugger.SendInternal(aPath);
+
+            var xChars = aCheckAdditional ? VFSManager.GetInvalidPathCharsWithAdditionalChecks() : VFSManager.GetRealInvalidPathChars();
+
+            for (int i = 0; i < xChars.Length; i++)
+            {
+                if (aPath.IndexOf(xChars[i]) >= 0)
+                {
+                    throw new ArgumentException("The path contains invalid characters.", aPath);
+                }
+            }
+        }
+
+        public static string GetDirectoryName(string aPath)
+        {
+            Global.mFileSystemDebugger.SendInternal("Path.GetDirectoryName");
+
+            if (aPath != null)
+            {
+                Global.mFileSystemDebugger.SendInternal("aPath =");
+                Global.mFileSystemDebugger.SendInternal(aPath);
+
+                CheckInvalidPathChars(aPath);
+                string xText = NormalizePath(aPath, false);
+                if (aPath.Length > 0)
+                {
+                    try
+                    {
+                        string text2 = aPath;
+                        int num = 0;
+                        while ((num < text2.Length) && (text2[num] != '?') && (text2[num] != '*'))
+                        {
+                            num++;
+                        }
+                        if (num > 0)
+                        {
+                            Path.GetFullPath(text2.Substring(0, num));
+                        }
+                    }
+                    catch (PathTooLongException)
+                    {
+                    }
+                    catch (NotSupportedException)
+                    {
+                    }
+                    catch (ArgumentException)
+                    {
+                    }
+                }
+                aPath = xText;
+                int rootLength = GetRootLength(aPath);
+                int num2 = aPath.Length;
+                if (num2 > rootLength)
+                {
+                    num2 = aPath.Length;
+                    if (num2 == rootLength)
+                    {
+                        return null;
+                    }
+                    while ((num2 > rootLength) && (aPath[--num2] != VFSManager.GetDirectorySeparatorChar()) && (aPath[num2] != VFSManager.GetAltDirectorySeparatorChar()))
+                    {
+                    }
+                    return aPath.Substring(0, num2);
+                }
+            }
+            return null;
+        }
+
+        internal static int GetRootLength(string aPath)
+        {
+            Global.mFileSystemDebugger.SendInternal("Path.GetRootLength");
+            Global.mFileSystemDebugger.SendInternal("aPath =");
+            Global.mFileSystemDebugger.SendInternal(aPath);
+
+            int i = 0;
+            int xLength = aPath.Length;
+            if ((xLength >= 1) && IsDirectorySeparator(aPath[0]))
+            {
+                i = 1;
+                if ((xLength >= 2) && IsDirectorySeparator(aPath[1]))
+                {
+                    i = 2;
+                    int xNum = 2;
+                    while (i < xLength)
+                    {
+                        if (((aPath[i] == VFSManager.GetDirectorySeparatorChar()) || (aPath[i] == Path.AltDirectorySeparatorChar)) && (--xNum <= 0))
+                        {
+                            break;
+                        }
+                        i++;
+                    }
+                }
+            }
+            else if ((xLength >= 2) && (aPath[1] == VFSManager.GetVolumeSeparatorChar()))
+            {
+                i = 2;
+                if ((xLength >= 3) && IsDirectorySeparator(aPath[2]))
+                {
+                    i++;
+                }
+            }
+            return i;
         }
 
         public static string NormalizePath(string aPath, bool aFullCheck)
