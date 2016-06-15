@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				XS.Set(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: 4);
 
 				new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 32, Size = 8 };
-				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.AboveOrEqual, DestinationLabel = HighPartIsZero };
+				XS.Jump(CPU.ConditionalTestEnum.AboveOrEqual, HighPartIsZero);
 
 				// shift lower part
 				new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX, ArgumentReg = CPUx86.RegistersEnum.CL };

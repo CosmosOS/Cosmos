@@ -226,7 +226,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     // todo: only happening for real methods now, not for ctor's ?
                     XS.Test(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 2);
                     string xNoErrorLabel = currentLabel + ".NoError" + LabelName.LabelCount.ToString();
-                    new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xNoErrorLabel };
+                    XS.Jump(CPUx86.ConditionalTestEnum.Equal, xNoErrorLabel);
 
                     //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
                     //{

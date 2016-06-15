@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
 						{
 							XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
 							XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), 0);
-							new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = NoOverflowLabel };
+							XS.Jump(CPUx86.ConditionalTestEnum.Equal, NoOverflowLabel);
 							ThrowNotImplementedException("Conv_Ovf_I_Un throws an overflow exception, which is not implemented!");
 						}
 						XS.Label(NoOverflowLabel);

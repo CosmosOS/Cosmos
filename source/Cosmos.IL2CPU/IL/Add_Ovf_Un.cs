@@ -67,7 +67,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
 				if (false == xIsFloat)
 				{
-					new CPUx86.ConditionalJump { Condition = ConditionalTestEnum.NotCarry, DestinationLabel = xSuccessLabel };
+					XS.Jump(ConditionalTestEnum.NotCarry, xSuccessLabel);
 					ThrowOverflowException();
 				}
 				XS.Label(xSuccessLabel);

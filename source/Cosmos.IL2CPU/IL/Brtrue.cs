@@ -41,14 +41,14 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 XS.Pop(XSRegisters.EAX);
         //                 XS.Pop(XSRegisters.EBX);
         //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX };
-        //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = TargetLabel };
+        //                 XS.Jump(ConditionalTestEnum.NotZero, TargetLabel);
         //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EBX };
-        //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = TargetLabel };
+        //                 XS.Jump(ConditionalTestEnum.NotZero, TargetLabel);
         // 			} else
         // 			{
         //                 XS.Pop(XSRegisters.EAX);
         //                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-        //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = TargetLabel };
+        //                 XS.Jump(ConditionalTestEnum.NotEqual, TargetLabel);
         // 			}
         // 		}
         // 	}

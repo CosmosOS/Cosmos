@@ -104,7 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                     XS.Pop(XSRegisters.EBX);
         // 					//must be equal to EDX
         //                     new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EDX };
-        //                     new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = NextInstructionLabel };
+        //                     XS.Jump(ConditionalTestEnum.Zero, NextInstructionLabel);
         // 					//equals
         // 					new CPUx86.Interrupt{DestinationValue=4};
         // 					break;

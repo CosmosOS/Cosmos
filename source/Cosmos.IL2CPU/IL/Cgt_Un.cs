@@ -69,7 +69,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
 				XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EDI));
 				/*
-                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Above, DestinationLabel = LabelTrue };
+                XS.Jump(ConditionalTestEnum.Above, LabelTrue);
 				XS.Label(LabelFalse);
                 new CPUx86.Push { DestinationValue = 0 };
                 new CPUx86.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
@@ -167,7 +167,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 				//new CPUx86.ConditionalMove(Condition.Above, "edi", "esi");
         //                 //XS.Push(XSRegisters.EDI);
         //
-        //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Above, DestinationLabel = LabelTrue };
+        //                 XS.Jump(ConditionalTestEnum.Above, LabelTrue);
         //                 new CPUx86.Push { DestinationValue = 0 };
         //                 new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
         //
@@ -178,7 +178,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			{
         //                 XS.Pop(XSRegisters.EAX);
         //                 XS.Compare(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
-        //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Below, DestinationLabel = LabelTrue };
+        //                 XS.Jump(ConditionalTestEnum.Below, LabelTrue);
         //                 new CPUx86.Jump { DestinationLabel = LabelFalse };
         //                 XS.Label(LabelTrue);
         //                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
