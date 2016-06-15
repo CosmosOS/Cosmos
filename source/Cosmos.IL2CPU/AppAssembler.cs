@@ -182,8 +182,7 @@ namespace Cosmos.IL2CPU
             {
                 XS.Comment("Static constructor. See if it has been called already, return if so.");
                 var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + LabelName.GetFullName(aMethod.MethodBase.DeclaringType));
-                var xAsmMember = new DataMember(xName, (byte)0);
-                Assembler.DataMembers.Add(xAsmMember);
+                XS.DataMember(xName, 0);
                 XS.Compare(xName, 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
                 XS.Jump(ConditionalTestEnum.Equal, ".BeforeQuickReturn");
                 XS.Set(xName, 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
