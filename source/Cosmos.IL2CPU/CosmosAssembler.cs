@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
+using Cosmos.Build.Common;
 using Cosmos.Debug.DebugStub;
 using XSharp.Compiler;
 
@@ -70,7 +71,7 @@ namespace Cosmos.IL2CPU
             xGDT.AddRange(GdtDescriptor(0x00000000, 0xFFFFFFFF, false));
             DataMembers.Add(new DataMember("_NATIVE_GDT_Contents", xGDT.ToArray()));
 
-            new Comment("Tell CPU about GDT");
+            XS.Comment("Tell CPU about GDT");
             var xGdtPtr = new UInt16[3];
 
             // Size of GDT Table - 1
@@ -78,67 +79,55 @@ namespace Cosmos.IL2CPU
             DataMembers.Add(new DataMember("_NATIVE_GDT_Pointer", xGdtPtr));
             new Mov
             {
-                DestinationRef = Cosmos.Assembler.ElementReference.New("_NATIVE_GDT_Pointer"),
+                DestinationRef = ElementReference.New("_NATIVE_GDT_Pointer"),
                 DestinationIsIndirect = true,
                 DestinationDisplacement = 2,
-                SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_GDT_Contents")
+                SourceRef = ElementReference.New("_NATIVE_GDT_Contents")
             };
-            new Mov
-            {
-                DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_GDT_Pointer")
-            };
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), "_NATIVE_GDT_Pointer");
             new Lgdt
             {
-                DestinationReg = Registers.EAX, DestinationIsIndirect = true
+                DestinationReg = RegistersEnum.EAX, DestinationIsIndirect = true
             };
 
-            new Comment("Set data segments");
-            new Mov
-            {
-                DestinationReg = Registers.EAX, SourceValue = mGdData
-            };
-            XS.Set(XSRegisters.OldToNewRegister(Registers.DS), XSRegisters.OldToNewRegister(Registers.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(Registers.ES), XSRegisters.OldToNewRegister(Registers.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(Registers.FS), XSRegisters.OldToNewRegister(Registers.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(Registers.GS), XSRegisters.OldToNewRegister(Registers.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(Registers.SS), XSRegisters.OldToNewRegister(Registers.EAX));
+            XS.Comment("Set data segments");
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), mGdData);
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.DS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.ES), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.FS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.GS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.SS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
 
-            new Comment("Force reload of code segment");
+            XS.Comment("Force reload of code segment");
             new JumpToSegment
             {
                 Segment = mGdCode, DestinationLabel = "Boot_FlushCsGDT"
             };
             new Label("Boot_FlushCsGDT");
-            new Cosmos.Assembler.Comment(this, "END - Create GDT");
+            new Comment(this, "END - Create GDT");
         }
 
         protected void SetIdtDescriptor(int aNo, string aLabel, bool aDisableInts)
         {
             int xOffset = aNo * 8;
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), aLabel);
+            var xIDT = ElementReference.New("_NATIVE_IDT_Contents");
             new Mov
             {
-                DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(aLabel)
-            };
-            var xIDT = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Contents");
-            new Mov
-            {
-                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset, SourceReg = Registers.AL
+                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset, SourceReg = RegistersEnum.AL
             };
             new Mov
             {
-                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 1, SourceReg = Registers.AH
+                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 1, SourceReg = RegistersEnum.AH
             };
-            new ShiftRight
+            XS.ShiftRight(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 16);
+            new Mov
             {
-                DestinationReg = Registers.EAX, SourceValue = 16
+                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 6, SourceReg = RegistersEnum.AL
             };
             new Mov
             {
-                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 6, SourceReg = Registers.AL
-            };
-            new Mov
-            {
-                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 7, SourceReg = Registers.AH
+                DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 7, SourceReg = RegistersEnum.AH
             };
 
             // Code Segment
@@ -194,16 +183,13 @@ namespace Cosmos.IL2CPU
                                                                   }));
             new Mov
             {
-                DestinationRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Pointer"),
+                DestinationRef = ElementReference.New("_NATIVE_IDT_Pointer"),
                 DestinationIsIndirect = true,
                 DestinationDisplacement = 2,
-                SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Contents")
+                SourceRef = ElementReference.New("_NATIVE_IDT_Contents")
             };
 
-            new Mov
-            {
-                DestinationReg = Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Pointer")
-            };
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), "_NATIVE_IDT_Pointer");
 
             if (mComPort > 0)
             {
@@ -213,7 +199,7 @@ namespace Cosmos.IL2CPU
                 };
                 new Lidt
                 {
-                    DestinationReg = Registers.EAX, DestinationIsIndirect = true
+                    DestinationReg = RegistersEnum.EAX, DestinationIsIndirect = true
                 };
             }
             new Label("AfterCreateIDT");
@@ -232,11 +218,11 @@ namespace Cosmos.IL2CPU
             uint xFlags = 0x10003;
             DataMembers.Add(new DataMember("MultibootFlags", xFlags));
             DataMembers.Add(new DataMember("MultibootChecksum", (int)(0 - (xFlags + xSig))));
-            DataMembers.Add(new DataMember("MultibootHeaderAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
-            DataMembers.Add(new DataMember("MultibootLoadAddr", Cosmos.Assembler.ElementReference.New("MultibootSignature")));
-            DataMembers.Add(new DataMember("MultibootLoadEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
-            DataMembers.Add(new DataMember("MultibootBSSEndAddr", Cosmos.Assembler.ElementReference.New("_end_code")));
-            DataMembers.Add(new DataMember("MultibootEntryAddr", Cosmos.Assembler.ElementReference.New("Kernel_Start")));
+            DataMembers.Add(new DataMember("MultibootHeaderAddr", ElementReference.New("MultibootSignature")));
+            DataMembers.Add(new DataMember("MultibootLoadAddr", ElementReference.New("MultibootSignature")));
+            DataMembers.Add(new DataMember("MultibootLoadEndAddr", ElementReference.New("_end_code")));
+            DataMembers.Add(new DataMember("MultibootBSSEndAddr", ElementReference.New("_end_code")));
+            DataMembers.Add(new DataMember("MultibootEntryAddr", ElementReference.New("Kernel_Start")));
             DataMembers.Add(new DataEndIfDefined());
 
             DataMembers.Add(new DataIfDefined("ELF_COMPILATION"));
@@ -268,11 +254,7 @@ namespace Cosmos.IL2CPU
 
             // This is our first entry point. Multiboot uses this as Cosmos entry point.
             new Label("Kernel_Start", isGlobal: true);
-            new Mov
-            {
-                DestinationReg = Registers.ESP,
-                SourceRef = Cosmos.Assembler.ElementReference.New("Kernel_Stack")
-            };
+            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.ESP), "Kernel_Stack");
 
             // Displays "Cosmos" in top left. Used to make sure Cosmos is booted in case of hang.
             // ie bootloader debugging. This must be the FIRST code, even before setup so we know
@@ -297,33 +279,27 @@ namespace Cosmos.IL2CPU
             new Comment(this, "BEGIN - Multiboot Info");
             new Mov
             {
-                DestinationRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = Registers.EBX
+                DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EBX
             };
-            new Add
+            XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 4);
+            new Mov
             {
-                DestinationReg = Registers.EBX, SourceValue = 4
+                DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBX, SourceIsIndirect = true
             };
             new Mov
             {
-                DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true
+                DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX
             };
+            XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 4);
             new Mov
             {
-                DestinationRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = Registers.EAX
-            };
-            new Add
-            {
-                DestinationReg = Registers.EBX, SourceValue = 4
-            };
-            new Mov
-            {
-                DestinationReg = Registers.EAX,
-                SourceReg = Registers.EBX,
+                DestinationReg = RegistersEnum.EAX,
+                SourceReg = RegistersEnum.EBX,
                 SourceIsIndirect = true
             };
             new Mov
             {
-                DestinationRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = Registers.EAX
+                DestinationRef = ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX
             };
             new Comment(this, "END - Multiboot Info");
             new LiteralAssemblerCode("%endif");
@@ -392,7 +368,7 @@ namespace Cosmos.IL2CPU
 
             if (mComPort > 0)
             {
-                var xGen = new XSharp.Compiler.AsmGenerator();
+                var xGen = new AsmGenerator();
 
                 var xGenerateAssembler =
                     new Action<object>(i =>
@@ -416,7 +392,7 @@ namespace Cosmos.IL2CPU
                                        });
                 if (ReadDebugStubFromDisk)
                 {
-                    foreach (var xFile in Directory.GetFiles(Cosmos.Build.Common.CosmosPaths.DebugStubSrc, "*.xs"))
+                    foreach (var xFile in Directory.GetFiles(CosmosPaths.DebugStubSrc, "*.xs"))
                     {
                         xGenerateAssembler(xFile);
                     }
@@ -447,7 +423,7 @@ namespace Cosmos.IL2CPU
             }
 
             // Start emitting assembly labels
-            Cosmos.Assembler.Assembler.CurrentInstance.EmitAsmLabels = true;
+            CurrentInstance.EmitAsmLabels = true;
         }
 
         private void ConfigurePIC()
@@ -475,18 +451,9 @@ namespace Cosmos.IL2CPU
             // emit helper functions:
             Action<byte, byte> xOutBytes = (port, value) =>
                                            {
-                                               new Mov
-                                               {
-                                                   DestinationReg = RegistersEnum.DX, SourceValue = port
-                                               };
-                                               new Mov
-                                               {
-                                                   DestinationReg = RegistersEnum.EAX, SourceValue = value
-                                               };
-                                               new OutToDX
-                                               {
-                                                   DestinationReg = RegistersEnum.AL
-                                               };
+                                               XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.DX), port);
+                                               XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), value);
+                                               XS.WriteToPortDX(XSRegisters.OldToNewRegister(RegistersEnum.AL));
                                            };
 
             Action xIOWait = () => xOutBytes(0x80, 0x22);

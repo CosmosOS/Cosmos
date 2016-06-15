@@ -20,16 +20,9 @@ namespace Cosmos.IL2CPU.X86.IL
             xAddress += (GetStackCountForLocal(aMethod, aMethod.MethodBase.GetMethodBody().LocalVariables[xOpVar.Value]) - 1)*4;
 
             // xAddress contains full size of locals, excluding the actual local
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.Registers.EAX), XSRegisters.OldToNewRegister(CPUx86.Registers.EBP));
-            new CPUx86.Sub
-            {
-                DestinationReg = CPUx86.Registers.EAX,
-                SourceValue = xAddress
-            };
-            new CPUx86.Push
-            {
-                DestinationReg = CPUx86.Registers.EAX,
-            };
+            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP));
+            XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), xAddress);
+            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
         }
     }
 }

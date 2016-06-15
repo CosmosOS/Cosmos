@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
+using XSharp.Compiler;
 using Assembler = Cosmos.Assembler.Assembler;
 using CPUx86 = Cosmos.Assembler.x86;
 
@@ -20,9 +21,9 @@ namespace Cosmos.Core.Plugs
                 //TODO: This is a lot of work to write to a single port.
                 // We need to have some kind of inline ASM option that can
                 // emit a single out instruction
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceDisplacement = 0x0C, SourceIsIndirect = true };
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceDisplacement = 0x08, SourceIsIndirect = true };
-                new CPUx86.OutToDX { DestinationReg = CPUx86.Registers.AL };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceDisplacement = 0x0C, SourceIsIndirect = true };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceDisplacement = 0x08, SourceIsIndirect = true };
+                XS.WriteToPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.AL));
             }
         }
         [PlugMethod(Assembler=typeof(Write8Assembler))]
@@ -32,11 +33,11 @@ namespace Cosmos.Core.Plugs
         #region Write16
         private class Write16Assembler : AssemblerMethod
         {
-            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+            public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x0C };
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
-                new CPUx86.OutToDX { DestinationReg = CPUx86.Registers.AX };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x0C };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
+                XS.WriteToPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.AX));
             }
         }
         [PlugMethod(Assembler = typeof(Write16Assembler))]
@@ -46,11 +47,11 @@ namespace Cosmos.Core.Plugs
         #region Write32
         private class Write32Assembler : AssemblerMethod
         {
-            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+            public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x0C };
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
-                new CPUx86.OutToDX { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x0C };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
+                XS.WriteToPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             }
         }
         [PlugMethod(Assembler = typeof(Write32Assembler))]
@@ -60,14 +61,14 @@ namespace Cosmos.Core.Plugs
         #region Read8
         private class Read8Assembler : AssemblerMethod
         {
-            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+            public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
                 //TODO: Do we need to clear rest of EAX first?
                 //    MTW: technically not, as in other places, it _should_ be working with AL too..
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                new CPUx86.InFromDX { DestinationReg = CPUx86.Registers.AL };
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+                XS.ReadFromPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.AL));
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             }
         }
         [PlugMethod(Assembler = typeof(Read8Assembler))]
@@ -77,12 +78,12 @@ namespace Cosmos.Core.Plugs
         #region Read16
         private class Read16Assembler : AssemblerMethod
         {
-            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+            public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                new CPUx86.InFromDX { DestinationReg = CPUx86.Registers.AX };
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+                XS.ReadFromPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.AX));
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             }
         }
         [PlugMethod(Assembler = typeof(Read16Assembler))]
@@ -92,11 +93,11 @@ namespace Cosmos.Core.Plugs
         #region Read32
         private class Read32Assembler : AssemblerMethod
         {
-            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+            public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
-                new CPUx86.InFromDX { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
+                XS.ReadFromPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             }
         }
         [PlugMethod(Assembler = typeof(Read32Assembler))]

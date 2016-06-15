@@ -891,11 +891,19 @@ namespace XSharp.Compiler {
                                 });
       AddPattern("_REG >> 123", delegate(TokenList aTokens)
                                 {
-                                  XS.ShiftRight(aTokens[0].Register, aTokens[2].IntValue);
+                                  if (aTokens[2].IntValue > 255)
+                                  {
+                                    throw new IndexOutOfRangeException("Value is too large to be used as bitcount!");
+                                  }
+                                  XS.ShiftRight(aTokens[0].Register, (byte)aTokens[2].IntValue);
                                 });
       AddPattern("_REG << 123", delegate(TokenList aTokens)
                                 {
-                                  XS.ShiftLeft(aTokens[0].Register, aTokens[2].IntValue);
+                                  if (aTokens[2].IntValue > 255)
+                                  {
+                                    throw new IndexOutOfRangeException("Value is too large to be used as bitcount!");
+                                  }
+                                  XS.ShiftLeft(aTokens[0].Register, (byte)aTokens[2].IntValue);
                                 });
 
       AddPattern("_REG = 123", delegate(TokenList aTokens)
@@ -1004,7 +1012,7 @@ namespace XSharp.Compiler {
 
       AddPattern("+123", delegate(TokenList aTokens)
                          {
-                           XS.Push(aTokens[0].IntValue, RegisterSize.Int32);
+                           XS.Push(aTokens[0].IntValue, size: RegisterSize.Int32);
                          });
       AddPattern(new string[]
                  {
@@ -1012,7 +1020,7 @@ namespace XSharp.Compiler {
                  }, delegate(TokenList aTokens)
                     {
                       var xSize = GetSize(aTokens[1]);
-                      XS.Push(aTokens[1].IntValue, xSize);
+                      XS.Push(aTokens[1].IntValue, size: xSize);
                     });
       AddPattern("+_REG", delegate(TokenList aTokens)
                           {

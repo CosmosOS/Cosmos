@@ -55,20 +55,20 @@ namespace Cosmos.Core.Plugs
                     continue;
                 }
 
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("__ISR_Handler_" + i.ToString("X2")) };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), "__ISR_Handler_" + i.ToString("X2"));
                 new CPUx86.Mov
                 {
                     DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 0),
-                    SourceReg = CPUx86.Registers.AL
+                    SourceReg = CPUx86.RegistersEnum.AL
                 };
                 new CPUx86.Mov
                 {
                     DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 1),
-                    SourceReg = CPUx86.Registers.AH
+                    SourceReg = CPUx86.RegistersEnum.AH
                 };
                 new CPUx86.Mov
                 {
@@ -87,20 +87,20 @@ namespace Cosmos.Core.Plugs
                     SourceValue = 0x8E,
                     Size = 8
                 };
-                new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EAX, SourceValue = 16 };
+                XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 16);
                 new CPUx86.Mov
                 {
                     DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 6),
-                    SourceReg = CPUx86.Registers.AL
+                    SourceReg = CPUx86.RegistersEnum.AL
                 };
                 new CPUx86.Mov
                 {
                     DestinationRef = CPUAll.ElementReference.New("_NATIVE_IDT_Contents"),
                     DestinationIsIndirect = true,
                     DestinationDisplacement = ((i * 8) + 7),
-                    SourceReg = CPUx86.Registers.AH
+                    SourceReg = CPUx86.RegistersEnum.AH
                 };
             }
 
@@ -118,17 +118,17 @@ namespace Cosmos.Core.Plugs
                 new CPUx86.Push { DestinationValue = (uint)j };
                 new CPUx86.Pushad();
 
-                new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.Registers.EAX), XSRegisters.OldToNewRegister(CPUx86.Registers.ESP)); // preserve old stack address for passing to interrupt handler
+                XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP)); // preserve old stack address for passing to interrupt handler
 
                 // store floating point data
-                new CPUx86.And { DestinationReg = CPUx86.Registers.ESP, SourceValue = 0xfffffff0 }; // fxsave needs to be 16-byte alligned
-                new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 512 }; // fxsave needs 512 bytes
-                new FXSave { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true }; // save the registers
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.ESP };
+                XS.And(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 0xfffffff0); // fxsave needs to be 16-byte alligned
+                XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 512); // fxsave needs 512 bytes
+                new FXSave { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true }; // save the registers
+                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.ESP };
 
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX }; //
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX }; // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); //
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
                                                                            //new CPUx86.Move("eax",
                                                                            //                "esp");
                                                                            //new CPUx86.Push("eax");
@@ -140,15 +140,15 @@ namespace Cosmos.Core.Plugs
                     xHandler = GetMethodDef(typeof(INTs).Assembly, typeof(INTs).FullName, "HandleInterrupt_Default", true);
                 }
                 new CPUx86.Call { DestinationLabel = CPUAll.LabelName.Get(xHandler) };
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new FXStore { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                new FXStore { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
 
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.Registers.ESP), XSRegisters.OldToNewRegister(CPUx86.Registers.EAX)); // this restores the stack for the FX stuff, except the pointer to the FX data
-                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 }; // "pop" the pointer
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // this restores the stack for the FX stuff, except the pointer to the FX data
+                XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4); // "pop" the pointer
 
                 new CPUx86.Popad();
 
-                new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+                XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
                 new CPUAll.Label("__ISR_Handler_" + j.ToString("X2") + "_END");
                 new CPUx86.IRET();
             }
@@ -156,14 +156,14 @@ namespace Cosmos.Core.Plugs
             new CPUx86.Return();
             new CPUAll.Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
             new CPUx86.Noop();
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
-            new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
+            XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".__AFTER_ENABLE_INTERRUPTS" };
 
             // reload interrupt list
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceRef = Cosmos.Assembler.ElementReference.New("_NATIVE_IDT_Pointer") };
+            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), "_NATIVE_IDT_Pointer");
             new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("static_field__Cosmos_Core_CPU_mInterruptsEnabled"), DestinationIsIndirect = true, SourceValue = 1 };
-            new CPUx86.Lidt { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+            new CPUx86.Lidt { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
             // Reenable interrupts
             new CPUx86.Sti();
 

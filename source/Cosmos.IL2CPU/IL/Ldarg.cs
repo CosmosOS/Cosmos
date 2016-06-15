@@ -3,6 +3,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.X86;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 using SysReflection = System.Reflection;
 
@@ -157,15 +158,15 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
             }
 
-            new Comment("Arg idx = " + aParam);
+            XS.Comment("Arg idx = " + aParam);
             uint xArgRealSize = SizeOfType(xArgType);
             uint xArgSize = Align(xArgRealSize, 4);
-            new Comment("Arg type = " + xArgType.ToString());
-            new Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
+            XS.Comment("Arg type = " + xArgType.ToString());
+            XS.Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
             if (xArgRealSize < 4)
             {
-                new CPUx86.MoveSignExtend {DestinationReg = CPUx86.Registers.EAX, Size = (byte)(xArgRealSize * 8), SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = xDisplacement};
-                new CPUx86.Push {DestinationReg = CPUx86.Registers.EAX};
+                new CPUx86.MoveSignExtend {DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xArgRealSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = xDisplacement};
+                XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
             }
             else
             {
@@ -173,7 +174,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     new Push
                     {
-                        DestinationReg = Registers.EBP,
+                        DestinationReg = RegistersEnum.EBP,
                         DestinationIsIndirect = true,
                         DestinationDisplacement = xDisplacement - (i * 4)
                     };
