@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					//low
 					new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
 					//high
-					new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 4);
 
 					// pop both 8 byte values
 					XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
@@ -58,7 +58,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					// low
 					new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
 					//high
-					new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 4);
 
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
 

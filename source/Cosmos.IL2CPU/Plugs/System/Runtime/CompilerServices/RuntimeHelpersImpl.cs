@@ -16,9 +16,9 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
 		public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle) {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; // array
+            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0xC); // array
 		    new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EDI, SourceIsIndirect = true};
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };// aFieldHandle
+            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 8);// aFieldHandle
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 8);
 		    new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EDI, DestinationIsIndirect = true};
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 4);

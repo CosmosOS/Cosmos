@@ -42,8 +42,8 @@ namespace Cosmos.Core.Plugs {
 		public class ZeroFillAsm : AssemblerMethod {
 			public override void AssembleNew(CPUAll.Assembler aAssembler, object aMethodInfo) {
 				new CPUx86.ClrDirFlag();
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; //address
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 }; //length
+				XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0xC); //address
+				XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x8); //length
 				// set EAX to value of fill (zero)
 				XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1);

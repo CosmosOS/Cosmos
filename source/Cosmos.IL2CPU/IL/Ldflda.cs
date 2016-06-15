@@ -48,7 +48,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 if (xNeedsGC)
                 {
                     // eax contains the handle now, lets convert it to the real memory address
-                    new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true, SourceDisplacement = (int)xActualOffset};
+                    XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), sourceDisplacement: (int)xActualOffset);
                 }
 
                 new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX};

@@ -138,7 +138,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                         // EAX contains a memory handle now, lets dereference it to a pointer
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true, SourceDisplacement = 8 };
+                        XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), sourceDisplacement: 8);
                         XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), 2);
                         XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
                         XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));

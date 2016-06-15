@@ -72,20 +72,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     // compair LEFT_HIGH, RIGHT_HIGH , on zero only simple multiply is used
                     //mov RIGHT_HIGH to eax, is useable on Full 64 multiply
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.EAX,
-                        SourceReg = CPUx86.RegistersEnum.ESP,
-                        SourceIsIndirect = true,
-                        SourceDisplacement = 4
-                    };
-                    new CPUx86.Or
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.EAX,
-                        SourceReg = CPUx86.RegistersEnum.ESP,
-                        SourceIsIndirect = true,
-                        SourceDisplacement = 12
-                    };
+                    XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 4);
+                    XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 12);
                     new CPUx86.ConditionalJump
                     {
                         Condition = CPUx86.ConditionalTestEnum.Zero,
@@ -95,22 +83,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     // copy again, or could change EAX
                     //TODO is there an opcode that does OR without change EAX?
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.EAX,
-                        SourceReg = CPUx86.RegistersEnum.ESP,
-                        SourceIsIndirect = true,
-                        SourceDisplacement = 4
-                    };
+                    XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 4);
                     // eax contains already RIGHT_HIGH
                     // multiply with LEFT_LOW
-                    new CPUx86.Multiply
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.ESP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = 8,
-                        Size = 32
-                    };
+                    XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), displacement: 8);
                     // save result of LEFT_LOW * RIGHT_HIGH
                     XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
@@ -122,13 +98,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         SourceIsIndirect = true
                     };
                     // multiply with LEFT_HIGH
-                    new CPUx86.Multiply
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.ESP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = 12,
-                        Size = 32
-                    };
+                    XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), displacement: 12);
                     // add result of LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
@@ -140,13 +110,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         SourceIsIndirect = true
                     };
                     // multiply with LEFT_LOW
-                    new CPUx86.Multiply
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.ESP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = 8,
-                        Size = 32
-                    };
+                    XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), displacement: 8);
                     // add LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH to high dword of last result
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 
@@ -164,13 +128,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         SourceIsIndirect = true
                     };
                     // multiply with LEFT_LOW
-                    new CPUx86.Multiply
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.ESP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = 8,
-                        Size = 32
-                    };
+                    XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), displacement: 8);
 
                     new Label(MoveReturnValue);
                     // move high result to left high
