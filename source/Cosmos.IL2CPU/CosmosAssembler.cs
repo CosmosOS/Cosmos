@@ -91,12 +91,12 @@ namespace Cosmos.IL2CPU
             };
 
             XS.Comment("Set data segments");
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), mGdData);
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.DS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.ES), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.FS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.GS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.SS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+            XS.Set(XSRegisters.EAX, mGdData);
+            XS.Set(XSRegisters.DS, XSRegisters.AX);
+            XS.Set(XSRegisters.ES, XSRegisters.AX);
+            XS.Set(XSRegisters.FS, XSRegisters.AX);
+            XS.Set(XSRegisters.GS, XSRegisters.AX);
+            XS.Set(XSRegisters.SS, XSRegisters.AX);
 
             XS.Comment("Force reload of code segment");
             new JumpToSegment

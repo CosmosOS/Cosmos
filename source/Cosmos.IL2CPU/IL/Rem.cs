@@ -25,8 +25,8 @@ namespace Cosmos.IL2CPU.X86.IL
                 new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
                 new MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-                new XorPS { DestinationReg = CPUx86.RegistersEnum.XMM2, SourceReg = CPUx86.RegistersEnum.XMM2 };
-                new DivPS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.XMM1 };
+                XS.SSE.XorPS(XSRegisters.XMM2, XSRegisters.XMM2);
+                XS.SSE.DivPS(XSRegisters.XMM1, XSRegisters.XMM0);
                 new MoveSS { SourceReg = CPUx86.RegistersEnum.XMM2, DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
             }
             else
@@ -116,8 +116,8 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
                 new MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
-                new XorPS { DestinationReg = CPUx86.RegistersEnum.XMM2, SourceReg = CPUx86.RegistersEnum.XMM2 };
-                new DivSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.XMM1 };
+                XS.SSE.XorPS(XSRegisters.XMM2, XSRegisters.XMM2);
+                XS.SSE.DivSS(XSRegisters.XMM1, XSRegisters.XMM0);
                 XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
                 new MoveSS { SourceReg = CPUx86.RegistersEnum.XMM2, DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
             }
