@@ -36,7 +36,6 @@ namespace DebugCompiler
             xEngine.OutputHandler = new TestOutputHandler();
 
             Assert.IsTrue(xEngine.Execute());
-
         }
 
         private class TestOutputHandler : OutputHandlerFullTextBase

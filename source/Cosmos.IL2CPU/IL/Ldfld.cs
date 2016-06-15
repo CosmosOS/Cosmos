@@ -142,7 +142,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             for (int i = 1; i <= (xSize / 4); i++)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true, SourceDisplacement = (int)(xSize - (i * 4)) };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), sourceDisplacement: (int)(xSize - (i * 4)));
                 XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             }
 

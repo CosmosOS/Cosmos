@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
             var xRoundedSize = Align(xFieldSize, 4);
             DoNullReferenceCheck(Assembler, DebugEnabled, xRoundedSize);
 
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = checked((int)xRoundedSize) };
+            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: checked((int)xRoundedSize));
             for( int i = 0; i < ( xFieldSize / 4 ); i++ )
             {
                 XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));

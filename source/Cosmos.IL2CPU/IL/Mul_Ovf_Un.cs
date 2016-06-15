@@ -46,36 +46,18 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // compair LEFT_HIGH, RIGHT_HIGH , on zero only simple multiply is used
         //mov RIGHT_HIGH to eax, is useable on Full 64 multiply
-        new Assembler.x86.Mov
+        XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
+        XS.Or(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 12);
+        new ConditionalJump
           {
-            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX,
-            SourceReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
-            SourceIsIndirect = true,
-            SourceDisplacement = 4
-          };
-        new Assembler.x86.Or
-          {
-            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX,
-            SourceReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
-            SourceIsIndirect = true,
-            SourceDisplacement = 12
-          };
-        new Assembler.x86.ConditionalJump
-          {
-            Condition = Cosmos.Assembler.x86.ConditionalTestEnum.Zero,
+            Condition = ConditionalTestEnum.Zero,
             DestinationLabel = Simple32Multiply
           };
         // Full 64 Multiply
 
         // copy again, or could change EAX
         //TODO is there an opcode that does OR without change EAX?
-        new Assembler.x86.Mov
-          {
-            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX,
-            SourceReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
-            SourceIsIndirect = true,
-            SourceDisplacement = 4
-          };
+        XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
         // eax contains already RIGHT_HIGH
         // multiply with LEFT_LOW
         XS.Multiply(XSRegisters.OldToNewRegister(RegistersEnum.ESP), displacement: 8);

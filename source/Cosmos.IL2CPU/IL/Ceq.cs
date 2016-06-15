@@ -83,10 +83,10 @@ namespace Cosmos.IL2CPU.X86.IL {
         else
         {
           XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-          new Compare { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+          XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
           XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
           new ConditionalJump { Condition = ConditionalTestEnum.NotEqual, DestinationLabel = Label.LastFullLabel + ".False" };
-          new CPUx86.Xor { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+          XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
           new ConditionalJump { Condition = ConditionalTestEnum.NotZero, DestinationLabel = Label.LastFullLabel + ".False" };
 
           //they are equal, eax == 0

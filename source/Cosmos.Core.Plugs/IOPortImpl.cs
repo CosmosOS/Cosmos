@@ -35,8 +35,8 @@ namespace Cosmos.Core.Plugs
         {
             public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x0C };
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x0C);
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x08);
                 XS.WriteToPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.AX));
             }
         }
@@ -49,8 +49,8 @@ namespace Cosmos.Core.Plugs
         {
             public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x0C };
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x0C);
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x08);
                 XS.WriteToPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             }
         }
@@ -63,7 +63,7 @@ namespace Cosmos.Core.Plugs
         {
             public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x08);
                 //TODO: Do we need to clear rest of EAX first?
                 //    MTW: technically not, as in other places, it _should_ be working with AL too..
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
@@ -80,7 +80,7 @@ namespace Cosmos.Core.Plugs
         {
             public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x08);
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
                 XS.ReadFromPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.AX));
                 XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
@@ -95,7 +95,7 @@ namespace Cosmos.Core.Plugs
         {
             public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0x08 };
+                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x08);
                 XS.ReadFromPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             }

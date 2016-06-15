@@ -72,20 +72,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     // compair LEFT_HIGH, RIGHT_HIGH , on zero only simple multiply is used
                     //mov RIGHT_HIGH to eax, is useable on Full 64 multiply
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.EAX,
-                        SourceReg = CPUx86.RegistersEnum.ESP,
-                        SourceIsIndirect = true,
-                        SourceDisplacement = 4
-                    };
-                    new CPUx86.Or
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.EAX,
-                        SourceReg = CPUx86.RegistersEnum.ESP,
-                        SourceIsIndirect = true,
-                        SourceDisplacement = 12
-                    };
+                    XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 4);
+                    XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 12);
                     new CPUx86.ConditionalJump
                     {
                         Condition = CPUx86.ConditionalTestEnum.Zero,
@@ -95,13 +83,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     // copy again, or could change EAX
                     //TODO is there an opcode that does OR without change EAX?
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.EAX,
-                        SourceReg = CPUx86.RegistersEnum.ESP,
-                        SourceIsIndirect = true,
-                        SourceDisplacement = 4
-                    };
+                    XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 4);
                     // eax contains already RIGHT_HIGH
                     // multiply with LEFT_LOW
                     XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), displacement: 8);
