@@ -165,15 +165,15 @@ namespace Cosmos.IL2CPU.X86.IL
       }
       else
       {
-        new Assembler.x86.Pop { DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX };
-        new Assembler.x86.Multiply
+        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+        new Multiply
           {
-            DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP,
+            DestinationReg = RegistersEnum.ESP,
             DestinationIsIndirect = true,
             Size = 32
           };
-        new Assembler.x86.Add { DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP, SourceValue = 4 };
-        new Assembler.x86.Push { DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX };
+        new Assembler.x86.Add { DestinationReg = RegistersEnum.ESP, SourceValue = 4 };
+        XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
       }
     }
   }

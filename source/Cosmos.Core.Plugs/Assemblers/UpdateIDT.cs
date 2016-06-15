@@ -127,8 +127,8 @@ namespace Cosmos.Core.Plugs
                 new FXSave { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true }; // save the registers
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.ESP };
 
-                new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX }; //
-                new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX }; // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); //
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
                                                                            //new CPUx86.Move("eax",
                                                                            //                "esp");
                                                                            //new CPUx86.Push("eax");
@@ -140,7 +140,7 @@ namespace Cosmos.Core.Plugs
                     xHandler = GetMethodDef(typeof(INTs).Assembly, typeof(INTs).FullName, "HandleInterrupt_Default", true);
                 }
                 new CPUx86.Call { DestinationLabel = CPUAll.LabelName.Get(xHandler) };
-                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 new FXStore { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
 
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // this restores the stack for the FX stuff, except the pointer to the FX data

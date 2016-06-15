@@ -19,9 +19,9 @@ namespace Cosmos.Core.Plugs {
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceRef = CPUAll.ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
 				XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceValue = 1024 };
-				new CPUx86.Divide { DestinationReg = CPUx86.RegistersEnum.ECX };
+				XS.Divide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 				new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 1 };
-				new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+				XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 			}
 		}
 

@@ -475,10 +475,7 @@ namespace Cosmos.IL2CPU
                                            {
                                                XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.DX), port);
                                                XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), value);
-                                               new OutToDX
-                                               {
-                                                   DestinationReg = RegistersEnum.AL
-                                               };
+                                               XS.WriteToPortDX(XSRegisters.OldToNewRegister(RegistersEnum.AL));
                                            };
 
             Action xIOWait = () => xOutBytes(0x80, 0x22);

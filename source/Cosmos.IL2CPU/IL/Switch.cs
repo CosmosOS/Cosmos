@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             ILOpCodes.OpSwitch OpSw = ( ILOpCodes.OpSwitch )aOpCode;
-            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             for( int i = 0; i < OpSw.BranchLocations.Length; i++ )
             {
                 XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), ( uint )i);

@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -58,7 +59,7 @@ namespace Cosmos.IL2CPU.X86.IL
                                 new CPUx86.x87.IntLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
                                 new CPUx86.SSE.ConvertSD2SS { SourceReg = CPUx86.RegistersEnum.ESP, DestinationReg = CPUx86.RegistersEnum.XMM0, SourceIsIndirect = true };
                                 new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
-                                
+
                                 //throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_R4.cs->Conversion of Int64 to Float is not yet implemented!");
                             }
                             else
@@ -66,9 +67,9 @@ namespace Cosmos.IL2CPU.X86.IL
                                 throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_R4.cs->Conversion of UInt64 to Float is not yet implemented!");
                             }
                         }
-                        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-                        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
-                        new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
+                        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                         break;
                     }
                 default:

@@ -3,6 +3,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using System.Reflection;
 using System.Linq;
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -53,20 +54,20 @@ namespace Cosmos.IL2CPU.X86.IL
             string xDataName = DataMember.GetStaticFieldName(xField);
             for( int i = 0; i < ( xSize / 4 ); i++ )
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-                new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( xDataName, i * 4 ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
+                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                new CPUx86.Mov { DestinationRef = ElementReference.New( xDataName, i * 4 ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
             }
             switch( xSize % 4 )
             {
                 case 1:
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-                        new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.AL };
+                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        new CPUx86.Mov { DestinationRef = ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.AL };
                         break;
                     }
                 case 2:
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                         new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.AX };
                         break;
                     }

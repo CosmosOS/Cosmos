@@ -55,14 +55,14 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             else
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 if (xNeedsGC)
                 {
                     // eax contains the handle now, lets convert it to the real memory address
                     new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
                 }
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), (uint)(xActualOffset));
-                new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EAX};
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             }
         }
     }

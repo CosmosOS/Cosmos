@@ -43,25 +43,25 @@ namespace Cosmos.IL2CPU.X86.IL {
         }
         else
         {
-          new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-          new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-          new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = Label.LastFullLabel + ".True" };
-          new CPUx86.Jump { DestinationLabel = Label.LastFullLabel + ".False" };
+          XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+          new Compare { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
+          new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = Label.LastFullLabel + ".True" };
+          new Jump { DestinationLabel = Label.LastFullLabel + ".False" };
           new Label(".True");
-          new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
-          new CPUx86.Push { DestinationValue = 1 };
-          new CPUx86.Jump { DestinationLabel = xNextLabel };
+          new CPUx86.Add { DestinationReg = RegistersEnum.ESP, SourceValue = 4 };
+          new Push { DestinationValue = 1 };
+          new Jump { DestinationLabel = xNextLabel };
           new Label(".False");
-          new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
-          new CPUx86.Push { DestinationValue = 0 };
-          new CPUx86.Jump { DestinationLabel = xNextLabel };
+          new CPUx86.Add { DestinationReg = RegistersEnum.ESP, SourceValue = 4 };
+          new Push { DestinationValue = 0 };
+          new Jump { DestinationLabel = xNextLabel };
         }
       }
       else if (xSize > 4)
       {
         if (xStackItemIsFloat)
         {
-          new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, SourceValue = 1 };
+          new Mov { DestinationReg = RegistersEnum.ESI, SourceValue = 1 };
           // esi = 1
           XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EDI), XSRegisters.OldToNewRegister(RegistersEnum.EDI));
           // edi = 0
@@ -70,20 +70,20 @@ namespace Cosmos.IL2CPU.X86.IL {
           new FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationDisplacement = 8, DestinationIsIndirect = true };
           // value 2
           new FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
-          new FloatCompareAndSet { DestinationReg = RegistersEnum.ST1 };
+          XS.FPU.FloatCompareAndSet(XSRegisters.ST1);
           // if zero is set, ST(0) == ST(i)
           new ConditionalMove { Condition = ConditionalTestEnum.Equal, DestinationReg = RegistersEnum.EDI, SourceReg = RegistersEnum.ESI };
           // pops fpu stack
-          new FloatStoreAndPop { DestinationReg = RegistersEnum.ST0 };
-          new FloatStoreAndPop { DestinationReg = RegistersEnum.ST0 };
+          XS.FPU.FloatStoreAndPop(XSRegisters.ST0);
+          XS.FPU.FloatStoreAndPop(XSRegisters.ST0);
           new CPUx86.Add { DestinationReg = RegistersEnum.ESP, SourceValue = 16 };
-          new Push { DestinationReg = RegistersEnum.EDI };
+          XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EDI));
         }
         else
         {
-          new CPUx86.Pop { DestinationReg = RegistersEnum.EAX };
+          XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
           new Compare { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
-          new CPUx86.Pop { DestinationReg = RegistersEnum.EAX };
+          XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
           new ConditionalJump { Condition = ConditionalTestEnum.NotEqual, DestinationLabel = Label.LastFullLabel + ".False" };
           new CPUx86.Xor { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
           new ConditionalJump { Condition = ConditionalTestEnum.NotZero, DestinationLabel = Label.LastFullLabel + ".False" };
@@ -91,13 +91,13 @@ namespace Cosmos.IL2CPU.X86.IL {
           //they are equal, eax == 0
           new CPUx86.Add { DestinationReg = RegistersEnum.ESP, SourceValue = 8 };
           new CPUx86.Add { DestinationReg = RegistersEnum.EAX, SourceValue = 1 };
-          new Push { DestinationReg = RegistersEnum.EAX };
+          XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
           new Jump { DestinationLabel = xNextLabel };
           new Label(Label.LastFullLabel + ".False");
           //eax = 0
           new CPUx86.Add { DestinationReg = RegistersEnum.ESP, SourceValue = 8 };
           XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-          new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+          XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
           new CPUx86.Jump { DestinationLabel = xNextLabel };
         }
 

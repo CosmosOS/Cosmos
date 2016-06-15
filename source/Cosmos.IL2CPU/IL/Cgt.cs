@@ -3,6 +3,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using Cosmos.Assembler.x86.SSE;
 using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -42,31 +43,31 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.x87.FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationDisplacement = 8, DestinationIsIndirect = true };
 					// value 2
 					new CPUx86.x87.FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
-					new CPUx86.x87.FloatCompareAndSet { DestinationReg = RegistersEnum.ST1 };
+					XS.FPU.FloatCompareAndSet(XSRegisters.ST1);
 					// if carry is set, ST(0) < ST(i)
-					new CPUx86.ConditionalMove { Condition = CPUx86.ConditionalTestEnum.Below, DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.ESI };
+					new ConditionalMove { Condition = ConditionalTestEnum.Below, DestinationReg = RegistersEnum.EDI, SourceReg = RegistersEnum.ESI };
 					// pops fpu stack
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ST0 };
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ST0 };
+					XS.FPU.FloatStoreAndPop(XSRegisters.ST0);
+					XS.FPU.FloatStoreAndPop(XSRegisters.ST0);
 					new CPUx86.Add { DestinationReg = RegistersEnum.ESP, SourceValue = 16 };
 				}
 				else
 				{
-					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EDX };
+					XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+					XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EDX));
 					//value2: EDX:EAX
-					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EBX };
-					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
+					XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+					XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.ECX));
 					//value1: ECX:EBX
 					XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EDX));
 					new ConditionalJump { Condition = ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
 					new ConditionalJump { Condition = ConditionalTestEnum.LessThan, DestinationLabel = LabelFalse };
 					XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
 					new Label(LabelTrue);
-					new CPUx86.ConditionalMove { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationReg = CPUx86.RegistersEnum.EDI, SourceReg = CPUx86.RegistersEnum.ESI };
+					new ConditionalMove { Condition = ConditionalTestEnum.GreaterThan, DestinationReg = RegistersEnum.EDI, SourceReg = RegistersEnum.ESI };
 					new Label(LabelFalse);
 				}
-				new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EDI };
+				XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EDI));
 				/*
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
 				new Label(LabelFalse);
@@ -78,17 +79,17 @@ namespace Cosmos.IL2CPU.X86.IL
 			else
 			{
 				if (xStackItemIsFloat){
-					new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-					new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, SourceValue = 4 };
-					new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
-					new CPUx86.SSE.CompareSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.XMM0, pseudoOpcode = (byte)CPUx86.SSE.ComparePseudoOpcodes.NotLessThanOrEqualTo };
-					new CPUx86.MoveD { DestinationReg = CPUx86.RegistersEnum.EBX, SourceReg = CPUx86.RegistersEnum.XMM1 };
-					new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.EBX, SourceValue = 1 };
-					new CPUx86.Mov { SourceReg = CPUx86.RegistersEnum.EBX, DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
+					new MoveSS { DestinationReg = RegistersEnum.XMM0, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
+					new CPUx86.Add { DestinationReg = RegistersEnum.ESP, SourceValue = 4 };
+					new MoveSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.ESP, SourceIsIndirect = true };
+					new CompareSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.XMM0, pseudoOpcode = (byte)ComparePseudoOpcodes.NotLessThanOrEqualTo };
+					new MoveD { DestinationReg = RegistersEnum.EBX, SourceReg = RegistersEnum.XMM1 };
+					new CPUx86.And { DestinationReg = RegistersEnum.EBX, SourceValue = 1 };
+					new Mov { SourceReg = RegistersEnum.EBX, DestinationReg = RegistersEnum.ESP, DestinationIsIndirect = true };
 				}
 
 				else{
-					new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+					XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
 					new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
 					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.LessThan, DestinationLabel = LabelTrue };
 					new CPUx86.Jump { DestinationLabel = LabelFalse };

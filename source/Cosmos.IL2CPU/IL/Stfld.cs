@@ -44,29 +44,29 @@ namespace Cosmos.IL2CPU.X86.IL {
       }
       if (debugEnabled)
       {
-        new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.ECX};
-        new CPUx86.Pop {DestinationReg = CPUx86.RegistersEnum.ECX};
+        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
+        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
       }
       XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), (uint)(xActualOffset));
       //TODO: Can't we use an x86 op to do a byte copy instead and be faster?
       for (int i = 0; i < (xSize / 4); i++) {
-        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((i * 4)), SourceReg = CPUx86.RegistersEnum.EAX };
       }
 
       switch (xSize % 4) {
         case 1: {
-            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AL };
             break;
           }
         case 2: {
-            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AX };
             break;
           }
 		case 3: {
-				new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+				XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 				// move 2 lower bytes
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AX };
 				// shift third byte to lowest
@@ -83,8 +83,8 @@ namespace Cosmos.IL2CPU.X86.IL {
 
 #if! SKIP_GC_CODE
           if (aNeedsGC) {
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ECX };
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
+            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.DecRefCountRef) };
             new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.DecRefCountRef) };
           }

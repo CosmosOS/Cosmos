@@ -22,9 +22,9 @@ namespace Cosmos.IL2CPU.X86.IL
       //    throw new Exception("Unsupported size for Ldelem_Ref: " + aElementSize);
       //}
 
-      new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+      XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
       XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), aElementSize);
-      new CPUx86.Multiply { DestinationReg = CPUx86.RegistersEnum.EDX };
+      XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 
       new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = (ObjectImpl.FieldDataOffset + 4) };
 
@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU.X86.IL
       }
 
       // pop the array
-      new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EDX };
+      XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
       // convert to real memory address
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
 
@@ -61,7 +61,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
               new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 8, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
             }
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ECX };
+            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
             break;
           case 2:
             if (isSigned)
@@ -72,7 +72,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
               new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 16, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
             }
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ECX };
+            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
             break;
           case 4:
             // copy a full dword

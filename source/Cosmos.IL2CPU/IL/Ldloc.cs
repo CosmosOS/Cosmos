@@ -2,6 +2,7 @@ using System;
 using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -20,13 +21,13 @@ namespace Cosmos.IL2CPU.X86.IL
 			var xStackCount = GetStackCountForLocal(aMethod, xVar);
 			var xEBPOffset = ((int)GetEBPOffsetForLocal(aMethod, xOpVar.Value));
 			var xSize = SizeOfType(xVar.LocalType);
-            new Comment("EBPOffset = " + xEBPOffset); 
+            new Comment("EBPOffset = " + xEBPOffset);
             if (xStackCount > 1)
 			{
 				for (int i = 0; i < xStackCount; i++)
 				{
 					new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - (xEBPOffset + (i * 4))) };
-					new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 				}
 			}
 			else
@@ -41,7 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
 								new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
 							else
 								new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
-							new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+							XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 							break;
 						}
 					case 4:

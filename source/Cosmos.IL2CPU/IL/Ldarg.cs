@@ -3,6 +3,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.X86;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 using SysReflection = System.Reflection;
 
@@ -165,7 +166,7 @@ namespace Cosmos.IL2CPU.X86.IL
             if (xArgRealSize < 4)
             {
                 new CPUx86.MoveSignExtend {DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xArgRealSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = xDisplacement};
-                new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EAX};
+                XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
             }
             else
             {

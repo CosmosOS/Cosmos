@@ -177,7 +177,7 @@ namespace Cosmos.IL2CPU.X86.IL
             Size = 32
           };
         new Assembler.x86.Add { DestinationReg = Cosmos.Assembler.x86.RegistersEnum.ESP, SourceValue = 4 };
-        new Assembler.x86.Push { DestinationReg = Cosmos.Assembler.x86.RegistersEnum.EAX };
+        XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
       }
     }
 

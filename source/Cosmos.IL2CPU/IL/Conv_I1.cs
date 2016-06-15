@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -46,15 +47,15 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 2:
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I1.cs->The size 2 could not exist, because always is pushed Int32 or Int64!");
                 case 4:
-                    new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.AL, Size = 8 };
-                    new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     break;
                 case 8:
-                    new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-                    new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EBX };
+                    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
                     new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.AL, Size = 8 };
-                    new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     break;
                 default:
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I1: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );

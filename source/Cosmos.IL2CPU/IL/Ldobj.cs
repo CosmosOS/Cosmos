@@ -27,7 +27,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 throw new ArgumentNullException("type");
             }
-            new CPUx86.Pop {DestinationReg = CPUx86.RegistersEnum.EAX};
+            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             var xObjSize = GetStorageSize(type);
 
             switch (xObjSize % 4)
@@ -37,7 +37,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
                     new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.BL, SourceIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX, SourceDisplacement = (int)(xObjSize - 1)};
                     //new CPUx86.ShiftLeft { DestinationReg = CPUx86.Registers.EBX, SourceValue = 24 };
-                    new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EBX};
+                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
                     break;
                 }
                 case 2:
@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
                     new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.BX, SourceIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX, SourceDisplacement = (int)(xObjSize - 2)};
                     //new CPUx86.ShiftLeft {DestinationReg = CPUx86.Registers.EBX, SourceValue = 16};
-                    new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EBX};
+                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
                     break;
                 }
                 case 0:

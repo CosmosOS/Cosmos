@@ -26,16 +26,16 @@ namespace Cosmos.IL2CPU.X86.IL
             var xStackItem_Value_Size = SizeOfType(xStackItem_Value);
             if( xStackItem_Value_Size <= 4 )
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX }; // shift amount
-                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EBX }; // value
+                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // shift amount
+                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX)); // value
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.CL), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.AL));
                 XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.CL);
-                new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EBX };
+                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
                 return;
             }
             if( xStackItem_Value_Size <= 8 )
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EDX };
+                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
                 new Label( xBaseLabel + "__StartLoop" );
                 XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));

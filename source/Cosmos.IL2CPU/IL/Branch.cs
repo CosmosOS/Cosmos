@@ -107,8 +107,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     //}
                     //else
                     //{
-                    new CPU.Pop {DestinationReg = CPU.RegistersEnum.EAX};
-                    new CPU.Pop {DestinationReg = CPU.RegistersEnum.EBX};
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EBX));
                     XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
                     new ConditionalJump {Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                     //}
@@ -124,11 +124,11 @@ namespace Cosmos.IL2CPU.X86.IL
                     var xNoJump = GetLabel(aMethod, aOpCode) + "__NoBranch";
 
                     // value 2  EBX:EAX
-                    new CPU.Pop {DestinationReg = RegistersEnum.EAX};
-                    new CPU.Pop {DestinationReg = RegistersEnum.EBX};
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EBX));
                     // value 1  EDX:ECX
-                    new CPU.Pop {DestinationReg = RegistersEnum.ECX};
-                    new CPU.Pop {DestinationReg = RegistersEnum.EDX};
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.ECX));
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EDX));
                     switch (xTestOp)
                     {
                         case ConditionalTestEnum.Zero: // Equal
@@ -191,7 +191,7 @@ namespace Cosmos.IL2CPU.X86.IL
                             new ConditionalJump {Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             new ConditionalJump {Condition = ConditionalTestEnum.Below, DestinationLabel = xNoJump};
                             XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-                            new CPU.ConditionalJump {Condition = CPU.ConditionalTestEnum.AboveOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                            new ConditionalJump {Condition = ConditionalTestEnum.AboveOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             break;
                         default:
                             throw new Exception("Unknown OpCode for conditional branch in 64-bit.");
@@ -211,16 +211,16 @@ namespace Cosmos.IL2CPU.X86.IL
                 // todo: improve code clarity
                 if (xStackContentSize <= 4)
                 {
-                    new CPU.Pop {DestinationReg = CPU.RegistersEnum.EAX};
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
                     if (xTestOp == ConditionalTestEnum.Zero)
                     {
-                        new CPU.Compare {DestinationReg = CPU.RegistersEnum.EAX, SourceValue = 0};
-                        new CPU.ConditionalJump {Condition = ConditionalTestEnum.Equal, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                        new Compare {DestinationReg = RegistersEnum.EAX, SourceValue = 0};
+                        new ConditionalJump {Condition = ConditionalTestEnum.Equal, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                     }
                     else if (xTestOp == ConditionalTestEnum.NotZero)
                     {
-                        new CPU.Compare {DestinationReg = CPU.RegistersEnum.EAX, SourceValue = 0};
-                        new CPU.ConditionalJump {Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
+                        new Compare {DestinationReg = RegistersEnum.EAX, SourceValue = 0};
+                        new ConditionalJump {Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                     }
                     else
                     {
@@ -229,8 +229,8 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else
                 {
-                    new CPU.Pop {DestinationReg = CPU.RegistersEnum.EAX};
-                    new CPU.Pop {DestinationReg = CPU.RegistersEnum.EBX};
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EBX));
                     switch (xTestOp)
                     {
                         case ConditionalTestEnum.Zero: // Equal

@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -16,24 +17,24 @@ namespace Cosmos.IL2CPU.X86.IL
             var xFieldSize = SizeOfType(aOpCode.StackPopTypes[0]);
             var xRoundedSize = Align(xFieldSize, 4);
             DoNullReferenceCheck(Assembler, DebugEnabled, xRoundedSize);
-            
+
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true, SourceDisplacement = checked((int)xRoundedSize) };
             for( int i = 0; i < ( xFieldSize / 4 ); i++ )
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.RegistersEnum.EAX };
             }
             switch( xFieldSize % 4 )
             {
                 case 1:
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = checked((int)( xFieldSize / 4 ) * 4 ), SourceReg = CPUx86.RegistersEnum.AL };
                         break;
                     }
                 case 2:
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = checked((int)( xFieldSize / 4 ) * 4 ), SourceReg = CPUx86.RegistersEnum.AX };
                         break;
                     }

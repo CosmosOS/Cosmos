@@ -4,7 +4,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs.System;
-
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -34,10 +34,10 @@ namespace Cosmos.IL2CPU.X86.IL
       SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.UInt32", "System.UInt32");
       Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, GetLabel(aMethod, aOpCode), xBaseLabel + "_After_IsInstance_Call", DebugEnabled);
       new Label(xBaseLabel + "_After_IsInstance_Call");
-      new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-      new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
-      new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
-      new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+      XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
+      new CPU.Compare { DestinationReg = CPU.RegistersEnum.EAX, SourceValue = 0 };
+      new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
+      XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
       uint xSize = xTypeSize;
       if (xSize % 4 > 0)
       {

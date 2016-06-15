@@ -24,7 +24,7 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
             new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EDI, SourceValue = 4 };
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EDI, SourceIsIndirect = true };
 		    new CPUx86.Multiply {DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 32};
-            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
+            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
             new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.EDI, SourceValue = 4 };

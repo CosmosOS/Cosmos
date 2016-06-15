@@ -126,7 +126,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //                        mLabelName + "_AfterAddressCheck",
                 //                        true,
                 //                        xEmitCleanup );
-                new CPU.Pop { DestinationReg = CPU.RegistersEnum.ECX };
+                XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ECX));
 
                 new Label(xCurrentMethodLabel + ".AfterAddressCheck");
                 if (xMethodInfo.DeclaringType == typeof(object))
@@ -181,7 +181,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     XS.Sub(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), xExtraStackSize);
                 }
-                new CPUx86.Call { DestinationReg = CPUx86.RegistersEnum.ECX };
+                XS.Call(XSRegisters.ECX);
                 new Label(xCurrentMethodLabel + ".AfterNotBoxedThis");
             }
             ILOp.EmitExceptionLogic(Assembler, aMethod, aOp, true,

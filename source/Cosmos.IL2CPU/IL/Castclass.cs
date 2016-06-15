@@ -7,6 +7,7 @@ using System.Reflection;
 using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -39,7 +40,7 @@ namespace Cosmos.IL2CPU.X86.IL
             // new OpMethod( ILOpCode.Code.Call, 0, 0, xMethodIsInstance, aOpCode.CurrentExceptionHandler ) );
             IL.Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, xCurrentMethodLabel, xCurrentMethodLabel + "_After_IsInstance_Call", DebugEnabled);
             new Label( xCurrentMethodLabel + "_After_IsInstance_Call" );
-            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+            XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
             new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.EAX, SourceValue = 0 };
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
             new CPUx86.Jump { DestinationLabel = ILOp.GetLabel(aMethod, aOpCode.NextPosition) };

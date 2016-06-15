@@ -231,10 +231,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else
                 {
-                    new CPUx86.Pop
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.EAX
-                    };
+                    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     new CPUx86.Multiply
                     {
                         DestinationReg = CPUx86.RegistersEnum.ESP,
@@ -246,10 +243,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         DestinationReg = CPUx86.RegistersEnum.ESP,
                         SourceValue = 4
                     };
-                    new CPUx86.Push
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.EAX
-                    };
+                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 }
             }
         }

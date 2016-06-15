@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -13,9 +14,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-            new CPUx86.Not { DestinationReg = CPUx86.RegistersEnum.EAX };
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Not(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
         }
 
     }

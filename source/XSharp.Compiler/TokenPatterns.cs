@@ -1012,7 +1012,7 @@ namespace XSharp.Compiler {
 
       AddPattern("+123", delegate(TokenList aTokens)
                          {
-                           XS.Push(aTokens[0].IntValue, RegisterSize.Int32);
+                           XS.Push(aTokens[0].IntValue, size: RegisterSize.Int32);
                          });
       AddPattern(new string[]
                  {
@@ -1020,7 +1020,7 @@ namespace XSharp.Compiler {
                  }, delegate(TokenList aTokens)
                     {
                       var xSize = GetSize(aTokens[1]);
-                      XS.Push(aTokens[1].IntValue, xSize);
+                      XS.Push(aTokens[1].IntValue, size: xSize);
                     });
       AddPattern("+_REG", delegate(TokenList aTokens)
                           {

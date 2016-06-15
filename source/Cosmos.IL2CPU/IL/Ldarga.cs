@@ -24,7 +24,7 @@ namespace Cosmos.IL2CPU.X86.IL
             XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EBX), (uint)(xDisplacement));
             XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.EBP));
             XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
-            new CPUx86.Push { DestinationReg = RegistersEnum.EAX };
+            XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
 
 //            if (aMethod.MethodBase.DeclaringType.FullName == "Cosmos.Kernel.Plugs.Console"
 //                && aMethod.MethodBase.Name == "Write"

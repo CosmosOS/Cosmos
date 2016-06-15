@@ -11,7 +11,8 @@ namespace XSharp.Compiler
     {
       Byte8 = 8,
       Short16 = 16,
-      Int32 = 32
+      Int32 = 32,
+        FPU = 128,
     }
 
     public abstract class Register
@@ -70,6 +71,13 @@ namespace XSharp.Compiler
       }
     }
 
+    public class RegisterFPU: Register
+    {
+      public RegisterFPU(string name, RegistersEnum regEnum): base(name, regEnum, RegisterSize.FPU)
+      {
+      }
+    }
+
     public class RegisterSegment: Register
     {
       public RegisterSegment(string name, RegistersEnum regEnum): base(name, regEnum, RegisterSize.Int32)
@@ -109,5 +117,14 @@ namespace XSharp.Compiler
     public static readonly RegisterSegment FS = new RegisterSegment(nameof(FS), RegistersEnum.FS);
     public static readonly RegisterSegment GS = new RegisterSegment(nameof(GS), RegistersEnum.GS);
     public static readonly RegisterSegment SS = new RegisterSegment(nameof(SS), RegistersEnum.SS);
+
+    public static readonly RegisterFPU ST0 = new RegisterFPU(nameof(ST0), RegistersEnum.ST0);
+    public static readonly RegisterFPU ST1 = new RegisterFPU(nameof(ST1), RegistersEnum.ST1);
+    public static readonly RegisterFPU ST2 = new RegisterFPU(nameof(ST2), RegistersEnum.ST2);
+    public static readonly RegisterFPU ST3 = new RegisterFPU(nameof(ST3), RegistersEnum.ST3);
+    public static readonly RegisterFPU ST4 = new RegisterFPU(nameof(ST4), RegistersEnum.ST4);
+    public static readonly RegisterFPU ST5 = new RegisterFPU(nameof(ST5), RegistersEnum.ST5);
+    public static readonly RegisterFPU ST6 = new RegisterFPU(nameof(ST6), RegistersEnum.ST6);
+    public static readonly RegisterFPU ST7 = new RegisterFPU(nameof(ST7), RegistersEnum.ST7);
   }
 }

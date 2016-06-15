@@ -279,32 +279,72 @@ namespace XSharp.Compiler
     #endregion InstructionWithDestinationAndSourceAndSize
 
     #region InstructionWithDestinationAndSize
-    private static void Do<T>(uint destinationValue, RegisterSize size = RegisterSize.Int32)
+    private static void Do<T>(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
       where T: InstructionWithDestinationAndSize, new()
     {
+      if (displacement != null)
+      {
+        isIndirect = true;
+        if (displacement == 0)
+        {
+          displacement = null;
+        }
+      }
+
       new T
       {
         DestinationValue = destinationValue,
+        DestinationIsIndirect = isIndirect,
+        DestinationDisplacement = displacement,
         Size = (byte)size
       };
     }
 
-    private static void Do<T>(Register register)
+    private static void Do<T>(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
       where T: InstructionWithDestinationAndSize, new()
     {
+      if (displacement != null)
+      {
+        isIndirect = true;
+        if (displacement == 0)
+        {
+          displacement = null;
+        }
+      }
+      if (size == null)
+      {
+        if (isIndirect)
+        {
+          throw new InvalidOperationException("No size specified!");
+        }
+        size = register.Size;
+      }
       new T
       {
-        DestinationReg = register.RegEnum
+        DestinationReg = register.RegEnum,
+        DestinationIsIndirect = isIndirect,
+        DestinationDisplacement = displacement,
+        Size = (byte)size.Value
       };
     }
 
-    private static void Do<T>(string label, bool isIndirect = false, RegisterSize size = RegisterSize.Int32)
+    private static void Do<T>(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
       where T: InstructionWithDestinationAndSize, new()
     {
+      if (displacement != null)
+      {
+        isIndirect = true;
+        if (displacement == 0)
+        {
+          displacement = null;
+        }
+      }
+
       new T
       {
         DestinationRef = ElementReference.New(label),
         DestinationIsIndirect = isIndirect,
+        DestinationDisplacement = displacement,
         Size = (byte)size
       };
     }
@@ -367,6 +407,11 @@ namespace XSharp.Compiler
     public static void Call(string target)
     {
       new Call { DestinationLabel=target };
+    }
+
+    public static void Call(Register32 register)
+    {
+      new Call { DestinationReg = register.RegEnum };
     }
 
     public static void Const(string name, string value)
@@ -453,19 +498,19 @@ namespace XSharp.Compiler
       };
     }
 
-    public static void Push(Register value)
+    public static void Push(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
     {
-      Do<Push>(value);
+      Do<Push>(destinationValue, isIndirect, displacement, size);
     }
 
-    public static void Push(uint value, RegisterSize size)
+    public static void Push(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
     {
-      Do<Push>(value, size);
+      Do<Push>(register, isIndirect, displacement, size);
     }
 
-    public static void Push(string label, bool isIndirect = false, RegisterSize size = RegisterSize.Int32)
+    public static void Push(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
     {
-      Do<Push>(label, isIndirect, size);
+      Do<Push>(label, isIndirect, displacement, size);
     }
 
     public static void Pop(Register value)
@@ -609,6 +654,81 @@ namespace XSharp.Compiler
         SourceRef = ElementReference.New(sourceRef),
         SourceIsIndirect = sourceIsIndirect
       };
+    }
+
+    public static void Divide(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<Divide>(destinationValue, isIndirect, displacement, size);
+    }
+
+    public static void Divide(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+    {
+      Do<Divide>(register, isIndirect, displacement, size);
+    }
+
+    public static void Divide(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<Divide>(label, isIndirect, displacement, size);
+    }
+
+    public static void IntegerDivide(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<IDivide>(destinationValue, isIndirect, displacement, size);
+    }
+
+    public static void IntegerDivide(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+    {
+      Do<IDivide>(register, isIndirect, displacement, size);
+    }
+
+    public static void IntegerDivide(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<IDivide>(label, isIndirect, displacement, size);
+    }
+
+    public static void Multiply(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<Multiply>(destinationValue, isIndirect, displacement, size);
+    }
+
+    public static void Multiply(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+    {
+      Do<Multiply>(register, isIndirect, displacement, size);
+    }
+
+    public static void Multiply(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<Multiply>(label, isIndirect, displacement, size);
+    }
+
+    public static void Negate(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<Neg>(destinationValue, isIndirect, displacement, size);
+    }
+
+    public static void Negate(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+    {
+      Do<Neg>(register, isIndirect, displacement, size);
+    }
+
+    public static void Negate(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<Neg>(label, isIndirect, displacement, size);
+    }
+
+    public static void Not(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<Not>(destinationValue, isIndirect, displacement, size);
+    }
+
+    public static void Not(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+    {
+      Do<Not>(register, isIndirect, displacement, size);
+    }
+
+    public static void Not(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<Not>(label, isIndirect, displacement, size);
     }
   }
 }

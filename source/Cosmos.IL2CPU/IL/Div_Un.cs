@@ -76,7 +76,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.EDI, SourceValue = 1 };
 
 					// increment shift counter
-					new CPUx86.INC { DestinationReg = CPUx86.RegistersEnum.ECX };
+					XS.Increment(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 
 					// set flags
 					XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
@@ -90,11 +90,11 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					// so we shifted both, so we have near the same relation as original values
 					// divide this
-					new CPUx86.Divide { DestinationReg = CPUx86.RegistersEnum.ESI };
+					XS.Divide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
 
 					// save result to stack
 					new CPUx86.Push { DestinationValue = 0 };
-					new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
 					//TODO: implement proper derivation correction and overflow detection
 
@@ -108,14 +108,14 @@ namespace Cosmos.IL2CPU.X86.IL
 					// zero EDX, so that high part is zero -> reduce overflow case
 					XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 					// divide high part
-					new CPUx86.Divide { DestinationReg = CPUx86.RegistersEnum.ESI };
+					XS.Divide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
 					// save high result
-					new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 					// divide low part
-					new CPUx86.Divide { DestinationReg = CPUx86.RegistersEnum.ESI };
+					XS.Divide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
 					// save low result
-					new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
 					new Label(LabelEnd);
 				}
@@ -133,10 +133,10 @@ namespace Cosmos.IL2CPU.X86.IL
                 else
                 {
                     XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
-                    new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.ECX };
-                    new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
-                    new CPUx86.Divide { DestinationReg = CPUx86.RegistersEnum.ECX };
-                    new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX };
+                    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
+                    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                    XS.Divide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
+                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 }
             }
         }
