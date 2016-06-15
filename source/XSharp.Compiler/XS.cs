@@ -401,7 +401,7 @@ namespace XSharp.Compiler
 
     public static void Comment(string comment)
     {
-      Comment(comment);
+      new Comment(comment);
     }
 
     public static void Call(string target)
@@ -639,7 +639,11 @@ namespace XSharp.Compiler
 
     public static void Test(Register destination, uint source)
     {
-      Test(OldToNewRegister(destination.RegEnum), source);
+      new Test
+      {
+        DestinationReg = destination.RegEnum,
+        SourceValue = source
+      };
     }
 
     public static void Test(Register destination, string sourceRef, bool sourceIsIndirect = false)
@@ -687,7 +691,7 @@ namespace XSharp.Compiler
       Do<Multiply>(destinationValue, isIndirect, displacement, size);
     }
 
-    public static void Multiply(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+    public static void Multiply(Register register, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
     {
       Do<Multiply>(register, isIndirect, displacement, size);
     }
