@@ -29,7 +29,7 @@ namespace Cosmos.Core.Memory.Test {
     // Native Intel page size
     // x86 Page Size: 4k, 2m (PAE only), 4m
     // x64 Page Size: 4k, 2m
-    static public readonly Native PageSize = 4096;
+    public const Native PageSize = 4096;
 
     // Start of area usable for heap, and also start of heap.
     static private byte* mRamStart;
