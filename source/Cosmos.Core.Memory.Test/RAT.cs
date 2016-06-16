@@ -138,9 +138,10 @@ namespace Cosmos.Core.Memory.Test {
 
     static public Native GetFirstRAT(void* aPtr) {
       var xPos = (Native)((byte*)aPtr - mRamStart) / RAT.PageSize;
-      for (Native i = xPos; i != Native.MaxValue; i--) {
-        if (mRAT[i] != PageType.Extension) {
-          return i;
+      // See note about when mRAT = 0 in Alloc.
+      for (byte* p = mRAT + xPos; p >= mRAT; p--) {
+        if (*p != PageType.Extension) {
+          return (Native)(p - mRAT);
         }
       }
       throw new Exception("Page type not found. Likely RAT is rotten.");
@@ -151,14 +152,13 @@ namespace Cosmos.Core.Memory.Test {
     }
 
     static public void Free(Native aPageIdx) {
-      byte xType = mRAT[aPageIdx];
-      mRAT[aPageIdx] = PageType.Empty;
-
-      for (Native i = aPageIdx + 1; i < mPageCount; i++) {
-        if (mRAT[i] != PageType.Extension) {
+      byte* p = mRAT + aPageIdx;
+      *p = PageType.Empty;
+      for (; p < mRAT + mPageCount; p++) {
+        if (*p != PageType.Extension) {
           break;
         }
-        mRAT[i] = PageType.Empty;
+        *p = PageType.Empty;
       }
     }
   }
