@@ -386,7 +386,7 @@ namespace Cosmos.IL2CPU {
         if (xJumpTo == null) {
           Jump_Exception(aMethodInfo);
         } else {
-          new CPU.Jump { DestinationLabel = xJumpTo };
+          XS.Jump(xJumpTo);
         }
 
       } else {
@@ -435,11 +435,11 @@ namespace Cosmos.IL2CPU {
         new CPU.ConditionalJump {DestinationLabel = ".AfterNullCheck", Condition = CPU.ConditionalTestEnum.NotEqual};
         new CPU.ClearInterruptFlag();
         // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-        new CPU.Call {DestinationLabel = ".NullCheck_GetCurrAddress"};
+        XS.Call(".NullCheck_GetCurrAddress");
         new Assembler.Label(".NullCheck_GetCurrAddress");
         XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
         new CPU.Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = CPU.RegistersEnum.EAX};
-        new CPU.Call {DestinationLabel = "DebugStub_SendNullReferenceOccurred"};
+        XS.Call("DebugStub_SendNullReferenceOccurred");
         new CPU.Halt();
         XS.Label(".AfterNullCheck");
       }

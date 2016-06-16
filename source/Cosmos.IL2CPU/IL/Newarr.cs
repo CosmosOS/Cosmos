@@ -42,7 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
       new CPUx86.Push { DestinationValue = (ObjectImpl.FieldDataOffset + 4) };
       new Add(Assembler).Execute(aMethod, aOpCode);
       // the total array size is now on the stack.
-      new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.AllocNewObjectRef) };
+      XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
       new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
       new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
       // it's on the stack 3 times now, once from the return value, twice from the pushes;
@@ -57,7 +57,7 @@ namespace Cosmos.IL2CPU.X86.IL
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.ESI, Size = 32 };
       XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceValue = (uint)xSize, Size = 32 };
-      new CPUx86.Call { DestinationLabel = xCtorName };
+      XS.Call(xCtorName);
     }
   }
 }

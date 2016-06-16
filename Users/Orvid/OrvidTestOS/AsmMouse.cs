@@ -25,29 +25,17 @@ namespace Cosmos.Hardware
             {
                 XS.Mov(XSRegisters.BL, 0xa8);
 
-                new Call
-                {
-                    DestinationLabel = "send_mouse_cmd"
-                };
+                XS.Call("send_mouse_cmd");
 
-                new Call
-                {
-                    DestinationLabel = "mouse_read"
-                };
+                XS.Call("mouse_read");
 
                 new Noop();
 
                 XS.Mov(XSRegisters.BL, 0x20);
 
-                new Call
-                {
-                    DestinationLabel = "send_mouse_cmd"
-                };
+                XS.Call("send_mouse_cmd");
 
-                new Call
-                {
-                    DestinationLabel = "mouse_read"
-                };
+                XS.Call("mouse_read");
 
                 XS.Or(XSRegisters.AL, 3);
 
@@ -55,38 +43,23 @@ namespace Cosmos.Hardware
 
                 XS.Push(XSRegisters.EAX);
 
-                new Call
-                {
-                    DestinationLabel = "send_mouse_cmd"
-                };
+                XS.Call("send_mouse_cmd");
 
                 XS.Pop(XSRegisters.EAX);
 
-                new Call
-                {
-                    DestinationLabel = "mouse_write"
-                };
+                XS.Call("mouse_write");
 
                 new Noop();
 
                 XS.Mov(XSRegisters.BL, 0xd4);
 
-                new Call
-                {
-                    DestinationLabel = "send_mouse_cmd"
-                };
+                XS.Call("send_mouse_cmd");
 
                 XS.Mov(XSRegisters.AL, 0xf4);
 
-                new Call
-                {
-                    DestinationLabel = "mouse_write"
-                };
+                XS.Call("mouse_write");
 
-                new Call
-                {
-                    DestinationLabel = "mouse_read"
-                };
+                XS.Call("mouse_read");
 
         #region mouse_read
                 XS.Label("mouse_read");

@@ -96,10 +96,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     // add LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH to high dword of last result
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 
-                    new CPUx86.Jump
-                    {
-                        DestinationLabel = MoveReturnValue
-                    };
+                    XS.Jump(MoveReturnValue);
 
                     XS.Label(Simple32Multiply);
                     //mov RIGHT_LOW to eax

@@ -88,7 +88,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 				//TODO: implement proper derivation correction and overflow detection
 
-				new CPUx86.Jump { DestinationLabel = LabelEnd };
+				XS.Jump(LabelEnd);
 
 				XS.Label(LabelNoLoop);
 				//save high dividend

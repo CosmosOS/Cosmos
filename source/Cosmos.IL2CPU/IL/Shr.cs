@@ -51,7 +51,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX, ArgumentReg = CPUx86.RegistersEnum.CL };
 				// shift higher part
 				new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, Size = 32, SourceReg = CPUx86.RegistersEnum.CL };
-				new CPUx86.Jump { DestinationLabel = End_Shr };
+				XS.Jump(End_Shr);
 
 				XS.Label(HighPartIsZero);
 				// remove bits >= 32, so that CL max value could be only 31

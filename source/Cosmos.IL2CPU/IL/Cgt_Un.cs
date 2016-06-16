@@ -169,7 +169,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //
         //                 XS.Jump(ConditionalTestEnum.Above, LabelTrue);
         //                 new CPUx86.Push { DestinationValue = 0 };
-        //                 new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
+        //                 XS.Jump(NextInstructionLabel);
         //
         // 				XS.Label(LabelTrue);
         // 				new CPUx86.Push{DestinationValue=1};
@@ -179,15 +179,15 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 XS.Pop(XSRegisters.EAX);
         //                 XS.Compare(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
         //                 XS.Jump(ConditionalTestEnum.Below, LabelTrue);
-        //                 new CPUx86.Jump { DestinationLabel = LabelFalse };
+        //                 XS.Jump(LabelFalse);
         //                 XS.Label(LabelTrue);
         //                 XS.Add(XSRegisters.ESP, 4);
         //                 new CPUx86.Push { DestinationValue = 1 };
-        //                 new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
+        //                 XS.Jump(NextInstructionLabel);
         //                 XS.Label(LabelFalse);
         //                 XS.Add(XSRegisters.ESP, 4);
         //                 new CPUx86.Push { DestinationValue = 0 };
-        //                 new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
+        //                 XS.Jump(NextInstructionLabel);
         // 			}
         // 		}
         // 	}

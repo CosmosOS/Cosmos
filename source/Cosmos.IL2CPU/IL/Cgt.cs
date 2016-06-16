@@ -73,7 +73,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				XS.Jump(ConditionalTestEnum.GreaterThan, LabelTrue);
 				XS.Label(LabelFalse);
 				new CPUx86.Push { DestinationValue = 0 };
-				new CPUx86.Jump { DestinationLabel = xNextLabel };
+				XS.Jump(xNextLabel);
 				XS.Label(LabelTrue );
 				new CPUx86.Push { DestinationValue = 1 };*/
 			}

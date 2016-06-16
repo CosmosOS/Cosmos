@@ -43,7 +43,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
             XS.Comment("push address of delgate to stack");
             XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));//addrof this
-            new CPUx86.Call { DestinationLabel = LabelName.Get(xGetInvocationListMethod) };
+            XS.Call(LabelName.Get(xGetInvocationListMethod));
             XS.Comment("get address from return value -> eax");
             XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             ;//list
@@ -115,7 +115,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
                 new CPUx86.Popad();
                 XS.Increment(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
-                new CPUx86.Jump { DestinationLabel = ".BEGIN_OF_LOOP" };
+                XS.Jump(".BEGIN_OF_LOOP");
             }
             XS.Label(".END_OF_INVOKE_");
             XS.Comment("get the return value");
@@ -172,7 +172,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      new CPU.Comment("push address of delgate to stack");
         //      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
         //      var xGetInvocationListMethod = typeof(MulticastDelegate).GetMethod("GetInvocationList");
-        //      new CPUx86.Call { DestinationLabel = CPU.MethodInfoLabelGenerator.GenerateLabelName(xGetInvocationListMethod) };
+        //      XS.Call(CPU.MethodInfoLabelGenerator.GenerateLabelName(xGetInvocationListMethod));
         //      new CPU.Comment("get address from return value -> eax");
         //      XS.Pop(XSRegisters.EAX);
         //      ;//list
@@ -269,7 +269,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      new CPUx86.Popad();
         //      XS.INC(XSRegisters.EDX);
         //      XS.Add(XSRegisters.EAX, 4);
-        //      new CPUx86.Jump { DestinationLabel = ".BEGIN_OF_LOOP" };
+        //      XS.Jump(".BEGIN_OF_LOOP");
         //      new CPU.Label(".END_OF_INVOKE_");
         //      new CPU.Comment("get the return value");
         //      // TEMP!!!

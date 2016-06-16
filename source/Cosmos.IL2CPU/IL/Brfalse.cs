@@ -54,7 +54,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 XS.Jump(ConditionalTestEnum.NotZero, LabelFalse);
         //                 XS.Xor(XSRegisters.EBX, XSRegisters.CPUx86.Registers.EBX);
         //                 XS.Jump(ConditionalTestEnum.NotZero, LabelFalse);
-        //                 new CPUx86.Jump { DestinationLabel = TargetLabel };
+        //                 XS.Jump(TargetLabel);
         // 				XS.Label(LabelFalse);
         // 			} else
         // 			{

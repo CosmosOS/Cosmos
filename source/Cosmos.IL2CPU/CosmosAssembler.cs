@@ -336,18 +336,12 @@ namespace Cosmos.IL2CPU
             if (mComPort > 0)
             {
                 WriteDebugVideo("Initializing DebugStub.");
-                new Call
-                {
-                    DestinationLabel = "DebugStub_Init"
-                };
+                XS.Call("DebugStub_Init");
             }
 
             // Jump to Kernel entry point
             WriteDebugVideo("Jumping to kernel.");
-            new Call
-            {
-                DestinationLabel = EntryPointName
-            };
+            XS.Call(EntryPointName);
 
             new Comment(this, "Kernel done - loop till next IRQ");
             XS.Label(".loop");

@@ -35,9 +35,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
           XS.OutToDX(XSRegisters.AL);
           new CPUAll.Label(".loop");//failed... halt
           new CPUx86.Halt();
-          new CPUx86.Jump {
-            DestinationLabel = ".loop"
-          };
+          XS.Jump(".loop");
         }
     }
 }
