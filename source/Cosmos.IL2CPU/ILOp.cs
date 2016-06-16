@@ -184,9 +184,7 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void ThrowNotImplementedException(string aMessage) {
-      new CPU.Push {
-        DestinationRef = Cosmos.Assembler.ElementReference.New(LdStr.GetContentsArrayName(aMessage))
-      };
+      XS.Push(LdStr.GetContentsArrayName(aMessage));
       new CPU.Call {
         DestinationLabel = LabelName.Get(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public))
       };

@@ -30,7 +30,7 @@ namespace Cosmos.Core.Plugs {
 
 		public class GetEndOfKernelAsm : AssemblerMethod {
 			public override void AssembleNew(CPUAll.Assembler aAssembler, object aMethodInfo) {
-				new CPUx86.Push { DestinationRef = CPUAll.ElementReference.New("_end_code") };
+				XS.Push("_end_code");
 			}
 		}
 
