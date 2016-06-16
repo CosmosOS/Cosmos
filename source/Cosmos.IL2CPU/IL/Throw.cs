@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             XS.Pop(XSRegisters.EAX);
         //             new CPUx86.Move { DestinationRef = CPU.ElementReference.New(CPU.DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef)), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
         //             new CPUx86.Call { DestinationLabel = aExceptionOccurredLabel };
-        //             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
+        //             XS.Mov(XSRegisters.ECX, 3);
         // 			Call.EmitExceptionLogic(aAssembler, (uint)aCurrentILOffset, aMethodInfo, null, false, null);
         // 			aAssembler.Stack.Pop();
         // 		}

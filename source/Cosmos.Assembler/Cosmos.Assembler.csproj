@@ -134,6 +134,7 @@
     <Compile Include="x86\INT.cs" />
     <Compile Include="x86\INT1.cs" />
     <Compile Include="x86\INT3.cs" />
+    <Compile Include="x86\Interrupt.cs" />
     <Compile Include="x86\IRET.cs" />
     <Compile Include="x86\JumpAlways.cs" />
     <Compile Include="x86\JumpBase.cs" />

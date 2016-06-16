@@ -1030,5 +1030,12 @@ namespace XSharp.Compiler
       Do<Or>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
     }
 
+    public static void SignExtendAX(RegisterSize size)
+    {
+      new SignExtendAX
+      {
+        Size = (byte)size
+      };
+    }
   }
 }

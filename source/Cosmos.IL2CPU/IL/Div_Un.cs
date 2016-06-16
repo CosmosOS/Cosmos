@@ -64,7 +64,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					// set flags
 					XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
 					// if high dword of divisor is already zero, we dont need the loop
-					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = LabelNoLoop };
+					XS.Jump(CPUx86.ConditionalTestEnum.Zero, LabelNoLoop);
 
 					// set ecx to zero for counting the shift operations
 					XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
@@ -81,7 +81,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					// set flags
 					XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
 					// loop while high dword of divisor till it is zero
-					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelShiftRight };
+					XS.Jump(CPUx86.ConditionalTestEnum.NotZero, LabelShiftRight);
 
 					// shift the divident now in one step
 					// shift divident CL bits right
@@ -128,7 +128,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
                     XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.SSE.MulSS(XSRegisters.XMM0, XSRegisters.XMM1);
-                    new MoveSS { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.XMM1 };
+                    XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                 }
                 else
                 {

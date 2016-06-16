@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         new CPUx86.SSE.MoveSS { SourceReg = CPUx86.RegistersEnum.XMM0, DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
                         break;
                     case 8:
-                    //new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                    //XS.Add(XSRegisters.ESP, 4);
                     //break;
                     default:
                         //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );

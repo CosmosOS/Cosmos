@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
 						{
 							XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
 							XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), 0);
-							new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = NoOverflowLabel };
+							XS.Jump(CPUx86.ConditionalTestEnum.Equal, NoOverflowLabel);
 							ThrowNotImplementedException("Conv_Ovf_I_Un throws an overflow exception, which is not implemented!");
 						}
 						XS.Label(NoOverflowLabel);
@@ -83,7 +83,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                 }
 		//                 case 8: {
 		//                         XS.Pop(XSRegisters.EAX);
-		//                         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+		//                         XS.Add(XSRegisters.ESP, 4);
 		//                     XS.Push(XSRegisters.EAX);
 		//                     //new CPUx86.Pop(CPUx86.Registers_Old.EAX);
 		//                     //new CPUx86.SignExtendAX(4);
@@ -94,7 +94,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                     //               "EDX");
 		//                     //new CPUx86.JumpIfZero(NextInstructionLabel);
 		//                     ////equals
-		//                     //new CPUx86.Interrupt(CPUx86.Interrupt.INTO);
+		//                     //newCPUx86.Interr upt(CPUx86.Interrupt.INTO);
 		//                     break;
 		//                 }
 		//                 default:

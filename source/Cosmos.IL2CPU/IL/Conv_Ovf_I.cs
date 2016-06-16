@@ -44,11 +44,11 @@ namespace Cosmos.IL2CPU.X86.IL
         //        case 8:
         //            {
         //                XS.Pop(XSRegisters.EAX);
-        //                new CPUx86.SignExtendAX { Size = 32 };
+        //                XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
         //                //all bits of EDX == sign (EAX)
         //                XS.Pop(XSRegisters.EBX);
         //                //must be equal to EDX
-        //                new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EDX };
+        //                XS.Xor(XSRegisters.EBX, XSRegisters.CPUx86.Registers.EDX);
         //                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = AssemblerNasm.TmpPosLabel( aMethod, aNextOpCode ) };
         //                //equals
         //                new CPUx86.Interrupt { DestinationValue = 4 };
@@ -99,12 +99,12 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			case 8:
         // 				{
         //                     XS.Pop(XSRegisters.EAX);
-        //                     new CPUx86.SignExtendAX { Size = 32 };
+        //                     XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
         // 					//all bits of EDX == sign (EAX)
         //                     XS.Pop(XSRegisters.EBX);
         // 					//must be equal to EDX
-        //                     new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EDX };
-        //                     new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = NextInstructionLabel };
+        //                     XS.Xor(XSRegisters.EBX, XSRegisters.CPUx86.Registers.EDX);
+        //                     XS.Jump(ConditionalTestEnum.Zero, NextInstructionLabel);
         // 					//equals
         // 					new CPUx86.Interrupt{DestinationValue=4};
         // 					break;

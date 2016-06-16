@@ -393,18 +393,18 @@ namespace Cosmos.IL2CPU {
         XS.Test(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ECX), 2);
 
         if (aCleanup != null) {
-          new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Equal, DestinationLabel = aJumpTargetNoException };
+          XS.Jump(CPU.ConditionalTestEnum.Equal, aJumpTargetNoException);
           aCleanup();
           if (xJumpTo == null) {
             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException };
           } else {
-            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = xJumpTo };
+            XS.Jump(CPU.ConditionalTestEnum.NotEqual, xJumpTo);
           }
         } else {
           if (xJumpTo == null) {
             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException };
           } else {
-            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = xJumpTo };
+            XS.Jump(CPU.ConditionalTestEnum.NotEqual, xJumpTo);
           }
         }
       }

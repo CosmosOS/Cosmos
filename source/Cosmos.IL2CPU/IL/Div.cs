@@ -65,7 +65,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					// set flags
 					XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
 					// if high dword of divisor is already zero, we dont need the loop
-					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = LabelNoLoop };
+					XS.Jump(CPUx86.ConditionalTestEnum.Zero, LabelNoLoop);
 
 					// set ecx to zero for counting the shift operations
 					XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
@@ -82,7 +82,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					// set flags
 					XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
 					// loop while high dword of divisor till it is zero
-					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelShiftRight };
+					XS.Jump(CPUx86.ConditionalTestEnum.NotZero, LabelShiftRight);
 
 					// shift the divident now in one step
 					// shift divident CL bits right
@@ -94,7 +94,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.IntegerDivide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
 
 					// sign extend
-					new CPUx86.SignExtendAX { Size = 32 };
+					XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
 
 					// save result to stack
 					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
@@ -109,7 +109,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 					// extend that sign is in edx
-					new CPUx86.SignExtendAX { Size = 32 };
+					XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
 					// divide high part
 					XS.IntegerDivide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
 					// save high result
@@ -131,13 +131,13 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
                     XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.SSE.DivSS(XSRegisters.XMM0, XSRegisters.XMM1);
-                    new MoveSS { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.XMM1 };
+                    XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                 }
                 else
                 {
                     XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
                     XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-					          new CPUx86.SignExtendAX { Size = 32 };
+					          XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
                     XS.IntegerDivide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
                     XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 }
