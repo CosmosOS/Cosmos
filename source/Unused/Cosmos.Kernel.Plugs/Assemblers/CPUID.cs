@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cosmos.IL2CPU.Plugs;
 using Assembler = Cosmos.Assembler;
 using CPUAll = Cosmos.Assembler;

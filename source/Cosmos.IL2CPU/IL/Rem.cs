@@ -95,7 +95,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 				XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 				// extend that sign is in edx
-				new CPUx86.SignExtendAX { Size = 32 };
+				XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
 				// divide high part
 				XS.IntegerDivide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
 				XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));

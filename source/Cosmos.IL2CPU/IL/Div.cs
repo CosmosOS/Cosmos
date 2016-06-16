@@ -94,7 +94,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.IntegerDivide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
 
 					// sign extend
-					new CPUx86.SignExtendAX { Size = 32 };
+					XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
 
 					// save result to stack
 					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
@@ -109,7 +109,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 					// extend that sign is in edx
-					new CPUx86.SignExtendAX { Size = 32 };
+					XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
 					// divide high part
 					XS.IntegerDivide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
 					// save high result
@@ -137,7 +137,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
                     XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-					          new CPUx86.SignExtendAX { Size = 32 };
+					          XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
                     XS.IntegerDivide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
                     XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 }

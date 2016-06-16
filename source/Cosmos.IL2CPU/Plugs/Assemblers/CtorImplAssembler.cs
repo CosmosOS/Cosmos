@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.X86.IL;

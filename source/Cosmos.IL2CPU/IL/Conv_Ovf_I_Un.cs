@@ -94,7 +94,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                     //               "EDX");
 		//                     //new CPUx86.JumpIfZero(NextInstructionLabel);
 		//                     ////equals
-		//                     //new CPUx86.Interrupt(CPUx86.Interrupt.INTO);
+		//                     //newCPUx86.Interr upt(CPUx86.Interrupt.INTO);
 		//                     break;
 		//                 }
 		//                 default:

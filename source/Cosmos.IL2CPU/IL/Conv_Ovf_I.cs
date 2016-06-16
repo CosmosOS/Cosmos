@@ -44,7 +44,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //        case 8:
         //            {
         //                XS.Pop(XSRegisters.EAX);
-        //                new CPUx86.SignExtendAX { Size = 32 };
+        //                XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
         //                //all bits of EDX == sign (EAX)
         //                XS.Pop(XSRegisters.EBX);
         //                //must be equal to EDX
@@ -99,7 +99,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			case 8:
         // 				{
         //                     XS.Pop(XSRegisters.EAX);
-        //                     new CPUx86.SignExtendAX { Size = 32 };
+        //                     XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
         // 					//all bits of EDX == sign (EAX)
         //                     XS.Pop(XSRegisters.EBX);
         // 					//must be equal to EDX
