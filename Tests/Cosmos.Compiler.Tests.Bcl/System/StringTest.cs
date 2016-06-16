@@ -15,6 +15,12 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             char x = 'a';
             string y = "a";
             Assert.IsTrue(x.ToString() == y, "String == operator ");
+
+            string str = "Cosmos is awesome!";
+            string expected = "Cosmos";
+            string substr = str.Substring(0, 6);
+            Assert.IsTrue((substr == expected), "Substring is not equal to the expected result, result should be \"Cosmos\". Substrings are broken or MichaelTheShifter made an off-by-one error.");
+
         }
     }
 }
