@@ -44,13 +44,13 @@ namespace Cosmos.IL2CPU.X86.IL
 				XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
 
 				new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 32, Size = 8 };
-				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.AboveOrEqual, DestinationLabel = LowPartIsZero };
+				XS.Jump(CPUx86.ConditionalTestEnum.AboveOrEqual, LowPartIsZero);
 
 				// shift higher part
 				new CPUx86.ShiftLeftDouble { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.RegistersEnum.EAX, ArgumentReg = CPUx86.RegistersEnum.CL };
 				// shift lower part
 				new CPUx86.ShiftLeft { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 32, SourceReg = CPUx86.RegistersEnum.CL };
-				new CPUx86.Jump { DestinationLabel = End_Shl };
+				XS.Jump(End_Shl);
 
 				XS.Label(LowPartIsZero);
 				// remove bits >= 32, so that CL max value could be only 31

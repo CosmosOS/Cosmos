@@ -35,16 +35,16 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 1:
                 {
                     XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
-                    new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.BL, SourceIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX, SourceDisplacement = (int)(xObjSize - 1)};
-                    //new CPUx86.ShiftLeft { DestinationReg = CPUx86.Registers.EBX, SourceValue = 24 };
+                    XS.Set(XSRegisters.BL, XSRegisters.EAX, sourceDisplacement: (int)(xObjSize - 1));
+                    //XS.ShiftLeft(XSRegisters.EBX, 24);
                     XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
                     break;
                 }
                 case 2:
                 {
                     XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
-                    new CPUx86.Mov {DestinationReg = CPUx86.RegistersEnum.BX, SourceIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX, SourceDisplacement = (int)(xObjSize - 2)};
-                    //new CPUx86.ShiftLeft {DestinationReg = CPUx86.Registers.EBX, SourceValue = 16};
+                    XS.Set(XSRegisters.BX, XSRegisters.EAX, sourceDisplacement: (int)(xObjSize - 2));
+                    //XS.ShiftLeft(XSRegisters.EBX, 16);
                     XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
                     break;
                 }

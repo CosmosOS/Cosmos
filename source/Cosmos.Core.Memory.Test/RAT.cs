@@ -29,7 +29,7 @@ namespace Cosmos.Core.Memory.Test {
     // Native Intel page size
     // x86 Page Size: 4k, 2m (PAE only), 4m
     // x64 Page Size: 4k, 2m
-    static public readonly Native PageSize = 4096;
+    public const Native PageSize = 4096;
 
     // Start of area usable for heap, and also start of heap.
     static private byte* mRamStart;
@@ -59,22 +59,21 @@ namespace Cosmos.Core.Memory.Test {
       Native xRatPageCount = (mPageCount - 1) / PageSize + 1;
       Native xRatPageBytes = xRatPageCount * PageSize;
       mRAT = mRamStart + mRamSize - xRatPageBytes;
-      for (Native i = 0; i < xRatPageBytes - xRatPageCount; i++) {
-        mRAT[i] = PageType.Empty;
+      for (byte* p = mRAT; p < mRAT + xRatPageBytes - xRatPageCount; p++) {
+        *p = PageType.Empty;
       }
-      for (Native i = xRatPageBytes - xRatPageCount; i < xRatPageBytes; i++) {
-        mRAT[i] = PageType.RAT;
+      for (byte* p = mRAT + xRatPageBytes - xRatPageCount; p < mRAT + xRatPageBytes; p++) {
+        *p = PageType.RAT;
       }
-
-      Heap.Init();
     }
 
     static public Native GetPageCount(byte aType = 0) {
       Native xResult = 0;
+      byte xType = 0; // Could us nullable type instead of this + xCounting, but this is faster.
       bool xCounting = false;
-      for (Native i = 0; i < mPageCount; i++) {
-        byte xType = mRAT[i];
-        if (xType == aType) {
+      for (byte* p = mRAT; p < mRAT + mPageCount; p++) {
+        if (*p == aType) {
+          xType = *p;
           xResult++;
           xCounting = true;
         } else if (xCounting) {
@@ -89,7 +88,7 @@ namespace Cosmos.Core.Memory.Test {
     }
 
     static public byte* Alloc(byte aType, Native aPageCount = 1) {
-      Native? xPos = null;
+      byte* xPos = null;
 
       // Could combine with an external method or delegate, but will slow things down
       // unless we can force it to be inlined.
@@ -97,11 +96,11 @@ namespace Cosmos.Core.Memory.Test {
       // Alloc single blocks at bottom, larger blocks at top to help reduce fragmentation.
       Native xCount = 0;
       if (aPageCount == 1) {
-        for (Native i = 0; i < mPageCount; i++) {
-          if (mRAT[i] == PageType.Empty) {
+        for (byte* p = mRAT; p < mRAT + mPageCount; p++) {
+          if (*p == PageType.Empty) {
             xCount++;
             if (xCount == aPageCount) {
-              xPos = i - xCount + 1;
+              xPos = p - xCount + 1;
               break;
             }
           } else {
@@ -109,11 +108,13 @@ namespace Cosmos.Core.Memory.Test {
           }
         }
       } else {
-        for (Native i = mPageCount - 1; i != Native.MaxValue; i--) {
-          if (mRAT[i] == PageType.Empty) {
+        // This loop will FAIL if mRAT is ever 0. This should be impossible though
+        // so we don't bother to account for such a case. xPos would also have issues.
+        for (byte* p = mRAT + mPageCount - 1; p >= mRAT; p--) {
+          if (*p == PageType.Empty) {
             xCount++;
             if (xCount == aPageCount) {
-              xPos = i;
+              xPos = p;
               break;
             }
           } else {
@@ -123,11 +124,11 @@ namespace Cosmos.Core.Memory.Test {
       }
 
       // If we found enough space, mark it as used.
-      if (xPos.HasValue) {
-        byte* xResult = mRamStart + xPos.Value * PageSize;
-        mRAT[xPos.Value] = aType;
-        for (Native i = xPos.Value + 1; i < xPos.Value + xCount; i++) {
-          mRAT[i] = PageType.Extension;
+      if (xPos != null) {
+        byte* xResult = mRamStart + (xPos - mRAT) * PageSize;
+        *xPos = aType;
+        for (byte* p = xPos + 1; p < xPos + xCount; p++) {
+          *p = PageType.Extension;
         }
         return xResult;
       }
@@ -137,9 +138,10 @@ namespace Cosmos.Core.Memory.Test {
 
     static public Native GetFirstRAT(void* aPtr) {
       var xPos = (Native)((byte*)aPtr - mRamStart) / RAT.PageSize;
-      for (Native i = xPos; i != Native.MaxValue; i--) {
-        if (mRAT[i] != PageType.Extension) {
-          return i;
+      // See note about when mRAT = 0 in Alloc.
+      for (byte* p = mRAT + xPos; p >= mRAT; p--) {
+        if (*p != PageType.Extension) {
+          return (Native)(p - mRAT);
         }
       }
       throw new Exception("Page type not found. Likely RAT is rotten.");
@@ -150,14 +152,13 @@ namespace Cosmos.Core.Memory.Test {
     }
 
     static public void Free(Native aPageIdx) {
-      byte xType = mRAT[aPageIdx];
-      mRAT[aPageIdx] = PageType.Empty;
-
-      for (Native i = aPageIdx + 1; i < mPageCount; i++) {
-        if (mRAT[i] != PageType.Extension) {
+      byte* p = mRAT + aPageIdx;
+      *p = PageType.Empty;
+      for (; p < mRAT + mPageCount; p++) {
+        if (*p != PageType.Extension) {
           break;
         }
-        mRAT[i] = PageType.Empty;
+        *p = PageType.Empty;
       }
     }
   }

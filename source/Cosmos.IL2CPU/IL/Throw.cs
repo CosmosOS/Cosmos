@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
             XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
             new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
-            new CPUx86.Call { DestinationLabel = "SystemExceptionOccurred" };
+            XS.Call("SystemExceptionOccurred");
             XS.Set(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ECX), 3);
             Call.EmitExceptionLogic( Assembler,aMethod, aOpCode, false, null );
 
@@ -40,8 +40,8 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		public static void Assemble(Assembler.Assembler aAssembler, MethodInformation aMethodInfo, int aCurrentILOffset, string aExceptionOccurredLabel) {
         //             XS.Pop(XSRegisters.EAX);
         //             new CPUx86.Move { DestinationRef = CPU.ElementReference.New(CPU.DataMember.GetStaticFieldName(CPU.Assembler.CurrentExceptionRef)), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
-        //             new CPUx86.Call { DestinationLabel = aExceptionOccurredLabel };
-        //             new CPUx86.Move { DestinationReg = CPUx86.Registers.ECX, SourceValue = 3 };
+        //             XS.Call(aExceptionOccurredLabel);
+        //             XS.Mov(XSRegisters.ECX, 3);
         // 			Call.EmitExceptionLogic(aAssembler, (uint)aCurrentILOffset, aMethodInfo, null, false, null);
         // 			aAssembler.Stack.Pop();
         // 		}

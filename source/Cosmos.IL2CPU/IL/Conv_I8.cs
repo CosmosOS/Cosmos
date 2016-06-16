@@ -36,7 +36,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					else
 					{
 						XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-						new CPUx86.SignExtendAX { Size = 32 };
+						XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
 						XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
                         XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 					}

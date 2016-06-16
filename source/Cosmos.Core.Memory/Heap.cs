@@ -12,8 +12,6 @@ namespace Cosmos.Core
     // Interrupts are disabled when trying to allocate a new block of memory.
     public static unsafe class Heap
     {
-        internal static Debugger mDebugger = new Debugger("Core", "Heap");
-
         private static uint mEndOfRam;
 
         private static uint mLastTableIndex = 0u;
@@ -49,7 +47,7 @@ namespace Cosmos.Core
         {
             if (aLength == 0)
             {
-                mDebugger.SendInternal("    Request to retrieve block with size = 0 was halted!");
+                Debugger.DoSend("    Request to retrieve block with size = 0 was halted!");
                 while (true)
                 {
                 }
@@ -66,15 +64,12 @@ namespace Cosmos.Core
                 #region Loop through existing tables and see if we find a free spot
                 while (xCurrentTable != null)
                 {
-                    mDebugger.SendInternal($"Scanning DataLookupTable {xCurrentTableIdx}");
                     //mDebugger.Trace($"At address {(uint)xCurrentTable}");
                     if (ScanDataLookupTable(xCurrentTableIdx, xCurrentTable, aLength, out xResult))
                     {
-                        mDebugger.SendInternal($"Returning handle {xResult}");
-                        mDebugger.SendInternal($"For dataobject size {aLength}");
                         if (xResult < CPU.GetEndOfKernel())
                         {
-                            mDebugger.SendInternal("Wrong handle returned!");
+                            Debugger.DoSend("Wrong handle returned!");
                             while (true)
                             {
                             }
@@ -93,12 +88,11 @@ namespace Cosmos.Core
                 if (xPreviousTable == null)
                 {
                     // this check should theoretically be unnecessary, but lets keep it, to do some double-checking.
-                    mDebugger.SendInternal("No PreviousTable found!");
+                    Debugger.DoSend("No PreviousTable found!");
                     while (true)
                     {
                     }
                 }
-                mDebugger.SendInternal("Creating new DataLookupTable");
                 var xLastItem = xPreviousTable->GetEntry(DataLookupTable.EntriesPerTable - 1);
                 var xNextTablePointer = (DataLookupTable*)((uint)xLastItem->DataBlock + xLastItem->Size);
                 // the memory hasn't been cleared yet, so lets do that now.
@@ -110,13 +104,11 @@ namespace Cosmos.Core
                 {
                     // Something seriously weird happened: we could create a new DataLookupTable (with new entries)
                     // but couldn't allocate a new handle from it.
-                    mDebugger.SendInternal("    Something seriously weird happened: we could create a new DataLookupTable (with new entries), but couldn't allocate a new handle from it.");
+                    Debugger.DoSend("    Something seriously weird happened: we could create a new DataLookupTable (with new entries), but couldn't allocate a new handle from it.");
                     while (true)
                     {
                     }
                 }
-                mDebugger.SendInternal($"Returning handle {xResult}");
-                mDebugger.SendInternal($"For dataobject size {aLength}");
                 mLastTableIndex = xCurrentTableIdx;
                 mLastEntryIndex = 0;
                 return xResult;
@@ -146,15 +138,12 @@ namespace Cosmos.Core
                 if (xCurrentEntry->Size == 0)
                 {
                     #region Found an uninitialized entry
-                    mDebugger.SendInternal($"Found an entry at position {(uint)i}");
                     // found an entry now. Let's set it
                     if (aTable->Next != null)
                     {
                         // once a handle is used, the size should be set. But at this point, it somehow got unset again.
                         // This should never occur.
-                        mDebugger.SendInternal($"TableIdx {aTableIdx}");
-                        mDebugger.SendInternal($"Index {(uint)i}");
-                        mDebugger.SendInternal("Found an entry which has no size, but there is a followup DataLookupTable");
+                        Debugger.DoSend("Found an entry which has no size, but there is a followup DataLookupTable");
                         while (true)
                         {
                         }
@@ -180,7 +169,6 @@ namespace Cosmos.Core
                         // We're not the very first handle being assigned, so calculate the start address using the previous block
                         xDataBlock = (void*)((uint)xPreviousEntry->DataBlock + xPreviousEntry->Size);
                     }
-                    mDebugger.SendInternal($"Datablock {(uint)xDataBlock}");
 
                     // make sure the memory is empty
                     ClearMemory(xDataBlock, aSize);
@@ -199,15 +187,12 @@ namespace Cosmos.Core
                 // Refcount == UInt32.MaxValue, it means that the block has been reclaimed, and can be reused now.
                 if (xCurrentEntry->Refcount == UInt32.MaxValue)
                 {
-                    mDebugger.SendInternal("Found a reclaimed entry");
                     // we can reuse this entry if its Size >= aLength
                     if (xCurrentEntry->Size >= aSize)
                     {
-                        mDebugger.SendInternal("Can be reused");
                         // we can reuse this entry
                         xCurrentEntry->Refcount = 1;
                         aHandle = (uint)xCurrentEntry;
-                        mDebugger.SendInternal($"Returning reused handle {aHandle}");
                         mLastEntryIndex = i;
                         return true;
                     }

@@ -36,10 +36,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 var xCctor = (objectType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
                 if (xCctor != null)
                 {
-                    new CPUx86.Call
-                    {
-                        DestinationLabel = LabelName.Get(xCctor)
-                    };
+                    XS.Call(LabelName.Get(xCctor));
                     ILOp.EmitExceptionLogic(aAssembler, aMethod, xMethod, true, null, ".AfterCCTorExceptionCheck");
                     XS.Label(".AfterCCTorExceptionCheck");
                 }
@@ -175,11 +172,11 @@ namespace Cosmos.IL2CPU.X86.IL
                 if (xHasCalcSize)
                 {
                     XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                    new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
+                    XS.Add(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
                 }
 
                 // todo: probably we want to check for exceptions after calling Alloc
-                new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.AllocNewObjectRef) };
+                XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
                 XS.Label(".AfterAlloc");
                 new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
@@ -201,8 +198,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceRef = ElementReference.New(strTypeId), SourceIsIndirect = true };
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
+                XS.Set(XSRegisters.EBX, strTypeId, sourceIsIndirect: true);
+                XS.Set(XSRegisters.EAX, XSRegisters.EBX, destinationIsIndirect: true);
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceValue = (uint)xGCFieldCount, Size = 32 };
                 uint xSize = (uint)(from item in xParams
@@ -219,14 +216,14 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                 }
 
-                new CPUx86.Call { DestinationLabel = LabelName.Get(constructor) };
+                XS.Call(LabelName.Get(constructor));
                 // should the complete error handling happen by ILOp.EmitExceptionLogic?
                 if (aMethod != null)
                 {
                     // todo: only happening for real methods now, not for ctor's ?
                     XS.Test(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 2);
                     string xNoErrorLabel = currentLabel + ".NoError" + LabelName.LabelCount.ToString();
-                    new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xNoErrorLabel };
+                    XS.Jump(CPUx86.ConditionalTestEnum.Equal, xNoErrorLabel);
 
                     //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
                     //{

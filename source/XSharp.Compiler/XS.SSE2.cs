@@ -48,6 +48,25 @@ namespace XSharp.Compiler
         DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
       }
 
+      public static void MoveSD(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
+      {
+        new MoveSD()
+        {
+          DestinationReg = destination,
+          SourceReg = source,
+          SourceIsIndirect = sourceIsIndirect
+        };
+      }
+
+      public static void MoveSD(Register32 destination, RegisterXMM source, bool destinationIsIndirect = false)
+      {
+        new MoveSD()
+        {
+          DestinationReg = destination,
+          DestinationIsIndirect = destinationIsIndirect,
+          SourceReg = source
+        };
+      }
     }
   }
 }

@@ -17,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
     //        if (xSource.IsFloat)
     //        {
     //            new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
-    //            new CPUx86.SSE.ConvertSS2SI { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
-    //            new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+    //            XS.ConvertSS2SI(XSRegisters.EAX, XSRegisters.CPUx86.Registers.XMM0);
+    //            XS.Mov(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
     //        }
     //        else
     //        {

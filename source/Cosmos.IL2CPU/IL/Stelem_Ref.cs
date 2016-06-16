@@ -27,7 +27,7 @@ namespace Cosmos.IL2CPU.X86.IL
       }
       //new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStackSize + 4) };
 
-      //new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+      //XS.Call(MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 
       XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: (int)xStackSize); // the index
       XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: (int)xStackSize + 4); // the array
@@ -55,7 +55,7 @@ namespace Cosmos.IL2CPU.X86.IL
       {
         new Comment(aAssembler, "Start 1 dword");
         XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
-        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
+        XS.Set(XSRegisters.ECX, XSRegisters.EBX, destinationIsIndirect: true);
         XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 4);
       }
       switch (aElementSize % 4)
@@ -64,14 +64,14 @@ namespace Cosmos.IL2CPU.X86.IL
           {
             new Comment(aAssembler, "Start 1 byte");
             XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.BL };
+            XS.Set(XSRegisters.ECX, XSRegisters.BL, destinationIsIndirect: true);
             break;
           }
         case 2:
           {
             new Comment(aAssembler, "Start 1 word");
             XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.BX };
+            XS.Set(XSRegisters.ECX, XSRegisters.BX, destinationIsIndirect: true);
             break;
           }
         case 0:

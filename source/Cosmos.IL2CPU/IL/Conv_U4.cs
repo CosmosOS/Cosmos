@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					{
 						XS.SSE.MoveSS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
 						XS.SSE.ConvertSS2SIAndTruncate(XSRegisters.EAX, XSRegisters.XMM0);
-						new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, SourceReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
+						XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
 					}
 					break;
                 case 8:
@@ -40,7 +40,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					{
                         XS.SSE3.MoveDoubleAndDuplicate(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
 						            XS.SSE2.ConvertSD2SIAndTruncate(XSRegisters.EAX, XSRegisters.XMM0);
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, SourceReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
+                        XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
                         XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                         XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
                         XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
