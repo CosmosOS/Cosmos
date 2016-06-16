@@ -38,12 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
                         XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                         XS.SSE.SubSS(XSRegisters.XMM0, XSRegisters.XMM1);
-                        new CPUx86.SSE.MoveSS
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.ESP,
-                            DestinationIsIndirect = true,
-                            SourceReg = CPUx86.RegistersEnum.XMM1
-                        };
+                        XS.SSE.MoveSS(XSRegisters.ESP, XSRegisters.XMM1, destinationIsIndirect: true);
                     }
                     else
                     {
@@ -81,12 +76,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
                         XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EDX));
-                        new CPUx86.Sub
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.ESP,
-                            DestinationIsIndirect = true,
-                            SourceReg = CPUx86.RegistersEnum.EAX
-                        };
+                        XS.Sub(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
                         new CPUx86.SubWithCarry
                         {
                             DestinationReg = CPUx86.RegistersEnum.ESP,

@@ -58,13 +58,13 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 8 };
       new CPUx86.CpuId();
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x18 };
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EDX };
+      XS.Mov(XSRegisters.EDI, XSRegisters.EDX, destinationIsIndirect: true);
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x14 };
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.ECX };
+      XS.Mov(XSRegisters.EDI, XSRegisters.ECX, destinationIsIndirect: true);
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x10 };
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
+      XS.Mov(XSRegisters.EDI, XSRegisters.EBX, destinationIsIndirect: true);
       new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC };
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+      XS.Mov(XSRegisters.EDI, XSRegisters.EAX, destinationIsIndirect: true);
       new CPUx86.Sti();
     }
   }

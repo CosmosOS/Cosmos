@@ -26,13 +26,13 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     new CPUx86.SSE.MoveSS { SourceReg = CPUx86.RegistersEnum.ESP, DestinationReg = CPUx86.RegistersEnum.XMM0, SourceIsIndirect = true };
                     XS.SSE.ConvertSS2SIAndTruncate(XSRegisters.EAX, XSRegisters.XMM0);
-                    new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, SourceReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
+                    XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
                 }
                 else if (xSourceSize == 8)
                 {
                     XS.SSE3.MoveDoubleAndDuplicate(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.SSE2.ConvertSD2SIAndTruncate(XSRegisters.EAX, XSRegisters.XMM0);
-                    new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, SourceReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
+                    XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
                 }
                 else
                 {

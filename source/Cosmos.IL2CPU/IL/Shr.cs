@@ -59,7 +59,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 				// shift high part and move it in low part
 				new CPUx86.ShiftRight{ DestinationReg = CPUx86.RegistersEnum.EAX, Size = 32, SourceReg = CPUx86.RegistersEnum.CL };
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
+				XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
 				// replace unknown high part with a zero, if <= 32
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = 0};
 
@@ -73,7 +73,7 @@ namespace Cosmos.IL2CPU.X86.IL
             if( xStackItem_Value.Size <= 4 )
             {
                 XS.Pop(XSRegisters.ECX); // shift amount
-                new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.CL };
+                XS.ShiftRight(XSRegisters.ESP, XSRegisters.CL, destinationIsIndirect: true);
             }
             else if( xStackItem_Value.Size <= 8 )
             {

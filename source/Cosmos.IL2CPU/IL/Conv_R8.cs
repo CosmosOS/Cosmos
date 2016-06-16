@@ -29,7 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				}
 				// expand stack, that moved data is valid stack
 				XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
-				new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.XMM0 };
+				XS.SSE2.MoveSD(XSRegisters.ESP, XSRegisters.XMM0, destinationIsIndirect: true);
 				break;
             case 8:
                 {
