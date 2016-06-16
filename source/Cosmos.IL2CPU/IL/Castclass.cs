@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
             new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
-            new CPU.Push { DestinationRef = ElementReference.New( xTypeID ), DestinationIsIndirect = true };
+            XS.Push(xTypeID, isIndirect: true);
             MethodBase xMethodIsInstance = VTablesImplRefs.IsInstanceRef;
             // new OpMethod( ILOpCode.Code.Call, 0, 0, xMethodIsInstance, aOpCode.CurrentExceptionHandler ) );
             Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, xCurrentMethodLabel, xCurrentMethodLabel + "_After_IsInstance_Call", DebugEnabled);
@@ -124,7 +124,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             XS.Compare(XSRegisters.EAX, 0);
         //             XS.Jump(ConditionalTestEnum.Zero, mReturnNullLabel);
         //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-        // 			new CPUx86.Push{DestinationRef=Cosmos.Assembler.ElementReference.New(mTypeId), DestinationIsIndirect=true};
+        // 			XS.Push(Cosmos.Assembler.ElementReference.New(mTypeId), isIndirect: true);
         // 			Assembler.Stack.Push(new StackContent(4, typeof(object)));
         // 			Assembler.Stack.Push(new StackContent(4, typeof(object)));
         // 			MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.Int32", "System.Int32");

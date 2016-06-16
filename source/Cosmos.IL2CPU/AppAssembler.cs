@@ -812,11 +812,7 @@ namespace Cosmos.IL2CPU
 
         protected void Push(string aLabelName, bool isIndirect = false)
         {
-            new Push
-            {
-                DestinationRef = ElementReference.New(aLabelName),
-                DestinationIsIndirect = isIndirect
-            };
+            XS.Push(aLabelName, isIndirect: isIndirect);
         }
 
         protected void Call(MethodBase aMethod)

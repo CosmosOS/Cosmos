@@ -99,7 +99,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     xPopType = xPopType.GetElementType();
                     string xTypeId = GetTypeIDLabel(xPopType);
-                    new CPU.Push { DestinationRef = ElementReference.New(xTypeId), DestinationIsIndirect = true };
+                    XS.Push(xTypeId, isIndirect: true);
                 }
                 else
                 {

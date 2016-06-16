@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Jump(CPU.ConditionalTestEnum.Zero, mReturnNullLabel);
       XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
       new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
-      new CPU.Push { DestinationRef = ElementReference.New(xTypeID), DestinationIsIndirect = true };
+      XS.Push(xTypeID, isIndirect: true);
       SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.UInt32", "System.UInt32");
       Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, GetLabel(aMethod, aOpCode), xBaseLabel + "_After_IsInstance_Call", DebugEnabled);
       XS.Label(xBaseLabel + "_After_IsInstance_Call");
