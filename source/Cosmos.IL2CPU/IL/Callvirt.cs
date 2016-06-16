@@ -10,6 +10,7 @@ using System.Reflection;
 
 using Cosmos.IL2CPU.Plugs.System;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -83,7 +84,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xExtraStackSize > 0)
                 {
-                    XS.Sub(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), (uint)xExtraStackSize);
+                    XS.Sub(OldToNewRegister(CPU.RegistersEnum.ESP), (uint)xExtraStackSize);
                 }
                 XS.Call(xNormalAddress);
             }
@@ -103,9 +104,9 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else
                 {
-                    XS.Set(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: (int)xThisOffset);
-                    XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
-                    XS.Push(XSRegisters.EAX, isIndirect: true);
+                    XS.Set(OldToNewRegister(CPU.RegistersEnum.EAX), OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: (int)xThisOffset);
+                    XS.Set(EAX, EAX, sourceIsIndirect: true);
+                    XS.Push(EAX, isIndirect: true);
                 }
                 XS.Push(aTargetMethodUID);
                 XS.Call(LabelName.Get(VTablesImplRefs.GetMethodAddressForTypeRef));
@@ -126,7 +127,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //                        mLabelName + "_AfterAddressCheck",
                 //                        true,
                 //                        xEmitCleanup );
-                XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ECX));
+                XS.Pop(OldToNewRegister(CPU.RegistersEnum.ECX));
 
                 XS.Label(xCurrentMethodLabel + ".AfterAddressCheck");
                 if (xMethodInfo.DeclaringType == typeof(object))
@@ -138,14 +139,14 @@ namespace Cosmos.IL2CPU.X86.IL
                * $esp + mThisOffset    This
                */
                     // we need to see if $this is a boxed object, and if so, we need to box it
-                    XS.Set(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: (int)xThisOffset);
+                    XS.Set(OldToNewRegister(CPU.RegistersEnum.EAX), OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: (int)xThisOffset);
 
-                    //new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = ( ( uint )InstanceTypeEnum.BoxedValueType ), Size = 32 };
+                    //XS.Compare(XSRegisters.EAX, ( ( uint )InstanceTypeEnum.BoxedValueType ), destinationDisplacement: 4, size: RegisterSizes.Int32);
 
                     // EAX contains the handle now, lets dereference it
-                    XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
+                    XS.Set(EAX, EAX, sourceIsIndirect: true);
 
-                    new CPU.Compare { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (int)InstanceTypeEnum.BoxedValueType, Size = 32 };
+                    XS.Compare(EAX, (int)InstanceTypeEnum.BoxedValueType, destinationDisplacement: 4, size: RegisterSize.Int32);
 
                     /*
                * On the stack now:
@@ -166,8 +167,8 @@ namespace Cosmos.IL2CPU.X86.IL
                * EAX contains the type pointer (not the handle!!)
                */
 
-                    XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), (uint)ObjectImpl.FieldDataOffset);
-                    XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationDisplacement: (int)xThisOffset);
+                    XS.Add(OldToNewRegister(CPU.RegistersEnum.EAX), (uint)ObjectImpl.FieldDataOffset);
+                    XS.Set(ESP, EAX, destinationDisplacement: (int)xThisOffset);
                     /*
                * On the stack now:
                * $esp                 Params
@@ -179,9 +180,9 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Label(xCurrentMethodLabel + ".NotBoxedThis");
                 if (xExtraStackSize > 0)
                 {
-                    XS.Sub(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), xExtraStackSize);
+                    XS.Sub(OldToNewRegister(CPU.RegistersEnum.ESP), xExtraStackSize);
                 }
-                XS.Call(XSRegisters.ECX);
+                XS.Call(ECX);
                 XS.Label(xCurrentMethodLabel + ".AfterNotBoxedThis");
             }
             ILOp.EmitExceptionLogic(Assembler, aMethod, aOp, true,

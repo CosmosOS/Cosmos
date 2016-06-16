@@ -5,6 +5,7 @@ using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs.System;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -24,18 +25,18 @@ namespace Cosmos.IL2CPU.X86.IL
       string xTypeID = GetTypeIDLabel(xType.Value);
       XS.Push((ObjectImpl.FieldDataOffset + xSize));
       XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
-      XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-      XS.Set(XSRegisters.ESI, XSRegisters.EAX, sourceIsIndirect: true);
-      XS.Set(XSRegisters.EBX, xTypeID, sourceIsIndirect: true);
-      XS.Set(XSRegisters.ESI, XSRegisters.EBX, destinationIsIndirect: true);
-      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.BoxedValueType, Size = 32 };
+      XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+      XS.Set(ESI, EAX, sourceIsIndirect: true);
+      XS.Set(EBX, xTypeID, sourceIsIndirect: true);
+      XS.Set(ESI, EBX, destinationIsIndirect: true);
+      XS.Set(ESI, (uint)InstanceTypeEnum.BoxedValueType, destinationDisplacement: 4, size: RegisterSize.Int32);
       new Comment(Assembler, "xSize is " + xSize);
       for (int i = 0; i < (xSize / 4); i++)
       {
-        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
+        XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EDX));
         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, DestinationIsIndirect = true, DestinationDisplacement = (ObjectImpl.FieldDataOffset + (i * 4)), SourceReg = CPUx86.RegistersEnum.EDX, Size = 32 };
       }
-      XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+      XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
     }
   }
 }
