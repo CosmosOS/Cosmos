@@ -7,6 +7,13 @@ using Native = System.UInt32;
 
 namespace Cosmos.Core.Memory.Test {
   unsafe static public class RAT {
+    // RAT: RAM Allocation Table
+    //
+    // A byte table which defines the code which owns the page. 
+    // Owners can further subdivide table types on their own and RAT
+    // code must not assume anything about contents of pages other 
+    // than who owns them.
+
     static public class PageType {
       public const byte Empty = 0;
 
