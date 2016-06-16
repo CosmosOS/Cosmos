@@ -14,7 +14,7 @@ namespace Cosmos.System.Plugs.System.Security.Cryptography
 	///<summary>
 	///The stock .NET constructor for CryptoConfig deals with dictionaries we don't need.
 	///</summary>		
-	public static CryptoConfigImpl() {
+	public static void CCtor() {
 
 	}
 
