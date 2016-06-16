@@ -29,23 +29,23 @@ namespace Cosmos.IL2CPU.X86.IL
             //mTypeId = GetService<IMetaDataInfoService>().GetTypeIdLabel( mCastAsType );
             // todo: throw an exception when the class does not support the cast!
             string mReturnNullLabel = xCurrentMethodLabel + "_ReturnNull";
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+            XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
             XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
 
-            new CPU.Mov { DestinationReg = CPU.RegistersEnum.EAX, SourceReg = CPU.RegistersEnum.EAX, SourceIsIndirect = true };
+            XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
             new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
             new CPU.Push { DestinationRef = ElementReference.New( xTypeID ), DestinationIsIndirect = true };
             MethodBase xMethodIsInstance = VTablesImplRefs.IsInstanceRef;
             // new OpMethod( ILOpCode.Code.Call, 0, 0, xMethodIsInstance, aOpCode.CurrentExceptionHandler ) );
             Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, xCurrentMethodLabel, xCurrentMethodLabel + "_After_IsInstance_Call", DebugEnabled);
-            new Label( xCurrentMethodLabel + "_After_IsInstance_Call" );
+            XS.Label(xCurrentMethodLabel + "_After_IsInstance_Call" );
             XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
             XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
             new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
             new CPU.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
 
-            new Label( mReturnNullLabel );
+            XS.Label(mReturnNullLabel );
             XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), 4);
             string xAllocInfoLabelName = LabelName.Get( GCImplementationRefs.AllocNewObjectRef );
 #warning TODO: Emit new exceptions
@@ -62,7 +62,7 @@ namespace Cosmos.IL2CPU.X86.IL
             //                GetService<IMetaDataInfoService>().GetMethodInfo( typeof( InvalidCastException ).GetConstructor( new Type[ 0 ] ), false ),
             //                GetServiceProvider(),
             //                xAllocInfo.LabelName );
-            new Label( xCurrentMethodLabel + "_After_NewException" );
+            XS.Label(xCurrentMethodLabel + "_After_NewException" );
             //Call.EmitExceptionLogic( Assembler, ( uint )mCurrentILOffset, mMethodInfo, mNextOpLabel, false, null );
         }
 
@@ -120,7 +120,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             mTypeId = GetService<IMetaDataInfoService>().GetTypeIdLabel(mCastAsType);
         // 			// todo: throw an exception when the class does not support the cast!
         // 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
-        //             new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+        //             XS.Mov(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
         //             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
         //             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
         //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
@@ -132,12 +132,12 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			xOp.Assembler = Assembler;
         //             xOp.SetServiceProvider(GetServiceProvider());
         // 			xOp.Assemble();
-        // 		    new Label(mThisLabel + "_After_IsInstance_Call");
+        // 		    XS.Label(mThisLabel + "_After_IsInstance_Call");
         // 			Assembler.Stack.Pop();
-        //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //             XS.Pop(XSRegisters.EAX);
         //             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
         //             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = mNextOpLabel };
-        // 			new Label(mReturnNullLabel);
+        // 			XS.Label(mReturnNullLabel);
         //             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
         //             var xAllocInfo = GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.AllocNewObjectRef,
         //                                                                               false);
@@ -152,7 +152,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //                             GetService<IMetaDataInfoService>().GetMethodInfo(typeof(InvalidCastException).GetConstructor(new Type[0]), false),
         //                             GetServiceProvider(),
         //                             xAllocInfo.LabelName);
-        //             new Label(mThisLabel + "_After_NewException");
+        //             XS.Label(mThisLabel + "_After_NewException");
         // 			Call.EmitExceptionLogic(Assembler, (uint)mCurrentILOffset, mMethodInfo, mNextOpLabel, false, null);
         // 		}
         // 	}

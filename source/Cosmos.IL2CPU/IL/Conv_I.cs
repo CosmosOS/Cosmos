@@ -31,9 +31,9 @@ namespace Cosmos.IL2CPU.X86.IL
     //                case 4:
     //                    break;
     //                case 8:
-    //                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-    //                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
-    //                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+    //                    XS.Pop(XSRegisters.EAX);
+    //                    XS.Pop(XSRegisters.EDX);
+    //                    XS.Push(XSRegisters.EAX);
     //                    break;
     //                default:
     //                    //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );

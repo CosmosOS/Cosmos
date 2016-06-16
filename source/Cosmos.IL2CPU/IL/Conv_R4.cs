@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 1:
                 case 2:
                     {
-                        new CPUx86.SSE.ConvertSI2SS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                        XS.SSE.ConvertSI2SS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
                         new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.XMM0 };
                         break;
                     }
@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         {
                             if (IsIntegerSigned(xSource))
                             {
-                                new CPUx86.SSE.ConvertSI2SS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                                XS.SSE.ConvertSI2SS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
                                 new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.XMM0 };
                             }
                             else

@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         DestinationLabel = LabelName.Get(xCctor)
                     };
                     ILOp.EmitExceptionLogic(aAssembler, aMethod, xMethod, true, null, ".AfterCCTorExceptionCheck");
-                    new Label(".AfterCCTorExceptionCheck");
+                    XS.Label(".AfterCCTorExceptionCheck");
                 }
             }
 
@@ -134,10 +134,10 @@ namespace Cosmos.IL2CPU.X86.IL
                         && xParams[0].ParameterType == typeof(char[]))
                     {
                         xHasCalcSize = true;
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
 
                         // EAX contains a memory handle now, lets dereference it to a pointer
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
+                        XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
                         XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), sourceDisplacement: 8);
                         XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), 2);
                         XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
@@ -149,7 +149,7 @@ namespace Cosmos.IL2CPU.X86.IL
                              && xParams[2].ParameterType == typeof(int))
                     {
                         xHasCalcSize = true;
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
                         XS.ShiftLeft(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
                         XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     }
@@ -158,7 +158,7 @@ namespace Cosmos.IL2CPU.X86.IL
                              && xParams[1].ParameterType == typeof(int))
                     {
                         xHasCalcSize = true;
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
                         XS.ShiftLeft(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
                         XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     }
@@ -180,7 +180,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 // todo: probably we want to check for exceptions after calling Alloc
                 new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.AllocNewObjectRef) };
-                new Label(".AfterAlloc");
+                XS.Label(".AfterAlloc");
                 new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
 
@@ -200,7 +200,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
                 XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
+                XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceRef = ElementReference.New(strTypeId), SourceIsIndirect = true };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
                 new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (uint)InstanceTypeEnum.NormalObject, Size = 32 };
@@ -251,7 +251,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     new Comment(aAssembler, "[ Newobj.Execute cleanup end ]");
                     Jump_Exception(aMethod);
-                    new Label(xNoErrorLabel);
+                    XS.Label(xNoErrorLabel);
                 }
                 XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 

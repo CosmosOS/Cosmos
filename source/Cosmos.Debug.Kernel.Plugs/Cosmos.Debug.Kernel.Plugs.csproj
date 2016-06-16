@@ -109,6 +109,10 @@
       <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
       <Name>Cosmos.Debug.Kernel</Name>
     </ProjectReference>
+    <ProjectReference Include="..\XSharp.Compiler\XSharp.Compiler.csproj">
+      <Project>{A281A1B1-C718-4BCB-A7BE-ED840A70449A}</Project>
+      <Name>XSharp.Compiler</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />

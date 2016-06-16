@@ -104,7 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 else
                 {
                     XS.Set(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: (int)xThisOffset);
-                    new CPU.Mov { DestinationReg = CPU.RegistersEnum.EAX, SourceReg = CPU.RegistersEnum.EAX, SourceIsIndirect = true };
+                    XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
                     new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
                 }
                 new CPU.Push { DestinationValue = aTargetMethodUID };
@@ -128,7 +128,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //                        xEmitCleanup );
                 XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ECX));
 
-                new Label(xCurrentMethodLabel + ".AfterAddressCheck");
+                XS.Label(xCurrentMethodLabel + ".AfterAddressCheck");
                 if (xMethodInfo.DeclaringType == typeof(object))
                 {
 
@@ -143,7 +143,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     //new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = ( ( uint )InstanceTypeEnum.BoxedValueType ), Size = 32 };
 
                     // EAX contains the handle now, lets dereference it
-                    new CPU.Mov { DestinationReg = CPU.RegistersEnum.EAX, SourceReg = CPU.RegistersEnum.EAX, SourceIsIndirect = true };
+                    XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
 
                     new CPU.Compare { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (int)InstanceTypeEnum.BoxedValueType, Size = 32 };
 
@@ -176,13 +176,13 @@ namespace Cosmos.IL2CPU.X86.IL
                * ECX contains the method to call
                */
                 }
-                new Label(xCurrentMethodLabel + ".NotBoxedThis");
+                XS.Label(xCurrentMethodLabel + ".NotBoxedThis");
                 if (xExtraStackSize > 0)
                 {
                     XS.Sub(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), xExtraStackSize);
                 }
                 XS.Call(XSRegisters.ECX);
-                new Label(xCurrentMethodLabel + ".AfterNotBoxedThis");
+                XS.Label(xCurrentMethodLabel + ".AfterNotBoxedThis");
             }
             ILOp.EmitExceptionLogic(Assembler, aMethod, aOp, true,
                                     delegate ()
@@ -203,7 +203,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                                         ILOp.EmitExceptionCleanupAfterCall(Assembler, xResultSize, xStackOffsetBefore, xPopSize);
                                     });
-            new Label(xCurrentMethodLabel + ".NoExceptionAfterCall");
+            XS.Label(xCurrentMethodLabel + ".NoExceptionAfterCall");
             new Comment(Assembler, "Argument Count = " + xParameters.Length.ToString());
         }
     }

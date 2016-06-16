@@ -28,12 +28,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
       XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
       new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
-      new CPU.Mov { DestinationReg = CPU.RegistersEnum.EAX, SourceReg = CPU.RegistersEnum.EAX, SourceIsIndirect = true };
+      XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
       new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
       new CPU.Push { DestinationRef = ElementReference.New(xTypeID), DestinationIsIndirect = true };
       SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.UInt32", "System.UInt32");
       Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, GetLabel(aMethod, aOpCode), xBaseLabel + "_After_IsInstance_Call", DebugEnabled);
-      new Label(xBaseLabel + "_After_IsInstance_Call");
+      XS.Label(xBaseLabel + "_After_IsInstance_Call");
       XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
       XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
       new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
         new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ((i * 4) + ObjectImpl.FieldDataOffset) };
       }
       new CPU.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
-      new Label(mReturnNullLabel);
+      XS.Label(mReturnNullLabel);
       XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), 4);
       new CPUx86.Push { DestinationValue = 0 };
     }

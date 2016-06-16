@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Cosmos.Assembler;
@@ -91,19 +91,19 @@ namespace Cosmos.IL2CPU
             };
 
             XS.Comment("Set data segments");
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), mGdData);
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.DS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.ES), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.FS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.GS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.SS), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+            XS.Set(XSRegisters.EAX, mGdData);
+            XS.Set(XSRegisters.DS, XSRegisters.AX);
+            XS.Set(XSRegisters.ES, XSRegisters.AX);
+            XS.Set(XSRegisters.FS, XSRegisters.AX);
+            XS.Set(XSRegisters.GS, XSRegisters.AX);
+            XS.Set(XSRegisters.SS, XSRegisters.AX);
 
             XS.Comment("Force reload of code segment");
             new JumpToSegment
             {
                 Segment = mGdCode, DestinationLabel = "Boot_FlushCsGDT"
             };
-            new Label("Boot_FlushCsGDT");
+            XS.Label("Boot_FlushCsGDT");
             new Comment(this, "END - Create GDT");
         }
 
@@ -202,7 +202,7 @@ namespace Cosmos.IL2CPU
                     DestinationReg = RegistersEnum.EAX, DestinationIsIndirect = true
                 };
             }
-            new Label("AfterCreateIDT");
+            XS.Label("AfterCreateIDT");
             new Comment(this, "END - Create IDT");
         }
 
@@ -282,21 +282,13 @@ namespace Cosmos.IL2CPU
                 DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EBX
             };
             XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 4);
-            new Mov
-            {
-                DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBX, SourceIsIndirect = true
-            };
+            XS.Set(XSRegisters.EAX, XSRegisters.EBX, sourceIsIndirect: true);
             new Mov
             {
                 DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX
             };
             XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 4);
-            new Mov
-            {
-                DestinationReg = RegistersEnum.EAX,
-                SourceReg = RegistersEnum.EBX,
-                SourceIsIndirect = true
-            };
+            XS.Set(XSRegisters.EAX, XSRegisters.EBX, sourceIsIndirect: true);
             new Mov
             {
                 DestinationRef = ElementReference.New("MultiBootInfo_Memory_High"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX
@@ -358,13 +350,10 @@ namespace Cosmos.IL2CPU
             };
 
             new Comment(this, "Kernel done - loop till next IRQ");
-            new Label(".loop");
+            XS.Label(".loop");
             new ClearInterruptFlag();
             new Halt();
-            new Jump
-            {
-                DestinationLabel = ".loop"
-            };
+            XS.Jump(".loop");
 
             if (mComPort > 0)
             {
@@ -418,8 +407,8 @@ namespace Cosmos.IL2CPU
             }
             else
             {
-                new Label("DebugStub_Step");
-                new Return();
+                XS.Label("DebugStub_Step");
+                XS.Return();
             }
 
             // Start emitting assembly labels

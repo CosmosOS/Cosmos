@@ -48,7 +48,7 @@ namespace Cosmos.IL2CPU.X86.IL
       // it's on the stack 3 times now, once from the return value, twice from the pushes;
 
       XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
+      XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceRef = Cosmos.Assembler.ElementReference.New(xTypeID), SourceIsIndirect = true };
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
       XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);

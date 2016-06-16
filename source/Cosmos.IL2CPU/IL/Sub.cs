@@ -34,24 +34,10 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 4:
                     if (xStackTopIsFloat)
                     {
-                        new CPUx86.SSE.MoveSS
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.XMM0,
-                            SourceReg = CPUx86.RegistersEnum.ESP,
-                            SourceIsIndirect = true
-                        };
+                        XS.SSE.MoveSS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
                         XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
-                        new CPUx86.SSE.MoveSS
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.XMM1,
-                            SourceReg = CPUx86.RegistersEnum.ESP,
-                            SourceIsIndirect = true
-                        };
-                        new CPUx86.SSE.SubSS
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.XMM1,
-                            SourceReg = CPUx86.RegistersEnum.XMM0
-                        };
+                        XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
+                        XS.SSE.SubSS(XSRegisters.XMM0, XSRegisters.XMM1);
                         new CPUx86.SSE.MoveSS
                         {
                             DestinationReg = CPUx86.RegistersEnum.ESP,

@@ -31,11 +31,11 @@ namespace Cosmos.IL2CPU.X86.IL
             // pop the array now
             XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
             // translate it to actual memory
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+            XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true);
 
             if (aOpType.StackPopTypes.Last().GetElementType().IsClass)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+                XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true);
             }
 
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
@@ -72,13 +72,13 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			aAssembler.Stack.Pop();
         // 			aAssembler.Stack.Pop();
         // 			aAssembler.Stack.Push(new StackContent(4, typeof(uint)));
-        //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //             XS.Pop(XSRegisters.EAX);
         //             new CPUx86.Move { DestinationReg = CPUx86.Registers.EDX, SourceValue = aElementSize };
-        // 			new CPUx86.Multiply{DestinationReg=CPUx86.Registers.EDX};
+        // 			XS.Multiply(XSRegisters.EDX);
         //             new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = (uint)(ObjectImpl.FieldDataOffset + 4) };
-        //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
+        //             XS.Pop(XSRegisters.EDX);
         //             new CPUx86.Add { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EAX };
-        //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
+        //             XS.Push(XSRegisters.EDX);
         // 		}
         //
         // 		public override void DoAssemble() {

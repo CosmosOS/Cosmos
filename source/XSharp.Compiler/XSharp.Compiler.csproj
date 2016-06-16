@@ -102,6 +102,9 @@
     <Compile Include="TokenPatterns.cs" />
     <Compile Include="XS.cs" />
     <Compile Include="XS.FPU.cs" />
+    <Compile Include="XS.SSE.cs" />
+    <Compile Include="XS.SSE2.cs" />
+    <Compile Include="XS.SSE3.cs" />
     <Compile Include="XS.Temp.cs" />
     <Compile Include="XSRegisters.cs" />
   </ItemGroup>
@@ -127,6 +130,7 @@
     <Content Include="Docs\ToDo.html" />
     <Content Include="Docs\XSharp.htm" />
     <Content Include="XSTemplate.DestinationSize.txt" />
+    <Content Include="XSTemplate.DestinationSource.txt" />
     <Content Include="XSTemplate.DestinationSourceSize.txt" />
     <None Include=".editorconfig" />
     <None Include="app.config" />

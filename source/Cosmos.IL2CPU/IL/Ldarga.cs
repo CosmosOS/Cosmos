@@ -66,7 +66,7 @@ namespace Cosmos.IL2CPU.X86.IL
 //            }
 //            xOffset += xExtraSize;
 //#warning TODO: check this
-//            new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP };
+//            XS.Push(XSRegisters.EBP);
 
 //            for( int i = 0; i < ( xCurArgSize / 4 ); i++ )
 //            {
@@ -134,7 +134,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
         // 		}
         // 		public override void DoAssemble() {
-        //             new CPU.Push { DestinationReg = CPU.Registers.EBP };
+        //             XS.Push(XSRegisters.EBP);
         // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
         //             new CPU.Push { DestinationValue = (uint)mAddress };
         // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));

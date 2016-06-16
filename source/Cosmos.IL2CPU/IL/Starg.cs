@@ -81,7 +81,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 				throw new Exception("No Address Specified!");
         // 			}
         // 			for (int i = (mAddresses.Length - 1); i >= 0; i -= 1) {
-        // 				new CPUx86.Pop{DestinationReg=CPUx86.Registers.EAX};
+        // 				XS.Pop(XSRegisters.EAX);
         //                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = mAddresses[i], SourceReg = CPUx86.Registers.EAX };
         // 			}
         // 			Assembler.Stack.Pop();

@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: (int)xStackSize); // the index
       XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: (int)xStackSize + 4); // the array
       // now convert the array handle to an actual memory address
-      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
+      XS.Set(XSRegisters.ECX, XSRegisters.ECX, sourceIsIndirect: true);
 
       XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), (uint)(ObjectImpl.FieldDataOffset + 4));
 

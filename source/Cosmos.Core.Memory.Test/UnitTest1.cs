@@ -22,6 +22,10 @@ namespace Cosmos.Core.Memory.Test {
         var x1 = (Int32*)Heap.Alloc(sizeof(Int32));
         var xFreePages2 = RAT.GetPageCount(RAT.PageType.Empty);
         Assert.IsTrue(xFreePages - xFreePages2 == 1);
+        //
+        Heap.Free(x1);
+        var xFreePages3 = RAT.GetPageCount(RAT.PageType.Empty);
+        Assert.IsTrue(xFreePages3 == xFreePages2 + 1);
       }
     }
   }

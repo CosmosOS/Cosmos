@@ -351,6 +351,218 @@ namespace XSharp.Compiler
 
     #endregion InstructionWithDestinationAndSize
 
+    #region InstructionWithDestinationAndSource
+
+    private static void DoDestinationSource<T>(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      where T : InstructionWithDestinationAndSource, new()
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+      if (destinationIsIndirect && sourceIsIndirect)
+      {
+        throw new Exception("Both destination and source cannot be indirect!");
+      }
+
+      new T
+      {
+        DestinationRef = ElementReference.New(destination),
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceReg = source.RegEnum,
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement
+      };
+    }
+
+    private static void DoDestinationSource<T>(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      where T : InstructionWithDestinationAndSource, new()
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+      if (destinationIsIndirect && sourceIsIndirect)
+      {
+        throw new Exception("Both destination and source cannot be indirect!");
+      }
+
+      new T
+      {
+        DestinationRef = ElementReference.New(destination),
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceValue = value,
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement,
+      };
+    }
+
+    private static void DoDestinationSource<T>(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      where T : InstructionWithDestinationAndSource, new()
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+      if (destinationIsIndirect && sourceIsIndirect)
+      {
+        throw new Exception("Both destination and source cannot be indirect!");
+      }
+
+      new T
+      {
+        DestinationRef = ElementReference.New(destination),
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceRef = ElementReference.New(source),
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement,
+      };
+    }
+
+    private static void DoDestinationSource<T>(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      where T : InstructionWithDestinationAndSource, new()
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+
+      new T
+      {
+        DestinationReg = destination.RegEnum,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceRef = ElementReference.New(sourceLabel),
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement
+      };
+    }
+
+    private static void DoDestinationSource<T>(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      where T : InstructionWithDestinationAndSource, new()
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+
+      new T
+      {
+        DestinationReg = destination.RegEnum,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceValue = value,
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement,
+      };
+    }
+
+    private static void DoDestinationSource<T>(Register destination,
+                                               Register source,
+                                               bool destinationIsIndirect = false,
+                                               int? destinationDisplacement = null,
+                                               bool sourceIsIndirect = false,
+                                               int? sourceDisplacement = null)
+      where T : InstructionWithDestinationAndSource, new()
+    {
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      if (sourceDisplacement != null)
+      {
+        sourceIsIndirect = true;
+        if (sourceDisplacement == 0)
+        {
+          sourceDisplacement = null;
+        }
+      }
+      if (destinationIsIndirect && sourceIsIndirect)
+      {
+        throw new Exception("Both destination and source cannot be indirect!");
+      }
+
+      new T
+      {
+        DestinationReg = destination.RegEnum,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceIsIndirect = sourceIsIndirect,
+        SourceDisplacement = sourceDisplacement,
+        SourceReg = source.RegEnum
+      };
+    }
+
+    #endregion InstructionWithDestinationAndSource
+
     #region Mov
     public static void Set(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
     {
@@ -662,6 +874,23 @@ namespace XSharp.Compiler
       {
         DestinationReg = destination.RegEnum,
         SourceRef = ElementReference.New(sourceRef),
+        SourceIsIndirect = sourceIsIndirect
+      };
+    }
+
+    public static void Test(Register destination, Register sourceReg, bool sourceIsIndirect = false)
+    {
+      if (!sourceIsIndirect)
+      {
+        if (destination.Size != sourceReg.Size)
+        {
+          throw new InvalidOperationException("Register sizes don't match!");
+        }
+      }
+      new Test
+      {
+        DestinationReg = destination.RegEnum,
+        SourceReg = sourceReg,
         SourceIsIndirect = sourceIsIndirect
       };
     }

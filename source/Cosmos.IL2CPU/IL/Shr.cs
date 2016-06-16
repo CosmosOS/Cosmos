@@ -53,7 +53,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, Size = 32, SourceReg = CPUx86.RegistersEnum.CL };
 				new CPUx86.Jump { DestinationLabel = End_Shr };
 
-				new Label(HighPartIsZero);
+				XS.Label(HighPartIsZero);
 				// remove bits >= 32, so that CL max value could be only 31
 				new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 0x1f, Size = 8 };
 
@@ -63,7 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				// replace unknown high part with a zero, if <= 32
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = 0};
 
-				new Label(End_Shr);
+				XS.Label(End_Shr);
 			}
 			else
 				throw new NotSupportedException("A size bigger 8 not supported at Shr!");
@@ -72,12 +72,12 @@ namespace Cosmos.IL2CPU.X86.IL
             var xStackItem_Value = Assembler.Stack.Peek();
             if( xStackItem_Value.Size <= 4 )
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX }; // shift amount
+                XS.Pop(XSRegisters.ECX); // shift amount
                 new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.CL };
             }
             else if( xStackItem_Value.Size <= 8 )
             {
-				new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX }; // shift amount
+				XS.Pop(XSRegisters.ECX); // shift amount
 				// [ESP] is high part
 				// [ESP + 4] is low part
 				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
