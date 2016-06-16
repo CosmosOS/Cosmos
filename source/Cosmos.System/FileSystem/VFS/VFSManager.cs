@@ -441,14 +441,6 @@ namespace Cosmos.System.FileSystem.VFS
             xReturn[1] = '<';
             xReturn[2] = '>';
             xReturn[3] = '|';
-            xReturn[4] = '\0';
-            xReturn[5] = '\a';
-            xReturn[6] = '\b';
-            xReturn[7] = '\t';
-            xReturn[8] = '\n';
-            xReturn[9] = '\v';
-            xReturn[10] = '\f';
-            xReturn[11] = '\r';
             return xReturn;
         }
 

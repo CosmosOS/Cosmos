@@ -321,6 +321,39 @@ namespace Cosmos.System.Plugs.System.IO
             return @"\Temp";
         }
 
+        private static string CombineNoChecks(string path1, string path2)
+        {
+            if (path2.Length == 0)
+            {
+                return path1;
+            }
+            if (path1.Length == 0)
+            {
+                return path2;
+            }
+            if (Path.IsPathRooted(path2))
+            {
+                return path2;
+            }
+            char c = path1[path1.Length - 1];
+            if (c != Path.DirectorySeparatorChar && c != Path.AltDirectorySeparatorChar && c != Path.VolumeSeparatorChar)
+            {
+                return path1 + "\\" + path2;
+            }
+            return path1 + path2;
+        }
+
+        public static string Combine(string path1, string path2)
+        {
+            if (path1 == null || path2 == null)
+            {
+                throw new ArgumentNullException((path1 == null) ? "path1" : "path2");
+            }
+            CheckInvalidPathChars(path1);
+            CheckInvalidPathChars(path2);
+            return CombineNoChecks(path1, path2);
+        }
+
         public static string RemoveLongPathPrefix(string aPath)
         {
             return aPath;
@@ -452,7 +485,7 @@ namespace Cosmos.System.Plugs.System.IO
             Global.mFileSystemDebugger.SendInternal("aPath =");
             Global.mFileSystemDebugger.SendInternal(aPath);
 
-            var xChars = aCheckAdditional ? VFSManager.GetInvalidPathCharsWithAdditionalChecks() : VFSManager.GetRealInvalidPathChars();
+            var xChars = VFSManager.GetRealInvalidPathChars();
 
             for (int i = 0; i < xChars.Length; i++)
             {
