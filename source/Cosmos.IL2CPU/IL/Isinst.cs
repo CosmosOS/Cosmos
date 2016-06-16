@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
 
             //XS.Mov(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
+            XS.Push(XSRegisters.EAX, isIndirect: true);
             XS.Push(xTypeID, isIndirect: true);
 
             SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.UInt32", "System.UInt32" );

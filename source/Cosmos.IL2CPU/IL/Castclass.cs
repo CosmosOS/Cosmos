@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
             XS.Jump(CPU.ConditionalTestEnum.Zero, mReturnNullLabel);
 
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
-            new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
+            XS.Push(XSRegisters.EAX, isIndirect: true);
             XS.Push(xTypeID, isIndirect: true);
             MethodBase xMethodIsInstance = VTablesImplRefs.IsInstanceRef;
             // new OpMethod( ILOpCode.Code.Call, 0, 0, xMethodIsInstance, aOpCode.CurrentExceptionHandler ) );
@@ -123,7 +123,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             XS.Mov(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
         //             XS.Compare(XSRegisters.EAX, 0);
         //             XS.Jump(ConditionalTestEnum.Zero, mReturnNullLabel);
-        //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+        //             XS.Push(XSRegisters.EAX, isIndirect: true);
         // 			XS.Push(Cosmos.Assembler.ElementReference.New(mTypeId), isIndirect: true);
         // 			Assembler.Stack.Push(new StackContent(4, typeof(object)));
         // 			Assembler.Stack.Push(new StackContent(4, typeof(object)));

@@ -178,8 +178,8 @@ namespace Cosmos.IL2CPU.X86.IL
                 // todo: probably we want to check for exceptions after calling Alloc
                 XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
                 XS.Label(".AfterAlloc");
-                new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
-                new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
+                XS.Push(XSRegisters.ESP, isIndirect: true);
+                XS.Push(XSRegisters.ESP, isIndirect: true);
 
                 // it's on the stack now 3 times. Once from the Alloc return value, twice from the pushes
 

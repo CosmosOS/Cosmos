@@ -105,7 +105,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     XS.Set(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: (int)xThisOffset);
                     XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
-                    new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
+                    XS.Push(XSRegisters.EAX, isIndirect: true);
                 }
                 new CPU.Push { DestinationValue = aTargetMethodUID };
                 XS.Call(LabelName.Get(VTablesImplRefs.GetMethodAddressForTypeRef));

@@ -76,12 +76,12 @@ namespace Cosmos.IL2CPU.X86.IL
             break;
           case 4:
             // copy a full dword
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EDX, DestinationIsIndirect = true };
+            XS.Push(XSRegisters.EDX, isIndirect: true);
             XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), 4); // move to previous 4 bytes
             break;
             //case 8:
             //    new CPUx86.Push {DestinationReg = CPUx86.Registers.EDX, DestinationDisplacement = 4, DestinationIsIndirect = true};
-            //    new CPUx86.Push {DestinationReg = CPUx86.Registers.EDX, DestinationIsIndirect = true};
+            //    XS.Push(XSRegisters.EDX, isIndirect: true);
             //    break;
         }
       }

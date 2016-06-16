@@ -1,9 +1,11 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection.Emit;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86.x87;
 using static XSharp.Compiler.XSRegisters;
+using Label = Cosmos.Assembler.Label;
 
 namespace XSharp.Compiler
 {
@@ -706,7 +708,7 @@ namespace XSharp.Compiler
       Do<Push>(destinationValue, isIndirect, displacement, size);
     }
 
-    public static void Push(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+    public static void Push(Register register, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
     {
       Do<Push>(register, isIndirect, displacement, size);
     }
@@ -1092,6 +1094,24 @@ namespace XSharp.Compiler
     public static void StoreWordInString()
     {
       new StoreWordInString();
+    }
+
+    public static void LoadGdt(Register32 destination, bool isIndirect = false)
+    {
+      new Lgdt
+      {
+        DestinationReg = destination,
+        DestinationIsIndirect = isIndirect
+      };
+    }
+
+    public static void LoadIdt(Register32 destination, bool isIndirect = false)
+    {
+      new Lidt
+      {
+        DestinationReg = destination,
+        DestinationIsIndirect = isIndirect
+      };
     }
   }
 }

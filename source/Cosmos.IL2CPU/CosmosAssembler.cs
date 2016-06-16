@@ -85,10 +85,7 @@ namespace Cosmos.IL2CPU
                 SourceRef = ElementReference.New("_NATIVE_GDT_Contents")
             };
             XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), "_NATIVE_GDT_Pointer");
-            new Lgdt
-            {
-                DestinationReg = RegistersEnum.EAX, DestinationIsIndirect = true
-            };
+            XS.LoadGdt(XSRegisters.EAX, isIndirect: true);
 
             XS.Comment("Set data segments");
             XS.Set(XSRegisters.EAX, mGdData);
@@ -197,10 +194,7 @@ namespace Cosmos.IL2CPU
                 {
                     DestinationRef = ElementReference.New("static_field__Cosmos_Core_CPU_mInterruptsEnabled"), DestinationIsIndirect = true, SourceValue = 1
                 };
-                new Lidt
-                {
-                    DestinationReg = RegistersEnum.EAX, DestinationIsIndirect = true
-                };
+                XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
             }
             XS.Label("AfterCreateIDT");
             new Comment(this, "END - Create IDT");

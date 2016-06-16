@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
             XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 8);
-            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
+            XS.Push(XSRegisters.EAX, isIndirect: true);
         }
 
 
@@ -36,7 +36,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			Assembler.Stack.Pop();
         //             XS.Pop(XSRegisters.EAX);
         // 			XS.Add(XSRegisters.EAX, 8);
-        //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+        //             XS.Push(XSRegisters.EAX, isIndirect: true);
         // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
         // 		}
         // 	}
