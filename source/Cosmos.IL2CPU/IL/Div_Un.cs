@@ -93,7 +93,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.Divide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
 
 					// save result to stack
-					new CPUx86.Push { DestinationValue = 0 };
+					XS.Push(0);
 					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 
 					//TODO: implement proper derivation correction and overflow detection

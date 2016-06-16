@@ -99,15 +99,15 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     xPopType = xPopType.GetElementType();
                     string xTypeId = GetTypeIDLabel(xPopType);
-                    new CPU.Push { DestinationRef = ElementReference.New(xTypeId), DestinationIsIndirect = true };
+                    XS.Push(xTypeId, isIndirect: true);
                 }
                 else
                 {
                     XS.Set(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: (int)xThisOffset);
                     XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
-                    new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
+                    XS.Push(XSRegisters.EAX, isIndirect: true);
                 }
-                new CPU.Push { DestinationValue = aTargetMethodUID };
+                XS.Push(aTargetMethodUID);
                 XS.Call(LabelName.Get(VTablesImplRefs.GetMethodAddressForTypeRef));
                 if (xExtraStackSize > 0)
                 {

@@ -22,7 +22,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
       uint xSize = Align(SizeOfType(xType.Value), 4);
       string xTypeID = GetTypeIDLabel(xType.Value);
-      new CPUx86.Push { DestinationValue = (ObjectImpl.FieldDataOffset + xSize) };
+      XS.Push((ObjectImpl.FieldDataOffset + xSize));
       XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
       XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
       XS.Set(XSRegisters.ESI, XSRegisters.EAX, sourceIsIndirect: true);

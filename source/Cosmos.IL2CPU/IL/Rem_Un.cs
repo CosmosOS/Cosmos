@@ -87,7 +87,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.Divide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
 
 					// save remainder to stack
-					new CPUx86.Push { DestinationValue = 0 };
+					XS.Push(0);
 					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 
 					//TODO: implement proper derivation correction and overflow detection
@@ -107,7 +107,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					// divide low part
 					XS.Divide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
 					// save remainder result
-					new CPUx86.Push { DestinationValue = 0 };
+					XS.Push(0);
 					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 
 					XS.Label(LabelEnd);

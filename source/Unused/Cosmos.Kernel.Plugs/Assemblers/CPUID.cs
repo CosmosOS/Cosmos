@@ -38,7 +38,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
         XS.Popfd();
 
         new CPUx86.Push("eax");*/
-      new CPUx86.Push { DestinationValue = 0 };
+      XS.Push(0);
     }
   }
   public class GetCPUIDInternal: AssemblerMethod {

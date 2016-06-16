@@ -39,7 +39,7 @@ namespace Cosmos.IL2CPU.Plugs.Assemblers {
         Console.Write("");
       }
       XS.Comment("-- push argsize");
-      new CPUx86.Push { DestinationValue = xSize };
+      XS.Push(xSize);
       XS.Comment("-- stfld ArgSize");
       Stfld.DoExecute(xAssembler, xMethodInfo, "$$ArgSize$$", xMethodInfo.MethodBase.DeclaringType, true, false);
 

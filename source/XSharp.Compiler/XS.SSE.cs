@@ -1,4 +1,5 @@
 ﻿using Cosmos.Assembler.x86.SSE;
+using Cosmos.Assembler.x86.x87;
 using static XSharp.Compiler.XSRegisters;
 
 namespace XSharp.Compiler
@@ -101,6 +102,24 @@ namespace XSharp.Compiler
         {
           DestinationReg = destination,
           SourceReg = source
+        };
+      }
+
+      public static void FXSave(Register32 destination, bool isIndirect)
+      {
+        new FXSave
+        {
+          DestinationReg = destination,
+          DestinationIsIndirect = isIndirect
+        };
+      }
+
+      public static void FXRestore(Register32 destination, bool isIndirect)
+      {
+        new FXStore()
+        {
+          DestinationReg = destination,
+          DestinationIsIndirect = isIndirect
         };
       }
     }

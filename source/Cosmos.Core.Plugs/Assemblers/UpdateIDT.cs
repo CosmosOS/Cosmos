@@ -113,9 +113,9 @@ namespace Cosmos.Core.Plugs
 
                 if (Array.IndexOf(xInterruptsWithParam, j) == -1)
                 {
-                    new CPUx86.Push { DestinationValue = 0 };
+                    XS.Push(0);
                 }
-                new CPUx86.Push { DestinationValue = (uint)j };
+                XS.Push((uint)j);
                 XS.PushAllRegisters();
 
                 XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
@@ -124,7 +124,7 @@ namespace Cosmos.Core.Plugs
                 // store floating point data
                 XS.And(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 0xfffffff0); // fxsave needs to be 16-byte alligned
                 XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 512); // fxsave needs 512 bytes
-                new FXSave { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true }; // save the registers
+                XS.SSE.FXSave(XSRegisters.ESP, isIndirect: true); // save the registers
                 XS.Set(XSRegisters.EAX, XSRegisters.ESP, destinationIsIndirect: true);
 
                 XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); //
@@ -141,7 +141,7 @@ namespace Cosmos.Core.Plugs
                 }
                 XS.Call(CPUAll.LabelName.Get(xHandler));
                 XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                new FXStore { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
+                XS.SSE.FXRestore(XSRegisters.ESP, isIndirect: true);
 
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // this restores the stack for the FX stuff, except the pointer to the FX data
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4); // "pop" the pointer
@@ -163,7 +163,7 @@ namespace Cosmos.Core.Plugs
             // reload interrupt list
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), "_NATIVE_IDT_Pointer");
             new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("static_field__Cosmos_Core_CPU_mInterruptsEnabled"), DestinationIsIndirect = true, SourceValue = 1 };
-            new CPUx86.Lidt { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
+            XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
             // Reenable interrupts
             XS.EnableInterrupts();
 

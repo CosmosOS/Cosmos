@@ -131,7 +131,7 @@ namespace Cosmos.IL2CPU.X86.IL
     //
     //
     // 			if (mNeedsGC) {
-    //                 new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New(mDataName), DestinationIsIndirect = true };
+    //                 XS.Push(Cosmos.Assembler.ElementReference.New(mDataName), isIndirect: true);
     //                 XS.Call(xDecRefMethodInfo.LabelName);
     // 			}
     //             for (int i = 0; i < (xSize / 4); i++)

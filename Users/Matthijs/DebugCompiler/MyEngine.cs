@@ -17,7 +17,7 @@ namespace DebugCompiler
             var xEngine = new Engine();
             // Sets the time before an error is registered. For example if set to 60 then if a kernel runs for more than 60 seconds then
             // that kernel will be marked as a failure and terminated
-            xEngine.AllowedSecondsInKernel = 15;
+            xEngine.AllowedSecondsInKernel = 30;
 
             // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are run.
             xEngine.RunTargets.Add(RunTargetEnum.Bochs);

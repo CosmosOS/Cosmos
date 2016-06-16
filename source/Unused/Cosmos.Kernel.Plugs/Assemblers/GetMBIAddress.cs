@@ -12,7 +12,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers
     {
         public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
         {
-            new Push { DestinationRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect=true };
+            XS.Push(Cosmos.Assembler.ElementReference.New("MultiBootInfo_Structure"), isIndirect: true);
         }
     }
 }
