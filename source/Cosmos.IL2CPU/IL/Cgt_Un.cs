@@ -151,9 +151,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			string LabelFalse = BaseLabel + "False";
         // 			if (xStackItem.Size > 4)
         // 			{
-        //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESI};
+        //                 XS.Xor(XSRegisters.ESI, XSRegisters.CPUx86.Registers.ESI);
         //                 XS.Add(XSRegisters.ESI, 1);
-        //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI};
+        //                 XS.Xor(XSRegisters.EDI, XSRegisters.CPUx86.Registers.EDI);
         // 				//esi = 1
         //                 XS.Pop(XSRegisters.EAX);
         //                 XS.Pop(XSRegisters.EDX);
@@ -161,8 +161,8 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 XS.Pop(XSRegisters.EBX);
         //                 XS.Pop(XSRegisters.ECX);
         //                 //value1: ECX:EBX
-        //                 new CPUx86.Sub { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EAX };
-        //                 new CPUx86.SubWithCarry { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EDX };
+        //                 XS.Sub(XSRegisters.EBX, XSRegisters.CPUx86.Registers.EAX);
+        //                 XS.SubWithCarry(XSRegisters.ECX, XSRegisters.CPUx86.Registers.EDX);
         // 				//result = value1 - value2
         // 				//new CPUx86.ConditionalMove(Condition.Above, "edi", "esi");
         //                 //XS.Push(XSRegisters.EDI);

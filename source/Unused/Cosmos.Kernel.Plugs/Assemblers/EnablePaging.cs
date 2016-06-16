@@ -8,9 +8,9 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
   public class ASMEnablePaging: AssemblerMethod {
     
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.CR0 };
+      XS.Mov(XSRegisters.EAX, XSRegisters.CPUx86.Registers.CR0);
       XS.Or(XSRegisters.EAX, 0x80000000);
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.CR0, SourceReg = CPUx86.Registers.EAX };
+      XS.Mov(XSRegisters.CR0, XSRegisters.CPUx86.Registers.EAX);
     } 
 
   }

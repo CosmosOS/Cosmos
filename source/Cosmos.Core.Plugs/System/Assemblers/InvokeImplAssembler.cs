@@ -193,10 +193,10 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      XS.Pop(XSRegisters.ECX);
         //      XS.Pop(XSRegisters.EAX);
         //      new CPU.Comment("ecx points to the size of the delegated methods arguments");
-        //      new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
+        //      XS.Xor(XSRegisters.EDX, XSRegisters.CPUx86.Registers.EDX);
         //      ;//make sure edx is 0
         //      new CPU.Label(".BEGIN_OF_LOOP");
-        //      new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EBX };//are we at the end of this list
+        //      XS.Compare(XSRegisters.EDX, XSRegisters.CPUx86.Registers.EBX);//are we at the end of this list
         //      new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".END_OF_INVOKE_" };//then we better stop
         //      //new CPUx86.Compare("edx", 0);
         //      //new CPUx86.JumpIfLessOrEqual(".noreturnYet");
@@ -206,7 +206,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      //new CPUx86.Pushd("0");
         //      new CPUx86.Pushad();
         //      new CPU.Comment("esi points to where we will copy the methods arguments from");
-        //      new CPUx86.Move { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESP };
+        //      XS.Mov(XSRegisters.ESI, XSRegisters.CPUx86.Registers.ESP);
         //      new CPU.Comment("edi = ptr to delegate object");
         //      new CPUx86.Pushad();
         //      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
@@ -220,14 +220,14 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      new CPU.Label(".NO_THIS");
 
         //      new CPU.Comment("make space for us to copy the arguments too");
-        //      new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EBX };
+        //      XS.Sub(XSRegisters.ESP, XSRegisters.CPUx86.Registers.EBX);
         //      new CPU.Comment("move the current delegate to edi");
         //      XS.Mov(XSRegisters.EDI, XSRegisters.EAX, sourceIsIndirect: true);
         //      new CPU.Comment("move the methodptr from that delegate to the stack ");
         //      new CPUx86.Pushad();
         //      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
         //      Ldfld.DoExecute(xAssembler, xMethodInfo.MethodBase.DeclaringType, "System.IntPtr System.Delegate._methodPtr");
-        //      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESP };
+        //      XS.Mov(XSRegisters.EDI, XSRegisters.CPUx86.Registers.ESP);
 
         //      new CPU.Comment("get above the saved methodptr");
         //      XS.Add(XSRegisters.EDI, 4);

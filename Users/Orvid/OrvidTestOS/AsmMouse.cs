@@ -143,11 +143,7 @@ namespace Cosmos.Hardware
                             Size = 8
                         };
 
-                        new Xor
-                        {
-                            DestinationReg = RegistersEnum.AH,
-                            SourceReg = RegistersEnum.AH
-                        };
+                        XS.Xor(XSRegisters.AH, XSRegisters.RegistersEnum.AH);
                     }
 
                     XS.Label("mouse_read_exit");
@@ -168,11 +164,7 @@ namespace Cosmos.Hardware
 
                     XS.Push(XSRegisters.EDX);
 
-                    new Move
-                    {
-                        DestinationReg = RegistersEnum.BH,
-                        SourceReg = RegistersEnum.AL
-                    };
+                    XS.Mov(XSRegisters.BH, XSRegisters.RegistersEnum.AL);
 
                     XS.Mov(XSRegisters.ECX, 0xffff);
 
@@ -236,11 +228,7 @@ namespace Cosmos.Hardware
 
                     XS.Label("mouse_write_ok");
                     {
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.AL,
-                            SourceReg = RegistersEnum.BH
-                        };
+                        XS.Mov(XSRegisters.AL, XSRegisters.RegistersEnum.BH);
 
                         new Out2Port
                         {
@@ -310,11 +298,7 @@ namespace Cosmos.Hardware
 
                     XS.Label("mouse_write_ok4");
                     {
-                        new Xor
-                        {
-                            DestinationReg = RegistersEnum.AH,
-                            SourceReg = RegistersEnum.AH
-                        };
+                        XS.Xor(XSRegisters.AH, XSRegisters.RegistersEnum.AH);
                     }
 
                     XS.Label("mouse_write_exit");
@@ -353,11 +337,7 @@ namespace Cosmos.Hardware
 
                     XS.Label("mouse_cmd_send");
                     {
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.AL,
-                            SourceReg = RegistersEnum.BL
-                        };
+                        XS.Mov(XSRegisters.AL, XSRegisters.RegistersEnum.BL);
                         new Out2Port
                         {
 #if DebugMouse
@@ -396,11 +376,7 @@ namespace Cosmos.Hardware
 
                     XS.Label("mouse_cmd_ok");
                     {
-                        new Xor
-                        {
-                            DestinationReg = RegistersEnum.AH,
-                            SourceReg = RegistersEnum.AH
-                        };
+                        XS.Xor(XSRegisters.AH, XSRegisters.RegistersEnum.AH);
                     }
 
                     XS.Label("mouse_cmd_exit");

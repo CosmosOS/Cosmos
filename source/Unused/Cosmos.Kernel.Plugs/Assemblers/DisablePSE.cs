@@ -7,9 +7,9 @@ using Assembler = Cosmos.Assembler;
 namespace Cosmos.Kernel.Plugs.Assemblers {
   public class ASMDisablePSE: AssemblerMethod {
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.CR4 };
+      XS.Mov(XSRegisters.EAX, XSRegisters.CPUx86.Registers.CR4);
       XS.And(XSRegisters.EAX, 0xFFFFFFEF);
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.CR4, SourceReg = CPUx86.Registers.EAX };
+      XS.Mov(XSRegisters.CR4, XSRegisters.CPUx86.Registers.EAX);
  
     }
   }

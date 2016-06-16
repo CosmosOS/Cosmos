@@ -40,9 +40,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			{
         //                 XS.Pop(XSRegisters.EAX);
         //                 XS.Pop(XSRegisters.EBX);
-        //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX };
+        //                 XS.Xor(XSRegisters.EAX, XSRegisters.CPUx86.Registers.EAX);
         //                 XS.Jump(ConditionalTestEnum.NotZero, TargetLabel);
-        //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EBX };
+        //                 XS.Xor(XSRegisters.EBX, XSRegisters.CPUx86.Registers.EBX);
         //                 XS.Jump(ConditionalTestEnum.NotZero, TargetLabel);
         // 			} else
         // 			{
