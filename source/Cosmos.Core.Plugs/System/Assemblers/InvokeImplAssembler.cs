@@ -65,7 +65,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             XS.Label(".BEGIN_OF_LOOP");
             {
                 XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));//are we at the end of this list
-                XS.Jump(ConditionalTestEnum.GreaterThanOrEqualTo, ".END_OF_INVOKE_");//then we better stop
+                XS.Jump(CPUx86.ConditionalTestEnum.GreaterThanOrEqualTo, ".END_OF_INVOKE_");//then we better stop
                 XS.PushAllRegisters();
                 XS.Comment("esi points to where we will copy the methods argumetns from");
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP));
@@ -75,7 +75,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
                 XS.Comment("edi = ptr to delegate object should be a pointer to the delgates context ie (this) for the methods ");
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target"));
                 XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 0);
-                XS.Jump(ConditionalTestEnum.Zero, ".NO_THIS");
+                XS.Jump(CPUx86.ConditionalTestEnum.Zero, ".NO_THIS");
                 XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
 
                 XS.Label(".NO_THIS");
@@ -123,13 +123,13 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true); // dereference handle
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "$$ReturnsValue$$"));
             XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), 0);
-            XS.Jump(ConditionalTestEnum.Equal, ".noReturn");
+            XS.Jump(CPUx86.ConditionalTestEnum.Equal, ".noReturn");
             //may have to expand the return... idk
-            new CPUx86.Xchg { DestinationReg = CPUx86.RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceReg = CPUx86.RegistersEnum.EDX };
-            new CPUx86.Xchg { DestinationReg = CPUx86.RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.RegistersEnum.EDX };
+            XS.Exchange(XSRegisters.EBP, XSRegisters.EDX, destinationDisplacement: 8);
+            XS.Exchange(XSRegisters.EBP, XSRegisters.EDX, destinationDisplacement: 4);
             XS.Exchange(XSRegisters.EBP, XSRegisters.EDX, destinationIsIndirect: true);
             XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));//ebp
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 12, SourceReg = CPUx86.RegistersEnum.EDI };
+            XS.Set(XSRegisters.ESP, XSRegisters.EDI, destinationDisplacement: 12);
             new Assembler.Label(".noReturn");
             XS.EnableInterrupts();
         }
@@ -283,11 +283,11 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      //XS.Compare(XSRegisters.EDX, 0);
         //      //XS.Jump(ConditionalTestEnum.Equal, ".noReturn");
         //      ////may have to expand the return... idk
-        //      //new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceReg = CPUx86.Registers.EDX };
-        //      //new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EDX };
+        //      //XS.Xchg(XSRegisters.EBP, XSRegisters.EDX, destinationDisplacement: 8);
+        //      //XS.Xchg(XSRegisters.EBP, XSRegisters.EDX, destinationDisplacement: 4);
         //      //XS.Xchg(XSRegisters.EBP, XSRegisters.EDX, destinationIsIndirect: true);
         //      //XS.Push(XSRegisters.EDX);//ebp
-        //      //new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 12, SourceReg = CPUx86.Registers.EDI };
+        //      //XS.Mov(XSRegisters.ESP, XSRegisters.EDI, destinationDisplacement: 12);
         //      new CPU.Label(".noReturn");
         //      //            XS.Sti();
         //      //#warning remove this ^ sti call when issue is fixed!!!

@@ -57,7 +57,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 0x1f, Size = 8 };
 				// shift low part in EAX and move it in high part
 				new CPUx86.ShiftLeft { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.CL, Size = 32};
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.RegistersEnum.EAX };
+				XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationDisplacement: 4);
 				// replace unknown low part with a zero, if <= 32
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceValue = 0 };
 

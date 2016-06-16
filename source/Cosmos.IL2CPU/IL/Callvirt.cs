@@ -155,7 +155,7 @@ namespace Cosmos.IL2CPU.X86.IL
                * ECX contains the method to call
                * EAX contains the type pointer (not the handle!!)
                */
-                    XS.Jump(ConditionalTestEnum.NotEqual, xCurrentMethodLabel + ".NotBoxedThis");
+                    XS.Jump(CPU.ConditionalTestEnum.NotEqual, xCurrentMethodLabel + ".NotBoxedThis");
 
                     /*
                * On the stack now:
@@ -167,7 +167,7 @@ namespace Cosmos.IL2CPU.X86.IL
                */
 
                     XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), (uint)ObjectImpl.FieldDataOffset);
-                    new CPU.Mov { DestinationReg = CPU.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)xThisOffset, SourceReg = CPU.RegistersEnum.EAX };
+                    XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationDisplacement: (int)xThisOffset);
                     /*
                * On the stack now:
                * $esp                 Params

@@ -382,7 +382,7 @@ namespace Cosmos.IL2CPU
                 for (int i = 0; i < ((int)(xReturnSize/4)); i++)
                 {
                     XS.Pop(OldToNewRegister(RegistersEnum.EAX));
-                    new Mov { DestinationReg = RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + ((i + 0) * 4)), SourceReg = RegistersEnum.EAX };
+                    XS.Set(XSRegisters.EBP, XSRegisters.EAX, destinationDisplacement: (int)(xOffset + ((i + 0) * 4)));
                 }
                 // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
             }

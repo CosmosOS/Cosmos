@@ -42,7 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				// [ESP] is low part
 				// [ESP + 4] is high part
 				XS.And(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
-				new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.RegistersEnum.EDX };
+				XS.And(XSRegisters.ESP, XSRegisters.EDX, destinationDisplacement: 4);
 			}
 			else
 			{
