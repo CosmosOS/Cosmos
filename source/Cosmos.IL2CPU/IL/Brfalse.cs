@@ -48,17 +48,17 @@ namespace Cosmos.IL2CPU.X86.IL
         // 
         // 			if (xStackContent.Size > 4)
         // 			{
-        //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-        //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
+        //                 XS.Pop(XSRegisters.EAX);
+        //                 XS.Pop(XSRegisters.EBX);
         //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX };
         //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelFalse };
         //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EBX };
         //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelFalse };
         //                 new CPUx86.Jump { DestinationLabel = TargetLabel };
-        // 				new Label(LabelFalse);
+        // 				XS.Label(LabelFalse);
         // 			} else
         // 			{
-        //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //                 XS.Pop(XSRegisters.EAX);
         //                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
         //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = TargetLabel };
         // 			}

@@ -45,8 +45,12 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((val2AsULong == 42), "Int64 to UInt64 conversion does not work");
 
+            val2 = long.Parse("42");
+            Assert.IsTrue(val2 == 42, "Parsing Int64 doesn't work.");
+
 #if false
-            // Now let's try ToString() again but printed in hex (this test fails for now!)
+
+    // Now let's try ToString() again but printed in hex (this test fails for now!)
             result = value.ToString("X2");
             expectedResult = "0x7FFFFFFFFFFFFFFF";
 

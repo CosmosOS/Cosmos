@@ -1,4 +1,4 @@
-﻿//define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 
 using global::System;
 using global::System.IO;
@@ -115,12 +115,6 @@ namespace Cosmos.System.Plugs.System.IO
             string[] result = text.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
             Global.mFileSystemDebugger.SendInternal("content as array of lines:");
-#if COSMOSDEBUG
-            for (int i = 0; i < result.Length; i++)
-            {
-                Global.mFileSystemDebugger.SendInternal(result[i]);
-            }
-#endif
 
             return result;
         }
@@ -131,7 +125,7 @@ namespace Cosmos.System.Plugs.System.IO
 
             for (int i = 0; i < contents.Length; i++)
             {
-                text = String.Concat(text, contents[i], Environment.NewLine);
+                text = string.Concat(text, contents[i], Environment.NewLine);
             }
 
             Global.mFileSystemDebugger.SendInternal("Writing contents");

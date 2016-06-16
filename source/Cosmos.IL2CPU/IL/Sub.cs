@@ -1,6 +1,8 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
+using Cosmos.Assembler.x86.x87;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -32,106 +34,69 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 4:
                     if (xStackTopIsFloat)
                     {
+                        XS.SSE.MoveSS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
+                        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
+                        XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
+                        XS.SSE.SubSS(XSRegisters.XMM0, XSRegisters.XMM1);
                         new CPUx86.SSE.MoveSS
                         {
-                            DestinationReg = CPUx86.Registers.XMM0,
-                            SourceReg = CPUx86.Registers.ESP,
-                            SourceIsIndirect = true
-                        };
-                        new CPUx86.Add
-                        {
-                            DestinationReg = CPUx86.Registers.ESP,
-                            SourceValue = 4
-                        };
-                        new CPUx86.SSE.MoveSS
-                        {
-                            DestinationReg = CPUx86.Registers.XMM1,
-                            SourceReg = CPUx86.Registers.ESP,
-                            SourceIsIndirect = true
-                        };
-                        new CPUx86.SSE.SubSS
-                        {
-                            DestinationReg = CPUx86.Registers.XMM1,
-                            SourceReg = CPUx86.Registers.XMM0
-                        };
-                        new CPUx86.SSE.MoveSS
-                        {
-                            DestinationReg = CPUx86.Registers.ESP,
+                            DestinationReg = CPUx86.RegistersEnum.ESP,
                             DestinationIsIndirect = true,
-                            SourceReg = CPUx86.Registers.XMM1
+                            SourceReg = CPUx86.RegistersEnum.XMM1
                         };
                     }
                     else
                     {
-                        new CPUx86.Pop
-                        {
-                            DestinationReg = CPUx86.Registers.ECX
-                        };
-                        new CPUx86.Pop
-                        {
-                            DestinationReg = CPUx86.Registers.EAX
-                        };
-                        new CPUx86.Sub
-                        {
-                            DestinationReg = CPUx86.Registers.EAX,
-                            SourceReg = CPUx86.Registers.ECX
-                        };
-                        new CPUx86.Push
-                        {
-                            DestinationReg = CPUx86.Registers.EAX
-                        };
+                        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.ECX));
+                        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                        XS.Sub(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ECX));
+                        XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
                     }
                     break;
                 case 8:
                     if (xStackTopIsFloat)
                     {
-                        new CPUx86.x87.FloatLoad
+                        new FloatLoad
                         {
-                            DestinationReg = Registers.ESP,
+                            DestinationReg = RegistersEnum.ESP,
                             Size = 64,
                             DestinationIsIndirect = true,
                             DestinationDisplacement = 8
                         };
-                        new CPUx86.x87.FloatSub
+                        new FloatSub
                         {
-                            DestinationReg = CPUx86.Registers.ESP,
+                            DestinationReg = RegistersEnum.ESP,
                             DestinationIsIndirect = true,
                             Size = 64
                         };
                         new CPUx86.Add
                         {
                             SourceValue = 8,
-                            DestinationReg = Registers.ESP
+                            DestinationReg = RegistersEnum.ESP
                         };
-                        new CPUx86.x87.FloatStoreAndPop
+                        new FloatStoreAndPop
                         {
-                            DestinationReg = Registers.ESP,
+                            DestinationReg = RegistersEnum.ESP,
                             Size = 64,
                             DestinationIsIndirect = true
                         };
                     }
                     else
                     {
-                        new CPUx86.Pop
-                        {
-                            DestinationReg = CPUx86.Registers.EAX
-                        };
-                        new CPUx86.Pop
-                        {
-                            DestinationReg = CPUx86.Registers.EDX
-                        };
+                        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EDX));
                         new CPUx86.Sub
                         {
-                            DestinationReg = CPUx86.Registers.ESP,
+                            DestinationReg = CPUx86.RegistersEnum.ESP,
                             DestinationIsIndirect = true,
-                            SourceReg = CPUx86.Registers.EAX
+                            SourceReg = CPUx86.RegistersEnum.EAX
                         };
                         new CPUx86.SubWithCarry
                         {
-                            DestinationReg = CPUx86.Registers.ESP,
+                            DestinationReg = CPUx86.RegistersEnum.ESP,
                             DestinationIsIndirect = true,
                             DestinationDisplacement = 4,
-                            SourceReg = CPUx86.Registers.EDX
+                            SourceReg = CPUx86.RegistersEnum.EDX
                         };
                     }
                     break;

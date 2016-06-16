@@ -109,6 +109,7 @@
     <Compile Include="System\IO\PathHelperImpl.cs" />
     <Compile Include="System\MulticastDelegateImpl.cs" />
     <Compile Include="System\NormalDelegateImpl.cs" />
+    <Compile Include="System\ObjectImpl.cs" />
     <Compile Include="System\Runtime\InteropServices\MarshalImpl.cs" />
     <Compile Include="System\StringImpl.cs" />
     <Compile Include="GCImplementionImpl.cs" />
@@ -128,6 +129,10 @@
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Core.Memory\Cosmos.Core.Memory.csproj">
+      <Project>{84BFA6F0-D518-4D22-BDCF-E07DF3C0E678}</Project>
+      <Name>Cosmos.Core.Memory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
       <Project>{61607f1e-58f9-41cf-972f-128384f3e115}</Project>
       <Name>Cosmos.Debug.Kernel</Name>
@@ -143,6 +148,10 @@
     <ProjectReference Include="..\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
       <Project>{239e33a7-f0c3-4801-85ca-4d8f89a31dc0}</Project>
       <Name>Cosmos.IL2CPU</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\XSharp.Compiler\XSharp.Compiler.csproj">
+      <Project>{a281a1b1-c718-4bcb-a7be-ed840a70449a}</Project>
+      <Name>XSharp.Compiler</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

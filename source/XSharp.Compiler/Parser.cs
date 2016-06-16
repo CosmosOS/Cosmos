@@ -2,8 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using static XSharp.Compiler.XSRegisters;
 
 namespace XSharp.Compiler {
+  /// <summary>
+  /// Parser recognizes the following tokens:
+  /// - _123      -> Number
+  /// - _REG      -> All registers
+  /// - _REGADDR  -> All 32-bit registers
+  /// - 1         -> Number as well
+  /// - _ABC      -> Random label, used indirectly (ie, used as a field)
+  /// - #_ABC     -> Random label, used for the value (ie, pointer to the field)
+  /// </summary>
   public class Parser {
     /// <summary>Index in <see cref="mData"/> of the first yet unconsumed character.</summary>
     protected int mStart = 0;
@@ -45,12 +55,12 @@ namespace XSharp.Compiler {
       + ",word,while"
     ).ToUpper().Split(mComma);
 
-    public static readonly string[] Registers;
-    public static readonly string[] RegistersAddr;
-    public static readonly string[] Registers8 = "AH,AL,BH,BL,CH,CL,DH,DL".Split(mComma);
-    public static readonly string[] Registers16 = "AX,BX,CX,DX".Split(mComma);
-    public static readonly string[] Registers32 = "EAX,EBX,ECX,EDX".Split(mComma);
-    public static readonly string[] RegistersIdx = "ESI,EDI,ESP,EBP".Split(mComma);
+    public static readonly Dictionary<string, Register> Registers;
+    public static readonly Dictionary<string, Register> RegistersAddr;
+    public static readonly Dictionary<string, Register> Registers8;
+    public static readonly Dictionary<string, Register> Registers16;
+    public static readonly Dictionary<string, Register> Registers32;
+    public static readonly Dictionary<string, Register> RegistersIdx;
     public static readonly string[] RegisterPatterns = "_REG,_REG8,_REG16,_REG32,_REGIDX,_REGADDR".Split(mComma);
     public static readonly string[] Delimiters = ",".Split(mSpace);
     // _.$ are AlphaNum. See comments in Parser
@@ -59,17 +69,52 @@ namespace XSharp.Compiler {
     public static readonly string[] Operators = "( ) () ! = != >= <= [ [- ] + - * : { } < > ?= ?& @ ~> <~ >> << ++ -- # +# & | ^".Split(mSpace);
 
     static Parser() {
-      var xRegisters = new List<string>();
+      Registers8 = new Dictionary<string, Register>(){
+        {"AL", AL },
+        {"AH", AH },
+        {"BL", BL },
+        {"BH", BH },
+        {"CL", CL },
+        {"CH", CH },
+        {"DL", DL },
+        {"DH", DH },
+                 };
+
+      Registers16 = new Dictionary<string, Register>()
+                    {
+        {"AX", AX },
+        {"BX", BX },
+        {"CX", CX },
+        {"DX", DX },
+                    };
+
+      Registers32 = new Dictionary<string, Register>()
+                    {
+        {"EAX", EAX },
+        {"EBX", EBX },
+        {"ECX", ECX },
+        {"EDX", EDX },
+                    };
+
+      RegistersIdx = new Dictionary<string, Register>()
+                    {
+        {"ESI", ESI },
+        {"EDI", EDI },
+        {"ESP", ESP },
+        {"EBP", EBP },
+                    };
+
+      var xRegisters = new Dictionary<string, Register>();
       xRegisters.AddRange(Registers8);
       xRegisters.AddRange(Registers16);
       xRegisters.AddRange(Registers32);
       xRegisters.AddRange(RegistersIdx);
-      Registers = xRegisters.ToArray();
+      Registers = xRegisters;
 
-      var xRegistersAddr = new List<string>();
+      var xRegistersAddr = new Dictionary<string, Register>();
       xRegistersAddr.AddRange(Registers32);
       xRegistersAddr.AddRange(RegistersIdx);
-      RegistersAddr = xRegistersAddr.ToArray();
+      RegistersAddr = xRegistersAddr;
     }
 
     /// <summary>Parse next token from currently parsed line, starting at given position and
@@ -98,7 +143,7 @@ namespace XSharp.Compiler {
       //
       // -AX/AL - Conflict if we ever use /
       // -AX|AL - Conflict if we ever use |
-      // -AX,AL - , is unlikely to ever be used as an operator and is logical as a separator. Method calls might use, but likely better to use a space 
+      // -AX,AL - , is unlikely to ever be used as an operator and is logical as a separator. Method calls might use, but likely better to use a space
       //          since we will only allow simple arguments, not compound.
       // -_REG:AX|AL - End terminator issue
       // -_REG[AX|AL] - Conflict with existing indirect access. Is indirect access always numeric? I think x86 has some register based ones too.
@@ -140,12 +185,26 @@ namespace XSharp.Compiler {
 
         } else if (char.IsDigit(xChar1)) {
           xToken.Type = TokenType.ValueInt;
-
+          if (xString.StartsWith("0x"))
+          {
+            xToken.SetIntValue(Convert.ToUInt32(xString, 16));
+          }
+          else
+          {
+            xToken.SetIntValue(uint.Parse(xString));
+          }
         } else if (xChar1 == '$') {
           xToken.Type = TokenType.ValueInt;
           // Remove surrounding '
           xString = "0x" + xString.Substring(1);
-
+          if (xString.StartsWith("0x"))
+          {
+            xToken.SetIntValue(Convert.ToUInt32(xString, 16));
+          }
+          else
+          {
+            xToken.SetIntValue(uint.Parse(xString));
+          }
         } else if (IsAlphaNum(xChar1)) { // This must be after check for ValueInt
           string xUpper = xString.ToUpper();
 
@@ -167,10 +226,14 @@ namespace XSharp.Compiler {
             }
           }
 
-          if (xToken.Type == TokenType.Unknown) {
-            if (Registers.Contains(xUpper)) {
+          if (xToken.Type == TokenType.Unknown)
+          {
+            Register xRegister;
+            if (Registers.TryGetValue(xUpper, out xRegister)) {
               xToken.Type = TokenType.Register;
-            } else if (mKeywords.Contains(xUpper)) {
+              xToken.SetRegister(xRegister);
+            } else if (mKeywords.Contains(xUpper))
+            {
               xToken.Type = TokenType.Keyword;
             } else if(xString.Contains("(") && xString.Contains(")") && IsAlphaNum(xChar1)) {
                 xToken.Type = TokenType.Call;
@@ -181,13 +244,12 @@ namespace XSharp.Compiler {
 
         } else if (Delimiters.Contains(xString)) {
           xToken.Type = TokenType.Delimiter;
-
         } else if (Operators.Contains(xString)) {
           xToken.Type = TokenType.Operator;
         }
       }
 
-      xToken.Value = xString;
+      xToken.RawValue = xString;
       xToken.SrcPosStart = mStart;
       xToken.SrcPosEnd = xToken.Type == TokenType.Call ? rPos : rPos - 1;
       if (mAllWhitespace && (xToken.Type != TokenType.WhiteSpace)) {
@@ -310,12 +372,12 @@ namespace XSharp.Compiler {
 
       mTokens = Parse(lineNumber);
       if (mTokens.Count(q => q.Type == TokenType.Unknown) > 0) {
-        
+
         foreach(Token token in mTokens)
         {
           if (TokenType.Unknown == token.Type) {
             throw new Exception(string.Format("Unknown token '{0}' found at {1}/{2}.",
-              token.Value ?? "NULL", token.LineNumber, token.SrcPosStart));
+              token.RawValue ?? "NULL", token.LineNumber, token.SrcPosStart));
           }
         }
       }

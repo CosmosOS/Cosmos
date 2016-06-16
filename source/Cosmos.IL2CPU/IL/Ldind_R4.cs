@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -13,16 +14,16 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, Size = 32 };
+            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, Size = 32 };
         }
 
 
         // using System;
-        // 
+        //
         // using CPUx86 = Cosmos.Assembler.x86;
         // using Cosmos.IL2CPU.X86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Ldind_R4)]
         // 	public class Ldind_R4: Op {
@@ -31,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 		public override void DoAssemble() {
         //             Assembler.Stack.Pop();
-        //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //             XS.Pop(XSRegisters.EAX);
         //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect=true, Size=32 };
         //             Assembler.Stack.Push(new StackContent(4, typeof(Single)));
         // 		}

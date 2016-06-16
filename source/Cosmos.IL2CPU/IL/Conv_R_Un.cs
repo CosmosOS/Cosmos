@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -32,9 +33,9 @@ namespace Cosmos.IL2CPU.X86.IL
                     case 1:
                     case 2:
                     case 4:
-                        new CPUx86.Mov { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
-                        new CPUx86.SSE.ConvertSI2SS { SourceReg = CPUx86.Registers.EAX, DestinationReg = CPUx86.Registers.XMM0 };
-                        new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
+                        new CPUx86.Mov { SourceReg = CPUx86.RegistersEnum.ESP, DestinationReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
+                        XS.SSE.ConvertSI2SS(XSRegisters.XMM0, XSRegisters.EAX);
+                        new CPUx86.SSE.MoveSS { SourceReg = CPUx86.RegistersEnum.XMM0, DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
                         break;
                     case 8:
                     //new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };

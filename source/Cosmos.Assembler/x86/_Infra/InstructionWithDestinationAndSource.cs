@@ -8,7 +8,7 @@ namespace Cosmos.Assembler.x86 {
 
         public InstructionWithDestinationAndSource()
         {
-            
+
         }
 
         public InstructionWithDestinationAndSource(string mnemonic):base(mnemonic)
@@ -38,7 +38,7 @@ namespace Cosmos.Assembler.x86 {
             set;
         }
 
-        public int SourceDisplacement {
+        public int? SourceDisplacement {
             get;
             set;
         }
@@ -64,8 +64,8 @@ namespace Cosmos.Assembler.x86 {
                         xDest = "0x" + SourceValue.GetValueOrDefault().ToString("X").ToUpperInvariant();
                 }
             }
-            if (SourceDisplacement != 0) {
-              xDest += (SourceDisplacement < 0 ? " - " : " + ") + Math.Abs(SourceDisplacement);
+            if (SourceDisplacement != null && SourceDisplacement != 0) {
+              xDest += (SourceDisplacement < 0 ? " - " : " + ") + Math.Abs(SourceDisplacement.Value);
             }
             if (SourceIsIndirect) {
                 return "[" + xDest + "]";

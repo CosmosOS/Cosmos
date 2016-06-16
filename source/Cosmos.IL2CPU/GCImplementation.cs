@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Diagnostics;
 using Cosmos.Common;
+using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU {
     [DebuggerStepThrough]
@@ -25,6 +26,7 @@ namespace Cosmos.IL2CPU {
             throw new NotImplementedException();
         }
 
+        [PlugMethod(PlugRequired=true)]
 		public static uint AllocNewObject(uint aSize) {
 //			uint xNewObject = RuntimeEngine.Heap_AllocNewObject(aSize + 4);
 //#if GC_DEBUG

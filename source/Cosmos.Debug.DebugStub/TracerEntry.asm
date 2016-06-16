@@ -1,43 +1,30 @@
-; Generated at 3/12/2016 8:37:32 PM
-
-
+; Generated at 6/14/2016 12:11:29 PM
 
 
 
 DebugStub_TracerEntry:
-
 cli
-
-
 Pushad
-Mov [DebugStub_PushAllPtr], ESP
-Mov [DebugStub_CallerEBP], EBP
-
-Mov EBP, ESP
-Add EBP, 32
-Mov EAX, [EBP + 0]
-
-Add EBP, 12
-Mov [DebugStub_CallerESP], EBP
-
-
-Mov EBX, EAX
+mov dword [DebugStub_PushAllPtr], ESP
+mov dword [DebugStub_CallerEBP], EBP
+mov dword EBP, ESP
+add dword EBP, 0x20
+mov dword EAX, [EBP]
+add dword EBP, 0xC
+mov dword [DebugStub_CallerESP], EBP
+mov dword EBX, EAX
 MOV EAX, DR6
-And EAX, 0x4000
-Cmp EAX, 0x4000
-JE DebugStub_TracerEntry_Block1_End
-Dec EBX
+and dword EAX, 0x4000
+cmp dword EAX, 0x4000
+JE near DebugStub_TracerEntry_Block1_End
+dec dword EBX
+
 DebugStub_TracerEntry_Block1_End:
-Mov EAX, EBX
-
-Mov [DebugStub_CallerEIP], EAX
-
+mov dword EAX, EBX
+mov dword [DebugStub_CallerEIP], EAX
 Call DebugStub_Executing
-
 Popad
-
 sti
 
 DebugStub_TracerEntry_Exit:
-IRet
-
+iret

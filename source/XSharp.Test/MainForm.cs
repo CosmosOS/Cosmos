@@ -126,18 +126,17 @@ namespace XSharp.Test {
       xTbox.ScrollBars = ScrollBars.Both;
 
       using (var xInput = new StreamReader(aFilename)) {
-        using (var xOutputCode = new StringWriter()) {
-          using (var xOutputData = new StringWriter()) {
+        using (var xOutput = new StringWriter()) {
             try {
               var xGenerator = new XSharp.Compiler.AsmGenerator();
 
-              xOutputData.WriteLine("ORIGIN:");
-              xGenerator.Generate(xInput, xOutputData, xOutputCode);
+              xOutput.WriteLine("ORIGIN:");
+              xGenerator.Generate(xInput, xOutput);
               if (Compile)
               {
                   if (null == _nasmPath)
                   {
-                      xOutputCode.WriteLine("Can't compile. NASM not found.");
+                      xOutput.WriteLine("Can't compile. NASM not found.");
                   }
                   else
                   {
@@ -149,14 +148,13 @@ namespace XSharp.Test {
                           // UTF8 stream without a BOM.
                           using (StreamWriter writer = new StreamWriter(inputFile.FullName, true))
                           {
-                              writer.WriteLine(xOutputData.ToString());
-                              writer.WriteLine(xOutputCode.ToString());
+                              writer.WriteLine(xOutput.ToString());
                           }
-                          xOutputCode.WriteLine("============================");
-                          xOutputCode.WriteLine("Compiling");
-                          compilationError = !LaunchNasm(inputFile.FullName, xOutputCode);
-                          if (compilationError) { xOutputCode.WriteLine("Some compilation error."); }
-                          else { xOutputCode.WriteLine("Successfully compiled."); }
+                          xOutput.WriteLine("============================");
+                          xOutput.WriteLine("Compiling");
+                          compilationError = !LaunchNasm(inputFile.FullName, xOutput);
+                          if (compilationError) { xOutput.WriteLine("Some compilation error."); }
+                          else { xOutput.WriteLine("Successfully compiled."); }
                       }
                       finally
                       {
@@ -165,13 +163,12 @@ namespace XSharp.Test {
                       }
                   }
               }
-              xTbox.Text = xOutputData.ToString() + "\r\n" + xOutputCode.ToString();
+              xTbox.Text = xOutput.ToString() + "\r\n" + xOutput.ToString();
             } catch (Exception ex) {
               xTab.Text = "* " + xTab.Text;
               StringBuilder builder = new StringBuilder();
 
-              builder.AppendLine(xOutputData.ToString());
-              builder.AppendLine(xOutputCode.ToString());
+              builder.AppendLine(xOutput.ToString());
               Exception innerMostException = null;
               for (Exception e = ex; null != e; e = e.InnerException)
               {
@@ -184,7 +181,6 @@ namespace XSharp.Test {
               }
               xTbox.Text = builder.ToString();
             }
-          }
         }
       }
     }

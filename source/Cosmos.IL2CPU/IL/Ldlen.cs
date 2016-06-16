@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -13,10 +14,10 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };
-            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
+            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 8);
+            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
         }
 
 
@@ -33,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         // 		public override void DoAssemble() {
         // 			Assembler.Stack.Pop();
-        //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //             XS.Pop(XSRegisters.EAX);
         // 			new CPUx86.Add{DestinationReg=CPUx86.Registers.EAX, SourceValue=8};
         //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
         // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));

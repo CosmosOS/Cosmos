@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 using Label = Cosmos.Assembler.Label;
 namespace Cosmos.IL2CPU.X86.IL
@@ -28,16 +29,16 @@ namespace Cosmos.IL2CPU.X86.IL
 				case 8:
 					{
 						string NoOverflowLabel = GetLabel(aMethod, aOpCode) + "__NoOverflow";
-						new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+						XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 						// EBX is high part and should be zero for unsigned, so we test it on zero
 						{
-							new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-							new CPUx86.Compare { DestinationReg = CPUx86.Registers.EBX, SourceValue = 0 };
+							XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
+							XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), 0);
 							new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = NoOverflowLabel };
 							ThrowNotImplementedException("Conv_Ovf_I_Un throws an overflow exception, which is not implemented!");
 						}
-						new Label(NoOverflowLabel);
-						new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+						XS.Label(NoOverflowLabel);
+						XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 						break;
 					}
 				default:
@@ -45,13 +46,13 @@ namespace Cosmos.IL2CPU.X86.IL
 					break;
 			}
 		}
-    
+
 		// using System;
 		// using System.IO;
 		// using CPU = Cosmos.Assembler.x86;
 		// using Cosmos.IL2CPU.X86;
 		// using CPUx86 = Cosmos.Assembler.x86;
-		// 
+		//
 		// namespace Cosmos.IL2CPU.IL.X86 {
 		//     [Cosmos.Assembler.OpCode(OpCodeEnum.Conv_Ovf_I_Un)]
 		//     public class Conv_Ovf_I_Un : Op {
@@ -60,7 +61,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 	    private string mCurLabel;
 		// 	    private uint mCurOffset;
 		// 	    private MethodInformation mMethodInformation;
-		// 
+		//
 		//         public Conv_Ovf_I_Un(ILReader aReader,
 		//                              MethodInformation aMethodInfo)
 		//             : base(aReader,
@@ -71,7 +72,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
 		//             NextInstructionLabel = GetInstructionLabel(aReader.NextPosition);
 		//         }
-		// 
+		//
 		//         public override void DoAssemble() {
 		//             var xSource = Assembler.Stack.Pop();
 		//             switch (xSource.Size) {
@@ -81,9 +82,9 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                     break;
 		//                 }
 		//                 case 8: {
-		//                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+		//                         XS.Pop(XSRegisters.EAX);
 		//                         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-		//                     new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+		//                     XS.Push(XSRegisters.EAX);
 		//                     //new CPUx86.Pop(CPUx86.Registers_Old.EAX);
 		//                     //new CPUx86.SignExtendAX(4);
 		//                     ////all bits of EDX == sign (EAX)
@@ -107,6 +108,6 @@ namespace Cosmos.IL2CPU.X86.IL
 		//         }
 		//     }
 		// }
-		
+
 	}
 }

@@ -4,6 +4,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Assembler.x86;
 using System.Reflection;
 using System.Linq;
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 
@@ -30,7 +31,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 new CPUx86.Call { DestinationLabel = LabelName.Get(xCctor) };
                 ILOp.EmitExceptionLogic(Assembler, aMethod, aOpCode, true, null, ".AfterCCTorExceptionCheck");
-                new Label(".AfterCCTorExceptionCheck");
+                XS.Label(".AfterCCTorExceptionCheck");
             }
 
             //Assembler.Stack.Pop();
@@ -55,16 +56,16 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     case 1:
                         {
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceRef = Cosmos.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+                            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AL, SourceRef = ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                             break;
                         }
                     case 2:
                         {
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceRef = Cosmos.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+                            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AX, SourceRef = ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                             break;
                         }
                     case 0:
@@ -83,16 +84,16 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     case 1:
                         {
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceRef = Cosmos.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+                            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AL, SourceRef = ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                             break;
                         }
                     case 2:
                         {
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceRef = Cosmos.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+                            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AX, SourceRef = ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                             break;
                         }
                     case 0:

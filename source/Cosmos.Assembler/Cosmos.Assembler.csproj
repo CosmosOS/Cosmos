@@ -128,7 +128,8 @@
     <Compile Include="x86\ExternalLabel.cs" />
     <Compile Include="x86\Halt.cs" />
     <Compile Include="x86\IDivide.cs" />
-    <Compile Include="x86\IN.cs" />
+    <Compile Include="x86\Imul.cs" />
+    <Compile Include="x86\InFromDX.cs" />
     <Compile Include="x86\INC.cs" />
     <Compile Include="x86\INT.cs" />
     <Compile Include="x86\INT1.cs" />
@@ -152,7 +153,7 @@
     <Compile Include="x86\Noop.cs" />
     <Compile Include="x86\Not.cs" />
     <Compile Include="x86\Or.cs" />
-    <Compile Include="x86\Out.cs" />
+    <Compile Include="x86\OutToDX.cs" />
     <Compile Include="x86\Pop.cs" />
     <Compile Include="x86\Popad.cs" />
     <Compile Include="x86\Popfd.cs" />
@@ -181,7 +182,7 @@
     <Compile Include="x86\SSE2\SqrtSD.cs" />
     <Compile Include="x86\SSE2\XorPD.cs" />
     <Compile Include="x86\SSE3\IntStoreWithTrunc.cs" />
-    <Compile Include="x86\SSE3\MoveDoubleAndDupplicate.cs" />
+    <Compile Include="x86\SSE3\MoveDoubleAndDuplicate.cs" />
     <Compile Include="x86\SSEAndMMX2\AddPS.cs" />
     <Compile Include="x86\SSEAndMMX2\AddSS.cs" />
     <Compile Include="x86\SSEAndMMX2\AndPS.cs" />
@@ -294,21 +295,9 @@
     <None Include=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\XSharp.Nasm\XSharp.Nasm.csproj">
-      <Project>{841A734E-9606-4AAB-9C4A-74E7E303FF5D}</Project>
-      <Name>XSharp.Nasm</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\XSharp.Compiler\XSharp.Compiler.csproj">
-      <Project>{A281A1B1-C718-4BCB-A7BE-ED840A70449A}</Project>
-      <Name>XSharp.Compiler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Debug.DebugStub\Cosmos.Debug.DebugStub.csproj">
-      <Project>{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}</Project>
-      <Name>Cosmos.Debug.DebugStub</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
