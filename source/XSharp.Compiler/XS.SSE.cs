@@ -47,6 +47,16 @@ namespace XSharp.Compiler
         };
       }
 
+      public static void MoveSS(Register32 destination, RegisterXMM source, bool destinationIsIndirect = false)
+      {
+        new MoveSS()
+        {
+          DestinationReg = destination,
+          DestinationIsIndirect = destinationIsIndirect,
+          SourceReg = source
+        };
+      }
+
       public static void ConvertSI2SD(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
       {
         new ConvertSI2SD()

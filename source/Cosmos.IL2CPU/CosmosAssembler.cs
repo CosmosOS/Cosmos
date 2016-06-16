@@ -306,11 +306,11 @@ namespace Cosmos.IL2CPU
 #if LFB_1024_8
             new Comment("Set graphics fields");
             XS.Mov(XSRegisters.EBX, Cosmos.Assembler.ElementReference.New("MultiBootInfo_Structure"), sourceIsIndirect: true);
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 72 };
+            XS.Mov(XSRegisters.EAX, XSRegisters.EBX, sourceDisplacement: 72);
             new Move { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeControlInfoAddr"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 76 };
+            XS.Mov(XSRegisters.EAX, XSRegisters.EBX, sourceDisplacement: 76);
             new Move { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeModeInfoAddr"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 80 };
+            XS.Mov(XSRegisters.EAX, XSRegisters.EBX, sourceDisplacement: 80);
             new Move { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeMode"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
 #endif
 

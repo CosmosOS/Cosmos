@@ -7,7 +7,7 @@ namespace Cosmos.Core.Memory.Test {
   public class UnitTest1 {
     [TestMethod]
     unsafe public void TestMethod1() {
-      var xRAM = new byte[128 * 1024 * 1024];
+      var xRAM = new byte[128 * 1024 * 1024]; // 128 MB
       xRAM[0] = 1;
       fixed (byte* xPtr = xRAM) {
         RAT.Debug = true;
