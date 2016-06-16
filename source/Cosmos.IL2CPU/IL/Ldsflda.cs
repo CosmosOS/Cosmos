@@ -29,10 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL
       var xCctor = (declaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
       if (xCctor != null)
       {
-        new CPUx86.Call
-        {
-          DestinationLabel = LabelName.Get(xCctor)
-        };
+        XS.Call(LabelName.Get(xCctor));
         if (aCurrentOpCode != null)
         {
           ILOp.EmitExceptionLogic(assembler, aMethod, aCurrentOpCode, true, null, ".AfterCCTorExceptionCheck");

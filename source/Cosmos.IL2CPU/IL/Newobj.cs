@@ -36,10 +36,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 var xCctor = (objectType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
                 if (xCctor != null)
                 {
-                    new CPUx86.Call
-                    {
-                        DestinationLabel = LabelName.Get(xCctor)
-                    };
+                    XS.Call(LabelName.Get(xCctor));
                     ILOp.EmitExceptionLogic(aAssembler, aMethod, xMethod, true, null, ".AfterCCTorExceptionCheck");
                     XS.Label(".AfterCCTorExceptionCheck");
                 }
@@ -179,7 +176,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
 
                 // todo: probably we want to check for exceptions after calling Alloc
-                new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.AllocNewObjectRef) };
+                XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
                 XS.Label(".AfterAlloc");
                 new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
                 new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
@@ -219,14 +216,14 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                 }
 
-                new CPUx86.Call { DestinationLabel = LabelName.Get(constructor) };
+                XS.Call(LabelName.Get(constructor));
                 // should the complete error handling happen by ILOp.EmitExceptionLogic?
                 if (aMethod != null)
                 {
                     // todo: only happening for real methods now, not for ctor's ?
                     XS.Test(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 2);
                     string xNoErrorLabel = currentLabel + ".NoError" + LabelName.LabelCount.ToString();
-                    new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xNoErrorLabel };
+                    XS.Jump(CPUx86.ConditionalTestEnum.Equal, xNoErrorLabel);
 
                     //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
                     //{

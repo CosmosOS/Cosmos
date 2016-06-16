@@ -85,8 +85,8 @@ namespace Cosmos.IL2CPU.X86.IL {
           if (aNeedsGC) {
             XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
             XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-            new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.DecRefCountRef) };
-            new CPUx86.Call { DestinationLabel = LabelName.Get(GCImplementationRefs.DecRefCountRef) };
+            XS.Call(LabelName.Get(GCImplementationRefs.DecRefCountRef));
+            XS.Call(LabelName.Get(GCImplementationRefs.DecRefCountRef));
           }
 #endif
       XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);

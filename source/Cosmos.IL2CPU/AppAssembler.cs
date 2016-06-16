@@ -170,7 +170,7 @@ namespace Cosmos.IL2CPU
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
                 XS.Pop(OldToNewRegister(RegistersEnum.EAX));
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
-                new Call { DestinationLabel = "DebugStub_SendStackOverflowOccurred" };
+                XS.Call("DebugStub_SendStackOverflowOccurred");
                 new Halt();
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_End");
 
@@ -424,7 +424,7 @@ namespace Cosmos.IL2CPU
                 XS.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
                 XS.Pop(OldToNewRegister(RegistersEnum.EAX));
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
-                new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
+                XS.Call("DebugStub_SendStackCorruptionOccurred");
                 new Halt();
             }
             XS.Label(xLabelExc + "__2");
@@ -821,10 +821,7 @@ namespace Cosmos.IL2CPU
 
         protected void Call(MethodBase aMethod)
         {
-            new Call
-            {
-                DestinationLabel = LabelName.Get(aMethod)
-            };
+            XS.Call(LabelName.Get(aMethod));
         }
 
         protected void Jump(string aLabelName)
@@ -849,7 +846,7 @@ namespace Cosmos.IL2CPU
             {
                 XS.Sub(OldToNewRegister(RegistersEnum.ESP), xSize);
             }
-            new Call { DestinationLabel = ILOp.GetMethodLabel(aTargetMethod) };
+            XS.Call(ILOp.GetMethodLabel(aTargetMethod));
             var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
 
             uint xReturnsize = 0;
@@ -1393,9 +1390,9 @@ namespace Cosmos.IL2CPU
             XS.Label(CosmosAssembler.EntryPointName);
             XS.Push(OldToNewRegister(RegistersEnum.EBP));
             XS.Set(OldToNewRegister(RegistersEnum.EBP), OldToNewRegister(RegistersEnum.ESP));
-            new Call { DestinationLabel = InitVMTCodeLabel };
+            XS.Call(InitVMTCodeLabel);
             Assembler.WriteDebugVideo("Initializing string IDs.");
-            new Call { DestinationLabel = InitStringIDsLabel };
+            XS.Call(InitStringIDsLabel);
             Assembler.WriteDebugVideo("Done initializing string IDs");
             // we now need to do "newobj" on the entry point, and after that, call .Start on it
             var xCurLabel = CosmosAssembler.EntryPointName + ".CreateEntrypoint";
@@ -1513,7 +1510,7 @@ namespace Cosmos.IL2CPU
                 XS.Label(xLabel + ".StackCorruptionCheck_GetAddress");
                 XS.Pop(OldToNewRegister(RegistersEnum.EAX));
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
-                new Call { DestinationLabel = "DebugStub_SendStackCorruptionOccurred" };
+                XS.Call("DebugStub_SendStackCorruptionOccurred");
                 new Halt();
                 new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
 

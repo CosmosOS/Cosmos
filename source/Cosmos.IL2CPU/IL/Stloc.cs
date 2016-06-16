@@ -55,7 +55,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 		public sealed override void DoAssemble() {
 		// 			if (mNeedsGC) {
 		//                 new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = mLocal.VirtualAddresses[0] };
-		//                 new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+		//                 XS.Call(MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 		// 			}
 		// 			foreach (int i in mLocal.VirtualAddresses.Reverse()) {
 		//                 XS.Pop(XSRegisters.EAX); ;

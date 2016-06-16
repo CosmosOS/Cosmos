@@ -1,4 +1,4 @@
-﻿using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 using Assembler=Cosmos.Assembler;
 using CPUAll = Cosmos.Assembler;
 using CPUx86 = Cosmos.Assembler.x86;
@@ -9,10 +9,7 @@ namespace Cosmos.Sys.Plugs.Assemblers{
     {
         public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
           //ACPI Way...ONLY QEMu And Boschs
-          new CPUx86.Mov {
-            DestinationReg = CPUx86.Registers.DX,
-            SourceValue = 0xB004
-          };
+          XS.Mov(XSRegisters.DX, 0xB004);
           new CPUx86.Mov {
             DestinationReg = CPUx86.Registers.AX,
             SourceValue = 0x0 | 0x2000

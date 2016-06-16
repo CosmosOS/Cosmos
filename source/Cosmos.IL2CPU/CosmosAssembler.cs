@@ -317,37 +317,31 @@ namespace Cosmos.IL2CPU
             //WriteDebugVideo("Initializing SSE.");
             //new Comment(this, "BEGIN - SSE Init");
             //// CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
-            //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-            //new Or { DestinationReg = Registers.EAX, SourceValue = 0x100 };
-            //new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
-            //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-            //new Or { DestinationReg = Registers.EAX, SourceValue = 0x200 };
-            //new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
-            //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
+            //XS.Mov(XSRegisters.EAX, XSRegisters.Registers.CR4);
+            //XS.Or(XSRegisters.EAX, 0x100);
+            //XS.Mov(XSRegisters.CR4, XSRegisters.Registers.EAX);
+            //XS.Mov(XSRegisters.EAX, XSRegisters.Registers.CR4);
+            //XS.Or(XSRegisters.EAX, 0x200);
+            //XS.Mov(XSRegisters.CR4, XSRegisters.Registers.EAX);
+            //XS.Mov(XSRegisters.EAX, XSRegisters.Registers.CR0);
 
-            //new And { DestinationReg = Registers.EAX, SourceValue = 0xfffffffd };
-            //new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
-            //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
+            //XS.And(XSRegisters.EAX, 0xfffffffd);
+            //XS.Mov(XSRegisters.CR0, XSRegisters.Registers.EAX);
+            //XS.Mov(XSRegisters.EAX, XSRegisters.Registers.CR0);
 
-            //new And { DestinationReg = Registers.EAX, SourceValue = 1 };
-            //new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
+            //XS.And(XSRegisters.EAX, 1);
+            //XS.Mov(XSRegisters.CR0, XSRegisters.Registers.EAX);
             //new Comment(this, "END - SSE Init");
 
             if (mComPort > 0)
             {
                 WriteDebugVideo("Initializing DebugStub.");
-                new Call
-                {
-                    DestinationLabel = "DebugStub_Init"
-                };
+                XS.Call("DebugStub_Init");
             }
 
             // Jump to Kernel entry point
             WriteDebugVideo("Jumping to kernel.");
-            new Call
-            {
-                DestinationLabel = EntryPointName
-            };
+            XS.Call(EntryPointName);
 
             new Comment(this, "Kernel done - loop till next IRQ");
             XS.Label(".loop");

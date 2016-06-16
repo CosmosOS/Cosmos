@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
             //TODO: Return
             Jump_End(aMethod);
             // Need to jump to end of method. Assembler can emit this label for now
-            //new CPU.Jump { DestinationLabel = MethodFooterOp.EndOfMethodLabelNameNormal };
+            //XS.Jump(MethodFooterOp.EndOfMethodLabelNameNormal);
         }
     }
 }

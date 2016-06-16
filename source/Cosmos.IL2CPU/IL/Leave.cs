@@ -40,7 +40,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			TargetLabel = GetInstructionLabel(aReader.OperandValueBranchPosition);
         // 		}
         // 		public override void DoAssemble() {
-        //         new CPU.Jump { DestinationLabel = TargetLabel };
+        //         XS.Jump(TargetLabel);
         // 		}
         // 	}
         // }

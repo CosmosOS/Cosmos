@@ -70,10 +70,10 @@ namespace Cosmos.IL2CPU.X86.IL
 				}
 				XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EDI));
 				/*
-				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThan, DestinationLabel = LabelTrue };
+				XS.Jump(ConditionalTestEnum.GreaterThan, LabelTrue);
 				XS.Label(LabelFalse);
 				new CPUx86.Push { DestinationValue = 0 };
-				new CPUx86.Jump { DestinationLabel = xNextLabel };
+				XS.Jump(xNextLabel);
 				XS.Label(LabelTrue );
 				new CPUx86.Push { DestinationValue = 1 };*/
 			}

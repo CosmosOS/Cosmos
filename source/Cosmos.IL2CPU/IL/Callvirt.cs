@@ -85,7 +85,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     XS.Sub(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), (uint)xExtraStackSize);
                 }
-                new CPU.Call { DestinationLabel = xNormalAddress };
+                XS.Call(xNormalAddress);
             }
             else
             {
@@ -108,7 +108,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
                 }
                 new CPU.Push { DestinationValue = aTargetMethodUID };
-                new CPU.Call { DestinationLabel = LabelName.Get(VTablesImplRefs.GetMethodAddressForTypeRef) };
+                XS.Call(LabelName.Get(VTablesImplRefs.GetMethodAddressForTypeRef));
                 if (xExtraStackSize > 0)
                 {
                     xThisOffset -= xExtraStackSize;

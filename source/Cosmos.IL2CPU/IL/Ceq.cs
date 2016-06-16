@@ -99,7 +99,7 @@ namespace Cosmos.IL2CPU.X86.IL {
           XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 8);
           XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
           XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-          new CPUx86.Jump { DestinationLabel = xNextLabel };
+          XS.Jump(xNextLabel);
         }
 
       }

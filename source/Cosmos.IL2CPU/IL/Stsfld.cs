@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
             var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
             if (xCctor != null && xCctor.DeclaringType != aMethod.MethodBase.DeclaringType)
             {
-                new CPUx86.Call { DestinationLabel = LabelName.Get(xCctor) };
+                XS.Call(LabelName.Get(xCctor));
                 ILOp.EmitExceptionLogic(Assembler, aMethod, aOpCode, true, null, ".AfterCCTorExceptionCheck");
                 XS.Label(".AfterCCTorExceptionCheck");
             }
@@ -132,7 +132,7 @@ namespace Cosmos.IL2CPU.X86.IL
     //
     // 			if (mNeedsGC) {
     //                 new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New(mDataName), DestinationIsIndirect = true };
-    //                 new CPUx86.Call { DestinationLabel = xDecRefMethodInfo.LabelName};
+    //                 XS.Call(xDecRefMethodInfo.LabelName);
     // 			}
     //             for (int i = 0; i < (xSize / 4); i++)
     //             {

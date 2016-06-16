@@ -23,94 +23,43 @@ namespace Cosmos.Hardware
 
             public override void AssembleNew(object aAssembler, object aMethodInfo)
             {
-                new Move
-                {
-                    DestinationReg = RegistersEnum.BL,
-                    SourceValue = 0xa8
-                };
+                XS.Mov(XSRegisters.BL, 0xa8);
 
-                new Call
-                {
-                    DestinationLabel = "send_mouse_cmd"
-                };
+                XS.Call("send_mouse_cmd");
 
-                new Call
-                {
-                    DestinationLabel = "mouse_read"
-                };
+                XS.Call("mouse_read");
 
                 new Noop();
 
-                new Move
-                {
-                    DestinationReg = RegistersEnum.BL,
-                    SourceValue = 0x20
-                };
+                XS.Mov(XSRegisters.BL, 0x20);
 
-                new Call
-                {
-                    DestinationLabel = "send_mouse_cmd"
-                };
+                XS.Call("send_mouse_cmd");
 
-                new Call
-                {
-                    DestinationLabel = "mouse_read"
-                };
+                XS.Call("mouse_read");
 
-                new Or
-                {
-                    DestinationReg = RegistersEnum.AL,
-                    SourceValue = 3
-                };
+                XS.Or(XSRegisters.AL, 3);
 
-                new Move
-                {
-                    DestinationReg = RegistersEnum.BL,
-                    SourceValue = 0x60
-                };
+                XS.Mov(XSRegisters.BL, 0x60);
 
                 XS.Push(XSRegisters.EAX);
 
-                new Call
-                {
-                    DestinationLabel = "send_mouse_cmd"
-                };
+                XS.Call("send_mouse_cmd");
 
                 XS.Pop(XSRegisters.EAX);
 
-                new Call
-                {
-                    DestinationLabel = "mouse_write"
-                };
+                XS.Call("mouse_write");
 
                 new Noop();
 
-                new Move
-                {
-                    DestinationReg = RegistersEnum.BL,
-                    SourceValue = 0xd4
-                };
+                XS.Mov(XSRegisters.BL, 0xd4);
 
-                new Call
-                {
-                    DestinationLabel = "send_mouse_cmd"
-                };
+                XS.Call("send_mouse_cmd");
 
-                new Move
-                {
-                    DestinationReg = RegistersEnum.AL,
-                    SourceValue = 0xf4
-                };
+                XS.Mov(XSRegisters.AL, 0xf4);
 
-                new Call
-                {
-                    DestinationLabel = "mouse_write"
-                };
+                XS.Call("mouse_write");
 
-                new Call
-                {
-                    DestinationLabel = "mouse_read"
-                };
+                XS.Call("mouse_read");
 
         #region mouse_read
                 XS.Label("mouse_read");
@@ -119,11 +68,7 @@ namespace Cosmos.Hardware
 
                     XS.Push(XSRegisters.EDX);
 
-                    new Move
-                    {
-                        DestinationReg = RegistersEnum.ECX,
-                        SourceValue = 0xffff
-                    };
+                    XS.Mov(XSRegisters.ECX, 0xffff);
 
                     XS.Label("mouse_read_loop");
                     {
@@ -134,11 +79,7 @@ namespace Cosmos.Hardware
                             Size = 8
                         };
 
-                        new Test
-                        {
-                            DestinationReg = RegistersEnum.AL,
-                            SourceValue = 1
-                        };
+                        XS.Test(XSRegisters.AL, 1);
 
                         XS.Jump(ConditionalTestEnum.NotZero, "mouse_read_ready");
 
@@ -147,11 +88,7 @@ namespace Cosmos.Hardware
                             DestinationLabel = "mouse_read_loop"
                         };
 
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.AH,
-                            SourceValue = 1
-                        };
+                        XS.Mov(XSRegisters.AH, 1);
 
                         XS.Jump("mouse_read_exit");
                     }
@@ -160,11 +97,7 @@ namespace Cosmos.Hardware
                     {
                         XS.Push(XSRegisters.ECX);
 
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.ECX,
-                            SourceValue = 32
-                        };
+                        XS.Mov(XSRegisters.ECX, 32);
                     }
 
                     XS.Label("mouse_read_delay");
@@ -183,11 +116,7 @@ namespace Cosmos.Hardware
                             Size = 8
                         };
 
-                        new Xor
-                        {
-                            DestinationReg = RegistersEnum.AH,
-                            SourceReg = RegistersEnum.AH
-                        };
+                        XS.Xor(XSRegisters.AH, XSRegisters.RegistersEnum.AH);
                     }
 
                     XS.Label("mouse_read_exit");
@@ -208,17 +137,9 @@ namespace Cosmos.Hardware
 
                     XS.Push(XSRegisters.EDX);
 
-                    new Move
-                    {
-                        DestinationReg = RegistersEnum.BH,
-                        SourceReg = RegistersEnum.AL
-                    };
+                    XS.Mov(XSRegisters.BH, XSRegisters.RegistersEnum.AL);
 
-                    new Move
-                    {
-                        DestinationReg = RegistersEnum.ECX,
-                        SourceValue = 0xffff
-                    };
+                    XS.Mov(XSRegisters.ECX, 0xffff);
 
                     XS.Label("mouse_write_loop1");
                     {
@@ -229,11 +150,7 @@ namespace Cosmos.Hardware
                             Size = 8
                         };
 
-                        new Test
-                        {
-                            DestinationReg = RegistersEnum.AL,
-                            SourceValue = 32
-                        };
+                        XS.Test(XSRegisters.AL, 32);
 
                         XS.Jump(ConditionalTestEnum.Zero, "mouse_write_ok1");
 
@@ -242,11 +159,7 @@ namespace Cosmos.Hardware
                             DestinationLabel = "mouse_write_loop1"
                         };
 
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.AH,
-                            SourceValue = 1
-                        };
+                        XS.Mov(XSRegisters.AH, 1);
 
                         XS.Jump("mouse_write_exit");
                     }
@@ -260,11 +173,7 @@ namespace Cosmos.Hardware
                             Size = 8
                         };
 
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.ECX,
-                            SourceValue = 0xffff
-                        };
+                        XS.Mov(XSRegisters.ECX, 0xffff);
                     }
 
                     XS.Label("mouse_write_loop");
@@ -276,11 +185,7 @@ namespace Cosmos.Hardware
                             Size = 8
                         };
 
-                        new Test
-                        {
-                            DestinationReg = RegistersEnum.AL,
-                            SourceValue = 2
-                        };
+                        XS.Test(XSRegisters.AL, 2);
 
                         XS.Jump(ConditionalTestEnum.Zero, "mouse_write_ok");
 
@@ -289,22 +194,14 @@ namespace Cosmos.Hardware
                             DestinationLabel = "mouse_write_loop"
                         };
 
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.AH,
-                            SourceValue = 1
-                        };
+                        XS.Mov(XSRegisters.AH, 1);
 
                         XS.Jump("mouse_write_exit");
                     }
 
                     XS.Label("mouse_write_ok");
                     {
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.AL,
-                            SourceReg = RegistersEnum.BH
-                        };
+                        XS.Mov(XSRegisters.AL, XSRegisters.RegistersEnum.BH);
 
                         new Out2Port
                         {
@@ -313,11 +210,7 @@ namespace Cosmos.Hardware
                             Size = 8
                         };
 
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.ECX,
-                            SourceValue = 0xffff
-                        };
+                        XS.Mov(XSRegisters.ECX, 0xffff);
                     }
 
                     XS.Label("mouse_write_loop3");
@@ -329,11 +222,7 @@ namespace Cosmos.Hardware
                             Size = 8
                         };
 
-                        new Test
-                        {
-                            DestinationReg = RegistersEnum.AL,
-                            SourceValue = 2
-                        };
+                        XS.Test(XSRegisters.AL, 2);
 
                         XS.Jump(ConditionalTestEnum.Zero, "mouse_write_ok3");
 
@@ -342,31 +231,19 @@ namespace Cosmos.Hardware
                             DestinationLabel = "mouse_write_loop3"
                         };
 
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.AH,
-                            SourceValue = 1
-                        };
+                        XS.Mov(XSRegisters.AH, 1);
 
                         XS.Jump("mouse_write_exit");
                     }
 
                     XS.Label("mouse_write_ok3");
                     {
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.AH,
-                            SourceValue = 0x08
-                        };
+                        XS.Mov(XSRegisters.AH, 0x08);
                     }
 
                     XS.Label("mouse_write_loop4");
                     {
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.ECX,
-                            SourceValue = 0xffff
-                        };
+                        XS.Mov(XSRegisters.ECX, 0xffff);
                     }
 
                     XS.Label("mouse_write_loop5");
@@ -378,11 +255,7 @@ namespace Cosmos.Hardware
                             Size = 8
                         };
 
-                        new Test
-                        {
-                            DestinationReg = RegistersEnum.AL,
-                            SourceValue = 1
-                        };
+                        XS.Test(XSRegisters.AL, 1);
 
                         XS.Jump(ConditionalTestEnum.NotZero, "mouse_write_ok4");
 
@@ -398,11 +271,7 @@ namespace Cosmos.Hardware
 
                     XS.Label("mouse_write_ok4");
                     {
-                        new Xor
-                        {
-                            DestinationReg = RegistersEnum.AH,
-                            SourceReg = RegistersEnum.AH
-                        };
+                        XS.Xor(XSRegisters.AH, XSRegisters.RegistersEnum.AH);
                     }
 
                     XS.Label("mouse_write_exit");
@@ -420,11 +289,7 @@ namespace Cosmos.Hardware
                 XS.Label("send_mouse_cmd");
                 {
 
-                    new Move
-                    {
-                        DestinationReg = RegistersEnum.ECX,
-                        SourceValue = 0xffff
-                    };
+                    XS.Mov(XSRegisters.ECX, 0xffff);
 
                     XS.Label("mouse_cmd_wait");
                     {
@@ -434,11 +299,7 @@ namespace Cosmos.Hardware
                             SourceValue = 0x64,
                             Size = 8
                         };
-                        new Test
-                        {
-                            DestinationReg = RegistersEnum.AL,
-                            SourceValue = 2
-                        };
+                        XS.Test(XSRegisters.AL, 2);
                         XS.Jump(ConditionalTestEnum.Zero, "mouse_cmd_send");
                         new Loop
                         {
@@ -449,11 +310,7 @@ namespace Cosmos.Hardware
 
                     XS.Label("mouse_cmd_send");
                     {
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.AL,
-                            SourceReg = RegistersEnum.BL
-                        };
+                        XS.Mov(XSRegisters.AL, XSRegisters.RegistersEnum.BL);
                         new Out2Port
                         {
 #if DebugMouse
@@ -465,11 +322,7 @@ namespace Cosmos.Hardware
 #endif
                             Size = 8
                         };
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.ECX,
-                            SourceValue = 0xffff
-                        };
+                        XS.Mov(XSRegisters.ECX, 0xffff);
                     }
 
                     XS.Label("mouse_cmd_accept");
@@ -480,11 +333,7 @@ namespace Cosmos.Hardware
                             SourceValue = 0x64,
                             Size = 8
                         };
-                        new Test
-                        {
-                            DestinationReg = RegistersEnum.AL,
-                            SourceValue = 0x02
-                        };
+                        XS.Test(XSRegisters.AL, 0x02);
                         XS.Jump(ConditionalTestEnum.Zero, "mouse_cmd_ok");
                         new Loop
                         {
@@ -494,21 +343,13 @@ namespace Cosmos.Hardware
 
                     XS.Label("mouse_cmd_error");
                     {
-                        new Move
-                        {
-                            DestinationReg = RegistersEnum.AH,
-                            SourceValue = 0x01
-                        };
+                        XS.Mov(XSRegisters.AH, 0x01);
                         XS.Jump("mouse_cmd_exit");
                     }
 
                     XS.Label("mouse_cmd_ok");
                     {
-                        new Xor
-                        {
-                            DestinationReg = RegistersEnum.AH,
-                            SourceReg = RegistersEnum.AH
-                        };
+                        XS.Xor(XSRegisters.AH, XSRegisters.RegistersEnum.AH);
                     }
 
                     XS.Label("mouse_cmd_exit");

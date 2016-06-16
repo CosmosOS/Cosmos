@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using Cosmos.Assembler.x86.x87;
 using Cosmos.IL2CPU.Plugs;
@@ -104,12 +104,12 @@ namespace Cosmos.Core.Plugs
                 };
             }
 
-            new CPUx86.Jump { DestinationLabel = "__AFTER__ALL__ISR__HANDLER__STUBS__" };
+            XS.Jump("__AFTER__ALL__ISR__HANDLER__STUBS__");
             var xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
             for (int j = 0; j < 256; j++)
             {
                 new CPUAll.Label("__ISR_Handler_" + j.ToString("X2"));
-                new CPUx86.Call { DestinationLabel = "__INTERRUPT_OCCURRED__" };
+                XS.Call("__INTERRUPT_OCCURRED__");
 
                 if (Array.IndexOf(xInterruptsWithParam, j) == -1)
                 {
@@ -139,7 +139,7 @@ namespace Cosmos.Core.Plugs
                 {
                     xHandler = GetMethodDef(typeof(INTs).Assembly, typeof(INTs).FullName, "HandleInterrupt_Default", true);
                 }
-                new CPUx86.Call { DestinationLabel = CPUAll.LabelName.Get(xHandler) };
+                XS.Call(CPUAll.LabelName.Get(xHandler));
                 XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                 new FXStore { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
 
