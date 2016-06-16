@@ -34,7 +34,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
           XS.Mov(XSRegisters.DX, 0x60);
           XS.OutToDX(XSRegisters.AL);
           new CPUAll.Label(".loop");//failed... halt
-          new CPUx86.Halt();
+          XS.Halt();
           XS.Jump(".loop");
         }
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
@@ -684,15 +684,6 @@ namespace XSharp.Compiler
       Do<ShiftLeft>(register, bitCount, skipSizeCheck: true);
     }
 
-    public static void PushAllGeneralRegisters()
-    {
-      new Pushad();
-    }
-
-    public static void PopAllGeneralRegisters()
-    {
-      new Popad();
-    }
 
     public static void WriteToPortDX(Register value)
     {
@@ -1048,6 +1039,66 @@ namespace XSharp.Compiler
         }
       }
       Do<Xchg>(destination, source, destinationIsIndirect: destinationIsIndirect);
+    }
+
+    public static void ClearInterruptFlag()
+    {
+      new ClearInterruptFlag();
+    }
+
+    public static void ClearDirectionFlag()
+    {
+      new ClrDirFlag();
+    }
+
+    public static void DebugNoop()
+    {
+      new DebugNoop();
+    }
+
+    public static void Halt()
+    {
+      new Halt();
+    }
+
+    public static void Int3()
+    {
+      new INT3();
+    }
+
+    public static void Noop()
+    {
+      new Noop();
+    }
+
+    public static void PopAllRegisters()
+    {
+      new Popad();
+    }
+
+    public static void PushAllRegisters()
+    {
+      new Pushad();
+    }
+
+    public static void EnableInterrupts()
+    {
+      new Sti();
+    }
+
+    public static void DisableInterrupts()
+    {
+      new ClearInterruptFlag();
+    }
+
+    public static void StoreByteInString()
+    {
+      new StoreByteInString();
+    }
+
+    public static void StoreWordInString()
+    {
+      new StoreWordInString();
     }
   }
 }

@@ -41,18 +41,18 @@ namespace Cosmos.Core.Plugs {
 
 		public class ZeroFillAsm : AssemblerMethod {
 			public override void AssembleNew(CPUAll.Assembler aAssembler, object aMethodInfo) {
-				new CPUx86.ClrDirFlag();
+				XS.ClearDirectionFlag();
 				XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0xC); //address
 				XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x8); //length
 				// set EAX to value of fill (zero)
 				XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1);
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotBelow, DestinationLabel = ".step2" };
-				new CPUx86.StoreByteInString();
+				XS.StoreByteInString();
 				new CPUAll.Label(".step2");
 				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1);
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotBelow, DestinationLabel = ".step3" };
-				new CPUx86.StoreWordInString();
+				XS.StoreWordInString();
 				new CPUAll.Label(".step3");
 				new CPUx86.Stos { Size = 32, Prefixes = CPUx86.InstructionPrefixes.Repeat };
 			}
@@ -63,7 +63,7 @@ namespace Cosmos.Core.Plugs {
 
 		public class InitFloatAsm : AssemblerMethod {
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-				new CPUx86.x87.FloatInit();
+				XS.FPU.FloatInit();
 			}
 		}
 
@@ -72,7 +72,7 @@ namespace Cosmos.Core.Plugs {
 
 		public class HaltAsm : AssemblerMethod {
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-				new CPUx86.Halt();
+				XS.Halt();
 			}
 		}
 
@@ -124,7 +124,7 @@ namespace Cosmos.Core.Plugs {
 		{
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
 			{
-				new CPUx86.ClearInterruptFlag();
+				XS.ClearInterruptFlag();
 			}
 		}
 
@@ -132,7 +132,7 @@ namespace Cosmos.Core.Plugs {
 		{
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
 			{
-				new CPUx86.Sti();
+				XS.EnableInterrupts();
 			}
 		}
 

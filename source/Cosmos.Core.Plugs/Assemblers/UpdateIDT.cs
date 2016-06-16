@@ -43,7 +43,7 @@ namespace Cosmos.Core.Plugs
             // the other INTs
 
             // We are updating the IDT, disable interrupts
-            new CPUx86.ClearInterruptFlag();
+            XS.ClearInterruptFlag();
 
             for (int i = 0; i < 256; i++)
             {
@@ -116,7 +116,7 @@ namespace Cosmos.Core.Plugs
                     new CPUx86.Push { DestinationValue = 0 };
                 }
                 new CPUx86.Push { DestinationValue = (uint)j };
-                new CPUx86.Pushad();
+                XS.PushAllRegisters();
 
                 XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP)); // preserve old stack address for passing to interrupt handler
@@ -146,16 +146,16 @@ namespace Cosmos.Core.Plugs
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // this restores the stack for the FX stuff, except the pointer to the FX data
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4); // "pop" the pointer
 
-                new CPUx86.Popad();
+                XS.PopAllRegisters();
 
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
                 new CPUAll.Label("__ISR_Handler_" + j.ToString("X2") + "_END");
-                new CPUx86.IRET();
+                XS.InterruptReturn();
             }
             new CPUAll.Label("__INTERRUPT_OCCURRED__");
             new CPUx86.Return();
             new CPUAll.Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
-            new CPUx86.Noop();
+            XS.Noop();
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 8);
             XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".__AFTER_ENABLE_INTERRUPTS" };
@@ -165,7 +165,7 @@ namespace Cosmos.Core.Plugs
             new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("static_field__Cosmos_Core_CPU_mInterruptsEnabled"), DestinationIsIndirect = true, SourceValue = 1 };
             new CPUx86.Lidt { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
             // Reenable interrupts
-            new CPUx86.Sti();
+            XS.EnableInterrupts();
 
             new CPUAll.Label(".__AFTER_ENABLE_INTERRUPTS");
         }
