@@ -7,7 +7,7 @@ using CPUAll = Cosmos.Assembler;
 namespace Cosmos.Kernel.Plugs.Assemblers {
   public class GetAmountOfRAM: AssemblerMethod {
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
+      XS.Mov(XSRegisters.EAX, CPUAll.ElementReference.New("MultiBootInfo_Memory_High"), sourceIsIndirect: true);
       XS.Xor(XSRegisters.EDX, XSRegisters.CPUx86.Registers.EDX);
       XS.Mov(XSRegisters.ECX, 1024);
       XS.Divide(XSRegisters.ECX);
