@@ -1,5 +1,6 @@
-﻿using Cosmos.Assembler.x86;
+using Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.Plugs;
+using XSharp.Compiler;
 
 namespace Cosmos.Core.Plugs.Assemblers
 {
@@ -7,7 +8,7 @@ namespace Cosmos.Core.Plugs.Assemblers
     {
         public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
         {
-            new ClearInterruptFlag();
+            XS.ClearInterruptFlag();
         }
     }
 }

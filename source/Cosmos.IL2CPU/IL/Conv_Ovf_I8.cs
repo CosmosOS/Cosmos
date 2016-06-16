@@ -28,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     break;
                 case 8:
-                    new CPUx86.Noop();
+                    XS.Noop();
                     break;
                 default:
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_Ovf_I8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );

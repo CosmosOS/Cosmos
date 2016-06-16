@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
@@ -684,15 +684,6 @@ namespace XSharp.Compiler
       Do<ShiftLeft>(register, bitCount, skipSizeCheck: true);
     }
 
-    public static void PushAllGeneralRegisters()
-    {
-      new Pushad();
-    }
-
-    public static void PopAllGeneralRegisters()
-    {
-      new Popad();
-    }
 
     public static void WriteToPortDX(Register value)
     {
@@ -765,9 +756,9 @@ namespace XSharp.Compiler
       Do<SubWithCarry>(register, valueToAdd);
     }
 
-    public static void SubWithCarry(Register register, Register valueToAdd)
+    public static void SubWithCarry(Register register, Register valueToAdd, bool destinationIsIndirect = false, int? destinationDisplacement = null)
     {
-      Do<SubWithCarry>(register, valueToAdd);
+      Do<SubWithCarry>(register, valueToAdd, destinationDisplacement: destinationDisplacement, destinationIsIndirect: destinationIsIndirect);
     }
 
     public static void And(Register register, uint value)
@@ -775,9 +766,9 @@ namespace XSharp.Compiler
       Do<And>(register, value);
     }
 
-    public static void And(Register register, Register value, bool destinationIsIndirect = false)
+    public static void And(Register register, Register value, bool destinationIsIndirect = false, int? destinationDisplacement = null)
     {
-      Do<And>(register, value, destinationIsIndirect: destinationIsIndirect);
+      Do<And>(register, value, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement);
     }
 
     public static void Xor(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
@@ -1038,16 +1029,69 @@ namespace XSharp.Compiler
       };
     }
 
-    public static void Exchange(Register destination, Register source, bool destinationIsIndirect = false)
+    public static void Exchange(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null)
     {
-      if (!destinationIsIndirect)
-      {
-        if (destination.Size != source.Size)
-        {
-          throw new InvalidOperationException("Register sizes don't match!");
-        }
-      }
-      Do<Xchg>(destination, source, destinationIsIndirect: destinationIsIndirect);
+      Do<Xchg>(destination, source, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement);
+    }
+
+    public static void ClearInterruptFlag()
+    {
+      new ClearInterruptFlag();
+    }
+
+    public static void ClearDirectionFlag()
+    {
+      new ClrDirFlag();
+    }
+
+    public static void DebugNoop()
+    {
+      new DebugNoop();
+    }
+
+    public static void Halt()
+    {
+      new Halt();
+    }
+
+    public static void Int3()
+    {
+      new INT3();
+    }
+
+    public static void Noop()
+    {
+      new Noop();
+    }
+
+    public static void PopAllRegisters()
+    {
+      new Popad();
+    }
+
+    public static void PushAllRegisters()
+    {
+      new Pushad();
+    }
+
+    public static void EnableInterrupts()
+    {
+      new Sti();
+    }
+
+    public static void DisableInterrupts()
+    {
+      new ClearInterruptFlag();
+    }
+
+    public static void StoreByteInString()
+    {
+      new StoreByteInString();
+    }
+
+    public static void StoreWordInString()
+    {
+      new StoreWordInString();
     }
   }
 }

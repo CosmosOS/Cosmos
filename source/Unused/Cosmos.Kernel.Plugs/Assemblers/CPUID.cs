@@ -13,15 +13,15 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
     //; 	(none)
     //; 	ReturnSize: 4
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-        /*new CPUx86.Pushfd();
+        /*XS.Pushfd();
         new CPUx86.Pop("eax");
         new CPUx86.Move("ecx", "eax");
 
         new CPUx86.Xor("eax", "200000h");
         new CPUx86.Push("eax");
-        new CPUx86.Popfd();
+        XS.Popfd();
 
-        new CPUx86.Pushfd();
+        XS.Pushfd();
         new CPUx86.Pop("ebx");
         new CPUx86.Xor("eax", "ebx");
         new CPUx86.And("eax", "200000h");
@@ -35,7 +35,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
 
         new CPUAll.Label(".return");
         new CPUx86.Push("ecx");
-        new CPUx86.Popfd();
+        XS.Popfd();
 
         new CPUx86.Push("eax");*/
       new CPUx86.Push { DestinationValue = 0 };
@@ -56,7 +56,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
       new CPUx86.ClrInterruptFlag();
       XS.Mov(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8);
-      new CPUx86.CpuId();
+      XS.CpuId();
       XS.Mov(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 0x18);
       XS.Mov(XSRegisters.EDI, XSRegisters.EDX, destinationIsIndirect: true);
       XS.Mov(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 0x14);
@@ -65,7 +65,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers {
       XS.Mov(XSRegisters.EDI, XSRegisters.EBX, destinationIsIndirect: true);
       XS.Mov(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 0xC);
       XS.Mov(XSRegisters.EDI, XSRegisters.EAX, destinationIsIndirect: true);
-      new CPUx86.Sti();
+      XS.Sti();
     }
   }
 }

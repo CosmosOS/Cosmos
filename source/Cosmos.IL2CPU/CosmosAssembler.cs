@@ -267,7 +267,7 @@ namespace Cosmos.IL2CPU
 
             // CLI ASAP
             WriteDebugVideo("Clearing interrupts.");
-            new ClearInterruptFlag();
+            XS.ClearInterruptFlag();
 
 
             WriteDebugVideo("Begin multiboot info.");
@@ -345,8 +345,8 @@ namespace Cosmos.IL2CPU
 
             new Comment(this, "Kernel done - loop till next IRQ");
             XS.Label(".loop");
-            new ClearInterruptFlag();
-            new Halt();
+            XS.ClearInterruptFlag();
+            XS.Halt();
             XS.Jump(".loop");
 
             if (mComPort > 0)

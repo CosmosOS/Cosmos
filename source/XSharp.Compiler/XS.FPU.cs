@@ -1,4 +1,5 @@
-﻿using Cosmos.Assembler.x86.SSE;
+﻿using Cosmos.Assembler.x86;
+using Cosmos.Assembler.x86.SSE;
 using Cosmos.Assembler.x86.x87;
 using static XSharp.Compiler.XSRegisters;
 
@@ -22,6 +23,16 @@ namespace XSharp.Compiler
         {
           DestinationReg = register.RegEnum
         };
+      }
+
+      public static void FloatAbs()
+      {
+        new FloatABS();
+      }
+
+      public static void FloatInit()
+      {
+        new FloatInit();
       }
     }
   }
