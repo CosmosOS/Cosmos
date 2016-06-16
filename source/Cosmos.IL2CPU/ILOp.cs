@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -441,7 +441,7 @@ namespace Cosmos.IL2CPU {
         new CPU.Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = CPU.RegistersEnum.EAX};
         new CPU.Call {DestinationLabel = "DebugStub_SendNullReferenceOccurred"};
         new CPU.Halt();
-        new Label(".AfterNullCheck");
+        XS.Label(".AfterNullCheck");
       }
     }
 

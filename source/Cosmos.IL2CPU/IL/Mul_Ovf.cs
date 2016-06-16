@@ -48,11 +48,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //mov RIGHT_HIGH to eax, is useable on Full 64 multiply
         XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
         XS.Or(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 12);
-        new ConditionalJump
-          {
-            Condition = ConditionalTestEnum.Zero,
-            DestinationLabel = Simple32Multiply
-          };
+        XS.Jump(ConditionalTestEnum.Zero, Simple32Multiply);
         // Full 64 Multiply
 
         // copy again, or could change EAX
@@ -65,43 +61,28 @@ namespace Cosmos.IL2CPU.X86.IL
         XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
 
         //mov RIGHT_LOW to eax
-        new Mov
-          {
-            DestinationReg = RegistersEnum.EAX,
-            SourceReg = RegistersEnum.ESP,
-            SourceIsIndirect = true
-          };
+        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
         // multiply with LEFT_HIGH
         XS.Multiply(XSRegisters.OldToNewRegister(RegistersEnum.ESP), displacement: 12);
         // add result of LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH
         XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
 
         //mov RIGHT_LOW to eax
-        new Mov
-          {
-            DestinationReg = RegistersEnum.EAX,
-            SourceReg = RegistersEnum.ESP,
-            SourceIsIndirect = true
-          };
+        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
         // multiply with LEFT_LOW
         XS.Multiply(XSRegisters.OldToNewRegister(RegistersEnum.ESP), displacement: 8);
         // add LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH to high dword of last result
         XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.ECX));
 
-        new Jump { DestinationLabel = MoveReturnValue };
+        XS.Jump(MoveReturnValue);
 
-        new Label(Simple32Multiply);
+        XS.Label(Simple32Multiply);
         //mov RIGHT_LOW to eax
-        new Mov
-          {
-            DestinationReg = RegistersEnum.EAX,
-            SourceReg = RegistersEnum.ESP,
-            SourceIsIndirect = true
-          };
+        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
         // multiply with LEFT_LOW
         XS.Multiply(XSRegisters.OldToNewRegister(RegistersEnum.ESP), displacement: 8);
 
-        new Label(MoveReturnValue);
+        XS.Label(MoveReturnValue);
         // move high result to left high
         new Mov
           {
@@ -123,7 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
       }
       else
       {
-        new Assembler.x86.Pop { DestinationReg = RegistersEnum.EAX };
+        XS.Pop(XSRegisters.EAX);
         new Multiply
           {
             DestinationReg = RegistersEnum.ESP,

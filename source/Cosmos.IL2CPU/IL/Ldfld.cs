@@ -131,13 +131,13 @@ namespace Cosmos.IL2CPU.X86.IL
             if ((!aTypeOnStack.IsPointer) && (aDeclaringType.IsClass))
             {
                 // convert to real memory address
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
+                XS.Set(XSRegisters.ECX, XSRegisters.ECX, sourceIsIndirect: true);
             }
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), (uint)(xOffset));
 
             if (xFieldInfo.IsExternalValue && aDerefExternalField)
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
+                XS.Set(XSRegisters.ECX, XSRegisters.ECX, sourceIsIndirect: true);
             }
 
             for (int i = 1; i <= (xSize / 4); i++)
@@ -151,17 +151,17 @@ namespace Cosmos.IL2CPU.X86.IL
             switch (xSize % 4)
             {
                 case 1:
-                    new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AL, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
+                    XS.Set(XSRegisters.AL, XSRegisters.ECX, sourceIsIndirect: true);
                     XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     break;
 
                 case 2:
-                    new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
+                    XS.Set(XSRegisters.AX, XSRegisters.ECX, sourceIsIndirect: true);
                     XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     break;
 
                 case 3: //For Release
-                    new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
+                    XS.Set(XSRegisters.EAX, XSRegisters.ECX, sourceIsIndirect: true);
                     XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 8);
                     XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     break;

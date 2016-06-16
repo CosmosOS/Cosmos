@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         else
                         {
                             XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-                            new Push { DestinationValue = 0 };
+                            XS.Push(0);
                             XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
                         }
                         break;

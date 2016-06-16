@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.Assembler;
+using XSharp.Compiler;
 
 namespace Cosmos.Debug.Kernel.Plugs
 {
@@ -144,13 +145,13 @@ namespace Cosmos.Debug.Kernel.Plugs
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
-      new Label(".BeforeArgumentsPrepare");
+      XS.Label(".BeforeArgumentsPrepare");
       new LiteralAssemblerCode("mov EBX, [EBP + 8]");
       new LiteralAssemblerCode("mov EBX, [EBX]");
       new LiteralAssemblerCode("push dword [EBX + 12]");
       new LiteralAssemblerCode("add EBX, 16");
       new LiteralAssemblerCode("push dword EBX");
-      new Label(".BeforeCall");
+      XS.Label(".BeforeCall");
       new LiteralAssemblerCode("Call DebugStub_SendText");
       new LiteralAssemblerCode("add ESP, 8");
       new LiteralAssemblerCode("%endif");

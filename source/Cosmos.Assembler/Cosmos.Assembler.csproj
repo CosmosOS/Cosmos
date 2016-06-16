@@ -182,7 +182,7 @@
     <Compile Include="x86\SSE2\SqrtSD.cs" />
     <Compile Include="x86\SSE2\XorPD.cs" />
     <Compile Include="x86\SSE3\IntStoreWithTrunc.cs" />
-    <Compile Include="x86\SSE3\MoveDoubleAndDupplicate.cs" />
+    <Compile Include="x86\SSE3\MoveDoubleAndDuplicate.cs" />
     <Compile Include="x86\SSEAndMMX2\AddPS.cs" />
     <Compile Include="x86\SSEAndMMX2\AddSS.cs" />
     <Compile Include="x86\SSEAndMMX2\AndPS.cs" />

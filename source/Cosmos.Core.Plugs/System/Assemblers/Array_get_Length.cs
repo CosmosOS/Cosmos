@@ -1,4 +1,4 @@
-﻿using Cosmos.Assembler.x86;
+using Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.Plugs;
 using XSharp.Compiler;
 
@@ -10,7 +10,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         {
             // $this   ebp+8
             XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.EBP), sourceDisplacement: 8);
-            new Mov { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EAX, SourceIsIndirect = true };
+            XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
             new Push { DestinationIsIndirect = true, DestinationReg = RegistersEnum.EAX, DestinationDisplacement = 8 };
         }
     }

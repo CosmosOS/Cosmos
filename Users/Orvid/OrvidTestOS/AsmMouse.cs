@@ -1,4 +1,4 @@
-﻿//#define ASMMouse
+//#define ASMMouse
 
 #if ASMMouse
 //#define DebugMouse
@@ -69,20 +69,14 @@ namespace Cosmos.Hardware
                     SourceValue = 0x60
                 };
 
-                new Push
-                {
-                    DestinationReg = RegistersEnum.EAX
-                };
+                XS.Push(XSRegisters.EAX);
 
                 new Call
                 {
                     DestinationLabel = "send_mouse_cmd"
                 };
 
-                new Pop
-                {
-                    DestinationReg = RegistersEnum.EAX
-                };
+                XS.Pop(XSRegisters.EAX);
 
                 new Call
                 {
@@ -119,17 +113,11 @@ namespace Cosmos.Hardware
                 };
 
         #region mouse_read
-                new Label("mouse_read");
+                XS.Label("mouse_read");
                 {
-                    new Push
-                    {
-                        DestinationReg = RegistersEnum.ECX
-                    };
+                    XS.Push(XSRegisters.ECX);
 
-                    new Push
-                    {
-                        DestinationReg = RegistersEnum.EDX
-                    };
+                    XS.Push(XSRegisters.EDX);
 
                     new Move
                     {
@@ -137,7 +125,7 @@ namespace Cosmos.Hardware
                         SourceValue = 0xffff
                     };
 
-                    new Label("mouse_read_loop");
+                    XS.Label("mouse_read_loop");
                     {
                         new In2Port
                         {
@@ -152,11 +140,7 @@ namespace Cosmos.Hardware
                             SourceValue = 1
                         };
 
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.NotZero,
-                            DestinationLabel = "mouse_read_ready"
-                        };
+                        XS.Jump(ConditionalTestEnum.NotZero, "mouse_read_ready");
 
                         new Loop
                         {
@@ -169,18 +153,12 @@ namespace Cosmos.Hardware
                             SourceValue = 1
                         };
 
-                        new Jump
-                        {
-                            DestinationLabel = "mouse_read_exit"
-                        };
+                        XS.Jump("mouse_read_exit");
                     }
 
-                    new Label("mouse_read_ready");
+                    XS.Label("mouse_read_ready");
                     {
-                        new Push
-                        {
-                            DestinationReg = RegistersEnum.ECX
-                        };
+                        XS.Push(XSRegisters.ECX);
 
                         new Move
                         {
@@ -189,17 +167,14 @@ namespace Cosmos.Hardware
                         };
                     }
 
-                    new Label("mouse_read_delay");
+                    XS.Label("mouse_read_delay");
                     {
                         new Loop
                         {
                             DestinationLabel = "mouse_read_delay"
                         };
 
-                        new Pop
-                        {
-                            DestinationReg = RegistersEnum.ECX
-                        };
+                        XS.Pop(XSRegisters.ECX);
 
                         new In2Port
                         {
@@ -215,35 +190,23 @@ namespace Cosmos.Hardware
                         };
                     }
 
-                    new Label("mouse_read_exit");
+                    XS.Label("mouse_read_exit");
                     {
-                        new Pop
-                        {
-                            DestinationReg = RegistersEnum.EDX
-                        };
+                        XS.Pop(XSRegisters.EDX);
 
-                        new Pop
-                        {
-                            DestinationReg = RegistersEnum.ECX
-                        };
+                        XS.Pop(XSRegisters.ECX);
 
-                        new Return();
+                        XS.Return();
                     }
                 }
         #endregion
 
         #region mouse_write
-                new Label("mouse_write");
+                XS.Label("mouse_write");
                 {
-                    new Push
-                    {
-                        DestinationReg = RegistersEnum.ECX
-                    };
+                    XS.Push(XSRegisters.ECX);
 
-                    new Push
-                    {
-                        DestinationReg = RegistersEnum.EDX
-                    };
+                    XS.Push(XSRegisters.EDX);
 
                     new Move
                     {
@@ -257,7 +220,7 @@ namespace Cosmos.Hardware
                         SourceValue = 0xffff
                     };
 
-                    new Label("mouse_write_loop1");
+                    XS.Label("mouse_write_loop1");
                     {
                         new In2Port
                         {
@@ -272,11 +235,7 @@ namespace Cosmos.Hardware
                             SourceValue = 32
                         };
 
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.Zero,
-                            DestinationLabel = "mouse_write_ok1"
-                        };
+                        XS.Jump(ConditionalTestEnum.Zero, "mouse_write_ok1");
 
                         new Loop
                         {
@@ -289,13 +248,10 @@ namespace Cosmos.Hardware
                             SourceValue = 1
                         };
 
-                        new Jump
-                        {
-                            DestinationLabel = "mouse_write_exit"
-                        };
+                        XS.Jump("mouse_write_exit");
                     }
 
-                    new Label("mouse_write_ok1");
+                    XS.Label("mouse_write_ok1");
                     {
                         new In2Port
                         {
@@ -311,7 +267,7 @@ namespace Cosmos.Hardware
                         };
                     }
 
-                    new Label("mouse_write_loop");
+                    XS.Label("mouse_write_loop");
                     {
                         new In2Port
                         {
@@ -326,11 +282,7 @@ namespace Cosmos.Hardware
                             SourceValue = 2
                         };
 
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.Zero,
-                            DestinationLabel = "mouse_write_ok"
-                        };
+                        XS.Jump(ConditionalTestEnum.Zero, "mouse_write_ok");
 
                         new Loop
                         {
@@ -343,13 +295,10 @@ namespace Cosmos.Hardware
                             SourceValue = 1
                         };
 
-                        new Jump
-                        {
-                            DestinationLabel = "mouse_write_exit"
-                        };
+                        XS.Jump("mouse_write_exit");
                     }
 
-                    new Label("mouse_write_ok");
+                    XS.Label("mouse_write_ok");
                     {
                         new Move
                         {
@@ -371,7 +320,7 @@ namespace Cosmos.Hardware
                         };
                     }
 
-                    new Label("mouse_write_loop3");
+                    XS.Label("mouse_write_loop3");
                     {
                         new In2Port
                         {
@@ -386,11 +335,7 @@ namespace Cosmos.Hardware
                             SourceValue = 2
                         };
 
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.Zero,
-                            DestinationLabel = "mouse_write_ok3"
-                        };
+                        XS.Jump(ConditionalTestEnum.Zero, "mouse_write_ok3");
 
                         new Loop
                         {
@@ -403,13 +348,10 @@ namespace Cosmos.Hardware
                             SourceValue = 1
                         };
 
-                        new Jump
-                        {
-                            DestinationLabel = "mouse_write_exit"
-                        };
+                        XS.Jump("mouse_write_exit");
                     }
 
-                    new Label("mouse_write_ok3");
+                    XS.Label("mouse_write_ok3");
                     {
                         new Move
                         {
@@ -418,7 +360,7 @@ namespace Cosmos.Hardware
                         };
                     }
 
-                    new Label("mouse_write_loop4");
+                    XS.Label("mouse_write_loop4");
                     {
                         new Move
                         {
@@ -427,7 +369,7 @@ namespace Cosmos.Hardware
                         };
                     }
 
-                    new Label("mouse_write_loop5");
+                    XS.Label("mouse_write_loop5");
                     {
                         new In2Port
                         {
@@ -442,30 +384,19 @@ namespace Cosmos.Hardware
                             SourceValue = 1
                         };
 
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.NotZero,
-                            DestinationLabel = "mouse_write_ok4"
-                        };
+                        XS.Jump(ConditionalTestEnum.NotZero, "mouse_write_ok4");
 
                         new Loop
                         {
                             DestinationLabel = "mouse_write_loop5"
                         };
 
-                        new Dec
-                        {
-                            DestinationReg = RegistersEnum.AH
-                        };
+                        XS.Dec(XSRegisters.AH);
 
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.NotZero,
-                            DestinationLabel = "mouse_write_loop4"
-                        };
+                        XS.Jump(ConditionalTestEnum.NotZero, "mouse_write_loop4");
                     }
 
-                    new Label("mouse_write_ok4");
+                    XS.Label("mouse_write_ok4");
                     {
                         new Xor
                         {
@@ -474,25 +405,19 @@ namespace Cosmos.Hardware
                         };
                     }
 
-                    new Label("mouse_write_exit");
+                    XS.Label("mouse_write_exit");
                     {
-                        new Pop
-                        {
-                            DestinationReg = RegistersEnum.EDX
-                        };
+                        XS.Pop(XSRegisters.EDX);
 
-                        new Pop
-                        {
-                            DestinationReg = RegistersEnum.ECX
-                        };
+                        XS.Pop(XSRegisters.ECX);
 
-                        new Return();
+                        XS.Return();
                     }
                 }
         #endregion
 
         #region send_mouse_cmd
-                new Label("send_mouse_cmd");
+                XS.Label("send_mouse_cmd");
                 {
 
                     new Move
@@ -501,7 +426,7 @@ namespace Cosmos.Hardware
                         SourceValue = 0xffff
                     };
 
-                    new Label("mouse_cmd_wait");
+                    XS.Label("mouse_cmd_wait");
                     {
                         new In2Port
                         {
@@ -514,22 +439,15 @@ namespace Cosmos.Hardware
                             DestinationReg = RegistersEnum.AL,
                             SourceValue = 2
                         };
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.Zero,
-                            DestinationLabel = "mouse_cmd_send"
-                        };
+                        XS.Jump(ConditionalTestEnum.Zero, "mouse_cmd_send");
                         new Loop
                         {
                             DestinationLabel = "mouse_cmd_wait"
                         };
-                        new Jump
-                        {
-                            DestinationLabel = "mouse_cmd_error"
-                        };
+                        XS.Jump("mouse_cmd_error");
                     }
 
-                    new Label("mouse_cmd_send");
+                    XS.Label("mouse_cmd_send");
                     {
                         new Move
                         {
@@ -554,7 +472,7 @@ namespace Cosmos.Hardware
                         };
                     }
 
-                    new Label("mouse_cmd_accept");
+                    XS.Label("mouse_cmd_accept");
                     {
                         new In2Port
                         {
@@ -567,31 +485,24 @@ namespace Cosmos.Hardware
                             DestinationReg = RegistersEnum.AL,
                             SourceValue = 0x02
                         };
-                        new ConditionalJump
-                        {
-                            Condition = ConditionalTestEnum.Zero,
-                            DestinationLabel = "mouse_cmd_ok"
-                        };
+                        XS.Jump(ConditionalTestEnum.Zero, "mouse_cmd_ok");
                         new Loop
                         {
                             DestinationLabel = "mouse_cmd_accept"
                         };
                     }
 
-                    new Label("mouse_cmd_error");
+                    XS.Label("mouse_cmd_error");
                     {
                         new Move
                         {
                             DestinationReg = RegistersEnum.AH,
                             SourceValue = 0x01
                         };
-                        new Jump
-                        {
-                            DestinationLabel = "mouse_cmd_exit"
-                        };
+                        XS.Jump("mouse_cmd_exit");
                     }
 
-                    new Label("mouse_cmd_ok");
+                    XS.Label("mouse_cmd_ok");
                     {
                         new Xor
                         {
@@ -600,9 +511,9 @@ namespace Cosmos.Hardware
                         };
                     }
 
-                    new Label("mouse_cmd_exit");
+                    XS.Label("mouse_cmd_exit");
                     {
-                        new Return();
+                        XS.Return();
                     }
                 }
         #endregion

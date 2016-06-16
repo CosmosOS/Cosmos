@@ -41,7 +41,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				// [ESP + 4] is high part
 
 				// move low part to eax
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+				XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
 
 				new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 32, Size = 8 };
 				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.AboveOrEqual, DestinationLabel = LowPartIsZero };
@@ -52,7 +52,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				new CPUx86.ShiftLeft { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 32, SourceReg = CPUx86.RegistersEnum.CL };
 				new CPUx86.Jump { DestinationLabel = End_Shl };
 
-				new Label(LowPartIsZero);
+				XS.Label(LowPartIsZero);
 				// remove bits >= 32, so that CL max value could be only 31
 				new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 0x1f, Size = 8 };
 				// shift low part in EAX and move it in high part
@@ -61,7 +61,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				// replace unknown low part with a zero, if <= 32
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceValue = 0 };
 
-				new Label(End_Shl);
+				XS.Label(End_Shl);
 			}
 			else
 				throw new NotSupportedException("A size bigger 8 not supported at Shl!");

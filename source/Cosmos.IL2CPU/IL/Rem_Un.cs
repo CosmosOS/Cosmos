@@ -26,9 +26,9 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (TypeIsFloat(xStackItem))
                 {
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                    XS.SSE.MoveSS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
-                    new MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                    XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.SSE.XorPS(XSRegisters.XMM2, XSRegisters.XMM2);
                     XS.SSE.DivPS(XSRegisters.XMM1, XSRegisters.XMM0);
                     new MoveSS { SourceReg = CPUx86.RegistersEnum.XMM2, DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
@@ -42,7 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					// divisor
 					//low
-					new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+					XS.Set(XSRegisters.ESI, XSRegisters.ESP, sourceIsIndirect: true);
 					//high
 					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 4);
 
@@ -63,7 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					// set ecx to zero for counting the shift operations
 					XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 
-					new Label(LabelShiftRight);
+					XS.Label(LabelShiftRight);
 
 					// shift divisor 1 bit right
 					new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.RegistersEnum.ESI, SourceReg = CPUx86.RegistersEnum.EDI, ArgumentValue = 1 };
@@ -94,7 +94,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					new CPUx86.Jump { DestinationLabel = LabelEnd };
 
-					new Label(LabelNoLoop);
+					XS.Label(LabelNoLoop);
 
 					//save high dividend
 					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
@@ -110,16 +110,16 @@ namespace Cosmos.IL2CPU.X86.IL
 					new CPUx86.Push { DestinationValue = 0 };
 					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 
-					new Label(LabelEnd);
+					XS.Label(LabelEnd);
                 }
             }
             else
             {
                 if (TypeIsFloat(xStackItem))
                 {
-                    new MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM0, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                    XS.SSE.MoveSS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
-                    new MoveSS { DestinationReg = CPUx86.RegistersEnum.XMM1, SourceReg = CPUx86.RegistersEnum.ESP, SourceIsIndirect = true };
+                    XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
                     XS.SSE.XorPS(XSRegisters.XMM2, XSRegisters.XMM2);
                     XS.SSE.DivPS(XSRegisters.XMM1, XSRegisters.XMM0);

@@ -27,12 +27,43 @@ namespace XSharp.Compiler
         DoDestinationSource<XorPS>(destination, source);
       }
 
-      public static void ConvertSI2SS(RegisterXMM destination, Register32 source)
+      public static void ConvertSI2SS(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
       {
         new ConvertSI2SS()
         {
           DestinationReg = destination,
-          SourceReg = source
+          SourceReg = source,
+          SourceIsIndirect = sourceIsIndirect
+        };
+      }
+
+      public static void MoveSS(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
+      {
+        new MoveSS()
+        {
+          DestinationReg = destination,
+          SourceReg = source,
+          SourceIsIndirect = sourceIsIndirect
+        };
+      }
+
+      public static void ConvertSI2SD(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
+      {
+        new ConvertSI2SD()
+        {
+          DestinationReg = destination,
+          SourceReg = source,
+          SourceIsIndirect = sourceIsIndirect
+        };
+      }
+
+      public static void ConvertSS2SD(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
+      {
+        new ConvertSS2SD()
+        {
+          DestinationReg = destination,
+          SourceReg = source,
+          SourceIsIndirect = sourceIsIndirect
         };
       }
 

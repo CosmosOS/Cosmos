@@ -46,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		}
         //
         // 		public override void DoAssemble() {
-        //             new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+        //             XS.Pop(XSRegisters.EAX);
         // 			for(int i = 0; i < mLabels.Length; i++){
         //                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue =(uint)i };
         //                 new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mLabels[i] };
