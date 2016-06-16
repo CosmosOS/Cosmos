@@ -31,7 +31,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.SSE.XorPS(XSRegisters.XMM2, XSRegisters.XMM2);
                     XS.SSE.DivPS(XSRegisters.XMM1, XSRegisters.XMM0);
-                    new MoveSS { SourceReg = CPUx86.RegistersEnum.XMM2, DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
+                    XS.SSE.MoveSS(XSRegisters.ESP, XSRegisters.XMM2, destinationIsIndirect: true);
                 }
                 else
                 {
@@ -124,7 +124,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.SSE.XorPS(XSRegisters.XMM2, XSRegisters.XMM2);
                     XS.SSE.DivPS(XSRegisters.XMM1, XSRegisters.XMM0);
                     XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
-                    new MoveSS { SourceReg = CPUx86.RegistersEnum.XMM2, DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
+                    XS.SSE.MoveSS(XSRegisters.ESP, XSRegisters.XMM2, destinationIsIndirect: true);
                 }
                 else
                 {

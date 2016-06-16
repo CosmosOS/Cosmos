@@ -49,8 +49,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
       XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
       XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
-      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, SourceRef = Cosmos.Assembler.ElementReference.New(xTypeID), SourceIsIndirect = true };
-      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
+      XS.Set(XSRegisters.EBX, xTypeID, sourceIsIndirect: true);
+      XS.Set(XSRegisters.EAX, XSRegisters.EBX, destinationIsIndirect: true);
       XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceValue = (uint)InstanceTypeEnum.Array, Size = 32 };
       XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);

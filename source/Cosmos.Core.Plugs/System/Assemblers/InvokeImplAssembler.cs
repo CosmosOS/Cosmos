@@ -127,7 +127,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             //may have to expand the return... idk
             new CPUx86.Xchg { DestinationReg = CPUx86.RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceReg = CPUx86.RegistersEnum.EDX };
             new CPUx86.Xchg { DestinationReg = CPUx86.RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.RegistersEnum.EDX };
-            new CPUx86.Xchg { DestinationReg = CPUx86.RegistersEnum.EBP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EDX };
+            XS.Exchange(XSRegisters.EBP, XSRegisters.EDX, destinationIsIndirect: true);
             XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));//ebp
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 12, SourceReg = CPUx86.RegistersEnum.EDI };
             new Assembler.Label(".noReturn");
@@ -285,7 +285,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      ////may have to expand the return... idk
         //      //new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceReg = CPUx86.Registers.EDX };
         //      //new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EDX };
-        //      //new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EDX };
+        //      //XS.Xchg(XSRegisters.EBP, XSRegisters.EDX, destinationIsIndirect: true);
         //      //XS.Push(XSRegisters.EDX);//ebp
         //      //new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 12, SourceReg = CPUx86.Registers.EDI };
         //      new CPU.Label(".noReturn");

@@ -16,7 +16,7 @@ namespace Cosmos.Core.Plugs {
 
 		public class GetAmountOfRAMAsm : AssemblerMethod {
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceRef = CPUAll.ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
+				XS.Set(XSRegisters.EAX, "MultiBootInfo_Memory_High", sourceIsIndirect: true);
 				XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
 				XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1024);
 				XS.Divide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));

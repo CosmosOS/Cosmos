@@ -43,7 +43,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Set(XSRegisters.EBX, XSRegisters.ESP, sourceIsIndirect: true);
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.CL), 1);
                 XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.CL);
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EBX };
+                XS.Set(XSRegisters.ESP, XSRegisters.EBX, destinationIsIndirect: true);
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.CL), 1);
                 new CPUx86.RotateThroughCarryRight { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, Size = 32, SourceReg = CPUx86.RegistersEnum.CL };
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);

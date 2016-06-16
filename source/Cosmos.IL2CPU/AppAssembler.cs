@@ -1361,7 +1361,7 @@ namespace Cosmos.IL2CPU
             XS.Label(InitStringIDsLabel);
             XS.Push(OldToNewRegister(RegistersEnum.EBP));
             XS.Set(OldToNewRegister(RegistersEnum.EBP), OldToNewRegister(RegistersEnum.ESP));
-            new Mov { DestinationReg = RegistersEnum.EAX, SourceRef = ElementReference.New(ILOp.GetTypeIDLabel(typeof(String))), SourceIsIndirect = true };
+            XS.Set(XSRegisters.EAX, ILOp.GetTypeIDLabel(typeof(String)), sourceIsIndirect: true);
             new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(LdStr.GetContentsArrayName("")) };
 
             var xMemberId = 0;

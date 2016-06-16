@@ -57,14 +57,14 @@ namespace Cosmos.IL2CPU.X86.IL
                     case 1:
                         {
                             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
-                            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AL, SourceRef = ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            XS.Set(XSRegisters.AL, xDataName, sourceIsIndirect: true);
                             XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                             break;
                         }
                     case 2:
                         {
                             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
-                            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AX, SourceRef = ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            XS.Set(XSRegisters.AX, xDataName, sourceIsIndirect: true);
                             XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                             break;
                         }
@@ -85,14 +85,14 @@ namespace Cosmos.IL2CPU.X86.IL
                     case 1:
                         {
                             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
-                            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AL, SourceRef = ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            XS.Set(XSRegisters.AL, xDataName, sourceIsIndirect: true);
                             XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                             break;
                         }
                     case 2:
                         {
                             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
-                            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AX, SourceRef = ElementReference.New( xDataName ), SourceIsIndirect = true };
+                            XS.Set(XSRegisters.AX, xDataName, sourceIsIndirect: true);
                             XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                             break;
                         }
