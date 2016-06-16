@@ -36,10 +36,10 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
       XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
       //Assembler.StackSizes.Push(xElementCountSize);
-      new CPUx86.Push { DestinationValue = xSize };
+      XS.Push(xSize);
       new Mul(Assembler).Execute(aMethod, aOpCode);
       // the total items size is now on the stack
-      new CPUx86.Push { DestinationValue = (ObjectImpl.FieldDataOffset + 4) };
+      XS.Push((ObjectImpl.FieldDataOffset + 4));
       new Add(Assembler).Execute(aMethod, aOpCode);
       // the total array size is now on the stack.
       XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));

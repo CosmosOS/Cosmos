@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPUx86.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
             XS.Label(mReturnNullLabel );
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
-            new CPUx86.Push { DestinationValue = 0 };
+            XS.Push(0);
         }
     }
 }

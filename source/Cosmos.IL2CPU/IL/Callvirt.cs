@@ -107,7 +107,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
                     XS.Push(XSRegisters.EAX, isIndirect: true);
                 }
-                new CPU.Push { DestinationValue = aTargetMethodUID };
+                XS.Push(aTargetMethodUID);
                 XS.Call(LabelName.Get(VTablesImplRefs.GetMethodAddressForTypeRef));
                 if (xExtraStackSize > 0)
                 {

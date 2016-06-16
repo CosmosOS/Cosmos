@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
             //{
             //    mTokenAddress = GetService<IMetaDataInfoService>().GetTypeIdLabel( mType );
             //}
-            //new CPUx86.Push { DestinationValue = xToken.Value };
+            //XS.Push(xToken.Value);
             XS.Push(xTokenAddress);
         }
 

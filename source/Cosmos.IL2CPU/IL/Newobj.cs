@@ -168,7 +168,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 uint xMemSize = GetStorageSize(objectType);
                 int xExtraSize = 12; // additional size for set values after alloc
-                new CPUx86.Push { DestinationValue = (uint)(xMemSize + xExtraSize) };
+                XS.Push((uint)(xMemSize + xExtraSize));
                 if (xHasCalcSize)
                 {
                     XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));

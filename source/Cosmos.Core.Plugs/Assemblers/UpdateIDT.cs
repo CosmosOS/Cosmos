@@ -113,9 +113,9 @@ namespace Cosmos.Core.Plugs
 
                 if (Array.IndexOf(xInterruptsWithParam, j) == -1)
                 {
-                    new CPUx86.Push { DestinationValue = 0 };
+                    XS.Push(0);
                 }
-                new CPUx86.Push { DestinationValue = (uint)j };
+                XS.Push((uint)j);
                 XS.PushAllRegisters();
 
                 XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
