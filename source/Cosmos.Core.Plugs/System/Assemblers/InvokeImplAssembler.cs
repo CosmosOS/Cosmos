@@ -93,7 +93,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP));
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 4);
                 //new CPU.Comment("get above the saved methodptr");
-                //new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+                //XS.Sub(XSRegisters.ESP, 4);
                 //we allocated the argsize on the stack once, and it we need to get above the original args
                 XS.Comment("we allocated argsize on the stack once");
                 XS.Comment("add 32 for the Pushad + 16 for the current stack + 4 for the return value");
@@ -177,12 +177,12 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      XS.Pop(XSRegisters.EAX);
         //      ;//list
         //      new CPU.Comment("eax+=8 is where the offset where an array's count is");
-        //      new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };//addrof list.count??
+        //      XS.Add(XSRegisters.EAX, 8);//addrof list.count??
         //      new CPU.Comment("store count in ebx");
         //      XS.Mov(XSRegisters.EBX, XSRegisters.EAX, sourceIsIndirect: true);//list.count
         //      new CPU.Comment("eax+=8 is where the offset where an array's items start");
-        //      new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 8 };//why? -- start of list i think? MtW: the array's .Length is at +8
-        //      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceValue = 0 };
+        //      XS.Add(XSRegisters.EAX, 8);//why? -- start of list i think? MtW: the array's .Length is at +8
+        //      XS.Mov(XSRegisters.EDI, 0);
         //      new CPU.Comment("ecx = ptr to delegate object");
 
         ////      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
@@ -213,7 +213,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      Ldfld.DoExecute(xAssembler, xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target");
         //      XS.Pop(XSRegisters.EDI);
         //      new CPUx86.Popad();
-        //      new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDI, SourceValue = 0 };
+        //      XS.Compare(XSRegisters.EDI, 0);
         //      new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".NO_THIS" };
         //      XS.Push(XSRegisters.EDI);
 
@@ -230,11 +230,11 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      new CPUx86.Move { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESP };
 
         //      new CPU.Comment("get above the saved methodptr");
-        //      new CPUx86.Add { DestinationReg = CPUx86.Registers.EDI, SourceValue = 4 };
+        //      XS.Add(XSRegisters.EDI, 4);
         //      //we allocated the argsize on the stack once, and it we need to get above the original args
         //      new CPU.Comment("we allocated argsize on the stack once");
         //      new CPU.Comment("add 32 for the Pushad + 16 for the current stack + 4 for the return value");
-        //      new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 52 };
+        //      XS.Add(XSRegisters.ESI, 52);
         //      new CPUx86.Movs { Size = 8, Prefixes = CPUx86.InstructionPrefixes.Repeat };
         //      XS.Pop(XSRegisters.EDI);
         //      XS.Call(XSRegisters.EDI);
@@ -268,19 +268,19 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      new CPU.Label(".noTHIStoPop");
         //      new CPUx86.Popad();
         //      XS.INC(XSRegisters.EDX);
-        //      new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 4 };
+        //      XS.Add(XSRegisters.EAX, 4);
         //      new CPUx86.Jump { DestinationLabel = ".BEGIN_OF_LOOP" };
         //      new CPU.Label(".END_OF_INVOKE_");
         //      new CPU.Comment("get the return value");
         //      // TEMP!!!
-        //     // new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+        //     // XS.Add(XSRegisters.ESP, 4);
         //      // END OF TEMP!!
         //      //new CPUx86.Pop("eax");
         //      //Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
         //      //Ldfld.DoExecute(xAssembler, xMethodInfo.MethodBase.DeclaringType, "$$ReturnsValue$$");
         //      //XS.Pop(XSRegisters.EDX);
         //      //if(xMethodInfo.
-        //      //new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDX, SourceValue = 0 };
+        //      //XS.Compare(XSRegisters.EDX, 0);
         //      //new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".noReturn" };
         //      ////may have to expand the return... idk
         //      //new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceReg = CPUx86.Registers.EDX };

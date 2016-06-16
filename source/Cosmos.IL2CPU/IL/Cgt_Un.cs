@@ -152,7 +152,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			if (xStackItem.Size > 4)
         // 			{
         //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESI};
-        //                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESI, SourceValue = 1 };
+        //                 XS.Add(XSRegisters.ESI, 1);
         //                 new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI};
         // 				//esi = 1
         //                 XS.Pop(XSRegisters.EAX);
@@ -181,11 +181,11 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 XS.Jump(ConditionalTestEnum.Below, LabelTrue);
         //                 new CPUx86.Jump { DestinationLabel = LabelFalse };
         //                 XS.Label(LabelTrue);
-        //                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+        //                 XS.Add(XSRegisters.ESP, 4);
         //                 new CPUx86.Push { DestinationValue = 1 };
         //                 new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
         //                 XS.Label(LabelFalse);
-        //                 new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+        //                 XS.Add(XSRegisters.ESP, 4);
         //                 new CPUx86.Push { DestinationValue = 0 };
         //                 new CPUx86.Jump { DestinationLabel = NextInstructionLabel };
         // 			}

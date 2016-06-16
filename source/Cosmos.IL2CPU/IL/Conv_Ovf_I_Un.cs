@@ -83,7 +83,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		//                 }
 		//                 case 8: {
 		//                         XS.Pop(XSRegisters.EAX);
-		//                         new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+		//                         XS.Add(XSRegisters.ESP, 4);
 		//                     XS.Push(XSRegisters.EAX);
 		//                     //new CPUx86.Pop(CPUx86.Registers_Old.EAX);
 		//                     //new CPUx86.SignExtendAX(4);

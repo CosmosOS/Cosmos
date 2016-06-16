@@ -69,11 +69,7 @@ namespace Cosmos.IL2CPU.X86.IL
                             DestinationIsIndirect = true,
                             Size = 64
                         };
-                        new CPUx86.Add
-                        {
-                            SourceValue = 8,
-                            DestinationReg = RegistersEnum.ESP
-                        };
+                        XS.Add(XSRegisters.ESP, 8);
                         new FloatStoreAndPop
                         {
                             DestinationReg = RegistersEnum.ESP,

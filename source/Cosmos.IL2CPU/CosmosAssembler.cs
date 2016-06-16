@@ -318,18 +318,18 @@ namespace Cosmos.IL2CPU
             //new Comment(this, "BEGIN - SSE Init");
             //// CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
             //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-            //new Or { DestinationReg = Registers.EAX, SourceValue = 0x100 };
+            //XS.Or(XSRegisters.EAX, 0x100);
             //new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
             //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-            //new Or { DestinationReg = Registers.EAX, SourceValue = 0x200 };
+            //XS.Or(XSRegisters.EAX, 0x200);
             //new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
             //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
-            //new And { DestinationReg = Registers.EAX, SourceValue = 0xfffffffd };
+            //XS.And(XSRegisters.EAX, 0xfffffffd);
             //new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
             //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
 
-            //new And { DestinationReg = Registers.EAX, SourceValue = 1 };
+            //XS.And(XSRegisters.EAX, 1);
             //new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
             //new Comment(this, "END - SSE Init");
 

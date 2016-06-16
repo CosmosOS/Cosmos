@@ -34,11 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         Size = 64,
                         DestinationIsIndirect = true
                     };
-                    new CPUx86.Add
-                    {
-                        SourceValue = 8,
-                        DestinationReg = CPUx86.RegistersEnum.ESP
-                    };
+                    XS.Add(XSRegisters.ESP, 8);
                     new CPUx86.x87.FloatMul
                     {
                         DestinationReg = CPUx86.RegistersEnum.ESP,

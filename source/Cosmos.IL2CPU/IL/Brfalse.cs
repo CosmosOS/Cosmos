@@ -59,7 +59,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			} else
         // 			{
         //                 XS.Pop(XSRegisters.EAX);
-        //                 new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+        //                 XS.Compare(XSRegisters.EAX, 0);
         //                 XS.Jump(ConditionalTestEnum.Equal, TargetLabel);
         // 			}
         // 		}

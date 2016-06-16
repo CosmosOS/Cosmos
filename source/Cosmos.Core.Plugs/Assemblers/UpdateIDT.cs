@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using Cosmos.Assembler.x86.x87;
 using Cosmos.IL2CPU.Plugs;

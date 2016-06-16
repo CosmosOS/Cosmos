@@ -121,7 +121,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			// todo: throw an exception when the class does not support the cast!
         // 			string mReturnNullLabel = mThisLabel + "_ReturnNull";
         //             XS.Mov(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
-        //             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+        //             XS.Compare(XSRegisters.EAX, 0);
         //             XS.Jump(ConditionalTestEnum.Zero, mReturnNullLabel);
         //             new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
         // 			new CPUx86.Push{DestinationRef=Cosmos.Assembler.ElementReference.New(mTypeId), DestinationIsIndirect=true};
@@ -135,10 +135,10 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		    XS.Label(mThisLabel + "_After_IsInstance_Call");
         // 			Assembler.Stack.Pop();
         //             XS.Pop(XSRegisters.EAX);
-        //             new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
+        //             XS.Compare(XSRegisters.EAX, 0);
         //             XS.Jump(ConditionalTestEnum.NotEqual, mNextOpLabel);
         // 			XS.Label(mReturnNullLabel);
-        //             new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
+        //             XS.Add(XSRegisters.ESP, 4);
         //             var xAllocInfo = GetService<IMetaDataInfoService>().GetMethodInfo(GCImplementationRefs.AllocNewObjectRef,
         //                                                                               false);
         //             Newobj.Assemble(Assembler,
