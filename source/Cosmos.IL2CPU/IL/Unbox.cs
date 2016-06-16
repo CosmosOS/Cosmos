@@ -27,7 +27,7 @@ namespace Cosmos.IL2CPU.X86.IL
       uint xTypeSize = SizeOfType(xType.Value);
 
       XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
-      new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
+      XS.Jump(CPU.ConditionalTestEnum.Zero, mReturnNullLabel);
       XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
       new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true };
       new CPU.Push { DestinationRef = ElementReference.New(xTypeID), DestinationIsIndirect = true };
@@ -36,7 +36,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Label(xBaseLabel + "_After_IsInstance_Call");
       XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
       XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
-      new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
+      XS.Jump(CPU.ConditionalTestEnum.Equal, mReturnNullLabel);
       XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
       uint xSize = xTypeSize;
       if (xSize % 4 > 0)

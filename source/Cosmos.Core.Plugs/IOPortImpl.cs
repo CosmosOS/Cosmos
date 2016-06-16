@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,8 +21,8 @@ namespace Cosmos.Core.Plugs
                 //TODO: This is a lot of work to write to a single port.
                 // We need to have some kind of inline ASM option that can
                 // emit a single out instruction
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDX, SourceReg = CPUx86.RegistersEnum.EBP, SourceDisplacement = 0x0C, SourceIsIndirect = true };
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceDisplacement = 0x08, SourceIsIndirect = true };
+                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x0C);
+                XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 0x08);
                 XS.WriteToPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.AL));
             }
         }

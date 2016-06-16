@@ -31,13 +31,13 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
 
 			XS.Label(".StartLoop");
 			XS.Set(XSRegisters.DL, XSRegisters.ESI, sourceIsIndirect: true);
-            new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EDI, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.DL };
+            XS.Set(XSRegisters.EDI, XSRegisters.DL, destinationIsIndirect: true);
 			XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), 1);
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 1);
 			XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
             new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".EndLoop" };
-            new CPUx86.Jump { DestinationLabel = ".StartLoop" };
+            XS.Jump(".StartLoop");
 
 			XS.Label(".EndLoop");
 		}

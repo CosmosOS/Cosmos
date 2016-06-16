@@ -745,9 +745,9 @@ namespace XSharp.Compiler
       Do<Add>(register, valueToAdd);
     }
 
-    public static void Add(Register register, Register valueToAdd)
+    public static void Add(Register register, Register valueToAdd, bool destinationIsIndirect = false)
     {
-      Do<Add>(register, valueToAdd);
+      Do<Add>(register, valueToAdd, destinationIsIndirect: destinationIsIndirect);
     }
 
     public static void Sub(Register register, uint valueToAdd)
@@ -755,9 +755,9 @@ namespace XSharp.Compiler
       Do<Sub>(register, valueToAdd);
     }
 
-    public static void Sub(Register register, Register valueToAdd)
+    public static void Sub(Register register, Register valueToAdd, bool destinationIsIndirect = false)
     {
-      Do<Sub>(register, valueToAdd);
+      Do<Sub>(register, valueToAdd, destinationIsIndirect: destinationIsIndirect);
     }
 
     public static void SubWithCarry(Register register, uint valueToAdd)
@@ -775,9 +775,9 @@ namespace XSharp.Compiler
       Do<And>(register, value);
     }
 
-    public static void And(Register register, Register value)
+    public static void And(Register register, Register value, bool destinationIsIndirect = false)
     {
-      Do<And>(register, value);
+      Do<And>(register, value, destinationIsIndirect: destinationIsIndirect);
     }
 
     public static void Xor(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
@@ -1030,5 +1030,24 @@ namespace XSharp.Compiler
       Do<Or>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
     }
 
+    public static void SignExtendAX(RegisterSize size)
+    {
+      new SignExtendAX
+      {
+        Size = (byte)size
+      };
+    }
+
+    public static void Exchange(Register destination, Register source, bool destinationIsIndirect = false)
+    {
+      if (!destinationIsIndirect)
+      {
+        if (destination.Size != source.Size)
+        {
+          throw new InvalidOperationException("Register sizes don't match!");
+        }
+      }
+      Do<Xchg>(destination, source, destinationIsIndirect: destinationIsIndirect);
+    }
   }
 }

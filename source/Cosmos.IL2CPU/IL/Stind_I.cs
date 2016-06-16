@@ -85,9 +85,9 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			if (xStorageSize < 4) {
         // 				xStorageSize = 4;
         // 			}
-        //             new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = xStorageSize };
+        //             XS.Mov(XSRegisters.EBX, XSRegisters.ESP, sourceDisplacement: xStorageSize);
         // 			for (int i = 0; i < (aSize / 4); i++) {
-        //                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = i * 4 };
+        //                 XS.Mov(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: i * 4);
         //                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
         // 			}
         // 			switch (aSize % 4) {

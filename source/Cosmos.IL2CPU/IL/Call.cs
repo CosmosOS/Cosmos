@@ -120,7 +120,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 XS.Sub(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), (uint)xExtraStackSize);
             }
-            new CPUx86.Call { DestinationLabel = xNormalAddress };
+            XS.Call(xNormalAddress);
 
             uint xReturnSize = 0;
             if (xMethodInfo != null)

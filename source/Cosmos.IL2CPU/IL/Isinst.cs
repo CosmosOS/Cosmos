@@ -28,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
             XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
 
             XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
-            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
+            XS.Jump(CPUx86.ConditionalTestEnum.Zero, mReturnNullLabel);
 
             // EAX contains a memory handle now. Lets convert it to a pointer
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
@@ -44,7 +44,7 @@ namespace Cosmos.IL2CPU.X86.IL
             new Label( GetLabel( aMethod, aOpCode ) + "_After_IsInstance_Call" );
             XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
             XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
-            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
+            XS.Jump(CPUx86.ConditionalTestEnum.Equal, mReturnNullLabel);
             // push nothing now, as we should return the object instance pointer.
             new CPUx86.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
             XS.Label(mReturnNullLabel );

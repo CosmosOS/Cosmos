@@ -95,20 +95,20 @@ namespace Cosmos.IL2CPU.X86.IL
                 switch (xFieldInfo.Size)
                 {
                     case 1:
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AL, SourceReg = CPUx86.RegistersEnum.ESP, SourceDisplacement = xOffset, SourceIsIndirect = true };
+                        XS.Set(XSRegisters.AL, XSRegisters.ESP, sourceDisplacement: xOffset);
                         break;
 
                     case 2:
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.AX, SourceReg = CPUx86.RegistersEnum.ESP, SourceDisplacement = xOffset, SourceIsIndirect = true };
+                        XS.Set(XSRegisters.AX, XSRegisters.ESP, sourceDisplacement: xOffset);
                         break;
 
                     case 3: //For Release
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceDisplacement = xOffset, SourceIsIndirect = true };
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: xOffset);
                         XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 8);
                         break;
 
                     case 4:
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ESP, SourceDisplacement = xOffset, SourceIsIndirect = true };
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: xOffset);
                         break;
 
                     default:
@@ -171,7 +171,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         break;
                     }
                 default:
-                    throw new Exception(string.Format("Remainder size {0:D} {1:D} not supported!", xFieldInfo.FieldType.ToString(), xSize));
+                    throw new Exception(string.Format("Remainder size {0} {1:D} not supported!", xFieldInfo.FieldType.ToString(), xSize));
             }
         }
     }

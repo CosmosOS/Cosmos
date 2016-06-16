@@ -34,11 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         Size = 64,
                         DestinationIsIndirect = true
                     };
-                    new CPUx86.Add
-                    {
-                        SourceValue = 8,
-                        DestinationReg = CPUx86.RegistersEnum.ESP
-                    };
+                    XS.Add(XSRegisters.ESP, 8);
                     new CPUx86.x87.FloatMul
                     {
                         DestinationReg = CPUx86.RegistersEnum.ESP,
@@ -74,11 +70,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     //mov RIGHT_HIGH to eax, is useable on Full 64 multiply
                     XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 4);
                     XS.Or(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 12);
-                    new CPUx86.ConditionalJump
-                    {
-                        Condition = CPUx86.ConditionalTestEnum.Zero,
-                        DestinationLabel = Simple32Multiply
-                    };
+                    XS.Jump(CPUx86.ConditionalTestEnum.Zero, Simple32Multiply);
                     // Full 64 Multiply
 
                     // copy again, or could change EAX
@@ -104,10 +96,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     // add LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH to high dword of last result
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
 
-                    new CPUx86.Jump
-                    {
-                        DestinationLabel = MoveReturnValue
-                    };
+                    XS.Jump(MoveReturnValue);
 
                     XS.Label(Simple32Multiply);
                     //mov RIGHT_LOW to eax
@@ -144,12 +133,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
                     XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                     XS.SSE.MulSS(XSRegisters.XMM0, XSRegisters.XMM1);
-                    new MoveSS
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.ESP,
-                        DestinationIsIndirect = true,
-                        SourceReg = CPUx86.RegistersEnum.XMM1
-                    };
+                    XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                 }
                 else
                 {

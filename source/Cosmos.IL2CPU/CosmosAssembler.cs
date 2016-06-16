@@ -305,49 +305,43 @@ namespace Cosmos.IL2CPU
             CreateIDT();
 #if LFB_1024_8
             new Comment("Set graphics fields");
-            new Move { DestinationReg = Registers.EBX, SourceRef = Cosmos.Assembler.ElementReference.New("MultiBootInfo_Structure"), SourceIsIndirect = true };
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 72 };
+            XS.Mov(XSRegisters.EBX, Cosmos.Assembler.ElementReference.New("MultiBootInfo_Structure"), sourceIsIndirect: true);
+            XS.Mov(XSRegisters.EAX, XSRegisters.EBX, sourceDisplacement: 72);
             new Move { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeControlInfoAddr"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 76 };
+            XS.Mov(XSRegisters.EAX, XSRegisters.EBX, sourceDisplacement: 76);
             new Move { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeModeInfoAddr"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
-            new Move { DestinationReg = Registers.EAX, SourceReg = Registers.EBX, SourceIsIndirect = true, SourceDisplacement = 80 };
+            XS.Mov(XSRegisters.EAX, XSRegisters.EBX, sourceDisplacement: 80);
             new Move { DestinationRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeMode"), DestinationIsIndirect = true, SourceReg = Registers.EAX };
 #endif
 
             //WriteDebugVideo("Initializing SSE.");
             //new Comment(this, "BEGIN - SSE Init");
             //// CR4[bit 9]=1, CR4[bit 10]=1, CR0[bit 2]=0, CR0[bit 1]=1
-            //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-            //new Or { DestinationReg = Registers.EAX, SourceValue = 0x100 };
-            //new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
-            //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR4 };
-            //new Or { DestinationReg = Registers.EAX, SourceValue = 0x200 };
-            //new Mov { DestinationReg = Registers.CR4, SourceReg = Registers.EAX };
-            //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
+            //XS.Mov(XSRegisters.EAX, XSRegisters.Registers.CR4);
+            //XS.Or(XSRegisters.EAX, 0x100);
+            //XS.Mov(XSRegisters.CR4, XSRegisters.Registers.EAX);
+            //XS.Mov(XSRegisters.EAX, XSRegisters.Registers.CR4);
+            //XS.Or(XSRegisters.EAX, 0x200);
+            //XS.Mov(XSRegisters.CR4, XSRegisters.Registers.EAX);
+            //XS.Mov(XSRegisters.EAX, XSRegisters.Registers.CR0);
 
-            //new And { DestinationReg = Registers.EAX, SourceValue = 0xfffffffd };
-            //new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
-            //new Mov { DestinationReg = Registers.EAX, SourceReg = Registers.CR0 };
+            //XS.And(XSRegisters.EAX, 0xfffffffd);
+            //XS.Mov(XSRegisters.CR0, XSRegisters.Registers.EAX);
+            //XS.Mov(XSRegisters.EAX, XSRegisters.Registers.CR0);
 
-            //new And { DestinationReg = Registers.EAX, SourceValue = 1 };
-            //new Mov { DestinationReg = Registers.CR0, SourceReg = Registers.EAX };
+            //XS.And(XSRegisters.EAX, 1);
+            //XS.Mov(XSRegisters.CR0, XSRegisters.Registers.EAX);
             //new Comment(this, "END - SSE Init");
 
             if (mComPort > 0)
             {
                 WriteDebugVideo("Initializing DebugStub.");
-                new Call
-                {
-                    DestinationLabel = "DebugStub_Init"
-                };
+                XS.Call("DebugStub_Init");
             }
 
             // Jump to Kernel entry point
             WriteDebugVideo("Jumping to kernel.");
-            new Call
-            {
-                DestinationLabel = EntryPointName
-            };
+            XS.Call(EntryPointName);
 
             new Comment(this, "Kernel done - loop till next IRQ");
             XS.Label(".loop");

@@ -1,4 +1,4 @@
-﻿using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs;
 using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
