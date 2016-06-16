@@ -80,7 +80,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				XS.Pop(XSRegisters.ECX); // shift amount
 				// [ESP] is high part
 				// [ESP + 4] is low part
-				new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+				XS.Mov(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 4);
 				// shift low part
 				new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX, ArgumentReg = CPUx86.Registers.CL };
 				// shift high part
