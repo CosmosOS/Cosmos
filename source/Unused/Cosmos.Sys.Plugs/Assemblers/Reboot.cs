@@ -15,10 +15,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
           XS.Mov(XSRegisters.DX, 0x64);
           XS.InFromDX(XSRegisters.AL);
           XS.Test(XSRegisters.AL, 2);
-          new CPUx86.ConditionalJump {
-            Condition = CPUx86.ConditionalTestEnum.NotEqual,
-            DestinationLabel = ".waitBuffer"
-          };
+          XS.Jump(ConditionalTestEnum.NotEqual, ".waitBuffer");
           XS.Mov(XSRegisters.AL, 0xD1);
           XS.Mov(XSRegisters.DX, 0x64);
           XS.OutToDX(XSRegisters.AL);
@@ -26,10 +23,7 @@ namespace Cosmos.Sys.Plugs.Assemblers
           XS.Mov(XSRegisters.DX, 0x64);
           XS.InFromDX(XSRegisters.AL);
           XS.Test(XSRegisters.AL, 2);
-          new CPUx86.ConditionalJump {
-            Condition = CPUx86.ConditionalTestEnum.NotEqual,
-            DestinationLabel = ".clearBuffer"
-          };
+          XS.Jump(ConditionalTestEnum.NotEqual, ".clearBuffer");
           XS.Mov(XSRegisters.AL, 0xFE);
           XS.Mov(XSRegisters.DX, 0x60);
           XS.OutToDX(XSRegisters.AL);

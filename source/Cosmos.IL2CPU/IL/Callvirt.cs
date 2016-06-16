@@ -155,7 +155,7 @@ namespace Cosmos.IL2CPU.X86.IL
                * ECX contains the method to call
                * EAX contains the type pointer (not the handle!!)
                */
-                    new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = xCurrentMethodLabel + ".NotBoxedThis" };
+                    XS.Jump(ConditionalTestEnum.NotEqual, xCurrentMethodLabel + ".NotBoxedThis");
 
                     /*
                * On the stack now:

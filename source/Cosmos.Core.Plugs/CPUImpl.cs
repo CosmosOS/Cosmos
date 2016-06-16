@@ -47,11 +47,11 @@ namespace Cosmos.Core.Plugs {
 				// set EAX to value of fill (zero)
 				XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
 				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1);
-				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotBelow, DestinationLabel = ".step2" };
+				XS.Jump(ConditionalTestEnum.NotBelow, ".step2");
 				XS.StoreByteInString();
 				new CPUAll.Label(".step2");
 				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1);
-				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotBelow, DestinationLabel = ".step3" };
+				XS.Jump(ConditionalTestEnum.NotBelow, ".step3");
 				XS.StoreWordInString();
 				new CPUAll.Label(".step3");
 				new CPUx86.Stos { Size = 32, Prefixes = CPUx86.InstructionPrefixes.Repeat };

@@ -394,13 +394,13 @@ namespace Cosmos.IL2CPU {
           XS.Jump(CPU.ConditionalTestEnum.Equal, aJumpTargetNoException);
           aCleanup();
           if (xJumpTo == null) {
-            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException };
+            XS.Jump(ConditionalTestEnum.NotEqual, GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException);
           } else {
             XS.Jump(CPU.ConditionalTestEnum.NotEqual, xJumpTo);
           }
         } else {
           if (xJumpTo == null) {
-            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException };
+            XS.Jump(ConditionalTestEnum.NotEqual, GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException);
           } else {
             XS.Jump(CPU.ConditionalTestEnum.NotEqual, xJumpTo);
           }
@@ -430,7 +430,7 @@ namespace Cosmos.IL2CPU {
       if (debugEnabled)
       {
         new CPU.Compare {DestinationReg = CPU.RegistersEnum.ESP, DestinationDisplacement = (int) stackOffsetToCheck, DestinationIsIndirect = true, SourceValue = 0};
-        new CPU.ConditionalJump {DestinationLabel = ".AfterNullCheck", Condition = CPU.ConditionalTestEnum.NotEqual};
+        XS.Jump(ConditionalTestEnum.NotEqual, ".AfterNullCheck");
         XS.ClearInterruptFlag();
         // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
         XS.Call(".NullCheck_GetCurrAddress");

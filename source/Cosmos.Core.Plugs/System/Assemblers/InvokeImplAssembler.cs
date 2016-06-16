@@ -65,7 +65,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             XS.Label(".BEGIN_OF_LOOP");
             {
                 XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));//are we at the end of this list
-                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.GreaterThanOrEqualTo, DestinationLabel = ".END_OF_INVOKE_" };//then we better stop
+                XS.Jump(ConditionalTestEnum.GreaterThanOrEqualTo, ".END_OF_INVOKE_");//then we better stop
                 XS.PushAllRegisters();
                 XS.Comment("esi points to where we will copy the methods argumetns from");
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP));
@@ -75,7 +75,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
                 XS.Comment("edi = ptr to delegate object should be a pointer to the delgates context ie (this) for the methods ");
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target"));
                 XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 0);
-                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".NO_THIS" };
+                XS.Jump(ConditionalTestEnum.Zero, ".NO_THIS");
                 XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI));
 
                 XS.Label(".NO_THIS");
@@ -123,7 +123,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true); // dereference handle
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), sourceDisplacement: Ldfld.GetFieldOffset(xMethodInfo.MethodBase.DeclaringType, "$$ReturnsValue$$"));
             XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), 0);
-            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".noReturn" };
+            XS.Jump(ConditionalTestEnum.Equal, ".noReturn");
             //may have to expand the return... idk
             new CPUx86.Xchg { DestinationReg = CPUx86.RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceReg = CPUx86.RegistersEnum.EDX };
             new CPUx86.Xchg { DestinationReg = CPUx86.RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.RegistersEnum.EDX };
@@ -197,7 +197,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      ;//make sure edx is 0
         //      new CPU.Label(".BEGIN_OF_LOOP");
         //      XS.Compare(XSRegisters.EDX, XSRegisters.CPUx86.Registers.EBX);//are we at the end of this list
-        //      new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".END_OF_INVOKE_" };//then we better stop
+        //      XS.Jump(ConditionalTestEnum.Equal, ".END_OF_INVOKE_");//then we better stop
         //      //new CPUx86.Compare("edx", 0);
         //      //new CPUx86.JumpIfLessOrEqual(".noreturnYet");
         //      //new CPUx86.Add("esp", 4);
@@ -214,7 +214,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      XS.Pop(XSRegisters.EDI);
         //      XS.Popad();
         //      XS.Compare(XSRegisters.EDI, 0);
-        //      new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".NO_THIS" };
+        //      XS.Jump(ConditionalTestEnum.Zero, ".NO_THIS");
         //      XS.Push(XSRegisters.EDI);
 
         //      new CPU.Label(".NO_THIS");
@@ -281,7 +281,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      //XS.Pop(XSRegisters.EDX);
         //      //if(xMethodInfo.
         //      //XS.Compare(XSRegisters.EDX, 0);
-        //      //new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".noReturn" };
+        //      //XS.Jump(ConditionalTestEnum.Equal, ".noReturn");
         //      ////may have to expand the return... idk
         //      //new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 8, SourceReg = CPUx86.Registers.EDX };
         //      //new CPUx86.Xchg { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EDX };
