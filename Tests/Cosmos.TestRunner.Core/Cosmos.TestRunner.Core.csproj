@@ -173,6 +173,10 @@
       <Project>{31e3f8e2-7cc0-426c-accb-77b3319af5d3}</Project>
       <Name>Cosmos.Compiler.Tests.Bcl</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj">
+      <Project>{48ebdeb2-6a6a-4df2-b5f1-db6d299401f2}</Project>
+      <Name>Cosmos.Compiler.Tests.Encryption</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj">
       <Project>{9df5c0a9-b91c-4647-b939-e47513743a0c}</Project>
       <Name>Cosmos.Compiler.Tests.Exceptions</Name>
