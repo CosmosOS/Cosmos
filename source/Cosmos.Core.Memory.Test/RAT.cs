@@ -72,6 +72,8 @@ namespace Cosmos.Core.Memory.Test {
       for (byte* p = mRAT + xRatPageBytes - xRatPageCount; p < mRAT + xRatPageBytes; p++) {
         *p = PageType.RAT;
       }
+
+      Heap.Init();
     }
 
     static public Native GetPageCount(byte aType = 0) {
@@ -94,7 +96,7 @@ namespace Cosmos.Core.Memory.Test {
       return xResult;
     }
 
-    static public byte* Alloc(byte aType, Native aPageCount = 1) {
+    static public void* Alloc(byte aType, Native aPageCount = 1) {
       byte* xPos = null;
 
       // Could combine with an external method or delegate, but will slow things down

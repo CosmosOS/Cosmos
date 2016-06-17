@@ -8,9 +8,14 @@ using Native = System.UInt32;
 namespace Cosmos.Core.Memory.Test {
 
   unsafe static public class Heap {
+    static public void Init() {
+      HeapSmall.Init();
+      HeapMedium.Init();
+      HeapLarge.Init();
+    }
 
     static public byte* Alloc(Native aSize) {
-      if (aSize <= HeapSmall.MaxItemSize) {
+      if (aSize <= HeapSmall.mMaxItemSize) {
         return HeapSmall.Alloc(aSize);
       } else if (aSize <= HeapMedium.MaxItemSize) {
         return HeapMedium.Alloc(aSize);

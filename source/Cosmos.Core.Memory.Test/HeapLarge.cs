@@ -9,6 +9,9 @@ namespace Cosmos.Core.Memory.Test {
   unsafe static public class HeapLarge {
     public const Native PrefixBytes = 4 * sizeof(Native);
 
+    static public void Init() {
+    }
+
     static public byte* Alloc(Native aSize) {
       Native xPages = (Native)((aSize + PrefixBytes) / RAT.PageSize) + 1;
       var xPtr = (Native*)RAT.Alloc(RAT.PageType.HeapLarge, xPages);
