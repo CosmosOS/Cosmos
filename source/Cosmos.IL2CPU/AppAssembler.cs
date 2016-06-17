@@ -1508,7 +1508,7 @@ namespace Cosmos.IL2CPU
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 XS.Call("DebugStub_SendStackCorruptionOccurred");
                 XS.Halt();
-                new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
+                XS.Label(xLabel + ".StackCorruptionCheck_End");
 
             }
         }

@@ -1,4 +1,4 @@
-﻿namespace Cosmos.Debug.GDB {
+namespace Cosmos.Debug.GDB {
     partial class WatchUC {
         /// <summary> 
         /// Required designer variable.
@@ -23,10 +23,10 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-			this.lablAddress = new System.Windows.Forms.Label();
+			this.lablAddress = XS.Label();
 			this.cboxEnabled = new System.Windows.Forms.CheckBox();
 			this.lablValue = new System.Windows.Forms.TextBox();
-			this.lablDelete = new System.Windows.Forms.Label();
+			this.lablDelete = XS.Label();
 			this.SuspendLayout();
 			// 
 			// lablAddress

@@ -1,4 +1,4 @@
-﻿namespace Cosmos.Debug.GDB {
+namespace Cosmos.Debug.GDB {
     partial class BreakpointUC {
         /// <summary> 
         /// Required designer variable.
@@ -23,10 +23,10 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.lablNum = new System.Windows.Forms.Label();
+            this.lablNum = XS.Label();
             this.cboxEnabled = new System.Windows.Forms.CheckBox();
-            this.lablName = new System.Windows.Forms.Label();
-            this.lablDelete = new System.Windows.Forms.Label();
+            this.lablName = XS.Label();
+            this.lablDelete = XS.Label();
             this.SuspendLayout();
             // 
             // lablNum

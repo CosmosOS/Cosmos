@@ -1,4 +1,4 @@
-﻿namespace Cosmos.Debug.GDB {
+namespace Cosmos.Debug.GDB {
     partial class FormLog {
         /// <summary>
         /// Required designer variable.
@@ -30,7 +30,7 @@
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.butnSendCmd = new System.Windows.Forms.Button();
 			this.textSendCmd = new System.Windows.Forms.TextBox();
-			this.label1 = new System.Windows.Forms.Label();
+			this.label1 = XS.Label();
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.lboxDebug = new System.Windows.Forms.ListBox();
 			this.lboxCmd = new System.Windows.Forms.ListBox();

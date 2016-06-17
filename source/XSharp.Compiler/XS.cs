@@ -1214,5 +1214,14 @@ namespace XSharp.Compiler
         ArgumentReg = argumentReg
       };
     }
+
+    public static void JumpToSegment(ushort segment, string targetLabel)
+    {
+      new JumpToSegment
+      {
+        Segment = segment,
+        DestinationLabel = targetLabel
+      };
+    }
   }
 }

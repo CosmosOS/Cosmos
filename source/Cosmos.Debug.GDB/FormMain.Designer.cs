@@ -1,4 +1,4 @@
-﻿namespace Cosmos.Debug.GDB {
+namespace Cosmos.Debug.GDB {
     partial class FormMain {
         /// <summary>
         /// Required designer variable.
@@ -27,8 +27,8 @@
 			this.panel1 = new System.Windows.Forms.Panel();
 			this.butnBreak = new System.Windows.Forms.Button();
 			this.butnBreakpoints = new System.Windows.Forms.Button();
-			this.lablRunning = new System.Windows.Forms.Label();
-			this.lablConnected = new System.Windows.Forms.Label();
+			this.lablRunning = XS.Label();
+			this.lablConnected = XS.Label();
 			this.butnContinue = new System.Windows.Forms.Button();
 			this.butnConnect = new System.Windows.Forms.Button();
 			this.menuMain = new System.Windows.Forms.MenuStrip();
@@ -54,7 +54,7 @@
 			this.mitmWindowsToForeground = new System.Windows.Forms.ToolStripMenuItem();
 			this.panel4 = new System.Windows.Forms.Panel();
 			this.textCurrentFunction = new System.Windows.Forms.TextBox();
-			this.label5 = new System.Windows.Forms.Label();
+			this.label5 = XS.Label();
 			this.lboxDisassemble = new Cosmos.Debug.GDB.ToolTipListBox();
 			this.menuDisassembly = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.mitemDisassemblyAddBreakpoint = new System.Windows.Forms.ToolStripMenuItem();

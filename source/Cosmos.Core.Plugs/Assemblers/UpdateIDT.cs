@@ -108,7 +108,7 @@ namespace Cosmos.Core.Plugs
             var xInterruptsWithParam = new int[] { 8, 10, 11, 12, 13, 14 };
             for (int j = 0; j < 256; j++)
             {
-                new CPUAll.Label("__ISR_Handler_" + j.ToString("X2"));
+                XS.Label("__ISR_Handler_" + j.ToString("X2"));
                 XS.Call("__INTERRUPT_OCCURRED__");
 
                 if (Array.IndexOf(xInterruptsWithParam, j) == -1)
@@ -129,11 +129,9 @@ namespace Cosmos.Core.Plugs
 
                 XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); //
                 XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
-                                                                           //new CPUx86.Move("eax",
-                                                                           //                "esp");
-                                                                           //new CPUx86.Push("eax");
-                new CPUx86.JumpToSegment { Segment = 8, DestinationLabel = "__ISR_Handler_" + j.ToString("X2") + "_SetCS" };
-                new CPUAll.Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
+
+                XS.JumpToSegment(8, "__ISR_Handler_" + j.ToString("X2") + "_SetCS");
+                XS.Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 MethodBase xHandler = GetInterruptHandler((byte)j);
                 if (xHandler == null)
                 {
@@ -152,9 +150,9 @@ namespace Cosmos.Core.Plugs
                 new CPUAll.Label("__ISR_Handler_" + j.ToString("X2") + "_END");
                 XS.InterruptReturn();
             }
-            new CPUAll.Label("__INTERRUPT_OCCURRED__");
+            XS.Label("__INTERRUPT_OCCURRED__");
             XS.Return();
-            new CPUAll.Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
+            XS.Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
             XS.Noop();
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 8);
             XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
@@ -167,7 +165,7 @@ namespace Cosmos.Core.Plugs
             // Reenable interrupts
             XS.EnableInterrupts();
 
-            new CPUAll.Label(".__AFTER_ENABLE_INTERRUPTS");
+            XS.Label(".__AFTER_ENABLE_INTERRUPTS");
         }
     }
 }

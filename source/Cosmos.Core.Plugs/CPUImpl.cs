@@ -49,11 +49,11 @@ namespace Cosmos.Core.Plugs {
 				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1);
 				XS.Jump(CPUx86.ConditionalTestEnum.NotBelow, ".step2");
 				XS.StoreByteInString();
-				new CPUAll.Label(".step2");
+				XS.Label(".step2");
 				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1);
 				XS.Jump(CPUx86.ConditionalTestEnum.NotBelow, ".step3");
 				XS.StoreWordInString();
-				new CPUAll.Label(".step3");
+				XS.Label(".step3");
 				new CPUx86.Stos { Size = 32, Prefixes = CPUx86.InstructionPrefixes.Repeat };
 			}
 		}
