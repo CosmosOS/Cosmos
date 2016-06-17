@@ -160,7 +160,7 @@ namespace Cosmos.Core.Plugs
 
             // reload interrupt list
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), "_NATIVE_IDT_Pointer");
-            new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("static_field__Cosmos_Core_CPU_mInterruptsEnabled"), DestinationIsIndirect = true, SourceValue = 1 };
+            XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true);
             XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
             // Reenable interrupts
             XS.EnableInterrupts();
