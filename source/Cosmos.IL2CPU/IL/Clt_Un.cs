@@ -75,7 +75,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
                     new CompareSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.XMM0, pseudoOpcode = (byte)ComparePseudoOpcodes.LessThan };
                     XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
-                    new CPUx86.And { DestinationReg = RegistersEnum.ESP, DestinationIsIndirect = true, SourceValue = 1 };
+                    XS.And(XSRegisters.ESP, 1, destinationIsIndirect: true);
                 }
                 else
                 {

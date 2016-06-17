@@ -203,10 +203,12 @@ namespace XSharp.Compiler
       {
         if (destinationIsIndirect)
         {
-          throw new Exception("No size specified!");
+          size = RegisterSize.Int32;
         }
-
-        size = destination.Size;
+        else
+        {
+          size = destination.Size;
+        }
       }
 
       new T
@@ -766,7 +768,7 @@ namespace XSharp.Compiler
       Do<SubWithCarry>(register, valueToAdd, destinationDisplacement: destinationDisplacement, destinationIsIndirect: destinationIsIndirect);
     }
 
-    public static void And(Register register, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
+    public static void And(Register register, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize size = RegisterSize.Int32)
     {
       Do<And>(register, value, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
     }

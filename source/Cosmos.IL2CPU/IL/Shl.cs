@@ -61,7 +61,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				XS.ShiftLeft(EAX, CL);
 				XS.Set(ESP, EAX, destinationDisplacement: 4);
 				// replace unknown low part with a zero, if <= 32
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceValue = 0 };
+				XS.Set(XSRegisters.ESP, 0, destinationIsIndirect: true);
 
 				XS.Label(End_Shl);
 			}
