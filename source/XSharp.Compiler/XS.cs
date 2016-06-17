@@ -1146,5 +1146,73 @@ namespace XSharp.Compiler
     {
       Do<RotateThroughCarryRight>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size: size);
     }
+
+    public static void ShiftRightDouble(Register destination, Register source, uint argumentValue)
+    {
+      new ShiftRightDouble()
+      {
+        DestinationReg = destination,
+        SourceReg = source,
+        ArgumentValue = argumentValue
+      };
+    }
+
+    public static void ShiftRightDouble(Register destination, Register source, Register8 argumentReg, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    {
+      if (argumentReg != CL)
+      {
+        throw new InvalidOperationException("Argument needs to be CL!");
+      }
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      new ShiftLeftDouble()
+      {
+        DestinationReg = destination,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceReg = source,
+        ArgumentReg = argumentReg
+      };
+    }
+
+    public static void ShiftLeftDouble(Register destination, Register source, uint argumentValue)
+    {
+      new ShiftRightDouble()
+      {
+        DestinationReg = destination,
+        SourceReg = source,
+        ArgumentValue = argumentValue
+      };
+    }
+
+    public static void ShiftLeftDouble(Register destination, Register source, Register8 argumentReg, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    {
+      if (argumentReg != CL)
+      {
+        throw new InvalidOperationException("Argument needs to be CL!");
+      }
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      new ShiftLeftDouble()
+      {
+        DestinationReg = destination,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceReg = source,
+        ArgumentReg = argumentReg
+      };
+    }
   }
 }

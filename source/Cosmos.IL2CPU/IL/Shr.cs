@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				XS.Jump(CPU.ConditionalTestEnum.AboveOrEqual, HighPartIsZero);
 
 				// shift lower part
-				new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX, ArgumentReg = CPUx86.RegistersEnum.CL };
+        XS.ShiftRightDouble(ESP, EAX, CL, destinationIsIndirect: true);
 				// shift higher part
 				XS.ShiftRight(ESP, CL, destinationDisplacement: 4, size: RegisterSize.Int32);
 				XS.Jump(End_Shr);
