@@ -44,7 +44,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				// move low part to eax
 				XS.Set(EAX, ESP, sourceIsIndirect: true);
 
-				new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 32, Size = 8 };
+				XS.Compare(XSRegisters.CL, 32, size: RegisterSize.Byte8);
 				XS.Jump(CPUx86.ConditionalTestEnum.AboveOrEqual, LowPartIsZero);
 
 				// shift higher part
@@ -56,7 +56,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 				XS.Label(LowPartIsZero);
 				// remove bits >= 32, so that CL max value could be only 31
-				new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 0x1f, Size = 8 };
+				XS.And(XSRegisters.CL, 0x1f, size: RegisterSize.Byte8);
 				// shift low part in EAX and move it in high part
 				new CPUx86.ShiftLeft { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.CL, Size = 32};
 				XS.Set(ESP, EAX, destinationDisplacement: 4);
