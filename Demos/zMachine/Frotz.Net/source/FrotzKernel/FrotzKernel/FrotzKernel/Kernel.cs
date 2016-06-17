@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using Sys = Cosmos.System;
 using System.IO;
+using zConsole;
+
 namespace FrotzKernel
 {
     public class Kernel : Sys.Kernel
@@ -28,8 +30,8 @@ namespace FrotzKernel
              * loads the file, and interprets it as a Z-Machine game.
              * If something bad happens, the exception is written to the
              * console and the user is told to specify a path again.
-             */ 
-            
+             */
+
             Console.WriteLine("Specify game path:");
             string fName = null;
             try
@@ -44,7 +46,7 @@ namespace FrotzKernel
                 }
                 else
                 {
-                    var screen = new zConsole.ZConsoleScreen(fName);
+                    var screen = new ZConsoleScreen(fName);
                 }
             }
             catch(Exception ex)
