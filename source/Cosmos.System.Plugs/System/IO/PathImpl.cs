@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 
 using System;
 using System.IO;
@@ -109,6 +109,8 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetExtension(string aPath)
         {
+            Global.mFileSystemDebugger.SendInternal("Path.GetExtension");
+
             if (aPath == null)
             {
                 return null;
@@ -117,6 +119,7 @@ namespace Cosmos.System.Plugs.System.IO
             CheckInvalidPathChars(aPath);
             int xLength = aPath.Length;
             int xNum = xLength;
+
             while (--xNum >= 0)
             {
                 char xC = aPath[xNum];
@@ -124,7 +127,7 @@ namespace Cosmos.System.Plugs.System.IO
                 {
                     if (xNum != xLength - 1)
                     {
-                        return aPath.Substring(xNum + 1, xLength - xNum);
+                        return aPath.Substring(xNum, xLength - xNum);
                     }
 
                     return string.Empty;
