@@ -47,9 +47,9 @@ namespace Cosmos.IL2CPU.X86.IL
 							XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
 						}
 
-                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                        XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
-                        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.EAX);
+                        XS.Add(XSRegisters.ESP, 4);
+                        XS.Push(XSRegisters.EAX);
                         break;
 
                     }

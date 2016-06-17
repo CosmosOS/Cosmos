@@ -47,33 +47,33 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // compair LEFT_HIGH, RIGHT_HIGH , on zero only simple multiply is used
         //mov RIGHT_HIGH to eax, is useable on Full 64 multiply
-        XS.Set(OldToNewRegister(RegistersEnum.EAX), OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
-        XS.Or(OldToNewRegister(RegistersEnum.EAX), OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 12);
+        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 4);
+        XS.Or(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 12);
         XS.Jump(ConditionalTestEnum.Zero, Simple32Multiply);
         // Full 64 Multiply
 
         // copy again, or could change EAX
         //TODO is there an opcode that does OR without change EAX?
-        XS.Set(OldToNewRegister(RegistersEnum.EAX), OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
+        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 4);
         // eax contains already RIGHT_HIGH
         // multiply with LEFT_LOW
-        XS.Multiply(OldToNewRegister(RegistersEnum.ESP), displacement: 8);
+        XS.Multiply(XSRegisters.ESP, displacement: 8);
         // save result of LEFT_LOW * RIGHT_HIGH
-        XS.Set(OldToNewRegister(RegistersEnum.ECX), OldToNewRegister(RegistersEnum.EAX));
+        XS.Set(XSRegisters.ECX, XSRegisters.EAX);
 
         //mov RIGHT_LOW to eax
         XS.Set(EAX, ESP, sourceIsIndirect: true);
         // multiply with LEFT_HIGH
-        XS.Multiply(OldToNewRegister(RegistersEnum.ESP), displacement: 12);
+        XS.Multiply(XSRegisters.ESP, displacement: 12);
         // add result of LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH
-        XS.Add(OldToNewRegister(RegistersEnum.ECX), OldToNewRegister(RegistersEnum.EAX));
+        XS.Add(XSRegisters.ECX, XSRegisters.EAX);
 
         //mov RIGHT_LOW to eax
         XS.Set(EAX, ESP, sourceIsIndirect: true);
         // multiply with LEFT_LOW
-        XS.Multiply(OldToNewRegister(RegistersEnum.ESP), displacement: 8);
+        XS.Multiply(XSRegisters.ESP, displacement: 8);
         // add LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH to high dword of last result
-        XS.Add(OldToNewRegister(RegistersEnum.EDX), OldToNewRegister(RegistersEnum.ECX));
+        XS.Add(XSRegisters.EDX, XSRegisters.ECX);
 
         XS.Jump(MoveReturnValue);
 
@@ -81,7 +81,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //mov RIGHT_LOW to eax
         XS.Set(EAX, ESP, sourceIsIndirect: true);
         // multiply with LEFT_LOW
-        XS.Multiply(OldToNewRegister(RegistersEnum.ESP), displacement: 8);
+        XS.Multiply(XSRegisters.ESP, displacement: 8);
 
         XS.Label(MoveReturnValue);
         // move high result to left high
@@ -89,14 +89,14 @@ namespace Cosmos.IL2CPU.X86.IL
         // move low result to left low
         XS.Set(ESP, EAX, destinationDisplacement: 8);
         // pop right 64 value
-        XS.Add(OldToNewRegister(RegistersEnum.ESP), 8);
+        XS.Add(XSRegisters.ESP, 8);
       }
       else
       {
-        XS.Pop(OldToNewRegister(RegistersEnum.EAX));
+        XS.Pop(XSRegisters.EAX);
         XS.Multiply(ESP, isIndirect: true, size: RegisterSize.Int32);
-        XS.Add(OldToNewRegister(RegistersEnum.ESP), 4);
-        XS.Push(OldToNewRegister(RegistersEnum.EAX));
+        XS.Add(XSRegisters.ESP, 4);
+        XS.Push(XSRegisters.EAX);
       }
     }
   }

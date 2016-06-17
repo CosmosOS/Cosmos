@@ -33,9 +33,9 @@ namespace Cosmos.IL2CPU.X86.IL
             string LabelFalse = BaseLabel + "False";
             if( xStackItemSize > 4 )
             {
-				XS.Set(OldToNewRegister(RegistersEnum.ESI), 1);
+				XS.Set(XSRegisters.ESI, 1);
 				// esi = 1
-				XS.Xor(OldToNewRegister(RegistersEnum.EDI), OldToNewRegister(RegistersEnum.EDI));
+				XS.Xor(XSRegisters.EDI, XSRegisters.EDI);
 				// edi = 0
 				if (xStackItemIsFloat)
 				{
@@ -49,26 +49,26 @@ namespace Cosmos.IL2CPU.X86.IL
 					// pops fpu stack
 					XS.FPU.FloatStoreAndPop(ST0);
 					XS.FPU.FloatStoreAndPop(ST0);
-					XS.Add(OldToNewRegister(RegistersEnum.ESP), 16);
+					XS.Add(XSRegisters.ESP, 16);
 				}
                 else
                 {
-                    XS.Pop(OldToNewRegister(RegistersEnum.EAX));
-                    XS.Pop(OldToNewRegister(RegistersEnum.EDX));
+                    XS.Pop(XSRegisters.EAX);
+                    XS.Pop(XSRegisters.EDX);
                     //value2: EDX:EAX
-                    XS.Pop(OldToNewRegister(RegistersEnum.EBX));
-                    XS.Pop(OldToNewRegister(RegistersEnum.ECX));
+                    XS.Pop(XSRegisters.EBX);
+                    XS.Pop(XSRegisters.ECX);
                     //value1: ECX:EBX
 
-					XS.Compare(OldToNewRegister(RegistersEnum.ECX), OldToNewRegister(RegistersEnum.EDX));
+					XS.Compare(XSRegisters.ECX, XSRegisters.EDX);
 					XS.Jump(ConditionalTestEnum.Above, LabelTrue);
 					XS.Jump(ConditionalTestEnum.Below, LabelFalse);
-					XS.Compare(OldToNewRegister(RegistersEnum.EBX), OldToNewRegister(RegistersEnum.EAX));
+					XS.Compare(XSRegisters.EBX, XSRegisters.EAX);
 					XS.Label(LabelTrue);
 					new ConditionalMove { Condition = ConditionalTestEnum.Above, DestinationReg = RegistersEnum.EDI, SourceReg = RegistersEnum.ESI };
 					XS.Label(LabelFalse);
                 }
-				XS.Push(OldToNewRegister(RegistersEnum.EDI));
+				XS.Push(XSRegisters.EDI);
 				/*
                 XS.Jump(ConditionalTestEnum.Above, LabelTrue);
 				XS.Label(LabelFalse);
@@ -84,26 +84,26 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
 
                     XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                    XS.Add(OldToNewRegister(RegistersEnum.ESP), 4);
+                    XS.Add(XSRegisters.ESP, 4);
                     XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
                     new CompareSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.XMM0, pseudoOpcode = (byte)ComparePseudoOpcodes.NotLessThanOrEqualTo };
                     XS.SSE2.MoveD(XMM1, EBX);
-                    XS.And(OldToNewRegister(RegistersEnum.EBX), 1);
+                    XS.And(XSRegisters.EBX, 1);
                     XS.Set(ESP, EBX, destinationIsIndirect: true);
                 }
                 else
                 {
-                    XS.Pop(OldToNewRegister(RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.EAX);
                     XS.Compare(EAX, ESP, sourceIsIndirect: true);
 
                     XS.Jump(ConditionalTestEnum.Below, LabelTrue);
                     XS.Jump(LabelFalse);
                     XS.Label(LabelTrue );
-                    XS.Add(OldToNewRegister(RegistersEnum.ESP), 4);
+                    XS.Add(XSRegisters.ESP, 4);
                     XS.Push(1);
                     new Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
                     XS.Label(LabelFalse );
-                    XS.Add(OldToNewRegister(RegistersEnum.ESP), 4);
+                    XS.Add(XSRegisters.ESP, 4);
                     XS.Push(0);
                 }
             }

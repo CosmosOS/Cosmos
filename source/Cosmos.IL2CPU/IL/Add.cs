@@ -43,8 +43,8 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             else
             {
-              XS.Pop(OldToNewRegister(RegistersEnum.EDX)); // low part
-              XS.Pop(OldToNewRegister(RegistersEnum.EAX)); // high part
+              XS.Pop(XSRegisters.EDX); // low part
+              XS.Pop(XSRegisters.EAX); // high part
               XS.Add(ESP, EDX, destinationIsIndirect: true);
               XS.AddWithCarry(ESP, EAX, destinationDisplacement: 4);
             }
@@ -54,14 +54,14 @@ namespace Cosmos.IL2CPU.X86.IL
             if (xIsFloat) //float
             {
               XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-              XS.Add(OldToNewRegister(RegistersEnum.ESP), 4);
+              XS.Add(XSRegisters.ESP, 4);
               XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
               XS.SSE.AddSS(XMM0, XMM1);
               XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
             }
             else //integer
             {
-              XS.Pop(OldToNewRegister(RegistersEnum.EAX));
+              XS.Pop(XSRegisters.EAX);
               XS.Add(ESP, EAX, destinationIsIndirect: true);
             }
           }

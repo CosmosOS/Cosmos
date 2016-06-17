@@ -17,11 +17,11 @@ namespace Cosmos.Core.Plugs {
 		public class GetAmountOfRAMAsm : AssemblerMethod {
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
 				XS.Set(XSRegisters.EAX, "MultiBootInfo_Memory_High", sourceIsIndirect: true);
-				XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
-				XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1024);
-				XS.Divide(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
-				XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
-				XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+				XS.Xor(XSRegisters.EDX, XSRegisters.EDX);
+				XS.Set(XSRegisters.ECX, 1024);
+				XS.Divide(XSRegisters.ECX);
+				XS.Add(XSRegisters.EAX, 1);
+				XS.Push(XSRegisters.EAX);
 			}
 		}
 
@@ -42,15 +42,15 @@ namespace Cosmos.Core.Plugs {
 		public class ZeroFillAsm : AssemblerMethod {
 			public override void AssembleNew(CPUAll.Assembler aAssembler, object aMethodInfo) {
 				XS.ClearDirectionFlag();
-				XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0xC); //address
-				XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x8); //length
+				XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 0xC); //address
+				XS.Set(XSRegisters.ECX, XSRegisters.EBP, sourceDisplacement: 0x8); //length
 				// set EAX to value of fill (zero)
-				XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1);
+				XS.Xor(XSRegisters.EAX, XSRegisters.EAX);
+				XS.ShiftRight(XSRegisters.ECX, 1);
 				XS.Jump(CPUx86.ConditionalTestEnum.NotBelow, ".step2");
 				XS.StoreByteInString();
 				XS.Label(".step2");
-				XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 1);
+				XS.ShiftRight(XSRegisters.ECX, 1);
 				XS.Jump(CPUx86.ConditionalTestEnum.NotBelow, ".step3");
 				XS.StoreWordInString();
 				XS.Label(".step3");

@@ -30,14 +30,14 @@ namespace Cosmos.IL2CPU.X86.IL
                         if (TypeIsFloat(xSource))
                         {
                             XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Int32);
-                            XS.Sub(OldToNewRegister(RegistersEnum.ESP), 4);
+                            XS.Sub(XSRegisters.ESP, 4);
                             XS.FPU.IntStoreWithTruncate(ESP, isIndirect: true, size: RegisterSize.Long64);
                         }
                         else
                         {
-                            XS.Pop(OldToNewRegister(RegistersEnum.EAX));
+                            XS.Pop(XSRegisters.EAX);
                             XS.Push(0);
-                            XS.Push(OldToNewRegister(RegistersEnum.EAX));
+                            XS.Push(XSRegisters.EAX);
                         }
                         break;
                     }

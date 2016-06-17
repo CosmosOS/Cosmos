@@ -50,15 +50,15 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 1:
                 //throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I2.cs->The size 1 could not exist, because always is pushed Int32 or Int64!");
                 case 4:
-                    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.EAX);
                     XS.MoveSignExtend(XSRegisters.EAX, XSRegisters.AX);
-                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                    XS.Push(XSRegisters.EAX);
                     break;
                 case 8:
-                    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
+                    XS.Pop(XSRegisters.EAX);
+                    XS.Pop(XSRegisters.EBX);
                     XS.MoveSignExtend(XSRegisters.EAX, XSRegisters.AX);
-                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                    XS.Push(XSRegisters.EAX);
                     break;
                 default:
                     throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_I2.cs->SourceSize " + xSource + " not supported!");

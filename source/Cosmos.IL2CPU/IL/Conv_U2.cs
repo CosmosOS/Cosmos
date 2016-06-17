@@ -46,16 +46,16 @@ namespace Cosmos.IL2CPU.X86.IL
                         break;
                     case 1:
                     case 4:
-						    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+						    XS.Pop(XSRegisters.EAX);
 						    XS.MoveZeroExtend(XSRegisters.EAX, XSRegisters.AX);
-                            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                            XS.Push(XSRegisters.EAX);
 						    break;
                     case 8:
                         {
-                            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
+                            XS.Pop(XSRegisters.EAX);
+                            XS.Pop(XSRegisters.ECX);
                             XS.MoveZeroExtend(XSRegisters.EAX, XSRegisters.AX);
-                            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                            XS.Push(XSRegisters.EAX);
                             break;
                         }
                     default:

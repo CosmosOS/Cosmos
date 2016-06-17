@@ -29,13 +29,13 @@ namespace Cosmos.IL2CPU.X86.IL
 				}
 				else
 				{
-					XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EBX)); // low
-					XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX)); // high
-					XS.Negate(OldToNewRegister(CPUx86.RegistersEnum.EBX)); // set carry if EBX != 0
-					XS.AddWithCarry(OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
-					XS.Negate(OldToNewRegister(CPUx86.RegistersEnum.EAX));
-					XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
-					XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EBX));
+					XS.Pop(XSRegisters.EBX); // low
+					XS.Pop(XSRegisters.EAX); // high
+					XS.Negate(XSRegisters.EBX); // set carry if EBX != 0
+					XS.AddWithCarry(XSRegisters.EAX, 0);
+					XS.Negate(XSRegisters.EAX);
+					XS.Push(XSRegisters.EAX);
+					XS.Push(XSRegisters.EBX);
 				}
 			}
 			else
@@ -48,9 +48,9 @@ namespace Cosmos.IL2CPU.X86.IL
 				}
 				else
 				{
-					XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
-					XS.Negate(OldToNewRegister(CPUx86.RegistersEnum.EAX));
-					XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+					XS.Pop(XSRegisters.EAX);
+					XS.Negate(XSRegisters.EAX);
+					XS.Push(XSRegisters.EAX);
 				}
 			}
 		}

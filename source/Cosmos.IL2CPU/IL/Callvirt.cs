@@ -84,7 +84,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xExtraStackSize > 0)
                 {
-                    XS.Sub(OldToNewRegister(CPU.RegistersEnum.ESP), (uint)xExtraStackSize);
+                    XS.Sub(XSRegisters.ESP, (uint)xExtraStackSize);
                 }
                 XS.Call(xNormalAddress);
             }
@@ -104,7 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else
                 {
-                    XS.Set(OldToNewRegister(CPU.RegistersEnum.EAX), OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: (int)xThisOffset);
+                    XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: (int)xThisOffset);
                     XS.Set(EAX, EAX, sourceIsIndirect: true);
                     XS.Push(EAX, isIndirect: true);
                 }
@@ -127,7 +127,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //                        mLabelName + "_AfterAddressCheck",
                 //                        true,
                 //                        xEmitCleanup );
-                XS.Pop(OldToNewRegister(CPU.RegistersEnum.ECX));
+                XS.Pop(XSRegisters.ECX);
 
                 XS.Label(xCurrentMethodLabel + ".AfterAddressCheck");
                 if (xMethodInfo.DeclaringType == typeof(object))
@@ -139,7 +139,7 @@ namespace Cosmos.IL2CPU.X86.IL
                * $esp + mThisOffset    This
                */
                     // we need to see if $this is a boxed object, and if so, we need to box it
-                    XS.Set(OldToNewRegister(CPU.RegistersEnum.EAX), OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: (int)xThisOffset);
+                    XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: (int)xThisOffset);
 
                     //XS.Compare(XSRegisters.EAX, ( ( uint )InstanceTypeEnum.BoxedValueType ), destinationDisplacement: 4, size: RegisterSizes.Int32);
 
@@ -167,7 +167,7 @@ namespace Cosmos.IL2CPU.X86.IL
                * EAX contains the type pointer (not the handle!!)
                */
 
-                    XS.Add(OldToNewRegister(CPU.RegistersEnum.EAX), (uint)ObjectImpl.FieldDataOffset);
+                    XS.Add(XSRegisters.EAX, (uint)ObjectImpl.FieldDataOffset);
                     XS.Set(ESP, EAX, destinationDisplacement: (int)xThisOffset);
                     /*
                * On the stack now:
@@ -180,7 +180,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Label(xCurrentMethodLabel + ".NotBoxedThis");
                 if (xExtraStackSize > 0)
                 {
-                    XS.Sub(OldToNewRegister(CPU.RegistersEnum.ESP), xExtraStackSize);
+                    XS.Sub(XSRegisters.ESP, xExtraStackSize);
                 }
                 XS.Call(ECX);
                 XS.Label(xCurrentMethodLabel + ".AfterNotBoxedThis");

@@ -332,7 +332,7 @@ namespace Cosmos.IL2CPU {
         // cleanup result values
         for (int i = 0; i < aReturnSize / 4; i++)
         {
-          XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), 4);
+          XS.Add(XSRegisters.ESP, 4);
         }
       }
 
@@ -346,7 +346,7 @@ namespace Cosmos.IL2CPU {
           // cleanup result values
           for (int i = 0; i < xExtraStack / 4; i++)
           {
-            XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), 4);
+            XS.Add(XSRegisters.ESP, 4);
           }
         }
       }
@@ -388,7 +388,7 @@ namespace Cosmos.IL2CPU {
         }
 
       } else {
-        XS.Test(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ECX), 2);
+        XS.Test(XSRegisters.ECX, 2);
 
         if (aCleanup != null) {
           XS.Jump(CPU.ConditionalTestEnum.Equal, aJumpTargetNoException);
@@ -435,7 +435,7 @@ namespace Cosmos.IL2CPU {
         // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
         XS.Call(".NullCheck_GetCurrAddress");
         XS.Label(".NullCheck_GetCurrAddress");
-        XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
+        XS.Pop(XSRegisters.EAX);
         new CPU.Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = CPU.RegistersEnum.EAX};
         XS.Call("DebugStub_SendNullReferenceOccurred");
         XS.Halt();

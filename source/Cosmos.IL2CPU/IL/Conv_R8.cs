@@ -29,7 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.SSE.ConvertSI2SD(XMM0, ESP, sourceIsIndirect: true);
 				}
 				// expand stack, that moved data is valid stack
-				XS.Sub(OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
+				XS.Sub(XSRegisters.ESP, 4);
 				XS.SSE2.MoveSD(ESP, XMM0, destinationIsIndirect: true);
 				break;
             case 8:

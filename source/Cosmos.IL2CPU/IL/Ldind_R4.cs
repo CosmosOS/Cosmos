@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
-            XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Pop(XSRegisters.EAX);
             XS.Push(EAX, isIndirect: true, size: RegisterSize.Int32);
         }
 

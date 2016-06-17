@@ -68,9 +68,9 @@ namespace Cosmos.IL2CPU.X86.IL
                                 throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_R4.cs->Conversion of UInt64 to Float is not yet implemented!");
                             }
                         }
-                        XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                        XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.ECX));
-                        XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.EAX);
+                        XS.Pop(XSRegisters.ECX);
+                        XS.Push(XSRegisters.EAX);
                         break;
                     }
                 default:

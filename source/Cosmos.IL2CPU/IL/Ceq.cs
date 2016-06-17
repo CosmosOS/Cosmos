@@ -36,25 +36,25 @@ namespace Cosmos.IL2CPU.X86.IL {
         if (xStackItemIsFloat)
         {
           XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-          XS.Add(OldToNewRegister(RegistersEnum.ESP), 4);
+          XS.Add(XSRegisters.ESP, 4);
           XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
           new CompareSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.XMM0, pseudoOpcode = (byte)ComparePseudoOpcodes.Equal };
           XS.SSE2.MoveD(XMM1, EBX);
-          XS.And(OldToNewRegister(RegistersEnum.EBX), 1);
+          XS.And(XSRegisters.EBX, 1);
           XS.Set(ESP, EBX, destinationIsIndirect: true);
         }
         else
         {
-          XS.Pop(OldToNewRegister(RegistersEnum.EAX));
+          XS.Pop(XSRegisters.EAX);
           XS.Compare(EAX, ESP, sourceIsIndirect: true);
           XS.Jump(ConditionalTestEnum.Equal, Label.LastFullLabel + ".True");
           XS.Jump(Label.LastFullLabel + ".False");
           XS.Label(".True");
-          XS.Add(OldToNewRegister(RegistersEnum.ESP), 4);
+          XS.Add(XSRegisters.ESP, 4);
           XS.Push(1);
           XS.Jump(xNextLabel);
           XS.Label(".False");
-          XS.Add(OldToNewRegister(RegistersEnum.ESP), 4);
+          XS.Add(XSRegisters.ESP, 4);
           XS.Push(0);
           XS.Jump(xNextLabel);
         }
@@ -63,9 +63,9 @@ namespace Cosmos.IL2CPU.X86.IL {
       {
         if (xStackItemIsFloat)
         {
-          XS.Set(OldToNewRegister(RegistersEnum.ESI), 1);
+          XS.Set(XSRegisters.ESI, 1);
           // esi = 1
-          XS.Xor(OldToNewRegister(RegistersEnum.EDI), OldToNewRegister(RegistersEnum.EDI));
+          XS.Xor(XSRegisters.EDI, XSRegisters.EDI);
           // edi = 0
 
           // value 1
@@ -78,28 +78,28 @@ namespace Cosmos.IL2CPU.X86.IL {
           // pops fpu stack
           XS.FPU.FloatStoreAndPop(ST0);
           XS.FPU.FloatStoreAndPop(ST0);
-          XS.Add(OldToNewRegister(RegistersEnum.ESP), 16);
-          XS.Push(OldToNewRegister(RegistersEnum.EDI));
+          XS.Add(XSRegisters.ESP, 16);
+          XS.Push(XSRegisters.EDI);
         }
         else
         {
-          XS.Pop(OldToNewRegister(RegistersEnum.EAX));
-          XS.Compare(OldToNewRegister(RegistersEnum.EAX), OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
-          XS.Pop(OldToNewRegister(RegistersEnum.EAX));
+          XS.Pop(XSRegisters.EAX);
+          XS.Compare(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 4);
+          XS.Pop(XSRegisters.EAX);
           XS.Jump(ConditionalTestEnum.NotEqual, Label.LastFullLabel + ".False");
-          XS.Xor(OldToNewRegister(RegistersEnum.EAX), OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
+          XS.Xor(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 4);
           XS.Jump(ConditionalTestEnum.NotZero, Label.LastFullLabel + ".False");
 
           //they are equal, eax == 0
-          XS.Add(OldToNewRegister(RegistersEnum.ESP), 8);
-          XS.Add(OldToNewRegister(RegistersEnum.EAX), 1);
-          XS.Push(OldToNewRegister(RegistersEnum.EAX));
+          XS.Add(XSRegisters.ESP, 8);
+          XS.Add(XSRegisters.EAX, 1);
+          XS.Push(XSRegisters.EAX);
           XS.Jump(xNextLabel);
           XS.Label(Label.LastFullLabel + ".False");
           //eax = 0
-          XS.Add(OldToNewRegister(RegistersEnum.ESP), 8);
-          XS.Xor(OldToNewRegister(RegistersEnum.EAX), OldToNewRegister(RegistersEnum.EAX));
-          XS.Push(OldToNewRegister(RegistersEnum.EAX));
+          XS.Add(XSRegisters.ESP, 8);
+          XS.Xor(XSRegisters.EAX, XSRegisters.EAX);
+          XS.Push(XSRegisters.EAX);
           XS.Jump(xNextLabel);
         }
 

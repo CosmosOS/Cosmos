@@ -48,21 +48,21 @@ namespace Cosmos.IL2CPU.X86.IL
                 if (xNeedsGC)
                 {
                     // eax contains the handle now, lets convert it to the real memory address
-                    XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), sourceDisplacement: (int)xActualOffset);
+                    XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceDisplacement: (int)xActualOffset);
                 }
 
                 XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
             }
             else
             {
-                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Pop(XSRegisters.EAX);
                 if (xNeedsGC)
                 {
                     // eax contains the handle now, lets convert it to the real memory address
                     XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
                 }
-                XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), (uint)(xActualOffset));
-                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Add(XSRegisters.EAX, (uint)(xActualOffset));
+                XS.Push(XSRegisters.EAX);
             }
         }
     }

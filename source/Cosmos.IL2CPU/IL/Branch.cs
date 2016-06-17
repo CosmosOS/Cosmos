@@ -107,9 +107,9 @@ namespace Cosmos.IL2CPU.X86.IL
                     //}
                     //else
                     //{
-                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EBX));
-                    XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.EAX);
+                    XS.Pop(XSRegisters.EBX);
+                    XS.Compare(XSRegisters.EBX, XSRegisters.EAX);
                     new ConditionalJump {Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                     //}
                 }
@@ -124,73 +124,73 @@ namespace Cosmos.IL2CPU.X86.IL
                     var xNoJump = GetLabel(aMethod, aOpCode) + "__NoBranch";
 
                     // value 2  EBX:EAX
-                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                    XS.Pop(XSRegisters.EAX);
+                    XS.Pop(XSRegisters.EBX);
                     // value 1  EDX:ECX
-                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.ECX));
-                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EDX));
+                    XS.Pop(XSRegisters.ECX);
+                    XS.Pop(XSRegisters.EDX);
                     switch (xTestOp)
                     {
                         case ConditionalTestEnum.Zero: // Equal
                         case ConditionalTestEnum.NotEqual: // NotZero
-                            XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ECX));
+                            XS.Xor(XSRegisters.EAX, XSRegisters.ECX);
                             new ConditionalJump {Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EBX), XSRegisters.OldToNewRegister(RegistersEnum.EDX));
+                            XS.Xor(XSRegisters.EBX, XSRegisters.EDX);
                             new ConditionalJump {Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             break;
                         case ConditionalTestEnum.GreaterThanOrEqualTo:
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
                             XS.Jump(ConditionalTestEnum.LessThan, xNoJump);
                             new ConditionalJump {Condition = ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
                             XS.Jump(ConditionalTestEnum.Below, xNoJump);
                             break;
                         case ConditionalTestEnum.GreaterThan:
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
                             XS.Jump(ConditionalTestEnum.LessThan, xNoJump);
                             new ConditionalJump {Condition = ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
                             XS.Jump(ConditionalTestEnum.BelowOrEqual, xNoJump);
                             break;
                         case ConditionalTestEnum.LessThanOrEqualTo:
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
                             new ConditionalJump {Condition = ConditionalTestEnum.LessThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             XS.Jump(ConditionalTestEnum.GreaterThan, xNoJump);
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
                             new ConditionalJump {Condition = ConditionalTestEnum.BelowOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             break;
                         case ConditionalTestEnum.LessThan:
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
                             new ConditionalJump {Condition = ConditionalTestEnum.LessThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             XS.Jump(ConditionalTestEnum.GreaterThan, xNoJump);
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
                             new ConditionalJump {Condition = ConditionalTestEnum.Below, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             break;
                         // from here all unsigned
                         case ConditionalTestEnum.AboveOrEqual:
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
                             new ConditionalJump {Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
                             XS.Jump(ConditionalTestEnum.Below, xNoJump);
                             break;
                         case ConditionalTestEnum.Above:
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
                             new ConditionalJump {Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
                             XS.Jump(ConditionalTestEnum.BelowOrEqual, xNoJump);
                             break;
                         case ConditionalTestEnum.BelowOrEqual:
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
                             new ConditionalJump {Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             XS.Jump(ConditionalTestEnum.Below, xNoJump);
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
                             new ConditionalJump {Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             break;
                         case ConditionalTestEnum.Below:
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                            XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
                             new ConditionalJump {Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             XS.Jump(ConditionalTestEnum.Below, xNoJump);
-                            XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                            XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
                             new ConditionalJump {Condition = ConditionalTestEnum.AboveOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                             break;
                         default:
@@ -211,15 +211,15 @@ namespace Cosmos.IL2CPU.X86.IL
                 // todo: improve code clarity
                 if (xStackContentSize <= 4)
                 {
-                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.EAX);
                     if (xTestOp == ConditionalTestEnum.Zero)
                     {
-                        XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 0);
+                        XS.Compare(XSRegisters.EAX, 0);
                         new ConditionalJump {Condition = ConditionalTestEnum.Equal, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                     }
                     else if (xTestOp == ConditionalTestEnum.NotZero)
                     {
-                        XS.Compare(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 0);
+                        XS.Compare(XSRegisters.EAX, 0);
                         new ConditionalJump {Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
                     }
                     else
@@ -229,15 +229,15 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else
                 {
-                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-                    XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EBX));
+                    XS.Pop(XSRegisters.EAX);
+                    XS.Pop(XSRegisters.EBX);
                     switch (xTestOp)
                     {
                         case ConditionalTestEnum.Zero: // Equal
                         case ConditionalTestEnum.NotZero: // NotEqual
-                            XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 0);
+                            XS.Xor(XSRegisters.EAX, 0);
                             new ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
-                            XS.Xor(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 0);
+                            XS.Xor(XSRegisters.EBX, 0);
                             new CPU.ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
                             break;
                         default:

@@ -36,17 +36,17 @@ namespace Cosmos.IL2CPU.X86.IL
                     if (xStackTopIsFloat)
                     {
                         XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                        XS.Add(OldToNewRegister(RegistersEnum.ESP), 4);
+                        XS.Add(XSRegisters.ESP, 4);
                         XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
                         XS.SSE.SubSS(XMM0, XMM1);
                         XS.SSE.MoveSS(ESP, XMM1, destinationIsIndirect: true);
                     }
                     else
                     {
-                        XS.Pop(OldToNewRegister(RegistersEnum.ECX));
-                        XS.Pop(OldToNewRegister(RegistersEnum.EAX));
-                        XS.Sub(OldToNewRegister(RegistersEnum.EAX), OldToNewRegister(RegistersEnum.ECX));
-                        XS.Push(OldToNewRegister(RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.ECX);
+                        XS.Pop(XSRegisters.EAX);
+                        XS.Sub(XSRegisters.EAX, XSRegisters.ECX);
+                        XS.Push(XSRegisters.EAX);
                     }
                     break;
                 case 8:
@@ -70,8 +70,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                     else
                     {
-                        XS.Pop(OldToNewRegister(RegistersEnum.EAX));
-                        XS.Pop(OldToNewRegister(RegistersEnum.EDX));
+                        XS.Pop(XSRegisters.EAX);
+                        XS.Pop(XSRegisters.EDX);
                         XS.Sub(ESP, EAX, destinationIsIndirect: true);
                         XS.SubWithCarry(ESP, EDX, destinationDisplacement: 4);
                     }

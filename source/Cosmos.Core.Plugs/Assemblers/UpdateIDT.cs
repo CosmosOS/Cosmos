@@ -56,12 +56,12 @@ namespace Cosmos.Core.Plugs
                     continue;
                 }
 
-                XS.Set(OldToNewRegister(CPUx86.RegistersEnum.EAX), "__ISR_Handler_" + i.ToString("X2"));
+                XS.Set(XSRegisters.EAX, "__ISR_Handler_" + i.ToString("X2"));
                 XS.Set("_NATIVE_IDT_Contents", AL, destinationDisplacement: (i * 8) + 0);
                 XS.Set("_NATIVE_IDT_Contents", AH, destinationDisplacement: (i * 8) + 1);
                 XS.Set("_NATIVE_IDT_Contents", 0x8, destinationDisplacement: (i * 8) + 2, size: RegisterSize.Byte8);
                 XS.Set("_NATIVE_IDT_Contents", 0x8E, destinationDisplacement: (i * 8) + 5, size: RegisterSize.Byte8);
-                XS.ShiftRight(OldToNewRegister(CPUx86.RegistersEnum.EAX), 16);
+                XS.ShiftRight(XSRegisters.EAX, 16);
                 XS.Set("_NATIVE_IDT_Contents", AL, destinationDisplacement: (i * 8) + 6);
                 XS.Set("_NATIVE_IDT_Contents", AH, destinationDisplacement: (i * 8) + 7);
             }
@@ -80,17 +80,17 @@ namespace Cosmos.Core.Plugs
                 XS.Push((uint)j);
                 XS.PushAllRegisters();
 
-                XS.Sub(OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
-                XS.Set(OldToNewRegister(CPUx86.RegistersEnum.EAX), OldToNewRegister(CPUx86.RegistersEnum.ESP)); // preserve old stack address for passing to interrupt handler
+                XS.Sub(XSRegisters.ESP, 4);
+                XS.Set(XSRegisters.EAX, XSRegisters.ESP); // preserve old stack address for passing to interrupt handler
 
                 // store floating point data
-                XS.And(OldToNewRegister(CPUx86.RegistersEnum.ESP), 0xfffffff0); // fxsave needs to be 16-byte alligned
-                XS.Sub(OldToNewRegister(CPUx86.RegistersEnum.ESP), 512); // fxsave needs 512 bytes
+                XS.And(XSRegisters.ESP, 0xfffffff0); // fxsave needs to be 16-byte alligned
+                XS.Sub(XSRegisters.ESP, 512); // fxsave needs 512 bytes
                 XS.SSE.FXSave(ESP, isIndirect: true); // save the registers
                 XS.Set(EAX, ESP, destinationIsIndirect: true);
 
-                XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX)); //
-                XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX)); // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
+                XS.Push(XSRegisters.EAX); //
+                XS.Push(XSRegisters.EAX); // pass old stack address (pointer to InterruptContext struct) to the interrupt handler
 
                 XS.JumpToSegment(8, "__ISR_Handler_" + j.ToString("X2") + "_SetCS");
                 XS.Label("__ISR_Handler_" + j.ToString("X2") + "_SetCS");
@@ -100,15 +100,15 @@ namespace Cosmos.Core.Plugs
                     xHandler = GetMethodDef(typeof(INTs).Assembly, typeof(INTs).FullName, "HandleInterrupt_Default", true);
                 }
                 XS.Call(CPUAll.LabelName.Get(xHandler));
-                XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Pop(XSRegisters.EAX);
                 XS.SSE.FXRestore(ESP, isIndirect: true);
 
-                XS.Set(OldToNewRegister(CPUx86.RegistersEnum.ESP), OldToNewRegister(CPUx86.RegistersEnum.EAX)); // this restores the stack for the FX stuff, except the pointer to the FX data
-                XS.Add(OldToNewRegister(CPUx86.RegistersEnum.ESP), 4); // "pop" the pointer
+                XS.Set(XSRegisters.ESP, XSRegisters.EAX); // this restores the stack for the FX stuff, except the pointer to the FX data
+                XS.Add(XSRegisters.ESP, 4); // "pop" the pointer
 
                 XS.PopAllRegisters();
 
-                XS.Add(OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
+                XS.Add(XSRegisters.ESP, 8);
                 new CPUAll.Label("__ISR_Handler_" + j.ToString("X2") + "_END");
                 XS.InterruptReturn();
             }
@@ -116,12 +116,12 @@ namespace Cosmos.Core.Plugs
             XS.Return();
             XS.Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
             XS.Noop();
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 8);
-            XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8);
+            XS.Compare(XSRegisters.EAX, 0);
             XS.Jump(CPUx86.ConditionalTestEnum.Zero, ".__AFTER_ENABLE_INTERRUPTS");
 
             // reload interrupt list
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), "_NATIVE_IDT_Pointer");
+            XS.Set(XSRegisters.EAX, "_NATIVE_IDT_Pointer");
             XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true);
             XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
             // Reenable interrupts

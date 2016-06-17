@@ -23,7 +23,7 @@ namespace Cosmos.Core.Plugs
                 // emit a single out instruction
                 XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x0C);
                 XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 0x08);
-                XS.WriteToPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.AL));
+                XS.WriteToPortDX(XSRegisters.AL);
             }
         }
         [PlugMethod(Assembler=typeof(Write8Assembler))]
@@ -35,9 +35,9 @@ namespace Cosmos.Core.Plugs
         {
             public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x0C);
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x08);
-                XS.WriteToPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.AX));
+                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x0C);
+                XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 0x08);
+                XS.WriteToPortDX(XSRegisters.AX);
             }
         }
         [PlugMethod(Assembler = typeof(Write16Assembler))]
@@ -49,9 +49,9 @@ namespace Cosmos.Core.Plugs
         {
             public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x0C);
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x08);
-                XS.WriteToPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x0C);
+                XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 0x08);
+                XS.WriteToPortDX(XSRegisters.EAX);
             }
         }
         [PlugMethod(Assembler = typeof(Write32Assembler))]
@@ -63,12 +63,12 @@ namespace Cosmos.Core.Plugs
         {
             public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x08);
+                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x08);
                 //TODO: Do we need to clear rest of EAX first?
                 //    MTW: technically not, as in other places, it _should_ be working with AL too..
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
-                XS.ReadFromPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.AL));
-                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Set(XSRegisters.EAX, 0);
+                XS.ReadFromPortDX(XSRegisters.AL);
+                XS.Push(XSRegisters.EAX);
             }
         }
         [PlugMethod(Assembler = typeof(Read8Assembler))]
@@ -80,10 +80,10 @@ namespace Cosmos.Core.Plugs
         {
             public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x08);
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
-                XS.ReadFromPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.AX));
-                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x08);
+                XS.Set(XSRegisters.EAX, 0);
+                XS.ReadFromPortDX(XSRegisters.AX);
+                XS.Push(XSRegisters.EAX);
             }
         }
         [PlugMethod(Assembler = typeof(Read16Assembler))]
@@ -95,9 +95,9 @@ namespace Cosmos.Core.Plugs
         {
             public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 0x08);
-                XS.ReadFromPortDX(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: 0x08);
+                XS.ReadFromPortDX(XSRegisters.EAX);
+                XS.Push(XSRegisters.EAX);
             }
         }
         [PlugMethod(Assembler = typeof(Read32Assembler))]

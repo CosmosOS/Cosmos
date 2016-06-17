@@ -22,10 +22,10 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 1:
                 case 2:
                 case 4:
-                    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.EAX);
                     XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
-                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
-                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                    XS.Push(XSRegisters.EDX);
+                    XS.Push(XSRegisters.EAX);
                     break;
                 case 8:
                     XS.Noop();

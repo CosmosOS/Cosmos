@@ -118,7 +118,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (xExtraStackSize > 0)
             {
-                XS.Sub(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), (uint)xExtraStackSize);
+                XS.Sub(XSRegisters.ESP, (uint)xExtraStackSize);
             }
             XS.Call(xNormalAddress);
 

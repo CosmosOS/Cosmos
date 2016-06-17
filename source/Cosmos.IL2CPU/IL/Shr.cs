@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-			XS.Pop(OldToNewRegister(CPU.RegistersEnum.ECX)); // shift amount
+			XS.Pop(XSRegisters.ECX); // shift amount
 			var xStackItem_ShiftAmount = aOpCode.StackPopTypes[0];
 			var xStackItem_Value = aOpCode.StackPopTypes[1];
             var xStackItem_Value_Size = SizeOfType(xStackItem_Value);
@@ -43,7 +43,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				// [ESP + 4] is high part
 
 				// move high part in EAX
-				XS.Set(OldToNewRegister(CPU.RegistersEnum.EAX), OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: 4);
+				XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 4);
 
 				XS.Compare(XSRegisters.CL, 32, size: RegisterSize.Byte8);
 				XS.Jump(CPU.ConditionalTestEnum.AboveOrEqual, HighPartIsZero);

@@ -23,8 +23,8 @@ namespace Cosmos.IL2CPU.X86.IL
       string xDataName = GetContentsArrayName(xOpString.Value);
       new Comment(Assembler, "String Value: " + xOpString.Value.Replace("\r", "\\r").Replace("\n", "\\n"));
       var xRefName = GetFakeHandleForLiteralArray(xDataName);
-      XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), xRefName);
-      XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+      XS.Set(XSRegisters.EAX, xRefName);
+      XS.Push(XSRegisters.EAX);
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering.
       // if that changes, we need to change the code below!
       // We also need to change the debugstub to fix this then.
