@@ -766,14 +766,14 @@ namespace XSharp.Compiler
       Do<SubWithCarry>(register, valueToAdd, destinationDisplacement: destinationDisplacement, destinationIsIndirect: destinationIsIndirect);
     }
 
-    public static void And(Register register, uint value)
+    public static void And(Register register, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
     {
-      Do<And>(register, value);
+      Do<And>(register, value, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
     }
 
-    public static void And(Register register, Register value, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    public static void And(Register register, Register value, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
     {
-      Do<And>(register, value, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement);
+      Do<And>(register, value, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
     }
 
     public static void Xor(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
