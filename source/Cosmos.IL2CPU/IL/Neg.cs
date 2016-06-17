@@ -23,7 +23,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				if (xStackContentIsFloat)
 				{
 					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
-					new CPUx86.x87.FloatNegate { };
+					XS.FPU.FloatNegate();
 					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
 				}
 				else
@@ -42,7 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				if (xStackContentIsFloat)
 				{
 					new FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
-					new FloatNegate { };
+				  XS.FPU.FloatNegate();
 					new FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
 				}
 				else

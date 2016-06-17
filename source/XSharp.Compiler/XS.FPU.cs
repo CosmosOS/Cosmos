@@ -34,6 +34,11 @@ namespace XSharp.Compiler
       {
         new FloatInit();
       }
+
+      public static void FloatNegate()
+      {
+        new FloatNegate();
+      }
     }
   }
 }

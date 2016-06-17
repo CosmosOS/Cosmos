@@ -153,7 +153,7 @@ namespace Cosmos.Core.Plugs
                 XS.InterruptReturn();
             }
             new CPUAll.Label("__INTERRUPT_OCCURRED__");
-            new CPUx86.Return();
+            XS.Return();
             new CPUAll.Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
             XS.Noop();
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 8);
