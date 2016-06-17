@@ -675,18 +675,18 @@ namespace XSharp.Compiler
       Do<ShiftRight>(destination, source, skipSizeCheck: true, destinationIsIndirect:destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
     }
 
-    public static void ShiftLeft(Register register, byte bitCount)
+    public static void ShiftLeft(Register destination, byte bitCount)
     {
-      Do<ShiftLeft>(register, bitCount);
+      Do<ShiftLeft>(destination, bitCount);
     }
 
-    public static void ShiftLeft(Register register, Register8 bitCount)
+    public static void ShiftLeft(Register destination, Register8 bitCount, bool destinationIsIndirect = false, RegisterSize size = RegisterSize.Int32)
     {
       if (bitCount != CL)
       {
         throw new InvalidOperationException();
       }
-      Do<ShiftLeft>(register, bitCount, skipSizeCheck: true);
+      Do<ShiftLeft>(destination, bitCount, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, size: size);
     }
 
 

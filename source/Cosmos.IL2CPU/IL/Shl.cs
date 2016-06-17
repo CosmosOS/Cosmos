@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			if (xStackItem_Value_Size <= 4)
 #endif
 			{
-				new CPUx86.ShiftLeft { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.CL };
+				XS.ShiftLeft(XSRegisters.ESP, XSRegisters.CL, destinationIsIndirect: true, size: RegisterSize.Int32);
 			}
 #if DOTNETCOMPATIBLE
 			else if (xStackItem_Value.Size == 8)
@@ -51,7 +51,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 				XS.ShiftLeftDouble(ESP, EAX, CL, destinationDisplacement: 4);
 				// shift lower part
-				new CPUx86.ShiftLeft { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 32, SourceReg = CPUx86.RegistersEnum.CL };
+				XS.ShiftLeft(XSRegisters.ESP, XSRegisters.CL, destinationIsIndirect: true, size: RegisterSize.Int32);
 				XS.Jump(End_Shl);
 
 				XS.Label(LowPartIsZero);
