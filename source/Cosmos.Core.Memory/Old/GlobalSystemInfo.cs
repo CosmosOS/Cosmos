@@ -1,6 +1,9 @@
-﻿using Cosmos.Debug.Kernel;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
 
-namespace Cosmos.Core
+namespace Cosmos.Core.Memory.Old
 {
     internal static unsafe class GlobalSystemInfo
     {

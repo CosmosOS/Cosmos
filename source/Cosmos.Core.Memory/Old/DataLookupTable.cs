@@ -1,6 +1,9 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
-namespace Cosmos.Core
+namespace Cosmos.Core.Memory.Old
 {
     // The DataLookupTable (DLT) basically is a double linked list.
     [StructLayout(LayoutKind.Explicit)]

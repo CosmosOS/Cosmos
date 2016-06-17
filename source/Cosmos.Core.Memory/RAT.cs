@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Native = System.UInt32;
 
-namespace Cosmos.Core.Memory.Test {
+namespace Cosmos.Core.Memory {
   unsafe static public class RAT {
     // RAT: RAM Allocation Table
     //
-    // A byte table which defines the code which owns the page. 
+    // A byte table which defines the code which owns the page.
     // Owners can further subdivide table types on their own and RAT
-    // code must not assume anything about contents of pages other 
+    // code must not assume anything about contents of pages other
     // than who owns them.
 
     static public class PageType {

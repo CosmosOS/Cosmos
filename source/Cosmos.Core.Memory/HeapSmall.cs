@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Native = System.UInt32;
 
-namespace Cosmos.Core.Memory.Test {
+namespace Cosmos.Core.Memory {
   //TODO Remove empty pages as necessary
   unsafe static public class HeapSmall {
     public const Native PrefixBytes = 4 * sizeof(Native);
-    public static Native mMaxItemSize; 
+    public static Native mMaxItemSize;
 
     private static void** mSMT;
 
@@ -22,7 +20,7 @@ namespace Cosmos.Core.Memory.Test {
       InitSMT(1016);
 
       // TODO Change these sizes after further stufy and also when page size
-      // changes. Also can adjust and create new ones dynamicaly as it runs. 
+      // changes. Also can adjust and create new ones dynamicaly as it runs.
       // SMT can be grown as needed.
       CreatePage(16);
       CreatePage(24);
