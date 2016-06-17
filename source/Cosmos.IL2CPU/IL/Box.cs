@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
       for (int i = 0; i < (xSize / 4); i++)
       {
         XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EDX));
-        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESI, DestinationIsIndirect = true, DestinationDisplacement = (ObjectImpl.FieldDataOffset + (i * 4)), SourceReg = CPUx86.RegistersEnum.EDX, Size = 32 };
+        XS.Set(ESI, EDX, destinationDisplacement: (ObjectImpl.FieldDataOffset + (i * 4)), size: RegisterSize.Int32);
       }
       XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
     }

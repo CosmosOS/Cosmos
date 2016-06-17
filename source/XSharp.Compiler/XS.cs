@@ -227,7 +227,8 @@ namespace XSharp.Compiler
                               int? destinationDisplacement = null,
                               bool sourceIsIndirect = false,
                               int? sourceDisplacement = null,
-                              bool skipSizeCheck = false)
+                              bool skipSizeCheck = false,
+                              RegisterSize? size = null)
       where T : InstructionWithDestinationAndSourceAndSize, new()
     {
       if (destinationDisplacement != null)
@@ -256,19 +257,21 @@ namespace XSharp.Compiler
       {
         throw new Exception("Both destination and source cannot be indirect!");
       }
-      RegisterSize xSize;
-      if (!destinationIsIndirect)
+      if (size == null)
       {
-        xSize = destination.Size;
-      }
-      else
-      {
-        xSize = source.Size;
+        if (!destinationIsIndirect)
+        {
+          size = destination.Size;
+        }
+        else
+        {
+          size = source.Size;
+        }
       }
 
       new T
       {
-        Size = (byte)xSize,
+        Size = (byte)size,
         DestinationReg = destination.RegEnum,
         DestinationIsIndirect = destinationIsIndirect,
         DestinationDisplacement = destinationDisplacement,
@@ -591,9 +594,9 @@ namespace XSharp.Compiler
       Do<Mov>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
     }
 
-    public static void Set(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    public static void Set(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
     {
-      Do<Mov>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+      Do<Mov>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size: size);
     }
 
     public static void SetByte(uint address, byte value)
@@ -658,18 +661,18 @@ namespace XSharp.Compiler
       Do<RotateLeft>(register, bitCount);
     }
 
-    public static void ShiftRight(Register register, byte bitCount)
+    public static void ShiftRight(Register destination, byte bitCount)
     {
-      Do<ShiftRight>(register, bitCount);
+      Do<ShiftRight>(destination, bitCount);
     }
 
-    public static void ShiftRight(Register register, Register8 bitCount)
+    public static void ShiftRight(Register destination, Register8 source, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
     {
-      if (bitCount != CL)
+      if (source != CL)
       {
         throw new InvalidOperationException();
       }
-      Do<ShiftRight>(register, bitCount, skipSizeCheck: true);
+      Do<ShiftRight>(destination, source, skipSizeCheck: true, destinationIsIndirect:destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
     }
 
     public static void ShiftLeft(Register register, byte bitCount)
@@ -1112,6 +1115,36 @@ namespace XSharp.Compiler
         DestinationReg = destination,
         DestinationIsIndirect = isIndirect
       };
+    }
+
+    public static void RotateThroughCarryRight(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+      Do<RotateThroughCarryRight>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void RotateThroughCarryRight(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<RotateThroughCarryRight>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void RotateThroughCarryRight(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<RotateThroughCarryRight>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void RotateThroughCarryRight(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+      Do<RotateThroughCarryRight>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void RotateThroughCarryRight(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+      Do<RotateThroughCarryRight>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void RotateThroughCarryRight(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+      Do<RotateThroughCarryRight>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size: size);
     }
   }
 }
