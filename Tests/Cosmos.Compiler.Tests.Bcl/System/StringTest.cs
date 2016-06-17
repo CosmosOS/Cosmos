@@ -22,7 +22,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
 
             int value1 = 1;
-            string value2 = " = 4";
+            string value2 = "4";
             string expected_res = "1 + 3 = 4";
             Assert.IsTrue(($"{value1} + 3 = {value2}" == expected_res), "String $ operator does not work.");
 
