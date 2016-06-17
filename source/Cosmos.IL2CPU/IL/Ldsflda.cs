@@ -37,10 +37,7 @@ namespace Cosmos.IL2CPU.X86.IL
         }
       }
       string xDataName = field;
-      new CPUx86.Push
-      {
-        DestinationRef = Cosmos.Assembler.ElementReference.New(xDataName)
-      };
+      XS.Push(xDataName);
     }
   }
 }

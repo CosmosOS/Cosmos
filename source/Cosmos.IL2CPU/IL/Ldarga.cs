@@ -70,7 +70,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 //            for( int i = 0; i < ( xCurArgSize / 4 ); i++ )
 //            {
-//                new CPUx86.Push { DestinationValue = ( uint )( xCurArgSize - ( ( i + 1 ) * 4 ) ) };
+//                XS.Push(( uint )( xCurArgSize - ( ( i + 1 ) * 4 ) ));
 //            }
 //            Assembler.Stack.Push( ( int )xCurArgSize, xParams[ xCorrectedOpValValue ].ParameterType );
 
@@ -83,7 +83,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 //            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
 
-//            //new CPUx86.Push { DestinationValue = ( uint )mAddress };
+//            //XS.Push(( uint )mAddress);
 //            //
 //            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
 
@@ -136,7 +136,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		public override void DoAssemble() {
         //             XS.Push(XSRegisters.EBP);
         // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
-        //             new CPU.Push { DestinationValue = (uint)mAddress };
+        //             XS.Push((uint)mAddress);
         // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
         // 			Add(Assembler, GetServiceProvider(), mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
         // 		}

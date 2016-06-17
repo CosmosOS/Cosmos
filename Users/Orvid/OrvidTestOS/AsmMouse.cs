@@ -29,7 +29,7 @@ namespace Cosmos.Hardware
 
                 XS.Call("mouse_read");
 
-                new Noop();
+                XS.Noop();
 
                 XS.Mov(XSRegisters.BL, 0x20);
 
@@ -49,7 +49,7 @@ namespace Cosmos.Hardware
 
                 XS.Call("mouse_write");
 
-                new Noop();
+                XS.Noop();
 
                 XS.Mov(XSRegisters.BL, 0xd4);
 

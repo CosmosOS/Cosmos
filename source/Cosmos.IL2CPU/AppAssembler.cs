@@ -164,14 +164,14 @@ namespace Cosmos.IL2CPU
                 XS.Set(OldToNewRegister(RegistersEnum.EAX), "Before_Kernel_Stack");
                 XS.Compare(OldToNewRegister(RegistersEnum.EAX), OldToNewRegister(RegistersEnum.ESP));
                 XS.Jump(ConditionalTestEnum.LessThan, mCurrentMethodLabel + ".StackOverflowCheck_End");
-                new ClearInterruptFlag();
+                XS.ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = mCurrentMethodLabel + ".StackOverflowCheck_GetAddress" };
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
                 XS.Pop(OldToNewRegister(RegistersEnum.EAX));
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 XS.Call("DebugStub_SendStackOverflowOccurred");
-                new Halt();
+                XS.Halt();
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_End");
 
             }
@@ -382,7 +382,7 @@ namespace Cosmos.IL2CPU
                 for (int i = 0; i < ((int)(xReturnSize/4)); i++)
                 {
                     XS.Pop(OldToNewRegister(RegistersEnum.EAX));
-                    new Mov { DestinationReg = RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + ((i + 0) * 4)), SourceReg = RegistersEnum.EAX };
+                    XS.Set(XSRegisters.EBP, XSRegisters.EAX, destinationDisplacement: (int)(xOffset + ((i + 0) * 4)));
                 }
                 // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
             }
@@ -418,14 +418,14 @@ namespace Cosmos.IL2CPU
                 XS.Set(OldToNewRegister(RegistersEnum.EBX), OldToNewRegister(RegistersEnum.EBP));
                 XS.Compare(OldToNewRegister(RegistersEnum.EAX), OldToNewRegister(RegistersEnum.EBX));
                 XS.Jump(ConditionalTestEnum.Equal, xLabelExc + "__2");
-                new ClearInterruptFlag();
+                XS.ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location" };
                 XS.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
                 XS.Pop(OldToNewRegister(RegistersEnum.EAX));
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 XS.Call("DebugStub_SendStackCorruptionOccurred");
-                new Halt();
+                XS.Halt();
             }
             XS.Label(xLabelExc + "__2");
             XS.Pop(OldToNewRegister(RegistersEnum.EBP));
@@ -812,11 +812,7 @@ namespace Cosmos.IL2CPU
 
         protected void Push(string aLabelName, bool isIndirect = false)
         {
-            new Push
-            {
-                DestinationRef = ElementReference.New(aLabelName),
-                DestinationIsIndirect = isIndirect
-            };
+            XS.Push(aLabelName, isIndirect: isIndirect);
         }
 
         protected void Call(MethodBase aMethod)
@@ -1504,14 +1500,14 @@ namespace Cosmos.IL2CPU
                 }
                 XS.Compare(OldToNewRegister(RegistersEnum.EAX), OldToNewRegister(RegistersEnum.EBX));
                 XS.Jump(ConditionalTestEnum.Equal, xLabel + ".StackCorruptionCheck_End");
-                new ClearInterruptFlag();
+                XS.ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = xLabel + ".StackCorruptionCheck_GetAddress" };
                 XS.Label(xLabel + ".StackCorruptionCheck_GetAddress");
                 XS.Pop(OldToNewRegister(RegistersEnum.EAX));
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 XS.Call("DebugStub_SendStackCorruptionOccurred");
-                new Halt();
+                XS.Halt();
                 new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
 
             }
@@ -1604,12 +1600,12 @@ namespace Cosmos.IL2CPU
             if (emitInt3NotNop)
             {
                 INT3Emitted = true;
-                new INT3();
+                XS.Int3();
             }
             else
             {
                 INT3PlaceholderEmitted = true;
-                new DebugNoop();
+                XS.DebugNoop();
             }
         }
 

@@ -48,6 +48,10 @@
     <Bochs_OutputPath>bin\Debug\</Bochs_OutputPath>
     <Bochs_EnableGDB>False</Bochs_EnableGDB>
     <Bochs_StartCosmosGDB>false</Bochs_StartCosmosGDB>
+    <TraceAssemblies>Cosmos</TraceAssemblies>
+    <StackCorruptionDetectionLevel>AllInstructions</StackCorruptionDetectionLevel>
+    <Bochs_StackCorruptionDetectionLevel>AllInstructions</Bochs_StackCorruptionDetectionLevel>
+    <Bochs_TraceAssemblies>Cosmos</Bochs_TraceAssemblies>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />

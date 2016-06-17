@@ -71,10 +71,10 @@ namespace Cosmos.IL2CPU.X86.IL
 				/*
                 XS.Jump(ConditionalTestEnum.Above, LabelTrue);
 				XS.Label(LabelFalse);
-                new CPUx86.Push { DestinationValue = 0 };
+                XS.Push(0);
                 new CPUx86.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
                 XS.Label(LabelTrue );
-                new CPUx86.Push { DestinationValue = 1 };
+                XS.Push(1);
 				*/
             }
             else
@@ -103,7 +103,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     new Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
                     XS.Label(LabelFalse );
                     XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
-                    new CPUx86.Push { DestinationValue = 0 };
+                    XS.Push(0);
                 }
             }
         }
@@ -168,11 +168,11 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 //XS.Push(XSRegisters.EDI);
         //
         //                 XS.Jump(ConditionalTestEnum.Above, LabelTrue);
-        //                 new CPUx86.Push { DestinationValue = 0 };
+        //                 XS.Push(0);
         //                 XS.Jump(NextInstructionLabel);
         //
         // 				XS.Label(LabelTrue);
-        // 				new CPUx86.Push{DestinationValue=1};
+        // 				XS.Push(1);
         //
         // 			} else
         // 			{
@@ -182,11 +182,11 @@ namespace Cosmos.IL2CPU.X86.IL
         //                 XS.Jump(LabelFalse);
         //                 XS.Label(LabelTrue);
         //                 XS.Add(XSRegisters.ESP, 4);
-        //                 new CPUx86.Push { DestinationValue = 1 };
+        //                 XS.Push(1);
         //                 XS.Jump(NextInstructionLabel);
         //                 XS.Label(LabelFalse);
         //                 XS.Add(XSRegisters.ESP, 4);
-        //                 new CPUx86.Push { DestinationValue = 0 };
+        //                 XS.Push(0);
         //                 XS.Jump(NextInstructionLabel);
         // 			}
         // 		}

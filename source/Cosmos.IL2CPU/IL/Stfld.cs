@@ -51,7 +51,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       //TODO: Can't we use an x86 op to do a byte copy instead and be faster?
       for (int i = 0; i < (xSize / 4); i++) {
         XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((i * 4)), SourceReg = CPUx86.RegistersEnum.EAX };
+        XS.Set(XSRegisters.ECX, XSRegisters.EAX, destinationDisplacement: (int)((i * 4)));
       }
 
       switch (xSize % 4) {

@@ -3,6 +3,7 @@ using CPU = Cosmos.Assembler.x86;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -16,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-			XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ECX)); // shift amount
+			XS.Pop(OldToNewRegister(CPU.RegistersEnum.ECX)); // shift amount
 			var xStackItem_ShiftAmount = aOpCode.StackPopTypes[0];
 			var xStackItem_Value = aOpCode.StackPopTypes[1];
             var xStackItem_Value_Size = SizeOfType(xStackItem_Value);
@@ -42,15 +43,15 @@ namespace Cosmos.IL2CPU.X86.IL
 				// [ESP + 4] is high part
 
 				// move high part in EAX
-				XS.Set(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: 4);
+				XS.Set(OldToNewRegister(CPU.RegistersEnum.EAX), OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: 4);
 
 				new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 32, Size = 8 };
 				XS.Jump(CPU.ConditionalTestEnum.AboveOrEqual, HighPartIsZero);
 
 				// shift lower part
-				new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX, ArgumentReg = CPUx86.RegistersEnum.CL };
+        XS.ShiftRightDouble(ESP, EAX, CL, destinationIsIndirect: true);
 				// shift higher part
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, Size = 32, SourceReg = CPUx86.RegistersEnum.CL };
+				XS.ShiftRight(ESP, CL, destinationDisplacement: 4, size: RegisterSize.Int32);
 				XS.Jump(End_Shr);
 
 				XS.Label(HighPartIsZero);
@@ -59,7 +60,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 				// shift high part and move it in low part
 				new CPUx86.ShiftRight{ DestinationReg = CPUx86.RegistersEnum.EAX, Size = 32, SourceReg = CPUx86.RegistersEnum.CL };
-				XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
+				XS.Set(ESP, EAX, destinationIsIndirect: true);
 				// replace unknown high part with a zero, if <= 32
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = 0};
 
