@@ -26,7 +26,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
                 throw new Exception("Events with return type not yet supported!");
             }
             XS.Comment("XXXXXXX");
-            new CPUx86.Xchg { DestinationReg = CPUx86.RegistersEnum.BX, SourceReg = CPUx86.RegistersEnum.BX, Size = 16 };
+            XS.Exchange(XSRegisters.BX, XSRegisters.BX);
 
             /*
        * EAX contains the GetInvocationList() array at the index at which it was last used
@@ -136,7 +136,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
 
         #region OLD attempt
         //    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-        //      new CPUx86.Xchg { DestinationReg = CPUx86.Registers.BX, SourceReg = CPUx86.Registers.BX, Size = 16 };
+        //      XS.Xchg(XSRegisters.BX, XSRegisters.BX);
         //      XS.Noop();
         //      var xAssembler = (CosmosAssembler)aAssembler;
         //      var xMethodInfo = (Cosmos.IL2CPU.MethodInfo)aMethodInfo;

@@ -49,13 +49,13 @@ namespace Cosmos.IL2CPU.X86.IL
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I1.cs->The size 2 could not exist, because always is pushed Int32 or Int64!");
                 case 4:
                     XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                    new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.AL, Size = 8 };
+                    XS.MoveSignExtend(XSRegisters.EAX, XSRegisters.AL);
                     XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     break;
                 case 8:
                     XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
-                    new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.AL, Size = 8 };
+                    XS.MoveSignExtend(XSRegisters.EAX, XSRegisters.AL);
                     XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
                     break;
                 default:

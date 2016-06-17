@@ -58,7 +58,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				// remove bits >= 32, so that CL max value could be only 31
 				XS.And(XSRegisters.CL, 0x1f, size: RegisterSize.Byte8);
 				// shift low part in EAX and move it in high part
-				new CPUx86.ShiftLeft { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.CL, Size = 32};
+				XS.ShiftLeft(EAX, CL);
 				XS.Set(ESP, EAX, destinationDisplacement: 4);
 				// replace unknown low part with a zero, if <= 32
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceValue = 0 };
