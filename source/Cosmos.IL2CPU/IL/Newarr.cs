@@ -36,15 +36,15 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
       XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
       //Assembler.StackSizes.Push(xElementCountSize);
-      new CPUx86.Push { DestinationValue = xSize };
+      XS.Push(xSize);
       new Mul(Assembler).Execute(aMethod, aOpCode);
       // the total items size is now on the stack
-      new CPUx86.Push { DestinationValue = (ObjectImpl.FieldDataOffset + 4) };
+      XS.Push((ObjectImpl.FieldDataOffset + 4));
       new Add(Assembler).Execute(aMethod, aOpCode);
       // the total array size is now on the stack.
       XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
-      new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
-      new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
+      XS.Push(XSRegisters.ESP, isIndirect: true);
+      XS.Push(XSRegisters.ESP, isIndirect: true);
       // it's on the stack 3 times now, once from the return value, twice from the pushes;
 
       XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));

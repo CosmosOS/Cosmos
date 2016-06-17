@@ -77,13 +77,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
                         XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EDX));
                         XS.Sub(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
-                        new CPUx86.SubWithCarry
-                        {
-                            DestinationReg = CPUx86.RegistersEnum.ESP,
-                            DestinationIsIndirect = true,
-                            DestinationDisplacement = 4,
-                            SourceReg = CPUx86.RegistersEnum.EDX
-                        };
+                        XS.SubWithCarry(XSRegisters.ESP, XSRegisters.EDX, destinationDisplacement: 4);
                     }
                     break;
                 default:

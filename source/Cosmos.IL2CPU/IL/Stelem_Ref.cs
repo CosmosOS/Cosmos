@@ -36,7 +36,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
       XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), (uint)(ObjectImpl.FieldDataOffset + 4));
 
-      new CPUx86.Push { DestinationValue = aElementSize };
+      XS.Push(aElementSize);
       XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
 
 

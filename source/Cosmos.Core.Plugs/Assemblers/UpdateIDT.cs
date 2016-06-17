@@ -43,7 +43,7 @@ namespace Cosmos.Core.Plugs
             // the other INTs
 
             // We are updating the IDT, disable interrupts
-            new CPUx86.ClearInterruptFlag();
+            XS.ClearInterruptFlag();
 
             for (int i = 0; i < 256; i++)
             {
@@ -113,10 +113,10 @@ namespace Cosmos.Core.Plugs
 
                 if (Array.IndexOf(xInterruptsWithParam, j) == -1)
                 {
-                    new CPUx86.Push { DestinationValue = 0 };
+                    XS.Push(0);
                 }
-                new CPUx86.Push { DestinationValue = (uint)j };
-                new CPUx86.Pushad();
+                XS.Push((uint)j);
+                XS.PushAllRegisters();
 
                 XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP)); // preserve old stack address for passing to interrupt handler
@@ -124,7 +124,7 @@ namespace Cosmos.Core.Plugs
                 // store floating point data
                 XS.And(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 0xfffffff0); // fxsave needs to be 16-byte alligned
                 XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 512); // fxsave needs 512 bytes
-                new FXSave { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true }; // save the registers
+                XS.SSE.FXSave(XSRegisters.ESP, isIndirect: true); // save the registers
                 XS.Set(XSRegisters.EAX, XSRegisters.ESP, destinationIsIndirect: true);
 
                 XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); //
@@ -141,31 +141,31 @@ namespace Cosmos.Core.Plugs
                 }
                 XS.Call(CPUAll.LabelName.Get(xHandler));
                 XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                new FXStore { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true };
+                XS.SSE.FXRestore(XSRegisters.ESP, isIndirect: true);
 
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // this restores the stack for the FX stuff, except the pointer to the FX data
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4); // "pop" the pointer
 
-                new CPUx86.Popad();
+                XS.PopAllRegisters();
 
                 XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
                 new CPUAll.Label("__ISR_Handler_" + j.ToString("X2") + "_END");
-                new CPUx86.IRET();
+                XS.InterruptReturn();
             }
             new CPUAll.Label("__INTERRUPT_OCCURRED__");
             new CPUx86.Return();
             new CPUAll.Label("__AFTER__ALL__ISR__HANDLER__STUBS__");
-            new CPUx86.Noop();
+            XS.Noop();
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 8);
             XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
-            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = ".__AFTER_ENABLE_INTERRUPTS" };
+            XS.Jump(CPUx86.ConditionalTestEnum.Zero, ".__AFTER_ENABLE_INTERRUPTS");
 
             // reload interrupt list
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), "_NATIVE_IDT_Pointer");
             new CPUx86.Mov { DestinationRef = CPUAll.ElementReference.New("static_field__Cosmos_Core_CPU_mInterruptsEnabled"), DestinationIsIndirect = true, SourceValue = 1 };
-            new CPUx86.Lidt { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true };
+            XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
             // Reenable interrupts
-            new CPUx86.Sti();
+            XS.EnableInterrupts();
 
             new CPUAll.Label(".__AFTER_ENABLE_INTERRUPTS");
         }

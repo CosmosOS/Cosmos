@@ -106,21 +106,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     XS.Label(MoveReturnValue);
                     // move high result to left high
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.ESP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = 12,
-                        SourceReg = CPUx86.RegistersEnum.EDX
-                    };
+                    XS.Set(XSRegisters.ESP, XSRegisters.EDX, destinationDisplacement: 12);
                     // move low result to left low
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.ESP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = 8,
-                        SourceReg = CPUx86.RegistersEnum.EAX
-                    };
+                    XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationDisplacement: 8);
                     // pop right 64 value
                     XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
                 }

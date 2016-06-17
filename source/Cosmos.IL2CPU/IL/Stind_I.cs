@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
             for( int i = 0; i < ( aSize / 4 ); i++ )
             {
                 XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: i * 4);
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.RegistersEnum.EAX };
+                XS.Set(XSRegisters.EBX, XSRegisters.EAX, destinationDisplacement: i * 4);
             }
             switch( aSize % 4 )
             {
@@ -88,7 +88,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //             XS.Mov(XSRegisters.EBX, XSRegisters.ESP, sourceDisplacement: xStorageSize);
         // 			for (int i = 0; i < (aSize / 4); i++) {
         //                 XS.Mov(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: i * 4);
-        //                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
+        //                 XS.Mov(XSRegisters.EBX, XSRegisters.EAX, destinationDisplacement: i * 4);
         // 			}
         // 			switch (aSize % 4) {
         // 				case 0: {

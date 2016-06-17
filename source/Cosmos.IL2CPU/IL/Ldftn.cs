@@ -3,6 +3,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Assembler.x86;
 using CPU = Cosmos.Assembler;
 using Cosmos.Assembler;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -16,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New( LabelName.Get(((OpMethod)aOpCode).Value ) ) };
+          XS.Push(LabelName.Get(((OpMethod)aOpCode).Value));
         }
     }
 }

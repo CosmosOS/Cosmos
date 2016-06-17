@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection.Emit;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86.x87;
 using static XSharp.Compiler.XSRegisters;
+using Label = Cosmos.Assembler.Label;
 
 namespace XSharp.Compiler
 {
@@ -225,7 +227,8 @@ namespace XSharp.Compiler
                               int? destinationDisplacement = null,
                               bool sourceIsIndirect = false,
                               int? sourceDisplacement = null,
-                              bool skipSizeCheck = false)
+                              bool skipSizeCheck = false,
+                              RegisterSize? size = null)
       where T : InstructionWithDestinationAndSourceAndSize, new()
     {
       if (destinationDisplacement != null)
@@ -254,19 +257,21 @@ namespace XSharp.Compiler
       {
         throw new Exception("Both destination and source cannot be indirect!");
       }
-      RegisterSize xSize;
-      if (!destinationIsIndirect)
+      if (size == null)
       {
-        xSize = destination.Size;
-      }
-      else
-      {
-        xSize = source.Size;
+        if (!destinationIsIndirect)
+        {
+          size = destination.Size;
+        }
+        else
+        {
+          size = source.Size;
+        }
       }
 
       new T
       {
-        Size = (byte)xSize,
+        Size = (byte)size,
         DestinationReg = destination.RegEnum,
         DestinationIsIndirect = destinationIsIndirect,
         DestinationDisplacement = destinationDisplacement,
@@ -589,9 +594,9 @@ namespace XSharp.Compiler
       Do<Mov>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
     }
 
-    public static void Set(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    public static void Set(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
     {
-      Do<Mov>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+      Do<Mov>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size: size);
     }
 
     public static void SetByte(uint address, byte value)
@@ -656,18 +661,18 @@ namespace XSharp.Compiler
       Do<RotateLeft>(register, bitCount);
     }
 
-    public static void ShiftRight(Register register, byte bitCount)
+    public static void ShiftRight(Register destination, byte bitCount)
     {
-      Do<ShiftRight>(register, bitCount);
+      Do<ShiftRight>(destination, bitCount);
     }
 
-    public static void ShiftRight(Register register, Register8 bitCount)
+    public static void ShiftRight(Register destination, Register8 source, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
     {
-      if (bitCount != CL)
+      if (source != CL)
       {
         throw new InvalidOperationException();
       }
-      Do<ShiftRight>(register, bitCount, skipSizeCheck: true);
+      Do<ShiftRight>(destination, source, skipSizeCheck: true, destinationIsIndirect:destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
     }
 
     public static void ShiftLeft(Register register, byte bitCount)
@@ -684,15 +689,6 @@ namespace XSharp.Compiler
       Do<ShiftLeft>(register, bitCount, skipSizeCheck: true);
     }
 
-    public static void PushAllGeneralRegisters()
-    {
-      new Pushad();
-    }
-
-    public static void PopAllGeneralRegisters()
-    {
-      new Popad();
-    }
 
     public static void WriteToPortDX(Register value)
     {
@@ -715,7 +711,7 @@ namespace XSharp.Compiler
       Do<Push>(destinationValue, isIndirect, displacement, size);
     }
 
-    public static void Push(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+    public static void Push(Register register, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
     {
       Do<Push>(register, isIndirect, displacement, size);
     }
@@ -765,9 +761,9 @@ namespace XSharp.Compiler
       Do<SubWithCarry>(register, valueToAdd);
     }
 
-    public static void SubWithCarry(Register register, Register valueToAdd)
+    public static void SubWithCarry(Register register, Register valueToAdd, bool destinationIsIndirect = false, int? destinationDisplacement = null)
     {
-      Do<SubWithCarry>(register, valueToAdd);
+      Do<SubWithCarry>(register, valueToAdd, destinationDisplacement: destinationDisplacement, destinationIsIndirect: destinationIsIndirect);
     }
 
     public static void And(Register register, uint value)
@@ -775,9 +771,9 @@ namespace XSharp.Compiler
       Do<And>(register, value);
     }
 
-    public static void And(Register register, Register value, bool destinationIsIndirect = false)
+    public static void And(Register register, Register value, bool destinationIsIndirect = false, int? destinationDisplacement = null)
     {
-      Do<And>(register, value, destinationIsIndirect: destinationIsIndirect);
+      Do<And>(register, value, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement);
     }
 
     public static void Xor(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
@@ -1038,16 +1034,185 @@ namespace XSharp.Compiler
       };
     }
 
-    public static void Exchange(Register destination, Register source, bool destinationIsIndirect = false)
+    public static void Exchange(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null)
     {
-      if (!destinationIsIndirect)
+      Do<Xchg>(destination, source, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement);
+    }
+
+    public static void ClearInterruptFlag()
+    {
+      new ClearInterruptFlag();
+    }
+
+    public static void ClearDirectionFlag()
+    {
+      new ClrDirFlag();
+    }
+
+    public static void DebugNoop()
+    {
+      new DebugNoop();
+    }
+
+    public static void Halt()
+    {
+      new Halt();
+    }
+
+    public static void Int3()
+    {
+      new INT3();
+    }
+
+    public static void Noop()
+    {
+      new Noop();
+    }
+
+    public static void PopAllRegisters()
+    {
+      new Popad();
+    }
+
+    public static void PushAllRegisters()
+    {
+      new Pushad();
+    }
+
+    public static void EnableInterrupts()
+    {
+      new Sti();
+    }
+
+    public static void DisableInterrupts()
+    {
+      new ClearInterruptFlag();
+    }
+
+    public static void StoreByteInString()
+    {
+      new StoreByteInString();
+    }
+
+    public static void StoreWordInString()
+    {
+      new StoreWordInString();
+    }
+
+    public static void LoadGdt(Register32 destination, bool isIndirect = false)
+    {
+      new Lgdt
       {
-        if (destination.Size != source.Size)
+        DestinationReg = destination,
+        DestinationIsIndirect = isIndirect
+      };
+    }
+
+    public static void LoadIdt(Register32 destination, bool isIndirect = false)
+    {
+      new Lidt
+      {
+        DestinationReg = destination,
+        DestinationIsIndirect = isIndirect
+      };
+    }
+
+    public static void RotateThroughCarryRight(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+      Do<RotateThroughCarryRight>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void RotateThroughCarryRight(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<RotateThroughCarryRight>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void RotateThroughCarryRight(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+      Do<RotateThroughCarryRight>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void RotateThroughCarryRight(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+      Do<RotateThroughCarryRight>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void RotateThroughCarryRight(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+      Do<RotateThroughCarryRight>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void RotateThroughCarryRight(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+      Do<RotateThroughCarryRight>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size: size);
+    }
+
+    public static void ShiftRightDouble(Register destination, Register source, uint argumentValue)
+    {
+      new ShiftRightDouble()
+      {
+        DestinationReg = destination,
+        SourceReg = source,
+        ArgumentValue = argumentValue
+      };
+    }
+
+    public static void ShiftRightDouble(Register destination, Register source, Register8 argumentReg, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    {
+      if (argumentReg != CL)
+      {
+        throw new InvalidOperationException("Argument needs to be CL!");
+      }
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
         {
-          throw new InvalidOperationException("Register sizes don't match!");
+          destinationDisplacement = null;
         }
       }
-      Do<Xchg>(destination, source, destinationIsIndirect: destinationIsIndirect);
+      new ShiftLeftDouble()
+      {
+        DestinationReg = destination,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceReg = source,
+        ArgumentReg = argumentReg
+      };
+    }
+
+    public static void ShiftLeftDouble(Register destination, Register source, uint argumentValue)
+    {
+      new ShiftRightDouble()
+      {
+        DestinationReg = destination,
+        SourceReg = source,
+        ArgumentValue = argumentValue
+      };
+    }
+
+    public static void ShiftLeftDouble(Register destination, Register source, Register8 argumentReg, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    {
+      if (argumentReg != CL)
+      {
+        throw new InvalidOperationException("Argument needs to be CL!");
+      }
+      if (destinationDisplacement != null)
+      {
+        destinationIsIndirect = true;
+        if (destinationDisplacement == 0)
+        {
+          destinationDisplacement = null;
+        }
+      }
+      new ShiftLeftDouble()
+      {
+        DestinationReg = destination,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement,
+        SourceReg = source,
+        ArgumentReg = argumentReg
+      };
     }
   }
 }

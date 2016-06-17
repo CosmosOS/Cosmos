@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
 		    XS.Set(XSRegisters.EDI, XSRegisters.EDI, sourceIsIndirect: true);
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 8);// aFieldHandle
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 8);
-		    new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EDI, DestinationIsIndirect = true};
+		    XS.Push(XSRegisters.EDI, isIndirect: true);
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 4);
             XS.Set(XSRegisters.EAX, XSRegisters.EDI, sourceIsIndirect: true);
 		    new CPUx86.Multiply {DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 32};
@@ -36,7 +36,7 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), 1);
             XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 1);
 			XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
-            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = ".EndLoop" };
+            XS.Jump(CPUx86.ConditionalTestEnum.Equal, ".EndLoop");
             XS.Jump(".StartLoop");
 
 			XS.Label(".EndLoop");

@@ -184,9 +184,7 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void ThrowNotImplementedException(string aMessage) {
-      new CPU.Push {
-        DestinationRef = Cosmos.Assembler.ElementReference.New(LdStr.GetContentsArrayName(aMessage))
-      };
+      XS.Push(LdStr.GetContentsArrayName(aMessage));
       new CPU.Call {
         DestinationLabel = LabelName.Get(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public))
       };
@@ -396,13 +394,13 @@ namespace Cosmos.IL2CPU {
           XS.Jump(CPU.ConditionalTestEnum.Equal, aJumpTargetNoException);
           aCleanup();
           if (xJumpTo == null) {
-            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException };
+            XS.Jump(CPU.ConditionalTestEnum.NotEqual, GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException);
           } else {
             XS.Jump(CPU.ConditionalTestEnum.NotEqual, xJumpTo);
           }
         } else {
           if (xJumpTo == null) {
-            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException };
+            XS.Jump(CPU.ConditionalTestEnum.NotEqual, GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException);
           } else {
             XS.Jump(CPU.ConditionalTestEnum.NotEqual, xJumpTo);
           }
@@ -432,15 +430,15 @@ namespace Cosmos.IL2CPU {
       if (debugEnabled)
       {
         new CPU.Compare {DestinationReg = CPU.RegistersEnum.ESP, DestinationDisplacement = (int) stackOffsetToCheck, DestinationIsIndirect = true, SourceValue = 0};
-        new CPU.ConditionalJump {DestinationLabel = ".AfterNullCheck", Condition = CPU.ConditionalTestEnum.NotEqual};
-        new CPU.ClearInterruptFlag();
+        XS.Jump(CPU.ConditionalTestEnum.NotEqual, ".AfterNullCheck");
+        XS.ClearInterruptFlag();
         // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
         XS.Call(".NullCheck_GetCurrAddress");
         new Assembler.Label(".NullCheck_GetCurrAddress");
         XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
         new CPU.Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = CPU.RegistersEnum.EAX};
         XS.Call("DebugStub_SendNullReferenceOccurred");
-        new CPU.Halt();
+        XS.Halt();
         XS.Label(".AfterNullCheck");
       }
     }

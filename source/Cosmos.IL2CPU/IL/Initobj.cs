@@ -1,5 +1,6 @@
 using System;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -19,10 +20,10 @@ namespace Cosmos.IL2CPU.X86.IL
             Type mType = (( Cosmos.IL2CPU.ILOpCodes.OpType )aOpCode).Value;
             mObjSize = SizeOfType( mType );
 
-            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
             for( int i = 0; i < ( mObjSize / 4 ); i++ )
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceValue = 0, Size = 32 };
+                XS.Set(EAX, 0, destinationDisplacement: i * 4, size: RegisterSize.Int32);
             }
             switch( mObjSize % 4 )
             {
@@ -90,7 +91,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			Assembler.Stack.Pop();
         //             XS.Pop(XSRegisters.EAX);
         // 			for (int i = 0; i < (mObjSize / 4); i++) {
-        //                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceValue = 0, Size=32 };
+        //                 XS.Mov(XSRegisters.EAX, 0, destinationDisplacement: i * 4, size: RegisterSizes.Int32);
         // 			}
         // 			switch (mObjSize % 4) {
         // 				case 1: {

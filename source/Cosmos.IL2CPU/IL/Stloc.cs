@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			for (int i = (int)GetStackCountForLocal(aMethod, xFieldInfo) - 1; i >= 0; i--)
 			{
 				XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement =(int)((0 - (xEBPOffset + (i * 4)))), SourceReg = CPUx86.RegistersEnum.EAX };
+				XS.Set(XSRegisters.EBP, XSRegisters.EAX, destinationDisplacement: (int)((0 - (xEBPOffset + (i * 4)))));
 			}
 		}
 
@@ -59,7 +59,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		// 			}
 		// 			foreach (int i in mLocal.VirtualAddresses.Reverse()) {
 		//                 XS.Pop(XSRegisters.EAX); ;
-		//                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = i, SourceReg = CPUx86.Registers.EAX };
+		//                 XS.Mov(XSRegisters.EBP, XSRegisters.EAX, destinationDisplacement: i);
 		// 			}
 		// 			// no need to inc again, items on the transient stack are also counted
 		// 			Assembler.Stack.Pop();

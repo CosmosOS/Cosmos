@@ -38,7 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //        case 2:
         //        case 4:
         //            {
-        //                new CPUx86.Noop();
+        //                XS.Noop();
         //                break;
         //            }
         //        case 8:
@@ -93,7 +93,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			case 2:
         // 			case 4:
         // 				{
-        // 					new CPUx86.Noop();
+        // 					XS.Noop();
         // 					break;
         // 				}
         // 			case 8:

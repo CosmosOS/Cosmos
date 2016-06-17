@@ -1041,11 +1041,11 @@ namespace XSharp.Compiler {
                     });
       AddPattern("+All", delegate(TokenList aTokens)
                          {
-                           XS.PushAllGeneralRegisters();
+                           XS.PushAllRegisters();
                          });
       AddPattern("-All", delegate(TokenList aTokens)
                          {
-                           XS.PopAllGeneralRegisters();
+                           XS.PopAllRegisters();
                          });
       AddPattern("-_REG", delegate(TokenList aTokens)
                           {

@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         if (TypeIsFloat(xSource))
                         {
                             new CPUx86.x87.FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
-                            new CPUx86.x87.FloatABS();
+                            XS.FPU.FloatAbs();
                             new CPUx86.x87.IntStoreWithTrunc { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
                         }
                         //Else it's already an Int64, or UInt64

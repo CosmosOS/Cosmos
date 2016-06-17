@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Cosmos.IL2CPU.Plugs;
 using Assembler = Cosmos.Assembler;
 using CPUAll = Cosmos.Assembler;
@@ -11,7 +11,7 @@ namespace Cosmos.Kernel.Plugs.Assemblers
     {
         public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
         {
-            new CPUx86.x87.FloatInit();
+            XS.FloatInit();
         }
     }
 }
