@@ -1,5 +1,6 @@
 using System;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -29,23 +30,23 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 4:
 					if (xSourceIsFloat)
 					{
-						new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 32 };
-						XS.Sub(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
-						new CPUx86.x87.IntStoreWithTrunc { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 64 };
+						XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Int32);
+						XS.Sub(OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
+						XS.FPU.IntStoreWithTruncate(ESP, isIndirect: true, size: RegisterSize.Long64);
 					}
 					else
 					{
-						XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-						XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
-						XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
-                        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+						XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+						XS.SignExtendAX(RegisterSize.Int32);
+						XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EDX));
+                        XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
 					}
                     break;
                 case 8:
 					if (xSourceIsFloat)
 					{
-						new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 64 };
-						new CPUx86.x87.IntStoreWithTrunc { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 64 };
+						XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
+						XS.FPU.IntStoreWithTruncate(ESP, isIndirect: true, size: RegisterSize.Long64);
 					}
                     break;
                 default:
