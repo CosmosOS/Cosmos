@@ -51,9 +51,9 @@ namespace Cosmos.Core.Memory {
 
       var xPtr = (Native*)RAT.Alloc(RAT.PageType.HeapSmall);
       *xPtr = 0;
-      for (void** p = mSMT + aItemSize; ; p--) {
-      // TODO - Make a free list, put a ptr in item header and first page header - how to keep compact?
-      }
+      //for (void** p = mSMT + aItemSize; ; p--) {
+      //// TODO - Make a free list, put a ptr in item header and first page header - how to keep compact?
+      //}
       // Header
       // Ptr to next page of same size
 
