@@ -878,7 +878,7 @@ namespace Cosmos.IL2CPU
 
         protected int GetVTableEntrySize()
         {
-            return 16; // todo: retrieve from actual type info
+            return 24; // todo: retrieve from actual type info
         }
 
         public const string InitVMTCodeLabel = "___INIT__VMT__CODE____";
@@ -912,9 +912,8 @@ namespace Cosmos.IL2CPU
             Array.Copy(xTemp, 0, xData, 8, 4);
             xTemp = BitConverter.GetBytes(GetVTableEntrySize());
             Array.Copy(xTemp, 0, xData, 12, 4);
-            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
-            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Handle", ElementReference.New(xTheName + "__Contents")));
-            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName, ElementReference.New(xTheName + "__Handle")));
+            XS.DataMemberBytes(xTheName + "__Contents", xData);
+            XS.DataMember(xTheName, 2, "dd", xTheName + "__Contents,0");
 #if VMT_DEBUG
         using (var xVmtDebugOutput = XmlWriter.Create(@"vmt_debug.xml"))
         {
@@ -1034,8 +1033,7 @@ namespace Cosmos.IL2CPU
                 {
                     Push(aGetTypeID(xType));
                     Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(
-                        new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { (int)aGetTypeID(xType) }));
+                    XS.DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), aGetTypeID(xType) );
                     Push((uint)xBaseIndex.Value);
                     xData = new byte[16 + (xEmittedMethods.Count * 4)];
                     xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
@@ -1048,12 +1046,12 @@ namespace Cosmos.IL2CPU
                     Array.Copy(xTemp, 0, xData, 12, 4);
                     string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodIndexesArray";
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName + "_Handle", ElementReference.New(xDataName)));
-                    Push(xDataName + "_Handle");
+                    Push(0);
+                    Push(xDataName);
                     xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName + "_Handle", ElementReference.New(xDataName)));
-                    Push(xDataName + "_Handle");
+                    Push(0);
+                    Push(xDataName);
                     xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
                     xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
                     Array.Copy(xTemp, 0, xData, 0, 4);
@@ -1065,7 +1063,6 @@ namespace Cosmos.IL2CPU
                     Array.Copy(xTemp, 0, xData, 12, 4);
                     xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName + "_Handle", ElementReference.New(xDataName)));
                     Push("0" + xEmittedMethods.Count.ToString("X") + "h");
                     Call(xSetTypeInfoRef);
                 }
@@ -1121,7 +1118,7 @@ namespace Cosmos.IL2CPU
                         Push((uint)xMethodId);
                         if (xMethod.IsAbstract)
                         {
-                            // abstract methods dont have bodies, oiw, are not emitted
+                            // abstract methods dont have bodies, iow, are not emitted
                             Push(0);
                         }
                         else
@@ -1492,6 +1489,7 @@ namespace Cosmos.IL2CPU
                 XS.Push(EAX);
                 XS.Push(EBX);
                 XS.Call("DebugStub_SendSimpleNumber");
+                XS.Add(ESP, 4);
                 XS.Call("DebugStub_SendSimpleNumber");
 
                 XS.ClearInterruptFlag();

@@ -648,6 +648,11 @@ namespace XSharp.Compiler
       Assembler.CurrentInstance.DataMembers.Add(new DataMember(name, value));
     }
 
+    public static void DataMemberBytes(string name, byte[] value)
+    {
+      Assembler.CurrentInstance.DataMembers.Add(new DataMember(name, value));
+    }
+
     public static void DataMember(string name, uint elementCount, string size, string value)
     {
       new LiteralAssemblerCode(name + ": TIMES " + elementCount + " " + size + " " + value);

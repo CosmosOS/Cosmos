@@ -38,7 +38,6 @@ namespace Cosmos.IL2CPU
 
     public static void SetTypeInfo(int aType, uint aBaseType, int[] aMethodIndexes, int[] aMethodAddresses, int aMethodCount)
     {
-      //mTypes[aType] = new VTable();
       mTypes[aType].BaseTypeIdentifier = aBaseType;
       mTypes[aType].MethodIndexes = aMethodIndexes;
       mTypes[aType].MethodAddresses = aMethodAddresses;
@@ -133,7 +132,7 @@ namespace Cosmos.IL2CPU
     }
   }
 
-  [StructLayout(LayoutKind.Explicit, Size = 16)]
+  [StructLayout(LayoutKind.Explicit, Size = 24)]
   public struct VTable
   {
     [FieldOffset(0)]
@@ -145,7 +144,7 @@ namespace Cosmos.IL2CPU
     [FieldOffset(8)]
     public int[] MethodIndexes;
 
-    [FieldOffset(12)]
+    [FieldOffset(16)]
     public int[] MethodAddresses;
   }
 }

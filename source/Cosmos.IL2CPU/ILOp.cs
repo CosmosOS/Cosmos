@@ -101,10 +101,14 @@ namespace Cosmos.IL2CPU {
       {
         throw new ArgumentNullException("aType");
       }
+      if (aType.IsPointer)
+      {
+        return 4;
+      }
       if (aType.FullName == "System.Void") {
         return 0;
       } else if ((!aType.IsValueType && aType.IsClass) || aType.IsInterface) {
-        return 4;
+        return 8;
       }
       if (aType.IsByRef) {
         return 4;

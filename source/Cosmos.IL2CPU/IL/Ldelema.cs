@@ -5,6 +5,7 @@ using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.Plugs.System;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -23,23 +24,25 @@ namespace Cosmos.IL2CPU.X86.IL
 
             DoNullReferenceCheck(aAssembler, debugEnabled, 4);
             // calculate element offset into array memory (including header)
-            XS.Pop(XSRegisters.EAX);
-            XS.Set(XSRegisters.EDX, aElementSize);
-            XS.Multiply(XSRegisters.EDX);
-            XS.Add(XSRegisters.EAX, (uint)(ObjectImpl.FieldDataOffset + 4));
+            XS.Pop(EAX);
+            XS.Pop(EDX);
+            XS.Set(EDX, aElementSize);
+            //XS.Add(ESP, 4);
+            XS.Multiply(EDX);
+            XS.Add(EAX, (uint)(ObjectImpl.FieldDataOffset + 4));
 
             // pop the array now
-            XS.Pop(XSRegisters.EDX);
+            XS.Pop(EDX);
             // translate it to actual memory
-            XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true);
+            XS.Set(EDX, EDX, sourceIsIndirect: true);
 
             if (aOpType.StackPopTypes.Last().GetElementType().IsClass)
             {
-                XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true);
+                XS.Set(EDX, EDX, sourceIsIndirect: true);
             }
 
-            XS.Add(XSRegisters.EDX, XSRegisters.EAX);
-            XS.Push(XSRegisters.EDX);
+            XS.Add(EDX, EAX);
+            XS.Push(EDX);
         }
 
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
