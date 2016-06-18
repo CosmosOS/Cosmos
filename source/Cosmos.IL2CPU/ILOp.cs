@@ -104,7 +104,7 @@ namespace Cosmos.IL2CPU {
       if (aType.FullName == "System.Void") {
         return 0;
       } else if ((!aType.IsValueType && aType.IsClass) || aType.IsInterface) {
-        return 8;
+        return 4;
       }
       if (aType.IsByRef) {
         return 4;
