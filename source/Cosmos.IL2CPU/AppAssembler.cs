@@ -1210,7 +1210,7 @@ namespace Cosmos.IL2CPU
                     Type xFieldTypeDef = aField.FieldType;
                     if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType)
                     {
-                        xTheSize = GetSizeOfType(aField.FieldType);
+                        xTheSize = ILOp.SizeOfType(aField.FieldType);
                     }
                     else
                     {
@@ -1250,12 +1250,6 @@ namespace Cosmos.IL2CPU
                 }
             }
         }
-
-        public uint GetSizeOfType(Type aType)
-        {
-            return ILOp.SizeOfType(aType);
-        }
-
 
         /// <summary>
         /// Generates a forwarding stub, which transforms from the actual method to the plug.
