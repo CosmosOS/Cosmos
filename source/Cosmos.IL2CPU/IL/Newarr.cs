@@ -6,6 +6,7 @@ using System.Reflection;
 
 using Cosmos.IL2CPU.Plugs.System;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -33,8 +34,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
       new Comment(Assembler, "Element Size = " + xSize);
       // element count is on the stack
-      XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
-      XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI));
+      XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.ESI));
+      XS.Push(OldToNewRegister(CPUx86.RegistersEnum.ESI));
       //Assembler.StackSizes.Push(xElementCountSize);
       XS.Push(xSize);
       new Mul(Assembler).Execute(aMethod, aOpCode);
@@ -43,19 +44,19 @@ namespace Cosmos.IL2CPU.X86.IL
       new Add(Assembler).Execute(aMethod, aOpCode);
       // the total array size is now on the stack.
       XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
-      XS.Push(XSRegisters.ESP, isIndirect: true);
-      XS.Push(XSRegisters.ESP, isIndirect: true);
+      XS.Push(ESP, isIndirect: true);
+      XS.Push(ESP, isIndirect: true);
       // it's on the stack 3 times now, once from the return value, twice from the pushes;
 
-      XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-      XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
-      XS.Set(XSRegisters.EBX, xTypeID, sourceIsIndirect: true);
-      XS.Set(XSRegisters.EAX, XSRegisters.EBX, destinationIsIndirect: true);
-      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
+      XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+      XS.Set(EAX, EAX, sourceIsIndirect: true);
+      XS.Set(EBX, xTypeID, sourceIsIndirect: true);
+      XS.Set(EAX, EBX, destinationIsIndirect: true);
+      XS.Add(OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceValue = (uint)InstanceTypeEnum.Array, Size = 32 };
-      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
-      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.ESI, Size = 32 };
-      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
+      XS.Add(OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
+      XS.Set(EAX, ESI, destinationIsIndirect: true, size: RegisterSize.Int32);
+      XS.Add(OldToNewRegister(CPUx86.RegistersEnum.EAX), 4);
       new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceValue = (uint)xSize, Size = 32 };
       XS.Call(xCtorName);
     }

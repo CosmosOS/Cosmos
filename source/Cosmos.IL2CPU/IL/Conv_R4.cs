@@ -1,5 +1,6 @@
 using System;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -25,8 +26,8 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 1:
                 case 2:
                     {
-                        XS.SSE.ConvertSI2SS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
-                        XS.SSE.MoveSS(XSRegisters.ESP, XSRegisters.XMM0, destinationIsIndirect: true);
+                        XS.SSE.ConvertSI2SS(XMM0, ESP, sourceIsIndirect: true);
+                        XS.SSE.MoveSS(ESP, XMM0, destinationIsIndirect: true);
                         break;
                     }
                 case 4:
@@ -35,8 +36,8 @@ namespace Cosmos.IL2CPU.X86.IL
                         {
                             if (IsIntegerSigned(xSource))
                             {
-                                XS.SSE.ConvertSI2SS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
-                                XS.SSE.MoveSS(XSRegisters.ESP, XSRegisters.XMM0, destinationIsIndirect: true);
+                                XS.SSE.ConvertSI2SS(XMM0, ESP, sourceIsIndirect: true);
+                                XS.SSE.MoveSS(ESP, XMM0, destinationIsIndirect: true);
                             }
                             else
                             {
@@ -50,15 +51,15 @@ namespace Cosmos.IL2CPU.X86.IL
                         if (xSourceIsFloat)
                         {
                             new CPUx86.SSE.ConvertSD2SS { SourceReg = CPUx86.RegistersEnum.ESP, DestinationReg = CPUx86.RegistersEnum.XMM0, SourceIsIndirect = true };
-                            XS.SSE.MoveSS(XSRegisters.ESP, XSRegisters.XMM0, destinationIsIndirect: true);
+                            XS.SSE.MoveSS(ESP, XMM0, destinationIsIndirect: true);
                         }
                         else
                         {
                             if (IsIntegerSigned(xSource))
                             {
-                                new CPUx86.x87.IntLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
+                                XS.FPU.IntLoad(ESP, isIndirect: true, size: RegisterSize.Long64);
                                 new CPUx86.SSE.ConvertSD2SS { SourceReg = CPUx86.RegistersEnum.ESP, DestinationReg = CPUx86.RegistersEnum.XMM0, SourceIsIndirect = true };
-                                new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
+                                XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Int32);
 
                                 //throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_R4.cs->Conversion of Int64 to Float is not yet implemented!");
                             }
@@ -67,9 +68,9 @@ namespace Cosmos.IL2CPU.X86.IL
                                 throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_R4.cs->Conversion of UInt64 to Float is not yet implemented!");
                             }
                         }
-                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
-                        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.ECX));
+                        XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
                         break;
                     }
                 default:

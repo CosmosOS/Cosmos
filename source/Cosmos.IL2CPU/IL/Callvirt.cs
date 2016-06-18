@@ -77,7 +77,7 @@ namespace Cosmos.IL2CPU.X86.IL
             // mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
 
 
-            new Comment(Assembler, "ThisOffset = " + xThisOffset);
+            XS.Comment("ThisOffset = " + xThisOffset);
             Call.DoNullReferenceCheck(Assembler, debugEnabled, xThisOffset);
 
             if (!String.IsNullOrEmpty(xNormalAddress))
@@ -205,7 +205,7 @@ namespace Cosmos.IL2CPU.X86.IL
                                         ILOp.EmitExceptionCleanupAfterCall(Assembler, xResultSize, xStackOffsetBefore, xPopSize);
                                     });
             XS.Label(xCurrentMethodLabel + ".NoExceptionAfterCall");
-            new Comment(Assembler, "Argument Count = " + xParameters.Length.ToString());
+            XS.Comment("Argument Count = " + xParameters.Length.ToString());
         }
     }
 }

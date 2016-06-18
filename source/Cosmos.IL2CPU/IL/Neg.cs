@@ -1,6 +1,7 @@
 using System;
 using Cosmos.Assembler.x86.x87;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -22,34 +23,34 @@ namespace Cosmos.IL2CPU.X86.IL
 			{
 				if (xStackContentIsFloat)
 				{
-					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
-					new CPUx86.x87.FloatNegate { };
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true };
+					XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
+					XS.FPU.FloatNegate();
+					XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
 				}
 				else
 				{
-					XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX)); // low
-					XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // high
-					XS.Negate(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX)); // set carry if EBX != 0
-					XS.AddWithCarry(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
-					XS.Negate(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
+					XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EBX)); // low
+					XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX)); // high
+					XS.Negate(OldToNewRegister(CPUx86.RegistersEnum.EBX)); // set carry if EBX != 0
+					XS.AddWithCarry(OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+					XS.Negate(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+					XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+					XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EBX));
 				}
 			}
 			else
 			{
 				if (xStackContentIsFloat)
 				{
-					new FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
-					new FloatNegate { };
-					new FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true };
+					XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Int32);
+				  XS.FPU.FloatNegate();
+					XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Int32);
 				}
 				else
 				{
-					XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-					XS.Negate(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+					XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+					XS.Negate(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+					XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
 				}
 			}
 		}

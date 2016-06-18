@@ -797,12 +797,7 @@ namespace Cosmos.IL2CPU
 
         protected void Move(string aDestLabelName, int aValue)
         {
-            new Mov
-            {
-                DestinationRef = ElementReference.New(aDestLabelName),
-                DestinationIsIndirect = true,
-                SourceValue = (uint)aValue
-            };
+            XS.Set(aDestLabelName, (uint)aValue, destinationIsIndirect: true, size: RegisterSize.Int32);
         }
 
         protected void Push(uint aValue)
@@ -1508,7 +1503,7 @@ namespace Cosmos.IL2CPU
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 XS.Call("DebugStub_SendStackCorruptionOccurred");
                 XS.Halt();
-                new Assembler.Label(xLabel + ".StackCorruptionCheck_End");
+                XS.Label(xLabel + ".StackCorruptionCheck_End");
 
             }
         }

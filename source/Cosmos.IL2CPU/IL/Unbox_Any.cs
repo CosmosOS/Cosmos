@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
       uint xTypeSize = SizeOfType(xType.Value);
       string mReturnNullLabel = xBaseLabel + "_ReturnNull";
 
-      new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceValue = 0 };
+      XS.Compare(XSRegisters.ESP, 0, destinationIsIndirect: true);
       XS.Jump(CPU.ConditionalTestEnum.Zero, mReturnNullLabel);
       XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
       XS.Push(XSRegisters.EAX, isIndirect: true);

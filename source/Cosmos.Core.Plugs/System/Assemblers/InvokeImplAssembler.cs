@@ -26,7 +26,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
                 throw new Exception("Events with return type not yet supported!");
             }
             XS.Comment("XXXXXXX");
-            new CPUx86.Xchg { DestinationReg = CPUx86.RegistersEnum.BX, SourceReg = CPUx86.RegistersEnum.BX, Size = 16 };
+            XS.Exchange(XSRegisters.BX, XSRegisters.BX);
 
             /*
        * EAX contains the GetInvocationList() array at the index at which it was last used
@@ -36,7 +36,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
        */
             XS.ClearInterruptFlag();
             XS.Label(".DEBUG");
-            //new CPU.Label("____DEBUG_FOR_MULTICAST___");
+            //XS.Label("____DEBUG_FOR_MULTICAST___");
             XS.Comment("move address of delegate to eax");
             XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: Ldarg.GetArgumentDisplacement(xMethodInfo, 0));
 
@@ -130,13 +130,13 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             XS.Exchange(XSRegisters.EBP, XSRegisters.EDX, destinationIsIndirect: true);
             XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));//ebp
             XS.Set(XSRegisters.ESP, XSRegisters.EDI, destinationDisplacement: 12);
-            new Assembler.Label(".noReturn");
+            XS.Label(".noReturn");
             XS.EnableInterrupts();
         }
 
         #region OLD attempt
         //    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-        //      new CPUx86.Xchg { DestinationReg = CPUx86.Registers.BX, SourceReg = CPUx86.Registers.BX, Size = 16 };
+        //      XS.Xchg(XSRegisters.BX, XSRegisters.BX);
         //      XS.Noop();
         //      var xAssembler = (CosmosAssembler)aAssembler;
         //      var xMethodInfo = (Cosmos.IL2CPU.MethodInfo)aMethodInfo;
@@ -167,7 +167,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //       * EBX contains the number of items in the array
         //       * ECX contains the argument size
         //       */
-        //      //new CPU.Label("____DEBUG_FOR_MULTICAST___");
+        //      //XS.Label("____DEBUG_FOR_MULTICAST___");
         //      //            new CPUx86.Cli();//DEBUG ONLY
         //      new CPU.Comment("push address of delgate to stack");
         //      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
@@ -195,13 +195,13 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      new CPU.Comment("ecx points to the size of the delegated methods arguments");
         //      XS.Xor(XSRegisters.EDX, XSRegisters.CPUx86.Registers.EDX);
         //      ;//make sure edx is 0
-        //      new CPU.Label(".BEGIN_OF_LOOP");
+        //      XS.Label(".BEGIN_OF_LOOP");
         //      XS.Compare(XSRegisters.EDX, XSRegisters.CPUx86.Registers.EBX);//are we at the end of this list
         //      XS.Jump(ConditionalTestEnum.Equal, ".END_OF_INVOKE_");//then we better stop
         //      //new CPUx86.Compare("edx", 0);
         //      //new CPUx86.JumpIfLessOrEqual(".noreturnYet");
         //      //new CPUx86.Add("esp", 4);
-        //      //new CPU.Label(".noreturnYet");
+        //      //XS.Label(".noreturnYet");
         //      //new CPU.Comment("space for the return value");
         //      //new CPUx86.Pushd("0");
         //      XS.Pushad();
@@ -217,7 +217,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      XS.Jump(ConditionalTestEnum.Zero, ".NO_THIS");
         //      XS.Push(XSRegisters.EDI);
 
-        //      new CPU.Label(".NO_THIS");
+        //      XS.Label(".NO_THIS");
 
         //      new CPU.Comment("make space for us to copy the arguments too");
         //      XS.Sub(XSRegisters.ESP, XSRegisters.CPUx86.Registers.EBX);
@@ -245,7 +245,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      //new CPUx86.JumpIfEqual(".getReturn");
         //      //new CPUx86.Move(Registers_Old.EAX, "[esp]");
         //      //new CPUx86.Move("[esp+0x20]", Registers_Old.EAX);
-        //      //new CPU.Label(".getReturn");
+        //      //XS.Label(".getReturn");
         //      Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
         //      Ldfld.DoExecute(xAssembler, xMethodInfo.MethodBase.DeclaringType, "System.Object System.Delegate._target");
         //      // edi contains $this now
@@ -262,15 +262,15 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      //new CPUx86.Move("ecx", "[ecx + " + (MethodInfo.Arguments[0].TypeInfo.Fields["$$ArgSize$$"].Offset + 12) + "]");//the size of the arguments to the method? + 12??? -- 12 is the size of the current call stack.. i think
         //      //new CPUx86.Compare("ecx", "0");
         //      //new CPUx86.JumpIfLessOrEqual(".noTHIStoPop");
-        //      //new CPU.Label(".needToPopThis");
+        //      //XS.Label(".needToPopThis");
         //      //new CPUx86.Pop("edi");
         //      //new CPUx86.Move("[esp]", "edi");
-        //      new CPU.Label(".noTHIStoPop");
+        //      XS.Label(".noTHIStoPop");
         //      XS.Popad();
         //      XS.INC(XSRegisters.EDX);
         //      XS.Add(XSRegisters.EAX, 4);
         //      XS.Jump(".BEGIN_OF_LOOP");
-        //      new CPU.Label(".END_OF_INVOKE_");
+        //      XS.Label(".END_OF_INVOKE_");
         //      new CPU.Comment("get the return value");
         //      // TEMP!!!
         //     // XS.Add(XSRegisters.ESP, 4);
@@ -288,7 +288,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         //      //XS.Xchg(XSRegisters.EBP, XSRegisters.EDX, destinationIsIndirect: true);
         //      //XS.Push(XSRegisters.EDX);//ebp
         //      //XS.Mov(XSRegisters.ESP, XSRegisters.EDI, destinationDisplacement: 12);
-        //      new CPU.Label(".noReturn");
+        //      XS.Label(".noReturn");
         //      //            XS.Sti();
         //      //#warning remove this ^ sti call when issue is fixed!!!
         //      //MethodInfo.Arguments[0].

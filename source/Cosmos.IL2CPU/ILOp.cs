@@ -434,7 +434,7 @@ namespace Cosmos.IL2CPU {
         XS.ClearInterruptFlag();
         // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
         XS.Call(".NullCheck_GetCurrAddress");
-        new Assembler.Label(".NullCheck_GetCurrAddress");
+        XS.Label(".NullCheck_GetCurrAddress");
         XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
         new CPU.Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = CPU.RegistersEnum.EAX};
         XS.Call("DebugStub_SendNullReferenceOccurred");

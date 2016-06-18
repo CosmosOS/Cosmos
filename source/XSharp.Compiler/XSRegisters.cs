@@ -12,8 +12,9 @@ namespace XSharp.Compiler
       Byte8 = 8,
       Short16 = 16,
       Int32 = 32,
+      Long64 = 64,
       FPU = 128,
-      XMM = 128,
+      XMM = 128
     }
 
     public abstract class Register

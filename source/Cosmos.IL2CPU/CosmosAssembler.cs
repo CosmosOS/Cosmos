@@ -190,10 +190,7 @@ namespace Cosmos.IL2CPU
 
             if (mComPort > 0)
             {
-                new Mov
-                {
-                    DestinationRef = ElementReference.New("static_field__Cosmos_Core_CPU_mInterruptsEnabled"), DestinationIsIndirect = true, SourceValue = 1
-                };
+                XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true);
                 XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
             }
             XS.Label("AfterCreateIDT");
