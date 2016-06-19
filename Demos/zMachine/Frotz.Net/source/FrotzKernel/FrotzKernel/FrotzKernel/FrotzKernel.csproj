@@ -50,6 +50,10 @@
       <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
       <Name>Cosmos.System</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Desktop\FrotzBase\FrotzNetDLL.csproj">
+      <Project>{a843c6b0-cff3-4a69-87bc-c93608235e47}</Project>
+      <Name>FrotzNetDLL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\zConsole\zConsole.csproj">
       <Project>{3e4a8079-aac0-429d-b042-0b5151e0e5be}</Project>
       <Name>zConsole</Name>
