@@ -3,6 +3,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86.x87;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -34,18 +35,18 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 4:
                     if (xStackTopIsFloat)
                     {
-                        XS.SSE.MoveSS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
-                        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
-                        XS.SSE.MoveSS(XSRegisters.XMM1, XSRegisters.ESP, sourceIsIndirect: true);
-                        XS.SSE.SubSS(XSRegisters.XMM0, XSRegisters.XMM1);
-                        XS.SSE.MoveSS(XSRegisters.ESP, XSRegisters.XMM1, destinationIsIndirect: true);
+                        XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
+                        XS.Add(XSRegisters.ESP, 4);
+                        XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
+                        XS.SSE.SubSS(XMM0, XMM1);
+                        XS.SSE.MoveSS(ESP, XMM1, destinationIsIndirect: true);
                     }
                     else
                     {
-                        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.ECX));
-                        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-                        XS.Sub(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ECX));
-                        XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.ECX);
+                        XS.Pop(XSRegisters.EAX);
+                        XS.Sub(XSRegisters.EAX, XSRegisters.ECX);
+                        XS.Push(XSRegisters.EAX);
                     }
                     break;
                 case 8:
@@ -64,20 +65,15 @@ namespace Cosmos.IL2CPU.X86.IL
                             DestinationIsIndirect = true,
                             Size = 64
                         };
-                        XS.Add(XSRegisters.ESP, 8);
-                        new FloatStoreAndPop
-                        {
-                            DestinationReg = RegistersEnum.ESP,
-                            Size = 64,
-                            DestinationIsIndirect = true
-                        };
+                        XS.Add(ESP, 8);
+                        XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
                     }
                     else
                     {
-                        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-                        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EDX));
-                        XS.Sub(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
-                        XS.SubWithCarry(XSRegisters.ESP, XSRegisters.EDX, destinationDisplacement: 4);
+                        XS.Pop(XSRegisters.EAX);
+                        XS.Pop(XSRegisters.EDX);
+                        XS.Sub(ESP, EAX, destinationIsIndirect: true);
+                        XS.SubWithCarry(ESP, EDX, destinationDisplacement: 4);
                     }
                     break;
                 default:

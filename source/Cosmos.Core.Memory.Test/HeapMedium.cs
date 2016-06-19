@@ -14,6 +14,9 @@ namespace Cosmos.Core.Memory.Test {
     // HeapMedium may be of limited use with 4k pages depending on the final sizes of the small heap.
     public const Native MaxItemSize = RAT.PageSize - 1024;
 
+    static public void Init() {
+    }
+
     static public byte* Alloc(Native aSize) {
       return HeapLarge.Alloc(aSize);
     }

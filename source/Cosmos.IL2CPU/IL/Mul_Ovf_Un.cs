@@ -3,6 +3,7 @@ using System;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -46,61 +47,56 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // compair LEFT_HIGH, RIGHT_HIGH , on zero only simple multiply is used
         //mov RIGHT_HIGH to eax, is useable on Full 64 multiply
-        XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
-        XS.Or(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 12);
+        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 4);
+        XS.Or(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 12);
         XS.Jump(ConditionalTestEnum.Zero, Simple32Multiply);
         // Full 64 Multiply
 
         // copy again, or could change EAX
         //TODO is there an opcode that does OR without change EAX?
-        XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.ESP), sourceDisplacement: 4);
+        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 4);
         // eax contains already RIGHT_HIGH
         // multiply with LEFT_LOW
-        XS.Multiply(XSRegisters.OldToNewRegister(RegistersEnum.ESP), displacement: 8);
+        XS.Multiply(XSRegisters.ESP, displacement: 8);
         // save result of LEFT_LOW * RIGHT_HIGH
-        XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+        XS.Set(XSRegisters.ECX, XSRegisters.EAX);
 
         //mov RIGHT_LOW to eax
-        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
+        XS.Set(EAX, ESP, sourceIsIndirect: true);
         // multiply with LEFT_HIGH
-        XS.Multiply(XSRegisters.OldToNewRegister(RegistersEnum.ESP), displacement: 12);
+        XS.Multiply(XSRegisters.ESP, displacement: 12);
         // add result of LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH
-        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ECX), XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+        XS.Add(XSRegisters.ECX, XSRegisters.EAX);
 
         //mov RIGHT_LOW to eax
-        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
+        XS.Set(EAX, ESP, sourceIsIndirect: true);
         // multiply with LEFT_LOW
-        XS.Multiply(XSRegisters.OldToNewRegister(RegistersEnum.ESP), displacement: 8);
+        XS.Multiply(XSRegisters.ESP, displacement: 8);
         // add LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH to high dword of last result
-        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EDX), XSRegisters.OldToNewRegister(RegistersEnum.ECX));
+        XS.Add(XSRegisters.EDX, XSRegisters.ECX);
 
         XS.Jump(MoveReturnValue);
 
         XS.Label(Simple32Multiply);
         //mov RIGHT_LOW to eax
-        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
+        XS.Set(EAX, ESP, sourceIsIndirect: true);
         // multiply with LEFT_LOW
-        XS.Multiply(XSRegisters.OldToNewRegister(RegistersEnum.ESP), displacement: 8);
+        XS.Multiply(XSRegisters.ESP, displacement: 8);
 
         XS.Label(MoveReturnValue);
         // move high result to left high
-        XS.Set(XSRegisters.ESP, XSRegisters.EDX, destinationDisplacement: 12);
+        XS.Set(ESP, EDX, destinationDisplacement: 12);
         // move low result to left low
-        XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationDisplacement: 8);
+        XS.Set(ESP, EAX, destinationDisplacement: 8);
         // pop right 64 value
-        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 8);
+        XS.Add(XSRegisters.ESP, 8);
       }
       else
       {
-        XS.Pop(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
-        new Multiply
-          {
-            DestinationReg = RegistersEnum.ESP,
-            DestinationIsIndirect = true,
-            Size = 32
-          };
-        XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.ESP), 4);
-        XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+        XS.Pop(XSRegisters.EAX);
+        XS.Multiply(ESP, isIndirect: true, size: RegisterSize.Int32);
+        XS.Add(XSRegisters.ESP, 4);
+        XS.Push(XSRegisters.EAX);
       }
     }
   }

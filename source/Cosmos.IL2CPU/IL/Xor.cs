@@ -16,10 +16,10 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xSize = Math.Max(SizeOfType(aOpCode.StackPopTypes[0]), SizeOfType(aOpCode.StackPopTypes[1]));
-            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
-            XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
-            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Pop(XSRegisters.EAX);
+            XS.Pop(XSRegisters.EDX);
+            XS.Xor(XSRegisters.EAX, XSRegisters.EDX);
+            XS.Push(XSRegisters.EAX);
         }
     }
 }

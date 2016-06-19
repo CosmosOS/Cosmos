@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
       string mReturnNullLabel = xBaseLabel + "_ReturnNull";
       uint xTypeSize = SizeOfType(xType.Value);
 
-      XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
+      XS.Compare(XSRegisters.EAX, 0);
       XS.Jump(CPU.ConditionalTestEnum.Zero, mReturnNullLabel);
       XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
       XS.Push(XSRegisters.EAX, isIndirect: true);
@@ -34,10 +34,10 @@ namespace Cosmos.IL2CPU.X86.IL
       SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.UInt32", "System.UInt32");
       Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, GetLabel(aMethod, aOpCode), xBaseLabel + "_After_IsInstance_Call", DebugEnabled);
       XS.Label(xBaseLabel + "_After_IsInstance_Call");
-      XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
-      XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
+      XS.Pop(XSRegisters.EAX);
+      XS.Compare(XSRegisters.EAX, 0);
       XS.Jump(CPU.ConditionalTestEnum.Equal, mReturnNullLabel);
-      XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
+      XS.Pop(XSRegisters.EAX);
       uint xSize = xTypeSize;
       if (xSize % 4 > 0)
       {
@@ -50,7 +50,7 @@ namespace Cosmos.IL2CPU.X86.IL
       }
       new CPU.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
       XS.Label(mReturnNullLabel);
-      XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), 4);
+      XS.Add(XSRegisters.ESP, 4);
       XS.Push(0);
     }
   }

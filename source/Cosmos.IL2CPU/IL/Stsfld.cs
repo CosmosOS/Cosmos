@@ -54,20 +54,20 @@ namespace Cosmos.IL2CPU.X86.IL
             string xDataName = DataMember.GetStaticFieldName(xField);
             for( int i = 0; i < ( xSize / 4 ); i++ )
             {
-                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Pop(XSRegisters.EAX);
                 new CPUx86.Mov { DestinationRef = ElementReference.New( xDataName, i * 4 ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
             }
             switch( xSize % 4 )
             {
                 case 1:
                     {
-                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.EAX);
                         new CPUx86.Mov { DestinationRef = ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.AL };
                         break;
                     }
                 case 2:
                     {
-                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.EAX);
                         new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.AX };
                         break;
                     }

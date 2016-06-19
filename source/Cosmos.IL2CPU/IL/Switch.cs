@@ -15,10 +15,10 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             ILOpCodes.OpSwitch OpSw = ( ILOpCodes.OpSwitch )aOpCode;
-            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Pop(XSRegisters.EAX);
             for( int i = 0; i < OpSw.BranchLocations.Length; i++ )
             {
-                XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), ( uint )i);
+                XS.Compare(XSRegisters.EAX, ( uint )i);
                 //string DestLabel = AssemblerNasm.TmpBranchLabel( aMethod, new ILOpCodes.OpBranch( ILOpCode.Code.Jmp, aOpCode.Position, OpSw.BranchLocations[ i ] ) );
                 string xDestLabel = AppAssembler.TmpPosLabel(aMethod, OpSw.BranchLocations[i]);
                 XS.Jump(CPUx86.ConditionalTestEnum.Equal, xDestLabel);

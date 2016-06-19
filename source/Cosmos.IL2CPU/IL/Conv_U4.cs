@@ -41,16 +41,16 @@ namespace Cosmos.IL2CPU.X86.IL
                         XS.SSE3.MoveDoubleAndDuplicate(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
 						            XS.SSE2.ConvertSD2SIAndTruncate(XSRegisters.EAX, XSRegisters.XMM0);
                         XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
-                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                        XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
-                        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.EAX);
+                        XS.Add(XSRegisters.ESP, 4);
+                        XS.Push(XSRegisters.EAX);
                         break;
 					}
 					else
                     {
-                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
-                        XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.EAX);
+                        XS.Pop(XSRegisters.ECX);
+                        XS.Push(XSRegisters.EAX);
                         break;
                     }
                 default:

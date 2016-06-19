@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
             // todo: throw an exception when the class does not support the cast!
             string mReturnNullLabel = xCurrentMethodLabel + "_ReturnNull";
             XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
-            XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
+            XS.Compare(XSRegisters.EAX, 0);
             XS.Jump(CPU.ConditionalTestEnum.Zero, mReturnNullLabel);
 
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
@@ -40,13 +40,13 @@ namespace Cosmos.IL2CPU.X86.IL
             // new OpMethod( ILOpCode.Code.Call, 0, 0, xMethodIsInstance, aOpCode.CurrentExceptionHandler ) );
             Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, xCurrentMethodLabel, xCurrentMethodLabel + "_After_IsInstance_Call", DebugEnabled);
             XS.Label(xCurrentMethodLabel + "_After_IsInstance_Call" );
-            XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
-            XS.Compare(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX), 0);
+            XS.Pop(XSRegisters.EAX);
+            XS.Compare(XSRegisters.EAX, 0);
             XS.Jump(CPU.ConditionalTestEnum.Equal, mReturnNullLabel);
             new CPU.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
 
             XS.Label(mReturnNullLabel );
-            XS.Add(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ESP), 4);
+            XS.Add(XSRegisters.ESP, 4);
             string xAllocInfoLabelName = LabelName.Get( GCImplementationRefs.AllocNewObjectRef );
 #warning TODO: Emit new exceptions
             //new Newobj( Assembler ).Execute( aMethod, aOpCode );
