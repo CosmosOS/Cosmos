@@ -29,6 +29,7 @@ namespace Cosmos.TestRunner.Core
             var xVMware = new VMware(xParams, RunWithGDB, harddisk);
             xVMware.OnShutDown = (a, b) =>
             {
+                mKernelRunning = false;
             };
 
             HandleRunning(xDebugConnector, xVMware);
