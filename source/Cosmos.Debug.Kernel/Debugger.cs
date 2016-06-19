@@ -23,6 +23,16 @@ namespace Cosmos.Debug.Kernel
         {
         } // Plugged
 
+        internal static void DoBochsBreak()
+        {
+            // plugged
+        }
+
+        internal static void DoRealHalt()
+        {
+            // plugged
+        }
+
         private static unsafe void ActualSend(int aLength, char* aText)
         {
         } // Plugged

@@ -16,13 +16,11 @@ namespace Cosmos.IL2CPU.X86.IL
 
     public static void Assemble(Cosmos.Assembler.Assembler aAssembler, uint aElementSize, bool isSigned, bool debugEnabled)
     {
+      // stack - 1: array
+      // stack - 0: index
       DoNullReferenceCheck(aAssembler, debugEnabled, 4);
-      //if (aElementSize <= 0 || aElementSize > 8 || (aElementSize > 4 && aElementSize < 8))
-      //{
-      //    throw new Exception("Unsupported size for Ldelem_Ref: " + aElementSize);
-      //}
 
-      XS.Pop(XSRegisters.EAX);
+      XS.Pop(XSRegisters.EAX); // index
       XS.Set(XSRegisters.EDX, aElementSize);
       XS.Multiply(XSRegisters.EDX);
 
@@ -36,8 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
       // pop the array
       XS.Pop(XSRegisters.EDX);
-      // convert to real memory address
-      XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true);
+      XS.Add(XSRegisters.ESP, 4);
 
       XS.Add(XSRegisters.EDX, XSRegisters.EAX);
 

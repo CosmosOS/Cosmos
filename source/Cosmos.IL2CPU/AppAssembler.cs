@@ -1,4 +1,4 @@
-//#define VMT_DEBUG
+#define VMT_DEBUG
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -893,7 +893,7 @@ namespace Cosmos.IL2CPU
             var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
             var xSetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
             var xTypesFieldRef = VTablesImplRefs.VTablesImplDef.GetField("mTypes",
-                                                                               BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+                                                                         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             string xTheName = DataMember.GetStaticFieldName(xTypesFieldRef);
             DataMember xDataMember = (from item in Cosmos.Assembler.Assembler.CurrentInstance.DataMembers
                                       where item.Name == xTheName
@@ -915,7 +915,7 @@ namespace Cosmos.IL2CPU
             XS.DataMemberBytes(xTheName + "__Contents", xData);
             XS.DataMember(xTheName, 2, "dd", xTheName + "__Contents,0");
 #if VMT_DEBUG
-        using (var xVmtDebugOutput = XmlWriter.Create(@"vmt_debug.xml"))
+        using (var xVmtDebugOutput = XmlWriter.Create(@"c:\data\vmt_debug.xml"))
         {
             xVmtDebugOutput.WriteStartDocument();
             xVmtDebugOutput.WriteStartElement("VMT");
@@ -1031,9 +1031,9 @@ namespace Cosmos.IL2CPU
                 }
                 if (!xType.IsInterface)
                 {
-                    Push(aGetTypeID(xType));
                     Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
                     XS.DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), aGetTypeID(xType) );
+                    Push(aGetTypeID(xType));
                     Push((uint)xBaseIndex.Value);
                     xData = new byte[16 + (xEmittedMethods.Count * 4)];
                     xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
@@ -1046,12 +1046,12 @@ namespace Cosmos.IL2CPU
                     Array.Copy(xTemp, 0, xData, 12, 4);
                     string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodIndexesArray";
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-                    Push(0);
                     Push(xDataName);
+                    Push(0);
                     xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-                    Push(0);
                     Push(xDataName);
+                    Push(0);
                     xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
                     xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
                     Array.Copy(xTemp, 0, xData, 0, 4);
@@ -1125,7 +1125,6 @@ namespace Cosmos.IL2CPU
                         {
                             Push(ILOp.GetMethodLabel(xMethod));
                         }
-                        Push(0);
                         Call(VTablesImplRefs.SetMethodInfoRef);
                     }
                 }
@@ -1372,6 +1371,7 @@ namespace Cosmos.IL2CPU
             XS.Label(CosmosAssembler.EntryPointName);
             XS.Push(XSRegisters.EBP);
             XS.Set(XSRegisters.EBP, XSRegisters.ESP);
+            Assembler.WriteDebugVideo("Initializing VMT.");
             XS.Call(InitVMTCodeLabel);
             Assembler.WriteDebugVideo("Initializing string IDs.");
             XS.Call(InitStringIDsLabel);

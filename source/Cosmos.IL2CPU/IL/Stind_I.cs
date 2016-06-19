@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void Assemble(Cosmos.Assembler.Assembler aAssembler,  int aSize, bool debugEnabled)
         {
-            DoNullReferenceCheck(aAssembler, debugEnabled, Align((uint)aSize, 4));
+            DoNullReferenceCheck(aAssembler, debugEnabled, (int)Align((uint)aSize, 4));
             new Comment(aAssembler,  "address at: [esp + " + aSize + "]" );
             int xStorageSize = aSize;
             if( xStorageSize < 4 )

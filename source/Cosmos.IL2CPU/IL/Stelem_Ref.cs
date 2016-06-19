@@ -16,10 +16,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
     public static void Assemble(Cosmos.Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
     {
-      DoNullReferenceCheck(aAssembler, debugEnabled, 4 + Align(aElementSize, 4));
-      // stack - 3 == the array
-      // stack - 2 == the index
-      // stack - 1 == the new value
+      DoNullReferenceCheck(aAssembler, debugEnabled, (int)(4 + Align(aElementSize, 4)));
+      // stack - 2 == the array
+      // stack - 1 == the index
+      // stack - 0 == the new value
       uint xStackSize = aElementSize;
       if (xStackSize % 4 != 0)
       {
@@ -32,7 +32,6 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Set(XSRegisters.EBX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize); // the index
       XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize + 4); // the array
       // now convert the array handle to an actual memory address
-      XS.Set(XSRegisters.ECX, XSRegisters.ECX, sourceIsIndirect: true);
 
       XS.Add(XSRegisters.ECX, (uint)(ObjectImpl.FieldDataOffset + 4));
 
@@ -82,7 +81,7 @@ namespace Cosmos.IL2CPU.X86.IL
           throw new Exception("Remainder size " + (aElementSize % 4) + " not supported!");
 
       }
-      XS.Add(XSRegisters.ESP, 0x8);
+      XS.Add(XSRegisters.ESP, 12);
     }
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {

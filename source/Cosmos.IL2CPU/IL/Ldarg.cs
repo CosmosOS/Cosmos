@@ -20,13 +20,6 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xOpVar = (OpVar)aOpCode;
-            if (aMethod.MethodBase.DeclaringType.Name == "OurList`1")
-            {
-                if (aMethod.MethodBase.Name == "get_Item")
-                {
-                    Console.Write("");
-                }
-            }
             DoExecute(Assembler, aMethod, xOpVar.Value);
         }
 

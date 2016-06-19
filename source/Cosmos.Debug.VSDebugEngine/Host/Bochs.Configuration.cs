@@ -74,6 +74,10 @@ namespace Cosmos.Debug.VSDebugEngine.Host
         defaultConfigs.Set("ata0-master", defaultConfigs.Get("ata0-master").Replace("%CDROMBOOTPATH%", mParams["ISOFile"]));
         defaultConfigs.Set("ata1-master", defaultConfigs.Get("ata1-master").Replace("%HARDDISKPATH%", mHarddiskFile));
         defaultConfigs.Set("debug_symbols", defaultConfigs.Get("debug_symbols").Replace("%DEBUGSYMBOLSPATH%", Path.ChangeExtension(mParams["ISOFile"], "sym")));
+        if (_useDebugVersion)
+        {
+          defaultConfigs.Set("magic_break", "enabled=1");
+        }
       }
 
       private void GenerateConfiguration(string filePath)

@@ -113,7 +113,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     xThisOffset += Align(SizeOfType(xItem.ParameterType), 4);
                 }
                 var stackOffsetToCheck = xThisOffset;
-                DoNullReferenceCheck(Assembler, debugEnabled, stackOffsetToCheck);
+                DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck);
             }
 
             if (xExtraStackSize > 0)

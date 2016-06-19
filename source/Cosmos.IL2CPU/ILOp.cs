@@ -41,6 +41,16 @@ namespace Cosmos.IL2CPU {
       return xSize;
     }
 
+    public static int SignedAlign(int aSize, int aAlign)
+    {
+      var xSize = aSize;
+      if ((xSize % aAlign) != 0)
+      {
+        xSize += aAlign - (xSize % aAlign);
+      }
+      return xSize;
+    }
+
     public static string GetLabel(MethodInfo aMethod, ILOpCode aOpCode) {
       return GetLabel(aMethod, aOpCode.Position);
     }
@@ -425,15 +435,15 @@ namespace Cosmos.IL2CPU {
       return false;
     }
 
-    public static void DoNullReferenceCheck(Assembler.Assembler assembler, bool debugEnabled, uint stackOffsetToCheck)
+    public static void DoNullReferenceCheck(Assembler.Assembler assembler, bool debugEnabled, int stackOffsetToCheck)
     {
-      if (stackOffsetToCheck != Align(stackOffsetToCheck, 4))
+      if (stackOffsetToCheck != SignedAlign(stackOffsetToCheck, 4))
       {
         throw new Exception("Stack offset not aligned!");
       }
       if (debugEnabled)
       {
-        new CPU.Compare {DestinationReg = CPU.RegistersEnum.ESP, DestinationDisplacement = (int) stackOffsetToCheck, DestinationIsIndirect = true, SourceValue = 0};
+        XS.Compare(XSRegisters.ESP, 0, destinationDisplacement: (int)stackOffsetToCheck);
         XS.Jump(CPU.ConditionalTestEnum.NotEqual, ".AfterNullCheck");
         XS.ClearInterruptFlag();
         // don't remove the call. It seems pointless, but we need it to retrieve the EIP value

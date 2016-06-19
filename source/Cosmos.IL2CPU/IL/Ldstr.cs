@@ -22,9 +22,10 @@ namespace Cosmos.IL2CPU.X86.IL
       var xOpString = aOpCode as OpString;
       string xDataName = GetContentsArrayName(xOpString.Value);
       new Comment(Assembler, "String Value: " + xOpString.Value.Replace("\r", "\\r").Replace("\n", "\\n"));
-      var xRefName = GetFakeHandleForLiteralArray(xDataName);
-      XS.Set(XSRegisters.EAX, xRefName);
+      XS.Set(XSRegisters.EAX, xDataName);
+      XS.Push(0);
       XS.Push(XSRegisters.EAX);
+
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering.
       // if that changes, we need to change the code below!
       // We also need to change the debugstub to fix this then.
@@ -42,14 +43,6 @@ namespace Cosmos.IL2CPU.X86.IL
         throw new Exception("Fields changed!");
       }
       #endregion
-    }
-
-    public static string GetFakeHandleForLiteralArray(string labelArray)
-    {
-      var xAsm = CPU.Assembler.CurrentInstance;
-      var xResult = labelArray + "__Handle";
-      xAsm.DataMembers.Add(new DataMember(xResult, ElementReference.New(labelArray)));
-      return xResult;
     }
 
     public static string GetContentsArrayName(string aLiteral)

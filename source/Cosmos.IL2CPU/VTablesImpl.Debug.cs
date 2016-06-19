@@ -4,7 +4,7 @@ namespace Cosmos.IL2CPU
 {
     partial class VTablesImpl
     {
-        public static bool EnableDebug = false;
+        public static bool EnableDebug = true;
         private static void Debug(string message)
         {
             if (!EnableDebug)
@@ -27,8 +27,7 @@ namespace Cosmos.IL2CPU
         private static void DebugAndHalt(string message)
         {
             Debug(message);
-            while (true)
-                ;
+            Debugger.DoRealHalt();
         }
     }
 }

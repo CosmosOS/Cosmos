@@ -53,15 +53,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 xReturnSize = Align(SizeOfType(xMethodInfo.ReturnType), 4);
             }
 
-            // Extracted from MethodInformation: Calculated offset
-            //             var xRoundedSize = ReturnSize;
-            //if (xRoundedSize % 4 > 0) {
-            //    xRoundedSize += (4 - (ReturnSize % 4));
-            //}
-
-
-
-            //ExtraStackSize = (int)xRoundedSize;
             uint xExtraStackSize = Call.GetStackSizeToReservate(aTargetMethod);
             uint xThisOffset = 0;
             var xParameters = aTargetMethod.GetParameters();
@@ -78,7 +69,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 
             XS.Comment("ThisOffset = " + xThisOffset);
-            Call.DoNullReferenceCheck(Assembler, debugEnabled, xThisOffset);
+            Call.DoNullReferenceCheck(Assembler, debugEnabled, (int)xThisOffset);
 
             if (!String.IsNullOrEmpty(xNormalAddress))
             {
@@ -105,7 +96,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 else
                 {
                     XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: (int)xThisOffset);
-                    XS.Set(EAX, EAX, sourceIsIndirect: true);
                     XS.Push(EAX, isIndirect: true);
                 }
                 XS.Push(aTargetMethodUID);

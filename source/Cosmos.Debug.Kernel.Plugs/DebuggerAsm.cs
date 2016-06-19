@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.Assembler;
-using XSharp.Compiler;
+using static XSharp.Compiler.XS;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.Debug.Kernel.Plugs
 {
@@ -43,6 +44,15 @@ namespace Cosmos.Debug.Kernel.Plugs
     [PlugMethod(Assembler = typeof(DebugSendChannelCommandNoData))]
     public static unsafe void SendChannelCommand(byte aChannel, byte aCommand) { }
 
+    [PlugMethod(Assembler = typeof(DoBochsBreak))]
+    public static void DoBochsBreak()
+    {
+    }
+
+    [PlugMethod(Assembler = typeof(DoRealHalt))]
+    public static void DoRealHalt()
+    {
+    }
     //[PlugMethod(Assembler = typeof(DebugTraceOff))]
     //public static void TraceOff() { }
 
@@ -145,13 +155,12 @@ namespace Cosmos.Debug.Kernel.Plugs
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
-      XS.Label(".BeforeArgumentsPrepare");
+      Label(".BeforeArgumentsPrepare");
       new LiteralAssemblerCode("mov EBX, [EBP + 8]");
-      new LiteralAssemblerCode("mov EBX, [EBX]");
       new LiteralAssemblerCode("push dword [EBX + 12]");
       new LiteralAssemblerCode("add EBX, 16");
       new LiteralAssemblerCode("push dword EBX");
-      XS.Label(".BeforeCall");
+      Label(".BeforeCall");
       new LiteralAssemblerCode("Call DebugStub_SendText");
       new LiteralAssemblerCode("add ESP, 8");
       new LiteralAssemblerCode("%endif");
@@ -229,6 +238,25 @@ namespace Cosmos.Debug.Kernel.Plugs
       new LiteralAssemblerCode("Call DebugStub_SendPtr");
       new LiteralAssemblerCode("popad");
       new LiteralAssemblerCode("%endif");
+    }
+  }
+
+  public class DoBochsBreak: AssemblerMethod
+  {
+    public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+    {
+      Exchange(BX, BX);
+    }
+  }
+
+  public class DoRealHalt: AssemblerMethod
+  {
+    public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+    {
+      DisableInterrupts();
+      // bochs magic break
+      Exchange(BX, BX);
+      Halt();
     }
   }
 }

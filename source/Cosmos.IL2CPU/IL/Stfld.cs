@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       XS.Comment("Offset: " + xActualOffset + " (includes object header)");
 
       uint xRoundedSize = Align(xSize, 4);
-      DoNullReferenceCheck(aAssembler, debugEnabled, xRoundedSize);
+      DoNullReferenceCheck(aAssembler, debugEnabled, (int)xRoundedSize);
       XS.Comment("After Nullref check");
       XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xRoundedSize);
       // ECX contains the object pointer now

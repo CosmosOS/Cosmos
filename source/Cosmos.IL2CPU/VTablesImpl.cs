@@ -36,23 +36,75 @@ namespace Cosmos.IL2CPU
       return false;
     }
 
-    public static void SetTypeInfo(int aType, uint aBaseType, int[] aMethodIndexes, int[] aMethodAddresses, int aMethodCount)
+    private static void NestedMethod(ulong test)
     {
-      mTypes[aType].BaseTypeIdentifier = aBaseType;
-      mTypes[aType].MethodIndexes = aMethodIndexes;
-      mTypes[aType].MethodAddresses = aMethodAddresses;
-      mTypes[aType].MethodCount = aMethodCount;
+      Debug("In NestedMethod");
+      if (test == 0x0102030405060708)
+      {
+        Debug("Goed!");
+      }else if (test == 0x0506070801020304)
+      {
+        Debug("Verkeerd om");
+      }
+      else
+      {
+        Debug("Anders...");
+      }
     }
 
-    public static void SetMethodInfo(int aType, int aMethodIndex, int aMethodIdentifier, int aMethodAddress, char[] aName)
+    public static void SetTypeInfo(int aType, uint aBaseType, uint[] aMethodIndexes, uint[] aMethodAddresses, uint aMethodCount)
+    //public static void SetTypeInfo(int aType, uint aBaseType, uint[] aMethodIndexes, uint aMethodAddressesA, uint aMethodAddressesB, uint aMethodCount)
     {
+      Debug("SetTypeInfo");
+      DebugHex("Type", (uint)aType);
+      ////NestedMethod(0x0102030405060708);
+      DebugHex("BaseType", (uint)aBaseType);
+      DebugHex("MethodCount", aMethodCount);
+      //DebugHex("aMethodAddressesA", aMethodAddressesA);
+      //DebugHex("aMethodAddressesB", aMethodAddressesB);
+      //DebugHex("aMethodAddresses.Length", (uint)aMethodAddresses.Length);
+      //DebugHex("aMethodIndexes.Length", (uint)aMethodIndexes.Length);
+      SubTest(aMethodIndexes, aMethodAddresses);
+
+      DebugAndHalt("Klaar");
+      //mTypes[aType].BaseTypeIdentifier = aBaseType;
+      //mTypes[aType].MethodIndexes = aMethodIndexes;
+      //mTypes[aType].MethodAddresses = aMethodAddresses;
+      //mTypes[aType].MethodCount = (int)aMethodCount;
+      //DebugHex("Read back BaseType", mTypes[aType].BaseTypeIdentifier);
+//      DebugHex("Read back aMethodAddresses.Length", (uint)mTypes[aType].MethodAddresses.Length);
+    }
+
+    private static void SubTest(uint[] aMethodIndexes, uint[] aMethodAddresses)
+    {
+      DebugHex("aMethodAddresses.Length", (uint)aMethodAddresses.Length);
+      //DebugHex("aMethodIndexes.Length", (uint)aMethodIndexes.Length);
+
+    }
+
+    public static void SetMethodInfo(int aType, int aMethodIndex, uint aMethodIdentifier, uint aMethodAddress)
+    {
+      var xType = mTypes[aType];
+      DebugHex("BaseTypeID from type", xType.BaseTypeIdentifier);
+      var xArray = mTypes[aType].MethodAddresses;
+      Debug("Na array");
+      DebugHex("Array length", (uint)xArray.Length);
+      DebugHex("Array[0]", xArray[0]);
+      DebugHex("Array[1]", xArray[1]);
+      DebugHex("Array[2]", xArray[2]);
+      DebugHex("Array[3]", xArray[3]);
+
+
+
+      Debugger.DoBochsBreak();
       mTypes[aType].MethodIndexes[aMethodIndex] = aMethodIdentifier;
       mTypes[aType].MethodAddresses[aMethodIndex] = aMethodAddress;
-      if (aType == 0x9D && aMethodIdentifier == 0x9C)
+      //if (aType == 0x9D && aMethodIdentifier == 0x9C)
       {
         Debug("SetMethodInfo");
         DebugHex("Type", (uint)aType);
         DebugHex("MethodId", (uint)aMethodIdentifier);
+        DebugHex("Read back MethodId: ", (uint)mTypes[aType].MethodIndexes[aMethodIndex]);
         DebugHex("MethodIdx", (uint)aMethodIndex);
         DebugHex("aMethodAddress", (uint)aMethodAddress);
         DebugHex("Read back address: ", (uint)mTypes[aType].MethodAddresses[aMethodIndex]);
@@ -62,13 +114,15 @@ namespace Cosmos.IL2CPU
       {
         DebugAndHalt("Setting went wrong! (1)");
       }
-      if (mTypes[aType].MethodAddresses[aMethodIndex] != aMethodAddress)
-      {
-        DebugAndHalt("Setting went wrong! (2)");
-      }
+      //if (mTypes[aType].MethodAddresses[aMethodIndex] != aMethodAddress)
+      //{
+      //  DebugHex("aMethodAddress", aMethodAddress);
+      //  DebugHex("MethodAddress from array", mTypes[aType].MethodAddresses[aMethodIndex]);
+      //  DebugAndHalt("Setting went wrong! (2)");
+      //}
     }
 
-    public static int GetMethodAddressForType(uint aType, uint aMethodId)
+    public static uint GetMethodAddressForType(uint aType, uint aMethodId)
     {
       if (aType > 0xFFFF)
       {
@@ -142,9 +196,9 @@ namespace Cosmos.IL2CPU
     public int MethodCount;
 
     [FieldOffset(8)]
-    public int[] MethodIndexes;
+    public uint[] MethodIndexes;
 
     [FieldOffset(16)]
-    public int[] MethodAddresses;
+    public uint[] MethodAddresses;
   }
 }
