@@ -20,9 +20,9 @@ namespace Cosmos.IL2CPU.X86.IL
             switch (xSourceSize)
             {
                 case 8:
-                    XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-                    XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
-                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.EAX);
+                    XS.Add(XSRegisters.ESP, 4);
+                    XS.Push(XSRegisters.EAX);
                     break;
                 default:
                     throw new NotImplementedException();

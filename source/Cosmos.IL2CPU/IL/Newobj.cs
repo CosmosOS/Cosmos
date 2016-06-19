@@ -87,15 +87,15 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Comment("Shift: " + xShift);
                 if (xShift < 0)
                 {
-                    XS.Sub(OldToNewRegister(CPUx86.RegistersEnum.ESP), (uint)Math.Abs(xShift));
+                    XS.Sub(XSRegisters.ESP, (uint)Math.Abs(xShift));
                 }
                 else if (xShift > 0)
                 {
-                    XS.Add(OldToNewRegister(CPUx86.RegistersEnum.ESP), (uint)xShift);
+                    XS.Add(XSRegisters.ESP, (uint)xShift);
                 }
 
                 // push struct ptr
-                XS.Push(OldToNewRegister(CPUx86.RegistersEnum.ESP));
+                XS.Push(XSRegisters.ESP);
 
                 // Shift args
                 foreach (var xParam in xParameterList)
@@ -136,10 +136,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
                         // EAX contains a memory handle now, lets dereference it to a pointer
                         XS.Set(EAX, EAX, sourceIsIndirect: true);
-                        XS.Set(OldToNewRegister(CPUx86.RegistersEnum.EAX), OldToNewRegister(CPUx86.RegistersEnum.EAX), sourceDisplacement: 8);
-                        XS.Set(OldToNewRegister(CPUx86.RegistersEnum.EDX), 2);
-                        XS.Multiply(OldToNewRegister(CPUx86.RegistersEnum.EDX));
-                        XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceDisplacement: 8);
+                        XS.Set(XSRegisters.EDX, 2);
+                        XS.Multiply(XSRegisters.EDX);
+                        XS.Push(XSRegisters.EAX);
                     }
                     else if (xParams.Length == 3
                              && (xParams[0].ParameterType == typeof(char[]) || xParams[0].ParameterType == typeof(char*))
@@ -148,8 +148,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         xHasCalcSize = true;
                         XS.Set(EAX, ESP, sourceIsIndirect: true);
-                        XS.ShiftLeft(OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
-                        XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.ShiftLeft(XSRegisters.EAX, 1);
+                        XS.Push(XSRegisters.EAX);
                     }
                     else if (xParams.Length == 2
                              && xParams[0].ParameterType == typeof(char)
@@ -157,8 +157,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         xHasCalcSize = true;
                         XS.Set(EAX, ESP, sourceIsIndirect: true);
-                        XS.ShiftLeft(OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
-                        XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.ShiftLeft(XSRegisters.EAX, 1);
+                        XS.Push(XSRegisters.EAX);
                     }
                     else
                     {
@@ -172,7 +172,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Push((uint)(xMemSize + xExtraSize));
                 if (xHasCalcSize)
                 {
-                    XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                    XS.Pop(XSRegisters.EAX);
                     XS.Add(ESP, EAX, destinationIsIndirect: true);
                 }
 
@@ -197,7 +197,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 // todo: use a cleaner approach here. this class shouldnt assemble the string
                 string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
-                XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Pop(XSRegisters.EAX);
                 XS.Set(EAX, EAX, sourceIsIndirect: true);
                 XS.Set(EBX, strTypeId, sourceIsIndirect: true);
                 XS.Set(EAX, EBX, destinationIsIndirect: true);
@@ -222,7 +222,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 if (aMethod != null)
                 {
                     // todo: only happening for real methods now, not for ctor's ?
-                    XS.Test(OldToNewRegister(CPUx86.RegistersEnum.ECX), 2);
+                    XS.Test(XSRegisters.ECX, 2);
                     string xNoErrorLabel = currentLabel + ".NoError" + LabelName.LabelCount.ToString();
                     XS.Jump(CPUx86.ConditionalTestEnum.Equal, xNoErrorLabel);
 
@@ -239,7 +239,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     PushAlignedParameterSize(constructor);
 
                     // an exception occurred, we need to cleanup the stack, and jump to the exit
-                    XS.Add(OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
+                    XS.Add(XSRegisters.ESP, 4);
 
                     //new Comment(aAssembler, "[ Newobj.Execute cleanup start count = " + aAssembler.Stack.Count.ToString() + " ]");
                     //foreach( var xStackInt in Assembler.Stack )
@@ -251,7 +251,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     Jump_Exception(aMethod);
                     XS.Label(xNoErrorLabel);
                 }
-                XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Pop(XSRegisters.EAX);
 
                 //for( int i = 1; i < aCtorMethodInfo.Arguments.Length; i++ )
                 //{
@@ -265,7 +265,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //}
                 PushAlignedParameterSize(constructor);
 
-                XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Push(XSRegisters.EAX);
             }
         }
 
@@ -278,7 +278,7 @@ namespace Cosmos.IL2CPU.X86.IL
             for (int i = 0; i < xParams.Length; i++)
             {
                 xSize = SizeOfType(xParams[i].ParameterType);
-                XS.Add(OldToNewRegister(CPUx86.RegistersEnum.ESP), Align(xSize, 4));
+                XS.Add(XSRegisters.ESP, Align(xSize, 4));
             }
             XS.Comment("[ Newobj.PushAlignedParameterSize end ]");
         }

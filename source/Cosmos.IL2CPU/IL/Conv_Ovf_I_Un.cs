@@ -29,16 +29,16 @@ namespace Cosmos.IL2CPU.X86.IL
 				case 8:
 					{
 						string NoOverflowLabel = GetLabel(aMethod, aOpCode) + "__NoOverflow";
-						XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+						XS.Pop(XSRegisters.EAX);
 						// EBX is high part and should be zero for unsigned, so we test it on zero
 						{
-							XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
-							XS.Compare(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), 0);
+							XS.Pop(XSRegisters.EBX);
+							XS.Compare(XSRegisters.EBX, 0);
 							XS.Jump(CPUx86.ConditionalTestEnum.Equal, NoOverflowLabel);
 							ThrowNotImplementedException("Conv_Ovf_I_Un throws an overflow exception, which is not implemented!");
 						}
 						XS.Label(NoOverflowLabel);
-						XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+						XS.Push(XSRegisters.EAX);
 						break;
 					}
 				default:

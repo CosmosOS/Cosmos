@@ -26,8 +26,8 @@ namespace Cosmos.IL2CPU.X86.IL
 			{
 				for (int i = 0; i < xStackCount; i++)
 				{
-					XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: (int)(0 - (xEBPOffset + (i * 4))));
-					XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+					XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: (int)(0 - (xEBPOffset + (i * 4))));
+					XS.Push(XSRegisters.EAX);
 				}
 			}
 			else
@@ -42,7 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
 								new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
 							else
 								new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = 0 - xEBPOffset };
-							XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+							XS.Push(XSRegisters.EAX);
 							break;
 						}
 					case 4:

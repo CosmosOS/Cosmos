@@ -28,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 if (TypeIsFloat(xStackItem))
                 {
                     XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                    XS.Add(OldToNewRegister(CPUx86.RegistersEnum.ESP), 8);
+                    XS.Add(XSRegisters.ESP, 8);
                     XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
                     XS.SSE.XorPS(XMM2, XMM2);
                     XS.SSE.DivPS(XMM1, XMM0);
@@ -45,51 +45,51 @@ namespace Cosmos.IL2CPU.X86.IL
 					//low
 					XS.Set(ESI, ESP, sourceIsIndirect: true);
 					//high
-					XS.Set(OldToNewRegister(CPUx86.RegistersEnum.EDI), OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 4);
+					XS.Set(XSRegisters.EDI, XSRegisters.ESP, sourceDisplacement: 4);
 
 					//dividend
 					// low
-					XS.Set(OldToNewRegister(CPUx86.RegistersEnum.EAX), OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 8);
+					XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 8);
 					//high
-					XS.Set(OldToNewRegister(CPUx86.RegistersEnum.EDX), OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: 12);
+					XS.Set(XSRegisters.EDX, XSRegisters.ESP, sourceDisplacement: 12);
 
 					// pop both 8 byte values
-					XS.Add(OldToNewRegister(CPUx86.RegistersEnum.ESP), 16);
+					XS.Add(XSRegisters.ESP, 16);
 
 					// set flags
-					XS.Or(OldToNewRegister(CPUx86.RegistersEnum.EDI), OldToNewRegister(CPUx86.RegistersEnum.EDI));
+					XS.Or(XSRegisters.EDI, XSRegisters.EDI);
 					// if high dword of divisor is already zero, we dont need the loop
 					XS.Jump(CPUx86.ConditionalTestEnum.Zero, LabelNoLoop);
 
 					// set ecx to zero for counting the shift operations
-					XS.Xor(OldToNewRegister(CPUx86.RegistersEnum.ECX), OldToNewRegister(CPUx86.RegistersEnum.ECX));
+					XS.Xor(XSRegisters.ECX, XSRegisters.ECX);
 
 					XS.Label(LabelShiftRight);
 
 					// shift divisor 1 bit right
           XS.ShiftRightDouble(ESI, EDI, 1);
-					XS.ShiftRight(OldToNewRegister(CPUx86.RegistersEnum.EDI), 1);
+					XS.ShiftRight(XSRegisters.EDI, 1);
 
 					// increment shift counter
-					XS.Increment(OldToNewRegister(CPUx86.RegistersEnum.ECX));
+					XS.Increment(XSRegisters.ECX);
 
 					// set flags
-					XS.Or(OldToNewRegister(CPUx86.RegistersEnum.EDI), OldToNewRegister(CPUx86.RegistersEnum.EDI));
+					XS.Or(XSRegisters.EDI, XSRegisters.EDI);
 					// loop while high dword of divisor till it is zero
 					XS.Jump(CPUx86.ConditionalTestEnum.NotZero, LabelShiftRight);
 
 					// shift the divident now in one step
 					// shift divident CL bits right
           XS.ShiftRightDouble(EAX, EDX, CL);
-					XS.ShiftRight(OldToNewRegister(CPUx86.RegistersEnum.EDX), CL);
+					XS.ShiftRight(XSRegisters.EDX, CL);
 
 					// so we shifted both, so we have near the same relation as original values
 					// divide this
-					XS.Divide(OldToNewRegister(CPUx86.RegistersEnum.ESI));
+					XS.Divide(XSRegisters.ESI);
 
 					// save remainder to stack
 					XS.Push(0);
-					XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EDX));
+					XS.Push(XSRegisters.EDX);
 
 					//TODO: implement proper derivation correction and overflow detection
 
@@ -98,18 +98,18 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.Label(LabelNoLoop);
 
 					//save high dividend
-					XS.Set(OldToNewRegister(CPUx86.RegistersEnum.ECX), OldToNewRegister(CPUx86.RegistersEnum.EAX));
-					XS.Set(OldToNewRegister(CPUx86.RegistersEnum.EAX), OldToNewRegister(CPUx86.RegistersEnum.EDX));
+					XS.Set(XSRegisters.ECX, XSRegisters.EAX);
+					XS.Set(XSRegisters.EAX, XSRegisters.EDX);
 					// zero EDX, so that high part is zero -> reduce overflow case
-					XS.Xor(OldToNewRegister(CPUx86.RegistersEnum.EDX), OldToNewRegister(CPUx86.RegistersEnum.EDX));
+					XS.Xor(XSRegisters.EDX, XSRegisters.EDX);
 					// divide high part
-					XS.Divide(OldToNewRegister(CPUx86.RegistersEnum.ESI));
-					XS.Set(OldToNewRegister(CPUx86.RegistersEnum.EAX), OldToNewRegister(CPUx86.RegistersEnum.ECX));
+					XS.Divide(XSRegisters.ESI);
+					XS.Set(XSRegisters.EAX, XSRegisters.ECX);
 					// divide low part
-					XS.Divide(OldToNewRegister(CPUx86.RegistersEnum.ESI));
+					XS.Divide(XSRegisters.ESI);
 					// save remainder result
 					XS.Push(0);
-					XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EDX));
+					XS.Push(XSRegisters.EDX);
 
 					XS.Label(LabelEnd);
                 }
@@ -119,22 +119,22 @@ namespace Cosmos.IL2CPU.X86.IL
                 if (TypeIsFloat(xStackItem))
                 {
                     XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                    XS.Add(OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
+                    XS.Add(XSRegisters.ESP, 4);
                     XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
-                    XS.Add(OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
+                    XS.Add(XSRegisters.ESP, 4);
                     XS.SSE.XorPS(XMM2, XMM2);
                     XS.SSE.DivPS(XMM1, XMM0);
-                    XS.Sub(OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
+                    XS.Sub(XSRegisters.ESP, 4);
                     XS.SSE.MoveSS(ESP, XMM2, destinationIsIndirect: true);
                 }
                 else
                 {
-                    XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.ECX));
-                    XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX)); // gets devised by ecx
-                    XS.Xor(OldToNewRegister(CPUx86.RegistersEnum.EDX), OldToNewRegister(CPUx86.RegistersEnum.EDX));
+                    XS.Pop(XSRegisters.ECX);
+                    XS.Pop(XSRegisters.EAX); // gets devised by ecx
+                    XS.Xor(XSRegisters.EDX, XSRegisters.EDX);
 
-                    XS.Divide(OldToNewRegister(CPUx86.RegistersEnum.ECX)); // => EAX / ECX
-                    XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EDX));
+                    XS.Divide(XSRegisters.ECX); // => EAX / ECX
+                    XS.Push(XSRegisters.EDX);
                 }
             }
         }

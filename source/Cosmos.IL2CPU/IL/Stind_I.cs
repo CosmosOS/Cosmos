@@ -22,10 +22,10 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 xStorageSize = 4;
             }
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: xStorageSize);
+            XS.Set(XSRegisters.EBX, XSRegisters.ESP, sourceDisplacement: xStorageSize);
             for( int i = 0; i < ( aSize / 4 ); i++ )
             {
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: i * 4);
+                XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: i * 4);
                 XS.Set(XSRegisters.EBX, XSRegisters.EAX, destinationDisplacement: i * 4);
             }
             switch( aSize % 4 )
@@ -36,28 +36,28 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                 case 1:
                     {
-                        XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: ( ( aSize / 4 ) * 4 ));
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: ( ( aSize / 4 ) * 4 ));
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, DestinationIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.RegistersEnum.AL };
                         break;
                     }
                 case 2:
                     {
-                        XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: ( ( aSize / 4 ) * 4 ));
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: ( ( aSize / 4 ) * 4 ));
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.RegistersEnum.AX };
                         break;
                     }
                 case 3:
                     {
-                        XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: ( ( aSize / 4 ) * 4 ));
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: ( ( aSize / 4 ) * 4 ));
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.RegistersEnum.AX };
-                        XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: ( ( ( aSize / 4 ) * 4 ) + 2 ));
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: ( ( ( aSize / 4 ) * 4 ) + 2 ));
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( ( aSize / 4 ) * 4 ) + 2 ), SourceReg = CPUx86.RegistersEnum.AL };
                         break;
                     }
                 default:
                     throw new Exception( "Error, shouldn't occur" );
             }
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), ( uint )( xStorageSize + 4 ));
+            XS.Add(XSRegisters.ESP, ( uint )( xStorageSize + 4 ));
         }
 
       public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )

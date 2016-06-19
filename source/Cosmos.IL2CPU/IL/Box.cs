@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
       string xTypeID = GetTypeIDLabel(xType.Value);
       XS.Push((ObjectImpl.FieldDataOffset + xSize));
       XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
-      XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+      XS.Pop(XSRegisters.EAX);
       XS.Set(ESI, EAX, sourceIsIndirect: true);
       XS.Set(EBX, xTypeID, sourceIsIndirect: true);
       XS.Set(ESI, EBX, destinationIsIndirect: true);
@@ -33,10 +33,10 @@ namespace Cosmos.IL2CPU.X86.IL
       new Comment(Assembler, "xSize is " + xSize);
       for (int i = 0; i < (xSize / 4); i++)
       {
-        XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EDX));
+        XS.Pop(XSRegisters.EDX);
         XS.Set(ESI, EDX, destinationDisplacement: (ObjectImpl.FieldDataOffset + (i * 4)), size: RegisterSize.Int32);
       }
-      XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+      XS.Push(XSRegisters.EAX);
     }
   }
 }

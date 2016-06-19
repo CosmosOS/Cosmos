@@ -34,8 +34,8 @@ namespace Cosmos.IL2CPU.X86.IL
 				// [ESP + 4] is high part
 				// [ESP + 8] is low part
 				// [ESP + 12] is high part
-				XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-				XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
+				XS.Pop(XSRegisters.EAX);
+				XS.Pop(XSRegisters.EDX);
 				// [ESP] is low part
 				// [ESP + 4] is high part
 				XS.Or(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
@@ -43,7 +43,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			}
 			else
 			{
-				XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+				XS.Pop(XSRegisters.EAX);
 				XS.Or(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
 			}
         }

@@ -18,10 +18,10 @@ namespace Cosmos.IL2CPU.X86.IL
         {
 #warning TODO: Implement exception
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
-            XS.Pop(XSRegisters.OldToNewRegister(CPU.RegistersEnum.EAX));
+            XS.Pop(XSRegisters.EAX);
             new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
             XS.Call("SystemExceptionOccurred");
-            XS.Set(XSRegisters.OldToNewRegister(CPU.RegistersEnum.ECX), 3);
+            XS.Set(XSRegisters.ECX, 3);
             Call.EmitExceptionLogic( Assembler,aMethod, aOpCode, false, null );
 
         }

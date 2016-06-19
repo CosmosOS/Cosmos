@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-			XS.Pop(OldToNewRegister(CPU.RegistersEnum.ECX)); // shift amount
+			XS.Pop(XSRegisters.ECX); // shift amount
 			var xStackItem_ShiftAmount = aOpCode.StackPopTypes[0];
 			var xStackItem_Value = aOpCode.StackPopTypes[1];
             var xStackItem_Value_Size = SizeOfType(xStackItem_Value);
@@ -27,7 +27,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			if (xStackItem_Value_Size <= 4)
 #endif
 			{
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 32, DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.CL };
+				XS.ShiftRight(XSRegisters.ESP, XSRegisters.CL, destinationIsIndirect: true, size: RegisterSize.Int32);
 			}
 #if DOTNETCOMPATIBLE
 			else if (xStackItem_Value_Size == 8)
@@ -43,9 +43,9 @@ namespace Cosmos.IL2CPU.X86.IL
 				// [ESP + 4] is high part
 
 				// move high part in EAX
-				XS.Set(OldToNewRegister(CPU.RegistersEnum.EAX), OldToNewRegister(CPU.RegistersEnum.ESP), sourceDisplacement: 4);
+				XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 4);
 
-				new CPUx86.Compare { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 32, Size = 8 };
+				XS.Compare(XSRegisters.CL, 32, size: RegisterSize.Byte8);
 				XS.Jump(CPU.ConditionalTestEnum.AboveOrEqual, HighPartIsZero);
 
 				// shift lower part
@@ -56,10 +56,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
 				XS.Label(HighPartIsZero);
 				// remove bits >= 32, so that CL max value could be only 31
-				new CPUx86.And { DestinationReg = CPUx86.RegistersEnum.CL, SourceValue = 0x1f, Size = 8 };
+				XS.And(XSRegisters.CL, 0x1f, size: RegisterSize.Byte8);
 
 				// shift high part and move it in low part
-				new CPUx86.ShiftRight{ DestinationReg = CPUx86.RegistersEnum.EAX, Size = 32, SourceReg = CPUx86.RegistersEnum.CL };
+				XS.ShiftRight(XSRegisters.EAX, XSRegisters.CL);
 				XS.Set(ESP, EAX, destinationIsIndirect: true);
 				// replace unknown high part with a zero, if <= 32
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = 0};
@@ -85,7 +85,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				// shift low part
 				new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX, ArgumentReg = CPUx86.Registers.CL };
 				// shift high part
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 32, SourceReg = CPUx86.Registers.CL };
+				XS.ShiftRight(XSRegisters.ESP, XSRegisters.CL, destinationIsIndirect: true, size: RegisterSize.Int32);
             }*/
         }
     }

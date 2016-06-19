@@ -56,16 +56,16 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     case 1:
                         {
-                            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+                            XS.Set(XSRegisters.EAX, 0);
                             XS.Set(XSRegisters.AL, xDataName, sourceIsIndirect: true);
-                            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                            XS.Push(XSRegisters.EAX);
                             break;
                         }
                     case 2:
                         {
-                            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+                            XS.Set(XSRegisters.EAX, 0);
                             XS.Set(XSRegisters.AX, xDataName, sourceIsIndirect: true);
-                            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                            XS.Push(XSRegisters.EAX);
                             break;
                         }
                     case 0:
@@ -84,16 +84,16 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     case 1:
                         {
-                            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+                            XS.Set(XSRegisters.EAX, 0);
                             XS.Set(XSRegisters.AL, xDataName, sourceIsIndirect: true);
-                            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                            XS.Push(XSRegisters.EAX);
                             break;
                         }
                     case 2:
                         {
-                            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+                            XS.Set(XSRegisters.EAX, 0);
                             XS.Set(XSRegisters.AX, xDataName, sourceIsIndirect: true);
-                            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                            XS.Push(XSRegisters.EAX);
                             break;
                         }
                     case 0:

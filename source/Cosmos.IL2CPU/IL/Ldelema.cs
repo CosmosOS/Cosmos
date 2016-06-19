@@ -23,13 +23,13 @@ namespace Cosmos.IL2CPU.X86.IL
 
             DoNullReferenceCheck(aAssembler, debugEnabled, 4);
             // calculate element offset into array memory (including header)
-            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), aElementSize);
-            XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), (uint)(ObjectImpl.FieldDataOffset + 4));
+            XS.Pop(XSRegisters.EAX);
+            XS.Set(XSRegisters.EDX, aElementSize);
+            XS.Multiply(XSRegisters.EDX);
+            XS.Add(XSRegisters.EAX, (uint)(ObjectImpl.FieldDataOffset + 4));
 
             // pop the array now
-            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
+            XS.Pop(XSRegisters.EDX);
             // translate it to actual memory
             XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true);
 
@@ -38,8 +38,8 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true);
             }
 
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
-            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
+            XS.Add(XSRegisters.EDX, XSRegisters.EAX);
+            XS.Push(XSRegisters.EDX);
         }
 
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)

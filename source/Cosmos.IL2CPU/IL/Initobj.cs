@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
             Type mType = (( Cosmos.IL2CPU.ILOpCodes.OpType )aOpCode).Value;
             mObjSize = SizeOfType( mType );
 
-            XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Pop(XSRegisters.EAX);
             for( int i = 0; i < ( mObjSize / 4 ); i++ )
             {
                 XS.Set(EAX, 0, destinationDisplacement: i * 4, size: RegisterSize.Int32);

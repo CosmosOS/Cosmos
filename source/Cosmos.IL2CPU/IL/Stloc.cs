@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
             XS.Comment("EBPOffset = " + xEBPOffset);
 			for (int i = (int)GetStackCountForLocal(aMethod, xFieldInfo) - 1; i >= 0; i--)
 			{
-				XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+				XS.Pop(XSRegisters.EAX);
 				XS.Set(XSRegisters.EBP, XSRegisters.EAX, destinationDisplacement: (int)((0 - (xEBPOffset + (i * 4)))));
 			}
 		}

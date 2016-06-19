@@ -18,23 +18,23 @@ namespace Cosmos.IL2CPU.X86.IL
             var xRoundedSize = Align(xFieldSize, 4);
             DoNullReferenceCheck(Assembler, DebugEnabled, xRoundedSize);
 
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: checked((int)xRoundedSize));
+            XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: checked((int)xRoundedSize));
             for( int i = 0; i < ( xFieldSize / 4 ); i++ )
             {
-                XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Pop(XSRegisters.EAX);
                 XS.Set(XSRegisters.ECX, XSRegisters.EAX, destinationDisplacement: i * 4);
             }
             switch( xFieldSize % 4 )
             {
                 case 1:
                     {
-                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.EAX);
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = checked((int)( xFieldSize / 4 ) * 4 ), SourceReg = CPUx86.RegistersEnum.AL };
                         break;
                     }
                 case 2:
                     {
-                        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                        XS.Pop(XSRegisters.EAX);
                         new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = checked((int)( xFieldSize / 4 ) * 4 ), SourceReg = CPUx86.RegistersEnum.AX };
                         break;
                     }
@@ -45,7 +45,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 default:
                     throw new Exception( "Remainder size " + ( xFieldSize % 4 ) + " not supported!" );
             }
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 4);
+            XS.Add(XSRegisters.ESP, 4);
         }
     }
 }

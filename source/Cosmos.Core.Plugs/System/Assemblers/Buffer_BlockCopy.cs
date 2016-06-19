@@ -16,17 +16,17 @@ namespace Cosmos.Core.Plugs.System.Assemblers
          */
         public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
         {
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 24);
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), 16);
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 20);
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: 24);
+            XS.Add(XSRegisters.ESI, 16);
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 20);
+            XS.Add(XSRegisters.ESI, XSRegisters.EAX);
 
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 16);
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), 16);
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 12);
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 16);
+            XS.Add(XSRegisters.EDI, 16);
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 12);
+            XS.Add(XSRegisters.EDI, XSRegisters.EAX);
 
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: 8);
+            XS.Set(XSRegisters.ECX, XSRegisters.EBP, sourceDisplacement: 8);
             new CPUx86.Movs { Size = 8, Prefixes = CPUx86.InstructionPrefixes.Repeat };
         }
     }

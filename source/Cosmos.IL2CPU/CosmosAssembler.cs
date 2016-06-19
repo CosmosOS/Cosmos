@@ -84,7 +84,7 @@ namespace Cosmos.IL2CPU
                 DestinationDisplacement = 2,
                 SourceRef = ElementReference.New("_NATIVE_GDT_Contents")
             };
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), "_NATIVE_GDT_Pointer");
+            XS.Set(XSRegisters.EAX, "_NATIVE_GDT_Pointer");
             XS.LoadGdt(XSRegisters.EAX, isIndirect: true);
 
             XS.Comment("Set data segments");
@@ -107,7 +107,7 @@ namespace Cosmos.IL2CPU
         protected void SetIdtDescriptor(int aNo, string aLabel, bool aDisableInts)
         {
             int xOffset = aNo * 8;
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), aLabel);
+            XS.Set(XSRegisters.EAX, aLabel);
             var xIDT = ElementReference.New("_NATIVE_IDT_Contents");
             new Mov
             {
@@ -117,7 +117,7 @@ namespace Cosmos.IL2CPU
             {
                 DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 1, SourceReg = RegistersEnum.AH
             };
-            XS.ShiftRight(XSRegisters.OldToNewRegister(RegistersEnum.EAX), 16);
+            XS.ShiftRight(XSRegisters.EAX, 16);
             new Mov
             {
                 DestinationRef = xIDT, DestinationIsIndirect = true, DestinationDisplacement = xOffset + 6, SourceReg = RegistersEnum.AL
@@ -186,14 +186,11 @@ namespace Cosmos.IL2CPU
                 SourceRef = ElementReference.New("_NATIVE_IDT_Contents")
             };
 
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), "_NATIVE_IDT_Pointer");
+            XS.Set(XSRegisters.EAX, "_NATIVE_IDT_Pointer");
 
             if (mComPort > 0)
             {
-                new Mov
-                {
-                    DestinationRef = ElementReference.New("static_field__Cosmos_Core_CPU_mInterruptsEnabled"), DestinationIsIndirect = true, SourceValue = 1
-                };
+                XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true);
                 XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
             }
             XS.Label("AfterCreateIDT");
@@ -248,7 +245,7 @@ namespace Cosmos.IL2CPU
 
             // This is our first entry point. Multiboot uses this as Cosmos entry point.
             new Label("Kernel_Start", isGlobal: true);
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.ESP), "Kernel_Stack");
+            XS.Set(XSRegisters.ESP, "Kernel_Stack");
 
             // Displays "Cosmos" in top left. Used to make sure Cosmos is booted in case of hang.
             // ie bootloader debugging. This must be the FIRST code, even before setup so we know
@@ -275,13 +272,13 @@ namespace Cosmos.IL2CPU
             {
                 DestinationRef = ElementReference.New("MultiBootInfo_Structure"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EBX
             };
-            XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 4);
+            XS.Add(XSRegisters.EBX, 4);
             XS.Set(XSRegisters.EAX, XSRegisters.EBX, sourceIsIndirect: true);
             new Mov
             {
                 DestinationRef = ElementReference.New("MultiBootInfo_Memory_Low"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX
             };
-            XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EBX), 4);
+            XS.Add(XSRegisters.EBX, 4);
             XS.Set(XSRegisters.EAX, XSRegisters.EBX, sourceIsIndirect: true);
             new Mov
             {
@@ -428,9 +425,9 @@ namespace Cosmos.IL2CPU
             // emit helper functions:
             Action<byte, byte> xOutBytes = (port, value) =>
                                            {
-                                               XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.DX), port);
-                                               XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), value);
-                                               XS.WriteToPortDX(XSRegisters.OldToNewRegister(RegistersEnum.AL));
+                                               XS.Set(XSRegisters.DX, port);
+                                               XS.Set(XSRegisters.EAX, value);
+                                               XS.WriteToPortDX(XSRegisters.AL);
                                            };
 
             Action xIOWait = () => xOutBytes(0x80, 0x22);

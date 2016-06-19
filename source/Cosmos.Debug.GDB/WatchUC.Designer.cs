@@ -1,11 +1,13 @@
-﻿namespace Cosmos.Debug.GDB {
+using System.Windows.Forms;
+
+namespace Cosmos.Debug.GDB {
     partial class WatchUC {
-        /// <summary> 
+        /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -18,38 +20,38 @@
 
         #region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
+        /// <summary>
+        /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-			this.lablAddress = new System.Windows.Forms.Label();
+			this.lablAddress = new Label();
 			this.cboxEnabled = new System.Windows.Forms.CheckBox();
 			this.lablValue = new System.Windows.Forms.TextBox();
-			this.lablDelete = new System.Windows.Forms.Label();
+			this.lablDelete = new Label();
 			this.SuspendLayout();
-			// 
+			//
 			// lablAddress
-			// 
+			//
 			this.lablAddress.AutoSize = true;
 			this.lablAddress.Location = new System.Drawing.Point(24, 4);
 			this.lablAddress.Name = "lablAddress";
 			this.lablAddress.Size = new System.Drawing.Size(66, 13);
 			this.lablAddress.TabIndex = 0;
 			this.lablAddress.Text = "0x00000000";
-			// 
+			//
 			// cboxEnabled
-			// 
+			//
 			this.cboxEnabled.AutoSize = true;
 			this.cboxEnabled.Location = new System.Drawing.Point(3, 4);
 			this.cboxEnabled.Name = "cboxEnabled";
 			this.cboxEnabled.Size = new System.Drawing.Size(15, 14);
 			this.cboxEnabled.TabIndex = 1;
 			this.cboxEnabled.UseVisualStyleBackColor = true;
-			// 
+			//
 			// lablValue
-			// 
-			this.lablValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+			//
+			this.lablValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.lablValue.BackColor = System.Drawing.SystemColors.Control;
 			this.lablValue.Location = new System.Drawing.Point(106, 4);
@@ -60,9 +62,9 @@
 			this.lablValue.TabIndex = 2;
 			this.lablValue.Text = "Watch Value";
 			this.lablValue.TextChanged += new System.EventHandler(this.lablName_TextChanged);
-			// 
+			//
 			// lablDelete
-			// 
+			//
 			this.lablDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.lablDelete.AutoSize = true;
 			this.lablDelete.BackColor = System.Drawing.SystemColors.Control;
@@ -75,9 +77,9 @@
 			this.lablDelete.TabIndex = 3;
 			this.lablDelete.Text = "X";
 			this.lablDelete.Click += new System.EventHandler(this.lablDelete_Click);
-			// 
+			//
 			// WatchUC
-			// 
+			//
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.AutoSize = true;

@@ -15,9 +15,12 @@
 				aOutput.Write(" ");
 				aOutput.Write(this.GetDestinationAsString());
 				aOutput.Write(", ");
-				aOutput.Write(SizeToString(Size));
-				aOutput.Write(" ");
-				aOutput.Write(this.GetSourceAsString());
+			    if (SourceIsIndirect)
+			    {
+			        aOutput.Write(SizeToString(Size));
+			        aOutput.Write(" ");
+			    }
+			    aOutput.Write(this.GetSourceAsString());
 			}
 		}
 	}

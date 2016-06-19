@@ -21,39 +21,39 @@ namespace Cosmos.Core.Plugs.System.Assemblers
          */
         public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
         {
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: SourceArrayDisplacement);
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: SourceArrayDisplacement);
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true); // dereference memory handle to pointer
-            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Push(XSRegisters.EAX);
             new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceValue = 12, Size = 32 }; // pointer is at the element size
-            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Pop(XSRegisters.EAX);
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true); // element size
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: SourceIndexDisplacement);
-            XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 16);
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: SourceArrayDisplacement);
+            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: SourceIndexDisplacement);
+            XS.Multiply(XSRegisters.EBX);
+            XS.Add(XSRegisters.EAX, 16);
+            XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: SourceArrayDisplacement);
             XS.Set(XSRegisters.ESI, XSRegisters.ESI, sourceIsIndirect: true); // dereference memory handle to pointer
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX)); // source ptr
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: DestinationArrayDisplacement);
+            XS.Add(XSRegisters.ESI, XSRegisters.EAX); // source ptr
+            XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
             XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true); // dereference memory handle to pointer
-            XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
+            XS.Push(XSRegisters.EDX);
             new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceValue = 12, Size = 32 }; // pointer is at element size
-            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Pop(XSRegisters.EAX);
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true); // dereference handle to pointer
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: DestinationIndexDisplacement);
-            XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 16);
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: DestinationArrayDisplacement);
+            XS.Set(XSRegisters.ECX, XSRegisters.EBP, sourceDisplacement: DestinationIndexDisplacement);
+            XS.Multiply(XSRegisters.ECX);
+            XS.Add(XSRegisters.EAX, 16);
+            XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
             XS.Set(XSRegisters.EDI, XSRegisters.EDI, sourceIsIndirect: true); // dereference handle to pointer
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDI), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Add(XSRegisters.EDI, XSRegisters.EAX);
 
             // calculate byte count to copy
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: DestinationArrayDisplacement);
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true); // dereference memory handle to pointer
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 12);
+            XS.Add(XSRegisters.EAX, 12);
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBP), sourceDisplacement: LengthDisplacement);
-            XS.Multiply(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EDX));
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: LengthDisplacement);
+            XS.Multiply(XSRegisters.EDX);
+            XS.Set(XSRegisters.ECX, XSRegisters.EAX);
             new CPUx86.Movs { Size = 8, Prefixes = CPUx86.InstructionPrefixes.Repeat };
         }
     }

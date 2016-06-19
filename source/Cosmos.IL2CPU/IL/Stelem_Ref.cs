@@ -29,15 +29,15 @@ namespace Cosmos.IL2CPU.X86.IL
 
       //XS.Call(MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 
-      XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: (int)xStackSize); // the index
-      XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), sourceDisplacement: (int)xStackSize + 4); // the array
+      XS.Set(XSRegisters.EBX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize); // the index
+      XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize + 4); // the array
       // now convert the array handle to an actual memory address
       XS.Set(XSRegisters.ECX, XSRegisters.ECX, sourceIsIndirect: true);
 
-      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), (uint)(ObjectImpl.FieldDataOffset + 4));
+      XS.Add(XSRegisters.ECX, (uint)(ObjectImpl.FieldDataOffset + 4));
 
       XS.Push(aElementSize);
-      XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
+      XS.Push(XSRegisters.EBX);
 
 
       //Multiply( aAssembler, aServiceProvider, aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
@@ -45,32 +45,32 @@ namespace Cosmos.IL2CPU.X86.IL
 
       Mul.DoExecute(4, false, xBaseLabel);
 
-      XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
+      XS.Push(XSRegisters.ECX);
 
       //Add( aAssembler, aServiceProvider, aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
       Add.DoExecute(4, false);
 
-      XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
+      XS.Pop(XSRegisters.ECX);
       for (int i = (int)(aElementSize / 4) - 1; i >= 0; i -= 1)
       {
         new Comment(aAssembler, "Start 1 dword");
-        XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
+        XS.Pop(XSRegisters.EBX);
         XS.Set(XSRegisters.ECX, XSRegisters.EBX, destinationIsIndirect: true);
-        XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), 4);
+        XS.Add(XSRegisters.ECX, 4);
       }
       switch (aElementSize % 4)
       {
         case 1:
           {
             new Comment(aAssembler, "Start 1 byte");
-            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
+            XS.Pop(XSRegisters.EBX);
             XS.Set(XSRegisters.ECX, XSRegisters.BL, destinationIsIndirect: true);
             break;
           }
         case 2:
           {
             new Comment(aAssembler, "Start 1 word");
-            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
+            XS.Pop(XSRegisters.EBX);
             XS.Set(XSRegisters.ECX, XSRegisters.BX, destinationIsIndirect: true);
             break;
           }
@@ -82,7 +82,7 @@ namespace Cosmos.IL2CPU.X86.IL
           throw new Exception("Remainder size " + (aElementSize % 4) + " not supported!");
 
       }
-      XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), 0x8);
+      XS.Add(XSRegisters.ESP, 0x8);
     }
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {

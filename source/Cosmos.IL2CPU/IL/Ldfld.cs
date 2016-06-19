@@ -90,7 +90,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     throw new Exception("For now, loading fields with sizes > 4 bytes from structs on the stack is not possible!");
                 }
 
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+                XS.Set(XSRegisters.EAX, 0);
 
                 switch (xFieldInfo.Size)
                 {
@@ -104,7 +104,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     case 3: //For Release
                         XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: xOffset);
-                        XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 8);
+                        XS.ShiftRight(XSRegisters.EAX, 8);
                         break;
 
                     case 4:
@@ -116,15 +116,15 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
 
                 // now remove the struct from the stack
-                XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ESP), Align(GetStorageSize(aDeclaringType), 4));
+                XS.Add(XSRegisters.ESP, Align(GetStorageSize(aDeclaringType), 4));
 
-                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Push(XSRegisters.EAX);
 
                 return;
             }
             DoNullReferenceCheck(Assembler, debugEnabled, 0);
 
-            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX));
+            XS.Pop(XSRegisters.ECX);
 
             // pushed size is always 4 or 8
             var xSize = xFieldInfo.Size;
@@ -133,7 +133,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 // convert to real memory address
                 XS.Set(XSRegisters.ECX, XSRegisters.ECX, sourceIsIndirect: true);
             }
-            XS.Add(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), (uint)(xOffset));
+            XS.Add(XSRegisters.ECX, (uint)(xOffset));
 
             if (xFieldInfo.IsExternalValue && aDerefExternalField)
             {
@@ -142,28 +142,28 @@ namespace Cosmos.IL2CPU.X86.IL
 
             for (int i = 1; i <= (xSize / 4); i++)
             {
-                XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.ECX), sourceDisplacement: (int)(xSize - (i * 4)));
-                XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Set(XSRegisters.EAX, XSRegisters.ECX, sourceDisplacement: (int)(xSize - (i * 4)));
+                XS.Push(XSRegisters.EAX);
             }
 
-            XS.Set(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+            XS.Set(XSRegisters.EAX, 0);
 
             switch (xSize % 4)
             {
                 case 1:
                     XS.Set(XSRegisters.AL, XSRegisters.ECX, sourceIsIndirect: true);
-                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                    XS.Push(XSRegisters.EAX);
                     break;
 
                 case 2:
                     XS.Set(XSRegisters.AX, XSRegisters.ECX, sourceIsIndirect: true);
-                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                    XS.Push(XSRegisters.EAX);
                     break;
 
                 case 3: //For Release
                     XS.Set(XSRegisters.EAX, XSRegisters.ECX, sourceIsIndirect: true);
-                    XS.ShiftRight(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX), 8);
-                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                    XS.ShiftRight(XSRegisters.EAX, 8);
+                    XS.Push(XSRegisters.EAX);
                     break;
 
                 case 0:

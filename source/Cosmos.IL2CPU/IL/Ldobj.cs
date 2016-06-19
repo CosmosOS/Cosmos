@@ -27,25 +27,25 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 throw new ArgumentNullException("type");
             }
-            XS.Pop(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EAX));
+            XS.Pop(XSRegisters.EAX);
             var xObjSize = GetStorageSize(type);
 
             switch (xObjSize % 4)
             {
                 case 1:
                 {
-                    XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
+                    XS.Xor(XSRegisters.EBX, XSRegisters.EBX);
                     XS.Set(XSRegisters.BL, XSRegisters.EAX, sourceDisplacement: (int)(xObjSize - 1));
                     //XS.ShiftLeft(XSRegisters.EBX, 24);
-                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
+                    XS.Push(XSRegisters.EBX);
                     break;
                 }
                 case 2:
                 {
-                    XS.Xor(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX), XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
+                    XS.Xor(XSRegisters.EBX, XSRegisters.EBX);
                     XS.Set(XSRegisters.BX, XSRegisters.EAX, sourceDisplacement: (int)(xObjSize - 2));
                     //XS.ShiftLeft(XSRegisters.EBX, 16);
-                    XS.Push(XSRegisters.OldToNewRegister(CPUx86.RegistersEnum.EBX));
+                    XS.Push(XSRegisters.EBX);
                     break;
                 }
                 case 0:

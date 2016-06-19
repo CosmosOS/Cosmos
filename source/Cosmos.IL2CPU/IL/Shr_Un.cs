@@ -27,27 +27,27 @@ namespace Cosmos.IL2CPU.X86.IL
             var xStackItem_Value_Size = SizeOfType(xStackItem_Value);
             if( xStackItem_Value_Size <= 4 )
             {
-                XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EAX)); // shift amount
-                XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EBX)); // value
-                XS.Set(OldToNewRegister(CPUx86.RegistersEnum.CL), OldToNewRegister(CPUx86.RegistersEnum.AL));
-                XS.ShiftRight(OldToNewRegister(CPUx86.RegistersEnum.EBX), CL);
-                XS.Push(OldToNewRegister(CPUx86.RegistersEnum.EBX));
+                XS.Pop(XSRegisters.EAX); // shift amount
+                XS.Pop(XSRegisters.EBX); // value
+                XS.Set(XSRegisters.CL, XSRegisters.AL);
+                XS.ShiftRight(XSRegisters.EBX, CL);
+                XS.Push(XSRegisters.EBX);
                 return;
             }
             if( xStackItem_Value_Size <= 8 )
             {
-                XS.Pop(OldToNewRegister(CPUx86.RegistersEnum.EDX));
-                XS.Set(OldToNewRegister(CPUx86.RegistersEnum.EAX), 0);
+                XS.Pop(XSRegisters.EDX);
+                XS.Set(XSRegisters.EAX, 0);
                 XS.Label(xBaseLabel + "__StartLoop" );
-                XS.Compare(OldToNewRegister(CPUx86.RegistersEnum.EDX), OldToNewRegister(CPUx86.RegistersEnum.EAX));
+                XS.Compare(XSRegisters.EDX, XSRegisters.EAX);
                 XS.Jump(CPUx86.ConditionalTestEnum.Equal, xBaseLabel + "__EndLoop");
                 XS.Set(EBX, ESP, sourceIsIndirect: true);
-                XS.Set(OldToNewRegister(CPUx86.RegistersEnum.CL), 1);
-                XS.ShiftRight(OldToNewRegister(CPUx86.RegistersEnum.EBX), CL);
+                XS.Set(XSRegisters.CL, 1);
+                XS.ShiftRight(XSRegisters.EBX, CL);
                 XS.Set(ESP, EBX, destinationIsIndirect: true);
-                XS.Set(OldToNewRegister(CPUx86.RegistersEnum.CL), 1);
+                XS.Set(XSRegisters.CL, 1);
                 XS.RotateThroughCarryRight(ESP, CL, destinationDisplacement: 4, size: RegisterSize.Int32);
-                XS.Add(OldToNewRegister(CPUx86.RegistersEnum.EAX), 1);
+                XS.Add(XSRegisters.EAX, 1);
                 new CPUx86.Jump { DestinationLabel = xBaseLabel + "__StartLoop" };
 
                 XS.Label(xBaseLabel + "__EndLoop" );

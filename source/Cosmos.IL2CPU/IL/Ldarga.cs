@@ -21,10 +21,10 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             var xOpVar = (OpVar)aOpCode;
             var xDisplacement = Ldarg.GetArgumentDisplacement(aMethod, xOpVar.Value);
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EBX), (uint)(xDisplacement));
-            XS.Set(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.EBP));
-            XS.Add(XSRegisters.OldToNewRegister(RegistersEnum.EAX), XSRegisters.OldToNewRegister(RegistersEnum.EBX));
-            XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+            XS.Set(XSRegisters.EBX, (uint)(xDisplacement));
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP);
+            XS.Add(XSRegisters.EAX, XSRegisters.EBX);
+            XS.Push(XSRegisters.EAX);
 
 //            if (aMethod.MethodBase.DeclaringType.FullName == "Cosmos.Kernel.Plugs.Console"
 //                && aMethod.MethodBase.Name == "Write"

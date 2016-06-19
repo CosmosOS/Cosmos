@@ -166,7 +166,7 @@ namespace Cosmos.IL2CPU.X86.IL
             if (xArgRealSize < 4)
             {
                 new CPUx86.MoveSignExtend {DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xArgRealSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = xDisplacement};
-                XS.Push(XSRegisters.OldToNewRegister(RegistersEnum.EAX));
+                XS.Push(XSRegisters.EAX);
             }
             else
             {
