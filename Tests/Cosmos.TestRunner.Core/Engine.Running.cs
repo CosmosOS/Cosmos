@@ -17,6 +17,10 @@ namespace Cosmos.TestRunner.Core
                 throw new ArgumentNullException("debugConnector");
             }
             debugConnector.OnDebugMsg = s => OutputHandler.LogDebugMessage(s);
+            debugConnector.ConnectionLost = ex =>
+            {
+                OutputHandler.LogError($"DC: Connection lost. {ex.Message}");
+            };
             debugConnector.CmdChannel = ChannelPacketReceived;
             debugConnector.CmdStarted = () =>
                 {
@@ -98,11 +102,16 @@ namespace Cosmos.TestRunner.Core
                         break;
                     }
                 }
+
                 if (mKernelResultSet)
                 {
                     OutputHandler.SetKernelTestResult(true, null);
+                    OutputHandler.SetKernelSucceededAssertionsCount(mSucceededAssertions);
                 }
-                OutputHandler.SetKernelSucceededAssertionsCount(mSucceededAssertions);
+                else
+                {
+                    KernelTestFailed();
+                }
             }
             finally
             {
