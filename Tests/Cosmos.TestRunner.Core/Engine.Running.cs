@@ -55,9 +55,7 @@ namespace Cosmos.TestRunner.Core
             debugConnector.CmdNullReferenceOccurred = a =>
                 {
                     OutputHandler.LogMessage("Null Reference Exception occurred at: 0x" + a.ToString("X8"));
-                    OutputHandler.SetKernelTestResult(
-                        false,
-                        "Null Reference Exception occurred at: 0x" + a.ToString("X8"));
+                    OutputHandler.SetKernelTestResult(false, "Null Reference Exception occurred at: 0x" + a.ToString("X8"));
                     mKernelResultSet = true;
                     mKernelRunning = false;
                 };
@@ -100,7 +98,7 @@ namespace Cosmos.TestRunner.Core
                         break;
                     }
                 }
-                if (!mKernelResultSet)
+                if (mKernelResultSet)
                 {
                     OutputHandler.SetKernelTestResult(true, null);
                 }
