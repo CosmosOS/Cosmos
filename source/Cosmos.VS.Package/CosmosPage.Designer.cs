@@ -2,12 +2,12 @@
 {
     partial class CosmosPage
     {
-        /// <summary> 
+        /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -22,8 +22,8 @@
 
         #region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
+        /// <summary>
+        /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
@@ -85,7 +85,8 @@
             this.checkStartBochsDebugGui = new System.Windows.Forms.CheckBox();
             this.checkEnableBochsDebug = new System.Windows.Forms.CheckBox();
             this.tabPXE = new System.Windows.Forms.TabPage();
-            this.textPxeInterface = new System.Windows.Forms.TextBox();
+            this.butnPxeRefresh = new System.Windows.Forms.Button();
+            this.comboPxeInterface = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.tabUSB = new System.Windows.Forms.TabPage();
             this.label7 = new System.Windows.Forms.Label();
@@ -740,7 +741,8 @@
             // 
             // tabPXE
             // 
-            this.tabPXE.Controls.Add(this.textPxeInterface);
+            this.tabPXE.Controls.Add(this.butnPxeRefresh);
+            this.tabPXE.Controls.Add(this.comboPxeInterface);
             this.tabPXE.Controls.Add(this.label1);
             this.tabPXE.Location = new System.Drawing.Point(4, 22);
             this.tabPXE.Name = "tabPXE";
@@ -750,12 +752,23 @@
             this.tabPXE.Text = "PXE";
             this.tabPXE.UseVisualStyleBackColor = true;
             // 
-            // textPxeInterface
+            // butnPxeRefresh
             // 
-            this.textPxeInterface.Location = new System.Drawing.Point(28, 32);
-            this.textPxeInterface.Name = "textPxeInterface";
-            this.textPxeInterface.Size = new System.Drawing.Size(146, 20);
-            this.textPxeInterface.TabIndex = 22;
+            this.butnPxeRefresh.AutoSize = true;
+            this.butnPxeRefresh.Image = ((System.Drawing.Image)(resources.GetObject("butnPxeRefresh.Image")));
+            this.butnPxeRefresh.Location = new System.Drawing.Point(177, 31);
+            this.butnPxeRefresh.Margin = new System.Windows.Forms.Padding(0);
+            this.butnPxeRefresh.Name = "butnPxeRefresh";
+            this.butnPxeRefresh.Size = new System.Drawing.Size(23, 23);
+            this.butnPxeRefresh.TabIndex = 23;
+            this.butnPxeRefresh.UseVisualStyleBackColor = true;
+            // 
+            // comboPxeInterface
+            // 
+            this.comboPxeInterface.Location = new System.Drawing.Point(28, 32);
+            this.comboPxeInterface.Name = "comboPxeInterface";
+            this.comboPxeInterface.Size = new System.Drawing.Size(146, 21);
+            this.comboPxeInterface.TabIndex = 22;
             // 
             // label1
             // 
@@ -890,65 +903,65 @@
 
         #endregion
 
-    private System.Windows.Forms.Panel panel1;
-    private System.Windows.Forms.Label lablCurrentProfile;
-    private System.Windows.Forms.Label label11;
-    private System.Windows.Forms.TabControl TabControl1;
-    private System.Windows.Forms.TabPage tabProfile;
-    private System.Windows.Forms.Label lablDeployText;
-    private System.Windows.Forms.Label lablBuildOnly;
-    private System.Windows.Forms.TabPage tabDeployment;
-    private System.Windows.Forms.ListBox lboxDeployment;
-    private System.Windows.Forms.TabPage tabLaunch;
-    private System.Windows.Forms.ListBox lboxLaunch;
-    private System.Windows.Forms.TabPage tabCompile;
-    private System.Windows.Forms.ComboBox comboFramework;
-    private System.Windows.Forms.Button buttonOutputBrowse;
-    private System.Windows.Forms.Label label2;
-    private System.Windows.Forms.TextBox textOutputPath;
-    private System.Windows.Forms.Label labelFramework;
-    private System.Windows.Forms.TabPage tabAssembler;
-    private System.Windows.Forms.CheckBox checkUseInternalAssembler;
-    private System.Windows.Forms.Label labelInternalAssembler;
-    private System.Windows.Forms.TabPage tabDebug;
-    private System.Windows.Forms.CheckBox chckEnableDebugStub;
-    private System.Windows.Forms.Panel panlDebugSettings;
-    private System.Windows.Forms.Label label4;
-    private System.Windows.Forms.ComboBox cmboVisualStudioDebugPort;
-    private System.Windows.Forms.ComboBox comboTraceMode;
-    private System.Windows.Forms.ComboBox cmboCosmosDebugPort;
-    private System.Windows.Forms.ComboBox comboDebugMode;
-    private System.Windows.Forms.Label label10;
-    private System.Windows.Forms.Label label5;
-    private System.Windows.Forms.Label label9;
-    private System.Windows.Forms.CheckBox checkIgnoreDebugStubAttribute;
-    private System.Windows.Forms.TabPage tabBochs;
-    private System.Windows.Forms.CheckBox checkEnableBochsDebug;
-    private System.Windows.Forms.TabPage tabVMware;
-    private System.Windows.Forms.CheckBox checkEnableGDB;
-    private System.Windows.Forms.CheckBox checkStartCosmosGDB;
-    private System.Windows.Forms.Label label3;
-    private System.Windows.Forms.ComboBox cmboVMwareEdition;
-    private System.Windows.Forms.TabPage tabPXE;
-    private System.Windows.Forms.TabPage tabUSB;
-    private System.Windows.Forms.Label label7;
-    private System.Windows.Forms.TabPage tabISO;
-    private System.Windows.Forms.Label label8;
-    private System.Windows.Forms.Panel panel2;
-    private System.Windows.Forms.ToolStrip toolStrip1;
-    private System.Windows.Forms.ListBox lboxProfile;
-    private System.Windows.Forms.ToolStripButton butnProfileClone;
-    private System.Windows.Forms.ToolStripButton butnProfileDelete;
-    private System.Windows.Forms.Label lablPreset;
-    private System.Windows.Forms.ToolStripButton butnProfileRename;
-    private System.Windows.Forms.TextBox textPxeInterface;
-    private System.Windows.Forms.Label label1;
-    private System.Windows.Forms.TabPage tabSlave;
-    private System.Windows.Forms.ComboBox cmboSlavePort;
-    private System.Windows.Forms.Label label6;
-    private System.Windows.Forms.CheckBox chkEnableStackCorruptionDetection;
-    private System.Windows.Forms.Label labelBinFormat;
-    private System.Windows.Forms.ComboBox comboBinFormat;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label lablCurrentProfile;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.TabControl TabControl1;
+        private System.Windows.Forms.TabPage tabProfile;
+        private System.Windows.Forms.Label lablDeployText;
+        private System.Windows.Forms.Label lablBuildOnly;
+        private System.Windows.Forms.TabPage tabDeployment;
+        private System.Windows.Forms.ListBox lboxDeployment;
+        private System.Windows.Forms.TabPage tabLaunch;
+        private System.Windows.Forms.ListBox lboxLaunch;
+        private System.Windows.Forms.TabPage tabCompile;
+        private System.Windows.Forms.ComboBox comboFramework;
+        private System.Windows.Forms.Button buttonOutputBrowse;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox textOutputPath;
+        private System.Windows.Forms.Label labelFramework;
+        private System.Windows.Forms.TabPage tabAssembler;
+        private System.Windows.Forms.CheckBox checkUseInternalAssembler;
+        private System.Windows.Forms.Label labelInternalAssembler;
+        private System.Windows.Forms.TabPage tabDebug;
+        private System.Windows.Forms.CheckBox chckEnableDebugStub;
+        private System.Windows.Forms.Panel panlDebugSettings;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.ComboBox cmboVisualStudioDebugPort;
+        private System.Windows.Forms.ComboBox comboTraceMode;
+        private System.Windows.Forms.ComboBox cmboCosmosDebugPort;
+        private System.Windows.Forms.ComboBox comboDebugMode;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.CheckBox checkIgnoreDebugStubAttribute;
+        private System.Windows.Forms.TabPage tabBochs;
+        private System.Windows.Forms.CheckBox checkEnableBochsDebug;
+        private System.Windows.Forms.TabPage tabVMware;
+        private System.Windows.Forms.CheckBox checkEnableGDB;
+        private System.Windows.Forms.CheckBox checkStartCosmosGDB;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ComboBox cmboVMwareEdition;
+        private System.Windows.Forms.TabPage tabPXE;
+        private System.Windows.Forms.TabPage tabUSB;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TabPage tabISO;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ListBox lboxProfile;
+        private System.Windows.Forms.ToolStripButton butnProfileClone;
+        private System.Windows.Forms.ToolStripButton butnProfileDelete;
+        private System.Windows.Forms.Label lablPreset;
+        private System.Windows.Forms.ToolStripButton butnProfileRename;
+        private System.Windows.Forms.ComboBox comboPxeInterface;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TabPage tabSlave;
+        private System.Windows.Forms.ComboBox cmboSlavePort;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.CheckBox chkEnableStackCorruptionDetection;
+        private System.Windows.Forms.Label labelBinFormat;
+        private System.Windows.Forms.ComboBox comboBinFormat;
         private System.Windows.Forms.CheckBox checkStartBochsDebugGui;
         private System.Windows.Forms.GroupBox stackCorruptionDetectionGroupBox;
         private System.Windows.Forms.ComboBox comboStackCorruptionDetectionLevel;
@@ -956,5 +969,6 @@
         private System.Windows.Forms.GroupBox debugStubGroupBox;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Button butnPxeRefresh;
     }
 }

@@ -27,10 +27,10 @@ namespace Cosmos.Build.Common {
     }
 
     public void SetProperty(string name, string value) {
-      if (mPropTable.ContainsKey(name) == false) { 
-        mPropTable.Add(name, value); 
-      } else { 
-        mPropTable[name] = value; 
+      if (mPropTable.ContainsKey(name) == false) {
+        mPropTable.Add(name, value);
+      } else {
+        mPropTable[name] = value;
       }
     }
 
@@ -51,7 +51,7 @@ namespace Cosmos.Build.Common {
     public string GetProperty(string name, string @default)
     {
         string value = @default;
-        if (mPropTable.ContainsKey(name) == true)
+        if (mPropTable.ContainsKey(name))
         {
             value = mPropTable[name];
         }
@@ -66,7 +66,7 @@ namespace Cosmos.Build.Common {
     /// <param name="name">Get name of the property.</param>
     /// <param name="default">Default value for the proeprty.</param>
     /// <returns>Value of the property with given name.</returns>
-    public T GetProperty<T>(string name, T @default) 
+    public T GetProperty<T>(string name, T @default)
         where T: struct
     {
       T value = @default;
