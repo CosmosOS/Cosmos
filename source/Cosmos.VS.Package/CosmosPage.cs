@@ -6,6 +6,7 @@ using System.IO.Ports;
 using System.Drawing;
 using System.Data;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
@@ -258,12 +259,6 @@ namespace Cosmos.VS.Package
             // Locked to COM1 for now.
             //cmboCosmosDebugPort.SelectedIndex = 0;
 
-            #region PXE
-
-            textPxeInterface.Text = mProps.PxeInterface;
-
-            #endregion
-
             #region Slave
 
             cmboSlavePort.SelectedIndex = cmboSlavePort.Items.IndexOf(mProps.SlavePort);
@@ -461,10 +456,10 @@ namespace Cosmos.VS.Package
 
             #region PXE
 
-            textPxeInterface.TextChanged += delegate(Object sender, EventArgs e)
+            comboPxeInterface.TextChanged += delegate(Object sender, EventArgs e)
                 {
                     if (FreezeEvents) return;
-                    var x = textPxeInterface.Text.Trim();
+                    var x = comboPxeInterface.Text.Trim();
                     if (x != mProps.PxeInterface)
                     {
                         mProps.PxeInterface = x;
@@ -482,6 +477,8 @@ namespace Cosmos.VS.Package
                         IsDirty = true;
                     }
                 };
+
+            butnPxeRefresh.Click += new EventHandler(butnPxeRefresh_Click);
 
             #endregion
 
@@ -694,6 +691,11 @@ namespace Cosmos.VS.Package
             lboxProfile.SelectedIndex = FillProfile(xID);
         }
 
+        void butnPxeRefresh_Click(object sender, EventArgs e)
+        {
+            FillNetworkInterfaces();
+        }
+
         protected BuildProperties mProps = new BuildProperties();
 
         public override PropertiesBase Properties
@@ -810,6 +812,8 @@ namespace Cosmos.VS.Package
 
             #region PXE
 
+            FillNetworkInterfaces();
+
             cmboSlavePort.Items.Clear();
             cmboSlavePort.Items.Add("None");
             FillComPorts(cmboSlavePort.Items);
@@ -826,6 +830,53 @@ namespace Cosmos.VS.Package
             {
                 aList.Add("Serial: " + xPort);
             }
+        }
+
+        protected void FillNetworkInterfaces()
+        {
+            comboPxeInterface.Items.Clear();
+
+            comboPxeInterface.Items.AddRange(GetNetworkInterfaces().ToArray());
+
+            if (mProps.PxeInterface == String.Empty)
+            {
+                if (comboPxeInterface.Items.Count > 0)
+                {
+                    comboPxeInterface.Text = comboPxeInterface.Items[0].ToString();
+                }
+                else
+                {
+                    comboPxeInterface.Text = "192.168.42.1";
+                }
+            }
+            else
+            {
+                comboPxeInterface.Text = mProps.PxeInterface;
+            }
+        }
+
+        protected List<string> GetNetworkInterfaces()
+        {
+            NetworkInterface[] nInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+            List<string> interfaces_list = new List<string>();
+
+            foreach (NetworkInterface nInterface in nInterfaces)
+            {
+                if (nInterface.OperationalStatus == OperationalStatus.Up)
+                {
+                    IPInterfaceProperties ipProperties = nInterface.GetIPProperties();
+
+                    foreach (var ip in ipProperties.UnicastAddresses)
+                    {
+                        if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                        {
+                            interfaces_list.Add(ip.Address.ToString());
+                        }
+                    }
+                }
+            }
+
+            return interfaces_list;
         }
 
         private void OutputBrowse_Click(object sender, EventArgs e)

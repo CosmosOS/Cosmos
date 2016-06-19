@@ -116,7 +116,7 @@ namespace Cosmos.Build.Common
                 Description =
                     "Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.";
                 Deployment = DeploymentType.PXE;
-                Launch = LaunchType.None;
+                Launch = LaunchType.PXE;
 
             }
             else if (aName == "Bochs")
@@ -306,7 +306,7 @@ namespace Cosmos.Build.Common
         {
             get
             {
-                return GetProperty(BuildPropertyNames.PxeInterfaceString, "192.168.42.1");
+                return GetProperty(BuildPropertyNames.PxeInterfaceString, "");
             }
             set
             {
