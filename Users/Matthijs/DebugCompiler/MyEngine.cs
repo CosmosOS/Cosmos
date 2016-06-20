@@ -22,14 +22,14 @@ namespace DebugCompiler
             // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are run.
             xEngine.RunTargets.Add(RunTargetEnum.Bochs);
             //xEngine.StartBochsDebugGui = true;
-            xEngine.RunWithGDB = true;
+            //xEngine.RunWithGDB = true;
             // If you're working on the compiler (or other lower parts), you can choose to run the compiler in process
             // one thing to keep in mind though, is that this only works with 1 kernel at a time!
             xEngine.RunIL2CPUInProcess = true;
             xEngine.TraceAssembliesLevel = TraceAssemblies.All;
             //xEngine.DebugStubEnabled = false;
 
-            xEngine.EnableStackCorruptionChecks = false;
+            xEngine.EnableStackCorruptionChecks = true;
             xEngine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
 
             // Select kernels to be tested by adding them to the engine

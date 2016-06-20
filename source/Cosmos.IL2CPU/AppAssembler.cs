@@ -891,7 +891,6 @@ namespace Cosmos.IL2CPU
             mSequences = new DebugInfo.SequencePoint[0];
 
             var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
-            var xSetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
             var xTypesFieldRef = VTablesImplRefs.VTablesImplDef.GetField("mTypes",
                                                                          BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             string xTheName = DataMember.GetStaticFieldName(xTypesFieldRef);
@@ -913,7 +912,7 @@ namespace Cosmos.IL2CPU
             xTemp = BitConverter.GetBytes(GetVTableEntrySize());
             Array.Copy(xTemp, 0, xData, 12, 4);
             XS.DataMemberBytes(xTheName + "__Contents", xData);
-            XS.DataMember(xTheName, 2, "dd", xTheName + "__Contents,0");
+            XS.DataMember(xTheName, 2, "dd", "0, " + xTheName + "__Contents");
 #if VMT_DEBUG
         using (var xVmtDebugOutput = XmlWriter.Create(@"c:\data\vmt_debug.xml"))
         {

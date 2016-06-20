@@ -57,18 +57,16 @@ namespace Cosmos.IL2CPU
     {
       Debug("SetTypeInfo");
       DebugHex("Type", (uint)aType);
-      ////NestedMethod(0x0102030405060708);
       DebugHex("BaseType", (uint)aBaseType);
       DebugHex("MethodCount", aMethodCount);
       //DebugHex("aMethodAddressesA", aMethodAddressesA);
       //DebugHex("aMethodAddressesB", aMethodAddressesB);
       //DebugHex("aMethodIndexesA", aMethodIndexesA);
       //DebugHex("aMethodIndexesB", aMethodIndexesB);
-      //DebugHex("mTypes.Length", (uint)mTypes.Length);
-      //DebugHex("aMethodAddresses.Length", (uint)aMethodAddresses.Length);
-      //DebugHex("aMethodIndexes.Length", (uint)aMethodIndexes.Length);
-      SubTest(aMethodIndexes, aMethodAddresses);
-
+      DebugHex("mTypes.Length", (uint)mTypes.Length);
+      DebugHex("aMethodAddresses.Length", (uint)aMethodAddresses.Length);
+      DebugHex("aMethodIndexes.Length", (uint)aMethodIndexes.Length);
+      
       DebugAndHalt("Klaar");
       //mTypes[aType].BaseTypeIdentifier = aBaseType;
       //mTypes[aType].MethodIndexes = aMethodIndexes;
