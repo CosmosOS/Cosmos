@@ -55,9 +55,16 @@ namespace Cosmos.IL2CPU
     public static void SetTypeInfo(int aType, uint aBaseType, uint[] aMethodIndexes, uint[] aMethodAddresses, uint aMethodCount)
     //public static void SetTypeInfo(int aType, uint aBaseType, uint aMethodIndexesA, uint aMethodIndexesB, uint aMethodAddressesA, uint aMethodAddressesB, uint aMethodCount)
     {
+      //var xType = mTypes[aType];
+      //xType.BaseTypeIdentifier = aBaseType;
+      //xType.MethodIndexes = aMethodIndexes;
+      //xType.MethodAddresses = aMethodAddresses;
+      //xType.MethodCount = (int)aMethodCount;
+      //mTypes[aType] = xType;
+
       //Debug("SetTypeInfo");
-      //DebugHex("Type", (uint)aType);
-      //DebugHex("BaseType", (uint)aBaseType);
+      DebugHex("Type", (uint)aType);
+      DebugHex("BaseType", (uint)aBaseType);
       //DebugHex("MethodCount", aMethodCount);
       ////DebugHex("aMethodAddressesA", aMethodAddressesA);
       ////DebugHex("aMethodAddressesB", aMethodAddressesB);
@@ -66,16 +73,25 @@ namespace Cosmos.IL2CPU
       //DebugHex("mTypes.Length", (uint)mTypes.Length);
       //DebugHex("aMethodAddresses.Length", (uint)aMethodAddresses.Length);
       //DebugHex("aMethodIndexes.Length", (uint)aMethodIndexes.Length);
-      
+
       mTypes[aType].BaseTypeIdentifier = aBaseType;
       mTypes[aType].MethodIndexes = aMethodIndexes;
       mTypes[aType].MethodAddresses = aMethodAddresses;
       mTypes[aType].MethodCount = (int)aMethodCount;
-      //DebugHex("Read back BaseType", mTypes[aType].BaseTypeIdentifier);
+      DebugHex("Read back BaseType", mTypes[aType].BaseTypeIdentifier);
+
+      //if (aType > 0x98)
+      {
+      //  DebugHex("BaseType of 0x00000098", mTypes[0x00000098].BaseTypeIdentifier);
+      }
+      //if (aBaseType != mTypes[aType].BaseTypeIdentifier)
+      //{
+      //  DebugAndHalt("Fout!");
+      //}
       //DebugHex("Read back aMethodAddresses.Length", (uint)mTypes[aType].MethodAddresses.Length);
-     
+
     }
-    
+
     public static void SetMethodInfo(int aType, int aMethodIndex, uint aMethodIdentifier, uint aMethodAddress)
     {
       //var xType = mTypes[aType];
@@ -88,7 +104,7 @@ namespace Cosmos.IL2CPU
       //DebugHex("Array[2]", xArray[2]);
       //DebugHex("Array[3]", xArray[3]);
 
-      Debugger.DoBochsBreak();
+      //Debugger.DoBochsBreak();
       mTypes[aType].MethodIndexes[aMethodIndex] = aMethodIdentifier;
       mTypes[aType].MethodAddresses[aMethodIndex] = aMethodAddress;
       //if (aType == 0x9D && aMethodIdentifier == 0x9C)
@@ -119,14 +135,16 @@ namespace Cosmos.IL2CPU
     {
       if (aType > 0xFFFF)
       {
-        Debug("Oops");
+        DebugAndHalt("Oops");
       }
       var xCurrentType = aType;
       DebugHex("Type", xCurrentType);
       DebugHex("MethodId", aMethodId);
       do
       {
+        DebugHex("Now checking type", xCurrentType);
         var xCurrentTypeInfo = mTypes[xCurrentType];
+        DebugHex("It's basetype is", xCurrentTypeInfo.BaseTypeIdentifier);
 
         if (xCurrentTypeInfo.MethodIndexes == null)
         {
@@ -162,6 +180,7 @@ namespace Cosmos.IL2CPU
         }
         if (xCurrentType == xCurrentTypeInfo.BaseTypeIdentifier)
         {
+          Debug("Ultimate base type already found!");
           break;
         }
         xCurrentType = xCurrentTypeInfo.BaseTypeIdentifier;

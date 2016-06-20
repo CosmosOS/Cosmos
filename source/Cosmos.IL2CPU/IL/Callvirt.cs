@@ -69,7 +69,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 
             XS.Comment("ThisOffset = " + xThisOffset);
-            Call.DoNullReferenceCheck(Assembler, debugEnabled, (int)xThisOffset);
+            Call.DoNullReferenceCheck(Assembler, debugEnabled, (int)xThisOffset + 4);
 
             if (!String.IsNullOrEmpty(xNormalAddress))
             {
@@ -95,7 +95,8 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else
                 {
-                    XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: (int)xThisOffset);
+                    XS.Exchange(BX, BX);
+                    XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: (int)xThisOffset + 4);
                     XS.Push(EAX, isIndirect: true);
                 }
                 XS.Push(aTargetMethodUID);

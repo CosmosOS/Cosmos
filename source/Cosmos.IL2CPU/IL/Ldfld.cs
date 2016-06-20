@@ -110,15 +110,19 @@ namespace Cosmos.IL2CPU.X86.IL
                 #endregion Read struct value from stack
                 return;
             }
-            DoNullReferenceCheck(Assembler, debugEnabled, 0);
 
             // pushed size is always 4 or 8
             var xSize = xFieldInfo.Size;
-            if ((!aTypeOnStack.IsPointer) && (aDeclaringType.IsClass))
+            if ((!aTypeOnStack.IsPointer)
+                && (aDeclaringType.IsClass))
             {
+                DoNullReferenceCheck(Assembler, debugEnabled, 4);
                 XS.Add(ESP, 4);
             }
-
+            else
+            {
+                DoNullReferenceCheck(Assembler, debugEnabled, 0);
+            }
             XS.Pop(ECX);
 
             XS.Add(ECX, (uint)(xOffset));

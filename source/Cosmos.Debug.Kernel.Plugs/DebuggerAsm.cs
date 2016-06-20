@@ -255,7 +255,7 @@ namespace Cosmos.Debug.Kernel.Plugs
     {
       DisableInterrupts();
       // bochs magic break
-      Exchange(BX, BX);
+      //Exchange(BX, BX);
       Halt();
     }
   }

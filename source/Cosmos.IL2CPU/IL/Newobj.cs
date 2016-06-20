@@ -198,7 +198,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
                 XS.Pop(XSRegisters.EAX);
-                XS.Set(EAX, EAX, sourceIsIndirect: true);
                 XS.Set(EBX, strTypeId, sourceIsIndirect: true);
                 XS.Set(EAX, EBX, destinationIsIndirect: true);
                 XS.Set(EAX, (uint)InstanceTypeEnum.NormalObject, destinationDisplacement: 4, size: RegisterSize.Int32);

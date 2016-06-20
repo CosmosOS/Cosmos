@@ -175,7 +175,7 @@ namespace Cosmos.Core.Memory.Old
                     xCurrentEntry->DataBlock = xDataBlock;
                     xCurrentEntry->Refcount = 1;
 
-                    aHandle = (uint)xCurrentEntry;
+                    aHandle = (uint)xCurrentEntry->DataBlock;
                     //mDebugger.Trace($"Returning handle ", aHandle);
                     mLastEntryIndex = i;
                     #endregion Found an uninitialized entry
@@ -190,7 +190,7 @@ namespace Cosmos.Core.Memory.Old
                     {
                         // we can reuse this entry
                         xCurrentEntry->Refcount = 1;
-                        aHandle = (uint)xCurrentEntry;
+                        aHandle = (uint)xCurrentEntry->DataBlock;
                         mLastEntryIndex = i;
                         return true;
                     }
