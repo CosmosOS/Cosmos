@@ -22,10 +22,10 @@ namespace Cosmos.IL2CPU.X86.IL
             XS.Comment("Arraytype: " + aOpType.StackPopTypes.Last().FullName);
             XS.Comment("Size: " + aElementSize);
 
-            DoNullReferenceCheck(aAssembler, debugEnabled, 4);
+            DoNullReferenceCheck(aAssembler, debugEnabled, 8);
             // calculate element offset into array memory (including header)
-            XS.Pop(EAX);
             XS.Add(ESP, 4); // for now, skip the reference to the next usage of the object
+            XS.Pop(EAX);
             XS.Set(EDX, aElementSize);
             //XS.Add(ESP, 4);
             XS.Multiply(EDX);

@@ -206,7 +206,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 uint xSize = (uint)(from item in xParams
                                     let xQSize = Align(SizeOfType(item.ParameterType), 4)
                                     select (int)xQSize).Take(xParams.Length).Sum();
-
+                XS.Push(0);
                 foreach (var xParam in xParams)
                 {
                     uint xParamSize = Align(SizeOfType(xParam.ParameterType), 4);
@@ -265,7 +265,8 @@ namespace Cosmos.IL2CPU.X86.IL
                 //}
                 PushAlignedParameterSize(constructor);
 
-                XS.Push(XSRegisters.EAX);
+                XS.Push(EAX);
+                XS.Push(0);
             }
         }
 

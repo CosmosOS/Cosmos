@@ -112,15 +112,15 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             DoNullReferenceCheck(Assembler, debugEnabled, 0);
 
-            XS.Pop(ECX);
-
             // pushed size is always 4 or 8
             var xSize = xFieldInfo.Size;
             if ((!aTypeOnStack.IsPointer) && (aDeclaringType.IsClass))
             {
-                // convert to real memory address
-                XS.Set(ECX, ECX, sourceIsIndirect: true);
+                XS.Add(ESP, 4);
             }
+
+            XS.Pop(ECX);
+
             XS.Add(ECX, (uint)(xOffset));
 
             if (xFieldInfo.IsExternalValue && aDerefExternalField)
@@ -160,33 +160,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                 default:
                     throw new Exception(string.Format("Remainder size {0} {1:D} not supported!", xFieldInfo.FieldType.ToString(), xSize));
-            }
-        }
-
-        private static void CopyValue(Register32 destination, int destinationDisplacement, Register32 source, int sourceDisplacement, uint size)
-        {
-            for (int i = 0; i < (size / 4); i++)
-            {
-                XS.Set(EAX, source, sourceDisplacement: sourceDisplacement + (i * 4));
-                XS.Set(destination, EAX, destinationDisplacement: destinationDisplacement + (i * 4));
-            }
-            switch (size % 4)
-            {
-                case 1:
-                    XS.Set(AL, source, sourceDisplacement: (int)(sourceDisplacement + ((size / 4) * 4)));
-                    XS.Set(destination, AL, destinationDisplacement: (int)(destinationDisplacement + ((size / 4) * 4)));
-                    break;
-                case 2:
-                    XS.Set(AX, source, sourceDisplacement: (int)(sourceDisplacement + ((size / 4) * 4)));
-                    XS.Set(destination, AX, destinationDisplacement: (int)(destinationDisplacement + ((size / 4) * 4)));
-                    break;
-                case 0:
-                        break;
-                default:
-                    //EmitNotImplementedException(Assembler, GetServiceProvider(), "Ldsfld: Remainder size " + (xSize % 4) + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
-                    throw new NotImplementedException();
-                    //break;
-
             }
         }
     }

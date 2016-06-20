@@ -9,7 +9,19 @@ namespace Cosmos.Debug.Kernel
 {
     public class Debugger
     {
-        public string mRing { get; set; }
+        private string mRing;
+
+        public string Ring
+        {
+            get
+            {
+                return mRing;
+            }
+            set
+            {
+                mRing = value;
+            }
+        }
 
         public string mSection { get; set; }
 

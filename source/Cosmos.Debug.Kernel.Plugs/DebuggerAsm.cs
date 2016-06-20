@@ -156,7 +156,7 @@ namespace Cosmos.Debug.Kernel.Plugs
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       Label(".BeforeArgumentsPrepare");
-      new LiteralAssemblerCode("mov EBX, [EBP + 8]");
+      new LiteralAssemblerCode("mov EBX, [EBP + 12]");
       new LiteralAssemblerCode("push dword [EBX + 12]");
       new LiteralAssemblerCode("add EBX, 16");
       new LiteralAssemblerCode("push dword EBX");

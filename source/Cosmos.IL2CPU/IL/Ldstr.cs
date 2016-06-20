@@ -23,8 +23,8 @@ namespace Cosmos.IL2CPU.X86.IL
       string xDataName = GetContentsArrayName(xOpString.Value);
       new Comment(Assembler, "String Value: " + xOpString.Value.Replace("\r", "\\r").Replace("\n", "\\n"));
       XS.Set(XSRegisters.EAX, xDataName);
-      XS.Push(0);
       XS.Push(XSRegisters.EAX);
+      XS.Push(0);
 
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering.
       // if that changes, we need to change the code below!
