@@ -26,7 +26,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
                 throw new Exception("Events with return type not yet supported!");
             }
             XS.Comment("XXXXXXX");
-            XS.Exchange(XSRegisters.BX, XSRegisters.BX);
+            //XS.Exchange(XSRegisters.BX, XSRegisters.BX);
 
             /*
        * EAX contains the GetInvocationList() array at the index at which it was last used

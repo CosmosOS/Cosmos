@@ -53,7 +53,7 @@ namespace Cosmos.IL2CPU
     }
 
     public static void SetTypeInfo(int aType, uint aBaseType, uint[] aMethodIndexes, uint[] aMethodAddresses, uint aMethodCount)
-    //public static void SetTypeInfo(int aType, uint aBaseType, uint[] aMethodIndexes, uint aMethodAddressesA, uint aMethodAddressesB, uint aMethodCount)
+    //public static void SetTypeInfo(int aType, uint aBaseType, uint aMethodIndexesA, uint aMethodIndexesB, uint aMethodAddressesA, uint aMethodAddressesB, uint aMethodCount)
     {
       Debug("SetTypeInfo");
       DebugHex("Type", (uint)aType);
@@ -62,6 +62,9 @@ namespace Cosmos.IL2CPU
       DebugHex("MethodCount", aMethodCount);
       //DebugHex("aMethodAddressesA", aMethodAddressesA);
       //DebugHex("aMethodAddressesB", aMethodAddressesB);
+      //DebugHex("aMethodIndexesA", aMethodIndexesA);
+      //DebugHex("aMethodIndexesB", aMethodIndexesB);
+      //DebugHex("mTypes.Length", (uint)mTypes.Length);
       //DebugHex("aMethodAddresses.Length", (uint)aMethodAddresses.Length);
       //DebugHex("aMethodIndexes.Length", (uint)aMethodIndexes.Length);
       SubTest(aMethodIndexes, aMethodAddresses);
@@ -77,9 +80,16 @@ namespace Cosmos.IL2CPU
 
     private static void SubTest(uint[] aMethodIndexes, uint[] aMethodAddresses)
     {
+      //Debug("Voor MethodAddresses");
       DebugHex("aMethodAddresses.Length", (uint)aMethodAddresses.Length);
-      //DebugHex("aMethodIndexes.Length", (uint)aMethodIndexes.Length);
+      //Debug("Na MethodAddresses");
 
+      //Debug("Voor MethodIndexes");
+      DebugHex("aMethodIndexes.Length", (uint)aMethodIndexes.Length);
+      //Debug("Na MethodIndexes");
+      ;
+      ;
+      ;
     }
 
     public static void SetMethodInfo(int aType, int aMethodIndex, uint aMethodIdentifier, uint aMethodAddress)

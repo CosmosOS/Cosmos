@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.IO;
+using Cosmos.Assembler.x86;
 
 namespace Cosmos.Assembler {
   public class DataMember : BaseAssemblerElement, IComparable<DataMember> {
@@ -13,9 +14,11 @@ namespace Cosmos.Assembler {
     public uint Alignment { get; set; }
     protected object[] UntypedDefaultValue;
     public string RawAsm = null;
+      private string Size;
+        private string StringValue;
 
-    // Hack for not to emit raw data. See RawAsm
-    public DataMember() {
+        // Hack for not to emit raw data. See RawAsm
+        public DataMember() {
       Name = "Dummy";
     }
 
@@ -32,7 +35,14 @@ namespace Cosmos.Assembler {
       RawDefaultValue = xBytes2;
     }
 
-    public DataMember(string aName, params object[] aDefaultValue) {
+        public DataMember(string aName, string size, string aValue)
+        {
+            Name = aName;
+            Size = size;
+            StringValue = aValue;
+        }
+
+        public DataMember(string aName, params object[] aDefaultValue) {
       Name = aName;
       UntypedDefaultValue = aDefaultValue;
     }
@@ -165,6 +175,15 @@ namespace Cosmos.Assembler {
           aOutput.Write(", ");
         }
         aOutput.Write(xGetTextForItem(UntypedDefaultValue.Last()));
+        return;
+      }
+      if (StringValue != null)
+      {
+        aOutput.Write(Name);
+        aOutput.Write(" ");
+        aOutput.Write(Size);
+        aOutput.Write(" ");
+        aOutput.Write(StringValue);
         return;
       }
       throw new Exception("Situation unsupported!");

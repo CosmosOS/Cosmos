@@ -27,7 +27,10 @@ namespace Cosmos.IL2CPU
         private static void DebugAndHalt(string message)
         {
             Debug(message);
-            Debugger.DoRealHalt();
+            while (true)
+                ;
+
+            //Debugger.DoRealHalt();
         }
     }
 }

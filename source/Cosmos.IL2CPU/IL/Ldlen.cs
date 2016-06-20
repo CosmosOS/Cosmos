@@ -13,12 +13,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            DoNullReferenceCheck(Assembler, DebugEnabled, 4);
-          XS.Add(XSRegisters.ESP, 4);
-          XS.Pop(XSRegisters.EAX);
+            XS.Add(XSRegisters.ESP, 4);
+            DoNullReferenceCheck(Assembler, DebugEnabled, 0);
+            XS.Pop(XSRegisters.EAX);
 
-          XS.Add(XSRegisters.EAX, 8);
-          XS.Push(XSRegisters.EAX, isIndirect: true);
+            XS.Add(XSRegisters.EAX, 8);
+            XS.Push(XSRegisters.EAX, isIndirect: true);
           //XS.Push(XSRegisters.EAX);
         }
 

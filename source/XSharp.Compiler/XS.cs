@@ -655,7 +655,7 @@ namespace XSharp.Compiler
 
     public static void DataMember(string name, uint elementCount, string size, string value)
     {
-      new LiteralAssemblerCode(name + ": TIMES " + elementCount + " " + size + " " + value);
+      Assembler.CurrentInstance.DataMembers.Add(new DataMember(name, size, value));
     }
 
     public static void RotateRight(Register register, uint bitCount)
