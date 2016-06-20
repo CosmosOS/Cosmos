@@ -30,8 +30,9 @@ namespace Cosmos.TestRunner.Core
             var xBochs = new Bochs(xParams, RunWithGDB, new FileInfo(xBochsConfig), harddisk);
 
             xBochs.OnShutDown = (a, b) =>
-                                {
-                                };
+            {
+                mKernelRunning = false;
+            };
 
             xBochs.RedirectOutput = false;
             xBochs.LogError = s => OutputHandler.LogDebugMessage(s);
