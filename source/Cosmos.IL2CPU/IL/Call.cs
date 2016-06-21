@@ -87,6 +87,13 @@ namespace Cosmos.IL2CPU.X86.IL
 
             // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
             //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
+            if (xMethodInfo?.Name == "GetEntry")
+            {
+                ;
+                ;
+                ;
+                ;
+            }
             string xNormalAddress;
             if (aTargetMethod.IsStatic
                 || !aTargetMethod.IsVirtual
@@ -101,7 +108,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 //throw new Exception("Call: non-concrete method called: '" + aTargetMethod.GetFullName() + "'");
             }
             var xParameters = aTargetMethod.GetParameters();
-            int xArgCount = xParameters.Length;
 
             // todo: implement exception support
             uint xExtraStackSize = GetStackSizeToReservate(aTargetMethod);
@@ -113,7 +119,14 @@ namespace Cosmos.IL2CPU.X86.IL
                     xThisOffset += Align(SizeOfType(xItem.ParameterType), 4);
                 }
                 var stackOffsetToCheck = xThisOffset;
-                DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck + 4);
+                if (aTargetMethod.DeclaringType.IsValueType)
+                {
+                    DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck);
+                }
+                else
+                {
+                    DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck + 4);
+                }
             }
 
             if (xExtraStackSize > 0)

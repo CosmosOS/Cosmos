@@ -33,12 +33,6 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             string xCurrentMethodLabel = GetLabel(aMethod, aOp.Position);
 
-            if (aTargetMethod.Name == "GetTextScreen")
-            {
-                ;
-                ;
-            }
-
             // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
             //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
             string xNormalAddress = "";
