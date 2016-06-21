@@ -63,7 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
             // old code, which goof up everything for structs
             //return (int)Align(SizeOfType(xMethodInfo.DeclaringType), 4);
             // TODO native pointer size, so that COSMOS could be 64 bit OS
-            return 4;
+            return 8;
         }
 
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
