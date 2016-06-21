@@ -87,13 +87,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
             // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
             //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
-            if (xMethodInfo?.Name == "GetEntry")
-            {
-                ;
-                ;
-                ;
-                ;
-            }
             string xNormalAddress;
             if (aTargetMethod.IsStatic
                 || !aTargetMethod.IsVirtual
