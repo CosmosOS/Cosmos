@@ -26,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
             SysReflection.FieldInfo xField = xOpCode.Value;
 
             // call cctor:
-			var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
+			      var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
             if (xCctor != null)
             {
                 XS.Call(LabelName.Get(xCctor));
@@ -44,7 +44,17 @@ namespace Cosmos.IL2CPU.X86.IL
             //}
 
             string xDataName = DataMember.GetStaticFieldName(xField);
-            if( xSize >= 4 )
+
+            var xTypeNeedsGC = TypeIsReferenceType(xField.FieldType);
+            if (xTypeNeedsGC)
+            {
+                XS.Push(xDataName);
+                XS.Push(0);
+                return;
+            }
+
+
+            if ( xSize >= 4 )
             {
                 for( int i = 1; i <= ( xSize / 4 ); i++ )
                 {
