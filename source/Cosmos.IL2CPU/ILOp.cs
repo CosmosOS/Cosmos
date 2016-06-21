@@ -111,7 +111,7 @@ namespace Cosmos.IL2CPU {
       {
         throw new ArgumentNullException("aType");
       }
-      if (aType.IsPointer)
+      if (aType.IsPointer || aType.IsByRef)
       {
         return 4;
       }
@@ -119,9 +119,6 @@ namespace Cosmos.IL2CPU {
         return 0;
       } else if ((!aType.IsValueType && aType.IsClass) || aType.IsInterface) {
         return 8;
-      }
-      if (aType.IsByRef) {
-        return 4;
       }
       switch (aType.FullName) {
         case "System.Char":
@@ -476,6 +473,31 @@ namespace Cosmos.IL2CPU {
       return xFieldInfo;
     }
 
+      protected static void CopyValue(XSRegisters.Register32 destination, int destinationDisplacement, XSRegisters.Register32 source, int sourceDisplacement, uint size)
+      {
+          for (int i = 0; i < (size / 4); i++)
+          {
+              XS.Set(XSRegisters.EAX, source, sourceDisplacement: sourceDisplacement + (i * 4));
+              XS.Set(destination, XSRegisters.EAX, destinationDisplacement: destinationDisplacement + (i * 4));
+          }
+          switch (size % 4)
+          {
+              case 1:
+                  XS.Set(XSRegisters.AL, source, sourceDisplacement: (int)(sourceDisplacement + ((size / 4) * 4)));
+                  XS.Set(destination, XSRegisters.AL, destinationDisplacement: (int)(destinationDisplacement + ((size / 4) * 4)));
+                  break;
+              case 2:
+                  XS.Set(XSRegisters.AX, source, sourceDisplacement: (int)(sourceDisplacement + ((size / 4) * 4)));
+                  XS.Set(destination, XSRegisters.AX, destinationDisplacement: (int)(destinationDisplacement + ((size / 4) * 4)));
+                  break;
+              case 0:
+                  break;
+              default:
+                  //EmitNotImplementedException(Assembler, GetServiceProvider(), "Ldsfld: Remainder size " + (xSize % 4) + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
+                  throw new NotImplementedException();
+              //break;
 
+          }
+      }
   }
 }

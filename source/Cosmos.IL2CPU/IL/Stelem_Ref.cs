@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
     public static void Assemble(Cosmos.Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
     {
-      DoNullReferenceCheck(aAssembler, debugEnabled, (int)(4 + Align(aElementSize, 4)));
+      DoNullReferenceCheck(aAssembler, debugEnabled, (int)(8 + Align(aElementSize, 4)));
       // stack - 2 == the array
       // stack - 1 == the index
       // stack - 0 == the new value
@@ -30,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
       //XS.Call(MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 
       XS.Set(XSRegisters.EBX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize); // the index
-      XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize + 4); // the array
+      XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize + 8); // the array
       // now convert the array handle to an actual memory address
 
       XS.Add(XSRegisters.ECX, (uint)(ObjectImpl.FieldDataOffset + 4));

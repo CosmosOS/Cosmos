@@ -10,7 +10,7 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>Bochs</Profile>
+    <Profile>ISO</Profile>
     <!-- Looks like this was a mispelled attribute. Replaced by DebugEnabled below.
     <DebugEnable>true</DebugEnable>
     -->
@@ -22,11 +22,11 @@
     <VMWareEdition>Workstation</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
     <Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</Name>
-    <Description>Use Bochs emulator to deploy and debug.</Description>
+    <Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</Description>
     <Deployment>ISO</Deployment>
-    <Launch>Bochs</Launch>
+    <Launch>None</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-    <StackCorruptionDetectionEnabled>False</StackCorruptionDetectionEnabled>
+    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
     <TraceAssemblies>All</TraceAssemblies>
     <VMware_Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</VMware_Name>
     <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
@@ -39,7 +39,7 @@
     <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
     <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
     <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
-    <VMware_EnableGDB>True</VMware_EnableGDB>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
     <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
     <EnableBochsDebug>True</EnableBochsDebug>
     <Bochs_Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</Bochs_Name>
@@ -55,7 +55,7 @@
     <Bochs_TraceAssemblies>All</Bochs_TraceAssemblies>
     <Bochs_EnableGDB>True</Bochs_EnableGDB>
     <Bochs_StartCosmosGDB>True</Bochs_StartCosmosGDB>
-    <Bochs_EnableBochsDebug>True</Bochs_EnableBochsDebug>
+    <Bochs_EnableBochsDebug>False</Bochs_EnableBochsDebug>
     <VMware_EnableBochsDebug>True</VMware_EnableBochsDebug>
     <ISO_Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</ISO_Name>
     <ISO_Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</ISO_Description>
@@ -71,6 +71,20 @@
     <ISO_EnableGDB>True</ISO_EnableGDB>
     <ISO_StartCosmosGDB>True</ISO_StartCosmosGDB>
     <ISO_EnableBochsDebug>True</ISO_EnableBochsDebug>
+    <PXE_StackCorruptionDetectionEnabled>False</PXE_StackCorruptionDetectionEnabled>
+    <PXE_Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</PXE_Name>
+    <PXE_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</PXE_Description>
+    <PXE_Deployment>PXE</PXE_Deployment>
+    <PXE_Launch>None</PXE_Launch>
+    <PXE_DebugEnabled>False</PXE_DebugEnabled>
+    <PXE_DebugMode>Source</PXE_DebugMode>
+    <PXE_VisualStudioDebugPort>Pipe: Cosmos\Serial</PXE_VisualStudioDebugPort>
+    <PXE_VMwareEdition>Workstation</PXE_VMwareEdition>
+    <PXE_OutputPath>bin\Debug\</PXE_OutputPath>
+    <PXE_TraceAssemblies>All</PXE_TraceAssemblies>
+    <PXE_EnableGDB>True</PXE_EnableGDB>
+    <PXE_StartCosmosGDB>True</PXE_StartCosmosGDB>
+    <PXE_EnableBochsDebug>False</PXE_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">

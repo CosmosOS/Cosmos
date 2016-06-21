@@ -39,9 +39,18 @@ namespace Cosmos.TestRunner.Core
 
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
+            string xDebugEnabled;
+            if (DebugStubEnabled)
+            {
+                xDebugEnabled = "true";
+            }
+            else
+            {
+                xDebugEnabled = "false";
+            }
             var xArguments = new[]
                              {
-                                 "DebugEnabled:true",
+                                 "DebugEnabled:" + xDebugEnabled,
                                  "StackCorruptionDetectionEnabled:" + EnableStackCorruptionChecks,
                                  "StackCorruptionDetectionLevel:" + StackCorruptionChecksLevel,
                                  "DebugMode:Source",

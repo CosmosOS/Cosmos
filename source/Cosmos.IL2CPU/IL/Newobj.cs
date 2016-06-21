@@ -198,7 +198,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
                 XS.Pop(XSRegisters.EAX);
-                XS.Set(EAX, EAX, sourceIsIndirect: true);
                 XS.Set(EBX, strTypeId, sourceIsIndirect: true);
                 XS.Set(EAX, EBX, destinationIsIndirect: true);
                 XS.Set(EAX, (uint)InstanceTypeEnum.NormalObject, destinationDisplacement: 4, size: RegisterSize.Int32);
@@ -206,7 +205,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 uint xSize = (uint)(from item in xParams
                                     let xQSize = Align(SizeOfType(item.ParameterType), 4)
                                     select (int)xQSize).Take(xParams.Length).Sum();
-
+                XS.Push(0);
                 foreach (var xParam in xParams)
                 {
                     uint xParamSize = Align(SizeOfType(xParam.ParameterType), 4);
@@ -265,7 +264,8 @@ namespace Cosmos.IL2CPU.X86.IL
                 //}
                 PushAlignedParameterSize(constructor);
 
-                XS.Push(XSRegisters.EAX);
+                XS.Push(EAX);
+                XS.Push(0);
             }
         }
 

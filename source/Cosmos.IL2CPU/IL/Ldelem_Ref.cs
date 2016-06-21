@@ -18,10 +18,11 @@ namespace Cosmos.IL2CPU.X86.IL
     {
       // stack - 1: array
       // stack - 0: index
-      DoNullReferenceCheck(aAssembler, debugEnabled, 4);
+      DoNullReferenceCheck(aAssembler, debugEnabled, 8);
 
       XS.Pop(XSRegisters.EAX); // index
       XS.Set(XSRegisters.EDX, aElementSize);
+      XS.Add(XSRegisters.ESP, 4);
       XS.Multiply(XSRegisters.EDX);
 
       XS.Add(XSRegisters.EAX, (ObjectImpl.FieldDataOffset + 4));
@@ -34,8 +35,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
       // pop the array
       XS.Pop(XSRegisters.EDX);
-      XS.Add(XSRegisters.ESP, 4);
-
+      
       XS.Add(XSRegisters.EDX, XSRegisters.EAX);
 
       var xSizeLeft = aElementSize;
