@@ -32,16 +32,18 @@ namespace Cosmos.IL2CPU.X86.IL {
       XS.Comment("Offset: " + xActualOffset + " (includes object header)");
 
       uint xRoundedSize = Align(xSize, 4);
-      DoNullReferenceCheck(aAssembler, debugEnabled, (int)xRoundedSize);
+      DoNullReferenceCheck(aAssembler, debugEnabled, (int)xRoundedSize + 4);
       XS.Comment("After Nullref check");
-      XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xRoundedSize);
-      // ECX contains the object pointer now
+
       if (aNeedsGC)
       {
-        // for reference types (or boxed types), ECX actually contains the handle now, so we need to convert it to a memory address
-        XS.Comment("Dereference memory handle now");
-        XS.Set(XSRegisters.ECX, XSRegisters.ECX, sourceIsIndirect: true);
+        XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xRoundedSize + 4);
       }
+      else
+      {
+        XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xRoundedSize);
+      }
+
       if (debugEnabled)
       {
         XS.Push(XSRegisters.ECX);
@@ -65,31 +67,26 @@ namespace Cosmos.IL2CPU.X86.IL {
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AX };
             break;
           }
-		case 3: {
-				XS.Pop(XSRegisters.EAX);
-				// move 2 lower bytes
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AX };
-				// shift third byte to lowest
-				XS.ShiftRight(XSRegisters.EAX, 16);
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4) + 2, SourceReg = CPUx86.RegistersEnum.AL };
-				break;
-			}
+		    case 3: {
+				    XS.Pop(XSRegisters.EAX);
+				    // move 2 lower bytes
+				    new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AX };
+				    // shift third byte to lowest
+				    XS.ShiftRight(XSRegisters.EAX, 16);
+				    new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4) + 2, SourceReg = CPUx86.RegistersEnum.AL };
+				    break;
+			    }
         case 0: {
             break;
           }
         default:
           throw new Exception("Remainder size " + (xSize % 4) + " not supported!");
       }
-
-#if! SKIP_GC_CODE
-          if (aNeedsGC) {
-            XS.Push(XSRegisters.ECX);
-            XS.Push(XSRegisters.EAX);
-            XS.Call(LabelName.Get(GCImplementationRefs.DecRefCountRef));
-            XS.Call(LabelName.Get(GCImplementationRefs.DecRefCountRef));
-          }
-#endif
       XS.Add(XSRegisters.ESP, 4);
+      if (aNeedsGC)
+      {
+        XS.Add(XSRegisters.ESP, 4);
+      }
     }
 
     public static void DoExecute(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethod, SysReflection.FieldInfo aField, bool debugEnabled)

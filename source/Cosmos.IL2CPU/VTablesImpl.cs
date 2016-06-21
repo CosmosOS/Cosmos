@@ -53,67 +53,77 @@ namespace Cosmos.IL2CPU
     }
 
     public static void SetTypeInfo(int aType, uint aBaseType, uint[] aMethodIndexes, uint[] aMethodAddresses, uint aMethodCount)
-    //public static void SetTypeInfo(int aType, uint aBaseType, uint[] aMethodIndexes, uint aMethodAddressesA, uint aMethodAddressesB, uint aMethodCount)
+      //public static void SetTypeInfo(int aType, uint aBaseType, uint aMethodIndexesA, uint aMethodIndexesB, uint aMethodAddressesA, uint aMethodAddressesB, uint aMethodCount)
     {
-      Debug("SetTypeInfo");
-      DebugHex("Type", (uint)aType);
-      ////NestedMethod(0x0102030405060708);
-      DebugHex("BaseType", (uint)aBaseType);
-      DebugHex("MethodCount", aMethodCount);
-      //DebugHex("aMethodAddressesA", aMethodAddressesA);
-      //DebugHex("aMethodAddressesB", aMethodAddressesB);
+      //var xType = mTypes[aType];
+      //xType.BaseTypeIdentifier = aBaseType;
+      //xType.MethodIndexes = aMethodIndexes;
+      //xType.MethodAddresses = aMethodAddresses;
+      //xType.MethodCount = (int)aMethodCount;
+      //mTypes[aType] = xType;
+
+      //Debug("SetTypeInfo");
+      DebugHex("Type", (uint) aType);
+      DebugHex("BaseType", (uint) aBaseType);
+      //DebugHex("MethodCount", aMethodCount);
+      ////DebugHex("aMethodAddressesA", aMethodAddressesA);
+      ////DebugHex("aMethodAddressesB", aMethodAddressesB);
+      ////DebugHex("aMethodIndexesA", aMethodIndexesA);
+      ////DebugHex("aMethodIndexesB", aMethodIndexesB);
+      //DebugHex("mTypes.Length", (uint)mTypes.Length);
       //DebugHex("aMethodAddresses.Length", (uint)aMethodAddresses.Length);
       //DebugHex("aMethodIndexes.Length", (uint)aMethodIndexes.Length);
-      SubTest(aMethodIndexes, aMethodAddresses);
 
-      DebugAndHalt("Klaar");
-      //mTypes[aType].BaseTypeIdentifier = aBaseType;
-      //mTypes[aType].MethodIndexes = aMethodIndexes;
-      //mTypes[aType].MethodAddresses = aMethodAddresses;
-      //mTypes[aType].MethodCount = (int)aMethodCount;
-      //DebugHex("Read back BaseType", mTypes[aType].BaseTypeIdentifier);
-//      DebugHex("Read back aMethodAddresses.Length", (uint)mTypes[aType].MethodAddresses.Length);
-    }
+      mTypes[aType].BaseTypeIdentifier = aBaseType;
+      mTypes[aType].MethodIndexes = aMethodIndexes;
+      mTypes[aType].MethodAddresses = aMethodAddresses;
+      mTypes[aType].MethodCount = (int) aMethodCount;
+      Debugger.DoBochsBreak();
+      DebugHex("Read back BaseType", mTypes[aType].BaseTypeIdentifier);
 
-    private static void SubTest(uint[] aMethodIndexes, uint[] aMethodAddresses)
-    {
-      DebugHex("aMethodAddresses.Length", (uint)aMethodAddresses.Length);
-      //DebugHex("aMethodIndexes.Length", (uint)aMethodIndexes.Length);
+      if (aType > 0x98)
+      {
+        DebugHex("BaseType of 0x00000098", mTypes[0x00000098].BaseTypeIdentifier);
+      }
+      //if (aBaseType != mTypes[aType].BaseTypeIdentifier)
+      //{
+      //  DebugAndHalt("Fout!");
+      //}
+      //DebugHex("Read back aMethodAddresses.Length", (uint)mTypes[aType].MethodAddresses.Length);
 
     }
 
     public static void SetMethodInfo(int aType, int aMethodIndex, uint aMethodIdentifier, uint aMethodAddress)
     {
-      var xType = mTypes[aType];
-      DebugHex("BaseTypeID from type", xType.BaseTypeIdentifier);
-      var xArray = mTypes[aType].MethodAddresses;
-      Debug("Na array");
-      DebugHex("Array length", (uint)xArray.Length);
-      DebugHex("Array[0]", xArray[0]);
-      DebugHex("Array[1]", xArray[1]);
-      DebugHex("Array[2]", xArray[2]);
-      DebugHex("Array[3]", xArray[3]);
+      //var xType = mTypes[aType];
+      //DebugHex("BaseTypeID from type", xType.BaseTypeIdentifier);
+      //var xArray = mTypes[aType].MethodAddresses;
+      //Debug("Na array");
+      //DebugHex("Array length", (uint)xArray.Length);
+      //DebugHex("Array[0]", xArray[0]);
+      //DebugHex("Array[1]", xArray[1]);
+      //DebugHex("Array[2]", xArray[2]);
+      //DebugHex("Array[3]", xArray[3]);
 
-
-
-      Debugger.DoBochsBreak();
+      //Debugger.DoBochsBreak();
       mTypes[aType].MethodIndexes[aMethodIndex] = aMethodIdentifier;
       mTypes[aType].MethodAddresses[aMethodIndex] = aMethodAddress;
       //if (aType == 0x9D && aMethodIdentifier == 0x9C)
-      {
-        Debug("SetMethodInfo");
-        DebugHex("Type", (uint)aType);
-        DebugHex("MethodId", (uint)aMethodIdentifier);
-        DebugHex("Read back MethodId: ", (uint)mTypes[aType].MethodIndexes[aMethodIndex]);
-        DebugHex("MethodIdx", (uint)aMethodIndex);
-        DebugHex("aMethodAddress", (uint)aMethodAddress);
-        DebugHex("Read back address: ", (uint)mTypes[aType].MethodAddresses[aMethodIndex]);
-      }
+      //{
+      //  Debug("SetMethodInfo");
+      //  DebugHex("Type", (uint)aType);
+      //  DebugHex("MethodId", (uint)aMethodIdentifier);
+      //  DebugHex("Read back MethodId: ", (uint)mTypes[aType].MethodIndexes[aMethodIndex]);
+      //  DebugHex("MethodIdx", (uint)aMethodIndex);
+      //  DebugHex("aMethodAddress", (uint)aMethodAddress);
+      //  DebugHex("Read back address: ", (uint)mTypes[aType].MethodAddresses[aMethodIndex]);
+      //}
 
       if (mTypes[aType].MethodIndexes[aMethodIndex] != aMethodIdentifier)
       {
         DebugAndHalt("Setting went wrong! (1)");
       }
+      //DebugAndHalt("Klaar");
       //if (mTypes[aType].MethodAddresses[aMethodIndex] != aMethodAddress)
       //{
       //  DebugHex("aMethodAddress", aMethodAddress);
@@ -126,14 +136,16 @@ namespace Cosmos.IL2CPU
     {
       if (aType > 0xFFFF)
       {
-        Debug("Oops");
+        DebugAndHalt("Oops");
       }
       var xCurrentType = aType;
       DebugHex("Type", xCurrentType);
       DebugHex("MethodId", aMethodId);
       do
       {
+        DebugHex("Now checking type", xCurrentType);
         var xCurrentTypeInfo = mTypes[xCurrentType];
+        DebugHex("It's basetype is", xCurrentTypeInfo.BaseTypeIdentifier);
 
         if (xCurrentTypeInfo.MethodIndexes == null)
         {
@@ -169,6 +181,7 @@ namespace Cosmos.IL2CPU
         }
         if (xCurrentType == xCurrentTypeInfo.BaseTypeIdentifier)
         {
+          Debug("Ultimate base type already found!");
           break;
         }
         xCurrentType = xCurrentTypeInfo.BaseTypeIdentifier;
