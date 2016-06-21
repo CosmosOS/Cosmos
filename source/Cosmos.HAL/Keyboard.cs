@@ -29,7 +29,7 @@ namespace Cosmos.HAL {
 
         public ScanMapBase KeyLayout { get; private set; }
 
-        public void SetKeyLayout(ScanMapBase layout)
+        public virtual void SetKeyLayout(ScanMapBase layout)
         {
             KeyLayout = layout;
         }

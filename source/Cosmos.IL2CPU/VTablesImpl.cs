@@ -63,8 +63,8 @@ namespace Cosmos.IL2CPU
       //mTypes[aType] = xType;
 
       //Debug("SetTypeInfo");
-      DebugHex("Type", (uint) aType);
-      DebugHex("BaseType", (uint) aBaseType);
+      //DebugHex("Type", (uint) aType);
+      //DebugHex("BaseType", (uint) aBaseType);
       //DebugHex("MethodCount", aMethodCount);
       ////DebugHex("aMethodAddressesA", aMethodAddressesA);
       ////DebugHex("aMethodAddressesB", aMethodAddressesB);
@@ -78,12 +78,12 @@ namespace Cosmos.IL2CPU
       mTypes[aType].MethodIndexes = aMethodIndexes;
       mTypes[aType].MethodAddresses = aMethodAddresses;
       mTypes[aType].MethodCount = (int) aMethodCount;
-      Debugger.DoBochsBreak();
-      DebugHex("Read back BaseType", mTypes[aType].BaseTypeIdentifier);
+      //Debugger.DoBochsBreak();
+      //DebugHex("Read back BaseType", mTypes[aType].BaseTypeIdentifier);
 
       if (aType > 0x98)
       {
-        DebugHex("BaseType of 0x00000098", mTypes[0x00000098].BaseTypeIdentifier);
+        //DebugHex("BaseType of 0x00000098", mTypes[0x00000098].BaseTypeIdentifier);
       }
       //if (aBaseType != mTypes[aType].BaseTypeIdentifier)
       //{
@@ -136,6 +136,7 @@ namespace Cosmos.IL2CPU
     {
       if (aType > 0xFFFF)
       {
+        EnableDebug = true;
         DebugAndHalt("Oops");
       }
       var xCurrentType = aType;
@@ -188,6 +189,7 @@ namespace Cosmos.IL2CPU
       }
       while (true);
       //}
+      EnableDebug = true;
       Debugger.DoSend("Type");
       Debugger.DoSendNumber(aType);
       Debugger.DoSend("MethodId");

@@ -44,11 +44,17 @@ namespace Cosmos.IL2CPU.X86.IL
       new Add(Assembler).Execute(aMethod, aOpCode);
       // the total array size is now on the stack.
       XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
-      XS.Push(ESP, isIndirect: true);
-      XS.Push(ESP, isIndirect: true);
-      // it's on the stack 3 times now, once from the return value, twice from the pushes;
 
       XS.Pop(XSRegisters.EAX);
+
+      XS.Push(EAX);
+      XS.Push(0);
+      XS.Push(EAX);
+      XS.Push(0);
+
+      // it's on the stack 3 times now, once from the return value, twice from the pushes;
+
+
       XS.Set(EAX, EAX, sourceIsIndirect: true);
       XS.Set(EBX, xTypeID, sourceIsIndirect: true);
       XS.Set(EAX, EBX, destinationIsIndirect: true);
