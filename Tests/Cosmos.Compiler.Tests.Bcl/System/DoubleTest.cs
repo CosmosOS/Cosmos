@@ -147,6 +147,25 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             long valueAsLong = (long)value;
             Assert.IsTrue((valueAsLong == (long)42), "double (long) operator doesn't work");
+
+            // We put on anUInt a very big value Int32.MaxValue + 42. Why all this 42 :-) ?
+            uint anUInt = 2147483689;
+            value = (double)anUInt;
+            Assert.IsTrue((DoublesAreEqual(value, 2147483689d)), "(double) from uint operator doesn't work");
+
+            //ulong anULong = 9223372036854775849;
+            //ulong anULong = 9423372036854775870;
+            unchecked
+            {
+                ulong anULong = (ulong)-1;
+                byte[] anULongAsBytes = BitConverter.GetBytes(anULong);
+                value = (double)anULong;
+                byte[] valueAsBytes = BitConverter.GetBytes(value);
+
+                //Assert.IsTrue((DoublesAreEqual(value, 18446744073709551615d)), "(double) from ulong operator doesn't work");
+
+                Assert.IsTrue((DoublesAreEqual(value, 9423372036854775870d)), "(double) from ulong operator doesn't work returns long is " + BitConverter.ToString(anULongAsBytes) + " value as bytes " + BitConverter.ToString(valueAsBytes));
+            }
         }
     }
 }

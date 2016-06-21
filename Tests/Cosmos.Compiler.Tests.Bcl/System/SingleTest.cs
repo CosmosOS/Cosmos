@@ -160,11 +160,20 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = (float)anInt;
             Assert.IsTrue((SinglesAreEqual(value, 69f)), "(float) from int operator doesn't work");
 
-            // This does not work Conv.R.Un always returns 0!
-#if false
-            uint anUInt = 99;
+            // We put on anUInt a very big value Int32.MaxValue + 42. Why all this 42 :-) ?
+            uint anUInt = 2147483689;
             value = (float)anUInt;
-            Assert.IsTrue((SinglesAreEqual(value, 99f)), "(float) from uint operator doesn't work returns " + value);
+            Assert.IsTrue((SinglesAreEqual(value, 2147483689f)), "(float) from uint operator doesn't work");
+
+            //ulong anULong = 9223372036854775849;
+            ulong anULong = 9423372036854775870;
+            value = (float)anULong;
+#if true
+            byte[] valueAsBytes = BitConverter.GetBytes(value);
+
+            Assert.IsTrue((SinglesAreEqual(value, 9223372036854775849f)), "(float) from ulong operator doesn't work returns " + value + " as bytes " + BitConverter.ToString(valueAsBytes));
+#else
+            Assert.IsTrue((SinglesAreEqual(value, 9423372036854775870f)), "(float) from ulong operator doesn't work: ");
 #endif
         }
     }
