@@ -15,6 +15,12 @@ namespace Cosmos.System.Plugs.System.IO
     [Plug(Target = typeof(File))]
     public static class FileImpl
     {
+        public static void InternalDelete(string aPath, bool checkHost)
+        {
+            String xFullPath = Path.GetFullPath(aPath);
+            VFSManager.DeleteFile(xFullPath);
+        }
+        
         public static bool Exists(string aFile)
         {
             Global.mFileSystemDebugger.SendInternal("File.Exists:");

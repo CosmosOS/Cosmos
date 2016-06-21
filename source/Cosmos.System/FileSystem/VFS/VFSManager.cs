@@ -12,6 +12,15 @@ namespace Cosmos.System.FileSystem.VFS
     {
         private static VFSBase mVFS;
 
+        public static void DeleteFile(string aPath)
+        {
+            if (mVFS == null)
+                throw new Exception("VFSManager isn't ready.");
+
+            var xFile = mVFS.GetFile(aPath);
+            mVFS.DeleteFile(xFile);
+        }
+
         public static void RegisterVFS(VFSBase aVFS)
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.RegisterVFS ---");

@@ -458,5 +458,13 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
             }
         }
+
+        public override void Delete()
+        {
+            if (mEntryType == DirectoryEntryTypeEnum.Directory || mEntryType == DirectoryEntryTypeEnum.Unknown)
+                throw new NotImplementedException();
+
+            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstByte, FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry);
+        }
     }
 }

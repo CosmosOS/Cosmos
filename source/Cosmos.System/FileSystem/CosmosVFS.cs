@@ -455,5 +455,20 @@ namespace Cosmos.System.FileSystem
 
             return aFS.GetRootDirectory();
         }
+
+        public override bool DeleteFile(DirectoryEntry aPath)
+        {
+            try
+            {
+                var xFS = GetFileSystemFromPath(aPath.mFullPath);
+                
+                xFS.Delete(aPath);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

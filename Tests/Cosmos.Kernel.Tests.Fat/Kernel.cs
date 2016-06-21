@@ -511,6 +511,7 @@ namespace Cosmos.Kernel.Tests.Fat
         /// </summary>
         private void TestFile()
         {
+            /*
             string xContents;
             // Moved this test here because if not the test can be executed only a time!
             mDebugger.Send("Write to file now");
@@ -682,6 +683,24 @@ namespace Cosmos.Kernel.Tests.Fat
             //    "Contents of Kudzu.txt was appended incorrectly!");
             //mDebugger.Send("END TEST");
             //mDebugger.Send("");
+            */
+
+            Assert.IsTrue(File.Exists("0:\\Kudzu.txt"), "Kudzu.txt wasn't found!");
+            File.Delete(@"0:\Kudzu.txt");
+            Assert.IsFalse(File.Exists("0:\\Kudzu.txt"), "Kudzu.txt wasn't deleted!");
+
+            //Simple test: create a directory, then try to delete it as a file.
+            Directory.CreateDirectory(@"0:\KillMe");
+            try
+            {
+                File.Delete("0:\\KillMe");
+                Assert.IsTrue(false, "Somehow, File.Delete on a directory either works like Directory.Delete, or it's just not throwing the exception.");
+                Assert.IsTrue(Directory.Exists("0:\\KillMe"), "Yeah, it's actually deleting the directory. That isn't right.");
+            }
+            catch
+            {
+                
+            }
         }
 
         #endregion

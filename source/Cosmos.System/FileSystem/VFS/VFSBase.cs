@@ -21,6 +21,8 @@ namespace Cosmos.System.FileSystem.VFS
 
         public abstract DirectoryEntry GetVolume(string aVolume);
 
+        public abstract bool DeleteFile(DirectoryEntry aPath);
+
         public abstract List<DirectoryEntry> GetVolumes();
 
         public static char DirectorySeparatorChar { get { return '\\'; } }

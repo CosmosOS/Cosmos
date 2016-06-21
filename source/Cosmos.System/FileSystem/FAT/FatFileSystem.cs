@@ -624,6 +624,11 @@ namespace Cosmos.System.FileSystem.FAT
             return xDirectoryEntryToAdd;
         }
 
+        public override void Delete(DirectoryEntry aPath)
+        {
+            aPath.Delete();
+        }
+
         private enum FatTypeEnum
         {
             Unknown,

@@ -80,5 +80,7 @@ namespace Cosmos.System.FileSystem.Listing
         public abstract void SetSize(long aSize);
 
         public abstract Stream GetFileStream();
+
+        public abstract void Delete();
     }
 }
