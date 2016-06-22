@@ -101,7 +101,7 @@ namespace Cosmos.Core.Plugs.System
 
 
         public static unsafe int get_Length(
-            int* aThis,
+            string aThis,
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aLength)
         {
             return aLength;

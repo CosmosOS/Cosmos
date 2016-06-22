@@ -20,6 +20,13 @@ namespace Cosmos.IL2CPU.X86.IL
       // stack - 2 == the array
       // stack - 1 == the index
       // stack - 0 == the new value
+      if (GetLabel(aMethod, aOpCode) == "SystemVoidCosmosCoreINTsSetIntHandlerSystemByteCosmosCoreINTsIRQDelegate.IL_0008.10")
+      {
+        ;
+        ;
+        ;
+        ;
+      }
       uint xStackSize = aElementSize;
       if (xStackSize % 4 != 0)
       {
@@ -85,7 +92,7 @@ namespace Cosmos.IL2CPU.X86.IL
     }
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
-      Assemble(Assembler, 4, aMethod, aOpCode, DebugEnabled);
+      Assemble(Assembler, 8, aMethod, aOpCode, DebugEnabled);
     }
   }
 }

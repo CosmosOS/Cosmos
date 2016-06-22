@@ -863,12 +863,12 @@ namespace Cosmos.IL2CPU
 
         protected void Ldflda(MethodInfo aMethod, string aFieldId)
         {
-            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false, false);
+            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false, false, aMethod.MethodBase.DeclaringType);
         }
 
         protected void Ldflda(MethodInfo aMethod, FieldInfo aFieldInfo)
         {
-            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldInfo, false, false);
+            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldInfo, false, false, aFieldInfo.DeclaringType);
         }
 
         protected void Ldsflda(MethodInfo aMethod, FieldInfo aFieldInfo)
