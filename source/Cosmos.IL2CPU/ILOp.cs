@@ -500,7 +500,7 @@ namespace Cosmos.IL2CPU {
       }
     }
 
-    protected static bool TypeIsReferenceType(Type type)
+    public static bool TypeIsReferenceType(Type type)
     {
       return type.IsClass
         && !type.IsValueType

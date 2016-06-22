@@ -29,11 +29,10 @@ namespace Cosmos.IL2CPU.X86.IL
             //mTypeId = GetService<IMetaDataInfoService>().GetTypeIdLabel( mCastAsType );
             // todo: throw an exception when the class does not support the cast!
             string mReturnNullLabel = xCurrentMethodLabel + "_ReturnNull";
-            XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
+            XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 4);
             XS.Compare(XSRegisters.EAX, 0);
             XS.Jump(CPU.ConditionalTestEnum.Zero, mReturnNullLabel);
 
-            XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
             XS.Push(XSRegisters.EAX, isIndirect: true);
             XS.Push(xTypeID, isIndirect: true);
             MethodBase xMethodIsInstance = VTablesImplRefs.IsInstanceRef;
@@ -46,9 +45,10 @@ namespace Cosmos.IL2CPU.X86.IL
             new CPU.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
 
             XS.Label(mReturnNullLabel );
-            XS.Add(XSRegisters.ESP, 4);
-            string xAllocInfoLabelName = LabelName.Get( GCImplementationRefs.AllocNewObjectRef );
-#warning TODO: Emit new exceptions
+            XS.Add(XSRegisters.ESP, 8);
+
+            //string xAllocInfoLabelName = LabelName.Get( GCImplementationRefs.AllocNewObjectRef );
+            // TODO: Emit new exceptions
             //new Newobj( Assembler ).Execute( aMethod, aOpCode );
 
             //Newobj.Assemble( Assembler,

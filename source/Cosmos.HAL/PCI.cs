@@ -73,7 +73,8 @@ namespace Cosmos.HAL
             devices.Add(device);
             if (device is PCIDeviceBridge)
             {
-                EnumerateBus(((PCIDeviceBridge)device).SecondaryBusNumber, step + 1);
+                var xDevice = device as PCIDeviceBridge;
+                EnumerateBus((xDevice).SecondaryBusNumber, step + 1);
             }
         }
     }

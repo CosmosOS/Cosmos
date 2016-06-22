@@ -37,6 +37,7 @@ namespace Cosmos.IL2CPU.X86.IL
         XS.Set(ESI, EDX, destinationDisplacement: (ObjectImpl.FieldDataOffset + (i * 4)), size: RegisterSize.Int32);
       }
       XS.Push(XSRegisters.EAX);
+      XS.Push(0);
     }
   }
 }

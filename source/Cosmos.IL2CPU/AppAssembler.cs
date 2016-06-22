@@ -422,8 +422,14 @@ namespace Cosmos.IL2CPU
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location" };
                 XS.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
-                XS.Pop(XSRegisters.EAX);
+                XS.Pop(ECX);
+                XS.Push(EAX);
+                XS.Push(EBX);
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
+                XS.Call("DebugStub_SendSimpleNumber");
+                XS.Add(ESP, 4);
+                XS.Call("DebugStub_SendSimpleNumber");
+                XS.Add(ESP, 4);
                 XS.Call("DebugStub_SendStackCorruptionOccurred");
                 XS.Halt();
             }
@@ -1255,18 +1261,22 @@ namespace Cosmos.IL2CPU
             // todo: completely get rid of this kind of trampoline code
             MethodBegin(aFrom);
             {
+                var xFromParameters = aFrom.MethodBase.GetParameters();
                 var xParams = aTo.MethodBase.GetParameters().ToArray();
-
                 if (aTo.MethodAssembler != null)
                 {
                     xParams = aFrom.MethodBase.GetParameters();
+                }
+
+                if (ILOp.GetMethodLabel(aFrom) == "SystemVoidCosmosCoreINTsIRQDelegateInvokeCosmosCoreINTsIRQContext")
+                {
+                    ;
                 }
 
                 int xCurParamIdx = 0;
                 if (!aFrom.MethodBase.IsStatic)
                 {
                     Ldarg(aFrom, 0);
-                    xCurParamIdx++;
                     if (aTo.MethodAssembler == null)
                     {
                         var xObjectPointerAccessAttrib = xParams[0].GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
@@ -1275,13 +1285,26 @@ namespace Cosmos.IL2CPU
                             XS.Comment("Skipping the reference to the next object reference.");
                             XS.Add(ESP, 4);
                         }
+                        else
+                        {
+                            if (ILOp.TypeIsReferenceType(aFrom.MethodBase.DeclaringType) && !ILOp.TypeIsReferenceType(xParams[0].ParameterType))
+                            {
+                                throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute!");
+                            }
+                        }
                         xParams = xParams.Skip(1).ToArray();
-
+                    }
+                    else
+                    {
+//                        xCurParamIdx++;
                     }
                 }
+
+                var xOriginalParamsIdx = 0;
                 foreach (var xParam in xParams)
                 {
                     var xFieldAccessAttrib = xParam.GetCustomAttributes<FieldAccessAttribute>(true).FirstOrDefault();
+                    var xObjectPointerAccessAttrib = xParam.GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
                     if (xFieldAccessAttrib != null)
                     {
                         // field access
@@ -1297,12 +1320,23 @@ namespace Cosmos.IL2CPU
                             Ldflda(aFrom, xFieldInfo);
                         }
                     }
+                    else if (xObjectPointerAccessAttrib != null)
+                    {
+                        xOriginalParamsIdx++;
+                        Ldarg(aFrom, xCurParamIdx);
+                        XS.Add(ESP, 4);
+                    }
                     else
                     {
+                        if (ILOp.TypeIsReferenceType(xFromParameters[xOriginalParamsIdx].ParameterType) && !ILOp.TypeIsReferenceType(xParams[xCurParamIdx].ParameterType))
+                        {
+                            throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute!");
+                        }
                         // normal field access
                         XS.Comment("Loading parameter " + xCurParamIdx);
                         Ldarg(aFrom, xCurParamIdx);
                         xCurParamIdx++;
+                        xOriginalParamsIdx++;
                     }
                 }
                 Call(aFrom, aTo, xEndOfMethodLabel);
