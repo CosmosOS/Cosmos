@@ -912,9 +912,10 @@ namespace Cosmos.IL2CPU
             Array.Copy(xTemp, 0, xData, 8, 4);
             xTemp = BitConverter.GetBytes(GetVTableEntrySize());
             Array.Copy(xTemp, 0, xData, 12, 4);
-            XS.DataMemberBytes(xTheName, xData);
+            XS.DataMemberBytes(xTheName + "_Contents", xData);
+            XS.DataMember(xTheName, 1, "dd", xTheName + "_Contents");
 #if VMT_DEBUG
-        using (var xVmtDebugOutput = XmlWriter.Create(@"c:\data\vmt_debug.xml"))
+            using (var xVmtDebugOutput = XmlWriter.Create(@"c:\data\vmt_debug.xml"))
         {
             xVmtDebugOutput.WriteStartDocument();
             xVmtDebugOutput.WriteStartElement("VMT");

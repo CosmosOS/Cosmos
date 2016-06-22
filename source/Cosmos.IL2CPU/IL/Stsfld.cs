@@ -3,6 +3,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using System.Reflection;
 using System.Linq;
+using Cosmos.IL2CPU.ILOpCodes;
 using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
@@ -18,10 +19,11 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-
             var xType = aMethod.MethodBase.DeclaringType;
             var xOpCode = ( ILOpCodes.OpField )aOpCode;
             SysReflection.FieldInfo xField = xOpCode.Value;
+            var xIsReferenceType = TypeIsReferenceType(xField.FieldType);
+
             // call cctor:
             var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
             if (xCctor != null && xCctor.DeclaringType != aMethod.MethodBase.DeclaringType)
@@ -52,6 +54,16 @@ namespace Cosmos.IL2CPU.X86.IL
                 xOffset += SizeOfType( xInfo.FieldType );
             }
             string xDataName = DataMember.GetStaticFieldName(xField);
+            if (xIsReferenceType)
+            {
+              if (xOpCode.StackPopTypes[0] != typeof(NullRef))
+              {
+                 XS.Add(XSRegisters.ESP, 4);
+              }
+              XS.Pop(XSRegisters.EAX);
+              XS.Set(xDataName, XSRegisters.EAX, destinationIsIndirect: true);
+              return;
+            }
             for( int i = 0; i < ( xSize / 4 ); i++ )
             {
                 XS.Pop(XSRegisters.EAX);

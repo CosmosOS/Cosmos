@@ -13,6 +13,11 @@ namespace Cosmos.IL2CPU
     // this field seems to be always empty, but the VTablesImpl class is embedded in the final exe.
     public static VTable[] mTypes;
 
+    static VTablesImpl()
+    {
+
+    }
+
     public static bool IsInstance(uint aObjectType, uint aDesiredObjectType)
     {
       var xCurrentType = aObjectType;

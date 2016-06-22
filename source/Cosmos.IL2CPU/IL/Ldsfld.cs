@@ -48,7 +48,7 @@ namespace Cosmos.IL2CPU.X86.IL
             var xTypeNeedsGC = TypeIsReferenceType(xField.FieldType);
             if (xTypeNeedsGC)
             {
-                XS.Push(xDataName);
+                XS.Push(xDataName, isIndirect: true);
                 XS.Push(0);
                 return;
             }
