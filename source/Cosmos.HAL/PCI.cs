@@ -29,7 +29,7 @@ namespace Cosmos.HAL
         private static void EnumerateDevices()
         {
             devices = new List<PCIDevice>();
-            EnumerateBus(0, 0);
+            //EnumerateBus(0, 0);
         }
 
         private static void EnumerateBus(uint xBus, uint step)
@@ -62,6 +62,7 @@ namespace Cosmos.HAL
 
         private static void AddDevice(PCIDevice device, uint step)
         {
+            Console.WriteLine("Adding PCIDevice");
             string str = "";
             for (int i = 0; i < step; i++)
             {

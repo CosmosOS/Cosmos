@@ -1283,7 +1283,7 @@ namespace Cosmos.IL2CPU
 
                     ;
                 }
-                if (ILOp.GetMethodLabel(aFrom) == "SystemVoidCosmosCoreINTsIRQDelegatectorSystemObjectSystemIntPtr")
+                if (ILOp.GetMethodLabel(aFrom) == "SystemVoidCosmosCoreINTsIRQDelegateInvokeCosmosCoreINTsIRQContext")
                 {
                     ;
                 }
@@ -1312,8 +1312,8 @@ namespace Cosmos.IL2CPU
                     if (!aTo.IsWildcard)
                     {
                         xParams = xParams.Skip(1).ToArray();
-                        xCurParamOffset = 1;
                     }
+                    xCurParamOffset = 1;
                 }
 
                 var xOriginalParamsIdx = 0;
