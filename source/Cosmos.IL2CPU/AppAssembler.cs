@@ -425,7 +425,7 @@ namespace Cosmos.IL2CPU
                 XS.Pop(ECX);
                 XS.Push(EAX);
                 XS.Push(EBX);
-                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
+                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.ECX };
                 XS.Call("DebugStub_SendSimpleNumber");
                 XS.Add(ESP, 4);
                 XS.Call("DebugStub_SendSimpleNumber");
@@ -1261,42 +1261,58 @@ namespace Cosmos.IL2CPU
             // todo: completely get rid of this kind of trampoline code
             MethodBegin(aFrom);
             {
+                var xExtraSpaceToSkipDueToObjectPointerAccess = 0u;
+
                 var xFromParameters = aFrom.MethodBase.GetParameters();
                 var xParams = aTo.MethodBase.GetParameters().ToArray();
-                if (aTo.MethodAssembler != null)
+                if (aTo.IsWildcard)
                 {
                     xParams = aFrom.MethodBase.GetParameters();
                 }
-
-                if (ILOp.GetMethodLabel(aFrom) == "SystemVoidCosmosCoreINTsIRQDelegateInvokeCosmosCoreINTsIRQContext")
+                if (aFrom.MethodBase.Name == "get_Chars")
                 {
                     ;
                 }
+                if (aFrom.MethodBase.Name == "UpdateIDT")
+                {
+                    ;
+                }
+                if (aFrom.MethodBase.Name == "get_Length"
+                    && aFrom.MethodBase.DeclaringType.Name == "Array")
+                {
 
+                    ;
+                }
+                if (ILOp.GetMethodLabel(aFrom) == "SystemVoidCosmosCoreINTsIRQDelegatectorSystemObjectSystemIntPtr")
+                {
+                    ;
+                }
                 int xCurParamIdx = 0;
+                var xCurParamOffset = 0;
                 if (!aFrom.MethodBase.IsStatic)
                 {
                     Ldarg(aFrom, 0);
-                    if (aTo.MethodAssembler == null)
+                    var xObjectPointerAccessAttrib = xParams[0].GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
+                    if (xObjectPointerAccessAttrib != null)
                     {
-                        var xObjectPointerAccessAttrib = xParams[0].GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
-                        if (xObjectPointerAccessAttrib != null)
-                        {
-                            XS.Comment("Skipping the reference to the next object reference.");
-                            XS.Add(ESP, 4);
-                        }
-                        else
-                        {
-                            if (ILOp.TypeIsReferenceType(aFrom.MethodBase.DeclaringType) && !ILOp.TypeIsReferenceType(xParams[0].ParameterType))
-                            {
-                                throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute!");
-                            }
-                        }
-                        xParams = xParams.Skip(1).ToArray();
+                        XS.Comment("Skipping the reference to the next object reference.");
+                        XS.Add(ESP, 4);
+                        xExtraSpaceToSkipDueToObjectPointerAccess += 4;
                     }
                     else
                     {
-//                        xCurParamIdx++;
+                        if (ILOp.TypeIsReferenceType(aFrom.MethodBase.DeclaringType)
+                            && !ILOp.TypeIsReferenceType(xParams[0].ParameterType))
+                        {
+                            throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute!");
+                        }
+                    }
+                    // voor array.getlength: wel doen
+
+                    if (!aTo.IsWildcard)
+                    {
+                        xParams = xParams.Skip(1).ToArray();
+                        xCurParamOffset = 1;
                     }
                 }
 
@@ -1323,8 +1339,9 @@ namespace Cosmos.IL2CPU
                     else if (xObjectPointerAccessAttrib != null)
                     {
                         xOriginalParamsIdx++;
-                        Ldarg(aFrom, xCurParamIdx);
+                        Ldarg(aFrom, xCurParamIdx + xCurParamOffset);
                         XS.Add(ESP, 4);
+                        xExtraSpaceToSkipDueToObjectPointerAccess += 4;
                     }
                     else
                     {
@@ -1333,8 +1350,8 @@ namespace Cosmos.IL2CPU
                             throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute!");
                         }
                         // normal field access
-                        XS.Comment("Loading parameter " + xCurParamIdx);
-                        Ldarg(aFrom, xCurParamIdx);
+                        XS.Comment("Loading parameter " + (xCurParamIdx + xCurParamOffset));
+                        Ldarg(aFrom, xCurParamIdx + xCurParamOffset);
                         xCurParamIdx++;
                         xOriginalParamsIdx++;
                     }
