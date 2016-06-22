@@ -861,11 +861,6 @@ namespace Cosmos.IL2CPU
                      }, aNextLabel);
         }
 
-        protected void Ldflda(MethodInfo aMethod, string aFieldId)
-        {
-            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false, false, aMethod.MethodBase.DeclaringType);
-        }
-
         protected void Ldflda(MethodInfo aMethod, FieldInfo aFieldInfo)
         {
             X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldInfo, false, false, aFieldInfo.DeclaringType);
@@ -1274,17 +1269,19 @@ namespace Cosmos.IL2CPU
                     xCurParamIdx++;
                     if (aTo.MethodAssembler == null)
                     {
+                        var xObjectPointerAccessAttrib = xParams[0].GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
+                        if (xObjectPointerAccessAttrib != null)
+                        {
+                            XS.Comment("Skipping the reference to the next object reference.");
+                            XS.Add(ESP, 4);
+                        }
                         xParams = xParams.Skip(1).ToArray();
+
                     }
                 }
                 foreach (var xParam in xParams)
                 {
-                    FieldAccessAttribute xFieldAccessAttrib = null;
-                    foreach (var xAttrib in xParam.GetCustomAttributes(typeof(FieldAccessAttribute), true))
-                    {
-                        xFieldAccessAttrib = xAttrib as FieldAccessAttribute;
-                    }
-
+                    var xFieldAccessAttrib = xParam.GetCustomAttributes<FieldAccessAttribute>(true).FirstOrDefault();
                     if (xFieldAccessAttrib != null)
                     {
                         // field access

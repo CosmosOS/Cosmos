@@ -108,6 +108,7 @@ namespace Cosmos.Core.Plugs.System
         }
 
         public static unsafe char get_Chars(
+            [ObjectPointerAccess]
             uint* aThis,
             int aIndex,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
