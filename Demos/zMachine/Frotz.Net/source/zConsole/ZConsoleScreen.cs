@@ -12,16 +12,22 @@ namespace zConsole
     {
         string loaded_file = null;
 
-        public ZConsoleScreen(string file)
+        public ZConsoleScreen(string file, byte[] bytes)
         {
             loaded_file = file;
             Frotz.os_.SetScreen(this);
+            //Frotz.Generic.main.
+            Frotz.os_.preloadedFileData = bytes;
             Frotz.Generic.main.MainFunc(new[] { file });
         }
 
-        
-        public event EventHandler<ZKeyPressEventArgs> KeyPressed;
-        
+
+        public EventHandler<ZKeyPressEventArgs> KeyPressed
+        {
+            get;
+            set;
+        }
+
         public void addInputChar(char c)
         {
             KeyPressed?.Invoke(this, new ZKeyPressEventArgs(c));
@@ -176,7 +182,7 @@ namespace zConsole
                 in_input = false;
             }
         }
-        
+
         public void RemoveChars(int count)
         {
             Console.Write(repeat(" ", count));

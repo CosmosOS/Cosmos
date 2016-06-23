@@ -18,6 +18,7 @@ using Cosmos.Common;
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs.System;
 using Cosmos.IL2CPU.X86.IL;
 using Mono.Cecil;
 using XSharp.Compiler;
@@ -1169,39 +1170,37 @@ namespace Cosmos.IL2CPU
                 if (xManifestResourceName != null)
                 {
                     // todo: add support for manifest streams again
-                    //RegisterType(xCurrentField.FieldType);
                     //string xFileName = Path.Combine(mOutputDir,
                     //                                (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",",
                     //                                                                                                                       "_") + ".res");
-                    //using (var xStream = xCurrentField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName)) {
-                    //    if (xStream == null) {
-                    //        throw new Exception("Resource '" + xManifestResourceName + "' not found!");
-                    //    }
-                    //    using (var xTarget = File.Create(xFileName)) {
-                    //        // todo: abstract this array code out.
-                    //        xTarget.Write(BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib",
-                    //                                                                               "System.Array"))),
-                    //                      0,
-                    //                      4);
-                    //        xTarget.Write(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray),
-                    //                      0,
-                    //                      4);
-                    //        xTarget.Write(BitConverter.GetBytes((int)xStream.Length), 0, 4);
-                    //        xTarget.Write(BitConverter.GetBytes((int)1), 0, 4);
-                    //        var xBuff = new byte[128];
-                    //        while (xStream.Position < xStream.Length) {
-                    //            int xBytesRead = xStream.Read(xBuff, 0, 128);
-                    //            xTarget.Write(xBuff, 0, xBytesRead);
-                    //        }
-                    //    }
-                    //}
-                    //Assembler.DataMembers.Add(new DataMember("___" + xFieldName + "___Contents",
-                    //                                          "incbin",
-                    //                                          "\"" + xFileName + "\""));
-                    //Assembler.DataMembers.Add(new DataMember(xFieldName,
-                    //                                          "dd",
-                    //                                          "___" + xFieldName + "___Contents"));
-                    throw new NotImplementedException();
+                    var xTarget = new StringBuilder();
+                    using (var xStream = aField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName))
+                    {
+                        if (xStream == null)
+                        {
+                            throw new Exception("Resource '" + xManifestResourceName + "' not found!");
+                        }
+                        xTarget.Append("0,");
+                        // todo: abstract this array code out.
+                        xTarget.Append((uint)InstanceTypeEnum.StaticEmbeddedArray);
+                        xTarget.Append(",");
+                        xTarget.Append((int)xStream.Length);
+                        xTarget.Append(",");
+                        xTarget.Append("1,");
+                        while (xStream.Position < xStream.Length)
+                        {
+                            xTarget.Append(xStream.ReadByte());
+                            xTarget.Append(",");
+                        }
+                        xTarget.Append(",");
+                    }
+
+                    Assembler.DataMembers.Add(new DataMember("___" + xFieldName + "___Contents",
+                                                              "db",
+                                                              xTarget));
+                    Assembler.DataMembers.Add(new DataMember(xFieldName,
+                                                              "dd",
+                                                              "___" + xFieldName + "___Contents"));
                 }
                 else
                 {
