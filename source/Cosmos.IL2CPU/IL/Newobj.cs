@@ -212,7 +212,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     new Comment(aAssembler, String.Format("Arg {0}: {1}", xParam.Name, xParamSize));
                     for (int i = 0; i < xParamSize; i += 4)
                     {
-                        new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize + 4) };
+                        new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize + 8) };
                     }
                 }
 

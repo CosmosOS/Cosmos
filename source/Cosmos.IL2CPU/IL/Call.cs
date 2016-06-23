@@ -63,7 +63,7 @@ namespace Cosmos.IL2CPU.X86.IL
             // old code, which goof up everything for structs
             //return (int)Align(SizeOfType(xMethodInfo.DeclaringType), 4);
             // TODO native pointer size, so that COSMOS could be 64 bit OS
-            return 4;
+            return 8;
         }
 
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
@@ -101,7 +101,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 //throw new Exception("Call: non-concrete method called: '" + aTargetMethod.GetFullName() + "'");
             }
             var xParameters = aTargetMethod.GetParameters();
-            int xArgCount = xParameters.Length;
 
             // todo: implement exception support
             uint xExtraStackSize = GetStackSizeToReservate(aTargetMethod);
@@ -113,7 +112,14 @@ namespace Cosmos.IL2CPU.X86.IL
                     xThisOffset += Align(SizeOfType(xItem.ParameterType), 4);
                 }
                 var stackOffsetToCheck = xThisOffset;
-                DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck + 4);
+                if (aTargetMethod.DeclaringType.IsValueType)
+                {
+                    DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck);
+                }
+                else
+                {
+                    DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck + 4);
+                }
             }
 
             if (xExtraStackSize > 0)

@@ -95,7 +95,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else
                 {
-                    XS.Exchange(BX, BX);
                     XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: (int)xThisOffset + 4);
                     XS.Push(EAX, isIndirect: true);
                 }

@@ -44,20 +44,21 @@ namespace Cosmos.IL2CPU.X86.IL
       new Add(Assembler).Execute(aMethod, aOpCode);
       // the total array size is now on the stack.
       XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
-      XS.Push(ESP, isIndirect: true);
-      XS.Push(ESP, isIndirect: true);
-      // it's on the stack 3 times now, once from the return value, twice from the pushes;
 
       XS.Pop(XSRegisters.EAX);
-      XS.Set(EAX, EAX, sourceIsIndirect: true);
+
+      XS.Push(EAX);
+      XS.Push(0);
+      XS.Push(EAX);
+      XS.Push(0);
+
+      // it's on the stack 3 times now, once from the return value, twice from the pushes;
+
       XS.Set(EBX, xTypeID, sourceIsIndirect: true);
       XS.Set(EAX, EBX, destinationIsIndirect: true);
-      XS.Add(XSRegisters.EAX, 4);
-      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceValue = (uint)InstanceTypeEnum.Array, Size = 32 };
-      XS.Add(XSRegisters.EAX, 4);
-      XS.Set(EAX, ESI, destinationIsIndirect: true, size: RegisterSize.Int32);
-      XS.Add(XSRegisters.EAX, 4);
-      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceValue = (uint)xSize, Size = 32 };
+      XS.Set(EAX, (uint)InstanceTypeEnum.Array, destinationDisplacement: 4);
+      XS.Set(EAX, ESI, destinationDisplacement: 8);
+      XS.Set(EAX, xSize, destinationDisplacement: 12);
       XS.Call(xCtorName);
     }
   }

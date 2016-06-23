@@ -422,8 +422,14 @@ namespace Cosmos.IL2CPU
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location" };
                 XS.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
-                XS.Pop(XSRegisters.EAX);
-                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
+                XS.Pop(ECX);
+                XS.Push(EAX);
+                XS.Push(EBX);
+                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.ECX };
+                XS.Call("DebugStub_SendSimpleNumber");
+                XS.Add(ESP, 4);
+                XS.Call("DebugStub_SendSimpleNumber");
+                XS.Add(ESP, 4);
                 XS.Call("DebugStub_SendStackCorruptionOccurred");
                 XS.Halt();
             }
@@ -661,6 +667,7 @@ namespace Cosmos.IL2CPU
                 if (xNeedsExceptionPush)
                 {
                     Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
+                    XS.Push(0);
                 }
                 xILOp.DebugEnabled = DebugEnabled;
                 xILOp.Execute(aMethod, xOpCode);
@@ -861,14 +868,9 @@ namespace Cosmos.IL2CPU
                      }, aNextLabel);
         }
 
-        protected void Ldflda(MethodInfo aMethod, string aFieldId)
-        {
-            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false, false);
-        }
-
         protected void Ldflda(MethodInfo aMethod, FieldInfo aFieldInfo)
         {
-            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldInfo, false, false);
+            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldInfo, false, false, aFieldInfo.DeclaringType);
         }
 
         protected void Ldsflda(MethodInfo aMethod, FieldInfo aFieldInfo)
@@ -912,9 +914,10 @@ namespace Cosmos.IL2CPU
             Array.Copy(xTemp, 0, xData, 8, 4);
             xTemp = BitConverter.GetBytes(GetVTableEntrySize());
             Array.Copy(xTemp, 0, xData, 12, 4);
-            XS.DataMemberBytes(xTheName, xData);
+            XS.DataMemberBytes(xTheName + "_Contents", xData);
+            XS.DataMember(xTheName, 1, "dd", xTheName + "_Contents");
 #if VMT_DEBUG
-        using (var xVmtDebugOutput = XmlWriter.Create(@"c:\data\vmt_debug.xml"))
+            using (var xVmtDebugOutput = XmlWriter.Create(@"c:\data\vmt_debug.xml"))
         {
             xVmtDebugOutput.WriteStartDocument();
             xVmtDebugOutput.WriteStartElement("VMT");
@@ -1259,31 +1262,66 @@ namespace Cosmos.IL2CPU
             // todo: completely get rid of this kind of trampoline code
             MethodBegin(aFrom);
             {
-                var xParams = aTo.MethodBase.GetParameters().ToArray();
+                var xExtraSpaceToSkipDueToObjectPointerAccess = 0u;
 
-                if (aTo.MethodAssembler != null)
+                var xFromParameters = aFrom.MethodBase.GetParameters();
+                var xParams = aTo.MethodBase.GetParameters().ToArray();
+                if (aTo.IsWildcard)
                 {
                     xParams = aFrom.MethodBase.GetParameters();
                 }
+                if (aFrom.MethodBase.Name == "get_Chars")
+                {
+                    ;
+                }
+                if (aFrom.MethodBase.Name == "UpdateIDT")
+                {
+                    ;
+                }
+                if (aFrom.MethodBase.Name == "get_Length"
+                    && aFrom.MethodBase.DeclaringType.Name == "Array")
+                {
 
+                    ;
+                }
+                if (ILOp.GetMethodLabel(aFrom) == "SystemVoidCosmosCoreINTsIRQDelegateInvokeCosmosCoreINTsIRQContext")
+                {
+                    ;
+                }
                 int xCurParamIdx = 0;
+                var xCurParamOffset = 0;
                 if (!aFrom.MethodBase.IsStatic)
                 {
                     Ldarg(aFrom, 0);
-                    xCurParamIdx++;
-                    if (aTo.MethodAssembler == null)
+                    var xObjectPointerAccessAttrib = xParams[0].GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
+                    if (xObjectPointerAccessAttrib != null)
+                    {
+                        XS.Comment("Skipping the reference to the next object reference.");
+                        XS.Add(ESP, 4);
+                        xExtraSpaceToSkipDueToObjectPointerAccess += 4;
+                    }
+                    else
+                    {
+                        if (ILOp.TypeIsReferenceType(aFrom.MethodBase.DeclaringType)
+                            && !ILOp.TypeIsReferenceType(xParams[0].ParameterType))
+                        {
+                            throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute!");
+                        }
+                    }
+                    // voor array.getlength: wel doen
+
+                    if (!aTo.IsWildcard)
                     {
                         xParams = xParams.Skip(1).ToArray();
                     }
+                    xCurParamOffset = 1;
                 }
+
+                var xOriginalParamsIdx = 0;
                 foreach (var xParam in xParams)
                 {
-                    FieldAccessAttribute xFieldAccessAttrib = null;
-                    foreach (var xAttrib in xParam.GetCustomAttributes(typeof(FieldAccessAttribute), true))
-                    {
-                        xFieldAccessAttrib = xAttrib as FieldAccessAttribute;
-                    }
-
+                    var xFieldAccessAttrib = xParam.GetCustomAttributes<FieldAccessAttribute>(true).FirstOrDefault();
+                    var xObjectPointerAccessAttrib = xParam.GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
                     if (xFieldAccessAttrib != null)
                     {
                         // field access
@@ -1299,12 +1337,24 @@ namespace Cosmos.IL2CPU
                             Ldflda(aFrom, xFieldInfo);
                         }
                     }
+                    else if (xObjectPointerAccessAttrib != null)
+                    {
+                        xOriginalParamsIdx++;
+                        Ldarg(aFrom, xCurParamIdx + xCurParamOffset);
+                        XS.Add(ESP, 4);
+                        xExtraSpaceToSkipDueToObjectPointerAccess += 4;
+                    }
                     else
                     {
+                        if (ILOp.TypeIsReferenceType(xFromParameters[xOriginalParamsIdx].ParameterType) && !ILOp.TypeIsReferenceType(xParams[xCurParamIdx].ParameterType))
+                        {
+                            throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute!");
+                        }
                         // normal field access
-                        XS.Comment("Loading parameter " + xCurParamIdx);
-                        Ldarg(aFrom, xCurParamIdx);
+                        XS.Comment("Loading parameter " + (xCurParamIdx + xCurParamOffset));
+                        Ldarg(aFrom, xCurParamIdx + xCurParamOffset);
                         xCurParamIdx++;
+                        xOriginalParamsIdx++;
                     }
                 }
                 Call(aFrom, aTo, xEndOfMethodLabel);

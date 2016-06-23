@@ -17,9 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
             XS.Add(XSRegisters.ESP, 4);
             XS.Pop(XSRegisters.EAX);
 
-            XS.Add(XSRegisters.EAX, 8);
-            XS.Push(XSRegisters.EAX, isIndirect: true);
-          //XS.Push(XSRegisters.EAX);
+            XS.Push(XSRegisters.EAX, displacement: 8);
         }
 
 

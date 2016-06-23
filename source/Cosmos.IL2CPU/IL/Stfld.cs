@@ -14,7 +14,8 @@ namespace Cosmos.IL2CPU.X86.IL {
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpCode = (ILOpCodes.OpField)aOpCode;
       var xField = xOpCode.Value;
-      DoExecute(Assembler, aMethod, xField, DebugEnabled);
+      XS.Comment("Operand type: " + aOpCode.StackPopTypes[1].ToString());
+      DoExecute(Assembler, aMethod, xField, DebugEnabled, SizeOfType(aOpCode.StackPopTypes[1]) == 8);
     }
 
     public static void DoExecute(Cosmos.Assembler.Assembler aAssembler,  MethodInfo aMethod, string aFieldId, Type aDeclaringObject, bool aNeedsGC, bool debugEnabled) {
@@ -32,7 +33,15 @@ namespace Cosmos.IL2CPU.X86.IL {
       XS.Comment("Offset: " + xActualOffset + " (includes object header)");
 
       uint xRoundedSize = Align(xSize, 4);
-      DoNullReferenceCheck(aAssembler, debugEnabled, (int)xRoundedSize + 4);
+      if (aNeedsGC)
+      {
+        DoNullReferenceCheck(aAssembler, debugEnabled, (int)xRoundedSize + 4);
+      }
+      else
+      {
+        DoNullReferenceCheck(aAssembler, debugEnabled, (int)xRoundedSize);
+      }
+
       XS.Comment("After Nullref check");
 
       if (aNeedsGC)
@@ -44,12 +53,11 @@ namespace Cosmos.IL2CPU.X86.IL {
         XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xRoundedSize);
       }
 
-      if (debugEnabled)
+      if (xActualOffset != 0)
       {
-        XS.Push(XSRegisters.ECX);
-        XS.Pop(XSRegisters.ECX);
+        XS.Add(XSRegisters.ECX, (uint)(xActualOffset));
       }
-      XS.Add(XSRegisters.ECX, (uint)(xActualOffset));
+
       //TODO: Can't we use an x86 op to do a byte copy instead and be faster?
       for (int i = 0; i < (xSize / 4); i++) {
         XS.Pop(XSRegisters.EAX);
@@ -89,11 +97,9 @@ namespace Cosmos.IL2CPU.X86.IL {
       }
     }
 
-    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethod, SysReflection.FieldInfo aField, bool debugEnabled)
+    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethod, SysReflection.FieldInfo aField, bool debugEnabled, bool aNeedsGC)
     {
-      bool xNeedsGC = aField.DeclaringType.IsClass && !aField.DeclaringType.IsValueType;
-
-      DoExecute(aAssembler, aMethod, aField.GetFullName(), aField.DeclaringType, xNeedsGC, debugEnabled);
+      DoExecute(aAssembler, aMethod, aField.GetFullName(), aField.DeclaringType, aNeedsGC, debugEnabled);
     }
 
   }

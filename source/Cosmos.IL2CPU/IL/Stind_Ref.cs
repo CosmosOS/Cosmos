@@ -12,16 +12,16 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            Stind_I.Assemble(Assembler, 4, DebugEnabled);
+            Stind_I.Assemble(Assembler, 8, DebugEnabled);
         }
 
 
         // using System;
         // using System.IO;
-        // 
-        // 
+        //
+        //
         // using CPU = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stind_Ref)]
         // 	public class Stind_Ref: Op {

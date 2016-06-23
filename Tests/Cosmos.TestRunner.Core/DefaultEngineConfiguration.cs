@@ -15,7 +15,7 @@ namespace Cosmos.TestRunner.Core
 
             // Sets the time before an error is registered. For example if set to 60 then if a kernel runs for more than 60 seconds then
             // that kernel will be marked as a failure and terminated
-            engine.AllowedSecondsInKernel = 60;
+            engine.AllowedSecondsInKernel = 6000;
 
             // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are run.
             engine.RunTargets.Add(RunTargetEnum.Bochs);
@@ -26,8 +26,9 @@ namespace Cosmos.TestRunner.Core
             engine.TraceAssembliesLevel = TraceAssemblies.User;
             engine.EnableStackCorruptionChecks = true;
             engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
+            //engine.DebugStubEnabled = false;
 
-            //engine.RunWithGDB = true;
+            engine.RunWithGDB = true;
             //engine.StartBochsDebugGui = true;
 
             // Select kernels to be tested by adding them to the engine

@@ -13,6 +13,11 @@ namespace Cosmos.IL2CPU
     // this field seems to be always empty, but the VTablesImpl class is embedded in the final exe.
     public static VTable[] mTypes;
 
+    static VTablesImpl()
+    {
+
+    }
+
     public static bool IsInstance(uint aObjectType, uint aDesiredObjectType)
     {
       var xCurrentType = aObjectType;
@@ -55,6 +60,13 @@ namespace Cosmos.IL2CPU
     public static void SetTypeInfo(int aType, uint aBaseType, uint[] aMethodIndexes, uint[] aMethodAddresses, uint aMethodCount)
       //public static void SetTypeInfo(int aType, uint aBaseType, uint aMethodIndexesA, uint aMethodIndexesB, uint aMethodAddressesA, uint aMethodAddressesB, uint aMethodCount)
     {
+      if (aType == 2)
+      {
+        EnableDebug = true;
+        Debug("DoTest");
+        DebugHex("aMethodIndexes.Length", (uint)aMethodIndexes.Length);
+        EnableDebug = false;
+      }
       //var xType = mTypes[aType];
       //xType.BaseTypeIdentifier = aBaseType;
       //xType.MethodIndexes = aMethodIndexes;
@@ -63,8 +75,8 @@ namespace Cosmos.IL2CPU
       //mTypes[aType] = xType;
 
       //Debug("SetTypeInfo");
-      DebugHex("Type", (uint) aType);
-      DebugHex("BaseType", (uint) aBaseType);
+      //DebugHex("Type", (uint) aType);
+      //DebugHex("BaseType", (uint) aBaseType);
       //DebugHex("MethodCount", aMethodCount);
       ////DebugHex("aMethodAddressesA", aMethodAddressesA);
       ////DebugHex("aMethodAddressesB", aMethodAddressesB);
@@ -78,12 +90,12 @@ namespace Cosmos.IL2CPU
       mTypes[aType].MethodIndexes = aMethodIndexes;
       mTypes[aType].MethodAddresses = aMethodAddresses;
       mTypes[aType].MethodCount = (int) aMethodCount;
-      Debugger.DoBochsBreak();
-      DebugHex("Read back BaseType", mTypes[aType].BaseTypeIdentifier);
+      //Debugger.DoBochsBreak();
+      //DebugHex("Read back BaseType", mTypes[aType].BaseTypeIdentifier);
 
       if (aType > 0x98)
       {
-        DebugHex("BaseType of 0x00000098", mTypes[0x00000098].BaseTypeIdentifier);
+        //DebugHex("BaseType of 0x00000098", mTypes[0x00000098].BaseTypeIdentifier);
       }
       //if (aBaseType != mTypes[aType].BaseTypeIdentifier)
       //{
@@ -136,6 +148,7 @@ namespace Cosmos.IL2CPU
     {
       if (aType > 0xFFFF)
       {
+        EnableDebug = true;
         DebugAndHalt("Oops");
       }
       var xCurrentType = aType;
@@ -188,6 +201,7 @@ namespace Cosmos.IL2CPU
       }
       while (true);
       //}
+      EnableDebug = true;
       Debugger.DoSend("Type");
       Debugger.DoSendNumber(aType);
       Debugger.DoSend("MethodId");

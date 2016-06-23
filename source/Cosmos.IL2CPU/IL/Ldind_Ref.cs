@@ -16,6 +16,9 @@ namespace Cosmos.IL2CPU.X86.IL
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
             XS.Pop(XSRegisters.EAX);
             XS.Push(XSRegisters.EAX, isIndirect: true);
+            XS.Pop(XSRegisters.EAX);
+            new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4 };
+            XS.Push(XSRegisters.EAX, isIndirect: true);
         }
 
 
