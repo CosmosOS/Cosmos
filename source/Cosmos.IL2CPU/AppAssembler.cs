@@ -667,6 +667,7 @@ namespace Cosmos.IL2CPU
                 if (xNeedsExceptionPush)
                 {
                     Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
+                    XS.Push(0);
                 }
                 xILOp.DebugEnabled = DebugEnabled;
                 xILOp.Execute(aMethod, xOpCode);

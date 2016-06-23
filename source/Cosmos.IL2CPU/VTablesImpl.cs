@@ -60,6 +60,13 @@ namespace Cosmos.IL2CPU
     public static void SetTypeInfo(int aType, uint aBaseType, uint[] aMethodIndexes, uint[] aMethodAddresses, uint aMethodCount)
       //public static void SetTypeInfo(int aType, uint aBaseType, uint aMethodIndexesA, uint aMethodIndexesB, uint aMethodAddressesA, uint aMethodAddressesB, uint aMethodCount)
     {
+      if (aType == 2)
+      {
+        EnableDebug = true;
+        Debug("DoTest");
+        DebugHex("aMethodIndexes.Length", (uint)aMethodIndexes.Length);
+        EnableDebug = false;
+      }
       //var xType = mTypes[aType];
       //xType.BaseTypeIdentifier = aBaseType;
       //xType.MethodIndexes = aMethodIndexes;

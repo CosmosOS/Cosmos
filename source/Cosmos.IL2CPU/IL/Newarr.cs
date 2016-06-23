@@ -54,16 +54,11 @@ namespace Cosmos.IL2CPU.X86.IL
 
       // it's on the stack 3 times now, once from the return value, twice from the pushes;
 
-
-      XS.Set(EAX, EAX, sourceIsIndirect: true);
       XS.Set(EBX, xTypeID, sourceIsIndirect: true);
       XS.Set(EAX, EBX, destinationIsIndirect: true);
-      XS.Add(XSRegisters.EAX, 4);
-      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceValue = (uint)InstanceTypeEnum.Array, Size = 32 };
-      XS.Add(XSRegisters.EAX, 4);
-      XS.Set(EAX, ESI, destinationIsIndirect: true, size: RegisterSize.Int32);
-      XS.Add(XSRegisters.EAX, 4);
-      new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, SourceValue = (uint)xSize, Size = 32 };
+      XS.Set(EAX, (uint)InstanceTypeEnum.Array, destinationDisplacement: 4);
+      XS.Set(EAX, ESI, destinationDisplacement: 8);
+      XS.Set(EAX, xSize, destinationDisplacement: 12);
       XS.Call(xCtorName);
     }
   }

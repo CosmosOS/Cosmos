@@ -127,9 +127,15 @@ namespace Cosmos.IL2CPU.X86.IL
             }
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, ushort aParam)
+      public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, ushort aParam)
+      {
+        if (GetMethodLabel(aMethod) == "SystemVoidCosmosHALBlockDeviceBlockDeviceCheckDataSizeSystemBytearraySystemUInt64")
         {
-            var xDisplacement = GetArgumentDisplacement(aMethod, aParam);
+          ;
+          ;
+        }
+
+      var xDisplacement = GetArgumentDisplacement(aMethod, aParam);
             Type xArgType;
             if (aMethod.MethodBase.IsStatic)
             {
