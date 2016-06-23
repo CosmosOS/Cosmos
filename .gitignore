@@ -46,3 +46,4 @@ Cosmos.Assembler.Log
 UpgradeLog*.htm
 .sync/
 source/_ReSharper.Caches/
+source/Cosmos.Core.Memory.Test/~$Heap.xlsx
