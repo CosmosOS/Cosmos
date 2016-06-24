@@ -12,7 +12,7 @@ namespace Cosmos.Core.Memory {
 
     static public byte* Alloc(Native aSize) {
       Native xPages = (Native)((aSize + PrefixBytes) / RAT.PageSize) + 1;
-      var xPtr = (Native*)RAT.Alloc(RAT.PageType.HeapLarge, xPages);
+      var xPtr = (Native*)RAT.AllocPages(RAT.PageType.HeapLarge, xPages);
 
       xPtr[0] = xPages * RAT.PageSize - PrefixBytes; // Allocated data size
       xPtr[1] = aSize; // Actual data size
