@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.Assembler;
+using Cosmos.Assembler.x86;
 using static XSharp.Compiler.XS;
 using static XSharp.Compiler.XSRegisters;
 
@@ -21,7 +22,13 @@ namespace Cosmos.Debug.Kernel.Plugs
     public static void DoSend(string aText) { }
 
     [PlugMethod(Assembler = typeof(DebugDoSendNumber))]
+    public static void DoSendNumber(int aNumber) { }
+
+    [PlugMethod(Assembler = typeof(DebugDoSendNumber))]
     public static void DoSendNumber(uint aNumber) { }
+
+    [PlugMethod(Assembler = typeof(DebugDoSendLongNumber))]
+    public static void DoSendNumber(long aNumber) { }
 
     [PlugMethod(Assembler = typeof(DebugDoSendLongNumber))]
     public static void DoSendNumber(ulong aNumber) { }

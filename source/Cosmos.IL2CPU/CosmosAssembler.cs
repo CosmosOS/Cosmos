@@ -255,7 +255,7 @@ namespace Cosmos.IL2CPU
             WriteDebugVideo("Cosmos pre boot");
 
             // For when using Bochs, causes a break ASAP on entry after initial Cosmos display.
-            new LiteralAssemblerCode("xchg bx, bx");
+            //new LiteralAssemblerCode("xchg bx, bx");
 
             // CLI ASAP
             WriteDebugVideo("Clearing interrupts.");
