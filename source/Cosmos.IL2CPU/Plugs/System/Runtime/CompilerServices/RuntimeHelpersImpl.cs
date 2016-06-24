@@ -14,6 +14,7 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
 		}
 
 		[Inline(TargetPlatform = TargetPlatform.x86)]
+        [PlugMethod]
 		public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle) {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle

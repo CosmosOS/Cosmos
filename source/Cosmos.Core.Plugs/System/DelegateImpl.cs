@@ -44,12 +44,10 @@ namespace Cosmos.Core.Plugs.System
             return false;
         }
 
-        public static unsafe bool InternalEqualTypes(uint** a, uint** b)
+        public static unsafe bool InternalEqualTypes([ObjectPointerAccess] uint** a, [ObjectPointerAccess] uint** b)
         {
             var xTypeA = a[0][0];
             var xTypeB = b[0][0];
-
-
 
             return xTypeA == xTypeB;
         }

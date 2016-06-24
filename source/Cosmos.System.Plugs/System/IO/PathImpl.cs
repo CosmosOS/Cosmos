@@ -65,7 +65,7 @@ namespace Cosmos.System.Plugs.System.IO
             {
                 throw new ArgumentNullException((aPath1 == null) ? "path1" : "path2");
             }
-            
+
             CheckInvalidPathChars(aPath1);
             CheckInvalidPathChars(aPath2);
             string result = CombineNoChecks(aPath1, aPath2);
@@ -275,6 +275,7 @@ namespace Cosmos.System.Plugs.System.IO
             return false;
         }
 
+        [PlugMethod(IsOptional = true)]
         public static bool HasIllegalCharacters(string aPath, bool aCheckAdditional)
         {
             if (aCheckAdditional)

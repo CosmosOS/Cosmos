@@ -209,26 +209,21 @@ namespace Cosmos.IL2CPU
                 {
                     DebugInfo.AddDocument(mSequences[0].Document);
 
-                    var xMethod = new Method()
+                    var xMethod = new Method();
+                    xMethod.ID = mCurrentMethodGuid;
+                    xMethod.TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken;
+                    xMethod.MethodToken = aMethod.MethodBase.MetadataToken;
+                    xMethod.LabelStartID = xLabelGuid;
+                    xMethod.LabelEndID = mCurrentMethodLabelEndGuid;
+                    xMethod.LabelCall = xMethodLabel;
+                    long xAssemblyFileID;
+                    if (DebugInfo.AssemblyGUIDs.TryGetValue(aMethod.MethodBase.DeclaringType.Assembly, out xAssemblyFileID))
                     {
-                        ID = mCurrentMethodGuid,
-                        TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
-                        MethodToken = aMethod.MethodBase.MetadataToken,
-
-                        LabelStartID = xLabelGuid,
-                        LabelEndID = mCurrentMethodLabelEndGuid,
-                        LabelCall = xMethodLabel,
-
-                        AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
-                        DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document.ToLower()],
-
-                        // Storing Line + Col as one item makes comparisons MUCH easier, otherwise we have to
-                        // check for things like col < start col but line > start line.
-                        //
-                        // () around << are VERY important.. + has precedence over <<
-                        LineColStart = ((Int64)mSequences[0].LineStart << 32) + mSequences[0].ColStart,
-                        LineColEnd = ((Int64)(mSequences[mSequences.Length - 1].LineEnd) << 32) + mSequences[mSequences.Length - 1].ColEnd
-                    };
+                        xMethod.AssemblyFileID = xAssemblyFileID;
+                    }
+                    xMethod.DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document.ToLower()];
+                    xMethod.LineColStart = ((Int64)mSequences[0].LineStart << 32) + mSequences[0].ColStart;
+                    xMethod.LineColEnd = ((Int64)(mSequences[mSequences.Length - 1].LineEnd) << 32) + mSequences[mSequences.Length - 1].ColEnd;
                     DebugInfo.AddMethod(xMethod);
                 }
             }
@@ -475,6 +470,11 @@ namespace Cosmos.IL2CPU
                     throw new Exception("Method needs plug, but no plug was assigned.");
                 }
 
+                if (aMethod.MethodBase.Name == "InitializeArray")
+                {
+                    ;
+                }
+
                 // todo: MtW: how to do this? we need some extra space.
                 //		see ConstructLabel for extra info
                 if (aMethod.UID > 0x00FFFFFF)
@@ -492,7 +492,7 @@ namespace Cosmos.IL2CPU
                 }
                 else if (aMethod.IsInlineAssembler)
                 {
-                    aMethod.MethodBase.Invoke("", new object[aMethod.MethodBase.GetParameters().Length]);
+                    aMethod.MethodBase.Invoke(null, new object[aMethod.MethodBase.GetParameters().Length]);
                 }
                 else
                 {
