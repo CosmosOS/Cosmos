@@ -61,6 +61,11 @@ namespace Cosmos.Debug.Kernel
             // plugged
         }
 
+        internal static void DoSendCoreDump()
+        {
+            // plugged
+        }
+
         public void SendNumber(uint aNumber)
         {
             DoSendNumber(aNumber);
@@ -386,6 +391,11 @@ namespace Cosmos.Debug.Kernel
 
             //    addr = FromHex(s);
             //}
+        }
+
+        public void SendCoreDump()
+        {
+            DoSendCoreDump();
         }
 
         private int FromHex(string p)

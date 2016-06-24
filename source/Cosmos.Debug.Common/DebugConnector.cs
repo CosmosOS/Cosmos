@@ -31,6 +31,7 @@ namespace Cosmos.Debug.Common
         public Action<byte[]> CmdStack;
         public Action<byte[]> CmdPong;
         public Action<byte, byte, byte[]> CmdChannel;
+        public Action<byte[]> CmdCoreDump;
         public Action<UInt32> CmdStackCorruptionOccurred;
         public Action<UInt32> CmdStackOverflowOccurred;
         public Action<UInt32> CmdInterruptOccurred;
@@ -275,6 +276,11 @@ namespace Cosmos.Debug.Common
                 case Ds2Vs.ComplexLongNumber:
                     DebugLog("DC Recv: ComplexLongNumber");
                     Next(8, PacketComplexLongNumber);
+                    break;
+
+                case Ds2Vs.CoreDump:
+                    DebugLog("DC Recv: CoreDump");
+                    Next(-1, PacketCoreDump);
                     break;
 
                 default:
