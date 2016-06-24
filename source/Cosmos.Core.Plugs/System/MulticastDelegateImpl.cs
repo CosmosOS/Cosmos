@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Cosmos.IL2CPU.Plugs.System {
 
@@ -15,6 +16,19 @@ namespace Cosmos.IL2CPU.Plugs.System {
 
     public static bool Equals(MulticastDelegate aThis, object aThat) {
       // todo: implement MulticastDelegate.Equals(MulticastDelegate)
+      return false;
+    }
+
+    public static bool TrySetSlot(MulticastDelegate multicastDelegate, object[] a, int index, object o)
+    {
+      if (a[index] == null)
+      {
+        a[index] = o;
+      }
+      if (a[index] != null)
+      {
+        return false;
+      }
       return false;
     }
   }

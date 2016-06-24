@@ -22,6 +22,8 @@
  * New undo mechanism added by Jim Dunleavy <jim.dunleavy@erha.ie>
  */
 
+using System;
+using System.IO;
 using zword = System.UInt16;
 using zbyte = System.Byte;
 
@@ -110,10 +112,11 @@ namespace Frotz.Generic
         internal static long zmp = 0;
         internal static long pcp = 0;
 
-        private static System.IO.MemoryStream story_fp = null;
+        //private static System.IO.MemoryStream story_fp = null;
 
         static bool first_restart = true;
         static long init_fp_pos = 0;
+        private static System.IO.Stream story_fp;
 
         #region zmp & pcp
 
@@ -343,17 +346,25 @@ namespace Frotz.Generic
             // TODO Abstract this part
             /* Open story file */
             // story_fp = new System.IO.FileStream(main.story_name, System.IO.FileMode.Open, System.IO.FileAccess.Read);
-            story_fp = os_.path_open(main.story_data);
-            if (story_fp == null)
+            if (os_.preloadedFileData != null)
             {
-                os_.fatal("Cannot open story file");
+                storyData = os_.preloadedFileData;
+                story_fp = new MemoryStream(storyData);
             }
-            init_fp_pos = story_fp.Position;
+            else
+            {
+                //story_fp = os_.path_open(main.story_data);
+                //if (story_fp == null)
+                //{
+                //    os_.fatal("Cannot open story file");
+                //}
+                //init_fp_pos = story_fp.Position;
 
-            storyData = new byte[story_fp.Length];
-            story_fp.Read(storyData, 0, storyData.Length);
-            story_fp.Position = 0;
-
+                //storyData = new byte[story_fp.Length];
+                //story_fp.Read(storyData, 0, storyData.Length);
+                //story_fp.Position = 0;
+                throw new Exception("File loading doesn't work yet");
+            }
             DebugState.Output("Starting story: {0}", main.story_name);
 
             /* Allocate memory for story header */
@@ -1016,13 +1027,13 @@ namespace Frotz.Generic
             /* undo possible */
 
             undo_struct undo = undo_mem[undo_mem.Count - 1];
-            
+
             System.Array.Copy(prev_zmp, ZMData, main.h_dynamic_size);
             SET_PC(undo.pc);
             main.sp = undo.sp;
             main.fp = undo.frame_offset;
             main.frame_count = undo.frame_count;
-             
+
             mem_undiff(undo.undo_data, undo.diff_size, prev_zmp);
 
             // System.Array.Copy(undo.stack, 0, main.stack, undo.sp, undo.stack.Length);
@@ -1112,7 +1123,7 @@ namespace Frotz.Generic
 
                 if (main.option_save_quetzal == true)
                 {
-                    success = Quetzal.save_quetzal(gfp, story_fp);
+                    //success = Quetzal.save_quetzal(gfp, story_fp);
 
                 }
                 else

@@ -47,7 +47,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             XS.Label(mReturnNullLabel );
             XS.Add(XSRegisters.ESP, 4);
-            string xAllocInfoLabelName = LabelName.Get( GCImplementationRefs.AllocNewObjectRef );
+            //string xAllocInfoLabelName = LabelName.Get( GCImplementationRefs.AllocNewObjectRef );
 #warning TODO: Emit new exceptions
             //new Newobj( Assembler ).Execute( aMethod, aOpCode );
 

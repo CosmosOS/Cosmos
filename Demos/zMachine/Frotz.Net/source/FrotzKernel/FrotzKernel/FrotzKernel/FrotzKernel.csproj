@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="Kernel.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="ManifestResourceStreamAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\..\..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
@@ -94,6 +95,15 @@
       <Project>{3e4a8079-aac0-429d-b042-0b5151e0e5be}</Project>
       <Name>zConsole</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ZORK3.DAT" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ZORK1.DAT" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ZORK2.DAT" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
