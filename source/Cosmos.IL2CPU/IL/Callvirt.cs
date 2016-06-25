@@ -45,7 +45,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
             // mMethodIdentifier = GetService<IMetaDataInfoService>().GetMethodIdLabel(mMethod);
 
-            int xArgCount = aTargetMethod.GetParameters().Length;
             uint xReturnSize = 0;
             var xMethodInfo = aTargetMethod as SysReflection.MethodInfo;
             if (xMethodInfo != null)

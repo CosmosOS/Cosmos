@@ -42,14 +42,7 @@ namespace Cosmos.HAL.BlockDevice
 
 		protected void CheckDataSize(byte[] aData, UInt64 aBlockCount)
 		{
-		    var xActualLength = aData.Length;
-		    var xExpectedDataSize = aBlockCount * mBlockSize;
-		    Debugger.DoSend("Expected data size:");
-		    Debugger.DoSendNumber(xExpectedDataSize);
-            Debugger.DoSend("Actual data size:");
-            Debugger.DoSendNumber(xActualLength);
-
-            if ((ulong)aData.Length != aBlockCount * mBlockSize)
+		    if ((ulong)aData.Length != aBlockCount * mBlockSize)
 			{
 				throw new Exception("Invalid data size.");
 			}

@@ -17,9 +17,18 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    {
+      Assemble(Assembler, 8, false, DebugEnabled);
+    }
+
     public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, bool isSigned, bool debugEnabled)
     {
+      //  stack     = index
+      //  stack + 1 = array
+      //
       DoNullReferenceCheck(aAssembler, debugEnabled, 8);
+
       // calculate element offset into array memory (including header)
       XS.Pop(EAX);
       XS.Set(EDX, aElementSize);
@@ -82,11 +91,6 @@ namespace Cosmos.IL2CPU.X86.IL
             //    break;
         }
       }
-    }
-
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
-    {
-      Assemble(Assembler, 4, false, DebugEnabled);
     }
   }
 }

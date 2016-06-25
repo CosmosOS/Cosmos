@@ -67,9 +67,24 @@ namespace Cosmos.Common
 
         public static string GetNumberString(int aValue)
         {
+            Debugger.DoSend("In GetNumberString(int)");
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
             int xValue = aValue;
+
+            var xTestArray = new int[]
+                             {
+                                 1, 2, 3
+                             };
+            var xIntValue = xTestArray[0];
+
+            Debugger.DoSend("Int array werkt ok");
+            var xTestArray2 = new long[]
+                              {
+                                  1, 2, 3
+                              };
+            var xLongValue = xTestArray2[1];
+            Debugger.DoSend("Long array werkt ok");
 
             if (aValue < 0)
             {

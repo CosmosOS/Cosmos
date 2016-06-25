@@ -341,6 +341,11 @@ namespace Cosmos.IL2CPU
             XS.Set(XSRegisters.ECX, 0);
             var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
                                   select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
+            if (ILOp.GetMethodLabel(aMethod) == "SystemVoidSystemConsoleWriteLineSystemString")
+            {
+                ;
+                ;
+            }
             if (!aMethod.MethodBase.IsStatic)
             {
                 if (aMethod.MethodBase.DeclaringType.IsValueType)

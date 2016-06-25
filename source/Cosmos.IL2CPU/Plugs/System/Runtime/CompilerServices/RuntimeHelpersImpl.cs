@@ -17,9 +17,8 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
 		public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle) {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle
-            XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 0xC); // array
-		    XS.Set(EDI, EDI, sourceIsIndirect: true);
-            XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: 8);// aFieldHandle
+            XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 20); // array
+		    XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: 12);// aFieldHandle
             XS.Add(XSRegisters.EDI, 8);
 		    XS.Push(EDI, isIndirect: true);
             XS.Add(XSRegisters.EDI, 4);

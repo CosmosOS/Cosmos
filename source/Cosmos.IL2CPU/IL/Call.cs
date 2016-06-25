@@ -77,8 +77,17 @@ namespace Cosmos.IL2CPU.X86.IL
             DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, ILOp.GetLabel(aCurrentMethod, aCurrent.NextPosition), debugEnabled);
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel, bool debugEnabled)
+        public static unsafe void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel, bool debugEnabled)
         {
+            if (aTargetMethod.DeclaringType.IsValueType && !aTargetMethod.IsStatic)
+            {
+                var xThisSize = Align(SizeOfType(aTargetMethod.DeclaringType), 4);
+                XS.Set(XSRegisters.EAX, XSRegisters.ESP);
+                XS.Add(XSRegisters.ESP, xThisSize);
+                XS.Push(XSRegisters.EAX);
+
+                return;
+            }
             //if (aTargetMethod.IsVirtual) {
             //  Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
             //  return;
@@ -88,18 +97,8 @@ namespace Cosmos.IL2CPU.X86.IL
             // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
             //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
             string xNormalAddress;
-            if (aTargetMethod.IsStatic
-                || !aTargetMethod.IsVirtual
-                || aTargetMethod.IsFinal)
-            {
-                xNormalAddress = LabelName.Get(aTargetMethod);
-            }
-            else
-            {
-                xNormalAddress = LabelName.Get(aTargetMethod);
+            xNormalAddress = LabelName.Get(aTargetMethod);
 
-                //throw new Exception("Call: non-concrete method called: '" + aTargetMethod.GetFullName() + "'");
-            }
             var xParameters = aTargetMethod.GetParameters();
 
             // todo: implement exception support
