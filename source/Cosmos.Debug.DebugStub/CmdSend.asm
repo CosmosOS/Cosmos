@@ -1,4 +1,4 @@
-; Generated at 6/24/2016 1:43:55 AM
+; Generated at 6/24/2016 9:50:36 PM
 
 
 
@@ -349,7 +349,6 @@
 		DebugStub_SendCoreDump_Block1_End:
 			mov byte AL, DebugStub_Const_Ds2Vs_CoreDump
 			Call DebugStub_ComWriteAL
-			mov dword EAX, 0x0
 			mov dword EAX, ECX
 			Call DebugStub_ComWriteAX
 
