@@ -43,6 +43,7 @@ namespace Cosmos.Debug.Common
         public const byte ComplexLongNumber = 21;
         public const byte StackOverflowOccurred = 22;
         public const byte InterruptOccurred = 23;
+        public const byte KernelPanic = 24;
     }
 
     // Messages from Host (VS) to Guest (Cosmos)

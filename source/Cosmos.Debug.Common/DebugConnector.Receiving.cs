@@ -99,6 +99,12 @@ namespace Cosmos.Debug.Common
             WaitForMessage();
         }
 
+        protected void PacketKernelPanic(byte[] aPacket)
+        {
+            CmdKernelPanic?.Invoke(GetUInt32(aPacket, 0));
+            WaitForMessage();
+        }
+
         protected void PacketSimpleLongNumber(byte[] aPacket)
         {
             CmdSimpleLongNumber?.Invoke(GetUInt64(aPacket, 0));

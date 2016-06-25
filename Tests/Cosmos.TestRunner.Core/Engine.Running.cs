@@ -40,6 +40,11 @@ namespace Cosmos.TestRunner.Core
             debugConnector.CmdComplexNumber += f => OutputHandler.LogMessage("Number from kernel: 0x" + f.ToString("X8").ToUpper());
             debugConnector.CmdComplexLongNumber += d => OutputHandler.LogMessage("Number from kernel: 0x" + d.ToString("X16").ToUpper());
             debugConnector.CmdMessageBox = s => OutputHandler.LogMessage("MessageBox from kernel: " + s);
+            debugConnector.CmdKernelPanic = n =>
+                                            {
+                                                OutputHandler.LogMessage("Kernel panic! Nummer = " + n);
+                                                // todo: add core dump here, call stack.
+                                            };
             debugConnector.CmdTrace = t => { };
             debugConnector.CmdBreak = t => { };
             debugConnector.CmdStackCorruptionOccurred = a =>

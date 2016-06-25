@@ -136,6 +136,11 @@ namespace Cosmos.Debug.Kernel
             // plugged
         }
 
+        public static void SendKernelPanic(uint id)
+        {
+            // plugged
+        }
+
         public void Send(string aText)
         {
             DoSend(aText);

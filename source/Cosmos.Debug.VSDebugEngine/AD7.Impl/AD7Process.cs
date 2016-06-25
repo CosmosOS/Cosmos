@@ -335,6 +335,7 @@ namespace Cosmos.Debug.VSDebugEngine
             mDbgConnector.CmdTrace += new Action<UInt32>(DbgCmdTrace);
             mDbgConnector.CmdText += new Action<string>(DbgCmdText);
             mDbgConnector.CmdSimpleNumber += new Action<uint>(DbgCmdSimpleNumber);
+            mDbgConnector.CmdKernelPanic += new Action<uint>(DbgCmdKernelPanic);
             mDbgConnector.CmdSimpleLongNumber += new Action<ulong>(DbgCmdSimpleLongNumber);
             mDbgConnector.CmdComplexNumber += new Action<float>(DbgCmdComplexNumber);
             mDbgConnector.CmdComplexLongNumber += new Action<double>(DbgCmdComplexLongNumber);
@@ -537,6 +538,11 @@ namespace Cosmos.Debug.VSDebugEngine
         void DbgCmdSimpleNumber(uint nr)
         {
             mCallback.OnOutputStringUser("0x" + nr.ToString("X8").ToUpper() + "\r\n");
+        }
+
+        void DbgCmdKernelPanic(uint nr)
+        {
+            MessageBox.Show("Kernel panic: 0x" + nr.ToString());
         }
 
         void DbgCmdSimpleLongNumber(ulong nr)

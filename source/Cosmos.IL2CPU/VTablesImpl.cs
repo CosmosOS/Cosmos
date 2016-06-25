@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
+using Cosmos.Common;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.IL2CPU
@@ -39,22 +40,6 @@ namespace Cosmos.IL2CPU
       }
       while (xCurrentType != 0);
       return false;
-    }
-
-    private static void NestedMethod(ulong test)
-    {
-      Debug("In NestedMethod");
-      if (test == 0x0102030405060708)
-      {
-        Debug("Goed!");
-      }else if (test == 0x0506070801020304)
-      {
-        Debug("Verkeerd om");
-      }
-      else
-      {
-        Debug("Anders...");
-      }
     }
 
     public static void SetTypeInfo(int aType, uint aBaseType, uint[] aMethodIndexes, uint[] aMethodAddresses, uint aMethodCount)
@@ -185,6 +170,7 @@ namespace Cosmos.IL2CPU
               DebugHex("MethodCount", (uint)xCurrentTypeInfo.MethodCount);
               DebugHex("MethodAddresses.Length", (uint)xCurrentTypeInfo.MethodAddresses.Length);
               Debug("Method found, but address is invalid!");
+              Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodFoundButAddressInvalid);
               while (true)
                 ;
             }
@@ -207,6 +193,7 @@ namespace Cosmos.IL2CPU
       Debugger.DoSend("MethodId");
       Debugger.DoSendNumber(aMethodId);
       Debugger.DoSend("Not FOUND!");
+      Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodNotFound);
       while (true)
         ;
       throw new Exception("Cannot find virtual method!");

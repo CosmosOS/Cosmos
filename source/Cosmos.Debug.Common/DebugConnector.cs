@@ -36,6 +36,7 @@ namespace Cosmos.Debug.Common
         public Action<UInt32> CmdInterruptOccurred;
         public Action<UInt32> CmdNullReferenceOccurred;
         public Action<uint> CmdSimpleNumber;
+        public Action<uint> CmdKernelPanic;
         public Action<ulong> CmdSimpleLongNumber;
         public Action<float> CmdComplexNumber;
         public Action<double> CmdComplexLongNumber;
@@ -260,6 +261,11 @@ namespace Cosmos.Debug.Common
                 case Ds2Vs.SimpleNumber:
                     DebugLog("DC Recv: SimpleNumber");
                     Next(4, PacketSimpleNumber);
+                    break;
+
+                case Ds2Vs.KernelPanic:
+                    DebugLog("DC Recv: KernelPanic");
+                    Next(4, PacketKernelPanic);
                     break;
 
                 case Ds2Vs.SimpleLongNumber:

@@ -216,6 +216,25 @@ EBP = ESP
 // Input: Stack
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
+function SendKernelPanic {
++EBP
+EBP = ESP
+    +All
+    // Write the type
+    AL = #Ds2Vs_KernelPanic
+    ComWriteAL()
+
+    // Write value
+    EAX = EBP[8]
+    ComWriteEAX()
+
+    -All
+  -EBP
+}
+
+// Input: Stack
+// Output: None
+// Modifies: EAX, ECX, EDX, ESI
 function SendSimpleLongNumber {
   +EBP
   EBP = ESP
