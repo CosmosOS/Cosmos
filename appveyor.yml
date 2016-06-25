@@ -47,12 +47,14 @@ build_script:
 
     msbuild "source\Cosmos.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
 notifications:
+
 - provider: Webhook
-  url: https://webhooks.gitter.im/e/a0ff70f4ffc77a2d07a0
+  url: https://webhooks.gitter.im/e/d5c57ffb9a04b1b180be
   on_build_success: true
   on_build_failure: true
   on_build_status_changed: true
-matrix:
+
+  matrix:
   fast_finish: true
 artifacts:
   - path: '**\TestResult.xml'
