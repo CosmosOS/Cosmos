@@ -94,7 +94,10 @@ namespace Cosmos.Core.Memory {
       return xResult;
     }
 
-    static public void* Alloc(byte aType, Native aPageCount = 1) {
+    static public void* AllocBytes(byte aType, Native aBytes) {
+      return AllocPages(aType, aBytes / PageSize);
+    }
+    static public void* AllocPages(byte aType, Native aPageCount = 1) {
       byte* xPos = null;
 
       // Could combine with an external method or delegate, but will slow things down
