@@ -7,21 +7,22 @@ namespace Cosmos.Core.Plugs.System
     [Plug(Target = typeof(Buffer))]
     public class BufferImpl
     {
-
+        [PlugMethod(IsOptional = true)]
         public static unsafe void __Memcpy(byte* src, byte* dest, int count)
         {
             global::System.Buffer.BlockCopy((Array)(object)*src, 0, (Array)(object)*dest, 0, count);
         }
 
         /// <summary>
-        /// The memmove() function copies n bytes from memory area src to memory area dest. 
-        /// The memory areas may overlap: copying takes place as though the bytes in src 
-        /// are first copied into a temporary array that does not overlap src or dest, 
+        /// The memmove() function copies n bytes from memory area src to memory area dest.
+        /// The memory areas may overlap: copying takes place as though the bytes in src
+        /// are first copied into a temporary array that does not overlap src or dest,
         /// and the bytes are then copied from the temporary array to dest.
         /// </summary>
         /// <param name="dest">Destination address to copy data into.</param>
         /// <param name="src">Source address from where copy data.</param>
         /// <param name="count">Count of bytes to copy.</param>
+        [PlugMethod(IsOptional = true)]
         public static unsafe void __Memmove(byte* dest, byte* src, uint count)
         {
             uint t;

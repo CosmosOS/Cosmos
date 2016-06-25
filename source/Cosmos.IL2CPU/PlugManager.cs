@@ -20,10 +20,10 @@ namespace Cosmos.IL2CPU
 
         public LogExceptionDelegate LogException = null;
 
-        public delegate void ScanMethodDelegate(MethodBase aMethod, bool aIsPlug, string sourceItem);
-        public ScanMethodDelegate ScanMethod = null;
-        public delegate void QueueDelegate(_MemberInfo aItem, object aSrc, string aSrcType, string sourceItem = null);
-        public QueueDelegate Queue = null;
+        ////public delegate void ScanMethodDelegate(MethodBase aMethod, bool aIsPlug, string sourceItem);
+        //public ScanMethodDelegate ScanMethod = null;
+        //public delegate void QueueDelegate(_MemberInfo aItem, object aSrc, string aSrcType, string sourceItem = null);
+        //public QueueDelegate Queue = null;
 
         // Contains a list of plug implementor classes
         // Key = Target Class
@@ -66,12 +66,6 @@ namespace Cosmos.IL2CPU
         public PlugManager(LogExceptionDelegate aLogException)
         {
             LogException = aLogException;
-        }
-        public PlugManager(LogExceptionDelegate aLogException, ScanMethodDelegate aScanMethod, QueueDelegate aQueueMethod)
-        {
-            LogException = aLogException;
-            ScanMethod = aScanMethod;
-            Queue = aQueueMethod;
         }
 
         public void FindPlugImpls()
@@ -184,10 +178,12 @@ namespace Cosmos.IL2CPU
                             }
                             else
                             {
-                                //Skip checking methods related to fields because it's just too messy...
-                                if (xMethod.GetParameters().Where(delegate (ParameterInfo x)
+                                // Skip checking methods related to fields because it's just too messy...
+                                // We also skip methods which do method access.
+                                if (xMethod.GetParameters().Where(x =>
                                 {
-                                    return x.GetCustomAttributes(typeof(FieldAccessAttribute)).Count() > 0;
+                                    return x.GetCustomAttributes(typeof(FieldAccessAttribute)).Count() > 0
+                                    || x.GetCustomAttributes(typeof(ObjectPointerAccessAttribute)).Count() > 0;
                                 }).Count() > 0)
                                 {
                                     OK = true;
@@ -306,41 +302,21 @@ namespace Cosmos.IL2CPU
                                 }
                             }
 
-                            if (OK)
+                            if (!OK)
                             {
-                                if (ScanMethod != null)
+                                if (xAttrib == null
+                                    || xAttrib.IsOptional)
                                 {
-                                    ScanMethod(xMethod, true, "Plug Sub Method");
-                                }
-                            }
-                            else
-                            {
-                                if (LogException != null)
-                                {
-                                    LogException(new Exception("Invalid plug method! Target method not found. : " + xMethod.GetFullName()));
+                                    throw new Exception("Invalid plug method! Target method not found. : " + xMethod.GetFullName());
                                 }
                             }
                         }
                         else
                         {
-                            if (xAttrib.IsWildcard && xAttrib.Assembler == null)
+                            if (xAttrib.IsWildcard
+                                && xAttrib.Assembler == null)
                             {
-                                Exception anEx = new Exception("Wildcard PlugMethods need to use an assembler for now.");
-                                if (ThrowExceptions)
-                                {
-                                    throw anEx;
-                                }
-                                else
-                                {
-                                    LogException(anEx);
-                                }
-                            }
-                            if (xAttrib.Enabled && !xAttrib.IsMonoOnly)
-                            {
-                                if (ScanMethod != null)
-                                {
-                                    ScanMethod(xMethod, true, ".Net plug Method");
-                                }
+                                throw new Exception("Wildcard PlugMethods need to use an assembler for now.");
                             }
                         }
                     }
@@ -356,15 +332,7 @@ namespace Cosmos.IL2CPU
                         }
                         if (xFields.ContainsKey(xField.FieldId))
                         {
-                            Exception anEx = new Exception("Duplicate PlugField found for field '" + xField.FieldId + "'!");
-                            if (ThrowExceptions)
-                            {
-                                throw anEx;
-                            }
-                            else
-                            {
-                                LogException(anEx);
-                            }
+                            throw new Exception("Duplicate PlugField found for field '" + xField.FieldId + "'!");
                         }
                         xFields.Add(xField.FieldId, xField);
                     }
@@ -642,21 +610,6 @@ namespace Cosmos.IL2CPU
                 //    xResult = null;
                 //  }
                 //}
-            }
-
-            InlineAttribute xInlineAttrib = null;
-            foreach (InlineAttribute inli in xResult.GetCustomAttributes(typeof(InlineAttribute), false))
-            {
-                xInlineAttrib = inli;
-            }
-
-            if (xInlineAttrib == null)
-            {
-                if (Queue != null)
-                {
-                    CompilerHelpers.Debug("Queueing Plug:", xResult.DeclaringType, "::", xResult.Name);
-                    Queue(xResult, null, "Plug Method");
-                }
             }
 
             //if (xAttrib != null && xAttrib.Signature != null)

@@ -12,5 +12,6 @@ namespace Cosmos.IL2CPU.Plugs
     public bool PlugRequired = false;
     public bool IsWildcard = false;
     public bool WildcardMatchParameters = false;
+    public bool IsOptional = true;
   }
 }

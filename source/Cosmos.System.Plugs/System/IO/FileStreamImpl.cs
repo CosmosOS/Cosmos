@@ -10,15 +10,17 @@ using Cosmos.System.FileSystem.VFS;
 namespace Cosmos.System.Plugs.System.IO
 {
     [Plug(Target = typeof(FileStream))]
-    [PlugField(FieldId = "$$InnerStream$$", FieldType = typeof(Stream))]
+    [PlugField(FieldId = InnerStreamFieldId, FieldType = typeof(Stream))]
     public class FileStreamImpl
     {
+        private const string InnerStreamFieldId = "$$InnerStream$$";
+
         // This plug basically forwards all calls to the $$InnerStream$$ stream, which is supplied by the file system.
 
         //  public static unsafe void Ctor(String aThis, [FieldAccess(Name = "$$Storage$$")]ref Char[] aStorage, Char[] aChars, int aStartIndex, int aLength,
 
         public static void Ctor(FileStream aThis, string aPathname, FileMode aMode,
-            [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
             Global.mFileSystemDebugger.SendInternal("FileStream.Ctor:");
 
@@ -31,15 +33,20 @@ namespace Cosmos.System.Plugs.System.IO
         }
 
         public static int Read(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
-            [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
             Global.mFileSystemDebugger.SendInternal("FileStream.Read:");
 
             return innerStream.Read(aBuffer, aOffset, aCount);
         }
 
+        public static int ReadByte(FileStream aThis, [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
+        {
+            return innerStream.ReadByte();
+        }
+
         public static void Write(FileStream aThis, byte[] aBuffer, int aOffset, int aCount,
-            [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
             Global.mFileSystemDebugger.SendInternal("FileStream.Write:");
 
@@ -47,19 +54,19 @@ namespace Cosmos.System.Plugs.System.IO
         }
 
         public static long get_Length(FileStream aThis,
-            [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
             return innerStream.Length;
         }
 
         public static void SetLength(FileStream aThis, long aLength,
-            [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
             innerStream.SetLength(aLength);
         }
 
         public static void Dispose(FileStream aThis, bool disposing,
-            [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+            [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
             if (disposing)
             {
@@ -68,25 +75,25 @@ namespace Cosmos.System.Plugs.System.IO
         }
 
         public static long Seek(FileStream aThis,
-                                [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream, long offset, SeekOrigin origin)
+                                [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream, long offset, SeekOrigin origin)
         {
             return innerStream.Seek(offset, origin);
         }
 
         public static void Flush(FileStream aThis,
-           [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+           [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
             innerStream.Flush();
         }
 
         public static long get_Position(FileStream aThis,
-                                        [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream)
+                                        [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream)
         {
             return innerStream.Position;
         }
 
         public static void set_Position(FileStream aThis,
-                                        [FieldAccess(Name = "$$InnerStream$$")] ref Stream innerStream, long value)
+                                        [FieldAccess(Name = InnerStreamFieldId)] ref Stream innerStream, long value)
         {
             innerStream.Position = value;
         }

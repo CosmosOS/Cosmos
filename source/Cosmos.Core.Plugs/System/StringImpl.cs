@@ -820,6 +820,7 @@ namespace Cosmos.Core.Plugs.System
             return new string(new char[length]);
         }
 
+        [PlugMethod(IsOptional = true)]
         public static string TrimStart(string aThis, string aSubStr)
         {
             char[] ci = aThis.ToCharArray();
