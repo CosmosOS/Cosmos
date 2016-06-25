@@ -12,7 +12,6 @@ namespace DebugCompiler
         [TestCaseSource(typeof(MySource), nameof(MySource.ProvideData))]
         public void Test(Type kernelToRun)
         {
-            Assert.Fail();
             Environment.CurrentDirectory = Path.GetDirectoryName(typeof(RunKernels).Assembly.Location);
 
             var xEngine = new Engine();
