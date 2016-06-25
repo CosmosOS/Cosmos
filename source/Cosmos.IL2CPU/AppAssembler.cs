@@ -917,7 +917,7 @@ namespace Cosmos.IL2CPU
             XS.DataMemberBytes(xTheName + "_Contents", xData);
             XS.DataMember(xTheName, 1, "dd", xTheName + "_Contents");
 #if VMT_DEBUG
-            using (var xVmtDebugOutput = XmlWriter.Create(@"c:\data\vmt_debug.xml"))
+            using (var xVmtDebugOutput = XmlWriter.Create(@"vmt_debug.xml"))
         {
             xVmtDebugOutput.WriteStartDocument();
             xVmtDebugOutput.WriteStartElement("VMT");
