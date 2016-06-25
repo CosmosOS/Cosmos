@@ -74,7 +74,9 @@ namespace PlugsInspector
 
             plugManager = new PlugManager((Exception ex) => {
                 AddExceptionEntry(ex.Message);
-            });
+            }, warning =>
+               {
+               });
             plugManager.ThrowExceptions = false;
         }
 

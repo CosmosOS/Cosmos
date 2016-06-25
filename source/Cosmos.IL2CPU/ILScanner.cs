@@ -31,6 +31,7 @@ namespace Cosmos.IL2CPU
     public class ILScanner : IDisposable
     {
         public LogExceptionDelegate LogException = null;
+        public Action<string> LogWarning = null;
 
         protected ILReader mReader;
         protected AppAssembler mAsmblr;
@@ -71,7 +72,7 @@ namespace Cosmos.IL2CPU
             mAsmblr = aAsmblr;
             mReader = new ILReader();
 
-            mPlugManager = new PlugManager(LogException);
+            mPlugManager = new PlugManager(LogException, LogWarning);
         }
 
         public bool EnableLogging(string aPathname)

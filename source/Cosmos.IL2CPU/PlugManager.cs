@@ -68,9 +68,10 @@ namespace Cosmos.IL2CPU
             return LabelName.GenerateFullName(m);
         }
 
-        public PlugManager(LogExceptionDelegate aLogException)
+        public PlugManager(LogExceptionDelegate aLogException, Action<string> aLogWarning)
         {
             LogException = aLogException;
+            LogWarning = aLogWarning;
         }
 
         public void FindPlugImpls()
@@ -321,7 +322,10 @@ namespace Cosmos.IL2CPU
                                 if (xAttrib == null
                                     || xAttrib.IsOptional)
                                 {
-                                    throw new Exception("Invalid plug method! Target method not found. : " + xMethod.GetFullName());
+                                    if (LogWarning != null)
+                                    {
+                                        LogWarning("Invalid plug method! Target method not found. : " + xMethod.GetFullName());
+                                    }
                                 }
                             }
                         }
@@ -330,7 +334,10 @@ namespace Cosmos.IL2CPU
                             if (xAttrib.IsWildcard
                                 && xAttrib.Assembler == null)
                             {
-                                throw new Exception("Wildcard PlugMethods need to use an assembler for now.");
+                                if (LogWarning != null)
+                                {
+                                    LogWarning("Wildcard PlugMethods need to use an assembler for now.");
+                                }
                             }
                         }
                     }
@@ -354,6 +361,8 @@ namespace Cosmos.IL2CPU
                 }
             }
         }
+
+        public Action<string> LogWarning;
 
         private MethodBase ResolvePlug(Type aTargetType, List<Type> aImpls, MethodBase aMethod, Type[] aParamTypes)
         {
@@ -717,7 +726,7 @@ namespace Cosmos.IL2CPU
                             }
                             else
                             {
-                                // private 
+                                // private
                                 xBindingFlagsToFindMethod = BindingFlags.NonPublic;
                             }
                             if (aMethod.IsStatic)
