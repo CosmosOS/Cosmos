@@ -88,6 +88,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="System\Collections\Generic\EqualityComparerImpl.cs" />
     <Compile Include="System\DecimalImpl.cs" />
     <Compile Include="System\Mda.cs" />
     <Compile Include="System\Security\Cryptography\CryptoConfigImpl.cs" />
