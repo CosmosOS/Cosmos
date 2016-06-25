@@ -85,6 +85,10 @@ namespace Cosmos.System {
 
         //TODO: Optimize this
         public void Write(string aText) {
+            if (aText == null)
+            {
+                return;
+            }
             for (int i = 0; i < aText.Length; i++) {
                 if (aText[i] == '\n') {
                     NewLine();
@@ -121,7 +125,7 @@ namespace Cosmos.System {
         }
 
         public bool CursorVisible {
-            get { return mText.GetCursorVisible(); } 
+            get { return mText.GetCursorVisible(); }
             set { mText.SetCursorVisible(value);  }
         }
     }

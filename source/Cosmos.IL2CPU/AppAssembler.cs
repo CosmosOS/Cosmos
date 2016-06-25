@@ -341,11 +341,8 @@ namespace Cosmos.IL2CPU
             XS.Set(XSRegisters.ECX, 0);
             var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
                                   select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
-            if (ILOp.GetMethodLabel(aMethod) == "SystemVoidSystemConsoleWriteLineSystemString")
-            {
-                ;
-                ;
-            }
+
+
             if (!aMethod.MethodBase.IsStatic)
             {
                 if (aMethod.MethodBase.DeclaringType.IsValueType)
@@ -1532,13 +1529,13 @@ namespace Cosmos.IL2CPU
 
                 // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
                 // if not, we should somehow break here.
-                XS.Set(XSRegisters.EAX, XSRegisters.ESP);
-                XS.Set(XSRegisters.EBX, XSRegisters.EBP);
+                XS.Set(EAX, ESP);
+                XS.Set(EBX, EBP);
                 if (xStackDifference != 0)
                 {
-                    XS.Add(XSRegisters.EAX, xStackDifference.Value);
+                    XS.Add(EAX, xStackDifference.Value);
                 }
-                XS.Compare(XSRegisters.EAX, XSRegisters.EBX);
+                XS.Compare(EAX, EBX);
                 XS.Jump(ConditionalTestEnum.Equal, xLabel + ".StackCorruptionCheck_End");
                 XS.Push(EAX);
                 XS.Push(EBX);

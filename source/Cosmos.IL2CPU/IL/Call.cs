@@ -49,7 +49,14 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             if (!xMethodInfo.IsStatic)
             {
-                xExtraStackSize -= GetNativePointerSize(xMethodInfo);
+                if (aMethod.DeclaringType.IsValueType)
+                {
+                    xExtraStackSize -= 4;
+                }
+                else
+                {
+                    xExtraStackSize -= GetNativePointerSize(xMethodInfo);
+                }
             }
             if (xExtraStackSize > 0)
             {
@@ -79,19 +86,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static unsafe void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel, bool debugEnabled)
         {
-            if (aTargetMethod.DeclaringType.IsValueType && !aTargetMethod.IsStatic)
+            if (GetMethodLabel(aTargetMethod) == "SystemStringSystemInt32ToString")
             {
-                var xThisSize = Align(SizeOfType(aTargetMethod.DeclaringType), 4);
-                XS.Set(XSRegisters.EAX, XSRegisters.ESP);
-                XS.Add(XSRegisters.ESP, xThisSize);
-                XS.Push(XSRegisters.EAX);
-
-                return;
+                ;
             }
-            //if (aTargetMethod.IsVirtual) {
-            //  Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
-            //  return;
-            //}
             var xMethodInfo = aTargetMethod as SysReflection.MethodInfo;
 
             // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod

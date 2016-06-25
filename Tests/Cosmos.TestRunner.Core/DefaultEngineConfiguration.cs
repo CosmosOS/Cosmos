@@ -28,7 +28,7 @@ namespace Cosmos.TestRunner.Core
             engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
             //engine.DebugStubEnabled = false;
 
-            engine.RunWithGDB = true;
+            //engine.RunWithGDB = true;
             //engine.StartBochsDebugGui = true;
 
             // Select kernels to be tested by adding them to the engine
