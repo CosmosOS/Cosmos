@@ -1,6 +1,9 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     /// <summary>
@@ -26,15 +29,15 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         if (TypeIsFloat(xSource))
                         {
-                            new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 32, DestinationIsIndirect = true };
-                            new CPUx86.Sub { DestinationReg = Registers.ESP, SourceValue = 4 };
-                            new CPUx86.x87.IntStoreWithTrunc { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                            XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Int32);
+                            XS.Sub(XSRegisters.ESP, 4);
+                            XS.FPU.IntStoreWithTruncate(ESP, isIndirect: true, size: RegisterSize.Long64);
                         }
                         else
                         {
-                            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                            new CPUx86.Push { DestinationValue = 0 };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            XS.Pop(XSRegisters.EAX);
+                            XS.Push(0);
+                            XS.Push(XSRegisters.EAX);
                         }
                         break;
                     }
@@ -42,9 +45,9 @@ namespace Cosmos.IL2CPU.X86.IL
                     {
                         if (TypeIsFloat(xSource))
                         {
-                            new CPUx86.x87.FloatLoad { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
-                            new CPUx86.x87.FloatABS();
-                            new CPUx86.x87.IntStoreWithTrunc { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                            XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
+                            XS.FPU.FloatAbs();
+                            XS.FPU.IntStoreWithTruncate(ESP, isIndirect: true, size: RegisterSize.Long64);
                         }
                         //Else it's already an Int64, or UInt64
                         break;

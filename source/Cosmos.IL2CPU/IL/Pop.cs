@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -15,11 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             // todo: implement exception support.
             var xSize = SizeOfType(aOpCode.StackPopTypes[0]);
-            new CPUx86.Add
-            {
-                DestinationReg = CPUx86.Registers.ESP,
-                SourceValue = ILOp.Align((uint)xSize, 4)
-            };
+            XS.Add(XSRegisters.ESP, Align((uint)xSize, 4));
         }
 
     }

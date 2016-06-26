@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -21,13 +22,13 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 1:
                 case 2:
                 case 4:
-                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                    new CPUx86.SignExtendAX { Size = 32 };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                    XS.Pop(XSRegisters.EAX);
+                    XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
+                    XS.Push(XSRegisters.EDX);
+                    XS.Push(XSRegisters.EAX);
                     break;
                 case 8:
-                    new CPUx86.Noop();
+                    XS.Noop();
                     break;
                 default:
                     //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_Ovf_I8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );

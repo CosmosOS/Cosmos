@@ -1,6 +1,8 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using XSharp.Compiler;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stind_I )]
@@ -20,11 +22,11 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 xStorageSize = 4;
             }
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = xStorageSize };
+            XS.Set(XSRegisters.EBX, XSRegisters.ESP, sourceDisplacement: xStorageSize);
             for( int i = 0; i < ( aSize / 4 ); i++ )
             {
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = i * 4 };
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
+                XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: i * 4);
+                XS.Set(XSRegisters.EBX, XSRegisters.EAX, destinationDisplacement: i * 4);
             }
             switch( aSize % 4 )
             {
@@ -34,28 +36,28 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                 case 1:
                     {
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ) };
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AL };
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: ( ( aSize / 4 ) * 4 ));
+                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, DestinationIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.RegistersEnum.AL };
                         break;
                     }
                 case 2:
                     {
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ) };
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AX };
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: ( ( aSize / 4 ) * 4 ));
+                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.RegistersEnum.AX };
                         break;
                     }
                 case 3:
                     {
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( ( aSize / 4 ) * 4 ) };
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.Registers.AX };
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = ( ( ( aSize / 4 ) * 4 ) + 2 ) };
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( ( aSize / 4 ) * 4 ) + 2 ), SourceReg = CPUx86.Registers.AL };
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: ( ( aSize / 4 ) * 4 ));
+                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( aSize / 4 ) * 4 ), SourceReg = CPUx86.RegistersEnum.AX };
+                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: ( ( ( aSize / 4 ) * 4 ) + 2 ));
+                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBX, DestinationIsIndirect = true, DestinationDisplacement = ( ( ( aSize / 4 ) * 4 ) + 2 ), SourceReg = CPUx86.RegistersEnum.AL };
                         break;
                     }
                 default:
                     throw new Exception( "Error, shouldn't occur" );
             }
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = ( uint )( xStorageSize + 4 ) };
+            XS.Add(XSRegisters.ESP, ( uint )( xStorageSize + 4 ));
         }
 
       public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
@@ -66,11 +68,11 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // using System.IO;
-        // 
-        // 
+        //
+        //
         // using CPU = Cosmos.Assembler.x86;
         // using CPUx86 = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stind_I)]
         // 	public class Stind_I: Op {
@@ -83,10 +85,10 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			if (xStorageSize < 4) {
         // 				xStorageSize = 4;
         // 			}
-        //             new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = xStorageSize };
+        //             XS.Mov(XSRegisters.EBX, XSRegisters.ESP, sourceDisplacement: xStorageSize);
         // 			for (int i = 0; i < (aSize / 4); i++) {
-        //                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = i * 4 };
-        //                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EBX, DestinationIsIndirect = true, DestinationDisplacement = i * 4, SourceReg = CPUx86.Registers.EAX };
+        //                 XS.Mov(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: i * 4);
+        //                 XS.Mov(XSRegisters.EBX, XSRegisters.EAX, destinationDisplacement: i * 4);
         // 			}
         // 			switch (aSize % 4) {
         // 				case 0: {
@@ -116,7 +118,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			aAssembler.Stack.Pop();
         // 			aAssembler.Stack.Pop();
         // 		}
-        // 
+        //
         // 		public override void DoAssemble() {
         // 			Assemble(Assembler, 4);
         // 		}

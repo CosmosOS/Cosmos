@@ -12,7 +12,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using Cosmos.Assembler;
-
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 
@@ -118,9 +118,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (xExtraStackSize > 0)
             {
-                new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xExtraStackSize };
+                XS.Sub(XSRegisters.ESP, (uint)xExtraStackSize);
             }
-            new CPUx86.Call { DestinationLabel = xNormalAddress };
+            XS.Call(xNormalAddress);
 
             uint xReturnSize = 0;
             if (xMethodInfo != null)

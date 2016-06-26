@@ -9,7 +9,8 @@ using Cosmos.Assembler;
 using System.Reflection;
 
 using Cosmos.IL2CPU.Plugs.System;
-
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -76,16 +77,16 @@ namespace Cosmos.IL2CPU.X86.IL
             // mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
 
 
-            new Comment(Assembler, "ThisOffset = " + xThisOffset);
+            XS.Comment("ThisOffset = " + xThisOffset);
             Call.DoNullReferenceCheck(Assembler, debugEnabled, xThisOffset);
 
             if (!String.IsNullOrEmpty(xNormalAddress))
             {
                 if (xExtraStackSize > 0)
                 {
-                    new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = (uint)xExtraStackSize };
+                    XS.Sub(XSRegisters.ESP, (uint)xExtraStackSize);
                 }
-                new CPUx86.Call { DestinationLabel = xNormalAddress };
+                XS.Call(xNormalAddress);
             }
             else
             {
@@ -99,16 +100,16 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     xPopType = xPopType.GetElementType();
                     string xTypeId = GetTypeIDLabel(xPopType);
-                    new CPUx86.Push { DestinationRef = ElementReference.New(xTypeId), DestinationIsIndirect = true };
+                    XS.Push(xTypeId, isIndirect: true);
                 }
                 else
                 {
-                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xThisOffset };
-                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+                    XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: (int)xThisOffset);
+                    XS.Set(EAX, EAX, sourceIsIndirect: true);
+                    XS.Push(EAX, isIndirect: true);
                 }
-                new CPUx86.Push { DestinationValue = aTargetMethodUID };
-                new CPUx86.Call { DestinationLabel = LabelName.Get(VTablesImplRefs.GetMethodAddressForTypeRef) };
+                XS.Push(aTargetMethodUID);
+                XS.Call(LabelName.Get(VTablesImplRefs.GetMethodAddressForTypeRef));
                 if (xExtraStackSize > 0)
                 {
                     xThisOffset -= xExtraStackSize;
@@ -126,9 +127,9 @@ namespace Cosmos.IL2CPU.X86.IL
                 //                        mLabelName + "_AfterAddressCheck",
                 //                        true,
                 //                        xEmitCleanup );
-                new CPUx86.Pop { DestinationReg = CPU.RegistersEnum.ECX };
+                XS.Pop(XSRegisters.ECX);
 
-                new Label(xCurrentMethodLabel + ".AfterAddressCheck");
+                XS.Label(xCurrentMethodLabel + ".AfterAddressCheck");
                 if (xMethodInfo.DeclaringType == typeof(object))
                 {
 
@@ -138,24 +139,14 @@ namespace Cosmos.IL2CPU.X86.IL
                * $esp + mThisOffset    This
                */
                     // we need to see if $this is a boxed object, and if so, we need to box it
-                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xThisOffset };
+                    XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: (int)xThisOffset);
 
-                    //new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = ( ( uint )InstanceTypeEnum.BoxedValueType ), Size = 32 };
+                    //XS.Compare(XSRegisters.EAX, ( ( uint )InstanceTypeEnum.BoxedValueType ), destinationDisplacement: 4, size: RegisterSizes.Int32);
 
                     // EAX contains the handle now, lets dereference it
-                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
+                    XS.Set(EAX, EAX, sourceIsIndirect: true);
 
-                    new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = (int)InstanceTypeEnum.BoxedValueType, Size = 32 };
-
-                    /*
-               * On the stack now:
-               * $esp                 Params
-               * $esp + mThisOffset   This
-               *
-               * ECX contains the method to call
-               * EAX contains the type pointer (not the handle!!)
-               */
-                    new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotEqual, DestinationLabel = xCurrentMethodLabel + ".NotBoxedThis" };
+                    XS.Compare(EAX, (int)InstanceTypeEnum.BoxedValueType, destinationDisplacement: 4, size: RegisterSize.Int32);
 
                     /*
                * On the stack now:
@@ -165,9 +156,19 @@ namespace Cosmos.IL2CPU.X86.IL
                * ECX contains the method to call
                * EAX contains the type pointer (not the handle!!)
                */
+                    XS.Jump(CPU.ConditionalTestEnum.NotEqual, xCurrentMethodLabel + ".NotBoxedThis");
 
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = (uint)ObjectImpl.FieldDataOffset };
-                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)xThisOffset, SourceReg = CPUx86.Registers.EAX };
+                    /*
+               * On the stack now:
+               * $esp                 Params
+               * $esp + mThisOffset   This
+               *
+               * ECX contains the method to call
+               * EAX contains the type pointer (not the handle!!)
+               */
+
+                    XS.Add(XSRegisters.EAX, (uint)ObjectImpl.FieldDataOffset);
+                    XS.Set(ESP, EAX, destinationDisplacement: (int)xThisOffset);
                     /*
                * On the stack now:
                * $esp                 Params
@@ -176,13 +177,13 @@ namespace Cosmos.IL2CPU.X86.IL
                * ECX contains the method to call
                */
                 }
-                new Label(xCurrentMethodLabel + ".NotBoxedThis");
+                XS.Label(xCurrentMethodLabel + ".NotBoxedThis");
                 if (xExtraStackSize > 0)
                 {
-                    new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = xExtraStackSize };
+                    XS.Sub(XSRegisters.ESP, xExtraStackSize);
                 }
-                new CPUx86.Call { DestinationReg = CPUx86.Registers.ECX };
-                new Label(xCurrentMethodLabel + ".AfterNotBoxedThis");
+                XS.Call(ECX);
+                XS.Label(xCurrentMethodLabel + ".AfterNotBoxedThis");
             }
             ILOp.EmitExceptionLogic(Assembler, aMethod, aOp, true,
                                     delegate ()
@@ -203,8 +204,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
                                         ILOp.EmitExceptionCleanupAfterCall(Assembler, xResultSize, xStackOffsetBefore, xPopSize);
                                     });
-            new Label(xCurrentMethodLabel + ".NoExceptionAfterCall");
-            new Comment(Assembler, "Argument Count = " + xParameters.Length.ToString());
+            XS.Label(xCurrentMethodLabel + ".NoExceptionAfterCall");
+            XS.Comment("Argument Count = " + xParameters.Length.ToString());
         }
     }
 }

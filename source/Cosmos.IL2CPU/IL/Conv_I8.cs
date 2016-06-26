@@ -1,5 +1,6 @@
 using System;
-
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -31,18 +32,18 @@ namespace Cosmos.IL2CPU.X86.IL
 					{
                         /* 
                          * Sadly for x86 there is no way using SSE to convert a float to an Int64... in x64 we could use ConvertPD2DQAndTruncate with
-                         * x64 register as a destination... so only in this case we need the legacy FPU!
+                         * x64 register as a destination... so this one of the few cases in which we need the legacy FPU!
                          */
-                        new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 32 };
-						new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-						new CPUx86.x87.IntStoreWithTrunc { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
+						XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Int32);
+						XS.Sub(XSRegisters.ESP, 4);
+						XS.FPU.IntStoreWithTruncate(ESP, isIndirect: true, size: RegisterSize.Long64);
 					}
 					else
 					{
-						new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-						new CPUx86.SignExtendAX { Size = 32 };
-						new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
-                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+						XS.Pop(XSRegisters.EAX);
+						XS.SignExtendAX(RegisterSize.Int32);
+						XS.Push(XSRegisters.EDX);
+                        XS.Push(XSRegisters.EAX);
 					}
                     break;
                 case 8:
@@ -52,9 +53,9 @@ namespace Cosmos.IL2CPU.X86.IL
                          * Sadly for x86 there is no way using SSE to convert a double to an Int64... in x64 we could use ConvertPD2DQAndTruncate with
                          * x64 register as a destination... so only in this case we need the legacy FPU!
                          */
-                        new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
-                        new CPUx86.x87.IntStoreWithTrunc { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
-                    }
+						XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
+						XS.FPU.IntStoreWithTruncate(ESP, isIndirect: true, size: RegisterSize.Long64);
+					}
                     break;
                 default:
                     //EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_I8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
@@ -63,4 +64,3 @@ namespace Cosmos.IL2CPU.X86.IL
         }
     }
 }
- 

@@ -1,5 +1,8 @@
 using System;
+using Cosmos.Assembler.x86.SSE;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -28,27 +31,28 @@ namespace Cosmos.IL2CPU.X86.IL
 				case 4:
 					if (TypeIsFloat(xSource))
 					{
-						new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-						new CPUx86.SSE.ConvertSS2SIAndTruncate { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.XMM0, };
-						new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-					}
+                        XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
+                        XS.SSE.ConvertSS2SIAndTruncate(EAX, XMM0);
+                        XS.Set(ESP, EAX, destinationIsIndirect: true);
+                    }
 					break;
                 case 8:
 					if (TypeIsFloat(xSource))
 					{
-                        new CPUx86.SSE.MoveDoubleAndDupplicate { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-						new CPUx86.SSE.ConvertSD2SIAndTruncate { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.XMM0, };
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                        XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+                        XS.SSE2.ConvertSD2SIAndTruncate(EAX, XMM0);
+                        // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
+                        XS.Add(ESP, 4);
+                        XS.Set(ESP, EAX, destinationIsIndirect: true);
+                        // Is this really needed? Conv.U2 and Conv.U1 did not this! In reality they should call the same code...
+                        //XS.Push(EAX);
                         break;
 					}
 					else
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-                        new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                        XS.Pop(EAX);
+                        XS.Pop(ECX);
+                        XS.Push(EAX);
                         break;
                     }
                 default:

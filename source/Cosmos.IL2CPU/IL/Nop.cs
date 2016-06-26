@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPU = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -13,7 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            new CPU.Noop();
+            XS.Noop();
         }
 
     }

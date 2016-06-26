@@ -1,5 +1,9 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
+using Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
+using static Cosmos.Assembler.x86.SSE.ComparePseudoOpcodes;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -7,17 +11,17 @@ namespace Cosmos.IL2CPU.X86.IL
     /// Converts the unsigned integer value on top of the evaluation stack to F (native float) it can be double or some FPU extended precision Floating Point
     /// type as the weird 80 bit float of x87). For now we assume it to be always equal to double.
     /// </summary>
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Conv_R_Un )]
-     
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_R_Un)]
+
     public class Conv_R_Un : ILOp
     {
-        
-        public Conv_R_Un( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+
+        public Conv_R_Un(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xValue = aOpCode.StackPopTypes[0];
             var xValueIsFloat = TypeIsFloat(xValue);
@@ -28,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 //EmitNotImplementedException( Assembler, aServiceProvider, "Size '" + xSize.Size + "' not supported (add)", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
                 throw new NotImplementedException();
             }
-			//TODO if on stack a float it is first truncated, http://msdn.microsoft.com/en-us/library/system.reflection.emit.opcodes.conv_r_un.aspx
+            //TODO if on stack a float it is first truncated, http://msdn.microsoft.com/en-us/library/system.reflection.emit.opcodes.conv_r_un.aspx
             if (!xValueIsFloat)
             {
                 switch (xValueSize)
@@ -49,41 +53,34 @@ namespace Cosmos.IL2CPU.X86.IL
                         string BaseLabel = GetLabel(aMethod, aOpCode) + ".";
                         string LabelSign_Bit_Unset = BaseLabel + "LabelSign_Bit_Unset";
 
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBP, SourceReg = CPUx86.Registers.EAX, DestinationDisplacement = -0xE0, DestinationIsIndirect = true };
-                        new CPUx86.SSE.ConvertSI2SD { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.EBP, SourceDisplacement = -0xE0, SourceIsIndirect = true };
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EBP, SourceDisplacement = -0xE0, SourceIsIndirect = true };
+                        XS.Set(EAX, ESP, sourceIsIndirect: true);
+                        XS.Set(EBP, EAX, destinationDisplacement: -0xE0, destinationIsIndirect: true);
+                        XS.SSE2.ConvertSI2SD(XMM0, EBP, sourceDisplacement: -0xE0, sourceIsIndirect: true);
+                        XS.Set(ECX, EBP, sourceDisplacement: -0xE0, sourceIsIndirect: true);
                         // OK now we put in ECX the last bit of our unsigned value,  we call it "SIGN_BIT" but is a little improper...
-                        new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ECX, SourceValue = 0x1F };
+                        XS.ShiftRight(ECX, 31);
                         /*
                          * if the 'SIGN_BIT' is 0 it means that our uint could have been placed in a normal int so ConvertSI2SD did already
                          * the right thing: we have finished
                          * if the value is 1 we need to do that addition with that weird constant to obtain the real value as double
                          */
-                        new CPUx86.Compare { DestinationReg = CPUx86.Registers.ECX, SourceValue = 0x00 };
-                        new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = LabelSign_Bit_Unset };
-                        new Assembler.LiteralAssemblerCode(@"addsd xmm0, [__xmm@41f0000000000000]");
-                        new Assembler.Label(LabelSign_Bit_Unset);
+                        XS.Compare(ECX, 0x00);
+                        XS.Jump(ConditionalTestEnum.Equal, LabelSign_Bit_Unset);
+                        XS.LiteralCode(@"addsd xmm0, [__xmm@41f0000000000000]");
+                        XS.Label(LabelSign_Bit_Unset);
                         // We have converted our value to double put it on ESP
                         // expand stack, that moved data is valid stack
-                        new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                        new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.XMM0, DestinationIsIndirect = true };
-#if false
-                        new Assembler.LiteralAssemblerCode(@"addsd xmm0, [__xmm@41f00000000000000000000000000000]");
-                        new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.XMM0, DestinationIsIndirect = true };
-                        //new CPUx86.SSE.AddSD { DestinationReg = CPUx86.Registers.XMM0, SourceValue = 0x41f00000000000000000000000000000, SourceIsIndirect = true };
-#endif
+                        XS.Sub(ESP, 4);
+                        XS.SSE2.MoveSD(ESP, XMM0, destinationIsIndirect: true);
                         break;
 #if false
                             /*
                              * This is the original code. It cannot work as ConvertSI2SS want a *signed* int as input but here we have an *unsigned* int 
                              * indeed we get always 0!
                              */
-                        new CPUx86.Mov { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
-                        new CPUx86.SSE.ConvertSI2SS { SourceReg = CPUx86.Registers.EAX, DestinationReg = CPUx86.Registers.XMM0 };
-                        new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true };
-                        // This will be the correct thing to do instead to return a random value but Il2CPU crashes!
-                        //EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
+                        new CPUx86.Mov { SourceReg = CPUx86.RegistersEnum.ESP, DestinationReg = CPUx86.RegistersEnum.EAX, SourceIsIndirect = true };
+                        XS.SSE.ConvertSI2SS(XSRegisters.XMM0, XSRegisters.EAX);
+                        XS.SSE.MoveSS(XSRegisters.ESP, XSRegisters.XMM0, destinationIsIndirect: true);
                         break;
 #endif
                     case 8:
@@ -158,27 +155,29 @@ namespace Cosmos.IL2CPU.X86.IL
                          * fstp ESP
                          */
                         // Save the high part of the ulong in EAX (we cannot move all of ESP as it has 64 bit size)
-                        new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
-                        new CPUx86.x87.IntLoad { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
+                        XS.Set(EAX, ESP, sourceIsIndirect: true, sourceDisplacement: 4);
+                        XS.FPU.IntLoad(ESP, isIndirect: true, size: RegisterSize.Long64);
                         // Get its highest bit to check if the value was signed or unsigned
-                        new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EAX, SourceValue = 31 };
-                        new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0x00 };
-                        new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = LabelSign_Bit_Unset };
-                        new Assembler.LiteralAssemblerCode(@"fadd qword [__ulong2double_const2]");
-                        new Assembler.Label(LabelSign_Bit_Unset);
-                        new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
-
+                        //XS.ShiftRight(EAX, 31);
+                        //XS.Compare(EAX, 0x00);
+                        //XS.Jump(ConditionalTestEnum.Equal, LabelSign_Bit_Unset);
+                        XS.Test(EAX, EAX);
+                        XS.Jump(ConditionalTestEnum.NotSign, LabelSign_Bit_Unset);
+                        //XS.LiteralCode(@"fadd qword [__ulong2double_const3]");
+                        XS.LiteralCode(@"fadd qword [0x5F800000]");
+                        XS.Label(LabelSign_Bit_Unset);
+                        XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
                         break;
-                        default:
-                            //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-                            throw new NotImplementedException("Conv_R_Un with type " + xValue + " not supported!");
-                        }
-                   }
-                   else
-                   {
-                        throw new NotImplementedException();
-                   }
-              }
-          }
+
+                    default:
+                        //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
+                        throw new NotImplementedException("Conv_R_Un with type " + xValue + " not supported!");
+                }
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
 }
- 

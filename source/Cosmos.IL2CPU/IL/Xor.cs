@@ -1,6 +1,7 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.X86;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -15,10 +16,10 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xSize = Math.Max(SizeOfType(aOpCode.StackPopTypes[0]), SizeOfType(aOpCode.StackPopTypes[1]));
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
-            new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX };
-            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+            XS.Pop(XSRegisters.EAX);
+            XS.Pop(XSRegisters.EDX);
+            XS.Xor(XSRegisters.EAX, XSRegisters.EDX);
+            XS.Push(XSRegisters.EAX);
         }
     }
 }

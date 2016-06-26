@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
+using XSharp.Compiler;
 using Assembler = Cosmos.Assembler.Assembler;
 using CPUAll = Cosmos.Assembler;
 using CPUx86 = Cosmos.Assembler.x86;
@@ -15,12 +16,12 @@ namespace Cosmos.Core.Plugs {
 
 		public class GetAmountOfRAMAsm : AssemblerMethod {
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-				new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceRef = CPUAll.ElementReference.New("MultiBootInfo_Memory_High"), SourceIsIndirect = true };
-				new CPUx86.Xor { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EDX };
-				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceValue = 1024 };
-				new CPUx86.Divide { DestinationReg = CPUx86.Registers.ECX };
-				new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
-				new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+				XS.Set(XSRegisters.EAX, "MultiBootInfo_Memory_High", sourceIsIndirect: true);
+				XS.Xor(XSRegisters.EDX, XSRegisters.EDX);
+				XS.Set(XSRegisters.ECX, 1024);
+				XS.Divide(XSRegisters.ECX);
+				XS.Add(XSRegisters.EAX, 1);
+				XS.Push(XSRegisters.EAX);
 			}
 		}
 
@@ -28,31 +29,31 @@ namespace Cosmos.Core.Plugs {
 		public static uint GetAmountOfRAM() { return 0; }
 
 		public class GetEndOfKernelAsm : AssemblerMethod {
-			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-				new CPUx86.Push { DestinationRef = CPUAll.ElementReference.New("_end_code") };
+			public override void AssembleNew(CPUAll.Assembler aAssembler, object aMethodInfo) {
+				XS.Push("_end_code");
 			}
 		}
 
 		[PlugMethod(Assembler = typeof(GetEndOfKernelAsm))]
-		public static uint GetEndOfKernel() { 
-		  return 0; 
+		public static uint GetEndOfKernel() {
+		  return 0;
 		}
 
 		public class ZeroFillAsm : AssemblerMethod {
-			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-				new CPUx86.ClrDirFlag();
-				new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0xC }; //address
-				new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EBP, SourceIsIndirect = true, SourceDisplacement = 0x8 }; //length
+			public override void AssembleNew(CPUAll.Assembler aAssembler, object aMethodInfo) {
+				XS.ClearDirectionFlag();
+				XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 0xC); //address
+				XS.Set(XSRegisters.ECX, XSRegisters.EBP, sourceDisplacement: 0x8); //length
 				// set EAX to value of fill (zero)
-				new CPUx86.Xor { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX };
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ECX, SourceValue = 1 };
-				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotBelow, DestinationLabel = ".step2" };
-				new CPUx86.StoreByteInString();
-				new CPUAll.Label(".step2");
-				new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.ECX, SourceValue = 1 };
-				new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotBelow, DestinationLabel = ".step3" };
-				new CPUx86.StoreWordInString();
-				new CPUAll.Label(".step3");
+				XS.Xor(XSRegisters.EAX, XSRegisters.EAX);
+				XS.ShiftRight(XSRegisters.ECX, 1);
+				XS.Jump(CPUx86.ConditionalTestEnum.NotBelow, ".step2");
+				XS.StoreByteInString();
+				XS.Label(".step2");
+				XS.ShiftRight(XSRegisters.ECX, 1);
+				XS.Jump(CPUx86.ConditionalTestEnum.NotBelow, ".step3");
+				XS.StoreWordInString();
+				XS.Label(".step3");
 				new CPUx86.Stos { Size = 32, Prefixes = CPUx86.InstructionPrefixes.Repeat };
 			}
 		}
@@ -62,10 +63,10 @@ namespace Cosmos.Core.Plugs {
 
 		public class InitFloatAsm : AssemblerMethod {
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-				new CPUx86.x87.FloatInit();
+				XS.FPU.FloatInit();
 			}
 		}
-	  
+
 	  [PlugMethod(Assembler = typeof(InitFloatAsm))]
 		public static void InitFloat(CPU aThis) { }
 
@@ -73,7 +74,8 @@ namespace Cosmos.Core.Plugs {
         {
             public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
             {
-                new CPUx86.SSE.SSEInit();
+                XS.SSE.SSEInit();
+                //new CPUx86.SSE.SSEInit();
             }
         }
 
@@ -82,10 +84,10 @@ namespace Cosmos.Core.Plugs {
 
         public class HaltAsm : AssemblerMethod {
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
-				new CPUx86.Halt();
+				XS.Halt();
 			}
 		}
-		
+
 	  [PlugMethod(Assembler = typeof(HaltAsm))]
 		public static void Halt(CPU aThis) { }
 
@@ -134,7 +136,7 @@ namespace Cosmos.Core.Plugs {
 		{
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
 			{
-				new CPUx86.ClearInterruptFlag();
+				XS.ClearInterruptFlag();
 			}
 		}
 
@@ -142,7 +144,7 @@ namespace Cosmos.Core.Plugs {
 		{
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
 			{
-				new CPUx86.Sti();
+				XS.EnableInterrupts();
 			}
 		}
 

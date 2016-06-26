@@ -67,6 +67,42 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -128,11 +164,13 @@
     <Compile Include="x86\ExternalLabel.cs" />
     <Compile Include="x86\Halt.cs" />
     <Compile Include="x86\IDivide.cs" />
-    <Compile Include="x86\IN.cs" />
+    <Compile Include="x86\Imul.cs" />
+    <Compile Include="x86\InFromDX.cs" />
     <Compile Include="x86\INC.cs" />
     <Compile Include="x86\INT.cs" />
     <Compile Include="x86\INT1.cs" />
     <Compile Include="x86\INT3.cs" />
+    <Compile Include="x86\Interrupt.cs" />
     <Compile Include="x86\IRET.cs" />
     <Compile Include="x86\JumpAlways.cs" />
     <Compile Include="x86\JumpBase.cs" />
@@ -152,7 +190,7 @@
     <Compile Include="x86\Noop.cs" />
     <Compile Include="x86\Not.cs" />
     <Compile Include="x86\Or.cs" />
-    <Compile Include="x86\Out.cs" />
+    <Compile Include="x86\OutToDX.cs" />
     <Compile Include="x86\Pop.cs" />
     <Compile Include="x86\Popad.cs" />
     <Compile Include="x86\Popfd.cs" />
@@ -187,7 +225,7 @@
     <Compile Include="x86\SSE2\DivPD.cs" />
     <Compile Include="x86\SSE2\DivSD.cs" />
     <Compile Include="x86\SSE2\MoveAPD.cs" />
-    <Compile Include="x86\SSE2\MoveD.cs" />
+    <None Include="x86\SSE2\MoveD.removed" />
     <Compile Include="x86\SSE2\MoveDQA.cs" />
     <Compile Include="x86\SSE2\MoveHLPD.cs" />
     <Compile Include="x86\SSE2\MoveHPD.cs" />
@@ -203,7 +241,7 @@
     <Compile Include="x86\SSE2\UnpackLowDouble.cs" />
     <Compile Include="x86\SSE2\XorPD.cs" />
     <Compile Include="x86\SSE3\IntStoreWithTrunc.cs" />
-    <Compile Include="x86\SSE3\MoveDoubleAndDupplicate.cs" />
+    <Compile Include="x86\SSE3\MoveDoubleAndDuplicate.cs" />
     <Compile Include="x86\SSEAndMMX2\AddPS.cs" />
     <Compile Include="x86\SSEAndMMX2\AddSS.cs" />
     <Compile Include="x86\SSEAndMMX2\AndPS.cs" />
@@ -320,21 +358,9 @@
     <None Include=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\XSharp.Nasm\XSharp.Nasm.csproj">
-      <Project>{841A734E-9606-4AAB-9C4A-74E7E303FF5D}</Project>
-      <Name>XSharp.Nasm</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
       <Name>Cosmos.Build.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\XSharp.Compiler\XSharp.Compiler.csproj">
-      <Project>{A281A1B1-C718-4BCB-A7BE-ED840A70449A}</Project>
-      <Name>XSharp.Compiler</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Debug.DebugStub\Cosmos.Debug.DebugStub.csproj">
-      <Project>{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}</Project>
-      <Name>Cosmos.Debug.DebugStub</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

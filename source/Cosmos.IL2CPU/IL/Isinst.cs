@@ -3,6 +3,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Assembler.x86;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -24,31 +25,31 @@ namespace Cosmos.IL2CPU.X86.IL
             string xTypeID = GetTypeIDLabel(xType.Value);
             string mReturnNullLabel = GetLabel( aMethod, aOpCode ) + "_ReturnNull";
 
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+            XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
 
-            new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = mReturnNullLabel };
+            XS.Compare(XSRegisters.EAX, 0);
+            XS.Jump(CPUx86.ConditionalTestEnum.Zero, mReturnNullLabel);
 
             // EAX contains a memory handle now. Lets convert it to a pointer
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
+            XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
 
-            //new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true};
-            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
-            new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New( xTypeID ), DestinationIsIndirect = true };
+            //XS.Mov(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
+            XS.Push(XSRegisters.EAX, isIndirect: true);
+            XS.Push(xTypeID, isIndirect: true);
 
             SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase( typeof( VTablesImpl ), "IsInstance", "System.UInt32", "System.UInt32" );
 //, new OpMethod( ILOpCode.Code.Call, aOpCode.Position, aOpCode.NextPosition, xMethodIsInstance, aOpCode.CurrentExceptionHandler));
             Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, GetLabel(aMethod, aOpCode), GetLabel(aMethod, aOpCode) + "_After_IsInstance_Call", DebugEnabled);
 
             new Label( GetLabel( aMethod, aOpCode ) + "_After_IsInstance_Call" );
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-            new CPUx86.Compare { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-            new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = mReturnNullLabel };
+            XS.Pop(XSRegisters.EAX);
+            XS.Compare(XSRegisters.EAX, 0);
+            XS.Jump(CPUx86.ConditionalTestEnum.Equal, mReturnNullLabel);
             // push nothing now, as we should return the object instance pointer.
             new CPUx86.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
-            new Label( mReturnNullLabel );
-            new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-            new CPUx86.Push { DestinationValue = 0 };
+            XS.Label(mReturnNullLabel );
+            XS.Add(XSRegisters.ESP, 4);
+            XS.Push(0);
         }
     }
 }

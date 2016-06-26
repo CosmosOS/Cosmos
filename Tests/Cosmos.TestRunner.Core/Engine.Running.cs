@@ -17,6 +17,10 @@ namespace Cosmos.TestRunner.Core
                 throw new ArgumentNullException("debugConnector");
             }
             debugConnector.OnDebugMsg = s => OutputHandler.LogDebugMessage(s);
+            debugConnector.ConnectionLost = ex =>
+            {
+                OutputHandler.LogError($"DC: Connection lost. {ex.Message}");
+            };
             debugConnector.CmdChannel = ChannelPacketReceived;
             debugConnector.CmdStarted = () =>
                 {
@@ -45,15 +49,27 @@ namespace Cosmos.TestRunner.Core
                     mKernelResultSet = true;
                     mKernelRunning = false;
                 };
+            debugConnector.CmdStackOverflowOccurred = a =>
+                                                      {
+                                                          OutputHandler.LogMessage("Stack overflow occurred at: 0x" + a.ToString("X8"));
+                                                          OutputHandler.SetKernelTestResult(false, "Stack overflow occurred at: 0x" + a.ToString("X8"));
+                                                          mKernelResultSet = true;
+                                                          mKernelRunning = false;
+                                                      };
             debugConnector.CmdNullReferenceOccurred = a =>
                 {
                     OutputHandler.LogMessage("Null Reference Exception occurred at: 0x" + a.ToString("X8"));
-                    OutputHandler.SetKernelTestResult(
-                        false,
-                        "Null Reference Exception occurred at: 0x" + a.ToString("X8"));
+                    OutputHandler.SetKernelTestResult(false, "Null Reference Exception occurred at: 0x" + a.ToString("X8"));
                     mKernelResultSet = true;
                     mKernelRunning = false;
                 };
+            if (RunWithGDB)
+            {
+                debugConnector.CmdInterruptOccurred = a =>
+                                                      {
+                                                          OutputHandler.LogMessage($"Interrupt {a} occurred");
+                                                      };
+            }
         }
 
         private void HandleRunning(DebugConnector debugConnector, Base host)
@@ -86,11 +102,16 @@ namespace Cosmos.TestRunner.Core
                         break;
                     }
                 }
-                if (!mKernelResultSet)
+
+                if (mKernelResultSet)
                 {
                     OutputHandler.SetKernelTestResult(true, null);
+                    OutputHandler.SetKernelSucceededAssertionsCount(mSucceededAssertions);
                 }
-                OutputHandler.SetKernelSucceededAssertionsCount(mSucceededAssertions);
+                else
+                {
+                    KernelTestFailed();
+                }
             }
             finally
             {

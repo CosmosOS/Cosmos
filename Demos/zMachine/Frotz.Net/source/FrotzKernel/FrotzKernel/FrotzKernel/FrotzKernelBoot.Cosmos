@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{511c4498-e62a-4ff2-94ba-472cf448b39b}</ProjectGuid>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <Name>FrotzKernelBoot</Name>
+    <BinFormat>elf</BinFormat>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <Profile>VMware</Profile>
+    <DebugEnabled>true</DebugEnabled>
+    <DebugMode>Source</DebugMode>
+    <TraceMode>User</TraceMode>
+    <EnableGDB>False</EnableGDB>
+    <StartCosmosGDB>false</StartCosmosGDB>
+    <VMWareEdition>Player</VMWareEdition>
+    <OutputPath>bin\Debug\</OutputPath>
+    <Name>FrotzKernelBoot</Name>
+    <Description>Use VMware Player or Workstation to deploy and debug.</Description>
+    <Deployment>ISO</Deployment>
+    <Launch>VMware</Launch>
+    <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
+      <Name>Cosmos.Core.Plugs</Name>
+      <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\..\source\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
+      <Name>Cosmos.Debug.Kernel.Plugs</Name>
+      <Project>{b97a2956-c363-47f2-a6aa-b4fccff4d315}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
+      <Name>Cosmos.System.Plugs</Name>
+      <Project>{7c64b97f-516d-4a6d-b9e1-3fe48f561409}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include=".\FrotzKernel.csproj">
+      <Name>FrotzKernel</Name>
+      <Project>{c18a7cf8-3205-48a8-95c9-08c780a0d51d}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <!--<ItemGroup>
+    <Content Include="Cosmos.bxrc">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>-->
+  <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
+</Project>

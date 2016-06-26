@@ -1,5 +1,8 @@
 using System;
+using Cosmos.Assembler.x86.SSE;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -22,40 +25,40 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xSourceSize == 4)
                 {
-                    new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
-                    new CPUx86.SSE.ConvertSS2SIAndTruncate { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
-                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+                    XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
+                    XS.SSE.ConvertSS2SIAndTruncate(EAX, XMM0);
+                    XS.Set(ESP, EAX, destinationIsIndirect: true);
                 }
                 else if (xSourceSize == 8)
                 {
-                    new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
-                    new CPUx86.SSE.ConvertSD2SIAndTruncate { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.XMM0, };
+                    XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+                    XS.SSE2.ConvertSD2SIAndTruncate(EAX, XMM0);
                     // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+                    XS.Add(ESP, 4);
+                    XS.Set(ESP, EAX, destinationIsIndirect: true);
                 }
                 else
                 {
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_U2.cs->Unknown size of floating point value.");
                 }
             }
-            else { 
+            else {
                 switch( xSourceSize )
                 {
                     case 2:
                         break;
                     case 1:
                     case 4:
-						    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-						    new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AX, Size = 16 };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+						    XS.Pop(EAX);
+						    XS.MoveZeroExtend(EAX, AX);
+                            XS.Push(EAX);
 						    break;
                     case 8:
                         {
-                            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                            new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-                            new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.AX, Size = 16 };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            XS.Pop(EAX);
+                            XS.Pop(ECX);
+                            XS.MoveZeroExtend(EAX, AX);
+                            XS.Push(EAX);
                             break;
                         }
                     default:

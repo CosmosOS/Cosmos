@@ -116,6 +116,7 @@
     <Compile Include="CompilerEngine.cs" />
     <Compile Include="CompilerExtensionAttribute.cs" />
     <Compile Include="CompilerExtensionBase.cs" />
+    <Compile Include="CosmosAssembler.cs" />
     <Compile Include="Plugs\AssemblerImpl.cs" />
     <Compile Include="Plugs\System\EnvironmentImpl.cs">
       <SubType>
@@ -366,6 +367,10 @@
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Debug.DebugStub\Cosmos.Debug.DebugStub.csproj">
+      <Project>{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}</Project>
+      <Name>Cosmos.Debug.DebugStub</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
       <Project>{61607f1e-58f9-41cf-972f-128384f3e115}</Project>

@@ -116,7 +116,11 @@ namespace Cosmos.IL2CPU
                                 }
                                 catch (Exception ex)
                                 {
-                                    throw new Exception("Error", ex);
+                                    if (!xAttrib.IsOptional)
+                                    {
+                                        throw new Exception("Error", ex);
+                                    }
+                                    continue;
                                 }
                             }
                             // Only keep this plug if its for MS.NET.

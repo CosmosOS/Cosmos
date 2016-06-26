@@ -1,4 +1,5 @@
 using System;
+using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -19,9 +20,9 @@ namespace Cosmos.IL2CPU.X86.IL
             switch (xSourceSize)
             {
                 case 8:
-                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                    XS.Pop(XSRegisters.EAX);
+                    XS.Add(XSRegisters.ESP, 4);
+                    XS.Push(XSRegisters.EAX);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -37,17 +38,17 @@ namespace Cosmos.IL2CPU.X86.IL
         //        case 2:
         //        case 4:
         //            {
-        //                new CPUx86.Noop();
+        //                XS.Noop();
         //                break;
         //            }
         //        case 8:
         //            {
-        //                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-        //                new CPUx86.SignExtendAX { Size = 32 };
+        //                XS.Pop(XSRegisters.EAX);
+        //                XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
         //                //all bits of EDX == sign (EAX)
-        //                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
+        //                XS.Pop(XSRegisters.EBX);
         //                //must be equal to EDX
-        //                new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EDX };
+        //                XS.Xor(XSRegisters.EBX, XSRegisters.CPUx86.Registers.EDX);
         //                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = AssemblerNasm.TmpPosLabel( aMethod, aNextOpCode ) };
         //                //equals
         //                new CPUx86.Interrupt { DestinationValue = 4 };
@@ -56,7 +57,7 @@ namespace Cosmos.IL2CPU.X86.IL
         //            }
         //        default:
         //            //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_Ovf_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-        //            throw new NotImplementedException(); 
+        //            throw new NotImplementedException();
         //    }
         //    Assembler.Stack.Push( new StackContent( 4, true, false, false ) );
         //}
@@ -67,7 +68,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // using CPU = Cosmos.Assembler.x86;
         // using Cosmos.IL2CPU.X86;
         // using CPUx86 = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Conv_Ovf_I)]
         // 	public class Conv_Ovf_I: Op {
@@ -92,22 +93,22 @@ namespace Cosmos.IL2CPU.X86.IL
         // 			case 2:
         // 			case 4:
         // 				{
-        // 					new CPUx86.Noop();
+        // 					XS.Noop();
         // 					break;
         // 				}
         // 			case 8:
         // 				{
-        //                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-        //                     new CPUx86.SignExtendAX { Size = 32 };
+        //                     XS.Pop(XSRegisters.EAX);
+        //                     XS.SignExtendAX(XSRegisters.RegisterSize.Int32);
         // 					//all bits of EDX == sign (EAX)
-        //                     new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
+        //                     XS.Pop(XSRegisters.EBX);
         // 					//must be equal to EDX
-        //                     new CPUx86.Xor { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.EDX };
-        //                     new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = NextInstructionLabel };
+        //                     XS.Xor(XSRegisters.EBX, XSRegisters.CPUx86.Registers.EDX);
+        //                     XS.Jump(ConditionalTestEnum.Zero, NextInstructionLabel);
         // 					//equals
         // 					new CPUx86.Interrupt{DestinationValue=4};
         // 					break;
-        // 
+        //
         // 				}
         // 			default:
         //                 EmitNotImplementedException(Assembler, GetServiceProvider(), "Conv_Ovf_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);

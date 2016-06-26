@@ -6,6 +6,7 @@ using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.Plugs.System;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -22,8 +23,8 @@ namespace Cosmos.IL2CPU.X86.IL
       string xDataName = GetContentsArrayName(xOpString.Value);
       new Comment(Assembler, "String Value: " + xOpString.Value.Replace("\r", "\\r").Replace("\n", "\\n"));
       var xRefName = GetFakeHandleForLiteralArray(xDataName);
-      new Mov { DestinationReg = RegistersEnum.EAX, SourceRef = Cosmos.Assembler.ElementReference.New(xRefName) };
-      new Push { DestinationReg = RegistersEnum.EAX };
+      XS.Set(XSRegisters.EAX, xRefName);
+      XS.Push(XSRegisters.EAX);
       // DEBUG VERIFICATION: leave it here for now. we have issues with fields ordering.
       // if that changes, we need to change the code below!
       // We also need to change the debugstub to fix this then.

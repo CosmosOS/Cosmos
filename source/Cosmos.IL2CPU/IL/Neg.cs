@@ -1,4 +1,7 @@
 using System;
+using Cosmos.Assembler.x86.x87;
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -20,34 +23,34 @@ namespace Cosmos.IL2CPU.X86.IL
 			{
 				if (xStackContentIsFloat)
 				{
-					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
-					new CPUx86.x87.FloatNegate { };
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
+					XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
+					XS.FPU.FloatNegate();
+					XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
 				}
 				else
 				{
-					new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX }; // low
-					new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // high
-					new CPUx86.Neg { DestinationReg = CPUx86.Registers.EBX }; // set carry if EBX != 0
-					new CPUx86.AddWithCarry { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-					new CPUx86.Neg { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
+					XS.Pop(XSRegisters.EBX); // low
+					XS.Pop(XSRegisters.EAX); // high
+					XS.Negate(XSRegisters.EBX); // set carry if EBX != 0
+					XS.AddWithCarry(XSRegisters.EAX, 0);
+					XS.Negate(XSRegisters.EAX);
+					XS.Push(XSRegisters.EAX);
+					XS.Push(XSRegisters.EBX);
 				}
 			}
 			else
 			{
 				if (xStackContentIsFloat)
 				{
-					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 32, DestinationIsIndirect = true };
-					new CPUx86.x87.FloatNegate { };
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 32, DestinationIsIndirect = true };
+					XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Int32);
+				  XS.FPU.FloatNegate();
+					XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Int32);
 				}
 				else
 				{
-					new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.Neg { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+					XS.Pop(XSRegisters.EAX);
+					XS.Negate(XSRegisters.EAX);
+					XS.Push(XSRegisters.EAX);
 				}
 			}
 		}

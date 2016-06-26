@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Cosmos.Assembler.x86 {
-    [Cosmos.Assembler.OpCode("pushad")]
+    [Cosmos.Assembler.OpCode("Pushad")]
 	public class Pushad: Instruction {
 	}
 }

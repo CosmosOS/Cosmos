@@ -4,6 +4,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using CPUx86 = Cosmos.Assembler.x86;
 using System.Reflection;
 using System.Linq;
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 
@@ -28,9 +29,9 @@ namespace Cosmos.IL2CPU.X86.IL
 			var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
             if (xCctor != null)
             {
-                new CPUx86.Call { DestinationLabel = LabelName.Get(xCctor) };
+                XS.Call(LabelName.Get(xCctor));
                 ILOp.EmitExceptionLogic(Assembler, aMethod, aOpCode, true, null, ".AfterCCTorExceptionCheck");
-                new Label(".AfterCCTorExceptionCheck");
+                XS.Label(".AfterCCTorExceptionCheck");
             }
 
             //Assembler.Stack.Pop();
@@ -55,16 +56,16 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     case 1:
                         {
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceRef = Cosmos.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            XS.Set(XSRegisters.EAX, 0);
+                            XS.Set(XSRegisters.AL, xDataName, sourceIsIndirect: true);
+                            XS.Push(XSRegisters.EAX);
                             break;
                         }
                     case 2:
                         {
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceRef = Cosmos.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            XS.Set(XSRegisters.EAX, 0);
+                            XS.Set(XSRegisters.AX, xDataName, sourceIsIndirect: true);
+                            XS.Push(XSRegisters.EAX);
                             break;
                         }
                     case 0:
@@ -83,16 +84,16 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     case 1:
                         {
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AL, SourceRef = Cosmos.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            XS.Set(XSRegisters.EAX, 0);
+                            XS.Set(XSRegisters.AL, xDataName, sourceIsIndirect: true);
+                            XS.Push(XSRegisters.EAX);
                             break;
                         }
                     case 2:
                         {
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                            new CPUx86.Mov { DestinationReg = CPUx86.Registers.AX, SourceRef = Cosmos.Assembler.ElementReference.New( xDataName ), SourceIsIndirect = true };
-                            new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                            XS.Set(XSRegisters.EAX, 0);
+                            XS.Set(XSRegisters.AX, xDataName, sourceIsIndirect: true);
+                            XS.Push(XSRegisters.EAX);
                             break;
                         }
                     case 0:

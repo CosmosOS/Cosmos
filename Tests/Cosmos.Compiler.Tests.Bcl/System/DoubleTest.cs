@@ -164,7 +164,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
                 //Assert.IsTrue((DoublesAreEqual(value, 18446744073709551615d)), "(double) from ulong operator doesn't work");
 
-                Assert.IsTrue((DoublesAreEqual(value, 9423372036854775870d)), "(double) from ulong operator doesn't work returns long is " + BitConverter.ToString(anULongAsBytes) + " value as bytes " + BitConverter.ToString(valueAsBytes));
+                Assert.IsTrue((DoublesAreEqual(value, 18446744073709551615d)), "(double) from ulong operator doesn't work long is " + BitConverter.ToString(anULongAsBytes) + " value (as bytes) is " + BitConverter.ToString(valueAsBytes));
             }
         }
     }

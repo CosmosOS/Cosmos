@@ -113,6 +113,10 @@
     <Compile Include="TestKernelSets.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Demos\zMachine\Frotz.Net\source\FrotzKernel\FrotzKernel\FrotzKernel\FrotzKernel.csproj">
+      <Project>{c18a7cf8-3205-48a8-95c9-08c780a0d51d}</Project>
+      <Name>FrotzKernel</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
       <Name>Cosmos.Assembler</Name>
@@ -149,6 +153,10 @@
       <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
       <Name>Cosmos.IL2CPU.Plugs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
+      <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
+      <Name>Cosmos.IL2CPU</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
       <Project>{7C64B97F-516D-4A6D-B9E1-3FE48F561409}</Project>
       <Name>Cosmos.System.Plugs</Name>
@@ -168,6 +176,10 @@
     <ProjectReference Include="..\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj">
       <Project>{31e3f8e2-7cc0-426c-accb-77b3319af5d3}</Project>
       <Name>Cosmos.Compiler.Tests.Bcl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj">
+      <Project>{48ebdeb2-6a6a-4df2-b5f1-db6d299401f2}</Project>
+      <Name>Cosmos.Compiler.Tests.Encryption</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj">
       <Project>{9df5c0a9-b91c-4647-b939-e47513743a0c}</Project>

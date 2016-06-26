@@ -17,8 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
     //        if (xSource.IsFloat)
     //        {
     //            new CPUx86.SSE.MoveSS { SourceReg = CPUx86.Registers.ESP, DestinationReg = CPUx86.Registers.XMM0, SourceIsIndirect = true };
-    //            new CPUx86.SSE.ConvertSS2SI { SourceReg = CPUx86.Registers.XMM0, DestinationReg = CPUx86.Registers.EAX };
-    //            new CPUx86.Move { DestinationReg = CPUx86.Registers.ESP, SourceReg = CPUx86.Registers.EAX, DestinationIsIndirect = true };
+    //            XS.ConvertSS2SI(XSRegisters.EAX, XSRegisters.CPUx86.Registers.XMM0);
+    //            XS.Mov(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
     //        }
     //        else
     //        {
@@ -31,9 +31,9 @@ namespace Cosmos.IL2CPU.X86.IL
     //                case 4:
     //                    break;
     //                case 8:
-    //                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-    //                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
-    //                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+    //                    XS.Pop(XSRegisters.EAX);
+    //                    XS.Pop(XSRegisters.EDX);
+    //                    XS.Push(XSRegisters.EAX);
     //                    break;
     //                default:
     //                    //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );

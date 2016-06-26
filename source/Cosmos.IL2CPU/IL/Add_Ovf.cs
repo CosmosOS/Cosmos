@@ -2,6 +2,9 @@ using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using Cosmos.Assembler.x86.SSE;
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -33,17 +36,17 @@ namespace Cosmos.IL2CPU.X86.IL
                     if (xIsFloat)
                     {
 						//TODO overflow check
-                        new CPUx86.x87.FloatLoad { DestinationReg=Registers.ESP,Size=64, DestinationIsIndirect=true };
-                        new CPUx86.Add { SourceValue = 8, DestinationReg = Registers.ESP };
-                        new CPUx86.x87.FloatAdd { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect=true, Size=64 };
-                        new CPUx86.x87.FloatStoreAndPop { DestinationReg = Registers.ESP, Size = 64, DestinationIsIndirect = true };
+                        XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
+                        XS.Add(ESP, 8);
+                        new CPUx86.x87.FloatAdd { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect=true, Size=64 };
+                        XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
                     }
                     else
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX }; // low part
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // high part
-                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EDX };
-						new CPUx86.AddWithCarry { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceReg = CPUx86.Registers.EAX };
+                        XS.Pop(XSRegisters.EDX); // low part
+                        XS.Pop(XSRegisters.EAX); // high part
+                        XS.Add(ESP, EDX, destinationIsIndirect: true);
+						XS.AddWithCarry(ESP, EAX, destinationDisplacement: 4);
                     }
                 }
                 else
@@ -51,24 +54,24 @@ namespace Cosmos.IL2CPU.X86.IL
                     if (xIsFloat) //float
                     {
 						//TODO overflow check
-                        new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                        new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                        new CPUx86.SSE.AddSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.XMM0 };
-                        new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.XMM1 };
+                        XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
+                        XS.Add(XSRegisters.ESP, 4);
+                        XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
+                        XS.SSE.AddSS(XMM0, XMM1);
+                        XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
                     }
                     else //integer
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+                        XS.Pop(XSRegisters.EAX);
+                        XS.Add(ESP, EAX, destinationIsIndirect: true);
                     }
                 }
 				if (false == xIsFloat)
 				{
-					new CPUx86.ConditionalJump { Condition = ConditionalTestEnum.NoOverflow, DestinationLabel = xSuccessLabel };
+					XS.Jump(ConditionalTestEnum.NoOverflow, xSuccessLabel);
 					ThrowOverflowException();
 				}
-				new Label(xSuccessLabel);
+				XS.Label(xSuccessLabel);
             }
         }
     }

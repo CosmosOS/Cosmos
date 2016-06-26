@@ -14,7 +14,7 @@ namespace Cosmos.TestRunner.Core
             }
 
             // Sets the time before an error is registered. For example if set to 60 then if a kernel runs for more than 60 seconds then
-            // that kernel will be marked as a failiure and terminated
+            // that kernel will be marked as a failure and terminated
             engine.AllowedSecondsInKernel = 1800;
 
             // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are run.
@@ -38,12 +38,13 @@ namespace Cosmos.TestRunner.Core
             }
 
             //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
-            engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);
+            //engine.AddKernel(typeof(Cosmos.Compiler.Tests.Bcl.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(SimpleStructsAndArraysTest.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.Exceptions.Kernel).Assembly.Location);
             //engine.AddKernel(typeof(Cosmos.Compiler.Tests.MethodTests.Kernel).Assembly.Location);
+            //engine.AddKernel(typeof(Cosmos.Kernel.Tests.Fat.Kernel).Assembly.Location);
 
             // Known bugs, therefore disabled for now:
             //engine.AddKernel(typeof(BoxingTests.Kernel).Assembly.Location);

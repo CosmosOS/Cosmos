@@ -2,6 +2,7 @@ using System;
 using CPU = Cosmos.Assembler.x86;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -52,8 +53,8 @@ namespace Cosmos.IL2CPU.X86.IL
             //  xOffset += xSize;
             //}
             for (int i = 0; i < (xCurArgSize / 4); i++) {
-              new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-              new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + /*xCurArgSize -*/ ((i/* + 1*/) * 4)), SourceReg = CPUx86.Registers.EAX };
+              XS.Pop(XSRegisters.EAX);
+              new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EBP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xOffset + /*xCurArgSize -*/ ((i/* + 1*/) * 4)), SourceReg = CPUx86.RegistersEnum.EAX };
             }
         }
 
@@ -80,7 +81,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 				throw new Exception("No Address Specified!");
         // 			}
         // 			for (int i = (mAddresses.Length - 1); i >= 0; i -= 1) {
-        // 				new CPUx86.Pop{DestinationReg=CPUx86.Registers.EAX};
+        // 				XS.Pop(XSRegisters.EAX);
         //                 new CPUx86.Move { DestinationReg = CPUx86.Registers.EBP, DestinationIsIndirect = true, DestinationDisplacement = mAddresses[i], SourceReg = CPUx86.Registers.EAX };
         // 			}
         // 			Assembler.Stack.Pop();

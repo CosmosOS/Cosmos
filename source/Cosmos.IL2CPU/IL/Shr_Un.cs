@@ -2,6 +2,9 @@ using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Shr_Un )]
@@ -24,30 +27,30 @@ namespace Cosmos.IL2CPU.X86.IL
             var xStackItem_Value_Size = SizeOfType(xStackItem_Value);
             if( xStackItem_Value_Size <= 4 )
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX }; // shift amount
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX }; // value
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.CL, SourceReg = CPUx86.Registers.AL };
-                new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.CL };
-                new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
+                XS.Pop(XSRegisters.EAX); // shift amount
+                XS.Pop(XSRegisters.EBX); // value
+                XS.Set(XSRegisters.CL, XSRegisters.AL);
+                XS.ShiftRight(XSRegisters.EBX, CL);
+                XS.Push(XSRegisters.EBX);
                 return;
             }
             if( xStackItem_Value_Size <= 8 )
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EDX };
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceValue = 0 };
-                new Label( xBaseLabel + "__StartLoop" );
-                new CPUx86.Compare { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.EAX };
-                new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Equal, DestinationLabel = xBaseLabel + "__EndLoop" };
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.CL, SourceValue = 1 };
-                new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.CL };
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
-                new CPUx86.Mov { DestinationReg = CPUx86.Registers.CL, SourceValue = 1 };
-                new CPUx86.RotateThroughCarryRight { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, Size = 32, SourceReg = CPUx86.Registers.CL };
-                new CPUx86.Add { DestinationReg = CPUx86.Registers.EAX, SourceValue = 1 };
+                XS.Pop(XSRegisters.EDX);
+                XS.Set(XSRegisters.EAX, 0);
+                XS.Label(xBaseLabel + "__StartLoop" );
+                XS.Compare(XSRegisters.EDX, XSRegisters.EAX);
+                XS.Jump(CPUx86.ConditionalTestEnum.Equal, xBaseLabel + "__EndLoop");
+                XS.Set(EBX, ESP, sourceIsIndirect: true);
+                XS.Set(XSRegisters.CL, 1);
+                XS.ShiftRight(XSRegisters.EBX, CL);
+                XS.Set(ESP, EBX, destinationIsIndirect: true);
+                XS.Set(XSRegisters.CL, 1);
+                XS.RotateThroughCarryRight(ESP, CL, destinationDisplacement: 4, size: RegisterSize.Int32);
+                XS.Add(XSRegisters.EAX, 1);
                 new CPUx86.Jump { DestinationLabel = xBaseLabel + "__StartLoop" };
 
-                new Label( xBaseLabel + "__EndLoop" );
+                XS.Label(xBaseLabel + "__EndLoop" );
                 return;
             }
         }

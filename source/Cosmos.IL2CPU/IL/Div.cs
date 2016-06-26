@@ -1,4 +1,7 @@
 using System;
+using Cosmos.Assembler.x86.SSE;
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 using Label = Cosmos.Assembler.Label;
 
@@ -27,21 +30,22 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 if (TypeIsFloat(xStackItem))
                 {
-                    new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
-                    new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.SSE.DivSD { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.XMM0 };
-                    new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.XMM1 };
+                    XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+                    XS.Add(ESP, 8);
+                    XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
+                    XS.SSE2.DivSD(XMM1, XMM0);
+                    XS.SSE2.MoveSD(ESP, XMM1, destinationIsIndirect: true);
+                    // x87 version left here for future use
 #if false
                     // TODO add 0/0 infinity/infinity X/infinity
-                    // value 1
-                    new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
+					// value 1
+					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
 					// value 2
-                    new CPUx86.x87.FloatDivide { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, Size = 64 };
+                    new CPUx86.x87.FloatDivide { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 64 };
 					// override value 1
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
+					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
 					// pop value 2
-					new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+                    XS.Add(XSRegisters.ESP, 8);
 #endif
                 }
                 else
@@ -53,99 +57,99 @@ namespace Cosmos.IL2CPU.X86.IL
 
 					// divisor
 					//low
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+					XS.Set(ESI, ESP, sourceIsIndirect: true);
 					//high
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+					XS.Set(EDI, ESP, sourceDisplacement: 4);
 
 					// pop both 8 byte values
-					new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+					XS.Add(ESP, 8);
 
 					//dividend
 					// low
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+					XS.Set(EAX, ESP, sourceIsIndirect: true);
 					//high
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = 4 };
+					XS.Set(EDX, ESP, sourceDisplacement: 4);
 
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 8 };
+                    XS.Add(ESP, 8);
 
 					// set flags
-					new CPUx86.Or { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
+					XS.Or(EDI, EDI);
 					// if high dword of divisor is already zero, we dont need the loop
-					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.Zero, DestinationLabel = LabelNoLoop };
+					XS.Jump(CPUx86.ConditionalTestEnum.Zero, LabelNoLoop);
 
 					// set ecx to zero for counting the shift operations
-					new CPUx86.Xor { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX};
+					XS.Xor(ECX, ECX);
 
-					new Label(LabelShiftRight);
+					XS.Label(LabelShiftRight);
 
 					// shift divisor 1 bit right
-					new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.Registers.ESI, SourceReg = CPUx86.Registers.EDI, ArgumentValue = 1 };
-					new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EDI, SourceValue = 1 };
+                    XS.ShiftRightDouble(ESI, EDI, 1);
+					XS.ShiftRight(EDI, 1);
 
 					// increment shift counter
-					new CPUx86.INC { DestinationReg = CPUx86.Registers.ECX};
+					XS.Increment(ECX);
 
 					// set flags
-					new CPUx86.Or { DestinationReg = CPUx86.Registers.EDI, SourceReg = CPUx86.Registers.EDI };
+					XS.Or(EDI, EDI);
 					// loop while high dword of divisor till it is zero
-					new CPUx86.ConditionalJump { Condition = CPUx86.ConditionalTestEnum.NotZero, DestinationLabel = LabelShiftRight };
+					XS.Jump(CPUx86.ConditionalTestEnum.NotZero, LabelShiftRight);
 
 					// shift the divident now in one step
 					// shift divident CL bits right
-					new CPUx86.ShiftRightDouble { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX, ArgumentReg = CPUx86.Registers.CL };
-					new CPUx86.ShiftRight { DestinationReg = CPUx86.Registers.EDX, SourceReg = CPUx86.Registers.CL };
+					XS.ShiftRightDouble(EAX, EDX, CL);
+					XS.ShiftRight(EDX, CL);
 
 					// so we shifted both, so we have near the same relation as original values
 					// divide this
-					new CPUx86.IDivide { DestinationReg = CPUx86.Registers.ESI };
+					XS.IntegerDivide(ESI);
 
 					// sign extend
-					new CPUx86.SignExtendAX { Size = 32 };
+					XS.SignExtendAX(RegisterSize.Int32);
 
 					// save result to stack
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EDX };
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+					XS.Push(EDX);
+					XS.Push(EAX);
 
 					//TODO: implement proper derivation correction and overflow detection
 
-					new CPUx86.Jump { DestinationLabel = LabelEnd };
+					XS.Jump(LabelEnd);
 
-					new Label(LabelNoLoop);
+					XS.Label(LabelNoLoop);
 					//save high dividend
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.EAX };
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EDX };
+					XS.Set(ECX, EAX);
+					XS.Set(EAX, EDX);
 					// extend that sign is in edx
-					new CPUx86.SignExtendAX { Size = 32 };
+					XS.SignExtendAX(RegisterSize.Int32);
 					// divide high part
-					new CPUx86.IDivide { DestinationReg = CPUx86.Registers.ESI };
+					XS.IntegerDivide(ESI);
 					// save high result
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.ECX };
+					XS.Push(EAX);
+					XS.Set(EAX, ECX);
 					// divide low part
-					new CPUx86.Divide { DestinationReg = CPUx86.Registers.ESI };
+					XS.Divide(ESI);
 					// save low result
-					new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+					XS.Push(EAX);
 
-					new Label(LabelEnd);
+					XS.Label(LabelEnd);
                 }
             }
             else
             {
 				if (TypeIsFloat(xStackItem))
                 {
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
-                    new CPUx86.SSE.DivSS { DestinationReg = CPUx86.Registers.XMM1, SourceReg = CPUx86.Registers.XMM0 };
-                    new CPUx86.SSE.MoveSS { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.XMM1 };
+                    XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
+                    XS.Add(XSRegisters.ESP, 4);
+                    XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
+                    XS.SSE.DivSS(XMM1, XMM0);
+                    XS.SSE.MoveSS(ESP, XMM1, destinationIsIndirect: true);
                 }
                 else
                 {
-                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
-                    new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-					new CPUx86.SignExtendAX { Size = 32 };
-                    new CPUx86.IDivide { DestinationReg = CPUx86.Registers.ECX };
-                    new CPUx86.Push { DestinationReg = CPUx86.Registers.EAX };
+                    XS.Pop(XSRegisters.ECX);
+                    XS.Pop(XSRegisters.EAX);
+					XS.SignExtendAX(RegisterSize.Int32);
+                    XS.IntegerDivide(XSRegisters.ECX);
+                    XS.Push(XSRegisters.EAX);
                 }
             }
         }

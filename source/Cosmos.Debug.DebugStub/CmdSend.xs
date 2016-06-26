@@ -306,6 +306,33 @@ function SendStackCorruptionOccurred {
 // Input: Stack
 // Output: None
 // Modifies: EAX, ECX, EDX, ESI
+function SendStackOverflowOccurred {
+    // Write the type
+    AL = #Ds2Vs_StackOverflowOccurred
+    ComWriteAL()
+
+    // pointer value
+    ESI = @.CallerEIP
+    ComWrite32()
+}
+
+// Input: None
+// Output: None
+// Modifies: EAX, ECX, EDX, ESI
+function SendInterruptOccurred {
+    // Write the type
+	+EAX
+
+		AL = #Ds2Vs_InterruptOccurred
+		ComWriteAL()
+
+    -EAX
+	ComWriteEAX()
+}
+
+// Input: Stack
+// Output: None
+// Modifies: EAX, ECX, EDX, ESI
 function SendNullReferenceOccurred {
     // Write the type
     AL = #Ds2Vs_NullReferenceOccurred

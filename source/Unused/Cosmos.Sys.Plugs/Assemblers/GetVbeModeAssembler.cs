@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,9 +12,9 @@ namespace Cosmos.Sys.Plugs.Assemblers
     {
         public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
         {
-            new Xor { DestinationReg = Registers.EAX, SourceReg = Registers.EAX };
-            new Mov { DestinationReg = Registers.AX, SourceRef = Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeMode"), SourceIsIndirect = true };
-            new Push { DestinationReg = Registers.EAX };
+            XS.Xor(XSRegisters.EAX, XSRegisters.Registers.EAX);
+            XS.Mov(XSRegisters.AX, Cosmos.Assembler.ElementReference.New("MultibootGraphicsRuntime_VbeMode"), sourceIsIndirect: true);
+            XS.Push(XSRegisters.EAX);
         }
     }
 }

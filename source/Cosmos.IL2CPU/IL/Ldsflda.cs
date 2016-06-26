@@ -4,6 +4,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using System.Reflection;
 using System.Linq;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -28,21 +29,15 @@ namespace Cosmos.IL2CPU.X86.IL
       var xCctor = (declaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
       if (xCctor != null)
       {
-        new CPUx86.Call
-        {
-          DestinationLabel = LabelName.Get(xCctor)
-        };
+        XS.Call(LabelName.Get(xCctor));
         if (aCurrentOpCode != null)
         {
           ILOp.EmitExceptionLogic(assembler, aMethod, aCurrentOpCode, true, null, ".AfterCCTorExceptionCheck");
-          new Label(".AfterCCTorExceptionCheck");
+          XS.Label(".AfterCCTorExceptionCheck");
         }
       }
       string xDataName = field;
-      new CPUx86.Push
-      {
-        DestinationRef = Cosmos.Assembler.ElementReference.New(xDataName)
-      };
+      XS.Push(xDataName);
     }
   }
 }

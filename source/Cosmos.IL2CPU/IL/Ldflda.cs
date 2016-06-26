@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -28,7 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, FieldInfo aField, bool aDerefValue, bool aDebugEnabled)
         {
-            new Comment("Field: " + aField.Id);
+            XS.Comment("Field: " + aField.Id);
             int xExtraOffset = 0;
             var xType = aMethod.MethodBase.DeclaringType;
             bool xNeedsGC = aDeclaringType.IsClass && !aDeclaringType.IsValueType;
@@ -47,21 +48,21 @@ namespace Cosmos.IL2CPU.X86.IL
                 if (xNeedsGC)
                 {
                     // eax contains the handle now, lets convert it to the real memory address
-                    new CPUx86.Mov {DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true, SourceDisplacement = (int)xActualOffset};
+                    XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceDisplacement: (int)xActualOffset);
                 }
 
-                new CPUx86.Mov {DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX};
+                XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
             }
             else
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.RegistersEnum.EAX };
+                XS.Pop(XSRegisters.EAX);
                 if (xNeedsGC)
                 {
                     // eax contains the handle now, lets convert it to the real memory address
-                    new CPUx86.Mov { DestinationReg = CPUx86.Registers.EAX, SourceReg = CPUx86.Registers.EAX, SourceIsIndirect = true };
+                    XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
                 }
-                new CPUx86.Add {DestinationReg = CPUx86.Registers.EAX, SourceValue = (uint)(xActualOffset)};
-                new CPUx86.Push {DestinationReg = CPUx86.RegistersEnum.EAX};
+                XS.Add(XSRegisters.EAX, (uint)(xActualOffset));
+                XS.Push(XSRegisters.EAX);
             }
         }
     }

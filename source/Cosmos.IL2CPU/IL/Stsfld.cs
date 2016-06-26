@@ -3,6 +3,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using System.Reflection;
 using System.Linq;
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -23,11 +24,11 @@ namespace Cosmos.IL2CPU.X86.IL
             SysReflection.FieldInfo xField = xOpCode.Value;
             // call cctor:
             var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
-            if (xCctor != null)
+            if (xCctor != null && xCctor.DeclaringType != aMethod.MethodBase.DeclaringType)
             {
-                new CPUx86.Call { DestinationLabel = LabelName.Get(xCctor) };
+                XS.Call(LabelName.Get(xCctor));
                 ILOp.EmitExceptionLogic(Assembler, aMethod, aOpCode, true, null, ".AfterCCTorExceptionCheck");
-                new Label(".AfterCCTorExceptionCheck");
+                XS.Label(".AfterCCTorExceptionCheck");
             }
 
             //int aExtraOffset;// = 0;
@@ -53,21 +54,21 @@ namespace Cosmos.IL2CPU.X86.IL
             string xDataName = DataMember.GetStaticFieldName(xField);
             for( int i = 0; i < ( xSize / 4 ); i++ )
             {
-                new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( xDataName, i * 4 ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
+                XS.Pop(XSRegisters.EAX);
+                new CPUx86.Mov { DestinationRef = ElementReference.New( xDataName, i * 4 ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
             }
             switch( xSize % 4 )
             {
                 case 1:
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AL };
+                        XS.Pop(XSRegisters.EAX);
+                        new CPUx86.Mov { DestinationRef = ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.AL };
                         break;
                     }
                 case 2:
                     {
-                        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
-                        new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AX };
+                        XS.Pop(XSRegisters.EAX);
+                        new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( xDataName, ( int )( ( xSize / 4 ) * 4 ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.AX };
                         break;
                     }
                 case 0:
@@ -130,23 +131,23 @@ namespace Cosmos.IL2CPU.X86.IL
     //
     //
     // 			if (mNeedsGC) {
-    //                 new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New(mDataName), DestinationIsIndirect = true };
-    //                 new CPUx86.Call { DestinationLabel = xDecRefMethodInfo.LabelName};
+    //                 XS.Push(Cosmos.Assembler.ElementReference.New(mDataName), isIndirect: true);
+    //                 XS.Call(xDecRefMethodInfo.LabelName);
     // 			}
     //             for (int i = 0; i < (xSize / 4); i++)
     //             {
-    //                 new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+    //                 XS.Pop(XSRegisters.EAX);
     //                 new CPUx86.Move { DestinationRef = Cosmos.Assembler.ElementReference.New(mDataName, i * 4), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EAX };
     // 			}
     //             switch (xSize % 4)
     //             {
     // 				case 1: {
-    //                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+    //                         XS.Pop(XSRegisters.EAX);
     //                         new CPUx86.Move { DestinationRef = Cosmos.Assembler.ElementReference.New(mDataName, (int)((xSize / 4) * 4)), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AL };
     // 						break;
     // 					}
     // 				case 2: {
-    //                         new CPUx86.Pop { DestinationReg = CPUx86.Registers.EAX };
+    //                         XS.Pop(XSRegisters.EAX);
     //                         new CPUx86.Move { DestinationRef = Cosmos.Assembler.ElementReference.New(mDataName, (int)((xSize / 4) * 4)), DestinationIsIndirect = true, SourceReg = CPUx86.Registers.AX };
     //                         break;
     // 					}

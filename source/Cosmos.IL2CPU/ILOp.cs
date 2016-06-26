@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +10,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.X86.IL;
 using System.Runtime.InteropServices;
+using XSharp.Compiler;
 using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
 using Label = Cosmos.Assembler.Label;
 
@@ -183,9 +184,7 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void ThrowNotImplementedException(string aMessage) {
-      new CPU.Push {
-        DestinationRef = Cosmos.Assembler.ElementReference.New(LdStr.GetContentsArrayName(aMessage))
-      };
+      XS.Push(LdStr.GetContentsArrayName(aMessage));
       new CPU.Call {
         DestinationLabel = LabelName.Get(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public))
       };
@@ -321,19 +320,19 @@ namespace Cosmos.IL2CPU {
     /// </summary>
     public static void EmitExceptionCleanupAfterCall(Assembler.Assembler aAssembler, uint aReturnSize, uint aStackSizeBeforeCall, uint aTotalArgumentSizeOfMethod)
     {
-      new Comment("aStackSizeBeforeCall = " + aStackSizeBeforeCall);
-      new Comment("aTotalArgumentSizeOfMethod = " + aTotalArgumentSizeOfMethod);
-      new Comment("aReturnSize = " + aReturnSize);
+      XS.Comment("aStackSizeBeforeCall = " + aStackSizeBeforeCall);
+      XS.Comment("aTotalArgumentSizeOfMethod = " + aTotalArgumentSizeOfMethod);
+      XS.Comment("aReturnSize = " + aReturnSize);
 
       if (aReturnSize != 0)
       {
         // at least pop return size:
-        new Comment("Cleanup return");
+        XS.Comment("Cleanup return");
 
         // cleanup result values
         for (int i = 0; i < aReturnSize / 4; i++)
         {
-          new CPU.Add { DestinationReg = CPU.Registers.ESP, SourceValue = 4 };
+          XS.Add(XSRegisters.ESP, 4);
         }
       }
 
@@ -342,35 +341,35 @@ namespace Cosmos.IL2CPU {
         if (aTotalArgumentSizeOfMethod > 0)
         {
           var xExtraStack = aStackSizeBeforeCall - aTotalArgumentSizeOfMethod;
-          new Comment("Cleanup extra stack");
+          XS.Comment("Cleanup extra stack");
 
           // cleanup result values
           for (int i = 0; i < xExtraStack / 4; i++)
           {
-            new CPU.Add { DestinationReg = CPU.Registers.ESP, SourceValue = 4 };
+            XS.Add(XSRegisters.ESP, 4);
           }
         }
       }
     }
 
-    public static void EmitExceptionLogic(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException = null) {
+    public static void EmitExceptionLogic(Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException = null) {
       if (aJumpTargetNoException == null)
       {
-        aJumpTargetNoException = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.NextPosition);
+        aJumpTargetNoException = GetLabel(aMethodInfo, aCurrentOpCode.NextPosition);
       }
       string xJumpTo = null;
       if (aCurrentOpCode != null && aCurrentOpCode.CurrentExceptionHandler != null) {
         // todo add support for nested handlers, see comment in Engine.cs
         //if (!((aMethodInfo.CurrentHandler.HandlerOffset < aCurrentOpOffset) || (aMethodInfo.CurrentHandler.HandlerLength + aMethodInfo.CurrentHandler.HandlerOffset) <= aCurrentOpOffset)) {
-        new Comment(String.Format("CurrentOffset = {0}, HandlerStartOffset = {1}", aCurrentOpCode.Position, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset));
+        XS.Comment(String.Format("CurrentOffset = {0}, HandlerStartOffset = {1}", aCurrentOpCode.Position, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset));
         if (aCurrentOpCode.CurrentExceptionHandler.HandlerOffset > aCurrentOpCode.Position) {
           switch (aCurrentOpCode.CurrentExceptionHandler.Flags) {
             case ExceptionHandlingClauseOptions.Clause: {
-                xJumpTo = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
+                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
                 break;
               }
             case ExceptionHandlingClauseOptions.Finally: {
-                xJumpTo = ILOp.GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
+                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
                 break;
               }
             default: {
@@ -385,25 +384,25 @@ namespace Cosmos.IL2CPU {
         if (xJumpTo == null) {
           Jump_Exception(aMethodInfo);
         } else {
-          new CPU.Jump { DestinationLabel = xJumpTo };
+          XS.Jump(xJumpTo);
         }
 
       } else {
-        new CPU.Test { DestinationReg = CPU.Registers.ECX, SourceValue = 2 };
+        XS.Test(XSRegisters.ECX, 2);
 
         if (aCleanup != null) {
-          new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.Equal, DestinationLabel = aJumpTargetNoException };
+          XS.Jump(CPU.ConditionalTestEnum.Equal, aJumpTargetNoException);
           aCleanup();
           if (xJumpTo == null) {
-            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException };
+            XS.Jump(CPU.ConditionalTestEnum.NotEqual, GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException);
           } else {
-            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = xJumpTo };
+            XS.Jump(CPU.ConditionalTestEnum.NotEqual, xJumpTo);
           }
         } else {
           if (xJumpTo == null) {
-            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException };
+            XS.Jump(CPU.ConditionalTestEnum.NotEqual, GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException);
           } else {
-            new CPU.ConditionalJump { Condition = CPU.ConditionalTestEnum.NotEqual, DestinationLabel = xJumpTo };
+            XS.Jump(CPU.ConditionalTestEnum.NotEqual, xJumpTo);
           }
         }
       }
@@ -431,16 +430,16 @@ namespace Cosmos.IL2CPU {
       if (debugEnabled)
       {
         new CPU.Compare {DestinationReg = CPU.RegistersEnum.ESP, DestinationDisplacement = (int) stackOffsetToCheck, DestinationIsIndirect = true, SourceValue = 0};
-        new CPU.ConditionalJump {DestinationLabel = ".AfterNullCheck", Condition = CPU.ConditionalTestEnum.NotEqual};
-        new CPU.ClearInterruptFlag();
+        XS.Jump(CPU.ConditionalTestEnum.NotEqual, ".AfterNullCheck");
+        XS.ClearInterruptFlag();
         // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-        new CPU.Call {DestinationLabel = ".NullCheck_GetCurrAddress"};
-        new Assembler.Label(".NullCheck_GetCurrAddress");
-        new CPU.Pop {DestinationReg = CPU.RegistersEnum.EAX};
+        XS.Call(".NullCheck_GetCurrAddress");
+        XS.Label(".NullCheck_GetCurrAddress");
+        XS.Pop(XSRegisters.EAX);
         new CPU.Mov {DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = CPU.RegistersEnum.EAX};
-        new CPU.Call {DestinationLabel = "DebugStub_SendNullReferenceOccurred"};
-        new CPU.Halt();
-        new Label(".AfterNullCheck");
+        XS.Call("DebugStub_SendNullReferenceOccurred");
+        XS.Halt();
+        XS.Label(".AfterNullCheck");
       }
     }
 

@@ -3,6 +3,7 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler.x86;
+using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
 
@@ -20,10 +21,10 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             var xOpVar = (OpVar)aOpCode;
             var xDisplacement = Ldarg.GetArgumentDisplacement(aMethod, xOpVar.Value);
-            new Mov {DestinationReg=RegistersEnum.EBX, SourceValue = (uint)(xDisplacement) };
-            new Mov{DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBP };
-            new CPUx86.Add { DestinationReg = RegistersEnum.EAX, SourceReg = RegistersEnum.EBX };
-            new CPUx86.Push { DestinationReg = RegistersEnum.EAX };
+            XS.Set(XSRegisters.EBX, (uint)(xDisplacement));
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP);
+            XS.Add(XSRegisters.EAX, XSRegisters.EBX);
+            XS.Push(XSRegisters.EAX);
 
 //            if (aMethod.MethodBase.DeclaringType.FullName == "Cosmos.Kernel.Plugs.Console"
 //                && aMethod.MethodBase.Name == "Write"
@@ -65,11 +66,11 @@ namespace Cosmos.IL2CPU.X86.IL
 //            }
 //            xOffset += xExtraSize;
 //#warning TODO: check this
-//            new CPUx86.Push { DestinationReg = CPUx86.Registers.EBP };
+//            XS.Push(XSRegisters.EBP);
 
 //            for( int i = 0; i < ( xCurArgSize / 4 ); i++ )
 //            {
-//                new CPUx86.Push { DestinationValue = ( uint )( xCurArgSize - ( ( i + 1 ) * 4 ) ) };
+//                XS.Push(( uint )( xCurArgSize - ( ( i + 1 ) * 4 ) ));
 //            }
 //            Assembler.Stack.Push( ( int )xCurArgSize, xParams[ xCorrectedOpValValue ].ParameterType );
 
@@ -82,7 +83,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
 //            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
 
-//            //new CPUx86.Push { DestinationValue = ( uint )mAddress };
+//            //XS.Push(( uint )mAddress);
 //            //
 //            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
 
@@ -133,9 +134,9 @@ namespace Cosmos.IL2CPU.X86.IL
         //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
         // 		}
         // 		public override void DoAssemble() {
-        //             new CPU.Push { DestinationReg = CPU.Registers.EBP };
+        //             XS.Push(XSRegisters.EBP);
         // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
-        //             new CPU.Push { DestinationValue = (uint)mAddress };
+        //             XS.Push((uint)mAddress);
         // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
         // 			Add(Assembler, GetServiceProvider(), mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
         // 		}

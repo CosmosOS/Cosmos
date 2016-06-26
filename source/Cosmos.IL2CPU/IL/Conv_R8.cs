@@ -1,4 +1,6 @@
 using System;
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -20,22 +22,22 @@ namespace Cosmos.IL2CPU.X86.IL
             case 4:
 				if (TypeIsFloat(xSource))
 				{
-					new CPUx86.SSE.ConvertSS2SD { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+					XS.SSE.ConvertSS2SD(XMM0, ESP, sourceIsIndirect: true);
 				}
 				else
 				{
-					new CPUx86.SSE.ConvertSI2SD { DestinationReg = CPUx86.Registers.XMM0, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true };
+					XS.SSE2.ConvertSI2SD(XMM0, ESP, sourceIsIndirect: true);
 				}
 				// expand stack, that moved data is valid stack
-				new CPUx86.Sub { DestinationReg = CPUx86.Registers.ESP, SourceValue = 4 };
-				new CPUx86.SSE.MoveSD { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.XMM0 };
+				XS.Sub(XSRegisters.ESP, 4);
+				XS.SSE2.MoveSD(ESP, XMM0, destinationIsIndirect: true);
 				break;
             case 8:
                 {
 					if (!TypeIsFloat(xSource))
 					{
-						new CPUx86.x87.IntLoad { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true };
-						new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.Registers.ESP, Size = 64, DestinationIsIndirect = true};
+						XS.FPU.IntLoad(ESP, isIndirect: true, size: RegisterSize.Long64);
+						XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
 					}
                     break;
                 }

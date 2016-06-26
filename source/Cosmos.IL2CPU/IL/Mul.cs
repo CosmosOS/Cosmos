@@ -1,6 +1,10 @@
 using System;
+using Cosmos.Assembler.x86.SSE;
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 using Label = Cosmos.Assembler.Label;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Mul)]
@@ -26,58 +30,22 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xStackContentIsFloat)
                 {
-                    new CPUx86.SSE.MoveSD
-                    {
-                        DestinationReg = CPUx86.Registers.XMM0,
-                        SourceReg = CPUx86.Registers.ESP,
-                        SourceIsIndirect = true
-                    };
-                    new CPUx86.Add
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        SourceValue = 8
-                    };
-                    new CPUx86.SSE.MoveSD
-                    {
-                        DestinationReg = CPUx86.Registers.XMM1,
-                        SourceReg = CPUx86.Registers.ESP,
-                        SourceIsIndirect = true
-                    };
-                    new CPUx86.SSE.MulSD
-                    {
-                        DestinationReg = CPUx86.Registers.XMM1,
-                        SourceReg = CPUx86.Registers.XMM0
-                    };
-                    new CPUx86.SSE.MoveSD
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        DestinationIsIndirect = true,
-                        SourceReg = CPUx86.Registers.XMM1
-                    };
+                    XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+                    XS.Add(ESP, 8);
+                    XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
+                    XS.SSE2.MulSD(XMM1, XMM0);
+                    XS.SSE2.MoveSD(ESP, XMM1, destinationIsIndirect: true);
+                    // x87 code left for future use
 #if false
-                    new CPUx86.x87.FloatLoad
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        Size = 64,
-                        DestinationIsIndirect = true
-                    };
-                    new CPUx86.Add
-                    {
-                        SourceValue = 8,
-                        DestinationReg = CPUx86.Registers.ESP
-                    };
+                    XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
+                    XS.Add(ESP, 8);
                     new CPUx86.x87.FloatMul
                     {
-                        DestinationReg = CPUx86.Registers.ESP,
+                        DestinationReg = CPUx86.RegistersEnum.ESP,
                         DestinationIsIndirect = true,
                         Size = 64
                     };
-                    new CPUx86.x87.FloatStoreAndPop
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        Size = 64,
-                        DestinationIsIndirect = true
-                    };
+                    XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
 #endif
                 }
                 else
@@ -100,197 +68,67 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     // compair LEFT_HIGH, RIGHT_HIGH , on zero only simple multiply is used
                     //mov RIGHT_HIGH to eax, is useable on Full 64 multiply
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.Registers.EAX,
-                        SourceReg = CPUx86.Registers.ESP,
-                        SourceIsIndirect = true,
-                        SourceDisplacement = 4
-                    };
-                    new CPUx86.Or
-                    {
-                        DestinationReg = CPUx86.Registers.EAX,
-                        SourceReg = CPUx86.Registers.ESP,
-                        SourceIsIndirect = true,
-                        SourceDisplacement = 12
-                    };
-                    new CPUx86.ConditionalJump
-                    {
-                        Condition = CPUx86.ConditionalTestEnum.Zero,
-                        DestinationLabel = Simple32Multiply
-                    };
+                    XS.Set(EAX, ESP, sourceDisplacement: 4);
+                    XS.Or(EAX, ESP, sourceDisplacement: 12);
+                    XS.Jump(CPUx86.ConditionalTestEnum.Zero, Simple32Multiply);
                     // Full 64 Multiply
 
                     // copy again, or could change EAX
                     //TODO is there an opcode that does OR without change EAX?
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.Registers.EAX,
-                        SourceReg = CPUx86.Registers.ESP,
-                        SourceIsIndirect = true,
-                        SourceDisplacement = 4
-                    };
+                    XS.Set(EAX, ESP, sourceDisplacement: 4);
                     // eax contains already RIGHT_HIGH
                     // multiply with LEFT_LOW
-                    new CPUx86.Multiply
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = 8,
-                        Size = 32
-                    };
+                    XS.Multiply(ESP, displacement: 8);
                     // save result of LEFT_LOW * RIGHT_HIGH
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.Registers.ECX,
-                        SourceReg = CPUx86.Registers.EAX
-                    };
+                    XS.Set(ECX, EAX);
 
                     //mov RIGHT_LOW to eax
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.Registers.EAX,
-                        SourceReg = CPUx86.Registers.ESP,
-                        SourceIsIndirect = true
-                    };
+                    XS.Set(EAX, ESP, sourceIsIndirect: true);
                     // multiply with LEFT_HIGH
-                    new CPUx86.Multiply
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = 12,
-                        Size = 32
-                    };
+                    XS.Multiply(ESP, displacement: 12);
                     // add result of LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH
-                    new CPUx86.Add
-                    {
-                        DestinationReg = CPUx86.Registers.ECX,
-                        SourceReg = CPUx86.Registers.EAX
-                    };
+                    XS.Add(ECX, EAX);
 
                     //mov RIGHT_LOW to eax
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.Registers.EAX,
-                        SourceReg = CPUx86.Registers.ESP,
-                        SourceIsIndirect = true
-                    };
+                    XS.Set(EAX, ESP, sourceIsIndirect: true);
                     // multiply with LEFT_LOW
-                    new CPUx86.Multiply
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = 8,
-                        Size = 32
-                    };
+                    XS.Multiply(ESP, displacement: 8);
                     // add LEFT_LOW * RIGHT_HIGH + RIGHT_LOW + LEFT_HIGH to high dword of last result
-                    new CPUx86.Add
-                    {
-                        DestinationReg = CPUx86.Registers.EDX,
-                        SourceReg = CPUx86.Registers.ECX
-                    };
+                    XS.Add(EDX, ECX);
 
-                    new CPUx86.Jump
-                    {
-                        DestinationLabel = MoveReturnValue
-                    };
+                    XS.Jump(MoveReturnValue);
 
-                    new Label(Simple32Multiply);
+                    XS.Label(Simple32Multiply);
                     //mov RIGHT_LOW to eax
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.Registers.EAX,
-                        SourceReg = CPUx86.Registers.ESP,
-                        SourceIsIndirect = true
-                    };
+                    XS.Set(EAX, ESP, sourceIsIndirect: true);
                     // multiply with LEFT_LOW
-                    new CPUx86.Multiply
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = 8,
-                        Size = 32
-                    };
+                    XS.Multiply(ESP, displacement: 8);
 
-                    new Label(MoveReturnValue);
+                    XS.Label(MoveReturnValue);
                     // move high result to left high
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = 12,
-                        SourceReg = CPUx86.Registers.EDX
-                    };
+                    XS.Set(ESP, EDX, destinationDisplacement: 12);
                     // move low result to left low
-                    new CPUx86.Mov
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        DestinationIsIndirect = true,
-                        DestinationDisplacement = 8,
-                        SourceReg = CPUx86.Registers.EAX
-                    };
+                    XS.Set(ESP, EAX, destinationDisplacement: 8);
                     // pop right 64 value
-                    new CPUx86.Add
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        SourceValue = 8
-                    };
+                    XS.Add(ESP, 8);
                 }
             }
             else
             {
                 if (xStackContentIsFloat)
                 {
-                    new CPUx86.SSE.MoveSS
-                    {
-                        DestinationReg = CPUx86.Registers.XMM0,
-                        SourceReg = CPUx86.Registers.ESP,
-                        SourceIsIndirect = true
-                    };
-                    new CPUx86.Add
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        SourceValue = 4
-                    };
-                    new CPUx86.SSE.MoveSS
-                    {
-                        DestinationReg = CPUx86.Registers.XMM1,
-                        SourceReg = CPUx86.Registers.ESP,
-                        SourceIsIndirect = true
-                    };
-                    new CPUx86.SSE.MulSS
-                    {
-                        DestinationReg = CPUx86.Registers.XMM1,
-                        SourceReg = CPUx86.Registers.XMM0
-                    };
-                    new CPUx86.SSE.MoveSS
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        DestinationIsIndirect = true,
-                        SourceReg = CPUx86.Registers.XMM1
-                    };
+                    XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
+                    XS.Add(ESP, 4);
+                    XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
+                    XS.SSE.MulSS(XMM1, XMM0);
+                    XS.SSE.MoveSS(ESP, XMM1, destinationIsIndirect: true);
                 }
                 else
                 {
-                    new CPUx86.Pop
-                    {
-                        DestinationReg = CPUx86.Registers.EAX
-                    };
-                    new CPUx86.Multiply
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        DestinationIsIndirect = true,
-                        Size = 32
-                    };
-                    new CPUx86.Add
-                    {
-                        DestinationReg = CPUx86.Registers.ESP,
-                        SourceValue = 4
-                    };
-                    new CPUx86.Push
-                    {
-                        DestinationReg = CPUx86.Registers.EAX
-                    };
+                    XS.Pop(EAX);
+                    XS.Multiply(ESP, isIndirect: true, size: RegisterSize.Int32);
+                    XS.Add(ESP, 4);
+                    XS.Push(EAX);
                 }
             }
         }

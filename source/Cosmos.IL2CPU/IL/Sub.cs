@@ -1,6 +1,9 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
+using Cosmos.Assembler.x86.x87;
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -32,137 +35,52 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 4:
                     if (xStackTopIsFloat)
                     {
-                        new CPUx86.SSE.MoveSS
-                        {
-                            DestinationReg = CPUx86.Registers.XMM0,
-                            SourceReg = CPUx86.Registers.ESP,
-                            SourceIsIndirect = true
-                        };
-                        new CPUx86.Add
-                        {
-                            DestinationReg = CPUx86.Registers.ESP,
-                            SourceValue = 4
-                        };
-                        new CPUx86.SSE.MoveSS
-                        {
-                            DestinationReg = CPUx86.Registers.XMM1,
-                            SourceReg = CPUx86.Registers.ESP,
-                            SourceIsIndirect = true
-                        };
-                        new CPUx86.SSE.SubSS
-                        {
-                            DestinationReg = CPUx86.Registers.XMM1,
-                            SourceReg = CPUx86.Registers.XMM0
-                        };
-                        new CPUx86.SSE.MoveSS
-                        {
-                            DestinationReg = CPUx86.Registers.ESP,
-                            DestinationIsIndirect = true,
-                            SourceReg = CPUx86.Registers.XMM1
-                        };
+                        XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
+                        XS.Add(ESP, 4);
+                        XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
+                        XS.SSE.SubSS(XMM1, XMM0);
+                        XS.SSE.MoveSS(ESP, XMM1, destinationIsIndirect: true);
                     }
                     else
                     {
-                        new CPUx86.Pop
-                        {
-                            DestinationReg = CPUx86.Registers.ECX
-                        };
-                        new CPUx86.Pop
-                        {
-                            DestinationReg = CPUx86.Registers.EAX
-                        };
-                        new CPUx86.Sub
-                        {
-                            DestinationReg = CPUx86.Registers.EAX,
-                            SourceReg = CPUx86.Registers.ECX
-                        };
-                        new CPUx86.Push
-                        {
-                            DestinationReg = CPUx86.Registers.EAX
-                        };
+                        XS.Pop(XSRegisters.ECX);
+                        XS.Pop(XSRegisters.EAX);
+                        XS.Sub(XSRegisters.EAX, XSRegisters.ECX);
+                        XS.Push(XSRegisters.EAX);
                     }
                     break;
                 case 8:
                     if (xStackTopIsFloat)
                     {
-                        new CPUx86.SSE.MoveSD
-                        {
-                            DestinationReg = CPUx86.Registers.XMM0,
-                            SourceReg = CPUx86.Registers.ESP,
-                            SourceIsIndirect = true
-                        };
-                        new CPUx86.Add
-                        {
-                            DestinationReg = CPUx86.Registers.ESP,
-                            SourceValue = 8
-                        };
-                        new CPUx86.SSE.MoveSD
-                        {
-                            DestinationReg = CPUx86.Registers.XMM1,
-                            SourceReg = CPUx86.Registers.ESP,
-                            SourceIsIndirect = true
-                        };
-                        new CPUx86.SSE.SubSD
-                        {
-                            DestinationReg = CPUx86.Registers.XMM1,
-                            SourceReg = CPUx86.Registers.XMM0
-                        };
-                        new CPUx86.SSE.MoveSD
-                        {
-                            DestinationReg = CPUx86.Registers.ESP,
-                            DestinationIsIndirect = true,
-                            SourceReg = CPUx86.Registers.XMM1
-                        };
+                        XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+                        XS.Add(ESP, 8);
+                        XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
+                        XS.SSE2.SubSD(XMM1, XMM0);
+                        XS.SSE2.MoveSD(ESP, XMM1, destinationIsIndirect: true);
 #if false
-                        new CPUx86.x87.FloatLoad
+                         new FloatLoad
                         {
-                            DestinationReg = Registers.ESP,
+                            DestinationReg = RegistersEnum.ESP,
                             Size = 64,
                             DestinationIsIndirect = true,
                             DestinationDisplacement = 8
                         };
-                        new CPUx86.x87.FloatSub
+                        new FloatSub
                         {
-                            DestinationReg = CPUx86.Registers.ESP,
+                            DestinationReg = RegistersEnum.ESP,
                             DestinationIsIndirect = true,
                             Size = 64
                         };
-                        new CPUx86.Add
-                        {
-                            SourceValue = 8,
-                            DestinationReg = Registers.ESP
-                        };
-                        new CPUx86.x87.FloatStoreAndPop
-                        {
-                            DestinationReg = Registers.ESP,
-                            Size = 64,
-                            DestinationIsIndirect = true
-                        };
+                        XS.Add(ESP, 8);
+                        XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
 #endif
                     }
                     else
                     {
-                        new CPUx86.Pop
-                        {
-                            DestinationReg = CPUx86.Registers.EAX
-                        };
-                        new CPUx86.Pop
-                        {
-                            DestinationReg = CPUx86.Registers.EDX
-                        };
-                        new CPUx86.Sub
-                        {
-                            DestinationReg = CPUx86.Registers.ESP,
-                            DestinationIsIndirect = true,
-                            SourceReg = CPUx86.Registers.EAX
-                        };
-                        new CPUx86.SubWithCarry
-                        {
-                            DestinationReg = CPUx86.Registers.ESP,
-                            DestinationIsIndirect = true,
-                            DestinationDisplacement = 4,
-                            SourceReg = CPUx86.Registers.EDX
-                        };
+                        XS.Pop(EAX);
+                        XS.Pop(EDX);
+                        XS.Sub(ESP, EAX, destinationIsIndirect: true);
+                        XS.SubWithCarry(ESP, EDX, destinationDisplacement: 4);
                     }
                     break;
                 default:

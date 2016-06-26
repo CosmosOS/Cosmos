@@ -32,6 +32,8 @@ namespace Cosmos.Debug.Common
         public Action<byte[]> CmdPong;
         public Action<byte, byte, byte[]> CmdChannel;
         public Action<UInt32> CmdStackCorruptionOccurred;
+        public Action<UInt32> CmdStackOverflowOccurred;
+        public Action<UInt32> CmdInterruptOccurred;
         public Action<UInt32> CmdNullReferenceOccurred;
         public Action<uint> CmdSimpleNumber;
         public Action<ulong> CmdSimpleLongNumber;
@@ -238,6 +240,16 @@ namespace Cosmos.Debug.Common
                 case Ds2Vs.StackCorruptionOccurred:
                     DebugLog("DC Recv: StackCorruptionOccurred");
                     Next(4, PacketStackCorruptionOccurred);
+                    break;
+
+                case Ds2Vs.StackOverflowOccurred:
+                    DebugLog("DC Recv: StackOverflowOccurred");
+                    Next(4, PacketStackOverflowOccurred);
+                    break;
+
+                case Ds2Vs.InterruptOccurred:
+                    DebugLog("DC Recv: InterruptOccurred");
+                    Next(4, PacketInterruptOccurred);
                     break;
 
                 case Ds2Vs.NullReferenceOccurred:

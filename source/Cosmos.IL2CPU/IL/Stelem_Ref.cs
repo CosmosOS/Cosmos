@@ -2,6 +2,7 @@ using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs.System;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -26,17 +27,17 @@ namespace Cosmos.IL2CPU.X86.IL
       }
       //new CPUx86.Push { DestinationReg = CPUx86.Registers.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)(xStackSize + 4) };
 
-      //new CPUx86.Call { DestinationLabel = MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef) };
+      //XS.Call(MethodInfoLabelGenerator.GenerateLabelName(GCImplementationRefs.DecRefCountRef));
 
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.EBX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xStackSize }; // the index
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ESP, SourceIsIndirect = true, SourceDisplacement = (int)xStackSize + 4 }; // the array
+      XS.Set(XSRegisters.EBX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize); // the index
+      XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize + 4); // the array
       // now convert the array handle to an actual memory address
-      new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, SourceReg = CPUx86.Registers.ECX, SourceIsIndirect = true };
+      XS.Set(XSRegisters.ECX, XSRegisters.ECX, sourceIsIndirect: true);
 
-      new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = (uint)(ObjectImpl.FieldDataOffset + 4) };
+      XS.Add(XSRegisters.ECX, (uint)(ObjectImpl.FieldDataOffset + 4));
 
-      new CPUx86.Push { DestinationValue = aElementSize };
-      new CPUx86.Push { DestinationReg = CPUx86.Registers.EBX };
+      XS.Push(aElementSize);
+      XS.Push(XSRegisters.EBX);
 
 
       //Multiply( aAssembler, aServiceProvider, aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
@@ -44,33 +45,33 @@ namespace Cosmos.IL2CPU.X86.IL
 
       Mul.DoExecute(4, false, xBaseLabel);
 
-      new CPUx86.Push { DestinationReg = CPUx86.Registers.ECX };
+      XS.Push(XSRegisters.ECX);
 
       //Add( aAssembler, aServiceProvider, aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
       Add.DoExecute(4, false);
 
-      new CPUx86.Pop { DestinationReg = CPUx86.Registers.ECX };
+      XS.Pop(XSRegisters.ECX);
       for (int i = (int)(aElementSize / 4) - 1; i >= 0; i -= 1)
       {
         new Comment(aAssembler, "Start 1 dword");
-        new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-        new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.EBX };
-        new CPUx86.Add { DestinationReg = CPUx86.Registers.ECX, SourceValue = 4 };
+        XS.Pop(XSRegisters.EBX);
+        XS.Set(XSRegisters.ECX, XSRegisters.EBX, destinationIsIndirect: true);
+        XS.Add(XSRegisters.ECX, 4);
       }
       switch (aElementSize % 4)
       {
         case 1:
           {
             new Comment(aAssembler, "Start 1 byte");
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.BL };
+            XS.Pop(XSRegisters.EBX);
+            XS.Set(XSRegisters.ECX, XSRegisters.BL, destinationIsIndirect: true);
             break;
           }
         case 2:
           {
             new Comment(aAssembler, "Start 1 word");
-            new CPUx86.Pop { DestinationReg = CPUx86.Registers.EBX };
-            new CPUx86.Mov { DestinationReg = CPUx86.Registers.ECX, DestinationIsIndirect = true, SourceReg = CPUx86.Registers.BX };
+            XS.Pop(XSRegisters.EBX);
+            XS.Set(XSRegisters.ECX, XSRegisters.BX, destinationIsIndirect: true);
             break;
           }
         case 0:
@@ -81,7 +82,7 @@ namespace Cosmos.IL2CPU.X86.IL
           throw new Exception("Remainder size " + (aElementSize % 4) + " not supported!");
 
       }
-      new CPUx86.Add { DestinationReg = CPUx86.Registers.ESP, SourceValue = 0x8 };
+      XS.Add(XSRegisters.ESP, 0x8);
     }
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
