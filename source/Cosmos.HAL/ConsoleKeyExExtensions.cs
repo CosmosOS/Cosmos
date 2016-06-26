@@ -140,6 +140,37 @@ namespace Cosmos.HAL
                     return ConsoleKey.RightArrow;
                 case ConsoleKeyEx.Sleep:
                     return ConsoleKey.Sleep;
+                case ConsoleKeyEx.BiggerThan:
+                case ConsoleKeyEx.Period:
+                    return ConsoleKey.OemPeriod;
+                case ConsoleKeyEx.LowerThan:
+                case ConsoleKeyEx.Comma:
+                    return ConsoleKey.OemComma;
+                case ConsoleKeyEx.NumPeriod:
+                    return ConsoleKey.Decimal;
+                case ConsoleKeyEx.NumPlus:
+                    return ConsoleKey.Add;
+                case ConsoleKeyEx.NumEnter:
+                    return ConsoleKey.Enter;
+                case ConsoleKeyEx.Backslash:
+                    return ConsoleKey.Oem5;
+                case ConsoleKeyEx.LBracket:
+                    return ConsoleKey.Oem4;
+                case ConsoleKeyEx.RBracket:
+                    return ConsoleKey.Oem6;
+                case ConsoleKeyEx.Minus:
+                    return ConsoleKey.OemMinus;
+                case ConsoleKeyEx.Apostrophe:
+                    return ConsoleKey.Oem7;
+                case ConsoleKeyEx.Slash:
+                    return ConsoleKey.Oem2;
+                case ConsoleKeyEx.Equal:
+                    return ConsoleKey.OemPlus;
+                case ConsoleKeyEx.Backquote:
+                    return ConsoleKey.Oem3;
+                case ConsoleKeyEx.Semicolon:
+                case ConsoleKeyEx.Colon:
+                    return ConsoleKey.Oem1;
                 default:
                     throw new Exception("KeyEx not implemented!");
             }
