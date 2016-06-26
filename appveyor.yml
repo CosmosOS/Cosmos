@@ -51,8 +51,7 @@ test:
   assemblies:
   - Cosmos.Core.Memory.Test.dll
   - DebugCompiler.dll
-		
-	
+
 notifications:
 - provider: Webhook
   url: https://webhooks.gitter.im/e/d5c57ffb9a04b1b180be
