@@ -7,17 +7,22 @@ namespace Cosmos.TestRunner.Core
     {
         public static IEnumerable<Type> GetStableKernelTypes()
         {
-            yield return typeof(VGACompilerCrash.Kernel);
-            //yield return typeof(Cosmos.Compiler.Tests.Encryption.Kernel);
-            yield return typeof(Cosmos.Compiler.Tests.Bcl.Kernel);
-            yield return typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel);
-            yield return typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel);
-            yield return typeof(SimpleStructsAndArraysTest.Kernel);
-            yield return typeof(Cosmos.Compiler.Tests.Exceptions.Kernel);
-            yield return typeof(Cosmos.Compiler.Tests.LinqTests.Kernel);
-            yield return typeof(Cosmos.Compiler.Tests.MethodTests.Kernel);
-            //yield return typeof(Cosmos.Kernel.Tests.Fat.Kernel);
-            //yield return typeof(FrotzKernel.Kernel);
+            for (int i = 0; i < 5; i++)
+            {
+                yield return typeof(VGACompilerCrash.Kernel);
+
+                //yield return typeof(Cosmos.Compiler.Tests.Encryption.Kernel);
+                yield return typeof(Cosmos.Compiler.Tests.Bcl.Kernel);
+                yield return typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel);
+                yield return typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel);
+                yield return typeof(SimpleStructsAndArraysTest.Kernel);
+                yield return typeof(Cosmos.Compiler.Tests.Exceptions.Kernel);
+                yield return typeof(Cosmos.Compiler.Tests.LinqTests.Kernel);
+                yield return typeof(Cosmos.Compiler.Tests.MethodTests.Kernel);
+
+                //yield return typeof(Cosmos.Kernel.Tests.Fat.Kernel);
+                //yield return typeof(FrotzKernel.Kernel);
+            }
         }
     }
 }
