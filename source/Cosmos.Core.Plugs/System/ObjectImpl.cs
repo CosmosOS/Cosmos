@@ -5,7 +5,7 @@ namespace Cosmos.Core.Plugs.System
     [Plug(Target = typeof(object))]
     public class ObjectImpl
     {
-        public static unsafe uint MemberwiseClone(uint aThis)
+        public static unsafe uint MemberwiseClone([ObjectPointerAccess] uint aThis)
         {
             // pointers are handles!
 

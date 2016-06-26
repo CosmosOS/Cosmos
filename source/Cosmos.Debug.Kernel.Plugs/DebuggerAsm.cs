@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.Assembler;
+using Cosmos.Assembler.x86;
 using XSharp.Compiler;
 
 namespace Cosmos.Debug.Kernel.Plugs
@@ -42,6 +43,9 @@ namespace Cosmos.Debug.Kernel.Plugs
 
     [PlugMethod(Assembler = typeof(DebugSendChannelCommandNoData))]
     public static unsafe void SendChannelCommand(byte aChannel, byte aCommand) { }
+
+    [PlugMethod(Assembler = typeof(DebugSendCoreDump))]
+    public static unsafe void DoSendCoreDump() { }
 
     //[PlugMethod(Assembler = typeof(DebugTraceOff))]
     //public static void TraceOff() { }
@@ -227,6 +231,19 @@ namespace Cosmos.Debug.Kernel.Plugs
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
       new LiteralAssemblerCode("pushad");
       new LiteralAssemblerCode("Call DebugStub_SendPtr");
+      new LiteralAssemblerCode("popad");
+      new LiteralAssemblerCode("%endif");
+    }
+  }
+
+  public class DebugSendCoreDump : AssemblerMethod
+  {
+    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    {
+      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+      new Xchg {DestinationReg = RegistersEnum.BX, SourceReg = RegistersEnum.BX};
+      new LiteralAssemblerCode("pushad");
+      new LiteralAssemblerCode("Call DebugStub_SendCoreDump");
       new LiteralAssemblerCode("popad");
       new LiteralAssemblerCode("%endif");
     }

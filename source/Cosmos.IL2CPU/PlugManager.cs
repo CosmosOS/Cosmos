@@ -20,10 +20,10 @@ namespace Cosmos.IL2CPU
 
         public LogExceptionDelegate LogException = null;
 
-        public delegate void ScanMethodDelegate(MethodBase aMethod, bool aIsPlug, string sourceItem);
-        public ScanMethodDelegate ScanMethod = null;
-        public delegate void QueueDelegate(_MemberInfo aItem, object aSrc, string aSrcType, string sourceItem = null);
-        public QueueDelegate Queue = null;
+        ////public delegate void ScanMethodDelegate(MethodBase aMethod, bool aIsPlug, string sourceItem);
+        //public ScanMethodDelegate ScanMethod = null;
+        //public delegate void QueueDelegate(_MemberInfo aItem, object aSrc, string aSrcType, string sourceItem = null);
+        //public QueueDelegate Queue = null;
 
         // Contains a list of plug implementor classes
         // Key = Target Class
@@ -32,6 +32,11 @@ namespace Cosmos.IL2CPU
         // List of inheritable plugs. Plugs that start at an ancestor and plug all
         // descendants. For example, delegates
         protected Dictionary<Type, List<Type>> mPlugImplsInhrt = new Dictionary<Type, List<Type>>();
+
+        // same as above 2 fields, except for generic plugs
+        protected Dictionary<Type, List<Type>> mGenericPlugImpls = new Dictionary<Type, List<Type>>();
+        protected Dictionary<Type, List<Type>> mGenericPlugImplsInhrt = new Dictionary<Type, List<Type>>();
+
         // list of field plugs
         protected IDictionary<Type, IDictionary<string, PlugFieldAttribute>> mPlugFields = new Dictionary<Type, IDictionary<string, PlugFieldAttribute>>();
 
@@ -63,15 +68,10 @@ namespace Cosmos.IL2CPU
             return LabelName.GenerateFullName(m);
         }
 
-        public PlugManager(LogExceptionDelegate aLogException)
+        public PlugManager(LogExceptionDelegate aLogException, Action<string> aLogWarning)
         {
             LogException = aLogException;
-        }
-        public PlugManager(LogExceptionDelegate aLogException, ScanMethodDelegate aScanMethod, QueueDelegate aQueueMethod)
-        {
-            LogException = aLogException;
-            ScanMethod = aScanMethod;
-            Queue = aQueueMethod;
+            LogWarning = aLogWarning;
         }
 
         public void FindPlugImpls()
@@ -127,7 +127,15 @@ namespace Cosmos.IL2CPU
                             // TODO: Integrate with builder options to allow Mono support again.
                             if (!xAttrib.IsMonoOnly)
                             {
-                                var mPlugs = xAttrib.Inheritable ? mPlugImplsInhrt : mPlugImpls;
+                                Dictionary<Type, List<Type>> mPlugs;
+                                if (xTargetType.ContainsGenericParameters)
+                                {
+                                    mPlugs = xAttrib.Inheritable ? mGenericPlugImplsInhrt : mGenericPlugImpls;
+                                }
+                                else
+                                {
+                                    mPlugs = xAttrib.Inheritable ? mPlugImplsInhrt : mPlugImpls;
+                                }
                                 List<Type> xImpls;
                                 if (mPlugs.TryGetValue(xTargetType, out xImpls))
                                 {
@@ -151,6 +159,7 @@ namespace Cosmos.IL2CPU
             ScanPlugs(mPlugImpls);
             ScanPlugs(mPlugImplsInhrt);
         }
+
         public void ScanPlugs(Dictionary<Type, List<Type>> aPlugs)
         {
             foreach (var xPlug in aPlugs)
@@ -184,10 +193,12 @@ namespace Cosmos.IL2CPU
                             }
                             else
                             {
-                                //Skip checking methods related to fields because it's just too messy...
-                                if (xMethod.GetParameters().Where(delegate (ParameterInfo x)
+                                // Skip checking methods related to fields because it's just too messy...
+                                // We also skip methods which do method access.
+                                if (xMethod.GetParameters().Where(x =>
                                 {
-                                    return x.GetCustomAttributes(typeof(FieldAccessAttribute)).Count() > 0;
+                                    return x.GetCustomAttributes(typeof(FieldAccessAttribute)).Count() > 0
+                                    || x.GetCustomAttributes(typeof(ObjectPointerAccessAttribute)).Count() > 0;
                                 }).Count() > 0)
                                 {
                                     OK = true;
@@ -306,40 +317,26 @@ namespace Cosmos.IL2CPU
                                 }
                             }
 
-                            if (OK)
+                            if (!OK)
                             {
-                                if (ScanMethod != null)
+                                if (xAttrib == null
+                                    || xAttrib.IsOptional)
                                 {
-                                    ScanMethod(xMethod, true, "Plug Sub Method");
-                                }
-                            }
-                            else
-                            {
-                                if (LogException != null)
-                                {
-                                    LogException(new Exception("Invalid plug method! Target method not found. : " + xMethod.GetFullName()));
+                                    if (LogWarning != null)
+                                    {
+                                        LogWarning("Invalid plug method! Target method not found. : " + xMethod.GetFullName());
+                                    }
                                 }
                             }
                         }
                         else
                         {
-                            if (xAttrib.IsWildcard && xAttrib.Assembler == null)
+                            if (xAttrib.IsWildcard
+                                && xAttrib.Assembler == null)
                             {
-                                Exception anEx = new Exception("Wildcard PlugMethods need to use an assembler for now.");
-                                if (ThrowExceptions)
+                                if (LogWarning != null)
                                 {
-                                    throw anEx;
-                                }
-                                else
-                                {
-                                    LogException(anEx);
-                                }
-                            }
-                            if (xAttrib.Enabled && !xAttrib.IsMonoOnly)
-                            {
-                                if (ScanMethod != null)
-                                {
-                                    ScanMethod(xMethod, true, ".Net plug Method");
+                                    LogWarning("Wildcard PlugMethods need to use an assembler for now.");
                                 }
                             }
                         }
@@ -356,15 +353,7 @@ namespace Cosmos.IL2CPU
                         }
                         if (xFields.ContainsKey(xField.FieldId))
                         {
-                            Exception anEx = new Exception("Duplicate PlugField found for field '" + xField.FieldId + "'!");
-                            if (ThrowExceptions)
-                            {
-                                throw anEx;
-                            }
-                            else
-                            {
-                                LogException(anEx);
-                            }
+                            throw new Exception("Duplicate PlugField found for field '" + xField.FieldId + "'!");
                         }
                         xFields.Add(xField.FieldId, xField);
                     }
@@ -373,7 +362,9 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        public MethodBase ResolvePlug(Type aTargetType, List<Type> aImpls, MethodBase aMethod, Type[] aParamTypes)
+        public Action<string> LogWarning;
+
+        private MethodBase ResolvePlug(Type aTargetType, List<Type> aImpls, MethodBase aMethod, Type[] aParamTypes)
         {
             //TODO: This method is "reversed" from old - remember that when porting
             MethodBase xResult = null;
@@ -558,6 +549,10 @@ namespace Cosmos.IL2CPU
                                 xResult = xSigMethod;
                                 break;
                             }
+                            //if (aMethod.DeclaringType.IsGenericTypeDefinition)
+                            //{
+                            //    if (xTargetMethod.GetF)
+                            //}
                             if (xAttrib != null && xAttrib.Signature != null)
                             {
                                 var xName = DataMember.FilterStringForIncorrectChars(LabelName.GenerateFullName(aMethod));
@@ -644,21 +639,6 @@ namespace Cosmos.IL2CPU
                 //}
             }
 
-            InlineAttribute xInlineAttrib = null;
-            foreach (InlineAttribute inli in xResult.GetCustomAttributes(typeof(InlineAttribute), false))
-            {
-                xInlineAttrib = inli;
-            }
-
-            if (xInlineAttrib == null)
-            {
-                if (Queue != null)
-                {
-                    CompilerHelpers.Debug("Queueing Plug:", xResult.DeclaringType, "::", xResult.Name);
-                    Queue(xResult, null, "Plug Method");
-                }
-            }
-
             //if (xAttrib != null && xAttrib.Signature != null)
             //{
             //    var xTargetMethods = aTargetType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
@@ -689,9 +669,14 @@ namespace Cosmos.IL2CPU
             //}
             return xResult;
         }
+
         public MethodBase ResolvePlug(MethodBase aMethod, Type[] aParamTypes)
         {
             MethodBase xResult = null;
+            if (aMethod.Name == "CreateComparer")
+            {
+                ;
+            }
             var xMethodKey = BuildMethodKeyName(aMethod);
             if (ResolvedPlugs.Contains(xMethodKey, out xResult))
             {
@@ -699,10 +684,6 @@ namespace Cosmos.IL2CPU
             }
             else
             {
-                // TODO: Right now plugs are compiled in, even if they are not needed.
-                // Maybe change this so plugs that are not needed are not compiled in?
-                // To do so, maybe plugs could be marked as they are used
-
                 List<Type> xImpls;
                 // Check for exact type plugs first, they have precedence
                 if (mPlugImpls.TryGetValue(aMethod.DeclaringType, out xImpls))
@@ -727,6 +708,62 @@ namespace Cosmos.IL2CPU
                                 // prevent key overriding.
                                 break;
                             }
+                        }
+                    }
+                }
+                if (xResult == null)
+                {
+                    xImpls = null;
+                    if (aMethod.DeclaringType.IsGenericType)
+                    {
+                        var xMethodDeclaringTypeDef = aMethod.DeclaringType.GetGenericTypeDefinition();
+                        if (mGenericPlugImpls.TryGetValue(xMethodDeclaringTypeDef, out xImpls))
+                        {
+                            var xBindingFlagsToFindMethod = BindingFlags.Default;
+                            if (aMethod.IsPublic)
+                            {
+                                xBindingFlagsToFindMethod = BindingFlags.Public;
+                            }
+                            else
+                            {
+                                // private
+                                xBindingFlagsToFindMethod = BindingFlags.NonPublic;
+                            }
+                            if (aMethod.IsStatic)
+                            {
+                                xBindingFlagsToFindMethod |= BindingFlags.Static;
+                            }
+                            else
+                            {
+                                xBindingFlagsToFindMethod |= BindingFlags.Instance;
+                            }
+                            var xGenericMethod = (from item in xMethodDeclaringTypeDef.GetMethods(xBindingFlagsToFindMethod)
+                                                  where item.Name == aMethod.Name
+                                                        && item.GetParameters().Length == aParamTypes.Length
+                                                  select item).SingleOrDefault();
+                            if (xGenericMethod != null)
+                            {
+                                var xTempResult = ResolvePlug(xMethodDeclaringTypeDef, xImpls, xGenericMethod, aParamTypes);
+
+                                if (xTempResult != null)
+                                {
+                                    if (xTempResult.DeclaringType.IsGenericTypeDefinition)
+                                    {
+                                        var xConcreteTempResultType = xTempResult.DeclaringType.MakeGenericType(aMethod.DeclaringType.GetGenericArguments());
+                                        xResult = (from item in xConcreteTempResultType.GetMethods(BindingFlags.Static | BindingFlags.Public)
+                                                   where item.Name == aMethod.Name
+                                                         && item.GetParameters().Length == aParamTypes.Length
+                                                   select item).SingleOrDefault();
+                                    }
+                                }
+                                ;
+                                ;
+                                ;
+                                ;
+
+                            }
+
+                            ///
                         }
                     }
                 }

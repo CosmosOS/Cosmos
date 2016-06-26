@@ -43,7 +43,7 @@ namespace Frotz.Generic {
         // * ID types.
         // */
 
-        //#define makeid(a,b,c,d) 
+        //#define makeid(a,b,c,d)
 
         // TODO Remove this in favor of zmath
         private static zlong makeid(char a, char b, char c, char d) {
@@ -158,7 +158,7 @@ namespace Frotz.Generic {
          * occurred before any damage was done, -1 on a fatal error.
          */
 
-        internal static zword restore_quetzal(FileStream svf, MemoryStream stf) {
+        internal static zword restore_quetzal(FileStream svf, System.IO.Stream stf) {
             zlong ifzslen, currlen, tmpl;
             zlong pc;
             zword i, tmpw;
@@ -298,7 +298,7 @@ namespace Frotz.Generic {
                                     return fatal;
                                 }
                             }
-                        
+
                             main.stack[--main.sp] = (zword)(tmpl >> 9);	/* High part of PC */
                             main.stack[--main.sp] = (zword)(tmpl & 0x1FF);	/* Low part of PC */
                             main.stack[--main.sp] = (zword)(main.fp - 1);	/* FP */
@@ -429,143 +429,146 @@ namespace Frotz.Generic {
          * Save a game using Quetzal format. Return 1 if OK, 0 if failed.
          */
 
-        internal static zword save_quetzal(FileStream svf, MemoryStream stf) {
-            zlong ifzslen = 0, cmemlen = 0, stkslen = 0;
-            long pc;
-            zword i, j, n;
-            int nvars, nargs, nstk, p;
-            zbyte var;
-            long cmempos, stkspos;
-            int c;
+        internal static zword save_quetzal(FileStream svf, MemoryStream stf)
+        {
+            return 0;
 
-            /* Write `IFZS' header. */
-            if (!write_chnk(svf, ID_FORM, 0)) return 0;
-            if (!write_long(svf, ID_IFZS)) return 0;
+            //zlong ifzslen = 0, cmemlen = 0, stkslen = 0;
+            //long pc;
+            //zword i, j, n;
+            //int nvars, nargs, nstk, p;
+            //zbyte var;
+            //long cmempos, stkspos;
+            //int c;
 
-            /* Write `IFhd' chunk. */
-            FastMem.GET_PC(out pc);
-            if (!write_chnk(svf, ID_IFhd, 13)) return 0;
-            if (!write_word(svf, main.h_release)) return 0;
-            for (i = ZMachine.H_SERIAL; i < ZMachine.H_SERIAL + 6; ++i)
-                if (!write_byte(svf, FastMem.ZMData[FastMem.zmp + i])) return 0;
-            if (!write_word(svf, main.h_checksum)) return 0;
-            if (!write_long(svf, pc << 8)) /* Includes pad. */	return 0;
+            ///* Write `IFZS' header. */
+            //if (!write_chnk(svf, ID_FORM, 0)) return 0;
+            //if (!write_long(svf, ID_IFZS)) return 0;
 
-            /* Write `CMem' chunk. */
-            if ((cmempos = svf.Position) < 0) return 0;
-            if (!write_chnk(svf, ID_CMem, 0)) return 0;
-            // (void) fseek (stf, 0, SEEK_SET);
-            stf.Position = 0;
-            /* j holds current run length. */
-            for (i = 0, j = 0, cmemlen = 0; i < main.h_dynamic_size; ++i) {
-                if ((c = stf.ReadByte()) == -1) return 0;
-                c ^= (int)FastMem.ZMData[i];
-                if (c == 0)
-                    ++j;	/* It's a run of equal bytes. */
-                else {
-                    /* Write out any run there may be. */
-                    if (j > 0) {
-                        for (; j > 0x100; j -= 0x100) {
-                            if (!write_run(svf, 0xFF)) return 0;
-                            cmemlen += 2;
-                        }
-                        if (!write_run(svf, (byte)(j - 1))) return 0;
-                        cmemlen += 2;
-                        j = 0;
-                    }
-                    /* Any runs are now written. Write this (nonzero) byte. */
-                    if (!write_byte(svf, (zbyte)c)) return 0;
-                    ++cmemlen;
-                }
-            }
-            /*
-             * Reached end of dynamic memory. We ignore any unwritten run there may be
-             * at this point.
-             */
-            if ((cmemlen & 1) > 0)	/* Chunk length must be even. */
-                if (!write_byte(svf, 0)) return 0;
+            ///* Write `IFhd' chunk. */
+            //FastMem.GET_PC(out pc);
+            //if (!write_chnk(svf, ID_IFhd, 13)) return 0;
+            //if (!write_word(svf, main.h_release)) return 0;
+            //for (i = ZMachine.H_SERIAL; i < ZMachine.H_SERIAL + 6; ++i)
+            //    if (!write_byte(svf, FastMem.ZMData[FastMem.zmp + i])) return 0;
+            //if (!write_word(svf, main.h_checksum)) return 0;
+            //if (!write_long(svf, pc << 8)) /* Includes pad. */	return 0;
 
-            /* Write `Stks' chunk. You are not expected to understand this. ;) */
-            if ((stkspos = svf.Position) < 0) return 0;
-            if (!write_chnk(svf, ID_Stks, 0)) return 0;
+            ///* Write `CMem' chunk. */
+            //if ((cmempos = svf.Position) < 0) return 0;
+            //if (!write_chnk(svf, ID_CMem, 0)) return 0;
+            //// (void) fseek (stf, 0, SEEK_SET);
+            //stf.Position = 0;
+            ///* j holds current run length. */
+            //for (i = 0, j = 0, cmemlen = 0; i < main.h_dynamic_size; ++i) {
+            //    if ((c = stf.ReadByte()) == -1) return 0;
+            //    c ^= (int)FastMem.ZMData[i];
+            //    if (c == 0)
+            //        ++j;	/* It's a run of equal bytes. */
+            //    else {
+            //        /* Write out any run there may be. */
+            //        if (j > 0) {
+            //            for (; j > 0x100; j -= 0x100) {
+            //                if (!write_run(svf, 0xFF)) return 0;
+            //                cmemlen += 2;
+            //            }
+            //            if (!write_run(svf, (byte)(j - 1))) return 0;
+            //            cmemlen += 2;
+            //            j = 0;
+            //        }
+            //        /* Any runs are now written. Write this (nonzero) byte. */
+            //        if (!write_byte(svf, (zbyte)c)) return 0;
+            //        ++cmemlen;
+            //    }
+            //}
+            ///*
+            // * Reached end of dynamic memory. We ignore any unwritten run there may be
+            // * at this point.
+            // */
+            //if ((cmemlen & 1) > 0)	/* Chunk length must be even. */
+            //    if (!write_byte(svf, 0)) return 0;
 
-            /*
-             * We construct a list of frame indices, most recent first, in `frames'.
-             * These indices are the offsets into the `stack' array of the word before
-             * the first word pushed in each frame.
-             */
-            frames[0] = (zword)main.sp;	/* The frame we'd get by doing a call now. */
-            for (i = (zword)(main.fp + 4), n = 0; i < General.STACK_SIZE + 4; i = (zword)(main.stack[i - 3] + 5))
-                frames[++n] = i;
+            ///* Write `Stks' chunk. You are not expected to understand this. ;) */
+            //if ((stkspos = svf.Position) < 0) return 0;
+            //if (!write_chnk(svf, ID_Stks, 0)) return 0;
 
-            /*
-             * All versions other than V6 can use evaluation stack outside a function
-             * context. We write a faked stack frame (most fields zero) to cater for
-             * this.
-             */
-            if (main.h_version != ZMachine.V6) {
-                for (i = 0; i < 6; ++i)
-                    if (!write_byte(svf, 0)) return 0;
-                nstk = General.STACK_SIZE - frames[n];
-                if (!write_word(svf, nstk)) return 0;
-                for (j = (zword)(General.STACK_SIZE - 1); j >= frames[n]; --j)
-                    if (!write_word(svf, main.stack[j])) return 0;
-                stkslen = (zword)(8 + 2 * nstk);
-            }
+            ///*
+            // * We construct a list of frame indices, most recent first, in `frames'.
+            // * These indices are the offsets into the `stack' array of the word before
+            // * the first word pushed in each frame.
+            // */
+            //frames[0] = (zword)main.sp;	/* The frame we'd get by doing a call now. */
+            //for (i = (zword)(main.fp + 4), n = 0; i < General.STACK_SIZE + 4; i = (zword)(main.stack[i - 3] + 5))
+            //    frames[++n] = i;
 
-            /* Write out the rest of the stack frames. */
-            for (i = n; i > 0; --i) {
-                p = frames[i] - 4;  // p = stack + frames[i] - 4;	/* Points to call frame. */
-                nvars = (main.stack[p] & 0x0F00) >> 8;
-                nargs = main.stack[p] & 0x00FF;
-                nstk = (zword)(frames[i] - frames[i - 1] - nvars - 4);
-                pc = ((zlong)main.stack[p + 3] << 9) | main.stack[p + 2];
+            ///*
+            // * All versions other than V6 can use evaluation stack outside a function
+            // * context. We write a faked stack frame (most fields zero) to cater for
+            // * this.
+            // */
+            //if (main.h_version != ZMachine.V6) {
+            //    for (i = 0; i < 6; ++i)
+            //        if (!write_byte(svf, 0)) return 0;
+            //    nstk = General.STACK_SIZE - frames[n];
+            //    if (!write_word(svf, nstk)) return 0;
+            //    for (j = (zword)(General.STACK_SIZE - 1); j >= frames[n]; --j)
+            //        if (!write_word(svf, main.stack[j])) return 0;
+            //    stkslen = (zword)(8 + 2 * nstk);
+            //}
 
-                switch (main.stack[p] & 0xF000)	/* Check type of call. */
-                {
-                    case 0x0000:	/* Function. */
-                        var = FastMem.ZMData[FastMem.zmp + pc];
-                        pc = ((pc + 1) << 8) | (zlong)nvars;
-                        break;
-                    case 0x1000:	/* Procedure. */
-                        var = 0;
-                        pc = (pc << 8) | 0x10 | (zlong)nvars;	/* Set procedure flag. */
-                        break;
-                    /* case 0x2000: */
-                    default:
-                        Err.runtime_error(ErrorCodes.ERR_SAVE_IN_INTER);
-                        return 0;
-                }
-                if (nargs != 0)
-                    nargs = (zword)((1 << nargs) - 1);	/* Make args into bitmap. */
+            ///* Write out the rest of the stack frames. */
+            //for (i = n; i > 0; --i) {
+            //    p = frames[i] - 4;  // p = stack + frames[i] - 4;	/* Points to call frame. */
+            //    nvars = (main.stack[p] & 0x0F00) >> 8;
+            //    nargs = main.stack[p] & 0x00FF;
+            //    nstk = (zword)(frames[i] - frames[i - 1] - nvars - 4);
+            //    pc = ((zlong)main.stack[p + 3] << 9) | main.stack[p + 2];
 
-                /* Write the main part of the frame... */
-                if (!write_long(svf, pc)
-                    || !write_byte(svf, var)
-                    || !write_byte(svf, nargs)
-                    || !write_word(svf, nstk)) return 0;
+            //    switch (main.stack[p] & 0xF000)	/* Check type of call. */
+            //    {
+            //        case 0x0000:	/* Function. */
+            //            var = FastMem.ZMData[FastMem.zmp + pc];
+            //            pc = ((pc + 1) << 8) | (zlong)nvars;
+            //            break;
+            //        case 0x1000:	/* Procedure. */
+            //            var = 0;
+            //            pc = (pc << 8) | 0x10 | (zlong)nvars;	/* Set procedure flag. */
+            //            break;
+            //        /* case 0x2000: */
+            //        default:
+            //            Err.runtime_error(ErrorCodes.ERR_SAVE_IN_INTER);
+            //            return 0;
+            //    }
+            //    if (nargs != 0)
+            //        nargs = (zword)((1 << nargs) - 1);	/* Make args into bitmap. */
 
-                /* Write the variables and eval stack. */
-                for (j = 0, --p; j < nvars + nstk; ++j, --p)
-                    if (!write_word(svf, main.stack[p])) return 0;
+            //    /* Write the main part of the frame... */
+            //    if (!write_long(svf, pc)
+            //        || !write_byte(svf, var)
+            //        || !write_byte(svf, nargs)
+            //        || !write_word(svf, nstk)) return 0;
 
-                /* Calculate length written thus far. */
-                stkslen += (zword)(8 + 2 * (nvars + nstk));
-            }
+            //    /* Write the variables and eval stack. */
+            //    for (j = 0, --p; j < nvars + nstk; ++j, --p)
+            //        if (!write_word(svf, main.stack[p])) return 0;
 
-            /* Fill in variable chunk lengths. */
-            ifzslen = 3 * 8 + 4 + 14 + cmemlen + stkslen;
-            if ((cmemlen & 1) > 0)
-                ++ifzslen;
-            svf.Position = 4;
-            if (!write_long(svf, ifzslen)) return 0;
-            svf.Position = cmempos + 4;
-            if (!write_long(svf, cmemlen)) return 0;
-            svf.Position = stkspos + 4;
-            if (!write_long(svf, stkslen)) return 0;
+            //    /* Calculate length written thus far. */
+            //    stkslen += (zword)(8 + 2 * (nvars + nstk));
+            //}
 
-            /* After all that, still nothing went wrong! */
-            return 1;
+            ///* Fill in variable chunk lengths. */
+            //ifzslen = 3 * 8 + 4 + 14 + cmemlen + stkslen;
+            //if ((cmemlen & 1) > 0)
+            //    ++ifzslen;
+            //svf.Position = 4;
+            //if (!write_long(svf, ifzslen)) return 0;
+            //svf.Position = cmempos + 4;
+            //if (!write_long(svf, cmemlen)) return 0;
+            //svf.Position = stkspos + 4;
+            //if (!write_long(svf, stkslen)) return 0;
+
+            ///* After all that, still nothing went wrong! */
+            //return 1;
         }
     }
 }

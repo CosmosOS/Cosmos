@@ -236,6 +236,7 @@ namespace Cosmos.IL2CPU
                         using (var xScanner = new ILScanner(xAsm))
                         {
                             xScanner.LogException = LogException;
+                            xScanner.LogWarning = LogWarning;
                             CompilerHelpers.DebugEvent += LogMessage;
                             if (EnableLogging)
                             {
@@ -249,7 +250,7 @@ namespace Cosmos.IL2CPU
                             }
                             xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
                             xScanner.Execute(xInitMethod);
-                            
+
                             AppAssemblerRingsCheck.Execute(xScanner, xInitMethod.DeclaringType.Assembly);
 
                             using (var xOut = new StreamWriter(OutputFilename, false, Encoding.ASCII, 128 * 1024))

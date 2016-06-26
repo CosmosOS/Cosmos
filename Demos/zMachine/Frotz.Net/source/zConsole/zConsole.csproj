@@ -90,6 +90,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <EmbeddedResource Include="ZORK1.DAT" />
+    <EmbeddedResource Include="ZORK2.DAT" />
+    <EmbeddedResource Include="ZORK3.DAT" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Desktop\FrotzBase\FrotzNetDLL.csproj">

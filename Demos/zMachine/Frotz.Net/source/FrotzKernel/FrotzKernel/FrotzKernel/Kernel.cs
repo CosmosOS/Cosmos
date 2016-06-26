@@ -20,6 +20,9 @@ namespace FrotzKernel
             Console.WriteLine("Created by Michael VanOverbeek, with help from mterwoord, Kudzu, and the other Cosmos devs.");
         }
 
+        [ManifestResourceStream(ResourceName = "FrotzKernel.ZORK1.DAT")]
+        public readonly static byte[] GameData;
+
         protected override void Run()
         {
             /*
@@ -46,7 +49,7 @@ namespace FrotzKernel
                 }
                 else
                 {
-                    var screen = new ZConsoleScreen(fName);
+                    var screen = new ZConsoleScreen(fName, GameData);
                 }
             }
             catch(Exception ex)

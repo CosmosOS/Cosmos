@@ -13,7 +13,23 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
 			//TODO: do something
 		}
 
+	    public new static bool Equals(object o1, object o2)
+	    {
+	        if (o1 == null
+	            && o2 == null)
+	        {
+	            return true;
+	        }
+	        if (o1 == null
+	            || o2 == null)
+	        {
+	            return false;
+	        }
+	        return object.Equals(o1, o2);
+	    }
+
 		[Inline(TargetPlatform = TargetPlatform.x86)]
+        [PlugMethod]
 		public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle) {
 			// Arguments:
 			//    Array aArray, RuntimeFieldHandle aFieldHandle

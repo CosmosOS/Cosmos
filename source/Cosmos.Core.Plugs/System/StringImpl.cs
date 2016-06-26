@@ -578,13 +578,13 @@ namespace Cosmos.Core.Plugs.System
                 }
                 return false;
             }
-            else if (aThis.Length > aSubStr.Length)
+            else if (aThis.Length < aSubStr.Length)
             {
                 return false;
             }
             else
             {
-                for (int i = aThis.Length - aSubStr.Length; i < aThis.Length; i++)
+                for (int i = 0; i < ci.Length; i++)
                 {
                     if (di[aThis.Length - aSubStr.Length + i] != ci[i])
                     {
@@ -820,6 +820,7 @@ namespace Cosmos.Core.Plugs.System
             return new string(new char[length]);
         }
 
+        [PlugMethod(IsOptional = true)]
         public static string TrimStart(string aThis, string aSubStr)
         {
             char[] ci = aThis.ToCharArray();

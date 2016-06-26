@@ -39,22 +39,25 @@ namespace Frotz {
 
         public static void Output(bool log, String s, params Object[] data) {
             if (IsActive) {
-                String current = String.Format(s, data);
-                    
-                if (log && currentState < _stateLines.Count && !s.StartsWith("#")) {
-                    String expected = _stateLines[currentState++];
+                //String current = String.Format(s, data);
 
-                    if (string.Compare(expected, current, StringComparison.OrdinalIgnoreCase) != 0) {
-                        System.Diagnostics.Debug.WriteLine("mismatch! Expected:" + expected + ": Current:" + current + ":" + currentState);
-                        _stateLines.Clear();
-                    }
+                //if (log && currentState < _stateLines.Count && !s.StartsWith("#")) {
+                //    String expected = _stateLines[currentState++];
 
-                } else {
-                    OutputLines.Add(current);
-                    System.Diagnostics.Debug.WriteLine(current);
-                }
+                //    if (!string.Equals(expected, current, StringComparison.OrdinalIgnoreCase)) {
+                //        System.Diagnostics.Debug.WriteLine("mismatch! Expected:" + expected + ": Current:" + current + ":" + currentState);
+                //        _stateLines.Clear();
+                //    }
+
+                //} else {
+                //    OutputLines.Add(current);
+                //    System.Diagnostics.Debug.WriteLine(current);
+                //}
+
             }
         }
+
+        //private static Debugger mDebugger = new Debugger("");
 
         public static void savezmachine(string fileToSaveTo) {
             if (IsActive)

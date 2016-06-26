@@ -368,3 +368,37 @@ WriteChar:
     ESI++
     goto WriteChar
 }
+
+function SendCoreDump {
+    +EAX
+    +EBX
+    +ECX
+    +EDX
+    +EDI
+    +ESI
+    EAX = @.CallerEBP
+    +EAX
+    EAX = @.CallerEIP
+    +EAX
+    EAX = @.CallerESP
+    +EAX
+    ECX = 36
+    EAX = EBP
+    while EAX != 0 {
+        EBX = EAX - 4
+        +EAX
+        ECX = ECX + 4
+        EAX = [EAX]
+    }
+
+    // Send command
+		AL = #Ds2Vs_CoreDump
+		ComWriteAL()
+    EAX = ECX
+    ComWriteAX()
+    while ECX != 0 {
+        -EAX
+        ComWriteEAX()
+        ECX--
+    }
+}

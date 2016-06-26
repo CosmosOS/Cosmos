@@ -176,9 +176,9 @@ namespace Frotz.Generic
         static int invokeCount = 0;
         private static void private_invoke(zinstruction instruction, string array, int index, int opcode)
         {
-            DebugState.last_call_made = instruction.Method.Name + ":" + opcode;
-            DebugState.Output(false, "Invoking: {0:X} -> {1} -> {2}", opcode, instruction.Method.Name, invokeCount);
-            instruction.DynamicInvoke();
+            //DebugState.last_call_made = instruction.Method.Name + ":" + opcode;
+            //DebugState.Output(false, "Invoking: {0:X} -> {1} -> {2}", opcode, instruction.Method.Name, invokeCount);
+            instruction.Invoke();
             invokeCount++;
         }
 

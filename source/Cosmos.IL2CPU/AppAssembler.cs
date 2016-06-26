@@ -18,6 +18,7 @@ using Cosmos.Common;
 using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs.System;
 using Cosmos.IL2CPU.X86.IL;
 using Mono.Cecil;
 using XSharp.Compiler;
@@ -208,26 +209,21 @@ namespace Cosmos.IL2CPU
                 {
                     DebugInfo.AddDocument(mSequences[0].Document);
 
-                    var xMethod = new Method()
+                    var xMethod = new Method();
+                    xMethod.ID = mCurrentMethodGuid;
+                    xMethod.TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken;
+                    xMethod.MethodToken = aMethod.MethodBase.MetadataToken;
+                    xMethod.LabelStartID = xLabelGuid;
+                    xMethod.LabelEndID = mCurrentMethodLabelEndGuid;
+                    xMethod.LabelCall = xMethodLabel;
+                    long xAssemblyFileID;
+                    if (DebugInfo.AssemblyGUIDs.TryGetValue(aMethod.MethodBase.DeclaringType.Assembly, out xAssemblyFileID))
                     {
-                        ID = mCurrentMethodGuid,
-                        TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken,
-                        MethodToken = aMethod.MethodBase.MetadataToken,
-
-                        LabelStartID = xLabelGuid,
-                        LabelEndID = mCurrentMethodLabelEndGuid,
-                        LabelCall = xMethodLabel,
-
-                        AssemblyFileID = DebugInfo.AssemblyGUIDs[aMethod.MethodBase.DeclaringType.Assembly],
-                        DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document.ToLower()],
-
-                        // Storing Line + Col as one item makes comparisons MUCH easier, otherwise we have to
-                        // check for things like col < start col but line > start line.
-                        //
-                        // () around << are VERY important.. + has precedence over <<
-                        LineColStart = ((Int64)mSequences[0].LineStart << 32) + mSequences[0].ColStart,
-                        LineColEnd = ((Int64)(mSequences[mSequences.Length - 1].LineEnd) << 32) + mSequences[mSequences.Length - 1].ColEnd
-                    };
+                        xMethod.AssemblyFileID = xAssemblyFileID;
+                    }
+                    xMethod.DocumentID = DebugInfo.DocumentGUIDs[mSequences[0].Document.ToLower()];
+                    xMethod.LineColStart = ((Int64)mSequences[0].LineStart << 32) + mSequences[0].ColStart;
+                    xMethod.LineColEnd = ((Int64)(mSequences[mSequences.Length - 1].LineEnd) << 32) + mSequences[mSequences.Length - 1].ColEnd;
                     DebugInfo.AddMethod(xMethod);
                 }
             }
@@ -474,6 +470,11 @@ namespace Cosmos.IL2CPU
                     throw new Exception("Method needs plug, but no plug was assigned.");
                 }
 
+                if (aMethod.MethodBase.Name == "InitializeArray")
+                {
+                    ;
+                }
+
                 // todo: MtW: how to do this? we need some extra space.
                 //		see ConstructLabel for extra info
                 if (aMethod.UID > 0x00FFFFFF)
@@ -491,7 +492,7 @@ namespace Cosmos.IL2CPU
                 }
                 else if (aMethod.IsInlineAssembler)
                 {
-                    aMethod.MethodBase.Invoke("", new object[aMethod.MethodBase.GetParameters().Length]);
+                    aMethod.MethodBase.Invoke(null, new object[aMethod.MethodBase.GetParameters().Length]);
                 }
                 else
                 {
@@ -1169,39 +1170,37 @@ namespace Cosmos.IL2CPU
                 if (xManifestResourceName != null)
                 {
                     // todo: add support for manifest streams again
-                    //RegisterType(xCurrentField.FieldType);
                     //string xFileName = Path.Combine(mOutputDir,
                     //                                (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",",
                     //                                                                                                                       "_") + ".res");
-                    //using (var xStream = xCurrentField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName)) {
-                    //    if (xStream == null) {
-                    //        throw new Exception("Resource '" + xManifestResourceName + "' not found!");
-                    //    }
-                    //    using (var xTarget = File.Create(xFileName)) {
-                    //        // todo: abstract this array code out.
-                    //        xTarget.Write(BitConverter.GetBytes(Engine.RegisterType(Engine.GetType("mscorlib",
-                    //                                                                               "System.Array"))),
-                    //                      0,
-                    //                      4);
-                    //        xTarget.Write(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedArray),
-                    //                      0,
-                    //                      4);
-                    //        xTarget.Write(BitConverter.GetBytes((int)xStream.Length), 0, 4);
-                    //        xTarget.Write(BitConverter.GetBytes((int)1), 0, 4);
-                    //        var xBuff = new byte[128];
-                    //        while (xStream.Position < xStream.Length) {
-                    //            int xBytesRead = xStream.Read(xBuff, 0, 128);
-                    //            xTarget.Write(xBuff, 0, xBytesRead);
-                    //        }
-                    //    }
-                    //}
-                    //Assembler.DataMembers.Add(new DataMember("___" + xFieldName + "___Contents",
-                    //                                          "incbin",
-                    //                                          "\"" + xFileName + "\""));
-                    //Assembler.DataMembers.Add(new DataMember(xFieldName,
-                    //                                          "dd",
-                    //                                          "___" + xFieldName + "___Contents"));
-                    throw new NotImplementedException();
+                    var xTarget = new StringBuilder();
+                    using (var xStream = aField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName))
+                    {
+                        if (xStream == null)
+                        {
+                            throw new Exception("Resource '" + xManifestResourceName + "' not found!");
+                        }
+                        xTarget.Append("0,");
+                        // todo: abstract this array code out.
+                        xTarget.Append((uint)InstanceTypeEnum.StaticEmbeddedArray);
+                        xTarget.Append(",");
+                        xTarget.Append((int)xStream.Length);
+                        xTarget.Append(",");
+                        xTarget.Append("1,");
+                        while (xStream.Position < xStream.Length)
+                        {
+                            xTarget.Append(xStream.ReadByte());
+                            xTarget.Append(",");
+                        }
+                        xTarget.Append(",");
+                    }
+
+                    Assembler.DataMembers.Add(new DataMember("___" + xFieldName + "___Contents",
+                                                              "db",
+                                                              xTarget));
+                    Assembler.DataMembers.Add(new DataMember(xFieldName,
+                                                              "dd",
+                                                              "___" + xFieldName + "___Contents"));
                 }
                 else
                 {
