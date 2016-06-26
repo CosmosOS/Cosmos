@@ -49,8 +49,8 @@ build_script:
 
 test:
   assemblies:
-  - Cosmos.Core.Memory.Test.dll
-#  - DebugCompiler.dll
+#  - Cosmos.Core.Memory.Test.dll
+  - DebugCompiler.dll
 
 notifications:
 - provider: Webhook
