@@ -70,11 +70,11 @@ namespace PlugsInspector
             //Force it to load/include all plugs assemblies so all types are correctly found
             //Otherwise the CLR's delay loading techniques block us...
             AssembliesPreloader.LoadAllAssemblies();
-            
+
 
             plugManager = new PlugManager((Exception ex) => {
                 AddExceptionEntry(ex.Message);
-            }, this.ScanMethod, null);
+            });
             plugManager.ThrowExceptions = false;
         }
 
@@ -278,7 +278,7 @@ namespace PlugsInspector
         public override string ToString()
         {
             string name = NetMethodInfo.Name;
-            
+
             name += "(";
             var netParams = NetMethodInfo.GetParameters();
             var netParamTypes = netParams.Select(q => q.ParameterType).ToArray();

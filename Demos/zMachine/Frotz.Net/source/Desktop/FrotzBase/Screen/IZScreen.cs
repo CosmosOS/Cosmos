@@ -17,7 +17,12 @@ namespace Frotz.Screen {
         void RefreshScreen(); // TODO Need to make this a little different
         void SetCursorPosition(int x, int y);
         void ScrollLines(int top, int height, int lines);
-        event EventHandler<ZKeyPressEventArgs> KeyPressed;
+        EventHandler<ZKeyPressEventArgs> KeyPressed
+        {
+            get;
+            set;
+        }
+
         void SetTextStyle(int new_style);
         void Clear();
         void ClearArea(int top, int left, int bottom, int right);
@@ -60,7 +65,7 @@ namespace Frotz.Screen {
         void addInputChar(char c);
 
         void StoryStarted(String StoryName, Blorb.Blorb BlorbFile);
-        
+
         ZPoint GetCursorPosition();
 
         void SetActiveWindow(int win);

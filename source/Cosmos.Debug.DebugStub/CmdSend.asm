@@ -1,4 +1,4 @@
-; Generated at 25-6-2016 19:29:47
+; Generated at 6/26/2016 1:42:14 PM
 
 
 
@@ -336,6 +336,50 @@
 
 		DebugStub_SendMessageBox_Exit:
 			mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendMessageBox_Exit
+			Ret
+
+
+		DebugStub_SendCoreDump:
+			push dword EAX
+			push dword EBX
+			push dword ECX
+			push dword EDX
+			push dword EDI
+			push dword ESI
+			mov dword EAX, DebugStub_CallerEBP
+			push dword EAX
+			mov dword EAX, DebugStub_CallerEIP
+			push dword EAX
+			mov dword EAX, DebugStub_CallerESP
+			push dword EAX
+			mov dword ECX, 0x24
+			mov dword EAX, EBP
+
+		DebugStub_SendCoreDump_Block1_Begin:
+			cmp dword EAX, 0x0
+			JE near DebugStub_SendCoreDump_Block1_End
+			push dword EAX
+			mov dword EAX, [EAX]
+			Jmp DebugStub_SendCoreDump_Block1_Begin
+
+		DebugStub_SendCoreDump_Block1_End:
+			mov byte AL, DebugStub_Const_Ds2Vs_CoreDump
+			Call DebugStub_ComWriteAL
+			mov dword EAX, ECX
+			Call DebugStub_ComWriteAX
+
+		DebugStub_SendCoreDump_Block2_Begin:
+			cmp dword ECX, 0x0
+			JE near DebugStub_SendCoreDump_Block2_End
+			pop dword EAX
+			Call DebugStub_ComWriteEAX
+			dec dword ECX
+			Jmp DebugStub_SendCoreDump_Block2_Begin
+
+		DebugStub_SendCoreDump_Block2_End:
+
+		DebugStub_SendCoreDump_Exit:
+			mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendCoreDump_Exit
 			Ret
 
 

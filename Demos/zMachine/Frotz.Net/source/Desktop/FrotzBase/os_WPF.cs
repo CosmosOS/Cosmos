@@ -59,11 +59,11 @@ namespace Frotz
         {
             if (_screen != null)
             {
-                _screen.KeyPressed -= new EventHandler<ZKeyPressEventArgs>(_screen_KeyPressed);
+                _screen.KeyPressed = null;
             }
 
             _screen = Screen;
-            _screen.KeyPressed += new EventHandler<ZKeyPressEventArgs>(_screen_KeyPressed);
+            _screen.KeyPressed = new EventHandler<ZKeyPressEventArgs>(_screen_KeyPressed);
         }
 
         private static void addTestKeys()
@@ -421,14 +421,14 @@ namespace Frotz
                 main.hx_flags &= mask;
 
                 // TODO Set fore & back color here if apporpriate
-                //  hx_fore_colour = 
-                //  hx_back_colour = 
+                //  hx_fore_colour =
+                //  hx_back_colour =
             }
 
 
             String name = main.story_name;
             // Set default filenames
-            
+
             FastMem.save_name = String.Format("{0}.sav", name);
             Files.script_name = String.Format("{0}.log", name);
             Files.command_name = String.Format("{0}.rec", name);
@@ -451,7 +451,7 @@ namespace Frotz
 
             while (entries.Count == 0)
             {
-                System.Threading.Thread.Sleep(100);
+                //System.Threading.Thread.Sleep(100);
             }
             entries.Dequeue();
 
@@ -481,11 +481,17 @@ namespace Frotz
          * The global pointer "story_name" is set to the story file name.
          *
          */
+        public static byte[] preloadedFileData;
         public static bool process_arguments(string[] args)
         {
             byte[] filedata;
             String fileName = null;
-            if (args.Length == 0)
+            if (preloadedFileData != null)
+            {
+                main.story_name = "game";
+                main.story_data = preloadedFileData;
+            }
+            else if (args.Length == 0)
             {
                 fileName = _screen.SelectGameFile(out filedata);
                 if (fileName != null)
@@ -616,8 +622,8 @@ namespace Frotz
                         {
                             return CharCodes.ZC_RETURN;
                         }
-                        
-                        System.Threading.Thread.Sleep(10);
+
+                        //System.Threading.Thread.Sleep(10);
                     }
                     zword c = entries.Dequeue();
 
@@ -639,7 +645,7 @@ namespace Frotz
                     {
                         // Just discard mouse clicks here
                         continue;
-                    } 
+                    }
                     else  if (c == CharCodes.ZC_ARROW_UP)
                     {
                         clearInputAndShowHistory(1, _buffer);
@@ -800,13 +806,13 @@ namespace Frotz
 
             try
             {
-#if SILVERLIGHT
+//#if SILVERLIGHT
 
-                var sw = new WiredPrairie.Silverlight.Stopwatch();
-#else
-                System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
-#endif
-                sw.Start();
+//                var sw = new WiredPrairie.Silverlight.Stopwatch();
+//#else
+//                System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+//#endif
+//                sw.Start();
                 while (true)
                 {
                     do
@@ -818,11 +824,12 @@ namespace Frotz
 
                         lock (entries)
                         {
-                          
+
                             if (entries.Count > 0) break;
-                            if (sw.Elapsed.TotalSeconds > timeout / 10 && timeout > 0) return CharCodes.ZC_TIME_OUT;
+                            //if (sw.Elapsed.TotalSeconds > timeout / 10 && timeout > 0)
+                            //    return CharCodes.ZC_TIME_OUT;
                         }
-                        System.Threading.Thread.Sleep(10);
+                        //System.Threading.Thread.Sleep(10);
 
                     } while (true);
 
@@ -846,6 +853,8 @@ namespace Frotz
                 _screen.SetInputMode(false, false);
             }
         }
+
+
 
         /*
          * os_read_mouse
@@ -1083,7 +1092,7 @@ namespace Frotz
          *
          * Return with bit 0 set if the Unicode character can be
          * displayed, and bit 1 if it can be input.
-         * 
+         *
          *
          */
         public static zword check_unicode(int font, zword c)
@@ -1411,8 +1420,8 @@ namespace Frotz
         /*
          * set_active_window
          * Called to set the output window (I hope)
-         * 
-         */ 
+         *
+         */
         public static void set_active_window(int win)
         {
             System.Diagnostics.Debug.WriteLine("Setting Window:" + win);
@@ -1441,7 +1450,7 @@ namespace Frotz
         public static void mouse_moved(int x, int y) {
             main.mouse_x = (ushort)x;
             main.mouse_y = (ushort)y;
-         
+
         }
 
         public static byte[] GetStoryFile()

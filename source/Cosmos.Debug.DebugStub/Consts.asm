@@ -1,4 +1,4 @@
-; Generated at 25-6-2016 19:24:07
+; Generated at 6/26/2016 1:43:07 PM
 
 
 
@@ -57,5 +57,6 @@
 			DebugStub_Const_Ds2Vs_ComplexLongNumber equ 21
 			DebugStub_Const_Ds2Vs_StackOverflowOccurred equ 22
 			DebugStub_Const_Ds2Vs_InterruptOccurred equ 23
-			DebugStub_Const_Ds2Vs_KernelPanic equ 24
+			DebugStub_Const_Ds2Vs_CoreDump equ 24
+			DebugStub_Const_Ds2Vs_KernelPanic equ 25
 

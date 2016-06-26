@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading;
 using Cosmos.Debug.Common;
 using Cosmos.Debug.VSDebugEngine.Host;
@@ -68,6 +69,74 @@ namespace Cosmos.TestRunner.Core
                     mKernelResultSet = true;
                     mKernelRunning = false;
                 };
+            debugConnector.CmdCoreDump = b =>
+            {
+                string xCallStack = "";
+                string xRegisters = "";
+                int i = 0;
+
+                OutputHandler.LogMessage("Core dump:");
+                string eax = "EAX = 0x" +
+                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
+                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
+                i += 4;
+                string ebx = "EBX = 0x" +
+                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
+                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
+                i += 4;
+                string ecx = "ECX = 0x" +
+                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
+                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
+                i += 4;
+                string edx = "EDX = 0x" +
+                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
+                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
+                i += 4;
+                string edi = "EDI = 0x" +
+                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
+                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
+                i += 4;
+                string esi = "ESI = 0x" +
+                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
+                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
+                i += 4;
+                string ebp = "EBP = 0x" +
+                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
+                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
+                i += 4;
+                string eip = "EIP = 0x" +
+                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
+                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
+                i += 4;
+                string esp = "ESP = 0x" +
+                             b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
+                             b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
+                i += 4;
+                OutputHandler.LogMessage(eax + " " + ebx + " " + ecx + " " + edx);
+                OutputHandler.LogMessage(edi + " " + esi);
+                OutputHandler.LogMessage(ebp+ " " + esp+ " " + eip);
+                OutputHandler.LogMessage("");
+
+                while (i < b.Length)
+                {
+                    string xAddress = "0x" +
+                                      b[i + 3].ToString("X2") + b[i + 2].ToString("X2") +
+                                      b[i + 0].ToString("X2") + b[i + 1].ToString("X2");
+                    xCallStack += xAddress + " ";
+                    if ((i != 0) &&(i%12 == 0))
+                    {
+                        OutputHandler.LogMessage(xCallStack.Trim());
+                        xCallStack = "";
+                    }
+                    i += 4;
+                }
+                if (xCallStack != "")
+                {
+                    OutputHandler.LogMessage(xCallStack.Trim());
+                    xCallStack = "";
+                }
+            };
+
             if (RunWithGDB)
             {
                 debugConnector.CmdInterruptOccurred = a =>

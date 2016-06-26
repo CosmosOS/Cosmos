@@ -1,2 +1,5 @@
 [*.cs]
 indent_size = 4
+
+[System/MulticastDelegateImpl.cs]
+indent_size = 2

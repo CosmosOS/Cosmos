@@ -201,6 +201,15 @@ namespace Cosmos.Debug.Common
             CmdMessageBox(Encoding.ASCII.GetString(aPacket));
         }
 
+        protected void PacketCoreDump(byte[] aPacket)
+        {
+            if (CmdCoreDump != null)
+            {
+                CmdCoreDump(aPacket.ToArray());
+            }
+            WaitForMessage();
+        }
+
         protected void SizePacket(byte[] aPacket)
         {
             int xSize = aPacket[0] + (aPacket[1] << 8);

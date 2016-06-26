@@ -168,7 +168,7 @@ namespace Frotz.Blorb {
                         _stream.Position = start;
                         ReadInt();
                         break;
-                    case "SNam": // TODO It seems that when it gets the story name, it is actually stored as 2 byte words, 
+                    case "SNam": // TODO It seems that when it gets the story name, it is actually stored as 2 byte words,
                         // not one byte chars
                         _blorb.StoryName = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
                         break;
@@ -176,7 +176,7 @@ namespace Frotz.Blorb {
                     case "ANNO":
                     case "(c) ":
                         break;
-                    case "APal": 
+                    case "APal":
                         int len = buffer.Length / 4;
                         for (int i = 0; i < len; i++)
                         {
@@ -262,20 +262,21 @@ namespace Frotz.Blorb {
             if (_blorb.MetaData != null) {
                 try
                 {
-                    XDocument doc = XDocument.Parse(_blorb.MetaData);
-                    var r = doc.Root;
-                    
-                    XName n = XName.Get("title", r.Name.NamespaceName);
-                    var desc = doc.Descendants(n);
-                    foreach (var e in desc)
-                    {
-                        _blorb.StoryName = e.Value;
-                    }
+                    //XDocument doc = XDocument.Parse(_blorb.MetaData);
+                    //var r = doc.Root;
+
+                    //XName n = XName.Get("title", r.Name.NamespaceName);
+                    //var desc = doc.Descendants(n);
+                    //foreach (var e in desc)
+                    //{
+                    //    _blorb.StoryName = e.Value;
+                    //}
+                    throw new Exception("Parsing blorb metadata not yet working");
                 }
                 catch (Exception ex)
                 {
 #if !SILVERLIGHT
-                    System.Windows.Forms.MessageBox.Show("Exception reading metadata:" + ex);
+                    //System.Windows.Forms.MessageBox.Show("Exception reading metadata:" + ex);
 #endif
                     _blorb.MetaData = null;
                 }
