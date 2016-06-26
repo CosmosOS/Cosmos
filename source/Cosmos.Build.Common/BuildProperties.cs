@@ -306,7 +306,7 @@ namespace Cosmos.Build.Common
         {
             get
             {
-                return GetProperty(BuildPropertyNames.PxeInterfaceString, "192.168.42.1");
+                return GetProperty(BuildPropertyNames.PxeInterfaceString, "");
             }
             set
             {

@@ -145,6 +145,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\Refresh_16x.png" />
     <None Include="Key.snk" />
     <Content Include="PLKResponse.html" />
     <Content Include="Resources\Cosmos.ico" />
