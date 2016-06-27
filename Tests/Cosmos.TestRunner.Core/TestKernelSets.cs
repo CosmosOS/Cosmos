@@ -20,6 +20,7 @@ namespace Cosmos.TestRunner.Core
 
             //yield return typeof(Cosmos.Kernel.Tests.Fat.Kernel);
             ////yield return typeof(FrotzKernel.Kernel);
+            yield break;
         }
     }
 }
