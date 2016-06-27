@@ -96,6 +96,7 @@
     <Compile Include="MyEngine.cs" />
     <Compile Include="MySource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TimeoutTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
