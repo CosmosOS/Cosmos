@@ -146,6 +146,10 @@
       <Project>{7c64b97f-516d-4a6d-b9e1-3fe48f561409}</Project>
       <Name>Cosmos.System.Plugs</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
+      <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
+      <Name>Cosmos.Core.Plugs</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

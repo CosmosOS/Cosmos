@@ -39,6 +39,11 @@ namespace Cosmos.System.Plugs.System
             return new string(xResult);
         }
 
+        public static bool Equals(ref char aThis, char that)
+        {
+            return aThis == that;
+        }
+
         public static char ToUpper(char aThis)
         {
             // todo: properly implement Char.ToUpper()
