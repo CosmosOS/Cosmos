@@ -37,13 +37,7 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
                 Assert.AreEqual(4, xTempString.Length, "Dynamic string has wrong length!");
                 Assert.AreEqual(97, (int)xTempString[0], "First character of dynamic string is wrong!");
 
-                Console.WriteLine(42);
-                DoPrint(42);
-                while (true)
-                    ;
-
-                //
-                //TestController.Completed();
+                TestController.Completed();
             }
             catch (Exception E)
             {

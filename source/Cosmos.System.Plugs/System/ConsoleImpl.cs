@@ -57,8 +57,7 @@ namespace Cosmos.System.Plugs.System
 
         public static bool get_CapsLock()
         {
-            WriteLine("Not implemented: get_CapsLock");
-            return false;
+            return Global.CapsLock;
         }
 
         public static int get_CursorLeft()
@@ -80,7 +79,15 @@ namespace Cosmos.System.Plugs.System
                 // for now:
                 return;
             }
-            xConsole.X = x;
+
+            if (x < get_WindowWidth())
+            {
+                xConsole.X = x;
+            }
+            else
+            {
+                WriteLine("x must be lower than the console width!");
+            }
         }
 
         public static int get_CursorSize()
@@ -124,13 +131,25 @@ namespace Cosmos.System.Plugs.System
                 // for now:
                 return;
             }
-            GetConsole().Y = y;
+
+            if (y < get_WindowHeight())
+            {
+                xConsole.Y = y;
+            }
+            else
+            {
+                WriteLine("y must be lower than the console height!");
+            }
         }
 
         public static bool get_CursorVisible()
         {
-            WriteLine("Not implemented: get_CursorVisible");
-            return false;
+            var xConsole = GetConsole();
+            if (xConsole == null)
+            {
+                return false;
+            }
+            return GetConsole().CursorVisible;
         }
 
         public static void set_CursorVisible(bool value)
@@ -199,8 +218,7 @@ namespace Cosmos.System.Plugs.System
 
         public static bool get_NumberLock()
         {
-            WriteLine("Not implemented: get_NumberLock");
-            return false;
+            return Global.NumLock;
         }
 
         //public static TextWriter get_Out() {
@@ -382,7 +400,6 @@ namespace Cosmos.System.Plugs.System
         public static ConsoleKeyInfo ReadKey(Boolean intercept)
         {
             var key = Cosmos.HAL.Global.Keyboard.ReadKey();
-
             if (false == intercept && key.KeyChar != '\0')
             {
                 Write(key.KeyChar);
@@ -494,7 +511,8 @@ namespace Cosmos.System.Plugs.System
 
         public static void ResetColor()
         {
-            WriteLine("Not implemented: ResetColor");
+            set_BackgroundColor(ConsoleColor.Black);
+            set_ForegroundColor(ConsoleColor.White);
         }
 
         public static void SetBufferSize(int width, int height)
@@ -504,7 +522,8 @@ namespace Cosmos.System.Plugs.System
 
         public static void SetCursorPosition(int left, int top)
         {
-            WriteLine("Not implemented: SetCursorPosition");
+            set_CursorLeft(left);
+            set_CursorTop(top);
         }
 
         //public static void SetError(TextWriter newError) {

@@ -669,9 +669,14 @@ namespace Cosmos.IL2CPU
             //}
             return xResult;
         }
+
         public MethodBase ResolvePlug(MethodBase aMethod, Type[] aParamTypes)
         {
             MethodBase xResult = null;
+            if (aMethod.Name == "CreateComparer")
+            {
+                ;
+            }
             var xMethodKey = BuildMethodKeyName(aMethod);
             if (ResolvedPlugs.Contains(xMethodKey, out xResult))
             {

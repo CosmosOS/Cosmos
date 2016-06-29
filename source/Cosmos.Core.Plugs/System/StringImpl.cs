@@ -580,13 +580,13 @@ namespace Cosmos.Core.Plugs.System
                 }
                 return false;
             }
-            else if (aThis.Length > aSubStr.Length)
+            else if (aThis.Length < aSubStr.Length)
             {
                 return false;
             }
             else
             {
-                for (int i = aThis.Length - aSubStr.Length; i < aThis.Length; i++)
+                for (int i = 0; i < ci.Length; i++)
                 {
                     if (di[aThis.Length - aSubStr.Length + i] != ci[i])
                     {

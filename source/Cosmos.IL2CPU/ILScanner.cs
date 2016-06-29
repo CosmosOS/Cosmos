@@ -407,7 +407,10 @@ namespace Cosmos.IL2CPU
             {
                 Queue(((SysReflection.MethodInfo) aMethod).ReturnType, aMethod, "Return Type");
             }
-
+            if (aMethod.GetFullName().IndexOf("CreateComparer", StringComparison.OrdinalIgnoreCase)!=-1)
+            {
+                ;
+            }
             // Scan virtuals
 
             #region Virtuals scan
@@ -505,6 +508,7 @@ namespace Cosmos.IL2CPU
             if (!aIsPlug && !xIsDynamicMethod)
             {
                 // Check to see if method is plugged, if it is we don't scan body
+
                 xPlug = mPlugManager.ResolvePlug(aMethod, xParamTypes);
                 if (xPlug != null)
                 {
