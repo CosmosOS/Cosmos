@@ -92,15 +92,13 @@ namespace Cosmos.HAL
         var xPart = xMBR.Partitions[i];
         if (xPart == null)
         {
-          Console.WriteLine("Null partition found at idx:");
-          Console.WriteLine(i);
+          Console.WriteLine("Null partition found at idx: " + i);
         }
         else
         {
           var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
           BlockDevice.BlockDevice.Devices.Add(xPartDevice);
-          Console.WriteLine("Found partition at idx");
-          Console.WriteLine(i);
+          Console.WriteLine("Found partition at idx" + i);
         }
       }
     }

@@ -66,7 +66,7 @@ namespace Cosmos.IL2CPU
             mAsmblr = aAsmblr;
             mReader = new ILReader();
 
-            mPlugManager = new PlugManager(LogException);
+            mPlugManager = new PlugManager(LogException, LogWarning);
         }
 
         public int MethodCount

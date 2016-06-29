@@ -1285,7 +1285,7 @@ namespace Cosmos.IL2CPU
 
                     ;
                 }
-                if (ILOp.GetMethodLabel(aFrom) == "SystemVoidCosmosCoreINTsIRQDelegateInvokeCosmosCoreINTsIRQContext")
+                if (ILOp.GetMethodLabel(aFrom) == "SystemVoidSystemActionInvoke")
                 {
                     ;
                 }
