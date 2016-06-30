@@ -337,8 +337,6 @@ namespace Cosmos.IL2CPU
             XS.Set(XSRegisters.ECX, 0);
             var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
                                   select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
-
-
             if (!aMethod.MethodBase.IsStatic)
             {
                 if (aMethod.MethodBase.DeclaringType.IsValueType)
@@ -1270,20 +1268,6 @@ namespace Cosmos.IL2CPU
                 if (aTo.IsWildcard)
                 {
                     xParams = aFrom.MethodBase.GetParameters();
-                }
-                if (aFrom.MethodBase.Name == "get_Chars")
-                {
-                    ;
-                }
-                if (aFrom.MethodBase.Name == "UpdateIDT")
-                {
-                    ;
-                }
-                if (aFrom.MethodBase.Name == "get_Length"
-                    && aFrom.MethodBase.DeclaringType.Name == "Array")
-                {
-
-                    ;
                 }
                 if (ILOp.GetMethodLabel(aFrom) == "SystemVoidSystemActionInvoke")
                 {

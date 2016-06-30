@@ -9,7 +9,6 @@ using Cosmos.IL2CPU.Plugs;
 using SR = System.Reflection;
 using SysReflection = System.Reflection;
 
-
 namespace Cosmos.IL2CPU
 {
     public delegate void LogExceptionDelegate(Exception e);
@@ -17,8 +16,8 @@ namespace Cosmos.IL2CPU
     public class ScannerQueueItem
     {
         public _MemberInfo Item;
-        public string QueueReason;
         public string SourceItem;
+        public string QueueReason;
 
         public override string ToString()
         {
@@ -30,127 +29,47 @@ namespace Cosmos.IL2CPU
     {
         public LogExceptionDelegate LogException = null;
         public Action<string> LogWarning = null;
-        protected AppAssembler mAsmblr;
-
-        protected OurHashSet<_MemberInfo> mItems = new OurHashSet<_MemberInfo>();
-        protected List<object> mItemsList = new List<object>();
-
-        // Logging
-        // Only use for debugging and profiling.
-        protected bool mLogEnabled;
-
-        protected Dictionary<object, List<LogItem>> mLogMap;
-        protected TextWriter mLogWriter;
-        protected string mMapPathname;
-
-        protected IDictionary<MethodBase, uint> mMethodUIDs = new Dictionary<MethodBase, uint>();
-
-        protected PlugManager mPlugManager;
-        // Contains items to be scanned, both types and methods
-        protected Queue<ScannerQueueItem> mQueue = new Queue<ScannerQueueItem>();
 
         protected ILReader mReader;
-        protected IDictionary<Type, uint> mTypeUIDs = new Dictionary<Type, uint>();
+        protected AppAssembler mAsmblr;
 
         // List of asssemblies found during scan. We cannot use the list of loaded
         // assemblies because the loaded list includes compilers, etc, and also possibly
         // other unused assemblies. So instead we collect a list of assemblies as we scan.
         internal List<Assembly> mUsedAssemblies = new List<Assembly>();
+
+        protected OurHashSet<_MemberInfo> mItems = new OurHashSet<_MemberInfo>();
+        protected List<object> mItemsList = new List<object>();
+        // Contains items to be scanned, both types and methods
+        protected Queue<ScannerQueueItem> mQueue = new Queue<ScannerQueueItem>();
         // Virtual methods are nasty and constantly need to be rescanned for
         // overriding methods in new types, so we keep track of them separately.
         // They are also in the main mItems and mQueue.
         protected HashSet<MethodBase> mVirtuals = new HashSet<MethodBase>();
 
+        protected IDictionary<MethodBase, uint> mMethodUIDs = new Dictionary<MethodBase, uint>();
+        protected IDictionary<Type, uint> mTypeUIDs = new Dictionary<Type, uint>();
+
+        protected PlugManager mPlugManager = null;
+
+        // Logging
+        // Only use for debugging and profiling.
+        protected bool mLogEnabled = false;
+        protected string mMapPathname;
+        protected TextWriter mLogWriter;
+        protected struct LogItem
+        {
+            public string SrcType;
+            public object Item;
+        }
+        protected Dictionary<object, List<LogItem>> mLogMap;
+        
         public ILScanner(AppAssembler aAsmblr)
         {
             mAsmblr = aAsmblr;
             mReader = new ILReader();
 
             mPlugManager = new PlugManager(LogException, LogWarning);
-        }
-
-        public int MethodCount
-        {
-            get
-            {
-                return mMethodUIDs.Count;
-            }
-        }
-
-        public void Dispose()
-        {
-            if (mLogEnabled)
-            {
-                // Create bookmarks, but also a dictionary that
-                // we can find the items in
-                var xBookmarks = new Dictionary<object, int>();
-                int xBookmark = 0;
-                foreach (var xList in mLogMap)
-                {
-                    foreach (var xItem in xList.Value)
-                    {
-                        xBookmarks.Add(xItem.Item, xBookmark);
-                        xBookmark++;
-                    }
-                }
-
-                using (mLogWriter = new StreamWriter(mMapPathname, false))
-                {
-                    mLogWriter.WriteLine("<html><body>");
-                    foreach (var xList in mLogMap)
-                    {
-                        var xLogItemText = LogItemText(xList.Key);
-
-                        mLogWriter.WriteLine("<hr>");
-
-                        // Emit bookmarks above source, so when clicking links user doesn't need
-                        // to constantly scroll up.
-                        foreach (var xItem in xList.Value)
-                        {
-                            mLogWriter.WriteLine("<a name=\"Item" + xBookmarks[xItem.Item] + "_S\"></a>");
-                        }
-
-                        int xHref;
-                        if (!xBookmarks.TryGetValue(xList.Key, out xHref))
-                        {
-                            xHref = -1;
-                        }
-                        mLogWriter.Write("<p>");
-                        if (xHref >= 0)
-                        {
-                            mLogWriter.WriteLine("<a href=\"#Item" + xHref + "_S\">");
-                            mLogWriter.WriteLine("<a name=\"Item{0}\">", xHref);
-                        }
-                        if (xList.Key == null)
-                        {
-                            mLogWriter.WriteLine("Unspecified Source");
-                        }
-                        else
-                        {
-                            mLogWriter.WriteLine(xLogItemText);
-                        }
-                        if (xHref >= 0)
-                        {
-                            mLogWriter.Write("</a>");
-                            mLogWriter.Write("</a>");
-                        }
-                        mLogWriter.WriteLine("</p>");
-
-                        mLogWriter.WriteLine("<ul>");
-                        foreach (var xItem in xList.Value)
-                        {
-                            mLogWriter.Write("<li><a href=\"#Item{1}\">{0}</a></li>", LogItemText(xItem.Item),
-                                xBookmarks[xItem.Item]);
-
-                            mLogWriter.WriteLine("<ul>");
-                            mLogWriter.WriteLine("<li>" + xItem.SrcType + "</li>");
-                            mLogWriter.WriteLine("</ul>");
-                        }
-                        mLogWriter.WriteLine("</ul>");
-                    }
-                    mLogWriter.WriteLine("</body></html>");
-                }
-            }
         }
 
         public bool EnableLogging(string aPathname)
@@ -219,12 +138,7 @@ namespace Cosmos.IL2CPU
                     aSrc = methodBaseSource.DeclaringType + "::" + aSrc;
                 }
 
-                mQueue.Enqueue(new ScannerQueueItem
-                {
-                    Item = aItem,
-                    QueueReason = aSrcType,
-                    SourceItem = aSrc + Environment.NewLine + sourceItem
-                });
+                mQueue.Enqueue(new ScannerQueueItem { Item = aItem, QueueReason = aSrcType, SourceItem = aSrc + Environment.NewLine + sourceItem });
             }
         }
 
@@ -239,7 +153,6 @@ namespace Cosmos.IL2CPU
             // http://cciast.codeplex.com/
 
             #region Description
-
             // Methodology
             //
             // Ok - we've done the scanner enough times to know it needs to be
@@ -283,7 +196,6 @@ namespace Cosmos.IL2CPU
             //    -Known Types and Methods
             //    -Types and Methods in Queue - to be scanned
             // -Finally, do compilation
-
             #endregion
 
             mPlugManager.FindPlugImpls();
@@ -310,24 +222,16 @@ namespace Cosmos.IL2CPU
             Queue(GCImplementationRefs.DecRefCountRef, null, "Explicit Entry");
             Queue(GCImplementationRefs.AllocNewObjectRef, null, "Explicit Entry");
             // for now, to ease runtime exception throwing
-            Queue(
-                typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public, null,
-                    new[] {typeof(string)}, null), null, "Explicit Entry");
-            Queue(
-                typeof(ExceptionHelper).GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public, null,
-                    new Type[] {}, null), null, "Explicit Entry");
+            Queue(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public, null, new Type[] {typeof(string)}, null), null, "Explicit Entry");
+            Queue(typeof(ExceptionHelper).GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public, null, new Type[] {}, null), null, "Explicit Entry");
             Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
             Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
             // register system types:
             Queue(typeof(Array), null, "Explicit Entry");
-            Queue(
-                typeof(Array).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null),
-                null, "Explicit Entry");
+            Queue(typeof(Array).GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null), null, "Explicit Entry");
 
             var xThrowHelper = Type.GetType("System.ThrowHelper", true);
-            Queue(
-                xThrowHelper.GetMethod("ThrowInvalidOperationException", BindingFlags.NonPublic | BindingFlags.Static),
-                null, "Explicit Entry");
+            Queue(xThrowHelper.GetMethod("ThrowInvalidOperationException", BindingFlags.NonPublic | BindingFlags.Static), null, "Explicit Entry");
 
             Queue(typeof(MulticastDelegate).GetMethod("GetInvocationList"), null, "Explicit Entry");
             Queue(ExceptionHelperRefs.CurrentExceptionRef, null, "Explicit Entry");
@@ -358,9 +262,92 @@ namespace Cosmos.IL2CPU
                 if (xOpMethod != null)
                 {
                     xOpMethod.Value = (MethodBase) mItems.GetItemInList(xOpMethod.Value);
-                    xOpMethod.ValueUID = GetMethodUID(xOpMethod.Value, true);
+                    xOpMethod.ValueUID = (uint)GetMethodUID(xOpMethod.Value, true);
                     xOpMethod.BaseMethodUID = GetMethodUID(xOpMethod.Value, false);
                 }
+            }
+        }
+
+        public void Dispose()
+        {
+            if (mLogEnabled)
+            {
+                // Create bookmarks, but also a dictionary that
+                // we can find the items in
+                var xBookmarks = new Dictionary<object, int>();
+                int xBookmark = 0;
+                foreach (var xList in mLogMap)
+                {
+                    foreach (var xItem in xList.Value)
+                    {
+                        xBookmarks.Add(xItem.Item, xBookmark);
+                        xBookmark++;
+                    }
+                }
+
+                using (mLogWriter = new StreamWriter(mMapPathname, false))
+                {
+                    mLogWriter.WriteLine("<html><body>");
+                    foreach (var xList in mLogMap)
+                    {
+                        var xLogItemText = LogItemText(xList.Key);
+
+                        mLogWriter.WriteLine("<hr>");
+
+                        // Emit bookmarks above source, so when clicking links user doesn't need
+                        // to constantly scroll up.
+                        foreach (var xItem in xList.Value)
+                        {
+                            mLogWriter.WriteLine("<a name=\"Item" + xBookmarks[xItem.Item].ToString() + "_S\"></a>");
+                        }
+
+                        int xHref;
+                        if (!xBookmarks.TryGetValue(xList.Key, out xHref))
+                        {
+                            xHref = -1;
+                        }
+                        mLogWriter.Write("<p>");
+                        if (xHref >= 0)
+                        {
+                            mLogWriter.WriteLine("<a href=\"#Item" + xHref.ToString() + "_S\">");
+                            mLogWriter.WriteLine("<a name=\"Item{0}\">", xHref);
+                        }
+                        if (xList.Key == null)
+                        {
+                            mLogWriter.WriteLine("Unspecified Source");
+                        }
+                        else
+                        {
+                            mLogWriter.WriteLine(xLogItemText);
+                        }
+                        if (xHref >= 0)
+                        {
+                            mLogWriter.Write("</a>");
+                            mLogWriter.Write("</a>");
+                        }
+                        mLogWriter.WriteLine("</p>");
+
+                        mLogWriter.WriteLine("<ul>");
+                        foreach (var xItem in xList.Value)
+                        {
+                            mLogWriter.Write("<li><a href=\"#Item{1}\">{0}</a></li>", LogItemText(xItem.Item), xBookmarks[xItem.Item]);
+
+                            mLogWriter.WriteLine("<ul>");
+                            mLogWriter.WriteLine("<li>" + xItem.SrcType + "</li>");
+                            mLogWriter.WriteLine("</ul>");
+                        }
+                        mLogWriter.WriteLine("</ul>");
+                    }
+                    mLogWriter.WriteLine("</body></html>");
+                }
+            }
+        }
+
+        public int MethodCount
+        {
+            get
+            {
+                return mMethodUIDs.Count;
             }
         }
 
@@ -412,9 +399,7 @@ namespace Cosmos.IL2CPU
                 ;
             }
             // Scan virtuals
-
             #region Virtuals scan
-
             if (!xIsDynamicMethod && aMethod.IsVirtual)
             {
                 // For virtuals we need to climb up the type tree
@@ -436,9 +421,7 @@ namespace Cosmos.IL2CPU
                     }
                     else
                     {
-                        xNewVirtMethod = xVirtType.GetMethod(aMethod.Name,
-                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, xParamTypes,
-                            null);
+                        xNewVirtMethod = xVirtType.GetMethod(aMethod.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, xParamTypes, null);
                         if (xNewVirtMethod != null)
                         {
                             if (!xNewVirtMethod.IsVirtual)
@@ -478,13 +461,9 @@ namespace Cosmos.IL2CPU
                         if (mItemsList[i] is Type)
                         {
                             var xType = (Type) mItemsList[i];
-                            if (xType.IsSubclassOf(xVirtMethod.DeclaringType) ||
-                                (xVirtMethod.DeclaringType.IsInterface &&
-                                 xVirtMethod.DeclaringType.IsAssignableFrom(xType)))
+                            if (xType.IsSubclassOf(xVirtMethod.DeclaringType) || (xVirtMethod.DeclaringType.IsInterface && xVirtMethod.DeclaringType.IsAssignableFrom(xType)))
                             {
-                                var xNewMethod = xType.GetMethod(aMethod.Name,
-                                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null,
-                                    xParamTypes, null);
+                                var xNewMethod = xType.GetMethod(aMethod.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, xParamTypes, null);
                                 if (xNewMethod != null)
                                 {
                                     // We need to check IsVirtual, a non virtual could
@@ -499,7 +478,6 @@ namespace Cosmos.IL2CPU
                     }
                 }
             }
-
             #endregion
 
             MethodBase xPlug = null;
@@ -541,10 +519,7 @@ namespace Cosmos.IL2CPU
                 }
                 if (xNeedsPlug)
                 {
-                    throw new Exception(
-                        "Native code encountered, plug required. Please see https://github.com/CosmosOS/Cosmos/wiki/Plugs). " +
-                        LabelName.GenerateFullName(aMethod) + "." + Environment.NewLine + " Called from :" +
-                        Environment.NewLine + sourceItem);
+                    throw new Exception("Native code encountered, plug required. Please see https://github.com/CosmosOS/Cosmos/wiki/Plugs). " + LabelName.GenerateFullName(aMethod) + "." + Environment.NewLine + " Called from :" + Environment.NewLine + sourceItem);
                 }
 
                 //TODO: As we scan each method, we could update or put in a new list
@@ -622,8 +597,7 @@ namespace Cosmos.IL2CPU
             // Queue static ctors
             // We always need static ctors, else the type cannot
             // be created.
-            foreach (
-                var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
+            foreach (var xCctor in aType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
             {
                 if (xCctor.DeclaringType == aType)
                 {
@@ -770,11 +744,7 @@ namespace Cosmos.IL2CPU
                 {
                     xBaseMethod = xFoundMethod;
 
-                    if ((xFoundMethod.IsVirtual == aMethod.IsVirtual) && (xFoundMethod.IsPrivate == false) &&
-                        (xFoundMethod.IsPublic == aMethod.IsPublic) && (xFoundMethod.IsFamily == aMethod.IsFamily) &&
-                        (xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly) &&
-                        (xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly) &&
-                        (xFoundMethod.IsFinal == false))
+                    if ((xFoundMethod.IsVirtual == aMethod.IsVirtual) && (xFoundMethod.IsPrivate == false) && (xFoundMethod.IsPublic == aMethod.IsPublic) && (xFoundMethod.IsFamily == aMethod.IsFamily) && (xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly) && (xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly) && (xFoundMethod.IsFinal == false))
                     {
                         var xFoundMethInfo = xFoundMethod as SR.MethodInfo;
                         var xBaseMethInfo = xBaseMethod as SR.MethodInfo;
@@ -859,8 +829,6 @@ namespace Cosmos.IL2CPU
             {
                 if (xItem is MethodBase)
                 {
-                    try
-                    {
                         var xMethod = (MethodBase) xItem;
                         var xParams = xMethod.GetParameters();
                         var xParamTypes = xParams.Select(q => q.ParameterType).ToArray();
@@ -968,22 +936,9 @@ namespace Cosmos.IL2CPU
                             }
                         }
                     }
-                    catch (Exception E)
-                    {
-                        throw new Exception("An error occurred while assembling method '" + ((MethodBase) xItem).GetFullName() + "'", E);
-                    }
-                    continue;
-                }
-                if (xItem is FieldInfo)
+                else if (xItem is FieldInfo)
                 {
-                    try
-                    {
                         mAsmblr.ProcessField((FieldInfo) xItem);
-                    }
-                    catch (Exception E)
-                    {
-                        throw new Exception("Error occurred while assembling field '" + ((FieldInfo) xItem).GetFullName() + "'", E);
-                    }
                 }
             }
 
@@ -1001,12 +956,6 @@ namespace Cosmos.IL2CPU
                 }
             }
             mAsmblr.GenerateVMTCode(xTypes, xMethods, GetTypeUID, x => GetMethodUID(x, false));
-        }
-
-        protected struct LogItem
-        {
-            public string SrcType;
-            public object Item;
         }
     }
 }

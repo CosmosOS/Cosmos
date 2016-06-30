@@ -86,10 +86,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static unsafe void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel, bool debugEnabled)
         {
-            if (GetMethodLabel(aTargetMethod) == "SystemStringSystemInt32ToString")
-            {
-                ;
-            }
             var xMethodInfo = aTargetMethod as SysReflection.MethodInfo;
 
             // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
