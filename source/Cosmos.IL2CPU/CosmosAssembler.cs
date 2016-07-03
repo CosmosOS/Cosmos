@@ -239,14 +239,8 @@ namespace Cosmos.IL2CPU
             DataMembers.Add(new DataMember("MultiBootInfo_Structure", new uint[1]));
 
             // constants
-            DataMembers.Add(new DataMember(@"__xmm@41f00000000000000000000000000000", new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x41 }));
-            DataMembers.Add(new DataMember(@"__xmm@41f0000000000000", new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x41 }));
-            DataMembers.Add(new DataMember(@"__ulong2double_const", 1602224128L));
-            DataMembers.Add(new DataMember(@"__ulong2double_const2", new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0x5B, 0xC0 }));
-            DataMembers.Add(new DataMember(@"__ulong2double_const3", new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x5F }));
-            //DataMembers.Add(new DataMember(@"__ulong2double_const2", new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x93 }));
-            //DataMembers.Add(new DataMember(@"__ulong2double_const2", new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03 }));
-            //DataMembers.Add(new DataMember(@"__xmm@41f00000000000000000000000000000_Handle", @"__xmm@41f00000000000000000000000000000"))
+            DataMembers.Add(new DataMember(@"__uint2double_const", new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf0, 0x41 }));
+            DataMembers.Add(new DataMember(@"__ulong2double_const", 0x5F800000));
 
             if (mComPort > 0)
             {

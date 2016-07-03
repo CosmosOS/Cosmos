@@ -153,8 +153,12 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = (double)anUInt;
             Assert.IsTrue((DoublesAreEqual(value, 2147483689d)), "(double) from uint operator doesn't work");
 
-            //ulong anULong = 9223372036854775849;
-            //ulong anULong = 9423372036854775870;
+            // We put on anUlong a very big value Int64MaxValue + 42. Hmm that '42'  :-)) ?
+            ulong anULong = 9223372036854775849;
+            value = (double)anULong;
+            Assert.IsTrue((DoublesAreEqual(value, 9223372036854775849d)), "(double) from ulong operator doesn't work");
+
+#if false
             unchecked
             {
                 ulong anULong = (ulong)-1;
@@ -165,7 +169,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 //Assert.IsTrue((DoublesAreEqual(value, 18446744073709551615d)), "(double) from ulong operator doesn't work");
 
                 Assert.IsTrue((DoublesAreEqual(value, 18446744073709551615d)), "(double) from ulong operator doesn't work long is " + BitConverter.ToString(anULongAsBytes) + " value (as bytes) is " + BitConverter.ToString(valueAsBytes));
-            }
+           }
+#endif
         }
     }
 }
