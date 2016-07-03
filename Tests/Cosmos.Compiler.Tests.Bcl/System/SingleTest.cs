@@ -165,6 +165,12 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = (float)anUInt;
             Assert.IsTrue((SinglesAreEqual(value, 2147483689f)), "(float) from uint operator doesn't work");
 
+            // We put on anUlong a very big value Int64MaxValue + 42. Hmm that '42' again :-)) ?
+            ulong anULong = 9223372036854775849;
+            value = (float)anULong;
+            Assert.IsTrue((DoublesAreEqual(value, 9223372036854775849d)), "(float) from ulong operator doesn't work");
+
+
 #if false
             //ulong anULong = 9223372036854775849;
             ulong anULong = 9423372036854775870;

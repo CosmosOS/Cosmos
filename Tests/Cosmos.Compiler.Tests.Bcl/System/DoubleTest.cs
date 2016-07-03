@@ -153,7 +153,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = (double)anUInt;
             Assert.IsTrue((DoublesAreEqual(value, 2147483689d)), "(double) from uint operator doesn't work");
 
-            // We put on anUlong a very big value Int64MaxValue + 42. Hmm that '42'  :-)) ?
+            // We put on anUlong a very big value Int64MaxValue + 42. Hmm that '42' again :-)) ?
             ulong anULong = 9223372036854775849;
             value = (double)anULong;
             Assert.IsTrue((DoublesAreEqual(value, 9223372036854775849d)), "(double) from ulong operator doesn't work");
