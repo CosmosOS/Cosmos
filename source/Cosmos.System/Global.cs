@@ -54,5 +54,13 @@ namespace Cosmos.System
             ScrollLock = false;
             //Network.NetworkStack.Init();
         }
+
+        public static void ChangeKeyLayout(ScanMapBase scanMap)
+        {
+            if (scanMap != null && HAL.Global.Keyboard != null)
+            {
+                HAL.Global.Keyboard.SetKeyLayout(scanMap);
+            }
+        }
     }
 }
