@@ -158,6 +158,14 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = (double)anULong;
             Assert.IsTrue((DoublesAreEqual(value, 9223372036854775849d)), "(double) from ulong operator doesn't work");
 
+            value = -42.0;
+            double valueNegated = -value;
+            Assert.IsTrue((DoublesAreEqual(valueNegated, 42d)), "(double) negation doesn't work");
+
+            // Let's try if it works in the other way too
+            value = 42.0;
+            valueNegated = -value;
+            Assert.IsTrue((DoublesAreEqual(valueNegated, -42.0f)), "(double) negation of positive float doesn't work");
 #if false
             unchecked
             {

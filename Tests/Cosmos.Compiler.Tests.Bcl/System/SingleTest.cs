@@ -168,8 +168,18 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // We put on anUlong a very big value Int64MaxValue + 42. Hmm that '42' again :-)) ?
             ulong anULong = 9223372036854775849;
             value = (float)anULong;
-            Assert.IsTrue((DoublesAreEqual(value, 9223372036854775849d)), "(float) from ulong operator doesn't work");
+            Assert.IsTrue((SinglesAreEqual(value, 9223372036854775849f)), "(float) from ulong operator doesn't work");
 
+            value = -42.0f;
+            float valueNegated = -value;
+            Assert.IsTrue((SinglesAreEqual(valueNegated, 42.0f)), "(float) negation doesn't work");
+
+#if false
+            // Let's try if it works in the other way too
+            value = 42.0f;
+            valueNegated = -value;
+            Assert.IsTrue((SinglesAreEqual(valueNegated, -42.0f)), "(float) negation doesn't work");
+#endif
 
 #if false
             //ulong anULong = 9223372036854775849;

@@ -38,6 +38,7 @@ namespace Cosmos.IL2CPU.X86.IL
                         XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
                         XS.Add(ESP, 4);
                         XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
+                        //XS.LiteralCode("movss XMM1, [ESP + 4]");
                         XS.SSE.SubSS(XMM1, XMM0);
                         XS.SSE.MoveSS(ESP, XMM1, destinationIsIndirect: true);
                     }

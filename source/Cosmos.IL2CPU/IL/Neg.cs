@@ -23,10 +23,18 @@ namespace Cosmos.IL2CPU.X86.IL
 			{
 				if (xStackContentIsFloat)
 				{
-					XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
+                    // There is no direct double negate instruction in SSE simply we do a XOR with 0x8000000000 to flip the sign bit
+                    XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+                    //XS.LiteralCode(@"pxor XMM0, [__doublesignbit]");
+                    XS.LiteralCode(@"xorpd XMM0, [__doublesignbit]");
+                    XS.SSE2.MoveSD(ESP, XMM0, destinationIsIndirect: true);
+
+#if false
+                    XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
 					XS.FPU.FloatNegate();
 					XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
-				}
+#endif
+                }
 				else
 				{
 					XS.Pop(XSRegisters.EBX); // low
@@ -42,10 +50,19 @@ namespace Cosmos.IL2CPU.X86.IL
 			{
 				if (xStackContentIsFloat)
 				{
-					XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Int32);
-				  XS.FPU.FloatNegate();
+#if true
+                    // There is no direct float negate instruction in SSE simply we do a XOR with 0x8000000000 to flip the sign bit
+                    XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
+                    XS.LiteralCode("movss XMM1, [__floatsignbit]");
+                    XS.LiteralCode(@"xorps XMM0, XMM1");
+                    XS.SSE.MoveSS(ESP, XMM0, destinationIsIndirect: true);
+#endif
+#if false
+                    XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Int32);
+				    XS.FPU.FloatNegate();
 					XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Int32);
-				}
+#endif
+                }
 				else
 				{
 					XS.Pop(XSRegisters.EAX);

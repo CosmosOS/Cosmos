@@ -6,6 +6,7 @@ using Cosmos.Assembler.x86.SSE;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 
+/* Add.Ovf is unsigned integer addition with check for overflow */
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Add_Ovf_Un )]
@@ -22,6 +23,12 @@ namespace Cosmos.IL2CPU.X86.IL
             var xType = aOpCode.StackPopTypes[0];
             var xSize = SizeOfType(xType);
             var xIsFloat = TypeIsFloat(xType);
+
+            if (xIsFloat)
+            {
+                throw new Exception("Cosmos.IL2CPU.x86->IL->Add_Ovf_Un.cs->Error: Expected unsigned integer operands but get float!");
+            }
+
             if (xSize > 8)
             {
                 //EmitNotImplementedException( Assembler, aServiceProvider, "Size '" + xSize.Size + "' not supported (add)", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
@@ -31,47 +38,23 @@ namespace Cosmos.IL2CPU.X86.IL
             {
 				var xBaseLabel = GetLabel(aMethod, aOpCode) + ".";
 				var xSuccessLabel = xBaseLabel + "Success";
-                if (xSize > 4)
+                if (xSize > 4) // long
                 {
-                    if (xIsFloat)
-                    {
-						//TODO overflow check
-                        XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
-                        XS.Add(ESP, 8);
-                        XS.FPU.FloatAdd(ESP, isIndirect: true, size: RegisterSize.Long64);
-                        XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
-                    }
-                    else
-                    {
-                        XS.Pop(XSRegisters.EDX); // low part
-                        XS.Pop(XSRegisters.EAX); // high part
-                        XS.Add(ESP, EDX, destinationIsIndirect: true);
-						XS.AddWithCarry(ESP, EAX, destinationDisplacement: 4);
-                    }
+                    XS.Pop(XSRegisters.EDX); // low part
+                    XS.Pop(XSRegisters.EAX); // high part
+                    XS.Add(ESP, EDX, destinationIsIndirect: true);
+					XS.AddWithCarry(ESP, EAX, destinationDisplacement: 4);
                 }
-                else
+                else //integer
                 {
-                    if (xIsFloat) //float
-                    {
-						//TODO overflow check
-                        XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                        XS.Add(XSRegisters.ESP, 4);
-                        XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
-                        XS.SSE.AddSS(XMM0, XMM1);
-                        XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
-                    }
-                    else //integer
-                    {
-                        XS.Pop(XSRegisters.EAX);
-                        XS.Add(ESP, EAX, destinationIsIndirect: true);
-                    }
+                    XS.Pop(XSRegisters.EAX);
+                    XS.Add(ESP, EAX, destinationIsIndirect: true);
                 }
-				if (false == xIsFloat)
-				{
-					XS.Jump(ConditionalTestEnum.NotCarry, xSuccessLabel);
-					ThrowOverflowException();
-				}
-				XS.Label(xSuccessLabel);
+
+                // Let's check if we add overflow and if so throw OverflowException
+				XS.Jump(ConditionalTestEnum.NotCarry, xSuccessLabel);
+                ThrowOverflowException();
+			    XS.Label(xSuccessLabel);
             }
         }
     }
