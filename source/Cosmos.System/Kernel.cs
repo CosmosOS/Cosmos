@@ -20,8 +20,6 @@ namespace Cosmos.System
         // Set to signal stopped
         protected bool mStopped = false;
 
-        protected ScanMapBase DefaultKeyboardScanMap = new US_Standard();
-
         protected virtual TextScreenBase GetTextScreen()
         {
             // null means use default
@@ -30,12 +28,12 @@ namespace Cosmos.System
 
         protected ScanMapBase GetKeyboardScanMap()
         {
-            return Global.Keyboard.GetKeyLayout();
+            return KeyboardManager.GetKeyLayout();
         }
 
         protected void SetKeyboardScanMap(ScanMapBase ScanMap)
         {
-            Global.Keyboard.SetKeyLayout(ScanMap);
+            KeyboardManager.SetKeyLayout(ScanMap);
         }
 
         /// <summary>
@@ -62,7 +60,10 @@ namespace Cosmos.System
                 HAL.Bootstrap.Init();
 
                 Global.mDebugger.Send("Global Init");
-                Global.Init(GetTextScreen(), new Keyboard(new PS2Keyboard(), DefaultKeyboardScanMap));
+                Global.Init(GetTextScreen());
+
+                //Start with a PS2Keyboard
+                KeyboardManager.AddKeyboard(new PS2Keyboard());
 
                 // Provide the user with a clear screen if they requested it
                 if (ClearScreen)

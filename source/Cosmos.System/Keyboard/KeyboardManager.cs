@@ -10,64 +10,51 @@ using Cosmos.System.ScanMaps;
 
 namespace Cosmos.System
 {
-    public class Keyboard
+    public static class KeyboardManager
     {
-        public bool NumLock
+
+        public static bool NumLock
         {
             get;
             set;
         }
 
-        public bool CapsLock
+        public static bool CapsLock
         {
             get;
             set;
         }
 
-        public bool ScrollLock
+        public static bool ScrollLock
         {
             get;
             set;
         }
 
-        public bool ControlPressed
+        public static bool ControlPressed
         {
             get;
             set;
         }
 
-        public bool ShiftPressed
+        public static bool ShiftPressed
         {
             get;
             set;
         }
 
-        public bool AltPressed
+        public static bool AltPressed
         {
             get;
             set;
         }
 
-        protected KeyboardBase _keyboard;
-        protected ScanMapBase _scanMap;
+        public static List<KeyboardBase> Keyboards = new List<KeyboardBase>();
 
-        protected Queue<KeyEvent> mQueuedKeys;
+        private static ScanMapBase _scanMap = new US_Standard();
+        private static Queue<KeyEvent> mQueuedKeys = new Queue<KeyEvent>();
 
-        public Keyboard(KeyboardBase Keyboard, ScanMapBase ScanMap)
-        {
-            _keyboard = Keyboard;
-            _keyboard.OnKeyPressed += new KeyboardBase.KeyPressedEventHandler(HandleScanCode);
-
-            if(ScanMap == null)
-            {
-                ScanMap = new US_Standard();
-            }
-            _scanMap = ScanMap;
-
-            mQueuedKeys = new Queue<KeyEvent>();
-        }
-
-        protected void Enqueue(KeyEvent keyEvent)
+        private static void Enqueue(KeyEvent keyEvent)
         {
             mQueuedKeys.Enqueue(keyEvent);
         }
@@ -75,31 +62,31 @@ namespace Cosmos.System
         /// <summary>
         /// Allow faking scancodes. Used for test kernels
         /// </summary>
-        internal void HandleFakeScanCode(byte aScancode, bool aReleased)
+        internal static void HandleFakeScanCode(byte aScancode, bool aReleased)
         {
             HandleScanCode(aScancode, aReleased);
         }
 
-        protected void HandleScanCode(byte aScanCode, bool aReleased)
+        private static void HandleScanCode(byte aScanCode, bool aReleased)
         {
             byte key = aScanCode;
             if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.CapsLock) && !aReleased)
             {
                 // caps lock
                 CapsLock = !CapsLock;
-                _keyboard.UpdateLeds();
+                UpdateLeds();
             }
             else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.NumLock) && !aReleased)
             {
                 // num lock
                 NumLock = !NumLock;
-                _keyboard.UpdateLeds();
+                UpdateLeds();
             }
             else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.ScrollLock) && !aReleased)
             {
                 // scroll lock
                 ScrollLock = !ScrollLock;
-                _keyboard.UpdateLeds();
+                UpdateLeds();
             }
             else if (_scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.LCtrl) || _scanMap.ScanCodeMatchesKey(key, ConsoleKeyEx.RCtrl))
             {
@@ -132,7 +119,15 @@ namespace Cosmos.System
             }
         }
 
-        public bool GetKey(byte aScancode, out KeyEvent keyInfo)
+        private static void UpdateLeds()
+        {
+            foreach(KeyboardBase keyboard in Keyboards)
+            {
+                keyboard.UpdateLeds();
+            }
+        }
+
+        public static bool GetKey(byte aScancode, out KeyEvent keyInfo)
         {
             if (_scanMap == null)
             {
@@ -142,7 +137,7 @@ namespace Cosmos.System
             return keyInfo != null;
         }
 
-        public bool TryReadKey(out KeyEvent oKey)
+        public static bool TryReadKey(out KeyEvent oKey)
         {
             if (mQueuedKeys.Count > 0)
             {
@@ -153,23 +148,48 @@ namespace Cosmos.System
             return false;
         }
 
-        public KeyEvent ReadKey()
+        public static KeyEvent ReadKey()
         {
             while (mQueuedKeys.Count == 0)
             {
-                _keyboard.WaitForKey();
+                KeyboardBase.WaitForKey();
             }
             return mQueuedKeys.Dequeue();
         }
 
-        public ScanMapBase GetKeyLayout()
+        public static ScanMapBase GetKeyLayout()
         {
             return _scanMap;
         }
 
-        public void SetKeyLayout(ScanMapBase ScanMap)
+        public static void SetKeyLayout(ScanMapBase ScanMap)
         {
-            _scanMap = ScanMap;
+            if (ScanMap != null)
+            {
+                _scanMap = ScanMap;
+            }
+        }
+
+        public static void AddKeyboard(KeyboardBase Keyboard)
+        {
+            if (!KeyboardExists(Keyboard.GetType()))
+            {
+                Keyboard.OnKeyPressed += new KeyboardBase.KeyPressedEventHandler(HandleScanCode);
+                Keyboards.Add(Keyboard);
+            }
+        }
+
+        public static bool KeyboardExists(Type KeyboardType)
+        {
+            foreach (KeyboardBase Keyboard in Keyboards)
+            {
+                if (Keyboard.GetType() == KeyboardType)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -103,7 +103,7 @@
     <Compile Include="Kernel.cs" />
     <Compile Include="Keyboard\ConsoleKeyEx.cs" />
     <Compile Include="Keyboard\ConsoleKeyExExtensions.cs" />
-    <Compile Include="Keyboard\Keyboard.cs" />
+    <Compile Include="Keyboard\KeyboardManager.cs" />
     <Compile Include="Keyboard\KeyEvent.cs" />
     <Compile Include="Keyboard\KeyMapping.cs" />
     <Compile Include="Keyboard\ScanMapBase.cs" />

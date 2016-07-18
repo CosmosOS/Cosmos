@@ -19,27 +19,25 @@ namespace Cosmos.System
 
         public static Console Console = new Console(null);
 
-        public static Keyboard Keyboard;
-
         public static bool NumLock
         {
-            get { return Keyboard.NumLock; }
-            set { Keyboard.NumLock = value; }
+            get { return KeyboardManager.NumLock; }
+            set { KeyboardManager.NumLock = value; }
         }
 
         public static bool CapsLock
         {
-            get { return Keyboard.CapsLock; }
-            set { Keyboard.CapsLock = value; }
+            get { return KeyboardManager.CapsLock; }
+            set { KeyboardManager.CapsLock = value; }
         }
 
         public static bool ScrollLock
         {
-            get { return Keyboard.ScrollLock; }
-            set { Keyboard.ScrollLock = value; }
+            get { return KeyboardManager.ScrollLock; }
+            set { KeyboardManager.ScrollLock = value; }
         }
 
-        public static void Init(TextScreenBase textScreen, Keyboard keyboard)
+        public static void Init(TextScreenBase textScreen)
         {
             // We must init Console before calling Inits.
             // This is part of the "minimal" boot to allow output.
@@ -50,15 +48,6 @@ namespace Cosmos.System
             }
 
             mDebugger.Send("Creating Keyboard");
-            if(keyboard != null)
-            {
-                Keyboard = keyboard;
-            }
-            else
-            {
-                Debugger.DoSend("Keyboard is null. Using default Keyboard: PS2Keyboard with US_Standard scan map.");
-                Keyboard = new Keyboard(new PS2Keyboard(), new ScanMaps.US_Standard());
-            }
 
             mDebugger.Send("HW Init");
             HAL.Global.Init(textScreen);
@@ -70,10 +59,7 @@ namespace Cosmos.System
 
         public static void ChangeKeyLayout(ScanMapBase scanMap)
         {
-            if (scanMap != null && Keyboard != null)
-            {
-                Keyboard.SetKeyLayout(scanMap);
-            }
+            KeyboardManager.SetKeyLayout(scanMap);
         }
     }
 }

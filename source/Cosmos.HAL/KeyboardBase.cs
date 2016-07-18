@@ -28,7 +28,7 @@ namespace Cosmos.HAL
         public delegate void KeyPressedEventHandler(byte ScanCode, bool Released);
         public KeyPressedEventHandler OnKeyPressed;
 
-        public void WaitForKey()
+        public static void WaitForKey()
         {
             Core.Global.CPU.Halt();
         }

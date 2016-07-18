@@ -10,38 +10,11 @@ namespace Cosmos.HAL
   {
     public static readonly Debugger mDebugger = new Debugger("HAL", "Global");
 
-    //public static Keyboard Keyboard;
-
-    //public static bool NumLock
-    //{
-    //  get { return _numLock; }
-    //  set { _numLock = value; Keyboard?.UpdateLeds(); }
-    //}
-
-    //public static bool CapsLock
-    //{
-    //  get { return _capsLock; }
-    //  set { _capsLock = value; Keyboard?.UpdateLeds(); }
-    //}
-
-    //public static bool ScrollLock
-    //{
-    //  get { return _scrollLock; }
-    //  set
-    //  {
-    //    _scrollLock = value;
-    //    Keyboard?.UpdateLeds();
-    //  }
-    //}
-
     //static public PIT PIT = new PIT();
     // Must be static init, other static inits rely on it not being null
     public static TextScreenBase TextScreen = new TextScreen();
 
     public static PCI Pci;
-    private static bool _numLock;
-    private static bool _capsLock;
-    private static bool _scrollLock;
 
     private static void InitAta(Ata.ControllerIdEnum aControllerID,
         Ata.BusPositionEnum aBusPosition)
