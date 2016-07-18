@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Cosmos.Debug.Kernel;
 
-namespace Cosmos.HAL
+using Cosmos.Debug.Kernel;
+using Cosmos.HAL;
+
+namespace Cosmos.System
 {
     public abstract class ScanMapBase
     {
@@ -75,6 +77,19 @@ namespace Cosmos.HAL
                 }
             }
             return found ? keyev : null;
+        }
+
+        public bool ScanCodeMatchesKey(byte ScanCode, ConsoleKeyEx Key)
+        {
+            for (int i = 0; i < _keys.Count; i++)
+            {
+                if (_keys[i].Scancode == ScanCode && _keys[i].Key == Key)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

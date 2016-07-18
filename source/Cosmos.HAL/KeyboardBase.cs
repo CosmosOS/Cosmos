@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Cosmos.Debug.Kernel;
+
+namespace Cosmos.HAL
+{
+    public abstract class KeyboardBase : Device
+    {
+        protected KeyboardBase()
+        {
+            Debugger.DoSend("mQueuedKeys created");
+            Debugger.DoSend("Keylayout set");
+            Initialize();
+            Debugger.DoSend("Initialized");
+            UpdateLeds();
+            Debugger.DoSend("Leds updated");
+        }
+
+        /// <summary>
+        /// Initialize the device. Happens before the interrupt is registered, ie before the class is being used.
+        /// </summary>
+        protected abstract void Initialize();
+
+        public abstract void UpdateLeds();
+
+        public delegate void KeyPressedEventHandler(byte ScanCode, bool Released);
+        public KeyPressedEventHandler OnKeyPressed;
+
+        public void WaitForKey()
+        {
+            Core.Global.CPU.Halt();
+        }
+    }
+}

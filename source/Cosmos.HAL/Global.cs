@@ -10,29 +10,29 @@ namespace Cosmos.HAL
   {
     public static readonly Debugger mDebugger = new Debugger("HAL", "Global");
 
-    public static Keyboard Keyboard;
+    //public static Keyboard Keyboard;
 
-    public static bool NumLock
-    {
-      get { return _numLock; }
-      set { _numLock = value; Keyboard?.UpdateLeds(); }
-    }
+    //public static bool NumLock
+    //{
+    //  get { return _numLock; }
+    //  set { _numLock = value; Keyboard?.UpdateLeds(); }
+    //}
 
-    public static bool CapsLock
-    {
-      get { return _capsLock; }
-      set { _capsLock = value; Keyboard?.UpdateLeds(); }
-    }
+    //public static bool CapsLock
+    //{
+    //  get { return _capsLock; }
+    //  set { _capsLock = value; Keyboard?.UpdateLeds(); }
+    //}
 
-    public static bool ScrollLock
-    {
-      get { return _scrollLock; }
-      set
-      {
-        _scrollLock = value;
-        Keyboard?.UpdateLeds();
-      }
-    }
+    //public static bool ScrollLock
+    //{
+    //  get { return _scrollLock; }
+    //  set
+    //  {
+    //    _scrollLock = value;
+    //    Keyboard?.UpdateLeds();
+    //  }
+    //}
 
     //static public PIT PIT = new PIT();
     // Must be static init, other static inits rely on it not being null
@@ -117,21 +117,13 @@ namespace Cosmos.HAL
       //PCI.Setup();
     }
 
-    static public void Init(TextScreenBase textScreen, Keyboard keyboard)
+    static public void Init(TextScreenBase textScreen)
     {
       if (textScreen != null)
       {
         TextScreen = textScreen;
       }
-      if (keyboard == null)
-      {
-        mDebugger.Send("No keyboard specified!");
-        throw new SystemException("No keyboard specified!");
-      }
-      else
-      {
-        Keyboard = keyboard;
-      }
+
       mDebugger.Send("Before Core.Global.Init");
       Core.Global.Init();
       mDebugger.Send("Static Devices");

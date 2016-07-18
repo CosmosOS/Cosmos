@@ -6,7 +6,7 @@ using Cosmos.HAL;
 
 namespace Cosmos.System.ScanMaps
 {
-    public class FR_Standard : ScanMap
+    public class FR_Standard : ScanMapBase
     {
         protected override void InitKeys()
         {

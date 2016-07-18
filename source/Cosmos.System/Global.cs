@@ -19,22 +19,24 @@ namespace Cosmos.System
 
         public static Console Console = new Console(null);
 
+        public static Keyboard Keyboard;
+
         public static bool NumLock
         {
-            get { return HAL.Global.NumLock; }
-            set { HAL.Global.NumLock = value; }
+            get { return Keyboard.NumLock; }
+            set { Keyboard.NumLock = value; }
         }
 
         public static bool CapsLock
         {
-            get { return HAL.Global.CapsLock; }
-            set { HAL.Global.CapsLock = value; }
+            get { return Keyboard.CapsLock; }
+            set { Keyboard.CapsLock = value; }
         }
 
         public static bool ScrollLock
         {
-            get { return HAL.Global.ScrollLock; }
-            set { HAL.Global.ScrollLock = value; }
+            get { return Keyboard.ScrollLock; }
+            set { Keyboard.ScrollLock = value; }
         }
 
         public static void Init(TextScreenBase textScreen, Keyboard keyboard)
@@ -47,8 +49,19 @@ namespace Cosmos.System
                 Console = new Console(textScreen);
             }
 
+            mDebugger.Send("Creating Keyboard");
+            if(keyboard != null)
+            {
+                Keyboard = keyboard;
+            }
+            else
+            {
+                Debugger.DoSend("Keyboard is null. Using default Keyboard: PS2Keyboard with US_Standard scan map.");
+                Keyboard = new Keyboard(new PS2Keyboard(), new ScanMaps.US_Standard());
+            }
+
             mDebugger.Send("HW Init");
-            HAL.Global.Init(textScreen, keyboard);
+            HAL.Global.Init(textScreen);
             NumLock = false;
             CapsLock = false;
             ScrollLock = false;
@@ -57,9 +70,9 @@ namespace Cosmos.System
 
         public static void ChangeKeyLayout(ScanMapBase scanMap)
         {
-            if (scanMap != null && HAL.Global.Keyboard != null)
+            if (scanMap != null && Keyboard != null)
             {
-                HAL.Global.Keyboard.SetKeyLayout(scanMap);
+                Keyboard.SetKeyLayout(scanMap);
             }
         }
     }
