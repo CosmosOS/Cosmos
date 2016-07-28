@@ -14,7 +14,7 @@ Downloads:
 
 Cosmos is available in two flavors:
 * **User Kit** - The User Kit is used to develop your operating system in Visual Studio.
-  If you are new to Cosmos, you can learn [here](https://github.com/CosmosOS/Cosmos/wiki). [Latest Release anvailable](https://github.com/CosmosOS/Cosmos/releases/latest)
+  If you are new to Cosmos, you can learn [here](https://github.com/CosmosOS/Cosmos/wiki). [Latest Release available.](https://github.com/CosmosOS/Cosmos/releases/latest)
 * **Development Kit** - The Development Kit is the full Cosmos source and build tools.
   If you need to modify the Cosmos core functions or modify built-in drivers, boot, compiler, etc.. you will need to use Development Kit.
   [Tutorial for building the Development Kit](https://github.com/CosmosOS/Cosmos/wiki/Devkit) - Building from the source is easy with our automated builder.
