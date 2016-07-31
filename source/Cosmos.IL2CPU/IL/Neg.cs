@@ -51,7 +51,7 @@ namespace Cosmos.IL2CPU.X86.IL
 			{
 				if (xStackContentIsFloat)
 				{
-#if false
+#if true
                     if (varDone == false)
                     {
                         XS.DataMember("__floatsignbit", 0x80000000);

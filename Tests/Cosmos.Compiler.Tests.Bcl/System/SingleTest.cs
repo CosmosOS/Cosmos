@@ -31,6 +31,14 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 return false;
         }
 
+        public static void negPositive()
+        {
+            // Let's try if it works in the other way too
+            float value = 42.0f;
+            float valueNegated = -value;
+            Assert.IsTrue((SinglesAreEqual(valueNegated, -42.0f)), "(float) negation of positive float doesn't work got " + valueNegated);
+
+        }
         public static void Execute()
         {
             Single value;
@@ -174,11 +182,13 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             float valueNegated = -value;
             Assert.IsTrue((SinglesAreEqual(valueNegated, 42.0f)), "(float) negation doesn't work");
 
+            negPositive();
+
 #if false
             // Let's try if it works in the other way too
             value = 42.0f;
             valueNegated = -value;
-            Assert.IsTrue((SinglesAreEqual(valueNegated, -42.0f)), "(float) negation doesn't work");
+            Assert.IsTrue((SinglesAreEqual(valueNegated, -42.0f)), "(float) negation of positive float doesn't work");
 #endif
 
 #if false
