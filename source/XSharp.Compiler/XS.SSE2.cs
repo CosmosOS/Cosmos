@@ -124,6 +124,16 @@ namespace XSharp.Compiler
           SourceReg = source
         };
       }
+
+      public static void XorPD(RegisterXMM destination, RegisterXMM source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      {
+          DoDestinationSource<XorPD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+      }
+
+      public static void XorPD(RegisterXMM destination, String sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      {
+         DoDestinationSource<XorPD>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+      }
     }
   }
 }

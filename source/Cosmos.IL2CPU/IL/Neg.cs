@@ -9,7 +9,9 @@ namespace Cosmos.IL2CPU.X86.IL
 	[Cosmos.IL2CPU.OpCode( ILOpCode.Code.Neg )]
 	public class Neg : ILOp
 	{
-		public Neg( Cosmos.Assembler.Assembler aAsmblr )
+        static bool varDone = false;
+
+        public Neg( Cosmos.Assembler.Assembler aAsmblr )
 			: base( aAsmblr )
 		{
 		}
@@ -25,8 +27,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				{
                     // There is no direct double negate instruction in SSE simply we do a XOR with 0x8000000000 to flip the sign bit
                     XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
-                    //XS.LiteralCode(@"pxor XMM0, [__doublesignbit]");
-                    XS.LiteralCode(@"xorpd XMM0, [__doublesignbit]");
+                    XS.SSE2.XorPD(XMM0, "__doublesignbit", sourceIsIndirect: true);
                     XS.SSE2.MoveSD(ESP, XMM0, destinationIsIndirect: true);
 
 #if false
@@ -50,13 +51,19 @@ namespace Cosmos.IL2CPU.X86.IL
 			{
 				if (xStackContentIsFloat)
 				{
-#if true
-                    // There is no direct float negate instruction in SSE simply we do a XOR with 0x8000000000 to flip the sign bit
-                    XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                    XS.LiteralCode("movss XMM1, [__floatsignbit]");
-                    XS.LiteralCode(@"xorps XMM0, XMM1");
-                    XS.SSE.MoveSS(ESP, XMM0, destinationIsIndirect: true);
+#if false
+                    if (varDone == false)
+                    {
+                        XS.DataMember("__floatsignbit", 0x80000000);
+                        varDone = true;
+                    }
 #endif
+
+                    // There is no direct float negate instruction in SSE simply we do a XOR with 0x80000000 to flip the sign bit
+                    XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
+                    XS.SSE.MoveSS(XMM1, "__floatsignbit", sourceIsIndirect: true);
+                    XS.SSE.XorPS(XMM0, XMM1);
+                    XS.SSE.MoveSS(ESP, XMM0, destinationIsIndirect: true);
 #if false
                     XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Int32);
 				    XS.FPU.FloatNegate();

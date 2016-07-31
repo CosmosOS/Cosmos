@@ -1,4 +1,5 @@
-﻿using Cosmos.Assembler.x86.SSE;
+﻿using System;
+using Cosmos.Assembler.x86.SSE;
 using Cosmos.Assembler.x86.x87;
 using static XSharp.Compiler.XSRegisters;
 
@@ -88,6 +89,11 @@ namespace XSharp.Compiler
           DestinationIsIndirect = destinationIsIndirect,
           SourceReg = source
         };
+      }
+
+      public static void MoveSS(RegisterXMM destination, String sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      {
+          DoDestinationSource<MoveSS>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
       }
 
       public static void ConvertSS2SD(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
