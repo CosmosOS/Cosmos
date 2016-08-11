@@ -16,6 +16,12 @@ namespace Cosmos.Kernel.Tests.Fat
     {
         private VFSBase mVFS;
 
+        private byte[] xBytes = new byte[16]
+        {
+            0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7,
+            0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF
+        };
+
         /// <summary>
         /// Pre-run events
         /// </summary>
@@ -39,6 +45,10 @@ namespace Cosmos.Kernel.Tests.Fat
                 TestDirectory();
                 TestFile();
                 TestFileStream();
+                TestStreamWriter();
+                TestStreamReader();
+                TestBinaryWriter();
+                TestBinaryReader();
 
                 TestController.Completed();
             }
@@ -710,6 +720,109 @@ namespace Cosmos.Kernel.Tests.Fat
                 string xReadBuffAsString = xReadBuff.GetUtf8String(0, (uint) xReadBuff.Length);
                 Assert.IsTrue(xWriteBuffAsString == xReadBuffAsString, "Failed to write and read file");
                 mDebugger.Send("END TEST");
+            }
+        }
+
+        #endregion
+
+        #region System.IO.StreamWriter Tests
+
+        private void TestStreamWriter()
+        {
+            var file = File.Create(@"0:\test.txt");
+            if (file != null)
+            {
+                using (var xSW = new StreamWriter(@"0:\test.txt"))
+                {
+                    if(xSW != null)
+                    {
+                        try
+                        {
+                            xSW.Write("A line of text for testing\nSecond line");
+                        }
+                        catch
+                        {
+                            Assert.IsTrue(false, @"Couldn't write to file 0:\test.txt using StreamWriter");
+                        }
+                    }
+                    else
+                    {
+                        Assert.IsTrue(false, @"Failed to create StreamWriter for file 0:\test.txt");
+                    }
+                }
+            }
+            else
+            {
+                Assert.IsTrue(false, @"Failed to create file 0:\test.txt");
+            }
+        }
+
+        #endregion
+
+        #region System.IO.StreamReader Tests
+
+        private void TestStreamReader()
+        {
+            using (var xSR = new StreamReader(@"0:\test.txt"))
+            {
+                if (xSR != null)
+                {
+                    var content = xSR.ReadToEnd();
+
+                    Assert.IsTrue(content == "A line of text for testing\nSecond line", "Content: " + content);
+                }
+                else
+                {
+                    Assert.IsTrue(false, @"Failed to create StreamReader for file 0:\test.txt");
+                }
+            }
+        }
+
+        #endregion
+
+        #region System.IO.BinaryWriter Tests
+
+        private void TestBinaryWriter()
+        {
+            using (var xFS = new FileStream(@"0:\binary.bin", FileMode.Create))
+            {
+                using (var xBW = new BinaryWriter(xFS))
+                {
+                    if (xFS != null)
+                    {
+                        xBW.Write(xBytes);
+
+                        Assert.IsTrue(xFS.Length == xBytes.Length, "The length of the stream and the length of the bytes are different");
+                    }
+                    else
+                    {
+                        Assert.IsTrue(false, @"Failed to create StreamWriter for file 0:\binary.bin");
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region System.IO.BinaryReader Tests
+
+        private void TestBinaryReader()
+        {
+            using (var xFS = new FileStream(@"0:\binary.bin", FileMode.Create))
+            {
+                using (var xBR = new BinaryReader(xFS))
+                {
+                    if (xFS != null)
+                    {
+                        byte[] xBuffer = xBR.ReadBytes(xBytes.Length);
+
+                        Assert.IsTrue(ByteArrayAreEquals(xBytes, xBuffer), "Bytes changed during BinaryWriter and BinaryReader opeartions on FileStream");
+                    }
+                    else
+                    {
+                        Assert.IsTrue(false, @"Failed to create StreamReader for file 0:\binary.bin");
+                    }
+                }
             }
         }
 

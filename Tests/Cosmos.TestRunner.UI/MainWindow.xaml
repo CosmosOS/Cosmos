@@ -11,7 +11,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-
+        <Button x:Name="save_log_btn" Content="Save Log" Width="90" Height="24" Margin="3" Click="save_log_btn_Click" IsEnabled="False"
+                HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="1"></Button>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right"
                     VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="1">
             <Button x:Name="s_messages_btn" Content="Show Messages" Width="90" Height="24" Margin="3" Click="s_messages_btn_Click" />
