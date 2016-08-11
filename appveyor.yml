@@ -4,8 +4,8 @@ platform: AnyCPU
 shallow_clone: true
 clone_folder: c:\Cosmos
 
-install:
-- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/install-nuget-3-4-0.ps1'))
+#install:
+#- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/install-nuget-3-4-0.ps1'))
 
 build_script:
 - cmd: >-
