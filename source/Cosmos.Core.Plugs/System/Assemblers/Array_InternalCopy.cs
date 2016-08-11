@@ -23,10 +23,8 @@ namespace Cosmos.Core.Plugs.System.Assemblers
          */
         public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
         {
-            XS.Exchange(XSRegisters.BX, XSRegisters.BX);
             XS.Comment("Source");
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: SourceArrayDisplacement);
-            //XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true); // dereference memory handle to pointer
             XS.Push(XSRegisters.EAX);
             new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceValue = ObjectInfo.FieldDataOffset, Size = 32 }; // pointer is at the element size
             XS.Pop(XSRegisters.EAX);
@@ -35,13 +33,10 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             XS.Multiply(XSRegisters.EBX);
             XS.Add(XSRegisters.EAX, 16);
             XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: SourceArrayDisplacement);
-            //XS.Set(XSRegisters.ESI, XSRegisters.ESI, sourceIsIndirect: true); // dereference memory handle to pointer
             XS.Add(XSRegisters.ESI, XSRegisters.EAX); // source ptr
 
-            XS.Exchange(XSRegisters.BX, XSRegisters.BX);
             XS.Comment("Destination");
             XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
-            //XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true); // dereference memory handle to pointer
             XS.Push(XSRegisters.EDX);
             new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceValue = ObjectInfo.FieldDataOffset, Size = 32 }; // pointer is at element size
             XS.Pop(XSRegisters.EAX);
@@ -50,13 +45,10 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             XS.Multiply(XSRegisters.ECX);
             XS.Add(XSRegisters.EAX, 16);
             XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
-            //XS.Set(XSRegisters.EDI, XSRegisters.EDI, sourceIsIndirect: true); // dereference handle to pointer
             XS.Add(XSRegisters.EDI, XSRegisters.EAX); // destination ptr
 
-            // calculate byte count to copy
             XS.Exchange(XSRegisters.BX, XSRegisters.BX);
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
-            //XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true); // dereference memory handle to pointer
             XS.Add(XSRegisters.EAX, 12);
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
             XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: LengthDisplacement);
