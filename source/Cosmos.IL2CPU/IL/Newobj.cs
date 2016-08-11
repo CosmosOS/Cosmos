@@ -9,6 +9,7 @@ using Cosmos.IL2CPU.Plugs.System;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 using SysReflection = System.Reflection;
+using ObjectInfo = Cosmos.IL2CPU.Plugs.System.ObjectImpl;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -128,15 +129,15 @@ namespace Cosmos.IL2CPU.X86.IL
                 // try calculating size:
                 if (constructor.DeclaringType == typeof(string))
                 {
-                    if (xParams.Length == 1
-                        && xParams[0].ParameterType == typeof(char[]))
+                    if (xParams.Length == 1 && xParams[0].ParameterType == typeof(char[]))
                     {
                         xHasCalcSize = true;
-                        XS.Set(EAX, ESP, sourceIsIndirect: true);
-
-                        // EAX contains a memory handle now, lets dereference it to a pointer
-                        XS.Set(EAX, EAX, sourceIsIndirect: true);
-                        XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceDisplacement: 8);
+                        XS.Exchange(XSRegisters.BX, XSRegisters.BX);
+                        XS.Set(EAX, ESP, sourceDisplacement: 4);
+                        XS.Push(XSRegisters.EAX);
+                        new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceValue = ObjectInfo.FieldDataOffset, Size = 32 }; // pointer is at the element size
+                        XS.Pop(XSRegisters.EAX);
+                        XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true); // element size
                         XS.Set(XSRegisters.EDX, 2);
                         XS.Multiply(XSRegisters.EDX);
                         XS.Push(XSRegisters.EAX);
