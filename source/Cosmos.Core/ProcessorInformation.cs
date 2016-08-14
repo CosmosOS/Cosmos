@@ -36,25 +36,21 @@ namespace Cosmos.Core
             else
                 return "\0";
         }
-
-        [PlugMethod(PlugRequired = true)]
+        
         internal static int canreadcpuid() { return 0; } //plugged
-
-        [PlugMethod(PlugRequired = true)]
+        
         internal static void fetchcpuvendor(int* target) { } //plugged
 
         /// <summary>
         /// Returns the number of CPU cycles since startup of the current CPU core
         /// </summary>
         /// <returns>Number of CPU cycles since startup</returns>
-        [PlugMethod(PlugRequired = true)]
         public static long GetCycleCount() { return 0; } //plugged
 
         /// <summary>
         /// Returns the number of CPU cycles per seconds
         /// </summary>
         /// <returns>Number of CPU cycles per seconds</returns>
-        [PlugMethod(PlugRequired = true)]
         public static long GetCycleRate() { return 0; } //plugged
     }
 }
