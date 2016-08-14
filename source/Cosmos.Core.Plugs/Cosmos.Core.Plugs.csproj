@@ -105,6 +105,7 @@
     <Compile Include="System\Assemblers\GetMulticastInvokeAssembler.cs" />
     <Compile Include="System\Assemblers\InvokeImplAssembler.cs" />
     <Compile Include="System\Buffer.cs" />
+    <Compile Include="System\DateTimeImpl.cs" />
     <Compile Include="System\DelegateImpl.cs" />
     <Compile Include="System\IO\PathHelperImpl.cs" />
     <Compile Include="System\MulticastDelegateImpl.cs" />

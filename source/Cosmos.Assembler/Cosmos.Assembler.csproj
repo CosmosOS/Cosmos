@@ -138,10 +138,13 @@
     <Compile Include="InfraExtensions.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="Label.cs" />
+    <Compile Include="x86\Lea.cs" />
     <Compile Include="LiteralAssemblerCode.cs" />
     <Compile Include="LabelName.cs" />
     <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="x86\Rdmsr.cs" />
+    <Compile Include="x86\Rdtsc.cs" />
     <Compile Include="StackContents.cs" />
     <Compile Include="TypeComparer.cs" />
     <Compile Include="x86\Add.cs" />
