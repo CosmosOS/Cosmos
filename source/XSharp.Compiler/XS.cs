@@ -691,6 +691,34 @@ namespace XSharp.Compiler
       Do<ShiftLeft>(destination, bitCount, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, size: size);
     }
 
+    public static void ShiftRightArithmetic(Register destination, byte bitCount)
+    {
+        Do<ShiftRightArithmetic>(destination, bitCount);
+    }
+
+    public static void ShiftRightArithmetic(Register destination, Register8 source, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
+    {
+        if (source != CL)
+        {
+           throw new InvalidOperationException();
+        }
+
+        Do<ShiftRightArithmetic>(destination, source, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
+   }
+
+    public static void ShiftLeftArithmetic(Register destination, byte bitCount)
+    {
+        Do<ShiftLeftArithmetic>(destination, bitCount);
+    }
+
+    public static void ShiftLeftArithmetic(Register destination, Register8 bitCount, bool destinationIsIndirect = false, RegisterSize size = RegisterSize.Int32)
+    {
+        if (bitCount != CL)
+        {
+            throw new InvalidOperationException();
+        }
+        Do<ShiftLeftArithmetic>(destination, bitCount, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, size: size);
+    }
 
     public static void WriteToPortDX(Register value)
     {
@@ -1173,7 +1201,7 @@ namespace XSharp.Compiler
           destinationDisplacement = null;
         }
       }
-      new ShiftLeftDouble()
+      new ShiftRightDouble()
       {
         DestinationReg = destination,
         DestinationIsIndirect = destinationIsIndirect,
