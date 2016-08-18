@@ -205,7 +205,9 @@
     <Compile Include="x86\Scas.cs" />
     <Compile Include="x86\SetInterruptFlag.cs" />
     <Compile Include="x86\ShiftLeft.cs" />
+    <Compile Include="x86\ShiftLeftArithmetic.cs" />
     <Compile Include="x86\ShiftRight.cs" />
+    <Compile Include="x86\ShiftRightArithmetic.cs" />
     <Compile Include="x86\Shld.cs" />
     <Compile Include="x86\Shrd.cs" />
     <Compile Include="x86\SignExtendAX.cs" />
