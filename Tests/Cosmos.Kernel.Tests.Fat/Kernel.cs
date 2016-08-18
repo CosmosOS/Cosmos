@@ -502,7 +502,7 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("");
 
             mDebugger.Send("START TEST: Delete a directory:");
-            Directory.CreateDirectory(@"0:\Test1");
+            Directory.CreateDirectory(@"0:\TestDir1");
             Assert.IsTrue(Directory.Exists(@"0:\TestDir1"), "TestDir1 wasn't created!");
             Directory.Delete(@"0:\TestDir1");
             Assert.IsFalse(Directory.Exists(@"0:\TestDir1"), "TestDir1 wasn't deleted!");
