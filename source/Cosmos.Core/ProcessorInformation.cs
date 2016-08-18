@@ -9,12 +9,12 @@ namespace Cosmos.Core
         /// <returns>CPU Vendor name</returns>
         public static string GetVendorName()
         {
-            if (canreadcpuid() > 0)
+            if (CanReadCPUID() > 0)
             {
                 int[] raw = new int[3];
 
                 fixed (int* ptr = raw)
-                    fetchcpuvendor(ptr);
+                    FetchCPUVendor(ptr);
 
                 return new string(new char[] {
                     (char)(raw[0] >> 24),
