@@ -47,7 +47,6 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
             XS.Add(XSRegisters.EDI, XSRegisters.EAX); // destination ptr
 
-            XS.Exchange(XSRegisters.BX, XSRegisters.BX);
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: DestinationArrayDisplacement);
             XS.Add(XSRegisters.EAX, 12);
             XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);

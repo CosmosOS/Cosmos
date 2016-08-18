@@ -26,7 +26,6 @@ namespace Cosmos.Core.Plugs.System.Assemblers
                 throw new Exception("Events with return type not yet supported!");
             }
             XS.Comment("XXXXXXX");
-            //XS.Exchange(XSRegisters.BX, XSRegisters.BX);
 
             /*
        * EAX contains the GetInvocationList() array at the index at which it was last used
@@ -34,6 +33,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
        * EBX contains the number of items in the array
        * ECX contains the argument size
        */
+
             XS.ClearInterruptFlag();
             XS.Label(".DEBUG");
             //XS.Label("____DEBUG_FOR_MULTICAST___");

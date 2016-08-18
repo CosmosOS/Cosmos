@@ -132,7 +132,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     if (xParams.Length == 1 && xParams[0].ParameterType == typeof(char[]))
                     {
                         xHasCalcSize = true;
-                        XS.Exchange(XSRegisters.BX, XSRegisters.BX);
                         XS.Set(EAX, ESP, sourceDisplacement: 4);
                         XS.Push(XSRegisters.EAX);
                         new CPUx86.Add { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, SourceValue = ObjectInfo.FieldDataOffset, Size = 32 }; // pointer is at the element size

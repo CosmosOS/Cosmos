@@ -1,20 +1,19 @@
-﻿using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.IL2CPU;
+using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core.Plugs.System
 {
     [Plug(Target = typeof(object))]
     public class ObjectImpl
     {
-        public static unsafe uint MemberwiseClone([ObjectPointerAccess] uint aThis)
+        public static unsafe ulong MemberwiseClone([ObjectPointerAccess] uint aThis)
         {
             // pointers are handles!
-
-
             var xThisPointer = (uint*)aThis;
 
             var xSize = xThisPointer[1];
 
-            var xResult = GCImplementionImpl.AllocNewObject(xSize);
+            var xResult = GCImplementation.AllocNewObject(xSize);
 
             var xThatPointer = (uint*)xResult;
             var xThatPointerByte = (byte*)xThatPointer[0];
@@ -24,6 +23,7 @@ namespace Cosmos.Core.Plugs.System
             {
                 xThatPointerByte[i] = xThisPointerByte[i];
             }
+
             return xResult;
         }
     }
