@@ -2,6 +2,8 @@ using System;
 using Cosmos.Assembler.x86.SSE;
 using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
+using static Cosmos.Assembler.x86.SSE.ComparePseudoOpcodes;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -25,15 +27,15 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xSourceSize == 4)
                 {
-                    new CPUx86.SSE.MoveSS { SourceReg = CPUx86.RegistersEnum.ESP, DestinationReg = CPUx86.RegistersEnum.XMM0, SourceIsIndirect = true };
-                    XS.SSE.ConvertSS2SIAndTruncate(XSRegisters.EAX, XSRegisters.XMM0);
-                    XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
+                    XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
+                    XS.SSE.ConvertSS2SIAndTruncate(EAX, XMM0);
+                    XS.Set(ESP, EAX, destinationIsIndirect: true);
                 }
                 else if (xSourceSize == 8)
                 {
-                    XS.SSE3.MoveDoubleAndDuplicate(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
-                    XS.SSE2.ConvertSD2SIAndTruncate(XSRegisters.EAX, XSRegisters.XMM0);
-                    XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
+                    XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+                    XS.SSE2.ConvertSD2SIAndTruncate(EAX, XMM0);
+                    XS.Set(ESP, EAX, destinationIsIndirect: true);
                 }
                 else
                 {

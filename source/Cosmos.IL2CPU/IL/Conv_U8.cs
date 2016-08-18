@@ -46,7 +46,8 @@ namespace Cosmos.IL2CPU.X86.IL
                         if (TypeIsFloat(xSource))
                         {
                             XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
-                            XS.FPU.FloatAbs();
+                            /* The sign of the value should not be changed a negative value is simply converted to its corresponding ulong value */
+                            //XS.FPU.FloatAbs();
                             XS.FPU.IntStoreWithTruncate(ESP, isIndirect: true, size: RegisterSize.Long64);
                         }
                         //Else it's already an Int64, or UInt64

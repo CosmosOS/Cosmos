@@ -150,5 +150,11 @@ namespace XSharp.Compiler
     public static readonly RegisterXMM XMM6 = new RegisterXMM(nameof(XMM6), RegistersEnum.XMM6);
     public static readonly RegisterXMM XMM7 = new RegisterXMM(nameof(XMM7), RegistersEnum.XMM7);
 
-  }
+    // Control Registers
+    public static readonly Register32 CR0 = new Register32(nameof(CR0), RegistersEnum.CR0);
+    public static readonly Register32 CR1 = new Register32(nameof(CR1), RegistersEnum.CR1);
+    public static readonly Register32 CR2 = new Register32(nameof(CR2), RegistersEnum.CR2);
+    public static readonly Register32 CR3 = new Register32(nameof(CR3), RegistersEnum.CR3);
+    public static readonly Register32 CR4 = new Register32(nameof(CR4), RegistersEnum.CR4);
+    }
 }
