@@ -35,11 +35,12 @@ namespace Cosmos.System.FileSystem
 
         public abstract DirectoryEntry CreateFile(DirectoryEntry aParentDirectory, string aNewFile);
 
+        public abstract void DeleteDirectory(DirectoryEntry aPath);
+
+        public abstract void DeleteFile(DirectoryEntry aPath);
+
         protected Partition mDevice { get; }
 
         public string mRootPath { get; }
-
-        public abstract void Delete(DirectoryEntry aPath);
-        
     }
 }
