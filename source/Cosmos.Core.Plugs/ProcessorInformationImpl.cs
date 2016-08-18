@@ -1,20 +1,26 @@
 ﻿using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.Plugs;
 
-using System;
+using XSharp.Compiler;
 
 namespace Cosmos.Core.Plugs
 {
     [Plug(Target = typeof(global::Cosmos.Core.ProcessorInformation))]
     public unsafe class ProcessorInformationImpl
     {
-        private static int* __cyclesrdtscptr; // I declare this as an extra field due to reflection -- don't like it, but can't change it :/
-        private static int* __raterdmsrptr; // I declare this as an extra field due to reflection -- don't like it, but can't change it :/
-        private static int* __vendortargetptr; // I declare this as an extra field due to reflection -- don't like it, but can't change it :/
+        /* The following three int*-pointers are needed for the lea instruction due to the following reason:
+         *      When comiling, the IL-code will be translated into x86-ASM, which has specific and unique names for local variables.
+         *      To access these local variables, I have to pass their excat name to the instruction in question. This is rather
+         *      difficult with reflection, if these variables reside in the local function scope. For this reason, I move the
+         *      pointer to class scope to access them quicker and more easily
+         */
+        private static int* __cyclesrdtscptr, __raterdmsrptr, __vendortargetptr;
         private static long __ticktate = -1;
 
-
+        /// <summary>
+        /// Returns the number of CPU cycles since startup
+        /// </summary>
+        /// <returns>Number of CPU cycles</returns>
         public static long GetCycleCount()
         {
             int[] val = new int[2];
@@ -25,6 +31,10 @@ namespace Cosmos.Core.Plugs
             return ((long)val[0] << 32) | (uint)val[1];
         }
 
+        /// <summary>
+        /// Returns the CPU cycle rate (in cycles/µs)
+        /// </summary>
+        /// <returns>CPU cycle rate</returns>
         public static long GetCycleRate()
         {
             if (__ticktate == -1)
@@ -43,6 +53,9 @@ namespace Cosmos.Core.Plugs
             return __ticktate;
         }
 
+        /// <summary>
+        /// Copies the cycle count to the given int pointer
+        /// </summary>
         [Inline]
         private static void __cyclesrdtsc(int* target)
         {
@@ -63,53 +76,22 @@ namespace Cosmos.Core.Plugs
 
             string intname = LabelName.GetFullName(typeof(CPUImpl).GetField(nameof(__cyclesrdtscptr)));
 
-            ElementReference targ = ElementReference.New(intname);
-            new Push
-            {
-                DestinationReg = RegistersEnum.EAX
-            };
-            new Push
-            {
-                DestinationReg = RegistersEnum.ECX
-            };
-            new Push
-            {
-                DestinationReg = RegistersEnum.EDX
-            };
-            new Lea
-            {
-                DestinationReg = RegistersEnum.ESI,
-                SourceRef = targ,
-            };
-            new Rdtsc();
-            new Mov
-            {
-                DestinationReg = RegistersEnum.ESI,
-                DestinationIsIndirect = true,
-                DestinationDisplacement = 4,
-                SourceReg = RegistersEnum.EAX,
-            };
-            new Mov
-            {
-                DestinationReg = RegistersEnum.ESI,
-                DestinationIsIndirect = true,
-                SourceReg = RegistersEnum.EDX,
-            };
-            new Pop
-            {
-                DestinationReg = RegistersEnum.EDX
-            };
-            new Pop
-            {
-                DestinationReg = RegistersEnum.ECX
-            };
-            new Pop
-            {
-                DestinationReg = RegistersEnum.EAX
-            };
-            new Return();
+            XS.Push(XSRegisters.EAX);
+            XS.Push(XSRegisters.ECX);
+            XS.Push(XSRegisters.EDX);
+            XS.Lea(XSRegisters.ESI, intname);
+            XS.Rdtsc();
+            XS.Set(XSRegisters.ESI, XSRegisters.EAX, destinationIsIndirect: true, destinationDisplacement: 4);
+            XS.Set(XSRegisters.ESI, XSRegisters.EDX, destinationIsIndirect: true);
+            XS.Push(XSRegisters.EDX);
+            XS.Push(XSRegisters.ECX);
+            XS.Push(XSRegisters.EAX);
+            XS.Return();
         }
 
+        /// <summary>
+        /// Copies the cycle rate to the given int pointer
+        /// </summary>
         [Inline]
         private static void __raterdmsr(int* target)
         {
@@ -127,69 +109,28 @@ namespace Cosmos.Core.Plugs
              * rdmsr
              * mov [esi + 12], eax
              * mov [esi + 8],  edx
-             * xor eax,        eax  ;reset to zero
+             * xor eax,        eax
              * ret
              */
             __raterdmsrptr = target;
 
             string intname = LabelName.GetFullName(typeof(CPUImpl).GetField(nameof(__raterdmsrptr)));
 
-            ElementReference targ = ElementReference.New(intname);
-            new Lea
-            {
-                DestinationReg = RegistersEnum.ESI,
-                SourceRef = targ,
-            };
-            new Mov
-            {
-                DestinationReg = RegistersEnum.ECX,
-                SourceValue = 0xe7,
-            };
-            new Rdmsr();
-            new Mov
-            {
-                SourceReg = RegistersEnum.EAX,
-                DestinationReg = RegistersEnum.ESI,
-                DestinationIsIndirect = true,
-                DestinationDisplacement = 4,
-            };
-            new Mov
-            {
-                SourceReg = RegistersEnum.EDX,
-                DestinationReg = RegistersEnum.ESI,
-                DestinationIsIndirect = true,
-                DestinationDisplacement = 0,
-            };
-            new Mov
-            {
-                DestinationReg = RegistersEnum.ECX,
-                SourceValue = 0xe8,
-            };
-            new Rdmsr();
-            new Mov
-            {
-                SourceReg = RegistersEnum.EAX,
-                DestinationReg = RegistersEnum.ESI,
-                DestinationIsIndirect = true,
-                DestinationDisplacement = 12,
-            };
-            new Mov
-            {
-                SourceReg = RegistersEnum.EDX,
-                DestinationReg = RegistersEnum.ESI,
-                DestinationIsIndirect = true,
-                DestinationDisplacement = 8,
-            };
-            new Xor
-            {
-                SourceReg = RegistersEnum.EAX,
-                DestinationReg = RegistersEnum.EAX,
-            };
-            new Return();
+            XS.Lea(XSRegisters.ESI, intname);
+            XS.Set(XSRegisters.ECX, 0xe7);
+            XS.Rdmsr();
+            XS.Set(XSRegisters.EAX, XSRegisters.ESI, destinationIsIndirect: true, destinationDisplacement: 4);
+            XS.Set(XSRegisters.EDX, XSRegisters.ESI, destinationIsIndirect: true, destinationDisplacement: 0);
+            XS.Set(XSRegisters.ECX, 0xe8);
+            XS.Rdmsr();
+            XS.Set(XSRegisters.EAX, XSRegisters.ESI, destinationIsIndirect: true, destinationDisplacement: 12);
+            XS.Set(XSRegisters.EDX, XSRegisters.ESI, destinationIsIndirect: true, destinationDisplacement: 8);
+            XS.Xor(XSRegisters.EAX, XSRegisters.EAX); // XS.Set(XSRegisters.EAX, 0);
+            XS.Return();
         }
         
         [Inline]
-        internal static void fetchcpuvendor(int* target)
+        internal static void FetchCPUVendor(int* target)
         {
             /*
              * lea esi, target
@@ -203,39 +144,17 @@ namespace Cosmos.Core.Plugs
             __vendortargetptr = target;
 
             string intname = LabelName.GetFullName(typeof(CPUImpl).GetField(nameof(__vendortargetptr)));
-
-            ElementReference targ = ElementReference.New(intname);
-            new Lea
-            {
-                DestinationReg = RegistersEnum.ESI,
-                SourceRef = targ,
-            };
-            new CpuId();
-            new Mov
-            {
-                DestinationReg = RegistersEnum.ESI,
-                DestinationIsIndirect = true,
-                SourceReg = RegistersEnum.EBX,
-            };
-            new Mov
-            {
-                DestinationReg = RegistersEnum.ESI,
-                DestinationIsIndirect = true,
-                DestinationDisplacement = 4,
-                SourceReg = RegistersEnum.EDX,
-            };
-            new Mov
-            {
-                DestinationReg = RegistersEnum.ESI,
-                DestinationIsIndirect = true,
-                DestinationDisplacement = 8,
-                SourceReg = RegistersEnum.ECX,
-            };
-            new Return();
+            
+            XS.Lea(XSRegisters.ESI, intname); // new Lea { DestinationReg = RegistersEnum.ESI, SourceRef = ElementReference.New(intname) };
+            XS.Cpuid();
+            XS.Set(XSRegisters.ESI, XSRegisters.EBX, destinationIsIndirect: true);
+            XS.Set(XSRegisters.ESI, XSRegisters.EDX, destinationIsIndirect: true, destinationDisplacement: 4);
+            XS.Set(XSRegisters.ESI, XSRegisters.ECX, destinationIsIndirect: true, destinationDisplacement: 8);
+            XS.Return();
         }
 
         [Inline]
-        internal static int canreadcpuid()
+        internal static int CanReadCPUID()
         {
             /*
              * pushfd
@@ -248,34 +167,18 @@ namespace Cosmos.Core.Plugs
              * and eax, 00200000h
              * ret
              */
-            new Pushfd();
-            new Pushfd();
-            new Xor
-            {
-                DestinationReg = RegistersEnum.ESP,
-                DestinationIsIndirect = true,
-                SourceValue = 0x00200000
-            };
-            new Popfd();
-            new Pushfd();
-            new Pop
-            {
-                DestinationReg = RegistersEnum.EAX,
-            };
-            new Xor
-            {
-                DestinationReg = RegistersEnum.EAX,
-                SourceReg = RegistersEnum.ESP,
-                SourceIsIndirect = true
-            };
-            new Popfd();
-            new And
-            {
-                DestinationReg = RegistersEnum.EAX,
-                SourceValue = 0x00200000
-            };
-            new Return();
-            return 0;
+            XS.Pushfd();
+            XS.Pushfd();
+            XS.Xor(XSRegisters.ESP, 0x00200000, destinationIsIndirect: true);
+            XS.Popfd();
+            XS.Pushfd();
+            XS.Pop(XSRegisters.EAX);
+            XS.Xor(XSRegisters.EAX, XSRegisters.ESP, destinationIsIndirect: true);
+            XS.Popfd();
+            XS.And(XSRegisters.EAX, 0x00200000);
+            XS.Return();
+
+            return 0; // should be ignored by the compiler
         }
     }
 }

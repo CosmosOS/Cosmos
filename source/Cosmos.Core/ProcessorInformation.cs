@@ -1,6 +1,4 @@
-﻿using Cosmos.IL2CPU.Plugs;
-using System;
-
+﻿
 namespace Cosmos.Core
 {
     public unsafe class ProcessorInformation
@@ -37,9 +35,9 @@ namespace Cosmos.Core
                 return "\0";
         }
         
-        internal static int canreadcpuid() { return 0; } //plugged
+        internal static int CanReadCPUID() { return 0; } //plugged
         
-        internal static void fetchcpuvendor(int* target) { } //plugged
+        internal static void FetchCPUVendor(int* target) { } //plugged
 
         /// <summary>
         /// Returns the number of CPU cycles since startup of the current CPU core
