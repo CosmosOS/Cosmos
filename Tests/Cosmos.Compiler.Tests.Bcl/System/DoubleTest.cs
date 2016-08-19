@@ -99,7 +99,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Now test lessThanEqual
             Assert.IsTrue((value <= 42.42), "double operator<= doesn't work");
 
-            // Now test addition, in this case == does not work anymore evidently 44.62 is not representable in binary we resort to test it using ToString() 
+            // Now test addition, in this case == does not work anymore evidently 44.62 is not representable in binary we resort to test it using ToString()
             Double OperationResult;
             Double otherValue = 2.20;
 
@@ -109,7 +109,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Now test subtraction
             OperationResult = value - otherValue;
-    
+
             Assert.IsTrue((DoublesAreEqual(OperationResult, 40.22)), "double operator- doesn't work");
 
             // Now test multiplication
@@ -128,7 +128,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((OperationResult == Double.PositiveInfinity), "double operator/0 doesn't work");
 
-#if false // This test fails (== with NaN does not work but this is OK as C# is wrong on this too) and the method isNaN fails 
+#if false // This test fails (== with NaN does not work but this is OK as C# is wrong on this too) and the method isNaN fails
             // Now test division again but with all values as 0 the expected result should be Double.NaN
             OperationResult = 0.00 / 0.00;
 
@@ -163,9 +163,9 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((DoublesAreEqual(valueNegated, 42d)), "(double) negation doesn't work");
 
             // Let's try if it works in the other way too
-            value = 42.0;
-            valueNegated = -value;
-            Assert.IsTrue((DoublesAreEqual(valueNegated, -42.0f)), "(double) negation of positive float doesn't work");
+            //value = 42.0;
+            //valueNegated = -value;
+            //Assert.IsTrue((DoublesAreEqual(valueNegated, -42.0f)), "(double) negation of positive float doesn't work");
 #if false
             unchecked
             {
