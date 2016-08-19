@@ -1,4 +1,5 @@
-﻿using Cosmos.Assembler;
+﻿using System;
+using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs;
 
 using XSharp.Compiler;
@@ -44,13 +45,35 @@ namespace Cosmos.Core.Plugs
                 fixed (int* ptr = raw)
                     __raterdmsr(ptr);
 
-                ulong l1 = ((ulong)raw[0] << 32) | (uint)raw[1];
-                ulong l2 = ((ulong)raw[2] << 32) | (uint)raw[3];
+                ulong l1 = (ulong)__maxrate();
+                ulong l2 = ((ulong)raw[0] << 32) | (uint)raw[1];
+                ulong l3 = ((ulong)raw[2] << 32) | (uint)raw[3];
 
-                __ticktate = (long)((double)l2 / (double)l1); // * cpu_rate
+                __ticktate = (long)l2; // (long)((double)l1 * l3 / l2);
             }
 
             return __ticktate;
+        }
+
+        /// <summary>
+        /// Copies the maximum cpu rate set by the bios at startup to the given int pointer
+        /// </summary>
+        [Inline]
+        private static int __maxrate()
+        {
+            /*
+             * mov eax, 16h
+             * cpuid
+             * and eax, ffffh
+             * ret
+             */
+            
+            XS.Set(XSRegisters.EAX, 0x00000016);
+            XS.Cpuid();
+            XS.And(XSRegisters.EAX, 0x0000ffff);
+            XS.Return();
+
+            return 0;
         }
 
         /// <summary>
