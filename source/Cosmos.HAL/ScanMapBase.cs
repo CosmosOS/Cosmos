@@ -59,9 +59,9 @@ namespace Cosmos.HAL
 
                     if (ctrl)
                         if (alt)
-                            key = shift ^ caps ? map.ControlAltShift : map.ControlAlt;
+                            key = xor(shift, caps) ? map.ControlAltShift : map.ControlAlt;
                         else
-                            key = shift ^ caps ? map.ControlShift : map.Control;
+                            key = xor(shift, caps) ? map.ControlShift : map.Control;
                     else if (shift)
                         key = caps ? map.ShiftCaps
                             : num ? map.ShiftNum
@@ -82,5 +82,8 @@ namespace Cosmos.HAL
 
             return found ? keyev : null;
         }
+
+#warning TODO: WHY IS XOR FOR BOOLEANS NOT IMPLEMENTED!?
+        internal static bool xor(bool b1, bool b2) => (b1 || b2) && !(b1 && b2);
     }
 }
