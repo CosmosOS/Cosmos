@@ -171,6 +171,8 @@ namespace Cosmos.HAL
                 case ConsoleKeyEx.Semicolon:
                 case ConsoleKeyEx.Colon:
                     return ConsoleKey.Oem1;
+                case ConsoleKeyEx.OEM102:
+                    return ConsoleKey.Oem102;
                 default:
                     throw new Exception("KeyEx not implemented!");
             }
