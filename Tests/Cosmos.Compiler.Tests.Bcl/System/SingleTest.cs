@@ -12,6 +12,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         {
             // Define the tolerance for variation in their values
             Single difference = (Single) Math.Abs(left * .00001);
+
             if (Math.Abs(left - right) <= difference)
                 return true;
             else
@@ -122,7 +123,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Now test lessThanEqual
             Assert.IsTrue((value <= 42.42f), "float operator<= doesn't work");
 
-            // Now test addition, in this case == does not work anymore evidently 44.62 is not representable in binary we resort to test it using ToString() 
+            // Now test addition, in this case == does not work anymore evidently 44.62 is not representable in binary we resort to test it using ToString()
             Single OperationResult;
             Single otherValue = 2.20f;
 
@@ -172,7 +173,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Let's continue with casting but the other way around
             valueAsInt = 69;
-            value = (float) valueAsInt;
+            value = (float)valueAsInt;
             Assert.IsTrue((SinglesAreEqual(value, 69f)), "(float) from int operator doesn't work");
 
             valueAsLong = 69;

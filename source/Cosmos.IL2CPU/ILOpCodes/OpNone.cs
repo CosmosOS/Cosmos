@@ -705,6 +705,13 @@ namespace Cosmos.IL2CPU.ILOpCodes {
               aSituationChanged = true;
               return;
             }
+            //Changed
+            if (StackPopTypes[0] == typeof(short) && StackPopTypes[1] == typeof(short))
+            {
+              StackPushTypes[0] = typeof(short);
+              aSituationChanged = true;
+              return;
+            }
             if (StackPopTypes[0] == typeof(long) && StackPopTypes[1] == typeof(long))
             {
               StackPushTypes[0] = typeof(long);
