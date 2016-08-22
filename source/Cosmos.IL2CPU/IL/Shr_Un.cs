@@ -62,7 +62,7 @@ namespace Cosmos.IL2CPU.X86.IL
 				// shift high part and move it in low part
 				XS.ShiftRight(XSRegisters.EAX, XSRegisters.CL);
 				XS.Set(ESP, EAX, destinationIsIndirect: true);
-				// replace unknown high part with a zero, if <= 32
+				// replace unknown high part with a zero
 				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = 0};
 
 				XS.Label(End_Shr);

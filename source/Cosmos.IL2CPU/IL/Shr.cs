@@ -60,16 +60,17 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Jump(End_Shr);
 
 				XS.Label(HighPartIsZero);
+
 				// remove bits >= 32, so that CL max value could be only 31
 				XS.And(XSRegisters.CL, 0x1f, size: RegisterSize.Byte8);
 
                 // shift high part and move it in low part
                 // To retain the sign bit we must use ShiftRightArithmetic and not ShiftRight!
-                //XS.ShiftRight(XSRegisters.EAX, XSRegisters.CL);
-                XS.ShiftRightArithmetic(ESP, CL, destinationDisplacement: 4, size: RegisterSize.Int32);
+                XS.ShiftRightArithmetic(XSRegisters.EAX, XSRegisters.CL);
                 XS.Set(ESP, EAX, destinationIsIndirect: true);
-				// replace unknown high part with a zero, if <= 32
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = 0};
+                // replace unknown high part with a zero
+                XS.Set(ESP, 0, destinationIsIndirect: true, destinationDisplacement: 4);
+				//new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = 4, SourceValue = 0};
 
 				XS.Label(End_Shr);
 			}
@@ -94,6 +95,6 @@ namespace Cosmos.IL2CPU.X86.IL
 				// shift high part
 				XS.ShiftRight(XSRegisters.ESP, XSRegisters.CL, destinationIsIndirect: true, size: RegisterSize.Int32);
             }*/
+            }
         }
-    }
 }

@@ -35,18 +35,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
                     XS.SSE2.DivSD(XMM1, XMM0);
                     XS.SSE2.MoveSD(ESP, XMM1, destinationIsIndirect: true);
-                    // x87 version left here for future use
-#if false
-                    // TODO add 0/0 infinity/infinity X/infinity
-					// value 1
-					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
-					// value 2
-                    new CPUx86.x87.FloatDivide { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 64 };
-					// override value 1
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
-					// pop value 2
-                    XS.Add(XSRegisters.ESP, 8);
-#endif
                 }
                 else
                 {

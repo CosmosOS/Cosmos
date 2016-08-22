@@ -26,31 +26,63 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             String result;
             String expectedResult;
 
-            value = 42.42; // It exists Single.MaxValue but it is a too big value an can be represented only on Scientific notation but then how to confront with a String?
-
-            // It seems to be a problem in BitConverter.GetBytes with a Double value that in turn broke toString() for now a solution to this is not found
-#if false
-            value = 1;
-
-            // Let's try to see as a ByteArray
-            byte[] doubleBytes = BitConverter.GetBytes(value);
-
-            Console.WriteLine($"doubleByte is of {doubleBytes.Length} bytes");
-
-            foreach (byte aByte in doubleBytes)
-                Console.WriteLine(aByte);
-
-            //Console.WriteLine("Double (as long) " + DoubleToUlong(value));
+            /* First start with some weird value (not really numbers) that the IEEE standard has */
+            value = Double.PositiveInfinity;
 
             result = value.ToString();
-            expectedResult = "1";
+            expectedResult = "∞";
 
-            // The test fails the conversion returns "Double Underrange"
-            Assert.IsTrue((result == expectedResult), "Double.ToString doesn't work");
+            Assert.IsTrue((result == expectedResult), "Double.ToString of INF doesn't work");
+
+            value = Double.NegativeInfinity;
+
+            result = value.ToString();
+            expectedResult = "-∞";
+
+            Assert.IsTrue((result == expectedResult), "Double.ToString of -INF doesn't work");
+
+            value = Double.NaN;
+
+            result = value.ToString();
+            expectedResult = "NaN";
+
+            Assert.IsTrue((result == expectedResult), "Double.ToString of -NaN doesn't work");
+
+            /* Another special value is '0' */
+            value = 0;
+
+            result = value.ToString();
+            expectedResult = "0";
+
+            Assert.IsTrue((result == expectedResult), "Double.ToString of 0 doesn't work");
+
+            /* A negative value */
+            value = -42.42;
+
+            result = value.ToString();
+            expectedResult = "-42.42";
+
+            Assert.IsTrue((result == expectedResult), "Double.ToString of negative number doesn't work");
+
+            /* A big value (to be correct toString should convert it in scientific notation) */
+            value = 9223372036854775808;
+
+            result = value.ToString();
+            expectedResult = "9223372036854775808";
+
+            Assert.IsTrue((result == expectedResult), "Double.ToString of big number doesn't work");
+
+            /* OK now a normal value */
+            value = 42.42; // It exists Double.MaxValue but it is a too big value an can be represented only on Scientific notation but then how to confront with a String?
+
+            result = value.ToString();
+            expectedResult = "42.42";
+
+            Assert.IsTrue((result == expectedResult), "Double.ToString of normal number doesn't work");
 
             // Now let's try to concat to a String using '+' operator
             result = "The value of the Double is " + value;
-            expectedResult = "The value of the Double is 1";
+            expectedResult = "The value of the Double is 42.42";
 
             Assert.IsTrue((result == expectedResult), "String concat (Double) doesn't work");
 
@@ -59,14 +91,14 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Actually 'expectedResult' should be the same so...
             Assert.IsTrue((result == expectedResult), "String format (Double) doesn't work");
 
+#if false
             // Now let's Get the HashCode of a value
             int resultAsInt = value.GetHashCode();
 
             // actually the Hash Code of a Int32 is the same value
             Assert.IsTrue((resultAsInt == value), "Double.GetHashCode() doesn't work");
-#endif
 
-#if false
+
             // Now let's try ToString() again but printed in hex (this test fails for now!)
             result = value.ToString("X2");
             expectedResult = "0x7FFFFFFF";
@@ -165,7 +197,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Let's try if it works in the other way too
             value = 42.0;
             valueNegated = -value;
-            Assert.IsTrue((DoublesAreEqual(valueNegated, -42.0f)), "(double) negation of positive float doesn't work");
+            Assert.IsTrue((DoublesAreEqual(valueNegated, -42.0f)), "(double) negation of positive double doesn't work");
 #if false
             unchecked
             {

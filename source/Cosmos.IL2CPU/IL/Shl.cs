@@ -48,17 +48,18 @@ namespace Cosmos.IL2CPU.X86.IL
 				XS.Jump(CPUx86.ConditionalTestEnum.AboveOrEqual, LowPartIsZero);
 
 				// shift higher part
-
 				XS.ShiftLeftDouble(ESP, EAX, CL, destinationDisplacement: 4);
-				// shift lower part
-				XS.ShiftLeft(XSRegisters.ESP, XSRegisters.CL, destinationIsIndirect: true, size: RegisterSize.Int32);
+                // shift lower part
+                // To retain the sign bit we must use ShiftLeftArithmetic and not ShiftLeft!
+                XS.ShiftLeftArithmetic(XSRegisters.ESP, XSRegisters.CL, destinationIsIndirect: true, size: RegisterSize.Int32);
 				XS.Jump(End_Shl);
 
 				XS.Label(LowPartIsZero);
 				// remove bits >= 32, so that CL max value could be only 31
 				XS.And(XSRegisters.CL, 0x1f, size: RegisterSize.Byte8);
-				// shift low part in EAX and move it in high part
-				XS.ShiftLeft(EAX, CL);
+                // shift low part in EAX and move it in high part
+                // To retain the sign bit we must use ShiftLeftArithmetic and not ShiftLeft!
+                XS.ShiftLeftArithmetic(EAX, CL);
 				XS.Set(ESP, EAX, destinationDisplacement: 4);
 				// replace unknown low part with a zero, if <= 32
 				XS.Set(XSRegisters.ESP, 0, destinationIsIndirect: true);
