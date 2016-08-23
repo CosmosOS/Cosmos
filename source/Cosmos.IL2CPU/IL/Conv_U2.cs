@@ -2,6 +2,7 @@ using System;
 using Cosmos.Assembler.x86.SSE;
 using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -24,15 +25,17 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xSourceSize == 4)
                 {
-                    new CPUx86.SSE.MoveSS { SourceReg = CPUx86.RegistersEnum.ESP, DestinationReg = CPUx86.RegistersEnum.XMM0, SourceIsIndirect = true };
-                    XS.SSE.ConvertSS2SIAndTruncate(XSRegisters.EAX, XSRegisters.XMM0);
-                    XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
+                    XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
+                    XS.SSE.ConvertSS2SIAndTruncate(EAX, XMM0);
+                    XS.Set(ESP, EAX, destinationIsIndirect: true);
                 }
                 else if (xSourceSize == 8)
                 {
-                    XS.SSE3.MoveDoubleAndDuplicate(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
-                    XS.SSE2.ConvertSD2SIAndTruncate(XSRegisters.EAX, XSRegisters.XMM0);
-                    XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
+                    XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+                    XS.SSE2.ConvertSD2SIAndTruncate(EAX, XMM0);
+                    // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
+                    XS.Add(ESP, 4);
+                    XS.Set(ESP, EAX, destinationIsIndirect: true);
                 }
                 else
                 {
@@ -46,16 +49,16 @@ namespace Cosmos.IL2CPU.X86.IL
                         break;
                     case 1:
                     case 4:
-						    XS.Pop(XSRegisters.EAX);
-						    XS.MoveZeroExtend(XSRegisters.EAX, XSRegisters.AX);
-                            XS.Push(XSRegisters.EAX);
+						    XS.Pop(EAX);
+						    XS.MoveZeroExtend(EAX, AX);
+                            XS.Push(EAX);
 						    break;
                     case 8:
                         {
-                            XS.Pop(XSRegisters.EAX);
-                            XS.Pop(XSRegisters.ECX);
-                            XS.MoveZeroExtend(XSRegisters.EAX, XSRegisters.AX);
-                            XS.Push(XSRegisters.EAX);
+                            XS.Pop(EAX);
+                            XS.Pop(ECX);
+                            XS.MoveZeroExtend(EAX, AX);
+                            XS.Push(EAX);
                             break;
                         }
                     default:

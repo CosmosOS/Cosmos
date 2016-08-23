@@ -42,7 +42,8 @@ namespace XSharp.Compiler
         {
           DestinationReg = register.RegEnum,
           DestinationIsIndirect = isIndirect,
-          DestinationDisplacement = displacement
+          DestinationDisplacement = displacement,
+          Size = (byte)size
         };
       }
 
@@ -104,7 +105,7 @@ namespace XSharp.Compiler
           size = destination.Size;
         }
 
-        new IntAdd
+        new IntLoad
         {
           DestinationReg = destination,
           DestinationIsIndirect = isIndirect,

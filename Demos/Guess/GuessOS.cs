@@ -23,6 +23,7 @@ namespace GuessKernel
         protected override void BeforeRun()
         {
             //Cosmos.Core.HMI.Init();
+            Console.Clear();
 
             Console.WriteLine("Guess Demo");
             Console.WriteLine("Please guess a number from 1 to 100.");

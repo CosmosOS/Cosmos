@@ -18,6 +18,8 @@ namespace Cosmos.Core {
         [PlugMethod(PlugRequired = true)]
         public void InitFloat() { } // Plugged
         [PlugMethod(PlugRequired = true)]
+        public void InitSSE() { } // Plugged
+        [PlugMethod(PlugRequired = true)]
         public static void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged
         [PlugMethod(PlugRequired = true)]
         public void Halt() { } // Plugged

@@ -70,7 +70,19 @@ namespace Cosmos.Core.Plugs {
 	  [PlugMethod(Assembler = typeof(InitFloatAsm))]
 		public static void InitFloat(CPU aThis) { }
 
-		public class HaltAsm : AssemblerMethod {
+        public class InitSSEAsm : AssemblerMethod
+        {
+            public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+            {
+                XS.SSE.SSEInit();
+                //new CPUx86.SSE.SSEInit();
+            }
+        }
+
+        [PlugMethod(Assembler = typeof(InitSSEAsm))]
+        public static void InitSSE(CPU aThis) { }
+
+        public class HaltAsm : AssemblerMethod {
 			public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
 				XS.Halt();
 			}

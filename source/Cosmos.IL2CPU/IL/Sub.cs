@@ -36,9 +36,10 @@ namespace Cosmos.IL2CPU.X86.IL
                     if (xStackTopIsFloat)
                     {
                         XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                        XS.Add(XSRegisters.ESP, 4);
+                        XS.Add(ESP, 4);
                         XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
-                        XS.SSE.SubSS(XMM0, XMM1);
+                        //XS.LiteralCode("movss XMM1, [ESP + 4]");
+                        XS.SSE.SubSS(XMM1, XMM0);
                         XS.SSE.MoveSS(ESP, XMM1, destinationIsIndirect: true);
                     }
                     else
@@ -52,7 +53,13 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 8:
                     if (xStackTopIsFloat)
                     {
-                        new FloatLoad
+                        XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+                        XS.Add(ESP, 8);
+                        XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
+                        XS.SSE2.SubSD(XMM1, XMM0);
+                        XS.SSE2.MoveSD(ESP, XMM1, destinationIsIndirect: true);
+#if false
+                         new FloatLoad
                         {
                             DestinationReg = RegistersEnum.ESP,
                             Size = 64,
@@ -67,11 +74,12 @@ namespace Cosmos.IL2CPU.X86.IL
                         };
                         XS.Add(ESP, 8);
                         XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
+#endif
                     }
                     else
                     {
-                        XS.Pop(XSRegisters.EAX);
-                        XS.Pop(XSRegisters.EDX);
+                        XS.Pop(EAX);
+                        XS.Pop(EDX);
                         XS.Sub(ESP, EAX, destinationIsIndirect: true);
                         XS.SubWithCarry(ESP, EDX, destinationDisplacement: 4);
                     }
