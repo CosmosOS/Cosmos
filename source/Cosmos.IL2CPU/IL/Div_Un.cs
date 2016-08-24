@@ -5,6 +5,7 @@ using static XSharp.Compiler.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 using Label = Cosmos.Assembler.Label;
 
+/* Div.Un is unsigned integer division so the valid input values are uint / ulong and the result is always expressed as unsigned */
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Div_Un )]
@@ -21,125 +22,107 @@ namespace Cosmos.IL2CPU.X86.IL
             var xStackItemSize = SizeOfType(xStackItem);
             var xStackItem2 = aOpCode.StackPopTypes[1];
             var xStackItem2Size = SizeOfType(xStackItem2);
-            if( xStackItemSize == 8 )
+
+            if (TypeIsFloat(xStackItem))
+            {
+                throw new Exception("Cosmos.IL2CPU.x86->IL->Div_Un.cs->Error: Expected unsigned integer operands but get float!");
+            }
+
+            if ( xStackItemSize == 8 )
             {
 				// there seem to be an error in MS documentation, there is pushed an int32, but IL shows else
                 if (xStackItem2Size != 8)
                 {
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Div.cs->Error: Expected a size of 8 for Div!");
                 }
-                if (TypeIsFloat(xStackItem))
-				{
-					// TODO add 0/0 infinity/infinity X/infinity
-					// value 1
-					new CPUx86.x87.FloatLoad { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
-					// value 2
-					new CPUx86.x87.FloatDivide { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 64 };
-					// override value 1
-					new CPUx86.x87.FloatStoreAndPop { DestinationReg = CPUx86.RegistersEnum.ESP, Size = 64, DestinationIsIndirect = true, DestinationDisplacement = 8 };
-					// pop value 2
-					XS.Add(XSRegisters.ESP, 8);
-				}
-				else
-				{
-					string BaseLabel = GetLabel(aMethod, aOpCode) + ".";
-					string LabelShiftRight = BaseLabel + "ShiftRightLoop";
-					string LabelNoLoop = BaseLabel + "NoLoop";
-					string LabelEnd = BaseLabel + "End";
 
-					// divisor
-					//low
-					XS.Set(ESI, ESP, sourceIsIndirect: true);
-					//high
-					XS.Set(XSRegisters.EDI, XSRegisters.ESP, sourceDisplacement: 4);
+                // ulong
+				string BaseLabel = GetLabel(aMethod, aOpCode) + ".";
+				string LabelShiftRight = BaseLabel + "ShiftRightLoop";
+				string LabelNoLoop = BaseLabel + "NoLoop";
+				string LabelEnd = BaseLabel + "End";
 
-					//dividend
-					// low
-					XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 8);
-					//high
-					XS.Set(XSRegisters.EDX, XSRegisters.ESP, sourceDisplacement: 12);
+				// divisor
+				//low
+				XS.Set(ESI, ESP, sourceIsIndirect: true);
+				//high
+				XS.Set(XSRegisters.EDI, XSRegisters.ESP, sourceDisplacement: 4);
 
-					// pop both 8 byte values
-					XS.Add(XSRegisters.ESP, 16);
+				//dividend
+				// low
+				XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: 8);
+				//high
+				XS.Set(XSRegisters.EDX, XSRegisters.ESP, sourceDisplacement: 12);
 
-					// set flags
-					XS.Or(XSRegisters.EDI, XSRegisters.EDI);
-					// if high dword of divisor is already zero, we dont need the loop
-					XS.Jump(CPUx86.ConditionalTestEnum.Zero, LabelNoLoop);
+				// pop both 8 byte values
+				XS.Add(XSRegisters.ESP, 16);
 
-					// set ecx to zero for counting the shift operations
-					XS.Xor(XSRegisters.ECX, XSRegisters.ECX);
+				// set flags
+				XS.Or(XSRegisters.EDI, XSRegisters.EDI);
+				// if high dword of divisor is already zero, we dont need the loop
+				XS.Jump(CPUx86.ConditionalTestEnum.Zero, LabelNoLoop);
 
-					XS.Label(LabelShiftRight);
+				// set ecx to zero for counting the shift operations
+				XS.Xor(XSRegisters.ECX, XSRegisters.ECX);
 
-					// shift divisor 1 bit right
-				  XS.ShiftRightDouble(ESI, EDI, 1);
+				XS.Label(LabelShiftRight);
 
-					XS.ShiftRight(XSRegisters.EDI, 1);
+				// shift divisor 1 bit right
+				XS.ShiftRightDouble(ESI, EDI, 1);
 
-					// increment shift counter
-					XS.Increment(XSRegisters.ECX);
+				XS.ShiftRight(XSRegisters.EDI, 1);
 
-					// set flags
-					XS.Or(XSRegisters.EDI, XSRegisters.EDI);
-					// loop while high dword of divisor till it is zero
-					XS.Jump(CPUx86.ConditionalTestEnum.NotZero, LabelShiftRight);
+				// increment shift counter
+				XS.Increment(XSRegisters.ECX);
 
-					// shift the divident now in one step
-					// shift divident CL bits right
-          XS.ShiftRightDouble(EAX, EDX, CL);
-					XS.ShiftRight(XSRegisters.EDX, CL);
+				// set flags
+				XS.Or(XSRegisters.EDI, XSRegisters.EDI);
+				// loop while high dword of divisor till it is zero
+				XS.Jump(CPUx86.ConditionalTestEnum.NotZero, LabelShiftRight);
 
-					// so we shifted both, so we have near the same relation as original values
-					// divide this
-					XS.Divide(XSRegisters.ESI);
+				// shift the divident now in one step
+				// shift divident CL bits right
+                XS.ShiftRightDouble(EAX, EDX, CL);
+				XS.ShiftRight(XSRegisters.EDX, CL);
 
-					// save result to stack
-					XS.Push(0);
-					XS.Push(XSRegisters.EAX);
+				// so we shifted both, so we have near the same relation as original values
+				// divide this
+				XS.Divide(XSRegisters.ESI);
 
-					//TODO: implement proper derivation correction and overflow detection
+				// save result to stack
+				XS.Push(0);
+				XS.Push(XSRegisters.EAX);
 
-					XS.Jump(LabelEnd);
+				//TODO: implement proper derivation correction and overflow detection
 
-					XS.Label(LabelNoLoop);
+				XS.Jump(LabelEnd);
 
-					//save high dividend
-					XS.Set(XSRegisters.ECX, XSRegisters.EAX);
-					XS.Set(XSRegisters.EAX, XSRegisters.EDX);
-					// zero EDX, so that high part is zero -> reduce overflow case
-					XS.Xor(XSRegisters.EDX, XSRegisters.EDX);
-					// divide high part
-					XS.Divide(XSRegisters.ESI);
-					// save high result
-					XS.Push(XSRegisters.EAX);
-					XS.Set(XSRegisters.EAX, XSRegisters.ECX);
-					// divide low part
-					XS.Divide(XSRegisters.ESI);
-					// save low result
-					XS.Push(XSRegisters.EAX);
+				XS.Label(LabelNoLoop);
 
-					XS.Label(LabelEnd);
-				}
+				//save high dividend
+				XS.Set(XSRegisters.ECX, XSRegisters.EAX);
+				XS.Set(XSRegisters.EAX, XSRegisters.EDX);
+				// zero EDX, so that high part is zero -> reduce overflow case
+				XS.Xor(XSRegisters.EDX, XSRegisters.EDX);
+				// divide high part
+				XS.Divide(XSRegisters.ESI);
+				// save high result
+				XS.Push(XSRegisters.EAX);
+				XS.Set(XSRegisters.EAX, XSRegisters.ECX);
+				// divide low part
+				XS.Divide(XSRegisters.ESI);
+				// save low result
+				XS.Push(XSRegisters.EAX);
+
+				XS.Label(LabelEnd);
             }
             else
             {
-                if (TypeIsFloat(xStackItem))
-                {
-                    XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                    XS.Add(XSRegisters.ESP, 4);
-                    XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
-                    XS.SSE.MulSS(XMM0, XMM1);
-                    XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
-                }
-                else
-                {
-                    XS.Xor(XSRegisters.EDX, XSRegisters.EDX);
-                    XS.Pop(XSRegisters.ECX);
-                    XS.Pop(XSRegisters.EAX);
-                    XS.Divide(XSRegisters.ECX);
-                    XS.Push(XSRegisters.EAX);
-                }
+                XS.Xor(XSRegisters.EDX, XSRegisters.EDX);
+                XS.Pop(XSRegisters.ECX);
+                XS.Pop(XSRegisters.EAX);
+                XS.Divide(XSRegisters.ECX);
+                XS.Push(XSRegisters.EAX);
             }
         }
     }

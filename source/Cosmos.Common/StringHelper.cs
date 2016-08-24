@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cosmos.Common
 {
@@ -129,6 +125,254 @@ namespace Cosmos.Common
             }
 
             return xResult;
+        }
+
+        /*
+         * This implementation could only print values which integer part is < ULONG_MAX, the only solution would have been to use BigInteger but then
+         * I'd have an analogous problem: to plug BigInteger.ToString() and I don't know how many other things.
+         * We will retain this code for now it is OK for debug purposes and big value should be printed in scientific notation to be readable anyway...
+         */
+        public static string GetNumberString(float aValue)
+        {
+            var singleBytes = BitConverter.GetBytes(aValue);
+            int hexVal = BitConverter.ToInt32(singleBytes, 0);
+            
+            /* Let's extract the parts that compose our single: sign, exponent and mantissa */
+            bool isNeg = (hexVal >> 31) != 0;
+            int exp = ((hexVal >> 23) & 0xFF);
+            ulong mantissa = (ulong)(hexVal & 0x7FFFFF);
+
+            ulong intPart = 0, fracPart = 0;
+
+            /* First we handle the special cases INF, NaN, 0 and denormalized float */
+            switch (exp)
+            {
+                /*
+                 * INF or NaN?
+                 */
+                case 0xFF:
+                    if (mantissa == 0)
+                    {
+                        if (isNeg)
+                            return "-∞";
+                        else
+                            return "∞";
+                    }
+                    else
+                        /* It could exist -NaN but this is always printed as NaN */
+                        return "NaN";
+
+                /* 0 or denormalized float? */
+                case 0x00:
+                    if (mantissa == 0)
+                        return "0";
+                    /* Denormalized float have always exp -126 */
+                    else
+                        exp = -126;
+                    break;
+
+                /* Normalized float the exponent is unbiased and the implicit leading one is placed in the mantissa */
+                default:
+                    exp -= 127;
+                    mantissa |= 0x800000;
+                    break;
+            }
+
+            if (exp >= 23)
+            {
+                intPart = mantissa << (exp - 23);
+            }
+            else if (exp >= 0)
+            {
+                intPart = mantissa >> (23 - exp);
+                fracPart = (mantissa << (exp + 1)) & 0xFFFFFF;
+            }
+            else
+            {
+                fracPart = (mantissa & 0xFFFFFF) >> (-(exp + 1));
+            }
+
+            string result = "";
+
+            if (isNeg)
+            {
+                result += "-";
+            }
+
+            result += intPart.ToString();
+            int usedDigits = intPart.ToString().Length;
+            if (fracPart == 0)
+            {
+                return result;
+            }
+            result += ".";
+
+            if (usedDigits >= 7)
+            {
+                usedDigits = 6;
+            }
+            for (int m = usedDigits; m < 7; m++)
+            {
+                fracPart = (fracPart << 3) + (fracPart << 1);
+
+                char p = (char)((fracPart >> 24) + '0');
+                result += p;
+
+                fracPart &= 0xFFFFFF;
+            }
+            fracPart = (fracPart << 3) + (fracPart << 1);
+            char remain = (char)((fracPart >> 24) + '0');
+            if ((remain > '5') && (result[result.Length - 1] > '0'))
+            {
+                char[] answer = result.ToCharArray();
+                int digitPos = answer.Length - 1;
+                char digit = result[digitPos];
+                answer[digitPos] = (char)(digit + 1);
+                while (answer[digitPos] > '9')
+                {
+                    answer[digitPos] = '0';
+                    digitPos--;
+                    digit = result[digitPos];
+                    if (digit == '.')
+                    {
+                        digitPos--;
+                        digit = result[digitPos];
+                    }
+                    answer[digitPos] = (char)(digit + 1);
+                }
+
+                result = new string(answer);
+            }
+
+            while (result[result.Length - 1] == '0')
+            {
+                result = result.Substring(0, result.Length - 1);
+            }
+
+            return result;
+        }
+
+        /*
+         * This implementation could only print values which integer part is < ULONG_MAX, the only solution would have been to use BigInteger but then
+         * I'd have an analogous problem: to plug BigInteger.ToString() and I don't know how many other things.
+         * We will retain this code for now it is OK for debug purposes and big value should be printed in scientific notation to be readable anyway...
+         */
+        public static string GetNumberString(double aValue)
+        {
+            long hexVal = BitConverter.DoubleToInt64Bits(aValue);
+
+            /* Let's extract the parts that compose our double: sign, exponent and mantissa */
+            bool isNeg = (hexVal >> 63) != 0;
+            int exp = (int)((hexVal >> 52) & 0x07FF);
+            ulong mantissa = (ulong)(hexVal & 0x0FFFFFFFFFFFFF);
+
+            ulong intPart = 0, fracPart = 0;
+
+            /* First we handle the special cases INF, NaN, 0 and denormalized float */
+            switch (exp)
+            {
+                /*
+                 * INF or NaN?
+                 */
+                case 0x07ff:
+                    if (mantissa == 0)
+                    {
+                        if (isNeg)
+                            return "-∞";
+                        else
+                            return "∞";
+                    }
+                    else
+                        /* It could exist -NaN but this is always printed as NaN */
+                        return "NaN";
+
+                /* 0 or denormalized double? */
+                case 0x0000:
+                    if (mantissa == 0)
+                        return "0";
+                    /* Denormalized float have always exp -1022 */
+                    else
+                        exp = -1022;
+                    break;
+
+                /* Normalized double the exponent is unbiased and the implicit leading one is placed in the mantissa */
+                default:
+                    exp -= 1023;
+                    mantissa |= 0x10000000000000;
+                    break;
+            }
+
+            if (exp >= 52)
+            {
+                intPart = mantissa << (exp - 52);
+            }
+            else if (exp >= 0)
+            {
+                intPart = mantissa >> (52 - exp);
+                fracPart = (mantissa << (exp + 1)) & 0x1FFFFFFFFFFFFF;
+            }
+            else
+            {
+                fracPart = (mantissa & 0x1FFFFFFFFFFFFF) >> (-(exp + 1));
+            }
+
+            string result = "";
+
+            if (isNeg)
+            {
+                result += "-";
+            }
+
+            result += intPart.ToString();
+            int usedDigits = result.Length;
+            if (fracPart == 0)
+            {
+                return result;
+            }
+            result += ".";
+
+            if (usedDigits >= 15)
+            {
+                usedDigits = 14;
+            }
+            for (int m = usedDigits; m < 15; m++)
+            {
+                fracPart = (fracPart << 3) + (fracPart << 1);
+                char p = (char)(((fracPart >> 53) & 0xFF) + '0');
+                result += p;
+
+                fracPart &= 0x1FFFFFFFFFFFFF;
+            }
+            fracPart = (fracPart << 3) + (fracPart << 1);
+            char remain = (char)((fracPart >> 53) + '0');
+            if ((remain > '5') && (result[result.Length - 1] > '0'))
+            {
+                char[] answer = result.ToCharArray();
+                int digitPos = answer.Length - 1;
+                char digit = result[digitPos];
+                answer[digitPos] = (char)(digit + 1);
+                while (answer[digitPos] > '9')
+                {
+                    answer[digitPos] = '0';
+                    digitPos--;
+                    digit = result[digitPos];
+                    if (digit == '.')
+                    {
+                        digitPos--;
+                        digit = result[digitPos];
+                    }
+                    answer[digitPos] = (char)(digit + 1);
+                }
+
+                result = new string(answer);
+            }
+
+            while (result[result.Length - 1] == '0')
+            {
+                result = result.Substring(0, result.Length - 1);
+            }
+
+            return result;
         }
 
         public static int GetStringToNumber(string aString)

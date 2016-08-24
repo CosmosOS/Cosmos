@@ -22,6 +22,16 @@ namespace Cosmos.Core {
 
             PIC = new PIC();
             CPU.UpdateIDT(true);
+
+            /* TODO check using CPUID that SSE2 is supported */ 
+            CPU.InitSSE();
+
+            /*
+             * We liked to use SSE for all floating point operation and end to mix SSE / x87 in Cosmos code
+             * but sadly in x86 this resulte impossible as Intel not implemented some needed instruction (for example conversion
+             * for long to double) so - in some rare cases - x87 continue to be used. I hope passing to the x32 or x64 IA will solve
+             * definively this problem.
+             */
             CPU.InitFloat();
             
            // Managed_Memory_System.ManagedMemory.Initialize();

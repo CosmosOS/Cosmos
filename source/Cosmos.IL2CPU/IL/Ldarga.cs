@@ -17,131 +17,49 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xOpVar = (OpVar)aOpCode;
+
             var xDisplacement = Ldarg.GetArgumentDisplacement(aMethod, xOpVar.Value);
+
+            /*
+             * The function GetArgumentDisplacement() does not give the correct displacement for the Ldarga opcode
+             * we need to "fix" it subtracting the argSize and 4
+             */
+            Type xArgType;
+            if (aMethod.MethodBase.IsStatic)
+            {
+                xArgType = aMethod.MethodBase.GetParameters()[xOpVar.Value].ParameterType;
+            }
+            else
+            {
+                if (xOpVar.Value == 0u)
+                {
+                    xArgType = aMethod.MethodBase.DeclaringType;
+                    if (xArgType.IsValueType)
+                    {
+                        xArgType = xArgType.MakeByRefType();
+                    }
+                }
+                else
+                {
+                    xArgType = aMethod.MethodBase.GetParameters()[xOpVar.Value - 1].ParameterType;
+                }
+            }
+
+            uint xArgRealSize = SizeOfType(xArgType);
+            uint xArgSize = Align(xArgRealSize, 4);
+            XS.Comment("Arg type = " + xArgType.ToString());
+            XS.Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
+
+            xDisplacement -= (int)(xArgSize - 4);
+            XS.Comment("Real displacement " + xDisplacement);
+
             XS.Set(XSRegisters.EBX, (uint)(xDisplacement));
             XS.Set(XSRegisters.EAX, XSRegisters.EBP);
             XS.Add(XSRegisters.EAX, XSRegisters.EBX);
             XS.Push(XSRegisters.EAX);
-
-//            if (aMethod.MethodBase.DeclaringType.FullName == "Cosmos.Kernel.Plugs.Console"
-//                && aMethod.MethodBase.Name == "Write"
-//                && aMethod.MethodBase.GetParameters()[0].ParameterType == typeof(int))
-//            {
-//                Console.Write("");
-//            }
-//            Cosmos.IL2CPU.ILOpCodes.OpVar xOpVar = ( Cosmos.IL2CPU.ILOpCodes.OpVar )aOpCode;
-//            var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
-//            uint xReturnSize = 0;
-//            if( xMethodInfo != null )
-//            {
-//                xReturnSize = Align( SizeOfType( xMethodInfo.ReturnType ), 4 );
-//            }
-//            uint xOffset = 8;
-//            var xCorrectedOpValValue = xOpVar.Value;
-//            if( !aMethod.MethodBase.IsStatic && xOpVar.Value > 0 )
-//            {
-//                // if the method has a $this, the OpCode value includes the this at index 0, but GetParameters() doesnt include the this
-//                xCorrectedOpValValue -= 1;
-//            }
-//            var xParams = aMethod.MethodBase.GetParameters();
-//            for( int i = xParams.Length - 1; i > xCorrectedOpValValue; i-- )
-//            {
-//                var xSize = Align( SizeOfType( xParams[ i ].ParameterType ), 4 );
-//                xOffset += xSize;
-//            }
-//            var xCurArgSize = Align( SizeOfType( xParams[ xCorrectedOpValValue ].ParameterType ), 4 );
-//            uint xArgSize = 0;
-//            foreach( var xParam in xParams )
-//            {
-//                xArgSize += Align( SizeOfType( xParam.ParameterType ), 4 );
-//            }
-//            xReturnSize = 0;
-//            uint xExtraSize = 0;
-//            if( xReturnSize > xArgSize )
-//            {
-//                xExtraSize = xArgSize - xReturnSize;
-//            }
-//            xOffset += xExtraSize;
-//#warning TODO: check this
-//            XS.Push(XSRegisters.EBP);
-
-//            for( int i = 0; i < ( xCurArgSize / 4 ); i++ )
-//            {
-//                XS.Push(( uint )( xCurArgSize - ( ( i + 1 ) * 4 ) ));
-//            }
-//            Assembler.Stack.Push( ( int )xCurArgSize, xParams[ xCorrectedOpValValue ].ParameterType );
-
-//            //for( int i = 0; i < ( mSize / 4 ); i++ )
-//            //{
-//            //    mVirtualAddresses[ i ] = ( mOffset + ( ( i + 1 ) * 4 ) + 4 );
-//            //}
-//            //mAddress = aMethodInfo.Arguments[ aIndex ].VirtualAddresses.First();
-
-
-//            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
-
-//            //XS.Push(( uint )mAddress);
-//            //
-//            Assembler.Stack.Push( new StackContents.Item( 4, typeof( uint ) ) );
-
-//            new Add( Assembler ).Execute( aMethod, aOpCode );
         }
-
-
-        // using System;
-        // using System.Linq;
-        //
-        //
-        // using CPU = Cosmos.Assembler.x86;
-        // using Cosmos.IL2CPU.X86;
-        //
-        // namespace Cosmos.IL2CPU.IL.X86 {
-        // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Ldarga)]
-        // 	public class Ldarga: Op {
-        // 		private int mAddress;
-        //         private string mNextLabel;
-        // 	    private string mCurLabel;
-        // 	    private uint mCurOffset;
-        // 	    private MethodInformation mMethodInformation;
-        // 		protected void SetArgIndex(int aIndex, MethodInformation aMethodInfo) {
-        // 			mAddress = aMethodInfo.Arguments[aIndex].VirtualAddresses.First();
-        // 		}
-        //         public Ldarga(MethodInformation aMethodInfo, int aIndex, string aCurrentLabel, uint aCurrentOffset, string aNextLabel)
-        // 			: base(null, aMethodInfo) {
-        // 			SetArgIndex(aIndex, aMethodInfo);
-        //
-        //             mMethodInformation = aMethodInfo;
-        // 		    mCurOffset = aCurrentOffset;
-        // 		    mCurLabel = aCurrentLabel;
-        //             mNextLabel = aNextLabel;
-        // 		}
-        //
-        // 		public Ldarga(ILReader aReader, MethodInformation aMethodInfo)
-        // 			: base(aReader, aMethodInfo) {
-        // 			if (aReader != null) {
-        // 				SetArgIndex(aReader.OperandValueInt32, aMethodInfo);
-        // 				//ParameterDefinition xParam = aReader.Operand as ParameterDefinition;
-        // 				//if (xParam != null) {
-        // 				//    SetArgIndex(xParam.Sequence - 1, aMethodInfo);
-        // 				//}
-        // 			}
-        //             mMethodInformation = aMethodInfo;
-        // 		    mCurOffset = aReader.Position;
-        // 		    mCurLabel = IL.Op.GetInstructionLabel(aReader);
-        //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
-        // 		}
-        // 		public override void DoAssemble() {
-        //             XS.Push(XSRegisters.EBP);
-        // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
-        //             XS.Push((uint)mAddress);
-        // 			Assembler.Stack.Push(new StackContent(4, typeof(uint)));
-        // 			Add(Assembler, GetServiceProvider(), mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
-        // 		}
-        // 	}
-        // }
-
     }
 }

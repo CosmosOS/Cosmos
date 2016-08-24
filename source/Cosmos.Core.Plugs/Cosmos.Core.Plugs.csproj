@@ -95,6 +95,7 @@
   <ItemGroup>
     <Compile Include="CPUImpl.cs" />
     <Compile Include="IOPortImpl.cs" />
+    <Compile Include="ProcessorInformationImpl.cs" />
     <Compile Include="System\ArrayImpl.cs" />
     <Compile Include="Assemblers\DisableInterruptsAssembler.cs" />
     <Compile Include="Assemblers\EnableInterruptsAssembler.cs" />
@@ -105,7 +106,9 @@
     <Compile Include="System\Assemblers\GetMulticastInvokeAssembler.cs" />
     <Compile Include="System\Assemblers\InvokeImplAssembler.cs" />
     <Compile Include="System\Buffer.cs" />
+    <Compile Include="System\DateTimeImpl.cs" />
     <Compile Include="System\DelegateImpl.cs" />
+    <Compile Include="System\Diagnostics\StopwatchImpl.cs" />
     <Compile Include="System\IO\PathHelperImpl.cs" />
     <Compile Include="System\MulticastDelegateImpl.cs" />
     <Compile Include="System\NormalDelegateImpl.cs" />
@@ -119,6 +122,7 @@
     <Compile Include="System\Text\DecoderFallbackImpl.cs" />
     <Compile Include="System\Text\EncoderFallbackImpl.cs" />
     <Compile Include="System\Text\InternalDecoderBestFitFallbackBufferImpl.cs" />
+    <Compile Include="System\Threading\ThreadImpl.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj">

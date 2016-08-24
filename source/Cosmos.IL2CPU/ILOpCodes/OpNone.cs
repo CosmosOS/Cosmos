@@ -527,6 +527,13 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             // PopTypes set, but PushType not yet, so fill it.
 
+            if (StackPopTypes[0] == typeof(bool) && StackPopTypes[1] == typeof(bool))
+            {
+                StackPushTypes[0] = typeof(bool);
+                aSituationChanged = true;
+                return;
+            }
+
             if ((StackPopTypes[0] == typeof(bool) && StackPopTypes[1] == typeof(Int32)) ||
               (StackPopTypes[0] == typeof(Int32) && StackPopTypes[1] == typeof(bool)))
             {
@@ -702,6 +709,13 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             if (StackPopTypes[0] == typeof(ushort) && StackPopTypes[1] == typeof(ushort))
             {
               StackPushTypes[0] = typeof(ushort);
+              aSituationChanged = true;
+              return;
+            }
+            //Changed
+            if (StackPopTypes[0] == typeof(short) && StackPopTypes[1] == typeof(short))
+            {
+              StackPushTypes[0] = typeof(short);
               aSituationChanged = true;
               return;
             }

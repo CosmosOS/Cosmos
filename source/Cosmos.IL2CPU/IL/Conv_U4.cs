@@ -2,6 +2,7 @@ using System;
 using Cosmos.Assembler.x86.SSE;
 using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -30,27 +31,28 @@ namespace Cosmos.IL2CPU.X86.IL
 				case 4:
 					if (TypeIsFloat(xSource))
 					{
-						XS.SSE.MoveSS(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
-						XS.SSE.ConvertSS2SIAndTruncate(XSRegisters.EAX, XSRegisters.XMM0);
-						XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
-					}
+                        XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
+                        XS.SSE.ConvertSS2SIAndTruncate(EAX, XMM0);
+                        XS.Set(ESP, EAX, destinationIsIndirect: true);
+                    }
 					break;
                 case 8:
 					if (TypeIsFloat(xSource))
 					{
-                        XS.SSE3.MoveDoubleAndDuplicate(XSRegisters.XMM0, XSRegisters.ESP, sourceIsIndirect: true);
-						            XS.SSE2.ConvertSD2SIAndTruncate(XSRegisters.EAX, XSRegisters.XMM0);
-                        XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
-                        XS.Pop(XSRegisters.EAX);
-                        XS.Add(XSRegisters.ESP, 4);
-                        XS.Push(XSRegisters.EAX);
+                        XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+                        XS.SSE2.ConvertSD2SIAndTruncate(EAX, XMM0);
+                        // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
+                        XS.Add(ESP, 4);
+                        XS.Set(ESP, EAX, destinationIsIndirect: true);
+                        // Is this really needed? Conv.U2 and Conv.U1 did not this! In reality they should call the same code...
+                        //XS.Push(EAX);
                         break;
 					}
 					else
                     {
-                        XS.Pop(XSRegisters.EAX);
-                        XS.Pop(XSRegisters.ECX);
-                        XS.Push(XSRegisters.EAX);
+                        XS.Pop(EAX);
+                        XS.Pop(ECX);
+                        XS.Push(EAX);
                         break;
                     }
                 default:

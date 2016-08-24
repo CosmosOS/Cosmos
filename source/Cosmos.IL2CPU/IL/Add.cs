@@ -34,14 +34,18 @@ namespace Cosmos.IL2CPU.X86.IL
         {
           if (xSize > 4)
           {
-            if (xIsFloat)
+            if (xIsFloat) // double
             {
-              XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
-              XS.Add(ESP, 8);
-              new CPUx86.x87.FloatAdd { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, Size = 64 };
-              XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
+
+               // Please note that SSE supports double operations only from version 2
+               XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+               // Move the stack of 8 bytes to get the second double
+               XS.Add(ESP, 8);
+               XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
+               XS.SSE2.AddSD(XMM1, XMM0);
+               XS.SSE2.MoveSD(ESP, XMM1, destinationIsIndirect: true);
             }
-            else
+            else // long
             {
               XS.Pop(XSRegisters.EDX); // low part
               XS.Pop(XSRegisters.EAX); // high part
@@ -56,8 +60,8 @@ namespace Cosmos.IL2CPU.X86.IL
               XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
               XS.Add(XSRegisters.ESP, 4);
               XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
-              XS.SSE.AddSS(XMM0, XMM1);
-              XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
+              XS.SSE.AddSS(XMM1, XMM0);
+              XS.SSE.MoveSS(ESP, XMM1, destinationIsIndirect: true);
             }
             else //integer
             {

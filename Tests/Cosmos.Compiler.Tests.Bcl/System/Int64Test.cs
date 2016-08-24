@@ -48,6 +48,24 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             val2 = long.Parse("42");
             Assert.IsTrue(val2 == 42, "Parsing Int64 doesn't work.");
 
+            /* Let's test right shift */
+            value = 4631166901565532406;
+
+            val2 = value >> 20;
+            Assert.IsTrue(val2 == 4416624929013, "long right shift does not work");
+
+            val2 = value >> 52;
+            Assert.IsTrue(val2 == 1028, "long right shift (count >=32) does not work");
+
+            /* ... and now left shift */
+            value = 4631166901565532406;
+
+            val2 = value << 20;
+            Assert.IsTrue(val2 == 6640827866535690240, "long left shift does not work got " + val2);
+
+            val2 = value << 52;
+            Assert.IsTrue(val2 == -8115486528521633792, "long left shift (count >=32) does not work got " + val2);
+
 #if false
 
     // Now let's try ToString() again but printed in hex (this test fails for now!)

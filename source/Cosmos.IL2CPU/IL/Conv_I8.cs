@@ -30,6 +30,10 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 4:
 					if (xSourceIsFloat)
 					{
+                        /* 
+                         * Sadly for x86 there is no way using SSE to convert a float to an Int64... in x64 we could use ConvertPD2DQAndTruncate with
+                         * x64 register as a destination... so this one of the few cases in which we need the legacy FPU!
+                         */
 						XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Int32);
 						XS.Sub(XSRegisters.ESP, 4);
 						XS.FPU.IntStoreWithTruncate(ESP, isIndirect: true, size: RegisterSize.Long64);
@@ -45,6 +49,10 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 8:
 					if (xSourceIsFloat)
 					{
+                        /* 
+                         * Sadly for x86 there is no way using SSE to convert a double to an Int64... in x64 we could use ConvertPD2DQAndTruncate with
+                         * x64 register as a destination... so only in this case we need the legacy FPU!
+                         */
 						XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
 						XS.FPU.IntStoreWithTruncate(ESP, isIndirect: true, size: RegisterSize.Long64);
 					}

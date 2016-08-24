@@ -11,6 +11,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(("a" + "b") == "ab", "concatting 2 string using + doesn't work");
             Assert.IsTrue(("a" + 'b') == "ab", "concatting 1 string and 1 character doesn't work");
 
+            string a = "a";
+            string b = "b";
+            string result = a + b;
+            Assert.IsTrue(result == "ab", "concatting 2 string (not optimizable) using + doesn't work"); // Fails
+
             char x = 'a';
             string y = "a";
             Assert.IsTrue(x.ToString() == y, "String == operator ");
