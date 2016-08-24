@@ -10,13 +10,14 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         // This does not compile: 
         public static void Execute()
         {
-#if false
+
             Decimal value;
             String result;
             String expectedResult;
 
             value = 42.42M; // It exists Single.MaxValue but it is a too big value an can be represented only on Scientific notation but then how to confront with a String?
 
+#if false
             // This does not compile: Error: Exception: System.Exception: Native code encountered, plug required. Please see https://github.com/CosmosOS/Cosmos/wiki/Plugs). System.String  System.Number.FormatDecimal(System.Decimal, System.String, System.Globalization.NumberFormatInfo
             result = value.ToString();
             expectedResult = "42.42";

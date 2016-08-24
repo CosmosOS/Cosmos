@@ -75,26 +75,6 @@ namespace Cosmos.IL2CPU.X86.IL {
            // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
            XS.Add(ESP, 4);
            XS.Set(ESP, EBX, destinationIsIndirect: true);
-           // This is the x87 version I left it here commented if in future will be needed...
-#if false
-          XS.Set(XSRegisters.ESI, 1);
-          // esi = 1
-          XS.Xor(XSRegisters.EDI, XSRegisters.EDI);
-          // edi = 0
-
-          // value 1
-          new FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationDisplacement = 8, DestinationIsIndirect = true };
-          // value 2
-          XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
-          XS.FPU.FloatCompareAndSet(ST1);
-          // if zero is set, ST(0) == ST(i)
-          new ConditionalMove { Condition = ConditionalTestEnum.Equal, DestinationReg = RegistersEnum.EDI, SourceReg = RegistersEnum.ESI };
-          // pops fpu stack
-          XS.FPU.FloatStoreAndPop(ST0);
-          XS.FPU.FloatStoreAndPop(ST0);
-          XS.Add(XSRegisters.ESP, 16);
-          XS.Push(XSRegisters.EDI);
-#endif
         }
         else
         {

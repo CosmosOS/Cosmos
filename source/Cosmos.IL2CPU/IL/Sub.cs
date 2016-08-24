@@ -58,23 +58,6 @@ namespace Cosmos.IL2CPU.X86.IL
                         XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
                         XS.SSE2.SubSD(XMM1, XMM0);
                         XS.SSE2.MoveSD(ESP, XMM1, destinationIsIndirect: true);
-#if false
-                         new FloatLoad
-                        {
-                            DestinationReg = RegistersEnum.ESP,
-                            Size = 64,
-                            DestinationIsIndirect = true,
-                            DestinationDisplacement = 8
-                        };
-                        new FloatSub
-                        {
-                            DestinationReg = RegistersEnum.ESP,
-                            DestinationIsIndirect = true,
-                            Size = 64
-                        };
-                        XS.Add(ESP, 8);
-                        XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
-#endif
                     }
                     else
                     {

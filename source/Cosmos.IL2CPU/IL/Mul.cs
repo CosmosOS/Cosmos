@@ -35,18 +35,6 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
                     XS.SSE2.MulSD(XMM1, XMM0);
                     XS.SSE2.MoveSD(ESP, XMM1, destinationIsIndirect: true);
-                    // x87 code left for future use
-#if false
-                    XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
-                    XS.Add(ESP, 8);
-                    new CPUx86.x87.FloatMul
-                    {
-                        DestinationReg = CPUx86.RegistersEnum.ESP,
-                        DestinationIsIndirect = true,
-                        Size = 64
-                    };
-                    XS.FPU.FloatStoreAndPop(ESP, isIndirect: true, size: RegisterSize.Long64);
-#endif
                 }
                 else
                 {
