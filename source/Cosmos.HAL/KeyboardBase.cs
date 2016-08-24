@@ -10,8 +10,6 @@ namespace Cosmos.HAL
     {
         protected KeyboardBase()
         {
-            Debugger.DoSend("mQueuedKeys created");
-            Debugger.DoSend("Keylayout set");
             Initialize();
             Debugger.DoSend("Initialized");
             UpdateLeds();
