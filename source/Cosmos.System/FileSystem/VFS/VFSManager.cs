@@ -39,6 +39,19 @@ namespace Cosmos.System.FileSystem.VFS
             return mVFS.CreateFile(aPath);
         }
 
+        public static void DeleteFile(string aPath)
+        {
+            if (mVFS == null)
+                throw new Exception("VFSManager isn't ready.");
+
+            var xFile = mVFS.GetFile(aPath);
+
+            if (xFile.mEntryType != DirectoryEntryTypeEnum.File)
+                throw new UnauthorizedAccessException("The specified path isn't a file");
+
+            mVFS.DeleteFile(xFile);
+        }
+
         public static DirectoryEntry GetFile(string aPath)
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetFile ---");
@@ -92,6 +105,42 @@ namespace Cosmos.System.FileSystem.VFS
             Global.mFileSystemDebugger.SendInternal(aPath);
 
             return mVFS.CreateDirectory(aPath);
+        }
+
+        public static void DeleteDirectory(string aPath, bool recursive)
+        {
+            if (mVFS == null)
+                throw new Exception("VFSManager isn't ready.");
+
+            var xDirectory = mVFS.GetDirectory(aPath);
+            var xDirectoryListing = mVFS.GetDirectoryListing(xDirectory);
+
+            if (xDirectory.mEntryType != DirectoryEntryTypeEnum.Directory)
+                throw new IOException("The specified path isn't a directory");
+
+            if (xDirectoryListing.Count > 0 && !recursive)
+                throw new IOException("Directory is not empty");
+
+            if(recursive)
+            {
+                foreach (var entry in xDirectoryListing)
+                {
+                    if (entry.mEntryType == DirectoryEntryTypeEnum.Directory)
+                    {
+                        DeleteDirectory(entry.mFullPath, true);
+                    }
+                    else if (entry.mEntryType == DirectoryEntryTypeEnum.File)
+                    {
+                        DeleteFile(entry.mFullPath);
+                    }
+                    else
+                    {
+                        throw new IOException("The directory contains a corrupted file");
+                    }
+                }
+            }
+
+            mVFS.DeleteDirectory(xDirectory);
         }
 
         public static DirectoryEntry GetDirectory(string aPath)

@@ -149,6 +149,47 @@ namespace Cosmos.System.FileSystem
         }
 
         /// <summary>
+        /// Deletes a file.
+        /// </summary>
+        /// <param name="aPath">The full path.</param>
+        /// <returns></returns>
+        public override bool DeleteFile(DirectoryEntry aPath)
+        {
+            try
+            {
+                var xFS = GetFileSystemFromPath(aPath.mFullPath);
+                xFS.DeleteFile(aPath);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Deletes an empty directory.
+        /// </summary>
+        /// <param name="aPath">The full path.</param>
+        /// <returns></returns>
+        public override bool DeleteDirectory(DirectoryEntry aPath)
+        {
+            try
+            {
+                if (GetDirectoryListing(aPath).Count > 0)
+                    throw new Exception("Directory is not empty");
+
+                var xFS = GetFileSystemFromPath(aPath.mFullPath);
+                xFS.DeleteDirectory(aPath);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Gets the directory listing for a path.
         /// </summary>
         /// <param name="aPath">The full path.</param>
@@ -167,15 +208,12 @@ namespace Cosmos.System.FileSystem
         /// <returns></returns>
         public override List<DirectoryEntry> GetDirectoryListing(DirectoryEntry aDirectory)
         {
-            DirectoryEntry xTempEntry = aDirectory;
-            string xFullPath = "";
-            while (xTempEntry.mParent != null)
+            if (aDirectory == null || String.IsNullOrEmpty(aDirectory.mFullPath))
             {
-                xFullPath = Path.Combine(xTempEntry.mName, xFullPath);
-                xTempEntry = xTempEntry.mParent;
+                throw new ArgumentException("Argument is null or empty", nameof(aDirectory));
             }
 
-            return GetDirectoryListing(xFullPath);
+            return GetDirectoryListing(aDirectory.mFullPath);
         }
 
         /// <summary>
@@ -321,7 +359,7 @@ namespace Cosmos.System.FileSystem
 
                 if ((mFileSystems.Count > 0) && (mFileSystems[mFileSystems.Count - 1].mRootPath == xRootPath))
                 {
-                    string xMessage = string.Concat("Initialized ", mFileSystems.Count, "filesystem(s)...");
+                    string xMessage = string.Concat("Initialized ", mFileSystems.Count, " filesystem(s)...");
                     global::System.Console.WriteLine(xMessage);
                     mFileSystems[i].DisplayFileSystemInfo();
                     Directory.SetCurrentDirectory(xRootPath);

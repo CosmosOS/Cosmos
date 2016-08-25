@@ -496,7 +496,16 @@ namespace Cosmos.Kernel.Tests.Fat
             var xDirectory = Directory.CreateDirectory(@"0:\test2");
             Assert.IsTrue(xDirectory != null, "Directory.CreateDirectory failed: Directory is null");
             bool xExists = Directory.Exists(@"0:\test2");
-            Assert.IsTrue(xExists, "Directory.CreateDirectory failed: Directory is doesn't exist after create call");
+            Assert.IsTrue(xExists, "Directory.CreateDirectory failed: Directory doesn't exist after create call");
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST: Delete a directory:");
+            Directory.CreateDirectory(@"0:\TestDir1");
+            Assert.IsTrue(Directory.Exists(@"0:\TestDir1"), "TestDir1 wasn't created!");
+            Directory.Delete(@"0:\TestDir1");
+            Assert.IsFalse(Directory.Exists(@"0:\TestDir1"), "TestDir1 wasn't deleted!");
             mDebugger.Send("END TEST");
 
             mDebugger.Send("");
@@ -682,6 +691,22 @@ namespace Cosmos.Kernel.Tests.Fat
             //    "Contents of Kudzu.txt was appended incorrectly!");
             //mDebugger.Send("END TEST");
             //mDebugger.Send("");
+
+            mDebugger.Send("START TEST: Delete a file:");
+            File.Create(@"0:\test1.txt");
+            Assert.IsTrue(File.Exists(@"0:\test1.txt"), "test1.txt wasn't created!");
+            File.Delete(@"0:\test1.txt");
+            Assert.IsFalse(File.Exists(@"0:\test1.txt"), "test1.txt wasn't deleted!");
+            mDebugger.Send("END TEST");
+
+            //mDebugger.Send("START TEST: Delete a directory with File.Delete:");
+            //Simple test: create a directory, then try to delete it as a file.
+            //Directory.CreateDirectory(@"0:\Dir1");
+
+            //File.Delete(@"0:\Dir1");
+            //Assert.IsTrue(Directory.Exists(@"0:\Dir1"), "Yeah, it's actually deleting the directory. That isn't right.");
+
+            //mDebugger.Send("END TEST");
         }
 
         #endregion

@@ -178,6 +178,14 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             throw new ArgumentOutOfRangeException(nameof(aType), "Unknown directory entry type.");
         }
 
+        public void DeleteDirectoryEntry()
+        {
+            if (mEntryType == DirectoryEntryTypeEnum.Unknown)
+                throw new NotImplementedException();
+
+            SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstByte, FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry);
+        }
+
         public List<FatDirectoryEntry> ReadDirectoryContents()
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.ReadDirectoryContents --");
@@ -197,15 +205,14 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 if (xAttrib == FatDirectoryEntryAttributeConsts.LongName)
                 {
                     byte xType = xData[i + 12];
-                    byte xOrd = xData[i];
-                    if (xOrd == 0xE5)
+                    if (xStatus == FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry)
                     {
                         Global.mFileSystemDebugger.SendInternal("<DELETED> : Attrib = " + xAttrib + ", Status = " + xStatus);
                         continue;
                     }
                     if (xType == 0)
                     {
-                        if ((xOrd & 0x40) > 0)
+                        if ((xStatus & 0x40) > 0)
                         {
                             xLongName = "";
                         }
@@ -243,7 +250,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                         case 0x05:
                             // Japanese characters - We dont handle these
                             break;
-                        case 0xE5:
+                        case FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry:
                             // Empty slot, skip it
                             break;
                         default:
@@ -291,7 +298,11 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 uint xFirstCluster = (uint)(xData.ToUInt16(i + 20) << 16 | xData.ToUInt16(i + 26));
 
                 int xTest = xAttrib & (FatDirectoryEntryAttributeConsts.Directory | FatDirectoryEntryAttributeConsts.VolumeID);
-                if (xAttrib == FatDirectoryEntryAttributeConsts.LongName)
+                if (xStatus == FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry)
+                {
+                    // deleted file
+                }
+                else if (xAttrib == FatDirectoryEntryAttributeConsts.LongName)
                 {
                     // skip adding, as it's a LongFileName entry, meaning the next normal entry is the item with the name.
                     //Global.mFileSystemDebugger.SendInternal($"Entry was a Long FileName entry. Current LongName = '{xLongName}'");
