@@ -118,6 +118,7 @@
     <Compile Include="Network\UdpClient.cs" />
     <Compile Include="Power.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScanMaps\DE_Standard.cs" />
     <Compile Include="ScanMaps\FR_Standard.cs" />
     <Compile Include="ScanMaps\US_Standard.cs" />
     <Compile Include="TestingHelpers.cs" />

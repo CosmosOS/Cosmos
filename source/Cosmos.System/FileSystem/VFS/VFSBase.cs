@@ -11,6 +11,10 @@ namespace Cosmos.System.FileSystem.VFS
 
         public abstract DirectoryEntry CreateDirectory(string aPath);
 
+        public abstract bool DeleteFile(DirectoryEntry aPath);
+
+        public abstract bool DeleteDirectory(DirectoryEntry aPath);
+
         public abstract DirectoryEntry GetDirectory(string aPath);
 
         public abstract DirectoryEntry GetFile(string aPath);

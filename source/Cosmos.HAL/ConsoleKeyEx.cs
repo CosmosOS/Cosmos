@@ -75,6 +75,7 @@ namespace Cosmos.HAL
 
         LShift,
         RShift,
+        OEM102, // <<=== This key does not exist on a US keyboard, but on the german one. It contains the characters `|`, `<` and `>`
         Z,
         X,
         C,

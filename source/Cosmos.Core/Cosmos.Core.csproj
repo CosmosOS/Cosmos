@@ -117,6 +117,7 @@
     <Compile Include="IOPort.cs" />
     <Compile Include="MemoryBlock.cs" />
     <Compile Include="PIC.cs" />
+    <Compile Include="ProcessorInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

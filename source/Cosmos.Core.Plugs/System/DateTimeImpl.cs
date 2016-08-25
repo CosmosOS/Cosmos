@@ -8,7 +8,7 @@ namespace Cosmos.Core.Plugs.System
     public class DateTimeImpl
     {
 
-        public DateTime get_Now()
+        public static DateTime get_Now()
         {
             int[] raw = GetRawDate();
             
@@ -19,14 +19,11 @@ namespace Cosmos.Core.Plugs.System
                 BCDtoBIN(raw[4]), //HOUR
                 BCDtoBIN(raw[2]), //MINUTE
                 BCDtoBIN(raw[0]) //SECOND
-                );
+            );
         }
 
-        public DateTime get_UtcNow()
-        {
-            // TODO: get timezone
-            return get_Now();
-        }
+        // TODO: get timezone
+        public static DateTime get_UtcNow() => get_Now();
 
         private static int[] GetRawDate()
         {
@@ -54,13 +51,12 @@ namespace Cosmos.Core.Plugs.System
 
             return raw;
         }
+        
+        public static long GetSystemTimeAsFileTime() => get_Now().Ticks;
 
         /// <summary>
         /// Converts BCD-encoded numbers to `normal` (binary-encoded) numbers
         /// </summary>
-        private static int BCDtoBIN(int bcd)
-        {
-            return ((bcd & 0xf0) >> 1) + ((bcd & 0xf0) >> 3) + (bcd & 0xf);
-        }
+        private static int BCDtoBIN(int bcd) => ((bcd & 0xf0) >> 1) + ((bcd & 0xf0) >> 3) + (bcd & 0xf);
     }
 }
