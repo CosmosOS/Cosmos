@@ -776,6 +776,11 @@ namespace XSharp.Compiler
       Do<Add>(register, valueToAdd);
     }
 
+    public static void Add(Register register, uint valueToAdd, bool destinationIsIndirect = false)
+    {
+      Do<Add>(register, valueToAdd, destinationIsIndirect: destinationIsIndirect);
+    }
+
     public static void Add(Register register, Register valueToAdd, bool destinationIsIndirect = false)
     {
       Do<Add>(register, valueToAdd, destinationIsIndirect: destinationIsIndirect);

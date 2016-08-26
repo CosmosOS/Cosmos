@@ -1,4 +1,4 @@
-; Generated at 6/26/2016 1:42:14 PM
+; Generated at 8/25/2016 4:07:44 PM
 
 
 
@@ -201,6 +201,7 @@
 			Call DebugStub_ComWriteAL
 			mov dword EAX, [EBP + 8]
 			Call DebugStub_ComWriteEAX
+			Call DebugStub_SendCoreDump
 			Popad
 			pop dword EBP
 

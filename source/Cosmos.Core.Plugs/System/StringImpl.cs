@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define COSMOSDEBUG
+
+using System;
 using System.Globalization;
 using System.Text;
 
@@ -36,6 +38,7 @@ namespace Cosmos.Core.Plugs.System
 
         public static unsafe void Ctor(
             string aThis,
+                        [ObjectPointerAccess]
             char* aChars,
             int start,
             int length,
@@ -238,8 +241,13 @@ namespace Cosmos.Core.Plugs.System
                         mDebugger.SendInternal("Converted paramindex to a number.");
                         if ((xParamIndex < aArgs.Length) && (aArgs[xParamIndex] != null))
                         {
-                            string xParamValue = aArgs[xParamIndex].ToString();
+                            string xParamValue = (string)aArgs[xParamIndex];
+                            mDebugger.SendInternal("Param value");
+                            mDebugger.SendInternal(xParamValue);
                             xFormattedString = string.Concat(xFormattedString, xParamValue);
+                            mDebugger.SendInternal("Formatted string");
+                            mDebugger.SendInternal(xFormattedString);
+
                         }
                         xFoundPlaceholder = false;
                         xParamNumberDone = true;
@@ -267,6 +275,11 @@ namespace Cosmos.Core.Plugs.System
                     mDebugger.SendInternal("Found opening placeholder");
                     xStaticString = aFormat.Substring(xLastPlaceHolder, i - xLastPlaceHolder);
                     xFormattedString = string.Concat(xFormattedString, xStaticString);
+                    mDebugger.SendInternal("Static string");
+                    mDebugger.SendInternal(xStaticString);
+                    mDebugger.SendInternal("Formatted string");
+                    mDebugger.SendInternal(xFormattedString);
+
                     xFoundPlaceholder = true;
                     xParamNumberDone = false;
                 }
@@ -846,7 +859,7 @@ namespace Cosmos.Core.Plugs.System
             throw new ArgumentNullException();
         }
 
-        public static int GetHashCode(ref String aThis)
+        public static int GetHashCode(ref string aThis)
         {
             throw new NotImplementedException("String.GetHashCode()");
         }

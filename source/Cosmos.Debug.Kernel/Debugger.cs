@@ -35,7 +35,7 @@ namespace Cosmos.Debug.Kernel
         {
         } // Plugged
 
-        internal static void DoBochsBreak()
+        public static void DoBochsBreak()
         {
             // plugged
         }

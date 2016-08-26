@@ -134,7 +134,11 @@ namespace Cosmos.IL2CPU
       if (aType > 0xFFFF)
       {
         EnableDebug = true;
-        DebugAndHalt("Oops");
+        DebugHex("Type", aType);
+        DebugHex("MethodId", aMethodId);
+        Debugger.SendKernelPanic(KernelPanicTypes.VMT_TypeIdInvalid);
+        while (true)
+        ;
       }
       var xCurrentType = aType;
       DebugHex("Type", xCurrentType);
@@ -147,13 +151,17 @@ namespace Cosmos.IL2CPU
 
         if (xCurrentTypeInfo.MethodIndexes == null)
         {
+          EnableDebug = true;
           DebugHex("MethodIndexes is null for type", aType);
+          Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodIndexesNull);
           while (true)
             ;
         }
         if (xCurrentTypeInfo.MethodAddresses == null)
         {
+          EnableDebug = true;
           DebugHex("MethodAddresses is null for type", aType);
+          Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodAddressesNull);
           while (true)
             ;
         }
@@ -165,6 +173,7 @@ namespace Cosmos.IL2CPU
             var xResult = xCurrentTypeInfo.MethodAddresses[i];
             if (xResult < 1048576) // if pointer is under 1MB, some issue exists!
             {
+              EnableDebug = true;
               DebugHex("Result", (uint)xResult);
               DebugHex("i", (uint)i);
               DebugHex("MethodCount", (uint)xCurrentTypeInfo.MethodCount);

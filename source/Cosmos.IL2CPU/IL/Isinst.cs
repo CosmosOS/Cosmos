@@ -25,8 +25,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
-            XS.Exchange(XSRegisters.BX, XSRegisters.BX);
-
             OpType xType = (OpType)aOpCode;
             string xTypeID = GetTypeIDLabel(xType.Value);
             string xCurrentMethodLabel = GetLabel(aMethod, aOpCode);

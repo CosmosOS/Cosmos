@@ -22,11 +22,11 @@ namespace Cosmos.IL2CPU.X86.IL
         {
 
             var xType = aMethod.MethodBase.DeclaringType;
-            var xOpCode = ( ILOpCodes.OpField )aOpCode;
+            var xOpCode = (OpField)aOpCode;
             SysReflection.FieldInfo xField = xOpCode.Value;
 
             // call cctor:
-			      var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();
+			var xCctor = (xField.DeclaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic)).SingleOrDefault();
             if (xCctor != null)
             {
                 XS.Call(LabelName.Get(xCctor));

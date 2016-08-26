@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
@@ -8,17 +9,23 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
-            Assert.IsTrue(("a" + "b") == "ab", "concatting 2 string using + doesn't work");
-            Assert.IsTrue(("a" + 'b') == "ab", "concatting 1 string and 1 character doesn't work");
+            //string a = "a";
+            //string b1 = "b";
+            //string xResult = a + b1;
+            //Assert.IsTrue(xResult == "ab", "concatting 2 string using + doesn't work");
 
-            char x = 'a';
-            string y = "a";
-            Assert.IsTrue(x.ToString() == y, "String == operator ");
+            //char b2 = 'b';
+            //xResult = a + b2;
+            //Assert.IsTrue(xResult == "ab", "concatting 1 string and 1 character doesn't work");
 
-            string str = "Cosmos is awesome!";
-            string expected = "Cosmos";
-            string substr = str.Substring(0, 6);
-            Assert.IsTrue((substr == expected), "Substring is not equal to the expected result, result should be \"Cosmos\". Substrings are broken or MichaelTheShifter made an off-by-one error.");
+            //char x = 'a';
+            //string y = "a";
+            //Assert.IsTrue(x.ToString() == y, "String == operator ");
+
+            //string str = "Cosmos is awesome!";
+            //string expected = "Cosmos";
+            //string substr = str.Substring(0, 6);
+            //Assert.IsTrue((substr == expected), "Substring is not equal to the expected result, result should be \"Cosmos\".");
 
 
             int value1 = 1;
@@ -28,7 +35,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             string split_in = "ABC";
             Assert.IsTrue(split_in.Split('B').Length == 2, "Split(char) doesn't return 2 element");
-            Assert.IsTrue(split_in.Split(new[] { 'B'}).Length == 2, "String.Split(char[]) doesn't work.");
+            Assert.IsTrue(split_in.Split(new[] { 'B' }).Length == 2, "String.Split(char[]) doesn't work.");
             Assert.IsTrue((split_in.Split(new[] { "B" }, StringSplitOptions.None).Length == 2), "String.Split(string[], StringSplitOptions) doesn't work.");
 
             string test = "This is a test string.";

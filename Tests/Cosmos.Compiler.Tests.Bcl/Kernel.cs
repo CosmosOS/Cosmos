@@ -22,21 +22,21 @@ namespace Cosmos.Compiler.Tests.Bcl
             {
                 mDebugger.Send("Run");
 
-                CSharp.WhileLoopTests.Execute();
-                ObjectTests.Execute();
+                //CSharp.WhileLoopTests.Execute();
+                //ObjectTests.Execute();
                 StringTest.Execute();
-                ByteTest.Execute();
-                SByteTest.Execute();
-                Int16Test.Execute();
-                UInt16Test.Execute();
-                Int32Test.Execute();
-                UInt32Test.Execute();
-                Int64Test.Execute();
-                UInt64Test.Execute();
-                CharTest.Execute();
-                BooleanTest.Execute();
-                SingleTest.Execute();
-                DoubleTest.Execute();
+                //ByteTest.Execute();
+                //SByteTest.Execute();
+                //Int16Test.Execute();
+                //UInt16Test.Execute();
+                //Int32Test.Execute();
+                //UInt32Test.Execute();
+                //Int64Test.Execute();
+                //UInt64Test.Execute();
+                //CharTest.Execute();
+                //BooleanTest.Execute();
+                //SingleTest.Execute();
+                //DoubleTest.Execute();
 
 #if false
                 BitConverterTest.Execute();

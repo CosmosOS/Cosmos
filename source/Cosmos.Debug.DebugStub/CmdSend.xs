@@ -228,6 +228,7 @@ EBP = ESP
     EAX = EBP[8]
     ComWriteEAX()
 
+	SendCoreDump()
     -All
   -EBP
 }
@@ -411,8 +412,8 @@ function SendCoreDump {
     }
 
     // Send command
-		AL = #Ds2Vs_CoreDump
-		ComWriteAL()
+	AL = #Ds2Vs_CoreDump
+	ComWriteAL()
     EAX = ECX
     ComWriteAX()
     while ECX != 0 {
