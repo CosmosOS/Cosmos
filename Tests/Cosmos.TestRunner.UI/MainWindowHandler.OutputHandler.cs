@@ -129,6 +129,22 @@ namespace Cosmos.TestRunner.UI
         private void DisplayOnWindow(string _date, string _level, string _msg)
         {
             message_display_list.Items.Add(new ListViewLogMessage(_date, _level, _msg));
+
+            foreach(var column in (message_display_list.View as GridView).Columns)
+            {
+                if (double.IsNaN(column.Width))
+                {
+                    column.Width = column.ActualWidth;
+                }
+
+                column.Width = double.NaN;
+            }
+
+            if (message_display_list.SelectedIndex == message_display_list.Items.Count - 2)
+            {
+                message_display_list.SelectedIndex = message_display_list.Items.Count - 1;
+                message_display_list.ScrollIntoView(message_display_list.SelectedItem);
+            }
         }
     }
 }

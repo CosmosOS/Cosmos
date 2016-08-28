@@ -25,6 +25,8 @@ namespace Cosmos.TestRunner.UI
         {
             InitializeComponent();
 
+            message_display_list.Focus();
+
             testEngineHandler = new MainWindowHandler(message_display_list);
 
             testEngineHandler.TestFinished += delegate
@@ -62,6 +64,11 @@ namespace Cosmos.TestRunner.UI
 
                 testEngineHandler.outputHandler.SaveToFile(filename);
             }
+        }
+
+        private void copy_message_menu_item_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText(((ListViewLogMessage)message_display_list.SelectedItem).Message);
         }
     }
 }
