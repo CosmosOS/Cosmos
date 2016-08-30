@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
@@ -273,6 +273,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.Encryption", "..\Tests\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj", "{48EBDEB2-6A6A-4DF2-B5F1-DB6D299401F2}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.EncryptionBoot", "..\Tests\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.EncryptionBoot.Cosmos", "{CCF11819-C8F9-4A74-ACAE-1421B06720B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.ConsoleDrawTest", "Cosmos.Compiler.Tests.ConsoleDrawTest\Cosmos.Compiler.Tests.ConsoleDrawTest.csproj", "{0F7AA362-6076-4830-837D-31277E550856}"
+EndProject
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.ConsoleDrawTestBoot", "Cosmos.Compiler.Tests.ConsoleDrawTest\Cosmos.Compiler.Tests.ConsoleDrawTestBoot.Cosmos", "{1DE1F460-5DD0-4807-9B75-9899AC66A666}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleDraw", "Cosmos.Compiler.Tests.ConsoleDrawTest\ConsoleDraw\ConsoleDraw.csproj", "{5978DE85-3FB9-4BAB-965F-95E4398309A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1283,6 +1289,42 @@ Global
 		{CCF11819-C8F9-4A74-ACAE-1421B06720B6}.Release|x64.Build.0 = Debug|x86
 		{CCF11819-C8F9-4A74-ACAE-1421B06720B6}.Release|x86.ActiveCfg = Debug|x86
 		{CCF11819-C8F9-4A74-ACAE-1421B06720B6}.Release|x86.Build.0 = Debug|x86
+		{0F7AA362-6076-4830-837D-31277E550856}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{0F7AA362-6076-4830-837D-31277E550856}.Debug|Any CPU.Build.0 = Debug|x86
+		{0F7AA362-6076-4830-837D-31277E550856}.Debug|x64.ActiveCfg = Debug|x86
+		{0F7AA362-6076-4830-837D-31277E550856}.Debug|x64.Build.0 = Debug|x86
+		{0F7AA362-6076-4830-837D-31277E550856}.Debug|x86.ActiveCfg = Debug|x86
+		{0F7AA362-6076-4830-837D-31277E550856}.Debug|x86.Build.0 = Debug|x86
+		{0F7AA362-6076-4830-837D-31277E550856}.Release|Any CPU.ActiveCfg = Release|x86
+		{0F7AA362-6076-4830-837D-31277E550856}.Release|Any CPU.Build.0 = Release|x86
+		{0F7AA362-6076-4830-837D-31277E550856}.Release|x64.ActiveCfg = Release|x86
+		{0F7AA362-6076-4830-837D-31277E550856}.Release|x64.Build.0 = Release|x86
+		{0F7AA362-6076-4830-837D-31277E550856}.Release|x86.ActiveCfg = Release|x86
+		{0F7AA362-6076-4830-837D-31277E550856}.Release|x86.Build.0 = Release|x86
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666}.Debug|Any CPU.Build.0 = Debug|x86
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666}.Debug|x64.ActiveCfg = Debug|x86
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666}.Debug|x64.Build.0 = Debug|x86
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666}.Debug|x86.ActiveCfg = Debug|x86
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666}.Debug|x86.Build.0 = Debug|x86
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666}.Release|Any CPU.ActiveCfg = Debug|x86
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666}.Release|Any CPU.Build.0 = Debug|x86
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666}.Release|x64.ActiveCfg = Debug|x86
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666}.Release|x64.Build.0 = Debug|x86
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666}.Release|x86.ActiveCfg = Debug|x86
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666}.Release|x86.Build.0 = Debug|x86
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2}.Debug|x64.Build.0 = Debug|Any CPU
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2}.Debug|x86.Build.0 = Debug|Any CPU
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2}.Release|x64.ActiveCfg = Release|Any CPU
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2}.Release|x64.Build.0 = Release|Any CPU
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2}.Release|x86.ActiveCfg = Release|Any CPU
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1392,5 +1434,8 @@ Global
 		{3E4A8079-AAC0-429D-B042-0B5151E0E5BE} = {0CB537D9-19BB-4185-9E9A-E1305F100B54}
 		{48EBDEB2-6A6A-4DF2-B5F1-DB6D299401F2} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 		{CCF11819-C8F9-4A74-ACAE-1421B06720B6} = {F104F6BC-EF8E-4408-A786-D570D7565231}
+		{0F7AA362-6076-4830-837D-31277E550856} = {F104F6BC-EF8E-4408-A786-D570D7565231}
+		{1DE1F460-5DD0-4807-9B75-9899AC66A666} = {F104F6BC-EF8E-4408-A786-D570D7565231}
+		{5978DE85-3FB9-4BAB-965F-95E4398309A2} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 	EndGlobalSection
 EndGlobal

@@ -90,6 +90,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
+      <Project>{0462e82b-8c29-41a9-8265-9c89038adb29}</Project>
+      <Name>Cosmos.Build.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Compiler.Tests.ConsoleDrawTest\Cosmos.Compiler.Tests.ConsoleDrawTest.csproj">
+      <Project>{0f7aa362-6076-4830-837d-31277e550856}</Project>
+      <Name>Cosmos.Compiler.Tests.ConsoleDrawTest</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
       <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
       <Name>Cosmos.System</Name>

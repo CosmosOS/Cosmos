@@ -33,6 +33,22 @@ namespace Cosmos.Compiler.Tests.LinqTests
                 //    Console.WriteLine(s);
                 //}
                 TestController.Completed();
+
+                var xInterfaceLst = new List<ILinqTestInterface>();
+                xInterfaceLst.Add(new LinqTestInterfaceClass());
+                foreach(var i in xInterfaceLst)
+                {
+                    try
+                    {
+                        Console.WriteLine(i.GetSomeValue());
+                        i.DoSomething();
+                        int math = i.DoMath();
+                    }
+                    catch
+                    {
+                        TestController.Failed();
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -41,6 +57,31 @@ namespace Cosmos.Compiler.Tests.LinqTests
                 mDebugger.Send("Exception occurred: " + e.Message);
                 TestController.Failed();
             }
+        }
+    }
+
+    public interface ILinqTestInterface
+    {
+        void DoSomething();
+        string GetSomeValue();
+        int DoMath();
+    }
+
+    public class LinqTestInterfaceClass : ILinqTestInterface
+    {
+        public Int32 DoMath()
+        {
+            return 1 + 2; // = 3
+        }
+
+        public void DoSomething()
+        {
+            Console.WriteLine("LinqTest/InterfaceList: Did something!");
+        }
+
+        public String GetSomeValue()
+        {
+            return "Hello Cosmos";
         }
     }
 }
