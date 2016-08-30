@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25402.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
@@ -273,6 +273,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.Encryption", "..\Tests\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj", "{48EBDEB2-6A6A-4DF2-B5F1-DB6D299401F2}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.EncryptionBoot", "..\Tests\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.EncryptionBoot.Cosmos", "{CCF11819-C8F9-4A74-ACAE-1421B06720B6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Tests.IO", "..\Tests\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj", "{47B1A772-4A53-4A53-9BAD-31DF119B1725}"
+EndProject
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Kernel.Tests.IOBoot", "..\Tests\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IOBoot.Cosmos", "{DC2CB877-EC23-463D-A870-054CA42DF48C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1283,6 +1287,25 @@ Global
 		{CCF11819-C8F9-4A74-ACAE-1421B06720B6}.Release|x64.Build.0 = Debug|x86
 		{CCF11819-C8F9-4A74-ACAE-1421B06720B6}.Release|x86.ActiveCfg = Debug|x86
 		{CCF11819-C8F9-4A74-ACAE-1421B06720B6}.Release|x86.Build.0 = Debug|x86
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Debug|Any CPU.Build.0 = Debug|x86
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Debug|x64.ActiveCfg = Debug|x86
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Debug|x86.ActiveCfg = Debug|x86
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Debug|x86.Build.0 = Debug|x86
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Release|Any CPU.ActiveCfg = Release|x86
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Release|x64.ActiveCfg = Release|x86
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Release|x86.ActiveCfg = Release|x86
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Release|x86.Build.0 = Release|x86
+		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Debug|x64.ActiveCfg = Debug|x86
+		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Debug|x86.ActiveCfg = Debug|x86
+		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Debug|x86.Build.0 = Debug|x86
+		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Release|Any CPU.ActiveCfg = Debug|x86
+		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Release|Any CPU.Build.0 = Debug|x86
+		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Release|x64.ActiveCfg = Debug|x86
+		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Release|x64.Build.0 = Debug|x86
+		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Release|x86.ActiveCfg = Debug|x86
+		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Release|x86.Build.0 = Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1392,5 +1415,7 @@ Global
 		{3E4A8079-AAC0-429D-B042-0B5151E0E5BE} = {0CB537D9-19BB-4185-9E9A-E1305F100B54}
 		{48EBDEB2-6A6A-4DF2-B5F1-DB6D299401F2} = {F104F6BC-EF8E-4408-A786-D570D7565231}
 		{CCF11819-C8F9-4A74-ACAE-1421B06720B6} = {F104F6BC-EF8E-4408-A786-D570D7565231}
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725} = {DC374FBC-4005-472F-BBF4-CEA608B86FB2}
+		{DC2CB877-EC23-463D-A870-054CA42DF48C} = {DC374FBC-4005-472F-BBF4-CEA608B86FB2}
 	EndGlobalSection
 EndGlobal

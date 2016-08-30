@@ -205,6 +205,10 @@
       <Project>{a0893493-d4f0-4b9f-9826-86319e143d86}</Project>
       <Name>Cosmos.Kernel.Tests.Fat</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj">
+      <Project>{47b1a772-4a53-4a53-9bad-31df119b1725}</Project>
+      <Name>Cosmos.Kernel.Tests.IO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Kernel.Tests.LinqTests\Cosmos.Compiler.Tests.LinqTests.csproj">
       <Project>{85b11f78-39bc-4cfc-9033-fc84ab14cd03}</Project>
       <Name>Cosmos.Compiler.Tests.LinqTests</Name>
