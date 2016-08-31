@@ -142,6 +142,15 @@ namespace Cosmos.System.FileSystem.FAT
 
                 throw new Exception("Failed to find an unallocated FAT entry.");
             }
+            
+            /// <summary>
+            /// Clears a fat entry.
+            /// </summary>
+            /// <param name="aEntryNumber">The entry number.</param>
+            public void ClearFatEntry(ulong aEntryNumber)
+            {
+                SetFatEntry(aEntryNumber, 0);
+            }
 
             private void ReadFatSector(ulong aSector, out byte[] aData)
             {
@@ -222,7 +231,7 @@ namespace Cosmos.System.FileSystem.FAT
             /// <summary>
             /// Sets a fat entry.
             /// </summary>
-            /// <param name="aEntryNumber"></param>
+            /// <param name="aEntryNumber">The entry number.</param>
             /// <param name="aValue">The value.</param>
             private void SetFatEntry(ulong aEntryNumber, ulong aValue)
             {
@@ -622,6 +631,37 @@ namespace Cosmos.System.FileSystem.FAT
             var xParentDirectory = (FatDirectoryEntry)aParentDirectory;
             var xDirectoryEntryToAdd = xParentDirectory.AddDirectoryEntry(aNewFile, DirectoryEntryTypeEnum.File);
             return xDirectoryEntryToAdd;
+        }
+
+        public override void DeleteDirectory(DirectoryEntry aDirectoryEntry)
+        {
+            if(aDirectoryEntry == null)
+            {
+                throw new ArgumentNullException(nameof(aDirectoryEntry));
+            }
+
+            var xDirectoryEntry = (FatDirectoryEntry)aDirectoryEntry;
+
+            xDirectoryEntry.DeleteDirectoryEntry();
+        }
+
+        public override void DeleteFile(DirectoryEntry aDirectoryEntry)
+        {
+            if (aDirectoryEntry == null)
+            {
+                throw new ArgumentNullException(nameof(aDirectoryEntry));
+            }
+
+            var xDirectoryEntry = (FatDirectoryEntry)aDirectoryEntry;
+
+            var entries = xDirectoryEntry.GetFatTable();
+
+            foreach (var entry in entries)
+            {
+                GetFat(0).ClearFatEntry(entry);
+            }
+
+            xDirectoryEntry.DeleteDirectoryEntry();
         }
 
         private enum FatTypeEnum

@@ -62,6 +62,18 @@ namespace Cosmos.System.Plugs.System.IO
             return new DirectoryInfo(aPath);
         }
 
+        public static void Delete(string aPath)
+        {
+            Delete(aPath, false);
+        }
+
+        public static void Delete(string aPath, bool recursive)
+        {
+            String xFullPath = Path.GetFullPath(aPath);
+
+            VFSManager.DeleteDirectory(xFullPath, recursive);
+        }
+
         public static DirectoryInfo GetParent(string aPath)
         {
             Global.mFileSystemDebugger.SendInternal("Directory.GetParent:");
@@ -133,6 +145,5 @@ namespace Cosmos.System.Plugs.System.IO
 
             return xFiles.ToArray();
         }
-
     }
 }

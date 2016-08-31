@@ -8,6 +8,11 @@ namespace Cosmos.TestRunner.UI
     partial class MainWindowHandler
     {
         private Thread TestEngineThread = null;
+        public OutputHandlerXml outputHandler;
+
+        public delegate void TestFinishedEventHandler();
+        public TestFinishedEventHandler TestFinished = delegate { };
+
         public void RunTestEngine()
         {
             TestEngineThread = new Thread(TestEngineThreadMain);
@@ -26,6 +31,10 @@ namespace Cosmos.TestRunner.UI
                 this);
 
             xEngine.Execute();
+
+            outputHandler = xOutputXml;
+
+            TestFinished();
         }
     }
 }

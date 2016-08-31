@@ -24,7 +24,19 @@ namespace Cosmos.TestRunner.UI
         public MainWindow()
         {
             InitializeComponent();
+
+            message_display_list.Focus();
+
             testEngineHandler = new MainWindowHandler(message_display_list);
+
+            testEngineHandler.TestFinished += delegate
+            {
+                Dispatcher.Invoke((Action)(() =>
+                {
+                    save_log_btn.IsEnabled = true;
+                }));
+            };
+
             testEngineHandler.RunTestEngine();
         }
 
@@ -36,6 +48,27 @@ namespace Cosmos.TestRunner.UI
         private void s_messages_btn_Click(object sender, RoutedEventArgs e)
         {
             message_display_list.Visibility = Visibility.Visible;
+        }
+
+        private void save_log_btn_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.SaveFileDialog saveDialog = new Microsoft.Win32.SaveFileDialog();
+
+            saveDialog.DefaultExt = ".xml";
+            saveDialog.FileName = "TestResult.xml";
+            saveDialog.Filter = "XML Documents (.xml)|*.xml";
+
+            if(saveDialog.ShowDialog() ?? false)
+            {
+                string filename = saveDialog.FileName;
+
+                testEngineHandler.outputHandler.SaveToFile(filename);
+            }
+        }
+
+        private void copy_message_menu_item_Click(object sender, RoutedEventArgs e)
+        {
+            Clipboard.SetText(((ListViewLogMessage)message_display_list.SelectedItem).Message);
         }
     }
 }
