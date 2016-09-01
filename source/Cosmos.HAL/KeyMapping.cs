@@ -9,10 +9,14 @@ namespace Cosmos.HAL
         public char Caps;
         public char ShiftCaps;
         public char ShiftNum;
+        public char Control;
+        public char ControlAlt;
+        public char ControlShift;
+        public char ControlAltShift;
         public ConsoleKeyEx Key;
         public ConsoleKeyEx NumLockKey;
 
-        public KeyMapping(uint aScanCode, char norm, char shift, char num, char caps, char shiftcaps, char shiftnum, ConsoleKeyEx aKey)
+        public KeyMapping(uint aScanCode, char norm, char shift, char num, char caps, char shiftcaps, char shiftnum, char altgr, char shiftaltgr, char ctrl, char shiftctrl, ConsoleKeyEx aKey, ConsoleKeyEx numKey)
         {
             Scancode = aScanCode;
             Value = norm;
@@ -23,21 +27,55 @@ namespace Cosmos.HAL
             ShiftNum = shiftnum;
             Key = aKey;
             NumLockKey = aKey;
-        }
-
-        public KeyMapping(uint aScanCode, char norm, char shift, char num, char caps, char shiftcaps, char shiftnum, ConsoleKeyEx aKey, ConsoleKeyEx numKey)
-            : this(aScanCode, norm, shift, num, caps, shiftcaps, shiftnum, aKey)
-        {
+            ControlAlt = altgr;
+            Control = ctrl;
+            ControlAltShift = shiftaltgr;
+            ControlShift = shiftctrl;
             NumLockKey = numKey;
         }
 
-        public KeyMapping(uint aScanCode, char num, ConsoleKeyEx aKey, ConsoleKeyEx numKey) 
-            : this(aScanCode, '\0', '\0', num, '\0', '\0', '\0', aKey, numKey)
+        public KeyMapping(uint aScanCode, char norm, char shift, char num, char caps, char shiftcaps, char shiftnum, char altgr, char shiftaltgr, ConsoleKeyEx aKey, ConsoleKeyEx numKey)
+            : this(aScanCode, norm, shift, num, caps, shiftcaps, shiftnum, altgr, shiftaltgr, '\0', '\0', aKey, numKey)
+        {
+        }
+
+        public KeyMapping(uint aScanCode, char norm, char shift, char num, char caps, char shiftcaps, char shiftnum, char altgr, ConsoleKeyEx aKey, ConsoleKeyEx numKey)
+            : this(aScanCode, norm, shift, num, caps, shiftcaps, shiftnum, altgr, '\0', '\0', '\0', aKey, numKey)
+        {
+        }
+
+        public KeyMapping(uint aScanCode, char norm, char shift, char num, char caps, char shiftcaps, char shiftnum, char altgr, char shiftaltgr, char ctrl, char shiftctrl, ConsoleKeyEx aKey)
+            : this(aScanCode, norm, shift, num, caps, shiftcaps, shiftnum, altgr, shiftaltgr, ctrl, shiftctrl, aKey, aKey)
+        {
+        }
+
+        public KeyMapping(uint aScanCode, char norm, char shift, char num, char caps, char shiftcaps, char shiftnum, char altgr, char shiftaltgr, ConsoleKeyEx aKey)
+            : this (aScanCode, norm, shift, num, caps, shiftcaps, shiftnum, altgr, shiftaltgr, '\0', '\0', aKey)
+        {
+        }
+
+        public KeyMapping(uint aScanCode, char norm, char shift, char num, char caps, char shiftcaps, char shiftnum, char altgr, ConsoleKeyEx aKey)
+            : this(aScanCode, norm, shift, num, caps, shiftcaps, shiftnum, altgr, '\0', '\0', '\0', aKey)
+        {
+        }
+
+        public KeyMapping(uint aScanCode, char norm, char shift, char num, char caps, char shiftcaps, char shiftnum, ConsoleKeyEx aKey)
+            : this(aScanCode, norm, shift, num, caps, shiftcaps, shiftnum, '\0', '\0', '\0', '\0', aKey)
+        {
+        }
+
+        public KeyMapping(uint aScanCode, char norm, char shift, char num, char caps, char shiftcaps, char shiftnum, ConsoleKeyEx aKey, ConsoleKeyEx numKey)
+            : this(aScanCode, norm, shift, num, caps, shiftcaps, shiftnum, '\0', aKey, numKey)
         {
         }
 
         public KeyMapping(uint aScanCode, int norm, int shift, int num, int caps, int shiftcaps, int shiftnum, ConsoleKeyEx aKey)
             : this(aScanCode, (char)norm, (char)shift, (char)num, (char)caps, (char)shiftcaps, (char)shiftnum, aKey)
+        {
+        }
+
+        public KeyMapping(uint aScanCode, char num, ConsoleKeyEx aKey, ConsoleKeyEx numKey)
+            : this(aScanCode, '\0', '\0', num, '\0', '\0', '\0', aKey, numKey)
         {
         }
 

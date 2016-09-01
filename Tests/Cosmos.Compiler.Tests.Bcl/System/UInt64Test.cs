@@ -34,7 +34,6 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Actually 'expectedResult' should be the same so...
             Assert.IsTrue((result == expectedResult), "String format (UInt64) doesn't work");
 
-
             // Now let's Get the HashCode of a value
             int resultAsInt = value.GetHashCode();
             // actually the Hash Code of a Int64 is the value interpolated with XOR to obtain an Int32... so not the same of 'value'!
@@ -47,6 +46,49 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Int64 val2AsLong = (long)val2;
 
             Assert.IsTrue((val2AsLong == 42), "UInt64 to Int64 conversion does not work");
+
+            // Let's try to convert a float to an ULong
+            float aFloat = 9223372036854775808;
+            value = (ulong)aFloat;
+
+            Assert.IsTrue((value == 9223372036854775808), "Float to UInt64 conversion doesn't work");
+
+            // If the double is negative the conversion to ulong is the same to have casted the value from long to ulong (that is -1 becames a real big number)
+            aFloat = -1;
+
+            value = (ulong)aFloat;
+
+            Assert.IsTrue((value == 18446744073709551615), "Negative Float to UInt64 conversion doesn't work");
+
+            // Let's try to convert a double to an ULong
+            double aDouble = 9223372036854775808;
+            value = (ulong)aDouble;
+
+            Assert.IsTrue((value == 9223372036854775808), "Double to UInt64 conversion doesn't work");
+
+            // If the double is negative the conversion to ulong is the same to have casted the value from long to ulong (that is -1 becames a real big number)
+            aDouble = -1;
+
+            value = (ulong)aDouble;
+
+            Assert.IsTrue((value == 18446744073709551615), "Negative Double to UInt64 conversion doesn't work");
+
+            value = 4631166901565532406u;
+
+            val2 = value >> 20;
+            Assert.IsTrue(val2 == 4416624929013, "ulong right shift does not work");
+
+            val2 = value >> 52;
+            Assert.IsTrue(val2 == 1028, "ulong right shift (count >=32) does not work");
+
+            /* ... and now left shift */
+            value = 4631166901565532406;
+
+            val2 = value << 20;
+            Assert.IsTrue(val2 == 6640827866535690240, "ulong left shift does not work");
+
+            val2 = value << 52;
+            Assert.IsTrue(val2 == 10331257545187917824, "ulong left shift (count >=32) does not work");
 
 #if false
             // Now let's try ToString() again but printed in hex (this test fails for now!)

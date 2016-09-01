@@ -39,8 +39,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((result == expectedResult), "BitConverter.ToString(ulongBytes) doesn't work: result " + result + " != " + expectedResult);
 
-            // These tests fails bytes are screwed!
 
+            // This test works, what is the difference with double? That is saved as an Int32 in oly a register?
             float aFloat = 1.0f;
 
             byte[] floatBytes = BitConverter.GetBytes(aFloat);
@@ -50,6 +50,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((result == expectedResult), "BitConverter.ToString(floatBytes) doesn't work: result " + result + " != " + expectedResult);
 
+            // This tests fails bytes are screwed!
             double aDouble = 1.0;
 
             byte[] doubleBytes = BitConverter.GetBytes(aDouble);

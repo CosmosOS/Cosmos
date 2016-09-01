@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
@@ -33,6 +34,10 @@ namespace Cosmos.System.FileSystem
         public abstract DirectoryEntry CreateDirectory(DirectoryEntry aParentDirectory, string aNewDirectory);
 
         public abstract DirectoryEntry CreateFile(DirectoryEntry aParentDirectory, string aNewFile);
+
+        public abstract void DeleteDirectory(DirectoryEntry aPath);
+
+        public abstract void DeleteFile(DirectoryEntry aPath);
 
         protected Partition mDevice { get; }
 

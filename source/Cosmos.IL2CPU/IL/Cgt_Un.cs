@@ -7,6 +7,7 @@ using Cosmos.Assembler.x86.SSE;
 using Cosmos.Assembler.x86.x87;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
+using static Cosmos.Assembler.x86.SSE.ComparePseudoOpcodes;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -33,26 +34,33 @@ namespace Cosmos.IL2CPU.X86.IL
             string LabelFalse = BaseLabel + "False";
             if( xStackItemSize > 4 )
             {
+                // Using SSE registers (that do NOT branch!) This is needed only for long now
+#if false
 				XS.Set(XSRegisters.ESI, 1);
 				// esi = 1
 				XS.Xor(XSRegisters.EDI, XSRegisters.EDI);
 				// edi = 0
-				if (xStackItemIsFloat)
+#endif
+                if (xStackItemIsFloat)
 				{
-					// value 1
-					new FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationDisplacement = 8, DestinationIsIndirect = true };
-					// value 2
-					XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
-					XS.FPU.FloatCompareAndSet(ST1);
-					// if carry is set, ST(0) < ST(i)
-					new ConditionalMove { Condition = ConditionalTestEnum.Below, DestinationReg = RegistersEnum.EDI, SourceReg = RegistersEnum.ESI };
-					// pops fpu stack
-					XS.FPU.FloatStoreAndPop(ST0);
-					XS.FPU.FloatStoreAndPop(ST0);
-					XS.Add(XSRegisters.ESP, 16);
-				}
+                    // Please note that SSE supports double operations only from version 2
+                    XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+                    // Increment ESP to get the value of the next double
+                    XS.Add(ESP, 8);
+                    XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
+                    XS.SSE2.CompareSD(XMM1, XMM0, comparision: NotLessThanOrEqualTo);
+                    XS.SSE2.MoveD(EBX, XMM1);
+                    XS.And(EBX, 1);
+                    // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
+                    XS.Add(ESP, 4);
+                    XS.Set(ESP, EBX, destinationIsIndirect: true);
+                }
                 else
                 {
+                    XS.Set(XSRegisters.ESI, 1);
+                    // esi = 1
+                    XS.Xor(XSRegisters.EDI, XSRegisters.EDI);
+                    // edi = 0
                     XS.Pop(XSRegisters.EAX);
                     XS.Pop(XSRegisters.EDX);
                     //value2: EDX:EAX
@@ -67,8 +75,8 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.Label(LabelTrue);
 					new ConditionalMove { Condition = ConditionalTestEnum.Above, DestinationReg = RegistersEnum.EDI, SourceReg = RegistersEnum.ESI };
 					XS.Label(LabelFalse);
+                    XS.Push(XSRegisters.EDI);
                 }
-				XS.Push(XSRegisters.EDI);
 				/*
                 XS.Jump(ConditionalTestEnum.Above, LabelTrue);
 				XS.Label(LabelFalse);
@@ -82,33 +90,31 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 if (xStackItemIsFloat)
                 {
-
                     XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                    XS.Add(XSRegisters.ESP, 4);
+                    XS.Add(ESP, 4);
                     XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
-                    new CompareSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.XMM0, pseudoOpcode = (byte)ComparePseudoOpcodes.NotLessThanOrEqualTo };
-                    XS.SSE2.MoveD(XMM1, EBX);
-                    XS.And(XSRegisters.EBX, 1);
+                    XS.SSE.CompareSS(XMM1, XMM0, comparision: NotLessThanOrEqualTo);
+                    XS.SSE2.MoveD(EBX, XMM1);
+                    XS.And(EBX, 1);
                     XS.Set(ESP, EBX, destinationIsIndirect: true);
                 }
                 else
                 {
-                    XS.Pop(XSRegisters.EAX);
+                    XS.Pop(EAX);
                     XS.Compare(EAX, ESP, sourceIsIndirect: true);
 
                     XS.Jump(ConditionalTestEnum.Below, LabelTrue);
                     XS.Jump(LabelFalse);
                     XS.Label(LabelTrue );
-                    XS.Add(XSRegisters.ESP, 4);
+                    XS.Add(ESP, 4);
                     XS.Push(1);
                     new Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
                     XS.Label(LabelFalse );
-                    XS.Add(XSRegisters.ESP, 4);
+                    XS.Add(ESP, 4);
                     XS.Push(0);
                 }
             }
         }
-
 
         // using System;
         //

@@ -7,6 +7,7 @@ using Cosmos.Assembler.x86.SSE;
 using Cosmos.Assembler.x86.x87;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
+using static Cosmos.Assembler.x86.SSE.ComparePseudoOpcodes;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -35,41 +36,49 @@ namespace Cosmos.IL2CPU.X86.IL
 			var xNextLabel = GetLabel(aMethod, aOpCode.NextPosition);
 			if( xStackItemSize > 4 )
 			{
+                // Using SSE registers (that do NOT branch!) This is needed only for long now
+#if false
 				XS.Set(XSRegisters.ESI, 1);
 				// esi = 1
 				XS.Xor(XSRegisters.EDI, XSRegisters.EDI);
 				// edi = 0
+#endif
 				if (xStackItemIsFloat)
 				{
-					// value 1
-					new FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationDisplacement = 8, DestinationIsIndirect = true };
-					// value 2
-					XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
-					XS.FPU.FloatCompareAndSet(ST1);
-					// if carry is set, ST(0) < ST(i)
-					new ConditionalMove { Condition = ConditionalTestEnum.Below, DestinationReg = RegistersEnum.EDI, SourceReg = RegistersEnum.ESI };
-					// pops fpu stack
-					XS.FPU.FloatStoreAndPop(ST0);
-					XS.FPU.FloatStoreAndPop(ST0);
-					XS.Add(XSRegisters.ESP, 16);
-				}
+                    // Please note that SSE supports double operations only from version 2
+                    XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+                    // Increment ESP to get the value of the next double
+                    XS.Add(ESP, 8);
+                    XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
+                    XS.SSE2.CompareSD(XMM1, XMM0, comparision: NotLessThanOrEqualTo);
+                    XS.SSE2.MoveD(EBX, XMM1);
+                    XS.And(EBX, 1);
+                    // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
+                    XS.Add(ESP, 4);
+                    XS.Set(ESP, EBX, destinationIsIndirect: true);
+                }
 				else
 				{
-					XS.Pop(XSRegisters.EAX);
-					XS.Pop(XSRegisters.EDX);
+                    XS.Set(ESI, 1);
+                    // esi = 1
+                    XS.Xor(EDI, EDI);
+                    // edi = 0
+                    XS.Pop(EAX);
+					XS.Pop(EDX);
+
 					//value2: EDX:EAX
-					XS.Pop(XSRegisters.EBX);
-					XS.Pop(XSRegisters.ECX);
+					XS.Pop(EBX);
+					XS.Pop(ECX);
 					//value1: ECX:EBX
-					XS.Compare(XSRegisters.ECX, XSRegisters.EDX);
+					XS.Compare(ECX, EDX);
 					XS.Jump(ConditionalTestEnum.GreaterThan, LabelTrue);
 					XS.Jump(ConditionalTestEnum.LessThan, LabelFalse);
-					XS.Compare(XSRegisters.EBX, XSRegisters.EAX);
+					XS.Compare(EBX, EAX);
 					XS.Label(LabelTrue);
 					new ConditionalMove { Condition = ConditionalTestEnum.GreaterThan, DestinationReg = RegistersEnum.EDI, SourceReg = RegistersEnum.ESI };
 					XS.Label(LabelFalse);
-				}
-				XS.Push(XSRegisters.EDI);
+                    XS.Push(EDI);
+                }
 				/*
 				XS.Jump(ConditionalTestEnum.GreaterThan, LabelTrue);
 				XS.Label(LabelFalse);
@@ -84,14 +93,14 @@ namespace Cosmos.IL2CPU.X86.IL
 					XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
 					XS.Add(XSRegisters.ESP, 4);
 					XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
-					new CompareSS { DestinationReg = RegistersEnum.XMM1, SourceReg = RegistersEnum.XMM0, pseudoOpcode = (byte)ComparePseudoOpcodes.NotLessThanOrEqualTo };
-					XS.SSE2.MoveD(XMM1, EBX);
-					XS.And(XSRegisters.EBX, 1);
+                    XS.SSE.CompareSS(XMM1, XMM0, comparision: NotLessThanOrEqualTo);
+                    XS.SSE2.MoveD(EBX, XMM1);
+                    XS.And(XSRegisters.EBX, 1);
 					XS.Set(ESP, EBX, destinationIsIndirect: true);
 				}
 
 				else{
-					XS.Pop(XSRegisters.EAX);
+					XS.Pop(EAX);
 					XS.Compare(EAX, ESP, sourceIsIndirect: true);
 					XS.Jump(ConditionalTestEnum.LessThan, LabelTrue);
 					XS.Jump(LabelFalse);

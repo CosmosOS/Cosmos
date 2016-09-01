@@ -166,8 +166,14 @@ namespace Cosmos.System.Plugs.System.IO
                 var xBuff = new byte[(int)xFS.Length];
                 var yFS = new FileStream(destFile, FileMode.Create);
                 yFS.Write(xBuff, 0, xBuff.Length);
-
             }
+        }
+
+        public static void InternalDelete(string aPath, bool checkHost)
+        {
+            String xFullPath = Path.GetFullPath(aPath);
+
+            VFSManager.DeleteFile(xFullPath);
         }
 
         public static FileStream Create(string aFile)
@@ -178,7 +184,6 @@ namespace Cosmos.System.Plugs.System.IO
             {
                 throw new ArgumentException("Argument is null or empty", nameof(aFile));
             }
-
 
             var xEntry = VFSManager.CreateFile(aFile);
             if (xEntry == null)

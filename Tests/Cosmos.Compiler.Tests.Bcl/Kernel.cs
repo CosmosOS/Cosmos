@@ -35,14 +35,18 @@ namespace Cosmos.Compiler.Tests.Bcl
                 UInt64Test.Execute();
                 CharTest.Execute();
                 BooleanTest.Execute();
-                //SingleTest.Execute();
-                //BitConverterTest.Execute();
-                //DoubleTest.Execute();
-                //DecimalTest.Execute();
+                SingleTest.Execute();
+                DoubleTest.Execute();
+                BitConverterTest.Execute();
+                UnsafeCodeTest.Execute();
+        
+#if false
+                DecimalTest.Execute();
                 System.Collections.Generic.ListTest.Execute();
                 System.Collections.Generic.QueueTest.Execute();
                 System.DelegatesTest.Execute();
                 System.UInt64Test.Execute();
+#endif
                 TestController.Completed();
             }
             catch (Exception e)

@@ -16,6 +16,12 @@ namespace Cosmos.Kernel.Tests.Fat
     {
         private VFSBase mVFS;
 
+        private byte[] xBytes = new byte[16]
+        {
+            0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7,
+            0x8, 0x9, 0xA, 0xB, 0xC, 0xD, 0xE, 0xF
+        };
+
         /// <summary>
         /// Pre-run events
         /// </summary>
@@ -39,6 +45,10 @@ namespace Cosmos.Kernel.Tests.Fat
                 TestDirectory();
                 TestFile();
                 TestFileStream();
+                TestStreamWriter();
+                TestStreamReader();
+                TestBinaryWriter();
+                TestBinaryReader();
 
                 TestController.Completed();
             }
@@ -496,7 +506,16 @@ namespace Cosmos.Kernel.Tests.Fat
             var xDirectory = Directory.CreateDirectory(@"0:\test2");
             Assert.IsTrue(xDirectory != null, "Directory.CreateDirectory failed: Directory is null");
             bool xExists = Directory.Exists(@"0:\test2");
-            Assert.IsTrue(xExists, "Directory.CreateDirectory failed: Directory is doesn't exist after create call");
+            Assert.IsTrue(xExists, "Directory.CreateDirectory failed: Directory doesn't exist after create call");
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST: Delete a directory:");
+            Directory.CreateDirectory(@"0:\TestDir1");
+            Assert.IsTrue(Directory.Exists(@"0:\TestDir1"), "TestDir1 wasn't created!");
+            Directory.Delete(@"0:\TestDir1");
+            Assert.IsFalse(Directory.Exists(@"0:\TestDir1"), "TestDir1 wasn't deleted!");
             mDebugger.Send("END TEST");
 
             mDebugger.Send("");
@@ -682,6 +701,22 @@ namespace Cosmos.Kernel.Tests.Fat
             //    "Contents of Kudzu.txt was appended incorrectly!");
             //mDebugger.Send("END TEST");
             //mDebugger.Send("");
+
+            mDebugger.Send("START TEST: Delete a file:");
+            File.Create(@"0:\test1.txt");
+            Assert.IsTrue(File.Exists(@"0:\test1.txt"), "test1.txt wasn't created!");
+            File.Delete(@"0:\test1.txt");
+            Assert.IsFalse(File.Exists(@"0:\test1.txt"), "test1.txt wasn't deleted!");
+            mDebugger.Send("END TEST");
+
+            //mDebugger.Send("START TEST: Delete a directory with File.Delete:");
+            //Simple test: create a directory, then try to delete it as a file.
+            //Directory.CreateDirectory(@"0:\Dir1");
+
+            //File.Delete(@"0:\Dir1");
+            //Assert.IsTrue(Directory.Exists(@"0:\Dir1"), "Yeah, it's actually deleting the directory. That isn't right.");
+
+            //mDebugger.Send("END TEST");
         }
 
         #endregion
@@ -711,6 +746,157 @@ namespace Cosmos.Kernel.Tests.Fat
                 Assert.IsTrue(xWriteBuffAsString == xReadBuffAsString, "Failed to write and read file");
                 mDebugger.Send("END TEST");
             }
+        }
+
+        #endregion
+
+        #region System.IO.StreamWriter Tests
+
+        private void TestStreamWriter()
+        {
+            /*
+            mDebugger.Send("START TEST: StreamWriter:");
+            mDebugger.Send("Create StreamWriter");
+
+            using (var xSW = new StreamWriter(@"0:\test.txt"))
+            {
+                if (xSW != null)
+                {
+                    try
+                    {
+                        mDebugger.Send("Start writing");
+
+                        xSW.Write("A line of text for testing\nSecond line");
+                    }
+                    catch
+                    {
+                        Assert.IsTrue(false, @"Couldn't write to file 0:\test.txt using StreamWriter");
+                    }
+                }
+                else
+                {
+                    Assert.IsTrue(false, @"Failed to create StreamWriter for file 0:\test.txt");
+                }
+            }
+
+            mDebugger.Send("END TEST");
+            */
+        }
+
+        #endregion
+
+        #region System.IO.StreamReader Tests
+
+        private void TestStreamReader()
+        {
+            /*
+            mDebugger.Send("START TEST: StreamReader:");
+            mDebugger.Send("Create StreamReader");
+
+            using (var xSR = new StreamReader(@"0:\test.txt"))
+            {
+                if (xSR != null)
+                {
+                    mDebugger.Send("Start reading");
+
+                    var content = xSR.ReadToEnd();
+                    Assert.IsTrue(content == "A line of text for testing\nSecond line", "Content: " + content);
+                }
+                else
+                {
+                    Assert.IsTrue(false, @"Failed to create StreamReader for file 0:\test.txt");
+                }
+            }
+
+            mDebugger.Send("END TEST");
+            */
+        }
+
+        #endregion
+
+        #region System.IO.BinaryWriter Tests
+
+        private void TestBinaryWriter()
+        {
+            //TODO: Implement FileStream with FileMode.Create, currently throws a file not found exception
+
+            /*
+            mDebugger.Send("START TEST: BinaryWriter");
+            mDebugger.Send("Creating FileStream: FileMode.Create");
+
+            using (var xFS = new FileStream(@"0:\binary.bin", FileMode.Create))
+            {
+                mDebugger.Send("Creating BinaryWriter");
+
+                using (var xBW = new BinaryWriter(xFS))
+                {
+                    if (xFS != null)
+                    {
+                        mDebugger.Send("Start writing");
+
+                        xBW.Write(xBytes);
+                        Assert.IsTrue(xFS.Length == xBytes.Length, "The length of the stream and the length of the bytes are different");
+                    }
+                    else
+                    {
+                        Assert.IsTrue(false, @"Failed to create StreamWriter for file 0:\binary.bin");
+                    }
+                }
+            }
+
+            mDebugger.Send("END TEST");
+            */
+        }
+
+        #endregion
+
+        #region System.IO.BinaryReader Tests
+
+        private void TestBinaryReader()
+        {
+            /*Error Stack Trace:
+             *
+             *Error: Exception: System.Exception: Error compiling method 'SystemVoidSystemIOMemoryStreamDisposeSystemBoolean': System.NullReferenceException: Object reference not set to an instance of an object.
+             *at Cosmos.IL2CPU.X86.IL.Leave.Execute(MethodInfo aMethod, ILOpCode aOpCode) in Cosmos\source\Cosmos.IL2CPU\IL\Leave.cs:line 17
+             *at Cosmos.IL2CPU.AppAssembler.EmitInstructions(MethodInfo aMethod, List`1 aCurrentGroup, Boolean & amp; emitINT3) in Cosmos\source\Cosmos.IL2CPU\AppAssembler.cs:line 667
+             *at Cosmos.IL2CPU.AppAssembler.ProcessMethod(MethodInfo aMethod, List`1 aOpCodes) in Cosmos\source\Cosmos.IL2CPU\AppAssembler.cs:line 533-- - >; System.NullReferenceException: Object reference not set to an instance of an object.
+             *at Cosmos.IL2CPU.X86.IL.Leave.Execute(MethodInfo aMethod, ILOpCode aOpCode) in Cosmos\source\Cosmos.IL2CPU\IL\Leave.cs:line 17
+             *at Cosmos.IL2CPU.AppAssembler.EmitInstructions(MethodInfo aMethod, List`1 aCurrentGroup, Boolean & amp; emitINT3) in Cosmos\source\Cosmos.IL2CPU\AppAssembler.cs:line 667
+             *at Cosmos.IL2CPU.AppAssembler.ProcessMethod(MethodInfo aMethod, List`1 aOpCodes) in Cosmos\source\Cosmos.IL2CPU\AppAssembler.cs:line 533
+             *--- End of inner exception stack trace ---
+             *at Cosmos.IL2CPU.AppAssembler.ProcessMethod(MethodInfo aMethod, List`1 aOpCodes) in Cosmos\source\Cosmos.IL2CPU\AppAssembler.cs:line 540
+             *at Cosmos.IL2CPU.ILScanner.Assemble() in Cosmos\source\Cosmos.IL2CPU\ILScanner.cs:line 946
+             *at Cosmos.IL2CPU.ILScanner.Execute(MethodBase aStartMethod) in Cosmos\source\Cosmos.IL2CPU\ILScanner.cs:line 247
+             *at Cosmos.IL2CPU.CompilerEngine.Execute() in Cosmos\source\Cosmos.IL2CPU\CompilerEngine.cs:line 252
+             *
+             */
+
+            /*
+            mDebugger.Send("START TEST: BinaryReader");
+            mDebugger.Send("Creating FileStream: FileMode.Open");
+
+            using (var xFS = new FileStream(@"0:\binary.bin", FileMode.Open))
+            {
+                mDebugger.Send("Creating BinaryReader");
+
+                using (var xBR = new BinaryReader(xFS))
+                {
+                    if (xFS != null)
+                    {
+                        mDebugger.Send("Start reading");
+
+                        byte[] xBuffer = xBR.ReadBytes(xBytes.Length);
+                        Assert.IsTrue(ByteArrayAreEquals(xBytes, xBuffer), "Bytes changed during BinaryWriter and BinaryReader opeartions on FileStream");
+                    }
+                    else
+                    {
+                        Assert.IsTrue(false, @"Failed to create StreamReader for file 0:\binary.bin");
+                    }
+                }
+            }
+
+            mDebugger.Send("END TEST");
+            */
         }
 
         #endregion

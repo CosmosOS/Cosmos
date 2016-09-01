@@ -19,11 +19,14 @@ namespace Cosmos.TestRunner.Core
 
             // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are run.
             engine.RunTargets.Add(RunTargetEnum.Bochs);
+            //engine.RunTargets.Add(RunTargetEnum.VMware);
 
             // If you're working on the compiler (or other lower parts), you can choose to run the compiler in process
             // one thing to keep in mind though, is that this only works with 1 kernel at a time!
             //engine.RunIL2CPUInProcess = true;
             engine.TraceAssembliesLevel = TraceAssemblies.User;
+            //engine.EnableStackCorruptionChecks = false;
+
             engine.EnableStackCorruptionChecks = true;
             engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
 
