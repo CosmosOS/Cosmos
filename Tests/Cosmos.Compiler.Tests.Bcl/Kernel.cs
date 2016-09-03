@@ -22,27 +22,26 @@ namespace Cosmos.Compiler.Tests.Bcl
             {
                 mDebugger.Send("Run");
 
-                //CSharp.WhileLoopTests.Execute();
+                CSharp.WhileLoopTests.Execute();
                 //ObjectTests.Execute();
                 StringTest.Execute();
-                //ByteTest.Execute();
-                //SByteTest.Execute();
-                //Int16Test.Execute();
-                //UInt16Test.Execute();
-                //Int32Test.Execute();
-                //UInt32Test.Execute();
-                //Int64Test.Execute();
-                //UInt64Test.Execute();
-                //CharTest.Execute();
-                //BooleanTest.Execute();
-                //SingleTest.Execute();
-                //DoubleTest.Execute();
+                ByteTest.Execute();
+                SByteTest.Execute();
+                Int16Test.Execute();
+                UInt16Test.Execute();
+                Int32Test.Execute();
+                UInt32Test.Execute();
+                Int64Test.Execute();
+                UInt64Test.Execute();
+                CharTest.Execute();
+                BooleanTest.Execute();
+                SingleTest.Execute();
+                DoubleTest.Execute();
+                BitConverterTest.Execute();
+                UnsafeCodeTest.Execute();
 
 #if false
-                BitConverterTest.Execute();
                 DecimalTest.Execute();
-                //BitConverterTest.Execute();
-                //DecimalTest.Execute();
                 System.Collections.Generic.ListTest.Execute();
                 System.Collections.Generic.QueueTest.Execute();
                 System.DelegatesTest.Execute();
@@ -52,9 +51,10 @@ namespace Cosmos.Compiler.Tests.Bcl
             }
             catch (Exception e)
             {
+                mDebugger.Send("Exception occurred: " + e.Message);
+                mDebugger.Send(e.Message);
                 Console.WriteLine("Exception occurred");
                 Console.WriteLine(e.Message);
-                mDebugger.Send("Exception occurred: " + e.Message);
                 TestController.Failed();
             }
         }

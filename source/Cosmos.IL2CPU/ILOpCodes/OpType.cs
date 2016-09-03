@@ -140,11 +140,21 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           return;
         case Code.Isinst:
           StackPopTypes[0] = typeof(object);
-          StackPushTypes[0] = Value;
+          if (Value.IsGenericType && Value.GetGenericTypeDefinition() == typeof(Nullable<>))
+          {
+            StackPushTypes[0] = typeof(Box<>).MakeGenericType(Value.GetGenericArguments()[0]);
+          }
+          else if (Value.IsValueType)
+          {
+            StackPushTypes[0] = typeof(Box<>).MakeGenericType(Value);
+          }
+          else
+          {
+            StackPushTypes[0] = Value;
+          }
           return;
         case Code.Castclass:
-          if (Value.IsGenericType &&
-              Value.GetGenericTypeDefinition() == typeof(Nullable<>))
+          if (Value.IsGenericType && Value.GetGenericTypeDefinition() == typeof(Nullable<>))
           {
             StackPushTypes[0] = typeof(Box<>).MakeGenericType(Value.GetGenericArguments()[0]);
           }

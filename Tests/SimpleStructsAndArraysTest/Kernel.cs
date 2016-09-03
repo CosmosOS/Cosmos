@@ -295,9 +295,6 @@ namespace SimpleStructsAndArraysTest
             ConstrainedTest.MutateStructTest();
             Assert.IsTrue(true, "After MutateTestStruct");
 
-            LoadLongFromStruct.Execte();
-            Assert.IsTrue(true, "After LoadLongFromStruct");
-
             TestController.Completed();
         }
     }

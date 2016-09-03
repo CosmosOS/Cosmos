@@ -19,14 +19,13 @@ namespace Cosmos.IL2CPU.X86.IL
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
-      Assemble(Assembler, 8, false, DebugEnabled);
+      Assemble(Assembler, 8, false, aMethod, aOpCode, DebugEnabled);
     }
 
-    public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, bool isSigned, bool debugEnabled)
+    public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, bool isSigned, MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
     {
       //  stack     = index
-      //  stack + 1 = array
-      //
+      //  stack + 2 = array
       DoNullReferenceCheck(aAssembler, debugEnabled, 8);
 
       // calculate element offset into array memory (including header)
@@ -55,6 +54,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
           xCurrentStep = xSizeLeft % 4;
         }
+
         xSizeLeft = xSizeLeft - xCurrentStep;
         switch (xCurrentStep)
         {

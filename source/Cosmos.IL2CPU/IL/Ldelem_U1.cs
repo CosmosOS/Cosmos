@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            Ldelem_Ref.Assemble(Assembler, 1, false, DebugEnabled);
+            Ldelem_Ref.Assemble(Assembler, 1, false, aMethod, aOpCode, DebugEnabled);
         }
     }
 }

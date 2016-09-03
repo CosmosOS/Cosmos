@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Common
 {
-    using Cosmos.Debug.Kernel;
-
     public static class StringHelper
     {
-        internal static Debugger mDebugger = new Debugger("Common", "String Helpers");
-
         internal enum StringComparisonResultEnum
         {
             Less = -1,
@@ -19,27 +12,6 @@ namespace Cosmos.Common
             Equal = 0,
 
             Greater = 1
-        }
-
-        public static string GetCharArrayString(char[] aArray)
-        {
-            if (aArray == null)
-            {
-                return string.Empty;
-            }
-
-            if (aArray.Length == 0)
-            {
-                return string.Empty;
-            }
-
-            string xString = string.Empty;
-            for (int i = 0; i < aArray.Length; i++)
-            {
-                //xString = string.Concat(xString, aArray[i].ToString());
-            }
-
-            return xString;
         }
 
         public static string GetNumberString(uint aValue)
@@ -67,36 +39,22 @@ namespace Cosmos.Common
 
         public static string GetNumberString(int aValue)
         {
-            Debugger.DoSend("In GetNumberString(int)");
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
-            int xValue = aValue;
-
-            var xTestArray = new int[]
-                             {
-                                 1, 2, 3
-                             };
-            var xIntValue = xTestArray[0];
-
-            Debugger.DoSend("Int array werkt ok");
-            var xTestArray2 = new long[]
-                              {
-                                  1, 2, 3
-                              };
-            var xLongValue = xTestArray2[1];
-            Debugger.DoSend("Long array werkt ok");
-
-            if (aValue < 0)
-            {
-                xValue *= -1;
-            }
 
             if (aValue == 0)
             {
-                xResult = string.Concat(xResult, "0");
+                xResult = "0";
             }
             else
             {
+                int xValue = aValue;
+
+                if (aValue < 0)
+                {
+                    xValue *= -1;
+                }
+
                 while (xValue > 0)
                 {
                     int xValue2 = xValue % 10;
@@ -108,6 +66,29 @@ namespace Cosmos.Common
             if (aValue < 0)
             {
                 xResult = string.Concat("-", xResult);
+            }
+
+            return xResult;
+        }
+
+        public static string GetNumberString(ulong aValue)
+        {
+            string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+            string xResult = string.Empty;
+
+            if (aValue == 0)
+            {
+                xResult = "0";
+            }
+            else
+            {
+                ulong xValue = aValue;
+                while (xValue > 0)
+                {
+                    ulong xValue2 = xValue % 10;
+                    xResult = string.Concat(xChars[xValue2], xResult);
+                    xValue /= 10;
+                }
             }
 
             return xResult;

@@ -10,8 +10,8 @@ namespace Cosmos.Core.Plugs.System.Assemblers
         {
             // $this   ebp+8
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8);
-            XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
-            new Push { DestinationIsIndirect = true, DestinationReg = RegistersEnum.EAX, DestinationDisplacement = 8 };
+            XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceDisplacement: 8, sourceIsIndirect: true); // element count
+            XS.Push(XSRegisters.EAX);
         }
     }
 }

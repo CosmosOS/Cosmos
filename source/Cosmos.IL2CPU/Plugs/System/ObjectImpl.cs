@@ -22,15 +22,8 @@ namespace Cosmos.IL2CPU.Plugs.System
     {
         public static string ToString(object aThis)
         {
-           try
-            {
-                return (string)aThis;
-            }
-            catch
-            {
-                Debugger.DoSend("<Object.ToString not yet implemented!>");
-                return "<Object.ToString not yet implemented!>";
-            }
+            Debugger.DoSend("<Object.ToString not yet implemented!>");
+            return "<Object.ToString not yet implemented!>";
         }
 
         //public static bool InternalEquals(object a, object b) {

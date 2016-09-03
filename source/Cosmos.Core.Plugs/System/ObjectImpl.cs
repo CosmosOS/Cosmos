@@ -8,7 +8,6 @@ namespace Cosmos.Core.Plugs.System
     {
         public static unsafe ulong MemberwiseClone([ObjectPointerAccess] uint aThis)
         {
-            // pointers are handles!
             var xThisPointer = (uint*)aThis;
 
             var xSize = xThisPointer[1];
@@ -23,7 +22,6 @@ namespace Cosmos.Core.Plugs.System
             {
                 xThatPointerByte[i] = xThisPointerByte[i];
             }
-
             return xResult;
         }
     }

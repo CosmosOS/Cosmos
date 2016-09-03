@@ -5,11 +5,14 @@ using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 
-namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
+namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices
+{
     [Plug(Target = typeof(global::System.Runtime.CompilerServices.RuntimeHelpers))]
-    public static class RuntimeHelpersImpl {
+    public static class RuntimeHelpersImpl
+    {
 
-        public static void cctor() {
+        public static void cctor()
+        {
             //TODO: do something
         }
 
@@ -30,13 +33,14 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices {
 
         [Inline(TargetPlatform = TargetPlatform.x86)]
         [PlugMethod]
-        public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle) {
+        public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle)
+        {
             // Arguments:
             //    Array aArray, RuntimeFieldHandle aFieldHandle
-            XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 20); // array
-            XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: 12); // aFieldHandle
+            XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 16); // array
+            XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: 8);  // aFieldHandle
             XS.Add(XSRegisters.EDI, 8);
-            XS.Push(EDI, isIndirect: true);
+            XS.Push(EDI, isIndirect: true); // element size
             XS.Add(XSRegisters.EDI, 4);
             XS.Set(EAX, EDI, sourceIsIndirect: true);
             XS.Multiply(ESP, isIndirect: true, size: RegisterSize.Int32);

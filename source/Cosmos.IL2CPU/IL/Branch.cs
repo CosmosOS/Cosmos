@@ -30,12 +30,6 @@ namespace Cosmos.IL2CPU.X86.IL
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
-      if (GetMethodLabel(aMethod) == "SystemBooleanSystemStringIsNullOrEmptySystemString")
-      {
-        ;
-        ;
-      }
-
       var xIsSingleCompare = true;
       switch (aOpCode.OpCode)
       {
@@ -141,120 +135,64 @@ namespace Cosmos.IL2CPU.X86.IL
             case ConditionalTestEnum.Zero: // Equal
             case ConditionalTestEnum.NotEqual: // NotZero
               XS.Xor(XSRegisters.EAX, XSRegisters.ECX);
-              new ConditionalJump
-              {
-                Condition = xTestOp,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               XS.Xor(XSRegisters.EBX, XSRegisters.EDX);
-              new ConditionalJump
-              {
-                Condition = xTestOp,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = xTestOp, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               break;
             case ConditionalTestEnum.GreaterThanOrEqualTo:
               XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
               XS.Jump(ConditionalTestEnum.LessThan, xNoJump);
-              new ConditionalJump
-              {
-                Condition = ConditionalTestEnum.GreaterThan,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
               XS.Jump(ConditionalTestEnum.Below, xNoJump);
               break;
             case ConditionalTestEnum.GreaterThan:
               XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
               XS.Jump(ConditionalTestEnum.LessThan, xNoJump);
-              new ConditionalJump
-              {
-                Condition = ConditionalTestEnum.GreaterThan,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = ConditionalTestEnum.GreaterThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
               XS.Jump(ConditionalTestEnum.BelowOrEqual, xNoJump);
               break;
             case ConditionalTestEnum.LessThanOrEqualTo:
               XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
-              new ConditionalJump
-              {
-                Condition = ConditionalTestEnum.LessThan,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = ConditionalTestEnum.LessThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               XS.Jump(ConditionalTestEnum.GreaterThan, xNoJump);
               XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
-              new ConditionalJump
-              {
-                Condition = ConditionalTestEnum.BelowOrEqual,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = ConditionalTestEnum.BelowOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               break;
             case ConditionalTestEnum.LessThan:
               XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
-              new ConditionalJump
-              {
-                Condition = ConditionalTestEnum.LessThan,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = ConditionalTestEnum.LessThan, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               XS.Jump(ConditionalTestEnum.GreaterThan, xNoJump);
               XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
-              new ConditionalJump
-              {
-                Condition = ConditionalTestEnum.Below,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = ConditionalTestEnum.Below, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               break;
             // from here all unsigned
             case ConditionalTestEnum.AboveOrEqual:
               XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
-              new ConditionalJump
-              {
-                Condition = ConditionalTestEnum.Above,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
               XS.Jump(ConditionalTestEnum.Below, xNoJump);
               break;
             case ConditionalTestEnum.Above:
               XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
-              new ConditionalJump
-              {
-                Condition = ConditionalTestEnum.Above,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
               XS.Jump(ConditionalTestEnum.BelowOrEqual, xNoJump);
               break;
             case ConditionalTestEnum.BelowOrEqual:
               XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
-              new ConditionalJump
-              {
-                Condition = ConditionalTestEnum.Above,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               XS.Jump(ConditionalTestEnum.Below, xNoJump);
               XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
-              new ConditionalJump
-              {
-                Condition = ConditionalTestEnum.Above,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               break;
             case ConditionalTestEnum.Below:
               XS.Compare(XSRegisters.EDX, XSRegisters.EBX);
-              new ConditionalJump
-              {
-                Condition = ConditionalTestEnum.Above,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = ConditionalTestEnum.Above, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               XS.Jump(ConditionalTestEnum.Below, xNoJump);
               XS.Compare(XSRegisters.ECX, XSRegisters.EAX);
-              new ConditionalJump
-              {
-                Condition = ConditionalTestEnum.AboveOrEqual,
-                DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-              };
+              new ConditionalJump { Condition = ConditionalTestEnum.AboveOrEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
               break;
             default:
               throw new Exception("Unknown OpCode for conditional branch in 64-bit.");
@@ -278,25 +216,16 @@ namespace Cosmos.IL2CPU.X86.IL
           if (xTestOp == ConditionalTestEnum.Zero)
           {
             XS.Compare(XSRegisters.EAX, 0);
-            new ConditionalJump
-            {
-              Condition = ConditionalTestEnum.Equal,
-              DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-            };
+            new ConditionalJump { Condition = ConditionalTestEnum.Equal, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
           }
           else if (xTestOp == ConditionalTestEnum.NotZero)
           {
             XS.Compare(XSRegisters.EAX, 0);
-            new ConditionalJump
-            {
-              Condition = ConditionalTestEnum.NotEqual,
-              DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)
-            };
+            new ConditionalJump { Condition = ConditionalTestEnum.NotEqual, DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
           }
           else
           {
-            throw new NotSupportedException(
-              "Cosmos.IL2CPU.x86->IL->Branch.cs->Error: Situation not supported yet! (In the Simple Comparison)");
+            throw new NotSupportedException("Cosmos.IL2CPU.x86->IL->Branch.cs->Error: Situation not supported yet! (In the Simple Comparison)");
           }
         }
         else

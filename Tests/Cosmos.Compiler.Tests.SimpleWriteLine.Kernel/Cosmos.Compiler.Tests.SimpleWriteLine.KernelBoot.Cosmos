@@ -10,7 +10,7 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <Profile>ISO</Profile>
+    <Profile>Bochs</Profile>
     <!-- Looks like this was a mispelled attribute. Replaced by DebugEnabled below.
     <DebugEnable>true</DebugEnable>
     -->
@@ -22,9 +22,9 @@
     <VMWareEdition>Workstation</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
     <Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</Name>
-    <Description>Creates a bootable ISO image which can be burned to a DVD. After running the selected project, an explorer window will open containing the ISO file. The ISO file can then be burned to a CD or DVD and used to boot a physical or virtual system.</Description>
+    <Description>Use Bochs emulator to deploy and debug.</Description>
     <Deployment>ISO</Deployment>
-    <Launch>None</Launch>
+    <Launch>Bochs</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
     <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
     <TraceAssemblies>All</TraceAssemblies>
@@ -71,20 +71,6 @@
     <ISO_EnableGDB>True</ISO_EnableGDB>
     <ISO_StartCosmosGDB>True</ISO_StartCosmosGDB>
     <ISO_EnableBochsDebug>True</ISO_EnableBochsDebug>
-    <PXE_StackCorruptionDetectionEnabled>False</PXE_StackCorruptionDetectionEnabled>
-    <PXE_Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</PXE_Name>
-    <PXE_Description>Creates a PXE setup and hosts a DCHP and TFTP server to deploy directly to physical hardware. Allows debugging with a serial cable.</PXE_Description>
-    <PXE_Deployment>PXE</PXE_Deployment>
-    <PXE_Launch>None</PXE_Launch>
-    <PXE_DebugEnabled>False</PXE_DebugEnabled>
-    <PXE_DebugMode>Source</PXE_DebugMode>
-    <PXE_VisualStudioDebugPort>Pipe: Cosmos\Serial</PXE_VisualStudioDebugPort>
-    <PXE_VMwareEdition>Workstation</PXE_VMwareEdition>
-    <PXE_OutputPath>bin\Debug\</PXE_OutputPath>
-    <PXE_TraceAssemblies>All</PXE_TraceAssemblies>
-    <PXE_EnableGDB>True</PXE_EnableGDB>
-    <PXE_StartCosmosGDB>True</PXE_StartCosmosGDB>
-    <PXE_EnableBochsDebug>False</PXE_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">

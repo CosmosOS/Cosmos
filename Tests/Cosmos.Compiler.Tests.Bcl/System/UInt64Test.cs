@@ -73,6 +73,22 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((value == 18446744073709551615), "Negative Double to UInt64 conversion doesn't work");
 
+            value = 4631166901565532406u;
+
+            val2 = value >> 20;
+            Assert.IsTrue(val2 == 4416624929013, "ulong right shift does not work");
+
+            val2 = value >> 52;
+            Assert.IsTrue(val2 == 1028, "ulong right shift (count >=32) does not work");
+
+            /* ... and now left shift */
+            value = 4631166901565532406;
+
+            val2 = value << 20;
+            Assert.IsTrue(val2 == 6640827866535690240, "ulong left shift does not work");
+
+            val2 = value << 52;
+            Assert.IsTrue(val2 == 10331257545187917824, "ulong left shift (count >=32) does not work");
 
 #if false
             // Now let's try ToString() again but printed in hex (this test fails for now!)

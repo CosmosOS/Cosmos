@@ -45,10 +45,5 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
                 Console.WriteLine(E.ToString());
             }
         }
-
-        private static void DoPrint(int i)
-        {
-            Console.WriteLine(i.ToString());
-        }
     }
 }

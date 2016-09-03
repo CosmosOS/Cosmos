@@ -63,7 +63,7 @@ namespace Cosmos.IL2CPU
             public object Item;
         }
         protected Dictionary<object, List<LogItem>> mLogMap;
-        
+
         public ILScanner(AppAssembler aAsmblr)
         {
             mAsmblr = aAsmblr;
@@ -863,7 +863,7 @@ namespace Cosmos.IL2CPU
                                 xPlugInfo = new MethodInfo(xPlug, (uint) xMethodIdPlug, MethodInfo.TypeEnum.Plug, null, xPlugAssembler);
 
                                 var xMethodInfo = new MethodInfo(xMethod, (uint) xMethodIdMethod, xMethodType, xPlugInfo);
-                                if (xAttrib.IsWildcard)
+                                if (xAttrib != null && xAttrib.IsWildcard)
                                 {
                                     xPlugInfo.IsWildcard = true;
                                     xPlugInfo.PluggedMethod = xMethodInfo;

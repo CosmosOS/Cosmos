@@ -1,4 +1,4 @@
-#define VMT_DEBUG
+//#define VMT_DEBUG
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -1118,19 +1118,19 @@ namespace Cosmos.IL2CPU
                             Push((uint)aGetTypeID(xType));
                             Push((uint)j);
 
-                            Push((uint)xMethodId);
-                            if (xMethod.IsAbstract)
-                            {
-                                // abstract methods dont have bodies, iow, are not emitted
-                                Push(0);
-                            }
-                            else
-                            {
-                                Push(ILOp.GetMethodLabel(xMethod));
-                            }
-                            Call(VTablesImplRefs.SetMethodInfoRef);
+                        Push((uint)xMethodId);
+                        if (xMethod.IsAbstract)
+                        {
+                            // abstract methods dont have bodies, oiw, are not emitted
+                            Push(0);
                         }
+                        else
+                        {
+                            Push(ILOp.GetMethodLabel(xMethod));
+                        }
+                        Call(VTablesImplRefs.SetMethodInfoRef);
                     }
+                }
 #if VMT_DEBUG
                     xVmtDebugOutput.WriteEndElement(); // type
 #endif

@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Cosmos.Common;
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System

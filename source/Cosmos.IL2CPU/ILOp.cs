@@ -199,15 +199,12 @@ namespace Cosmos.IL2CPU
       if (aType.IsValueType)
       {
         var xSla = aType.StructLayoutAttribute;
-        if (xSla != null)
+        if ((xSla != null) && (xSla.Size > 0))
         {
-          if (xSla.Size > 0)
-          {
-            return (uint) xSla.Size;
-          }
+          return (uint) xSla.Size;
         }
         return (uint) (from item in GetFieldsInfo(aType, false)
-                       select (int) item.Size).Sum();
+          select (int) item.Size).Sum();
       }
       return 4;
     }
@@ -243,9 +240,9 @@ namespace Cosmos.IL2CPU
     {
       new CPU.Call
       {
-        DestinationLabel = LabelName.Get(
-          typeof(ExceptionHelper).GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public, null,
-            new Type[] {}, null))
+        DestinationLabel =
+          LabelName.Get(typeof(ExceptionHelper).GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public,
+            null, new Type[] {}, null))
       };
     }
 
@@ -258,8 +255,8 @@ namespace Cosmos.IL2CPU
         xBindingFlags |= BindingFlags.Static;
       }
       var xFields = (from item in aType.GetFields(xBindingFlags)
-                     orderby item.Name, item.DeclaringType.ToString()
-                     select item).ToArray();
+        orderby item.Name, item.DeclaringType.ToString()
+        select item).ToArray();
       for (int i = 0; i < xFields.Length; i++)
       {
         var xField = xFields[i];
@@ -376,18 +373,16 @@ namespace Cosmos.IL2CPU
         string fName = inf.Id.Substring(loc, inf.Id.Length - loc);
         return inf.DeclaringType.AssemblyQualifiedName + fName;
       }
-      else
-      {
-        return inf.Id;
-      }
+
+      return inf.Id;
     }
 
     protected static uint GetStorageSize(Type aType)
     {
       return (from item in GetFieldsInfo(aType, false)
-              where !item.IsStatic
-              orderby item.Offset descending
-              select item.Offset + item.Size).FirstOrDefault();
+        where !item.IsStatic
+        orderby item.Offset descending
+        select item.Offset + item.Size).FirstOrDefault();
     }
 
 
@@ -558,9 +553,9 @@ namespace Cosmos.IL2CPU
     {
       var xFields = GetFieldsInfo(aDeclaringType, !aOnlyInstance);
       var xFieldInfo = (from item in xFields
-                        where item.Id == aField
-                              && (!aOnlyInstance || item.IsStatic == false)
-                        select item).SingleOrDefault();
+        where item.Id == aField
+              && (!aOnlyInstance || item.IsStatic == false)
+        select item).SingleOrDefault();
       if (xFieldInfo == null)
       {
         Console.WriteLine("Following fields have been found on '{0}'", aDeclaringType.FullName);
@@ -573,8 +568,7 @@ namespace Cosmos.IL2CPU
       return xFieldInfo;
     }
 
-    protected static void CopyValue(XSRegisters.Register32 destination, int destinationDisplacement,
-      XSRegisters.Register32 source, int sourceDisplacement, uint size)
+    protected static void CopyValue(XSRegisters.Register32 destination, int destinationDisplacement, XSRegisters.Register32 source, int sourceDisplacement, uint size)
     {
       for (int i = 0; i < (size/4); i++)
       {
@@ -594,19 +588,13 @@ namespace Cosmos.IL2CPU
         case 0:
           break;
         default:
-          //EmitNotImplementedException(Assembler, GetServiceProvider(), "Ldsfld: Remainder size " + (xSize % 4) + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
           throw new NotImplementedException();
-        //break;
-
       }
     }
 
     public static bool TypeIsReferenceType(Type type)
     {
-      return type.IsClass
-             && !type.IsValueType
-             && !type.IsPointer;
-
+      return (!type.IsValueType && !type.IsPointer);
     }
   }
 }

@@ -9,23 +9,22 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
-            //string a = "a";
-            //string b1 = "b";
-            //string xResult = a + b1;
-            //Assert.IsTrue(xResult == "ab", "concatting 2 string using + doesn't work");
+            Assert.IsTrue(("a" + "b") == "ab", "concatting 2 string using + doesn't work");
+            Assert.IsTrue(("a" + 'b') == "ab", "concatting 1 string and 1 character doesn't work");
 
-            //char b2 = 'b';
-            //xResult = a + b2;
-            //Assert.IsTrue(xResult == "ab", "concatting 1 string and 1 character doesn't work");
+            string a = "a";
+            string b = "b";
+            string result = a + b;
+            Assert.IsTrue(result == "ab", "concatting 2 string (not optimizable) using + doesn't work"); // Fails
 
-            //char x = 'a';
-            //string y = "a";
-            //Assert.IsTrue(x.ToString() == y, "String == operator ");
+            char x = 'a';
+            string y = "a";
+            Assert.IsTrue(x.ToString() == y, "String == operator ");
 
-            //string str = "Cosmos is awesome!";
-            //string expected = "Cosmos";
-            //string substr = str.Substring(0, 6);
-            //Assert.IsTrue((substr == expected), "Substring is not equal to the expected result, result should be \"Cosmos\".");
+            string str = "Cosmos is awesome!";
+            string expected = "Cosmos";
+            string substr = str.Substring(0, 6);
+            Assert.IsTrue((substr == expected), "Substring is not equal to the expected result, result should be \"Cosmos\". Substrings are broken or MichaelTheShifter made an off-by-one error.");
 
 
             int value1 = 1;
@@ -34,9 +33,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(($"{value1} + 3 = {value2}" == expected_res), "String $ operator does not work.");
 
             string split_in = "ABC";
-            Assert.IsTrue(split_in.Split('B').Length == 2, "Split(char) doesn't return 2 element");
-            Assert.IsTrue(split_in.Split(new[] { 'B' }).Length == 2, "String.Split(char[]) doesn't work.");
-            Assert.IsTrue((split_in.Split(new[] { "B" }, StringSplitOptions.None).Length == 2), "String.Split(string[], StringSplitOptions) doesn't work.");
+            var xResultArray = split_in.Split('B');
+            Assert.IsTrue(xResultArray.Length == 2, "String.Split(char[]) doesn't work.");
+
+            xResultArray = split_in.Split(new[] { "B" }, StringSplitOptions.None);
+            Assert.IsTrue(xResultArray.Length == 2, "String.Split(string[], StringSplitOptions) doesn't work.");
 
             string test = "This is a test string.";
             Assert.IsTrue(test.Contains("test"), "string.Contains(string) doesn't find a substring that actually exists.");

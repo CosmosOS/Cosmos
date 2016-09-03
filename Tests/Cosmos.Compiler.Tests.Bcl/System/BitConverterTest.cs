@@ -21,7 +21,6 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((result == expectedResult), "BitConverter.ToString(intBytes) doesn't work: result " + result + " != " + expectedResult);
 
-
             long aLong = 1;
 
             byte[] longBytes = BitConverter.GetBytes(aLong);

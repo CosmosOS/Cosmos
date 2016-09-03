@@ -122,13 +122,30 @@ namespace Cosmos.IL2CPU.X86.IL
 
     public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, ushort aParam)
     {
-      if (GetMethodLabel(aMethod) == "SystemBooleanSystemStringIsNullOrEmptySystemString")
-      {
-        ;
-        ;
-      }
-
       var xDisplacement = GetArgumentDisplacement(aMethod, aParam);
+      var xType = GetArgumentType(aMethod, aParam);
+      uint xArgRealSize = SizeOfType(xType);
+      uint xArgSize = Align(xArgRealSize, 4);
+
+      XS.Comment("Arg idx = " + aParam);
+      XS.Comment("Arg type = " + xType);
+      XS.Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
+      if (xArgRealSize < 4)
+      {
+        new MoveSignExtend { DestinationReg = RegistersEnum.EAX, Size = (byte)(xArgRealSize * 8), SourceReg = RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = xDisplacement };
+        XS.Push(XSRegisters.EAX);
+      }
+      else
+      {
+        for (int i = 0; i < (xArgSize / 4); i++)
+        {
+          XS.Push(XSRegisters.EBP, isIndirect: true, displacement: (xDisplacement - (i * 4)));
+        }
+      }
+    }
+
+    public static Type GetArgumentType(MethodInfo aMethod, ushort aParam)
+    {
       Type xArgType;
       if (aMethod.MethodBase.IsStatic)
       {
@@ -150,23 +167,7 @@ namespace Cosmos.IL2CPU.X86.IL
         }
       }
 
-      XS.Comment("Arg idx = " + aParam);
-      uint xArgRealSize = SizeOfType(xArgType);
-      uint xArgSize = Align(xArgRealSize, 4);
-      XS.Comment("Arg type = " + xArgType);
-      XS.Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
-      if (xArgRealSize < 4)
-      {
-        new MoveSignExtend { DestinationReg = RegistersEnum.EAX, Size = (byte)(xArgRealSize * 8), SourceReg = RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = xDisplacement };
-        XS.Push(XSRegisters.EAX);
-      }
-      else
-      {
-        for (int i = 0; i < (xArgSize / 4); i++)
-        {
-          XS.Push(XSRegisters.EBP, isIndirect: true, displacement: (xDisplacement - (i * 4)));
-        }
-      }
+      return xArgType;
     }
   }
 }
