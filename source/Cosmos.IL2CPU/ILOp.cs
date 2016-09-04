@@ -42,9 +42,9 @@ namespace Cosmos.IL2CPU
     public static uint Align(uint aSize, uint aAlign)
     {
       var xSize = aSize;
-      if ((xSize%aAlign) != 0)
+      if ((xSize % aAlign) != 0)
       {
-        xSize += aAlign - (xSize%aAlign);
+        xSize += aAlign - (xSize % aAlign);
       }
       return xSize;
     }
@@ -52,9 +52,9 @@ namespace Cosmos.IL2CPU
     public static int SignedAlign(int aSize, int aAlign)
     {
       var xSize = aSize;
-      if ((xSize%aAlign) != 0)
+      if ((xSize % aAlign) != 0)
       {
-        xSize += aAlign - (xSize%aAlign);
+        xSize += aAlign - (xSize % aAlign);
       }
       return xSize;
     }
@@ -94,19 +94,19 @@ namespace Cosmos.IL2CPU
     protected static void Jump_Exception(MethodInfo aMethod)
     {
       // todo: port to numeric labels
-      new CPU.Jump {DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameException};
+      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameException };
     }
 
     protected static void Jump_End(MethodInfo aMethod)
     {
-      new CPU.Jump {DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal};
+      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal };
     }
 
     public static uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField)
     {
       var xSize = SizeOfType(aField.LocalType);
-      var xResult = xSize/4;
-      if (xSize%4 != 0)
+      var xResult = xSize / 4;
+      if (xSize % 4 != 0)
       {
         xResult++;
       }
@@ -124,7 +124,7 @@ namespace Cosmos.IL2CPU
           break;
         }
         var xField = xBody.LocalVariables[i];
-        xOffset += GetStackCountForLocal(aMethod, xField)*4;
+        xOffset += GetStackCountForLocal(aMethod, xField) * 4;
       }
       return xOffset;
     }
@@ -201,10 +201,10 @@ namespace Cosmos.IL2CPU
         var xSla = aType.StructLayoutAttribute;
         if ((xSla != null) && (xSla.Size > 0))
         {
-          return (uint) xSla.Size;
+          return (uint)xSla.Size;
         }
-        return (uint) (from item in GetFieldsInfo(aType, false)
-          select (int) item.Size).Sum();
+        return (uint)(from item in GetFieldsInfo(aType, false)
+                      select (int)item.Size).Sum();
       }
       return 4;
     }
@@ -217,11 +217,11 @@ namespace Cosmos.IL2CPU
 
     public static uint GetEBPOffsetForLocalForDebugger(MethodInfo aMethod, int localIndex)
     {
-      // because the memory is readed in positiv direction, we need to add additional size if greater than 4
+      // because the memory is read in positive direction, we need to add additional size if greater than 4
       uint xOffset = GetEBPOffsetForLocal(aMethod, localIndex);
       var xBody = aMethod.MethodBase.GetMethodBody();
       var xField = xBody.LocalVariables[localIndex];
-      xOffset += GetStackCountForLocal(aMethod, xField)*4 - 4;
+      xOffset += GetStackCountForLocal(aMethod, xField) * 4 - 4;
       return xOffset;
     }
 
@@ -242,7 +242,7 @@ namespace Cosmos.IL2CPU
       {
         DestinationLabel =
           LabelName.Get(typeof(ExceptionHelper).GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public,
-            null, new Type[] {}, null))
+            null, new Type[] { }, null))
       };
     }
 
@@ -255,8 +255,8 @@ namespace Cosmos.IL2CPU
         xBindingFlags |= BindingFlags.Static;
       }
       var xFields = (from item in aType.GetFields(xBindingFlags)
-        orderby item.Name, item.DeclaringType.ToString()
-        select item).ToArray();
+                     orderby item.Name, item.DeclaringType.ToString()
+                     select item).ToArray();
       for (int i = 0; i < xFields.Length; i++)
       {
         var xField = xFields[i];
@@ -276,7 +276,7 @@ namespace Cosmos.IL2CPU
           xField.GetCustomAttributes(typeof(FieldOffsetAttribute), true).FirstOrDefault() as FieldOffsetAttribute;
         if (xFieldOffsetAttrib != null)
         {
-          xInfo.Offset = (uint) xFieldOffsetAttrib.Value;
+          xInfo.Offset = (uint)xFieldOffsetAttrib.Value;
         }
 
         aFields.Add(xInfo);
@@ -339,7 +339,7 @@ namespace Cosmos.IL2CPU
           xDebugInfs.Add(new FIELD_INFO()
           {
             TYPE = xInfo.FieldType.AssemblyQualifiedName,
-            OFFSET = (int) xInfo.Offset,
+            OFFSET = (int)xInfo.Offset,
             NAME = GetNameForField(xInfo),
           });
         }
@@ -380,9 +380,9 @@ namespace Cosmos.IL2CPU
     protected static uint GetStorageSize(Type aType)
     {
       return (from item in GetFieldsInfo(aType, false)
-        where !item.IsStatic
-        orderby item.Offset descending
-        select item.Offset + item.Size).FirstOrDefault();
+              where !item.IsStatic
+              orderby item.Offset descending
+              select item.Offset + item.Size).FirstOrDefault();
     }
 
 
@@ -402,7 +402,7 @@ namespace Cosmos.IL2CPU
         XS.Comment("Cleanup return");
 
         // cleanup result values
-        for (int i = 0; i < aReturnSize/4; i++)
+        for (int i = 0; i < aReturnSize / 4; i++)
         {
           XS.Add(XSRegisters.ESP, 4);
         }
@@ -416,7 +416,7 @@ namespace Cosmos.IL2CPU
           XS.Comment("Cleanup extra stack");
 
           // cleanup result values
-          for (int i = 0; i < xExtraStack/4; i++)
+          for (int i = 0; i < xExtraStack / 4; i++)
           {
             XS.Add(XSRegisters.ESP, 4);
           }
@@ -443,20 +443,20 @@ namespace Cosmos.IL2CPU
           switch (aCurrentOpCode.CurrentExceptionHandler.Flags)
           {
             case ExceptionHandlingClauseOptions.Clause:
-            {
-              xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
-              break;
-            }
+              {
+                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
+                break;
+              }
             case ExceptionHandlingClauseOptions.Finally:
-            {
-              xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
-              break;
-            }
+              {
+                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
+                break;
+              }
             default:
-            {
-              throw new Exception("ExceptionHandlerType '" + aCurrentOpCode.CurrentExceptionHandler.Flags.ToString() +
-                                  "' not supported yet!");
-            }
+              {
+                throw new Exception("ExceptionHandlerType '" + aCurrentOpCode.CurrentExceptionHandler.Flags.ToString() +
+                                    "' not supported yet!");
+              }
           }
         }
       }
@@ -530,7 +530,7 @@ namespace Cosmos.IL2CPU
       }
       if (debugEnabled)
       {
-        XS.Compare(XSRegisters.ESP, 0, destinationDisplacement: (int) stackOffsetToCheck);
+        XS.Compare(XSRegisters.ESP, 0, destinationDisplacement: (int)stackOffsetToCheck);
         XS.Jump(CPU.ConditionalTestEnum.NotEqual, ".AfterNullCheck");
         XS.ClearInterruptFlag();
         // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
@@ -553,9 +553,9 @@ namespace Cosmos.IL2CPU
     {
       var xFields = GetFieldsInfo(aDeclaringType, !aOnlyInstance);
       var xFieldInfo = (from item in xFields
-        where item.Id == aField
-              && (!aOnlyInstance || item.IsStatic == false)
-        select item).SingleOrDefault();
+                        where item.Id == aField
+                              && (!aOnlyInstance || item.IsStatic == false)
+                        select item).SingleOrDefault();
       if (xFieldInfo == null)
       {
         Console.WriteLine("Following fields have been found on '{0}'", aDeclaringType.FullName);
@@ -570,20 +570,20 @@ namespace Cosmos.IL2CPU
 
     protected static void CopyValue(XSRegisters.Register32 destination, int destinationDisplacement, XSRegisters.Register32 source, int sourceDisplacement, uint size)
     {
-      for (int i = 0; i < (size/4); i++)
+      for (int i = 0; i < (size / 4); i++)
       {
-        XS.Set(XSRegisters.EAX, source, sourceDisplacement: sourceDisplacement + (i*4));
-        XS.Set(destination, XSRegisters.EAX, destinationDisplacement: destinationDisplacement + (i*4));
+        XS.Set(XSRegisters.EAX, source, sourceDisplacement: sourceDisplacement + (i * 4));
+        XS.Set(destination, XSRegisters.EAX, destinationDisplacement: destinationDisplacement + (i * 4));
       }
-      switch (size%4)
+      switch (size % 4)
       {
         case 1:
-          XS.Set(XSRegisters.AL, source, sourceDisplacement: (int) (sourceDisplacement + ((size/4)*4)));
-          XS.Set(destination, XSRegisters.AL, destinationDisplacement: (int) (destinationDisplacement + ((size/4)*4)));
+          XS.Set(XSRegisters.AL, source, sourceDisplacement: (int)(sourceDisplacement + ((size / 4) * 4)));
+          XS.Set(destination, XSRegisters.AL, destinationDisplacement: (int)(destinationDisplacement + ((size / 4) * 4)));
           break;
         case 2:
-          XS.Set(XSRegisters.AX, source, sourceDisplacement: (int) (sourceDisplacement + ((size/4)*4)));
-          XS.Set(destination, XSRegisters.AX, destinationDisplacement: (int) (destinationDisplacement + ((size/4)*4)));
+          XS.Set(XSRegisters.AX, source, sourceDisplacement: (int)(sourceDisplacement + ((size / 4) * 4)));
+          XS.Set(destination, XSRegisters.AX, destinationDisplacement: (int)(destinationDisplacement + ((size / 4) * 4)));
           break;
         case 0:
           break;

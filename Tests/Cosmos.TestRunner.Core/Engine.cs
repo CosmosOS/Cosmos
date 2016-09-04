@@ -19,7 +19,6 @@ namespace Cosmos.TestRunner.Core
         public bool EnableStackCorruptionChecks = true;
         public TraceAssemblies TraceAssembliesLevel = TraceAssemblies.User;
         public StackCorruptionDetectionLevel StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
-        public bool DebugStubEnabled = true;
 
         public List<string> KernelsToRun
         {

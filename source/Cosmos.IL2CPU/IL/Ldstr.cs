@@ -55,7 +55,7 @@ namespace Cosmos.IL2CPU.X86.IL
       Array.Copy(BitConverter.GetBytes((int)1), 0, xObjectData, 8, 4);
       Array.Copy(BitConverter.GetBytes(aLiteral.Length), 0, xObjectData, 12, 4);
       Array.Copy(xEncoding.GetBytes(aLiteral), 0, xObjectData, 16, xBytecount);
-      xAsm.DataMembers.Add(new CPU.DataMember(xDataName, xObjectData));
+      xAsm.DataMembers.Add(new DataMember(xDataName, xObjectData));
       return xDataName;
     }
 

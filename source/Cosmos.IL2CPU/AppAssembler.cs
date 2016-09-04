@@ -1211,7 +1211,7 @@ namespace Cosmos.IL2CPU
                     }
                     else
                     {
-                        xTheSize = 4;
+                        xTheSize = 8;
                     }
                     byte[] xData = new byte[xTheSize];
                     try
@@ -1228,7 +1228,7 @@ namespace Cosmos.IL2CPU
                                 }
                                 if (xTyp.IsValueType)
                                 {
-                                    for (int x = 0; x < xTheSize; x++)
+                                    for (int x = 4; x < xTheSize; x++)
                                     {
                                         xData[x] = Marshal.ReadByte(xValue,
                                                                     x);
@@ -1374,7 +1374,7 @@ namespace Cosmos.IL2CPU
             XS.Push(XSRegisters.EBP);
             XS.Set(XSRegisters.EBP, XSRegisters.ESP);
             XS.Set(XSRegisters.EAX, ILOp.GetTypeIDLabel(typeof(String)), sourceIsIndirect: true);
-            new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(LdStr.GetContentsArrayName("")) };
+            new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(LdStr.GetContentsArrayName("")), DestinationDisplacement = 4 };
 
             var xMemberId = 0;
 
@@ -1393,7 +1393,7 @@ namespace Cosmos.IL2CPU
                     Assembler.WriteDebugVideo(".");
                 }
                 xMemberId++;
-                new Mov { DestinationRef = ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
+                new Mov { DestinationRef = ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX, DestinationDisplacement = 4 };
             }
             Assembler.WriteDebugVideo("Done");
             XS.Pop(XSRegisters.EBP);
