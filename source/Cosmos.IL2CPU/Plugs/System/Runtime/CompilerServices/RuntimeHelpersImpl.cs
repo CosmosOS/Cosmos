@@ -35,10 +35,11 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices
         [PlugMethod]
         public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle)
         {
+            XS.Exchange(BX, BX);
             // Arguments:
             //    Array aArray, RuntimeFieldHandle aFieldHandle
-            XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 16); // array
-            XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: 8);  // aFieldHandle
+            XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 20); // array
+            XS.Set(XSRegisters.ESI, XSRegisters.EBP, sourceDisplacement: 12);  // aFieldHandle
             XS.Add(XSRegisters.EDI, 8);
             XS.Push(EDI, isIndirect: true); // element size
             XS.Add(XSRegisters.EDI, 4);

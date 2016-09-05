@@ -916,7 +916,8 @@ namespace Cosmos.IL2CPU
             xTemp = BitConverter.GetBytes(GetVTableEntrySize());
             Array.Copy(xTemp, 0, xData, 12, 4);
             XS.DataMemberBytes(xTheName + "_Contents", xData);
-            XS.DataMember(xTheName, 1, "dd", xTheName + "_Contents");
+            XS.DataMember(xTheName,  1, "db", "0, 0, 0, 0, 0, 0, 0, 0");
+            XS.Set(xTheName, xTheName + "_Contents", destinationIsIndirect: true, destinationDisplacement: 4);
 #if VMT_DEBUG
             using (var xVmtDebugOutput = XmlWriter.Create(@"vmt_debug.xml"))
             {
@@ -1393,7 +1394,7 @@ namespace Cosmos.IL2CPU
                     Assembler.WriteDebugVideo(".");
                 }
                 xMemberId++;
-                new Mov { DestinationRef = ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX, DestinationDisplacement = 4 };
+                new Mov { DestinationRef = ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
             }
             Assembler.WriteDebugVideo("Done");
             XS.Pop(XSRegisters.EBP);

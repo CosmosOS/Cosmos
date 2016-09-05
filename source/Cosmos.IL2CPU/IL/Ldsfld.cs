@@ -48,10 +48,8 @@ namespace Cosmos.IL2CPU.X86.IL
       var xTypeNeedsGC = TypeIsReferenceType(xField.FieldType);
       if (xTypeNeedsGC)
       {
-        XS.Exchange(XSRegisters.BX, XSRegisters.BX);
-        XS.Set(XSRegisters.EAX, xDataName);
-        XS.Add(XSRegisters.EAX, 4);
-        XS.Push(XSRegisters.EAX, isIndirect: true);
+        XS.Push(xDataName, isIndirect: true, displacement: 4);
+        XS.Push(0);
         return;
       }
 

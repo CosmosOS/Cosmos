@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       var xOpCode = (ILOpCodes.OpField)aOpCode;
       var xField = xOpCode.Value;
       XS.Comment("Operand type: " + aOpCode.StackPopTypes[1].ToString());
-      DoExecute(Assembler, aMethod, xField, DebugEnabled, SizeOfType(aOpCode.StackPopTypes[1]) == 8);
+      DoExecute(Assembler, aMethod, xField, DebugEnabled, TypeIsReferenceType(aOpCode.StackPopTypes[1]));
     }
 
     public static void DoExecute(Cosmos.Assembler.Assembler aAssembler,  MethodInfo aMethod, string aFieldId, Type aDeclaringObject, bool aNeedsGC, bool debugEnabled) {

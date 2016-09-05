@@ -1,5 +1,5 @@
 ﻿using System;
-
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System
@@ -10,6 +10,7 @@ namespace Cosmos.System.Plugs.System
     {
         public static string ToString(ref long aThis)
         {
+            Debugger.DoBochsBreak();
             return Int64Impl2.GetNumberString(aThis);
         }
 

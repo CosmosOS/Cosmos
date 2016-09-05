@@ -57,11 +57,9 @@ namespace Cosmos.IL2CPU.X86.IL
       string xDataName = DataMember.GetStaticFieldName(xField);
       if (xIsReferenceType)
       {
-        XS.Exchange(XSRegisters.BX, XSRegisters.BX);
+        XS.Add(XSRegisters.ESP, 4);
         XS.Pop(XSRegisters.EAX);
-        XS.Set(xDataName, XSRegisters.EAX, destinationIsIndirect: true);
-        XS.Pop(XSRegisters.EAX);
-        XS.Set(xDataName, XSRegisters.EAX, destinationIsIndirect: true, destinationDisplacement: 4);
+        XS.Set(ElementReference.New(xDataName).Name, XSRegisters.EAX, destinationIsIndirect: true, destinationDisplacement: 4);
         return;
       }
       for (int i = 0; i < (xSize / 4); i++)
