@@ -1288,8 +1288,7 @@ namespace Cosmos.IL2CPU
                         }
                         else
                         {
-                            if (ILOp.TypeIsReferenceType(aFrom.MethodBase.DeclaringType)
-                                && !ILOp.TypeIsReferenceType(xParams[0].ParameterType))
+                            if (ILOp.TypeIsReferenceType(aFrom.MethodBase.DeclaringType) && !ILOp.TypeIsReferenceType(xParams[0].ParameterType))
                             {
                                 throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute!");
                             }

@@ -143,7 +143,7 @@ namespace Cosmos.IL2CPU
       {
         return 0;
       }
-      if ((!aType.IsValueType && aType.IsClass) || aType.IsInterface)
+      if (TypeIsReferenceType(aType))
       {
         return 8;
       }
@@ -211,8 +211,7 @@ namespace Cosmos.IL2CPU
 
     public static bool TypeIsFloat(Type type)
     {
-      return type == typeof(Single)
-             || type == typeof(Double);
+      return type == typeof(float) || type == typeof(double);
     }
 
     public static uint GetEBPOffsetForLocalForDebugger(MethodInfo aMethod, int localIndex)
@@ -594,7 +593,7 @@ namespace Cosmos.IL2CPU
 
     public static bool TypeIsReferenceType(Type type)
     {
-      return (!type.IsValueType && !type.IsPointer);
+      return !type.IsValueType && !type.IsPointer && !type.IsByRef;
     }
   }
 }

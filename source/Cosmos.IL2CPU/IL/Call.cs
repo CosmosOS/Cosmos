@@ -19,7 +19,7 @@ using SysReflection = System.Reflection;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Call)]
-    public class Call: ILOp
+    public class Call : ILOp
     {
         public Call(Cosmos.Assembler.Assembler aAsmblr)
             : base(aAsmblr)
@@ -88,10 +88,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             var xMethodInfo = aTargetMethod as SysReflection.MethodInfo;
 
-            // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
-            //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
-            string xNormalAddress;
-            xNormalAddress = LabelName.Get(aTargetMethod);
+            string xNormalAddress = LabelName.Get(aTargetMethod);
 
             var xParameters = aTargetMethod.GetParameters();
 
@@ -129,7 +126,7 @@ namespace Cosmos.IL2CPU.X86.IL
             if (aCurrentMethod != null)
             {
                 EmitExceptionLogic(Assembler, aCurrentMethod, aCurrent, true,
-                                   delegate()
+                                   delegate
                                    {
                                        var xStackOffsetBefore = aCurrent.StackOffsetBeforeExecution.Value;
 
@@ -149,12 +146,6 @@ namespace Cosmos.IL2CPU.X86.IL
                                    }, nextLabel);
 
             }
-            if (xMethodInfo == null
-                || SizeOfType(xMethodInfo.ReturnType) == 0)
-            {
-                return;
-            }
-
         }
     }
 }
