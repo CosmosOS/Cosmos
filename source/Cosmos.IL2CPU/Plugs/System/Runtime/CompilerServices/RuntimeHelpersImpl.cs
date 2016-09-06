@@ -35,7 +35,6 @@ namespace Cosmos.IL2CPU.Plugs.System.Runtime.CompilerServices
         [PlugMethod]
         public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle)
         {
-            XS.Exchange(BX, BX);
             // Arguments:
             //    Array aArray, RuntimeFieldHandle aFieldHandle
             XS.Set(XSRegisters.EDI, XSRegisters.EBP, sourceDisplacement: 20); // array

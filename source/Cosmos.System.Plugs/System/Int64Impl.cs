@@ -10,7 +10,6 @@ namespace Cosmos.System.Plugs.System
     {
         public static string ToString(ref long aThis)
         {
-            Debugger.DoBochsBreak();
             return Int64Impl2.GetNumberString(aThis);
         }
 

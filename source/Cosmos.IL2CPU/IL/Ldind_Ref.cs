@@ -16,7 +16,6 @@ namespace Cosmos.IL2CPU.X86.IL
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
       DoNullReferenceCheck(Assembler, DebugEnabled, 0);
-      XS.Exchange(BX, BX);
       XS.Pop(EAX);
       XS.Push(EAX, isIndirect: true, displacement: 4);
       XS.Push(0);
