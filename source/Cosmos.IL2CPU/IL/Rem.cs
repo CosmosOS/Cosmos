@@ -21,6 +21,7 @@ namespace Cosmos.IL2CPU.X86.IL
       var xStackItem = aOpCode.StackPopTypes[0];
       var xStackItemSize = SizeOfType(xStackItem);
       var xSize = Math.Max(xStackItemSize, SizeOfType(aOpCode.StackPopTypes[1]));
+
       if (xSize > 4)
       {
         if (TypeIsFloat(xStackItem))
@@ -41,12 +42,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
           // divisor
           //low
-          XS.Test(ESI, ESP, sourceIsIndirect: true);
+          XS.Set(ESI, ESP, sourceIsIndirect: true);
           //high
           XS.Set(EDI, ESP, sourceDisplacement: 4);
-
-          // pop both 8 byte values
-          XS.Add(ESP, 16);
 
           //dividend
           // low
@@ -54,8 +52,12 @@ namespace Cosmos.IL2CPU.X86.IL
           //high
           XS.Set(EDX, ESP, sourceDisplacement: 12);
 
+          // pop both 8 byte values
+          XS.Add(ESP, 16);
+
           // set flags
           XS.Or(EDI, EDI);
+
           // if high dword of divisor is already zero, we dont need the loop
           XS.Jump(CPUx86.ConditionalTestEnum.Zero, LabelNoLoop);
 

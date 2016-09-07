@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 
 using System;
 using Cosmos.Debug.Kernel;
@@ -169,7 +169,6 @@ namespace Cosmos.Common
                 mDebugger.SendInternal(xValue);
                 while (xValue > 0)
                 {
-                    Debugger.DoBochsBreak();
                     long xValue2 = xValue % 10;
                     mDebugger.SendInternal("xValue2 =");
                     mDebugger.SendInternal(xValue2);
