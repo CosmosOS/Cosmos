@@ -1,10 +1,14 @@
-﻿using System;
+﻿#define COSMOSDEBUG
+
+using System;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Common
 {
     public static class StringHelper
     {
+        private static Debugger mDebugger = new Debugger("Common", "StringHelper");
+
         internal enum StringComparisonResultEnum
         {
             Less = -1,
@@ -71,51 +75,110 @@ namespace Cosmos.Common
             return xResult;
         }
 
+        public static string GetNumberString(ulong aValue, bool aIsNegative)
+        {
+            const string xDigits = "0123456789";
+            char[] xResultChars = new char[21];
+            int xCurrentPos = 20;
+            if (aValue > 0)
+            {
+                while (aValue > 0)
+                {
+                    byte xPos = (byte)(aValue % 10);
+                    aValue /= 10;
+                    xResultChars[xCurrentPos] = xDigits[xPos];
+                    xCurrentPos -= 1;
+                }
+            }
+            else
+            {
+                xResultChars[xCurrentPos] = '0';
+                xCurrentPos -= 1;
+            }
+            if (aIsNegative)
+            {
+                xResultChars[xCurrentPos] = '-';
+                xCurrentPos -= 1;
+            }
+            return new String(xResultChars, xCurrentPos + 1, 20 - xCurrentPos);
+        }
+
         public static string GetNumberString(ulong aValue)
         {
+            mDebugger.SendInternal("StringHrlprt.GetNumberString");
+            mDebugger.SendInternal("aValue =");
+            mDebugger.SendInternal(aValue);
+
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
 
             if (aValue == 0)
             {
                 xResult = "0";
+                mDebugger.SendInternal("xResult =");
+                mDebugger.SendInternal(xResult);
             }
             else
             {
                 ulong xValue = aValue;
+                mDebugger.SendInternal("xValue =");
+                mDebugger.SendInternal(xValue);
                 while (xValue > 0)
                 {
                     ulong xValue2 = xValue % 10;
+                    mDebugger.SendInternal("xValue2 =");
+                    mDebugger.SendInternal(xValue2);
                     xResult = string.Concat(xChars[xValue2], xResult);
+                    mDebugger.SendInternal("xResult =");
+                    mDebugger.SendInternal(xResult);
                     xValue /= 10;
+                    mDebugger.SendInternal("xValue =");
+                    mDebugger.SendInternal(xValue);
                 }
             }
 
+            mDebugger.SendInternal("xResult =");
+            mDebugger.SendInternal(xResult);
             return xResult;
         }
 
         public static string GetNumberString(long aValue)
         {
+            mDebugger.SendInternal("StringHrlprt.GetNumberString");
+            mDebugger.SendInternal("aValue =");
+            mDebugger.SendInternal(aValue);
+
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
             long xValue = aValue;
 
-            if (aValue < 0)
-            {
-                xValue *= -1;
-            }
-
             if (aValue == 0)
             {
-                xResult = string.Concat(xResult, "0");
+                xResult = "0";
+                mDebugger.SendInternal("xResult =");
+                mDebugger.SendInternal(xResult);
             }
             else
             {
+                if (aValue < 0)
+                {
+                    xValue *= -1;
+                }
+
+                mDebugger.SendInternal("xValue =");
+                mDebugger.SendInternal(xValue);
                 while (xValue > 0)
                 {
+                    Debugger.DoBochsBreak();
                     long xValue2 = xValue % 10;
+                    mDebugger.SendInternal("xValue2 =");
+                    mDebugger.SendInternal(xValue2);
                     xResult = string.Concat(xChars[xValue2], xResult);
+                    mDebugger.SendInternal("xResult =");
+                    mDebugger.SendInternal(xResult);
                     xValue /= 10;
+                    mDebugger.SendInternal("xValue =");
+                    mDebugger.SendInternal(xValue);
                 }
             }
 
@@ -124,6 +187,8 @@ namespace Cosmos.Common
                 xResult = string.Concat("-", xResult);
             }
 
+            mDebugger.SendInternal("xResult =");
+            mDebugger.SendInternal(xResult);
             return xResult;
         }
 
@@ -170,13 +235,7 @@ namespace Cosmos.Common
             return xNumber;
         }
 
-        public static int Compare(
-            string aString1,
-            int aIndex1,
-            string aString2,
-            int aIndex2,
-            int aLength1,
-            int aLength2)
+        public static int Compare(string aString1, int aIndex1, string aString2, int aIndex2, int aLength1,int aLength2)
         {
             if (aString1.Length < aString2.Length)
             {

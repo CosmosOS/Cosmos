@@ -103,7 +103,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
             var xExtraLog = "";
             if (_useDebugVersion)
             {
-                //xExtraLog = "-dbglog \"c:\\data\\bochsdbg.log\"";
+                //xExtraLog = "-dbglog \"bochsdbg.log\"";
             }
             _bochsStartInfo.Arguments = string.Format("-q {1} -f \"{0}\"", _bochsConfigurationFile.FullName, xExtraLog);
             _bochsStartInfo.WorkingDirectory = _bochsConfigurationFile.Directory.FullName;
