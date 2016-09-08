@@ -11,7 +11,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         private static bool SinglesAreEqual(Single left, Single right)
         {
             // Define the tolerance for variation in their values
-            Single difference = (Single)Math.Abs(left * .00001);
+            Single difference = (Single) Math.Abs(left * .00001);
 
             if (Math.Abs(left - right) <= difference)
                 return true;
@@ -19,38 +19,65 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 return false;
         }
 
-        /* The double== equality operator is so imprecise to not be really ever useful we should be happy if the two values are "similar" */
-        private static bool DoublesAreEqual(double left, double right)
-        {
-            // Define the tolerance for variation in their values
-            double difference = Math.Abs(left * .00001);
-
-            if (Math.Abs(left - right) <= difference)
-                return true;
-            else
-                return false;
-        }
-
-        public static void negPositive()
-        {
-            // Let's try if it works in the other way too
-            //float value = 42.0f;
-            //float valueNegated = -value;
-            //Assert.IsTrue((SinglesAreEqual(valueNegated, -42.0f)), "(float) negation of positive float doesn't work got " + valueNegated);
-
-        }
         public static void Execute()
         {
             Single value;
             String result;
             String expectedResult;
 
-            value = 42.42F; // It exists Single.MaxValue but it is a too big value an can be represented only on Scientific notation but then how to confront with a String?
+            /* First start with some weird value (not really numbers) that the IEEE standard has */
+            value = Single.PositiveInfinity;
 
+            result = value.ToString();
+            expectedResult = "∞";
+
+            Assert.IsTrue((result == expectedResult), "Single.ToString of INF doesn't work");
+
+            value = Single.NegativeInfinity;
+
+            result = value.ToString();
+            expectedResult = "-∞";
+
+            Assert.IsTrue((result == expectedResult), "Single.ToString of -INF doesn't work");
+
+            value = Single.NaN;
+
+            result = value.ToString();
+            expectedResult = "NaN";
+
+            Assert.IsTrue((result == expectedResult), "Single.ToString of -NaN doesn't work");
+
+            /* Another special value is '0' */
+            value = 0f;
+
+            result = value.ToString();
+            expectedResult = "0";
+
+            Assert.IsTrue((result == expectedResult), "Single.ToString of 0 doesn't work");
+
+            /* A negative value */
+            value = -42.42f;
+
+            result = value.ToString();
+            expectedResult = "-42.42";
+
+            Assert.IsTrue((result == expectedResult), "Single.ToString of negative number doesn't work");
+            
+            /* A big value (to be correct toString should convert it in scientific notation) */
+            value = 9223372036854775808f;
+
+            result = value.ToString();
+            expectedResult = "9223372036854775808";
+
+            Assert.IsTrue((result == expectedResult), "Single.ToString of big number doesn't work");
+
+            /* OK now a normal value */
+            value = 42.42F; // It exists Single.MaxValue but it is a too big value an can be represented only on Scientific notation but then how to confront with a String?
+           
             result = value.ToString();
             expectedResult = "42.42";
 
-            Assert.IsTrue((result == expectedResult), "Single.ToString doesn't work");
+            Assert.IsTrue((result == expectedResult), "Single.ToString of normal number doesn't work");
 
             // Now let's try to concat to a String using '+' operator
             result = "The value of the Single is " + value;
@@ -101,42 +128,35 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Single otherValue = 2.20f;
 
             OperationResult = value + otherValue;
-            //expectedResult = "44.62";
 
             Assert.IsTrue((SinglesAreEqual(OperationResult, 44.62f)), "float operator+ doesn't work");
-            //Assert.IsTrue((OperationResult.ToString() == expectedResult), "float operator+ doesn't work");
 
             // Now test subtraction
             OperationResult = value - otherValue;
             //expectedResult = "40.22";
 
             Assert.IsTrue((SinglesAreEqual(OperationResult, 40.22f)), "float operator- doesn't work");
-            //Assert.IsTrue((OperationResult.ToString() == expectedResult), "float operator- doesn't work");
 
             // Now test multiplication
             otherValue = 2.00f; // I'll change 'otherValue' to 2.00f because if not the result is too much wrong to make sense...
             OperationResult = value * otherValue;
-            //expectedResult = "84.84";
 
             Assert.IsTrue((SinglesAreEqual(OperationResult, 84.84f)), "float operator* doesn't work");
-            //Assert.IsTrue((OperationResult.ToString() == expectedResult), "float operator* doesn't work");
 
             // Now test division
             OperationResult = value / otherValue;
-            //expectedResult = "21.21";
 
             Assert.IsTrue((SinglesAreEqual(OperationResult, 21.21f)), "float operator/ doesn't work");
-            //Assert.IsTrue((OperationResult.ToString() == expectedResult), "float operator/ doesn't work");
 
             // Now test division again but with dividend 0 the expected result should be Double.PositiveInfinity
             OperationResult = value / 0.00f;
 
-            Assert.IsTrue((OperationResult == Single.PositiveInfinity), "single operator/0 doesn't work");
+            Assert.IsTrue((OperationResult == Single.PositiveInfinity), "flot operator/0 doesn't work");
 
             // Now test division again but with all values as 0 the expected result should be Double.NaN
             OperationResult = 0.00f / 0.00f;
 
-            Assert.IsTrue((Single.IsNaN(OperationResult)), "single operator/(0/0) doesn't work");
+            Assert.IsTrue((Single.IsNaN(OperationResult)), "float operator/(0/0) doesn't work");
 
             // Now test some castings operations
             byte valueAsByte = (byte)value;
@@ -178,31 +198,14 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = (float)anULong;
             Assert.IsTrue((SinglesAreEqual(value, 9223372036854775849f)), "(float) from ulong operator doesn't work");
 
-            //value = -42.0f;
-            //float valueNegated = -value;
-            //Assert.IsTrue((SinglesAreEqual(valueNegated, 42.0f)), "(float) negation doesn't work");
+            value = -42.0f;
+            float valueNegated = -value;
+            Assert.IsTrue((SinglesAreEqual(valueNegated, 42.0f)), "(float) negation doesn't work");
 
-            //negPositive();
-
-#if false
             // Let's try if it works in the other way too
             value = 42.0f;
             valueNegated = -value;
             Assert.IsTrue((SinglesAreEqual(valueNegated, -42.0f)), "(float) negation of positive float doesn't work");
-#endif
-
-#if false
-            //ulong anULong = 9223372036854775849;
-            ulong anULong = 9423372036854775870;
-            value = (float)anULong;
-#if true
-            byte[] valueAsBytes = BitConverter.GetBytes(value);
-
-            Assert.IsTrue((SinglesAreEqual(value, 9223372036854775849f)), "(float) from ulong operator doesn't work returns " + value + " as bytes " + BitConverter.ToString(valueAsBytes));
-#else
-            Assert.IsTrue((SinglesAreEqual(value, 9423372036854775870f)), "(float) from ulong operator doesn't work: ");
-#endif
-#endif
         }
     }
 }

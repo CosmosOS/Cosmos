@@ -11,6 +11,7 @@
             DataLength = aDataLength;
         }
 
+        public static readonly FatDirectoryEntryMetadata FirstByte = new FatDirectoryEntryMetadata(0x00, 1);
         public static readonly FatDirectoryEntryMetadata ShortName = new FatDirectoryEntryMetadata(0x00, 11);
         public static readonly FatDirectoryEntryMetadata Attributes = new FatDirectoryEntryMetadata(0x0B, 1);
         public static readonly FatDirectoryEntryMetadata NTReserved = new FatDirectoryEntryMetadata(0x0C, 1);

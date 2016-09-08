@@ -39,7 +39,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 DoubleTest.Execute();
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
-
+        
 #if false
                 DecimalTest.Execute();
                 System.Collections.Generic.ListTest.Execute();

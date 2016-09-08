@@ -7,6 +7,8 @@ using Cosmos.Assembler.x86.x87;
 using static XSharp.Compiler.XSRegisters;
 using Label = Cosmos.Assembler.Label;
 
+//TODO: Fix indentaion and formatting in this file: ideal would be 4space-indent
+
 namespace XSharp.Compiler
 {
   [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
@@ -608,6 +610,40 @@ namespace XSharp.Compiler
 
     #endregion Mov
 
+    #region Lea
+
+    public static void Lea(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+        Do<Lea>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void Lea(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+        Do<Lea>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void Lea(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+    {
+        Do<Lea>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void Lea(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+        Do<Lea>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void Lea(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+        Do<Lea>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+    }
+
+    public static void Lea(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+    {
+        Do<Lea>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size: size);
+    }
+
+    #endregion
+
     public static void Jump(ConditionalTestEnum condition, string label)
     {
       new ConditionalJump { Condition = condition, DestinationLabel = label };
@@ -754,6 +790,16 @@ namespace XSharp.Compiler
     public static void Push(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
     {
       Do<Push>(label, isIndirect, displacement, size);
+    }
+
+    public static void Pushfd()
+    {
+        new Pushfd();
+    }
+
+    public static void Popfd()
+    {
+        new Popfd();
     }
 
     public static void Pop(Register value)
@@ -1263,7 +1309,7 @@ namespace XSharp.Compiler
         DestinationLabel = targetLabel
       };
     }
-
+        
     #region MoveSignExtend
 
     public static void MoveSignExtend(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
@@ -1331,5 +1377,20 @@ namespace XSharp.Compiler
     }
 
     #endregion MoveZeroExtend
-  }
+
+    public static void Cpuid()
+    {
+        new CpuId();
+    }
+
+    public static void Rdtsc()
+    {
+        new Rdtsc();
+    }
+
+    public static void Rdmsr()
+    {
+        new Rdmsr();
+    }
+    }
 }

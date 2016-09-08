@@ -68,37 +68,17 @@ namespace Cosmos.IL2CPU.X86.IL
       {
         if (xStackItemIsFloat)
         {
-          // Please note that SSE supports double operations only from version 2
-          XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
-          // Increment ESP to get the value of the next double
-          XS.Add(ESP, 8);
-          XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
-          XS.SSE2.CompareSD(XMM1, XMM0, comparision: Equal);
-          XS.SSE2.MoveD(EBX, XMM1);
-          XS.And(EBX, 1);
-          // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
-          XS.Add(ESP, 4);
-          XS.Set(ESP, EBX, destinationIsIndirect: true);
-          // This is the x87 version I left it here commented if in future will be needed...
-#if false
-          XS.Set(XSRegisters.ESI, 1);
-          // esi = 1
-          XS.Xor(XSRegisters.EDI, XSRegisters.EDI);
-          // edi = 0
-
-          // value 1
-          new FloatLoad { DestinationReg = RegistersEnum.ESP, Size = 64, DestinationDisplacement = 8, DestinationIsIndirect = true };
-          // value 2
-          XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Long64);
-          XS.FPU.FloatCompareAndSet(ST1);
-          // if zero is set, ST(0) == ST(i)
-          new ConditionalMove { Condition = ConditionalTestEnum.Equal, DestinationReg = RegistersEnum.EDI, SourceReg = RegistersEnum.ESI };
-          // pops fpu stack
-          XS.FPU.FloatStoreAndPop(ST0);
-          XS.FPU.FloatStoreAndPop(ST0);
-          XS.Add(XSRegisters.ESP, 16);
-          XS.Push(XSRegisters.EDI);
-#endif
+           // Please note that SSE supports double operations only from version 2
+           XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
+           // Increment ESP to get the value of the next double
+           XS.Add(ESP, 8);
+           XS.SSE2.MoveSD(XMM1, ESP, sourceIsIndirect: true);
+           XS.SSE2.CompareSD(XMM1, XMM0, comparision: Equal);
+           XS.SSE2.MoveD(EBX, XMM1);
+           XS.And(EBX, 1);
+           // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
+           XS.Add(ESP, 4);
+           XS.Set(ESP, EBX, destinationIsIndirect: true);
         }
         else
         {
