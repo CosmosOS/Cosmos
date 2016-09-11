@@ -90,7 +90,7 @@
     <Compile Include="FieldTypeAttribute.cs" />
     <Compile Include="FieldAccessAttribute.cs" />
     <Compile Include="InlineAttribute.cs" />
-    <Compile Include="ObjectAccessPointerAttribute.cs" />
+    <Compile Include="ObjectPointerAccessAttribute.cs" />
     <Compile Include="PlugAttribute.cs" />
     <Compile Include="PlugFieldAttribute.cs" />
     <Compile Include="PlugMethodAttribute.cs" />

@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL.BlockDevice
 {
-	// This class should not support selecting a device or sub device. 
+	// This class should not support selecting a device or sub device.
 	// Each instance must control exactly one device. For example with ATA
 	// master/slave, each one needs its own device instance. For ATA
-	// this complicates things a bit because they share IO ports, but this 
+	// this complicates things a bit because they share IO ports, but this
 	// is an intentional decision.
 
 	public abstract class BlockDevice : Device
 	{
-		// TODO: Need to protect this from changes except by Hardware ring 
+		// TODO: Need to protect this from changes except by Hardware ring
 		static public List<BlockDevice> Devices = new List<BlockDevice>();
 
 		public byte[] NewBlockArray(UInt32 aBlockCount)
@@ -41,10 +42,7 @@ namespace Cosmos.HAL.BlockDevice
 
 		protected void CheckDataSize(byte[] aData, UInt64 aBlockCount)
 		{
-			//var xBlockSize = mBlockSize;
-			//var xDataLength = aData.Length;
-			//var xDataSize = aBlockCount * mBlockSize;
-			if ((ulong)aData.Length != aBlockCount * mBlockSize)
+		    if ((ulong)aData.Length != aBlockCount * mBlockSize)
 			{
 				throw new Exception("Invalid data size.");
 			}

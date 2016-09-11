@@ -9,7 +9,19 @@ namespace Cosmos.Debug.Kernel
 {
     public class Debugger
     {
-        public string mRing { get; set; }
+        private string mRing;
+
+        public string Ring
+        {
+            get
+            {
+                return mRing;
+            }
+            set
+            {
+                mRing = value;
+            }
+        }
 
         public string mSection { get; set; }
 
@@ -22,6 +34,16 @@ namespace Cosmos.Debug.Kernel
         public void Break()
         {
         } // Plugged
+
+        public static void DoBochsBreak()
+        {
+            // plugged
+        }
+
+        internal static void DoRealHalt()
+        {
+            // plugged
+        }
 
         private static unsafe void ActualSend(int aLength, char* aText)
         {
@@ -115,6 +137,11 @@ namespace Cosmos.Debug.Kernel
         }
 
         internal static void DoSend(string aText)
+        {
+            // plugged
+        }
+
+        public static void SendKernelPanic(uint id)
         {
             // plugged
         }

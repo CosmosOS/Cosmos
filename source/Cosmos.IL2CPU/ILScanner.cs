@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
+using System.Runtime.InteropServices;
+using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs;
 using SR = System.Reflection;
-using Cosmos.Assembler;
-
-using _MemberInfo = System.Runtime.InteropServices._MemberInfo;
 using SysReflection = System.Reflection;
-
 
 namespace Cosmos.IL2CPU
 {
@@ -103,9 +100,9 @@ namespace Cosmos.IL2CPU
             var xMemInfo = aItem as MemberInfo;
             //TODO: fix this, as each label/symbol should also contain an assembly specifier.
 
-            if (xMemInfo != null && xMemInfo.DeclaringType != null
-              && xMemInfo.DeclaringType.FullName == "System.ThrowHelper"
-              && xMemInfo.DeclaringType.Assembly.GetName().Name != "mscorlib")
+            if ((xMemInfo != null) && (xMemInfo.DeclaringType != null)
+                && (xMemInfo.DeclaringType.FullName == "System.ThrowHelper")
+                && (xMemInfo.DeclaringType.Assembly.GetName().Name != "mscorlib"))
             {
                 // System.ThrowHelper exists in MS .NET twice...
                 // Its an internal class that exists in both mscorlib and system assemblies.
@@ -138,14 +135,14 @@ namespace Cosmos.IL2CPU
                 MethodBase methodBaseSource = aSrc as MethodBase;
                 if (methodBaseSource != null)
                 {
-                    aSrc = methodBaseSource.DeclaringType.ToString() + "::" + aSrc.ToString();
+                    aSrc = methodBaseSource.DeclaringType + "::" + aSrc;
                 }
 
-                mQueue.Enqueue(new ScannerQueueItem() { Item = aItem, QueueReason = aSrcType, SourceItem = aSrc + Environment.NewLine + sourceItem });
+                mQueue.Enqueue(new ScannerQueueItem { Item = aItem, QueueReason = aSrcType, SourceItem = aSrc + Environment.NewLine + sourceItem });
             }
         }
 
-        public void Execute(SysReflection.MethodBase aStartMethod)
+        public void Execute(MethodBase aStartMethod)
         {
             if (aStartMethod == null)
             {
@@ -200,6 +197,7 @@ namespace Cosmos.IL2CPU
             //    -Types and Methods in Queue - to be scanned
             // -Finally, do compilation
             #endregion
+
             mPlugManager.FindPlugImpls();
             // Now that we found all plugs, scan them.
             // We have to scan them after we find all plugs, because
@@ -224,8 +222,8 @@ namespace Cosmos.IL2CPU
             Queue(GCImplementationRefs.DecRefCountRef, null, "Explicit Entry");
             Queue(GCImplementationRefs.AllocNewObjectRef, null, "Explicit Entry");
             // for now, to ease runtime exception throwing
-            Queue(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public, null, new Type[] { typeof(string) }, null), null, "Explicit Entry");
-            Queue(typeof(ExceptionHelper).GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public, null, new Type[] { }, null), null, "Explicit Entry");
+            Queue(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public, null, new Type[] {typeof(string)}, null), null, "Explicit Entry");
+            Queue(typeof(ExceptionHelper).GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public, null, new Type[] {}, null), null, "Explicit Entry");
             Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
             Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
             // register system types:
@@ -263,7 +261,7 @@ namespace Cosmos.IL2CPU
                 var xOpMethod = xOpCode as ILOpCodes.OpMethod;
                 if (xOpMethod != null)
                 {
-                    xOpMethod.Value = (MethodBase)mItems.GetItemInList(xOpMethod.Value);
+                    xOpMethod.Value = (MethodBase) mItems.GetItemInList(xOpMethod.Value);
                     xOpMethod.ValueUID = (uint)GetMethodUID(xOpMethod.Value, true);
                     xOpMethod.BaseMethodUID = GetMethodUID(xOpMethod.Value, false);
                 }
@@ -357,18 +355,15 @@ namespace Cosmos.IL2CPU
         {
             if (aItem is MethodBase)
             {
-                var x = (MethodBase)aItem;
+                var x = (MethodBase) aItem;
                 return "Method: " + x.DeclaringType + "." + x.Name + "<br>" + x.GetFullName();
             }
-            else if (aItem is Type)
+            if (aItem is Type)
             {
-                var x = (Type)aItem;
+                var x = (Type) aItem;
                 return "Type: " + x.FullName;
             }
-            else
-            {
-                return "Other: " + aItem.ToString();
-            }
+            return "Other: " + aItem;
         }
 
         protected void ScanMethod(MethodBase aMethod, bool aIsPlug, string sourceItem)
@@ -397,7 +392,7 @@ namespace Cosmos.IL2CPU
             }
             if (aMethod is SysReflection.MethodInfo)
             {
-                Queue(((SysReflection.MethodInfo)aMethod).ReturnType, aMethod, "Return Type");
+                Queue(((SysReflection.MethodInfo) aMethod).ReturnType, aMethod, "Return Type");
             }
             if (aMethod.GetFullName().IndexOf("CreateComparer", StringComparison.OrdinalIgnoreCase)!=-1)
             {
@@ -465,8 +460,8 @@ namespace Cosmos.IL2CPU
                     {
                         if (mItemsList[i] is Type)
                         {
-                            var xType = (Type)mItemsList[i];
-                            if ((xType.IsSubclassOf(xVirtMethod.DeclaringType)) || ((xVirtMethod.DeclaringType.IsInterface) && (xVirtMethod.DeclaringType.IsAssignableFrom(xType))))
+                            var xType = (Type) mItemsList[i];
+                            if (xType.IsSubclassOf(xVirtMethod.DeclaringType) || (xVirtMethod.DeclaringType.IsInterface && xVirtMethod.DeclaringType.IsAssignableFrom(xType)))
                             {
                                 var xNewMethod = xType.GetMethod(aMethod.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, xParamTypes, null);
                                 if (xNewMethod != null)
@@ -515,8 +510,8 @@ namespace Cosmos.IL2CPU
                 {
                     var xImplFlags = aMethod.GetMethodImplementationFlags();
                     // todo: prob even more
-                    if ((xImplFlags & MethodImplAttributes.Native) != 0 ||
-                        (xImplFlags & MethodImplAttributes.InternalCall) != 0)
+                    if (((xImplFlags & MethodImplAttributes.Native) != 0) ||
+                        ((xImplFlags & MethodImplAttributes.InternalCall) != 0))
                     {
                         // native implementations cannot be compiled
                         xNeedsPlug = true;
@@ -536,7 +531,9 @@ namespace Cosmos.IL2CPU
                 // or do we need to queue them with a resolved ref in a new list?
 
                 if (inl != null)
-                    return;	// cancel inline
+                {
+                    return; // cancel inline
+                }
 
                 List<ILOpCode> xOpCodes;
                 xOpCodes = mReader.ProcessMethod(aMethod);
@@ -547,15 +544,15 @@ namespace Cosmos.IL2CPU
                     {
                         if (xOpCode is ILOpCodes.OpMethod)
                         {
-                            Queue(((ILOpCodes.OpMethod)xOpCode).Value, aMethod, "Call", sourceItem);
+                            Queue(((ILOpCodes.OpMethod) xOpCode).Value, aMethod, "Call", sourceItem);
                         }
                         else if (xOpCode is ILOpCodes.OpType)
                         {
-                            Queue(((ILOpCodes.OpType)xOpCode).Value, aMethod, "OpCode Value");
+                            Queue(((ILOpCodes.OpType) xOpCode).Value, aMethod, "OpCode Value");
                         }
                         else if (xOpCode is ILOpCodes.OpField)
                         {
-                            var xOpField = (ILOpCodes.OpField)xOpCode;
+                            var xOpField = (ILOpCodes.OpField) xOpCode;
                             //TODO: Need to do this? Will we get a ILOpCodes.OpType as well?
                             Queue(xOpField.Value.DeclaringType, aMethod, "OpCode Value");
                             if (xOpField.Value.IsStatic)
@@ -567,7 +564,7 @@ namespace Cosmos.IL2CPU
                         }
                         else if (xOpCode is ILOpCodes.OpToken)
                         {
-                            var xTokenOp = (ILOpCodes.OpToken)xOpCode;
+                            var xTokenOp = (ILOpCodes.OpToken) xOpCode;
                             if (xTokenOp.ValueIsType)
                             {
                                 Queue(xTokenOp.ValueType, aMethod, "OpCode Value");
@@ -638,10 +635,10 @@ namespace Cosmos.IL2CPU
                 }
                 if (!aType.IsGenericParameter && xVirt.DeclaringType.IsInterface)
                 {
-                    if ((!aType.IsInterface) && (aType.GetInterfaces().Contains(xVirt.DeclaringType)))
+                    if (!aType.IsInterface && aType.GetInterfaces().Contains(xVirt.DeclaringType))
                     {
                         var xIntfMapping = aType.GetInterfaceMap(xVirt.DeclaringType);
-                        if (xIntfMapping.InterfaceMethods != null && xIntfMapping.TargetMethods != null)
+                        if ((xIntfMapping.InterfaceMethods != null) && (xIntfMapping.TargetMethods != null))
                         {
                             var xIdx = Array.IndexOf(xIntfMapping.InterfaceMethods, xVirt);
                             if (xIdx != -1)
@@ -651,7 +648,6 @@ namespace Cosmos.IL2CPU
                         }
                     }
                 }
-
             }
         }
 
@@ -664,12 +660,11 @@ namespace Cosmos.IL2CPU
                 // and will reduce compares
                 if (xItem.Item is MethodBase)
                 {
-                    //if (xItem.QueueReason == "Plug m")
-                    ScanMethod((MethodBase)xItem.Item, false, xItem.SourceItem);
+                    ScanMethod((MethodBase) xItem.Item, false, xItem.SourceItem);
                 }
                 else if (xItem.Item is Type)
                 {
-                    var xType = (Type)xItem.Item;
+                    var xType = (Type) xItem.Item;
                     ScanType(xType);
 
                     // Methods and fields cant exist without types, so we only update
@@ -698,7 +693,7 @@ namespace Cosmos.IL2CPU
                 aSrc = typeof(ILScanner);
             }
 
-            var xLogItem = new LogItem()
+            var xLogItem = new LogItem
             {
                 SrcType = aSrcType,
                 Item = aItem
@@ -724,10 +719,10 @@ namespace Cosmos.IL2CPU
                 }
                 aCurrentInspectedType = aCurrentInspectedType.BaseType;
                 MethodBase xFoundMethod = aCurrentInspectedType.GetMethod(aMethod.Name,
-                                                                          BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
-                                                                          Type.DefaultBinder,
-                                                                          aMethodParams,
-                                                                          new ParameterModifier[0]);
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
+                    Type.DefaultBinder,
+                    aMethodParams,
+                    new ParameterModifier[0]);
                 if (xFoundMethod == null)
                 {
                     break;
@@ -739,7 +734,6 @@ namespace Cosmos.IL2CPU
                     if (xParams[i].ParameterType != aMethodParams[i])
                     {
                         xContinue = false;
-                        continue;
                     }
                 }
                 if (!xContinue)
@@ -750,15 +744,15 @@ namespace Cosmos.IL2CPU
                 {
                     xBaseMethod = xFoundMethod;
 
-                    if (xFoundMethod.IsVirtual == aMethod.IsVirtual && xFoundMethod.IsPrivate == false && xFoundMethod.IsPublic == aMethod.IsPublic && xFoundMethod.IsFamily == aMethod.IsFamily && xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly && xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly && xFoundMethod.IsFinal == false)
+                    if ((xFoundMethod.IsVirtual == aMethod.IsVirtual) && (xFoundMethod.IsPrivate == false) && (xFoundMethod.IsPublic == aMethod.IsPublic) && (xFoundMethod.IsFamily == aMethod.IsFamily) && (xFoundMethod.IsFamilyAndAssembly == aMethod.IsFamilyAndAssembly) && (xFoundMethod.IsFamilyOrAssembly == aMethod.IsFamilyOrAssembly) && (xFoundMethod.IsFinal == false))
                     {
                         var xFoundMethInfo = xFoundMethod as SR.MethodInfo;
                         var xBaseMethInfo = xBaseMethod as SR.MethodInfo;
-                        if (xFoundMethInfo == null && xBaseMethInfo == null)
+                        if ((xFoundMethInfo == null) && (xBaseMethInfo == null))
                         {
                             xBaseMethod = xFoundMethod;
                         }
-                        if (xFoundMethInfo != null && xBaseMethInfo != null)
+                        if ((xFoundMethInfo != null) && (xBaseMethInfo != null))
                         {
                             if (xFoundMethInfo.ReturnType.AssemblyQualifiedName.Equals(xBaseMethInfo.ReturnType.AssemblyQualifiedName))
                             {
@@ -792,20 +786,17 @@ namespace Cosmos.IL2CPU
                 var xBaseMethod = GetUltimateBaseMethod(aMethod, xParamTypes, aMethod.DeclaringType);
                 if (!mMethodUIDs.ContainsKey(xBaseMethod))
                 {
-                    var xId = (uint)mMethodUIDs.Count;
+                    var xId = (uint) mMethodUIDs.Count;
                     mMethodUIDs.Add(xBaseMethod, xId);
                 }
                 return mMethodUIDs[xBaseMethod];
             }
-            else
+            if (!mMethodUIDs.ContainsKey(aMethod))
             {
-                if (!mMethodUIDs.ContainsKey(aMethod))
-                {
-                    var xId = (uint)mMethodUIDs.Count;
-                    mMethodUIDs.Add(aMethod, xId);
-                }
-                return mMethodUIDs[aMethod];
+                var xId = (uint) mMethodUIDs.Count;
+                mMethodUIDs.Add(aMethod, xId);
             }
+            return mMethodUIDs[aMethod];
         }
 
         protected uint GetTypeUID(Type aType)
@@ -816,14 +807,11 @@ namespace Cosmos.IL2CPU
             }
             if (!mTypeUIDs.ContainsKey(aType))
             {
-                var xId = (uint)mTypeUIDs.Count;
+                var xId = (uint) mTypeUIDs.Count;
                 mTypeUIDs.Add(aType, xId);
                 return xId;
             }
-            else
-            {
-                return mTypeUIDs[aType];
-            }
+            return mTypeUIDs[aType];
         }
 
         protected void UpdateAssemblies()
@@ -841,115 +829,116 @@ namespace Cosmos.IL2CPU
             {
                 if (xItem is MethodBase)
                 {
-                    var xMethod = (MethodBase)xItem;
-                    var xParams = xMethod.GetParameters();
-                    var xParamTypes = xParams.Select(q => q.ParameterType).ToArray();
-                    var xPlug = mPlugManager.ResolvePlug(xMethod, xParamTypes);
-                    var xMethodType = MethodInfo.TypeEnum.Normal;
-                    Type xPlugAssembler = null;
-                    MethodInfo xPlugInfo = null;
-                    var xMethodInline = xMethod.GetCustomAttribute<InlineAttribute>();
-                    if (xMethodInline != null)
-                    {
-                        // inline assembler, shouldn't come here..
-                        continue;
-                    }
-                    var xMethodIdMethod = mItemsList.IndexOf(xMethod);
-                    if (xMethodIdMethod == -1)
-                    {
-                        throw new Exception("Method not in scanner list!");
-                    }
-                    if (xPlug != null)
-                    {
-                        xMethodType = MethodInfo.TypeEnum.NeedsPlug;
-                        var xAttrib = xPlug.GetCustomAttribute<PlugMethodAttribute>();
-                        var xInline = xPlug.GetCustomAttribute<InlineAttribute>();
-                        var xMethodIdPlug = mItemsList.IndexOf(xPlug);
-                        if (xMethodIdPlug == -1 && xInline == null)
+                        var xMethod = (MethodBase) xItem;
+                        var xParams = xMethod.GetParameters();
+                        var xParamTypes = xParams.Select(q => q.ParameterType).ToArray();
+                        var xPlug = mPlugManager.ResolvePlug(xMethod, xParamTypes);
+                        var xMethodType = MethodInfo.TypeEnum.Normal;
+                        Type xPlugAssembler = null;
+                        MethodInfo xPlugInfo = null;
+                        var xMethodInline = xMethod.GetCustomAttribute<InlineAttribute>();
+                        if (xMethodInline != null)
                         {
-                            throw new Exception("Plug method not in scanner list!");
+                            // inline assembler, shouldn't come here..
+                            continue;
                         }
-                        if (xAttrib != null && xInline == null)
+                        var xMethodIdMethod = mItemsList.IndexOf(xMethod);
+                        if (xMethodIdMethod == -1)
                         {
-                            xPlugAssembler = xAttrib.Assembler;
-                            xPlugInfo = new MethodInfo(xPlug, (uint)xMethodIdPlug, MethodInfo.TypeEnum.Plug, null, xPlugAssembler);
-
-                            var xMethodInfo = new MethodInfo(xMethod, (uint)xMethodIdMethod, xMethodType, xPlugInfo/*, xPlugAssembler*/);
-                            if (xAttrib != null && xAttrib.IsWildcard)
+                            throw new Exception("Method not in scanner list!");
+                        }
+                        if (xPlug != null)
+                        {
+                            xMethodType = MethodInfo.TypeEnum.NeedsPlug;
+                            var xAttrib = xPlug.GetCustomAttribute<PlugMethodAttribute>();
+                            var xInline = xPlug.GetCustomAttribute<InlineAttribute>();
+                            var xMethodIdPlug = mItemsList.IndexOf(xPlug);
+                            if ((xMethodIdPlug == -1) && (xInline == null))
                             {
-                                xPlugInfo.PluggedMethod = xMethodInfo;
-                                var xInstructions = mReader.ProcessMethod(xPlug);
-                                if (xInstructions != null)
-                                {
-                                    ProcessInstructions(xInstructions);
-                                    mAsmblr.ProcessMethod(xPlugInfo, xInstructions);
-                                }
+                                throw new Exception("Plug method not in scanner list!");
                             }
-                            mAsmblr.GenerateMethodForward(xMethodInfo, xPlugInfo);
-                        }
-                        else
-                        {
-                            if (xInline != null)
+                            if ((xAttrib != null) && (xInline == null))
                             {
-                                var xMethodID = mItemsList.IndexOf(xItem);
-                                if (xMethodID == -1)
-                                {
-                                    throw new Exception("Method not in list!");
-                                }
-                                xPlugInfo = new MethodInfo(xPlug, (uint)xMethodID, MethodInfo.TypeEnum.Plug, null, true);
+                                xPlugAssembler = xAttrib.Assembler;
+                                xPlugInfo = new MethodInfo(xPlug, (uint) xMethodIdPlug, MethodInfo.TypeEnum.Plug, null, xPlugAssembler);
 
-                                var xMethodInfo = new MethodInfo(xMethod, (uint)xMethodIdMethod, xMethodType, xPlugInfo/*, xPlugAssembler*/);
-
-                                xPlugInfo.PluggedMethod = xMethodInfo;
-                                var xInstructions = mReader.ProcessMethod(xPlug);
-                                if (xInstructions != null)
+                                var xMethodInfo = new MethodInfo(xMethod, (uint) xMethodIdMethod, xMethodType, xPlugInfo);
+                                if (xAttrib != null && xAttrib.IsWildcard)
                                 {
-                                    ProcessInstructions(xInstructions);
-                                    mAsmblr.ProcessMethod(xPlugInfo, xInstructions);
+                                    xPlugInfo.IsWildcard = true;
+                                    xPlugInfo.PluggedMethod = xMethodInfo;
+                                    var xInstructions = mReader.ProcessMethod(xPlug);
+                                    if (xInstructions != null)
+                                    {
+                                        ProcessInstructions(xInstructions);
+                                        mAsmblr.ProcessMethod(xPlugInfo, xInstructions);
+                                    }
                                 }
                                 mAsmblr.GenerateMethodForward(xMethodInfo, xPlugInfo);
                             }
                             else
                             {
-                                xPlugInfo = new MethodInfo(xPlug, (uint)xMethodIdPlug, MethodInfo.TypeEnum.Plug, null, xPlugAssembler);
+                                if (xInline != null)
+                                {
+                                    var xMethodID = mItemsList.IndexOf(xItem);
+                                    if (xMethodID == -1)
+                                    {
+                                        throw new Exception("Method not in list!");
+                                    }
+                                    xPlugInfo = new MethodInfo(xPlug, (uint) xMethodID, MethodInfo.TypeEnum.Plug, null, true);
 
-                                var xMethodInfo = new MethodInfo(xMethod, (uint)xMethodIdMethod, xMethodType, xPlugInfo/*, xPlugAssembler*/);
-                                mAsmblr.GenerateMethodForward(xMethodInfo, xPlugInfo);
+                                    var xMethodInfo = new MethodInfo(xMethod, (uint) xMethodIdMethod, xMethodType, xPlugInfo);
+
+                                    xPlugInfo.PluggedMethod = xMethodInfo;
+                                    var xInstructions = mReader.ProcessMethod(xPlug);
+                                    if (xInstructions != null)
+                                    {
+                                        ProcessInstructions(xInstructions);
+                                        mAsmblr.ProcessMethod(xPlugInfo, xInstructions);
+                                    }
+                                    mAsmblr.GenerateMethodForward(xMethodInfo, xPlugInfo);
+                                }
+                                else
+                                {
+                                    xPlugInfo = new MethodInfo(xPlug, (uint) xMethodIdPlug, MethodInfo.TypeEnum.Plug, null, xPlugAssembler);
+
+                                    var xMethodInfo = new MethodInfo(xMethod, (uint) xMethodIdMethod, xMethodType, xPlugInfo);
+                                    mAsmblr.GenerateMethodForward(xMethodInfo, xPlugInfo);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            PlugMethodAttribute xAttrib = null;
+                            foreach (PlugMethodAttribute attrib in xMethod.GetCustomAttributes(typeof(PlugMethodAttribute), true))
+                            {
+                                xAttrib = attrib;
+                            }
+                            if (xAttrib != null)
+                            {
+                                if (xAttrib.IsWildcard)
+                                {
+                                    continue;
+                                }
+                                if (xAttrib.PlugRequired)
+                                {
+                                    throw new Exception(string.Format("Method {0} requires a plug, but none is implemented", xMethod.Name));
+                                }
+                                xPlugAssembler = xAttrib.Assembler;
+                            }
+
+                            var xMethodInfo = new MethodInfo(xMethod, (uint) xMethodIdMethod, xMethodType, xPlugInfo, xPlugAssembler);
+                            var xInstructions = mReader.ProcessMethod(xMethod);
+                            if (xInstructions != null)
+                            {
+                                ProcessInstructions(xInstructions);
+                                mAsmblr.ProcessMethod(xMethodInfo, xInstructions);
                             }
                         }
                     }
-                    else
-                    {
-                        PlugMethodAttribute xAttrib = null;
-                        foreach (PlugMethodAttribute attrib in xMethod.GetCustomAttributes(typeof(PlugMethodAttribute), true))
-                        {
-                            xAttrib = attrib;
-                        }
-                        if (xAttrib != null)
-                        {
-                            if (xAttrib.IsWildcard)
-                            {
-                                continue;
-                            }
-                            else if(xAttrib.PlugRequired)
-                            {
-                                throw new Exception(string.Format("Method {0} requires a plug, but none is implemented",xMethod.Name));
-                            }
-                            xPlugAssembler = xAttrib.Assembler;
-                        }
-
-                        var xMethodInfo = new MethodInfo(xMethod, (uint)xMethodIdMethod, xMethodType, xPlugInfo, xPlugAssembler);
-                        var xInstructions = mReader.ProcessMethod(xMethod);
-                        if (xInstructions != null)
-                        {
-                            ProcessInstructions(xInstructions);
-                            mAsmblr.ProcessMethod(xMethodInfo, xInstructions);
-                        }
-                    }
-                }
                 else if (xItem is FieldInfo)
                 {
-                    mAsmblr.ProcessField((FieldInfo)xItem);
+                        mAsmblr.ProcessField((FieldInfo) xItem);
                 }
             }
 
@@ -959,11 +948,11 @@ namespace Cosmos.IL2CPU
             {
                 if (xItem is MethodBase)
                 {
-                    xMethods.Add((MethodBase)xItem);
+                    xMethods.Add((MethodBase) xItem);
                 }
                 else if (xItem is Type)
                 {
-                    xTypes.Add((Type)xItem);
+                    xTypes.Add((Type) xItem);
                 }
             }
             mAsmblr.GenerateVMTCode(xTypes, xMethods, GetTypeUID, x => GetMethodUID(x, false));

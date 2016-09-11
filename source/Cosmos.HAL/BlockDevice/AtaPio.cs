@@ -344,8 +344,8 @@ namespace Cosmos.HAL.BlockDevice
 
 		public override void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount, byte[] aData)
 		{
-			CheckDataSize(aData, aBlockCount);
-			SelectSector(aBlockNo, aBlockCount);
+            CheckDataSize(aData, aBlockCount);
+            SelectSector(aBlockNo, aBlockCount);
 			SendCmd(LBA48Bit ? Cmd.WritePioExt : Cmd.WritePio);
 
 			UInt16 xValue;

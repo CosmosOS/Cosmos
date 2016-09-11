@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Native = System.UInt32;
 
-namespace Cosmos.Core.Memory.Test {
+namespace Cosmos.Core.Memory {
   unsafe static public class HeapLarge {
     public const Native PrefixBytes = 4 * sizeof(Native);
 
@@ -14,7 +12,7 @@ namespace Cosmos.Core.Memory.Test {
 
     static public byte* Alloc(Native aSize) {
       Native xPages = (Native)((aSize + PrefixBytes) / RAT.PageSize) + 1;
-      var xPtr = (Native*)RAT.Alloc(RAT.PageType.HeapLarge, xPages);
+      var xPtr = (Native*)RAT.AllocPages(RAT.PageType.HeapLarge, xPages);
 
       xPtr[0] = xPages * RAT.PageSize - PrefixBytes; // Allocated data size
       xPtr[1] = aSize; // Actual data size

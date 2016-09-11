@@ -65,3 +65,4 @@ const Ds2Vs_ComplexLongNumber = 21
 const Ds2Vs_StackOverflowOccurred = 22
 const Ds2Vs_InterruptOccurred = 23
 const Ds2Vs_CoreDump = 24
+const Ds2Vs_KernelPanic = 25

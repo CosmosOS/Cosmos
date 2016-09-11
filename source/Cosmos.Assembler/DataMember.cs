@@ -4,17 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.IO;
+using Cosmos.Assembler.x86;
 
 namespace Cosmos.Assembler
 {
     public class DataMember : BaseAssemblerElement, IComparable<DataMember>
     {
-        public string Name { get; private set; }
+        public const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
+
+        public string Name { get; }
         public bool IsComment { get; set; }
         public byte[] RawDefaultValue { get; set; }
         public uint Alignment { get; set; }
+        public bool IsGlobal { get; set; }
         protected object[] UntypedDefaultValue;
         public string RawAsm = null;
+        private string Size;
+        private string StringValue;
 
         // Hack for not to emit raw data. See RawAsm
         public DataMember()
@@ -30,11 +36,18 @@ namespace Cosmos.Assembler
         public DataMember(string aName, string aValue)
         {
             Name = aName;
-            var xBytes = ASCIIEncoding.ASCII.GetBytes(aValue);
+            var xBytes = Encoding.ASCII.GetBytes(aValue);
             var xBytes2 = new byte[xBytes.Length + 1];
             xBytes.CopyTo(xBytes2, 0);
             xBytes2[xBytes2.Length - 1] = 0;
             RawDefaultValue = xBytes2;
+        }
+
+        public DataMember(string aName, string size, string aValue)
+        {
+            Name = aName;
+            Size = size;
+            StringValue = aValue;
         }
 
         public DataMember(string aName, params object[] aDefaultValue)
@@ -47,31 +60,25 @@ namespace Cosmos.Assembler
         {
             Name = aName;
             RawDefaultValue = aDefaultValue;
-            //UntypedDefaultValue = aDefaultValue;
         }
 
-        // TODO Why not use <Cast> here too and instead to pack the short array into an Int32 array simply emit it with dw?
         public DataMember(string aName, short[] aDefaultValue)
         {
             Name = aName;
-            RawDefaultValue = new byte[aDefaultValue.Length * 2];
+            RawDefaultValue = new byte[aDefaultValue.Length*2];
             for (int i = 0; i < aDefaultValue.Length; i++)
             {
-                Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0,
-                            RawDefaultValue, i * 2, 2);
+                Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0, RawDefaultValue, i*2, 2);
             }
-            //UntypedDefaultValue = aDefaultValue;
         }
 
-        // TODO Why not use <Cast> here too and instead to pack the short array into an Int32 array simply emit it with dw?
         public DataMember(string aName, params ushort[] aDefaultValue)
         {
             Name = aName;
-            RawDefaultValue = new byte[aDefaultValue.Length * 2];
+            RawDefaultValue = new byte[aDefaultValue.Length*2];
             for (int i = 0; i < aDefaultValue.Length; i++)
             {
-                Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0,
-                            RawDefaultValue, i * 2, 2);
+                Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0, RawDefaultValue, i*2, 2);
             }
             //UntypedDefaultValue = aDefaultValue;
         }
@@ -112,7 +119,6 @@ namespace Cosmos.Assembler
             return FilterStringForIncorrectChars("static_field__" + LabelName.GetFullName(aField.DeclaringType) + "." + aField.Name);
         }
 
-        public const string IllegalIdentifierChars = "&.,+$<>{}-`\'/\\ ()[]*!=";
         public static string FilterStringForIncorrectChars(string aName)
         {
             string xTempResult = aName;
@@ -120,10 +126,10 @@ namespace Cosmos.Assembler
             {
                 xTempResult = xTempResult.Replace(c, '_');
             }
-            return String.Intern(xTempResult);
+            return string.Intern(xTempResult);
         }
 
-        public override void WriteText(Cosmos.Assembler.Assembler aAssembler, TextWriter aOutput)
+        public override void WriteText(Assembler aAssembler, TextWriter aOutput)
         {
             if (RawAsm != null)
             {
@@ -140,9 +146,9 @@ namespace Cosmos.Assembler
                     return;
                 }
                 if ((from item in RawDefaultValue
-                     group item by item
-                       into i
-                     select i).Count() > 1 || RawDefaultValue.Length < 250)
+                        group item by item
+                        into i
+                        select i).Count() > 1 || RawDefaultValue.Length < 250)
                 {
                     if (IsGlobal)
                     {
@@ -160,7 +166,6 @@ namespace Cosmos.Assembler
                 }
                 else
                 {
-                    //aOutputWriter.WriteLine("TIMES 0x50000 db 0");
                     aOutput.Write("global ");
                     aOutput.WriteLine(Name);
                     aOutput.Write(Name);
@@ -173,36 +178,35 @@ namespace Cosmos.Assembler
             }
             if (UntypedDefaultValue != null)
             {
-                StringBuilder xSB = new StringBuilder();
                 if (IsGlobal)
                 {
                     aOutput.Write("global ");
                     aOutput.WriteLine(Name);
                 }
-
-                //aOutput.WriteLine("; Type of UntypedDefaultValue is " + UntypedDefaultValue[0].GetType());
                 aOutput.Write(Name);
 
                 if (UntypedDefaultValue[0] is Int64 || UntypedDefaultValue[0] is UInt64 || UntypedDefaultValue[0] is Double)
-                    aOutput.Write(" dq ");
-                else
-                    aOutput.Write(" dd ");
-
-                Func<object, string> xGetTextForItem = delegate (object aItem)
                 {
-                    var xElementRef = aItem as Cosmos.Assembler.ElementReference;
+                    aOutput.Write(" dq ");
+                }
+                else
+                {
+                    aOutput.Write(" dd ");
+                }
+
+                Func<object, string> xGetTextForItem = delegate(object aItem)
+                {
+                    var xElementRef = aItem as ElementReference;
                     if (xElementRef == null)
                     {
                         return (aItem ?? 0).ToString();
                     }
-                    else
+
+                    if (xElementRef.Offset == 0)
                     {
-                        if (xElementRef.Offset == 0)
-                        {
-                            return xElementRef.Name;
-                        }
-                        return xElementRef.Name + " + " + xElementRef.Offset;
+                        return xElementRef.Name;
                     }
+                    return xElementRef.Name + " + " + xElementRef.Offset;
                 };
                 for (int i = 0; i < (UntypedDefaultValue.Length - 1); i++)
                 {
@@ -212,18 +216,23 @@ namespace Cosmos.Assembler
                 aOutput.Write(xGetTextForItem(UntypedDefaultValue.Last()));
                 return;
             }
+
+            if (StringValue != null)
+            {
+                aOutput.Write(Name);
+                aOutput.Write(" ");
+                aOutput.Write(Size);
+                aOutput.Write(" ");
+                aOutput.Write(StringValue);
+                return;
+            }
+
             throw new Exception("Situation unsupported!");
         }
 
         public int CompareTo(DataMember other)
         {
-            return String.Compare(Name, other.Name);
-        }
-
-        public bool IsGlobal
-        {
-            get;
-            set;
+            return string.Compare(Name, other.Name);
         }
 
         public override ulong? ActualAddress
@@ -235,24 +244,24 @@ namespace Cosmos.Assembler
             }
         }
 
-        public override void UpdateAddress(Cosmos.Assembler.Assembler aAssembler, ref ulong xAddress)
+        public override void UpdateAddress(Assembler aAssembler, ref ulong xAddress)
         {
             if (Alignment > 0)
             {
-                if (xAddress % Alignment != 0)
+                if (xAddress%Alignment != 0)
                 {
-                    xAddress += Alignment - (xAddress % Alignment);
+                    xAddress += Alignment - (xAddress%Alignment);
                 }
             }
             base.UpdateAddress(aAssembler, ref xAddress);
             if (RawDefaultValue != null)
             {
-                xAddress += (ulong)RawDefaultValue.LongLength;
+                xAddress += (ulong) RawDefaultValue.LongLength;
             }
             if (UntypedDefaultValue != null)
             {
                 // TODO: what to do with 64bit target platforms? right now we only support 32bit
-                xAddress += (ulong)(UntypedDefaultValue.LongLength * 4);
+                xAddress += (ulong) (UntypedDefaultValue.LongLength*4);
             }
         }
 
@@ -262,38 +271,38 @@ namespace Cosmos.Assembler
             {
                 return true;
             }
-            if (UntypedDefaultValue != null &&
-                UntypedDefaultValue.LongLength > 0)
+
+            if (UntypedDefaultValue != null && UntypedDefaultValue.LongLength > 0)
             {
                 foreach (var xReference in (from item in UntypedDefaultValue
-                                            let xRef = item as Cosmos.Assembler.ElementReference
-                                            where xRef != null
-                                            select xRef))
+                    let xRef = item as ElementReference
+                    where xRef != null
+                    select xRef))
                 {
                     var xRef = aAssembler.TryResolveReference(xReference);
+
                     if (xRef == null)
                     {
                         return false;
                     }
-                    else if (!xRef.IsComplete(aAssembler))
+
+                    if (!xRef.IsComplete(aAssembler))
                     {
                         return false;
                     }
                 }
             }
+
             return true;
         }
 
-        public override void WriteData(Cosmos.Assembler.Assembler aAssembler, Stream aOutput)
+        public override void WriteData(Assembler aAssembler, Stream aOutput)
         {
-            if (UntypedDefaultValue != null &&
-                UntypedDefaultValue.LongLength > 0)
+            if (UntypedDefaultValue != null && UntypedDefaultValue.LongLength > 0)
             {
-                //var xBuff = (byte[])Array.CreateInstance(typeof(byte), UntypedDefaultValue.LongLength * 4);
                 for (int i = 0; i < UntypedDefaultValue.Length; i++)
                 {
-                    var xRef = UntypedDefaultValue[i] as Cosmos.Assembler.ElementReference;
-                    //byte[] xTemp;
+                    var xRef = UntypedDefaultValue[i] as ElementReference;
                     if (xRef != null)
                     {
                         var xTheRef = aAssembler.TryResolveReference(xRef);
@@ -306,22 +315,18 @@ namespace Cosmos.Assembler
                             Console.Write("");
                         }
                         aOutput.Write(BitConverter.GetBytes(xTheRef.ActualAddress.Value), 0, 4);
-                        //xTemp = BitConverter.GetBytes();
                     }
                     else
                     {
                         if (UntypedDefaultValue[i] is int)
                         {
-                            aOutput.Write(BitConverter.GetBytes((int)UntypedDefaultValue[i]), 0, 4);
-                            //xTemp = BitConverter.GetBytes((int)UntypedDefaultValue[i]);
+                            aOutput.Write(BitConverter.GetBytes((int) UntypedDefaultValue[i]), 0, 4);
                         }
                         else
                         {
                             if (UntypedDefaultValue[i] is uint)
                             {
-                                aOutput.Write(BitConverter.GetBytes((uint)UntypedDefaultValue[i]), 0, 4);
-
-                                //xTemp = BitConverter.GetBytes((uint)UntypedDefaultValue[i]);
+                                aOutput.Write(BitConverter.GetBytes((uint) UntypedDefaultValue[i]), 0, 4);
                             }
                             else
                             {
@@ -329,7 +334,6 @@ namespace Cosmos.Assembler
                             }
                         }
                     }
-                    //Array.Copy(xTemp, 0, xBuff, i * 4, 4);
                 }
             }
             else

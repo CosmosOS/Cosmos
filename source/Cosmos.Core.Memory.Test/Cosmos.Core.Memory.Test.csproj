@@ -90,13 +90,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Heap.cs" />
-    <Compile Include="HeapLarge.cs" />
-    <Compile Include="HeapMedium.cs" />
-    <Compile Include="HeapSmall.cs" />
-    <Compile Include="RAT.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Core.Memory\Cosmos.Core.Memory.csproj">
+      <Project>{84BFA6F0-D518-4D22-BDCF-E07DF3C0E678}</Project>
+      <Name>Cosmos.Core.Memory</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

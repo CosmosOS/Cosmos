@@ -1,4 +1,4 @@
-; Generated at 6/24/2016 9:50:36 PM
+; Generated at 8/25/2016 4:07:44 PM
 
 
 
@@ -190,6 +190,23 @@
 
 		DebugStub_SendSimpleNumber_Exit:
 			mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendSimpleNumber_Exit
+			Ret
+
+
+		DebugStub_SendKernelPanic:
+			push dword EBP
+			mov dword EBP, ESP
+			Pushad
+			mov byte AL, DebugStub_Const_Ds2Vs_KernelPanic
+			Call DebugStub_ComWriteAL
+			mov dword EAX, [EBP + 8]
+			Call DebugStub_ComWriteEAX
+			Call DebugStub_SendCoreDump
+			Popad
+			pop dword EBP
+
+		DebugStub_SendKernelPanic_Exit:
+			mov dword [static_field__Cosmos_Core_INTs_mLastKnownAddress], DebugStub_SendKernelPanic_Exit
 			Ret
 
 

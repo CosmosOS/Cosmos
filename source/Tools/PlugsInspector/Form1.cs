@@ -71,13 +71,15 @@ namespace PlugsInspector
             //Otherwise the CLR's delay loading techniques block us...
             AssembliesPreloader.LoadAllAssemblies();
 
+            plugManager = new PlugManager(
+                (Exception ex) =>
+                {
+                    AddExceptionEntry(ex.Message);
+                }, warning =>
+                {
 
-            plugManager = new PlugManager((Exception ex) => {
-                AddExceptionEntry(ex.Message);
-            }, warning =>
-               {
-               });
-            plugManager.ThrowExceptions = false;
+                });
+             plugManager.ThrowExceptions = false;
         }
 
         private void LoadPlugsButton_Click(object sender, EventArgs e)

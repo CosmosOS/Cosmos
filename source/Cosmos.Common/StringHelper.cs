@@ -1,12 +1,13 @@
-﻿using System;
+﻿//#define COSMOSDEBUG
+
+using System;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Common
 {
-    using Cosmos.Debug.Kernel;
-
     public static class StringHelper
     {
-        internal static Debugger mDebugger = new Debugger("Common", "String Helpers");
+        private static Debugger mDebugger = new Debugger("Common", "StringHelper");
 
         internal enum StringComparisonResultEnum
         {
@@ -17,29 +18,10 @@ namespace Cosmos.Common
             Greater = 1
         }
 
-        public static string GetCharArrayString(char[] aArray)
-        {
-            if (aArray == null)
-            {
-                return string.Empty;
-            }
-
-            if (aArray.Length == 0)
-            {
-                return string.Empty;
-            }
-
-            string xString = string.Empty;
-            for (int i = 0; i < aArray.Length; i++)
-            {
-                //xString = string.Concat(xString, aArray[i].ToString());
-            }
-
-            return xString;
-        }
-
         public static string GetNumberString(uint aValue)
         {
+            mDebugger.SendInternal("StringHelper.GetNumberString(uint)");
+
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
 
@@ -63,21 +45,24 @@ namespace Cosmos.Common
 
         public static string GetNumberString(int aValue)
         {
+            mDebugger.SendInternal("StringHelper.GetNumberString(int)");
+
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
-            int xValue = aValue;
-
-            if (aValue < 0)
-            {
-                xValue *= -1;
-            }
 
             if (aValue == 0)
             {
-                xResult = string.Concat(xResult, "0");
+                xResult = "0";
             }
             else
             {
+                int xValue = aValue;
+
+                if (aValue < 0)
+                {
+                    xValue *= -1;
+                }
+
                 while (xValue > 0)
                 {
                     int xValue2 = xValue % 10;
@@ -94,28 +79,77 @@ namespace Cosmos.Common
             return xResult;
         }
 
+        public static string GetNumberString(ulong aValue)
+        {
+            mDebugger.SendInternal("StringHelper.GetNumberString(ulong)");
+
+            string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+            string xResult = string.Empty;
+
+            if (aValue == 0)
+            {
+                xResult = "0";
+                mDebugger.SendInternal("xResult =");
+                mDebugger.SendInternal(xResult);
+            }
+            else
+            {
+                ulong xValue = aValue;
+                mDebugger.SendInternal("xValue =");
+                mDebugger.SendInternal(xValue);
+                while (xValue > 0)
+                {
+                    ulong xValue2 = xValue % 10;
+                    mDebugger.SendInternal("xValue2 =");
+                    mDebugger.SendInternal(xValue2);
+                    xResult = string.Concat(xChars[xValue2], xResult);
+                    mDebugger.SendInternal("xResult =");
+                    mDebugger.SendInternal(xResult);
+                    xValue /= 10;
+                    mDebugger.SendInternal("xValue =");
+                    mDebugger.SendInternal(xValue);
+                }
+            }
+
+            mDebugger.SendInternal("xResult =");
+            mDebugger.SendInternal(xResult);
+            return xResult;
+        }
+
         public static string GetNumberString(long aValue)
         {
+            mDebugger.SendInternal("StringHelper.GetNumberString(long)");
+
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
             long xValue = aValue;
 
-            if (aValue < 0)
-            {
-                xValue *= -1;
-            }
-
             if (aValue == 0)
             {
-                xResult = string.Concat(xResult, "0");
+                xResult = "0";
+                mDebugger.SendInternal("xResult =");
+                mDebugger.SendInternal(xResult);
             }
             else
             {
+                if (aValue < 0)
+                {
+                    xValue *= -1;
+                }
+
+                mDebugger.SendInternal("xValue =");
+                mDebugger.SendInternal(xValue);
                 while (xValue > 0)
                 {
                     long xValue2 = xValue % 10;
+                    mDebugger.SendInternal("xValue2 =");
+                    mDebugger.SendInternal(xValue2);
                     xResult = string.Concat(xChars[xValue2], xResult);
+                    mDebugger.SendInternal("xResult =");
+                    mDebugger.SendInternal(xResult);
                     xValue /= 10;
+                    mDebugger.SendInternal("xValue =");
+                    mDebugger.SendInternal(xValue);
                 }
             }
 
@@ -124,6 +158,8 @@ namespace Cosmos.Common
                 xResult = string.Concat("-", xResult);
             }
 
+            mDebugger.SendInternal("xResult =");
+            mDebugger.SendInternal(xResult);
             return xResult;
         }
 
@@ -134,9 +170,11 @@ namespace Cosmos.Common
          */
         public static string GetNumberString(float aValue)
         {
+            mDebugger.SendInternal("StringHelper.GetNumberString(float)");
+
             var singleBytes = BitConverter.GetBytes(aValue);
             int hexVal = BitConverter.ToInt32(singleBytes, 0);
-            
+
             /* Let's extract the parts that compose our single: sign, exponent and mantissa */
             bool isNeg = (hexVal >> 31) != 0;
             int exp = ((hexVal >> 23) & 0xFF);
@@ -259,33 +297,43 @@ namespace Cosmos.Common
          */
         public static string GetNumberString(double aValue)
         {
+            mDebugger.SendInternal("StringHelper.GetNumberString(double)");
+            mDebugger.SendInternal("aValue = ");
+            mDebugger.SendInternal(aValue);
+
             long hexVal = BitConverter.DoubleToInt64Bits(aValue);
+            mDebugger.SendInternal("hexVal = ");
+            mDebugger.SendInternal(hexVal);
 
             /* Let's extract the parts that compose our double: sign, exponent and mantissa */
             bool isNeg = (hexVal >> 63) != 0;
             int exp = (int)((hexVal >> 52) & 0x07FF);
             ulong mantissa = (ulong)(hexVal & 0x0FFFFFFFFFFFFF);
+            mDebugger.SendInternal("isNeg = ");
+            mDebugger.SendInternal(isNeg.ToString());
+            mDebugger.SendInternal("exp = ");
+            mDebugger.SendInternal(exp);
+            mDebugger.SendInternal("mantissa = ");
+            mDebugger.SendInternal(mantissa);
 
             ulong intPart = 0, fracPart = 0;
+
+            if (double.IsPositiveInfinity(aValue))
+            {
+                return "∞";
+            }
+            else if (double.IsNegativeInfinity(aValue))
+            {
+                return "-∞";
+            }
+            else if (double.IsNaN(aValue))
+            {
+                return "NaN";
+            }
 
             /* First we handle the special cases INF, NaN, 0 and denormalized float */
             switch (exp)
             {
-                /*
-                 * INF or NaN?
-                 */
-                case 0x07ff:
-                    if (mantissa == 0)
-                    {
-                        if (isNeg)
-                            return "-∞";
-                        else
-                            return "∞";
-                    }
-                    else
-                        /* It could exist -NaN but this is always printed as NaN */
-                        return "NaN";
-
                 /* 0 or denormalized double? */
                 case 0x0000:
                     if (mantissa == 0)
@@ -418,13 +466,7 @@ namespace Cosmos.Common
             return xNumber;
         }
 
-        public static int Compare(
-            string aString1,
-            int aIndex1,
-            string aString2,
-            int aIndex2,
-            int aLength1,
-            int aLength2)
+        public static int Compare(string aString1, int aIndex1, string aString2, int aIndex2, int aLength1, int aLength2)
         {
             if (aString1.Length < aString2.Length)
             {
@@ -450,3 +492,4 @@ namespace Cosmos.Common
         }
     }
 }
+

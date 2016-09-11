@@ -14,7 +14,8 @@ namespace Cosmos.IL2CPU.X86.IL {
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpCode = (ILOpCodes.OpField)aOpCode;
       var xField = xOpCode.Value;
-      DoExecute(Assembler, aMethod, xField, DebugEnabled);
+      XS.Comment("Operand type: " + aOpCode.StackPopTypes[1].ToString());
+      DoExecute(Assembler, aMethod, xField, DebugEnabled, TypeIsReferenceType(aOpCode.StackPopTypes[1]));
     }
 
     public static void DoExecute(Cosmos.Assembler.Assembler aAssembler,  MethodInfo aMethod, string aFieldId, Type aDeclaringObject, bool aNeedsGC, bool debugEnabled) {
@@ -32,22 +33,31 @@ namespace Cosmos.IL2CPU.X86.IL {
       XS.Comment("Offset: " + xActualOffset + " (includes object header)");
 
       uint xRoundedSize = Align(xSize, 4);
-      DoNullReferenceCheck(aAssembler, debugEnabled, xRoundedSize);
-      XS.Comment("After Nullref check");
-      XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xRoundedSize);
-      // ECX contains the object pointer now
       if (aNeedsGC)
       {
-        // for reference types (or boxed types), ECX actually contains the handle now, so we need to convert it to a memory address
-        XS.Comment("Dereference memory handle now");
-        XS.Set(XSRegisters.ECX, XSRegisters.ECX, sourceIsIndirect: true);
+        DoNullReferenceCheck(aAssembler, debugEnabled, (int)xRoundedSize + 4);
       }
-      if (debugEnabled)
+      else
       {
-        XS.Push(XSRegisters.ECX);
-        XS.Pop(XSRegisters.ECX);
+        DoNullReferenceCheck(aAssembler, debugEnabled, (int)xRoundedSize);
       }
-      XS.Add(XSRegisters.ECX, (uint)(xActualOffset));
+
+      XS.Comment("After Nullref check");
+
+      if (aNeedsGC)
+      {
+        XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xRoundedSize + 4);
+      }
+      else
+      {
+        XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: (int)xRoundedSize);
+      }
+
+      if (xActualOffset != 0)
+      {
+        XS.Add(XSRegisters.ECX, (uint)(xActualOffset));
+      }
+
       //TODO: Can't we use an x86 op to do a byte copy instead and be faster?
       for (int i = 0; i < (xSize / 4); i++) {
         XS.Pop(XSRegisters.EAX);
@@ -65,38 +75,31 @@ namespace Cosmos.IL2CPU.X86.IL {
             new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AX };
             break;
           }
-		case 3: {
-				XS.Pop(XSRegisters.EAX);
-				// move 2 lower bytes
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AX };
-				// shift third byte to lowest
-				XS.ShiftRight(XSRegisters.EAX, 16);
-				new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4) + 2, SourceReg = CPUx86.RegistersEnum.AL };
-				break;
-			}
+		    case 3: {
+				    XS.Pop(XSRegisters.EAX);
+				    // move 2 lower bytes
+				    new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4), SourceReg = CPUx86.RegistersEnum.AX };
+				    // shift third byte to lowest
+				    XS.ShiftRight(XSRegisters.EAX, 16);
+				    new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.ECX, DestinationIsIndirect = true, DestinationDisplacement = (int)((xSize / 4) * 4) + 2, SourceReg = CPUx86.RegistersEnum.AL };
+				    break;
+			    }
         case 0: {
             break;
           }
         default:
           throw new Exception("Remainder size " + (xSize % 4) + " not supported!");
       }
-
-#if! SKIP_GC_CODE
-          if (aNeedsGC) {
-            XS.Push(XSRegisters.ECX);
-            XS.Push(XSRegisters.EAX);
-            XS.Call(LabelName.Get(GCImplementationRefs.DecRefCountRef));
-            XS.Call(LabelName.Get(GCImplementationRefs.DecRefCountRef));
-          }
-#endif
       XS.Add(XSRegisters.ESP, 4);
+      if (aNeedsGC)
+      {
+        XS.Add(XSRegisters.ESP, 4);
+      }
     }
 
-    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethod, SysReflection.FieldInfo aField, bool debugEnabled)
+    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethod, SysReflection.FieldInfo aField, bool debugEnabled, bool aNeedsGC)
     {
-      bool xNeedsGC = aField.DeclaringType.IsClass && !aField.DeclaringType.IsValueType;
-
-      DoExecute(aAssembler, aMethod, aField.GetFullName(), aField.DeclaringType, xNeedsGC, debugEnabled);
+      DoExecute(aAssembler, aMethod, aField.GetFullName(), aField.DeclaringType, aNeedsGC, debugEnabled);
     }
 
   }
