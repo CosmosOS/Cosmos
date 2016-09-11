@@ -261,11 +261,12 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "FrotzKernelBoot", "..\Demos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrotzNetDLL", "..\Demos\zMachine\Frotz.Net\source\Desktop\FrotzBase\FrotzNetDLL.csproj", "{A843C6B0-CFF3-4A69-87BC-C93608235E47}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{57B83EE4-164F-4BB2-8AFA-76445333A0E4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3949B278-1C9E-43C0-8E92-BF39824EC3CC}"
 	ProjectSection(SolutionItems) = preProject
 		..\Demos\zMachine\Frotz.Net\source\ColorPicker.dll = ..\Demos\zMachine\Frotz.Net\source\ColorPicker.dll
 		..\Demos\zMachine\Frotz.Net\source\Notes.txt = ..\Demos\zMachine\Frotz.Net\source\Notes.txt
 		..\Demos\zMachine\Frotz.Net\source\todos.txt = ..\Demos\zMachine\Frotz.Net\source\todos.txt
+		WebEssentials2015-Settings.json = WebEssentials2015-Settings.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zConsole", "..\Demos\zMachine\Frotz.Net\source\zConsole\zConsole.csproj", "{3E4A8079-AAC0-429D-B042-0B5151E0E5BE}"
@@ -280,6 +281,9 @@ Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Kernel.Tests.IOBoot"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3949B278-1C9E-43C0-8E92-BF39824EC3CC}"
 	ProjectSection(SolutionItems) = preProject
+		..\Demos\zMachine\Frotz.Net\source\ColorPicker.dll = ..\Demos\zMachine\Frotz.Net\source\ColorPicker.dll
+		..\Demos\zMachine\Frotz.Net\source\Notes.txt = ..\Demos\zMachine\Frotz.Net\source\Notes.txt
+		..\Demos\zMachine\Frotz.Net\source\todos.txt = ..\Demos\zMachine\Frotz.Net\source\todos.txt
 		WebEssentials2015-Settings.json = WebEssentials2015-Settings.json
 	EndProjectSection
 EndProject
