@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25402.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
@@ -277,6 +277,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Tests.IO", "..\Tests\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj", "{47B1A772-4A53-4A53-9BAD-31DF119B1725}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Kernel.Tests.IOBoot", "..\Tests\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IOBoot.Cosmos", "{DC2CB877-EC23-463D-A870-054CA42DF48C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3949B278-1C9E-43C0-8E92-BF39824EC3CC}"
+	ProjectSection(SolutionItems) = preProject
+		WebEssentials2015-Settings.json = WebEssentials2015-Settings.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

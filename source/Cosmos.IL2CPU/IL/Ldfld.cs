@@ -56,17 +56,12 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             int xExtraOffset = 0;
             var xFieldInfo = ResolveField(aDeclaringType, aFieldId, true);
-            bool xNeedsGC = TypeNeedsGC(aDeclaringType);
+            bool xNeedsGC = TypeIsReferenceType(aDeclaringType);
             if (xNeedsGC)
             {
                 xExtraOffset = 12;
             }
             return (int)(xExtraOffset + xFieldInfo.Offset);
-        }
-
-        public static bool TypeNeedsGC(Type aDeclaringType)
-        {
-            return aDeclaringType.IsClass && !aDeclaringType.IsValueType;
         }
 
         public static void DoExecute(Cosmos.Assembler.Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField, bool debugEnabled, Type aTypeOnStack)
@@ -113,8 +108,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             // pushed size is always 4 or 8
             var xSize = xFieldInfo.Size;
-            if ((!aTypeOnStack.IsPointer)
-                && (aDeclaringType.IsClass))
+            if (TypeIsReferenceType(aTypeOnStack))
             {
                 DoNullReferenceCheck(Assembler, debugEnabled, 4);
                 XS.Add(ESP, 4);

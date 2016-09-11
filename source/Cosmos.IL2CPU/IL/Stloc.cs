@@ -19,9 +19,10 @@ namespace Cosmos.IL2CPU.X86.IL
       var xStackCount = (int) GetStackCountForLocal(aMethod, xVar);
       var xEBPOffset = (int) GetEBPOffsetForLocal(aMethod, xOpVar.Value);
       var xSize = SizeOfType(xVar.LocalType);
-      XS.Comment(xVar.LocalType.ToString());
-      XS.Comment("EBPOffset = " + xEBPOffset);
-      XS.Comment("xSize = " + xSize);
+
+      XS.Comment("Local type = " + xVar.LocalType);
+      XS.Comment("Local EBP offset = " + xEBPOffset);
+      XS.Comment("Local size = " + xSize);
 
       for (int i = xStackCount - 1; i >= 0; i--)
       {

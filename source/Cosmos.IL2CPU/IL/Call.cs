@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Cosmos.IL2CPU.ILOpCodes;
 // using System.Collections.Generic;
 // using System.IO;
@@ -7,10 +8,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 // using IL2CPU=Cosmos.IL2CPU;
 using CPU = Cosmos.Assembler.x86;
 using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.IL2CPU.X86;
 using System.Reflection;
-using System.Collections.Generic;
-using System.IO;
 using Cosmos.Assembler;
 using XSharp.Compiler;
 using SysReflection = System.Reflection;
@@ -26,7 +24,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public static uint GetStackSizeToReservate(MethodBase aMethod)
+        public static uint GetStackSizeToReservate(MethodBase aMethod, Type aType = null)
         {
 
             var xMethodInfo = aMethod as SysReflection.MethodInfo;
@@ -49,15 +47,30 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             if (!xMethodInfo.IsStatic)
             {
-                if (aMethod.DeclaringType.IsValueType)
+                if (aType != null)
                 {
-                    xExtraStackSize -= 4;
+                    if (TypeIsReferenceType(aType))
+                    {
+                        xExtraStackSize -= GetObjectReferenceSize();
+                    }
+                    else
+                    {
+                        xExtraStackSize -= 4;
+                    }
                 }
                 else
                 {
-                    xExtraStackSize -= GetNativePointerSize(xMethodInfo);
+                    if (TypeIsReferenceType(aMethod.DeclaringType))
+                    {
+                        xExtraStackSize -= GetObjectReferenceSize();
+                    }
+                    else
+                    {
+                        xExtraStackSize -= 4;
+                    }
                 }
             }
+
             if (xExtraStackSize > 0)
             {
                 return (uint)xExtraStackSize;
@@ -65,7 +78,7 @@ namespace Cosmos.IL2CPU.X86.IL
             return 0;
         }
 
-        private static int GetNativePointerSize(SysReflection.MethodInfo xMethodInfo)
+        private static int GetObjectReferenceSize()
         {
             // old code, which goof up everything for structs
             //return (int)Align(SizeOfType(xMethodInfo.DeclaringType), 4);
@@ -84,17 +97,15 @@ namespace Cosmos.IL2CPU.X86.IL
             DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, ILOp.GetLabel(aCurrentMethod, aCurrent.NextPosition), debugEnabled);
         }
 
-        public static unsafe void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel, bool debugEnabled)
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aOp, string currentLabel, string nextLabel, bool debugEnabled)
         {
             var xMethodInfo = aTargetMethod as SysReflection.MethodInfo;
-
             string xNormalAddress = LabelName.Get(aTargetMethod);
-
             var xParameters = aTargetMethod.GetParameters();
 
             // todo: implement exception support
             uint xExtraStackSize = GetStackSizeToReservate(aTargetMethod);
-            if (!aTargetMethod.IsStatic && debugEnabled)
+            if (!aTargetMethod.IsStatic)
             {
                 uint xThisOffset = 0;
                 foreach (var xItem in xParameters)
@@ -102,13 +113,13 @@ namespace Cosmos.IL2CPU.X86.IL
                     xThisOffset += Align(SizeOfType(xItem.ParameterType), 4);
                 }
                 var stackOffsetToCheck = xThisOffset;
-                if (aTargetMethod.DeclaringType.IsValueType)
+                if (TypeIsReferenceType(aTargetMethod.DeclaringType))
                 {
-                    DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck);
+                    DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck + 4);
                 }
                 else
                 {
-                    DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck + 4);
+                    DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck);
                 }
             }
 
@@ -125,13 +136,13 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             if (aCurrentMethod != null)
             {
-                EmitExceptionLogic(Assembler, aCurrentMethod, aCurrent, true,
+                EmitExceptionLogic(Assembler, aCurrentMethod, aOp, true,
                                    delegate
                                    {
-                                       var xStackOffsetBefore = aCurrent.StackOffsetBeforeExecution.Value;
+                                       var xStackOffsetBefore = aOp.StackOffsetBeforeExecution.Value;
 
                                        uint xPopSize = 0;
-                                       foreach (var type in aCurrent.StackPopTypes)
+                                       foreach (var type in aOp.StackPopTypes)
                                        {
                                            xPopSize += Align(SizeOfType(type), 4);
                                        }

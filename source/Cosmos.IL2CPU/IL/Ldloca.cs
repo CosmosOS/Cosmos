@@ -19,16 +19,14 @@ namespace Cosmos.IL2CPU.X86.IL
     {
       var xOpVar = (OpVar)aOpCode;
       var xVar = aMethod.MethodBase.GetMethodBody().LocalVariables[xOpVar.Value];
-      var xStackCount = (int)GetStackCountForLocal(aMethod, xVar);
-      var xEBPOffset = (int)GetEBPOffsetForLocal(aMethod, xOpVar.Value);
-      xEBPOffset += (xStackCount - 1)*4;
+      var xEBPOffset = GetEBPOffsetForLocal(aMethod, xOpVar.Value);
+      xEBPOffset += (uint)(((int)GetStackCountForLocal(aMethod, xVar) - 1) * 4);
 
       XS.Comment("Local type = " + xVar.LocalType);
       XS.Comment("Local EBP offset = " + xEBPOffset);
 
       XS.Set(EAX, EBP);
-      XS.Set(EBX, (uint)(xEBPOffset));
-      XS.Sub(EAX, EBX);
+      XS.Sub(EAX, xEBPOffset);
       XS.Push(EAX);
     }
   }

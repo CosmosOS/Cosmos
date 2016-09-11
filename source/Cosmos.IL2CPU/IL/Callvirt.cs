@@ -32,13 +32,10 @@ namespace Cosmos.IL2CPU.X86.IL
         public static void DoExecute(Assembler.Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp, bool debugEnabled)
         {
             string xCurrentMethodLabel = GetLabel(aMethod, aOp.Position);
+            Type xPopType = aOp.StackPopTypes.Last();
 
-            // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
-            //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
             string xNormalAddress = "";
-            if (aTargetMethod.IsStatic
-                || !aTargetMethod.IsVirtual
-                || aTargetMethod.IsFinal)
+            if (aTargetMethod.IsStatic || !aTargetMethod.IsVirtual || aTargetMethod.IsFinal)
             {
                 xNormalAddress = LabelName.Get(aTargetMethod);
             }
@@ -50,7 +47,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 xReturnSize = Align(SizeOfType(xMethodInfo.ReturnType), 4);
             }
 
-            uint xExtraStackSize = Call.GetStackSizeToReservate(aTargetMethod);
+            uint xExtraStackSize = Call.GetStackSizeToReservate(aTargetMethod, xPopType);
             uint xThisOffset = 0;
             var xParameters = aTargetMethod.GetParameters();
             foreach (var xItem in xParameters)
@@ -65,7 +62,15 @@ namespace Cosmos.IL2CPU.X86.IL
             // mThisOffset = mTargetMethodInfo.Arguments[0].Offset;
 
             XS.Comment("ThisOffset = " + xThisOffset);
-            DoNullReferenceCheck(Assembler, debugEnabled, (int) xThisOffset + 4);
+
+            if (TypeIsReferenceType(xPopType))
+            {
+                DoNullReferenceCheck(Assembler, debugEnabled, (int)xThisOffset + 4);
+            }
+            else
+            {
+                DoNullReferenceCheck(Assembler, debugEnabled, (int)xThisOffset);
+            }
 
             if (!String.IsNullOrEmpty(xNormalAddress))
             {
@@ -82,7 +87,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 * $esp                 Params
                 * $esp + mThisOffset   This
                 */
-                Type xPopType = aOp.StackPopTypes.Last();
                 if ((xPopType.IsPointer) || (xPopType.IsByRef))
                 {
                     xPopType = xPopType.GetElementType();
@@ -91,7 +95,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else
                 {
-                    XS.Set(EAX, ESP, sourceDisplacement: (int) xThisOffset + 4);
+                    XS.Set(EAX, ESP, sourceDisplacement: (int)xThisOffset + 4);
                     XS.Push(EAX, isIndirect: true);
                 }
                 XS.Push(aTargetMethodUID);
@@ -109,7 +113,8 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Pop(ECX);
 
                 XS.Label(xCurrentMethodLabel + ".AfterAddressCheck");
-                if (xMethodInfo.DeclaringType == typeof(object))
+
+                if (TypeIsReferenceType(xPopType))
                 {
                     /*
                     * On the stack now:
@@ -117,9 +122,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     * $esp + mThisOffset    This
                     */
                     // we need to see if $this is a boxed object, and if so, we need to box it
-                    XS.Set(EAX, ESP, sourceDisplacement: (int) xThisOffset + 4);
-                    XS.Set(EBX, EAX, sourceDisplacement: 4, sourceIsIndirect: true);
-                    XS.Compare(EBX, (int) InstanceTypeEnum.BoxedValueType, size: RegisterSize.Int32);
+                    XS.Set(EAX, ESP, sourceDisplacement: (int)xThisOffset + 4);
+                    XS.Compare(EAX, (int)InstanceTypeEnum.BoxedValueType, destinationIsIndirect: true, destinationDisplacement: 4, size: RegisterSize.Int32);
 
                     /*
                     * On the stack now:
@@ -139,8 +143,8 @@ namespace Cosmos.IL2CPU.X86.IL
                     * ECX contains the method to call
                     * EAX contains the type pointer (not the handle!!)
                     */
-                    XS.Add(EAX, (uint) ObjectImpl.FieldDataOffset);
-                    XS.Set(ESP, EAX, destinationDisplacement: (int) xThisOffset + 4);
+                    XS.Add(EAX, (uint)ObjectImpl.FieldDataOffset);
+                    XS.Set(ESP, EAX, destinationDisplacement: (int)xThisOffset + 4);
 
                     /*
                     * On the stack now:
@@ -170,9 +174,9 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
 
                     var xResultSize = xReturnSize;
-                    if (xResultSize%4 != 0)
+                    if (xResultSize % 4 != 0)
                     {
-                        xResultSize += 4 - (xResultSize%4);
+                        xResultSize += 4 - (xResultSize % 4);
                     }
 
                     EmitExceptionCleanupAfterCall(Assembler, xResultSize, xStackOffsetBefore, xPopSize);

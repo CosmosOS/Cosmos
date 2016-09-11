@@ -142,7 +142,6 @@
     <Compile Include="System\UInt32Impl.cs" />
     <Compile Include="System\UInt64Impl.cs" />
     <Compile Include="System\UIntPtrImpl.cs" />
-    <Compile Include="System\ValueTypeImp.cs" />
     <Compile Include="System\WindowsInsiderPlugs.cs" />
   </ItemGroup>
   <ItemGroup>

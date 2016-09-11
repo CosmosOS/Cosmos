@@ -243,11 +243,10 @@ namespace Cosmos.TestRunner.Core
 
         private void KernelTestCompleted()
         {
-            Thread.Sleep(50);
+            OutputHandler.SetKernelTestResult(true, "Test completed");
             mKernelResultSet = true;
             mKernelResult = true;
             mKernelRunning = false;
-            Console.WriteLine("Test completed");
         }
     }
 }

@@ -20,6 +20,8 @@ namespace Cosmos.Common
 
         public static string GetNumberString(uint aValue)
         {
+            mDebugger.SendInternal("StringHelper.GetNumberString(uint)");
+
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
 
@@ -43,6 +45,8 @@ namespace Cosmos.Common
 
         public static string GetNumberString(int aValue)
         {
+            mDebugger.SendInternal("StringHelper.GetNumberString(int)");
+
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
 
@@ -75,39 +79,9 @@ namespace Cosmos.Common
             return xResult;
         }
 
-        public static string GetNumberString(ulong aValue, bool aIsNegative)
-        {
-            const string xDigits = "0123456789";
-            char[] xResultChars = new char[21];
-            int xCurrentPos = 20;
-            if (aValue > 0)
-            {
-                while (aValue > 0)
-                {
-                    byte xPos = (byte)(aValue % 10);
-                    aValue /= 10;
-                    xResultChars[xCurrentPos] = xDigits[xPos];
-                    xCurrentPos -= 1;
-                }
-            }
-            else
-            {
-                xResultChars[xCurrentPos] = '0';
-                xCurrentPos -= 1;
-            }
-            if (aIsNegative)
-            {
-                xResultChars[xCurrentPos] = '-';
-                xCurrentPos -= 1;
-            }
-            return new String(xResultChars, xCurrentPos + 1, 20 - xCurrentPos);
-        }
-
         public static string GetNumberString(ulong aValue)
         {
-            mDebugger.SendInternal("StringHrlprt.GetNumberString");
-            mDebugger.SendInternal("aValue =");
-            mDebugger.SendInternal(aValue);
+            mDebugger.SendInternal("StringHelper.GetNumberString(ulong)");
 
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
@@ -144,9 +118,7 @@ namespace Cosmos.Common
 
         public static string GetNumberString(long aValue)
         {
-            mDebugger.SendInternal("StringHrlprt.GetNumberString");
-            mDebugger.SendInternal("aValue =");
-            mDebugger.SendInternal(aValue);
+            mDebugger.SendInternal("StringHelper.GetNumberString(long)");
 
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
@@ -198,9 +170,11 @@ namespace Cosmos.Common
          */
         public static string GetNumberString(float aValue)
         {
+            mDebugger.SendInternal("StringHelper.GetNumberString(float)");
+
             var singleBytes = BitConverter.GetBytes(aValue);
             int hexVal = BitConverter.ToInt32(singleBytes, 0);
-            
+
             /* Let's extract the parts that compose our single: sign, exponent and mantissa */
             bool isNeg = (hexVal >> 31) != 0;
             int exp = ((hexVal >> 23) & 0xFF);
@@ -323,33 +297,43 @@ namespace Cosmos.Common
          */
         public static string GetNumberString(double aValue)
         {
+            mDebugger.SendInternal("StringHelper.GetNumberString(double)");
+            mDebugger.SendInternal("aValue = ");
+            mDebugger.SendInternal(aValue);
+
             long hexVal = BitConverter.DoubleToInt64Bits(aValue);
+            mDebugger.SendInternal("hexVal = ");
+            mDebugger.SendInternal(hexVal);
 
             /* Let's extract the parts that compose our double: sign, exponent and mantissa */
             bool isNeg = (hexVal >> 63) != 0;
             int exp = (int)((hexVal >> 52) & 0x07FF);
             ulong mantissa = (ulong)(hexVal & 0x0FFFFFFFFFFFFF);
+            mDebugger.SendInternal("isNeg = ");
+            mDebugger.SendInternal(isNeg.ToString());
+            mDebugger.SendInternal("exp = ");
+            mDebugger.SendInternal(exp);
+            mDebugger.SendInternal("mantissa = ");
+            mDebugger.SendInternal(mantissa);
 
             ulong intPart = 0, fracPart = 0;
+
+            if (double.IsPositiveInfinity(aValue))
+            {
+                return "∞";
+            }
+            else if (double.IsNegativeInfinity(aValue))
+            {
+                return "-∞";
+            }
+            else if (double.IsNaN(aValue))
+            {
+                return "NaN";
+            }
 
             /* First we handle the special cases INF, NaN, 0 and denormalized float */
             switch (exp)
             {
-                /*
-                 * INF or NaN?
-                 */
-                case 0x07ff:
-                    if (mantissa == 0)
-                    {
-                        if (isNeg)
-                            return "-∞";
-                        else
-                            return "∞";
-                    }
-                    else
-                        /* It could exist -NaN but this is always printed as NaN */
-                        return "NaN";
-
                 /* 0 or denormalized double? */
                 case 0x0000:
                     if (mantissa == 0)
@@ -482,7 +466,7 @@ namespace Cosmos.Common
             return xNumber;
         }
 
-        public static int Compare(string aString1, int aIndex1, string aString2, int aIndex2, int aLength1,int aLength2)
+        public static int Compare(string aString1, int aIndex1, string aString2, int aIndex2, int aLength1, int aLength2)
         {
             if (aString1.Length < aString2.Length)
             {
@@ -508,3 +492,4 @@ namespace Cosmos.Common
         }
     }
 }
+

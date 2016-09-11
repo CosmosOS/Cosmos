@@ -15,31 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
-      DoNullReferenceCheck(Assembler, DebugEnabled, 0);
-      XS.Pop(EAX);
-      XS.Push(EAX, isIndirect: true, displacement: 4);
-      XS.Push(0);
+      Ldind_I.Assemble(Assembler, 8, DebugEnabled);
     }
-
-
-    // using System;
-    // using System.IO;
-    //
-    //
-    // using CPU = Cosmos.Assembler.x86;
-    //
-    // namespace Cosmos.IL2CPU.IL.X86 {
-    // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Ldind_Ref)]
-    // 	public class Ldind_Ref: Op {
-    // 		public Ldind_Ref(ILReader aReader, MethodInformation aMethodInfo)
-    // 			: base(aReader, aMethodInfo) {
-    // 		}
-    // 		public override void DoAssemble() {
-    //             XS.Pop(XSRegisters.EAX);
-    //             XS.Push(XSRegisters.EAX, isIndirect: true);
-    // 		}
-    // 	}
-    // }
-
   }
 }
