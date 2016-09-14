@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Cosmos.Debug.Kernel;
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
@@ -32,9 +33,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue(($"{value1} + 3 = {value2}" == expected_res), "String $ operator does not work.");
 
             string split_in = "ABC";
-            Assert.IsTrue(split_in.Split('B').Length == 2, "Split(char) doesn't return 2 element");
-            Assert.IsTrue(split_in.Split(new[] { 'B'}).Length == 2, "String.Split(char[]) doesn't work.");
-            Assert.IsTrue((split_in.Split(new[] { "B" }, StringSplitOptions.None).Length == 2), "String.Split(string[], StringSplitOptions) doesn't work.");
+            var xResultArray = split_in.Split('B');
+            Assert.IsTrue(xResultArray.Length == 2, "String.Split(char[]) doesn't work.");
+
+            xResultArray = split_in.Split(new[] { "B" }, StringSplitOptions.None);
+            Assert.IsTrue(xResultArray.Length == 2, "String.Split(string[], StringSplitOptions) doesn't work.");
 
             string test = "This is a test string.";
             Assert.IsTrue(test.Contains("test"), "string.Contains(string) doesn't find a substring that actually exists.");

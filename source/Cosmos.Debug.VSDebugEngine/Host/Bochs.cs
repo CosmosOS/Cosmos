@@ -100,7 +100,12 @@ namespace Cosmos.Debug.VSDebugEngine.Host
             // Start Bochs without displaying the configuration interface (-q) and using the specified
             // configuration file (-f). The user is intended to edit the configuration file coming with
             // the Cosmos project whenever she wants to modify the environment.
-            _bochsStartInfo.Arguments = string.Format("-q -f \"{0}\"", _bochsConfigurationFile.FullName);
+            var xExtraLog = "";
+            if (_useDebugVersion)
+            {
+                //xExtraLog = "-dbglog \"bochsdbg.log\"";
+            }
+            _bochsStartInfo.Arguments = string.Format("-q {1} -f \"{0}\"", _bochsConfigurationFile.FullName, xExtraLog);
             _bochsStartInfo.WorkingDirectory = _bochsConfigurationFile.Directory.FullName;
             _bochsStartInfo.UseShellExecute = true;
             if (RedirectOutput)

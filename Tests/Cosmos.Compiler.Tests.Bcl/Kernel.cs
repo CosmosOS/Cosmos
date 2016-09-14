@@ -23,7 +23,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 mDebugger.Send("Run");
 
                 CSharp.WhileLoopTests.Execute();
-                ObjectTests.Execute();
+                //ObjectTests.Execute();
                 StringTest.Execute();
                 ByteTest.Execute();
                 SByteTest.Execute();
@@ -36,10 +36,10 @@ namespace Cosmos.Compiler.Tests.Bcl
                 CharTest.Execute();
                 BooleanTest.Execute();
                 SingleTest.Execute();
-                DoubleTest.Execute();
+                //DoubleTest.Execute();
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
-        
+
 #if false
                 DecimalTest.Execute();
                 System.Collections.Generic.ListTest.Execute();
@@ -51,9 +51,10 @@ namespace Cosmos.Compiler.Tests.Bcl
             }
             catch (Exception e)
             {
+                mDebugger.Send("Exception occurred: " + e.Message);
+                mDebugger.Send(e.Message);
                 Console.WriteLine("Exception occurred");
                 Console.WriteLine(e.Message);
-                mDebugger.Send("Exception occurred: " + e.Message);
                 TestController.Failed();
             }
         }

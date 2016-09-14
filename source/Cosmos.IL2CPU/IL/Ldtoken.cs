@@ -40,6 +40,7 @@ namespace Cosmos.IL2CPU.X86.IL
             //}
             //XS.Push(xToken.Value);
             XS.Push(xTokenAddress);
+            XS.Push(0);
         }
 
 

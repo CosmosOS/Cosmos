@@ -19,7 +19,7 @@ namespace Cosmos.Compiler.Tests.Exceptions
             mDebugger.Send("Run");
 
             TestSimpleException();
-            
+
             var xFilter = false;
             var xShouldCatch = false;
             var xCaught = false;
@@ -92,7 +92,7 @@ namespace Cosmos.Compiler.Tests.Exceptions
 
             Assert.IsTrue(xCaught, "Did not reach catch block (3)");
             //Assert.IsTrue(xInFinally, "Did not reach finally block (3)");
-            
+
             xFilter = false;
             xShouldCatch = false;
             xCaught = false;
@@ -124,7 +124,7 @@ namespace Cosmos.Compiler.Tests.Exceptions
             //Assert.IsFalse(xFilter, "Should not reach filter block (4)");
             //Assert.IsTrue(xCaught, "Did not reach catch block (4)");
             //Assert.IsTrue(xInFinally, "Did not reach finally block (4)");
-            
+
             xFilter = false;
             xShouldCatch = true;
             xCaught = false;

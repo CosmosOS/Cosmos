@@ -1,6 +1,4 @@
-﻿
-
-The security model of&nbsp;_place_holder; Cosmos will evolve and mature as
+﻿The security model of Cosmos will evolve and mature as
 Cosmos does, however the base model is presented here.
 
 ###  Goals
@@ -82,46 +80,66 @@ public enum Ring
 }
 ```
 
-### 0 Core Level
+### 0 Core
 
-Core level has special permissions which basically let it do anyting it wants.
-core code should be very limited with most kernel code existing in the System
-level. Core code should be kept to a minimum with code not requiring special
+Summary: "Anything goes"
+Implements: IO and memory classes
+Specificity: CPU
+Assemblies: Cosmos Only
+
+Core exists to provide access to hardware. C# code should mostly
+exist in level 1 instead, with level 0 being intended for code that can exist
+only in core such as assembly code.
+
+Core has special permissions which essentially allow it do anything.
+Core code is to be very limited with most kernel code existing in the System
+level. Core code is to be kept to a minimum. Code not requiring special
 permissions should be moved or split into the system level.
 
-Special abilities that core has exclusively:
+Things that can exist only in Core - no other levels.
 
   1. Assembly plugs
+  2. Unsafe code (pointers)
 
-Core 0 exists to provide access to direct hardware. C# code should mostly
-exist in level 1 instead, with level 0 being intended for code that can exist
-only in level 0 such as assembly code.
+Core via unsafe code and assembly plugs is used to expose classes to system allowing
+system to interact with hardware.
+
+Core can contain only assemblies of Cosmos itself. No drivers or non Cosmos code is allowed in Core.
+
+Things that Core implements and exposes to HAL:
+
+  1. IO Ports (x86 and some others). Exposes safe interface and implemented using assembly plugs.
+  2. Memory Access. Exposes safe interfaces which keep all pointer access in Core. HAL and lower use 
+     objects which expose byte arrays and other methods to allow HAL to communicate with memory without
+     using pointers itself.
+  3. IRQs and other CPU specific functions.
+  4. Threading
+  5. Memory Management.
+  7. PCI
+
+Core also manages consumers of its services to avoid conflicts and security to prevent a specific driver from accessing "everything".
+
+### 1 HAL (Hardware Abstraction Layer)
+
+Summary: Hardware control
+Specificity: Hardware (ie Keyboard, USB, Video), but not CPU
+Assemblies: Cosmos, Drivers
+
+HAL uses Core to access hardware and implements the logic details in HAL. Core implements only raw 
+classes for accessing hardware, but knows nothing about most of the hardware itself. ie, HAL would implement the
+logic for talking to the keyboard using the hardwarwe access classes in Core. Core simply facilitates the 
+communication for HAL to the hardware.
 
 Examples:
+  1. Raw graphics access (Send this command to graphics card, etc)
+  2. Raw disk access
+  3. USB
 
-  1. Plugs that must be implemented in assembly
-  2. Memory management
-  3. Direct generic IO access to map to C# functions
+### 2 System
 
-### 1 HAL (Hardware) Level
-
-From the HAL (hardware abstraction level) level up, none of the special
-permissions available in core level are available. If such code is needed, it
-must be split between system and core.
-
-HAL in some senses might be thought of as a sub level of level 0, but exists
-to help separate assembly and other such code. HAL must not simply proxy
-access to code. For example, level 0 will expose functions to directly access
-IO ports, but level 2 should never be able to perform such raw access. HAL
-must wrap and encapselate such access. For example, instead of proxying access
-to a specific port drivers exists in HAL to expose access to a specific device
-such as an IDE controller.
-
-Examples:
-
-  1. Hardware specific drivers - any code that needs to talk to hardware via core.0.
-
-### 2 System Level
+Summary: Main part of OS
+Specificity: None (not tied to any hardware or CPU)
+Assemblies: Cosmos, Drivers
 
 System level contains all such code that is not wrapping hardware directly but
 instead adding higher level functionality. ie file systems, etc. The
@@ -129,16 +147,21 @@ distinction between level 1 and 2 is a manual one and no technical
 restrictions currently exist aside from the restriction of higher level
 reference only.
 
-System.2 should not contain system applications, but instead system
-functionality.
+System should not contain system applications, but instead system
+functionality. System applications belong in User.
 
 Examples:
 
   1. File systems
   2. BCL plugs
   3. Network stacks
+  4. Graphics with higher level API consumable by user apps. (Things that cannot be accomplished by hardware. Loading images from files, drawing things not supported by a graphics card command)
 
 ### 3 User Level
+
+Summary: User applications
+Specificity: None
+Assemblies: Any
 
 No Cosmos.3.User project exists because level 3 is user code. ie applications.
 When a user creates a new application (or currently monolithic project) the
@@ -156,48 +179,25 @@ You only need to add 1 or maybe 2 extra projects, but this give you the
 physical separation from the start, preventing you to make circular
 references.
 
-#  Older Ring Docs
+# Examples
 
-###  Core Ring
+## Disk
 
-In the core ring, "anything goes". This also means that code which does not
-require such privileges should not exist in the core ring. The core ring
-should be restricted to code which truly needs such unfettered access.
+0 IO/Memory access (Cosmos)
+1 IDE / SATA
+2 Block Device, Filesystem
+3 Application
 
-Priviliges that exist only in the core ring:
+## Graphics
 
-  * Use of pointers and direct access to memory
-  * Access to x86 IO ports.
-  * Explicit assembly language code
-  * Unsafe code
+0 IO/Memory access (Cosmos)
+1 DirectX / Graphics Memory
+2 WinForms, WPF, Other UI, Canvas, JPG/PNG/GIF
+3 Application
 
-The core ring includes functionality such as:
+## Network
 
-  * Threading
-  * Memory management
-
-Assemblies which are part of the core are restricted.
-
-The core ring exposes objects which allow the hardware ring to access memory
-indirectly, and in a controlled restricted fashion. For example to allow a
-driver to acccess video RAM, a memory object can be created by the core ring
-which allows access to only the specific block of memory needed by the video
-driver.
-
-###  Hardware Ring
-
-The hardware ring contains drivers and code for accessing hardware via more
-generic objects exposed by the kernel ring.
-
-The hardware ring includes functionality such as:
-
-  * IDE
-  * SATA
-  * Ethernet
-  * USB Controller
-
-The hardware ring may be further split into two levels at a later date. For
-example, a driver may exist for the USB Controller and it would require access
-to the core ring. But drivers implementing USB devices do not need to talk to
-hardware directly, but instead talk to the USB Controller driver.
-
+0 IO/Memory access (Cosmos)
+1 Ethernet 
+2 TCP/IP
+3 Application

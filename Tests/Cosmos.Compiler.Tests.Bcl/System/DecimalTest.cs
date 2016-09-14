@@ -10,7 +10,6 @@ namespace Cosmos.Compiler.Tests.Bcl.System
         // This does not compile: 
         public static void Execute()
         {
-
             Decimal value;
             String result;
             String expectedResult;

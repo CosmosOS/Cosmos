@@ -375,7 +375,7 @@ namespace Cosmos.IL2CPU
             if (xReturnSize > 0)
             {
                 var xOffset = GetResultCodeOffset(xReturnSize, (uint)xTotalArgsSize);
-                for (int i = 0; i < ((int)(xReturnSize/4)); i++)
+                for (int i = 0; i < ((int)(xReturnSize / 4)); i++)
                 {
                     XS.Pop(XSRegisters.EAX);
                     XS.Set(XSRegisters.EBP, XSRegisters.EAX, destinationDisplacement: (int)(xOffset + ((i + 0) * 4)));
@@ -418,8 +418,14 @@ namespace Cosmos.IL2CPU
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location" };
                 XS.Label(xLabelExc + ".MethodFooterStackCorruptionCheck_Break_on_location");
-                XS.Pop(XSRegisters.EAX);
-                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
+                XS.Pop(ECX);
+                XS.Push(EAX);
+                XS.Push(EBX);
+                new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.ECX };
+                XS.Call("DebugStub_SendSimpleNumber");
+                XS.Add(ESP, 4);
+                XS.Call("DebugStub_SendSimpleNumber");
+                XS.Add(ESP, 4);
                 XS.Call("DebugStub_SendStackCorruptionOccurred");
                 XS.Halt();
             }
@@ -662,6 +668,7 @@ namespace Cosmos.IL2CPU
                 if (xNeedsExceptionPush)
                 {
                     Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
+                    XS.Push(0);
                 }
                 xILOp.DebugEnabled = DebugEnabled;
                 xILOp.Execute(aMethod, xOpCode);
@@ -862,14 +869,9 @@ namespace Cosmos.IL2CPU
                      }, aNextLabel);
         }
 
-        protected void Ldflda(MethodInfo aMethod, string aFieldId)
-        {
-            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldId, false, false);
-        }
-
         protected void Ldflda(MethodInfo aMethod, FieldInfo aFieldInfo)
         {
-            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldInfo, false, false);
+            X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldInfo, false, false, aFieldInfo.DeclaringType);
         }
 
         protected void Ldsflda(MethodInfo aMethod, FieldInfo aFieldInfo)
@@ -879,7 +881,7 @@ namespace Cosmos.IL2CPU
 
         protected int GetVTableEntrySize()
         {
-            return 16; // todo: retrieve from actual type info
+            return 24; // todo: retrieve from actual type info
         }
 
         public const string InitVMTCodeLabel = "___INIT__VMT__CODE____";
@@ -892,9 +894,8 @@ namespace Cosmos.IL2CPU
             mSequences = new DebugInfo.SequencePoint[0];
 
             var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
-            var xSetMethodInfoRef = VTablesImplRefs.SetMethodInfoRef;
             var xTypesFieldRef = VTablesImplRefs.VTablesImplDef.GetField("mTypes",
-                                                                               BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+                                                                         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             string xTheName = DataMember.GetStaticFieldName(xTypesFieldRef);
             DataMember xDataMember = (from item in Cosmos.Assembler.Assembler.CurrentInstance.DataMembers
                                       where item.Name == xTheName
@@ -907,205 +908,85 @@ namespace Cosmos.IL2CPU
             }
             var xData = new byte[16 + (aTypesSet.Count * GetVTableEntrySize())];
             var xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
+            Array.Copy(xTemp, 0, xData, 0, 4);
             xTemp = BitConverter.GetBytes(0x80000002);
             Array.Copy(xTemp, 0, xData, 4, 4);
             xTemp = BitConverter.GetBytes(aTypesSet.Count);
             Array.Copy(xTemp, 0, xData, 8, 4);
             xTemp = BitConverter.GetBytes(GetVTableEntrySize());
             Array.Copy(xTemp, 0, xData, 12, 4);
-            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Contents", xData));
-            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName + "__Handle", ElementReference.New(xTheName + "__Contents")));
-            Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xTheName, ElementReference.New(xTheName + "__Handle")));
+            XS.DataMemberBytes(xTheName + "_Contents", xData);
+            XS.DataMember(xTheName,  1, "db", "0, 0, 0, 0, 0, 0, 0, 0");
+            XS.Set(xTheName, xTheName + "_Contents", destinationIsIndirect: true, destinationDisplacement: 4);
 #if VMT_DEBUG
-        using (var xVmtDebugOutput = XmlWriter.Create(@"vmt_debug.xml"))
-        {
-            xVmtDebugOutput.WriteStartDocument();
-            xVmtDebugOutput.WriteStartElement("VMT");
-#endif
-            //Push((uint)aTypesSet.Count);
-            foreach (var xType in aTypesSet)
+            using (var xVmtDebugOutput = XmlWriter.Create(@"vmt_debug.xml"))
             {
-#if VMT_DEBUG
-                xVmtDebugOutput.WriteStartElement("Type");
-                xVmtDebugOutput.WriteAttributeString("TypeId", aGetTypeID(xType).ToString());
-                if (xType.BaseType != null)
-                {
-                    xVmtDebugOutput.WriteAttributeString("BaseTypeId", aGetTypeID(xType.BaseType).ToString());
-                }
-                xVmtDebugOutput.WriteAttributeString("Name", xType.FullName);
+                xVmtDebugOutput.WriteStartDocument();
+                xVmtDebugOutput.WriteStartElement("VMT");
 #endif
-                // value contains true if the method is an interface method definition
-                SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
-                foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                //Push((uint)aTypesSet.Count);
+                foreach (var xType in aTypesSet)
                 {
-                    if (aMethodsSet.Contains(xMethod))
-                    { //) && !xMethod.IsAbstract) {
-                        if (!xEmittedMethods.ContainsKey(xMethod))
-                        {
-                            xEmittedMethods.Add(xMethod, false);
-                        }
-                    }
-                }
-                foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
-                {
-                    if (aMethodsSet.Contains(xCtor))
-                    { // && !xCtor.IsAbstract) {
-                        if (!xEmittedMethods.ContainsKey(xCtor))
-                        {
-                            xEmittedMethods.Add(xCtor, false);
-                        }
-                    }
-                }
-                foreach (var xIntf in xType.GetInterfaces())
-                {
-                    foreach (var xMethodIntf in xIntf.GetMethods())
-                    {
-                        var xActualMethod = xType.GetMethod(xIntf.FullName + "." + xMethodIntf.Name,
-                                                            (from xParam in xMethodIntf.GetParameters()
-                                                             select xParam.ParameterType).ToArray());
-
-                        if (xActualMethod == null)
-                        {
-                            // get private implemenation
-                            xActualMethod = xType.GetMethod(xMethodIntf.Name,
-                                                            (from xParam in xMethodIntf.GetParameters()
-                                                             select xParam.ParameterType).ToArray());
-                        }
-                        if (xActualMethod == null)
-                        {
-                            try
-                            {
-                                if (!xIntf.IsGenericType)
-                                {
-                                    var xMap = xType.GetInterfaceMap(xIntf);
-                                    for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
-                                    {
-                                        if (xMap.InterfaceMethods[k] == xMethodIntf)
-                                        {
-                                            xActualMethod = xMap.TargetMethods[k];
-                                            break;
-                                        }
-                                    }
-                                }
-                            }
-                            catch
-                            {
-                            }
-                        }
-                        if (aMethodsSet.Contains(xMethodIntf))
-                        {
-                            if (!xEmittedMethods.ContainsKey(xMethodIntf))
-                            {
-                                xEmittedMethods.Add(xMethodIntf, true);
-                            }
-                        }
-
-                    }
-                }
-                int? xBaseIndex = null;
-                if (xType.BaseType == null)
-                {
-                    xBaseIndex = (int)aGetTypeID(xType);
-                }
-                else
-                {
-                    for (int t = 0; t < aTypesSet.Count; t++)
-                    {
-                        // todo: optimize check
-                        var xItem = aTypesSet.Skip(t).First();
-                        if (xItem.ToString() == xType.BaseType.ToString())
-                        {
-                            xBaseIndex = (int)aGetTypeID(xItem);
-                            break;
-                        }
-                    }
-                }
-                if (xBaseIndex == null)
-                {
-                    throw new Exception("Base type not found!");
-                }
-                for (int x = xEmittedMethods.Count - 1; x >= 0; x--)
-                {
-                    if (!aMethodsSet.Contains(xEmittedMethods.Keys[x]))
-                    {
-                        xEmittedMethods.RemoveAt(x);
-                    }
-                }
-                if (!xType.IsInterface)
-                {
-                    Push(aGetTypeID(xType));
-                    Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(
-                        new DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), new int[] { (int)aGetTypeID(xType) }));
-                    Push((uint)xBaseIndex.Value);
-                    xData = new byte[16 + (xEmittedMethods.Count * 4)];
-                    xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
-                    Array.Copy(xTemp, 0, xData, 0, 4);
-                    xTemp = BitConverter.GetBytes(0x80000002); // embedded array
-                    Array.Copy(xTemp, 0, xData, 4, 4);
-                    xTemp = BitConverter.GetBytes(xEmittedMethods.Count); // embedded array
-                    Array.Copy(xTemp, 0, xData, 8, 4);
-                    xTemp = BitConverter.GetBytes(4); // embedded array
-                    Array.Copy(xTemp, 0, xData, 12, 4);
-                    string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodIndexesArray";
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName + "_Handle", ElementReference.New(xDataName)));
-                    Push(xDataName + "_Handle");
-                    xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName + "_Handle", ElementReference.New(xDataName)));
-                    Push(xDataName + "_Handle");
-                    xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
-                    xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
-                    Array.Copy(xTemp, 0, xData, 0, 4);
-                    xTemp = BitConverter.GetBytes(0x80000002); // embedded array
-                    Array.Copy(xTemp, 0, xData, 4, 4);
-                    xTemp = BitConverter.GetBytes((xType.FullName + ", " + xType.Module.Assembly.GetName().FullName).Length);
-                    Array.Copy(xTemp, 0, xData, 8, 4);
-                    xTemp = BitConverter.GetBytes(2); // embedded array
-                    Array.Copy(xTemp, 0, xData, 12, 4);
-                    xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
-                    Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName + "_Handle", ElementReference.New(xDataName)));
-                    Push("0" + xEmittedMethods.Count.ToString("X") + "h");
-                    Call(xSetTypeInfoRef);
-                }
-                for (int j = 0; j < xEmittedMethods.Count; j++)
-                {
-                    MethodBase xMethod = xEmittedMethods.Keys[j];
 #if VMT_DEBUG
-                    xVmtDebugOutput.WriteStartElement("Method");
-                    xVmtDebugOutput.WriteAttributeString("Id", aGetMethodUID(xMethod).ToString());
-                    xVmtDebugOutput.WriteAttributeString("Name", xMethod.GetFullName());
-                    xVmtDebugOutput.WriteEndElement();
-#endif
-                    var xMethodId = aGetMethodUID(xMethod);
-                    if (!xType.IsInterface)
+                    xVmtDebugOutput.WriteStartElement("Type");
+                    xVmtDebugOutput.WriteAttributeString("TypeId", aGetTypeID(xType).ToString());
+                    if (xType.BaseType != null)
                     {
-                        if (xEmittedMethods.Values[j])
+                        xVmtDebugOutput.WriteAttributeString("BaseTypeId", aGetTypeID(xType.BaseType).ToString());
+                    }
+                    xVmtDebugOutput.WriteAttributeString("Name", xType.FullName);
+#endif
+                    // value contains true if the method is an interface method definition
+                    SortedList<MethodBase, bool> xEmittedMethods = new SortedList<MethodBase, bool>(new MethodBaseComparer());
+                    foreach (MethodBase xMethod in xType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                    {
+                        if (aMethodsSet.Contains(xMethod))
+                        { //) && !xMethod.IsAbstract) {
+                            if (!xEmittedMethods.ContainsKey(xMethod))
+                            {
+                                xEmittedMethods.Add(xMethod, false);
+                            }
+                        }
+                    }
+                    foreach (MethodBase xCtor in xType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                    {
+                        if (aMethodsSet.Contains(xCtor))
+                        { // && !xCtor.IsAbstract) {
+                            if (!xEmittedMethods.ContainsKey(xCtor))
+                            {
+                                xEmittedMethods.Add(xCtor, false);
+                            }
+                        }
+                    }
+                    foreach (var xIntf in xType.GetInterfaces())
+                    {
+                        foreach (var xMethodIntf in xIntf.GetMethods())
                         {
-                            var xNewMethod = xType.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
-                                                                (from xParam in xMethod.GetParameters()
+                            var xActualMethod = xType.GetMethod(xIntf.FullName + "." + xMethodIntf.Name,
+                                                                (from xParam in xMethodIntf.GetParameters()
                                                                  select xParam.ParameterType).ToArray());
 
-                            if (xNewMethod == null)
+                            if (xActualMethod == null)
                             {
-                                // get private implementation
-                                xNewMethod = xType.GetMethod(xMethod.Name,
-                                                                (from xParam in xMethod.GetParameters()
+                                // get private implemenation
+                                xActualMethod = xType.GetMethod(xMethodIntf.Name,
+                                                                (from xParam in xMethodIntf.GetParameters()
                                                                  select xParam.ParameterType).ToArray());
                             }
-                            if (xNewMethod == null)
+                            if (xActualMethod == null)
                             {
                                 try
                                 {
-                                    var xMap = xType.GetInterfaceMap(xMethod.DeclaringType);
-                                    for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
+                                    if (!xIntf.IsGenericType)
                                     {
-                                        if (xMap.InterfaceMethods[k] == xMethod)
+                                        var xMap = xType.GetInterfaceMap(xIntf);
+                                        for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
                                         {
-                                            xNewMethod = xMap.TargetMethods[k];
-                                            break;
+                                            if (xMap.InterfaceMethods[k] == xMethodIntf)
+                                            {
+                                                xActualMethod = xMap.TargetMethods[k];
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -1113,11 +994,130 @@ namespace Cosmos.IL2CPU
                                 {
                                 }
                             }
-                            xMethod = xNewMethod;
-                        }
+                            if (aMethodsSet.Contains(xMethodIntf))
+                            {
+                                if (!xEmittedMethods.ContainsKey(xMethodIntf))
+                                {
+                                    xEmittedMethods.Add(xMethodIntf, true);
+                                }
+                            }
 
-                        Push((uint)aGetTypeID(xType));
-                        Push((uint)j);
+                        }
+                    }
+                    int? xBaseIndex = null;
+                    if (xType.BaseType == null)
+                    {
+                        xBaseIndex = (int)aGetTypeID(xType);
+                    }
+                    else
+                    {
+                        for (int t = 0; t < aTypesSet.Count; t++)
+                        {
+                            // todo: optimize check
+                            var xItem = aTypesSet.Skip(t).First();
+                            if (xItem.ToString() == xType.BaseType.ToString())
+                            {
+                                xBaseIndex = (int)aGetTypeID(xItem);
+                                break;
+                            }
+                        }
+                    }
+                    if (xBaseIndex == null)
+                    {
+                        throw new Exception("Base type not found!");
+                    }
+                    for (int x = xEmittedMethods.Count - 1; x >= 0; x--)
+                    {
+                        if (!aMethodsSet.Contains(xEmittedMethods.Keys[x]))
+                        {
+                            xEmittedMethods.RemoveAt(x);
+                        }
+                    }
+                    if (!xType.IsInterface)
+                    {
+                        Move("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), (int)aGetTypeID(xType));
+                        XS.DataMember("VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name), aGetTypeID(xType));
+                        Push(aGetTypeID(xType));
+                        Push((uint)xBaseIndex.Value);
+                        xData = new byte[16 + (xEmittedMethods.Count * 4)];
+                        xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
+                        Array.Copy(xTemp, 0, xData, 0, 4);
+                        xTemp = BitConverter.GetBytes(0x80000002); // embedded array
+                        Array.Copy(xTemp, 0, xData, 4, 4);
+                        xTemp = BitConverter.GetBytes(xEmittedMethods.Count); // embedded array
+                        Array.Copy(xTemp, 0, xData, 8, 4);
+                        xTemp = BitConverter.GetBytes(4); // embedded array
+                        Array.Copy(xTemp, 0, xData, 12, 4);
+                        string xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodIndexesArray";
+                        Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
+                        Push(xDataName);
+                        Push(0);
+                        xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name) + "__MethodAddressesArray";
+                        Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
+                        Push(xDataName);
+                        Push(0);
+                        xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
+                        xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
+                        Array.Copy(xTemp, 0, xData, 0, 4);
+                        xTemp = BitConverter.GetBytes(0x80000002); // embedded array
+                        Array.Copy(xTemp, 0, xData, 4, 4);
+                        xTemp = BitConverter.GetBytes((xType.FullName + ", " + xType.Module.Assembly.GetName().FullName).Length);
+                        Array.Copy(xTemp, 0, xData, 8, 4);
+                        xTemp = BitConverter.GetBytes(2); // embedded array
+                        Array.Copy(xTemp, 0, xData, 12, 4);
+                        xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
+                        Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
+                        Push("0" + xEmittedMethods.Count.ToString("X") + "h");
+                        Call(xSetTypeInfoRef);
+                    }
+                    for (int j = 0; j < xEmittedMethods.Count; j++)
+                    {
+                        MethodBase xMethod = xEmittedMethods.Keys[j];
+#if VMT_DEBUG
+                        xVmtDebugOutput.WriteStartElement("Method");
+                        xVmtDebugOutput.WriteAttributeString("Id", aGetMethodUID(xMethod).ToString());
+                        xVmtDebugOutput.WriteAttributeString("Name", xMethod.GetFullName());
+                        xVmtDebugOutput.WriteEndElement();
+#endif
+                        var xMethodId = aGetMethodUID(xMethod);
+                        if (!xType.IsInterface)
+                        {
+                            if (xEmittedMethods.Values[j])
+                            {
+                                var xNewMethod = xType.GetMethod(xMethod.DeclaringType.FullName + "." + xMethod.Name,
+                                                                    (from xParam in xMethod.GetParameters()
+                                                                     select xParam.ParameterType).ToArray());
+
+                                if (xNewMethod == null)
+                                {
+                                    // get private implementation
+                                    xNewMethod = xType.GetMethod(xMethod.Name,
+                                                                    (from xParam in xMethod.GetParameters()
+                                                                     select xParam.ParameterType).ToArray());
+                                }
+                                if (xNewMethod == null)
+                                {
+                                    try
+                                    {
+                                        var xMap = xType.GetInterfaceMap(xMethod.DeclaringType);
+                                        for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
+                                        {
+                                            if (xMap.InterfaceMethods[k] == xMethod)
+                                            {
+                                                xNewMethod = xMap.TargetMethods[k];
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    catch
+                                    {
+                                    }
+                                }
+                                xMethod = xNewMethod;
+                            }
+
+                            Push((uint)aGetTypeID(xType));
+                            Push((uint)j);
 
                         Push((uint)xMethodId);
                         if (xMethod.IsAbstract)
@@ -1129,18 +1129,17 @@ namespace Cosmos.IL2CPU
                         {
                             Push(ILOp.GetMethodLabel(xMethod));
                         }
-                        Push(0);
                         Call(VTablesImplRefs.SetMethodInfoRef);
                     }
                 }
 #if VMT_DEBUG
-                xVmtDebugOutput.WriteEndElement(); // type
+                    xVmtDebugOutput.WriteEndElement(); // type
 #endif
-            }
+                }
 #if VMT_DEBUG
-                    xVmtDebugOutput.WriteEndElement(); // types
-                    xVmtDebugOutput.WriteEndDocument();
-        }
+                xVmtDebugOutput.WriteEndElement(); // types
+                xVmtDebugOutput.WriteEndDocument();
+            }
 #endif
 
             XS.Label("_END_OF_" + InitVMTCodeLabel);
@@ -1209,11 +1208,11 @@ namespace Cosmos.IL2CPU
                     Type xFieldTypeDef = aField.FieldType;
                     if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType)
                     {
-                        xTheSize = GetSizeOfType(aField.FieldType);
+                        xTheSize = ILOp.SizeOfType(aField.FieldType);
                     }
                     else
                     {
-                        xTheSize = 4;
+                        xTheSize = 8;
                     }
                     byte[] xData = new byte[xTheSize];
                     try
@@ -1230,7 +1229,7 @@ namespace Cosmos.IL2CPU
                                 }
                                 if (xTyp.IsValueType)
                                 {
-                                    for (int x = 0; x < xTheSize; x++)
+                                    for (int x = 4; x < xTheSize; x++)
                                     {
                                         xData[x] = Marshal.ReadByte(xValue,
                                                                     x);
@@ -1250,12 +1249,6 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        public uint GetSizeOfType(Type aType)
-        {
-            return ILOp.SizeOfType(aType);
-        }
-
-
         /// <summary>
         /// Generates a forwarding stub, which transforms from the actual method to the plug.
         /// </summary>
@@ -1269,31 +1262,48 @@ namespace Cosmos.IL2CPU
             // todo: completely get rid of this kind of trampoline code
             MethodBegin(aFrom);
             {
-                var xParams = aTo.MethodBase.GetParameters().ToArray();
+                var xExtraSpaceToSkipDueToObjectPointerAccess = 0u;
 
-                if (aTo.MethodAssembler != null)
+                var xFromParameters = aFrom.MethodBase.GetParameters();
+                var xParams = aTo.MethodBase.GetParameters().ToArray();
+                if (aTo.IsWildcard)
                 {
                     xParams = aFrom.MethodBase.GetParameters();
                 }
 
                 int xCurParamIdx = 0;
+                var xCurParamOffset = 0;
                 if (!aFrom.MethodBase.IsStatic)
                 {
                     Ldarg(aFrom, 0);
-                    xCurParamIdx++;
-                    if (aTo.MethodAssembler == null)
+
+                    if (!aTo.IsWildcard)
                     {
+                        var xObjectPointerAccessAttrib = xParams[0].GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
+                        if (xObjectPointerAccessAttrib != null)
+                        {
+                            XS.Comment("Skipping the reference to the next object reference.");
+                            XS.Add(ESP, 4);
+                            xExtraSpaceToSkipDueToObjectPointerAccess += 4;
+                        }
+                        else
+                        {
+                            if (ILOp.TypeIsReferenceType(aFrom.MethodBase.DeclaringType) && !ILOp.TypeIsReferenceType(xParams[0].ParameterType))
+                            {
+                                throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute!");
+                            }
+                        }
+
                         xParams = xParams.Skip(1).ToArray();
                     }
+                    xCurParamOffset = 1;
                 }
+
+                var xOriginalParamsIdx = 0;
                 foreach (var xParam in xParams)
                 {
-                    FieldAccessAttribute xFieldAccessAttrib = null;
-                    foreach (var xAttrib in xParam.GetCustomAttributes(typeof(FieldAccessAttribute), true))
-                    {
-                        xFieldAccessAttrib = xAttrib as FieldAccessAttribute;
-                    }
-
+                    var xFieldAccessAttrib = xParam.GetCustomAttributes<FieldAccessAttribute>(true).FirstOrDefault();
+                    var xObjectPointerAccessAttrib = xParam.GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
                     if (xFieldAccessAttrib != null)
                     {
                         // field access
@@ -1309,12 +1319,24 @@ namespace Cosmos.IL2CPU
                             Ldflda(aFrom, xFieldInfo);
                         }
                     }
+                    else if (xObjectPointerAccessAttrib != null)
+                    {
+                        xOriginalParamsIdx++;
+                        Ldarg(aFrom, xCurParamIdx + xCurParamOffset);
+                        XS.Add(ESP, 4);
+                        xExtraSpaceToSkipDueToObjectPointerAccess += 4;
+                    }
                     else
                     {
+                        if (ILOp.TypeIsReferenceType(xFromParameters[xOriginalParamsIdx].ParameterType) && !ILOp.TypeIsReferenceType(xParams[xCurParamIdx].ParameterType))
+                        {
+                            throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute!");
+                        }
                         // normal field access
-                        XS.Comment("Loading parameter " + xCurParamIdx);
-                        Ldarg(aFrom, xCurParamIdx);
+                        XS.Comment("Loading parameter " + (xCurParamIdx + xCurParamOffset));
+                        Ldarg(aFrom, xCurParamIdx + xCurParamOffset);
                         xCurParamIdx++;
+                        xOriginalParamsIdx++;
                     }
                 }
                 Call(aFrom, aTo, xEndOfMethodLabel);
@@ -1352,7 +1374,7 @@ namespace Cosmos.IL2CPU
             XS.Push(XSRegisters.EBP);
             XS.Set(XSRegisters.EBP, XSRegisters.ESP);
             XS.Set(XSRegisters.EAX, ILOp.GetTypeIDLabel(typeof(String)), sourceIsIndirect: true);
-            new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(LdStr.GetContentsArrayName("")) };
+            new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(LdStr.GetContentsArrayName("")), DestinationDisplacement = 4 };
 
             var xMemberId = 0;
 
@@ -1380,6 +1402,7 @@ namespace Cosmos.IL2CPU
             XS.Label(CosmosAssembler.EntryPointName);
             XS.Push(XSRegisters.EBP);
             XS.Set(XSRegisters.EBP, XSRegisters.ESP);
+            Assembler.WriteDebugVideo("Initializing VMT.");
             XS.Call(InitVMTCodeLabel);
             Assembler.WriteDebugVideo("Initializing string IDs.");
             XS.Call(InitStringIDsLabel);
@@ -1486,17 +1509,23 @@ namespace Cosmos.IL2CPU
 
                 // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
                 // if not, we should somehow break here.
-                XS.Set(XSRegisters.EAX, XSRegisters.ESP);
-                XS.Set(XSRegisters.EBX, XSRegisters.EBP);
+                XS.Set(EAX, ESP);
+                XS.Set(EBX, EBP);
                 if (xStackDifference != 0)
                 {
-                    XS.Add(XSRegisters.EAX, xStackDifference.Value);
+                    XS.Add(EAX, xStackDifference.Value);
                 }
-                XS.Compare(XSRegisters.EAX, XSRegisters.EBX);
+                XS.Compare(EAX, EBX);
                 XS.Jump(ConditionalTestEnum.Equal, xLabel + ".StackCorruptionCheck_End");
+                XS.Push(EAX);
+                XS.Push(EBX);
+                XS.Call("DebugStub_SendSimpleNumber");
+                XS.Add(ESP, 4);
+                XS.Call("DebugStub_SendSimpleNumber");
+
                 XS.ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
-                new Call { DestinationLabel = xLabel + ".StackCorruptionCheck_GetAddress" };
+                XS.Call(xLabel + ".StackCorruptionCheck_GetAddress");
                 XS.Label(xLabel + ".StackCorruptionCheck_GetAddress");
                 XS.Pop(XSRegisters.EAX);
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };

@@ -5,25 +5,29 @@ using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86.SSE;
 using Cosmos.Assembler.x86.x87;
+using Cosmos.IL2CPU.ILOpCodes;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 using static Cosmos.Assembler.x86.SSE.ComparePseudoOpcodes;
 
-namespace Cosmos.IL2CPU.X86.IL {
+namespace Cosmos.IL2CPU.X86.IL
+{
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ceq)]
-  public class Ceq : ILOp {
+  public class Ceq : ILOp
+  {
     public Ceq(Cosmos.Assembler.Assembler aAsmblr)
-      : base(aAsmblr) {
+      : base(aAsmblr)
+    {
     }
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
-        var xStackItem = aOpCode.StackPopTypes[0];
-        var xStackItemSize = SizeOfType(xStackItem);
-        var xStackItemIsFloat = TypeIsFloat(xStackItem);
-        var xStackItem2 = aOpCode.StackPopTypes[1];
-        var xStackItem2Size = SizeOfType(xStackItem2);
-        var xStackItem2IsFloat = TypeIsFloat(xStackItem2);
+      var xStackItem = aOpCode.StackPopTypes[0];
+      var xStackItemSize = SizeOfType(xStackItem);
+      var xStackItemIsFloat = TypeIsFloat(xStackItem);
+      var xStackItem2 = aOpCode.StackPopTypes[1];
+      var xStackItem2Size = SizeOfType(xStackItem2);
+      var xStackItem2IsFloat = TypeIsFloat(xStackItem2);
       var xSize = Math.Max(xStackItemSize, xStackItem2Size);
 
       var xNextLabel = GetLabel(aMethod, aOpCode.NextPosition);
@@ -78,26 +82,48 @@ namespace Cosmos.IL2CPU.X86.IL {
         }
         else
         {
-          XS.Pop(EAX);
-          XS.Compare(EAX, ESP, sourceDisplacement: 4);
-          XS.Pop(EAX);
-          XS.Jump(ConditionalTestEnum.NotEqual, Label.LastFullLabel + ".False");
-          XS.Xor(EAX, ESP, sourceDisplacement: 4);
-          XS.Jump(ConditionalTestEnum.NotZero, Label.LastFullLabel + ".False");
+          if (TypeIsReferenceType(xStackItem) && TypeIsReferenceType(xStackItem2))
+          {
+            XS.Comment(xStackItem.Name);
+            XS.Add(ESP, 4);
+            XS.Pop(EAX);
 
-          //they are equal, eax == 0
-          XS.Add(ESP, 8);
-          XS.Add(EAX, 1);
-          XS.Push(EAX);
-          XS.Jump(xNextLabel);
-          XS.Label(Label.LastFullLabel + ".False");
-          //eax = 0
-          XS.Add(ESP, 8);
-          XS.Xor(EAX, EAX);
-          XS.Push(EAX);
-          XS.Jump(xNextLabel);
+            XS.Comment(xStackItem2.Name);
+            XS.Add(ESP, 4);
+            XS.Pop(EBX);
+
+            XS.Compare(EAX, EBX);
+            XS.Jump(ConditionalTestEnum.NotEqual, Label.LastFullLabel + ".False");
+
+            // equal
+            XS.Push(1);
+            XS.Jump(xNextLabel);
+            XS.Label(Label.LastFullLabel + ".False");
+            //not equal
+            XS.Push(0);
+            XS.Jump(xNextLabel);
+          }
+          else
+          {
+            XS.Pop(EAX);
+            XS.Compare(EAX, ESP, sourceDisplacement: 4);
+            XS.Pop(EAX);
+            XS.Jump(ConditionalTestEnum.NotEqual, Label.LastFullLabel + ".False");
+            XS.Xor(EAX, ESP, sourceDisplacement: 4);
+            XS.Jump(ConditionalTestEnum.NotZero, Label.LastFullLabel + ".False");
+
+            //they are equal
+            XS.Add(ESP, 8);
+            XS.Push(1);
+            XS.Jump(xNextLabel);
+            XS.Label(Label.LastFullLabel + ".False");
+            //not equal
+            XS.Add(ESP, 8);
+            XS.Push(0);
+            XS.Jump(xNextLabel);
+
+          }
         }
-
       }
       else
       {

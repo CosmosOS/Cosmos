@@ -13,6 +13,10 @@ namespace Cosmos.System
 {
     public static class Global
     {
+        static Global()
+        {
+
+        }
         public static readonly Debugger mDebugger = new Debugger("System", "Global");
 
         public static readonly Debugger mFileSystemDebugger = new Debugger("System", "FileSystem");

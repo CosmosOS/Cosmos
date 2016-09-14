@@ -24,6 +24,12 @@ indent_size = 4
 [IL/Callvirt.cs]
 indent_size = 4
 
+[IL/Ldfld.cs]
+indent_size = 4
+
+[IL/Ldlen.cs]
+indent_size = 4
+
 [IL/Newobj.cs]
 indent_size = 4
 
