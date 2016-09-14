@@ -85,12 +85,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataLookupEntry.cs" />
-    <Compile Include="DataLookupTable.cs" />
-    <Compile Include="GlobalInformationTable.cs" />
-    <Compile Include="GlobalSystemInfo.cs" />
+    <Compile Include="Old\DataLookupEntry.cs" />
+    <Compile Include="Old\DataLookupTable.cs" />
+    <Compile Include="Old\GlobalInformationTable.cs" />
+    <Compile Include="Old\GlobalSystemInfo.cs" />
     <Compile Include="Heap.cs" />
+    <Compile Include="HeapLarge.cs" />
+    <Compile Include="HeapMedium.cs" />
+    <Compile Include="HeapSmall.cs" />
+    <Compile Include="Old\Old_Heap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RAT.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">

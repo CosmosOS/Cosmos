@@ -35,6 +35,7 @@ namespace Cosmos.IL2CPU
             var xPreBootLogging = true;
             if (xPreBootLogging)
             {
+                new Comment("DebugVideo '" + aText + "'");
                 UInt32 xVideo = 0xB8000;
                 for (UInt32 i = xVideo; i < xVideo + 80 * 2; i = i + 2)
                 {
@@ -260,7 +261,7 @@ namespace Cosmos.IL2CPU
             WriteDebugVideo("Cosmos pre boot");
 
             // For when using Bochs, causes a break ASAP on entry after initial Cosmos display.
-            new LiteralAssemblerCode("xchg bx, bx");
+            //new LiteralAssemblerCode("xchg bx, bx");
 
             // CLI ASAP
             WriteDebugVideo("Clearing interrupts.");

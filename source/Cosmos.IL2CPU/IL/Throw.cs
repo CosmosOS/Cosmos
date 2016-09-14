@@ -17,7 +17,8 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
 #warning TODO: Implement exception
-            DoNullReferenceCheck(Assembler, DebugEnabled, 0);
+            DoNullReferenceCheck(Assembler, DebugEnabled, 4);
+            XS.Add(XSRegisters.ESP, 4);
             XS.Pop(XSRegisters.EAX);
             new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
             XS.Call("SystemExceptionOccurred");

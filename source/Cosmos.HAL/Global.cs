@@ -85,19 +85,20 @@ namespace Cosmos.HAL
       }
 
       // TODO Change this to foreach when foreach is supported
-      Ata.AtaDebugger.Send("Number of MBR partitions found:  " + xMBR.Partitions.Count);
+      Ata.AtaDebugger.Send("Number of MBR partitions found:");
+      Ata.AtaDebugger.SendNumber(xMBR.Partitions.Count);
       for (int i = 0; i < xMBR.Partitions.Count; i++)
       {
         var xPart = xMBR.Partitions[i];
         if (xPart == null)
         {
-          Console.WriteLine("Null partition found at idx " + i);
+          Console.WriteLine("Null partition found at idx: " + i);
         }
         else
         {
           var xPartDevice = new Partition(xATA, xPart.StartSector, xPart.SectorCount);
           BlockDevice.BlockDevice.Devices.Add(xPartDevice);
-          Console.WriteLine("Found partition at idx " + i);
+          Console.WriteLine("Found partition at idx" + i);
         }
       }
     }
@@ -163,6 +164,10 @@ namespace Cosmos.HAL
       // system level and not accessible from Core. Need to think about this
       // for the future.
       Console.WriteLine("Finding PCI Devices");
+      Console.WriteLine();
+      ;
+      ;
+      ;
       PCI.Setup();
     }
 

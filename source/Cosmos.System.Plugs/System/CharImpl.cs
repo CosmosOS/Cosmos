@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System

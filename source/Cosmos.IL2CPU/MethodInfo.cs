@@ -51,5 +51,10 @@ namespace Cosmos.IL2CPU
             }
         }
 
+        public bool IsWildcard
+        {
+            get;
+            set;
+        }
     }
 }

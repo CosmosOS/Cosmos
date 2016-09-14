@@ -29,6 +29,8 @@ namespace Cosmos.IL2CPU
             Debug(message);
             while (true)
                 ;
+
+            //Debugger.DoRealHalt();
         }
     }
 }

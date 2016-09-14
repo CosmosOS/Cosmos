@@ -4,7 +4,8 @@ using System.Text;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
-using XSharp.Compiler;
+using static XSharp.Compiler.XS;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.Debug.Kernel.Plugs
 {
@@ -21,7 +22,13 @@ namespace Cosmos.Debug.Kernel.Plugs
     public static void DoSend(string aText) { }
 
     [PlugMethod(Assembler = typeof(DebugDoSendNumber))]
+    public static void DoSendNumber(int aNumber) { }
+
+    [PlugMethod(Assembler = typeof(DebugDoSendNumber))]
     public static void DoSendNumber(uint aNumber) { }
+
+    [PlugMethod(Assembler = typeof(DebugDoSendLongNumber))]
+    public static void DoSendNumber(long aNumber) { }
 
     [PlugMethod(Assembler = typeof(DebugDoSendLongNumber))]
     public static void DoSendNumber(ulong aNumber) { }
@@ -44,9 +51,25 @@ namespace Cosmos.Debug.Kernel.Plugs
     [PlugMethod(Assembler = typeof(DebugSendChannelCommandNoData))]
     public static unsafe void SendChannelCommand(byte aChannel, byte aCommand) { }
 
-    [PlugMethod(Assembler = typeof(DebugSendCoreDump))]
-    public static unsafe void DoSendCoreDump() { }
+    [PlugMethod(Assembler = typeof(DoBochsBreak))]
+    public static void DoBochsBreak()
+    {
+    }
 
+    [Inline]
+    public static void SendKernelPanic(uint id)
+    {
+      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
+      new LiteralAssemblerCode("push dword [EBP + 8]");
+      new LiteralAssemblerCode("Call DebugStub_SendKernelPanic");
+      new LiteralAssemblerCode("add ESP, 4");
+      new LiteralAssemblerCode("%endif");
+    }
+
+    [PlugMethod(Assembler = typeof(DoRealHalt))]
+    public static void DoRealHalt()
+    {
+    }
     //[PlugMethod(Assembler = typeof(DebugTraceOff))]
     //public static void TraceOff() { }
 
@@ -149,13 +172,12 @@ namespace Cosmos.Debug.Kernel.Plugs
     public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
     {
       new LiteralAssemblerCode("%ifdef DEBUGSTUB");
-      XS.Label(".BeforeArgumentsPrepare");
-      new LiteralAssemblerCode("mov EBX, [EBP + 8]");
-      new LiteralAssemblerCode("mov EBX, [EBX]");
+      Label(".BeforeArgumentsPrepare");
+      new LiteralAssemblerCode("mov EBX, [EBP + 12]");
       new LiteralAssemblerCode("push dword [EBX + 12]");
       new LiteralAssemblerCode("add EBX, 16");
       new LiteralAssemblerCode("push dword EBX");
-      XS.Label(".BeforeCall");
+      Label(".BeforeCall");
       new LiteralAssemblerCode("Call DebugStub_SendText");
       new LiteralAssemblerCode("add ESP, 8");
       new LiteralAssemblerCode("%endif");
@@ -236,16 +258,22 @@ namespace Cosmos.Debug.Kernel.Plugs
     }
   }
 
-  public class DebugSendCoreDump : AssemblerMethod
+  public class DoBochsBreak: AssemblerMethod
   {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+    public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
     {
-      new LiteralAssemblerCode("%ifdef DEBUGSTUB");
-      new Xchg {DestinationReg = RegistersEnum.BX, SourceReg = RegistersEnum.BX};
-      new LiteralAssemblerCode("pushad");
-      new LiteralAssemblerCode("Call DebugStub_SendCoreDump");
-      new LiteralAssemblerCode("popad");
-      new LiteralAssemblerCode("%endif");
+      Exchange(BX, BX);
+    }
+  }
+
+  public class DoRealHalt: AssemblerMethod
+  {
+    public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
+    {
+      DisableInterrupts();
+      // bochs magic break
+      //Exchange(BX, BX);
+      Halt();
     }
   }
 }

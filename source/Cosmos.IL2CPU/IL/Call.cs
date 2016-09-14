@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Cosmos.IL2CPU.ILOpCodes;
 // using System.Collections.Generic;
 // using System.IO;
@@ -7,10 +8,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 // using IL2CPU=Cosmos.IL2CPU;
 using CPU = Cosmos.Assembler.x86;
 using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.IL2CPU.X86;
 using System.Reflection;
-using System.Collections.Generic;
-using System.IO;
 using Cosmos.Assembler;
 using XSharp.Compiler;
 using SysReflection = System.Reflection;
@@ -19,14 +17,14 @@ using SysReflection = System.Reflection;
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Call)]
-    public class Call: ILOp
+    public class Call : ILOp
     {
         public Call(Cosmos.Assembler.Assembler aAsmblr)
             : base(aAsmblr)
         {
         }
 
-        public static uint GetStackSizeToReservate(MethodBase aMethod)
+        public static uint GetStackSizeToReservate(MethodBase aMethod, Type aType = null)
         {
 
             var xMethodInfo = aMethod as SysReflection.MethodInfo;
@@ -49,8 +47,30 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             if (!xMethodInfo.IsStatic)
             {
-                xExtraStackSize -= GetNativePointerSize(xMethodInfo);
+                if (aType != null)
+                {
+                    if (TypeIsReferenceType(aType))
+                    {
+                        xExtraStackSize -= GetObjectReferenceSize();
+                    }
+                    else
+                    {
+                        xExtraStackSize -= 4;
+                    }
+                }
+                else
+                {
+                    if (TypeIsReferenceType(aMethod.DeclaringType))
+                    {
+                        xExtraStackSize -= GetObjectReferenceSize();
+                    }
+                    else
+                    {
+                        xExtraStackSize -= 4;
+                    }
+                }
             }
+
             if (xExtraStackSize > 0)
             {
                 return (uint)xExtraStackSize;
@@ -58,12 +78,12 @@ namespace Cosmos.IL2CPU.X86.IL
             return 0;
         }
 
-        private static int GetNativePointerSize(SysReflection.MethodInfo xMethodInfo)
+        private static int GetObjectReferenceSize()
         {
             // old code, which goof up everything for structs
             //return (int)Align(SizeOfType(xMethodInfo.DeclaringType), 4);
             // TODO native pointer size, so that COSMOS could be 64 bit OS
-            return 4;
+            return 8;
         }
 
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
@@ -77,35 +97,15 @@ namespace Cosmos.IL2CPU.X86.IL
             DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, ILOp.GetLabel(aCurrentMethod, aCurrent.NextPosition), debugEnabled);
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, string nextLabel, bool debugEnabled)
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aOp, string currentLabel, string nextLabel, bool debugEnabled)
         {
-            //if (aTargetMethod.IsVirtual) {
-            //  Callvirt.DoExecute(Assembler, aCurrentMethod, aTargetMethod, aTargetMethodUID, aCurrentPosition);
-            //  return;
-            //}
             var xMethodInfo = aTargetMethod as SysReflection.MethodInfo;
-
-            // mTargetMethodInfo = GetService<IMetaDataInfoService>().GetMethodInfo(mMethod
-            //   , mMethod, mMethodDescription, null, mCurrentMethodInfo.DebugMode);
-            string xNormalAddress;
-            if (aTargetMethod.IsStatic
-                || !aTargetMethod.IsVirtual
-                || aTargetMethod.IsFinal)
-            {
-                xNormalAddress = LabelName.Get(aTargetMethod);
-            }
-            else
-            {
-                xNormalAddress = LabelName.Get(aTargetMethod);
-
-                //throw new Exception("Call: non-concrete method called: '" + aTargetMethod.GetFullName() + "'");
-            }
+            string xNormalAddress = LabelName.Get(aTargetMethod);
             var xParameters = aTargetMethod.GetParameters();
-            int xArgCount = xParameters.Length;
 
             // todo: implement exception support
             uint xExtraStackSize = GetStackSizeToReservate(aTargetMethod);
-            if (!aTargetMethod.IsStatic && debugEnabled)
+            if (!aTargetMethod.IsStatic)
             {
                 uint xThisOffset = 0;
                 foreach (var xItem in xParameters)
@@ -113,7 +113,14 @@ namespace Cosmos.IL2CPU.X86.IL
                     xThisOffset += Align(SizeOfType(xItem.ParameterType), 4);
                 }
                 var stackOffsetToCheck = xThisOffset;
-                DoNullReferenceCheck(Assembler, debugEnabled, stackOffsetToCheck);
+                if (TypeIsReferenceType(aTargetMethod.DeclaringType))
+                {
+                    DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck + 4);
+                }
+                else
+                {
+                    DoNullReferenceCheck(Assembler, debugEnabled, (int)stackOffsetToCheck);
+                }
             }
 
             if (xExtraStackSize > 0)
@@ -129,13 +136,13 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             if (aCurrentMethod != null)
             {
-                EmitExceptionLogic(Assembler, aCurrentMethod, aCurrent, true,
-                                   delegate()
+                EmitExceptionLogic(Assembler, aCurrentMethod, aOp, true,
+                                   delegate
                                    {
-                                       var xStackOffsetBefore = aCurrent.StackOffsetBeforeExecution.Value;
+                                       var xStackOffsetBefore = aOp.StackOffsetBeforeExecution.Value;
 
                                        uint xPopSize = 0;
-                                       foreach (var type in aCurrent.StackPopTypes)
+                                       foreach (var type in aOp.StackPopTypes)
                                        {
                                            xPopSize += Align(SizeOfType(type), 4);
                                        }
@@ -150,12 +157,6 @@ namespace Cosmos.IL2CPU.X86.IL
                                    }, nextLabel);
 
             }
-            if (xMethodInfo == null
-                || SizeOfType(xMethodInfo.ReturnType) == 0)
-            {
-                return;
-            }
-
         }
     }
 }

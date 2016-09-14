@@ -8,6 +8,7 @@ using System.Linq;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -55,17 +56,12 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             int xExtraOffset = 0;
             var xFieldInfo = ResolveField(aDeclaringType, aFieldId, true);
-            bool xNeedsGC = TypeNeedsGC(aDeclaringType);
+            bool xNeedsGC = TypeIsReferenceType(aDeclaringType);
             if (xNeedsGC)
             {
                 xExtraOffset = 12;
             }
             return (int)(xExtraOffset + xFieldInfo.Offset);
-        }
-
-        public static bool TypeNeedsGC(Type aDeclaringType)
-        {
-            return aDeclaringType.IsClass && !aDeclaringType.IsValueType;
         }
 
         public static void DoExecute(Cosmos.Assembler.Assembler Assembler, Type aDeclaringType, string xFieldId, bool aDerefExternalField, bool debugEnabled, Type aTypeOnStack)
@@ -84,86 +80,76 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (aDeclaringType.IsValueType && aTypeOnStack == aDeclaringType)
             {
-                // the full struct is on the stack, instead of only a pointer to it
-                if (xFieldInfo.Size > 4)
-                {
-                    throw new Exception("For now, loading fields with sizes > 4 bytes from structs on the stack is not possible!");
-                }
+                #region Read struct value from stack
 
-                XS.Set(XSRegisters.EAX, 0);
+                // This is a 3-step process
+                // 1. Move the actual value below the stack (negative to ESP)
+                // 2. Move the value at the right spot of the stack (positive to stack)
+                // 3. Adjust stack to remove the struct
+                //
+                // This is necessary, as the value could otherwise overwrite the struct too soon.
 
-                switch (xFieldInfo.Size)
-                {
-                    case 1:
-                        XS.Set(XSRegisters.AL, XSRegisters.ESP, sourceDisplacement: xOffset);
-                        break;
+                var xTypeStorageSize = GetStorageSize(aDeclaringType);
+                var xFieldStorageSize = xFieldInfo.Size;
 
-                    case 2:
-                        XS.Set(XSRegisters.AX, XSRegisters.ESP, sourceDisplacement: xOffset);
-                        break;
+                // Step 1, Move the actual value below the stack (negative to ESP)
+                CopyValue(ESP, -(int)xFieldStorageSize, ESP, xOffset, xFieldStorageSize);
 
-                    case 3: //For Release
-                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: xOffset);
-                        XS.ShiftRight(XSRegisters.EAX, 8);
-                        break;
+                // Step 2 Move the value at the right spot of the stack (positive to stack)
+                var xStackOffset = (int)(Align(xTypeStorageSize, 4) - xFieldStorageSize);
+                CopyValue(ESP, xStackOffset, ESP, -(int)xFieldStorageSize, xFieldStorageSize);
 
-                    case 4:
-                        XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: xOffset);
-                        break;
+                // Step 3 Adjust stack to remove the struct
+                XS.Add(ESP, Align((uint)(xStackOffset), 4));
 
-                    default:
-                        throw new Exception(string.Format("Field size {0} not supported!", xFieldInfo.Size));
-                }
-
-                // now remove the struct from the stack
-                XS.Add(XSRegisters.ESP, Align(GetStorageSize(aDeclaringType), 4));
-
-                XS.Push(XSRegisters.EAX);
-
+                #endregion Read struct value from stack
                 return;
             }
-            DoNullReferenceCheck(Assembler, debugEnabled, 0);
-
-            XS.Pop(XSRegisters.ECX);
 
             // pushed size is always 4 or 8
             var xSize = xFieldInfo.Size;
-            if ((!aTypeOnStack.IsPointer) && (aDeclaringType.IsClass))
+            if (TypeIsReferenceType(aTypeOnStack))
             {
-                // convert to real memory address
-                XS.Set(XSRegisters.ECX, XSRegisters.ECX, sourceIsIndirect: true);
+                DoNullReferenceCheck(Assembler, debugEnabled, 4);
+                XS.Add(ESP, 4);
             }
-            XS.Add(XSRegisters.ECX, (uint)(xOffset));
+            else
+            {
+                DoNullReferenceCheck(Assembler, debugEnabled, 0);
+            }
+            XS.Pop(ECX);
+
+            XS.Add(ECX, (uint)(xOffset));
 
             if (xFieldInfo.IsExternalValue && aDerefExternalField)
             {
-                XS.Set(XSRegisters.ECX, XSRegisters.ECX, sourceIsIndirect: true);
+                XS.Set(ECX, ECX, sourceIsIndirect: true);
             }
 
             for (int i = 1; i <= (xSize / 4); i++)
             {
-                XS.Set(XSRegisters.EAX, XSRegisters.ECX, sourceDisplacement: (int)(xSize - (i * 4)));
-                XS.Push(XSRegisters.EAX);
+                XS.Set(EAX, ECX, sourceDisplacement: (int)(xSize - (i * 4)));
+                XS.Push(EAX);
             }
 
-            XS.Set(XSRegisters.EAX, 0);
+            XS.Set(EAX, 0);
 
             switch (xSize % 4)
             {
                 case 1:
-                    XS.Set(XSRegisters.AL, XSRegisters.ECX, sourceIsIndirect: true);
-                    XS.Push(XSRegisters.EAX);
+                    XS.Set(AL, ECX, sourceIsIndirect: true);
+                    XS.Push(EAX);
                     break;
 
                 case 2:
-                    XS.Set(XSRegisters.AX, XSRegisters.ECX, sourceIsIndirect: true);
-                    XS.Push(XSRegisters.EAX);
+                    XS.Set(AX, ECX, sourceIsIndirect: true);
+                    XS.Push(EAX);
                     break;
 
                 case 3: //For Release
-                    XS.Set(XSRegisters.EAX, XSRegisters.ECX, sourceIsIndirect: true);
-                    XS.ShiftRight(XSRegisters.EAX, 8);
-                    XS.Push(XSRegisters.EAX);
+                    XS.Set(EAX, ECX, sourceIsIndirect: true);
+                    XS.ShiftRight(EAX, 8);
+                    XS.Push(EAX);
                     break;
 
                 case 0:

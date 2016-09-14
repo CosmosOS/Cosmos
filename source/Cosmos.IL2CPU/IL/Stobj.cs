@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             var xFieldSize = SizeOfType(aOpCode.StackPopTypes[0]);
             var xRoundedSize = Align(xFieldSize, 4);
-            DoNullReferenceCheck(Assembler, DebugEnabled, xRoundedSize);
+            DoNullReferenceCheck(Assembler, DebugEnabled, (int)xRoundedSize);
 
             XS.Set(XSRegisters.ECX, XSRegisters.ESP, sourceDisplacement: checked((int)xRoundedSize));
             for( int i = 0; i < ( xFieldSize / 4 ); i++ )

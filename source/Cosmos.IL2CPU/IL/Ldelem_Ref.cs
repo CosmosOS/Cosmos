@@ -1,45 +1,50 @@
 using System;
+using System.Linq;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.Plugs.System;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-  [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldelem_Ref)]
+  [OpCode(ILOpCode.Code.Ldelem_Ref)]
   public class Ldelem_Ref : ILOp
   {
-    public Ldelem_Ref(Cosmos.Assembler.Assembler aAsmblr)
+    public Ldelem_Ref(Assembler.Assembler aAsmblr)
         : base(aAsmblr)
     {
     }
 
-    public static void Assemble(Cosmos.Assembler.Assembler aAssembler, uint aElementSize, bool isSigned, bool debugEnabled)
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
-      DoNullReferenceCheck(aAssembler, debugEnabled, 4);
-      //if (aElementSize <= 0 || aElementSize > 8 || (aElementSize > 4 && aElementSize < 8))
-      //{
-      //    throw new Exception("Unsupported size for Ldelem_Ref: " + aElementSize);
-      //}
+      Assemble(Assembler, 8, false, aMethod, aOpCode, DebugEnabled);
+    }
 
-      XS.Pop(XSRegisters.EAX);
-      XS.Set(XSRegisters.EDX, aElementSize);
-      XS.Multiply(XSRegisters.EDX);
+    public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, bool isSigned, MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
+    {
+      //  stack     = index
+      //  stack + 2 = array
+      DoNullReferenceCheck(aAssembler, debugEnabled, 8);
 
-      XS.Add(XSRegisters.EAX, (ObjectImpl.FieldDataOffset + 4));
+      // calculate element offset into array memory (including header)
+      XS.Pop(EAX);
+      XS.Set(EDX, aElementSize);
+      XS.Multiply(EDX);
+      XS.Add(EAX, ObjectImpl.FieldDataOffset + 4);
 
       if (aElementSize > 4)
       {
         // we start copying the last bytes
-        XS.Add(XSRegisters.EAX, aElementSize - 4);
+        XS.Add(EAX, aElementSize - 4);
       }
 
-      // pop the array
-      XS.Pop(XSRegisters.EDX);
-      // convert to real memory address
-      XS.Set(XSRegisters.EDX, XSRegisters.EDX, sourceIsIndirect: true);
+      // pop the array now
+      XS.Add(ESP, 4);
+      XS.Pop(EDX);
 
-      XS.Add(XSRegisters.EDX, XSRegisters.EAX);
+      XS.Add(EDX, EAX);
 
       var xSizeLeft = aElementSize;
       while (xSizeLeft > 0)
@@ -49,6 +54,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
           xCurrentStep = xSizeLeft % 4;
         }
+
         xSizeLeft = xSizeLeft - xCurrentStep;
         switch (xCurrentStep)
         {
@@ -61,7 +67,7 @@ namespace Cosmos.IL2CPU.X86.IL
             {
               new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 8, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
             }
-            XS.Push(XSRegisters.ECX);
+            XS.Push(ECX);
             break;
           case 2:
             if (isSigned)
@@ -72,12 +78,12 @@ namespace Cosmos.IL2CPU.X86.IL
             {
               new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 16, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
             }
-            XS.Push(XSRegisters.ECX);
+            XS.Push(ECX);
             break;
           case 4:
             // copy a full dword
-            XS.Push(XSRegisters.EDX, isIndirect: true);
-            XS.Sub(XSRegisters.EDX, 4); // move to previous 4 bytes
+            XS.Push(EDX, isIndirect: true);
+            XS.Sub(EDX, 4); // move to previous 4 bytes
             break;
             //case 8:
             //    new CPUx86.Push {DestinationReg = CPUx86.Registers.EDX, DestinationDisplacement = 4, DestinationIsIndirect = true};
@@ -85,11 +91,6 @@ namespace Cosmos.IL2CPU.X86.IL
             //    break;
         }
       }
-    }
-
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
-    {
-      Assemble(Assembler, 4, false, DebugEnabled);
     }
   }
 }
