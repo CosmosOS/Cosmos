@@ -370,7 +370,14 @@ namespace Cosmos.Debug.VSDebugEngine
 
         private void DbgCmdNullReferenceOccurred(uint lastEIPAddress)
         {
-            MessageBox.Show(String.Format("NullReferenceException occurred at address 0x{0:X8}! Halting now.", lastEIPAddress));
+            string labels = String.Empty;
+
+            foreach (string label in mDebugInfoDb.GetLabels(lastEIPAddress))
+            {
+                labels += label + "\r\n";
+            }
+
+            MessageBox.Show(String.Format("NullReferenceException occurred at address 0x{0:X8}! Halting now.\r\nLabels for address: \r\n{1}", lastEIPAddress, labels));
         }
 
         private void DbgCmdMessageBox(string message)
