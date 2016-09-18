@@ -64,8 +64,24 @@ namespace Cosmos.TestRunner.Core
                                                       };
             debugConnector.CmdNullReferenceOccurred = a =>
                 {
-                    OutputHandler.LogMessage("Null Reference Exception occurred at: 0x" + a.ToString("X8"));
-                    OutputHandler.SetKernelTestResult(false, "Null Reference Exception occurred at: 0x" + a.ToString("X8"));
+                    if(ReadMapToDebugInfo)
+                    {
+                        string labels = String.Empty;
+
+                        foreach (string label in mDebugInfoDb.GetLabels(a))
+                        {
+                            labels += "\r\n" + label;
+                        }
+
+                        OutputHandler.LogMessage(String.Format("NullReferenceException occurred at address 0x{0:X8}! Halting now.\r\nLabels for address: {1}", a, labels));
+                        OutputHandler.SetKernelTestResult(false, String.Format("NullReferenceException occurred at address 0x{0:X8}! Halting now.\r\nLabels for address: {1}", a, labels));
+                    }
+                    else
+                    {
+                        OutputHandler.LogMessage(String.Format("NullReferenceException occurred at address 0x{0:X8}! Halting now.", a));
+                        OutputHandler.SetKernelTestResult(false, String.Format("NullReferenceException occurred at address 0x{0:X8}! Halting now.", a));
+                    }
+
                     mKernelResultSet = true;
                     mKernelRunning = false;
                 };

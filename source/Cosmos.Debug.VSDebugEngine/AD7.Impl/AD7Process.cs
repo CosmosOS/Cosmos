@@ -374,10 +374,10 @@ namespace Cosmos.Debug.VSDebugEngine
 
             foreach (string label in mDebugInfoDb.GetLabels(lastEIPAddress))
             {
-                labels += label + "\r\n";
+                labels += "\r\n" + label;
             }
 
-            MessageBox.Show(String.Format("NullReferenceException occurred at address 0x{0:X8}! Halting now.\r\nLabels for address: \r\n{1}", lastEIPAddress, labels));
+            MessageBox.Show(String.Format("NullReferenceException occurred at address 0x{0:X8}! Halting now.\r\nLabels for address: {1}", lastEIPAddress, labels));
         }
 
         private void DbgCmdMessageBox(string message)
