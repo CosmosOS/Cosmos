@@ -35,20 +35,19 @@ namespace Cosmos.TestRunner.Core
 
                 RunTask("IL2CPU", () => RunIL2CPU(assemblyFileName, xAssemblyFile));
                 RunTask("Nasm", () => RunNasm(xAssemblyFile, xObjectFile, configuration.IsELF));
+
                 if (configuration.IsELF)
                 {
                     File.Move(xObjectFile, xTempObjectFile);
 
                     RunTask("Ld", () => RunLd(xTempObjectFile, xObjectFile));
                     RunTask("ExtractMapFromElfFile", () => RunExtractMapFromElfFile(mBaseWorkingDirectory, xObjectFile));
-
-                    if (ReadMapToDebugInfo)
-                    {
-                        File.Copy(Path.Combine(mBaseWorkingDirectory, "Kernel.map"), Path.Combine(mBaseWorkingDirectory, "main.map"));
-
-                        RunTask("ReadNAsmMapToDebugInfo", () => RunReadNAsmMapToDebugInfo(xDebugFile));
-                    }
                 }
+                else if(ReadMapToDebugInfo)
+                {
+                    RunTask("ReadNAsmMapToDebugInfo", () => RunReadNAsmMapToDebugInfo(xDebugFile));
+                }
+
                 var xHarddiskPath = Path.Combine(mBaseWorkingDirectory, "Harddisk.vmdk");
                 var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "VMware", "Workstation", "Filesystem.vmdk");
                 File.Copy(xOriginalHarddiskPath, xHarddiskPath);
@@ -87,7 +86,7 @@ namespace Cosmos.TestRunner.Core
                 OutputHandler.ExecuteKernelEnd(assemblyFileName);
 
             }
-            
+
             xResult = mKernelResult;
             return xResult;
         }

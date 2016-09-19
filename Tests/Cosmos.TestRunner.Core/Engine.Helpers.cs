@@ -111,7 +111,7 @@ namespace Cosmos.TestRunner.Core
 
         private void RunReadNAsmMapToDebugInfo(string debugInfoFile)
         {
-            var xReadNAsmMapToDebugInfoTask = new ReadNAsmMapToDebugInfo();
+            var xReadNAsmMapToDebugInfoTask = new ReadNAsmMapToDebugInfoTask();
 
             xReadNAsmMapToDebugInfoTask.DebugInfoFile = debugInfoFile;
             xReadNAsmMapToDebugInfoTask.InputBaseDir = mBaseWorkingDirectory;

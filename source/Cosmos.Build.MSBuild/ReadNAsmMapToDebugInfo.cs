@@ -49,7 +49,7 @@ namespace Cosmos.Build.MSBuild {
       }
     }
 
-    private static List<Label> ParseMapFile(string inputBaseDir)
+    public static List<Label> ParseMapFile(string inputBaseDir)
     {
       var xSourceStrings = File.ReadAllLines(Path.Combine(inputBaseDir, "main.map"));
       var xSource = new List<Label>();
@@ -99,5 +99,4 @@ namespace Cosmos.Build.MSBuild {
       return xSource;
     }
   }
-
 }
