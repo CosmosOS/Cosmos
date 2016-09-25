@@ -14,7 +14,7 @@ namespace Cosmos.System.Plugs.System
 #warning I don't know if this is correctly plugged, but it's here to see other plugs missing for Zork to work
         public static bool Equals(ValueType aThis, object aThat)
         {
-            return aThis == aThat;
+            return (aThis.GetType() == aThat.GetType()) && (aThis == aThat);
         }
 
         public static int GetHashCode(ValueType aThis)
