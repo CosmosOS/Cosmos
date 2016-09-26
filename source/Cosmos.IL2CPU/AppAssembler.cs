@@ -113,6 +113,8 @@ namespace Cosmos.IL2CPU
                         xIdxOffset++;
                     }
 
+                    string x = aMethod.MethodBase.Name;
+                    string y = aMethod.MethodBase.DeclaringType.Name;
                     var xParams = aMethod.MethodBase.GetParameters();
                     var xParamCount = (ushort)xParams.Length;
 

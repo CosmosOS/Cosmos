@@ -25,6 +25,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             {
                 throw new Exception("Events with return type not yet supported!");
             }
+            XS.Exchange(XSRegisters.BX, XSRegisters.BX);
             XS.Comment("XXXXXXX");
 
             /*
@@ -44,6 +45,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
             XS.Push(XSRegisters.EAX);//addrof this
             XS.Call(LabelName.Get(xGetInvocationListMethod));
             XS.Comment("get address from return value -> eax");
+            XS.Add(XSRegisters.ESP, 4);
             XS.Pop(XSRegisters.EAX);
             ;//list
             XS.Comment("eax+=8 is where the offset where an array's count is");
@@ -112,6 +114,7 @@ namespace Cosmos.Core.Plugs.System.Assemblers
                 XS.Add(XSRegisters.EAX, 4);
                 XS.Jump(".BEGIN_OF_LOOP");
             }
+            XS.Exchange(XSRegisters.BX, XSRegisters.BX);
             XS.Label(".END_OF_INVOKE_");
             XS.Comment("get the return value");
             XS.Set(XSRegisters.EDX, XSRegisters.EBP, sourceDisplacement: Ldarg.GetArgumentDisplacement(xMethodInfo, 0));//addrof the delegate
