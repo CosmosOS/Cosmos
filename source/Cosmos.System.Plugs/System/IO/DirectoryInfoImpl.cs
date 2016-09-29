@@ -36,12 +36,6 @@ namespace Cosmos.System.Plugs.System.IO
             Global.mFileSystemDebugger.SendInternal(aPath);
 
             aStorage = VFSManager.GetDirectory(aPath);
-
-            if (aStorage == null)
-            {
-                throw new NullReferenceException("Failed to create DirectoryInfo: Directory '" + aPath + "' doesn't exist");
-            }
-
             aFullPath = aPath;
             aName = Path.GetFileName(aPath);
         }
