@@ -42,8 +42,8 @@ namespace Cosmos.System.Plugs.System.IO
                 throw new NullReferenceException("Failed to create DirectoryInfo: Directory '" + aPath + "' doesn't exist");
             }
 
-            aFullPath = aStorage.mFullPath;
-            aName = aStorage.mName;
+            aFullPath = aPath;
+            aName = Path.GetFileName(aPath);
         }
 
         public static string get_Name(DirectoryInfo aThis)
