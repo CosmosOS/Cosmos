@@ -21,8 +21,6 @@ namespace Cosmos.IL2CPU.X86.IL
     {
       int xAlignedSize = (int)Align((uint)aSize, 4);
 
-      XS.Exchange(XSRegisters.BX, XSRegisters.BX);
-
       XS.Comment("address at: [esp]");
       DoNullReferenceCheck(aAssembler, debugEnabled, 0);
 

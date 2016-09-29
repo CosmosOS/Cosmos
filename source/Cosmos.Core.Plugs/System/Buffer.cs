@@ -1,6 +1,8 @@
 ﻿using System;
 
 using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs.Assemblers;
+using Cosmos.IL2CPU.Plugs.Assemblers.Buffer;
 
 namespace Cosmos.Core.Plugs.System
 {
@@ -140,7 +142,7 @@ namespace Cosmos.Core.Plugs.System
             }
         }
 
-        [PlugMethod(Assembler = typeof(Assemblers.Buffer_BlockCopy))]
+        [PlugMethod(Assembler = typeof(BufferBlockCopyAsm))]
         public static void BlockCopy(Array src, int srcOffset, Array dst, int dstOffset, int count)
         {
         }

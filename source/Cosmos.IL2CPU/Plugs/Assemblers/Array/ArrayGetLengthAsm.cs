@@ -1,10 +1,8 @@
-using Cosmos.Assembler.x86;
-using Cosmos.IL2CPU.Plugs;
 using XSharp.Compiler;
 
-namespace Cosmos.Core.Plugs.System.Assemblers
+namespace Cosmos.IL2CPU.Plugs.Assemblers.Array
 {
-    public class Array_get_Length : AssemblerMethod
+    public class ArrayGetLengthAsm : AssemblerMethod
     {
         public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
         {
