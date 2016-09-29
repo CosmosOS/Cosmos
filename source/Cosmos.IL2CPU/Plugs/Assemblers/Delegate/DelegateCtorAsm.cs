@@ -1,17 +1,15 @@
-using System;
-
-using Cosmos.Assembler;
 using Cosmos.IL2CPU.X86.IL;
 using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
-using NewAssembler = Cosmos.Assembler.Assembler;
 
-namespace Cosmos.IL2CPU.Plugs.Assemblers {
-  public class CtorImplAssembler: AssemblerMethod {
-    public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo) {
+namespace Cosmos.IL2CPU.Plugs.Assemblers.Delegate
+{
+    public class DelegateCtorAsm : AssemblerMethod
+    {
+        public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+        {
             // method signature: $this, object @object, IntPtr method
+            var xAssembler = aAssembler;
             var xMethodInfo = (MethodInfo)aMethodInfo;
-            var xAssembler = (NewAssembler)aAssembler;
             XS.Comment("Save target ($this) to field");
             XS.Comment("-- ldarg 0");
             Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
@@ -32,13 +30,13 @@ namespace Cosmos.IL2CPU.Plugs.Assemblers {
             {
                 xSize += ILOp.Align(ILOp.SizeOfType(xArg.ParameterType), 4);
             }
+
             XS.Comment("-- ldarg 0");
             Ldarg.DoExecute(xAssembler, xMethodInfo, 0);
             XS.Comment("-- push argsize");
             XS.Push(xSize);
             XS.Comment("-- stfld ArgSize");
             Stfld.DoExecute(xAssembler, xMethodInfo, "$$ArgSize$$", xMethodInfo.MethodBase.DeclaringType, true, false);
-
         }
     }
 }

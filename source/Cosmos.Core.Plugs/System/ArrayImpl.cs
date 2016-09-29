@@ -1,6 +1,7 @@
 ﻿using System;
-
 using Cosmos.IL2CPU.Plugs;
+using Cosmos.IL2CPU.Plugs.Assemblers;
+using Cosmos.IL2CPU.Plugs.Assemblers.Array;
 
 namespace Cosmos.Core.Plugs.System
 {
@@ -36,7 +37,7 @@ namespace Cosmos.Core.Plugs.System
             return aThis.Length;
         }
 
-        [PlugMethod(Assembler = typeof(Assemblers.Array_get_Length))]
+        [PlugMethod(Assembler = typeof(ArrayGetLengthAsm))]
         public static int get_Length(Array aThis)
         {
             //aThis += 2;
@@ -85,12 +86,12 @@ namespace Cosmos.Core.Plugs.System
             return false;
         }
 
-        [PlugMethod(Assembler = typeof(Assemblers.Array_InternalCopy))]
+        [PlugMethod(Assembler = typeof(ArrayInternalCopyAsm))]
         public static void Copy(Array sourceArray, int sourceIndex, Array destinationArray, int destinationIndex, int length, bool reliable)
         {
         }
 
-        public unsafe static int get_Rank(int* aThis)
+        public static unsafe int get_Rank(int* aThis)
         {
             return 1;
         }
@@ -120,9 +121,9 @@ namespace Cosmos.Core.Plugs.System
                 case 2:
                     return *((ushort*)aThis);
                 case 3:
-                    return (*((uint*)aThis)) & 0x0FFFFFFF;
+                    return (*aThis) & 0x0FFFFFFF;
                 case 4:
-                    return *((uint*)aThis);
+                    return *aThis;
             }
             throw new NotSupportedException("GetValue not supported in this situation!");
         }
