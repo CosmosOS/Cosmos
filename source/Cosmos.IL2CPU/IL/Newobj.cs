@@ -144,7 +144,7 @@ namespace Cosmos.IL2CPU.X86.IL
                              && xParams[2].ParameterType == typeof(int))
                     {
                         xHasCalcSize = true;
-                        XS.Set(EAX, ESP, sourceDisplacement: 4, sourceIsIndirect: true);
+                        XS.Set(EAX, ESP, sourceIsIndirect: true);
                         XS.ShiftLeft(EAX, 1);
                         XS.Push(EAX);
                     }
@@ -153,7 +153,7 @@ namespace Cosmos.IL2CPU.X86.IL
                              && xParams[1].ParameterType == typeof(int))
                     {
                         xHasCalcSize = true;
-                        XS.Set(EAX, ESP, sourceDisplacement: 4, sourceIsIndirect: true);
+                        XS.Set(EAX, ESP, sourceIsIndirect: true);
                         XS.ShiftLeft(EAX, 1);
                         XS.Push(EAX);
                     }
