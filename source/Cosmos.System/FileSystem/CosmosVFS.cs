@@ -235,6 +235,7 @@ namespace Cosmos.System.FileSystem
             }
             catch (Exception)
             {
+                Global.mFileSystemDebugger.SendInternal("CosmosVFS.GetDirectory - DoGetDirectoryEntry failed, returning null. aPath = " + aPath);
                 return null;
             }
             throw new Exception(aPath + " was found, but is not a directory.");
@@ -259,6 +260,7 @@ namespace Cosmos.System.FileSystem
             }
             catch (Exception)
             {
+                Global.mFileSystemDebugger.SendInternal("CosmosVFS.GetFile - DoGetDirectoryEntry failed, returning null. aPath = " + aPath);
                 return null;
             }
             throw new Exception(aPath + " was found, but is not a file.");

@@ -140,14 +140,19 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             }
 
             string xNameString = new string(xName);
+
             SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.ShortName, xNameString);
+
             if (mEntryType == DirectoryEntryTypeEnum.Directory)
             {
                 SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.Attributes, FatDirectoryEntryAttributeConsts.Directory);
             }
+
             SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterHigh, (uint)(mFirstClusterNum >> 16));
             SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterLow, (uint)(mFirstClusterNum & 0xFFFF));
+
             byte[] xData = GetDirectoryEntryData();
+
             SetDirectoryEntryData(xData);
         }
 
@@ -172,7 +177,9 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 Global.mFileSystemDebugger.SendInternal(xEntryHeaderDataOffset);
 
                 var xNewEntry = new FatDirectoryEntry((FatFileSystem)mFileSystem, this, xFullPath, aName, 0, xFirstCluster, xEntryHeaderDataOffset, aType);
+
                 xNewEntry.AllocateDirectoryEntry();
+
                 return xNewEntry;
             }
             throw new ArgumentOutOfRangeException(nameof(aType), "Unknown directory entry type.");
@@ -205,21 +212,25 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 if (xAttrib == FatDirectoryEntryAttributeConsts.LongName)
                 {
                     byte xType = xData[i + 12];
+
                     if (xStatus == FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry)
                     {
                         Global.mFileSystemDebugger.SendInternal("<DELETED> : Attrib = " + xAttrib + ", Status = " + xStatus);
                         continue;
                     }
+
                     if (xType == 0)
                     {
                         if ((xStatus & 0x40) > 0)
                         {
                             xLongName = "";
                         }
+
                         //TODO: Check LDIR_Ord for ordering and throw exception
                         // if entries are found out of order.
                         // Also save buffer and only copy name if a end Ord marker is found.
                         string xLongPart = xData.GetUtf16String(i + 1, 5);
+
                         // We have to check the length because 0xFFFF is a valid Unicode codepoint.
                         // So we only want to stop if the 0xFFFF is AFTER a 0x0000. We can determin
                         // this by also looking at the length. Since we short circuit the or, the length
@@ -227,11 +238,13 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                         if (xData.ToUInt16(i + 14) != 0xFFFF || xLongPart.Length == 5)
                         {
                             xLongPart = xLongPart + xData.GetUtf16String(i + 14, 6);
+
                             if (xData.ToUInt16(i + 28) != 0xFFFF || xLongPart.Length == 11)
                             {
                                 xLongPart = xLongPart + xData.GetUtf16String(i + 28, 2);
                             }
                         }
+
                         xLongName = xLongPart + xLongName;
                         xLongPart = null;
                         //TODO: LDIR_Chksum
@@ -240,11 +253,13 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 else
                 {
                     xName = xLongName;
+
                     if (xStatus == 0x00)
                     {
                         Global.mFileSystemDebugger.SendInternal("<EOF> : Attrib = " + xAttrib + ", Status = " + xStatus);
                         break;
                     }
+
                     switch (xStatus)
                     {
                         case 0x05:
@@ -266,6 +281,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
                                     //If there are trailing periods
                                     int nameIndex = xName.Length - 1;
+
                                     if (xName[nameIndex] == '.')
                                     {
                                         //Search backwards till we find the first non-period character
@@ -279,6 +295,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                                         //Substring to remove the periods
                                         xName = xName.Substring(0, nameIndex + 1);
                                     }
+
                                     xLongName = "";
                                 }
                                 else
@@ -286,6 +303,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                                     string xEntry = xData.GetAsciiString(i, 11);
                                     xName = xEntry.Substring(0, 8).TrimEnd();
                                     string xExt = xEntry.Substring(8, 3).TrimEnd();
+
                                     if (xExt.Length > 0)
                                     {
                                         xName = xName + "." + xExt;
@@ -298,11 +316,8 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 uint xFirstCluster = (uint)(xData.ToUInt16(i + 20) << 16 | xData.ToUInt16(i + 26));
 
                 int xTest = xAttrib & (FatDirectoryEntryAttributeConsts.Directory | FatDirectoryEntryAttributeConsts.VolumeID);
-                if (xStatus == FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry)
-                {
-                    // deleted file
-                }
-                else if (xAttrib == FatDirectoryEntryAttributeConsts.LongName)
+
+                if (xAttrib == FatDirectoryEntryAttributeConsts.LongName)
                 {
                     // skip adding, as it's a LongFileName entry, meaning the next normal entry is the item with the name.
                     //Global.mFileSystemDebugger.SendInternal($"Entry was a Long FileName entry. Current LongName = '{xLongName}'");
@@ -310,10 +325,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 else if (xTest == 0)
                 {
                     uint xSize = xData.ToUInt32(i + 28);
+
                     if (xSize == 0 && xName.Length == 0)
                     {
                         continue;
                     }
+
                     string xFullPath = Path.Combine(mFullPath, xName);
                     var xEntry = new FatDirectoryEntry(((FatFileSystem)mFileSystem), xParent, xFullPath, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.File);
                     xResult.Add(xEntry);
@@ -419,7 +436,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                     uint offset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
                     Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
                     ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
-                }
+               }
             }
             else
             {
@@ -445,7 +462,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                     Global.mFileSystemDebugger.SendInternal(offset);
                     Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
                     ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
-                }
+               }
             }
             else
             {
@@ -464,10 +481,12 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             {
                 var xValue = new byte[aEntryMetadata.DataLength];
                 xValue = aValue.GetUtf8Bytes(0, aEntryMetadata.DataLength);
+
                 uint offset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
                 Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
+
                 ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
-            }
+           }
         }
     }
 }
