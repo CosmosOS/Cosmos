@@ -172,9 +172,15 @@ namespace Cosmos.Build.Builder
         protected bool IsVMWareInstalled()
         {
             //Check registry keys
-            if (CheckForInstall("VMware Workstation", false)) return true;
-            if (CheckForInstall("VMware Player", false)) return true;
-            if (CheckForInstall("VMwarePlayer_x64", false)) return true;
+            if (CheckForInstall("VMware Workstation", false)) {
+				return true;
+			}
+            if (CheckForInstall("VMware Player", false)) {
+				return true;
+			}
+            if (CheckForInstall("VMwarePlayer_x64", false)) {
+				return true;
+			}
 
             try //Try/catch block since the reg key might not exist, we might not have perms etc.
             {
