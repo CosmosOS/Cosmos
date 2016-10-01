@@ -180,7 +180,8 @@ namespace Cosmos.Build.Builder
             {
                 using (var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VMware, Inc.\VMware Player"))
                 {
-                    return (key.GetValue("ProductCode") != null); //On successful install, ProductCode should be set (we don't care what the value is, but we care that it exists)
+                    return true; //Just assume that because we have the key, we've installed
+                    //return (key.GetValue("ProductCode") != null); //On successful install, ProductCode should be set (we don't care what the value is, but we care that it exists)
                 }
             }
             catch
