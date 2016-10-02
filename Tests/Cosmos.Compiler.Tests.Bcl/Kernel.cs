@@ -21,25 +21,26 @@ namespace Cosmos.Compiler.Tests.Bcl
             try
             {
                 mDebugger.Send("Run");
-                DelegatesTest.Execute();
 
-                //CSharp.WhileLoopTests.Execute();
-                //ObjectTests.Execute();
-                //StringTest.Execute();
-                //ByteTest.Execute();
-                //SByteTest.Execute();
-                //Int16Test.Execute();
-                //UInt16Test.Execute();
-                //Int32Test.Execute();
-                //UInt32Test.Execute();
-                //Int64Test.Execute();
-                //UInt64Test.Execute();
-                //CharTest.Execute();
-                //BooleanTest.Execute();
-                //SingleTest.Execute();
-                //DoubleTest.Execute();
-                //BitConverterTest.Execute();
-                //UnsafeCodeTest.Execute();
+                CSharp.WhileLoopTests.Execute();
+
+                //ObjectTests.Execute(); Stack corruption on method Clone()
+                StringTest.Execute();
+                ByteTest.Execute();
+                SByteTest.Execute();
+                Int16Test.Execute();
+                UInt16Test.Execute();
+                Int32Test.Execute();
+                UInt32Test.Execute();
+                Int64Test.Execute();
+                UInt64Test.Execute();
+                CharTest.Execute();
+                BooleanTest.Execute();
+                SingleTest.Execute();
+                //DoubleTest.Execute(); Failing NaN ToString: returns "0"
+                BitConverterTest.Execute();
+                UnsafeCodeTest.Execute();
+                DelegatesTest.Execute();
 
 #if false
                 DecimalTest.Execute();
