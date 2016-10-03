@@ -179,7 +179,7 @@ namespace Cosmos.TestRunner.Core
 
                 if (mKernelResultSet)
                 {
-                    OutputHandler.SetKernelTestResult(true, null);
+                    //OutputHandler.SetKernelTestResult(true, null);
                     OutputHandler.SetKernelSucceededAssertionsCount(mSucceededAssertions);
                 }
                 else
