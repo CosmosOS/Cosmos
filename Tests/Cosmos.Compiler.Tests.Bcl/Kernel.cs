@@ -37,7 +37,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 CharTest.Execute();
                 BooleanTest.Execute();
                 SingleTest.Execute();
-                //DoubleTest.Execute(); Failing NaN ToString: returns "0"
+                DoubleTest.Execute();
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();

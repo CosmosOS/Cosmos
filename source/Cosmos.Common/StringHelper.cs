@@ -318,22 +318,21 @@ namespace Cosmos.Common
 
             ulong intPart = 0, fracPart = 0;
 
-            if (double.IsPositiveInfinity(aValue))
-            {
-                return "∞";
-            }
-            else if (double.IsNegativeInfinity(aValue))
-            {
-                return "-∞";
-            }
-            else if (double.IsNaN(aValue))
-            {
-                return "NaN";
-            }
-
             /* First we handle the special cases INF, NaN, 0 and denormalized float */
             switch (exp)
             {
+                case 0x07ff:
+                    if (mantissa == 0)
+                    {
+                        if (isNeg)
+                            return "-∞";
+                        else
+                            return "∞";
+                    }
+                    else
+                        /* It could exist -NaN but this is always printed as NaN */
+                        return "NaN";
+
                 /* 0 or denormalized double? */
                 case 0x0000:
                     if (mantissa == 0)
