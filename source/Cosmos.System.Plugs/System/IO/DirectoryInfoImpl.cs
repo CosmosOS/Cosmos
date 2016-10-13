@@ -36,13 +36,13 @@ namespace Cosmos.System.Plugs.System.IO
             Global.mFileSystemDebugger.SendInternal(aPath);
 
             aStorage = VFSManager.GetDirectory(aPath);
-            aFullPath = aStorage.mFullPath;
-            aName = aStorage.mName;
+            aFullPath = aPath;
+            aName = Path.GetFileName(aPath);
         }
 
         public static string get_Name(DirectoryInfo aThis)
         {
-            Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.get_Name : Nane = {aThis}");
+            Global.mFileSystemDebugger.SendInternal($"DirectoryInfo.get_Name : Name = {aThis}");
             return aThis.ToString();
         }
 
