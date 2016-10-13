@@ -25,6 +25,7 @@ namespace Cosmos.Core.Memory.Old
         }
 
         private static bool mInitialized = false;
+
         internal static void EnsureIsInitialized()
         {
             if (!mInitialized)

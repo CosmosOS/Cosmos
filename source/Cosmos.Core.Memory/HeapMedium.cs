@@ -14,13 +14,5 @@ namespace Cosmos.Core.Memory {
 
     static public void Init() {
     }
-
-    static public byte* Alloc(Native aSize) {
-      return HeapLarge.Alloc(aSize);
-    }
-
-    static public void Free(void* aPtr) {
-      HeapLarge.Free(aPtr);
-    }
   }
 }

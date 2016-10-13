@@ -8,10 +8,10 @@ using Cosmos.Assembler;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Debug.Common;
-using Cosmos.IL2CPU.X86.IL;
+using Cosmos.IL2CPU.IL.x86;
 using System.Runtime.InteropServices;
 using XSharp.Compiler;
-using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
+using FieldInfo = Cosmos.IL2CPU.IL.x86.FieldInfo;
 using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU
@@ -245,9 +245,9 @@ namespace Cosmos.IL2CPU
       };
     }
 
-    private static void DoGetFieldsInfo(Type aType, List<X86.IL.FieldInfo> aFields, bool includeStatic)
+    private static void DoGetFieldsInfo(Type aType, List<FieldInfo> aFields, bool includeStatic)
     {
-      var xCurList = new Dictionary<string, X86.IL.FieldInfo>();
+      var xCurList = new Dictionary<string, FieldInfo>();
       var xBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
       if (includeStatic)
       {
@@ -267,7 +267,7 @@ namespace Cosmos.IL2CPU
 
         string xId = xField.GetFullName();
 
-        var xInfo = new X86.IL.FieldInfo(xId, SizeOfType(xField.FieldType), aType, xField.FieldType);
+        var xInfo = new FieldInfo(xId, SizeOfType(xField.FieldType), aType, xField.FieldType);
         xInfo.IsStatic = xField.IsStatic;
         xInfo.Field = xField;
 
@@ -288,7 +288,7 @@ namespace Cosmos.IL2CPU
       {
         foreach (var xPlugField in xPlugFields)
         {
-          X86.IL.FieldInfo xPluggedField = null;
+          FieldInfo xPluggedField = null;
           if (xCurList.TryGetValue(xPlugField.Key, out xPluggedField))
           {
             // plugfield modifies an already existing field
@@ -303,7 +303,7 @@ namespace Cosmos.IL2CPU
           }
           else
           {
-            xPluggedField = new X86.IL.FieldInfo(xPlugField.Value.FieldId, SizeOfType(xPlugField.Value.FieldType), aType,
+            xPluggedField = new FieldInfo(xPlugField.Value.FieldId, SizeOfType(xPlugField.Value.FieldType), aType,
               xPlugField.Value.FieldType);
             aFields.Add(xPluggedField);
           }
@@ -316,9 +316,9 @@ namespace Cosmos.IL2CPU
       }
     }
 
-    public static List<X86.IL.FieldInfo> GetFieldsInfo(Type aType, bool includeStatic)
+    public static List<FieldInfo> GetFieldsInfo(Type aType, bool includeStatic)
     {
-      var xResult = new List<X86.IL.FieldInfo>(16);
+      var xResult = new List<FieldInfo>(16);
       DoGetFieldsInfo(aType, xResult, includeStatic);
       xResult.Reverse();
       uint xOffset = 0;
@@ -350,7 +350,7 @@ namespace Cosmos.IL2CPU
       return xResult;
     }
 
-    private static void GetFieldMapping(List<X86.IL.FieldInfo> aFieldInfs, List<DebugInfo.Field_Map> aFieldMapping,
+    private static void GetFieldMapping(List<FieldInfo> aFieldInfs, List<DebugInfo.Field_Map> aFieldMapping,
       Type aType)
     {
       DebugInfo.Field_Map xFMap = new DebugInfo.Field_Map();
@@ -362,7 +362,7 @@ namespace Cosmos.IL2CPU
       aFieldMapping.Add(xFMap);
     }
 
-    private static string GetNameForField(X86.IL.FieldInfo inf)
+    private static string GetNameForField(FieldInfo inf)
     {
       // First we need to separate out the
       // actual name of field from the type of the field.

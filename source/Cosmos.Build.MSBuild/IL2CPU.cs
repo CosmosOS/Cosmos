@@ -10,7 +10,6 @@ using Cosmos.Assembler.x86;
 using System.IO;
 using Cosmos.Build.Common;
 using Microsoft.Win32;
-using Cosmos.IL2CPU.X86;
 using Cosmos.IL2CPU;
 using System.Reflection.Emit;
 using System.Diagnostics;
