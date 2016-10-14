@@ -46,7 +46,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             result = value.ToString();
             expectedResult = "NaN";
 
-            Assert.IsTrue((result == expectedResult), "Double.ToString of -NaN doesn't work");
+            Assert.IsTrue((result == expectedResult), "Double.ToString of NaN doesn't work");
 
             /* Another special value is '0' */
             value = 0;
