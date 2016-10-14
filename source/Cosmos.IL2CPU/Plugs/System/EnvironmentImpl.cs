@@ -125,6 +125,15 @@ namespace Cosmos.IL2CPU.Plugs.System
             return GetResourceFromDefault(aResource);
         }
 
+        public static string NewLine
+        {
+            get
+            {
+                return "\r\n";
+            }
+        }
+
+
     }
 
 }
