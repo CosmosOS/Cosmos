@@ -121,7 +121,7 @@ namespace Cosmos.System.FileSystem.VFS
             if (xDirectoryListing.Count > 0 && !recursive)
                 throw new IOException("Directory is not empty");
 
-            if(recursive)
+            if (recursive)
             {
                 foreach (var entry in xDirectoryListing)
                 {
@@ -437,44 +437,48 @@ namespace Cosmos.System.FileSystem.VFS
 
         public static char[] GetInvalidFileNameChars()
         {
-            char[] xReturn = new char[17];
-            xReturn[0] = '"';
-            xReturn[1] = '<';
-            xReturn[2] = '>';
-            xReturn[3] = '|';
-            xReturn[4] = '\0';
-            xReturn[5] = '\a';
-            xReturn[6] = '\b';
-            xReturn[7] = '\t';
-            xReturn[8] = '\n';
-            xReturn[9] = '\v';
-            xReturn[10] = '\f';
-            xReturn[11] = '\r';
-            xReturn[12] = ':';
-            xReturn[13] = '*';
-            xReturn[14] = '?';
-            xReturn[15] = '\\';
-            xReturn[16] = '/';
+            char[] xReturn =
+            {
+                '"',
+                '<',
+                '>',
+                '|',
+                '\0',
+                '\a',
+                '\b',
+                '\t',
+                '\n',
+                '\v',
+                '\f',
+                '\r',
+                ':',
+                '*',
+                '?',
+                '\\',
+                '/'
+            };
             return xReturn;
         }
 
         public static char[] GetInvalidPathCharsWithAdditionalChecks()
         {
-            char[] xReturn = new char[14];
-            xReturn[0] = '"';
-            xReturn[1] = '<';
-            xReturn[2] = '>';
-            xReturn[3] = '|';
-            xReturn[4] = '\0';
-            xReturn[5] = '\a';
-            xReturn[6] = '\b';
-            xReturn[7] = '\t';
-            xReturn[8] = '\n';
-            xReturn[9] = '\v';
-            xReturn[10] = '\f';
-            xReturn[11] = '\r';
-            xReturn[12] = '*';
-            xReturn[13] = '?';
+            char[] xReturn =
+            {
+                '"',
+                '<',
+                '>',
+                '|',
+                '\0',
+                '\a',
+                '\b',
+                '\t',
+                '\n',
+                '\v',
+                '\f',
+                '\r',
+                '*',
+                '?'
+            };
             return xReturn;
         }
 
@@ -485,25 +489,29 @@ namespace Cosmos.System.FileSystem.VFS
 
         public static char[] GetRealInvalidPathChars()
         {
-            char[] xReturn = new char[12];
-            xReturn[0] = '"';
-            xReturn[1] = '<';
-            xReturn[2] = '>';
-            xReturn[3] = '|';
+            char[] xReturn =
+            {
+                '"',
+                '<',
+                '>',
+                '|'
+            };
             return xReturn;
         }
 
         public static char[] GetTrimEndChars()
         {
-            char[] xReturn = new char[8];
-            xReturn[0] = (char)0x9;
-            xReturn[1] = (char)0xA;
-            xReturn[2] = (char)0xB;
-            xReturn[3] = (char)0xC;
-            xReturn[4] = (char)0xD;
-            xReturn[5] = (char)0x20;
-            xReturn[6] = (char)0x85;
-            xReturn[7] = (char)0xA0;
+            char[] xReturn =
+            {
+                (char) 0x9,
+                (char) 0xA,
+                (char) 0xB,
+                (char) 0xC,
+                (char) 0xD,
+                (char) 0x20,
+                (char) 0x85,
+                (char) 0xA0
+            };
             return xReturn;
         }
 

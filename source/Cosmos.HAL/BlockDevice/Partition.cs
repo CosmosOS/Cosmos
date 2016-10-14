@@ -20,14 +20,16 @@ namespace Cosmos.HAL.BlockDevice
 
 		public override void ReadBlock(UInt64 aBlockNo, UInt64 aBlockCount, byte[] aData)
 		{
-			UInt64 xHostBlockNo = mStartingSector + aBlockNo;
+            CheckDataSize(aData, aBlockCount);
+            UInt64 xHostBlockNo = mStartingSector + aBlockNo;
 			CheckBlockNo(xHostBlockNo, aBlockCount);
 			mHost.ReadBlock(xHostBlockNo, aBlockCount, aData);
 		}
 
 		public override void WriteBlock(UInt64 aBlockNo, UInt64 aBlockCount, byte[] aData)
 		{
-			UInt64 xHostBlockNo = mStartingSector + aBlockNo;
+            CheckDataSize(aData, aBlockCount);
+            UInt64 xHostBlockNo = mStartingSector + aBlockNo;
 			CheckBlockNo(xHostBlockNo, aBlockCount);
 			mHost.WriteBlock(xHostBlockNo, aBlockCount, aData);
 		}

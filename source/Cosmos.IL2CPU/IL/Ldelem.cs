@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL {
         Ldobj.DoAssemble(xOpType.Value);
         return;
       }
-      Ldelem_Ref.Assemble(Assembler, xSize, false, DebugEnabled);
+      Ldelem_Ref.Assemble(Assembler, xSize, false, aMethod, aOpCode, DebugEnabled);
     }
   }
 }

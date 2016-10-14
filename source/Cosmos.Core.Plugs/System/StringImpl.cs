@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define COSMOSDEBUG
+
+using System;
 using System.Globalization;
 using System.Text;
 
@@ -16,11 +18,13 @@ namespace Cosmos.Core.Plugs.System
 
         public static unsafe void Ctor(
             string aThis,
-            char* aChars,
+            [ObjectPointerAccess] char* aChars,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
+            mDebugger.SendInternal("String.Ctor(string, char*)");
+
             aStringEmpty = "";
             while (*aChars != '\0')
             {
@@ -35,7 +39,7 @@ namespace Cosmos.Core.Plugs.System
 
         public static unsafe void Ctor(
             string aThis,
-            char* aChars,
+            [ObjectPointerAccess] char* aChars,
             int start,
             int length,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
@@ -51,11 +55,11 @@ namespace Cosmos.Core.Plugs.System
         }
 
         public static unsafe void Ctor(
-                    string aThis,
-                    char[] aChars,
-                    [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
-                    [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
-                    [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
+            string aThis,
+            char[] aChars,
+            [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
+            [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
+            [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
             aStringEmpty = "";
             aStringLength = aChars.Length;
@@ -101,14 +105,14 @@ namespace Cosmos.Core.Plugs.System
 
 
         public static unsafe int get_Length(
-            int* aThis,
+            [ObjectPointerAccess] uint* aThis,
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aLength)
         {
             return aLength;
         }
 
         public static unsafe char get_Chars(
-            uint* aThis,
+            [ObjectPointerAccess] uint* aThis,
             int aIndex,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
         {
@@ -139,9 +143,17 @@ namespace Cosmos.Core.Plugs.System
 
         public static string Format(string aFormat, object aArg0, object aArg1)
         {
-            if (aArg0 == null || aArg1 == null)
+            if (aFormat == null)
             {
-                throw new ArgumentNullException(aFormat == null ? "aFormat" : "aArgs");
+                throw new ArgumentNullException(nameof(aFormat));
+            }
+            if (aArg0 == null)
+            {
+                throw new ArgumentNullException(nameof(aArg0));
+            }
+            if (aArg1 == null)
+            {
+                throw new ArgumentNullException(nameof(aArg1));
             }
 
             return FormatHelper(null, aFormat, aArg0, aArg1);
@@ -238,6 +250,11 @@ namespace Cosmos.Core.Plugs.System
                         {
                             string xParamValue = aArgs[xParamIndex].ToString();
                             xFormattedString = string.Concat(xFormattedString, xParamValue);
+                            mDebugger.SendInternal("xParamValue =");
+                            mDebugger.SendInternal(xParamValue);
+                            mDebugger.SendInternal("xFormattedString =");
+                            mDebugger.SendInternal(xFormattedString);
+
                         }
                         xFoundPlaceholder = false;
                         xParamNumberDone = true;
@@ -657,7 +674,7 @@ namespace Cosmos.Core.Plugs.System
 
         public static int LastIndexOf(string aThis, char aChar, int aStartIndex, int aCount)
         {
-            return LastIndexOfAny(aThis, new[] { aChar }, aStartIndex, aCount);
+            return LastIndexOfAny(aThis, new[] {aChar}, aStartIndex, aCount);
         }
 
         public static int LastIndexOfAny(string aThis, char[] aChars, int aStartIndex, int aCount)
@@ -732,7 +749,7 @@ namespace Cosmos.Core.Plugs.System
             {
                 if (aStrA != aStrB)
                 {
-                    xResult = (byte)aStrA[i] - (byte)aStrB[i];
+                    xResult = (byte) aStrA[i] - (byte) aStrB[i];
                     mDebugger.SendInternal("nativeCompareOrdinalEx : aStrA[i] != aStrB[i], returning " + xResult);
                     return xResult;
                 }
@@ -799,7 +816,7 @@ namespace Cosmos.Core.Plugs.System
                 int xAsciiCode = aValue[i];
                 if ((xAsciiCode <= upperAscii) && (xAsciiCode >= lowerAscii))
                 {
-                    xChars[i] = (char)(xAsciiCode + offset);
+                    xChars[i] = (char) (xAsciiCode + offset);
                 }
                 else
                 {
@@ -815,9 +832,9 @@ namespace Cosmos.Core.Plugs.System
             return aThis;
         }
 
-        public static string FastAllocateString(int length)
+        public static string FastAllocateString(int aLength)
         {
-            return new string(new char[length]);
+            return new string(new char[aLength]);
         }
 
         [PlugMethod(IsOptional = true)]
@@ -844,7 +861,7 @@ namespace Cosmos.Core.Plugs.System
             throw new ArgumentNullException();
         }
 
-        public static int GetHashCode(ref String aThis)
+        public static int GetHashCode(string aThis)
         {
             throw new NotImplementedException("String.GetHashCode()");
         }
