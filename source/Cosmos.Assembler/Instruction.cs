@@ -2,46 +2,57 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Cosmos.Assembler {
-  public abstract class Instruction : BaseAssemblerElement {
-      /// <summary>
-      /// Cache for the default mnemonics.
-      /// </summary>
-      public static Dictionary<Type, string> defaultMnemonicsCache = new Dictionary<Type,string>();
+namespace Cosmos.Assembler
+{
+    public abstract class Instruction : BaseAssemblerElement
+    {
+        /// <summary>
+        /// Cache for the default mnemonics.
+        /// </summary>
+        public static Dictionary<Type, string> defaultMnemonicsCache = new Dictionary<Type, string>();
 
-    protected string mMnemonic;
-    public string Mnemonic {
-      get { return mMnemonic; }
-    }
-
-    protected int mMethodID;
-    public int MethodID {
-      get { return mMethodID; }
-    }
-
-    protected int mAsmMethodIdx;
-    public int AsmMethodIdx {
-      get { return mAsmMethodIdx; }
-    }
-
-    public override void WriteText(Cosmos.Assembler.Assembler aAssembler, TextWriter aOutput) {
-      aOutput.Write(mMnemonic);
-    }
-
-    protected Instruction(string mnemonic = null) : this(true) {
-    }
-
-    protected Instruction(bool aAddToAssembler, string mnemonic=null) {
-      if (aAddToAssembler) {
-        Cosmos.Assembler.Assembler.CurrentInstance.Add(this);
-      }
-        mMnemonic = mnemonic;
-        if (mMnemonic == null)
+        protected string mMnemonic;
+        public string Mnemonic
         {
-            var type = GetType();
-            mMnemonic = GetDefaultMnemonic(type);
+            get { return mMnemonic; }
         }
-    }
+
+        protected int mMethodID;
+        public int MethodID
+        {
+            get { return mMethodID; }
+        }
+
+        protected int mAsmMethodIdx;
+        public int AsmMethodIdx
+        {
+            get { return mAsmMethodIdx; }
+        }
+
+        public override void WriteText(Cosmos.Assembler.Assembler aAssembler, TextWriter aOutput)
+        {
+            aOutput.Write(mMnemonic);
+        }
+
+        protected Instruction(string mnemonic = null) : this(true)
+        {
+        }
+
+        protected Instruction(bool aAddToAssembler, string mnemonic = null)
+        {
+            if (aAddToAssembler)
+            {
+                Assembler.CurrentInstance.Add(this);
+            }
+
+            mMnemonic = mnemonic;
+
+            if (mMnemonic == null)
+            {
+                var type = GetType();
+                mMnemonic = GetDefaultMnemonic(type);
+            }
+        }
 
         /// <summary>
         /// Gets default operation mnemonic for given type.
@@ -71,23 +82,28 @@ namespace Cosmos.Assembler {
             return xMnemonic;
         }
 
-    public override ulong? ActualAddress {
-      get {
-        // TODO: for now, we dont have any data alignment
-        return StartAddress;
-      }
-    }
+        public override ulong? ActualAddress
+        {
+            get
+            {
+                // TODO: for now, we dont have any data alignment
+                return StartAddress;
+            }
+        }
 
-    public override void UpdateAddress(Cosmos.Assembler.Assembler aAssembler, ref ulong aAddress) {
-      base.UpdateAddress(aAssembler, ref aAddress);
-    }
+        public override void UpdateAddress(Cosmos.Assembler.Assembler aAssembler, ref ulong aAddress)
+        {
+            base.UpdateAddress(aAssembler, ref aAddress);
+        }
 
-    public override bool IsComplete(Assembler aAssembler) {
-      throw new NotImplementedException("Method not implemented for instruction " + this.GetType().FullName.Substring(typeof(Instruction).Namespace.Length + 1));
-    }
+        public override bool IsComplete(Assembler aAssembler)
+        {
+            throw new NotImplementedException("Method not implemented for instruction " + this.GetType().FullName.Substring(typeof(Instruction).Namespace.Length + 1));
+        }
 
-    public override void WriteData(Cosmos.Assembler.Assembler aAssembler, Stream aOutput) {
-      throw new NotImplementedException("Method not implemented for instruction " + this.GetType().FullName.Substring(typeof(Instruction).Namespace.Length + 1));
+        public override void WriteData(Cosmos.Assembler.Assembler aAssembler, Stream aOutput)
+        {
+            throw new NotImplementedException("Method not implemented for instruction " + this.GetType().FullName.Substring(typeof(Instruction).Namespace.Length + 1));
+        }
     }
-  }
 }
