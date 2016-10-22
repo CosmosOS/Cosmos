@@ -1,17 +1,22 @@
 ﻿namespace Cosmos.Assembler.ARMv7
 {
-    public abstract class InstructionWithOptionalSuffixAndDestinationAndOperand : InstructionWithDestination, IInstructionWithOptionalSuffix, IInstructionWithOperand
+    public abstract class InstructionWithOptionalFlagsUpdateAndDestinationAndOperand : Instruction, IInstructionWithOptionalFlagsUpdate, IInstructionWithDestination, IInstructionWithOperand
     {
-
-        public InstructionWithOptionalSuffixAndDestinationAndOperand()
+        public InstructionWithOptionalFlagsUpdateAndDestinationAndOperand()
         {
         }
 
-        public InstructionWithOptionalSuffixAndDestinationAndOperand(string mnemonic) : base(mnemonic)
+        public InstructionWithOptionalFlagsUpdateAndDestinationAndOperand(string mnemonic) : base(mnemonic)
         {
         }
 
         public bool UpdateFlags
+        {
+            get;
+            set;
+        }
+
+        public RegistersEnum? DestinationReg
         {
             get;
             set;
@@ -50,14 +55,14 @@
             {
                 aOutput.Write(" ");
                 aOutput.Write(destination);
+            }
 
-                string firstOperand = this.GetFirstOperandAsString();
+            string firstOperand = this.GetFirstOperandAsString();
 
-                if (!(firstOperand.Equals("")))
-                {
-                    aOutput.Write(", ");
-                    aOutput.Write(firstOperand);
-                }
+            if (!(firstOperand.Equals("")))
+            {
+                aOutput.Write(", ");
+                aOutput.Write(firstOperand);
             }
         }
     }

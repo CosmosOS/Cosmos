@@ -2,7 +2,6 @@
 {
     public abstract class InstructionWithLabelOrDestination : InstructionWithDestination, IInstructionWithLabel
     {
-
         public InstructionWithLabelOrDestination()
         {
         }

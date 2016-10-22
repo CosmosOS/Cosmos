@@ -1,6 +1,6 @@
 ﻿namespace Cosmos.Assembler.ARMv7
 {
-    public enum ConditionEnum : byte
+    public enum ConditionsEnum
     {
         Equal,
         EqualsZero,
@@ -22,5 +22,31 @@
         SignedGreaterThan,
         SignedLessThanOrEqual,
         Always
+    }
+
+    public enum Operand2ShiftType
+    {
+        ArithmeticShiftRight,
+        LogicalShiftLeft,
+        LogicalShiftRight,
+        RotateRight,
+        RotateRightWithExtend
+    }
+
+    public enum DataSize
+    {
+        Byte,
+        SignedByte,
+        Halfword,
+        SignedHalfword,
+        Word,
+        Doubleword
+    }
+
+    public enum MemoryAddressOffsetType
+    {
+        ImmediateOffset,
+        PreIndexedOffset,
+        PostIndexedOffset
     }
 }

@@ -1,16 +1,22 @@
 ﻿namespace Cosmos.Assembler.ARMv7
 {
-    public abstract class InstructionWithTwoOperands : Instruction, IInstructionWithOperand, IInstructionWithOperand2
+    public class InstructionWithOptionalFlagsUpdateAndDestinationAndOperand2 : Instruction, IInstructionWithOptionalFlagsUpdate, IInstructionWithDestination, IInstructionWithOperand2
     {
-        public InstructionWithTwoOperands()
+        public InstructionWithOptionalFlagsUpdateAndDestinationAndOperand2()
         {
         }
 
-        public InstructionWithTwoOperands(string mnemonic) : base(mnemonic)
+        public InstructionWithOptionalFlagsUpdateAndDestinationAndOperand2(string mnemonic) : base(mnemonic)
         {
         }
 
-        public RegistersEnum? FirstOperandReg
+        public bool UpdateFlags
+        {
+            get;
+            set;
+        }
+
+        public RegistersEnum? DestinationReg
         {
             get;
             set;
@@ -48,19 +54,24 @@
         {
             aOutput.Write(mMnemonic);
 
+            if(UpdateFlags)
+            {
+                aOutput.Write("S");
+            }
+
             aOutput.Write(this.GetConditionAsString());
 
-            string firstOperand = this.GetFirstOperandAsString();
+            string destination = this.GetDestinationAsString();
 
-            if (!(firstOperand.Equals("")))
+            if (!destination.Equals(""))
             {
                 aOutput.Write(" ");
-                aOutput.Write(firstOperand);
+                aOutput.Write(destination);
             }
 
             string operand2 = this.GetOperand2AsString();
 
-            if (!operand2.Equals(""))
+            if (!(operand2.Equals("")))
             {
                 aOutput.Write(", ");
                 aOutput.Write(operand2);

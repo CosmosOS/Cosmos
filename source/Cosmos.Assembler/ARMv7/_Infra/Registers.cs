@@ -112,6 +112,7 @@ namespace Cosmos.Assembler.ARMv7
         public static List<RegistersEnum> GetRegisters()
         {
             List<RegistersEnum> registers = new List<RegistersEnum>();
+
             foreach (RegistersEnum xField in Enum.GetValues(typeof(RegistersEnum)))
             {
                 registers.Add(xField);

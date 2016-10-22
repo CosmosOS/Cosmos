@@ -1,18 +1,16 @@
 ﻿namespace Cosmos.Assembler.ARMv7
 {
-    public abstract class InstructionWithDestination : Instruction, IInstructionWithDestination
+    public abstract class InstructionWithReglist : Instruction, IInstructionWithReglist
     {
-        public InstructionWithDestination()
+        public InstructionWithReglist()
         {
-
         }
 
-        public InstructionWithDestination(string mnemonic) : base(mnemonic)
+        public InstructionWithReglist(string mnemonic) : base(mnemonic)
         {
-
         }
 
-        public RegistersEnum? DestinationReg
+        public RegistersEnum[] Reglist
         {
             get;
             set;
@@ -32,14 +30,12 @@
         {
             aOutput.Write(mMnemonic);
 
-            aOutput.Write(this.GetConditionAsString());
+            string reglist = this.GetReglistAsString();
 
-            string destination = this.GetDestinationAsString();
-
-            if (!destination.Equals(""))
+            if (!reglist.Equals(""))
             {
                 aOutput.Write(" ");
-                aOutput.Write(destination);
+                aOutput.Write(reglist);
             }
         }
     }

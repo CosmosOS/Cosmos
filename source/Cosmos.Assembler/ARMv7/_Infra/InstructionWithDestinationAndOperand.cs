@@ -1,18 +1,22 @@
 ﻿namespace Cosmos.Assembler.ARMv7
 {
-    public abstract class InstructionWithDestination : Instruction, IInstructionWithDestination
+    public class InstructionWithDestinationAndOperand : Instruction, IInstructionWithDestination, IInstructionWithOperand
     {
-        public InstructionWithDestination()
+        public InstructionWithDestinationAndOperand()
         {
-
         }
 
-        public InstructionWithDestination(string mnemonic) : base(mnemonic)
+        public InstructionWithDestinationAndOperand(string mnemonic) : base(mnemonic)
         {
-
         }
 
         public RegistersEnum? DestinationReg
+        {
+            get;
+            set;
+        }
+
+        public RegistersEnum? FirstOperandReg
         {
             get;
             set;
@@ -23,9 +27,9 @@
             return base.IsComplete(aAssembler);
         }
 
-        public override void UpdateAddress(Assembler aAssembler, ref ulong aAddresss)
+        public override void UpdateAddress(Assembler aAssembler, ref ulong aAddress)
         {
-            base.UpdateAddress(aAssembler, ref aAddresss);
+            base.UpdateAddress(aAssembler, ref aAddress);
         }
 
         public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
@@ -40,6 +44,14 @@
             {
                 aOutput.Write(" ");
                 aOutput.Write(destination);
+            }
+
+            string firstOperand = this.GetFirstOperandAsString();
+
+            if (!(firstOperand.Equals("")))
+            {
+                aOutput.Write(", ");
+                aOutput.Write(firstOperand);
             }
         }
     }

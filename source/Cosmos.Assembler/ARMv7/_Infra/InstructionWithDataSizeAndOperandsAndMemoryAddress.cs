@@ -1,13 +1,19 @@
 ﻿namespace Cosmos.Assembler.ARMv7
 {
-    public abstract class InstructionWithTwoOperands : Instruction, IInstructionWithOperand, IInstructionWithOperand2
+    public abstract class InstructionWithDataSizeAndOperandsAndMemoryAddress : Instruction, IInstructionWithDataSize, IInstructionWithOperand, IInstructionWithSecondOperand, IInstructionWithMemoryAddress
     {
-        public InstructionWithTwoOperands()
+        public InstructionWithDataSizeAndOperandsAndMemoryAddress()
         {
         }
 
-        public InstructionWithTwoOperands(string mnemonic) : base(mnemonic)
+        public InstructionWithDataSizeAndOperandsAndMemoryAddress(string mnemonic) : base(mnemonic)
         {
+        }
+
+        public DataSize? DataSize
+        {
+            get;
+            set;
         }
 
         public RegistersEnum? FirstOperandReg
@@ -16,19 +22,25 @@
             set;
         }
 
-        public RegistersEnum? Operand2Reg
+        public RegistersEnum? SecondOperandReg
         {
             get;
             set;
         }
 
-        public uint? Operand2Value
+        public RegistersEnum? BaseMemoryAddressReg
         {
             get;
             set;
         }
 
-        public Operand2Shift Operand2Shift
+        public short? MemoryAddressOffset
+        {
+            get;
+            set;
+        }
+
+        public MemoryAddressOffsetType MemoryAddressOffsetType
         {
             get;
             set;
@@ -48,6 +60,8 @@
         {
             aOutput.Write(mMnemonic);
 
+            aOutput.Write(this.GetDataSizeAsString());
+
             aOutput.Write(this.GetConditionAsString());
 
             string firstOperand = this.GetFirstOperandAsString();
@@ -58,12 +72,17 @@
                 aOutput.Write(firstOperand);
             }
 
-            string operand2 = this.GetOperand2AsString();
+            if ((int)DataSize.Value >= 5)
+            {
+                string secondOperand = this.GetSecondOperandAsString();
+            }
 
-            if (!operand2.Equals(""))
+            string memoryAddress = this.GetMemoryAddressAsString();
+
+            if (!memoryAddress.Equals(""))
             {
                 aOutput.Write(", ");
-                aOutput.Write(operand2);
+                aOutput.Write(memoryAddress);
             }
         }
     }

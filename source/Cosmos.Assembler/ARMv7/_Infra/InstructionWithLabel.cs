@@ -2,7 +2,6 @@
 {
     public abstract class InstructionWithLabel : Instruction, IInstructionWithLabel
     {
-
         public InstructionWithLabel()
         {
         }

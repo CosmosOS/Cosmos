@@ -1,8 +1,8 @@
 ﻿namespace Cosmos.Assembler.ARMv7
 {
-    public interface IInstructionWithOptionalSuffix
+    public interface IInstructionWithDataSize
     {
-        bool UpdateFlags
+        DataSize? DataSize
         {
             get;
             set;
