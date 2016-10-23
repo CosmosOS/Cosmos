@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using Cosmos.Assembler;
 using Cosmos.Assembler.ARMv7;
 using Label = Cosmos.Assembler.Label;
-using static ASharp.Compiler.ASConditions;
-using static ASharp.Compiler.ASRegisters;
 
 namespace ASharp.Compiler
 {
+    using static ASConditions;
+    using static ASRegisters;
+
     public static class AS
     {
         #region Instruction
@@ -118,7 +119,7 @@ namespace ASharp.Compiler
 
         #region InstructionWithOptionalSuffixAndDestinationAndOperand2
 
-        private static void Do<T>(Register destination, Register operand2, Operand2Shift operand2Shift, bool updateFlags = false, Condition condition = null)
+        private static void Do<T>(Register destination, Register operand2, Operand2Shift operand2Shift = null, bool updateFlags = false, Condition condition = null)
           where T : InstructionWithOptionalFlagsUpdateAndDestinationAndOperand2, new()
         {
             new T
@@ -147,7 +148,7 @@ namespace ASharp.Compiler
 
         #region InstructionWithOptionalSuffixAndDestinationAndOperandAndOperand2
 
-        private static void Do<T>(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        private static void Do<T>(Register destination, Register firstOperand, Register operand2, Operand2Shift operand2Shift = null, bool updateFlags = false, Condition condition = null)
           where T : InstructionWithOptionalFlagsUpdateAndDestinationAndOperandAndOperand2, new()
         {
             new T
@@ -156,8 +157,8 @@ namespace ASharp.Compiler
                 UpdateFlags = updateFlags,
                 DestinationReg = destination,
                 FirstOperandReg = firstOperand,
-                Operand2Reg = secondOperand,
-                Operand2Shift = secondOperandShift
+                Operand2Reg = operand2,
+                Operand2Shift = operand2Shift
             };
         }
 
@@ -214,10 +215,10 @@ namespace ASharp.Compiler
 
         #endregion
 
-        #region InstructionWithTwoOperands
+        #region InstructionWithOperandAndOperand2
 
         private static void Do<T>(Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, Condition condition = null)
-          where T : InstructionWithTwoOperands, new()
+          where T : InstructionWithOperandAndOperand2, new()
         {
             new T
             {
@@ -229,7 +230,7 @@ namespace ASharp.Compiler
         }
 
         private static void Do<T>(Register firstOperand, uint secondOperand, Condition condition = null)
-          where T : InstructionWithTwoOperands, new()
+          where T : InstructionWithOperandAndOperand2, new()
         {
             new T
             {
@@ -393,6 +394,26 @@ namespace ASharp.Compiler
             Do<BranchWithLinkAndExchange>(label, labelOffset, condition);
         }
 
+        public static void Compare(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift, Condition condition = null)
+        {
+            Do<Compare>(firstOperand, secondOperand, secondOperandShift, condition);
+        }
+
+        public static void Compare(Register destination, Register firstOperand, uint secondOperand, Condition condition = null)
+        {
+            Do<Compare>(firstOperand, secondOperand, condition);
+        }
+
+        public static void CompareNot(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift, Condition condition = null)
+        {
+            Do<CompareNot>(firstOperand, secondOperand, secondOperandShift, condition);
+        }
+
+        public static void CompareNot(Register destination, Register firstOperand, uint secondOperand, Condition condition = null)
+        {
+            Do<CompareNot>(firstOperand, secondOperand, condition);
+        }
+
         public static void ExceptionReturn(Condition condition = null)
         {
             Do<ExceptionReturn>(condition);
@@ -438,7 +459,7 @@ namespace ASharp.Compiler
             Do<LogicalShiftRight>(destination, operand, bitsToShift, updateFlags, condition);
         }
 
-        public static void Move(Register destination, Register operand2, Operand2Shift operand2Shift, bool updateFlags = false, Condition condition = null)
+        public static void Move(Register destination, Register operand2, Operand2Shift operand2Shift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<Move>(destination, operand2, operand2Shift, updateFlags, condition);
         }
@@ -580,6 +601,16 @@ namespace ASharp.Compiler
             Do<StoreRegister>(r12, r11, dataSize: DataSize.Byte);
         }
 
+        public static void SetEvent(Condition condition = null)
+        {
+            Do<SetEvent>(condition);
+        }
+
+        public static void SetEventLocally(Condition condition = null)
+        {
+            Do<SetEventLocally>(condition);
+        }
+
         public static void StoreRegister(Register firstOperand, Register baseMemoryAddress, short? memoryAddressOffset = null, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
         {
             Do<StoreRegister>(firstOperand, baseMemoryAddress, memoryAddressOffset, memoryAddressOffsetType, dataSize, condition);
@@ -648,6 +679,21 @@ namespace ASharp.Compiler
         public static void TestEquivalence(Register destination, Register firstOperand, uint secondOperand, Condition condition = null)
         {
             Do<TestEquivalence>(firstOperand, secondOperand, condition);
+        }
+
+        public static void WaitForEvent(Condition condition = null)
+        {
+            Do<WaitForEvent>(condition);
+        }
+
+        public static void WaitForInterrupt(Condition condition = null)
+        {
+            Do<WaitForInterrupt>(condition);
+        }
+
+        public static void Yield(Condition condition = null)
+        {
+            Do<Yield>(condition);
         }
     }
 }

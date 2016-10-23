@@ -9,8 +9,10 @@ using Cosmos.Assembler;
 
 namespace ASharp.Compiler
 {
-    // This class performs the translation from X# source code into a target
-    // assembly language. At current time the only supported assembler syntax is NASM.
+    // This class performs the translation from A# source code into a target
+    // assembly language. At current time the only supported assembler syntax is arm-none-eabi.
+
+#warning Completely not tested!!!
 
     public class AsmGenerator
     {
@@ -101,7 +103,7 @@ namespace ASharp.Compiler
             {
                 using (var xInput = new StreamReader(aSrcPathname))
                 {
-                    using (var xOutput = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".asm")))
+                    using (var xOutput = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".S")))
                     {
                         xOutput.WriteLine("; Generated at {0}", DateTime.Now.ToString(new CultureInfo("en-US")));
 
@@ -150,6 +152,7 @@ namespace ASharp.Compiler
         protected void ProcessLine(string aLine, int lineNumber)
         {
             aLine = aLine.Trim();
+
             if (String.IsNullOrEmpty(aLine) || aLine == "//")
             {
                 return;

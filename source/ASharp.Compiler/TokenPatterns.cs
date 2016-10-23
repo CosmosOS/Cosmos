@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using Cosmos.Assembler;
-using Cosmos.Assembler.ARMv7;
-//using Instruction = Cosmos.Assembler.Instruction;
-using static ASharp.Compiler.ASConditions;
-using static ASharp.Compiler.ASRegisters;
 
 namespace ASharp.Compiler
 {
-    /// <summary>This class is able to translate a single X# source code line into one or more
+    using static ASConditions;
+    using static ASRegisters;
+
+    /// <summary>This class is able to translate a single A# source code line into one or more
     /// target assembler source code and data lines. The class is a group of pattern each of
-    /// which defines a transformation function from the X# syntax to the target assembler
+    /// which defines a transformation function from the A# syntax to the target assembler
     /// syntax.</summary>
     public class TokenPatterns
     {
         /// <summary>Describe a single pattern with its list of tokens that might include pattern
         /// reserved syntax token and a transformation function. For ease of search and performance
         /// an hashcode value is computed on the tokens list content and later used for searching
-        /// a pattern matching an actual line of X# code source.</summary>
+        /// a pattern matching an actual line of A# code source.</summary>
         protected class Pattern
         {
             public readonly TokenList Tokens;
@@ -97,12 +97,14 @@ namespace ASharp.Compiler
         protected List<string> mCompares = new List<string>();
 
         protected string mNamespace = null;
+
         protected string GetNamespace()
         {
             if (mNamespace == null)
             {
                 throw new Exception("A namespace has not been defined.");
             }
+
             return mNamespace;
         }
 
@@ -243,7 +245,7 @@ namespace ASharp.Compiler
         /// depending on whether the function is an interrupt handler or a standard function.</summary>
         protected void EndFunc()
         {
-            if (null == mFuncName)
+            if (mFuncName == null)
             {
                 throw new Exception("Found a closing curly brace that doesn't match an opening curly brace.");
             }
@@ -643,6 +645,7 @@ namespace ASharp.Compiler
             //        }
             //    }
             //}
+
             //#endregion Handle all comparisons
 
             // Labels
@@ -924,19 +927,20 @@ namespace ASharp.Compiler
                                      {
                                          AS.Move(aTokens[0].Register, aTokens[2].IntValue);
                                      });
-            AddPattern("_REGADDR[1] = 123", delegate (TokenList aTokens)
-                                            {
-                                                AS.Move(aTokens[0].Register, aTokens[5].IntValue, destinationDisplacement: (int)aTokens[2].IntValue); //TODO: Change this
-                                            });
-            AddPattern("_REGADDR[-1] = 123", delegate (TokenList aTokens)
-                                             {
-                                                 AS.Move(aTokens[0].Register, aTokens[5].IntValue, destinationDisplacement: -(int)aTokens[2].IntValue); //TODO: Change this
-                                             });
+            //AddPattern("_REGADDR[1] = 123", delegate (TokenList aTokens)
+            //                                {
+            //                                    AS.Move(aTokens[0].Register, aTokens[5].IntValue, destinationDisplacement: (int)aTokens[2].IntValue); //TODO: Change this
+            //                                });
+            //AddPattern("_REGADDR[-1] = 123", delegate (TokenList aTokens)
+            //                                 {
+            //                                     AS.Move(aTokens[0].Register, aTokens[5].IntValue, destinationDisplacement: -(int)aTokens[2].IntValue); //TODO: Change this
+            //                                 });
 
             AddPattern("_REG = #_ABC", delegate (TokenList aTokens)
                                        {
-                                           //TODO: Change this, load address to register first
-                                           //AS.Set(aTokens[0].Register, ConstLabel(aTokens[3]));
+                                           //TODO: Implement LoadRegister for Labels
+                                           //AS.LoadRegister(aTokens[0].Register, ConstLabel(aTokens[3]));
+                                           AS.LiteralCode("LDR " + aTokens[0].Register.Name + ", =" + ConstLabel(aTokens[3]));
                                        });
             AddPattern("_REGADDR[1] = #_ABC", delegate (TokenList aTokens)
                                               {
@@ -958,73 +962,81 @@ namespace ASharp.Compiler
                                       });
             AddPattern("_REGADDR[1] = _REG", delegate (TokenList aTokens)
                                              {
-                                                 AS.Move(aTokens[0].Register, aTokens[5].Register, destinationDisplacement: (int)aTokens[2].IntValue);
+                                                 //TODO: Check this
+                                                 //AS.Move(aTokens[0].Register, aTokens[5].Register, new Operand2Shift(Operand2ShiftType.LogicalShiftLeft, (byte)aTokens[2].IntValue));
+                                                 //AS.Move(aTokens[0].Register, aTokens[5].Register, destinationDisplacement: (int)aTokens[2].IntValue);
                                              });
             AddPattern("_REGADDR[-1] = _REG", delegate (TokenList aTokens)
                                               {
-                                                  AS.Move(aTokens[0].Register, aTokens[5].Register, destinationDisplacement: -(int)aTokens[2].IntValue);
+                                                  //TODO: Check this
+                                                  //AS.Move(aTokens[0].Register, aTokens[5].Register, new Operand2Shift(Operand2ShiftType.LogicalShiftRight, (byte)aTokens[2].IntValue));
+                                                  //AS.Move(aTokens[0].Register, aTokens[5].Register, destinationDisplacement: -(int)aTokens[2].IntValue);
                                               });
-            AddPattern("_REG = _REGADDR[1]", delegate (TokenList aTokens)
-                                             {
-                                                 AS.Move(aTokens[0].Register, aTokens[2].Register, sourceDisplacement: (int)aTokens[4].IntValue);
-                                             });
-            AddPattern("_REG = _REGADDR[-1]", delegate (TokenList aTokens)
-                                              {
-                                                  AS.Move(aTokens[0].Register, aTokens[2].Register, sourceDisplacement: -(int)aTokens[4].IntValue);
-                                              });
+            //AddPattern("_REG = _REGADDR[1]", delegate (TokenList aTokens)
+            //                                 {
+            //                                     AS.Move(aTokens[0].Register, aTokens[2].Register, sourceDisplacement: (int)aTokens[4].IntValue);
+            //                                 });
+            //AddPattern("_REG = _REGADDR[-1]", delegate (TokenList aTokens)
+            //                                  {
+            //                                      AS.Move(aTokens[0].Register, aTokens[2].Register, sourceDisplacement: -(int)aTokens[4].IntValue);
+            //                                  });
 
             AddPattern("_REG = [_REG]", delegate (TokenList aTokens)
                                         {
-                                            AS.Move(aTokens[0].Register, aTokens[3].Register, sourceIsIndirect: true);
+                                            AS.LoadRegister(aTokens[0].Register, aTokens[3].Register);
+                                            //AS.Move(aTokens[0].Register, aTokens[3].Register, sourceIsIndirect: true);
                                         });
-            AddPattern("_REG = [_REG + 1]", delegate (TokenList aTokens)
-                                            {
-                                                AS.Move(aTokens[0].Register, aTokens[3].Register, sourceDisplacement: (int?)aTokens[5].IntValue);
-                                            });
-            AddPattern("_REG = [_REG - 1]", delegate (TokenList aTokens)
-                                            {
-                                                AS.Move(aTokens[0].Register, aTokens[3].Register, sourceDisplacement: -(int)aTokens[5].IntValue);
-                                            });
-            AddPattern("[_REG] = _REG", delegate (TokenList aTokens)
-                                        {
-                                            AS.Move(aTokens[1].Register, aTokens[4].Register, destinationIsIndirect: true);
-                                        });
-            AddPattern("[_REG + 1] = _REG", delegate (TokenList aTokens)
-                                            {
-                                                AS.Move(aTokens[0].Register, aTokens[3].Register, destinationDisplacement: (int)aTokens[5].IntValue);
-                                            });
-            AddPattern("[_REG - 1] = _REG", delegate (TokenList aTokens)
-                                            {
-                                                AS.Move(aTokens[0].Register, aTokens[3].Register, destinationDisplacement: -(int)aTokens[5].IntValue);
-                                            });
+            //AddPattern("_REG = [_REG + 1]", delegate (TokenList aTokens)
+            //                                {
+            //                                    AS.Move(aTokens[0].Register, aTokens[3].Register, sourceDisplacement: (int?)aTokens[5].IntValue);
+            //                                });
+            //AddPattern("_REG = [_REG - 1]", delegate (TokenList aTokens)
+            //                                {
+            //                                    AS.Move(aTokens[0].Register, aTokens[3].Register, sourceDisplacement: -(int)aTokens[5].IntValue);
+            //                                });
+            //AddPattern("[_REG] = _REG", delegate (TokenList aTokens)
+            //                            {
+            //                                AS.Move(aTokens[1].Register, aTokens[4].Register, destinationIsIndirect: true);
+            //                            });
+            //AddPattern("[_REG + 1] = _REG", delegate (TokenList aTokens)
+            //                                {
+            //                                    AS.Move(aTokens[0].Register, aTokens[3].Register, destinationDisplacement: (int)aTokens[5].IntValue);
+            //                                });
+            //AddPattern("[_REG - 1] = _REG", delegate (TokenList aTokens)
+            //                                {
+            //                                    AS.Move(aTokens[0].Register, aTokens[3].Register, destinationDisplacement: -(int)aTokens[5].IntValue);
+            //                                });
 
             AddPattern("_REG = _ABC", delegate (TokenList aTokens)
                                       {
-                                          AS.Move(aTokens[0].Register, GetLabel(aTokens[2]), sourceIsIndirect: true);
+                                          //TODO: Implement LoadRegister for Labels
+                                          //AS.LoadRegister(aTokens[0].Register, GetLabel(aTokens[2]));
+                                          AS.LiteralCode("LDR " + aTokens[0].Register.Name + ", =" + GetLabel(aTokens[2]));
                                       });
 
             // why not [var] like registers? Because its less frequent to access the ptr
             // and it is like a reg.. without [] to get the value...
             AddPattern("_REG = @_ABC", delegate (TokenList aTokens)
                                        {
-                                           //AS.Move(aTokens[0].Register, GetLabel(aTokens[3]));
-                                           AS.LoadRegister(aTokens[0].Register, GetLabel(aTokens[3]));
+                                           //TODO: Implement LoadRegister for Labels
+                                           //AS.LoadRegister(aTokens[0].Register, GetLabel(aTokens[3]));
+                                           AS.LiteralCode("LDR " + aTokens[0].Register.Name + ", =" + GetLabel(aTokens[3]));
                                        });
 
-            AddPattern(new string[]
-                       {
-                   "Port[DX] = AL", "Port[DX] = AX", "Port[DX] = EAX"
-                       }, delegate (TokenList aTokens)
-                          {
-                              AS.WriteToPortDX(aTokens[5].Register);
-                          });
-            AddPattern(new string[]
-                       {
-                   "AL = Port[DX]", "AX = Port[DX]", "EAX = Port[DX]"
-                       }, delegate (TokenList aTokens)
-                          {
-                              AS.ReadFromPortDX(aTokens[0].Register);
-                          });
+            //AddPattern(new string[]
+            //           {
+            //       "Port[DX] = AL", "Port[DX] = AX", "Port[DX] = EAX"
+            //           }, delegate (TokenList aTokens)
+            //              {
+            //                  AS.WriteToPortDX(aTokens[5].Register);
+            //              });
+            //AddPattern(new string[]
+            //           {
+            //       "AL = Port[DX]", "AX = Port[DX]", "EAX = Port[DX]"
+            //           }, delegate (TokenList aTokens)
+            //              {
+            //                  AS.ReadFromPortDX(aTokens[0].Register);
+            //              });
 
             AddPattern("+123", delegate (TokenList aTokens)
                                {
@@ -1049,17 +1061,19 @@ namespace ASharp.Compiler
                    "+#_ABC", "+#_ABC as byte", "+#_ABC as word", "+#_ABC as dword"
                        }, delegate (TokenList aTokens)
                           {
-                              AS.LoadRegister(r12, ConstLabel(aTokens[1]));
+                              //TODO: Implement LoadRegister for Labels
+                              //AS.LoadRegister(r12, ConstLabel(aTokens[1]));
+                              AS.LiteralCode("LDR " + r12.Name + ", =" + ConstLabel(aTokens[1]));
                               AS.Push(r12);
                           });
-            AddPattern("+All", delegate (TokenList aTokens)
-                               {
-                                   AS.PushAllRegisters();
-                               });
-            AddPattern("-All", delegate (TokenList aTokens)
-                               {
-                                   AS.PopAllRegisters();
-                               });
+            //AddPattern("+All", delegate (TokenList aTokens)
+            //                   {
+            //                       AS.PushAllRegisters();
+            //                   });
+            //AddPattern("-All", delegate (TokenList aTokens)
+            //                   {
+            //                       AS.PopAllRegisters();
+            //                   });
             AddPattern("-_REG", delegate (TokenList aTokens)
                                 {
                                     AS.Pop(aTokens[1].Register);
@@ -1067,24 +1081,34 @@ namespace ASharp.Compiler
 
             AddPattern("_ABC = _REG", delegate (TokenList aTokens)
                                       {
-                                          AS.LoadRegister(r12, GetLabel(aTokens[0]));
+                                          //TODO: Implement LoadRegister for Labels
+                                          //AS.LoadRegister(r12, GetLabel(aTokens[0]));
+                                          AS.LiteralCode("LDR " + r12.Name + ", =" + GetLabel(aTokens[0]));
                                           AS.StoreRegister(aTokens[2].Register, r12);
                                       });
             AddPattern("_ABC = #_ABC", delegate (TokenList aTokens)
                                        {
-                                           AS.Move(GetLabel(aTokens[0]), ConstLabel(aTokens[3]), destinationIsIndirect: true, size: RegisterSize.Int32);
+                                           //TODO: Check this
+                                           AS.LiteralCode("LDR " + r12.Name + ", =" + GetLabel(aTokens[0]));
+                                           AS.LiteralCode("LDR " + r11.Name + ", =" + ConstLabel(aTokens[3]));
+                                           AS.StoreRegister(r11, r12);
+                                           //AS.Move(GetLabel(aTokens[0]), ConstLabel(aTokens[3]), destinationIsIndirect: true, size: RegisterSize.Int32);
                                        });
             AddPattern("_ABC = 123", delegate (TokenList aTokens)
                                      {
-                                         AS.Move(GetLabel(aTokens[0]), aTokens[2].IntValue, destinationIsIndirect: true);
+                                         //TODO: Check this
+                                         AS.Move(r12, aTokens[2].IntValue);
+                                         AS.LiteralCode("LDR " + r11.Name + ", =" + GetLabel(aTokens[0]));
+                                         AS.StoreRegister(r12, r11);
+                                         //AS.Move(GetLabel(aTokens[0]), aTokens[2].IntValue, destinationIsIndirect: true);
                                      });
-            AddPattern(new string[]
-                       {
-                   "_ABC = 123 as byte", "_ABC = 123 as word", "_ABC = 123 as dword"
-                       }, delegate (TokenList aTokens)
-                          {
-                              AS.Move(GetLabel(aTokens[0]), aTokens[2].IntValue, size: GetSize(aTokens[4]));
-                          });
+            //AddPattern(new string[]
+            //           {
+            //       "_ABC = 123 as byte", "_ABC = 123 as word", "_ABC = 123 as dword"
+            //           }, delegate (TokenList aTokens)
+            //              {
+            //                  AS.Move(GetLabel(aTokens[0]), aTokens[2].IntValue, size: GetSize(aTokens[4]));
+            //              });
 
             AddPattern(new string[]
                        {
@@ -1347,6 +1371,7 @@ namespace ASharp.Compiler
         public bool GetPatternCode(TokenList aTokens)
         {
             var xPattern = FindMatch(aTokens);
+
             if (xPattern == null)
             {
                 return false;
@@ -1391,6 +1416,7 @@ namespace ASharp.Compiler
             var xTokens = xParser.Tokens;
 
             var xResult = GetPatternCode(xTokens);
+
             if (!xResult)
             {
                 if (!GetNonPatternCode(xTokens))
@@ -1409,6 +1435,7 @@ namespace ASharp.Compiler
         protected void AddPattern(string aPattern, CodeFunc aCode)
         {
             Parser xParser = null;
+
             try
             {
                 xParser = new Parser(aPattern, 1, false, true);
@@ -1417,7 +1444,9 @@ namespace ASharp.Compiler
             {
                 throw new Exception(string.Format("Invalid pattern '{0}'", aPattern ?? "NULL"), e);
             }
+
             var xPattern = new Pattern(xParser.Tokens, aCode, aPattern);
+
             mPatterns.Add(xPattern);
         }
 

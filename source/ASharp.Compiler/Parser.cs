@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using static ASharp.Compiler.ASRegisters;
 
 namespace ASharp.Compiler
 {
+    using static ASRegisters;
+
     /// <summary>
     /// Parser recognizes the following tokens:
     /// - _123      -> Number
@@ -68,7 +68,7 @@ namespace ASharp.Compiler
 
         static Parser()
         {
-            Registers = ASRegisters.GetRegisters();
+            Registers = GetRegisters();
         }
 
         /// <summary>Parse next token from currently parsed line, starting at given position and
@@ -176,7 +176,7 @@ namespace ASharp.Compiler
                 }
                 else if (IsAlphaNum(xChar1))
                 { // This must be after check for ValueInt
-                    string xUpper = xString.ToUpper();
+                    string xUpper = xString.ToUpperInvariant();
 
                     // Special parsing when in pattern mode. We recognize some special strings
                     // which would otherwise be considered as simple AlphaNum token otherwise.
@@ -206,7 +206,7 @@ namespace ASharp.Compiler
                     if (xToken.Type == TokenType.Unknown)
                     {
                         Register xRegister;
-                        if (Registers.TryGetValue(xUpper, out xRegister))
+                        if (Registers.TryGetValue(xUpper.ToLowerInvariant(), out xRegister))
                         {
                             xToken.Type = TokenType.Register;
                             xToken.SetRegister(xRegister);

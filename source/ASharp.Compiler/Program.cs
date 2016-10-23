@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Cosmos.Assembler;
 
 namespace ASharp.Compiler
 {
@@ -21,29 +19,31 @@ namespace ASharp.Compiler
 
                 var xGenerator = new AsmGenerator();
 
-                //string[] xFiles;
-                //if (Directory.Exists(xSrc))
-                //{
-                //  xFiles = Directory.GetFiles(xSrc, "*.xs");
-                //}
-                //else
-                //{
-                //  xFiles = new string[] { xSrc };
-                //}
-                //foreach (var xFile in xFiles)
-                //{
-                //  xGenerator.GenerateToFiles(xFile);
-                //}
+                string[] xFiles;
+
+                if (Directory.Exists(xSrc))
+                {
+                    xFiles = Directory.GetFiles(xSrc, "*.as");
+                }
+                else
+                {
+                    xFiles = new string[] { xSrc };
+                }
+
+                foreach (var xFile in xFiles)
+                {
+                    xGenerator.GenerateToFiles(xFile);
+                }
 
                 var xAsm = new Assembler();
 
-                var xStreamReader = new StringReader(@"namespace Test
-                    while byte ESI[0] != 0 {
-                        ! nop
-                    }
-                    ");
+                //var xStreamReader = new StringReader(@"namespace Test
+                //    while byte ESI[0] != 0 {
+                //        ! nop
+                //    }
+                //    ");
 
-                var xResult = xGenerator.Generate(xStreamReader);
+                //var xResult = xGenerator.Generate(xStreamReader);
 
                 xSW.Stop();
 
@@ -54,8 +54,12 @@ namespace ASharp.Compiler
                 xSW.Stop();
 
                 Console.WriteLine(ex.ToString());
-                Environment.Exit(1);
             }
+
+            Console.WriteLine("Press any key to exit.");
+            Console.ReadLine();
+
+            Environment.Exit(1);
         }
     }
 }

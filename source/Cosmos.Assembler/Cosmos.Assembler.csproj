@@ -118,6 +118,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ARMv7\CompareNot.cs" />
     <Compile Include="ARMv7\Multiply.cs" />
     <Compile Include="ARMv7\Add.cs" />
     <Compile Include="ARMv7\AddWithCarry.cs" />
@@ -129,6 +130,12 @@
     <Compile Include="ARMv7\BranchWithLink.cs" />
     <Compile Include="ARMv7\ExceptionReturn.cs" />
     <Compile Include="ARMv7\ExclusiveOr.cs" />
+    <Compile Include="ARMv7\SetEventLocally.cs" />
+    <Compile Include="ARMv7\Compare.cs" />
+    <Compile Include="ARMv7\WaitForEvent.cs" />
+    <Compile Include="ARMv7\WaitForInterrupt.cs" />
+    <Compile Include="ARMv7\Yield.cs" />
+    <Compile Include="ARMv7\SetEvent.cs" />
     <Compile Include="ARMv7\StoreRegister.cs" />
     <Compile Include="ARMv7\LogicalShiftLeft.cs" />
     <Compile Include="ARMv7\LogicalShiftRight.cs" />
@@ -173,7 +180,7 @@
     <Compile Include="ARMv7\_Infra\InstructionWithOptionalFlagsUpdateAndDestinationAndOperand.cs" />
     <Compile Include="ARMv7\_Infra\InstructionWithOptionalFlagsUpdateAndDestinationAndTwoOperands.cs" />
     <Compile Include="ARMv7\_Infra\InstructionWithDataSizeAndOperandsAndMemoryAddress.cs" />
-    <Compile Include="ARMv7\_Infra\InstructionWithTwoOperands.cs" />
+    <Compile Include="ARMv7\_Infra\InstructionWithOperandAndOperand2.cs" />
     <Compile Include="ARMv7\_Infra\Registers.cs" />
     <Compile Include="Assembler.cs" />
     <Compile Include="BaseAssemblerElement.cs" />

@@ -18,9 +18,9 @@ namespace ASharp.Compiler
                 ConditionEnum = conditionEnum;
             }
 
-            public static implicit operator ConditionsEnum(Condition condition)
+            public static implicit operator ConditionsEnum?(Condition condition)
             {
-                return condition.ConditionEnum;
+                return condition?.ConditionEnum;
             }
         }
 
@@ -30,7 +30,7 @@ namespace ASharp.Compiler
         {
             mConditions = new Dictionary<string, Condition>();
 
-            foreach (var xField in typeof(ASRegisters).GetFields(BindingFlags.Static | BindingFlags.Public))
+            foreach (var xField in typeof(ASConditions).GetFields(BindingFlags.Static | BindingFlags.Public))
             {
                 mConditions.Add(xField.Name, (Condition)xField.GetValue(null));
             }

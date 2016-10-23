@@ -1,12 +1,12 @@
 ﻿namespace Cosmos.Assembler.ARMv7
 {
-    public abstract class InstructionWithTwoOperands : Instruction, IInstructionWithOperand, IInstructionWithOperand2
+    public abstract class InstructionWithOperandAndOperand2 : Instruction, IInstructionWithOperand, IInstructionWithOperand2
     {
-        public InstructionWithTwoOperands()
+        public InstructionWithOperandAndOperand2()
         {
         }
 
-        public InstructionWithTwoOperands(string mnemonic) : base(mnemonic)
+        public InstructionWithOperandAndOperand2(string mnemonic) : base(mnemonic)
         {
         }
 
