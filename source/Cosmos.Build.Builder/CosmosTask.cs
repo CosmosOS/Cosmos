@@ -169,6 +169,33 @@ namespace Cosmos.Build.Builder
             return (from x in Process.GetProcesses() where x.ProcessName.Contains(name) select x).Count();
         }
 
+        protected bool IsVMWareInstalled()
+        {
+            //Check registry keys
+            if (CheckForInstall("VMware Workstation", false)) {
+				return true;
+			}
+            if (CheckForInstall("VMware Player", false)) {
+				return true;
+			}
+            if (CheckForInstall("VMwarePlayer_x64", false)) {
+				return true;
+			}
+
+            try //Try/catch block since the reg key might not exist, we might not have perms etc.
+            {
+                using (var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VMware, Inc.\VMware Player"))
+                {
+                    return true; //Just assume that because we have the key, we've installed
+                    //return (key.GetValue("ProductCode") != null); //On successful install, ProductCode should be set (we don't care what the value is, but we care that it exists)
+                }
+            }
+            catch
+            { //TODO: check directories?
+                return false;
+            }
+        }
+
         protected bool CheckForInstall(string aCheck, bool aCanThrow)
         {
             return CheckForProduct(aCheck, aCanThrow, @"SOFTWARE\Classes\Installer\Products\", "ProductName");
@@ -357,18 +384,9 @@ namespace Cosmos.Build.Builder
             CheckNet35Sp1(); // Required by VMWareLib and other stuff
             CheckNet403();
             CheckForInno();
-            bool vmWareInstalled = true;
+            bool vmWareInstalled = IsVMWareInstalled();
             bool bochsInstalled = IsBochsInstalled();
-            if (!CheckForInstall("VMware Workstation", false))
-            {
-                if (!CheckForInstall("VMware Player", false))
-                {
-                    if (!CheckForInstall("VMwarePlayer_x64", false))
-                    {
-                        vmWareInstalled = false;
-                    }
-                }
-            }
+            
             if (!vmWareInstalled && !bochsInstalled)
             {
                 NotFound("VMWare or Bochs");
