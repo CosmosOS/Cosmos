@@ -111,6 +111,7 @@ namespace Cosmos.System
                 if (!aReleased)
                 {
                     KeyEvent keyInfo;
+                    
                     if (GetKey(key, out keyInfo))
                     {
                         Enqueue(keyInfo);
@@ -133,7 +134,9 @@ namespace Cosmos.System
             {
                 Debugger.DoSend("No KeyLayout");
             }
+            
             keyInfo = _scanMap.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, NumLock, CapsLock, ScrollLock);
+            
             return keyInfo != null;
         }
 
@@ -144,7 +147,9 @@ namespace Cosmos.System
                 oKey = mQueuedKeys.Dequeue();
                 return true;
             }
+            
             oKey = default(KeyEvent);
+            
             return false;
         }
 
@@ -154,6 +159,7 @@ namespace Cosmos.System
             {
                 KeyboardBase.WaitForKey();
             }
+            
             return mQueuedKeys.Dequeue();
         }
 
@@ -174,7 +180,7 @@ namespace Cosmos.System
         {
             if (!KeyboardExists(Keyboard.GetType()))
             {
-                Keyboard.OnKeyPressed += new KeyboardBase.KeyPressedEventHandler(HandleScanCode);
+                Keyboard.OnKeyPressed = new KeyboardBase.KeyPressedEventHandler(HandleScanCode);
                 Keyboards.Add(Keyboard);
             }
         }
