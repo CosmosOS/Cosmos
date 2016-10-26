@@ -9,7 +9,7 @@ namespace Cosmos.System.Plugs.System
     {
         public static string ToString(object aThis)
         {
-            throw new NotImplementedException("RuntimeTypePlug.ToStrin()");
+            throw new NotImplementedException("RuntimeTypePlug.ToString()");
         }
 
     }

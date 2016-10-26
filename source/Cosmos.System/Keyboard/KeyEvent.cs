@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Cosmos.HAL
+namespace Cosmos.System
 {
     public class KeyEvent
     {
