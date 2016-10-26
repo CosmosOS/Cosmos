@@ -11,20 +11,6 @@ namespace Cosmos.HAL.Drivers
        
         private Core.IOGroup.VBE IO = Core.Global.BaseIOGroups.VBE;
 
-
-        /// <summary>
-        /// The current Width of the screen in pixels
-        /// </summary>
-        public uint ScreenWidth { get; set; }
-        /// <summary>
-        /// The current Height of the screen in pixels
-        /// </summary>
-        public uint ScreenHeight { get; set; }
-        /// <summary>
-        /// The current Bytes per pixel
-        /// </summary>
-        public uint ScreenBpp { get; set; }
-
         private void vbe_write(ushort index, ushort value)
         {
             IO.VbeIndex.Word =  index;
@@ -33,10 +19,6 @@ namespace Cosmos.HAL.Drivers
 
         public void vbe_set(ushort xres, ushort yres, ushort bpp)
         {
-            ScreenWidth = xres;
-            ScreenHeight = yres;
-            ScreenBpp = bpp;
-
             //Disable Display
             vbe_write(0x4, 0x00);
             //Set Display Xres
@@ -51,13 +33,13 @@ namespace Cosmos.HAL.Drivers
 
         public void set_vram(uint index, byte value)
         {
-            IO.VBEMemoryBlock[index] = value;
+            IO.VGAMemoryBlock[index] = value;
         }
-        
+
         public byte get_vram(uint index)
         {
-            return IO.VBEMemoryBlock[index];
+            return IO.VGAMemoryBlock[index];
         }
-        
+
     }
 }
