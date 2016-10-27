@@ -29,7 +29,8 @@ namespace XSharp.VS {
         using (var xOut = new StringWriter()) {
             try
             {
-              new Assembler();
+              new Assembler(CompilerStyles.NAsm);
+
               try
               {
                 var xGen = new XSharp.Compiler.AsmGenerator();

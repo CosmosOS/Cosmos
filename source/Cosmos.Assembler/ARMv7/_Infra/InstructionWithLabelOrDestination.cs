@@ -48,6 +48,8 @@
             {
                 aOutput.Write(mMnemonic);
 
+                aOutput.Write(this.GetConditionAsString());
+
                 string label = this.GetLabelAsString();
 
                 if (!string.IsNullOrEmpty(label))

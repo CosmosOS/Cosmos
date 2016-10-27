@@ -1,13 +1,19 @@
 ﻿namespace Cosmos.Assembler.ARMv7
 {
-    public abstract class InstructionWithOperandAndOperand2 : Instruction, IInstructionWithOperand, IInstructionWithOperand2
+    public class InstructionWithDestinationAndTwoOperands : Instruction, IInstructionWithDestination, IInstructionWithOperand, IInstructionWithSecondOperand
     {
-        public InstructionWithOperandAndOperand2()
+        public InstructionWithDestinationAndTwoOperands()
         {
         }
 
-        public InstructionWithOperandAndOperand2(string mnemonic) : base(mnemonic)
+        public InstructionWithDestinationAndTwoOperands(string mnemonic) : base(mnemonic)
         {
+        }
+
+        public RegistersEnum? DestinationReg
+        {
+            get;
+            set;
         }
 
         public RegistersEnum? OperandReg
@@ -16,19 +22,7 @@
             set;
         }
 
-        public RegistersEnum? Operand2Reg
-        {
-            get;
-            set;
-        }
-
-        public uint? Operand2Value
-        {
-            get;
-            set;
-        }
-
-        public OptionalShift Operand2Shift
+        public RegistersEnum? SecondOperandReg
         {
             get;
             set;
@@ -50,23 +44,34 @@
 
             aOutput.Write(this.GetConditionAsString());
 
+            string destination = this.GetDestinationAsString();
             string firstOperand = this.GetOperandAsString();
-            string operand2 = this.GetOperand2AsString();
+            string secondOperand = this.GetSecondOperandAsString();
+
+            if (!destination.Equals(""))
+            {
+                aOutput.Write(" ");
+                aOutput.Write(destination);
+            }
 
             if (!firstOperand.Equals(""))
             {
-                aOutput.Write(" ");
+                if (!destination.Equals(""))
+                {
+                    aOutput.Write(", ");
+                }
+
                 aOutput.Write(firstOperand);
             }
 
-            if (!operand2.Equals(""))
+            if (!secondOperand.Equals(""))
             {
                 if (!firstOperand.Equals(""))
                 {
                     aOutput.Write(", ");
                 }
 
-                aOutput.Write(operand2);
+                aOutput.Write(secondOperand);
             }
         }
     }

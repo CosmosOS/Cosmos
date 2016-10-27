@@ -22,7 +22,7 @@
             set;
         }
 
-        public RegistersEnum? FirstOperandReg
+        public RegistersEnum? OperandReg
         {
             get;
             set;
@@ -40,7 +40,7 @@
             set;
         }
 
-        public Operand2Shift Operand2Shift
+        public OptionalShift Operand2Shift
         {
             get;
             set;
@@ -68,6 +68,8 @@
             aOutput.Write(this.GetConditionAsString());
 
             string destination = this.GetDestinationAsString();
+            string firstOperand = this.GetOperandAsString();
+            string operand2 = this.GetOperand2AsString();
 
             if (!destination.Equals(""))
             {
@@ -75,19 +77,23 @@
                 aOutput.Write(destination);
             }
 
-            string firstOperand = this.GetFirstOperandAsString();
-
-            if (!(firstOperand.Equals("")))
+            if (!destination.Equals("") && !firstOperand.Equals(""))
             {
                 aOutput.Write(", ");
+            }
+
+            if (!firstOperand.Equals(""))
+            {
                 aOutput.Write(firstOperand);
             }
 
-            string operand2 = this.GetOperand2AsString();
-
             if (!operand2.Equals(""))
             {
-                aOutput.Write(", ");
+                if (!firstOperand.Equals(""))
+                {
+                    aOutput.Write(", ");
+                }
+
                 aOutput.Write(operand2);
             }
         }

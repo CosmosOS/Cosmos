@@ -26,6 +26,21 @@ namespace ASharp.Compiler
 
         #region InstructionWithDataSizeAndOperandsAndMemoryAddress
 
+        private static void Do<T>(Register firstOperand, Register baseMemoryAddress, Register memoryAddressOffset, OptionalShift memoryAddressOptionalShift, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
+          where T : InstructionWithDataSizeAndOperandsAndMemoryAddress, new()
+        {
+            new T
+            {
+                Condition = condition,
+                DataSize = dataSize,
+                OperandReg = firstOperand,
+                BaseMemoryAddressReg = baseMemoryAddress,
+                MemoryAddressOffsetReg = memoryAddressOffset,
+                MemoryAddressOffsetType = memoryAddressOffsetType,
+                MemoryAddressOptionalShift = memoryAddressOptionalShift
+            };
+        }
+
         private static void Do<T>(Register firstOperand, Register baseMemoryAddress, short? memoryAddressOffset = null, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
           where T : InstructionWithDataSizeAndOperandsAndMemoryAddress, new()
         {
@@ -33,9 +48,24 @@ namespace ASharp.Compiler
             {
                 Condition = condition,
                 DataSize = dataSize,
-                FirstOperandReg = firstOperand,
+                OperandReg = firstOperand,
                 BaseMemoryAddressReg = baseMemoryAddress,
-                MemoryAddressOffset = memoryAddressOffset,
+                MemoryAddressOffsetValue = memoryAddressOffset,
+                MemoryAddressOffsetType = memoryAddressOffsetType
+            };
+        }
+
+        private static void Do<T>(Register firstOperand, Register secondOperand, Register baseMemoryAddress, Register memoryAddressOffset, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
+          where T : InstructionWithDataSizeAndOperandsAndMemoryAddress, new()
+        {
+            new T
+            {
+                Condition = condition,
+                DataSize = dataSize,
+                OperandReg = firstOperand,
+                SecondOperandReg = secondOperand,
+                BaseMemoryAddressReg = baseMemoryAddress,
+                MemoryAddressOffsetReg = memoryAddressOffset,
                 MemoryAddressOffsetType = memoryAddressOffsetType
             };
         }
@@ -47,10 +77,10 @@ namespace ASharp.Compiler
             {
                 Condition = condition,
                 DataSize = dataSize,
-                FirstOperandReg = firstOperand,
+                OperandReg = firstOperand,
                 SecondOperandReg = secondOperand,
                 BaseMemoryAddressReg = baseMemoryAddress,
-                MemoryAddressOffset = memoryAddressOffset,
+                MemoryAddressOffsetValue = memoryAddressOffset,
                 MemoryAddressOffsetType = memoryAddressOffsetType
             };
         }
@@ -71,6 +101,22 @@ namespace ASharp.Compiler
 
         #endregion
 
+        #region InstructionWithDestinationAndLabel
+
+        private static void Do<T>(Register destination, string label, uint? labelOffset = null, Condition condition = null)
+          where T : InstructionWithDestinationAndLabel, new()
+        {
+            new T
+            {
+                Condition = condition,
+                DestinationReg = destination,
+                Label = label,
+                LabelOffset = labelOffset
+            };
+        }
+
+        #endregion
+
         #region InstructionWithDestinationAndOperand
 
         private static void Do<T>(Register destination, Register operand, Condition condition = null)
@@ -80,7 +126,23 @@ namespace ASharp.Compiler
             {
                 Condition = condition,
                 DestinationReg = destination,
-                FirstOperandReg = operand
+                OperandReg = operand
+            };
+        }
+
+        #endregion
+
+        #region InstructionWithDestinationAndTwoOperands
+
+        private static void Do<T>(Register destination, Register firstOperand, Register secondOperand, Condition condition = null)
+          where T : InstructionWithDestinationAndTwoOperands, new()
+        {
+            new T
+            {
+                Condition = condition,
+                DestinationReg = destination,
+                OperandReg = firstOperand,
+                SecondOperandReg = secondOperand
             };
         }
 
@@ -111,15 +173,15 @@ namespace ASharp.Compiler
                 Condition = condition,
                 UpdateFlags = updateFlags,
                 DestinationReg = destination,
-                FirstOperandReg = firstOperand
+                OperandReg = firstOperand
             };
         }
 
         #endregion
 
-        #region InstructionWithOptionalSuffixAndDestinationAndOperand2
+        #region InstructionWithOptionalFlagsUpdateAndDestinationAndOperand2
 
-        private static void Do<T>(Register destination, Register operand2, Operand2Shift operand2Shift = null, bool updateFlags = false, Condition condition = null)
+        private static void Do<T>(Register destination, Register operand2, OptionalShift operand2Shift = null, bool updateFlags = false, Condition condition = null)
           where T : InstructionWithOptionalFlagsUpdateAndDestinationAndOperand2, new()
         {
             new T
@@ -146,9 +208,9 @@ namespace ASharp.Compiler
 
         #endregion
 
-        #region InstructionWithOptionalSuffixAndDestinationAndOperandAndOperand2
+        #region InstructionWithOptionalFlagsUpdateAndDestinationAndOperandAndOperand2
 
-        private static void Do<T>(Register destination, Register firstOperand, Register operand2, Operand2Shift operand2Shift = null, bool updateFlags = false, Condition condition = null)
+        private static void Do<T>(Register destination, Register firstOperand, Register operand2, OptionalShift operand2Shift = null, bool updateFlags = false, Condition condition = null)
           where T : InstructionWithOptionalFlagsUpdateAndDestinationAndOperandAndOperand2, new()
         {
             new T
@@ -156,7 +218,7 @@ namespace ASharp.Compiler
                 Condition = condition,
                 UpdateFlags = updateFlags,
                 DestinationReg = destination,
-                FirstOperandReg = firstOperand,
+                OperandReg = firstOperand,
                 Operand2Reg = operand2,
                 Operand2Shift = operand2Shift
             };
@@ -170,14 +232,14 @@ namespace ASharp.Compiler
                 Condition = condition,
                 UpdateFlags = updateFlags,
                 DestinationReg = destination,
-                FirstOperandReg = firstOperand,
+                OperandReg = firstOperand,
                 Operand2Value = secondOperand
             };
         }
 
         #endregion
 
-        #region InstructionWithOptionalSuffixAndDestinationAndTwoOperands
+        #region InstructionWithOptionalFlagsUpdateAndDestinationAndTwoOperands
 
         private static void Do<T>(Register destination, Register firstOperand, Register secondOperand, bool updateFlags = false, Condition condition = null)
           where T : InstructionWithOptionalFlagsUpdateAndDestinationAndTwoOperands, new()
@@ -187,7 +249,7 @@ namespace ASharp.Compiler
                 Condition = condition,
                 UpdateFlags = updateFlags,
                 DestinationReg = destination,
-                FirstOperandReg = firstOperand,
+                OperandReg = firstOperand,
                 SecondOperandReg = secondOperand,
             };
         }
@@ -203,7 +265,7 @@ namespace ASharp.Compiler
 
             for (ushort i = 0; i < registerList.Count; i++)
             {
-                reglist[i] = registerList[i];
+                reglist[i] = registerList[i].RegEnum;
             }
 
             new T
@@ -217,13 +279,13 @@ namespace ASharp.Compiler
 
         #region InstructionWithOperandAndOperand2
 
-        private static void Do<T>(Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, Condition condition = null)
+        private static void Do<T>(Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, Condition condition = null)
           where T : InstructionWithOperandAndOperand2, new()
         {
             new T
             {
                 Condition = condition,
-                FirstOperandReg = firstOperand,
+                OperandReg = firstOperand,
                 Operand2Reg = secondOperand,
                 Operand2Shift = secondOperandShift
             };
@@ -235,7 +297,7 @@ namespace ASharp.Compiler
             new T
             {
                 Condition = condition,
-                FirstOperandReg = firstOperand,
+                OperandReg = firstOperand,
                 Operand2Value = secondOperand
             };
         }
@@ -252,7 +314,7 @@ namespace ASharp.Compiler
                 Condition = condition,
                 UpdateFlags = updateFlags,
                 DestinationReg = destination,
-                FirstOperandReg = firstOperand,
+                OperandReg = firstOperand,
                 ShiftValue = bitsToShift
             };
         }
@@ -299,12 +361,12 @@ namespace ASharp.Compiler
             new LiteralAssemblerCode(code);
         }
 
-        public static void Add(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void Add(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<Add>(destination, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
 
-        public static void Add(Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void Add(Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<Add>(null, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
@@ -319,12 +381,12 @@ namespace ASharp.Compiler
             Do<Add>(null, firstOperand, secondOperand, updateFlags, condition);
         }
 
-        public static void AddWithCarry(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void AddWithCarry(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<AddWithCarry>(destination, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
 
-        public static void AddWithCarry(Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void AddWithCarry(Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<AddWithCarry>(null, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
@@ -339,7 +401,7 @@ namespace ASharp.Compiler
             Do<AddWithCarry>(null, firstOperand, secondOperand, updateFlags, condition);
         }
 
-        public static void And(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, Condition condition = null)
+        public static void And(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, Condition condition = null)
         {
             Do<And>(destination, firstOperand, secondOperand, secondOperandShift, false, condition);
         }
@@ -394,7 +456,7 @@ namespace ASharp.Compiler
             Do<BranchWithLinkAndExchange>(label, labelOffset, condition);
         }
 
-        public static void Compare(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift, Condition condition = null)
+        public static void Compare(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift, Condition condition = null)
         {
             Do<Compare>(firstOperand, secondOperand, secondOperandShift, condition);
         }
@@ -404,14 +466,19 @@ namespace ASharp.Compiler
             Do<Compare>(firstOperand, secondOperand, condition);
         }
 
-        public static void CompareNot(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift, Condition condition = null)
+        public static void CompareNegative(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift, Condition condition = null)
         {
-            Do<CompareNot>(firstOperand, secondOperand, secondOperandShift, condition);
+            Do<CompareNegative>(firstOperand, secondOperand, secondOperandShift, condition);
         }
 
-        public static void CompareNot(Register destination, Register firstOperand, uint secondOperand, Condition condition = null)
+        public static void CompareNegative(Register destination, Register firstOperand, uint secondOperand, Condition condition = null)
         {
-            Do<CompareNot>(firstOperand, secondOperand, condition);
+            Do<CompareNegative>(firstOperand, secondOperand, condition);
+        }
+
+        public static void CountLeadingZeros(Register destination, Register operand, Condition condition = null)
+        {
+            Do<CountLeadingZeros>(destination, operand, condition);
         }
 
         public static void ExceptionReturn(Condition condition = null)
@@ -419,7 +486,7 @@ namespace ASharp.Compiler
             Do<ExceptionReturn>(condition);
         }
 
-        public static void ExclusiveOr(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void ExclusiveOr(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<ExclusiveOr>(destination, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
@@ -429,9 +496,29 @@ namespace ASharp.Compiler
             Do<ExclusiveOr>(destination, firstOperand, secondOperand, false, condition);
         }
 
-        public static void LoadRegister(Register firstOperand, Register baseMemoryAddress, short? memoryAddressOffset = null, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
+        public static void LabelAddress(Register destination, string label, uint? labelOffset = null, Condition condition = null)
         {
-            Do<LoadRegister>(firstOperand, baseMemoryAddress, memoryAddressOffset, memoryAddressOffsetType, dataSize, condition);
+            Do<LabelAddress>(destination, label, labelOffset, condition);
+        }
+
+        public static void LoadLabelAddress(Register destination, string label, uint? labelOffset = null, Condition condition = null)
+        {
+            Do<LoadLabelAddress>(destination, label, labelOffset, condition);
+        }
+
+        public static void LoadRegister(Register operand, Register baseMemoryAddress, Register memoryAddressOffset, OptionalShift memoryAddressOptionalShift = null, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
+        {
+            Do<LoadRegister>(operand, baseMemoryAddress, memoryAddressOffset, memoryAddressOptionalShift, memoryAddressOffsetType, dataSize, condition);
+        }
+
+        public static void LoadRegister(Register operand, Register baseMemoryAddress, short? memoryAddressOffset = null, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
+        {
+            Do<LoadRegister>(operand, baseMemoryAddress, memoryAddressOffset, memoryAddressOffsetType, dataSize, condition);
+        }
+
+        public static void LoadRegister(Register firstOperand, Register secondOperand, Register baseMemoryAddress, Register memoryAddressOffset, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
+        {
+            Do<LoadRegister>(firstOperand, secondOperand, baseMemoryAddress, memoryAddressOffset, memoryAddressOffsetType, dataSize, condition);
         }
 
         public static void LoadRegister(Register firstOperand, Register secondOperand, Register baseMemoryAddress, short? memoryAddressOffset = null, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
@@ -459,7 +546,7 @@ namespace ASharp.Compiler
             Do<LogicalShiftRight>(destination, operand, bitsToShift, updateFlags, condition);
         }
 
-        public static void Move(Register destination, Register operand2, Operand2Shift operand2Shift = null, bool updateFlags = false, Condition condition = null)
+        public static void Move(Register destination, Register operand2, OptionalShift operand2Shift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<Move>(destination, operand2, operand2Shift, updateFlags, condition);
         }
@@ -469,7 +556,7 @@ namespace ASharp.Compiler
             Do<Move>(destination, operand2, updateFlags, condition);
         }
 
-        public static void MoveNot(Register destination, Register operand2, Operand2Shift operand2Shift, bool updateFlags = false, Condition condition = null)
+        public static void MoveNot(Register destination, Register operand2, OptionalShift operand2Shift, bool updateFlags = false, Condition condition = null)
         {
             Do<MoveNot>(destination, operand2, operand2Shift, updateFlags, condition);
         }
@@ -479,12 +566,12 @@ namespace ASharp.Compiler
             Do<MoveNot>(destination, operand2, updateFlags, condition);
         }
 
-        public static void Multiply(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void Multiply(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<Multiply>(destination, firstOperand, secondOperand, updateFlags, condition);
         }
 
-        public static void Multiply(Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void Multiply(Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<Multiply>(null, firstOperand, secondOperand, updateFlags, condition);
         }
@@ -499,7 +586,7 @@ namespace ASharp.Compiler
             Do<NoOp>(condition);
         }
 
-        public static void Or(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void Or(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<Or>(destination, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
@@ -509,7 +596,7 @@ namespace ASharp.Compiler
             Do<Or>(destination, firstOperand, secondOperand, false, condition);
         }
 
-        public static void OrNot(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void OrNot(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<OrNot>(destination, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
@@ -539,12 +626,12 @@ namespace ASharp.Compiler
             Do<Push>(reglist, condition);
         }
 
-        public static void ReverseSubtract(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void ReverseSubtract(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<ReverseSubtract>(destination, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
 
-        public static void ReverseSubtract(Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void ReverseSubtract(Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<ReverseSubtract>(null, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
@@ -559,12 +646,12 @@ namespace ASharp.Compiler
             Do<ReverseSubtract>(null, firstOperand, secondOperand, updateFlags, condition);
         }
 
-        public static void ReverseSubtractWithCarry(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void ReverseSubtractWithCarry(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<ReverseSubtractWithCarry>(destination, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
 
-        public static void ReverseSubtractWithCarry(Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void ReverseSubtractWithCarry(Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<ReverseSubtractWithCarry>(null, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
@@ -611,9 +698,29 @@ namespace ASharp.Compiler
             Do<SetEventLocally>(condition);
         }
 
-        public static void StoreRegister(Register firstOperand, Register baseMemoryAddress, short? memoryAddressOffset = null, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
+        public static void SignedDivide(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
-            Do<StoreRegister>(firstOperand, baseMemoryAddress, memoryAddressOffset, memoryAddressOffsetType, dataSize, condition);
+            Do<SignedDivide>(destination, firstOperand, secondOperand, condition);
+        }
+
+        public static void SignedDivide(Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        {
+            Do<SignedDivide>(null, firstOperand, secondOperand, condition);
+        }
+
+        public static void StoreRegister(Register operand, Register baseMemoryAddress, Register memoryAddressOffset, OptionalShift memoryAddressOptionalShift = null, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
+        {
+            Do<StoreRegister>(operand, baseMemoryAddress, memoryAddressOffset, memoryAddressOptionalShift, memoryAddressOffsetType, dataSize, condition);
+        }
+
+        public static void StoreRegister(Register operand, Register baseMemoryAddress, short? memoryAddressOffset = null, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
+        {
+            Do<StoreRegister>(operand, baseMemoryAddress, memoryAddressOffset, memoryAddressOffsetType, dataSize, condition);
+        }
+
+        public static void StoreRegister(Register firstOperand, Register secondOperand, Register baseMemoryAddress, Register memoryAddressOffset, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
+        {
+            Do<StoreRegister>(firstOperand, secondOperand, baseMemoryAddress, memoryAddressOffset, memoryAddressOffsetType, dataSize, condition);
         }
 
         public static void StoreRegister(Register firstOperand, Register secondOperand, Register baseMemoryAddress, short? memoryAddressOffset = null, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
@@ -621,12 +728,12 @@ namespace ASharp.Compiler
             Do<StoreRegister>(firstOperand, secondOperand, baseMemoryAddress, memoryAddressOffset, memoryAddressOffsetType, dataSize, condition);
         }
 
-        public static void Subtract(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void Subtract(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<Subtract>(destination, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
 
-        public static void Subtract(Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void Subtract(Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<Subtract>(null, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
@@ -641,12 +748,12 @@ namespace ASharp.Compiler
             Do<Subtract>(null, firstOperand, secondOperand, updateFlags, condition);
         }
 
-        public static void SubtractWithCarry(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void SubtractWithCarry(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<SubtractWithCarry>(destination, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
 
-        public static void SubtractWithCarry(Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        public static void SubtractWithCarry(Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
         {
             Do<SubtractWithCarry>(null, firstOperand, secondOperand, secondOperandShift, updateFlags, condition);
         }
@@ -661,7 +768,7 @@ namespace ASharp.Compiler
             Do<SubtractWithCarry>(null, firstOperand, secondOperand, updateFlags, condition);
         }
 
-        public static void TestBits(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift, Condition condition = null)
+        public static void TestBits(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift, Condition condition = null)
         {
             Do<TestBits>(firstOperand, secondOperand, secondOperandShift, condition);
         }
@@ -671,7 +778,7 @@ namespace ASharp.Compiler
             Do<TestBits>(firstOperand, secondOperand, condition);
         }
 
-        public static void TestEquivalence(Register destination, Register firstOperand, Register secondOperand, Operand2Shift secondOperandShift, Condition condition = null)
+        public static void TestEquivalence(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift, Condition condition = null)
         {
             Do<TestEquivalence>(firstOperand, secondOperand, secondOperandShift, condition);
         }
@@ -679,6 +786,16 @@ namespace ASharp.Compiler
         public static void TestEquivalence(Register destination, Register firstOperand, uint secondOperand, Condition condition = null)
         {
             Do<TestEquivalence>(firstOperand, secondOperand, condition);
+        }
+
+        public static void UnsignedDivide(Register destination, Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        {
+            Do<UnsignedDivide>(destination, firstOperand, secondOperand, condition);
+        }
+
+        public static void UnsignedDivide(Register firstOperand, Register secondOperand, OptionalShift secondOperandShift = null, bool updateFlags = false, Condition condition = null)
+        {
+            Do<UnsignedDivide>(null, firstOperand, secondOperand, condition);
         }
 
         public static void WaitForEvent(Condition condition = null)

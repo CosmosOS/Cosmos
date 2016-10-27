@@ -57,6 +57,7 @@ namespace ASharp.Compiler
             public void Start(TokenList aTokens, bool aIsCollector)
             {
                 var xBlock = new Block();
+
                 mCurrentLabelID++;
                 xBlock.LabelID = mCurrentLabelID;
                 xBlock.StartTokens = aTokens;
@@ -64,7 +65,8 @@ namespace ASharp.Compiler
                 // Last because we use Current() above
                 Add(xBlock);
                 xBlock.ParentAssembler = Assembler.CurrentInstance;
-                new Assembler();
+
+                new Assembler(CompilerStyles.GNU);
             }
 
             public void End()
@@ -240,7 +242,7 @@ namespace ASharp.Compiler
 
         /// <summary>Terminate assembling current function. If a local to function exit label has not
         /// been explicitly defined a new one is automatically created. This is because some "return"
-        /// keyword might have been used in function X# code. This keyword requires an exit label to
+        /// keyword might have been used in function A# code. This keyword requires an exit label to
         /// be defined at function level. This method also automatically insert an IRET or RET instruction
         /// depending on whether the function is an interrupt handler or a standard function.</summary>
         protected void EndFunc()
@@ -938,9 +940,7 @@ namespace ASharp.Compiler
 
             AddPattern("_REG = #_ABC", delegate (TokenList aTokens)
                                        {
-                                           //TODO: Implement LoadRegister for Labels
-                                           //AS.LoadRegister(aTokens[0].Register, ConstLabel(aTokens[3]));
-                                           AS.LiteralCode("LDR " + aTokens[0].Register.Name + ", =" + ConstLabel(aTokens[3]));
+                                           AS.LoadLabelAddress(aTokens[0].Register, ConstLabel(aTokens[3]));
                                        });
             AddPattern("_REGADDR[1] = #_ABC", delegate (TokenList aTokens)
                                               {
@@ -1009,18 +1009,15 @@ namespace ASharp.Compiler
 
             AddPattern("_REG = _ABC", delegate (TokenList aTokens)
                                       {
-                                          //TODO: Implement LoadRegister for Labels
-                                          //AS.LoadRegister(aTokens[0].Register, GetLabel(aTokens[2]));
-                                          AS.LiteralCode("LDR " + aTokens[0].Register.Name + ", =" + GetLabel(aTokens[2]));
+                                          AS.LoadLabelAddress(aTokens[0].Register, GetLabel(aTokens[2]));
                                       });
 
             // why not [var] like registers? Because its less frequent to access the ptr
             // and it is like a reg.. without [] to get the value...
             AddPattern("_REG = @_ABC", delegate (TokenList aTokens)
                                        {
-                                           //TODO: Implement LoadRegister for Labels
-                                           //AS.LoadRegister(aTokens[0].Register, GetLabel(aTokens[3]));
-                                           AS.LiteralCode("LDR " + aTokens[0].Register.Name + ", =" + GetLabel(aTokens[3]));
+                                           //TODO: Check this
+                                           AS.LoadLabelAddress(aTokens[0].Register, GetLabel(aTokens[3]));
                                        });
 
             //AddPattern(new string[]
@@ -1061,9 +1058,7 @@ namespace ASharp.Compiler
                    "+#_ABC", "+#_ABC as byte", "+#_ABC as word", "+#_ABC as dword"
                        }, delegate (TokenList aTokens)
                           {
-                              //TODO: Implement LoadRegister for Labels
-                              //AS.LoadRegister(r12, ConstLabel(aTokens[1]));
-                              AS.LiteralCode("LDR " + r12.Name + ", =" + ConstLabel(aTokens[1]));
+                              AS.LoadLabelAddress(r12, ConstLabel(aTokens[1]));
                               AS.Push(r12);
                           });
             //AddPattern("+All", delegate (TokenList aTokens)
@@ -1081,16 +1076,14 @@ namespace ASharp.Compiler
 
             AddPattern("_ABC = _REG", delegate (TokenList aTokens)
                                       {
-                                          //TODO: Implement LoadRegister for Labels
-                                          //AS.LoadRegister(r12, GetLabel(aTokens[0]));
-                                          AS.LiteralCode("LDR " + r12.Name + ", =" + GetLabel(aTokens[0]));
+                                          AS.LoadLabelAddress(r12, GetLabel(aTokens[0]));
                                           AS.StoreRegister(aTokens[2].Register, r12);
                                       });
             AddPattern("_ABC = #_ABC", delegate (TokenList aTokens)
                                        {
                                            //TODO: Check this
-                                           AS.LiteralCode("LDR " + r12.Name + ", =" + GetLabel(aTokens[0]));
-                                           AS.LiteralCode("LDR " + r11.Name + ", =" + ConstLabel(aTokens[3]));
+                                           AS.LoadLabelAddress(r12, GetLabel(aTokens[0]));
+                                           AS.LoadLabelAddress(r11, ConstLabel(aTokens[3]));
                                            AS.StoreRegister(r11, r12);
                                            //AS.Move(GetLabel(aTokens[0]), ConstLabel(aTokens[3]), destinationIsIndirect: true, size: RegisterSize.Int32);
                                        });
@@ -1098,7 +1091,7 @@ namespace ASharp.Compiler
                                      {
                                          //TODO: Check this
                                          AS.Move(r12, aTokens[2].IntValue);
-                                         AS.LiteralCode("LDR " + r11.Name + ", =" + GetLabel(aTokens[0]));
+                                         AS.LoadLabelAddress(r11, GetLabel(aTokens[0]));
                                          AS.StoreRegister(r12, r11);
                                          //AS.Move(GetLabel(aTokens[0]), aTokens[2].IntValue, destinationIsIndirect: true);
                                      });
@@ -1398,7 +1391,7 @@ namespace ASharp.Compiler
             var xFirst = aTokens[0];
             var xLast = aTokens[aTokens.Count - 1];
 
-            // Find match and emit X#
+            // Find match and emit A#
             if (aTokens.Count == 2
                 && xFirst.Type == TokenType.AlphaNum
                 && xLast.Matches("()"))
@@ -1429,7 +1422,7 @@ namespace ASharp.Compiler
         }
 
         /// <summary>Register a single pattern with its associated transformation handler.</summary>
-        /// <param name="aPattern">A single line of X# code that define the pattern optionally using
+        /// <param name="aPattern">A single line of A# code that define the pattern optionally using
         /// pattern reserved syntax.</param>
         /// <param name="aCode">The associated code transformation handler.</param>
         protected void AddPattern(string aPattern, CodeFunc aCode)
@@ -1452,7 +1445,7 @@ namespace ASharp.Compiler
 
         /// <summary>Register a collection of patterns that share a single transformation handler.
         /// </summary>
-        /// <param name="aPatterns">A collection of X# lines of code. Each line of code define a
+        /// <param name="aPatterns">A collection of A# lines of code. Each line of code define a
         /// pattern optionally using the pattern reserved syntax.</param>
         /// <param name="aCode">The code transformation handler that is common abmongst all the
         /// patterns from the collection.</param>

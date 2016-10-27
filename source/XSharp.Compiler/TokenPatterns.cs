@@ -56,7 +56,7 @@ namespace XSharp.Compiler {
         // Last because we use Current() above
         Add(xBlock);
         xBlock.ParentAssembler = Assembler.CurrentInstance;
-        new Assembler();
+        new Assembler(CompilerStyles.NAsm);
       }
 
       public void End()

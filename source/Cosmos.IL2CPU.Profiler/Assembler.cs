@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Cosmos.IL2CPU.Profiler {
     public class Assembler : Cosmos.IL2CPU.AppAssembler
     {
 
         public Assembler(string assemblerLogFile)
-            : base(0, assemblerLogFile)
+            : base(Cosmos.Assembler.CompilerStyles.NAsm, 0, assemblerLogFile)
         {
         }
 
-        protected override void InitILOps(Type aAssemblerBaseOp) 
+        protected override void InitILOps(Type aAssemblerBaseOp)
         {
             var xILOp = new ILOp(this.Assembler);
             DebugInfo = new Debug.Common.DebugInfo(AppDomain.CurrentDomain.BaseDirectory + "DebugInfo.mdf", true, true);

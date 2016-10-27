@@ -35,7 +35,7 @@ namespace ASharp.Compiler
                     xGenerator.GenerateToFiles(xFile);
                 }
 
-                var xAsm = new Assembler();
+                var xAsm = new Assembler(CompilerStyles.GNU);
 
                 //var xStreamReader = new StringReader(@"namespace Test
                 //    while byte ESI[0] != 0 {

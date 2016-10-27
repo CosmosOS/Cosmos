@@ -18,9 +18,9 @@ namespace ASharp.Compiler
                 RegEnum = regEnum;
             }
 
-            public static implicit operator RegistersEnum(Register register)
+            public static implicit operator RegistersEnum?(Register register)
             {
-                return register.RegEnum;
+                return register?.RegEnum;
             }
         }
 

@@ -2,7 +2,7 @@
 {
     public interface IInstructionWithOperand
     {
-        RegistersEnum? FirstOperandReg
+        RegistersEnum? OperandReg
         {
             get;
             set;

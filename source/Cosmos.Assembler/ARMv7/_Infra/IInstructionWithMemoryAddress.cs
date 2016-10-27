@@ -8,13 +8,25 @@
             set;
         }
 
-        short? MemoryAddressOffset
+        RegistersEnum? MemoryAddressOffsetReg
+        {
+            get;
+            set;
+        }
+
+        short? MemoryAddressOffsetValue
         {
             get;
             set;
         }
 
         MemoryAddressOffsetType MemoryAddressOffsetType
+        {
+            get;
+            set;
+        }
+
+        OptionalShift MemoryAddressOptionalShift
         {
             get;
             set;

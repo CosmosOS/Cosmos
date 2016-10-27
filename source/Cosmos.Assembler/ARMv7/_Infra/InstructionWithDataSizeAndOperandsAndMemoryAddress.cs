@@ -1,4 +1,6 @@
-﻿namespace Cosmos.Assembler.ARMv7
+﻿using System;
+
+namespace Cosmos.Assembler.ARMv7
 {
     public abstract class InstructionWithDataSizeAndOperandsAndMemoryAddress : Instruction, IInstructionWithDataSize, IInstructionWithOperand, IInstructionWithSecondOperand, IInstructionWithMemoryAddress
     {
@@ -16,7 +18,7 @@
             set;
         }
 
-        public RegistersEnum? FirstOperandReg
+        public RegistersEnum? OperandReg
         {
             get;
             set;
@@ -34,13 +36,25 @@
             set;
         }
 
-        public short? MemoryAddressOffset
+        public RegistersEnum? MemoryAddressOffsetReg
+        {
+            get;
+            set;
+        }
+
+        public short? MemoryAddressOffsetValue
         {
             get;
             set;
         }
 
         public MemoryAddressOffsetType MemoryAddressOffsetType
+        {
+            get;
+            set;
+        }
+
+        public OptionalShift MemoryAddressOptionalShift
         {
             get;
             set;
@@ -64,9 +78,9 @@
 
             aOutput.Write(this.GetConditionAsString());
 
-            string firstOperand = this.GetFirstOperandAsString();
+            string firstOperand = this.GetOperandAsString();
 
-            if (!(firstOperand.Equals("")))
+            if (!firstOperand.Equals(""))
             {
                 aOutput.Write(" ");
                 aOutput.Write(firstOperand);
@@ -75,13 +89,27 @@
             if ((int)DataSize.Value >= 5)
             {
                 string secondOperand = this.GetSecondOperandAsString();
+
+                if (!secondOperand.Equals(""))
+                {
+                    if (!firstOperand.Equals(""))
+                    {
+                        aOutput.Write(", ");
+                    }
+
+                    aOutput.Write(secondOperand);
+                }
             }
 
             string memoryAddress = this.GetMemoryAddressAsString();
 
             if (!memoryAddress.Equals(""))
             {
-                aOutput.Write(", ");
+                if (!firstOperand.Equals(""))
+                {
+                    aOutput.Write(", ");
+                }
+
                 aOutput.Write(memoryAddress);
             }
         }

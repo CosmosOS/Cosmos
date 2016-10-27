@@ -1,13 +1,15 @@
 ﻿namespace Cosmos.Assembler.ARMv7
 {
-    public class InstructionWithDestinationAndOperand : Instruction, IInstructionWithDestination, IInstructionWithOperand
+    public abstract class InstructionWithDestinationAndLabel : Instruction, IInstructionWithDestination, IInstructionWithLabel
     {
-        public InstructionWithDestinationAndOperand()
+        public InstructionWithDestinationAndLabel()
         {
+
         }
 
-        public InstructionWithDestinationAndOperand(string mnemonic) : base(mnemonic)
+        public InstructionWithDestinationAndLabel(string mnemonic) : base(mnemonic)
         {
+
         }
 
         public RegistersEnum? DestinationReg
@@ -16,7 +18,13 @@
             set;
         }
 
-        public RegistersEnum? OperandReg
+        public string Label
+        {
+            get;
+            set;
+        }
+
+        public uint? LabelOffset
         {
             get;
             set;
@@ -27,9 +35,9 @@
             return base.IsComplete(aAssembler);
         }
 
-        public override void UpdateAddress(Assembler aAssembler, ref ulong aAddress)
+        public override void UpdateAddress(Assembler aAssembler, ref ulong aAddresss)
         {
-            base.UpdateAddress(aAssembler, ref aAddress);
+            base.UpdateAddress(aAssembler, ref aAddresss);
         }
 
         public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
@@ -39,22 +47,18 @@
             aOutput.Write(this.GetConditionAsString());
 
             string destination = this.GetDestinationAsString();
-            string operand = this.GetOperandAsString();
+            string label = this.GetLabelAsString();
 
             if (!destination.Equals(""))
             {
                 aOutput.Write(" ");
                 aOutput.Write(destination);
-            }
 
-            if (!operand.Equals(""))
-            {
-                if (!destination.Equals(""))
+                if(!label.Equals(""))
                 {
                     aOutput.Write(", ");
+                    aOutput.Write(label);
                 }
-
-                aOutput.Write(operand);
             }
         }
     }

@@ -22,7 +22,7 @@
             set;
         }
 
-        public RegistersEnum? FirstOperandReg
+        public RegistersEnum? OperandReg
         {
             get;
             set;
@@ -56,6 +56,8 @@
             aOutput.Write(this.GetConditionAsString());
 
             string destination = this.GetDestinationAsString();
+            string firstOperand = this.GetOperandAsString();
+            string secondOperand = this.GetSecondOperandAsString();
 
             if (!destination.Equals(""))
             {
@@ -63,19 +65,23 @@
                 aOutput.Write(destination);
             }
 
-            string firstOperand = this.GetFirstOperandAsString();
-
-            if (!(firstOperand.Equals("")))
+            if (!firstOperand.Equals(""))
             {
-                aOutput.Write(", ");
+                if(!destination.Equals(""))
+                {
+                    aOutput.Write(", ");
+                }
+
                 aOutput.Write(firstOperand);
             }
 
-            string secondOperand = this.GetSecondOperandAsString();
-
             if (!secondOperand.Equals(""))
             {
-                aOutput.Write(", ");
+                if (!firstOperand.Equals(""))
+                {
+                    aOutput.Write(", ");
+                }
+
                 aOutput.Write(secondOperand);
             }
         }

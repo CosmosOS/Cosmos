@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.IO;
+
 using Cosmos.Assembler;
 
 namespace ASharp.Compiler
@@ -34,9 +32,9 @@ namespace ASharp.Compiler
             throw new Exception("The last function or interrupt handler from source code file is missing a curly brace.");
         }
 
-        /// <summary>Parse the input X# source code file and generate the matching target assembly
+        /// <summary>Parse the input A# source code file and generate the matching target assembly
         /// language.</summary>
-        /// <param name="aReader">X# source code reader.</param>
+        /// <param name="aReader">A# source code reader.</param>
         /// <returns>The resulting target assembler content. The returned object contains
         /// a code and a data block.</returns>
         public Assembler Generate(TextReader aReader)
@@ -47,10 +45,12 @@ namespace ASharp.Compiler
             }
             mPatterns.EmitUserComments = EmitUserComments;
             mLineNo = 0;
-            var xResult = new Assembler();
+
+            var xResult = new Assembler(CompilerStyles.GNU);
+
             try
             {
-                // Read one X# source code line at a time and process it.
+                // Read one A# source code line at a time and process it.
                 while (true)
                 {
                     mLineNo++;
@@ -71,9 +71,9 @@ namespace ASharp.Compiler
             }
         }
 
-        /// <summary>Parse the input X# source code file and generate the matching target assembly
+        /// <summary>Parse the input A# source code file and generate the matching target assembly
         /// language.</summary>
-        /// <param name="aSrcPathname">X# source code file.</param>
+        /// <param name="aSrcPathname">A# source code file.</param>
         /// <returns>The resulting target assembler content. The returned object contains
         /// a code and a data block.</returns>
         public Assembler Generate(string aSrcPathname)
@@ -91,21 +91,23 @@ namespace ASharp.Compiler
             }
         }
 
-        /// <summary>Parse the input X# source code file and generate two new files with target
+        /// <summary>Parse the input A# source code file and generate two new files with target
         /// assembly language. The two generated files contain target assembler source and target
         /// assembler data respectively.</summary>
-        /// <param name="aSrcPathname">X# source code file.</param>
+        /// <param name="aSrcPathname">A# source code file.</param>
         public void GenerateToFiles(string aSrcPathname)
         {
             mPathname = Path.GetFileName(aSrcPathname);
-            new Assembler(false);
+
+            new Assembler(CompilerStyles.GNU, false);
+
             try
             {
                 using (var xInput = new StreamReader(aSrcPathname))
                 {
                     using (var xOutput = new StreamWriter(Path.ChangeExtension(aSrcPathname, ".S")))
                     {
-                        xOutput.WriteLine("; Generated at {0}", DateTime.Now.ToString(new CultureInfo("en-US")));
+                        xOutput.WriteLine("@ Generated at {0}", DateTime.Now.ToString(new CultureInfo("en-US")));
 
                         Generate(xInput, xOutput);
                     }
@@ -117,16 +119,16 @@ namespace ASharp.Compiler
             }
         }
 
-        /// <summary>Parse the input X# source code from the given reader and write both target
+        /// <summary>Parse the input A# source code from the given reader and write both target
         /// assembler code and target assembler data in their respective writers.</summary>
-        /// <param name="aInput">A reader to acquire X# source code from.</param>
+        /// <param name="aInput">A reader to acquire A# source code from.</param>
         /// <param name="aOutputData">A writer that will receive target assembler data.</param>
         /// <param name="aOutputCode">A writer that will receive target assembler code.</param>
         public void Generate(TextReader aInput, TextWriter aOutput)
         {
             mPatterns.EmitUserComments = EmitUserComments;
             mLineNo = 0;
-            // Read one X# source code line at a time and process it.
+            // Read one A# source code line at a time and process it.
             while (true)
             {
                 mLineNo++;
@@ -143,9 +145,9 @@ namespace ASharp.Compiler
             AssertLastFunctionComplete();
         }
 
-        /// <summary>Process a single X# source code line and translate it into the target
+        /// <summary>Process a single A# source code line and translate it into the target
         /// assembler syntax.</summary>
-        /// <param name="aLine">The processed X# source code line.</param>
+        /// <param name="aLine">The processed A# source code line.</param>
         /// <param name="lineNumber">Line number for debugging and diagnostic messages.</param>
         /// <returns>The resulting target assembler content. The returned object contains
         /// a code and a data block.</returns>

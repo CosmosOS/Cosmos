@@ -14,7 +14,7 @@ namespace ASharp.Compiler
 
             public Condition(ConditionsEnum conditionEnum)
             {
-                Name = Instruction.Conditions[conditionEnum];
+                Name = Instruction.GetConditionName(conditionEnum);
                 ConditionEnum = conditionEnum;
             }
 

@@ -41,7 +41,7 @@ namespace XSharp.Compiler {
       }
       mPatterns.EmitUserComments = EmitUserComments;
       mLineNo = 0;
-      var xResult = new Assembler();
+      var xResult = new Assembler(CompilerStyles.NAsm);
       try
       {
         // Read one X# source code line at a time and process it.
@@ -91,7 +91,7 @@ namespace XSharp.Compiler {
     /// <param name="aSrcPathname">X# source code file.</param>
     public void GenerateToFiles(string aSrcPathname) {
       mPathname = Path.GetFileName(aSrcPathname);
-      new Assembler(false);
+      new Assembler(CompilerStyles.NAsm, false);
       try
       {
         using (var xInput = new StreamReader(aSrcPathname))

@@ -34,7 +34,7 @@
             set;
         }
 
-        public Operand2Shift Operand2Shift
+        public OptionalShift Operand2Shift
         {
             get;
             set;
@@ -62,6 +62,7 @@
             aOutput.Write(this.GetConditionAsString());
 
             string destination = this.GetDestinationAsString();
+            string operand2 = this.GetOperand2AsString();
 
             if (!destination.Equals(""))
             {
@@ -69,11 +70,13 @@
                 aOutput.Write(destination);
             }
 
-            string operand2 = this.GetOperand2AsString();
-
             if (!(operand2.Equals("")))
             {
-                aOutput.Write(", ");
+                if (!destination.Equals(""))
+                {
+                    aOutput.Write(", ");
+                }
+
                 aOutput.Write(operand2);
             }
         }

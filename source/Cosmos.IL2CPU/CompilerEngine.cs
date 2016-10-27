@@ -1,5 +1,4 @@
 ﻿using Cosmos.Build.Common;
-using Cosmos.IL2CPU;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -322,13 +321,14 @@ namespace Cosmos.IL2CPU
             foreach (var xExt in mLoadedExtensions)
             {
                 AppAssembler xResult;
+
                 if (xExt.TryCreateAppAssembler(DebugCom, AssemblerLog, out xResult))
                 {
                     return xResult;
                 }
             }
 
-            return new AppAssembler(DebugCom, AssemblerLog);
+            return new AppAssembler(Assembler.CompilerStyles.NAsm, DebugCom, AssemblerLog);
         }
 
         /// <summary>Load every refernced assemblies that have an associated FullPath property and seek for

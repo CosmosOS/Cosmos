@@ -9,9 +9,9 @@ using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU
 {
-    public class CosmosAssembler: Assembler.Assembler
+    public class CosmosAssembler : Assembler.Assembler
     {
-        public CosmosAssembler(int comPort)
+        public CosmosAssembler(CompilerStyles compilerStyle, int comPort) : base(compilerStyle)
         {
             mComPort = comPort;
         }

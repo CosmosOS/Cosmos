@@ -24,7 +24,7 @@
         Always
     }
 
-    public enum Operand2ShiftType
+    public enum OptionalShiftType
     {
         ArithmeticShiftRight,
         LogicalShiftLeft,

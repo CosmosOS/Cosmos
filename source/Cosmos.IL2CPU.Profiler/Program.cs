@@ -25,7 +25,6 @@ namespace Cosmos.IL2CPU.Profiler {
 
     private static void DoScan()
     {
-
         var xSW = new Stopwatch();
         xSW.Start();
         string MDFFile = AppDomain.CurrentDomain.BaseDirectory + "TestKernel.mdf";
@@ -40,7 +39,8 @@ namespace Cosmos.IL2CPU.Profiler {
         if (File.Exists(logFile))
             File.Delete(logFile);
 
-        var xAsmblr = new AppAssembler(1, "Cosmos.Assembler.Log");
+        var xAsmblr = new AppAssembler(Cosmos.Assembler.CompilerStyles.NAsm, 1, "Cosmos.Assembler.Log");
+
         using (var xScanner = new ILScanner(xAsmblr))
         {
             xScanner.LogException = (Exception e) =>
@@ -90,7 +90,7 @@ namespace Cosmos.IL2CPU.Profiler {
 
     // This is a dummy entry point for the scanner to start at.
     // Its not even a Cosmos app, just a standard Windows console app,
-    // but that fine for the scanner profiling as it does 
+    // but that fine for the scanner profiling as it does
     // not actually compile it.
     private static void ScannerEntryPoint() {
       Console.WriteLine("Hello, World!");

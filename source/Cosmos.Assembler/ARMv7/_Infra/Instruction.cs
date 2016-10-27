@@ -7,7 +7,7 @@ namespace Cosmos.Assembler.ARMv7
         /// <summary>
         /// ARMv7 mnemonic conditions
         /// </summary>
-        public static Dictionary<ConditionsEnum, string> Conditions = new Dictionary<ConditionsEnum, string>()
+        private static Dictionary<ConditionsEnum, string> Conditions = new Dictionary<ConditionsEnum, string>()
         {
             { ConditionsEnum.Equal, "EQ" },
             { ConditionsEnum.EqualsZero, "EQ" },
@@ -43,6 +43,11 @@ namespace Cosmos.Assembler.ARMv7
 
         protected Instruction(bool aAddToAssembler, string mnemonic = null) : base(aAddToAssembler, mnemonic)
         {
+        }
+
+        public static string GetConditionName(ConditionsEnum condition)
+        {
+            return Conditions[condition];
         }
     }
 }

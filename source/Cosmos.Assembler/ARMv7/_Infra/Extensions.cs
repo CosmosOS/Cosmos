@@ -20,7 +20,7 @@ namespace Cosmos.Assembler.ARMv7
 
             if (aThis.Condition.HasValue)
             {
-                xCondition = Instruction.Conditions[aThis.Condition.Value];
+                xCondition = Instruction.GetConditionName(aThis.Condition.Value);
             }
 
             return xCondition;
@@ -43,28 +43,28 @@ namespace Cosmos.Assembler.ARMv7
             return xDestination;
         }
 
-        public static string GetFirstOperandAsString(this IInstructionWithOperand aThis)
+        public static string GetOperandAsString(this IInstructionWithOperand aThis)
         {
             string xOperand = "";
 
-            if (aThis.FirstOperandReg != null)
+            if (aThis.OperandReg != null)
             {
-                xOperand = Registers.GetRegisterName(aThis.FirstOperandReg.Value);
+                xOperand = Registers.GetRegisterName(aThis.OperandReg.Value);
             }
 
             return xOperand;
         }
 
-        public static string GetSecondOperandAsString(this IInstructionWithOperand aThis)
+        public static string GetSecondOperandAsString(this IInstructionWithSecondOperand aThis)
         {
-            string xOperand = "";
+            string xSecondOperand = "";
 
-            if (aThis.FirstOperandReg != null)
+            if (aThis.SecondOperandReg != null)
             {
-                xOperand = Registers.GetRegisterName(aThis.FirstOperandReg.Value);
+                xSecondOperand = Registers.GetRegisterName(aThis.SecondOperandReg.Value);
             }
 
-            return xOperand;
+            return xSecondOperand;
         }
 
         public static string GetLabelAsString(this IInstructionWithLabel aThis)
@@ -88,13 +88,13 @@ namespace Cosmos.Assembler.ARMv7
         {
             string xOperand2 = "";
 
-            if (aThis.Operand2Reg != null && (aThis.Operand2Shift.ShiftRegister.HasValue || aThis.Operand2Shift.ShiftValue.HasValue))
+            if (aThis.Operand2Reg != null)
             {
                 xOperand2 = Registers.GetRegisterName(aThis.Operand2Reg.Value);
 
                 if (aThis.Operand2Shift != null)
                 {
-                    xOperand2 += ", " + Operand2Shift.GetShiftName(aThis.Operand2Shift.ShiftType);
+                    xOperand2 += ", " + OptionalShift.GetShiftName(aThis.Operand2Shift.ShiftType);
 
                     if (aThis.Operand2Shift.ShiftRegister.HasValue)
                     {
@@ -129,9 +129,27 @@ namespace Cosmos.Assembler.ARMv7
                     memoryAddress += "]";
                 }
 
-                if (aThis.MemoryAddressOffset.HasValue)
+                if(aThis.MemoryAddressOffsetReg.HasValue)
                 {
-                    memoryAddress += ", #" + aThis.MemoryAddressOffset.Value.ToString();
+                    memoryAddress += ", " + Registers.GetRegisterName(aThis.MemoryAddressOffsetReg.Value);
+
+                    if(aThis.MemoryAddressOptionalShift != null)
+                    {
+                        memoryAddress += ", " + OptionalShift.GetShiftName(aThis.MemoryAddressOptionalShift.ShiftType);
+
+                        if (aThis.MemoryAddressOptionalShift.ShiftRegister.HasValue)
+                        {
+                            memoryAddress += " " + Registers.GetRegisterName(aThis.MemoryAddressOptionalShift.ShiftRegister.Value);
+                        }
+                        else
+                        {
+                            memoryAddress += " #" + aThis.MemoryAddressOptionalShift.ShiftValue.Value.ToString();
+                        }
+                    }
+                }
+                else if (aThis.MemoryAddressOffsetValue.HasValue)
+                {
+                    memoryAddress += ", #" + aThis.MemoryAddressOffsetValue.Value.ToString();
                 }
             }
 

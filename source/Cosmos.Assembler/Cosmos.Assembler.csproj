@@ -118,7 +118,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ARMv7\CompareNot.cs" />
+    <Compile Include="ARMv7\CountLeadingZeros.cs" />
+    <Compile Include="ARMv7\LoadLabelAddress.cs" />
+    <Compile Include="ARMv7\LabelAddress.cs" />
+    <Compile Include="ARMv7\UnsignedDivide.cs" />
+    <Compile Include="ARMv7\SignedDivide.cs" />
+    <Compile Include="ARMv7\CompareNegative.cs" />
     <Compile Include="ARMv7\Multiply.cs" />
     <Compile Include="ARMv7\Add.cs" />
     <Compile Include="ARMv7\AddWithCarry.cs" />
@@ -169,8 +174,11 @@
     <Compile Include="ARMv7\_Infra\IInstructionWithOptionalFlagsUpdate.cs" />
     <Compile Include="ARMv7\_Infra\IInstructionWithReglist.cs" />
     <Compile Include="ARMv7\_Infra\Instruction.cs" />
+    <Compile Include="ARMv7\_Infra\InstructionWithDestinationAndLabel.cs" />
+    <Compile Include="ARMv7\_Infra\InstructionWithDestinationAndTwoOperands.cs" />
     <Compile Include="ARMv7\_Infra\InstructionWithOptionalFlagsUpdateAndDestinationAndOperand2.cs" />
     <Compile Include="ARMv7\_Infra\InstructionWithOptionalFlagsUpdateAndDestinationAndOperandAndOperand2.cs" />
+    <Compile Include="ARMv7\_Infra\OptionalShift.cs" />
     <Compile Include="ARMv7\_Infra\ShiftInstruction.cs" />
     <Compile Include="ARMv7\_Infra\InstructionWithReglist.cs" />
     <Compile Include="ARMv7\_Infra\InstructionWithDestination.cs" />
@@ -185,6 +193,7 @@
     <Compile Include="Assembler.cs" />
     <Compile Include="BaseAssemblerElement.cs" />
     <Compile Include="Comment.cs" />
+    <Compile Include="CompilerStyle.cs" />
     <Compile Include="DataEndIfDefined.cs" />
     <Compile Include="DataIfDefined.cs" />
     <Compile Include="DataIfNotDefined.cs" />
