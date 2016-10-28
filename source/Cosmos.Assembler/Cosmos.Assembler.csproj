@@ -118,6 +118,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ARMv7\SelectBytes.cs" />
     <Compile Include="ARMv7\CountLeadingZeros.cs" />
     <Compile Include="ARMv7\LoadLabelAddress.cs" />
     <Compile Include="ARMv7\LabelAddress.cs" />

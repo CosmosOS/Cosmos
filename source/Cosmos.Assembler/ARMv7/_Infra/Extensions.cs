@@ -170,34 +170,6 @@ namespace Cosmos.Assembler.ARMv7
         {
             if(aThis.Reglist != null && aThis.Reglist.Length > 0)
             {
-                //TODO: Check if grouping 'r' registers like r3-r5 optimizes code (commented code is not complete)
-                //
-                //List<string> xRegisters = new List<string>();
-                //List<ushort> rRegistersNumbers = new List<ushort>();
-
-                //foreach (RegistersEnum reg in aThis.Reglist)
-                //{
-                //    string regStr = Registers.GetRegisterName(reg);
-
-                //    if (regStr.StartsWith("r"))
-                //    {
-                //        ushort rRegisterNumber;
-
-                //        ushort.TryParse(regStr.Substring(1), out rRegisterNumber);
-
-                //        rRegistersNumbers.Add(rRegisterNumber);
-                //    }
-                //}
-
-                //rRegistersNumbers.Sort();
-
-                //bool c;
-
-                //for (ushort i = 0; i < rRegistersNumbers.Count; i++)
-                //{
-                //    c = rRegistersNumbers[i] == rRegistersNumbers[i - 1] + 1 ? true : false;
-                //}
-
                 return "{" + string.Join(",", aThis.Reglist) + "}";
             }
             else

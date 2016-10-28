@@ -516,6 +516,18 @@ namespace ASharp.Compiler
             Do<LoadRegister>(operand, baseMemoryAddress, memoryAddressOffset, memoryAddressOffsetType, dataSize, condition);
         }
 
+        public static void LoadRegister(Register operand, string label, uint? labelOffset = null, DataSize dataSize = DataSize.Word, Condition condition = null)
+        {
+            new LoadRegister()
+            {
+                Condition = condition,
+                DataSize = dataSize,
+                OperandReg = operand,
+                Label = label,
+                LabelOffset = labelOffset
+            };
+        }
+
         public static void LoadRegister(Register firstOperand, Register secondOperand, Register baseMemoryAddress, Register memoryAddressOffset, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
         {
             Do<LoadRegister>(firstOperand, secondOperand, baseMemoryAddress, memoryAddressOffset, memoryAddressOffsetType, dataSize, condition);
@@ -524,6 +536,42 @@ namespace ASharp.Compiler
         public static void LoadRegister(Register firstOperand, Register secondOperand, Register baseMemoryAddress, short? memoryAddressOffset = null, MemoryAddressOffsetType memoryAddressOffsetType = MemoryAddressOffsetType.ImmediateOffset, DataSize dataSize = DataSize.Word, Condition condition = null)
         {
             Do<LoadRegister>(firstOperand, secondOperand, baseMemoryAddress, memoryAddressOffset, memoryAddressOffsetType, dataSize, condition);
+        }
+
+        public static void LoadRegister(Register firstOperand, Register secondOperand, string label, uint? labelOffset = null, DataSize dataSize = DataSize.Word, Condition condition = null)
+        {
+            new LoadRegister()
+            {
+                Condition = condition,
+                DataSize = dataSize,
+                OperandReg = firstOperand,
+                SecondOperandReg = secondOperand,
+                Label = label,
+                LabelOffset = labelOffset
+            };
+        }
+
+        public static void LoadRegisterFromExpression(Register operand, string label, uint? labelOffset = null, DataSize dataSize = DataSize.Word, Condition condition = null)
+        {
+            new LoadRegister()
+            {
+                Condition = condition,
+                DataSize = dataSize,
+                OperandReg = operand,
+                Label = "=" + label, //HACK
+                LabelOffset = labelOffset
+            };
+        }
+
+        public static void LoadRegisterFromExpression(Register operand, uint expression, DataSize dataSize = DataSize.Word, Condition condition = null)
+        {
+            new LoadRegister()
+            {
+                Condition = condition,
+                DataSize = dataSize,
+                OperandReg = operand,
+                Label = "=0x" + expression.ToString("X") //HACK
+            };
         }
 
         public static void LogicalShiftLeft(Register destination, Register firstOperand, Register secondOperand, bool updateFlags = false, Condition condition = null)
@@ -679,6 +727,16 @@ namespace ASharp.Compiler
         public static void RotateRightWithExtend(Register destination, Register firstOperand, bool updateFlags = false, Condition condition = null)
         {
             Do<RotateRightWithExtend>(destination, firstOperand, updateFlags, condition);
+        }
+
+        public static void SelectBytes(Register destination, Register firstOperand, Register secondOperand, bool updateFlags = false, Condition condition = null)
+        {
+            Do<SelectBytes>(destination, firstOperand, secondOperand, updateFlags, condition);
+        }
+
+        public static void SelectBytes(Register firstOperand, Register secondOperand, bool updateFlags = false, Condition condition = null)
+        {
+            Do<SelectBytes>(null, firstOperand, secondOperand, updateFlags, condition);
         }
 
         public static void SetByte(uint address, byte value)
