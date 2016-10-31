@@ -57,11 +57,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             string replace_test = "That is a test string.";
             Assert.IsTrue((test.Replace("This", "That") == replace_test), "string.Replace(string, string) does not work.");
 
-            test = @"this a test strin
-
-
-g";
-            Assert.IsTrue((test.Replace(Environment.NewLine, "") == replace_test), "string.Replace(Environment.NewLine, string) does not work.");
+            string new_expected = "this is a test string..";
+            Assert.IsTrue((test.Replace(Environment.NewLine, ".") == new_expected), "string.Replace(Environment.NewLine, string) does not work.");
 
             //Assert.IsTrue((Environment.NewLine == "\r\n"), "");
 
