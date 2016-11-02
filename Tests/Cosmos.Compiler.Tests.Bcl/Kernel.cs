@@ -25,6 +25,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 CSharp.WhileLoopTests.Execute();
 
                 //ObjectTests.Execute(); Stack corruption on method Clone()
+                ArrayTests.Execute();
                 StringTest.Execute();
                 ByteTest.Execute();
                 SByteTest.Execute();
