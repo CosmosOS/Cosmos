@@ -59,8 +59,14 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             test = "this is a test string." + Environment.NewLine;
             string new_expected = "this is a test string..";
-            Assert.IsTrue((test.Replace(Environment.NewLine, ".") == new_expected), "string.Replace(Environment.NewLine, string) does not work.");
+            Assert.IsTrue((test.Replace(Environment.NewLine, ".") == new_expected), "string.Replace(Environment.NewLine, string) does not work.(Environment.NewLine)");
 
+			
+            test = @"this is a test string.
+			";
+            string new_expected = "this is a test string..";
+            Assert.IsTrue((test.Replace(Environment.NewLine, ".") == new_expected), "string.Replace(Environment.NewLine, string) does not work.(True NewLine)");
+			
             //Assert.IsTrue((Environment.NewLine == "\r\n"), "");
 
             string char_array_test = "char";
