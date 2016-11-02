@@ -4,11 +4,10 @@ using System.Text;
 using Cosmos.Debug.Kernel;
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
+using Cosmos.Compiler.Tests.Bcl.System;
 
 namespace Cosmos.Compiler.Tests.Bcl
 {
-    using Cosmos.Compiler.Tests.Bcl.System;
-
     public class Kernel : Sys.Kernel
     {
         protected override void BeforeRun()
@@ -23,6 +22,7 @@ namespace Cosmos.Compiler.Tests.Bcl
                 mDebugger.Send("Run");
 
                 CSharp.WhileLoopTests.Execute();
+                CSharp.ForeachLoopTests.Execute();
 
                 //ObjectTests.Execute(); Stack corruption on method Clone()
                 ArrayTests.Execute();
