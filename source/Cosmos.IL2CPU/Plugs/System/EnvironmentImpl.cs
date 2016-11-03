@@ -129,7 +129,8 @@ namespace Cosmos.IL2CPU.Plugs.System
         {
             get
             {
-                return "\r\n";
+                //return "\r\n";
+                return (string)0x0d + (string)0x0a;
             }
         }
 
