@@ -59,6 +59,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -79,9 +80,11 @@
     <Reference Include="Cosmos.Debug.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CSharp\ForeachLoopTests.cs" />
     <Compile Include="CSharp\WhileLoopTests.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="System\ArrayTests.cs" />
     <Compile Include="System\BitConverterTest.cs" />
     <Compile Include="System\BooleanTest.cs" />
     <Compile Include="System\ByteTest.cs" />

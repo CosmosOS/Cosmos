@@ -113,10 +113,6 @@
     <Compile Include="TestKernelSets.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Demos\zMachine\Frotz.Net\source\FrotzKernel\FrotzKernel\FrotzKernel\FrotzKernel.csproj">
-      <Project>{c18a7cf8-3205-48a8-95c9-08c780a0d51d}</Project>
-      <Name>FrotzKernel</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130E-28E0-428A-A597-F4B3B676C0CA}</Project>
       <Name>Cosmos.Assembler</Name>

@@ -461,7 +461,7 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("");
 
             //
-            mDebugger.Send("Get files:");
+            mDebugger.Send("START TEST: Get files:");
             var xFiles = Directory.GetFiles(@"0:\");
             mDebugger.Send("Found " + xFiles.Length + " files.");
             if (xFiles.Length > 0)
@@ -478,7 +478,7 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("");
 
             //
-            mDebugger.Send("Get directories:");
+            mDebugger.Send("START TEST: Get directories:");
             var xDirectories = Directory.GetDirectories(@"0:\");
             mDebugger.Send("Found " + xDirectories.Length + " directories.");
             if (xDirectories.Length > 0)
@@ -495,14 +495,14 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("");
 
             //
-            mDebugger.Send("Directory exist check:");
+            mDebugger.Send("START TEST: Directory exist check:");
             var xTest = Directory.Exists(@"0:\test");
             Assert.IsTrue(xTest, "Folder does not exist!");
             mDebugger.Send("END TEST");
 
             mDebugger.Send("");
 
-            mDebugger.Send("START TEST");
+            mDebugger.Send("START TEST: Create Directory");
             var xDirectory = Directory.CreateDirectory(@"0:\test2");
             Assert.IsTrue(xDirectory != null, "Directory.CreateDirectory failed: Directory is null");
             bool xExists = Directory.Exists(@"0:\test2");

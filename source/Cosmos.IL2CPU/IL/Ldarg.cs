@@ -19,7 +19,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
-      var xOpVar = (OpVar)aOpCode;
+      var xOpVar = (OpVar) aOpCode;
       DoExecute(Assembler, aMethod, xOpVar.Value);
     }
 
@@ -92,7 +92,7 @@ namespace Cosmos.IL2CPU.X86.IL
           xOffset += xExtraSize;
         }
 
-        return (int)(xOffset + xCurArgSize - 4);
+        return (int) (xOffset + xCurArgSize - 4);
       }
       else
       {
@@ -116,7 +116,7 @@ namespace Cosmos.IL2CPU.X86.IL
           uint xExtraSize = xReturnSize - xArgSize;
           xOffset += xExtraSize;
         }
-        return (int)(xOffset + xCurArgSize - 4);
+        return (int) (xOffset + xCurArgSize - 4);
       }
     }
 
@@ -132,7 +132,14 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
       if (xArgRealSize < 4)
       {
-        new MoveSignExtend { DestinationReg = RegistersEnum.EAX, Size = (byte)(xArgRealSize * 8), SourceReg = RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = xDisplacement };
+        new MoveSignExtend
+        {
+          DestinationReg = RegistersEnum.EAX,
+          Size = (byte) (xArgRealSize * 8),
+          SourceReg = RegistersEnum.EBP,
+          SourceIsIndirect = true,
+          SourceDisplacement = xDisplacement
+        };
         XS.Push(XSRegisters.EAX);
       }
       else

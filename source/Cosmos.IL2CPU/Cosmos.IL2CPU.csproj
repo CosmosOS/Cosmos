@@ -118,6 +118,21 @@
     <Compile Include="CompilerExtensionBase.cs" />
     <Compile Include="CosmosAssembler.cs" />
     <Compile Include="Plugs\AssemblerImpl.cs" />
+    <Compile Include="Plugs\Assemblers\Array\ArrayGetLengthAsm.cs" />
+    <Compile Include="Plugs\Assemblers\Array\ArrayInternalCopyAsm.cs" />
+    <Compile Include="Plugs\Assemblers\Buffer\BufferBlockCopyAsm.cs" />
+    <Compile Include="Plugs\Assemblers\CPU\CPUInitFloatAsm.cs" />
+    <Compile Include="Plugs\Assemblers\CPU\CPUDisableINTsAsm.cs" />
+    <Compile Include="Plugs\Assemblers\CPU\CPUEnableINTsAsm.cs" />
+    <Compile Include="Plugs\Assemblers\CPU\CPUGetAmountOfRAMAsm.cs" />
+    <Compile Include="Plugs\Assemblers\CPU\CPUGetEndOfKernelAsm.cs" />
+    <Compile Include="Plugs\Assemblers\CPU\CPUHaltAsm.cs" />
+    <Compile Include="Plugs\Assemblers\CPU\CPUInitSSEAsm.cs" />
+    <Compile Include="Plugs\Assemblers\CPU\CPUZeroFillAsm.cs" />
+    <Compile Include="Plugs\Assemblers\Delegate\DelegateInvokeAsm.cs" />
+    <Compile Include="Plugs\Assemblers\Delegate\DelegateGetMulticastInvokeAsm.cs" />
+    <Compile Include="Plugs\Assemblers\Delegate\DelegateCtorAsm.cs" />
+    <Compile Include="Plugs\Assemblers\CPU\CPUUpdateIDTAsm.cs" />
     <Compile Include="Plugs\System\EnvironmentImpl.cs">
       <SubType>
       </SubType>
@@ -348,10 +363,8 @@
     <Compile Include="IL\Volatile.cs" />
     <Compile Include="IL\Xor.cs" />
     <Compile Include="Optimizer.cs" />
-    <Compile Include="Plugs\Assemblers\BreakAssembler.cs" />
     <Compile Include="Plugs\Diagnostics\DebuggerImpl.cs" />
     <Compile Include="Plugs\Diagnostics\DebugImpl.cs" />
-    <Compile Include="Plugs\Assemblers\CtorImplAssembler.cs" />
     <Compile Include="Plugs\System\Runtime\CompilerServices\RuntimeHelpersImpl.cs" />
     <Compile Include="Plugs\System\EventHandlerImpl.cs" />
     <Compile Include="Plugs\System\ExceptionImpl.cs" />
@@ -361,13 +374,13 @@
     <Content Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Tests\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">
-      <Project>{E6D3B644-C487-472D-A978-C1A82D0C099B}</Project>
-      <Name>Cosmos.TestRunner.TestController</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
       <Project>{1FAC100C-D732-4EA4-B518-5AF4BAF64F2E}</Project>
       <Name>Cosmos.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Core\Cosmos.Core.csproj">
+      <Project>{5ac4773c-cb4e-4cd9-8d50-02e10a07dee6}</Project>
+      <Name>Cosmos.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Debug.DebugStub\Cosmos.Debug.DebugStub.csproj">
       <Project>{A7F3F078-CF99-4018-9A35-2D6DC9517ADB}</Project>

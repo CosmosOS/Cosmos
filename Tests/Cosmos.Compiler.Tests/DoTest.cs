@@ -1,11 +1,4 @@
-﻿using System;
-using System.IO;
-using ApprovalTests;
-using ApprovalTests.Reporters;
-using Cosmos.Compiler.TestsBase;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace Cosmos.Compiler.Tests
+﻿namespace Cosmos.Compiler.Tests
 {
     //[TestClass]
     //public class DoTest : BaseTest
