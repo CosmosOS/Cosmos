@@ -134,13 +134,9 @@ namespace Cosmos.IL2CPU.Plugs.System
         //    }
         //}
 
-        public static string get_NewLine
+        public static string get_NewLine()
         {
-            get
-            {
                 return "\r\n";
-                //return (char)0x0d + (char)0x0a;
-            }
         }
 
     }
