@@ -43,12 +43,11 @@ namespace Cosmos.Compiler.Tests.Bcl
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
 
-#if false
-                DecimalTest.Execute();
+                //DecimalTest.Execute();
                 System.Collections.Generic.ListTest.Execute();
                 System.Collections.Generic.QueueTest.Execute();
-                System.UInt64Test.Execute();
-#endif
+                //System.Collections.Generic.DictionaryTest.Execute();
+
                 TestController.Completed();
             }
             catch (Exception e)
