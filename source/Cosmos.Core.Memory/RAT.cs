@@ -47,7 +47,14 @@ namespace Cosmos.Core.Memory {
     // We need a pointer as the RAT can move around in future with dynamic RAM etc.
     static private byte* mRAT;
 
+    static private bool mInitialized;
+
     static public void Init(byte* aStartPtr, Native aSize) {
+      if(mInitialized)
+      {
+        return;
+      }
+
       if ((Native)aStartPtr % PageSize != 0 && !Debug) {
         throw new Exception("RAM start must be page aligned.");
       } else if (aSize % PageSize != 0) {
@@ -72,6 +79,8 @@ namespace Cosmos.Core.Memory {
       }
 
       Heap.Init();
+
+      mInitialized = true;
     }
 
     static public Native GetPageCount(byte aType = 0) {

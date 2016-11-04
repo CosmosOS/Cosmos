@@ -18,14 +18,14 @@ namespace Cosmos.Core.Memory {
     private static void** mSMT;
 
     static public void Init() {
-      //TODO Adjust for new page and header sizes 
+      //TODO Adjust for new page and header sizes
       // 4 slots, ~1k ea
       Native xMaxItemSize = (RAT.PageSize - PrefixBytes) / 4 - PrefixItemBytes;
       // Word align it
       xMaxItemSize = xMaxItemSize / sizeof(Native) * sizeof(Native);
       InitSMT(xMaxItemSize);
 
-      // TODO Change these sizes after further study and also when page size changes. 
+      // TODO Change these sizes after further study and also when page size changes.
       // SMT can be grown as needed. Also can adjust and create new ones dynamicaly as it runs.
       CreatePage(16);
       CreatePage(24);
@@ -78,14 +78,6 @@ namespace Cosmos.Core.Memory {
         xMetaDataPtr[1] = 0; // Ref count
         xMetaDataPtr[2] = 0; // Ptr to first
       }
-    }
-
-    static public byte* Alloc(Native aSize) {
-      return HeapLarge.Alloc(aSize);
-    }
-
-    static public void Free(void* aPtr) {
-      HeapLarge.Free(aPtr);
     }
   }
 }

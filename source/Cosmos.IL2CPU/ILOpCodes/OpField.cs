@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Cosmos.IL2CPU.X86.IL;
 using FieldInfo = System.Reflection.FieldInfo;
 
 namespace Cosmos.IL2CPU.ILOpCodes

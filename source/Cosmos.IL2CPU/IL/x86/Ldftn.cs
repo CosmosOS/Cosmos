@@ -1,0 +1,23 @@
+using System;
+using Cosmos.IL2CPU.ILOpCodes;
+using CPUx86 = Cosmos.Assembler.x86;
+using CPU = Cosmos.Assembler;
+using Cosmos.Assembler;
+using XSharp.Compiler;
+
+namespace Cosmos.IL2CPU.IL.x86
+{
+    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldftn )]
+    public class Ldftn : ILOp
+    {
+        public Ldftn( Cosmos.Assembler.Assembler aAsmblr )
+            : base( aAsmblr )
+        {
+        }
+
+        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        {
+          XS.Push(LabelName.Get(((OpMethod)aOpCode).Value));
+        }
+    }
+}

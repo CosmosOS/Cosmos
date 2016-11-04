@@ -1,6 +1,6 @@
 using System;
 using Cosmos.Assembler;
-using Cosmos.IL2CPU.X86.IL;
+using Cosmos.IL2CPU.IL.x86;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 
