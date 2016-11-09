@@ -160,7 +160,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             //SetDirectoryEntryData(xData);
         }
-        
+
         public FatDirectoryEntry AddDirectoryEntry(string aName, DirectoryEntryTypeEnum aType)
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.AddDirectoryEntry --");

@@ -94,12 +94,14 @@ namespace Cosmos.IL2CPU
     protected static void Jump_Exception(MethodInfo aMethod)
     {
       // todo: port to numeric labels
-      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameException };
+      XS.Jump (GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameException);
+      //new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameException };
     }
 
     protected static void Jump_End(MethodInfo aMethod)
     {
-      new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal };
+      XS.Jump(GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal);
+      //new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal };
     }
 
     public static uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField)
