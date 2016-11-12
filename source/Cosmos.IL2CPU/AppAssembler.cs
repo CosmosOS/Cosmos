@@ -642,7 +642,7 @@ namespace Cosmos.IL2CPU
                             }
                         }
                     }
-                    if ((xHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0)
+                    if (xHandler.Flags.HasFlag(ExceptionHandlingClauseOptions.Filter))
                     {
                         if (xHandler.FilterOffset > 0)
                         {

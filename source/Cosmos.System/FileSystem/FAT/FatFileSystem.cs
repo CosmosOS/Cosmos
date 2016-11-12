@@ -489,18 +489,19 @@ namespace Cosmos.System.FileSystem.FAT
                 aSize = BytesPerCluster;
             }
 
-            byte[] xTempData;
-            Read(aCluster, out xTempData);
-            Array.Copy(aData, 0, xTempData, (long)aOffset, aData.Length);
+            byte[] xData;
+
+            Read(aCluster, out xData);
+            Array.Copy(aData, 0, xData, aOffset, aData.Length);
 
             if (mFatType == FatTypeEnum.Fat32)
             {
                 long xSector = DataSector + (aCluster - RootCluster) * SectorsPerCluster;
-                mDevice.WriteBlock((ulong)xSector, SectorsPerCluster, aData);
+                mDevice.WriteBlock((ulong) xSector, SectorsPerCluster, xData);
             }
             else
             {
-                mDevice.WriteBlock((ulong)aCluster, RootSectorCount, aData);
+                mDevice.WriteBlock((ulong) aCluster, RootSectorCount, xData);
             }
         }
 

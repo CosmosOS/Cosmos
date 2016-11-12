@@ -31,6 +31,7 @@ namespace Cosmos.Compiler.Tests.Bcl.CSharp
         {
             int xFindMe = 3;
             int[] xArray = {1, 2, 3, 4, 5};
+
             foreach (int i in xArray)
             {
                 if (i == xFindMe)
@@ -38,6 +39,7 @@ namespace Cosmos.Compiler.Tests.Bcl.CSharp
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -45,6 +47,7 @@ namespace Cosmos.Compiler.Tests.Bcl.CSharp
         {
             int xFindMe = 3;
             var xList = new List<int> {1, 2, 3, 4, 5};
+
             foreach (int i in xList)
             {
                 if (i == xFindMe)
@@ -52,6 +55,7 @@ namespace Cosmos.Compiler.Tests.Bcl.CSharp
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -60,6 +64,7 @@ namespace Cosmos.Compiler.Tests.Bcl.CSharp
             bool xResult = false;
             int xFindMe = 3;
             int[] xArray = {1, 2, 3, 4, 5};
+
             foreach (int i in xArray)
             {
                 if (i == xFindMe)
@@ -67,7 +72,10 @@ namespace Cosmos.Compiler.Tests.Bcl.CSharp
                     xResult = true;
                     break;
                 }
+
+                xResult = false;
             }
+
             return xResult;
         }
 
@@ -76,6 +84,7 @@ namespace Cosmos.Compiler.Tests.Bcl.CSharp
             bool xResult = false;
             int xFindMe = 3;
             var xList = new List<int> {1, 2, 3, 4, 5};
+
             foreach (int i in xList)
             {
                 if (i == xFindMe)
@@ -83,7 +92,10 @@ namespace Cosmos.Compiler.Tests.Bcl.CSharp
                     xResult = true;
                     break;
                 }
+
+                xResult = false;
             }
+
             return xResult;
         }
     }

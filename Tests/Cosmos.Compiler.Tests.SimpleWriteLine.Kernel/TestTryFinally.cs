@@ -23,6 +23,16 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
             Assert.IsTrue(mWasInTry, "ExplicitReturnNoReturnValue.WasInTry");
             Assert.IsTrue(mWasInFinally, "ExplicitReturnNoReturnValue.WasInFinally");
             Assert.IsFalse(mWasAfterFinally, "ExplicitReturnNoReturnValue.WasAfterFinally");
+
+            ClearToggles();
+            TestNestedFinally();
+
+            Assert.IsTrue(mWasBeforeTry, "ExplicitReturnNoReturnValue.WasBeforeTry");
+            Assert.IsTrue(mWasInTry, "ExplicitReturnNoReturnValue.WasInTry");
+            Assert.IsTrue(mWasInFinally, "ExplicitReturnNoReturnValue.WasInFinally");
+            Assert.IsTrue(mWasInTry2, "ExplicitReturnNoReturnValue.WasInTry2");
+            Assert.IsTrue(mWasInFinally2, "ExplicitReturnNoReturnValue.WasInFinally2");
+            Assert.IsTrue(mWasAfterFinally, "ExplicitReturnNoReturnValue.WasAfterFinally");
         }
 
         private static bool mWasBeforeTry;
@@ -30,17 +40,24 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
         private static bool mWasInFinally;
         private static bool mWasAfterFinally;
 
+        private static bool mWasInTry2;
+        private static bool mWasInFinally2;
+
         private static void ClearToggles()
         {
             mWasBeforeTry = false;
             mWasInTry = false;
             mWasInFinally = false;
             mWasAfterFinally = false;
+
+            mWasInTry2 = false;
+            mWasInFinally2 = false;
         }
 
         private static void TestNormalFlowNoReturnValue()
         {
             mWasBeforeTry = true;
+
             try
             {
                 mWasInTry = true;
@@ -49,12 +66,14 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
             {
                 mWasInFinally = true;
             }
+
             mWasAfterFinally = true;
         }
 
         private static void TestExplicitReturnNoReturnValue()
         {
             mWasBeforeTry = true;
+
             try
             {
                 mWasInTry = true;
@@ -64,6 +83,32 @@ namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
             {
                 mWasInFinally = true;
             }
+
+            mWasAfterFinally = true;
+        }
+
+        public static void TestNestedFinally()
+        {
+            mWasBeforeTry = true;
+
+            try
+            {
+                mWasInTry = true;
+            }
+            finally
+            {
+                try
+                {
+                    mWasInTry2 = true;
+                }
+                finally
+                {
+                    mWasInFinally2 = true;
+                }
+
+                mWasInFinally = true;
+            }
+
             mWasAfterFinally = true;
         }
     }

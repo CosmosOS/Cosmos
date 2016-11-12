@@ -1,6 +1,5 @@
 ﻿using System;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.Plugs.Assemblers;
 using Cosmos.IL2CPU.Plugs.Assemblers.Array;
 
 namespace Cosmos.Core.Plugs.System
@@ -10,7 +9,7 @@ namespace Cosmos.Core.Plugs.System
     {
 
         [PlugMethod(Signature = "System_Void__System_Array_Clear_System_Array__System_Int32__System_Int32_")]
-        public static unsafe void Clear(uint* aArray, uint aIndex, uint aLength)
+        public static unsafe void Clear([ObjectPointerAccess]uint* aArray, uint aIndex, uint aLength)
         {
             aArray = (uint*)aArray[0];
             aArray += 3;

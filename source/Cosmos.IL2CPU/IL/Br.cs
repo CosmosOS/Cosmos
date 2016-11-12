@@ -1,20 +1,20 @@
-using System;
-using CPU = Cosmos.Assembler.x86;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Br )]
+    [OpCode(ILOpCode.Code.Br)]
     public class Br : ILOp
     {
-        public Br( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Br(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
-            new CPU.Jump { DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
-        }
+            XS.Jump(AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+            //new CPU.Jump { DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode) };
 
     }
+  }
 }

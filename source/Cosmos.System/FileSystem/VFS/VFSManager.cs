@@ -1,8 +1,8 @@
 ﻿//#define COSMOSDEBUG
 
-using global::System;
-using global::System.Collections.Generic;
-using global::System.IO;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 using Cosmos.System.FileSystem.Listing;
 
