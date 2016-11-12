@@ -1,7 +1,7 @@
 using System.Reflection;
 
-using Cosmos.IL2CPU.ILOpCodes;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -17,17 +17,15 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             // apparently, Roslyn changed something to the output. We now have to figure out where to jump to.
             if (aOpCode.CurrentExceptionHandler.Flags.HasFlag(ExceptionHandlingClauseOptions.Finally)
-              && aOpCode.CurrentExceptionHandler.HandlerOffset > aOpCode.Position
-              && ((OpBranch)aOpCode).Value <= aOpCode.CurrentExceptionHandler.HandlerOffset + aOpCode.CurrentExceptionHandler.HandlerLength)
+              && aOpCode.CurrentExceptionHandler.HandlerOffset > aOpCode.Position)
             {
+                XS.Set(aMethod.MethodBase.GetFullName() + "_" + "LeaveAddress_" + aOpCode.CurrentExceptionHandler.HandlerOffset.ToString("X2"), Assembler.CurrentIlLabel + "." + (Assembler.AsmIlIdx + 2).ToString("X2"), destinationIsIndirect: true, size: RegisterSize.Int32);
                 XS.Jump(AppAssembler.TmpPosLabel(aMethod, aOpCode.CurrentExceptionHandler.HandlerOffset));
                 //new CPUx86.Jump {DestinationLabel = AppAssembler.TmpPosLabel(aMethod, aOpCode.CurrentExceptionHandler.HandlerOffset + aOpCode.CurrentExceptionHandler.HandlerLength) };
             }
-            else
-            {
-                XS.Jump(AppAssembler.TmpBranchLabel(aMethod, aOpCode));
-                //new CPUx86.Jump {DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
-            }
+
+            XS.Jump(AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+            //new CPUx86.Jump {DestinationLabel = AppAssembler.TmpBranchLabel(aMethod, aOpCode)};
         }
 
 
