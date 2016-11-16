@@ -9,20 +9,21 @@ namespace Cosmos.Core.Plugs.System
         public static unsafe ulong MemberwiseClone([ObjectPointerAccess] uint aThis)
         {
             var xThisPointer = (uint*)aThis;
-
-            var xSize = xThisPointer[1];
+            var xSize = IL2CPU.Plugs.System.ObjectImpl.FieldDataOffset + xThisPointer[2];
 
             var xResult = GCImplementation.AllocNewObject(xSize);
 
-            var xThatPointer = (uint*)xResult;
-            var xThatPointerByte = (byte*)xThatPointer[0];
-            var xThisSimplePointer = (uint*)aThis;
-            var xThisPointerByte = (byte*)xThisSimplePointer[0];
+            var xThisPointerByte = (byte*)xThisPointer;
+            var xThatPointerByte = (byte*)xResult;
+
             for (int i = 0; i < xSize; i++)
             {
                 xThatPointerByte[i] = xThisPointerByte[i];
             }
-            return xResult;
+
+            ulong xReturn = ((ulong)xResult) << (sizeof(ulong) / 2 * 8);
+
+            return xReturn;
         }
     }
 }
