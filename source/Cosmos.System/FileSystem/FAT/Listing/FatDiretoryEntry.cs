@@ -229,6 +229,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             //TODO: Change xLongName to StringBuilder
             string xLongName = "";
             string xName = "";
+
             for (uint i = 0; i < xData.Length; i = i + 32)
             {
                 byte xAttrib = xData[i + 11];
@@ -292,7 +293,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                             break;
                         case FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry:
                             // Empty slot, skip it
-                            break;
+                            continue;
                         default:
                             if (xStatus >= 0x20)
                             {
@@ -338,6 +339,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                             break;
                     }
                 }
+
                 uint xFirstCluster = (uint)(xData.ToUInt16(i + 20) << 16 | xData.ToUInt16(i + 26));
 
                 int xTest = xAttrib & (FatDirectoryEntryAttributeConsts.Directory | FatDirectoryEntryAttributeConsts.VolumeID);
@@ -458,6 +460,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             if (mParent != null)
             {
                 var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
+
                 if (xData.Length > 0)
                 {
                     var xValue = new byte[aEntryMetadata.DataLength];
@@ -482,6 +485,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             if (mParent != null)
             {
                 var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
+
                 if (xData.Length > 0)
                 {
                     var xValue = new byte[aEntryMetadata.DataLength];
@@ -506,6 +510,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             Global.mFileSystemDebugger.SendInternal(aValue);
 
             var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
+
             if (xData.Length > 0)
             {
                 var xValue = new byte[aEntryMetadata.DataLength];

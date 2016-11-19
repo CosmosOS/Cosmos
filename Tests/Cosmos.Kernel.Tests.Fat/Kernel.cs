@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+
 using Cosmos.Common.Extensions;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
@@ -728,9 +729,10 @@ namespace Cosmos.Kernel.Tests.Fat
         /// </summary>
         private void TestFileStream()
         {
+            mDebugger.Send("START TEST: Filestream:");
+
             using (var xFS = new FileStream(@"0:\Kudzu.txt", FileMode.Create))
             {
-                mDebugger.Send("START TEST: Filestream:");
                 mDebugger.Send("Start writing");
                 var xStr = "Test FAT Write.";
                 byte[] xWriteBuff = xStr.GetUtf8Bytes(0, (uint)xStr.Length);
