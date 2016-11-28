@@ -26,11 +26,15 @@ namespace Cosmos.System
             return null;
         }
 
-        protected virtual ScanMapBase GetKeyboardScanMap()
+        protected ScanMapBase GetKeyboardScanMap()
         {
-            return new US_Standard();
+            return KeyboardManager.GetKeyLayout();
         }
 
+        protected void SetKeyboardScanMap(ScanMapBase ScanMap)
+        {
+            KeyboardManager.SetKeyLayout(ScanMap);
+        }
 
         /// <summary>
         /// Start the system up using the properties for configuration.
@@ -56,7 +60,10 @@ namespace Cosmos.System
                 HAL.Bootstrap.Init();
 
                 Global.mDebugger.Send("Global Init");
-                Global.Init(GetTextScreen(), new PS2Keyboard(GetKeyboardScanMap()));
+                Global.Init(GetTextScreen());
+
+                //Start with a PS2Keyboard
+                KeyboardManager.AddKeyboard(new PS2Keyboard());
 
                 // Provide the user with a clear screen if they requested it
                 if (ClearScreen)

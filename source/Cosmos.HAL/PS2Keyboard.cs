@@ -6,12 +6,13 @@ using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL
 {
-    public class PS2Keyboard : Keyboard
+    public class PS2Keyboard : KeyboardBase
     {
         protected Core.IOGroup.Keyboard IO = Core.Global.BaseIOGroups.Keyboard;
 
-        public PS2Keyboard(ScanMapBase scanMap): base(scanMap)
+        public PS2Keyboard() : base()
         {
+
         }
 
         protected override void Initialize()
@@ -27,7 +28,7 @@ namespace Cosmos.HAL
             {
                 xScanCode = (byte)(xScanCode ^ 0x80);
             }
-            HandleScancode(xScanCode, xReleased);
+            OnKeyPressed?.Invoke(xScanCode, xReleased);
         }
 
         public override void UpdateLeds()
@@ -42,79 +43,6 @@ namespace Cosmos.HAL
             //while ((new IOPort(0x64).Byte & 2) != 0)
             //{
             //}
-        }
-
-        protected override void HandleScancode(byte aScancode, bool aReleased)
-        {
-            byte key = aScancode;
-            if (key == 0x3A && !aReleased)
-            {
-                // caps lock
-                Global.CapsLock = !Global.CapsLock;
-                UpdateLeds();
-            }
-            else if (key == 0x45 && !aReleased)
-            {
-                // num lock
-                Global.NumLock = !Global.NumLock;
-                UpdateLeds();
-            }
-            else if (key == 0x46 && !aReleased)
-            {
-                // scroll lock
-                Global.ScrollLock = !Global.ScrollLock;
-                UpdateLeds();
-            }
-            else
-                switch (key)
-                {
-                    case 0x1D:
-                        {
-                            ControlPressed = !aReleased;
-                            break;
-                        }
-                    case 0x2A:
-                    case 0x36:
-                        {
-                            ShiftPressed = !aReleased;
-                            break;
-                        }
-                    case 0x38:
-                        {
-                            AltPressed = !aReleased;
-                            break;
-                        }
-                    default:
-                        {
-                            if (ControlPressed && AltPressed && (key == 0x53))
-                            {
-                                Console.WriteLine("Detected Ctrl-Alt-Delete! Rebooting System...");
-                                Core.Global.CPU.Reboot();
-                            }
-
-                            if (!aReleased)
-                            {
-                                KeyEvent keyInfo;
-                                if (GetKey(key, aReleased, out keyInfo))
-                                {
-                                    Enqueue(keyInfo);
-                                }
-                            }
-
-
-                            break;
-                        }
-                }
-        }
-
-        public bool GetKey(byte aScancode, bool released, out KeyEvent keyInfo)
-        {
-            if (KeyLayout == null)
-            {
-                Debugger.DoSend("No KeyLayout");
-            }
-            keyInfo = KeyLayout.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, Global.NumLock, Global.CapsLock, Global.ScrollLock);
-            return keyInfo != null;
         }
     }
 }

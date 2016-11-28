@@ -53,12 +53,14 @@ namespace Cosmos.System.Plugs.System.IO
             }
 
             Global.mFileSystemDebugger.SendInternal($"Directory.CreateDirectory : aPath = {aPath}");
+
             var xEntry = VFSManager.CreateDirectory(aPath);
+
             if (xEntry == null)
             {
                 return null;
             }
-
+            
             return new DirectoryInfo(aPath);
         }
 

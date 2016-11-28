@@ -1,11 +1,10 @@
-using Cosmos.IL2CPU.Plugs;
 using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 using ObjectInfo = Cosmos.IL2CPU.Plugs.System.ObjectImpl;
 
-namespace Cosmos.Core.Plugs.System.Assemblers
+namespace Cosmos.IL2CPU.Plugs.Assemblers.Buffer
 {
-    public class Buffer_BlockCopy : AssemblerMethod
+    public class BufferBlockCopyAsm : AssemblerMethod
     {
         private const int SourceArrayDisplacement = 32;
         private const int SourceIndexDisplacement = 24;

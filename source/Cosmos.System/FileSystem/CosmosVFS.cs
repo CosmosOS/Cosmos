@@ -124,24 +124,29 @@ namespace Cosmos.System.FileSystem
                 Global.mFileSystemDebugger.SendInternal("Path already exists.");
                 return GetDirectory(aPath);
             }
+
             Global.mFileSystemDebugger.SendInternal("Path doesn't exist.");
 
             string xDirectoryToCreate = Path.GetFileName(aPath);
+
             Global.mFileSystemDebugger.SendInternal("After GetFileName");
             Global.mFileSystemDebugger.SendInternal("xDirectoryToCreate =");
             Global.mFileSystemDebugger.SendInternal(xDirectoryToCreate);
 
             string xParentDirectory = aPath.Remove(aPath.Length - xDirectoryToCreate.Length);
+
             Global.mFileSystemDebugger.SendInternal("After removing last path part");
             Global.mFileSystemDebugger.SendInternal("xParentDirectory =");
             Global.mFileSystemDebugger.SendInternal(xParentDirectory);
 
             DirectoryEntry xParentEntry = GetDirectory(xParentDirectory);
+
             if (xParentEntry == null)
             {
                 Global.mFileSystemDebugger.SendInternal("Parent directory doesn't exist.");
                 xParentEntry = CreateDirectory(xParentDirectory);
             }
+
             Global.mFileSystemDebugger.SendInternal("Parent directory exists.");
 
             var xFS = GetFileSystemFromPath(xParentDirectory);
@@ -235,6 +240,7 @@ namespace Cosmos.System.FileSystem
             }
             catch (Exception)
             {
+                Global.mFileSystemDebugger.SendInternal("CosmosVFS.GetDirectory - DoGetDirectoryEntry failed, returning null. aPath = " + aPath);
                 return null;
             }
             throw new Exception(aPath + " was found, but is not a directory.");
@@ -259,6 +265,7 @@ namespace Cosmos.System.FileSystem
             }
             catch (Exception)
             {
+                Global.mFileSystemDebugger.SendInternal("CosmosVFS.GetFile - DoGetDirectoryEntry failed, returning null. aPath = " + aPath);
                 return null;
             }
             throw new Exception(aPath + " was found, but is not a file.");

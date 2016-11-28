@@ -106,6 +106,5 @@ namespace Cosmos.Common.Extensions
             }
             return new string(xChars);
         }
-
     }
 }

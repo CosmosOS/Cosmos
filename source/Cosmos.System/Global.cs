@@ -25,23 +25,23 @@ namespace Cosmos.System
 
         public static bool NumLock
         {
-            get { return HAL.Global.NumLock; }
-            set { HAL.Global.NumLock = value; }
+            get { return KeyboardManager.NumLock; }
+            set { KeyboardManager.NumLock = value; }
         }
 
         public static bool CapsLock
         {
-            get { return HAL.Global.CapsLock; }
-            set { HAL.Global.CapsLock = value; }
+            get { return KeyboardManager.CapsLock; }
+            set { KeyboardManager.CapsLock = value; }
         }
 
         public static bool ScrollLock
         {
-            get { return HAL.Global.ScrollLock; }
-            set { HAL.Global.ScrollLock = value; }
+            get { return KeyboardManager.ScrollLock; }
+            set { KeyboardManager.ScrollLock = value; }
         }
 
-        public static void Init(TextScreenBase textScreen, Keyboard keyboard)
+        public static void Init(TextScreenBase textScreen)
         {
             // We must init Console before calling Inits.
             // This is part of the "minimal" boot to allow output.
@@ -51,12 +51,19 @@ namespace Cosmos.System
                 Console = new Console(textScreen);
             }
 
+            mDebugger.Send("Creating Keyboard");
+
             mDebugger.Send("HW Init");
-            HAL.Global.Init(textScreen, keyboard);
+            HAL.Global.Init(textScreen);
             NumLock = false;
             CapsLock = false;
             ScrollLock = false;
             //Network.NetworkStack.Init();
+        }
+
+        public static void ChangeKeyLayout(ScanMapBase scanMap)
+        {
+            KeyboardManager.SetKeyLayout(scanMap);
         }
     }
 }

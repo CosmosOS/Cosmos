@@ -22,23 +22,36 @@ namespace Cosmos.IL2CPU
     public static bool IsInstance(uint aObjectType, uint aDesiredObjectType)
     {
       var xCurrentType = aObjectType;
+
       if (aObjectType == 0)
       {
         return true;
       }
+
       do
       {
         if (xCurrentType == aDesiredObjectType)
         {
           return true;
         }
+
         if (xCurrentType == mTypes[xCurrentType].BaseTypeIdentifier)
         {
+          Debug("IsInstance failed (1):");
+          DebugHex("aObjectType: ", aObjectType);
+          DebugHex("aDesiredObjectType: ", aDesiredObjectType);
+
           return false;
         }
+
         xCurrentType = mTypes[xCurrentType].BaseTypeIdentifier;
       }
       while (xCurrentType != 0);
+
+      Debug("IsInstance failed (2):");
+      DebugHex("aObjectType: ", aObjectType);
+      DebugHex("aDesiredObjectType: ", aDesiredObjectType);
+
       return false;
     }
 

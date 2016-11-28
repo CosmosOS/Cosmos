@@ -113,6 +113,8 @@ namespace Cosmos.IL2CPU
                         xIdxOffset++;
                     }
 
+                    string x = aMethod.MethodBase.Name;
+                    string y = aMethod.MethodBase.DeclaringType.Name;
                     var xParams = aMethod.MethodBase.GetParameters();
                     var xParamCount = (ushort)xParams.Length;
 
@@ -640,7 +642,7 @@ namespace Cosmos.IL2CPU
                             }
                         }
                     }
-                    if ((xHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0)
+                    if (xHandler.Flags.HasFlag(ExceptionHandlingClauseOptions.Filter))
                     {
                         if (xHandler.FilterOffset > 0)
                         {
@@ -1290,7 +1292,7 @@ namespace Cosmos.IL2CPU
                         {
                             if (ILOp.TypeIsReferenceType(aFrom.MethodBase.DeclaringType) && !ILOp.TypeIsReferenceType(xParams[0].ParameterType))
                             {
-                                throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute!");
+                                throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute! Method: " + aFrom.MethodBase.GetFullName() + " Parameter: " + xParams[0].Name);
                             }
                         }
 
@@ -1330,7 +1332,7 @@ namespace Cosmos.IL2CPU
                     {
                         if (ILOp.TypeIsReferenceType(xFromParameters[xOriginalParamsIdx].ParameterType) && !ILOp.TypeIsReferenceType(xParams[xCurParamIdx].ParameterType))
                         {
-                            throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute!");
+                            throw new Exception("Original method argument $this is a reference type. Plug attribute first argument is not an argument type, nor was it marked with ObjectPointerAccessAttribute! Method: " + aFrom.MethodBase.GetFullName() + " Parameter: " + xParam.Name);
                         }
                         // normal field access
                         XS.Comment("Loading parameter " + (xCurParamIdx + xCurParamOffset));

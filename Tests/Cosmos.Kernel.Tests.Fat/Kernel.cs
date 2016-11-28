@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+
 using Cosmos.Common.Extensions;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
@@ -461,7 +462,7 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("");
 
             //
-            mDebugger.Send("Get files:");
+            mDebugger.Send("START TEST: Get files:");
             var xFiles = Directory.GetFiles(@"0:\");
             mDebugger.Send("Found " + xFiles.Length + " files.");
             if (xFiles.Length > 0)
@@ -478,7 +479,7 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("");
 
             //
-            mDebugger.Send("Get directories:");
+            mDebugger.Send("START TEST: Get directories:");
             var xDirectories = Directory.GetDirectories(@"0:\");
             mDebugger.Send("Found " + xDirectories.Length + " directories.");
             if (xDirectories.Length > 0)
@@ -495,14 +496,14 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("");
 
             //
-            mDebugger.Send("Directory exist check:");
+            mDebugger.Send("START TEST: Directory exist check:");
             var xTest = Directory.Exists(@"0:\test");
             Assert.IsTrue(xTest, "Folder does not exist!");
             mDebugger.Send("END TEST");
 
             mDebugger.Send("");
 
-            mDebugger.Send("START TEST");
+            mDebugger.Send("START TEST: Create Directory");
             var xDirectory = Directory.CreateDirectory(@"0:\test2");
             Assert.IsTrue(xDirectory != null, "Directory.CreateDirectory failed: Directory is null");
             bool xExists = Directory.Exists(@"0:\test2");
@@ -662,16 +663,16 @@ namespace Cosmos.Kernel.Tests.Fat
             using (var xFile2 = File.Create(@"0:\testdir\file.txt"))
             {
                 string wText = "This a test";
-                byte[] xWriteBuff = wText.GetUtf8Bytes(0, (uint) wText.Length);
+                byte[] xWriteBuff = wText.GetUtf8Bytes(0, (uint)wText.Length);
                 xFile2.Write(xWriteBuff, 0, xWriteBuff.Length);
                 mDebugger.Send("---- Data written");
                 xFile2.Position = 0;
                 byte[] xReadBuff = new byte[xWriteBuff.Length];
                 xFile2.Read(xReadBuff, 0, xWriteBuff.Length);
-                mDebugger.Send("xWriteBuff=" + xWriteBuff.GetUtf8String(0, (uint) xWriteBuff.Length));
-                mDebugger.Send("xReadBuff =" + xReadBuff.GetUtf8String(0, (uint) xReadBuff.Length));
-                string xWriteBuffAsString = xWriteBuff.GetUtf8String(0, (uint) xWriteBuff.Length);
-                string xReadBuffAsString = xReadBuff.GetUtf8String(0, (uint) xReadBuff.Length);
+                mDebugger.Send("xWriteBuff=" + xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length));
+                mDebugger.Send("xReadBuff =" + xReadBuff.GetUtf8String(0, (uint)xReadBuff.Length));
+                string xWriteBuffAsString = xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length);
+                string xReadBuffAsString = xReadBuff.GetUtf8String(0, (uint)xReadBuff.Length);
                 mDebugger.Send("xWriteBuffAsString=" + xWriteBuffAsString);
                 mDebugger.Send("xReadBuffAsString =" + xReadBuffAsString);
                 Assert.IsTrue(xWriteBuffAsString == xReadBuffAsString, "Failed to write and read file");
@@ -728,21 +729,22 @@ namespace Cosmos.Kernel.Tests.Fat
         /// </summary>
         private void TestFileStream()
         {
+            mDebugger.Send("START TEST: Filestream:");
+
             using (var xFS = new FileStream(@"0:\Kudzu.txt", FileMode.Create))
             {
-                mDebugger.Send("START TEST: Filestream:");
                 mDebugger.Send("Start writing");
                 var xStr = "Test FAT Write.";
-                byte[] xWriteBuff = xStr.GetUtf8Bytes(0, (uint) xStr.Length);
+                byte[] xWriteBuff = xStr.GetUtf8Bytes(0, (uint)xStr.Length);
                 xFS.Write(xWriteBuff, 0, xWriteBuff.Length);
                 mDebugger.Send("---- Data written");
                 xFS.Position = 0;
                 byte[] xReadBuff = new byte[xWriteBuff.Length];
                 xFS.Read(xReadBuff, 0, xWriteBuff.Length);
-                mDebugger.Send("xWriteBuff " + xWriteBuff.GetUtf8String(0, (uint) xWriteBuff.Length) + " xReadBuff " +
-                               xReadBuff.GetUtf8String(0, (uint) xWriteBuff.Length));
-                string xWriteBuffAsString = xWriteBuff.GetUtf8String(0, (uint) xWriteBuff.Length);
-                string xReadBuffAsString = xReadBuff.GetUtf8String(0, (uint) xReadBuff.Length);
+                mDebugger.Send("xWriteBuff " + xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length) + " xReadBuff " +
+                               xReadBuff.GetUtf8String(0, (uint)xWriteBuff.Length));
+                string xWriteBuffAsString = xWriteBuff.GetUtf8String(0, (uint)xWriteBuff.Length);
+                string xReadBuffAsString = xReadBuff.GetUtf8String(0, (uint)xReadBuff.Length);
                 Assert.IsTrue(xWriteBuffAsString == xReadBuffAsString, "Failed to write and read file");
                 mDebugger.Send("END TEST");
             }
