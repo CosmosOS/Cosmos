@@ -119,6 +119,9 @@ Things that Core implements and exposes to HAL:
 
 Core also manages consumers of its services to avoid conflicts and security to prevent a specific driver from accessing "everything".
 
+Notes:
+https://github.com/joeduffy/slice.net
+
 ### 1 HAL (Hardware Abstraction Layer)
 
 Summary: Hardware control
@@ -191,7 +194,7 @@ references.
 ## Graphics
 
 0 IO/Memory access (Cosmos)
-1 DirectX / Graphics Memory
+1 DirectX / VESA / Graphics Memory
 2 WinForms, WPF, Other UI, Canvas, JPG/PNG/GIF
 3 Application
 

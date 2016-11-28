@@ -1,9 +1,9 @@
-using System;
-using CPUx86 = Cosmos.Assembler.x86;
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Dup)]
+    [OpCode(ILOpCode.Code.Dup)]
     public class Dup : ILOp
     {
         public Dup(Cosmos.Assembler.Assembler aAsmblr)
@@ -19,7 +19,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
             for (int i = StackSize; i > 0; i--)
             {
-                new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)((StackSize - 1) * 4) };
+              XS.Push(ESP, true, (StackSize - 1) * 4);
+              //new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)((StackSize - 1) * 4) };
             }
         }
 

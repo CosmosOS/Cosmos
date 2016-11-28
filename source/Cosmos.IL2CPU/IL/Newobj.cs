@@ -180,8 +180,6 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Push(ESP, isIndirect: true);
                 // it's on the stack now 3 times. Once from the Alloc return value, twice from the pushes
 
-                int xGCFieldCount = objectType.GetFields().Count(x => x.FieldType.IsValueType);
-
                 // todo: use a cleaner approach here. this class shouldnt assemble the string
                 string strTypeId = GetTypeIDLabel(constructor.DeclaringType);
 
@@ -189,7 +187,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Set(EBX, strTypeId, sourceIsIndirect: true);
                 XS.Set(EAX, EBX, destinationIsIndirect: true);
                 XS.Set(EAX, (uint)InstanceTypeEnum.NormalObject, destinationDisplacement: 4, destinationIsIndirect: true, size: RegisterSize.Int32);
-                XS.Set(EAX, (uint)xGCFieldCount, destinationDisplacement: 8, destinationIsIndirect: true, size: RegisterSize.Int32);
+                XS.Set(EAX, xMemSize, destinationDisplacement: 8, destinationIsIndirect: true, size: RegisterSize.Int32);
                 uint xSize = (uint)(from item in xParams
                                     let xQSize = Align(SizeOfType(item.ParameterType), 4)
                                     select (int)xQSize).Take(xParams.Length).Sum();

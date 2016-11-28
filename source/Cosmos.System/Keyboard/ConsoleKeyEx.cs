@@ -1,4 +1,4 @@
-namespace Cosmos.HAL
+namespace Cosmos.System
 {
     public enum ConsoleKeyEx
     {
@@ -53,7 +53,7 @@ namespace Cosmos.HAL
         LBracket,
         RBracket,
         Enter,
-        
+
         CapsLock,
         A,
         S,

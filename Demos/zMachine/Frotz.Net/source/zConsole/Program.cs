@@ -24,7 +24,7 @@ namespace zConsole
             Frotz.os_.debug_mode = false;
             //if (File.Exists("debug.log"))
             //    File.Delete("debug.log");
-            string fName = "";
+            string fName = args[0];
             //while(!File.Exists(fName))
             //{
             //    Console.WriteLine("Please type a path to a storyfile:");

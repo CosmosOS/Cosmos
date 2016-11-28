@@ -5,6 +5,7 @@ namespace Cosmos.IL2CPU
     partial class VTablesImpl
     {
         public static bool EnableDebug = false;
+
         private static void Debug(string message)
         {
             if (!EnableDebug)

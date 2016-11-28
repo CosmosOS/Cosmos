@@ -24,10 +24,17 @@ namespace Cosmos.System.Plugs.System
         }
 
         [PlugMethod(Signature = "System_Boolean__System_Type_op_Equality_System_Type__System_Type_")]
-        public static bool op_Equality(uint left, uint right)
+        public static bool op_Equality([ObjectPointerAccess]uint left, [ObjectPointerAccess]uint right)
         {
             // for now, type info is the type id.
             return left == right;
+        }
+
+        [PlugMethod(Signature = "System_Boolean__System_Type_op_Inequality_System_Type__System_Type_")]
+        public static bool op_Inequality([ObjectPointerAccess]uint left, [ObjectPointerAccess]uint right)
+        {
+            // for now, type info is the type id.
+            return left != right;
         }
 
         //System.Type  System.Type.GetTypeFromHandle(System.RuntimeTypeHandle)
