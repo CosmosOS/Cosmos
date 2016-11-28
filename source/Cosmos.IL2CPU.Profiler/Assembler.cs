@@ -5,7 +5,7 @@ namespace Cosmos.IL2CPU.Profiler {
     {
 
         public Assembler(string assemblerLogFile)
-            : base(Cosmos.Assembler.CompilerStyles.NAsm, 0, assemblerLogFile)
+            : base(Cosmos.Assembler.AssemblerStyles.NAsm, 0, assemblerLogFile)
         {
         }
 

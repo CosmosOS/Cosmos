@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU
 {
     public class CosmosAssembler : Assembler.Assembler
     {
-        public CosmosAssembler(CompilerStyles compilerStyle, int comPort) : base(compilerStyle)
+        public CosmosAssembler(AssemblerStyles assemblerStyle, int comPort) : base(assemblerStyle)
         {
             mComPort = comPort;
         }

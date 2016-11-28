@@ -328,7 +328,7 @@ namespace Cosmos.IL2CPU
                 }
             }
 
-            return new AppAssembler(Assembler.CompilerStyles.NAsm, DebugCom, AssemblerLog);
+            return new AppAssembler(Assembler.AssemblerStyles.NAsm, DebugCom, AssemblerLog);
         }
 
         /// <summary>Load every refernced assemblies that have an associated FullPath property and seek for

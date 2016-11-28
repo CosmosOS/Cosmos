@@ -194,7 +194,7 @@
     <Compile Include="Assembler.cs" />
     <Compile Include="BaseAssemblerElement.cs" />
     <Compile Include="Comment.cs" />
-    <Compile Include="CompilerStyle.cs" />
+    <Compile Include="AssemblerStyle.cs" />
     <Compile Include="DataEndIfDefined.cs" />
     <Compile Include="DataIfDefined.cs" />
     <Compile Include="DataIfNotDefined.cs" />

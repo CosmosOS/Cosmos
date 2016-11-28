@@ -11,7 +11,7 @@
 
         public Comment(Assembler aAssembler, string aText) : base() //HACK
         {
-            commentChar = CompilerStyle.GetCommentChar(aAssembler.CompilerStyle);
+            commentChar = AssemblerStyle.GetCommentChar(aAssembler.AssemblerStyle);
 
             if (aText.StartsWith(commentChar.ToString()))
             {
@@ -23,7 +23,7 @@
 
         public Comment(string aText) : base(true)
         {
-            commentChar = CompilerStyle.GetCommentChar(Assembler.CurrentInstance.CompilerStyle);
+            commentChar = AssemblerStyle.GetCommentChar(Assembler.CurrentInstance.AssemblerStyle);
 
             if (aText.StartsWith(commentChar.ToString()))
             {

@@ -62,16 +62,16 @@ namespace Cosmos.IL2CPU
         protected long mCurrentMethodLabelEndGuid;
         protected long mCurrentMethodGuid;
 
-        public AppAssembler(CompilerStyles compilerStyle, int aComPort, string assemblerLogFile)
+        public AppAssembler(AssemblerStyles assemblerStyle, int aComPort, string assemblerLogFile)
         {
-            Assembler = CreateAssembler(compilerStyle, aComPort);
+            Assembler = CreateAssembler(assemblerStyle, aComPort);
             mLog = new StreamWriter(assemblerLogFile, false);
             InitILOps();
         }
 
-        protected virtual CosmosAssembler CreateAssembler(CompilerStyles compilerStyle, int aComPort)
+        protected virtual CosmosAssembler CreateAssembler(AssemblerStyles assemblerStyle, int aComPort)
         {
-            return new CosmosAssembler(compilerStyle, aComPort);
+            return new CosmosAssembler(assemblerStyle, aComPort);
         }
 
         public void Dispose()

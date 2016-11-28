@@ -8,15 +8,15 @@ namespace Cosmos.Assembler
 {
   public class Assembler
   {
-    public Assembler(CompilerStyles compilerStyle)
+    public Assembler(AssemblerStyles assemblerStyle)
     {
       mCurrentInstance = this;
       mInstances.Push(this);
 
-      CompilerStyle = compilerStyle;
+      AssemblerStyle = assemblerStyle;
     }
 
-    public Assembler(CompilerStyles compilerStyle, bool addWhitespaceWhileFlushing) : this(compilerStyle)
+    public Assembler(AssemblerStyles assemblerStyle, bool addWhitespaceWhileFlushing) : this(assemblerStyle)
     {
       mAddWhitespaceWhileFlushing = addWhitespaceWhileFlushing;
     }
@@ -67,7 +67,7 @@ namespace Cosmos.Assembler
       set { mInstructions = value; }
     }
 
-    public CompilerStyles CompilerStyle
+    public AssemblerStyles AssemblerStyle
     {
       get;
     }

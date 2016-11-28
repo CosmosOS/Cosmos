@@ -27,7 +27,7 @@ namespace XSharp.Compiler {
         //  xGenerator.GenerateToFiles(xFile);
         //}
 
-        var xAsm = new Assembler(CompilerStyles.NAsm);
+        var xAsm = new Assembler(AssemblerStyles.NAsm);
         var xStreamReader = new StringReader(@"namespace Test
             while byte ESI[0] != 0 {
               ! nop

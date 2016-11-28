@@ -29,7 +29,7 @@ namespace XSharp.VS {
         using (var xOut = new StringWriter()) {
             try
             {
-              new Assembler(CompilerStyles.NAsm);
+              new Assembler(AssemblerStyles.NAsm);
 
               try
               {
