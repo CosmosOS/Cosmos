@@ -156,9 +156,8 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterHigh, (uint)(mFirstClusterNum >> 16));
             SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstClusterLow, (uint)(mFirstClusterNum & 0xFFFF));
 
-            //byte[] xData = GetDirectoryEntryData();
-
-            //SetDirectoryEntryData(xData);
+            // GetFatTable calls GetFatChain, which "refreshes" the FAT table and clusters
+            GetFatTable();
         }
 
         public FatDirectoryEntry AddDirectoryEntry(string aName, DirectoryEntryTypeEnum aType)
@@ -224,7 +223,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             var xData = GetDirectoryEntryData();
             var xResult = new List<FatDirectoryEntry>();
-            FatDirectoryEntry xParent = (FatDirectoryEntry)(mParent ?? mFileSystem.GetRootDirectory());
+            FatDirectoryEntry xParent = this;
 
             //TODO: Change xLongName to StringBuilder
             string xLongName = "";
@@ -318,6 +317,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                                                 break;
                                             }
                                         }
+
                                         //Substring to remove the periods
                                         xName = xName.Substring(0, nameIndex + 1);
                                     }

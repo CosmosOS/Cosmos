@@ -677,6 +677,7 @@ namespace Cosmos.Kernel.Tests.Fat
                 mDebugger.Send("xReadBuffAsString =" + xReadBuffAsString);
                 Assert.IsTrue(xWriteBuffAsString == xReadBuffAsString, "Failed to write and read file");
                 mDebugger.Send("END TEST");
+                mDebugger.Send("");
             }
 
             //mDebugger.Send("START TEST: Create a new directory with a file inside (File):");
@@ -709,6 +710,7 @@ namespace Cosmos.Kernel.Tests.Fat
             File.Delete(@"0:\test1.txt");
             Assert.IsFalse(File.Exists(@"0:\test1.txt"), "test1.txt wasn't deleted!");
             mDebugger.Send("END TEST");
+            mDebugger.Send("");
 
             //mDebugger.Send("START TEST: Delete a directory with File.Delete:");
             //Simple test: create a directory, then try to delete it as a file.
@@ -718,6 +720,18 @@ namespace Cosmos.Kernel.Tests.Fat
             //Assert.IsTrue(Directory.Exists(@"0:\Dir1"), "Yeah, it's actually deleting the directory. That isn't right.");
 
             //mDebugger.Send("END TEST");
+
+            mDebugger.Send("START TEST: Create a directory and a file in that directory and write to that file:");
+
+            Directory.CreateDirectory(@"0:\testdir");
+            File.Create(@"0:\testdir\testfile.txt");
+
+            File.WriteAllText(@"0:\testdir\testfile.txt", "Hello Cosmos!");
+
+            Assert.IsTrue(File.ReadAllText(@"0:\testdir\testfile.txt") == "Hello Cosmos!", "File was not written correctly");
+
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
         }
 
         #endregion

@@ -236,6 +236,7 @@ namespace Cosmos.System.FileSystem.FAT
                 long xWriteSize;
                 long xClusterIdx = mPosition / xClusterSize;
                 long xPosInCluster = mPosition % xClusterSize;
+
                 if (xPosInCluster + xCount > xClusterSize)
                 {
                     xWriteSize = xClusterSize - xPosInCluster - 1;
