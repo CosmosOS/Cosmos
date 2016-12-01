@@ -11,7 +11,7 @@ namespace Cosmos.Core.Plugs.System
         public static DateTime get_Now()
         {
             int[] raw = GetRawDate();
-            
+
             return new DateTime(
                 100 * BCDtoBIN(raw[10]) + BCDtoBIN(raw[9]), //YEAR
                 BCDtoBIN(raw[8]), //MONTH
@@ -51,7 +51,12 @@ namespace Cosmos.Core.Plugs.System
 
             return raw;
         }
-        
+
+        public static int ToString(ref decimal aThis)
+        {
+            throw new NotImplementedException("DateTime.ToString()");
+        }
+
         public static long GetSystemTimeAsFileTime() => get_Now().Ticks;
 
         /// <summary>
