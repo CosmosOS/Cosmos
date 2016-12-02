@@ -112,7 +112,22 @@ namespace Cosmos.System.FileSystem.FAT
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            throw new NotImplementedException();
+            switch (origin)
+            {
+                case SeekOrigin.Begin:
+                    Position = offset;
+                    break;
+                case SeekOrigin.Current:
+                    Position += offset;
+                    break;
+                case SeekOrigin.End:
+                    Position = Length + offset;
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            return Position;
         }
 
         public override void SetLength(long value)
@@ -226,6 +241,7 @@ namespace Cosmos.System.FileSystem.FAT
             long xOffset = aOffset;
 
             long xTotalLength = (mPosition + xCount);
+
             if (xTotalLength > Length)
             {
                 SetLength(xTotalLength);
@@ -247,9 +263,10 @@ namespace Cosmos.System.FileSystem.FAT
                 }
 
                 byte[] xCluster;
-                mFS.Read(xClusterIdx, out xCluster);
+                mFS.Read(mFatTable[xClusterIdx], out xCluster);
                 Array.Copy(aBuffer, aOffset, xCluster, xPosInCluster, xWriteSize);
                 mFS.Write(mFatTable[xClusterIdx], xCluster);
+
                 xOffset += xWriteSize;
                 xCount -= xWriteSize;
             }

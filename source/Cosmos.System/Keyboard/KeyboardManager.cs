@@ -49,6 +49,14 @@ namespace Cosmos.System
             set;
         }
 
+        public static bool KeyAvailable
+        {
+            get
+            {
+                return mQueuedKeys.Count > 0;
+            }
+        }
+
         public static List<KeyboardBase> Keyboards = new List<KeyboardBase>();
 
         private static ScanMapBase _scanMap = new US_Standard();
@@ -111,7 +119,7 @@ namespace Cosmos.System
                 if (!aReleased)
                 {
                     KeyEvent keyInfo;
-                    
+
                     if (GetKey(key, out keyInfo))
                     {
                         Enqueue(keyInfo);
@@ -134,9 +142,9 @@ namespace Cosmos.System
             {
                 Debugger.DoSend("No KeyLayout");
             }
-            
+
             keyInfo = _scanMap.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, NumLock, CapsLock, ScrollLock);
-            
+
             return keyInfo != null;
         }
 
@@ -147,9 +155,9 @@ namespace Cosmos.System
                 oKey = mQueuedKeys.Dequeue();
                 return true;
             }
-            
+
             oKey = default(KeyEvent);
-            
+
             return false;
         }
 
@@ -159,7 +167,7 @@ namespace Cosmos.System
             {
                 KeyboardBase.WaitForKey();
             }
-            
+
             return mQueuedKeys.Dequeue();
         }
 

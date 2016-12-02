@@ -115,11 +115,8 @@ namespace Cosmos.System.Plugs.System.IO
                 throw new ArgumentException("The file path cannot be empty.");
             }
 
-            //Global.mFileSystemDebugger.SendInternal("Calling VFSManager.GetFileStream...");
-            return VFSManager.GetFileStream(aPath);
+            // Naive, but working implementation of FileMode. Probably is better to do this at lower level...
 
-            // Naive and not working implementation of FileMode. Probably is better to do this at lower level...
-#if false
             // Before let's see if aPath already exists
             bool aPathExists = File.Exists(aPath);
 
@@ -129,13 +126,13 @@ namespace Cosmos.System.Plugs.System.IO
             {
                 case FileMode.Append:
                     // TODO it seems that GetFileStream effectively Creates the file if not exist
-                    aStream = VFSManager.GetFileStream(aPath);
+                    aStream = aPathExists ? VFSManager.GetFileStream(aPath) : File.Create(aPath);
+
                     if (aPathExists)
                     {
                         Global.mFileSystemDebugger.SendInternal("Append mode with aPath already existing let's seek to end of the file");
-                        Global.mFileSystemDebugger.SendInternal("Actual aStream Lenght: ", aStream.Length);
-                        aStream.Position = aStream.Length;
-                        //aStream.Seek(0, SeekOrigin.End);
+                        Global.mFileSystemDebugger.SendInternal("Actual aStream Lenght: " + aStream.Length);
+                        aStream.Seek(0, SeekOrigin.End);
                     }
                     else
                     {
@@ -146,7 +143,7 @@ namespace Cosmos.System.Plugs.System.IO
                 case FileMode.Create:
                     Global.mFileSystemDebugger.SendInternal("Create Mode aPath will be overwritten if existing");
                     // TODO it seems that GetFileStream effectively Creates the file if not exist
-                    aStream = VFSManager.GetFileStream(aPath);
+                    aStream = File.Create(aPath);
                     break;
 
                 case FileMode.CreateNew:
@@ -158,13 +155,14 @@ namespace Cosmos.System.Plugs.System.IO
 
                     Global.mFileSystemDebugger.SendInternal("CreateNew Mode with aPath not existing new file created");
                     // TODO it seems that GetFileStream effectively Creates the file if it does not exist
-                    aStream = VFSManager.GetFileStream(aPath);
+                    aStream = File.Create(aPath);
                     break;
 
                 case FileMode.Open:
                     if (!aPathExists)
                     {
                         Global.mFileSystemDebugger.SendInternal("Open Mode with aPath not existing");
+#warning TODO: Change IOException to FileNotFoundException, it asks for a plug
                         throw new IOException("File not existing but Open Requested");
                     }
 
@@ -175,9 +173,9 @@ namespace Cosmos.System.Plugs.System.IO
                     break;
 
                 case FileMode.OpenOrCreate:
-                    Global.mFileSystemDebugger.SendInternal("CreateNew Mode with aPath not existing new file created");
+                    Global.mFileSystemDebugger.SendInternal("OpenOrCreate Mode with aPath not existing new file created");
                     // TODO it seems that GetFileStream effectively Creates the file if it does not exist
-                    aStream = VFSManager.GetFileStream(aPath);
+                    aStream = aPathExists ? VFSManager.GetFileStream(aPath) : File.Create(aPath);
                     break;
 
                 case FileMode.Truncate:
@@ -199,7 +197,6 @@ namespace Cosmos.System.Plugs.System.IO
             }
 
             return aStream;
-#endif
         }
     }
 }
