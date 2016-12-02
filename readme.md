@@ -65,6 +65,7 @@ We encourage you to add your own Cosmos videos to YouTube. Please add the tags C
 
 **Official Videos** - Videos made by the Cosmos Team.
 
+* [2016 Nov 23 - Cosmos interview for Channel 9](https://www.youtube.com/watch?v=wgEBo-u19Wc&feature=youtu.be)
 * [Building your first Operating System in less than 60 seconds](http://www.youtube.com/watch?v=k5UPuPCY-5U)
 * [Cosmos Debugging](http://www.youtube.com/watch?v=oInLSZia4pQ)
 * [Cosmos PXE network boot with VMware](http://www.youtube.com/watch?v=kXwlg-NN8NI)

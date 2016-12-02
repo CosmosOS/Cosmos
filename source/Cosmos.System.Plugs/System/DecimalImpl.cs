@@ -15,5 +15,10 @@ namespace Cosmos.System.Plugs.System
         {
             throw new NotImplementedException("Decimal.GetHashCode()");
         }
+
+        public static int ToString(ref decimal aThis)
+        {
+            throw new NotImplementedException("Decimal.ToString()");
+        }
     }
 }
