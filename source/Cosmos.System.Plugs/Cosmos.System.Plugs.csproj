@@ -88,7 +88,6 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="System\Collections\Generic\DictionaryImpI.cs" />
     <Compile Include="System\Collections\Generic\EqualityComparerImpl.cs" />
     <Compile Include="System\DecimalImpl.cs" />
     <Compile Include="System\Mda.cs" />
