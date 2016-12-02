@@ -723,9 +723,13 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("START TEST: Create a directory and a file in that directory and write to that file:");
 
             Directory.CreateDirectory(@"0:\testdir");
+            mDebugger.Send("Directory created");
+
             File.Create(@"0:\testdir\testfile.txt");
+            mDebugger.Send("File created");
 
             File.WriteAllText(@"0:\testdir\testfile.txt", "Hello Cosmos!");
+            mDebugger.Send("Text written");
 
             Assert.IsTrue(File.ReadAllText(@"0:\testdir\testfile.txt") == "Hello Cosmos!", "File was not written correctly");
 

@@ -116,10 +116,20 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.AllocateDirectoryEntry --");
 
+            string xShortName;
+
             // TODO: Deal with short and long name.
             if (mName.Length > 12)
             {
+                string xLongName = mName;
+
+                xShortName = mName;
+
                 throw new Exception("FatDirectoryEntry: Long Names not supported in new Directory Entries");
+            }
+            else
+            {
+                xShortName = mName;
             }
 
             char[] xName =
@@ -129,9 +139,10 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 };
 
             int j = 0;
-            for (int i = 0; i < mName.Length; i++)
+
+            for (int i = 0; i < xShortName.Length; i++)
             {
-                if (mName[i] == '.')
+                if (xShortName[i] == '.')
                 {
                     i++;
                     j = 8;
@@ -140,7 +151,9 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 {
                     break;
                 }
-                xName[j] = mName[i];
+
+                xName[j] = xShortName[i];
+
                 j++;
             }
 

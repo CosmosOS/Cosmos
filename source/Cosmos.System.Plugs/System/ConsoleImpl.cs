@@ -403,9 +403,15 @@ namespace Cosmos.System.Plugs.System
                 Write(key.KeyChar);
             }
 
-            bool shift = key.Modifiers.HasFlag(ConsoleModifiers.Shift);
-            bool alt = key.Modifiers.HasFlag(ConsoleModifiers.Alt);
-            bool control = key.Modifiers.HasFlag(ConsoleModifiers.Control);
+            //TODO: Plug HasFlag and use the next 3 lines instead of the 3 following lines
+
+            //bool shift = key.Modifiers.HasFlag(ConsoleModifiers.Shift);
+            //bool alt = key.Modifiers.HasFlag(ConsoleModifiers.Alt);
+            //bool control = key.Modifiers.HasFlag(ConsoleModifiers.Control);
+
+            bool shift = (key.Modifiers & ConsoleModifiers.Shift) == ConsoleModifiers.Shift;
+            bool alt = (key.Modifiers & ConsoleModifiers.Alt) == ConsoleModifiers.Alt;
+            bool control = (key.Modifiers & ConsoleModifiers.Control) == ConsoleModifiers.Control;
 
             return new ConsoleKeyInfo(key.KeyChar, key.Key.ToConsoleKey(), shift, alt, control);
         }
