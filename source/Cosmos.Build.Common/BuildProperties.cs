@@ -131,6 +131,12 @@ namespace Cosmos.Build.Common
                 Deployment = DeploymentType.BinaryImage;
                 Launch = LaunchType.IntelEdison;
             }
+            else if (aName == "HyperV")
+            {
+                Description = "Use Hyper-V to deploy and debug.";
+                Deployment = DeploymentType.ISO;
+                Launch = LaunchType.HyperV;
+            }
         }
 
         public void DeleteProfile(string aPrefix)
