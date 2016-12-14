@@ -95,7 +95,7 @@ namespace Cosmos.Core.Plugs.System
             return 1;
         }
 
-        public static unsafe int GetLowerBound(int* aThis, int aDimension)
+        public static unsafe int GetLowerBound([ObjectPointerAccess]int* aThis, int aDimension)
         {
             aThis = (int*)aThis[0];
             if (aDimension != 0)
