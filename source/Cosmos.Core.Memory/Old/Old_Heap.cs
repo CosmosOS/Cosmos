@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Cosmos.Core.Common;
 using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core.Memory.Old

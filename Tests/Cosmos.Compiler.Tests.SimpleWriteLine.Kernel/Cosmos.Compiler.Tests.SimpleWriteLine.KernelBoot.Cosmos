@@ -7,7 +7,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <Name>Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot</Name>
     <BinFormat>elf</BinFormat>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Profile>Bochs</Profile>
@@ -73,21 +73,6 @@
     <ISO_EnableBochsDebug>True</ISO_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
-      <Name>Cosmos.Core.Plugs</Name>
-      <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
-      <Name>Cosmos.Debug.Kernel.Plugs</Name>
-      <Project>{b97a2956-c363-47f2-a6aa-b4fccff4d315}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
-      <Name>Cosmos.System.Plugs</Name>
-      <Project>{7c64b97f-516d-4a6d-b9e1-3fe48f561409}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.csproj">
       <Name>Cosmos.Compiler.Tests.SimpleWriteLine.Kernel</Name>
       <Project>{57045fe8-b0fe-4fc1-810f-7c3914aef1de}</Project>

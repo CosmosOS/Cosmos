@@ -1,6 +1,7 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+using Cosmos.IL2CPU.Plugs;
 using Cosmos.IL2CPU.Plugs.System;
 using XSharp.Compiler;
 
@@ -31,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize); // the index
       XS.Set(XSRegisters.EDX, aElementSize);
       XS.Multiply(XSRegisters.EDX);
-      XS.Add(XSRegisters.EAX, ObjectImpl.FieldDataOffset + 4);
+      XS.Add(XSRegisters.EAX, ObjectUtilities.FieldDataOffset + 4);
 
       XS.Set(XSRegisters.EDX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize + 8); // the array
       XS.Add(XSRegisters.EDX, XSRegisters.EAX);

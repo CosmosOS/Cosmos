@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>XSharp.Compiler</RootNamespace>
     <AssemblyName>XSC</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -22,7 +22,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\Cosmos.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -109,11 +109,6 @@
     <Compile Include="XSRegisters.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Cosmos.snk">
-      <Link>Cosmos.snk</Link>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj">
       <Project>{1116130e-28e0-428a-a597-f4b3b676c0ca}</Project>
       <Name>Cosmos.Assembler</Name>
@@ -132,6 +127,9 @@
     <Content Include="XSTemplate.DestinationSize.txt" />
     <Content Include="XSTemplate.DestinationSource.txt" />
     <Content Include="XSTemplate.DestinationSourceSize.txt" />
+    <None Include="..\..\Cosmos.snk">
+      <Link>Cosmos.snk</Link>
+    </None>
     <None Include=".editorconfig" />
     <None Include="app.config" />
     <None Include="XSharp.ico" />

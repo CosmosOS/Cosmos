@@ -10,14 +10,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.Debug.DebugStub</RootNamespace>
     <AssemblyName>Cosmos.Debug.DebugStub</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -93,6 +93,9 @@
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>AsmBreak.asm</LastGenOutput>
     </EmbeddedResource>
+    <None Include="..\..\Cosmos.snk">
+      <Link>Cosmos.snk</Link>
+    </None>
     <None Include=".editorconfig" />
     <EmbeddedResource Include="CmdMisc.xs">
       <Generator>CosmosXSharpGenerator</Generator>
@@ -110,7 +113,6 @@
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>Consts.asm</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Cosmos.snk" />
     <EmbeddedResource Include="DebugStub.xs">
       <Generator>CosmosXSharpGenerator</Generator>
       <LastGenOutput>DebugStub.asm</LastGenOutput>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using Cosmos.Assembler;
 using Cosmos.Common;
 using Cosmos.IL2CPU.Plugs;
 

@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.Compiler.Tests</RootNamespace>
     <AssemblyName>Cosmos.Compiler.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -72,6 +72,12 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ApprovalTests">
       <HintPath>..\..\Resources\Dependencies\ApprovalTests.3.0.10\ApprovalTests.dll</HintPath>
@@ -95,26 +101,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
-      <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
-      <Name>Cosmos.Core.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Plugs\Cosmos.Debug.Kernel.Plugs.csproj">
-      <Project>{b97a2956-c363-47f2-a6aa-b4fccff4d315}</Project>
-      <Name>Cosmos.Debug.Kernel.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
-      <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
-      <Name>Cosmos.IL2CPU.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
-      <Project>{7C64B97F-516D-4A6D-B9E1-3FE48F561409}</Project>
-      <Name>Cosmos.System.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
-      <Project>{3DEF0461-08AB-471A-8F03-A9C556652A0F}</Project>
-      <Name>Cosmos.System</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.Kernel.csproj">
       <Project>{bdc011be-6041-4a58-a6e7-0f592e78cb27}</Project>
       <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>
@@ -130,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Cosmos.snk" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

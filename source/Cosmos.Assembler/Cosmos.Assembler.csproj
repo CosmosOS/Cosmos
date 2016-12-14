@@ -10,14 +10,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.Assembler</RootNamespace>
     <AssemblyName>Cosmos.Assembler</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkProfile />
     <CodeContractsAssemblyMode>0</CodeContractsAssemblyMode>
   </PropertyGroup>
@@ -119,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembler.cs" />
+    <Compile Include="AssemblerMethod.cs" />
     <Compile Include="BaseAssemblerElement.cs" />
     <Compile Include="Comment.cs" />
     <Compile Include="DataEndIfDefined.cs" />
@@ -225,6 +226,9 @@
     <Compile Include="x86\SSE2\ConvertSS2SD.cs" />
     <Compile Include="x86\SSE2\ConvertTruncatePD2DQ.cs" />
     <Compile Include="x86\SSE2\ConvertTruncateSD2SI.cs" />
+    <None Include="..\..\Cosmos.snk">
+      <Link>Cosmos.snk</Link>
+    </None>
     <None Include="x86\SSE2\ConvertTruncateSD2SIQ.not_used" />
     <Compile Include="x86\SSE2\ConvertTruncateSS2SI.cs" />
     <Compile Include="x86\SSE2\DivPD.cs" />
@@ -358,8 +362,6 @@
     <Compile Include="x86\_Infra\InstructionWithSize.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Cosmos.snk" />
-    <None Include="x86\Cosmos.snk" />
     <None Include=".editorconfig" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,35 @@
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetFrameworkIdentifier Condition="'$(TargetFrameworkIdentifier)' == ''">None</TargetFrameworkIdentifier>
+    <NuGetTargetMoniker Condition="'$(NuGetTargetMoniker)' == ''">.NETStandard,Version=v1.6</NuGetTargetMoniker>
+    <NuGetTargetMoniker Condition="'$(TargetFrameworkIdentifier)' != 'None'">$(TargetFrameworkIdentifier)</NuGetTargetMoniker>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.Targets" />
+
+  <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == 'None'">
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+    <NoStdLib>true</NoStdLib>
+    <_TargetFrameworkDirectories>$(MSBuildThisFileDirectory)</_TargetFrameworkDirectories>
+    <_FullFrameworkReferenceAssemblyPaths>$(MSBuildThisFileDirectory)</_FullFrameworkReferenceAssemblyPaths>
+    <AutoUnifyAssemblyReferences>true</AutoUnifyAssemblyReferences>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <PackagesDir>$(HOME)/.nuget/packages/</PackagesDir>
+    <RestorePackages>false</RestorePackages>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <HostName>dotnet</HostName>
+  </PropertyGroup>
+
+  <Target Name="RenameHost" AfterTargets="CopyFilesToOutputDirectory" Condition="'$(OutputType)' == 'Exe' ">
+    <CallTarget Targets="RenameHostWindows" Condition="Exists('$(Outdir)$(HostName).exe')" />
+  </Target>
+
+  <Target Name="RenameHostWindows">
+    <Move SourceFiles="$(Outdir)$(AssemblyName).exe" DestinationFiles="$(Outdir)$(AssemblyName).dll" />
+    <Move SourceFiles="$(Outdir)$(HostName).exe" DestinationFiles="$(Outdir)$(AssemblyName).exe" />
+  </Target>
+
+  <Import Project="$(MSBuildToolsPath)\packageresolve.targets" Condition="Exists('$(MSBuildToolsPath)\packageresolve.targets')  " />
+</Project>

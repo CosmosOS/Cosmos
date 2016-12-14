@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.TestRunner</RootNamespace>
     <AssemblyName>Cosmos.TestRunner.TestController</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -17,7 +17,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\source\Cosmos.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -91,13 +91,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
-      <Project>{61607F1E-58F9-41CF-972F-128384F3E115}</Project>
-      <Name>Cosmos.Debug.Kernel</Name>
+    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Net462\Cosmos.Debug.Kernel.Net462.csproj">
+      <Project>{71022119-E402-4483-8556-409397D9A26C}</Project>
+      <Name>Cosmos.Debug.Kernel.Net462</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\source\Cosmos.snk">
+    <None Include="..\..\Cosmos.snk">
       <Link>Cosmos.snk</Link>
     </None>
   </ItemGroup>

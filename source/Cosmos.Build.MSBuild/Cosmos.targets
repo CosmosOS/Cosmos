@@ -8,7 +8,7 @@
     <BuildToolsDir Condition="$(BuildToolsDir) == ''">$(CosmosDir)\Build\Tools</BuildToolsDir>
     <VSIPDir Condition="$(VSIPDir) == ''">$(CosmosDir)\Build\VSIP</VSIPDir>
     <NasmFile>$(BuildToolsDir)\Nasm\nasm.exe</NasmFile>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <BinFormat Condition="$(BinFormat) == ''">bin</BinFormat>
     <CosmosBuildTaskAssemblyFile>$(VSIPDir)\Cosmos.Build.MSBuild.dll</CosmosBuildTaskAssemblyFile>
   </PropertyGroup>

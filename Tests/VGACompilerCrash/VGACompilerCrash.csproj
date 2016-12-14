@@ -11,7 +11,7 @@
     <RootNamespace>VGACompilerCrash</RootNamespace>
     <AssemblyName>VGACompilerCrash</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -80,10 +80,6 @@
     <Compile Include="AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
-      <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
-      <Name>Cosmos.System</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">
       <Project>{E6D3B644-C487-472D-A978-C1A82D0C099B}</Project>
       <Name>Cosmos.TestRunner.TestController</Name>

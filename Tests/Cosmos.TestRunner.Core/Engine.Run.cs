@@ -1,14 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Cosmos.Build.Common;
-using Cosmos.Build.MSBuild;
-using Cosmos.Core.Plugs;
-using Cosmos.Debug.Kernel;
-using Cosmos.Debug.Kernel.Plugs;
-using Cosmos.System.Plugs.System;
-using IL2CPU;
-using Microsoft.Win32;
 
 namespace Cosmos.TestRunner.Core
 {

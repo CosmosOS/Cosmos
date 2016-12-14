@@ -1,5 +1,4 @@
 ﻿using Cosmos.Build.Common;
-using Cosmos.IL2CPU;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +6,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using Cosmos.Debug.Common;
-using Cosmos.System;
 
 namespace Cosmos.IL2CPU
 {
@@ -360,7 +358,7 @@ namespace Cosmos.IL2CPU
                         if (!xType.IsGenericTypeDefinition
                             && !xType.IsAbstract)
                         {
-                            if (xType.IsSubclassOf(typeof(Kernel)))
+                            if (xType.Name == "Kernel")
                             {
                                 // found kernel?
                                 if (xKernelType != null)
