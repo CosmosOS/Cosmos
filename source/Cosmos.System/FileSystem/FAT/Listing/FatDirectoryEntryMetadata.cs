@@ -24,5 +24,17 @@
         public static readonly FatDirectoryEntryMetadata ModifiedDate = new FatDirectoryEntryMetadata(0x18, 2);
         public static readonly FatDirectoryEntryMetadata FirstClusterLow = new FatDirectoryEntryMetadata(0x1A, 2);
         public static readonly FatDirectoryEntryMetadata Size = new FatDirectoryEntryMetadata(0x1C, 4);
+
+        public sealed class LongFilenameEntryMetadata
+        {
+            public static readonly FatDirectoryEntryMetadata SequenceNumberAndAllocationStatus = new FatDirectoryEntryMetadata(0x00, 1);
+            public static readonly FatDirectoryEntryMetadata LongName1 = new FatDirectoryEntryMetadata(0x01, 10);
+            public static readonly FatDirectoryEntryMetadata Attributes = new FatDirectoryEntryMetadata(0x0B, 1);
+            //public static readonly FatDirectoryEntryMetadata Reserved1 = new FatDirectoryEntryMetadata(0x0C, 1);
+            public static readonly FatDirectoryEntryMetadata Checksum = new FatDirectoryEntryMetadata(0x0D, 1);
+            public static readonly FatDirectoryEntryMetadata LongName2 = new FatDirectoryEntryMetadata(0x0E, 12);
+            //public static readonly FatDirectoryEntryMetadata Reserved2 = new FatDirectoryEntryMetadata(0x1A, 2);
+            public static readonly FatDirectoryEntryMetadata LongName3 = new FatDirectoryEntryMetadata(0x1C, 4);
+        }
     }
 }

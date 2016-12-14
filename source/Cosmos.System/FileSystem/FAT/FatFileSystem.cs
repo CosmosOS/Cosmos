@@ -481,7 +481,7 @@ namespace Cosmos.System.FileSystem.FAT
 
         internal void Write(long aCluster, byte[] aData, long aSize = 0, long aOffset = 0)
         {
-            Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.Read --");
+            Global.mFileSystemDebugger.SendInternal("-- FatFileSystem.Write --");
 
             if (aData == null)
             {

@@ -520,6 +520,29 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("END TEST");
 
             mDebugger.Send("");
+
+            mDebugger.Send("START TEST: Delete a file with Driectory.Delete:");
+            File.Create(@"0:\file1.txt");
+
+            try
+            {
+                Directory.Delete(@"0:\file1.txt");
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(File.Exists(@"0:\file1.txt"), "The file was deleted by Directory.Delete.");
+            }
+
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
+
+            mDebugger.Send("START TEST: Create a directory with a Long Filename:");
+            Directory.CreateDirectory(@"0:\TestDir1");
+            Directory.CreateDirectory(@"0:\TestDir1\LongDirectoryName");
+            Assert.IsTrue(Directory.Exists(@"0:\TestDir1\LongDirectoryName"), "LongDirectoryName wasn't created!");
+            mDebugger.Send("END TEST");
+
+            mDebugger.Send("");
         }
 
         #endregion
@@ -711,28 +734,38 @@ namespace Cosmos.Kernel.Tests.Fat
             mDebugger.Send("END TEST");
             mDebugger.Send("");
 
-            //mDebugger.Send("START TEST: Delete a directory with File.Delete:");
-            //Simple test: create a directory, then try to delete it as a file.
-            //Directory.CreateDirectory(@"0:\Dir1");
+            mDebugger.Send("START TEST: Delete a directory with File.Delete:");
+            Directory.CreateDirectory(@"0:\Dir1");
 
-            //File.Delete(@"0:\Dir1");
-            //Assert.IsTrue(Directory.Exists(@"0:\Dir1"), "Yeah, it's actually deleting the directory. That isn't right.");
+            try
+            {
+                File.Delete(@"0:\Dir1");
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(Directory.Exists(@"0:\Dir1"), "The directory was deleted by File.Delete.");
+            }
 
-            //mDebugger.Send("END TEST");
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
 
             mDebugger.Send("START TEST: Create a directory and a file in that directory and write to that file:");
-
             Directory.CreateDirectory(@"0:\testdir");
             mDebugger.Send("Directory created");
-
             File.Create(@"0:\testdir\testfile.txt");
             mDebugger.Send("File created");
-
             File.WriteAllText(@"0:\testdir\testfile.txt", "Hello Cosmos!");
             mDebugger.Send("Text written");
-
             Assert.IsTrue(File.ReadAllText(@"0:\testdir\testfile.txt") == "Hello Cosmos!", "File was not written correctly");
+            mDebugger.Send("END TEST");
+            mDebugger.Send("");
 
+            mDebugger.Send("START TEST: Create a file with a Long Filename");
+            File.Create(@"0:\testdir\LongFilename.txt");
+            mDebugger.Send("File created");
+            File.WriteAllText(@"0:\testdir\LongFilename.txt", "Hello Cosmos!");
+            mDebugger.Send("Text written");
+            Assert.IsTrue(File.ReadAllText(@"0:\testdir\LongFilename.txt") == "Hello Cosmos!", "Contents weren't correctly written");
             mDebugger.Send("END TEST");
             mDebugger.Send("");
         }
