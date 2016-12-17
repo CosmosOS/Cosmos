@@ -521,7 +521,7 @@ namespace Cosmos.Kernel.Tests.Fat
 
             mDebugger.Send("");
 
-            mDebugger.Send("START TEST: Delete a file with Driectory.Delete:");
+            mDebugger.Send("START TEST: Delete a file with Directory.Delete:");
             File.Create(@"0:\file1.txt");
 
             try
