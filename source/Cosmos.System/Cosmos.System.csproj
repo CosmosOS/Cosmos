@@ -84,6 +84,7 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +101,12 @@
     <Compile Include="FileSystem\VFS\VFSBase.cs" />
     <Compile Include="FileSystem\VFS\VFSManager.cs" />
     <Compile Include="Global.cs" />
+    <Compile Include="Graphics\Canvas.cs" />
+    <Compile Include="Graphics\ColorDepth.cs" />
+    <Compile Include="Graphics\FullScreenCanvas.cs" />
+    <Compile Include="Graphics\Mode.cs" />
+    <Compile Include="Graphics\Pen.cs" />
+    <Compile Include="Graphics\VBEScreen.cs" />
     <Compile Include="Kernel.cs" />
     <Compile Include="Keyboard\ConsoleKeyEx.cs" />
     <Compile Include="Keyboard\ConsoleKeyExExtensions.cs" />
@@ -128,7 +135,6 @@
     <Compile Include="Power.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestingHelpers.cs" />
-    <Compile Include="Graphics\VBEScreen.cs" />
     <Compile Include="Graphics\VGAScreen.cs" />
   </ItemGroup>
   <ItemGroup>

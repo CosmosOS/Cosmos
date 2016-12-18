@@ -213,6 +213,10 @@
       <Project>{E6D3B644-C487-472D-A978-C1A82D0C099B}</Project>
       <Name>Cosmos.TestRunner.TestController</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GraphicTest\GraphicTest.csproj">
+      <Project>{fb23bd72-aec3-485e-b86c-8e7db0b3bb9b}</Project>
+      <Name>GraphicTest</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj">
       <Project>{839edc9d-6d2e-4892-a7f0-17861ba9fa0c}</Project>
       <Name>SimpleStructsAndArraysTest</Name>
@@ -224,6 +228,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
