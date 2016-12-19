@@ -91,15 +91,15 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Net462\Cosmos.Debug.Kernel.Net462.csproj">
-      <Project>{71022119-E402-4483-8556-409397D9A26C}</Project>
-      <Name>Cosmos.Debug.Kernel.Net462</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\..\Cosmos.snk">
       <Link>Cosmos.snk</Link>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{dc93aed0-a9bf-42c4-ac7b-fa9b2063e5d1}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

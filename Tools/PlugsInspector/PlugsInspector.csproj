@@ -126,9 +126,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.IL2CPU.Plugs.Net462\Cosmos.IL2CPU.Plugs.Net462.csproj">
-      <Project>{0285be1d-5d13-4c71-97e0-b31c8b141780}</Project>
-      <Name>Cosmos.IL2CPU.Plugs.Net462</Name>
+    <ProjectReference Include="..\..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+      <Project>{12a519aa-7af2-4873-8ad1-fab5a76448b1}</Project>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
       <Project>{239e33a7-f0c3-4801-85ca-4d8f89a31dc0}</Project>

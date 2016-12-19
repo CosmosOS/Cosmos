@@ -1,21 +1,6 @@
-{
-  "version": "1.0.0.0",
-  "buildOptions": {
-    "allowUnsafe": true,
-    "publicSign": true,
-    "keyFile": "..\\..\\Cosmos.snk"
-  },
+﻿{
   "dependencies": {
-    "NETStandard.Library": "1.6.1",
-    "Cosmos.Common": {
-      "target": "project"
-    },
-    "Cosmos.Core.Common": {
-      "target": "project"
-    },
-    "Cosmos.Debug.Kernel": {
-      "target": "project"
-    }
+    "NETStandard.Library": "1.6.0"
   },
   "frameworks": {
     "netstandard1.6": {}

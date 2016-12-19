@@ -1,50 +1,74 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\Cosmos\CosmosNetCore.props" Condition="Exists('$(MSBuildExtensionsPath)\Cosmos\CosmosNetCore.props')" />
-  <Import Project="$(MSBuildThisFileDirectory)\..\..\Build\MSBuild\CosmosNetCore.props" />
-  <PropertyGroup Label="Globals">
+<Project ToolsVersion="4.0" DefaultTargets="CoreBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)/$(MSBuildToolsVersion)/Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)/$(MSBuildToolsVersion)/Microsoft.Common.props')" />
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <Platform Condition="'$(Platform)'==''">AnyCPU</Platform>
+    <PlatformTarget Condition="'$(OutputType)' == ''">AnyCPU</PlatformTarget>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <ProjectGuid>{5b2c0369-7a84-4113-892c-f71b50e1da12}</ProjectGuid>
-    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
-    <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <Name>GuessBoot</Name>
+    <BinFormat>elf</BinFormat>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Profile>VMware</Profile>
-    <DebugEnabled>true</DebugEnabled>
+    <DebugEnabled>True</DebugEnabled>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
     <EnableGDB>False</EnableGDB>
-    <StartCosmosGDB>false</StartCosmosGDB>
-    <VMWareEdition>Player</VMWareEdition>
+    <StartCosmosGDB>False</StartCosmosGDB>
+    <VMWareEdition>Workstation</VMWareEdition>
+    <OutputPath>bin\Debug\</OutputPath>
+    <Name>GuessBoot</Name>
     <Description>Use VMware Player or Workstation to deploy and debug.</Description>
     <Deployment>ISO</Deployment>
     <Launch>VMware</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
-    <BinFormat>elf</BinFormat>
+    <TraceAssemblies>All</TraceAssemblies>
+    <VMware_Name>PlaygroundBoot</VMware_Name>
+    <VMware_Description>Use VMware Player or Workstation to deploy and debug.</VMware_Description>
+    <VMware_Deployment>ISO</VMware_Deployment>
+    <VMware_Launch>VMware</VMware_Launch>
+    <VMware_DebugEnabled>True</VMware_DebugEnabled>
+    <VMware_DebugMode>Source</VMware_DebugMode>
+    <VMware_VisualStudioDebugPort>Pipe: Cosmos\Serial</VMware_VisualStudioDebugPort>
+    <VMware_VMwareEdition>Workstation</VMware_VMwareEdition>
+    <VMware_OutputPath>bin\Debug\</VMware_OutputPath>
+    <VMware_TraceAssemblies>All</VMware_TraceAssemblies>
+    <VMware_EnableGDB>False</VMware_EnableGDB>
+    <VMware_StartCosmosGDB>False</VMware_StartCosmosGDB>
+    <StackCorruptionDetectionEnabled>True</StackCorruptionDetectionEnabled>
+    <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
+    <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
+    <VMware_CosmosDebugPort>Serial: COM1</VMware_CosmosDebugPort>
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Cosmos.bxrc">
       <SubType>Content</SubType>
     </Content>
-    <Content Include="GuessBoot.project.json">
-      <SubType>Content</SubType>
-    </Content>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Guess, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <Name>Guess</Name>
-      <AssemblyName>Guess.dll</AssemblyName>
-      <HintPath>bin\Debug\netstandard1.6\Guess.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Guess\GuessKernel.xproj">
+    <ProjectReference Include="..\Guess\GuessKernel.csproj">
       <Name>GuessKernel</Name>
-      <Project>{1f258a7b-f86b-47b0-bf11-41e5f8d30d68}</Project>
+      <Project>{1780684c-6b7f-4360-81c0-69204e343a08}</Project>
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Cosmos\CosmosNetCore.targets" Condition="Exists('$(MSBuildExtensionsPath)\Cosmos\CosmosNetCore.targets')" />
-  <Import Project="$(MSBuildThisFileDirectory)\..\..\Build\MSBuild\CosmosNetCore.targets" />
-  <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" Condition="Exists('$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets')" />
+  <PropertyGroup>
+    <TargetFrameworkIdentifier Condition="'$(TargetFrameworkIdentifier)' == ''">None</TargetFrameworkIdentifier>
+    <NuGetTargetMoniker Condition="'$(NuGetTargetMoniker)' == ''">.NETStandard,Version=v1.6</NuGetTargetMoniker>
+  </PropertyGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
+  <!--<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.Targets" />-->
+  <PropertyGroup>
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+    <NoStdLib>true</NoStdLib>
+    <_TargetFrameworkDirectories>$(MSBuildThisFileDirectory)</_TargetFrameworkDirectories>
+    <_FullFrameworkReferenceAssemblyPaths>$(MSBuildThisFileDirectory)</_FullFrameworkReferenceAssemblyPaths>
+    <AutoUnifyAssemblyReferences>true</AutoUnifyAssemblyReferences>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <PackagesDir>$(HOME)/.nuget/packages/</PackagesDir>
+    <RestorePackages>false</RestorePackages>
+  </PropertyGroup>
 </Project>

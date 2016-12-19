@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{19D31813-CAF2-42D9-A1E3-448913DE6CE2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Cosmos.System</RootNamespace>
+    <AssemblyName>Cosmos.System</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\..\Cosmos.snk">
+      <Link>Cosmos.snk</Link>
+    </None>
+    <None Include=".editorconfig" />
+    <None Include="Network\.editorconfig" />
+    <None Include="project.json" />
+    <!-- A reference to the entire .NET Framework is automatically included -->
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Console.cs" />
+    <Compile Include="FileSystem\CosmosVFS.cs" />
+    <Compile Include="FileSystem\FAT\FatFileSystem.cs" />
+    <Compile Include="FileSystem\FAT\FatStream.cs" />
+    <Compile Include="FileSystem\FAT\Listing\FatDirectoryEntryAttributeConsts.cs" />
+    <Compile Include="FileSystem\FAT\Listing\FatDirectoryEntryMetadata.cs" />
+    <Compile Include="FileSystem\FAT\Listing\FatDiretoryEntry.cs" />
+    <Compile Include="FileSystem\FileSystem.cs" />
+    <Compile Include="FileSystem\FileSystemType.cs" />
+    <Compile Include="FileSystem\Listing\DirectoryEntry.cs" />
+    <Compile Include="FileSystem\VFS\VFSBase.cs" />
+    <Compile Include="FileSystem\VFS\VFSManager.cs" />
+    <Compile Include="Global.cs" />
+    <Compile Include="Graphics\VBEScreen.cs" />
+    <Compile Include="Graphics\VGAScreen.cs" />
+    <Compile Include="Kernel.cs" />
+    <Compile Include="Keyboard\ConsoleKeyEx.cs" />
+    <Compile Include="Keyboard\ConsoleKeyExExtensions.cs" />
+    <Compile Include="Keyboard\KeyboardManager.cs" />
+    <Compile Include="Keyboard\KeyEvent.cs" />
+    <Compile Include="Keyboard\KeyMapping.cs" />
+    <Compile Include="Keyboard\ScanMapBase.cs" />
+    <Compile Include="Keyboard\ScanMaps\DE_Standard.cs" />
+    <Compile Include="Keyboard\ScanMaps\FR_Standard.cs" />
+    <Compile Include="Keyboard\ScanMaps\US_Standard.cs" />
+    <Compile Include="MathEx.cs" />
+    <Compile Include="Network\ARP\ARPCache.cs" />
+    <Compile Include="Network\ARP\ARPPacket.cs" />
+    <Compile Include="Network\EthernetPacket.cs" />
+    <Compile Include="Network\IPv4\Address.cs" />
+    <Compile Include="Network\IPv4\ARPPacket_Ethernet.cs" />
+    <Compile Include="Network\IPv4\Config.cs" />
+    <Compile Include="Network\IPv4\EndPoint.cs" />
+    <Compile Include="Network\IPv4\ICMPPacket.cs" />
+    <Compile Include="Network\IPv4\IPPacket.cs" />
+    <Compile Include="Network\IPv4\OutgoingBuffer.cs" />
+    <Compile Include="Network\IPv4\UDPPacket.cs" />
+    <Compile Include="Network\NetworkStack.cs" />
+    <Compile Include="Network\TempDictionary.cs" />
+    <Compile Include="Network\UdpClient.cs" />
+    <Compile Include="Power.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestingHelpers.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Console.html" />
+    <Content Include="Kernel.html" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
+      <Project>{b0957633-03c5-4531-9358-14d520f7ff78}</Project>
+      <Name>Cosmos.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{dc93aed0-a9bf-42c4-ac7b-fa9b2063e5d1}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.HAL\Cosmos.HAL.csproj">
+      <Project>{bc775926-731c-449d-8e8a-90d1d8116872}</Project>
+      <Name>Cosmos.HAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+      <Project>{12a519aa-7af2-4873-8ad1-fab5a76448b1}</Project>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <NuGetTargetMoniker>.NETStandard,Version=v1.6</NuGetTargetMoniker>
+  </PropertyGroup>
+</Project>
