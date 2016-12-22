@@ -67,7 +67,9 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 // Size of return value - we need to make room for this on the stack.
                 uint xStorageSize = Align(SizeOfType(objectType), 4);
+
                 XS.Comment("StorageSize: " + xStorageSize);
+
                 if (xStorageSize == 0)
                 {
                     throw new Exception("ValueType storage size cannot be 0.");
@@ -77,36 +79,57 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 uint xArgSize = 0;
                 var xParameterList = constructor.GetParameters();
+
                 foreach (var xParam in xParameterList)
                 {
                     xArgSize = xArgSize + Align(SizeOfType(xParam.ParameterType), 4);
                 }
+
                 XS.Comment("ArgSize: " + xArgSize);
 
                 // Set ESP so we can push the struct ptr
-                int xShift = (int)(xArgSize - xStorageSize);
-                XS.Comment("Shift: " + xShift);
-                if (xShift < 0)
-                {
-                    XS.Sub(ESP, (uint)Math.Abs(xShift));
-                }
-                else if (xShift > 0)
-                {
-                    XS.Add(ESP, (uint)xShift);
-                }
+                //int xShift = (int)(xArgSize - xStorageSize);
 
-                // push struct ptr
-                XS.Push(ESP);
+                //XS.Comment("Shift: " + xShift);
+
+                //if (xShift < 0)
+                //{
+                //    XS.Sub(ESP, (uint)Math.Abs(xShift));
+                //}
+                //else if (xShift > 0)
+                //{
+                //    XS.Add(ESP, (uint)xShift);
+                //}
+
+                // set source of args copy
+                XS.Set(ESI, ESP);
+
+                // allocate space for struct
+                XS.Sub(ESP, xStorageSize + 4);
+
+                // set destination and count of args copy
+                XS.Set(EDI, ESP);
+                XS.Set(ECX, xArgSize / 4);
+
+                // move the args to their new location
+                new CPUx86.Movs { Size = 32, Prefixes = CPUx86.InstructionPrefixes.Repeat };
+
+                // set struct ptr
+                XS.Set(EAX, ESP);
+                XS.Add(EAX, xArgSize + 4);
+                XS.Set(ESP, EAX, destinationDisplacement: (int)xArgSize);
+                //XS.Push(ESP);
 
                 // Shift args
-                foreach (var xParam in xParameterList)
-                {
-                    uint xArgSizeForThis = Align(SizeOfType(xParam.ParameterType), 4);
-                    for (int i = 1; i <= xArgSizeForThis / 4; i++)
-                    {
-                        new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)xStorageSize };
-                    }
-                }
+                //foreach (var xParam in xParameterList)
+                //{
+                //    uint xArgSizeForThis = Align(SizeOfType(xParam.ParameterType), 4);
+                //    for (int i = 1; i <= xArgSizeForThis / 4; i++)
+                //    {
+                //        //new CPUx86.Push { DestinationReg = CPUx86.RegistersEnum.ESP, DestinationIsIndirect = true, DestinationDisplacement = (int)xStorageSize };
+                //        XS.Push(ESP, displacement: (int)xStorageSize);
+                //    }
+                //}
 
                 new Call(aAssembler).Execute(aMethod, xMethod);
 

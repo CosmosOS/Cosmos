@@ -98,7 +98,6 @@
     <Compile Include="ProcessorInformationImpl.cs" />
     <Compile Include="System\ArrayImpl.cs" />
     <Compile Include="System\Buffer.cs" />
-    <Compile Include="System\DateTimeImpl.cs" />
     <Compile Include="System\DelegateImpl.cs" />
     <Compile Include="System\Diagnostics\StopwatchImpl.cs" />
     <Compile Include="System\IO\PathHelperImpl.cs" />

@@ -76,20 +76,34 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = 4631166901565532406u;
 
             val2 = value >> 20;
-            Assert.IsTrue(val2 == 4416624929013, "ulong right shift does not work");
+            Assert.IsTrue(val2 == 4416624929013, "UInt64 right shift does not work");
 
             val2 = value >> 52;
-            Assert.IsTrue(val2 == 1028, "ulong right shift (count >=32) does not work");
+            Assert.IsTrue(val2 == 1028, "UInt64 right shift (count >=32) does not work");
 
             /* ... and now left shift */
             value = 4631166901565532406;
 
             val2 = value << 20;
-            Assert.IsTrue(val2 == 6640827866535690240, "ulong left shift does not work");
+            Assert.IsTrue(val2 == 6640827866535690240, "UInt64 left shift does not work");
 
             val2 = value << 52;
-            Assert.IsTrue(val2 == 10331257545187917824, "ulong left shift (count >=32) does not work");
+            Assert.IsTrue(val2 == 10331257545187917824, "UInt64 left shift (count >=32) does not work");
 
+            // basic arithmetic operations
+            value = 1728000000000;
+
+            val2 = value + 36000000000;
+            Assert.IsTrue(val2 == 1764000000000, "UInt64 addition does not work got " + val2);
+
+            val2 = value - 36000000000;
+            Assert.IsTrue(val2 == 1692000000000, "UInt64 subtraction does not work got " + val2);
+
+            val2 = value * 36000000000;
+            Assert.IsTrue(val2 == 5578983451391950848, "UInt64 multiplication does not work got " + val2);
+
+            val2 = value / 36000000000;
+            Assert.IsTrue(val2 == 48, "UInt64 division does not work got " + val2);
 #if false
             // Now let's try ToString() again but printed in hex (this test fails for now!)
             result = value.ToString("X2");

@@ -9,11 +9,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
-            Int64 value;
-            String result;
-            String expectedResult;
+            long value;
+            string result;
+            string expectedResult;
 
-            value = Int64.MaxValue;
+            value = long.MaxValue;
 
             result = value.ToString();
             expectedResult = "9223372036854775807";
@@ -28,7 +28,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Now let's try to use '$ instead of '+'
             result = $"The Maximum value of an Int64 is {value}";
-            
+
             // Actually 'expectedResult' should be the same so...
             Assert.IsTrue((result == expectedResult), "String format (Int64) doesn't work");
 
@@ -36,12 +36,12 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             int resultAsInt = value.GetHashCode();
             // actually the Hash Code of a Int64 is the value interpolated with XOR to obtain an Int32... so not the same of 'value'!
             int expectedResultAsInt = (unchecked((int)((long)value)) ^ (int)(value >> 32));
-  
-            Assert.IsTrue((resultAsInt == expectedResultAsInt), "Int64.GetHashCode() doesn't work"); 
+
+            Assert.IsTrue((resultAsInt == expectedResultAsInt), "Int64.GetHashCode() doesn't work");
 
             // Let's try to convert a Long in a ULong
-            Int64 val2 = 42;
-            UInt64 val2AsULong = (ulong)val2;
+            long val2 = 42;
+            ulong val2AsULong = (ulong)val2;
 
             Assert.IsTrue((val2AsULong == 42), "Int64 to UInt64 conversion does not work");
 
@@ -52,23 +52,47 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = 4631166901565532406;
 
             val2 = value >> 20;
-            Assert.IsTrue(val2 == 4416624929013, "long right shift does not work");
+            Assert.IsTrue(val2 == 4416624929013, "Int64 right shift does not work");
 
             val2 = value >> 52;
-            Assert.IsTrue(val2 == 1028, "long right shift (count >=32) does not work");
+            Assert.IsTrue(val2 == 1028, "Int64 right shift (count >=32) does not work");
 
             /* ... and now left shift */
             value = 4631166901565532406;
 
             val2 = value << 20;
-            Assert.IsTrue(val2 == 6640827866535690240, "long left shift does not work got " + val2);
+            Assert.IsTrue(val2 == 6640827866535690240, "Int64 left shift does not work got " + val2);
 
             val2 = value << 52;
-            Assert.IsTrue(val2 == -8115486528521633792, "long left shift (count >=32) does not work got " + val2);
+            Assert.IsTrue(val2 == -8115486528521633792, "Int64 left shift (count >=32) does not work got " + val2);
+
+            // basic arithmetic operations
+            value = 1728000000000;
+
+            val2 = value + 36000000000;
+            Assert.IsTrue(val2 == 1764000000000, "Int64 addition does not work got " + val2);
+
+            val2 = value - 36000000000;
+            Assert.IsTrue(val2 == 1692000000000, "Int64 subtraction does not work got " + val2);
+
+            val2 = value * 36000000000;
+            Assert.IsTrue(val2 == 5578983451391950848, "Int64 multiplication does not work got " + val2);
+
+            val2 = value / 36000000000;
+            Assert.IsTrue(val2 == 48, "Int64 division does not work got " + val2);
+
+            val2 = value / -36000000000;
+            Assert.IsTrue(val2 == -48, "Int64 division does not work got " + val2);
+
+            val2 = -value / 36000000000;
+            Assert.IsTrue(val2 == -48, "Int64 division does not work got " + val2);
+
+            val2 = -value / -36000000000;
+            Assert.IsTrue(val2 == 48, "Int64 division does not work got " + val2);
 
 #if false
 
-    // Now let's try ToString() again but printed in hex (this test fails for now!)
+            // Now let's try ToString() again but printed in hex (this test fails for now!)
             result = value.ToString("X2");
             expectedResult = "0x7FFFFFFFFFFFFFFF";
 

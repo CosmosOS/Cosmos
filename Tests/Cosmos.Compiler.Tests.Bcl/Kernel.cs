@@ -42,6 +42,8 @@ namespace Cosmos.Compiler.Tests.Bcl
                 BitConverterTest.Execute();
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
+                DateTimeTest.Execute();
+                TimeSpanTest.Execute();
 
                 //DecimalTest.Execute();
                 System.Collections.Generic.ListTest.Execute();

@@ -92,6 +92,8 @@
     <Compile Include="System\Collections\Generic\DictionaryTest.cs" />
     <Compile Include="System\Collections\Generic\ListTest.cs" />
     <Compile Include="System\Collections\Generic\QueueTest.cs" />
+    <Compile Include="System\TimeSpanTest.cs" />
+    <Compile Include="System\DateTimeTest.cs" />
     <Compile Include="System\DecimalTest.cs" />
     <Compile Include="System\DelegatesTest.cs" />
     <Compile Include="System\DoubleTest.cs" />
