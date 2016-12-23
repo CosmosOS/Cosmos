@@ -11,6 +11,6 @@ namespace Cosmos.Core.IOGroup
         public IOPort VbeIndex= new IOPort(0x01CE);
         public IOPort VbeData = new IOPort(0x01CF);
 
-        public MemoryBlock08 VGAMemoryBlock = new MemoryBlock08(0xE0000000, 1280 * 1024 * 4);
+        public MemoryBlock08 VBEMemoryBlock = new MemoryBlock08(0xE0000000, 1280 * 1024 * 4);
     }
 }
