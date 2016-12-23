@@ -5,7 +5,12 @@ namespace Cosmos.TestRunner.Core
 {
     public static class TestKernelSets
     {
-        public static IEnumerable<Type> GetStableKernelTypes()
+        public static IEnumerable<string> GetNetCoreKernelPaths()
+        {
+            yield return @"..\..\..\..\Demos\Guess\bin\Debug\GuessKernel.dll";
+        }
+
+        public static IEnumerable<string> GetStableKernelTypes()
         {
             yield return null;
 

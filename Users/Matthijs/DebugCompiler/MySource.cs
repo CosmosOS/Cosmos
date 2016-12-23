@@ -9,7 +9,7 @@ namespace DebugCompiler
 {
     public static class MySource
     {
-        public static IEnumerable<Type> ProvideData()
+        public static IEnumerable<string> ProvideData()
         {
             return TestKernelSets.GetStableKernelTypes();
         }

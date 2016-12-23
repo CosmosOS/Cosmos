@@ -10,6 +10,11 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <Name>GuessBoot</Name>
     <BinFormat>elf</BinFormat>
+    <TargetFrameworkIdentifier>.NETCoreApp</TargetFrameworkIdentifier>
+    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
+    <BaseNuGetRuntimeIdentifier>win</BaseNuGetRuntimeIdentifier>
+    <NoStdLib>true</NoStdLib>
+    <NoWarn>$(NoWarn);1701</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Profile>VMware</Profile>
@@ -47,6 +52,9 @@
     <Content Include="Cosmos.bxrc">
       <SubType>Content</SubType>
     </Content>
+    <Content Include="GuessBoot.project.json">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Guess\GuessKernel.csproj">
@@ -55,20 +63,18 @@
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
-  <PropertyGroup>
-    <TargetFrameworkIdentifier Condition="'$(TargetFrameworkIdentifier)' == ''">None</TargetFrameworkIdentifier>
-    <NuGetTargetMoniker Condition="'$(NuGetTargetMoniker)' == ''">.NETStandard,Version=v1.6</NuGetTargetMoniker>
-  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.Targets" />
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
-  <!--<Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.Targets" />-->
   <PropertyGroup>
-    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
-    <NoStdLib>true</NoStdLib>
+      <!-- We don't use any of MSBuild's resolution logic for resolving the framework, so just set these two
+            properties to any folder that exists to skip the GetReferenceAssemblyPaths task (not target) and
+            to prevent it from outputting a warning (MSB3644).
+        -->
     <_TargetFrameworkDirectories>$(MSBuildThisFileDirectory)</_TargetFrameworkDirectories>
     <_FullFrameworkReferenceAssemblyPaths>$(MSBuildThisFileDirectory)</_FullFrameworkReferenceAssemblyPaths>
+
+    <!-- MSBuild thinks all EXEs need binding redirects, not so for CoreCLR! -->
     <AutoUnifyAssemblyReferences>true</AutoUnifyAssemblyReferences>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-    <PackagesDir>$(HOME)/.nuget/packages/</PackagesDir>
-    <RestorePackages>false</RestorePackages>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
   </PropertyGroup>
 </Project>
