@@ -34,7 +34,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
             // Target exe or file
             var info = new ProcessStartInfo(@"C:\Windows\sysnative\VmConnect.exe", @"""localhost"" ""Cosmos""")
             {
-                UseShellExecute = true //must be true to allow elevate the process, sometimes needed if vmware only runs with admin rights
+                UseShellExecute = true
             };
 
             mProcess = new Process();

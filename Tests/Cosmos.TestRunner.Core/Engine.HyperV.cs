@@ -23,8 +23,7 @@ namespace Cosmos.TestRunner.Core
             var xDebugConnector = new DebugConnectorPipeClient(DebugConnectorPipeClient.DefaultCosmosPipeName);
             InitializeDebugConnector(xDebugConnector);
 
-            var xHyperV = new HyperV(xParams, RunWithGDB, harddisk); // harddisk passed in is in vmdk format and therefore not compatible
-            //var xHyperV = new HyperV(xParams, RunWithGDB);
+            var xHyperV = new HyperV(xParams, RunWithGDB, harddisk);
             xHyperV.OnShutDown = (a, b) =>
             {
                 mKernelRunning = false;
