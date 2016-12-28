@@ -87,7 +87,7 @@ namespace Cosmos.IL2CPU
             // Check nuget packages.
             foreach (var xRef in AdditionalReferences)
             {
-                var xAssemblyName = new AssemblyName(xRef);
+                var xAssemblyName = AssemblyName.GetAssemblyName(xRef);
                 if (xAssemblyName.Name == xShortName)
                 {
                     return Assembly.ReflectionOnlyLoadFrom(xRef);
