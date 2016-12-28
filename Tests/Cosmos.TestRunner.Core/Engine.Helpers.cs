@@ -2,26 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using Cosmos.Build.Common;
 using Cosmos.Build.MSBuild;
-using Cosmos.Core.Plugs.Asm;
-using Cosmos.Debug.Kernel.Plugs.Asm;
 using Cosmos.IL2CPU;
 using IL2CPU;
-using Microsoft.Build.Tasks;
-using Microsoft.Build.Utilities;
 using Microsoft.Win32;
 using NuGet;
-using NuGet.Commands;
-using NuGet.Frameworks;
-using NuGet.LibraryModel;
-using NuGet.Packaging;
+using NuGet.Configuration;
 using NuGet.Packaging.Core;
-using NuGet.ProjectManagement;
-using NuGet.ProjectManagement.Projects;
 using NuGet.ProjectModel;
-using NuGet.Protocol;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -46,6 +35,7 @@ namespace Cosmos.TestRunner.Core
             ExtractMapFromElfFile.RunObjDump(CosmosPaths.Build, workingDir, kernelFileName, OutputHandler.LogError, OutputHandler.LogMessage);
         }
 
+        // TODO: Move this and GetProjectReferences to an msbuild task.
         private string GetProjectJsonLockFilePath(string kernelFileName)
         {
             string xProjectJsonPath = null;
@@ -67,73 +57,62 @@ namespace Cosmos.TestRunner.Core
             throw new FileNotFoundException("Project json lock file not found!");
         }
 
-        private List<string> GetProjectReferences(string kernelFileName)
+        private void GetProjectReferences(string kernelFileName)
         {
-            var xReferences = new List<string>();
             string xLockFilePath = GetProjectJsonLockFilePath(kernelFileName);
             if (File.Exists(xLockFilePath))
             {
-                var xCsProjDirectoryInfo = new DirectoryInfo(Path.GetDirectoryName(xLockFilePath));
-                foreach (var xCsProjFile in xCsProjDirectoryInfo.GetFiles("*.csproj"))
-                {
-
-                }
                 var xLockFile = NuGet.ProjectModel.LockFileUtilities.GetLockFile(xLockFilePath, null);
                 if (xLockFile != null)
                 {
                     var pathContext = NuGet.Configuration.NuGetPathContext.Create(Path.GetDirectoryName(xLockFilePath));
                     if (xLockFile.Libraries.Any())
-
-                        if (xLockFile.Targets.Any())
+                    {
+                        var lockFileTarget = xLockFile.Targets.First(x => x.RuntimeIdentifier != null);
+                        foreach (var lockFileTargetLibrary in lockFileTarget.Libraries)
                         {
-                            foreach (var lockFileTarget in xLockFile.Targets)
+                            if (!lockFileTargetLibrary.RuntimeAssemblies.Any())
                             {
-                                if (lockFileTarget.RuntimeIdentifier != null && lockFileTarget.RuntimeIdentifier.Contains("win"))
+                                foreach (var assembly in lockFileTargetLibrary.CompileTimeAssemblies)
                                 {
-                                    foreach (var lockFileTargetLibrary in lockFileTarget.Libraries)
+                                    var lockFileLibrary = xLockFile.GetLibrary(lockFileTargetLibrary.Name, lockFileTargetLibrary.Version);
+                                    string xAssemblyPath = Path.Combine(pathContext.UserPackageFolder, lockFileLibrary.Path, assembly.Path);
+                                    var fileInfo = new FileInfo(xAssemblyPath);
+                                    if (fileInfo.Exists && fileInfo.Length > 0 && !AdditionalReferences.Contains(fileInfo.FullName))
                                     {
-                                        foreach (var assembly in lockFileTargetLibrary.RuntimeAssemblies)
-                                        {
-                                            var lockFileLibrary = xLockFile.GetLibrary(lockFileTargetLibrary.Name, lockFileTargetLibrary.Version);
-                                            string xAssemblyPath = Path.Combine(pathContext.UserPackageFolder, lockFileLibrary.Path, assembly.Path);
-                                            var fileInfo = new FileInfo(xAssemblyPath);
-                                            if (fileInfo.Exists && fileInfo.Length > 0 && !xReferences.Contains(fileInfo.FullName))
-                                            {
-                                                xReferences.Add(fileInfo.FullName);
-                                            }
-                                        }
+                                        AdditionalReferences.Add(fileInfo.FullName);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                foreach (var assembly in lockFileTargetLibrary.RuntimeAssemblies)
+                                {
+                                    var lockFileLibrary = xLockFile.GetLibrary(lockFileTargetLibrary.Name, lockFileTargetLibrary.Version);
+                                    string xAssemblyPath = Path.Combine(pathContext.UserPackageFolder, lockFileLibrary.Path, assembly.Path);
+                                    var fileInfo = new FileInfo(xAssemblyPath);
+                                    if (fileInfo.Exists && fileInfo.Length > 0 && !AdditionalReferences.Contains(fileInfo.FullName))
+                                    {
+                                        AdditionalReferences.Add(fileInfo.FullName);
                                     }
                                 }
                             }
                         }
+                    }
                 }
             }
-            return xReferences;
-        }
-
-        private string CopyKernelFiles(string assemblyFile)
-        {
-            string xCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            string xAssemblyDirectory = Path.GetDirectoryName(assemblyFile);
-            string xDestinationKernel = Path.Combine(xCurrentDirectory, Path.GetFileName(assemblyFile));
-            var di = new DirectoryInfo(xAssemblyDirectory);
-            foreach (var xFile in di.GetFiles("*.dll"))
-            {
-                string xDestination = Path.Combine(xCurrentDirectory, xFile.Name);
-                xFile.CopyTo(xDestination, true);
-            }
-            foreach (var xFile in di.GetFiles("*.pdb"))
-            {
-                string xDestination = Path.Combine(xCurrentDirectory, xFile.Name);
-                xFile.CopyTo(xDestination, true);
-            }
-            return xDestinationKernel;
         }
 
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
-            var xProjectReferences = GetProjectReferences(kernelFileName);
-            kernelFileName = CopyKernelFiles(kernelFileName);
+            References = new List<string>();
+            AdditionalReferences = new List<string>();
+            AdditionalSearchDirs = new List<string>();
+
+            GetProjectReferences(kernelFileName);
+
+            AdditionalSearchDirs.Add(Path.GetDirectoryName(kernelFileName));
+            References.Add(kernelFileName);
 
             var xArguments = new List<string>
                              {
@@ -147,20 +126,18 @@ namespace Cosmos.TestRunner.Core
                                  "OutputFilename:" + outputFile,
                                  "EnableLogging:True",
                                  "EmitDebugSymbols:True",
-                                 "IgnoreDebugStubAttribute:False",
-                                 "References:" + kernelFileName,
+                                 "IgnoreDebugStubAttribute:False"
                              };
-            foreach (string xProjectReference in xProjectReferences)
-            {
-                xArguments.Add("References:" + xProjectReference);
-            }
+            xArguments.AddRange(References.Select(xRef => "References:" + xRef));
+            xArguments.AddRange(AdditionalSearchDirs.Select(xDir => "AdditionalSearchDirs:" + xDir));
+            xArguments.AddRange(AdditionalReferences.Select(xRef => "AdditionalReferences:" + xRef));
 
             //xArguments.Add("References:" + typeof(CPUImpl).Assembly.Location);
             //xArguments.Add("References:" + typeof(DebugBreak).Assembly.Location);
 
             if (RunIL2CPUInProcess)
             {
-                if (mKernelsToRun.Count > 1)
+                if (KernelsToRun.Count > 1)
                 {
                     throw new Exception("Cannot run multiple kernels with in-process compilation!");
                 }

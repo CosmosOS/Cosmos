@@ -1,8 +1,11 @@
 ﻿{
+  "supports": {
+    "netcoreapp1.0.app": {}
+  },
   "dependencies": {
-    "NETStandard.Library": "1.6.0"
+    "NETStandard.Library": "1.6.1"
   },
   "frameworks": {
-    "netstandard1.6": {}
+    "netstandard1.5": {}
   }
 }

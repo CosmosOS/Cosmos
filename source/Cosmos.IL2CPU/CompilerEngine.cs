@@ -30,6 +30,21 @@ namespace Cosmos.IL2CPU
         public bool EmitDebugSymbols { get; set; }
         public bool IgnoreDebugStubAttribute { get; set; }
         public string StackCorruptionDetectionLevel { get; set; }
+        public string[] AdditionalSearchDirs { get; set; }
+        public string[] AdditionalReferences { get; set; }
+
+        public bool DebugEnabled = false;
+        public bool StackCorruptionDetectionEnabled = false;
+        protected StackCorruptionDetectionLevel mStackCorruptionDetectionLevel = Cosmos.Build.Common.StackCorruptionDetectionLevel.MethodFooters;
+        protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.Source;
+        protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
+        protected static List<string> mSearchDirs = new List<string>();
+
+        public string AssemblerLog = "Cosmos.Assembler.log";
+
+        protected void LogTime(string message)
+        {
+        }
 
         protected void LogMessage(string aMsg)
         {
@@ -51,15 +66,35 @@ namespace Cosmos.IL2CPU
             OnLogException?.Invoke(e);
         }
 
-        protected static List<string> mSearchDirs = new List<string>();
-
-        static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        private Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
         {
             var xShortName = args.Name;
             if (xShortName.Contains(','))
             {
                 xShortName = xShortName.Substring(0, xShortName.IndexOf(','));
             }
+
+            // Check already loaded assemblies.
+            foreach (var assembly in AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies())
+            {
+                var xLoadedShortName = assembly.GetName().Name;
+                if (xLoadedShortName == xShortName)
+                {
+                    return assembly;
+                }
+            }
+
+            // Check nuget packages.
+            foreach (var xRef in AdditionalReferences)
+            {
+                var xAssemblyName = new AssemblyName(xRef);
+                if (xAssemblyName.Name == xShortName)
+                {
+                    return Assembly.ReflectionOnlyLoadFrom(xRef);
+                }
+            }
+
+            // Check search directories.
             foreach (var xDir in mSearchDirs)
             {
                 var xPath = Path.Combine(xDir, xShortName + ".dll");
@@ -105,36 +140,23 @@ namespace Cosmos.IL2CPU
 
         protected bool Initialize()
         {
-            // Add UserKit dirs for asms to load from.
-            mSearchDirs.Add(Path.GetDirectoryName(typeof(CompilerEngine).Assembly.Location));
             if (!EnsureCosmosPathsInitialization())
             {
                 return false;
             }
+
+            if (AdditionalSearchDirs != null)
+            {
+                mSearchDirs.AddRange(AdditionalSearchDirs);
+            }
+
+            // Add UserKit dirs for asms to load from.
+            mSearchDirs.Add(Path.GetDirectoryName(typeof(CompilerEngine).Assembly.Location));
             mSearchDirs.Add(CosmosPaths.UserKit);
             mSearchDirs.Add(CosmosPaths.Kernel);
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_AssemblyResolve;
 
-            // This seems to be to try to load plugs on demand from their own dirs, but
-            // it often just causes load conflicts, and weird errors like "implementation not found"
-            // for a method, even when both the output user kit dir and local bin dir have up to date
-            // and same assemblies.
-            // So its removed for now and we should find a better way to dynamically load plugs in
-            // future.
-            // Furthermore, it only scanned plugs/asms reffed from the boot proj, not the kernel proj
-            // so it was bugged there too.
-            //if (References != null) {
-            //  foreach (var xRef in References) {
-            //    if (xRef.MetadataNames.OfType<string>().Contains("FullPath")) {
-            //      var xName = xRef.GetMetadata("FullPath");
-            //      var xDir = Path.GetDirectoryName(xName);
-            //      if (!mSearchPaths.Contains(xDir)) {
-            //        mSearchPaths.Insert(0, xDir);
-            //      }
-            //    }
-            //  }
-            //}
 
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
 
             mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
             if (string.IsNullOrEmpty(TraceAssemblies))
@@ -161,18 +183,6 @@ namespace Cosmos.IL2CPU
             }
 
             return true;
-        }
-
-        public bool DebugEnabled = false;
-        public bool StackCorruptionDetectionEnabled = false;
-        protected StackCorruptionDetectionLevel mStackCorruptionDetectionLevel = Cosmos.Build.Common.StackCorruptionDetectionLevel.MethodFooters;
-        protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.Source;
-        protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
-
-        public string AssemblerLog = "Cosmos.Assembler.log";
-
-        protected void LogTime(string message)
-        {
         }
 
         public bool Execute()
@@ -333,38 +343,40 @@ namespace Cosmos.IL2CPU
             // and we have to do it manually (Probably better for us anyways)
 
             mLoadedExtensions = new List<CompilerExtensionBase>();
-
-            LoadReferences();
-
             Type xKernelType = null;
 
-            foreach (var xRef in AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies())
+            foreach (string xReference in References)
             {
-                LogMessage($"Looking for kernel in {xRef}");
-                foreach (var xType in xRef.ExportedTypes)
+                if (File.Exists(xReference))
                 {
-                    if (!xType.IsGenericTypeDefinition && !xType.IsAbstract)
+                    var xAssembly = Assembly.ReflectionOnlyLoadFrom(xReference);
+
+                    LogMessage($"Looking for kernel in {xAssembly}");
+                    foreach (var xType in xAssembly.ExportedTypes)
                     {
-                        LogMessage($"Checking type {xType}");
-                        if (xType.BaseType.Name == "Kernel")
+                        if (!xType.IsGenericTypeDefinition && !xType.IsAbstract)
                         {
-                            // found kernel?
-                            if (xKernelType != null)
+                            LogMessage($"Checking type {xType}");
+                            if (xType.BaseType.Name == "Kernel")
                             {
-                                // already a kernel found, which is not supported.
-                                LogError($"Two kernels found! '{xType.AssemblyQualifiedName}' and '{xKernelType.AssemblyQualifiedName}'");
-                                return null;
+                                // found kernel?
+                                if (xKernelType != null)
+                                {
+                                    // already a kernel found, which is not supported.
+                                    LogError($"Two kernels found! '{xType.AssemblyQualifiedName}' and '{xKernelType.AssemblyQualifiedName}'");
+                                    return null;
+                                }
+                                xKernelType = xType;
                             }
-                            xKernelType = xType;
                         }
                     }
-                }
 
-                //var xCompilerExtensionsMetas = xRef.GetReflectionOnlyCustomAttributes<CompilerExtensionAttribute>();
-                //foreach (var xMeta in xCompilerExtensionsMetas)
-                //{
-                //    mLoadedExtensions.Add((CompilerExtensionBase)Activator.CreateInstance(xMeta.AttributeType));
-                //}
+                    //var xCompilerExtensionsMetas = xRef.GetReflectionOnlyCustomAttributes<CompilerExtensionAttribute>();
+                    //foreach (var xMeta in xCompilerExtensionsMetas)
+                    //{
+                    //    mLoadedExtensions.Add((CompilerExtensionBase)Activator.CreateInstance(xMeta.AttributeType));
+                    //}
+                }
             }
 
             if (xKernelType == null)
@@ -379,17 +391,6 @@ namespace Cosmos.IL2CPU
                 return null;
             }
             return xCtor;
-        }
-
-        private void LoadReferences()
-        {
-            foreach (string xReference in References)
-            {
-                if (File.Exists(xReference))
-                {
-                    Assembly.ReflectionOnlyLoadFrom(xReference);
-                }
-            }
         }
 
         private List<CompilerExtensionBase> mLoadedExtensions;

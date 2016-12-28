@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="CoreBuild" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)/$(MSBuildToolsVersion)/Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)/$(MSBuildToolsVersion)/Microsoft.Common.props')" />
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
-    <SchemaVersion>2.0</SchemaVersion>
-    <Platform Condition="'$(Platform)'==''">AnyCPU</Platform>
-    <PlatformTarget Condition="'$(OutputType)' == ''">AnyCPU</PlatformTarget>
-    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{5b2c0369-7a84-4113-892c-f71b50e1da12}</ProjectGuid>
-    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <Name>GuessBoot</Name>
+    <OutputType>Library</OutputType>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <BinFormat>elf</BinFormat>
-    <TargetFrameworkIdentifier>.NETCoreApp</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
-    <BaseNuGetRuntimeIdentifier>win</BaseNuGetRuntimeIdentifier>
-    <NoStdLib>true</NoStdLib>
-    <NoWarn>$(NoWarn);1701</NoWarn>
+    <ResolveNuGetPackages>False</ResolveNuGetPackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Profile>VMware</Profile>
@@ -49,10 +49,11 @@
     <VMware_CosmosDebugPort>Serial: COM1</VMware_CosmosDebugPort>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="project.json" />
+    <!-- A reference to the entire .NET Framework is automatically included -->
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Cosmos.bxrc">
-      <SubType>Content</SubType>
-    </Content>
-    <Content Include="GuessBoot.project.json">
       <SubType>Content</SubType>
     </Content>
   </ItemGroup>
@@ -63,18 +64,10 @@
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.Targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
   <PropertyGroup>
-      <!-- We don't use any of MSBuild's resolution logic for resolving the framework, so just set these two
-            properties to any folder that exists to skip the GetReferenceAssemblyPaths task (not target) and
-            to prevent it from outputting a warning (MSB3644).
-        -->
-    <_TargetFrameworkDirectories>$(MSBuildThisFileDirectory)</_TargetFrameworkDirectories>
-    <_FullFrameworkReferenceAssemblyPaths>$(MSBuildThisFileDirectory)</_FullFrameworkReferenceAssemblyPaths>
-
-    <!-- MSBuild thinks all EXEs need binding redirects, not so for CoreCLR! -->
-    <AutoUnifyAssemblyReferences>true</AutoUnifyAssemblyReferences>
-    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    <NoStdLib>true</NoStdLib>
+    <NuGetTargetMoniker>.NETPlatform,Version=v5.0;.NETStandard,Version=v1.0;.NETStandard,Version=v1.1;.NETStandard,Version=v1.2;.NETStandard,Version=v1.3;.NETStandard,Version=v1.4;.NETStandard,Version=v1.5;.NETStandard,Version=v1.6;.NETCoreApp,Version=v1.0</NuGetTargetMoniker>
   </PropertyGroup>
 </Project>

@@ -369,7 +369,7 @@
       <Name>Cosmos.Debug.DebugStub</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
-      <Project>{dc93aed0-a9bf-42c4-ac7b-fa9b2063e5d1}</Project>
+      <Project>{DC93AED0-A9BF-42C4-AC7B-FA9B2063E5D1}</Project>
       <Name>Cosmos.Debug.Kernel</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">

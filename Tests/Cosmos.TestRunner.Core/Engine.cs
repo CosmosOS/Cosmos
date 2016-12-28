@@ -19,23 +19,19 @@ namespace Cosmos.TestRunner.Core
         public bool EnableStackCorruptionChecks = true;
         public TraceAssemblies TraceAssembliesLevel = TraceAssemblies.User;
         public StackCorruptionDetectionLevel StackCorruptionChecksLevel = StackCorruptionDetectionLevel.MethodFooters;
+        public List<string> References = new List<string>();
+        public List<string> AdditionalSearchDirs = new List<string>();
+        public List<string> AdditionalReferences = new List<string>();
 
-        public List<string> KernelsToRun
-        {
-            get
-            {
-                return mKernelsToRun;
-            }
-        }
+        public List<string> KernelsToRun { get; } = new List<string>();
 
-        private List<string> mKernelsToRun = new List<string>();
         public void AddKernel(string assemblyFile)
         {
             if (!File.Exists(assemblyFile))
             {
                 throw new FileNotFoundException("Kernel file not found!", assemblyFile);
             }
-            mKernelsToRun.Add(assemblyFile);
+            KernelsToRun.Add(assemblyFile);
         }
 
         private string mBaseWorkingDirectory;
@@ -63,7 +59,7 @@ namespace Cosmos.TestRunner.Core
                     OutputHandler.RunConfigurationStart(xConfig);
                     try
                     {
-                        foreach (var xAssemblyFile in mKernelsToRun)
+                        foreach (var xAssemblyFile in KernelsToRun)
                         {
                             mBaseWorkingDirectory = Path.Combine(Path.GetDirectoryName(typeof(Engine).Assembly.Location), "WorkingDirectory");
                             if (Directory.Exists(mBaseWorkingDirectory))

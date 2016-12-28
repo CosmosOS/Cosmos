@@ -18,6 +18,8 @@ namespace IL2CPU
         private const string OutputFile = CosmosRoot + "";
         private static Dictionary<string, string> CmdOptions = new Dictionary<string, string>();
         private static List<string> References = new List<string>();
+        private static List<string> AdditionalReferences = new List<string>();
+        private static List<string> AdditionalSearchDirs = new List<string>();
 
         public static int Main(string[] args)
         {
@@ -48,20 +50,25 @@ namespace IL2CPU
                 var tmp = "";
                 foreach (var s in args)
                 {
-
                     tmp += s;
                     string[] s1 = s.Split(':');
                     string argID = s1[0].ToLower();
-                    if (argID != "References".ToLower())
+                    if (argID == "References".ToLower())
                     {
-                        CmdOptions.Add(argID, s.Replace(s1[0] + ":", ""));
+                        References.Add(s.Replace(s1[0] + ":", ""));
+                    }
+                    else if (argID == "AdditionalReferences".ToLower())
+                    {
+                        AdditionalReferences.Add(s.Replace(s1[0] + ":", ""));
+                    }
+                    else if (argID == "AdditionalSearchDirs".ToLower())
+                    {
+                        AdditionalSearchDirs.Add(s.Replace(s1[0] + ":", ""));
                     }
                     else
                     {
-
-                        References.Add(s.Replace(s1[0] + ":", ""));
+                        CmdOptions.Add(argID, s.Replace(s1[0] + ":", ""));
                     }
-
                 }
 
                 var xTask = new CompilerEngine();
@@ -89,6 +96,10 @@ namespace IL2CPU
                 logMessage("Loaded : IgnoreDebugStubAttribute");
                 xTask.References = References.ToArray();
                 logMessage("Loaded : References");
+                xTask.AdditionalSearchDirs = AdditionalSearchDirs.ToArray();
+                logMessage("Loaded : AdditionalSearchDirs");
+                xTask.AdditionalReferences = AdditionalReferences.ToArray();
+                logMessage("Loaded : AdditionalReferences");
 
                 xTask.OnLogError = logError;
                 xTask.OnLogWarning = m => logMessage(String.Format("Warning: {0}", m));

@@ -55,6 +55,10 @@ namespace Cosmos.Build.MSBuild
 
         public bool EmitDebugSymbols { get; set; }
 
+        public string[] AdditionalSearchDirs { get; set; }
+
+        public string[] AdditionalReferences { get; set; }
+
         protected void LogMessage(string aMsg)
         {
             Log.LogMessage(aMsg);
@@ -86,6 +90,7 @@ namespace Cosmos.Build.MSBuild
 
             try
             {
+                //TODO: Add AdditionalReferences and AdditionalSearchDirs here and to log messages below.
                 Dictionary<string, string> args = new Dictionary<string, string>
                 {
                     {"DebugEnabled", Convert.ToString(DebugEnabled)},
@@ -110,15 +115,14 @@ namespace Cosmos.Build.MSBuild
 
                 string Arguments = args.Aggregate("", (current, arg) => current + "\"" + arg.Key + ":" + arg.Value + "\" ");
                 Arguments = refs.Aggregate(Arguments, (current, Ref) => current + "\"References:" + Ref + "\" ");
-
+                
                 Log.LogMessage(MessageImportance.High, $"Invoking il2cpu.exe {Arguments}");
                 return ExecuteTool(WorkingDir, Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe"), Arguments, "IL2CPU");
             }
             finally
             {
                 xSW.Stop();
-                Log.LogMessage(MessageImportance.High,
-                    $"IL2CPU invoked with DebugMode='{DebugMode}', DebugEnabled='{DebugEnabled}',StackCorruptionDetectionLevel='{StackCorruptionDetectionLevel ?? "{NULL}"}', TraceAssemblies='{TraceAssemblies ?? "{NULL}"}', IgnoreDebugStub='{IgnoreDebugStubAttribute}'");
+                Log.LogMessage(MessageImportance.High, $"IL2CPU invoked with DebugMode='{DebugMode}', DebugEnabled='{DebugEnabled}',StackCorruptionDetectionLevel='{StackCorruptionDetectionLevel ?? "{NULL}"}', TraceAssemblies='{TraceAssemblies ?? "{NULL}"}', IgnoreDebugStub='{IgnoreDebugStubAttribute}'");
                 Log.LogMessage(MessageImportance.High, "IL2CPU task took {0}", xSW.Elapsed);
             }
         }
