@@ -19,6 +19,9 @@ namespace Cosmos.HAL.Drivers
 
         public void vbe_set(ushort xres, ushort yres, ushort bpp)
         {
+            if (Cosmos.HAL.PCI.GetDevice(1234, 1111) == null){
+                throw new Exception("No BGA adapter found..");
+            }
             //Disable Display
             vbe_write(0x4, 0x00);
             //Set Display Xres
