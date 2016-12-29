@@ -46,68 +46,68 @@ namespace SimpleStructsAndArraysTest
             return arr[index];
         }
 
-        //private static void TestStep1()
-        //{
-        //    //var xItem = xQueue.Dequeue();
-        //    //Console.Write("Char: ");
-        //    //Console.WriteLine(xResult.KeyChar);
-        //    var xItem = new MyStruct
-        //    {
-        //        A = 1,
-        //        B = 2,
-        //        C = 3,
-        //        D = 4,
-        //        E = 5
-        //    };
+        private static void TestStep1()
+        {
+            //var xItem = xQueue.Dequeue();
+            //Console.Write("Char: ");
+            //Console.WriteLine(xResult.KeyChar);
+            var xItem = new MyStruct
+            {
+                A = 1,
+                B = 2,
+                C = 3,
+                D = 4,
+                E = 5
+            };
 
-        //    var xArray = new MyStruct[1];
-        //    xArray[0] = xItem;
-        //    //xArray[0] = new MyStruct(1, 2, 3, 4, 5);
+            var xArray = new MyStruct[1];
+            xArray[0] = xItem;
+            //xArray[0] = new MyStruct(1, 2, 3, 4, 5);
 
-        //    xItem = xArray[0];
-        //    Assert.IsTrue(xItem.A == 1, "xItem.A == 1");
-        //    Console.Write("A: ");
-        //    Console.WriteLine(xItem.A);
-        //    Assert.IsTrue(xItem.B == 2, "xItem.B == 2");
-        //    Console.Write("B: ");
-        //    Console.WriteLine(xItem.B);
-        //    Assert.IsTrue(xItem.C == 3, "xItem.C == 3");
-        //    Console.Write("C: ");
-        //    Console.WriteLine(xItem.C);
-        //    Assert.IsTrue(xItem.D == 4, "xItem.D == 4");
-        //    Console.Write("D: ");
-        //    Console.WriteLine(xItem.D);
-        //    Assert.IsTrue(xItem.E == 5, "xItem.E == 5");
-        //    Console.Write("E: ");
-        //    Console.WriteLine(xItem.E);
+            xItem = xArray[0];
+            Assert.IsTrue(xItem.A == 1, "xItem.A == 1");
+            Console.Write("A: ");
+            Console.WriteLine(xItem.A);
+            Assert.IsTrue(xItem.B == 2, "xItem.B == 2");
+            Console.Write("B: ");
+            Console.WriteLine(xItem.B);
+            Assert.IsTrue(xItem.C == 3, "xItem.C == 3");
+            Console.Write("C: ");
+            Console.WriteLine(xItem.C);
+            Assert.IsTrue(xItem.D == 4, "xItem.D == 4");
+            Console.Write("D: ");
+            Console.WriteLine(xItem.D);
+            Assert.IsTrue(xItem.E == 5, "xItem.E == 5");
+            Console.Write("E: ");
+            Console.WriteLine(xItem.E);
 
-        //    //xItem = new MyStruct(6, 7, 8, 9, 10);
+            //xItem = new MyStruct(6, 7, 8, 9, 10);
 
-        //    Console.WriteLine("Next: ");
-        //    //xItem = xQueue.Dequeue();
-        //    //Console.Write("Char: ");
-        //    //Console.WriteLine(xResult.KeyChar);
+            Console.WriteLine("Next: ");
+            //xItem = xQueue.Dequeue();
+            //Console.Write("Char: ");
+            //Console.WriteLine(xResult.KeyChar);
 
-        //    //var xArray = new MyStruct[0];
-        //    //xArray[0] = new MyStruct(1, 2, 3, 4, 5);
+            //var xArray = new MyStruct[0];
+            //xArray[0] = new MyStruct(1, 2, 3, 4, 5);
 
-        //    var xItem2 = GetValue(xArray, 0);
-        //    Assert.IsTrue(xItem2.A == 1, "xItem2.A == 1");
-        //    Console.Write("A: ");
-        //    Console.WriteLine(xItem2.A);
-        //    Assert.IsTrue(xItem2.B == 2, "xItem2.B == 2");
-        //    Console.Write("B: ");
-        //    Console.WriteLine(xItem2.B);
-        //    Assert.IsTrue(xItem2.C == 3, "xItem2.C == 3");
-        //    Console.Write("C: ");
-        //    Console.WriteLine(xItem2.C);
-        //    Assert.IsTrue(xItem2.D == 4, "xItem2.D == 4");
-        //    Console.Write("D: ");
-        //    Console.WriteLine(xItem2.D);
-        //    Assert.IsTrue(xItem2.E == 5, "xItem2.E == 5");
-        //    Console.Write("E: ");
-        //    Console.WriteLine(xItem2.E);
-        //}
+            var xItem2 = GetValue(xArray, 0);
+            Assert.IsTrue(xItem2.A == 1, "xItem2.A == 1");
+            Console.Write("A: ");
+            Console.WriteLine(xItem2.A);
+            Assert.IsTrue(xItem2.B == 2, "xItem2.B == 2");
+            Console.Write("B: ");
+            Console.WriteLine(xItem2.B);
+            Assert.IsTrue(xItem2.C == 3, "xItem2.C == 3");
+            Console.Write("C: ");
+            Console.WriteLine(xItem2.C);
+            Assert.IsTrue(xItem2.D == 4, "xItem2.D == 4");
+            Console.Write("D: ");
+            Console.WriteLine(xItem2.D);
+            Assert.IsTrue(xItem2.E == 5, "xItem2.E == 5");
+            Console.Write("E: ");
+            Console.WriteLine(xItem2.E);
+        }
 
         private class KVPClass
         {
@@ -283,8 +283,8 @@ namespace SimpleStructsAndArraysTest
 
         protected override void Run()
         {
-            //TestStep1();
-            //Assert.IsTrue(true, "After TestStep1");
+            TestStep1();
+            Assert.IsTrue(true, "After TestStep1");
             TestOurList();
             Assert.IsTrue(true, "After TestOurList");
             TestStandardList();

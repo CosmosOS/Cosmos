@@ -640,6 +640,16 @@ namespace XSharp.Compiler
       new ConditionalJump { Condition = condition, DestinationLabel = label };
     }
 
+    public static void Jump(Register32 destination, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    {
+      new Jump
+      {
+        DestinationReg = destination,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement
+      };
+    }
+
     public static void Jump(string label)
     {
       new Jump { DestinationLabel = label };
@@ -657,7 +667,7 @@ namespace XSharp.Compiler
 
     public static void Call(Register32 register)
     {
-      new Call { DestinationReg = register.RegEnum };
+      new Call { DestinationReg = register };
     }
 
     public static void Const(string name, string value)
@@ -706,6 +716,7 @@ namespace XSharp.Compiler
       {
         throw new InvalidOperationException();
       }
+
       Do<ShiftRight>(destination, source, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
     }
 
@@ -714,13 +725,14 @@ namespace XSharp.Compiler
       Do<ShiftLeft>(destination, bitCount);
     }
 
-    public static void ShiftLeft(Register destination, Register8 bitCount, bool destinationIsIndirect = false, RegisterSize size = RegisterSize.Int32)
+    public static void ShiftLeft(Register destination, Register8 source, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
     {
-      if (bitCount != CL)
+      if (source != CL)
       {
         throw new InvalidOperationException();
       }
-      Do<ShiftLeft>(destination, bitCount, destinationIsIndirect: destinationIsIndirect, size: size);
+
+      Do<ShiftLeft>(destination, source, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
     }
 
     public static void ShiftRightArithmetic(Register destination, byte bitCount)
@@ -1368,6 +1380,51 @@ namespace XSharp.Compiler
     }
 
     #endregion MoveZeroExtend
+
+    #region MoveD
+
+    public static void MoveD(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+    }
+
+    public static void MoveD(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      DoDestinationSource<MoveD>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+    }
+
+    public static void MoveD(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+    }
+
+    public static void MoveD(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      DoDestinationSource<MoveD>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+    }
+
+    public static void MoveD(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      DoDestinationSource<MoveD>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+    }
+
+    public static void MoveD(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+    }
+
+    #endregion
+
+    public static void SetByteOnCondition(ConditionalTestEnum condition, Register destination, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+    {
+      new SetByteOnCondition
+      {
+        Condition = condition,
+        DestinationReg = destination,
+        DestinationIsIndirect = destinationIsIndirect,
+        DestinationDisplacement = destinationDisplacement
+      };
+    }
 
     public static void Cpuid()
     {

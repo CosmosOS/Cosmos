@@ -104,6 +104,7 @@
     <Compile Include="XS.FPU.cs" />
     <Compile Include="XS.SSE.cs" />
     <Compile Include="XS.SSE2.cs" />
+    <Compile Include="XS.SSE4.cs" />
     <Compile Include="XS.SSE3.cs" />
     <Compile Include="XS.Temp.cs" />
     <Compile Include="XSRegisters.cs" />

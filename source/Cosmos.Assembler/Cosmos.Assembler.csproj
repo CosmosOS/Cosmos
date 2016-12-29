@@ -206,6 +206,7 @@
     <Compile Include="x86\RotateRight.cs" />
     <Compile Include="x86\RotateThroughCarryRight.cs" />
     <Compile Include="x86\Scas.cs" />
+    <Compile Include="x86\SetByteOnCondition.cs" />
     <Compile Include="x86\SetInterruptFlag.cs" />
     <Compile Include="x86\ShiftLeft.cs" />
     <Compile Include="x86\ShiftLeftArithmetic.cs" />
@@ -230,7 +231,6 @@
     <Compile Include="x86\SSE2\DivPD.cs" />
     <Compile Include="x86\SSE2\DivSD.cs" />
     <Compile Include="x86\SSE2\MoveAPD.cs" />
-    <None Include="x86\SSE2\MoveD.removed" />
     <Compile Include="x86\SSE2\MoveDQA.cs" />
     <Compile Include="x86\SSE2\MoveHLPD.cs" />
     <Compile Include="x86\SSE2\MoveHPD.cs" />
@@ -247,6 +247,8 @@
     <Compile Include="x86\SSE2\XorPD.cs" />
     <Compile Include="x86\SSE3\IntStoreWithTrunc.cs" />
     <Compile Include="x86\SSE3\MoveDoubleAndDuplicate.cs" />
+    <Compile Include="x86\SSE4\RoundSD.cs" />
+    <Compile Include="x86\SSE4\RoundSS.cs" />
     <Compile Include="x86\SSEAndMMX2\AddPS.cs" />
     <Compile Include="x86\SSEAndMMX2\AddSS.cs" />
     <Compile Include="x86\SSEAndMMX2\AndPS.cs" />

@@ -47,10 +47,17 @@ namespace Cosmos.IL2CPU.X86.IL
       }
 
       var xStackContent = aOpCode.StackPopTypes[0];
-      var xStackContentSize = SizeOfType(xStackContent);
+      var xSize = SizeOfType(xStackContent);
       var xIsFloat = TypeIsFloat(xStackContent);
 
-      if (xStackContentSize > 8)
+      if (!xIsSingleCompare)
+      {
+        var xStackContent2 = aOpCode.StackPopTypes[1];
+        xSize = Math.Max(xSize, SizeOfType(xStackContent2));
+        xIsFloat = xIsFloat || TypeIsFloat(xStackContent2);
+      }
+
+      if (xSize > 8)
       {
         throw new Exception("Cosmos.IL2CPU.x86->IL->Branch.cs->Error: StackSize > 8 not supported");
       }
@@ -100,7 +107,7 @@ namespace Cosmos.IL2CPU.X86.IL
       }
       if (!xIsSingleCompare)
       {
-        if (xStackContentSize <= 4)
+        if (xSize <= 4)
         {
           if (xIsFloat) //float
           {
@@ -113,13 +120,74 @@ namespace Cosmos.IL2CPU.X86.IL
             {
               case ConditionalTestEnum.Equal:
                 XS.SSE.CompareSS(XMM1, XMM0, ComparePseudoOpcodes.Equal);
-                XS.SSE2.MoveD(EBX, XMM1);
+                XS.MoveD(EBX, XMM1);
                 XS.And(EBX, 1);
                 XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.NotEqual:
                 XS.SSE.CompareSS(XMM1, XMM0, ComparePseudoOpcodes.NotEqual);
-                XS.SSE2.MoveD(EBX, XMM1);
+                XS.MoveD(EBX, XMM1);
+                XS.And(EBX, 1);
+                XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                break;
+              case ConditionalTestEnum.LessThan:
+                XS.SSE.CompareSS(XMM1, XMM0, ComparePseudoOpcodes.LessThan);
+                XS.MoveD(EBX, XMM1);
+                XS.And(EBX, 1);
+                XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                break;
+              case ConditionalTestEnum.LessThanOrEqualTo:
+                XS.SSE.CompareSS(XMM1, XMM0, ComparePseudoOpcodes.LessThanOrEqualTo);
+                XS.MoveD(EBX, XMM1);
+                XS.And(EBX, 1);
+                XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                break;
+              case ConditionalTestEnum.GreaterThan:
+                XS.SSE.MoveSS(XMM2, XMM1);
+                XS.SSE.CompareSS(XMM2, XMM0, ComparePseudoOpcodes.Ordered);
+                XS.MoveD(EAX, XMM2);
+                XS.SSE.CompareSS(XMM1, XMM0, ComparePseudoOpcodes.NotLessThanOrEqualTo);
+                XS.MoveD(EBX, XMM1);
+                XS.And(EBX, EAX);
+                XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                break;
+              case ConditionalTestEnum.GreaterThanOrEqualTo:
+                XS.SSE.MoveSS(XMM2, XMM1);
+                XS.SSE.CompareSS(XMM2, XMM0, ComparePseudoOpcodes.Ordered);
+                XS.MoveD(EAX, XMM2);
+                XS.SSE.CompareSS(XMM1, XMM0, ComparePseudoOpcodes.NotLessThan);
+                XS.MoveD(EBX, XMM1);
+                XS.And(EBX, EAX);
+                XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                break;
+              // from here all unordered
+              case ConditionalTestEnum.BelowOrEqual:
+                XS.SSE.MoveSS(XMM2, XMM1);
+                XS.SSE.CompareSS(XMM2, XMM0, ComparePseudoOpcodes.Unordered);
+                XS.MoveD(EAX, XMM2);
+                XS.SSE.CompareSS(XMM1, XMM0, ComparePseudoOpcodes.LessThanOrEqualTo);
+                XS.MoveD(EBX, XMM1);
+                XS.Or(EBX, EAX);
+                XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                break;
+              case ConditionalTestEnum.Below:
+                XS.SSE.MoveSS(XMM2, XMM1);
+                XS.SSE.CompareSS(XMM2, XMM0, ComparePseudoOpcodes.Unordered);
+                XS.MoveD(EAX, XMM2);
+                XS.SSE.CompareSS(XMM1, XMM0, ComparePseudoOpcodes.LessThan);
+                XS.MoveD(EBX, XMM1);
+                XS.Or(EBX, EAX);
+                XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                break;
+              case ConditionalTestEnum.AboveOrEqual:
+                XS.SSE.CompareSS(XMM1, XMM0, ComparePseudoOpcodes.NotLessThan);
+                XS.MoveD(EBX, XMM1);
+                XS.And(EBX, 1);
+                XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                break;
+              case ConditionalTestEnum.Above:
+                XS.SSE.CompareSS(XMM1, XMM0, ComparePseudoOpcodes.NotLessThanOrEqualTo);
+                XS.MoveD(EBX, XMM1);
                 XS.And(EBX, 1);
                 XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
@@ -127,7 +195,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 throw new Exception("Cosmos.IL2CPU.x86->IL->Branch.cs->Error: Comparison of floats (System.Single) is not yet supported!");
             }
           }
-          else //int
+          else //int and uint
           {
             XS.Pop(EAX);
             XS.Pop(EBX);
@@ -135,7 +203,7 @@ namespace Cosmos.IL2CPU.X86.IL
             XS.Jump(xTestOp, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
           }
         }
-        else
+        else if (xSize <= 8)
         {
           if (xIsFloat) //double
           {
@@ -148,63 +216,74 @@ namespace Cosmos.IL2CPU.X86.IL
             {
               case ConditionalTestEnum.Equal:
                 XS.SSE2.CompareSD(XMM1, XMM0, ComparePseudoOpcodes.Equal);
-                XS.SSE2.MoveD(EBX, XMM1);
+                XS.MoveD(EBX, XMM1);
                 XS.And(EBX, 1);
                 XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.NotEqual:
                 XS.SSE2.CompareSD(XMM1, XMM0, ComparePseudoOpcodes.NotEqual);
-                XS.SSE2.MoveD(EBX, XMM1);
+                XS.MoveD(EBX, XMM1);
                 XS.And(EBX, 1);
                 XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.LessThan:
                 XS.SSE2.CompareSD(XMM1, XMM0, ComparePseudoOpcodes.LessThan);
-                XS.SSE2.MoveD(EBX, XMM1);
+                XS.MoveD(EBX, XMM1);
                 XS.And(EBX, 1);
                 XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.LessThanOrEqualTo:
                 XS.SSE2.CompareSD(XMM1, XMM0, ComparePseudoOpcodes.LessThanOrEqualTo);
-                XS.SSE2.MoveD(EBX, XMM1);
+                XS.MoveD(EBX, XMM1);
                 XS.And(EBX, 1);
                 XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.GreaterThan:
+                XS.SSE2.MoveSD(XMM2, XMM1);
+                XS.SSE2.CompareSD(XMM2, XMM0, ComparePseudoOpcodes.Ordered);
+                XS.MoveD(EAX, XMM2);
                 XS.SSE2.CompareSD(XMM1, XMM0, ComparePseudoOpcodes.NotLessThanOrEqualTo);
-                XS.SSE2.MoveD(EBX, XMM1);
-                XS.And(EBX, 1);
+                XS.MoveD(EBX, XMM1);
+                XS.And(EBX, EAX);
                 XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.GreaterThanOrEqualTo:
+                XS.SSE2.MoveSD(XMM2, XMM1);
+                XS.SSE2.CompareSD(XMM2, XMM0, ComparePseudoOpcodes.Ordered);
+                XS.MoveD(EAX, XMM2);
                 XS.SSE2.CompareSD(XMM1, XMM0, ComparePseudoOpcodes.NotLessThan);
-                XS.SSE2.MoveD(EBX, XMM1);
-                XS.And(EBX, 1);
+                XS.MoveD(EBX, XMM1);
+                XS.And(EBX, EAX);
                 XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
-              // from here all unsigned
-              //TODO: unsigned operations are actually signed, they need to be reviewed/fixed
+              // from here all unordered
               case ConditionalTestEnum.BelowOrEqual:
+                XS.SSE2.MoveSD(XMM2, XMM1);
+                XS.SSE2.CompareSD(XMM2, XMM0, ComparePseudoOpcodes.Unordered);
+                XS.MoveD(EAX, XMM2);
                 XS.SSE2.CompareSD(XMM1, XMM0, ComparePseudoOpcodes.LessThanOrEqualTo);
-                XS.SSE2.MoveD(EBX, XMM1);
-                XS.And(EBX, 1);
+                XS.MoveD(EBX, XMM1);
+                XS.Or(EBX, EAX);
                 XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.Below:
+                XS.SSE2.MoveSD(XMM2, XMM1);
+                XS.SSE2.CompareSD(XMM2, XMM0, ComparePseudoOpcodes.Unordered);
+                XS.MoveD(EAX, XMM2);
                 XS.SSE2.CompareSD(XMM1, XMM0, ComparePseudoOpcodes.LessThan);
-                XS.SSE2.MoveD(EBX, XMM1);
-                XS.And(EBX, 1);
+                XS.MoveD(EBX, XMM1);
+                XS.Or(EBX, EAX);
                 XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.AboveOrEqual:
                 XS.SSE2.CompareSD(XMM1, XMM0, ComparePseudoOpcodes.NotLessThan);
-                XS.SSE2.MoveD(EBX, XMM1);
+                XS.MoveD(EBX, XMM1);
                 XS.And(EBX, 1);
                 XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.Above:
                 XS.SSE2.CompareSD(XMM1, XMM0, ComparePseudoOpcodes.NotLessThanOrEqualTo);
-                XS.SSE2.MoveD(EBX, XMM1);
+                XS.MoveD(EBX, XMM1);
                 XS.And(EBX, 1);
                 XS.Jump(ConditionalTestEnum.NotZero, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
@@ -212,7 +291,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 throw new Exception("Unknown OpCode for conditional branch in double.");
             }
           }
-          else //long
+          else //long and ulong
           {
             var xNoJump = GetLabel(aMethod, aOpCode) + "__NoBranch";
 
@@ -225,7 +304,12 @@ namespace Cosmos.IL2CPU.X86.IL
 
             switch (xTestOp)
             {
-              case ConditionalTestEnum.Zero: // Equal
+              case ConditionalTestEnum.Equal: // Zero
+                XS.Xor(EBX, EDX);
+                XS.Xor(EAX, ECX);
+                XS.Or(EAX, EBX);
+                XS.Jump(xTestOp, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                break;
               case ConditionalTestEnum.NotEqual: // NotZero
                 XS.Xor(EAX, ECX);
                 XS.Jump(xTestOp, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
@@ -237,55 +321,57 @@ namespace Cosmos.IL2CPU.X86.IL
                 XS.Jump(ConditionalTestEnum.LessThan, xNoJump);
                 XS.Jump(ConditionalTestEnum.GreaterThan, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 XS.Compare(ECX, EAX);
-                XS.Jump(ConditionalTestEnum.Below, xNoJump);
+                XS.Jump(ConditionalTestEnum.GreaterThanOrEqualTo, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.GreaterThan:
                 XS.Compare(EDX, EBX);
                 XS.Jump(ConditionalTestEnum.LessThan, xNoJump);
                 XS.Jump(ConditionalTestEnum.GreaterThan, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 XS.Compare(ECX, EAX);
-                XS.Jump(ConditionalTestEnum.BelowOrEqual, xNoJump);
+                XS.Jump(ConditionalTestEnum.GreaterThan, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.LessThanOrEqualTo:
                 XS.Compare(EDX, EBX);
-                XS.Jump(ConditionalTestEnum.LessThan, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 XS.Jump(ConditionalTestEnum.GreaterThan, xNoJump);
+                XS.Jump(ConditionalTestEnum.LessThan, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 XS.Compare(ECX, EAX);
-                XS.Jump(ConditionalTestEnum.BelowOrEqual, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                XS.Jump(ConditionalTestEnum.LessThanOrEqualTo, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.LessThan:
                 XS.Compare(EDX, EBX);
-                XS.Jump(ConditionalTestEnum.LessThan, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 XS.Jump(ConditionalTestEnum.GreaterThan, xNoJump);
+                XS.Jump(ConditionalTestEnum.LessThan, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 XS.Compare(ECX, EAX);
-                XS.Jump(ConditionalTestEnum.Below, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                XS.Jump(ConditionalTestEnum.LessThan, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               // from here all unsigned
               case ConditionalTestEnum.AboveOrEqual:
                 XS.Compare(EDX, EBX);
+                XS.Jump(ConditionalTestEnum.Below, xNoJump);
                 XS.Jump(ConditionalTestEnum.Above, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 XS.Compare(ECX, EAX);
-                XS.Jump(ConditionalTestEnum.Below, xNoJump);
+                XS.Jump(ConditionalTestEnum.AboveOrEqual, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.Above:
                 XS.Compare(EDX, EBX);
+                XS.Jump(ConditionalTestEnum.Below, xNoJump);
                 XS.Jump(ConditionalTestEnum.Above, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 XS.Compare(ECX, EAX);
-                XS.Jump(ConditionalTestEnum.BelowOrEqual, xNoJump);
+                XS.Jump(ConditionalTestEnum.Above, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.BelowOrEqual:
                 XS.Compare(EDX, EBX);
-                XS.Jump(ConditionalTestEnum.Above, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
-                XS.Jump(ConditionalTestEnum.Below, xNoJump);
+                XS.Jump(ConditionalTestEnum.Above, xNoJump);
+                XS.Jump(ConditionalTestEnum.Below, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 XS.Compare(ECX, EAX);
-                XS.Jump(ConditionalTestEnum.Above, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                XS.Jump(ConditionalTestEnum.BelowOrEqual, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               case ConditionalTestEnum.Below:
                 XS.Compare(EDX, EBX);
-                XS.Jump(ConditionalTestEnum.Above, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
-                XS.Jump(ConditionalTestEnum.Below, xNoJump);
+                XS.Jump(ConditionalTestEnum.Above, xNoJump);
+                XS.Jump(ConditionalTestEnum.Below, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 XS.Compare(ECX, EAX);
-                XS.Jump(ConditionalTestEnum.AboveOrEqual, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
+                XS.Jump(ConditionalTestEnum.BelowOrEqual, AppAssembler.TmpBranchLabel(aMethod, aOpCode));
                 break;
               default:
                 throw new Exception("Unknown OpCode for conditional branch in 64-bit.");
@@ -304,7 +390,7 @@ namespace Cosmos.IL2CPU.X86.IL
         else
         {
           // todo: improve code clarity
-          if (xStackContentSize <= 4)
+          if (xSize <= 4)
           {
             XS.Pop(EAX);
             if (xTestOp == ConditionalTestEnum.Zero)
@@ -322,7 +408,7 @@ namespace Cosmos.IL2CPU.X86.IL
               throw new NotSupportedException("Cosmos.IL2CPU.x86->IL->Branch.cs->Error: Situation not supported yet! (In the Simple Comparison)");
             }
           }
-          else
+          else if (xSize <= 8)
           {
             if (TypeIsReferenceType(xStackContent))
             {

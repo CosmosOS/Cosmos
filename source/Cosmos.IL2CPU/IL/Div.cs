@@ -1,6 +1,6 @@
 using System;
 
-using CPUx86 = Cosmos.Assembler.x86;
+using Cosmos.Assembler.x86;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 
@@ -18,20 +18,15 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xStackItem = aOpCode.StackPopTypes[0];
-            var xStackItemSize = SizeOfType(xStackItem);
-            var xStackItem2 = aOpCode.StackPopTypes[0];
-            var xStackItem2Size = SizeOfType(xStackItem2);
-
+            var xSize = Math.Max(SizeOfType(xStackItem), SizeOfType(aOpCode.StackPopTypes[1]));
             var xIsFloat = TypeIsFloat(xStackItem);
 
-            if (xStackItemSize == 8)
+            if (xSize > 8)
             {
-                // there seem to be an error in MS documentation, there is pushed an int32, but IL shows else
-                if (xStackItem2Size != 8)
-                {
-                    throw new Exception("Cosmos.IL2CPU.x86->IL->Div.cs->Error: Expected a size of 8 for Div!");
-                }
-
+                throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Div.cs->Error: StackSize > 8 not supported");
+            }
+            else if (xSize > 4)
+            {
                 if (xIsFloat) //double
                 {
                     XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
@@ -49,24 +44,20 @@ namespace Cosmos.IL2CPU.X86.IL
 
                     // divisor
                     // low
-                    XS.Set(ESI, ESP, sourceIsIndirect: true);
+                    XS.Pop(ESI);
                     // high
-                    XS.Set(EDI, ESP, sourceDisplacement: 4);
-
-                    XS.Add(ESP, 8);
+                    XS.Pop(EDI);
 
                     // dividend
                     // low
-                    XS.Set(EAX, ESP, sourceIsIndirect: true);
+                    XS.Pop(EAX);
                     // high
-                    XS.Set(EDX, ESP, sourceDisplacement: 4);
-
-                    XS.Add(ESP, 8);
+                    XS.Pop(EDX);
 
                     // set flags
                     XS.Or(EDI, EDI);
                     // if high dword of divisor is already zero, we dont need the loop
-                    XS.Jump(CPUx86.ConditionalTestEnum.Zero, LabelNoLoop);
+                    XS.Jump(ConditionalTestEnum.Zero, LabelNoLoop);
 
                     // set ecx to zero for counting the shift operations
                     XS.Xor(ECX, ECX);
@@ -77,7 +68,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Push(EBX);
 
                     XS.Compare(EDI, 0x80000000);
-                    XS.Jump(CPUx86.ConditionalTestEnum.Below, BaseLabel + "divisor_no_neg");
+                    XS.Jump(ConditionalTestEnum.Below, BaseLabel + "divisor_no_neg");
 
                     XS.Negate(ESI);
                     XS.AddWithCarry(EDI, 0);
@@ -86,7 +77,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Label(BaseLabel + "divisor_no_neg");
 
                     XS.Compare(EDX, 0x80000000);
-                    XS.Jump(CPUx86.ConditionalTestEnum.Below, BaseLabel + "dividend_no_neg");
+                    XS.Jump(ConditionalTestEnum.Below, BaseLabel + "dividend_no_neg");
 
                     XS.Negate(EAX);
                     XS.AddWithCarry(EDX, 0);
@@ -109,11 +100,11 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.And(EBX, 0x80000000);
                     XS.Or(EBX, EDI);
                     // loop while high dword of divisor is not zero or most significant bit of low dword of divisor is set
-                    XS.Jump(CPUx86.ConditionalTestEnum.NotZero, LabelShiftRight);
+                    XS.Jump(ConditionalTestEnum.NotZero, LabelShiftRight);
 
                     // shift the dividend now in one step
-                    // shift dividend CL bits right
                     XS.ShiftRightDouble(EAX, EDX, CL);
+                    // shift dividend CL bits right
                     XS.ShiftRight(EDX, CL);
 
                     // so we shifted both, so we have near the same relation as original values
@@ -124,7 +115,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     XS.Pop(EBX);
 
                     XS.Compare(EBX, 0x80000000);
-                    XS.Jump(CPUx86.ConditionalTestEnum.Below, BaseLabel + "_result_no_neg");
+                    XS.Jump(ConditionalTestEnum.Below, BaseLabel + "_result_no_neg");
 
                     XS.Negate(EAX);
 
@@ -173,10 +164,15 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
                 else
                 {
+                    // divisor
                     XS.Pop(ECX);
+                    // dividend
                     XS.Pop(EAX);
+
+                    // sign extend
                     XS.SignExtendAX(RegisterSize.Int32);
-                    XS.IntegerDivide(ECX);
+
+                    XS.IntegerDivide(ECX); // => EAX / ECX
                     XS.Push(EAX);
                 }
             }

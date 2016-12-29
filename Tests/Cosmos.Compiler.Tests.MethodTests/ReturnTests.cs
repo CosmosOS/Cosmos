@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using Cosmos.TestRunner;
+﻿using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.MethodTests
 {
@@ -28,13 +22,13 @@ namespace Cosmos.Compiler.Tests.MethodTests
             Assert.IsTrue(d == TestULong(d), "ULong return value failed.");
             Assert.IsTrue(d == TestRefULong(ref d), "ULong& return value failed.");
 
-            //float e = 42.42f;
-            //Assert.IsTrue(e == TestSingle(e), "Single return value failed.");
-            //Assert.IsTrue(e == TestRefSingle(ref e), "Single& return value failed.");
+            float e = 42.42f;
+            Assert.IsTrue(e == TestSingle(e), "Single return value failed.");
+            Assert.IsTrue(e == TestRefSingle(ref e), "Single& return value failed.");
 
-            //double f = 42.42;
-            //Assert.IsTrue(f == TestDouble(f), "Double return value failed.");
-            //Assert.IsTrue(f == TestRefDouble(ref f), "Double& return value failed.");
+            double f = 42.42;
+            Assert.IsTrue(f == TestDouble(f), "Double return value failed.");
+            Assert.IsTrue(f == TestRefDouble(ref f), "Double& return value failed.");
 
             string h = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             Assert.IsTrue(h == TestString(h), "String return value failed.");

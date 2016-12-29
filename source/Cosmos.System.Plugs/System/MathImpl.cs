@@ -129,14 +129,15 @@ namespace Cosmos.System.Plugs.System
         #endregion
 
         #region Ceiling
-        public static double Ceiling(double a)
-        {
-            // should be using assembler for bigger values than int or long max
-            if (a == Double.NaN || a == Double.NegativeInfinity || a == Double.PositiveInfinity)
-                return a;
-            int i = (a - (int)a > 0) ? (int)(a + 1) : (int)a;
-            return i;
-        }
+        // see Cosmos.Core.Plugs.System.MathImpl for assembly implementation
+        //public static double Ceiling(double a)
+        //{
+        //    // should be using assembler for bigger values than int or long max
+        //    if (a == Double.NaN || a == Double.NegativeInfinity || a == Double.PositiveInfinity)
+        //        return a;
+        //    int i = (a - (int)a > 0) ? (int)(a + 1) : (int)a;
+        //    return i;
+        //}
         #endregion
 
         #region Cos
@@ -236,14 +237,15 @@ namespace Cosmos.System.Plugs.System
         #endregion
 
         #region Floor
-        public static double Floor(double a)
-        {
-            // should be using assembler for bigger values than int or long max
-            if (a == Double.NaN || a == Double.NegativeInfinity || a == Double.PositiveInfinity)
-                return a;
-            int i = (a - (int)a < 0) ? (int)(a - 1) : (int)a;
-            return i;
-        }
+        // see Cosmos.Core.Plugs.System.MathImpl for assembly implementation
+        //public static double Floor(double a)
+        //{
+        //    // should be using assembler for bigger values than int or long max
+        //    if (a == Double.NaN || a == Double.NegativeInfinity || a == Double.PositiveInfinity)
+        //                return a;
+        //    int i = (a - (int)a < 0) ? (int)(a - 1) : (int)a;
+        //    return i;
+        //}
         #endregion
 
         #region Log (base e)
@@ -315,7 +317,7 @@ namespace Cosmos.System.Plugs.System
                 if (x == 0.0F && y <= 0.0F)
                     throw new ArgumentException();
 
-                l = (long)Floor(y);
+                l = (long)Math.Floor(y);
                 if (l != y)
                     temp = Exp(y * Log(-x));
                 if ((l % 2) == 1)
@@ -425,7 +427,7 @@ namespace Cosmos.System.Plugs.System
                 x -= (2 * PI);
             }
 
-            byte octant = (byte)Floor(x * (1 / (PI / 4)));
+            byte octant = (byte)Math.Floor(x * (1 / (PI / 4)));
             switch (octant)
             {
                 case 0:
@@ -494,7 +496,7 @@ namespace Cosmos.System.Plugs.System
         #region Truncate
         public static double Truncate(double x)
         {
-            return ((x == 0) ? 0F : ((x > 0F) ? Floor(x) : Ceiling(x)));
+            return ((x == 0) ? 0F : ((x > 0F) ? Math.Floor(x) : Math.Ceiling(x)));
         }
         #endregion
 

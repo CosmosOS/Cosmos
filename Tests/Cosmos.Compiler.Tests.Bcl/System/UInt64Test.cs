@@ -1,27 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
 {
-    using Cosmos.TestRunner;
-
     public static class UInt64Test
     {
         public static void Execute()
         {
-            UInt64 value;
-            String result;
-            String expectedResult;
+            ulong value;
+            string result;
+            string expectedResult;
 
-            value = UInt64.MaxValue;
+            value = ulong.MaxValue;
 
             result = value.ToString();
             expectedResult = "18446744073709551615";
 
-            Assert.IsTrue((result == expectedResult), "UInt64.ToString doesn't work");
+            Assert.IsTrue((result == expectedResult), "UInt64.ToString() doesn't work");
 
             // Now let's try to concat to a String using '+' operator
             result = "The Maximum value of an UInt64 is " + value;
@@ -42,8 +38,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((resultAsInt == expectedResultAsInt), "UInt64.GetHashCode() doesn't work");
 
             // Let's try to convert an ULong in a Long
-            UInt64 val2 = 42;
-            Int64 val2AsLong = (long)val2;
+            ulong val2 = 42;
+            long val2AsLong = (long)val2;
 
             Assert.IsTrue((val2AsLong == 42), "UInt64 to Int64 conversion does not work");
 
@@ -76,34 +72,40 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = 4631166901565532406u;
 
             val2 = value >> 20;
-            Assert.IsTrue(val2 == 4416624929013, "UInt64 right shift does not work");
+            Assert.IsTrue(val2 == 4416624929013, "UInt64 right shift doesn't work");
 
             val2 = value >> 52;
-            Assert.IsTrue(val2 == 1028, "UInt64 right shift (count >=32) does not work");
+            Assert.IsTrue(val2 == 1028, "UInt64 right shift (count >=32) doesn't work");
 
             /* ... and now left shift */
             value = 4631166901565532406;
 
             val2 = value << 20;
-            Assert.IsTrue(val2 == 6640827866535690240, "UInt64 left shift does not work");
+            Assert.IsTrue(val2 == 6640827866535690240, "UInt64 left shift doesn't work");
 
             val2 = value << 52;
-            Assert.IsTrue(val2 == 10331257545187917824, "UInt64 left shift (count >=32) does not work");
+            Assert.IsTrue(val2 == 10331257545187917824, "UInt64 left shift (count >=32) doesn't work");
 
             // basic arithmetic operations
             value = 1728000000000;
 
             val2 = value + 36000000000;
-            Assert.IsTrue(val2 == 1764000000000, "UInt64 addition does not work got " + val2);
+            Assert.IsTrue(val2 == 1764000000000, "UInt64 addition doesn't work got " + val2);
 
             val2 = value - 36000000000;
-            Assert.IsTrue(val2 == 1692000000000, "UInt64 subtraction does not work got " + val2);
+            Assert.IsTrue(val2 == 1692000000000, "UInt64 subtraction doesn't work got " + val2);
 
             val2 = value * 36000000000;
-            Assert.IsTrue(val2 == 5578983451391950848, "UInt64 multiplication does not work got " + val2);
+            Assert.IsTrue(val2 == 5578983451391950848, "UInt64 multiplication doesn't work got " + val2);
 
             val2 = value / 36000000000;
-            Assert.IsTrue(val2 == 48, "UInt64 division does not work got " + val2);
+            Assert.IsTrue(val2 == 48, "UInt64 division doesn't work got " + val2);
+
+            value = 3200000000000;
+
+            val2 = value % 1300000000000;
+            Assert.IsTrue(val2 == 600000000000, "UInt64 remainder doesn't work got " + val2);
+
 #if false
             // Now let's try ToString() again but printed in hex (this test fails for now!)
             result = value.ToString("X2");

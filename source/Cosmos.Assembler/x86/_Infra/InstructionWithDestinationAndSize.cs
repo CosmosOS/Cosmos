@@ -16,9 +16,6 @@ namespace Cosmos.Assembler.x86 {
                 return mSize;
             }
             set {
-                if (value > 0) {
-                    SizeToString(value);
-                }
                 mSize = value;
             }
         }

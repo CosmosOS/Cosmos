@@ -10,6 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
     [OpCode(ILOpCode.Code.Div_Un)]
     public class Div_Un : ILOp
     {
+#warning TODO: Improve division on UInt64, in the case of high dword of divisor not 0
         public Div_Un(Cosmos.Assembler.Assembler aAsmblr)
             : base(aAsmblr)
         {
@@ -18,24 +19,19 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xStackItem = aOpCode.StackPopTypes[0];
-            var xStackItemSize = SizeOfType(xStackItem);
-            var xStackItem2 = aOpCode.StackPopTypes[1];
-            var xStackItem2Size = SizeOfType(xStackItem2);
+            var xSize = Math.Max(SizeOfType(xStackItem), SizeOfType(aOpCode.StackPopTypes[1]));
 
             if (TypeIsFloat(xStackItem))
             {
-                throw new Exception("Cosmos.IL2CPU.x86->IL->Div_Un.cs->Error: Expected unsigned integer operands but get float!");
+                throw new Exception("Cosmos.IL2CPU.x86->IL->Div_Un.cs->Error: Expected unsigned integer operands but got float!");
             }
 
-            if (xStackItemSize == 8)
+            if (xSize > 8)
             {
-                // there seem to be an error in MS documentation, there is pushed an int32, but IL shows else
-                if (xStackItem2Size != 8)
-                {
-                    throw new Exception("Cosmos.IL2CPU.x86->IL->Div.cs->Error: Expected a size of 8 for Div!");
-                }
-
-                // ulong
+                throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Div_Un.cs->Error: StackSize > 8 not supported");
+            }
+            else if (xSize > 4) //ulong
+            {
                 string BaseLabel = GetLabel(aMethod, aOpCode) + ".";
                 string LabelShiftRight = BaseLabel + "ShiftRightLoop";
                 string LabelNoLoop = BaseLabel + "NoLoop";
@@ -43,19 +39,15 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 // divisor
                 // low
-                XS.Set(ESI, ESP, sourceIsIndirect: true);
+                XS.Pop(ESI);
                 // high
-                XS.Set(EDI, ESP, sourceDisplacement: 4);
-
-                XS.Add(ESP, 8);
+                XS.Pop(EDI);
 
                 // dividend
                 // low
-                XS.Set(EAX, ESP, sourceIsIndirect: true);
+                XS.Pop(EAX);
                 // high
-                XS.Set(EDX, ESP, sourceDisplacement: 4);
-
-                XS.Add(ESP, 8);
+                XS.Pop(EDX);
 
                 // set flags
                 XS.Or(EDI, EDI);
@@ -115,12 +107,16 @@ namespace Cosmos.IL2CPU.X86.IL
 
                 XS.Label(LabelEnd);
             }
-            else
+            else //uint
             {
-                XS.Xor(EDX, EDX);
+                // divisor
                 XS.Pop(ECX);
+                // dividend
                 XS.Pop(EAX);
-                XS.Divide(ECX);
+
+                XS.Xor(EDX, EDX);
+
+                XS.Divide(ECX); // => EAX / ECX
                 XS.Push(EAX);
             }
         }

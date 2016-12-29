@@ -133,6 +133,8 @@
     <Compile Include="Plugs\Assemblers\Delegate\DelegateGetMulticastInvokeAsm.cs" />
     <Compile Include="Plugs\Assemblers\Delegate\DelegateCtorAsm.cs" />
     <Compile Include="Plugs\Assemblers\CPU\CPUUpdateIDTAsm.cs" />
+    <Compile Include="Plugs\Assemblers\Math\MathCeilingOfDoubleAsm.cs" />
+    <Compile Include="Plugs\Assemblers\Math\MathFloorOfDoubleAsm.cs" />
     <Compile Include="Plugs\System\EnvironmentImpl.cs">
       <SubType>
       </SubType>

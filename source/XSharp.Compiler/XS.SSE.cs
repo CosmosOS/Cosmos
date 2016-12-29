@@ -71,6 +71,15 @@ namespace XSharp.Compiler
         };
       }
 
+      public static void MoveSS(RegisterXMM destination, RegisterXMM source)
+      {
+        new MoveSS()
+        {
+          DestinationReg = destination,
+          SourceReg = source,
+        };
+      }
+
       public static void MoveSS(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
       {
         new MoveSS()

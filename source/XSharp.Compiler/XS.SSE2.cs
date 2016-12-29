@@ -75,54 +75,19 @@ namespace XSharp.Compiler
          };
       }
 
-      public static void MoveD(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      public static void MoveSD(RegisterXMM destination, RegisterXMM source)
       {
-        DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+        DoDestinationSource<MoveSD>(destination, source);
       }
 
-      public static void MoveD(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      public static void MoveSD(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false, int? sourceDisplacement = null)
       {
-        DoDestinationSource<MoveD>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+        DoDestinationSource<MoveSD>(destination, source, sourceIsIndirect: sourceIsIndirect, sourceDisplacement: sourceDisplacement);
       }
 
-      public static void MoveD(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      public static void MoveSD(Register32 destination, RegisterXMM source, bool destinationIsIndirect = false, int? destinationDisplacement = null)
       {
-        DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
-      }
-
-      public static void MoveD(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
-      {
-        DoDestinationSource<MoveD>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
-      }
-
-      public static void MoveD(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
-      {
-        DoDestinationSource<MoveD>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
-      }
-
-      public static void MoveD(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
-      {
-        DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
-      }
-
-      public static void MoveSD(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
-      {
-        new MoveSD()
-        {
-          DestinationReg = destination,
-          SourceReg = source,
-          SourceIsIndirect = sourceIsIndirect
-        };
-      }
-
-      public static void MoveSD(Register32 destination, RegisterXMM source, bool destinationIsIndirect = false)
-      {
-        new MoveSD()
-        {
-          DestinationReg = destination,
-          DestinationIsIndirect = destinationIsIndirect,
-          SourceReg = source
-        };
+        DoDestinationSource<MoveSD>(destination, source, destinationIsIndirect, destinationDisplacement);
       }
 
       public static void XorPD(RegisterXMM destination, RegisterXMM source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)

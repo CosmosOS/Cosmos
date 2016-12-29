@@ -31,10 +31,13 @@ namespace Cosmos.TestRunner.UI
 
             testEngineHandler.TestFinished += delegate
             {
-                Dispatcher.Invoke((Action)(() =>
+                if (Dispatcher.Thread.IsAlive)
                 {
-                    save_log_btn.IsEnabled = true;
-                }));
+                    Dispatcher.Invoke((Action)(() =>
+                    {
+                        save_log_btn.IsEnabled = true;
+                    }));
+                }
             };
 
             testEngineHandler.RunTestEngine();

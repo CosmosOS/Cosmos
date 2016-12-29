@@ -11,7 +11,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System.Collections.Generic
     {
         public static void Execute()
         {
-            Dictionary<String, Object> commands = new Dictionary<String, Object>()
+            Dictionary<string, object> commands = new Dictionary<string, object>()
             {
                 {"echo", "ECHO"},
                 {"reboot", "REBOOT" },

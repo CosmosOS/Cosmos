@@ -96,7 +96,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 CopyValue(ESP, -(int)xFieldStorageSize, ESP, xOffset, xFieldStorageSize);
 
                 // Step 2 Move the value at the right spot of the stack (positive to stack)
-                var xStackOffset = (int)(Align(xTypeStorageSize, 4) - xFieldStorageSize);
+                var xStackOffset = (int)(Align(xTypeStorageSize, 4) - Align(xFieldStorageSize, 4));
                 CopyValue(ESP, xStackOffset, ESP, -(int)xFieldStorageSize, xFieldStorageSize);
 
                 // Step 3 Adjust stack to remove the struct

@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+
 using Cosmos.TestRunner;
 
 namespace Cosmos.Compiler.Tests.Bcl.System
@@ -43,7 +42,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             long val2 = 42;
             ulong val2AsULong = (ulong)val2;
 
-            Assert.IsTrue((val2AsULong == 42), "Int64 to UInt64 conversion does not work");
+            Assert.IsTrue((val2AsULong == 42), "Int64 to UInt64 conversion doesn't work");
 
             val2 = long.Parse("42");
             Assert.IsTrue(val2 == 42, "Parsing Int64 doesn't work.");
@@ -52,43 +51,57 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             value = 4631166901565532406;
 
             val2 = value >> 20;
-            Assert.IsTrue(val2 == 4416624929013, "Int64 right shift does not work");
+            Assert.IsTrue(val2 == 4416624929013, "Int64 right shift doesn't work");
 
             val2 = value >> 52;
-            Assert.IsTrue(val2 == 1028, "Int64 right shift (count >=32) does not work");
+            Assert.IsTrue(val2 == 1028, "Int64 right shift (count >=32) doesn't work");
 
             /* ... and now left shift */
             value = 4631166901565532406;
 
             val2 = value << 20;
-            Assert.IsTrue(val2 == 6640827866535690240, "Int64 left shift does not work got " + val2);
+            Assert.IsTrue(val2 == 6640827866535690240, "Int64 left shift doesn't work got " + val2);
 
             val2 = value << 52;
-            Assert.IsTrue(val2 == -8115486528521633792, "Int64 left shift (count >=32) does not work got " + val2);
+            Assert.IsTrue(val2 == -8115486528521633792, "Int64 left shift (count >=32) doesn't work got " + val2);
 
             // basic arithmetic operations
             value = 1728000000000;
 
             val2 = value + 36000000000;
-            Assert.IsTrue(val2 == 1764000000000, "Int64 addition does not work got " + val2);
+            Assert.IsTrue(val2 == 1764000000000, "Int64 addition doesn't work got " + val2);
 
             val2 = value - 36000000000;
-            Assert.IsTrue(val2 == 1692000000000, "Int64 subtraction does not work got " + val2);
+            Assert.IsTrue(val2 == 1692000000000, "Int64 subtraction doesn't work got " + val2);
 
             val2 = value * 36000000000;
-            Assert.IsTrue(val2 == 5578983451391950848, "Int64 multiplication does not work got " + val2);
+            Assert.IsTrue(val2 == 5578983451391950848, "Int64 multiplication doesn't work got " + val2);
 
             val2 = value / 36000000000;
-            Assert.IsTrue(val2 == 48, "Int64 division does not work got " + val2);
+            Assert.IsTrue(val2 == 48, "Int64 division doesn't work got " + val2);
 
             val2 = value / -36000000000;
-            Assert.IsTrue(val2 == -48, "Int64 division does not work got " + val2);
+            Assert.IsTrue(val2 == -48, "Int64 division doesn't work got " + val2);
 
             val2 = -value / 36000000000;
-            Assert.IsTrue(val2 == -48, "Int64 division does not work got " + val2);
+            Assert.IsTrue(val2 == -48, "Int64 division doesn't work got " + val2);
 
             val2 = -value / -36000000000;
-            Assert.IsTrue(val2 == 48, "Int64 division does not work got " + val2);
+            Assert.IsTrue(val2 == 48, "Int64 division doesn't work got " + val2);
+
+            value = 3200000000000;
+
+            val2 = value % 1300000000000;
+            Assert.IsTrue(val2 == 600000000000, "Int64 remainder doesn't work got " + val2);
+
+            val2 = value % -1300000000000;
+            Assert.IsTrue(val2 == 600000000000, "Int64 remainder doesn't work got " + val2);
+
+            val2 = -value % 1300000000000;
+            Assert.IsTrue(val2 == -600000000000, "Int64 remainder doesn't work got " + val2);
+
+            val2 = -value % -1300000000000;
+            Assert.IsTrue(val2 == -600000000000, "Int64 remainder doesn't work got " + val2);
 
 #if false
 
