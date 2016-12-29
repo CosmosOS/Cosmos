@@ -274,10 +274,10 @@ namespace Cosmos.IL2CPU
         xInfo.Field = xField;
 
         var xFieldOffsetAttrib =
-          xField.GetCustomAttributes(typeof(FieldOffsetAttribute), true).FirstOrDefault() as FieldOffsetAttribute;
+          xField.GetReflectionOnlyCustomAttributes<FieldOffsetAttribute>(true).FirstOrDefault();
         if (xFieldOffsetAttrib != null)
         {
-          xInfo.Offset = (uint)xFieldOffsetAttrib.Value;
+          xInfo.Offset = (uint)xFieldOffsetAttrib.GetArgumentValue<int>("Value");
         }
 
         aFields.Add(xInfo);

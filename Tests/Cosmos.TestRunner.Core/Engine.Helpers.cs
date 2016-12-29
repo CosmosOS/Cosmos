@@ -7,10 +7,6 @@ using Cosmos.Build.MSBuild;
 using Cosmos.IL2CPU;
 using IL2CPU;
 using Microsoft.Win32;
-using NuGet;
-using NuGet.Configuration;
-using NuGet.Packaging.Core;
-using NuGet.ProjectModel;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -113,6 +109,13 @@ namespace Cosmos.TestRunner.Core
 
             AdditionalSearchDirs.Add(Path.GetDirectoryName(kernelFileName));
             References.Add(kernelFileName);
+            // TODO: Need a better way to do this.
+            foreach (var xFile in new DirectoryInfo(Path.GetDirectoryName(kernelFileName)).GetFiles("*Plugs*.dll"))
+            {
+                References.Add(xFile.FullName);
+            }
+            //References.Add(typeof(Cosmos.Debug.Kernel.Plugs.Asm.DebugBreak).Assembly.Location);
+            //References.Add(typeof(Cosmos.Core.Plugs.Asm.ArrayImpl).Assembly.Location);
 
             var xArguments = new List<string>
                              {

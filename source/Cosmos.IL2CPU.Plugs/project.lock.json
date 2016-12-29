@@ -3,9 +3,6 @@
   "version": 2,
   "targets": {
     ".NETCoreApp,Version=v1.0": {
-      "Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package"
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -13,48 +10,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        },
-        "compile": {
-          "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "ref/netstandard1.0/System.Core.dll": {},
-          "ref/netstandard1.0/System.Net.dll": {},
-          "ref/netstandard1.0/System.Numerics.dll": {},
-          "ref/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.dll": {},
-          "ref/netstandard1.0/System.Windows.dll": {},
-          "ref/netstandard1.0/System.Xml.Linq.dll": {},
-          "ref/netstandard1.0/System.Xml.Serialization.dll": {},
-          "ref/netstandard1.0/System.Xml.dll": {},
-          "ref/netstandard1.0/System.dll": {},
-          "ref/netstandard1.0/mscorlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "lib/netstandard1.0/System.Core.dll": {},
-          "lib/netstandard1.0/System.Net.dll": {},
-          "lib/netstandard1.0/System.Numerics.dll": {},
-          "lib/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.dll": {},
-          "lib/netstandard1.0/System.Windows.dll": {},
-          "lib/netstandard1.0/System.Xml.Linq.dll": {},
-          "lib/netstandard1.0/System.Xml.Serialization.dll": {},
-          "lib/netstandard1.0/System.Xml.dll": {},
-          "lib/netstandard1.0/System.dll": {}
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.2",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1"
         }
       },
       "Microsoft.NETCore.Targets/1.1.0": {
@@ -65,9 +20,6 @@
         "runtime": {
           "lib/netstandard1.0/_._": {}
         }
-      },
-      "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package"
       },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
@@ -1246,12 +1198,6 @@
       }
     },
     ".NETCoreApp,Version=v1.0/centos.7-x64": {
-      "Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "runtime.rhel.7-x64.Microsoft.NETCore.Jit": "1.0.2"
-        }
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -1259,49 +1205,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        },
-        "compile": {
-          "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "ref/netstandard1.0/System.Core.dll": {},
-          "ref/netstandard1.0/System.Net.dll": {},
-          "ref/netstandard1.0/System.Numerics.dll": {},
-          "ref/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.dll": {},
-          "ref/netstandard1.0/System.Windows.dll": {},
-          "ref/netstandard1.0/System.Xml.Linq.dll": {},
-          "ref/netstandard1.0/System.Xml.Serialization.dll": {},
-          "ref/netstandard1.0/System.Xml.dll": {},
-          "ref/netstandard1.0/System.dll": {},
-          "ref/netstandard1.0/mscorlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "lib/netstandard1.0/System.Core.dll": {},
-          "lib/netstandard1.0/System.Net.dll": {},
-          "lib/netstandard1.0/System.Numerics.dll": {},
-          "lib/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.dll": {},
-          "lib/netstandard1.0/System.Windows.dll": {},
-          "lib/netstandard1.0/System.Xml.Linq.dll": {},
-          "lib/netstandard1.0/System.Xml.Serialization.dll": {},
-          "lib/netstandard1.0/System.Xml.dll": {},
-          "lib/netstandard1.0/System.dll": {}
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.2",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1",
-          "runtime.rhel.7-x64.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
       "Microsoft.NETCore.Targets/1.1.0": {
@@ -1312,9 +1215,6 @@
         "runtime": {
           "lib/netstandard1.0/_._": {}
         }
-      },
-      "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package"
       },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
@@ -1631,35 +1531,6 @@
       },
       "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
         "type": "package"
-      },
-      "runtime.rhel.7-x64.Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "native": {
-          "runtimes/rhel.7-x64/native/libclrjit.so": {}
-        }
-      },
-      "runtime.rhel.7-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.0/_._": {}
-        },
-        "runtime": {
-          "runtimes/rhel.7-x64/lib/netstandard1.0/System.Private.CoreLib.dll": {},
-          "runtimes/rhel.7-x64/lib/netstandard1.0/mscorlib.dll": {}
-        },
-        "native": {
-          "runtimes/rhel.7-x64/native/System.Globalization.Native.so": {},
-          "runtimes/rhel.7-x64/native/System.Private.CoreLib.ni.dll": {},
-          "runtimes/rhel.7-x64/native/libcoreclr.so": {},
-          "runtimes/rhel.7-x64/native/libcoreclrtraceptprovider.so": {},
-          "runtimes/rhel.7-x64/native/libdbgshim.so": {},
-          "runtimes/rhel.7-x64/native/libmscordaccore.so": {},
-          "runtimes/rhel.7-x64/native/libmscordbi.so": {},
-          "runtimes/rhel.7-x64/native/libsos.so": {},
-          "runtimes/rhel.7-x64/native/libsosplugin.so": {},
-          "runtimes/rhel.7-x64/native/mscorlib.ni.dll": {},
-          "runtimes/rhel.7-x64/native/sosdocsunix.txt": {}
-        }
       },
       "runtime.rhel.7-x64.runtime.native.System/4.3.0": {
         "type": "package",
@@ -2844,12 +2715,6 @@
       }
     },
     ".NETCoreApp,Version=v1.0/debian.8-x64": {
-      "Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "runtime.debian.8-x64.Microsoft.NETCore.Jit": "1.0.2"
-        }
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -2857,49 +2722,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        },
-        "compile": {
-          "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "ref/netstandard1.0/System.Core.dll": {},
-          "ref/netstandard1.0/System.Net.dll": {},
-          "ref/netstandard1.0/System.Numerics.dll": {},
-          "ref/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.dll": {},
-          "ref/netstandard1.0/System.Windows.dll": {},
-          "ref/netstandard1.0/System.Xml.Linq.dll": {},
-          "ref/netstandard1.0/System.Xml.Serialization.dll": {},
-          "ref/netstandard1.0/System.Xml.dll": {},
-          "ref/netstandard1.0/System.dll": {},
-          "ref/netstandard1.0/mscorlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "lib/netstandard1.0/System.Core.dll": {},
-          "lib/netstandard1.0/System.Net.dll": {},
-          "lib/netstandard1.0/System.Numerics.dll": {},
-          "lib/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.dll": {},
-          "lib/netstandard1.0/System.Windows.dll": {},
-          "lib/netstandard1.0/System.Xml.Linq.dll": {},
-          "lib/netstandard1.0/System.Xml.Serialization.dll": {},
-          "lib/netstandard1.0/System.Xml.dll": {},
-          "lib/netstandard1.0/System.dll": {}
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.2",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1",
-          "runtime.debian.8-x64.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
       "Microsoft.NETCore.Targets/1.1.0": {
@@ -2910,9 +2732,6 @@
         "runtime": {
           "lib/netstandard1.0/_._": {}
         }
-      },
-      "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package"
       },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
@@ -3132,35 +2951,6 @@
         },
         "runtime": {
           "lib/netstandard1.3/System.Threading.Timer.dll": {}
-        }
-      },
-      "runtime.debian.8-x64.Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "native": {
-          "runtimes/debian.8-x64/native/libclrjit.so": {}
-        }
-      },
-      "runtime.debian.8-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.0/_._": {}
-        },
-        "runtime": {
-          "runtimes/debian.8-x64/lib/netstandard1.0/System.Private.CoreLib.dll": {},
-          "runtimes/debian.8-x64/lib/netstandard1.0/mscorlib.dll": {}
-        },
-        "native": {
-          "runtimes/debian.8-x64/native/System.Globalization.Native.so": {},
-          "runtimes/debian.8-x64/native/System.Private.CoreLib.ni.dll": {},
-          "runtimes/debian.8-x64/native/libcoreclr.so": {},
-          "runtimes/debian.8-x64/native/libcoreclrtraceptprovider.so": {},
-          "runtimes/debian.8-x64/native/libdbgshim.so": {},
-          "runtimes/debian.8-x64/native/libmscordaccore.so": {},
-          "runtimes/debian.8-x64/native/libmscordbi.so": {},
-          "runtimes/debian.8-x64/native/libsos.so": {},
-          "runtimes/debian.8-x64/native/libsosplugin.so": {},
-          "runtimes/debian.8-x64/native/mscorlib.ni.dll": {},
-          "runtimes/debian.8-x64/native/sosdocsunix.txt": {}
         }
       },
       "runtime.debian.8-x64.runtime.native.System/4.3.0": {
@@ -4442,12 +4232,6 @@
       }
     },
     ".NETCoreApp,Version=v1.0/linuxmint.17-x64": {
-      "Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Jit": "1.0.2"
-        }
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -4455,49 +4239,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        },
-        "compile": {
-          "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "ref/netstandard1.0/System.Core.dll": {},
-          "ref/netstandard1.0/System.Net.dll": {},
-          "ref/netstandard1.0/System.Numerics.dll": {},
-          "ref/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.dll": {},
-          "ref/netstandard1.0/System.Windows.dll": {},
-          "ref/netstandard1.0/System.Xml.Linq.dll": {},
-          "ref/netstandard1.0/System.Xml.Serialization.dll": {},
-          "ref/netstandard1.0/System.Xml.dll": {},
-          "ref/netstandard1.0/System.dll": {},
-          "ref/netstandard1.0/mscorlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "lib/netstandard1.0/System.Core.dll": {},
-          "lib/netstandard1.0/System.Net.dll": {},
-          "lib/netstandard1.0/System.Numerics.dll": {},
-          "lib/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.dll": {},
-          "lib/netstandard1.0/System.Windows.dll": {},
-          "lib/netstandard1.0/System.Xml.Linq.dll": {},
-          "lib/netstandard1.0/System.Xml.Serialization.dll": {},
-          "lib/netstandard1.0/System.Xml.dll": {},
-          "lib/netstandard1.0/System.dll": {}
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.2",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1",
-          "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
       "Microsoft.NETCore.Targets/1.1.0": {
@@ -4508,9 +4249,6 @@
         "runtime": {
           "lib/netstandard1.0/_._": {}
         }
-      },
-      "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package"
       },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
@@ -4830,35 +4568,6 @@
       },
       "runtime.rhel.7-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
         "type": "package"
-      },
-      "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "native": {
-          "runtimes/ubuntu.14.04-x64/native/libclrjit.so": {}
-        }
-      },
-      "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.0/_._": {}
-        },
-        "runtime": {
-          "runtimes/ubuntu.14.04-x64/lib/netstandard1.0/System.Private.CoreLib.dll": {},
-          "runtimes/ubuntu.14.04-x64/lib/netstandard1.0/mscorlib.dll": {}
-        },
-        "native": {
-          "runtimes/ubuntu.14.04-x64/native/System.Globalization.Native.so": {},
-          "runtimes/ubuntu.14.04-x64/native/System.Private.CoreLib.ni.dll": {},
-          "runtimes/ubuntu.14.04-x64/native/libcoreclr.so": {},
-          "runtimes/ubuntu.14.04-x64/native/libcoreclrtraceptprovider.so": {},
-          "runtimes/ubuntu.14.04-x64/native/libdbgshim.so": {},
-          "runtimes/ubuntu.14.04-x64/native/libmscordaccore.so": {},
-          "runtimes/ubuntu.14.04-x64/native/libmscordbi.so": {},
-          "runtimes/ubuntu.14.04-x64/native/libsos.so": {},
-          "runtimes/ubuntu.14.04-x64/native/libsosplugin.so": {},
-          "runtimes/ubuntu.14.04-x64/native/mscorlib.ni.dll": {},
-          "runtimes/ubuntu.14.04-x64/native/sosdocsunix.txt": {}
-        }
       },
       "runtime.ubuntu.14.04-x64.runtime.native.System/4.3.0": {
         "type": "package",
@@ -6040,12 +5749,6 @@
       }
     },
     ".NETCoreApp,Version=v1.0/opensuse.13.2-x64": {
-      "Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "runtime.opensuse.13.2-x64.Microsoft.NETCore.Jit": "1.0.2"
-        }
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -6053,49 +5756,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        },
-        "compile": {
-          "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "ref/netstandard1.0/System.Core.dll": {},
-          "ref/netstandard1.0/System.Net.dll": {},
-          "ref/netstandard1.0/System.Numerics.dll": {},
-          "ref/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.dll": {},
-          "ref/netstandard1.0/System.Windows.dll": {},
-          "ref/netstandard1.0/System.Xml.Linq.dll": {},
-          "ref/netstandard1.0/System.Xml.Serialization.dll": {},
-          "ref/netstandard1.0/System.Xml.dll": {},
-          "ref/netstandard1.0/System.dll": {},
-          "ref/netstandard1.0/mscorlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "lib/netstandard1.0/System.Core.dll": {},
-          "lib/netstandard1.0/System.Net.dll": {},
-          "lib/netstandard1.0/System.Numerics.dll": {},
-          "lib/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.dll": {},
-          "lib/netstandard1.0/System.Windows.dll": {},
-          "lib/netstandard1.0/System.Xml.Linq.dll": {},
-          "lib/netstandard1.0/System.Xml.Serialization.dll": {},
-          "lib/netstandard1.0/System.Xml.dll": {},
-          "lib/netstandard1.0/System.dll": {}
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.2",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1",
-          "runtime.opensuse.13.2-x64.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
       "Microsoft.NETCore.Targets/1.1.0": {
@@ -6106,9 +5766,6 @@
         "runtime": {
           "lib/netstandard1.0/_._": {}
         }
-      },
-      "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package"
       },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
@@ -6412,35 +6069,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "runtime.opensuse.13.2-x64.Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "native": {
-          "runtimes/opensuse.13.2-x64/native/libclrjit.so": {}
-        }
-      },
-      "runtime.opensuse.13.2-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.0/_._": {}
-        },
-        "runtime": {
-          "runtimes/opensuse.13.2-x64/lib/netstandard1.0/System.Private.CoreLib.dll": {},
-          "runtimes/opensuse.13.2-x64/lib/netstandard1.0/mscorlib.dll": {}
-        },
-        "native": {
-          "runtimes/opensuse.13.2-x64/native/System.Globalization.Native.so": {},
-          "runtimes/opensuse.13.2-x64/native/System.Private.CoreLib.ni.dll": {},
-          "runtimes/opensuse.13.2-x64/native/libcoreclr.so": {},
-          "runtimes/opensuse.13.2-x64/native/libcoreclrtraceptprovider.so": {},
-          "runtimes/opensuse.13.2-x64/native/libdbgshim.so": {},
-          "runtimes/opensuse.13.2-x64/native/libmscordaccore.so": {},
-          "runtimes/opensuse.13.2-x64/native/libmscordbi.so": {},
-          "runtimes/opensuse.13.2-x64/native/libsos.so": {},
-          "runtimes/opensuse.13.2-x64/native/libsosplugin.so": {},
-          "runtimes/opensuse.13.2-x64/native/mscorlib.ni.dll": {},
-          "runtimes/opensuse.13.2-x64/native/sosdocsunix.txt": {}
         }
       },
       "runtime.opensuse.13.2-x64.runtime.native.System/4.3.0": {
@@ -7638,12 +7266,6 @@
       }
     },
     ".NETCoreApp,Version=v1.0/osx.10.11-x64": {
-      "Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "runtime.osx.10.10-x64.Microsoft.NETCore.Jit": "1.0.2"
-        }
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -7651,49 +7273,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        },
-        "compile": {
-          "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "ref/netstandard1.0/System.Core.dll": {},
-          "ref/netstandard1.0/System.Net.dll": {},
-          "ref/netstandard1.0/System.Numerics.dll": {},
-          "ref/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.dll": {},
-          "ref/netstandard1.0/System.Windows.dll": {},
-          "ref/netstandard1.0/System.Xml.Linq.dll": {},
-          "ref/netstandard1.0/System.Xml.Serialization.dll": {},
-          "ref/netstandard1.0/System.Xml.dll": {},
-          "ref/netstandard1.0/System.dll": {},
-          "ref/netstandard1.0/mscorlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "lib/netstandard1.0/System.Core.dll": {},
-          "lib/netstandard1.0/System.Net.dll": {},
-          "lib/netstandard1.0/System.Numerics.dll": {},
-          "lib/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.dll": {},
-          "lib/netstandard1.0/System.Windows.dll": {},
-          "lib/netstandard1.0/System.Xml.Linq.dll": {},
-          "lib/netstandard1.0/System.Xml.Serialization.dll": {},
-          "lib/netstandard1.0/System.Xml.dll": {},
-          "lib/netstandard1.0/System.dll": {}
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.2",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1",
-          "runtime.osx.10.10-x64.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
       "Microsoft.NETCore.Targets/1.1.0": {
@@ -7704,9 +7283,6 @@
         "runtime": {
           "lib/netstandard1.0/_._": {}
         }
-      },
-      "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package"
       },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
@@ -8017,33 +7593,6 @@
       },
       "runtime.opensuse.42.1-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
         "type": "package"
-      },
-      "runtime.osx.10.10-x64.Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "native": {
-          "runtimes/osx.10.10-x64/native/libclrjit.dylib": {}
-        }
-      },
-      "runtime.osx.10.10-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.0/_._": {}
-        },
-        "runtime": {
-          "runtimes/osx.10.10-x64/lib/netstandard1.0/System.Private.CoreLib.dll": {},
-          "runtimes/osx.10.10-x64/lib/netstandard1.0/mscorlib.dll": {}
-        },
-        "native": {
-          "runtimes/osx.10.10-x64/native/System.Globalization.Native.dylib": {},
-          "runtimes/osx.10.10-x64/native/System.Private.CoreLib.ni.dll": {},
-          "runtimes/osx.10.10-x64/native/libcoreclr.dylib": {},
-          "runtimes/osx.10.10-x64/native/libdbgshim.dylib": {},
-          "runtimes/osx.10.10-x64/native/libmscordaccore.dylib": {},
-          "runtimes/osx.10.10-x64/native/libmscordbi.dylib": {},
-          "runtimes/osx.10.10-x64/native/libsos.dylib": {},
-          "runtimes/osx.10.10-x64/native/mscorlib.ni.dll": {},
-          "runtimes/osx.10.10-x64/native/sosdocsunix.txt": {}
-        }
       },
       "runtime.osx.10.10-x64.runtime.native.System/4.3.0": {
         "type": "package",
@@ -9237,12 +8786,6 @@
       }
     },
     ".NETCoreApp,Version=v1.0/rhel.7.2-x64": {
-      "Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "runtime.rhel.7-x64.Microsoft.NETCore.Jit": "1.0.2"
-        }
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -9250,49 +8793,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        },
-        "compile": {
-          "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "ref/netstandard1.0/System.Core.dll": {},
-          "ref/netstandard1.0/System.Net.dll": {},
-          "ref/netstandard1.0/System.Numerics.dll": {},
-          "ref/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.dll": {},
-          "ref/netstandard1.0/System.Windows.dll": {},
-          "ref/netstandard1.0/System.Xml.Linq.dll": {},
-          "ref/netstandard1.0/System.Xml.Serialization.dll": {},
-          "ref/netstandard1.0/System.Xml.dll": {},
-          "ref/netstandard1.0/System.dll": {},
-          "ref/netstandard1.0/mscorlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "lib/netstandard1.0/System.Core.dll": {},
-          "lib/netstandard1.0/System.Net.dll": {},
-          "lib/netstandard1.0/System.Numerics.dll": {},
-          "lib/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.dll": {},
-          "lib/netstandard1.0/System.Windows.dll": {},
-          "lib/netstandard1.0/System.Xml.Linq.dll": {},
-          "lib/netstandard1.0/System.Xml.Serialization.dll": {},
-          "lib/netstandard1.0/System.Xml.dll": {},
-          "lib/netstandard1.0/System.dll": {}
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.2",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1",
-          "runtime.rhel.7-x64.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
       "Microsoft.NETCore.Targets/1.1.0": {
@@ -9303,9 +8803,6 @@
         "runtime": {
           "lib/netstandard1.0/_._": {}
         }
-      },
-      "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package"
       },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
@@ -9622,35 +9119,6 @@
       },
       "runtime.osx.10.10-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
         "type": "package"
-      },
-      "runtime.rhel.7-x64.Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "native": {
-          "runtimes/rhel.7-x64/native/libclrjit.so": {}
-        }
-      },
-      "runtime.rhel.7-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.0/_._": {}
-        },
-        "runtime": {
-          "runtimes/rhel.7-x64/lib/netstandard1.0/System.Private.CoreLib.dll": {},
-          "runtimes/rhel.7-x64/lib/netstandard1.0/mscorlib.dll": {}
-        },
-        "native": {
-          "runtimes/rhel.7-x64/native/System.Globalization.Native.so": {},
-          "runtimes/rhel.7-x64/native/System.Private.CoreLib.ni.dll": {},
-          "runtimes/rhel.7-x64/native/libcoreclr.so": {},
-          "runtimes/rhel.7-x64/native/libcoreclrtraceptprovider.so": {},
-          "runtimes/rhel.7-x64/native/libdbgshim.so": {},
-          "runtimes/rhel.7-x64/native/libmscordaccore.so": {},
-          "runtimes/rhel.7-x64/native/libmscordbi.so": {},
-          "runtimes/rhel.7-x64/native/libsos.so": {},
-          "runtimes/rhel.7-x64/native/libsosplugin.so": {},
-          "runtimes/rhel.7-x64/native/mscorlib.ni.dll": {},
-          "runtimes/rhel.7-x64/native/sosdocsunix.txt": {}
-        }
       },
       "runtime.rhel.7-x64.runtime.native.System/4.3.0": {
         "type": "package",
@@ -10835,12 +10303,6 @@
       }
     },
     ".NETCoreApp,Version=v1.0/ubuntu.14.04-x64": {
-      "Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Jit": "1.0.2"
-        }
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -10848,49 +10310,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        },
-        "compile": {
-          "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "ref/netstandard1.0/System.Core.dll": {},
-          "ref/netstandard1.0/System.Net.dll": {},
-          "ref/netstandard1.0/System.Numerics.dll": {},
-          "ref/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.dll": {},
-          "ref/netstandard1.0/System.Windows.dll": {},
-          "ref/netstandard1.0/System.Xml.Linq.dll": {},
-          "ref/netstandard1.0/System.Xml.Serialization.dll": {},
-          "ref/netstandard1.0/System.Xml.dll": {},
-          "ref/netstandard1.0/System.dll": {},
-          "ref/netstandard1.0/mscorlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "lib/netstandard1.0/System.Core.dll": {},
-          "lib/netstandard1.0/System.Net.dll": {},
-          "lib/netstandard1.0/System.Numerics.dll": {},
-          "lib/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.dll": {},
-          "lib/netstandard1.0/System.Windows.dll": {},
-          "lib/netstandard1.0/System.Xml.Linq.dll": {},
-          "lib/netstandard1.0/System.Xml.Serialization.dll": {},
-          "lib/netstandard1.0/System.Xml.dll": {},
-          "lib/netstandard1.0/System.dll": {}
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.2",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1",
-          "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
       "Microsoft.NETCore.Targets/1.1.0": {
@@ -10901,9 +10320,6 @@
         "runtime": {
           "lib/netstandard1.0/_._": {}
         }
-      },
-      "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package"
       },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
@@ -11223,35 +10639,6 @@
       },
       "runtime.rhel.7-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
         "type": "package"
-      },
-      "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "native": {
-          "runtimes/ubuntu.14.04-x64/native/libclrjit.so": {}
-        }
-      },
-      "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.0/_._": {}
-        },
-        "runtime": {
-          "runtimes/ubuntu.14.04-x64/lib/netstandard1.0/System.Private.CoreLib.dll": {},
-          "runtimes/ubuntu.14.04-x64/lib/netstandard1.0/mscorlib.dll": {}
-        },
-        "native": {
-          "runtimes/ubuntu.14.04-x64/native/System.Globalization.Native.so": {},
-          "runtimes/ubuntu.14.04-x64/native/System.Private.CoreLib.ni.dll": {},
-          "runtimes/ubuntu.14.04-x64/native/libcoreclr.so": {},
-          "runtimes/ubuntu.14.04-x64/native/libcoreclrtraceptprovider.so": {},
-          "runtimes/ubuntu.14.04-x64/native/libdbgshim.so": {},
-          "runtimes/ubuntu.14.04-x64/native/libmscordaccore.so": {},
-          "runtimes/ubuntu.14.04-x64/native/libmscordbi.so": {},
-          "runtimes/ubuntu.14.04-x64/native/libsos.so": {},
-          "runtimes/ubuntu.14.04-x64/native/libsosplugin.so": {},
-          "runtimes/ubuntu.14.04-x64/native/mscorlib.ni.dll": {},
-          "runtimes/ubuntu.14.04-x64/native/sosdocsunix.txt": {}
-        }
       },
       "runtime.ubuntu.14.04-x64.runtime.native.System/4.3.0": {
         "type": "package",
@@ -12433,12 +11820,6 @@
       }
     },
     ".NETCoreApp,Version=v1.0/ubuntu.16.04-x64": {
-      "Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "runtime.ubuntu.16.04-x64.Microsoft.NETCore.Jit": "1.0.2"
-        }
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -12446,49 +11827,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        },
-        "compile": {
-          "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "ref/netstandard1.0/System.Core.dll": {},
-          "ref/netstandard1.0/System.Net.dll": {},
-          "ref/netstandard1.0/System.Numerics.dll": {},
-          "ref/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.dll": {},
-          "ref/netstandard1.0/System.Windows.dll": {},
-          "ref/netstandard1.0/System.Xml.Linq.dll": {},
-          "ref/netstandard1.0/System.Xml.Serialization.dll": {},
-          "ref/netstandard1.0/System.Xml.dll": {},
-          "ref/netstandard1.0/System.dll": {},
-          "ref/netstandard1.0/mscorlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "lib/netstandard1.0/System.Core.dll": {},
-          "lib/netstandard1.0/System.Net.dll": {},
-          "lib/netstandard1.0/System.Numerics.dll": {},
-          "lib/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.dll": {},
-          "lib/netstandard1.0/System.Windows.dll": {},
-          "lib/netstandard1.0/System.Xml.Linq.dll": {},
-          "lib/netstandard1.0/System.Xml.Serialization.dll": {},
-          "lib/netstandard1.0/System.Xml.dll": {},
-          "lib/netstandard1.0/System.dll": {}
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.2",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1",
-          "runtime.ubuntu.16.04-x64.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
         }
       },
       "Microsoft.NETCore.Targets/1.1.0": {
@@ -12499,9 +11837,6 @@
         "runtime": {
           "lib/netstandard1.0/_._": {}
         }
-      },
-      "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package"
       },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
@@ -12824,35 +12159,6 @@
       },
       "runtime.ubuntu.14.04-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
         "type": "package"
-      },
-      "runtime.ubuntu.16.04-x64.Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "native": {
-          "runtimes/ubuntu.16.04-x64/native/libclrjit.so": {}
-        }
-      },
-      "runtime.ubuntu.16.04-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.0/_._": {}
-        },
-        "runtime": {
-          "runtimes/ubuntu.16.04-x64/lib/netstandard1.0/System.Private.CoreLib.dll": {},
-          "runtimes/ubuntu.16.04-x64/lib/netstandard1.0/mscorlib.dll": {}
-        },
-        "native": {
-          "runtimes/ubuntu.16.04-x64/native/System.Globalization.Native.so": {},
-          "runtimes/ubuntu.16.04-x64/native/System.Private.CoreLib.ni.dll": {},
-          "runtimes/ubuntu.16.04-x64/native/libcoreclr.so": {},
-          "runtimes/ubuntu.16.04-x64/native/libcoreclrtraceptprovider.so": {},
-          "runtimes/ubuntu.16.04-x64/native/libdbgshim.so": {},
-          "runtimes/ubuntu.16.04-x64/native/libmscordaccore.so": {},
-          "runtimes/ubuntu.16.04-x64/native/libmscordbi.so": {},
-          "runtimes/ubuntu.16.04-x64/native/libsos.so": {},
-          "runtimes/ubuntu.16.04-x64/native/libsosplugin.so": {},
-          "runtimes/ubuntu.16.04-x64/native/mscorlib.ni.dll": {},
-          "runtimes/ubuntu.16.04-x64/native/sosdocsunix.txt": {}
-        }
       },
       "runtime.ubuntu.16.04-x64.runtime.native.System/4.3.0": {
         "type": "package",
@@ -14031,12 +13337,6 @@
       }
     },
     ".NETCoreApp,Version=v1.0/win7-x64": {
-      "Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "runtime.win7-x64.Microsoft.NETCore.Jit": "1.0.2"
-        }
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -14046,49 +13346,6 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        },
-        "compile": {
-          "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "ref/netstandard1.0/System.Core.dll": {},
-          "ref/netstandard1.0/System.Net.dll": {},
-          "ref/netstandard1.0/System.Numerics.dll": {},
-          "ref/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.dll": {},
-          "ref/netstandard1.0/System.Windows.dll": {},
-          "ref/netstandard1.0/System.Xml.Linq.dll": {},
-          "ref/netstandard1.0/System.Xml.Serialization.dll": {},
-          "ref/netstandard1.0/System.Xml.dll": {},
-          "ref/netstandard1.0/System.dll": {},
-          "ref/netstandard1.0/mscorlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "lib/netstandard1.0/System.Core.dll": {},
-          "lib/netstandard1.0/System.Net.dll": {},
-          "lib/netstandard1.0/System.Numerics.dll": {},
-          "lib/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.dll": {},
-          "lib/netstandard1.0/System.Windows.dll": {},
-          "lib/netstandard1.0/System.Xml.Linq.dll": {},
-          "lib/netstandard1.0/System.Xml.Serialization.dll": {},
-          "lib/netstandard1.0/System.Xml.dll": {},
-          "lib/netstandard1.0/System.dll": {}
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.2",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1",
-          "runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        }
-      },
       "Microsoft.NETCore.Targets/1.1.0": {
         "type": "package",
         "compile": {
@@ -14096,12 +13353,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package",
-        "dependencies": {
-          "runtime.win7-x64.Microsoft.NETCore.Windows.ApiSets": "1.0.1"
         }
       },
       "Microsoft.Win32.Primitives/4.3.0": {
@@ -14558,162 +13809,6 @@
         },
         "runtime": {
           "runtimes/win/lib/netstandard1.5/System.Runtime.Extensions.dll": {}
-        }
-      },
-      "runtime.win7-x64.Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "native": {
-          "runtimes/win7-x64/native/clrjit.dll": {}
-        }
-      },
-      "runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.0/_._": {}
-        },
-        "runtime": {
-          "runtimes/win7-x64/lib/netstandard1.0/System.Private.CoreLib.dll": {},
-          "runtimes/win7-x64/lib/netstandard1.0/mscorlib.dll": {}
-        },
-        "native": {
-          "runtimes/win7-x64/native/System.Private.CoreLib.ni.dll": {},
-          "runtimes/win7-x64/native/clretwrc.dll": {},
-          "runtimes/win7-x64/native/coreclr.dll": {},
-          "runtimes/win7-x64/native/dbgshim.dll": {},
-          "runtimes/win7-x64/native/mscordaccore.dll": {},
-          "runtimes/win7-x64/native/mscordbi.dll": {},
-          "runtimes/win7-x64/native/mscorlib.ni.dll": {},
-          "runtimes/win7-x64/native/mscorrc.debug.dll": {},
-          "runtimes/win7-x64/native/mscorrc.dll": {},
-          "runtimes/win7-x64/native/sos.dll": {}
-        }
-      },
-      "runtime.win7-x64.Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package",
-        "native": {
-          "runtimes/win7-x64/native/API-MS-Win-Base-Util-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Core-Kernel32-Private-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Core-Kernel32-Private-L1-1-1.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Core-Kernel32-Private-L1-1-2.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Core-PrivateProfile-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Core-ProcessTopology-Obsolete-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Core-String-L2-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Core-StringAnsi-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-EventLog-Legacy-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Eventing-ClassicProvider-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Eventing-Consumer-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Eventing-Controller-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Eventing-Legacy-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Eventing-Provider-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-Security-LsaPolicy-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-devices-config-L1-1-0.dll": {},
-          "runtimes/win7-x64/native/API-MS-Win-devices-config-L1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-com-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-com-private-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-comm-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-console-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-console-l2-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-datetime-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-datetime-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-debug-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-debug-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-delayload-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-errorhandling-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-errorhandling-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-fibers-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-fibers-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-file-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-file-l1-2-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-file-l1-2-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-file-l2-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-file-l2-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-handle-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-heap-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-heap-obsolete-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-interlocked-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-io-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-io-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-kernel32-legacy-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-kernel32-legacy-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-kernel32-legacy-l1-1-2.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-libraryloader-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-libraryloader-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-localization-l1-2-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-localization-l1-2-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-localization-l2-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-localization-obsolete-l1-2-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-memory-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-memory-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-memory-l1-1-2.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-memory-l1-1-3.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-namedpipe-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-namedpipe-l1-2-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-normalization-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-privateprofile-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-processenvironment-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-processenvironment-l1-2-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-processsecurity-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-processthreads-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-processthreads-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-processthreads-l1-1-2.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-profile-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-psapi-ansi-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-psapi-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-psapi-obsolete-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-realtime-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-registry-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-registry-l2-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-rtlsupport-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-shlwapi-legacy-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-shlwapi-obsolete-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-shutdown-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-shutdown-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-string-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-string-obsolete-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-string-obsolete-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-stringloader-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-stringloader-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-synch-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-synch-l1-2-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-sysinfo-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-sysinfo-l1-2-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-sysinfo-l1-2-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-sysinfo-l1-2-2.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-sysinfo-l1-2-3.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-threadpool-l1-2-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-threadpool-legacy-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-threadpool-private-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-timezone-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-url-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-util-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-version-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-winrt-error-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-winrt-error-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-winrt-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-winrt-registration-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-winrt-robuffer-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-winrt-roparameterizediid-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-winrt-string-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-wow64-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-xstate-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-core-xstate-l2-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-ro-typeresolution-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-security-base-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-security-cpwl-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-security-cryptoapi-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-security-lsalookup-l2-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-security-lsalookup-l2-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-security-provider-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-security-sddl-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-service-core-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-service-core-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-service-management-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-service-management-l2-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-service-private-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-service-private-l1-1-1.dll": {},
-          "runtimes/win7-x64/native/api-ms-win-service-winsvc-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/ext-ms-win-advapi32-encryptedfile-l1-1-0.dll": {},
-          "runtimes/win7-x64/native/ext-ms-win-ntuser-keyboard-l1-2-1.dll": {}
         }
       },
       "runtime.win7-x64.runtime.native.System.IO.Compression/4.3.0": {
@@ -15730,12 +14825,6 @@
       }
     },
     ".NETCoreApp,Version=v1.0/win7-x86": {
-      "Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "runtime.win7-x86.Microsoft.NETCore.Jit": "1.0.2"
-        }
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -15745,49 +14834,6 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        },
-        "compile": {
-          "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "ref/netstandard1.0/System.Core.dll": {},
-          "ref/netstandard1.0/System.Net.dll": {},
-          "ref/netstandard1.0/System.Numerics.dll": {},
-          "ref/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.dll": {},
-          "ref/netstandard1.0/System.Windows.dll": {},
-          "ref/netstandard1.0/System.Xml.Linq.dll": {},
-          "ref/netstandard1.0/System.Xml.Serialization.dll": {},
-          "ref/netstandard1.0/System.Xml.dll": {},
-          "ref/netstandard1.0/System.dll": {},
-          "ref/netstandard1.0/mscorlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "lib/netstandard1.0/System.Core.dll": {},
-          "lib/netstandard1.0/System.Net.dll": {},
-          "lib/netstandard1.0/System.Numerics.dll": {},
-          "lib/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.dll": {},
-          "lib/netstandard1.0/System.Windows.dll": {},
-          "lib/netstandard1.0/System.Xml.Linq.dll": {},
-          "lib/netstandard1.0/System.Xml.Serialization.dll": {},
-          "lib/netstandard1.0/System.Xml.dll": {},
-          "lib/netstandard1.0/System.dll": {}
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.2",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1",
-          "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        }
-      },
       "Microsoft.NETCore.Targets/1.1.0": {
         "type": "package",
         "compile": {
@@ -15795,12 +14841,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package",
-        "dependencies": {
-          "runtime.win7-x86.Microsoft.NETCore.Windows.ApiSets": "1.0.1"
         }
       },
       "Microsoft.Win32.Primitives/4.3.0": {
@@ -16257,162 +15297,6 @@
         },
         "runtime": {
           "runtimes/win/lib/netstandard1.5/System.Runtime.Extensions.dll": {}
-        }
-      },
-      "runtime.win7-x86.Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package",
-        "native": {
-          "runtimes/win7-x86/native/clrjit.dll": {}
-        }
-      },
-      "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/netstandard1.0/_._": {}
-        },
-        "runtime": {
-          "runtimes/win7-x86/lib/netstandard1.0/System.Private.CoreLib.dll": {},
-          "runtimes/win7-x86/lib/netstandard1.0/mscorlib.dll": {}
-        },
-        "native": {
-          "runtimes/win7-x86/native/System.Private.CoreLib.ni.dll": {},
-          "runtimes/win7-x86/native/clretwrc.dll": {},
-          "runtimes/win7-x86/native/coreclr.dll": {},
-          "runtimes/win7-x86/native/dbgshim.dll": {},
-          "runtimes/win7-x86/native/mscordaccore.dll": {},
-          "runtimes/win7-x86/native/mscordbi.dll": {},
-          "runtimes/win7-x86/native/mscorlib.ni.dll": {},
-          "runtimes/win7-x86/native/mscorrc.debug.dll": {},
-          "runtimes/win7-x86/native/mscorrc.dll": {},
-          "runtimes/win7-x86/native/sos.dll": {}
-        }
-      },
-      "runtime.win7-x86.Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package",
-        "native": {
-          "runtimes/win7-x86/native/API-MS-Win-Base-Util-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Core-Kernel32-Private-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Core-Kernel32-Private-L1-1-1.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Core-Kernel32-Private-L1-1-2.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Core-PrivateProfile-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Core-ProcessTopology-Obsolete-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Core-String-L2-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Core-StringAnsi-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-EventLog-Legacy-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Eventing-ClassicProvider-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Eventing-Consumer-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Eventing-Controller-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Eventing-Legacy-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Eventing-Provider-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-Security-LsaPolicy-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-devices-config-L1-1-0.dll": {},
-          "runtimes/win7-x86/native/API-MS-Win-devices-config-L1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-com-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-com-private-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-comm-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-console-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-console-l2-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-datetime-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-datetime-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-debug-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-debug-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-delayload-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-errorhandling-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-errorhandling-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-fibers-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-fibers-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-file-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-file-l1-2-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-file-l1-2-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-file-l2-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-file-l2-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-handle-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-heap-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-heap-obsolete-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-interlocked-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-io-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-io-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-kernel32-legacy-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-kernel32-legacy-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-kernel32-legacy-l1-1-2.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-libraryloader-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-libraryloader-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-localization-l1-2-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-localization-l1-2-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-localization-l2-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-localization-obsolete-l1-2-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-memory-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-memory-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-memory-l1-1-2.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-memory-l1-1-3.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-namedpipe-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-namedpipe-l1-2-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-normalization-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-privateprofile-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-processenvironment-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-processenvironment-l1-2-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-processsecurity-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-processthreads-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-processthreads-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-processthreads-l1-1-2.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-profile-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-psapi-ansi-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-psapi-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-psapi-obsolete-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-realtime-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-registry-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-registry-l2-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-rtlsupport-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-shlwapi-legacy-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-shlwapi-obsolete-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-shutdown-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-shutdown-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-string-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-string-obsolete-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-string-obsolete-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-stringloader-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-stringloader-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-synch-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-synch-l1-2-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-sysinfo-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-sysinfo-l1-2-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-sysinfo-l1-2-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-sysinfo-l1-2-2.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-sysinfo-l1-2-3.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-threadpool-l1-2-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-threadpool-legacy-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-threadpool-private-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-timezone-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-url-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-util-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-version-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-winrt-error-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-winrt-error-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-winrt-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-winrt-registration-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-winrt-robuffer-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-winrt-roparameterizediid-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-winrt-string-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-wow64-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-xstate-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-core-xstate-l2-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-ro-typeresolution-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-security-base-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-security-cpwl-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-security-cryptoapi-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-security-lsalookup-l2-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-security-lsalookup-l2-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-security-provider-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-security-sddl-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-service-core-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-service-core-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-service-management-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-service-management-l2-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-service-private-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-service-private-l1-1-1.dll": {},
-          "runtimes/win7-x86/native/api-ms-win-service-winsvc-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/ext-ms-win-advapi32-encryptedfile-l1-1-0.dll": {},
-          "runtimes/win7-x86/native/ext-ms-win-ntuser-keyboard-l1-2-1.dll": {}
         }
       },
       "runtime.win7-x86.runtime.native.System.IO.Compression/4.3.0": {
@@ -17438,15 +16322,6 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/net45/_._": {}
-        },
-        "runtime": {
-          "lib/net45/_._": {}
-        }
-      },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
         "frameworkAssemblies": [
@@ -18093,15 +16968,6 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/net45/_._": {}
-        },
-        "runtime": {
-          "lib/net45/_._": {}
-        }
-      },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
         "frameworkAssemblies": [
@@ -18700,15 +17566,6 @@
           "lib/netstandard1.0/_._": {}
         }
       },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "compile": {
-          "ref/net45/_._": {}
-        },
-        "runtime": {
-          "lib/net45/_._": {}
-        }
-      },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
         "frameworkAssemblies": [
@@ -19298,9 +18155,6 @@
       }
     },
     ".NETStandard,Version=v1.5": {
-      "Microsoft.NETCore.Jit/1.0.2": {
-        "type": "package"
-      },
       "Microsoft.NETCore.Platforms/1.1.0": {
         "type": "package",
         "compile": {
@@ -19308,48 +18162,6 @@
         },
         "runtime": {
           "lib/netstandard1.0/_._": {}
-        }
-      },
-      "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Runtime.CoreCLR": "1.0.2"
-        },
-        "compile": {
-          "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "ref/netstandard1.0/System.Core.dll": {},
-          "ref/netstandard1.0/System.Net.dll": {},
-          "ref/netstandard1.0/System.Numerics.dll": {},
-          "ref/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "ref/netstandard1.0/System.ServiceModel.dll": {},
-          "ref/netstandard1.0/System.Windows.dll": {},
-          "ref/netstandard1.0/System.Xml.Linq.dll": {},
-          "ref/netstandard1.0/System.Xml.Serialization.dll": {},
-          "ref/netstandard1.0/System.Xml.dll": {},
-          "ref/netstandard1.0/System.dll": {},
-          "ref/netstandard1.0/mscorlib.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll": {},
-          "lib/netstandard1.0/System.Core.dll": {},
-          "lib/netstandard1.0/System.Net.dll": {},
-          "lib/netstandard1.0/System.Numerics.dll": {},
-          "lib/netstandard1.0/System.Runtime.Serialization.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.Web.dll": {},
-          "lib/netstandard1.0/System.ServiceModel.dll": {},
-          "lib/netstandard1.0/System.Windows.dll": {},
-          "lib/netstandard1.0/System.Xml.Linq.dll": {},
-          "lib/netstandard1.0/System.Xml.Serialization.dll": {},
-          "lib/netstandard1.0/System.Xml.dll": {},
-          "lib/netstandard1.0/System.dll": {}
-        }
-      },
-      "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-        "type": "package",
-        "dependencies": {
-          "Microsoft.NETCore.Jit": "1.0.2",
-          "Microsoft.NETCore.Windows.ApiSets": "1.0.1"
         }
       },
       "Microsoft.NETCore.Targets/1.1.0": {
@@ -19360,9 +18172,6 @@
         "runtime": {
           "lib/netstandard1.0/_._": {}
         }
-      },
-      "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-        "type": "package"
       },
       "Microsoft.Win32.Primitives/4.3.0": {
         "type": "package",
@@ -20234,18 +19043,6 @@
     }
   },
   "libraries": {
-    "Microsoft.NETCore.Jit/1.0.2": {
-      "sha512": "Ok2vWofa6X8WD9vc4pfLHwvJz1/B6t3gOAoZcjrjrQf7lQOlNIuZIZtLn3wnWX28DuQGpPJkRlBxFj7Z5txNqw==",
-      "type": "package",
-      "path": "Microsoft.NETCore.Jit/1.0.2",
-      "files": [
-        "Microsoft.NETCore.Jit.1.0.2.nupkg.sha512",
-        "Microsoft.NETCore.Jit.nuspec",
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.json"
-      ]
-    },
     "Microsoft.NETCore.Platforms/1.1.0": {
       "sha512": "kz0PEW2lhqygehI/d6XsPCQzD7ff7gUJaVGPVETX611eadGsA3A877GdSlU0LRVMCTH/+P3o2iDTak+S08V2+A==",
       "type": "package",
@@ -20259,100 +19056,6 @@
         "runtime.json"
       ]
     },
-    "Microsoft.NETCore.Portable.Compatibility/1.0.2": {
-      "sha512": "sR4m1GQ8Tbg+Xdbf8Y8yC+LXKSUJUVe/B5vckCAU9Jd5MYf84gC1D0u2YeA72B4WjeWewCyHRB20ddA8hyLmqQ==",
-      "type": "package",
-      "path": "Microsoft.NETCore.Portable.Compatibility/1.0.2",
-      "files": [
-        "Microsoft.NETCore.Portable.Compatibility.1.0.2.nupkg.sha512",
-        "Microsoft.NETCore.Portable.Compatibility.nuspec",
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "lib/net45/_._",
-        "lib/netcore50/System.ComponentModel.DataAnnotations.dll",
-        "lib/netcore50/System.Core.dll",
-        "lib/netcore50/System.Net.dll",
-        "lib/netcore50/System.Numerics.dll",
-        "lib/netcore50/System.Runtime.Serialization.dll",
-        "lib/netcore50/System.ServiceModel.Web.dll",
-        "lib/netcore50/System.ServiceModel.dll",
-        "lib/netcore50/System.Windows.dll",
-        "lib/netcore50/System.Xml.Linq.dll",
-        "lib/netcore50/System.Xml.Serialization.dll",
-        "lib/netcore50/System.Xml.dll",
-        "lib/netcore50/System.dll",
-        "lib/netstandard1.0/System.ComponentModel.DataAnnotations.dll",
-        "lib/netstandard1.0/System.Core.dll",
-        "lib/netstandard1.0/System.Net.dll",
-        "lib/netstandard1.0/System.Numerics.dll",
-        "lib/netstandard1.0/System.Runtime.Serialization.dll",
-        "lib/netstandard1.0/System.ServiceModel.Web.dll",
-        "lib/netstandard1.0/System.ServiceModel.dll",
-        "lib/netstandard1.0/System.Windows.dll",
-        "lib/netstandard1.0/System.Xml.Linq.dll",
-        "lib/netstandard1.0/System.Xml.Serialization.dll",
-        "lib/netstandard1.0/System.Xml.dll",
-        "lib/netstandard1.0/System.dll",
-        "lib/win8/_._",
-        "lib/wp80/_._",
-        "lib/wpa81/_._",
-        "ref/net45/_._",
-        "ref/netcore50/System.ComponentModel.DataAnnotations.dll",
-        "ref/netcore50/System.Core.dll",
-        "ref/netcore50/System.Net.dll",
-        "ref/netcore50/System.Numerics.dll",
-        "ref/netcore50/System.Runtime.Serialization.dll",
-        "ref/netcore50/System.ServiceModel.Web.dll",
-        "ref/netcore50/System.ServiceModel.dll",
-        "ref/netcore50/System.Windows.dll",
-        "ref/netcore50/System.Xml.Linq.dll",
-        "ref/netcore50/System.Xml.Serialization.dll",
-        "ref/netcore50/System.Xml.dll",
-        "ref/netcore50/System.dll",
-        "ref/netcore50/mscorlib.dll",
-        "ref/netstandard1.0/System.ComponentModel.DataAnnotations.dll",
-        "ref/netstandard1.0/System.Core.dll",
-        "ref/netstandard1.0/System.Net.dll",
-        "ref/netstandard1.0/System.Numerics.dll",
-        "ref/netstandard1.0/System.Runtime.Serialization.dll",
-        "ref/netstandard1.0/System.ServiceModel.Web.dll",
-        "ref/netstandard1.0/System.ServiceModel.dll",
-        "ref/netstandard1.0/System.Windows.dll",
-        "ref/netstandard1.0/System.Xml.Linq.dll",
-        "ref/netstandard1.0/System.Xml.Serialization.dll",
-        "ref/netstandard1.0/System.Xml.dll",
-        "ref/netstandard1.0/System.dll",
-        "ref/netstandard1.0/mscorlib.dll",
-        "ref/win8/_._",
-        "ref/wp80/_._",
-        "ref/wpa81/_._",
-        "runtimes/aot/lib/netcore50/System.ComponentModel.DataAnnotations.dll",
-        "runtimes/aot/lib/netcore50/System.Core.dll",
-        "runtimes/aot/lib/netcore50/System.Net.dll",
-        "runtimes/aot/lib/netcore50/System.Numerics.dll",
-        "runtimes/aot/lib/netcore50/System.Runtime.Serialization.dll",
-        "runtimes/aot/lib/netcore50/System.ServiceModel.Web.dll",
-        "runtimes/aot/lib/netcore50/System.ServiceModel.dll",
-        "runtimes/aot/lib/netcore50/System.Windows.dll",
-        "runtimes/aot/lib/netcore50/System.Xml.Linq.dll",
-        "runtimes/aot/lib/netcore50/System.Xml.Serialization.dll",
-        "runtimes/aot/lib/netcore50/System.Xml.dll",
-        "runtimes/aot/lib/netcore50/System.dll",
-        "runtimes/aot/lib/netcore50/mscorlib.dll"
-      ]
-    },
-    "Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-      "sha512": "A0x1xtTjYJWZr2DRzgfCOXgB0JkQg8twnmtTJ79wFje+IihlLbXtx6Z2AxyVokBM5ruwTedR6YdCmHk39QJdtQ==",
-      "type": "package",
-      "path": "Microsoft.NETCore.Runtime.CoreCLR/1.0.2",
-      "files": [
-        "Microsoft.NETCore.Runtime.CoreCLR.1.0.2.nupkg.sha512",
-        "Microsoft.NETCore.Runtime.CoreCLR.nuspec",
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.json"
-      ]
-    },
     "Microsoft.NETCore.Targets/1.1.0": {
       "sha512": "aOZA3BWfz9RXjpzt0sRJJMjAscAUm3Hoa4UWAfceV9UTYxgwZ1lZt5nO2myFf+/jetYQo4uTP7zS8sJY67BBxg==",
       "type": "package",
@@ -20363,18 +19066,6 @@
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/netstandard1.0/_._",
-        "runtime.json"
-      ]
-    },
-    "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-      "sha512": "SaToCvvsGMxTgtLv/BrFQ5IFMPRE1zpWbnqbpwykJa8W5XiX82CXI6K2o7yf5xS7EP6t/JzFLV0SIDuWpvBZVw==",
-      "type": "package",
-      "path": "Microsoft.NETCore.Windows.ApiSets/1.0.1",
-      "files": [
-        "Microsoft.NETCore.Windows.ApiSets.1.0.1.nupkg.sha512",
-        "Microsoft.NETCore.Windows.ApiSets.nuspec",
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
         "runtime.json"
       ]
     },
@@ -20840,44 +19531,6 @@
         "runtimes/aot/lib/netcore50/_._"
       ]
     },
-    "runtime.debian.8-x64.Microsoft.NETCore.Jit/1.0.2": {
-      "sha512": "+WxUK3qJvbkL6mcFh1hm+uJRnV+bDXViwFLh8eRC3hkCLtrRl8koQTwl1ymOizWxahoI7Y2xPgkQ0f13PTMQhg==",
-      "type": "package",
-      "path": "runtime.debian.8-x64.Microsoft.NETCore.Jit/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.debian.8-x64.Microsoft.NETCore.Jit.1.0.2.nupkg.sha512",
-        "runtime.debian.8-x64.Microsoft.NETCore.Jit.nuspec",
-        "runtimes/debian.8-x64/native/libclrjit.so"
-      ]
-    },
-    "runtime.debian.8-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-      "sha512": "ZhgAJqMxoaybzlTRl8wOpu7+PfZhv4JXPbX+L9QhX8nk9U0U7o7hb53QLI0jTEugM1YU4VcwDXOjc1yjlTLQWg==",
-      "type": "package",
-      "path": "runtime.debian.8-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "ref/netstandard1.0/_._",
-        "runtime.debian.8-x64.Microsoft.NETCore.Runtime.CoreCLR.1.0.2.nupkg.sha512",
-        "runtime.debian.8-x64.Microsoft.NETCore.Runtime.CoreCLR.nuspec",
-        "runtimes/debian.8-x64/lib/netstandard1.0/System.Private.CoreLib.dll",
-        "runtimes/debian.8-x64/lib/netstandard1.0/mscorlib.dll",
-        "runtimes/debian.8-x64/native/System.Globalization.Native.so",
-        "runtimes/debian.8-x64/native/System.Private.CoreLib.ni.dll",
-        "runtimes/debian.8-x64/native/libcoreclr.so",
-        "runtimes/debian.8-x64/native/libcoreclrtraceptprovider.so",
-        "runtimes/debian.8-x64/native/libdbgshim.so",
-        "runtimes/debian.8-x64/native/libmscordaccore.so",
-        "runtimes/debian.8-x64/native/libmscordbi.so",
-        "runtimes/debian.8-x64/native/libsos.so",
-        "runtimes/debian.8-x64/native/libsosplugin.so",
-        "runtimes/debian.8-x64/native/mscorlib.ni.dll",
-        "runtimes/debian.8-x64/native/sosdocsunix.txt",
-        "tools/crossgen"
-      ]
-    },
     "runtime.debian.8-x64.runtime.native.System/4.3.0": {
       "sha512": "DM8DCReQA9aFlr/JeB6hySp9uN/kRG019Z+0anR2F+PMQ+3OzXMR4hE6cVNob99JeVlGvY/Io6FBqx7JtjDt8Q==",
       "type": "package",
@@ -21011,44 +19664,6 @@
         "runtime.native.System.Security.Cryptography.OpenSsl.nuspec"
       ]
     },
-    "runtime.opensuse.13.2-x64.Microsoft.NETCore.Jit/1.0.2": {
-      "sha512": "5xQ47Os5Ad6B28i1fAfyQDEzxyi45SO11UCSYHFNcxYpy2vRDRzw6QcWr0u2vnXeGV86NHW8VkNcUAImzNTa1A==",
-      "type": "package",
-      "path": "runtime.opensuse.13.2-x64.Microsoft.NETCore.Jit/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.opensuse.13.2-x64.Microsoft.NETCore.Jit.1.0.2.nupkg.sha512",
-        "runtime.opensuse.13.2-x64.Microsoft.NETCore.Jit.nuspec",
-        "runtimes/opensuse.13.2-x64/native/libclrjit.so"
-      ]
-    },
-    "runtime.opensuse.13.2-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-      "sha512": "jXTBSd+o+5OMblcUW/8nOf7rW9lbrMnOY+5eG9L8SajEhp0j/q59LpZw+CELEFgzPoGoCF6qQHwDpewXjx5hpA==",
-      "type": "package",
-      "path": "runtime.opensuse.13.2-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "ref/netstandard1.0/_._",
-        "runtime.opensuse.13.2-x64.Microsoft.NETCore.Runtime.CoreCLR.1.0.2.nupkg.sha512",
-        "runtime.opensuse.13.2-x64.Microsoft.NETCore.Runtime.CoreCLR.nuspec",
-        "runtimes/opensuse.13.2-x64/lib/netstandard1.0/System.Private.CoreLib.dll",
-        "runtimes/opensuse.13.2-x64/lib/netstandard1.0/mscorlib.dll",
-        "runtimes/opensuse.13.2-x64/native/System.Globalization.Native.so",
-        "runtimes/opensuse.13.2-x64/native/System.Private.CoreLib.ni.dll",
-        "runtimes/opensuse.13.2-x64/native/libcoreclr.so",
-        "runtimes/opensuse.13.2-x64/native/libcoreclrtraceptprovider.so",
-        "runtimes/opensuse.13.2-x64/native/libdbgshim.so",
-        "runtimes/opensuse.13.2-x64/native/libmscordaccore.so",
-        "runtimes/opensuse.13.2-x64/native/libmscordbi.so",
-        "runtimes/opensuse.13.2-x64/native/libsos.so",
-        "runtimes/opensuse.13.2-x64/native/libsosplugin.so",
-        "runtimes/opensuse.13.2-x64/native/mscorlib.ni.dll",
-        "runtimes/opensuse.13.2-x64/native/sosdocsunix.txt",
-        "tools/crossgen"
-      ]
-    },
     "runtime.opensuse.13.2-x64.runtime.native.System/4.3.0": {
       "sha512": "tlwZiRN66luG8f04Q+LVWIsBmM8TpU0HamDnKvhDAfgg+JoLljQ52m0PR8NcVrD1BBNtGI+zo9UhhojmQmrRdg==",
       "type": "package",
@@ -21108,42 +19723,6 @@
         "runtime.opensuse.42.1-x64.runtime.native.System.Security.Cryptography.OpenSsl.4.3.0.nupkg.sha512",
         "runtime.opensuse.42.1-x64.runtime.native.System.Security.Cryptography.OpenSsl.nuspec",
         "runtimes/opensuse.42.1-x64/native/System.Security.Cryptography.Native.OpenSsl.so"
-      ]
-    },
-    "runtime.osx.10.10-x64.Microsoft.NETCore.Jit/1.0.2": {
-      "sha512": "uUgtMYhlbDv7snNaAlIzU7H8u3QTlPb0lZSDQsEtslLyJi/KTbfDPyVMF7hc3qNUTYjcyH6uLxHvlqHccP0SmQ==",
-      "type": "package",
-      "path": "runtime.osx.10.10-x64.Microsoft.NETCore.Jit/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.osx.10.10-x64.Microsoft.NETCore.Jit.1.0.2.nupkg.sha512",
-        "runtime.osx.10.10-x64.Microsoft.NETCore.Jit.nuspec",
-        "runtimes/osx.10.10-x64/native/libclrjit.dylib"
-      ]
-    },
-    "runtime.osx.10.10-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-      "sha512": "lTYj4jPcmf+ZywX7AuJIIOw3gkpUDMi/O0UDIfO134aOqZTWMKnsbyAT1J0kz2jvNBH48c5B1BY3jSonkstLpA==",
-      "type": "package",
-      "path": "runtime.osx.10.10-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "ref/netstandard1.0/_._",
-        "runtime.osx.10.10-x64.Microsoft.NETCore.Runtime.CoreCLR.1.0.2.nupkg.sha512",
-        "runtime.osx.10.10-x64.Microsoft.NETCore.Runtime.CoreCLR.nuspec",
-        "runtimes/osx.10.10-x64/lib/netstandard1.0/System.Private.CoreLib.dll",
-        "runtimes/osx.10.10-x64/lib/netstandard1.0/mscorlib.dll",
-        "runtimes/osx.10.10-x64/native/System.Globalization.Native.dylib",
-        "runtimes/osx.10.10-x64/native/System.Private.CoreLib.ni.dll",
-        "runtimes/osx.10.10-x64/native/libcoreclr.dylib",
-        "runtimes/osx.10.10-x64/native/libdbgshim.dylib",
-        "runtimes/osx.10.10-x64/native/libmscordaccore.dylib",
-        "runtimes/osx.10.10-x64/native/libmscordbi.dylib",
-        "runtimes/osx.10.10-x64/native/libsos.dylib",
-        "runtimes/osx.10.10-x64/native/mscorlib.ni.dll",
-        "runtimes/osx.10.10-x64/native/sosdocsunix.txt",
-        "tools/crossgen"
       ]
     },
     "runtime.osx.10.10-x64.runtime.native.System/4.3.0": {
@@ -21207,44 +19786,6 @@
         "runtimes/osx.10.10-x64/native/System.Security.Cryptography.Native.OpenSsl.dylib"
       ]
     },
-    "runtime.rhel.7-x64.Microsoft.NETCore.Jit/1.0.2": {
-      "sha512": "AAQVPlnHtLPYiXtDTwRidqjmZV7nBvYmWKeJcadapQP0Ap2J50iRcgBQKOd0dzAv9ejuc3o4qfgzioQdE9lFbQ==",
-      "type": "package",
-      "path": "runtime.rhel.7-x64.Microsoft.NETCore.Jit/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.rhel.7-x64.Microsoft.NETCore.Jit.1.0.2.nupkg.sha512",
-        "runtime.rhel.7-x64.Microsoft.NETCore.Jit.nuspec",
-        "runtimes/rhel.7-x64/native/libclrjit.so"
-      ]
-    },
-    "runtime.rhel.7-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-      "sha512": "ixr71ZpFhW1M9KVLp9kXA7lr6Ic3rpnPxSugi+3rOsiO/Qq9/JnV43hTB4t7ZozskobnQNr/OnG1be6jq96gww==",
-      "type": "package",
-      "path": "runtime.rhel.7-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "ref/netstandard1.0/_._",
-        "runtime.rhel.7-x64.Microsoft.NETCore.Runtime.CoreCLR.1.0.2.nupkg.sha512",
-        "runtime.rhel.7-x64.Microsoft.NETCore.Runtime.CoreCLR.nuspec",
-        "runtimes/rhel.7-x64/lib/netstandard1.0/System.Private.CoreLib.dll",
-        "runtimes/rhel.7-x64/lib/netstandard1.0/mscorlib.dll",
-        "runtimes/rhel.7-x64/native/System.Globalization.Native.so",
-        "runtimes/rhel.7-x64/native/System.Private.CoreLib.ni.dll",
-        "runtimes/rhel.7-x64/native/libcoreclr.so",
-        "runtimes/rhel.7-x64/native/libcoreclrtraceptprovider.so",
-        "runtimes/rhel.7-x64/native/libdbgshim.so",
-        "runtimes/rhel.7-x64/native/libmscordaccore.so",
-        "runtimes/rhel.7-x64/native/libmscordbi.so",
-        "runtimes/rhel.7-x64/native/libsos.so",
-        "runtimes/rhel.7-x64/native/libsosplugin.so",
-        "runtimes/rhel.7-x64/native/mscorlib.ni.dll",
-        "runtimes/rhel.7-x64/native/sosdocsunix.txt",
-        "tools/crossgen"
-      ]
-    },
     "runtime.rhel.7-x64.runtime.native.System/4.3.0": {
       "sha512": "FgYyVbr9KS9223IxpMTiFnjCN27sehWdnebTngl32eMX6qL6qaCrCjnBeoytG0oAGcNgBlz/CJw75dHVCGv3SQ==",
       "type": "package",
@@ -21294,44 +19835,6 @@
         "runtimes/rhel.7-x64/native/System.Security.Cryptography.Native.OpenSsl.so"
       ]
     },
-    "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Jit/1.0.2": {
-      "sha512": "nPH4JNF2HbdOpWSTTFubCMitre9UnQ7SXmkw4kNamoEdtObmTsYj+hA/8Iols3R7Pp2wqdOQUWhfSy/MGnCBpg==",
-      "type": "package",
-      "path": "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Jit/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Jit.1.0.2.nupkg.sha512",
-        "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Jit.nuspec",
-        "runtimes/ubuntu.14.04-x64/native/libclrjit.so"
-      ]
-    },
-    "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-      "sha512": "4dsDZys2qBrbXYob7z7cve1hcHiPgndWeHgqre9v+WVx2feFolTSFyc2goXWuIigd0+lHH+5ihajtjFQOAN6AQ==",
-      "type": "package",
-      "path": "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "ref/netstandard1.0/_._",
-        "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Runtime.CoreCLR.1.0.2.nupkg.sha512",
-        "runtime.ubuntu.14.04-x64.Microsoft.NETCore.Runtime.CoreCLR.nuspec",
-        "runtimes/ubuntu.14.04-x64/lib/netstandard1.0/System.Private.CoreLib.dll",
-        "runtimes/ubuntu.14.04-x64/lib/netstandard1.0/mscorlib.dll",
-        "runtimes/ubuntu.14.04-x64/native/System.Globalization.Native.so",
-        "runtimes/ubuntu.14.04-x64/native/System.Private.CoreLib.ni.dll",
-        "runtimes/ubuntu.14.04-x64/native/libcoreclr.so",
-        "runtimes/ubuntu.14.04-x64/native/libcoreclrtraceptprovider.so",
-        "runtimes/ubuntu.14.04-x64/native/libdbgshim.so",
-        "runtimes/ubuntu.14.04-x64/native/libmscordaccore.so",
-        "runtimes/ubuntu.14.04-x64/native/libmscordbi.so",
-        "runtimes/ubuntu.14.04-x64/native/libsos.so",
-        "runtimes/ubuntu.14.04-x64/native/libsosplugin.so",
-        "runtimes/ubuntu.14.04-x64/native/mscorlib.ni.dll",
-        "runtimes/ubuntu.14.04-x64/native/sosdocsunix.txt",
-        "tools/crossgen"
-      ]
-    },
     "runtime.ubuntu.14.04-x64.runtime.native.System/4.3.0": {
       "sha512": "5VGclG/uSCxMCWNLSAU2kliuHP2pv69XOwraRK9AXzVeJlQxNnCk43okuBxuw4bEXu9DFPXT7J1yiw1pJaEFDA==",
       "type": "package",
@@ -21379,44 +19882,6 @@
         "runtime.ubuntu.14.04-x64.runtime.native.System.Security.Cryptography.OpenSsl.4.3.0.nupkg.sha512",
         "runtime.ubuntu.14.04-x64.runtime.native.System.Security.Cryptography.OpenSsl.nuspec",
         "runtimes/ubuntu.14.04-x64/native/System.Security.Cryptography.Native.OpenSsl.so"
-      ]
-    },
-    "runtime.ubuntu.16.04-x64.Microsoft.NETCore.Jit/1.0.2": {
-      "sha512": "sL3KfEf8TNmdFHA+/QxHgmotlbPpEIg16WBdf4TuFgAWjm56UE1/VcOpBRvqHEbg3Bv8VrikFOwRgGeY7nr7qg==",
-      "type": "package",
-      "path": "runtime.ubuntu.16.04-x64.Microsoft.NETCore.Jit/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.ubuntu.16.04-x64.Microsoft.NETCore.Jit.1.0.2.nupkg.sha512",
-        "runtime.ubuntu.16.04-x64.Microsoft.NETCore.Jit.nuspec",
-        "runtimes/ubuntu.16.04-x64/native/libclrjit.so"
-      ]
-    },
-    "runtime.ubuntu.16.04-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-      "sha512": "wPBMUURHBvU1AFTvSyHJsXuoyrPQSX1BX5FD4zFojOWCDkvjaSa4aGavs5V3yxHV++sN/Q3ibqnJzVvjLfgvqQ==",
-      "type": "package",
-      "path": "runtime.ubuntu.16.04-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "ref/netstandard1.0/_._",
-        "runtime.ubuntu.16.04-x64.Microsoft.NETCore.Runtime.CoreCLR.1.0.2.nupkg.sha512",
-        "runtime.ubuntu.16.04-x64.Microsoft.NETCore.Runtime.CoreCLR.nuspec",
-        "runtimes/ubuntu.16.04-x64/lib/netstandard1.0/System.Private.CoreLib.dll",
-        "runtimes/ubuntu.16.04-x64/lib/netstandard1.0/mscorlib.dll",
-        "runtimes/ubuntu.16.04-x64/native/System.Globalization.Native.so",
-        "runtimes/ubuntu.16.04-x64/native/System.Private.CoreLib.ni.dll",
-        "runtimes/ubuntu.16.04-x64/native/libcoreclr.so",
-        "runtimes/ubuntu.16.04-x64/native/libcoreclrtraceptprovider.so",
-        "runtimes/ubuntu.16.04-x64/native/libdbgshim.so",
-        "runtimes/ubuntu.16.04-x64/native/libmscordaccore.so",
-        "runtimes/ubuntu.16.04-x64/native/libmscordbi.so",
-        "runtimes/ubuntu.16.04-x64/native/libsos.so",
-        "runtimes/ubuntu.16.04-x64/native/libsosplugin.so",
-        "runtimes/ubuntu.16.04-x64/native/mscorlib.ni.dll",
-        "runtimes/ubuntu.16.04-x64/native/sosdocsunix.txt",
-        "tools/crossgen"
       ]
     },
     "runtime.ubuntu.16.04-x64.runtime.native.System/4.3.0": {
@@ -21696,179 +20161,6 @@
         "runtimes/win/lib/netstandard1.5/System.Runtime.Extensions.dll"
       ]
     },
-    "runtime.win7-x64.Microsoft.NETCore.Jit/1.0.2": {
-      "sha512": "Jd3q9BKO+Sun6mPXRvHZMYG0WJmnASjXUxsT5MJwBoz8xbeZRTuFTPD5RtNlKxxioCiWR/hp3mKgYjlJ4dLQsw==",
-      "type": "package",
-      "path": "runtime.win7-x64.Microsoft.NETCore.Jit/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.win7-x64.Microsoft.NETCore.Jit.1.0.2.nupkg.sha512",
-        "runtime.win7-x64.Microsoft.NETCore.Jit.nuspec",
-        "runtimes/win7-x64/native/clrjit.dll"
-      ]
-    },
-    "runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-      "sha512": "YaXA5RVLCYIcV1N31A7MJhWJnNkNfGnyRBNH1yYilUrBDvzMxNsbXX2pD7owWsC/go/4LRwbHbdWWXwHowKNvw==",
-      "type": "package",
-      "path": "runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "ref/netstandard1.0/_._",
-        "runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR.1.0.2.nupkg.sha512",
-        "runtime.win7-x64.Microsoft.NETCore.Runtime.CoreCLR.nuspec",
-        "runtimes/win7-x64-aot/lib/netstandard1.0/_._",
-        "runtimes/win7-x64-aot/native/_._",
-        "runtimes/win7-x64/lib/netstandard1.0/System.Private.CoreLib.dll",
-        "runtimes/win7-x64/lib/netstandard1.0/mscorlib.dll",
-        "runtimes/win7-x64/native/System.Private.CoreLib.ni.dll",
-        "runtimes/win7-x64/native/clretwrc.dll",
-        "runtimes/win7-x64/native/coreclr.dll",
-        "runtimes/win7-x64/native/dbgshim.dll",
-        "runtimes/win7-x64/native/mscordaccore.dll",
-        "runtimes/win7-x64/native/mscordbi.dll",
-        "runtimes/win7-x64/native/mscorlib.ni.dll",
-        "runtimes/win7-x64/native/mscorrc.debug.dll",
-        "runtimes/win7-x64/native/mscorrc.dll",
-        "runtimes/win7-x64/native/sos.dll",
-        "tools/crossgen.exe"
-      ]
-    },
-    "runtime.win7-x64.Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-      "sha512": "jlT1ClqaOhEfpLpPU3iNpbmHnoPBe+T01509Q+tlxnax7ZXUsY6L22Vow6jj2koYY9u1GR6g6/UJXZRQihDAvw==",
-      "type": "package",
-      "path": "runtime.win7-x64.Microsoft.NETCore.Windows.ApiSets/1.0.1",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.win7-x64.Microsoft.NETCore.Windows.ApiSets.1.0.1.nupkg.sha512",
-        "runtime.win7-x64.Microsoft.NETCore.Windows.ApiSets.nuspec",
-        "runtimes/win7-x64/native/API-MS-Win-Base-Util-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Core-Kernel32-Private-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Core-Kernel32-Private-L1-1-1.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Core-Kernel32-Private-L1-1-2.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Core-PrivateProfile-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Core-ProcessTopology-Obsolete-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Core-String-L2-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Core-StringAnsi-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-EventLog-Legacy-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Eventing-ClassicProvider-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Eventing-Consumer-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Eventing-Controller-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Eventing-Legacy-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Eventing-Provider-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-Security-LsaPolicy-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-devices-config-L1-1-0.dll",
-        "runtimes/win7-x64/native/API-MS-Win-devices-config-L1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-com-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-com-private-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-comm-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-console-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-console-l2-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-datetime-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-datetime-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-debug-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-debug-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-delayload-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-errorhandling-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-errorhandling-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-fibers-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-fibers-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-file-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-file-l1-2-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-file-l1-2-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-file-l2-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-file-l2-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-handle-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-heap-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-heap-obsolete-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-interlocked-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-io-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-io-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-kernel32-legacy-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-kernel32-legacy-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-kernel32-legacy-l1-1-2.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-libraryloader-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-libraryloader-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-localization-l1-2-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-localization-l1-2-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-localization-l2-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-localization-obsolete-l1-2-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-memory-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-memory-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-memory-l1-1-2.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-memory-l1-1-3.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-namedpipe-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-namedpipe-l1-2-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-normalization-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-privateprofile-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-processenvironment-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-processenvironment-l1-2-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-processsecurity-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-processthreads-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-processthreads-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-processthreads-l1-1-2.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-profile-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-psapi-ansi-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-psapi-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-psapi-obsolete-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-realtime-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-registry-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-registry-l2-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-rtlsupport-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-shlwapi-legacy-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-shlwapi-obsolete-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-shutdown-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-shutdown-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-string-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-string-obsolete-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-string-obsolete-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-stringloader-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-stringloader-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-synch-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-synch-l1-2-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-sysinfo-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-sysinfo-l1-2-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-sysinfo-l1-2-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-sysinfo-l1-2-2.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-sysinfo-l1-2-3.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-threadpool-l1-2-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-threadpool-legacy-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-threadpool-private-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-timezone-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-url-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-util-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-version-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-winrt-error-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-winrt-error-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-winrt-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-winrt-registration-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-winrt-robuffer-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-winrt-roparameterizediid-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-winrt-string-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-wow64-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-xstate-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-core-xstate-l2-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-ro-typeresolution-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-security-base-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-security-cpwl-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-security-cryptoapi-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-security-lsalookup-l2-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-security-lsalookup-l2-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-security-provider-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-security-sddl-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-service-core-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-service-core-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-service-management-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-service-management-l2-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-service-private-l1-1-0.dll",
-        "runtimes/win7-x64/native/api-ms-win-service-private-l1-1-1.dll",
-        "runtimes/win7-x64/native/api-ms-win-service-winsvc-l1-1-0.dll",
-        "runtimes/win7-x64/native/ext-ms-win-advapi32-encryptedfile-l1-1-0.dll",
-        "runtimes/win7-x64/native/ext-ms-win-ntuser-keyboard-l1-2-1.dll"
-      ]
-    },
     "runtime.win7-x64.runtime.native.System.IO.Compression/4.3.0": {
       "sha512": "UamDlgSO/nIzc96M+g3wbvAGbAuXjvRYR5Ttm/FVJgt2iva8ouOqSJ0j6eGI7pZDLvD/ZISl9XRZOajE/Xvizg==",
       "type": "package",
@@ -21879,179 +20171,6 @@
         "runtime.win7-x64.runtime.native.System.IO.Compression.4.3.0.nupkg.sha512",
         "runtime.win7-x64.runtime.native.System.IO.Compression.nuspec",
         "runtimes/win7-x64/native/clrcompression.dll"
-      ]
-    },
-    "runtime.win7-x86.Microsoft.NETCore.Jit/1.0.2": {
-      "sha512": "DEDFKUREtfMZue7qIGNelkZqay6bpC1iTWt/ZFQ0yxnqtINXmVYiOW9ML7w/1E4WBUaPCUo4tKWasK53c063qg==",
-      "type": "package",
-      "path": "runtime.win7-x86.Microsoft.NETCore.Jit/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.win7-x86.Microsoft.NETCore.Jit.1.0.2.nupkg.sha512",
-        "runtime.win7-x86.Microsoft.NETCore.Jit.nuspec",
-        "runtimes/win7-x86/native/clrjit.dll"
-      ]
-    },
-    "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR/1.0.2": {
-      "sha512": "80Jj8QlMLAnTq+BDhoHBnSNXRKqVjjZM9VjHcpw9/F98cBmh80rBdbnM0AAr54htjhzupYvwLqwuKnlzxec04A==",
-      "type": "package",
-      "path": "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR/1.0.2",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "ref/netstandard1.0/_._",
-        "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR.1.0.2.nupkg.sha512",
-        "runtime.win7-x86.Microsoft.NETCore.Runtime.CoreCLR.nuspec",
-        "runtimes/win7-x86-aot/lib/netstandard1.0/_._",
-        "runtimes/win7-x86-aot/native/_._",
-        "runtimes/win7-x86/lib/netstandard1.0/System.Private.CoreLib.dll",
-        "runtimes/win7-x86/lib/netstandard1.0/mscorlib.dll",
-        "runtimes/win7-x86/native/System.Private.CoreLib.ni.dll",
-        "runtimes/win7-x86/native/clretwrc.dll",
-        "runtimes/win7-x86/native/coreclr.dll",
-        "runtimes/win7-x86/native/dbgshim.dll",
-        "runtimes/win7-x86/native/mscordaccore.dll",
-        "runtimes/win7-x86/native/mscordbi.dll",
-        "runtimes/win7-x86/native/mscorlib.ni.dll",
-        "runtimes/win7-x86/native/mscorrc.debug.dll",
-        "runtimes/win7-x86/native/mscorrc.dll",
-        "runtimes/win7-x86/native/sos.dll",
-        "tools/crossgen.exe"
-      ]
-    },
-    "runtime.win7-x86.Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-      "sha512": "bPLbJzMJpczV+EMU4CK2Hb+DJrX3C93dXPMe+JsArqFTnJ9ou+xAa3lHt2qbWvzVVR1OMpgQUpB7aug6PcRPbA==",
-      "type": "package",
-      "path": "runtime.win7-x86.Microsoft.NETCore.Windows.ApiSets/1.0.1",
-      "files": [
-        "ThirdPartyNotices.txt",
-        "dotnet_library_license.txt",
-        "runtime.win7-x86.Microsoft.NETCore.Windows.ApiSets.1.0.1.nupkg.sha512",
-        "runtime.win7-x86.Microsoft.NETCore.Windows.ApiSets.nuspec",
-        "runtimes/win7-x86/native/API-MS-Win-Base-Util-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Core-Kernel32-Private-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Core-Kernel32-Private-L1-1-1.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Core-Kernel32-Private-L1-1-2.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Core-PrivateProfile-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Core-ProcessTopology-Obsolete-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Core-String-L2-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Core-StringAnsi-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-EventLog-Legacy-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Eventing-ClassicProvider-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Eventing-Consumer-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Eventing-Controller-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Eventing-Legacy-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Eventing-Provider-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-Security-LsaPolicy-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-devices-config-L1-1-0.dll",
-        "runtimes/win7-x86/native/API-MS-Win-devices-config-L1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-com-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-com-private-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-comm-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-console-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-console-l2-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-datetime-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-datetime-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-debug-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-debug-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-delayload-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-errorhandling-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-errorhandling-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-fibers-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-fibers-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-file-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-file-l1-2-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-file-l1-2-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-file-l2-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-file-l2-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-handle-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-heap-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-heap-obsolete-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-interlocked-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-io-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-io-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-kernel32-legacy-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-kernel32-legacy-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-kernel32-legacy-l1-1-2.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-libraryloader-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-libraryloader-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-localization-l1-2-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-localization-l1-2-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-localization-l2-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-localization-obsolete-l1-2-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-memory-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-memory-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-memory-l1-1-2.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-memory-l1-1-3.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-namedpipe-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-namedpipe-l1-2-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-normalization-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-privateprofile-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-processenvironment-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-processenvironment-l1-2-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-processsecurity-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-processthreads-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-processthreads-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-processthreads-l1-1-2.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-profile-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-psapi-ansi-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-psapi-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-psapi-obsolete-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-realtime-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-registry-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-registry-l2-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-rtlsupport-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-shlwapi-legacy-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-shlwapi-obsolete-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-shutdown-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-shutdown-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-string-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-string-obsolete-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-string-obsolete-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-stringloader-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-stringloader-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-synch-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-synch-l1-2-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-sysinfo-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-sysinfo-l1-2-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-sysinfo-l1-2-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-sysinfo-l1-2-2.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-sysinfo-l1-2-3.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-threadpool-l1-2-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-threadpool-legacy-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-threadpool-private-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-timezone-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-url-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-util-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-version-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-winrt-error-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-winrt-error-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-winrt-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-winrt-registration-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-winrt-robuffer-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-winrt-roparameterizediid-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-winrt-string-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-wow64-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-xstate-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-core-xstate-l2-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-ro-typeresolution-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-security-base-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-security-cpwl-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-security-cryptoapi-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-security-lsalookup-l2-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-security-lsalookup-l2-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-security-provider-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-security-sddl-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-service-core-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-service-core-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-service-management-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-service-management-l2-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-service-private-l1-1-0.dll",
-        "runtimes/win7-x86/native/api-ms-win-service-private-l1-1-1.dll",
-        "runtimes/win7-x86/native/api-ms-win-service-winsvc-l1-1-0.dll",
-        "runtimes/win7-x86/native/ext-ms-win-advapi32-encryptedfile-l1-1-0.dll",
-        "runtimes/win7-x86/native/ext-ms-win-ntuser-keyboard-l1-2-1.dll"
       ]
     },
     "runtime.win7-x86.runtime.native.System.IO.Compression/4.3.0": {
@@ -25181,7 +23300,6 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Microsoft.NETCore.Portable.Compatibility >= 1.0.2",
       "NETStandard.Library >= 1.6.1"
     ],
     ".NETStandard,Version=v1.5": []

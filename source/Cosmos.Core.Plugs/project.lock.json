@@ -21928,6 +21928,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
+      "Microsoft.NETCore.Portable.Compatibility >= 1.0.2",
       "NETStandard.Library >= 1.6.1"
     ],
     ".NETStandard,Version=v1.5": []

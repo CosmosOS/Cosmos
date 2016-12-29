@@ -43,9 +43,41 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.Common\Cosmos.Common.csproj">
+      <Project>{b0957633-03c5-4531-9358-14d520f7ff78}</Project>
+      <Name>Cosmos.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Core.Common\Cosmos.Core.Common.csproj">
+      <Project>{5a38be55-d402-4de6-bb2b-f0360da1c1bd}</Project>
+      <Name>Cosmos.Core.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Core.Memory\Cosmos.Core.Memory.csproj">
+      <Project>{06cc50c4-6ffd-42a8-85e2-309e187b345e}</Project>
+      <Name>Cosmos.Core.Memory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
+      <Project>{09273ea1-d3ea-4ccf-aabc-4a209eb367b7}</Project>
+      <Name>Cosmos.Core.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Core\Cosmos.Core.csproj">
+      <Project>{51efe968-249d-445c-9184-37c4ae1edf4e}</Project>
+      <Name>Cosmos.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
       <Project>{dc93aed0-a9bf-42c4-ac7b-fa9b2063e5d1}</Project>
       <Name>Cosmos.Debug.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.HAL\Cosmos.HAL.csproj">
+      <Project>{bc775926-731c-449d-8e8a-90d1d8116872}</Project>
+      <Name>Cosmos.HAL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+      <Project>{12a519aa-7af2-4873-8ad1-fab5a76448b1}</Project>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
+      <Project>{e52f6162-5094-49f4-a685-d08e5480bac2}</Project>
+      <Name>Cosmos.System.Plugs</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
       <Project>{19d31813-caf2-42d9-a1e3-448913de6ce2}</Project>

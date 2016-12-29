@@ -58,6 +58,26 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs.Asm\Cosmos.Core.Plugs.Asm.csproj">
+      <Name>Cosmos.Core.Plugs.Asm</Name>
+      <Project>{fc7919d8-374c-4d13-95a9-0b248c372efe}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
+      <Name>Cosmos.Core.Plugs</Name>
+      <Project>{09273ea1-d3ea-4ccf-aabc-4a209eb367b7}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj">
+      <Name>Cosmos.Debug.Kernel.Plugs.Asm</Name>
+      <Project>{b97a2956-c363-47f2-a6aa-b4fccff4d315}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
+      <Name>Cosmos.System.Plugs</Name>
+      <Project>{e52f6162-5094-49f4-a685-d08e5480bac2}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\Guess\GuessKernel.csproj">
       <Name>GuessKernel</Name>
       <Project>{1780684c-6b7f-4360-81c0-69204e343a08}</Project>

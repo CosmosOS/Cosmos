@@ -482,7 +482,7 @@ namespace Cosmos.IL2CPU
 
             MethodBase xPlug = null;
             // Plugs may use plugs, but plugs won't be plugged over themself
-            var inl = aMethod.GetCustomAttribute<InlineAttribute>();
+            var inl = aMethod.GetReflectionOnlyCustomAttribute<InlineAttribute>();
             if (!aIsPlug && !xIsDynamicMethod)
             {
                 // Check to see if method is plugged, if it is we don't scan body
@@ -836,11 +836,11 @@ namespace Cosmos.IL2CPU
                         var xMethodType = MethodInfo.TypeEnum.Normal;
                         Type xPlugAssembler = null;
                         MethodInfo xPlugInfo = null;
-                        var xMethodInline = xMethod.GetCustomAttribute<InlineAttribute>();
-                        if (xMethodInline != null)
-                        {
-                            // inline assembler, shouldn't come here..
-                            continue;
+                    var xMethodInline = xMethod.GetReflectionOnlyCustomAttribute<InlineAttribute>();
+                    if (xMethodInline != null)
+                    {
+                        // inline assembler, shouldn't come here..
+                        continue;
                         }
                         var xMethodIdMethod = mItemsList.IndexOf(xMethod);
                         if (xMethodIdMethod == -1)
@@ -850,8 +850,21 @@ namespace Cosmos.IL2CPU
                         if (xPlug != null)
                         {
                             xMethodType = MethodInfo.TypeEnum.NeedsPlug;
-                            var xAttrib = xPlug.GetCustomAttribute<PlugMethodAttribute>();
-                            var xInline = xPlug.GetCustomAttribute<InlineAttribute>();
+                            var x = xPlug.GetReflectionOnlyCustomAttribute<PlugMethodAttribute>();
+                        var xAttrib = new PlugMethodAttribute
+                        {
+                            Assembler = x.GetArgumentValue<Type>("Assembler"),
+                            Enabled = x.GetArgumentValue<bool>("Enabled"),
+                            IsMicrosoftdotNETOnly = x.GetArgumentValue<bool>("IsMicrosoftdotNETOnly"),
+                            IsMonoOnly = x.GetArgumentValue<bool>("IsMonoOnly"),
+                            IsOptional = x.GetArgumentValue<bool>("IsOptional"),
+                            IsWildcard = x.GetArgumentValue<bool>("IsWildcard"),
+                            PlugRequired = x.GetArgumentValue<bool>("PlugRequired"),
+                            Signature = x.GetArgumentValue<string>("Signature"),
+                            WildcardMatchParameters = x.GetArgumentValue<bool>("WildcardMatchParameters")
+                        };
+
+                        var xInline = xPlug.GetReflectionOnlyCustomAttribute<InlineAttribute>();
                             var xMethodIdPlug = mItemsList.IndexOf(xPlug);
                             if ((xMethodIdPlug == -1) && (xInline == null))
                             {
@@ -910,10 +923,21 @@ namespace Cosmos.IL2CPU
                         else
                         {
                             PlugMethodAttribute xAttrib = null;
-                            foreach (PlugMethodAttribute attrib in xMethod.GetCustomAttributes(typeof(PlugMethodAttribute), true))
+                            foreach (var x in xMethod.GetReflectionOnlyCustomAttributes<PlugMethodAttribute>(true))
                             {
-                                xAttrib = attrib;
-                            }
+                            xAttrib = new PlugMethodAttribute
+                            {
+                                Assembler = x.GetArgumentValue<Type>("Assembler"),
+                                Enabled = x.GetArgumentValue<bool>("Enabled"),
+                                IsMicrosoftdotNETOnly = x.GetArgumentValue<bool>("IsMicrosoftdotNETOnly"),
+                                IsMonoOnly = x.GetArgumentValue<bool>("IsMonoOnly"),
+                                IsOptional = x.GetArgumentValue<bool>("IsOptional"),
+                                IsWildcard = x.GetArgumentValue<bool>("IsWildcard"),
+                                PlugRequired = x.GetArgumentValue<bool>("PlugRequired"),
+                                Signature = x.GetArgumentValue<string>("Signature"),
+                                WildcardMatchParameters = x.GetArgumentValue<bool>("WildcardMatchParameters")
+                            };
+                        }
                             if (xAttrib != null)
                             {
                                 if (xAttrib.IsWildcard)

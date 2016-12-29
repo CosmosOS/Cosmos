@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU
 {
@@ -43,10 +44,13 @@ namespace Cosmos.IL2CPU
             PlugMethod = aPlugMethod;
             IsInlineAssembler = isInlineAssembler;
 
-            Object[] attribs = this.MethodBase.GetCustomAttributes(typeof(Cosmos.IL2CPU.Plugs.DebugStubAttribute), false);
-            if (attribs.Length > 0)
+            var attribs = aMethodBase.GetReflectionOnlyCustomAttributes<DebugStubAttribute>(false);
+            if (attribs.Any())
             {
-                Cosmos.IL2CPU.Plugs.DebugStubAttribute attrib = attribs[0] as Cosmos.IL2CPU.Plugs.DebugStubAttribute;
+                DebugStubAttribute attrib = new DebugStubAttribute
+                                            {
+                                                Off = attribs[0].GetArgumentValue<bool>("Off"),
+                                            };
                 DebugStubOff = attrib.Off;
             }
         }

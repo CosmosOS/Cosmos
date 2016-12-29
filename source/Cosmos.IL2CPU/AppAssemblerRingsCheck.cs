@@ -156,13 +156,13 @@ namespace Cosmos.IL2CPU
 
         private static Ring GetRingFromAssembly(Assembly assembly)
         {
-            var xRingAttrib = assembly.GetCustomAttributes<RingAttribute>().SingleOrDefault();
+            var xRingAttrib = assembly.GetReflectionOnlyCustomAttribute<RingAttribute>();
             if (xRingAttrib == null)
             {
                 return Ring.User;
             }
 
-            return xRingAttrib.Ring;
+            return xRingAttrib.GetArgumentValue<Ring>("Ring");
         }
 
         private static void RingsWriteLine(string line, params object[] args)

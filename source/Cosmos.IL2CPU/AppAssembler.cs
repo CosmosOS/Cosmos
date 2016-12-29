@@ -777,12 +777,12 @@ namespace Cosmos.IL2CPU
             {
                 if (xType.IsSubclassOf(aAssemblerBaseOp))
                 {
-                    var xAttribs = (OpCodeAttribute[])xType.GetCustomAttributes(typeof(OpCodeAttribute), false);
+                    var xAttribs = xType.GetCustomAttributes<OpCodeAttribute>(false);
                     foreach (var xAttrib in xAttribs)
                     {
                         var xOpCode = (ushort)xAttrib.OpCode;
                         var xCtor = xType.GetConstructor(new Type[] { typeof(Assembler.Assembler) });
-                        var xILOp = (ILOp)xCtor.Invoke(new Object[] { Assembler });
+                        var xILOp = (ILOp)xCtor.Invoke(new object[] { Assembler });
                         if (xOpCode <= 0xFF)
                         {
                             mILOpsLo[xOpCode] = xILOp;
@@ -1146,8 +1146,8 @@ namespace Cosmos.IL2CPU
             xFieldName = DataMember.GetStaticFieldName(aField);
             if (Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Count(x => x.Name == xFieldName) == 0)
             {
-                var xItemList = (from item in aField.GetCustomAttributes(false)
-                                 where item.GetType().FullName == "ManifestResourceStreamAttribute"
+                var xItemList = (from item in aField.CustomAttributes
+                                 where item.AttributeType.FullName == "ManifestResourceStreamAttribute"
                                  select item).ToList();
 
                 object xItem = null;
@@ -1272,7 +1272,7 @@ namespace Cosmos.IL2CPU
 
                     if (!aTo.IsWildcard)
                     {
-                        var xObjectPointerAccessAttrib = xParams[0].GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
+                        var xObjectPointerAccessAttrib = xParams[0].GetReflectionOnlyCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
                         if (xObjectPointerAccessAttrib != null)
                         {
                             XS.Comment("Skipping the reference to the next object reference.");
@@ -1295,13 +1295,13 @@ namespace Cosmos.IL2CPU
                 var xOriginalParamsIdx = 0;
                 foreach (var xParam in xParams)
                 {
-                    var xFieldAccessAttrib = xParam.GetCustomAttributes<FieldAccessAttribute>(true).FirstOrDefault();
-                    var xObjectPointerAccessAttrib = xParam.GetCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
+                    var xFieldAccessAttrib = xParam.GetReflectionOnlyCustomAttributes<FieldAccessAttribute>(true).FirstOrDefault();
+                    var xObjectPointerAccessAttrib = xParam.GetReflectionOnlyCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
                     if (xFieldAccessAttrib != null)
                     {
                         // field access
-                        XS.Comment("Loading address of field '" + xFieldAccessAttrib.Name + "'");
-                        var xFieldInfo = ResolveField(aFrom, xFieldAccessAttrib.Name, false);
+                        XS.Comment("Loading address of field '" + xFieldAccessAttrib.GetArgumentValue<string>("Name") + "'");
+                        var xFieldInfo = ResolveField(aFrom, xFieldAccessAttrib.GetArgumentValue<string>("Name"), false);
                         if (xFieldInfo.IsStatic)
                         {
                             Ldsflda(aFrom, xFieldInfo);

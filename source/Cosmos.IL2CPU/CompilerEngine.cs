@@ -33,6 +33,8 @@ namespace Cosmos.IL2CPU
         public string[] AdditionalSearchDirs { get; set; }
         public string[] AdditionalReferences { get; set; }
 
+        private List<CompilerExtensionBase> mLoadedExtensions;
+
         public bool DebugEnabled = false;
         public bool StackCorruptionDetectionEnabled = false;
         protected StackCorruptionDetectionLevel mStackCorruptionDetectionLevel = Cosmos.Build.Common.StackCorruptionDetectionLevel.MethodFooters;
@@ -66,8 +68,80 @@ namespace Cosmos.IL2CPU
             OnLogException?.Invoke(e);
         }
 
+        private string CurrentDomain_AssemblyPath(string aShortName, Assembly aRequestingAssembly)
+        {
+            // Check nuget packages.
+            foreach (var xRef in AdditionalReferences)
+            {
+                var xAssemblyName = AssemblyName.GetAssemblyName(xRef);
+                if (xAssemblyName.Name == aShortName)
+                {
+                    return xRef;
+                }
+            }
+
+            // Check search directories.
+            foreach (var xDir in mSearchDirs)
+            {
+                var xPath = Path.Combine(xDir, aShortName + ".dll");
+                if (File.Exists(xPath))
+                {
+                    return xPath;
+                }
+                xPath = Path.Combine(xDir, aShortName + ".exe");
+                if (File.Exists(xPath))
+                {
+                    return xPath;
+                }
+            }
+
+            if (aRequestingAssembly != null)
+            {
+
+                // check for path in as requested dll is stored, this makes refrenced dll project working
+                var xPathAsRequested = Path.Combine(Path.GetDirectoryName(aRequestingAssembly.Location), aShortName + ".dll");
+                if (File.Exists(xPathAsRequested))
+                {
+                    return xPathAsRequested;
+                }
+            }
+            return null;
+        }
+
+        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            mStaticLog?.Invoke($"Resolving assembly '{args.Name}'.");
+
+            var xShortName = args.Name;
+            if (xShortName.Contains(','))
+            {
+                xShortName = xShortName.Substring(0, xShortName.IndexOf(','));
+            }
+
+            // Check already loaded assemblies.
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var xLoadedShortName = assembly.GetName().Name;
+                if (xLoadedShortName == xShortName)
+                {
+                    return assembly;
+                }
+            }
+
+            string xPath = CurrentDomain_AssemblyPath(xShortName, args.RequestingAssembly);
+            if (!string.IsNullOrWhiteSpace(xPath))
+            {
+                return Assembly.LoadFrom(xPath);
+            }
+
+            mStaticLog?.Invoke($"Assembly '{args.Name}' not resolved!");
+            return null;
+        }
+
         private Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
         {
+            mStaticLog?.Invoke($"Resolving assembly '{args.Name}'.");
+
             var xShortName = args.Name;
             if (xShortName.Contains(','))
             {
@@ -84,36 +158,12 @@ namespace Cosmos.IL2CPU
                 }
             }
 
-            // Check nuget packages.
-            foreach (var xRef in AdditionalReferences)
+            string xPath = CurrentDomain_AssemblyPath(xShortName, args.RequestingAssembly);
+            if (!string.IsNullOrWhiteSpace(xPath))
             {
-                var xAssemblyName = AssemblyName.GetAssemblyName(xRef);
-                if (xAssemblyName.Name == xShortName)
-                {
-                    return Assembly.ReflectionOnlyLoadFrom(xRef);
-                }
+                return Assembly.ReflectionOnlyLoadFrom(xPath);
             }
 
-            // Check search directories.
-            foreach (var xDir in mSearchDirs)
-            {
-                var xPath = Path.Combine(xDir, xShortName + ".dll");
-                if (File.Exists(xPath))
-                {
-                    return Assembly.ReflectionOnlyLoadFrom(xPath);
-                }
-                xPath = Path.Combine(xDir, xShortName + ".exe");
-                if (File.Exists(xPath))
-                {
-                    return Assembly.ReflectionOnlyLoadFrom(xPath);
-                }
-            }
-            // check for path in as requested dll is stored, this makes refrenced dll project working
-            var xPathAsRequested = Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), xShortName + ".dll");
-            if (File.Exists(xPathAsRequested))
-            {
-                return Assembly.ReflectionOnlyLoadFrom(xPathAsRequested);
-            }
             mStaticLog?.Invoke($"Assembly '{args.Name}' not resolved!");
             return null;
         }
@@ -155,10 +205,10 @@ namespace Cosmos.IL2CPU
             mSearchDirs.Add(CosmosPaths.UserKit);
             mSearchDirs.Add(CosmosPaths.Kernel);
 
-
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
 
-            mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
+            mDebugMode = (DebugMode) Enum.Parse(typeof(DebugMode), DebugMode);
             if (string.IsNullOrEmpty(TraceAssemblies))
             {
                 mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.User;
@@ -170,7 +220,7 @@ namespace Cosmos.IL2CPU
                     LogError("Invalid TraceAssemblies specified");
                     return false;
                 }
-                mTraceAssemblies = (TraceAssemblies)Enum.Parse(typeof(TraceAssemblies), TraceAssemblies);
+                mTraceAssemblies = (TraceAssemblies) Enum.Parse(typeof(TraceAssemblies), TraceAssemblies);
             }
 
             if (string.IsNullOrEmpty(StackCorruptionDetectionLevel))
@@ -179,7 +229,7 @@ namespace Cosmos.IL2CPU
             }
             else
             {
-                mStackCorruptionDetectionLevel = (StackCorruptionDetectionLevel)Enum.Parse(typeof(StackCorruptionDetectionLevel), StackCorruptionDetectionLevel);
+                mStackCorruptionDetectionLevel = (StackCorruptionDetectionLevel) Enum.Parse(typeof(StackCorruptionDetectionLevel), StackCorruptionDetectionLevel);
             }
 
             return true;
@@ -357,7 +407,7 @@ namespace Cosmos.IL2CPU
                         if (!xType.IsGenericTypeDefinition && !xType.IsAbstract)
                         {
                             LogMessage($"Checking type {xType}");
-                            if (xType.BaseType.Name == "Kernel")
+                            if (xType.BaseType?.Name == "Kernel")
                             {
                                 // found kernel?
                                 if (xKernelType != null)
@@ -371,10 +421,11 @@ namespace Cosmos.IL2CPU
                         }
                     }
 
-                    //var xCompilerExtensionsMetas = xRef.GetReflectionOnlyCustomAttributes<CompilerExtensionAttribute>();
+                    // TODO: Fix this.
+                    //var xCompilerExtensionsMetas = xAssembly.GetReflectionOnlyCustomAttributes<CompilerExtensionAttribute>();
                     //foreach (var xMeta in xCompilerExtensionsMetas)
                     //{
-                    //    mLoadedExtensions.Add((CompilerExtensionBase)Activator.CreateInstance(xMeta.AttributeType));
+                    //    mLoadedExtensions.Add((CompilerExtensionBase) Activator.CreateInstance(xMeta.Type));
                     //}
                 }
             }
@@ -392,16 +443,182 @@ namespace Cosmos.IL2CPU
             }
             return xCtor;
         }
-
-        private List<CompilerExtensionBase> mLoadedExtensions;
     }
 
-    public static class AssemblyExtensions
+    public static class CustomAttributeExtensions
     {
-        public static IEnumerable<CustomAttributeData> GetReflectionOnlyCustomAttributes<T>(this Assembly aAssembly)
+        public static CustomAttributeData GetReflectionOnlyCustomAttribute<T>(this Assembly aElement) where T : Attribute
         {
-            var xAttributes = aAssembly.GetCustomAttributesData();
+            CustomAttributeData xData = null;
+
+            if (aElement == null)
+            {
+                throw new ArgumentNullException(nameof(aElement));
+            }
+
+            var xAttributes = aElement.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
+
+            if (xAttributes.Any())
+            {
+                if (xAttributes.Count > 1)
+                {
+                    throw new Exception($"More than one attribute of type '{typeof(T)}' was found!");
+                }
+
+                xData = xAttributes[0];
+            }
+
+            return xData;
+        }
+
+        public static CustomAttributeData GetReflectionOnlyCustomAttribute<T>(this MemberInfo aElement, bool aInherit = false) where T : Attribute
+        {
+            CustomAttributeData xData = null;
+
+            if (aElement == null)
+            {
+                throw new ArgumentNullException(nameof(aElement));
+            }
+
+            var xAttributes = aElement.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
+            if (aInherit)
+            {
+                var xBaseType = aElement.ReflectedType?.BaseType;
+                while (!xAttributes.Any() && xBaseType != null)
+                {
+                    xAttributes = xBaseType.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
+                    xBaseType = xBaseType.BaseType;
+                }
+            }
+
+            if (xAttributes.Any())
+            {
+                if (xAttributes.Count > 1)
+                {
+                    throw new Exception($"More than one attribute of type '{typeof(T)}' was found!");
+                }
+
+                xData = xAttributes[0];
+            }
+
+            return xData;
+        }
+
+        public static CustomAttributeData GetReflectionOnlyCustomAttribute<T>(this ParameterInfo aElement, bool aInherit = false) where T : Attribute
+        {
+            CustomAttributeData xData = null;
+
+            if (aElement == null)
+            {
+                throw new ArgumentNullException(nameof(aElement));
+            }
+
+            var xAttributes = aElement.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
+            if (aInherit)
+            {
+                var xBaseType = aElement.ParameterType.BaseType;
+                while (!xAttributes.Any() && xBaseType != null)
+                {
+                    xAttributes = xBaseType.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
+                    xBaseType = xBaseType.BaseType;
+                }
+            }
+
+            if (xAttributes.Any())
+            {
+                if (xAttributes.Count > 1)
+                {
+                    throw new Exception($"More than one attribute of type '{typeof(T)}' was found!");
+                }
+
+                xData = xAttributes[0];
+            }
+
+            return xData;
+        }
+
+        public static List<CustomAttributeData> GetReflectionOnlyCustomAttributes<T>(this Assembly aElement) where T : Attribute
+        {
+            if (aElement == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            var xAttributes = aElement.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
+
             return xAttributes;
+        }
+
+        public static List<CustomAttributeData> GetReflectionOnlyCustomAttributes<T>(this MemberInfo aElement, bool aInherit = false) where T : Attribute
+        {
+            if (aElement == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            var xAttributes = aElement.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
+            if (aInherit)
+            {
+                var xBaseType = aElement.ReflectedType?.BaseType;
+
+                while (!xAttributes.Any() && xBaseType != null)
+                {
+                    xAttributes = xBaseType.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
+                    xBaseType = xBaseType.BaseType;
+                }
+            }
+            return xAttributes;
+        }
+
+        public static List<CustomAttributeData> GetReflectionOnlyCustomAttributes<T>(this ParameterInfo aElement, bool aInherit = false) where T : Attribute
+        {
+            if (aElement == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            var xAttributes = aElement.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
+            if (aInherit)
+            {
+                var xBaseType = aElement.ParameterType.BaseType;
+
+                while (!xAttributes.Any() && xBaseType != null)
+                {
+                    xAttributes = xBaseType.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
+                    xBaseType = xBaseType.BaseType;
+                }
+            }
+            return xAttributes;
+        }
+
+        public static T GetArgumentValue<T>(this CustomAttributeData aElement, string aName)
+        {
+            if (aElement == null)
+            {
+                throw new ArgumentNullException(nameof(aElement));
+            }
+
+            if (string.IsNullOrWhiteSpace(aName))
+            {
+                throw new ArgumentNullException(nameof(aName));
+            }
+
+            var xArg = aElement.NamedArguments?.Where(x => x.MemberName == aName).ToList();
+            if (xArg != null && xArg.Any())
+            {
+                return (T) xArg[0].TypedValue.Value;
+            }
+
+            var xParams = aElement.Constructor.GetParameters().Where(x => x.Name == aName).ToList();
+            if (xParams != null && xParams.Any())
+            {
+                if (aElement.ConstructorArguments.Count > xParams[0].Position)
+                {
+                    return (T) aElement.ConstructorArguments[xParams[0].Position].Value;
+                }
+            }
+
+            return default(T);
         }
     }
 }
