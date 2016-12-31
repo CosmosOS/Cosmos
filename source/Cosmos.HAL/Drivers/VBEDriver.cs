@@ -10,7 +10,12 @@ namespace Cosmos.HAL.Drivers
     {
        
         private Core.IOGroup.VBE IO = Core.Global.BaseIOGroups.VBE;
-
+        public VBEDriver()
+        {
+            if (Cosmos.HAL.PCI.GetDevice(1234, 1111) == null){
+                throw new Exception("No BGA adapter found..");
+            }
+        }
         private void vbe_write(ushort index, ushort value)
         {
             IO.VbeIndex.Word =  index;
@@ -19,9 +24,7 @@ namespace Cosmos.HAL.Drivers
 
         public void vbe_set(ushort xres, ushort yres, ushort bpp)
         {
-            if (Cosmos.HAL.PCI.GetDevice(1234, 1111) == null){
-                throw new Exception("No BGA adapter found..");
-            }
+
             //Disable Display
             vbe_write(0x4, 0x00);
             //Set Display Xres
