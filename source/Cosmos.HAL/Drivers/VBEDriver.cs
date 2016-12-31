@@ -13,8 +13,15 @@ namespace Cosmos.HAL.Drivers
         public VBEDriver()
         {
             if (Cosmos.HAL.PCI.GetDevice(1234, 1111) == null){
-                throw new Exception("No BGA adapter found..");
+                throw new NotSupportedException("No BGA adapter found..");
             }
+        }
+        public VBEDriver(ushort x, ushort y, ushort bpp)
+        {
+            if (Cosmos.HAL.PCI.GetDevice(1234, 1111) == null){
+                throw new NotSupportedException("No BGA adapter found..");
+            }
+            vbe_set(x,y,bpp);
         }
         private void vbe_write(ushort index, ushort value)
         {
