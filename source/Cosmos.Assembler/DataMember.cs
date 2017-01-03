@@ -65,20 +65,20 @@ namespace Cosmos.Assembler
         public DataMember(string aName, short[] aDefaultValue)
         {
             Name = aName;
-            RawDefaultValue = new byte[aDefaultValue.Length*2];
+            RawDefaultValue = new byte[aDefaultValue.Length * 2];
             for (int i = 0; i < aDefaultValue.Length; i++)
             {
-                Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0, RawDefaultValue, i*2, 2);
+                Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0, RawDefaultValue, i * 2, 2);
             }
         }
 
         public DataMember(string aName, params ushort[] aDefaultValue)
         {
             Name = aName;
-            RawDefaultValue = new byte[aDefaultValue.Length*2];
+            RawDefaultValue = new byte[aDefaultValue.Length * 2];
             for (int i = 0; i < aDefaultValue.Length; i++)
             {
-                Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0, RawDefaultValue, i*2, 2);
+                Array.Copy(BitConverter.GetBytes(aDefaultValue[i]), 0, RawDefaultValue, i * 2, 2);
             }
             //UntypedDefaultValue = aDefaultValue;
         }
@@ -126,7 +126,7 @@ namespace Cosmos.Assembler
             {
                 xTempResult = xTempResult.Replace(c, '_');
             }
-            return string.Intern(xTempResult);
+            return xTempResult;
         }
 
         public override void WriteText(Assembler aAssembler, TextWriter aOutput)
@@ -146,9 +146,9 @@ namespace Cosmos.Assembler
                     return;
                 }
                 if ((from item in RawDefaultValue
-                        group item by item
-                        into i
-                        select i).Count() > 1 || RawDefaultValue.Length < 250)
+                     group item by item
+                     into i
+                     select i).Count() > 1 || RawDefaultValue.Length < 250)
                 {
                     if (IsGlobal)
                     {
@@ -195,19 +195,19 @@ namespace Cosmos.Assembler
                 }
 
                 Func<object, string> xGetTextForItem = delegate(object aItem)
-                {
-                    var xElementRef = aItem as ElementReference;
-                    if (xElementRef == null)
-                    {
-                        return (aItem ?? 0).ToString();
-                    }
+                                                       {
+                                                           var xElementRef = aItem as ElementReference;
+                                                           if (xElementRef == null)
+                                                           {
+                                                               return (aItem ?? 0).ToString();
+                                                           }
 
-                    if (xElementRef.Offset == 0)
-                    {
-                        return xElementRef.Name;
-                    }
-                    return xElementRef.Name + " + " + xElementRef.Offset;
-                };
+                                                           if (xElementRef.Offset == 0)
+                                                           {
+                                                               return xElementRef.Name;
+                                                           }
+                                                           return xElementRef.Name + " + " + xElementRef.Offset;
+                                                       };
                 for (int i = 0; i < (UntypedDefaultValue.Length - 1); i++)
                 {
                     aOutput.Write(xGetTextForItem(UntypedDefaultValue[i]));
@@ -248,20 +248,20 @@ namespace Cosmos.Assembler
         {
             if (Alignment > 0)
             {
-                if (xAddress%Alignment != 0)
+                if (xAddress % Alignment != 0)
                 {
-                    xAddress += Alignment - (xAddress%Alignment);
+                    xAddress += Alignment - (xAddress % Alignment);
                 }
             }
             base.UpdateAddress(aAssembler, ref xAddress);
             if (RawDefaultValue != null)
             {
-                xAddress += (ulong) RawDefaultValue.LongLength;
+                xAddress += (ulong) RawDefaultValue.Length;
             }
             if (UntypedDefaultValue != null)
             {
                 // TODO: what to do with 64bit target platforms? right now we only support 32bit
-                xAddress += (ulong) (UntypedDefaultValue.LongLength*4);
+                xAddress += (ulong) (UntypedDefaultValue.Length * 4);
             }
         }
 
@@ -272,12 +272,12 @@ namespace Cosmos.Assembler
                 return true;
             }
 
-            if (UntypedDefaultValue != null && UntypedDefaultValue.LongLength > 0)
+            if (UntypedDefaultValue != null && UntypedDefaultValue.Length > 0)
             {
                 foreach (var xReference in (from item in UntypedDefaultValue
-                    let xRef = item as ElementReference
-                    where xRef != null
-                    select xRef))
+                                            let xRef = item as ElementReference
+                                            where xRef != null
+                                            select xRef))
                 {
                     var xRef = aAssembler.TryResolveReference(xReference);
 
@@ -298,7 +298,7 @@ namespace Cosmos.Assembler
 
         public override void WriteData(Assembler aAssembler, Stream aOutput)
         {
-            if (UntypedDefaultValue != null && UntypedDefaultValue.LongLength > 0)
+            if (UntypedDefaultValue != null && UntypedDefaultValue.Length > 0)
             {
                 for (int i = 0; i < UntypedDefaultValue.Length; i++)
                 {

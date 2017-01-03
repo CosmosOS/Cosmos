@@ -36,7 +36,7 @@ namespace Cosmos.IL2CPU
     {
       return "VMT__TYPE_ID_HOLDER__" +
              DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(aType) + " ASM_IS__" +
-                                                      aType.Assembly.GetName().Name);
+                                                      aType.GetTypeInfo().Assembly.GetName().Name);
     }
 
     public static uint Align(uint aSize, uint aAlign)
@@ -194,13 +194,13 @@ namespace Cosmos.IL2CPU
       //if (xTypeSpec != null) {
       //    return 4;
       //}
-      if (aType.IsEnum)
+      if (aType.GetTypeInfo().IsEnum)
       {
-        return SizeOfType(aType.GetField("value__").FieldType);
+        return SizeOfType(aType.GetTypeInfo().GetField("value__").FieldType);
       }
-      if (aType.IsValueType)
+      if (aType.GetTypeInfo().IsValueType)
       {
-        var xSla = aType.StructLayoutAttribute;
+        var xSla = aType.GetTypeInfo().StructLayoutAttribute;
         if ((xSla != null) && (xSla.Size > 0))
         {
           return (uint)xSla.Size;
@@ -232,7 +232,7 @@ namespace Cosmos.IL2CPU
       new CPU.Call
       {
         DestinationLabel =
-          LabelName.Get(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented",
+          LabelName.Get(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowNotImplemented",
             BindingFlags.Static | BindingFlags.Public))
       };
     }
@@ -242,7 +242,7 @@ namespace Cosmos.IL2CPU
       new CPU.Call
       {
         DestinationLabel =
-          LabelName.Get(typeof(ExceptionHelper).GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public,
+          LabelName.Get(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public,
             null, new Type[] { }, null))
       };
     }
@@ -255,7 +255,7 @@ namespace Cosmos.IL2CPU
       {
         xBindingFlags |= BindingFlags.Static;
       }
-      var xFields = (from item in aType.GetFields(xBindingFlags)
+      var xFields = (from item in aType.GetTypeInfo().GetFields(xBindingFlags)
                      orderby item.Name, item.DeclaringType.ToString()
                      select item).ToArray();
       for (int i = 0; i < xFields.Length; i++)
@@ -312,9 +312,9 @@ namespace Cosmos.IL2CPU
         }
       }
 
-      if (aType.BaseType != null)
+      if (aType.GetTypeInfo().BaseType != null)
       {
-        DoGetFieldsInfo(aType.BaseType, aFields, includeStatic);
+        DoGetFieldsInfo(aType.GetTypeInfo().BaseType, aFields, includeStatic);
       }
     }
 
@@ -595,7 +595,7 @@ namespace Cosmos.IL2CPU
 
     public static bool TypeIsReferenceType(Type type)
     {
-      return !type.IsValueType && !type.IsPointer && !type.IsByRef;
+      return !type.GetTypeInfo().IsValueType && !type.IsPointer && !type.IsByRef;
     }
   }
 }

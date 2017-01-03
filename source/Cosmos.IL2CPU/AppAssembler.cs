@@ -56,7 +56,7 @@ namespace Cosmos.IL2CPU
         public AppAssembler(int aComPort, string assemblerLogFile)
         {
             Assembler = CreateAssembler(aComPort);
-            mLog = new StreamWriter(assemblerLogFile, false);
+            mLog = new StreamWriter(File.OpenWrite(assemblerLogFile));
             InitILOps();
         }
 
@@ -78,8 +78,8 @@ namespace Cosmos.IL2CPU
         protected void MethodBegin(MethodInfo aMethod)
         {
             XS.Comment("---------------------------------------------------------");
-            XS.Comment("Assembly: " + aMethod.MethodBase.DeclaringType.Assembly.FullName);
-            XS.Comment("Type: " + aMethod.MethodBase.DeclaringType.ToString());
+            XS.Comment("Assembly: " + aMethod.MethodBase.DeclaringType.GetTypeInfo().Assembly.FullName);
+            XS.Comment("Type: " + aMethod.MethodBase.DeclaringType);
             XS.Comment("Name: " + aMethod.MethodBase.Name);
             XS.Comment("Plugged: " + (aMethod.PlugMethod == null ? "No" : "Yes"));
             // for now:
@@ -112,7 +112,7 @@ namespace Cosmos.IL2CPU
                     for (ushort i = 0; i < xParamCount; i++)
                     {
                         var xOffset = X86.IL.Ldarg.GetArgumentDisplacement(aMethod, (ushort)(i + xIdxOffset));
-                        var xSize = X86.IL.Ldarg.SizeOfType(xParams[i].ParameterType);
+                        var xSize = ILOp.SizeOfType(xParams[i].ParameterType);
                         // if last argument is 8 byte long, we need to add 4, so that debugger could read all 8 bytes from this variable in positiv direction
                         XS.Comment(String.Format("Argument[{3}] {0} at EBP+{1}, size = {2}", xParams[i].Name, xOffset, xSize, (xIdxOffset + i)));
                     }
@@ -155,14 +155,14 @@ namespace Cosmos.IL2CPU
             if (DebugEnabled && StackCorruptionDetection)
             {
                 // if StackCorruption detection is active, we're also going to emit a stack overflow detection
-                XS.Set(XSRegisters.EAX, "Before_Kernel_Stack");
-                XS.Compare(XSRegisters.EAX, XSRegisters.ESP);
+                XS.Set(EAX, "Before_Kernel_Stack");
+                XS.Compare(EAX, ESP);
                 XS.Jump(ConditionalTestEnum.LessThan, mCurrentMethodLabel + ".StackOverflowCheck_End");
                 XS.ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 new Call { DestinationLabel = mCurrentMethodLabel + ".StackOverflowCheck_GetAddress" };
                 XS.Label(mCurrentMethodLabel + ".StackOverflowCheck_GetAddress");
-                XS.Pop(XSRegisters.EAX);
+                XS.Pop(EAX);
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 XS.Call("DebugStub_SendStackOverflowOccurred");
                 XS.Halt();
@@ -182,13 +182,13 @@ namespace Cosmos.IL2CPU
                 XS.Set(xName, 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
                 XS.Jump(".AfterCCTorAlreadyCalledCheck");
                 XS.Label(".BeforeQuickReturn");
-                XS.Set(XSRegisters.ECX, 0);
+                XS.Set(ECX, 0);
                 XS.Return();
                 XS.Label(".AfterCCTorAlreadyCalledCheck");
             }
 
-            XS.Push(XSRegisters.EBP);
-            XS.Set(XSRegisters.EBP, XSRegisters.ESP);
+            XS.Push(EBP);
+            XS.Set(EBP, ESP);
 
             if (DebugMode == DebugMode.Source)
             {
@@ -204,13 +204,13 @@ namespace Cosmos.IL2CPU
 
                     var xMethod = new Method();
                     xMethod.ID = mCurrentMethodGuid;
-                    xMethod.TypeToken = aMethod.MethodBase.DeclaringType.MetadataToken;
+                    xMethod.TypeToken = aMethod.MethodBase.DeclaringType.GetTypeInfo().MetadataToken;
                     xMethod.MethodToken = aMethod.MethodBase.MetadataToken;
                     xMethod.LabelStartID = xLabelGuid;
                     xMethod.LabelEndID = mCurrentMethodLabelEndGuid;
                     xMethod.LabelCall = xMethodLabel;
                     long xAssemblyFileID;
-                    if (DebugInfo.AssemblyGUIDs.TryGetValue(aMethod.MethodBase.DeclaringType.Assembly, out xAssemblyFileID))
+                    if (DebugInfo.AssemblyGUIDs.TryGetValue(aMethod.MethodBase.DeclaringType.GetTypeInfo().Assembly, out xAssemblyFileID))
                     {
                         xMethod.AssemblyFileID = xAssemblyFileID;
                     }
@@ -327,12 +327,12 @@ namespace Cosmos.IL2CPU
                 XS.Set("static_field__Cosmos_Core_INTs_mLastKnownAddress", xMethodLabel + EndOfMethodLabelNameNormal, destinationIsIndirect: true);
             }
 
-            XS.Set(XSRegisters.ECX, 0);
+            XS.Set(ECX, 0);
             var xTotalArgsSize = (from item in aMethod.MethodBase.GetParameters()
                                   select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
             if (!aMethod.MethodBase.IsStatic)
             {
-                if (aMethod.MethodBase.DeclaringType.IsValueType)
+                if (aMethod.MethodBase.DeclaringType.GetTypeInfo().IsValueType)
                 {
                     xTotalArgsSize += 4; // only a reference is passed
                 }
@@ -354,7 +354,7 @@ namespace Cosmos.IL2CPU
                                   select (int)ILOp.Align(ILOp.SizeOfType(item.ParameterType), 4)).Sum();
                 if (!aMethod.PluggedMethod.MethodBase.IsStatic)
                 {
-                    if (aMethod.PluggedMethod.MethodBase.DeclaringType.IsValueType)
+                    if (aMethod.PluggedMethod.MethodBase.DeclaringType.GetTypeInfo().IsValueType)
                     {
                         xTotalArgsSize += 4; // only a reference is passed
                     }
@@ -370,8 +370,8 @@ namespace Cosmos.IL2CPU
                 var xOffset = GetResultCodeOffset(xReturnSize, (uint)xTotalArgsSize);
                 for (int i = 0; i < ((int)(xReturnSize / 4)); i++)
                 {
-                    XS.Pop(XSRegisters.EAX);
-                    XS.Set(XSRegisters.EBP, XSRegisters.EAX, destinationDisplacement: (int)(xOffset + ((i + 0) * 4)));
+                    XS.Pop(EAX);
+                    XS.Set(EBP, EAX, destinationDisplacement: (int)(xOffset + ((i + 0) * 4)));
                 }
                 // extra stack space is the space reserved for example when a "public static int TestMethod();" method is called, 4 bytes is pushed, to make room for result;
             }
@@ -389,13 +389,13 @@ namespace Cosmos.IL2CPU
 
                         if (xLocalsSize >= 256)
                         {
-                            XS.Add(XSRegisters.ESP, 255);
+                            XS.Add(ESP, 255);
                             xLocalsSize -= 255;
                         }
                     }
                     if (xLocalsSize > 0)
                     {
-                        XS.Add(XSRegisters.ESP, xLocalsSize);
+                        XS.Add(ESP, xLocalsSize);
                     }
                 }
             }
@@ -403,9 +403,9 @@ namespace Cosmos.IL2CPU
             {
                 // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
                 // if not, we should somehow break here.
-                XS.Set(XSRegisters.EAX, XSRegisters.ESP);
-                XS.Set(XSRegisters.EBX, XSRegisters.EBP);
-                XS.Compare(XSRegisters.EAX, XSRegisters.EBX);
+                XS.Set(EAX, ESP);
+                XS.Set(EBX, EBP);
+                XS.Compare(EAX, EBX);
                 XS.Jump(ConditionalTestEnum.Equal, xLabelExc + "__2");
                 XS.ClearInterruptFlag();
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
@@ -423,7 +423,7 @@ namespace Cosmos.IL2CPU
                 XS.Halt();
             }
             XS.Label(xLabelExc + "__2");
-            XS.Pop(XSRegisters.EBP);
+            XS.Pop(EBP);
             var xRetSize = ((int)xTotalArgsSize) - ((int)xReturnSize);
             if (xRetSize < 0)
             {
@@ -823,7 +823,7 @@ namespace Cosmos.IL2CPU
 
         protected FieldInfo ResolveField(MethodInfo method, string fieldId, bool aOnlyInstance)
         {
-            return X86.IL.Ldflda.ResolveField(method.MethodBase.DeclaringType, fieldId, aOnlyInstance);
+            return ILOp.ResolveField(method.MethodBase.DeclaringType, fieldId, aOnlyInstance);
         }
 
         protected void Ldarg(MethodInfo aMethod, int aIndex)
@@ -836,7 +836,7 @@ namespace Cosmos.IL2CPU
             var xSize = X86.IL.Call.GetStackSizeToReservate(aTargetMethod.MethodBase);
             if (xSize > 0)
             {
-                XS.Sub(XSRegisters.ESP, xSize);
+                XS.Sub(ESP, xSize);
             }
             XS.Call(ILOp.GetMethodLabel(aTargetMethod));
             var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
@@ -857,7 +857,7 @@ namespace Cosmos.IL2CPU
                          }
                          for (int i = 0; i < xResultSize / 4; i++)
                          {
-                             XS.Add(XSRegisters.ESP, 4);
+                             XS.Add(ESP, 4);
                          }
                      }, aNextLabel);
         }
@@ -878,17 +878,16 @@ namespace Cosmos.IL2CPU
         }
 
         public const string InitVMTCodeLabel = "___INIT__VMT__CODE____";
-        public virtual void GenerateVMTCode(HashSet<Type> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<Type, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID)
+        public virtual void GenerateVMTCode(HashSet<TypeInfo> aTypesSet, HashSet<MethodBase> aMethodsSet, Func<TypeInfo, uint> aGetTypeID, Func<MethodBase, uint> aGetMethodUID)
         {
             XS.Comment("---------------------------------------------------------");
             XS.Label(InitVMTCodeLabel);
-            XS.Push(XSRegisters.EBP);
-            XS.Set(XSRegisters.EBP, XSRegisters.ESP);
+            XS.Push(EBP);
+            XS.Set(EBP, ESP);
             mSequences = new DebugInfo.SequencePoint[0];
 
             var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
-            var xTypesFieldRef = VTablesImplRefs.VTablesImplDef.GetField("mTypes",
-                                                                         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+            var xTypesFieldRef = VTablesImplRefs.VTablesImplDef.GetTypeInfo().GetField("mTypes", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             string xTheName = DataMember.GetStaticFieldName(xTypesFieldRef);
             DataMember xDataMember = (from item in Cosmos.Assembler.Assembler.CurrentInstance.DataMembers
                                       where item.Name == xTheName
@@ -900,7 +899,7 @@ namespace Cosmos.IL2CPU
                                                                                select item).First());
             }
             var xData = new byte[16 + (aTypesSet.Count * GetVTableEntrySize())];
-            var xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
+            var xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array).GetTypeInfo()));
             Array.Copy(xTemp, 0, xData, 0, 4);
             xTemp = BitConverter.GetBytes(0x80000002);
             Array.Copy(xTemp, 0, xData, 4, 4);
@@ -953,7 +952,7 @@ namespace Cosmos.IL2CPU
                 }
                 foreach (var xIntf in xType.GetInterfaces())
                 {
-                    foreach (var xMethodIntf in xIntf.GetMethods())
+                    foreach (var xMethodIntf in xIntf.GetTypeInfo().GetMethods())
                     {
                         var xActualMethod = xType.GetMethod(xIntf.FullName + "." + xMethodIntf.Name,
                                                             (from xParam in xMethodIntf.GetParameters()
@@ -970,7 +969,7 @@ namespace Cosmos.IL2CPU
                         {
                             try
                             {
-                                if (!xIntf.IsGenericType)
+                                if (!xIntf.GetTypeInfo().IsGenericType)
                                 {
                                     var xMap = xType.GetInterfaceMap(xIntf);
                                     for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
@@ -1033,7 +1032,7 @@ namespace Cosmos.IL2CPU
                     Push(aGetTypeID(xType));
                     Push((uint)xBaseIndex.Value);
                     xData = new byte[16 + (xEmittedMethods.Count * 4)];
-                    xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
+                    xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array).GetTypeInfo()));
                     Array.Copy(xTemp, 0, xData, 0, 4);
                     xTemp = BitConverter.GetBytes(0x80000002); // embedded array
                     Array.Copy(xTemp, 0, xData, 4, 4);
@@ -1136,7 +1135,7 @@ namespace Cosmos.IL2CPU
 #endif
 
             XS.Label("_END_OF_" + InitVMTCodeLabel);
-            XS.Pop(XSRegisters.EBP);
+            XS.Pop(EBP);
             XS.Return();
         }
 
@@ -1157,7 +1156,7 @@ namespace Cosmos.IL2CPU
                 if (xItem != null)
                 {
                     var xItemType = xItem.GetType();
-                    xManifestResourceName = (string)xItemType.GetField("ResourceName").GetValue(xItem);
+                    xManifestResourceName = (string)xItemType.GetTypeInfo().GetField("ResourceName").GetValue(xItem);
                 }
                 if (xManifestResourceName != null)
                 {
@@ -1166,7 +1165,7 @@ namespace Cosmos.IL2CPU
                     //                                (xCurrentField.DeclaringType.Assembly.FullName + "__" + xManifestResourceName).Replace(",",
                     //                                                                                                                       "_") + ".res");
                     var xTarget = new StringBuilder();
-                    using (var xStream = aField.DeclaringType.Assembly.GetManifestResourceStream(xManifestResourceName))
+                    using (var xStream = aField.DeclaringType.GetTypeInfo().Assembly.GetManifestResourceStream(xManifestResourceName))
                     {
                         if (xStream == null)
                         {
@@ -1199,7 +1198,7 @@ namespace Cosmos.IL2CPU
                     uint xTheSize;
                     //string theType = "db";
                     Type xFieldTypeDef = aField.FieldType;
-                    if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType)
+                    if (!xFieldTypeDef.GetTypeInfo().IsClass || xFieldTypeDef.GetTypeInfo().IsValueType)
                     {
                         xTheSize = ILOp.SizeOfType(aField.FieldType);
                     }
@@ -1216,16 +1215,15 @@ namespace Cosmos.IL2CPU
                             try
                             {
                                 Type xTyp = xValue.GetType();
-                                if (xTyp.IsEnum)
+                                if (xTyp.GetTypeInfo().IsEnum)
                                 {
                                     xValue = Convert.ChangeType(xValue, Enum.GetUnderlyingType(xTyp));
                                 }
-                                if (xTyp.IsValueType)
+                                if (xTyp.GetTypeInfo().IsValueType)
                                 {
                                     for (int x = 4; x < xTheSize; x++)
                                     {
-                                        xData[x] = Marshal.ReadByte(xValue,
-                                                                    x);
+                                        xData[x] = Marshal.ReadByte(xValue, x);
                                     }
                                 }
                             }
@@ -1364,9 +1362,9 @@ namespace Cosmos.IL2CPU
             // at the time the datamembers for literal strings are created, the type id for string is not yet determined.
             // for now, we fix this at runtime.
             XS.Label(InitStringIDsLabel);
-            XS.Push(XSRegisters.EBP);
-            XS.Set(XSRegisters.EBP, XSRegisters.ESP);
-            XS.Set(XSRegisters.EAX, ILOp.GetTypeIDLabel(typeof(String)), sourceIsIndirect: true);
+            XS.Push(EBP);
+            XS.Set(EBP, ESP);
+            XS.Set(EAX, ILOp.GetTypeIDLabel(typeof(String)), sourceIsIndirect: true);
             new Mov { DestinationRef = ElementReference.New("static_field__System_String_Empty"), DestinationIsIndirect = true, SourceRef = ElementReference.New(LdStr.GetContentsArrayName("")), DestinationDisplacement = 4 };
 
             var xMemberId = 0;
@@ -1389,12 +1387,12 @@ namespace Cosmos.IL2CPU
                 new Mov { DestinationRef = ElementReference.New(xDataMember.Name), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
             }
             Assembler.WriteDebugVideo("Done");
-            XS.Pop(XSRegisters.EBP);
+            XS.Pop(EBP);
             XS.Return();
 
             XS.Label(CosmosAssembler.EntryPointName);
-            XS.Push(XSRegisters.EBP);
-            XS.Set(XSRegisters.EBP, XSRegisters.ESP);
+            XS.Push(EBP);
+            XS.Set(EBP, ESP);
             Assembler.WriteDebugVideo("Initializing VMT.");
             XS.Call(InitVMTCodeLabel);
             Assembler.WriteDebugVideo("Initializing string IDs.");
@@ -1410,7 +1408,7 @@ namespace Cosmos.IL2CPU
             XS.Label(xCurLabel);
             X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart", DebugEnabled);
             XS.Label(CosmosAssembler.EntryPointName + ".AfterStart");
-            XS.Pop(XSRegisters.EBP);
+            XS.Pop(EBP);
             XS.Return();
 
             if (ShouldOptimize)
@@ -1520,7 +1518,7 @@ namespace Cosmos.IL2CPU
                 // don't remove the call. It seems pointless, but we need it to retrieve the EIP value
                 XS.Call(xLabel + ".StackCorruptionCheck_GetAddress");
                 XS.Label(xLabel + ".StackCorruptionCheck_GetAddress");
-                XS.Pop(XSRegisters.EAX);
+                XS.Pop(EAX);
                 new Mov { DestinationRef = ElementReference.New("DebugStub_CallerEIP"), DestinationIsIndirect = true, SourceReg = RegistersEnum.EAX };
                 XS.Call("DebugStub_SendStackCorruptionOccurred");
                 XS.Halt();

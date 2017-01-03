@@ -7,10 +7,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <Name>PlaygroundBoot</Name>
     <BinFormat>elf</BinFormat>
-    <SccProjectName>SAK</SccProjectName>
-    <SccProvider>SAK</SccProvider>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

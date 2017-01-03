@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU {
     }
 
     protected void LoadOpCodes() {
-      foreach (var xField in typeof(OpCodes).GetFields(BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Public)) {
+      foreach (var xField in typeof(OpCodes).GetTypeInfo().GetFields(BindingFlags.DeclaredOnly | BindingFlags.Static | BindingFlags.Public)) {
         var xOpCode = (OpCode)xField.GetValue(null);
         var xValue = (ushort)xOpCode.Value;
         if (xValue <= 0xFF) {
@@ -44,8 +44,8 @@ namespace Cosmos.IL2CPU {
       // Cache for use in field and method resolution
       Type[] xTypeGenArgs = null;
       Type[] xMethodGenArgs = null;
-      if (aMethod.DeclaringType.IsGenericType) {
-        xTypeGenArgs = aMethod.DeclaringType.GetGenericArguments();
+      if (aMethod.DeclaringType.GetTypeInfo().IsGenericType) {
+        xTypeGenArgs = aMethod.DeclaringType.GetTypeInfo().GetGenericArguments();
       }
       if (aMethod.IsGenericMethod) {
         xMethodGenArgs = aMethod.GetGenericArguments();

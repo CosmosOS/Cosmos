@@ -1,13 +1,10 @@
 ﻿{
-  "supports": {
-    "netcoreapp1.0.app": {}
-  },
+  "supports": {},
   "dependencies": {
-    "NETStandard.Library": "1.6.1"
+    "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
+    "NETStandard.Library": "1.6.0"
   },
   "frameworks": {
-    "netstandard1.5": {
-      "imports": "portable-net452"
-    }
+    "netstandard1.5": {}
   }
 }

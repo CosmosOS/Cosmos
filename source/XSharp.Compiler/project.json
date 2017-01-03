@@ -1,0 +1,25 @@
+{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "publicSign": true,
+    "keyFile": "../../Cosmos.snk",
+    "outputName": "XSC"
+  },
+  "dependencies": {
+    "Microsoft.NETCore.App": "1.0.1"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": "portable-net452",
+      "dependencies": {
+        "Cosmos.Assembler": {
+          "target": "project"
+        },
+        "XSharp.Common": {
+          "target": "project"
+        }
+      }
+    }
+  }
+}

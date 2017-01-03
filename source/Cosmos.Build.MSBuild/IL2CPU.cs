@@ -1,18 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.Build.Utilities;
 using Microsoft.Build.Framework;
-using System.Reflection;
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
 using System.IO;
-using Cosmos.Build.Common;
-using Microsoft.Win32;
-using Cosmos.IL2CPU.X86;
-using Cosmos.IL2CPU;
-using System.Reflection.Emit;
 using System.Diagnostics;
 
 namespace Cosmos.Build.MSBuild
@@ -115,7 +105,7 @@ namespace Cosmos.Build.MSBuild
 
                 string Arguments = args.Aggregate("", (current, arg) => current + "\"" + arg.Key + ":" + arg.Value + "\" ");
                 Arguments = refs.Aggregate(Arguments, (current, Ref) => current + "\"References:" + Ref + "\" ");
-                
+
                 Log.LogMessage(MessageImportance.High, $"Invoking il2cpu.exe {Arguments}");
                 return ExecuteTool(WorkingDir, Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe"), Arguments, "IL2CPU");
             }

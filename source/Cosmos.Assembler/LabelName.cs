@@ -74,7 +74,7 @@ namespace Cosmos.Assembler
             {
                 using (var xHash = MD5.Create())
                 {
-                    var xValue = xHash.ComputeHash(Encoding.Default.GetBytes(xName));
+                    var xValue = xHash.ComputeHash(Encoding.GetEncoding(0).GetBytes(xName));
                     var xSB = new StringBuilder(xName);
                     // Keep length max same as before.
                     xSB.Length = MaxLengthWithoutSuffix - xValue.Length * 2;
@@ -90,7 +90,7 @@ namespace Cosmos.Assembler
             return xName;
         }
 
-        public static string GetFullName(Type aType)
+        public static string GetFullName(TypeInfo aType)
         {
             if (aType.IsGenericParameter)
             {
@@ -99,7 +99,7 @@ namespace Cosmos.Assembler
             StringBuilder xSB = new StringBuilder(256);
             if (aType.IsArray)
             {
-                xSB.Append(GetFullName(aType.GetElementType()));
+                xSB.Append(GetFullName(aType.GetElementType().GetTypeInfo()));
                 xSB.Append("[");
                 int xRank = aType.GetArrayRank();
                 while (xRank > 1)
@@ -112,11 +112,11 @@ namespace Cosmos.Assembler
             }
             if (aType.IsByRef && aType.HasElementType)
             {
-                return "&" + GetFullName(aType.GetElementType());
+                return "&" + GetFullName(aType.GetElementType().GetTypeInfo());
             }
             if (aType.IsGenericType && !aType.IsGenericTypeDefinition)
             {
-                xSB.Append(GetFullName(aType.GetGenericTypeDefinition()));
+                xSB.Append(GetFullName(aType.GetGenericTypeDefinition().GetTypeInfo()));
             }
             else {
                 xSB.Append(aType.FullName);
@@ -127,10 +127,10 @@ namespace Cosmos.Assembler
                 var xArgs = aType.GetGenericArguments();
                 for (int i = 0; i < xArgs.Length - 1; i++)
                 {
-                    xSB.Append(GetFullName(xArgs[i]));
+                    xSB.Append(GetFullName(xArgs[i].GetTypeInfo()));
                     xSB.Append(", ");
                 }
-                xSB.Append(GetFullName(xArgs.Last()));
+                xSB.Append(GetFullName(xArgs.Last().GetTypeInfo()));
                 xSB.Append(">");
             }
             return xSB.ToString();
@@ -148,7 +148,7 @@ namespace Cosmos.Assembler
             var xMethodInfo = aMethod as System.Reflection.MethodInfo;
             if (xMethodInfo != null)
             {
-                xBuilder.Append(GetFullName(xMethodInfo.ReturnType));
+                xBuilder.Append(GetFullName(xMethodInfo.ReturnType.GetTypeInfo()));
             }
             else {
                 var xCtor = aMethod as ConstructorInfo;
@@ -163,7 +163,7 @@ namespace Cosmos.Assembler
             xBuilder.Append("  ");
             if (aMethod.DeclaringType != null)
             {
-                xBuilder.Append(GetFullName(aMethod.DeclaringType));
+                xBuilder.Append(GetFullName(aMethod.DeclaringType.GetTypeInfo()));
             }
             else {
                 xBuilder.Append("dynamic_method");
@@ -178,10 +178,10 @@ namespace Cosmos.Assembler
                     xBuilder.Append("<");
                     for (int i = 0; i < xGenArgs.Length - 1; i++)
                     {
-                        xBuilder.Append(GetFullName(xGenArgs[i]));
+                        xBuilder.Append(GetFullName(xGenArgs[i].GetTypeInfo()));
                         xBuilder.Append(", ");
                     }
-                    xBuilder.Append(GetFullName(xGenArgs.Last()));
+                    xBuilder.Append(GetFullName(xGenArgs.Last().GetTypeInfo()));
                     xBuilder.Append(">");
                 }
             }
@@ -193,19 +193,19 @@ namespace Cosmos.Assembler
                 {
                     continue;
                 }
-                xBuilder.Append(GetFullName(xParams[i].ParameterType));
+                xBuilder.Append(GetFullName(xParams[i].ParameterType.GetTypeInfo()));
                 if (i < (xParams.Length - 1))
                 {
                     xBuilder.Append(", ");
                 }
             }
             xBuilder.Append(")");
-            return String.Intern(xBuilder.ToString());
+            return xBuilder.ToString();
         }
 
         public static string GetFullName(FieldInfo aField)
         {
-            return GetFullName(aField.FieldType) + " " + GetFullName(aField.DeclaringType) + "." + aField.Name;
+            return GetFullName(aField.FieldType.GetTypeInfo()) + " " + GetFullName(aField.DeclaringType.GetTypeInfo()) + "." + aField.Name;
         }
     }
 }

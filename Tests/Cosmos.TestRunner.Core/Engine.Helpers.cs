@@ -65,16 +65,21 @@ namespace Cosmos.TestRunner.Core
                     if (xLockFile.Libraries.Any())
                     {
                         var lockFileTarget = xLockFile.Targets.First(x => x.RuntimeIdentifier != null);
+                        if (lockFileTarget == null)
+                        {
+                            throw new Exception("No runtime targets found in the jernel project.");
+                        }
+
                         foreach (var lockFileTargetLibrary in lockFileTarget.Libraries)
                         {
-                            if (!lockFileTargetLibrary.RuntimeAssemblies.Any())
+                            if (!lockFileTargetLibrary.NativeLibraries.Any())
                             {
-                                foreach (var assembly in lockFileTargetLibrary.CompileTimeAssemblies)
+                                foreach (var assembly in lockFileTargetLibrary.RuntimeAssemblies)
                                 {
                                     var lockFileLibrary = xLockFile.GetLibrary(lockFileTargetLibrary.Name, lockFileTargetLibrary.Version);
                                     string xAssemblyPath = Path.Combine(pathContext.UserPackageFolder, lockFileLibrary.Path, assembly.Path);
                                     var fileInfo = new FileInfo(xAssemblyPath);
-                                    if (fileInfo.Exists && fileInfo.Length > 0 && !AdditionalReferences.Contains(fileInfo.FullName))
+                                    if (fileInfo.Exists && fileInfo.Length > 0 && AdditionalReferences.FirstOrDefault(x => x.Contains(fileInfo.Name)) == null)
                                     {
                                         AdditionalReferences.Add(fileInfo.FullName);
                                     }
@@ -82,12 +87,12 @@ namespace Cosmos.TestRunner.Core
                             }
                             else
                             {
-                                foreach (var assembly in lockFileTargetLibrary.RuntimeAssemblies)
+                                foreach (var assembly in lockFileTargetLibrary.NativeLibraries)
                                 {
                                     var lockFileLibrary = xLockFile.GetLibrary(lockFileTargetLibrary.Name, lockFileTargetLibrary.Version);
                                     string xAssemblyPath = Path.Combine(pathContext.UserPackageFolder, lockFileLibrary.Path, assembly.Path);
                                     var fileInfo = new FileInfo(xAssemblyPath);
-                                    if (fileInfo.Exists && fileInfo.Length > 0 && !AdditionalReferences.Contains(fileInfo.FullName))
+                                    if (fileInfo.Exists && fileInfo.Length > 0 && AdditionalReferences.FirstOrDefault(x => x.Contains(fileInfo.Name)) == null)
                                     {
                                         AdditionalReferences.Add(fileInfo.FullName);
                                     }

@@ -1,4 +1,6 @@
-﻿using Cosmos.Build.Common;
+﻿#define COSMOSDEBUG
+
+using Cosmos.Build.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -110,7 +112,7 @@ namespace Cosmos.IL2CPU
 
         private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            mStaticLog?.Invoke($"Resolving assembly '{args.Name}'.");
+            CompilerHelpers.Debug($"Resolving assembly '{args.Name}'.");
 
             var xShortName = args.Name;
             if (xShortName.Contains(','))
@@ -140,7 +142,7 @@ namespace Cosmos.IL2CPU
 
         private Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
         {
-            mStaticLog?.Invoke($"Resolving assembly '{args.Name}'.");
+            CompilerHelpers.Debug($"Resolving assembly '{args.Name}'.");
 
             var xShortName = args.Name;
             if (xShortName.Contains(','))
@@ -205,10 +207,12 @@ namespace Cosmos.IL2CPU
             mSearchDirs.Add(CosmosPaths.UserKit);
             mSearchDirs.Add(CosmosPaths.Kernel);
 
+            PlugManager.AdditionalReferences = AdditionalReferences;
+
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
 
-            mDebugMode = (DebugMode) Enum.Parse(typeof(DebugMode), DebugMode);
+            mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
             if (string.IsNullOrEmpty(TraceAssemblies))
             {
                 mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.User;
@@ -220,7 +224,7 @@ namespace Cosmos.IL2CPU
                     LogError("Invalid TraceAssemblies specified");
                     return false;
                 }
-                mTraceAssemblies = (TraceAssemblies) Enum.Parse(typeof(TraceAssemblies), TraceAssemblies);
+                mTraceAssemblies = (TraceAssemblies)Enum.Parse(typeof(TraceAssemblies), TraceAssemblies);
             }
 
             if (string.IsNullOrEmpty(StackCorruptionDetectionLevel))
@@ -229,7 +233,7 @@ namespace Cosmos.IL2CPU
             }
             else
             {
-                mStackCorruptionDetectionLevel = (StackCorruptionDetectionLevel) Enum.Parse(typeof(StackCorruptionDetectionLevel), StackCorruptionDetectionLevel);
+                mStackCorruptionDetectionLevel = (StackCorruptionDetectionLevel)Enum.Parse(typeof(StackCorruptionDetectionLevel), StackCorruptionDetectionLevel);
             }
 
             return true;
@@ -292,12 +296,12 @@ namespace Cosmos.IL2CPU
                                     LogWarning("Could not create the file \"" + xLogFile + "\"! No log will be created!");
                                 }
                             }
-                            xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
+                            xScanner.QueueMethod(xInitMethod.DeclaringType.GetTypeInfo().BaseType.GetTypeInfo().GetMethod("Start"));
                             xScanner.Execute(xInitMethod);
 
-                            AppAssemblerRingsCheck.Execute(xScanner, xInitMethod.DeclaringType.Assembly);
+                            AppAssemblerRingsCheck.Execute(xScanner, xInitMethod.DeclaringType.GetTypeInfo().Assembly);
 
-                            using (var xOut = new StreamWriter(OutputFilename, false, Encoding.ASCII, 128 * 1024))
+                            using (var xOut = new StreamWriter(File.OpenWrite(OutputFilename), Encoding.ASCII, 128 * 1024))
                             {
                                 //if (EmitDebugSymbols) {
                                 xAsm.Assembler.FlushText(xOut);
@@ -375,6 +379,47 @@ namespace Cosmos.IL2CPU
             return new AppAssembler(DebugCom, AssemblerLog);
         }
 
+        private void LoadReferences(Assembly xAssembly)
+        {
+            foreach (var a in xAssembly.GetReferencedAssemblies())
+            {
+                string s = null;
+                foreach (var xAsm in AdditionalReferences)
+                {
+                    try
+                    {
+
+                        s = AssemblyName.GetAssemblyName(xAsm).Name;
+                        if (s == null || s != a.Name)
+                        {
+                            s = null;
+                        }
+                    }
+                    catch (BadImageFormatException e)
+                    {
+                    }
+                }
+                if (AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies().FirstOrDefault(m => m.GetName().Name == a.Name) == null)
+                {
+                    if (s != null)
+                    {
+                        var xAsm = Assembly.ReflectionOnlyLoadFrom(s);
+                        x.Add(xAsm);
+                        if (xAsm.GetReferencedAssemblies().Any())
+                        {
+                            LoadReferences(xAsm);
+                        }
+                    }
+                    else
+                    {
+
+                    }
+                }
+            }
+
+        }
+        List<Assembly> x = new List<Assembly>();
+
         /// <summary>Load every refernced assemblies that have an associated FullPath property and seek for
         /// the kernel default constructor.</summary>
         /// <returns>The kernel default constructor or a null reference if either none or several such
@@ -389,8 +434,6 @@ namespace Cosmos.IL2CPU
             // Plugs and refs in this list will be loaded absolute (or as proj refs) only. Asm resolution
             // will not be tried on them, but will on ASMs they reference.
             //
-            // TODO - Update to use Load for Reflection only, but note that this wont load references
-            // and we have to do it manually (Probably better for us anyways)
 
             mLoadedExtensions = new List<CompilerExtensionBase>();
             Type xKernelType = null;
@@ -401,13 +444,15 @@ namespace Cosmos.IL2CPU
                 {
                     var xAssembly = Assembly.ReflectionOnlyLoadFrom(xReference);
 
-                    LogMessage($"Looking for kernel in {xAssembly}");
+                    CompilerHelpers.Debug($"Looking for kernel in '{xAssembly}'");
+
                     foreach (var xType in xAssembly.ExportedTypes)
                     {
                         if (!xType.IsGenericTypeDefinition && !xType.IsAbstract)
                         {
-                            LogMessage($"Checking type {xType}");
-                            if (xType.BaseType?.Name == "Kernel")
+                            CompilerHelpers.Debug($"Checking type '{xType.FullName}'");
+
+                            if (xType.GetTypeInfo().IsSubclassOf(typeof(Cosmos.System.Kernel)))
                             {
                                 // found kernel?
                                 if (xKernelType != null)
@@ -421,12 +466,11 @@ namespace Cosmos.IL2CPU
                         }
                     }
 
-                    // TODO: Fix this.
-                    //var xCompilerExtensionsMetas = xAssembly.GetReflectionOnlyCustomAttributes<CompilerExtensionAttribute>();
-                    //foreach (var xMeta in xCompilerExtensionsMetas)
-                    //{
-                    //    mLoadedExtensions.Add((CompilerExtensionBase) Activator.CreateInstance(xMeta.Type));
-                    //}
+                    var xCompilerExtensionsMetas = xAssembly.GetCustomAttributes<CompilerExtensionAttribute>();
+                    foreach (var xMeta in xCompilerExtensionsMetas)
+                    {
+                        mLoadedExtensions.Add((CompilerExtensionBase) Activator.CreateInstance(xMeta.Type));
+                    }
                 }
             }
 
@@ -435,190 +479,13 @@ namespace Cosmos.IL2CPU
                 LogError("No Kernel found!");
                 return null;
             }
-            var xCtor = xKernelType.GetConstructor(Type.EmptyTypes);
+            var xCtor = xKernelType.GetTypeInfo().GetConstructor(Type.EmptyTypes);
             if (xCtor == null)
             {
                 LogError("Kernel has no public default constructor");
                 return null;
             }
             return xCtor;
-        }
-    }
-
-    public static class CustomAttributeExtensions
-    {
-        public static CustomAttributeData GetReflectionOnlyCustomAttribute<T>(this Assembly aElement) where T : Attribute
-        {
-            CustomAttributeData xData = null;
-
-            if (aElement == null)
-            {
-                throw new ArgumentNullException(nameof(aElement));
-            }
-
-            var xAttributes = aElement.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
-
-            if (xAttributes.Any())
-            {
-                if (xAttributes.Count > 1)
-                {
-                    throw new Exception($"More than one attribute of type '{typeof(T)}' was found!");
-                }
-
-                xData = xAttributes[0];
-            }
-
-            return xData;
-        }
-
-        public static CustomAttributeData GetReflectionOnlyCustomAttribute<T>(this MemberInfo aElement, bool aInherit = false) where T : Attribute
-        {
-            CustomAttributeData xData = null;
-
-            if (aElement == null)
-            {
-                throw new ArgumentNullException(nameof(aElement));
-            }
-
-            var xAttributes = aElement.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
-            if (aInherit)
-            {
-                var xBaseType = aElement.ReflectedType?.BaseType;
-                while (!xAttributes.Any() && xBaseType != null)
-                {
-                    xAttributes = xBaseType.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
-                    xBaseType = xBaseType.BaseType;
-                }
-            }
-
-            if (xAttributes.Any())
-            {
-                if (xAttributes.Count > 1)
-                {
-                    throw new Exception($"More than one attribute of type '{typeof(T)}' was found!");
-                }
-
-                xData = xAttributes[0];
-            }
-
-            return xData;
-        }
-
-        public static CustomAttributeData GetReflectionOnlyCustomAttribute<T>(this ParameterInfo aElement, bool aInherit = false) where T : Attribute
-        {
-            CustomAttributeData xData = null;
-
-            if (aElement == null)
-            {
-                throw new ArgumentNullException(nameof(aElement));
-            }
-
-            var xAttributes = aElement.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
-            if (aInherit)
-            {
-                var xBaseType = aElement.ParameterType.BaseType;
-                while (!xAttributes.Any() && xBaseType != null)
-                {
-                    xAttributes = xBaseType.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
-                    xBaseType = xBaseType.BaseType;
-                }
-            }
-
-            if (xAttributes.Any())
-            {
-                if (xAttributes.Count > 1)
-                {
-                    throw new Exception($"More than one attribute of type '{typeof(T)}' was found!");
-                }
-
-                xData = xAttributes[0];
-            }
-
-            return xData;
-        }
-
-        public static List<CustomAttributeData> GetReflectionOnlyCustomAttributes<T>(this Assembly aElement) where T : Attribute
-        {
-            if (aElement == null)
-            {
-                throw new ArgumentNullException();
-            }
-
-            var xAttributes = aElement.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
-
-            return xAttributes;
-        }
-
-        public static List<CustomAttributeData> GetReflectionOnlyCustomAttributes<T>(this MemberInfo aElement, bool aInherit = false) where T : Attribute
-        {
-            if (aElement == null)
-            {
-                throw new ArgumentNullException();
-            }
-
-            var xAttributes = aElement.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
-            if (aInherit)
-            {
-                var xBaseType = aElement.ReflectedType?.BaseType;
-
-                while (!xAttributes.Any() && xBaseType != null)
-                {
-                    xAttributes = xBaseType.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
-                    xBaseType = xBaseType.BaseType;
-                }
-            }
-            return xAttributes;
-        }
-
-        public static List<CustomAttributeData> GetReflectionOnlyCustomAttributes<T>(this ParameterInfo aElement, bool aInherit = false) where T : Attribute
-        {
-            if (aElement == null)
-            {
-                throw new ArgumentNullException();
-            }
-
-            var xAttributes = aElement.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
-            if (aInherit)
-            {
-                var xBaseType = aElement.ParameterType.BaseType;
-
-                while (!xAttributes.Any() && xBaseType != null)
-                {
-                    xAttributes = xBaseType.CustomAttributes.Where(x => x.AttributeType.FullName == typeof(T).FullName).ToList();
-                    xBaseType = xBaseType.BaseType;
-                }
-            }
-            return xAttributes;
-        }
-
-        public static T GetArgumentValue<T>(this CustomAttributeData aElement, string aName)
-        {
-            if (aElement == null)
-            {
-                throw new ArgumentNullException(nameof(aElement));
-            }
-
-            if (string.IsNullOrWhiteSpace(aName))
-            {
-                throw new ArgumentNullException(nameof(aName));
-            }
-
-            var xArg = aElement.NamedArguments?.Where(x => x.MemberName == aName).ToList();
-            if (xArg != null && xArg.Any())
-            {
-                return (T) xArg[0].TypedValue.Value;
-            }
-
-            var xParams = aElement.Constructor.GetParameters().Where(x => x.Name == aName).ToList();
-            if (xParams != null && xParams.Any())
-            {
-                if (aElement.ConstructorArguments.Count > xParams[0].Position)
-                {
-                    return (T) aElement.ConstructorArguments[xParams[0].Position].Value;
-                }
-            }
-
-            return default(T);
         }
     }
 }

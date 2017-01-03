@@ -17,11 +17,11 @@ namespace Cosmos.IL2CPU
             {
                 throw new Exception("GCImplementation type not found!");
             }
-            foreach (FieldInfo xField in typeof(GCImplementationRefs).GetFields())
+            foreach (FieldInfo xField in typeof(GCImplementationRefs).GetTypeInfo().GetFields())
             {
                 if (xField.Name.EndsWith("Ref"))
                 {
-                    MethodBase xTempMethod = xType.GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length));
+                    MethodBase xTempMethod = xType.GetTypeInfo().GetMethod(xField.Name.Substring(0, xField.Name.Length - "Ref".Length));
                     if (xTempMethod == null)
                     {
                         throw new Exception("Method '" + xField.Name.Substring(0, xField.Name.Length - "Ref".Length) + "' not found on RuntimeEngine!");

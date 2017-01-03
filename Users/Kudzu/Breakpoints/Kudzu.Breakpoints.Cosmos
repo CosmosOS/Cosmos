@@ -8,10 +8,6 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <Name>Kudzu.Breakpoints</Name>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <SccProjectName>SAK</SccProjectName>
-    <SccProvider>SAK</SccProvider>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Profile>VMware</Profile>

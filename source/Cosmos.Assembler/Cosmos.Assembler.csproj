@@ -1,121 +1,53 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{1116130E-28E0-428A-A597-F4B3B676C0CA}</ProjectGuid>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C29CCC1C-5AF2-4CE5-96E5-86E083BC03BD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Cosmos.Assembler</RootNamespace>
     <AssemblyName>Cosmos.Assembler</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
-    <SccProjectName>SAK</SccProjectName>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccProvider>SAK</SccProvider>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
     <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
-    <TargetFrameworkProfile />
-    <CodeContractsAssemblyMode>0</CodeContractsAssemblyMode>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <CodeContractsEnableRuntimeChecking>True</CodeContractsEnableRuntimeChecking>
-    <CodeContractsRuntimeOnlyPublicSurface>False</CodeContractsRuntimeOnlyPublicSurface>
-    <CodeContractsRuntimeThrowOnFailure>True</CodeContractsRuntimeThrowOnFailure>
-    <CodeContractsRuntimeCallSiteRequires>False</CodeContractsRuntimeCallSiteRequires>
-    <CodeContractsRunCodeAnalysis>False</CodeContractsRunCodeAnalysis>
-    <CodeContractsNonNullObligations>False</CodeContractsNonNullObligations>
-    <CodeContractsBoundsObligations>False</CodeContractsBoundsObligations>
-    <CodeContractsArithmeticObligations>False</CodeContractsArithmeticObligations>
-    <CodeContractsRedundantAssumptions>False</CodeContractsRedundantAssumptions>
-    <CodeContractsRunInBackground>True</CodeContractsRunInBackground>
-    <CodeContractsShowSquigglies>False</CodeContractsShowSquigglies>
-    <CodeContractsUseBaseLine>False</CodeContractsUseBaseLine>
-    <CodeContractsEmitXMLDocs>False</CodeContractsEmitXMLDocs>
-    <CodeContractsCustomRewriterAssembly />
-    <CodeContractsCustomRewriterClass />
-    <CodeContractsLibPaths />
-    <CodeContractsExtraRewriteOptions />
-    <CodeContractsExtraAnalysisOptions />
-    <CodeContractsBaseLineFile />
-    <CodeContractsCacheAnalysisResults>False</CodeContractsCacheAnalysisResults>
-    <CodeContractsRuntimeCheckingLevel>Full</CodeContractsRuntimeCheckingLevel>
-    <CodeContractsReferenceAssembly>%28none%29</CodeContractsReferenceAssembly>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <None Include="..\..\Cosmos.snk">
+      <Link>Cosmos.snk</Link>
+    </None>
+    <None Include=".editorconfig" />
+    <None Include="project.json" />
+    <None Include="x86\SSE2\ConvertTruncateSD2SIQ.not_used" />
+    <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assembler.cs" />
@@ -139,22 +71,18 @@
     <Compile Include="InfraExtensions.cs" />
     <Compile Include="Instruction.cs" />
     <Compile Include="Label.cs" />
-    <Compile Include="x86\Lea.cs" />
-    <Compile Include="LiteralAssemblerCode.cs" />
     <Compile Include="LabelName.cs" />
+    <Compile Include="LiteralAssemblerCode.cs" />
     <Compile Include="OpCodeAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="x86\Rdmsr.cs" />
-    <Compile Include="x86\Rdtsc.cs" />
-    <Compile Include="StackContents.cs" />
     <Compile Include="TypeComparer.cs" />
     <Compile Include="x86\Add.cs" />
     <Compile Include="x86\AddWithCarry.cs" />
     <Compile Include="x86\And.cs" />
     <Compile Include="x86\Call.cs" />
+    <Compile Include="x86\ClearInterruptFlag.cs" />
     <Compile Include="x86\ClrCarryFlag.cs" />
     <Compile Include="x86\ClrDirFlag.cs" />
-    <Compile Include="x86\ClearInterruptFlag.cs" />
     <Compile Include="x86\Cmps.cs" />
     <Compile Include="x86\CmpXchg.cs" />
     <Compile Include="x86\Compare.cs" />
@@ -169,8 +97,8 @@
     <Compile Include="x86\Halt.cs" />
     <Compile Include="x86\IDivide.cs" />
     <Compile Include="x86\Imul.cs" />
-    <Compile Include="x86\InFromDX.cs" />
     <Compile Include="x86\INC.cs" />
+    <Compile Include="x86\InFromDX.cs" />
     <Compile Include="x86\INT.cs" />
     <Compile Include="x86\INT1.cs" />
     <Compile Include="x86\INT3.cs" />
@@ -179,6 +107,7 @@
     <Compile Include="x86\JumpAlways.cs" />
     <Compile Include="x86\JumpBase.cs" />
     <Compile Include="x86\JumpToSegment.cs" />
+    <Compile Include="x86\Lea.cs" />
     <Compile Include="x86\Lgdt.cs" />
     <Compile Include="x86\Lidt.cs" />
     <Compile Include="x86\LoadStatusFlags.cs" />
@@ -201,6 +130,8 @@
     <Compile Include="x86\Push.cs" />
     <Compile Include="x86\Pushad.cs" />
     <Compile Include="x86\Pushfd.cs" />
+    <Compile Include="x86\Rdmsr.cs" />
+    <Compile Include="x86\Rdtsc.cs" />
     <Compile Include="x86\Registers.cs" />
     <Compile Include="x86\Return.cs" />
     <Compile Include="x86\RotateLeft.cs" />
@@ -226,15 +157,10 @@
     <Compile Include="x86\SSE2\ConvertSS2SD.cs" />
     <Compile Include="x86\SSE2\ConvertTruncatePD2DQ.cs" />
     <Compile Include="x86\SSE2\ConvertTruncateSD2SI.cs" />
-    <None Include="..\..\Cosmos.snk">
-      <Link>Cosmos.snk</Link>
-    </None>
-    <None Include="x86\SSE2\ConvertTruncateSD2SIQ.not_used" />
     <Compile Include="x86\SSE2\ConvertTruncateSS2SI.cs" />
     <Compile Include="x86\SSE2\DivPD.cs" />
     <Compile Include="x86\SSE2\DivSD.cs" />
     <Compile Include="x86\SSE2\MoveAPD.cs" />
-    <None Include="x86\SSE2\MoveD.removed" />
     <Compile Include="x86\SSE2\MoveDQA.cs" />
     <Compile Include="x86\SSE2\MoveHLPD.cs" />
     <Compile Include="x86\SSE2\MoveHPD.cs" />
@@ -244,6 +170,7 @@
     <Compile Include="x86\SSE2\MoveUPD.cs" />
     <Compile Include="x86\SSE2\MulPD.cs" />
     <Compile Include="x86\SSE2\MulSD.cs" />
+    <Compile Include="x86\SSE2\Psrld.cs" />
     <Compile Include="x86\SSE2\SqrtSD.cs" />
     <Compile Include="x86\SSE2\SubPD.cs" />
     <Compile Include="x86\SSE2\SubSD.cs" />
@@ -272,7 +199,6 @@
     <Compile Include="x86\SSEAndMMX2\MoveUPS.cs" />
     <Compile Include="x86\SSEAndMMX2\MulPS.cs" />
     <Compile Include="x86\SSEAndMMX2\MulSS.cs" />
-    <Compile Include="x86\SSE2\Psrld.cs" />
     <Compile Include="x86\SSEAndMMX2\OrPs.cs" />
     <Compile Include="x86\SSEAndMMX2\POR.cs" />
     <Compile Include="x86\SSEAndMMX2\SSEInit.cs" />
@@ -361,16 +287,7 @@
     <Compile Include="x86\_Infra\InstructionWithDestinationAndSourceAndSize.cs" />
     <Compile Include="x86\_Infra\InstructionWithSize.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include=".editorconfig" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
-      <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
-      <Name>Cosmos.Build.Common</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

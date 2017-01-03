@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace Cosmos.Build.Common
 {
@@ -75,26 +76,26 @@ namespace Cosmos.Build.Common
         {
             Type valueType = value.GetType();
             MemberInfo[] valueMemberInfo;
-            Object[] valueMemberAttribute;
+            List<Attribute> valueMemberAttribute;
 
-            if (valueType.IsEnum)
+            if (valueType.GetTypeInfo().IsEnum)
             {
-                valueMemberInfo = valueType.GetMember(value.ToString());
+                valueMemberInfo = valueType.GetTypeInfo().GetMember(value.ToString());
 
                 if ((valueMemberInfo != null) && (valueMemberInfo.Length > 0))
                 {
-                    valueMemberAttribute = valueMemberInfo[0].GetCustomAttributes(typeof (DescriptionAttribute), false);
-                    if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0))
+                    valueMemberAttribute = valueMemberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false)?.ToList();
+                    if ((valueMemberAttribute != null) && (valueMemberAttribute.Any()))
                     {
-                        return ((DescriptionAttribute) valueMemberAttribute[0]).Description;
+                        return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
                     }
                 }
             }
 
-            valueMemberAttribute = valueType.GetCustomAttributes(typeof (DescriptionAttribute), false);
-            if ((valueMemberAttribute != null) && (valueMemberAttribute.Length > 0))
+            valueMemberAttribute = valueType.GetTypeInfo().GetCustomAttributes(typeof(DescriptionAttribute), false)?.ToList();
+            if ((valueMemberAttribute != null) && (valueMemberAttribute.Any()))
             {
-                return ((DescriptionAttribute) valueMemberAttribute[0]).Description;
+                return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
             }
 
             return value.ToString();
@@ -112,4 +113,5 @@ namespace Cosmos.Build.Common
             get { return emDescription; }
         }
     }
+
 }
