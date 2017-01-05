@@ -1,0 +1,18 @@
+﻿{
+  "supports": {},
+  "dependencies": {
+    "Microsoft.NETCore.Portable.Compatibility": "1.0.2",
+    "NETStandard.Library": "1.6.1",
+    "System.Diagnostics.Process": "4.3.0",
+    "System.IO.Pipes": "4.3.0",
+    "System.Threading.Thread": "4.3.0"
+  },
+  "frameworks": {
+    "net462": {
+      "dependencies": {
+        "System": "4.0.0"
+      }
+    },
+    "netstandard1.5": {}
+  }
+}

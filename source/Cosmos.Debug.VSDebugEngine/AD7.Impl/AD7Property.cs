@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using Cosmos.Debug.Common;
-using Dapper;
-using SQLinq.Dapper;
-using SQLinq;
+
+//using Dapper;
+//using SQLinq.Dapper;
+//using SQLinq;
+
+using Cosmos.Debug.Symbols;
+using FIELD_INFO = Cosmos.Debug.Symbols.FIELD_INFO;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -486,7 +488,7 @@ namespace Cosmos.Debug.VSDebugEngine
                                     var mp = mProcess.mDebugInfoDb.GetFieldMap(mDebugInfo.TYPENAME);
                                     foreach (string str in mp.FieldNames)
                                     {
-                                        Cosmos.Debug.Common.FIELD_INFO xFieldInfo;
+                                        FIELD_INFO xFieldInfo;
                                         xFieldInfo = mProcess.mDebugInfoDb.GetFieldInfoByName(str);
                                         var inf = new DebugLocalInfo();
                                         inf.IsReference = true;
@@ -545,7 +547,7 @@ namespace Cosmos.Debug.VSDebugEngine
             return propertyInfo;
         }
 
-        private static string GetFieldName(Cosmos.Debug.Common.FIELD_INFO fInf)
+        private static string GetFieldName(FIELD_INFO fInf)
         {
             string s = fInf.NAME;
             int i = s.LastIndexOf('.');

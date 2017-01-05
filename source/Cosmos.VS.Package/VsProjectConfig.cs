@@ -2,19 +2,17 @@
 // please DO NOT remove this code line and DO comment it out.
 #define FULL_DEBUG
 using System;
-using Path = System.IO.Path;
-using Marshal = System.Runtime.InteropServices.Marshal;
-using Microsoft.VisualStudio.Project;
-using VSConstants = Microsoft.VisualStudio.VSConstants;
-using Microsoft.VisualStudio.OLE.Interop;
-using VsShellUtilities = Microsoft.VisualStudio.Shell.VsShellUtilities;
-using Microsoft.VisualStudio.Shell.Interop;
-using NameValueCollection = System.Collections.Specialized.NameValueCollection;
-using NameValueCollectionHelper = Cosmos.Debug.Common.NameValueCollectionHelper;
-using Cosmos.Build.Common;
-using System.Linq;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
+using Microsoft.VisualStudio.Project;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+
+using Cosmos.Build.Common;
+using Cosmos.Debug.Common;
 
 namespace Cosmos.VS.Package {
 
@@ -73,7 +71,7 @@ namespace Cosmos.VS.Package {
           xInfo.grfLaunch = aLaunch; // Just pass through for now.
           xInfo.bstrRemoteMachine = null; // debug locally
 
-          var xValues = new NameValueCollection();
+          var xValues = new Dictionary<string, string>();
           xValues.Add("ProjectFile", Path.Combine(ProjectMgr.ProjectFolder, ProjectMgr.ProjectFile));
           xValues.Add("ISOFile", xIsoFile);
           xValues.Add("BinFormat", GetConfigurationProperty("BinFormat", false));
@@ -81,7 +79,7 @@ namespace Cosmos.VS.Package {
             xValues.Add(xName, GetConfigurationProperty(xName, false));
           }
 
-          xInfo.bstrExe = NameValueCollectionHelper.DumpToString(xValues);
+          xInfo.bstrExe = DebugInfoDictionaryHelper.DumpToString(xValues);
 
           // Select the debugger
           xInfo.clsidCustom = new Guid("{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}"); // Debug engine identifier.

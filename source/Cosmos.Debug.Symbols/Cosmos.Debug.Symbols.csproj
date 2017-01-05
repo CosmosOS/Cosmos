@@ -5,11 +5,11 @@
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AB24E403-54F3-4F67-B5E0-119A7227AAC1}</ProjectGuid>
+    <ProjectGuid>{2E740096-911F-47D0-A46D-998DBB76FC5D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Debug.Common</RootNamespace>
-    <AssemblyName>Cosmos.Debug.Common</AssemblyName>
+    <RootNamespace>Cosmos.Debug.Symbols</RootNamespace>
+    <AssemblyName>Cosmos.Debug.Symbols</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -41,31 +41,36 @@
     <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <!-- A reference to the entire .NET Framework is automatically included -->
     <None Include="..\..\Cosmos.snk">
       <Link>Cosmos.snk</Link>
     </None>
-    <None Include="packages.config" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BochsSupport.cs" />
-    <Compile Include="DebugInfoDictionaryHelper.cs" />
-    <Compile Include="ObjDump.cs" />
-    <Compile Include="PipeClient.cs" />
-    <Compile Include="PipeServer.cs" />
+    <Compile Include="CacheHelper.cs" />
+    <Compile Include="DebugInfo.cs" />
+    <Compile Include="DebugModel.cs" />
+    <Compile Include="DebugSymbolReader.cs" />
+    <Compile Include="ObjectReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SourceInfo.cs" />
+    <Compile Include="SQL.cs" />
+    <Compile Include="SqliteBulkCopy.cs" />
   </ItemGroup>
-  <!--<ItemGroup>
-    <Service Include="{3259AA49-8AA1-44D3-9025-A0B520596A8C}" />
-  </ItemGroup>-->
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj">
-      <Project>{2e740096-911f-47d0-a46d-998dbb76fc5d}</Project>
-      <Name>Cosmos.Debug.Symbols</Name>
-    </ProjectReference>
+    <EmbeddedResource Include="SQLite.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SQLiteIndexes.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="DapperExtensionsDNXCore">
+      <HintPath>..\..\Resources\Dependencies\Dapper\DapperExtensionsDNXCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

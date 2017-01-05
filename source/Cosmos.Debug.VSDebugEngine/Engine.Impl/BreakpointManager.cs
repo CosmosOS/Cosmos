@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using Cosmos.Debug.Common;
 using Microsoft.VisualStudio.Debugger.Interop;
 
+using Cosmos.Debug.DebugConnectors;
+
 namespace Cosmos.Debug.VSDebugEngine {
-    // This class manages breakpoints for the engine. 
+    // This class manages breakpoints for the engine.
     public class BreakpointManager {
         public const int MaxBP = 256;
         protected AD7Engine mEngine;
@@ -20,7 +20,7 @@ namespace Cosmos.Debug.VSDebugEngine {
         public void SetDebugConnector(DebugConnector aConnector) {
             mDbgConnector = aConnector;
         }
-      
+
         // A helper method used to construct a new pending breakpoint.
         public void CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP) {
             var pendingBreakpoint = new AD7PendingBreakpoint(pBPRequest, mEngine, this);

@@ -2,8 +2,5 @@
 indent_size=4
 indent_style=space
 
-[Host/*.cs]
-indent_size=2
-
 [AD7.Impl/AD7StackFrame.cs]
 indent_size=2
