@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Pipes;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using Cosmos.Build.Common;
-using Cosmos.Debug.Common;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using Microsoft.Win32;
-using Label = Cosmos.Debug.Common.Label;
+
+using Cosmos.Build.Common;
+using Cosmos.Debug.Common;
+using Cosmos.Debug.DebugConnectors;
+using Cosmos.Debug.Hosts;
+using Cosmos.Debug.Symbols;
+using Label = Cosmos.Debug.Symbols.Label;
 
 namespace Cosmos.Debug.VSDebugEngine
 {
@@ -27,11 +26,11 @@ namespace Cosmos.Debug.VSDebugEngine
         protected EngineCallback mCallback;
         public AD7Thread mThread;
         protected AD7Engine mEngine;
-        public UInt32? mCurrentAddress = null;
-        public UInt32? mNextAddress1 = null;
+        public uint? mCurrentAddress = null;
+        public uint? mNextAddress1 = null;
         public string mCurrentASMLine = null;
         public string mNextASMLine1 = null;
-        protected readonly NameValueCollection mDebugInfo;
+        protected readonly Dictionary<string, string> mDebugInfo;
         protected LaunchType mLaunch;
         internal DebugInfo mDebugInfoDb;
         protected int mProcessExitEventSent = 0;
@@ -39,11 +38,11 @@ namespace Cosmos.Debug.VSDebugEngine
         public IEnumDebugFrameInfo2 mStackFrame;
         private bool mASMSteppingOut = false;
         private int mASMSteppingOut_NumEndMethodLabelsPassed = 0;
-        private Tuple<UInt32, UInt32, int> ASMBPToStepTo = null;
+        private Tuple<uint, uint, int> ASMBPToStepTo = null;
 
         //ASM Breakpoints stored as C# Address -> ASM Address, C# BP ID
         //Allows quick look-up on INT3 occurring
-        private List<Tuple<UInt32, UInt32, int>> ASMBreakpoints = new List<Tuple<UInt32, UInt32, int>>();
+        private List<Tuple<uint, uint, int>> ASMBreakpoints = new List<Tuple<uint, uint, int>>();
         private ManualResetEvent ASMWindow_CurrentLineUpdated = new ManualResetEvent(false);
         private ManualResetEvent ASMWindow_NextLine1Updated = new ManualResetEvent(false);
         private ManualResetEvent ASMWindow_NextAddress1Updated = new ManualResetEvent(false);
@@ -64,7 +63,7 @@ namespace Cosmos.Debug.VSDebugEngine
         // Pipe to receive messages from Cosmos.VS.Windows
         static private Cosmos.Debug.Common.PipeServer mDebugUpPipe = null;
 
-        Host.Base mHost;
+        Host mHost;
 
         public string mISO;
         public string mProjectFile;
@@ -79,7 +78,7 @@ namespace Cosmos.Debug.VSDebugEngine
             }
             else
             {
-                UInt32 x32 = (UInt32)
+                uint x32 = (uint)
                     (aData[39] << 24 |
                      aData[38] << 16 |
                      aData[37] << 8 |
@@ -127,7 +126,7 @@ namespace Cosmos.Debug.VSDebugEngine
                         case Windows2Debugger.SetAsmBreak:
                             {
                                 string xLabel = Encoding.UTF8.GetString(aData);
-                                UInt32 xAddress = mDebugInfoDb.GetAddressOfLabel(xLabel);
+                                uint xAddress = mDebugInfoDb.GetAddressOfLabel(xLabel);
                                 mDbgConnector.SetAsmBreakpoint(xAddress);
                                 mDbgConnector.Continue();
                             }
@@ -136,7 +135,7 @@ namespace Cosmos.Debug.VSDebugEngine
                         case Windows2Debugger.ToggleAsmBreak2:
                             {
                                 string xLabel = Encoding.UTF8.GetString(aData);
-                                UInt32 xAddress = mDebugInfoDb.GetAddressOfLabel(xLabel);
+                                uint xAddress = mDebugInfoDb.GetAddressOfLabel(xLabel);
                                 if (GetASMBreakpointInfoFromASMAddress(xAddress) == null)
                                 {
                                     SetASMBreakpoint(xAddress);
@@ -211,13 +210,13 @@ namespace Cosmos.Debug.VSDebugEngine
             }
         }
 
-        private List<Tuple<UInt32, UInt32, int>> GetASMBreakpointInfoFromCSAddress(UInt32 csAddress)
+        private List<Tuple<uint, uint, int>> GetASMBreakpointInfoFromCSAddress(uint csAddress)
         {
             return ASMBreakpoints.Where(x => x.Item1 == csAddress).ToList();
         }
-        private Tuple<UInt32, UInt32, int> GetASMBreakpointInfoFromASMAddress(UInt32 asmAddress)
+        private Tuple<uint, uint, int> GetASMBreakpointInfoFromASMAddress(uint asmAddress)
         {
-            Tuple<UInt32, UInt32, int> result = null;
+            Tuple<uint, uint, int> result = null;
 
             var posBPs = ASMBreakpoints.Where(x => x.Item2 == asmAddress);
             if (posBPs.Count() > 0)
@@ -227,7 +226,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
             return result;
         }
-        private void SetASMBreakpoint(UInt32 aAddress)
+        private void SetASMBreakpoint(uint aAddress)
         {
             if (GetASMBreakpointInfoFromASMAddress(aAddress) == null)
             {
@@ -236,8 +235,8 @@ namespace Cosmos.Debug.VSDebugEngine
                 {
                     if (mEngine.BPMgr.mActiveBPs[xID] == null)
                     {
-                        UInt32 CSBPAddress = mDebugInfoDb.GetClosestCSharpBPAddress(aAddress);
-                        ASMBreakpoints.Add(new Tuple<UInt32, UInt32, int>(CSBPAddress, aAddress, xID));
+                        uint CSBPAddress = mDebugInfoDb.GetClosestCSharpBPAddress(aAddress);
+                        ASMBreakpoints.Add(new Tuple<uint, uint, int>(CSBPAddress, aAddress, xID));
 
                         mEngine.BPMgr.mActiveBPs[xID] = new AD7BoundBreakpoint(CSBPAddress);
                         var label = mDebugInfoDb.GetLabels(CSBPAddress)[0];
@@ -254,7 +253,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
             }
         }
-        private void ClearASMBreakpoint(UInt32 aAddress)
+        private void ClearASMBreakpoint(uint aAddress)
         {
             var bp = GetASMBreakpointInfoFromASMAddress(aAddress);
             if (bp != null)
@@ -314,16 +313,16 @@ namespace Cosmos.Debug.VSDebugEngine
             switch (xPortType)
             {
                 case "pipe:":
-                    mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer(xPortParam);
+                    mDbgConnector = new DebugConnectorPipeServer(xPortParam);
                     break;
                 case "serial:":
                     if (xLaunch == "IntelEdison")
                     {
-                        mDbgConnector = new Cosmos.Debug.Common.DebugConnectorEdison(xPortParam, Path.ChangeExtension(mDebugInfo["ISOFile"], ".bin"));
+                        mDbgConnector = new DebugConnectorEdison(xPortParam, Path.ChangeExtension(mDebugInfo["ISOFile"], ".bin"));
                     }
                     else
                     {
-                        mDbgConnector = new Cosmos.Debug.Common.DebugConnectorSerial(xPortParam);
+                        mDbgConnector = new DebugConnectorSerial(xPortParam);
                     }
                     break;
                 default:
@@ -331,8 +330,8 @@ namespace Cosmos.Debug.VSDebugEngine
 
             }
             mDbgConnector.SetConnectionHandler(DebugConnectorConnected);
-            mDbgConnector.CmdBreak += new Action<UInt32>(DbgCmdBreak);
-            mDbgConnector.CmdTrace += new Action<UInt32>(DbgCmdTrace);
+            mDbgConnector.CmdBreak += new Action<uint>(DbgCmdBreak);
+            mDbgConnector.CmdTrace += new Action<uint>(DbgCmdTrace);
             mDbgConnector.CmdText += new Action<string>(DbgCmdText);
             mDbgConnector.CmdSimpleNumber += new Action<uint>(DbgCmdSimpleNumber);
             mDbgConnector.CmdKernelPanic += new Action<uint>(DbgCmdKernelPanic);
@@ -378,7 +377,7 @@ namespace Cosmos.Debug.VSDebugEngine
             MessageBox.Show("Message from your Cosmos operating system:\r\n\r\n" + message);
         }
 
-        internal AD7Process(NameValueCollection aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
+        internal AD7Process(Dictionary<string, string> aDebugInfo, EngineCallback aCallback, AD7Engine aEngine, IDebugPort2 aPort)
         {
             mCallback = aCallback;
             mDebugInfo = aDebugInfo;
@@ -387,9 +386,9 @@ namespace Cosmos.Debug.VSDebugEngine
 
             if (mDebugDownPipe == null)
             {
-                mDebugDownPipe = new Cosmos.Debug.Common.PipeClient(Pipes.DownName);
+                mDebugDownPipe = new PipeClient(Pipes.DownName);
 
-                mDebugUpPipe = new Cosmos.Debug.Common.PipeServer(Pipes.UpName);
+                mDebugUpPipe = new PipeServer(Pipes.UpName);
                 mDebugUpPipe.DataPacketReceived += mDebugUpPipe_DataPacketReceived;
                 mDebugUpPipe.Start();
             }
@@ -416,10 +415,36 @@ namespace Cosmos.Debug.VSDebugEngine
             switch (mLaunch)
             {
                 case LaunchType.VMware:
-                    mHost = new Host.VMware(mDebugInfo, xUseGDB);
+                    #region CheckIfHyperVServiceIsRunning
+
+                    using (System.ServiceProcess.ServiceController sc = new System.ServiceProcess.ServiceController("vmms"))
+                    {
+                        try
+                        {
+                            if (sc.Status == System.ServiceProcess.ServiceControllerStatus.Running)
+                            {
+                                if (DialogResult.Yes == MessageBox.Show("Do you want to stop the Hyper-V Virtual Machine Management Service? This is needed to allow to run VMware. If you press \"No\" the debug will stop.", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+                                {
+                                    sc.Stop();
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException("VMware start useless, because of running Hyper-V Virtual Machine Management!");
+                                }
+                            }
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            // service not present
+                        }
+                    }
+
+                    #endregion CheckIfHyperVServiceIsRunning
+
+                    mHost = new VMware(mDebugInfo, xUseGDB);
                     break;
                 case LaunchType.Slave:
-                    mHost = new Host.Slave(mDebugInfo, xUseGDB);
+                    mHost = new Slave(mDebugInfo, xUseGDB);
                     break;
                 case LaunchType.Bochs:
                     // The project has been created on another machine or Bochs has been uninstalled since the project has
@@ -439,12 +464,12 @@ namespace Cosmos.Debug.VSDebugEngine
                     FileInfo bochsConfigurationFile = new FileInfo(bochsConfigurationFileName);
                     // TODO : What if the configuration file doesn't exist ? This will throw a FileNotFoundException in
                     // the Bochs class constructor. Is this appropriate behavior ?
-                    mHost = new Host.Bochs(mDebugInfo, xUseGDB, bochsConfigurationFile);
+                    mHost = new Bochs(mDebugInfo, xUseGDB, bochsConfigurationFile);
 
                     //((Host.Bochs)mHost).FixBochsConfiguration(new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("IsoFileName", mISO) });
                     break;
                 case LaunchType.IntelEdison:
-                    mHost = new Host.IntelEdison(mDebugInfo, false);
+                    mHost = new IntelEdison(mDebugInfo, false);
                     break;
                 default:
                     throw new Exception("Invalid Launch value: '" + mLaunch + "'.");
@@ -573,12 +598,12 @@ namespace Cosmos.Debug.VSDebugEngine
             }
         }
 
-        void DbgCmdTrace(UInt32 aAddress)
+        void DbgCmdTrace(uint aAddress)
         {
             DebugMsg("TraceReceived: " + aAddress);
         }
 
-        void DbgCmdBreak(UInt32 aAddress)
+        void DbgCmdBreak(uint aAddress)
         {
             // aAddress will be actual address. Call and other methods push return to (after op), but DS
             // corrects for us and sends us actual op address.
@@ -884,7 +909,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
             // The current address may or may not be a C# line due to asm stepping
             //So get the C# INT3 address
-            UInt32 csAddress = mDebugInfoDb.GetClosestCSharpBPAddress(mCurrentAddress.Value);
+            uint csAddress = mDebugInfoDb.GetClosestCSharpBPAddress(mCurrentAddress.Value);
             //Get any Asm BPs for this address
             var bps = GetASMBreakpointInfoFromCSAddress(csAddress).Where(x => x.Item2 > mCurrentAddress.Value).ToList();
             //If there are any, do AsmStepOver on the next one after current address
@@ -988,7 +1013,7 @@ namespace Cosmos.Debug.VSDebugEngine
 
             ChangeINT3sOnCurrentMethod(true);
         }
-        public List<KeyValuePair<UInt32, string>> INT3sSet = new List<KeyValuePair<UInt32, string>>();
+        public List<KeyValuePair<uint, string>> INT3sSet = new List<KeyValuePair<uint, string>>();
 
         internal void ChangeINT3sOnCurrentMethod(bool clear)
         {
@@ -997,7 +1022,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 var currMethod = mDebugInfoDb.GetMethod(mCurrentAddress.Value);
                 //Clear out the full list so we don't accidentally accumulate INT3s all over the place
                 //Or set INT3s for all places in current method
-                var tpAdresses = clear ? new List<KeyValuePair<UInt32, string>>(INT3sSet.Count) : mDebugInfoDb.GetAllINT3AddressesForMethod(currMethod, true);
+                var tpAdresses = clear ? new List<KeyValuePair<uint, string>>(INT3sSet.Count) : mDebugInfoDb.GetAllINT3AddressesForMethod(currMethod, true);
                 //If we just do a stright assigment then we get a collection modified exception in foreach loop below
                 if (clear)
                 {
@@ -1005,7 +1030,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 }
 
                 var bps = mEngine.BPMgr.mPendingBPs.Select(x => x.mBoundBPs).ToList();
-                var bpAddressessUnified = new List<UInt32>();
+                var bpAddressessUnified = new List<uint>();
                 foreach (var bp in bps)
                 {
                     bpAddressessUnified.AddRange(bp.Select(x => x != null ? x.mAddress : 0));
@@ -1062,7 +1087,7 @@ namespace Cosmos.Debug.VSDebugEngine
                 {
                     //Get the line after the call
                     string nextASMLine = mNextASMLine1;
-                    UInt32? nextAddress = mNextAddress1;
+                    uint? nextAddress = mNextAddress1;
                     if (string.IsNullOrEmpty(nextASMLine) || !nextAddress.HasValue)
                     {
                         mDbgConnector.SendCmd(Vs2Ds.AsmStepInto);
@@ -1088,7 +1113,7 @@ namespace Cosmos.Debug.VSDebugEngine
             ASMWindow_NextAddress1Updated.Reset();
             ASMWindow_NextLine1Updated.Reset();
 
-            UInt32 xAddress = mCurrentAddress.Value;
+            uint xAddress = mCurrentAddress.Value;
             var xSourceInfos = mDebugInfoDb.GetSourceInfos(xAddress);
             AD7Util.Log("SendAssembly - SourceInfos retrieved for address 0x{0}", xAddress.ToString("X8"));
             if (xSourceInfos.Count > 0)

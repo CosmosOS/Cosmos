@@ -1,16 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Windows.Forms;
-using Dapper;
-using DapperExtensions;
-using SQLinq.Dapper;
-using SQLinq;
-using Cosmos.Debug.Common;
 
 namespace Cosmos.Debug.VSDebugEngine {
   // This class represents a pending breakpoint which is an abstract representation of a breakpoint before it is bound.

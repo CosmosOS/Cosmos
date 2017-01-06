@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
+using System.Linq;
 using System.IO;
+
+using Cosmos.Debug.Symbols;
 
 namespace Cosmos.Debug.Common {
     public class ObjDump {
@@ -114,7 +115,7 @@ namespace Cosmos.Debug.Common {
             using (var xDebugInfo = new DebugInfo(debugFile))
             {
                 // In future instead of loading all labels, save indexes to major labels but not IL.ASM labels.
-                // Then code can find major lables, and use position markers into the map file to parse in between 
+                // Then code can find major lables, and use position markers into the map file to parse in between
                 // as needed.
                 var xLabels = new List<Label>();
                 var xFileLines = File.ReadLines(mapFile);

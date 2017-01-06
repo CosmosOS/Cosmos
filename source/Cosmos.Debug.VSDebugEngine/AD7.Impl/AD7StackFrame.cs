@@ -1,16 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Diagnostics;
-using Cosmos.Debug.Common;
 using System.Windows.Forms;
-using Dapper;
-using DapperExtensions;
-using SQLinq;
-using SQLinq.Dapper;
+
+using Cosmos.Debug.Symbols;
 
 namespace Cosmos.Debug.VSDebugEngine {
   // Represents a logical stack frame on the thread stack.
@@ -68,7 +62,7 @@ namespace Cosmos.Debug.VSDebugEngine {
                 var xSourceInfo = xSourceInfos[xAddress];
                 mDocName = xSourceInfo.SourceFile;
                 mFunctionName = xSourceInfo.MethodName;
-                mLineNum = (uint)xSourceInfo.Line;
+                mLineNum = (uint)xSourceInfo.LineStart;
 
                 // Multiple labels that point to a single address can happen because of exception handling exits etc.
                 // Because of this given an address, we might find more than one label that matches the address.

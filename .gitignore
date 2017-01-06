@@ -35,6 +35,7 @@
 *.pdb
 Thumbs.db
 build.force
+project.lock.json
 
 Build/VSIP/
 Setup/Output/
