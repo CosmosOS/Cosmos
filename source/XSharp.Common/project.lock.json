@@ -3706,11 +3706,12 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Cosmos.Assembler >= 1.0.0-*",
       "Microsoft.NETCore.Portable.Compatibility >= 1.0.1",
       "NETStandard.Library >= 1.6.0"
     ],
-    ".NETStandard,Version=v1.5": []
+    ".NETStandard,Version=v1.5": [
+      "Cosmos.Assembler >= 1.0.0"
+    ]
   },
   "tools": {},
   "projectFileToolGroups": {}

@@ -1270,7 +1270,7 @@ namespace Cosmos.IL2CPU
 
                     if (!aTo.IsWildcard)
                     {
-                        var xObjectPointerAccessAttrib = xParams[0].GetReflectionOnlyCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
+                        var xObjectPointerAccessAttrib = xParams[0].GetCustomAttribute<ObjectPointerAccessAttribute>(true);
                         if (xObjectPointerAccessAttrib != null)
                         {
                             XS.Comment("Skipping the reference to the next object reference.");
@@ -1293,13 +1293,13 @@ namespace Cosmos.IL2CPU
                 var xOriginalParamsIdx = 0;
                 foreach (var xParam in xParams)
                 {
-                    var xFieldAccessAttrib = xParam.GetReflectionOnlyCustomAttributes<FieldAccessAttribute>(true).FirstOrDefault();
-                    var xObjectPointerAccessAttrib = xParam.GetReflectionOnlyCustomAttributes<ObjectPointerAccessAttribute>(true).FirstOrDefault();
+                    var xFieldAccessAttrib = xParam.GetCustomAttribute<FieldAccessAttribute>(true);
+                    var xObjectPointerAccessAttrib = xParam.GetCustomAttribute<ObjectPointerAccessAttribute>(true);
                     if (xFieldAccessAttrib != null)
                     {
                         // field access
-                        XS.Comment("Loading address of field '" + xFieldAccessAttrib.GetArgumentValue<string>("Name") + "'");
-                        var xFieldInfo = ResolveField(aFrom, xFieldAccessAttrib.GetArgumentValue<string>("Name"), false);
+                        XS.Comment("Loading address of field '" + xFieldAccessAttrib.Name + "'");
+                        var xFieldInfo = ResolveField(aFrom, xFieldAccessAttrib.Name, false);
                         if (xFieldInfo.IsStatic)
                         {
                             Ldsflda(aFrom, xFieldInfo);
@@ -1406,7 +1406,7 @@ namespace Cosmos.IL2CPU
             Assembler.WriteDebugVideo("Kernel class created");
             xCurLabel = CosmosAssembler.EntryPointName + ".CallStart";
             XS.Label(xCurLabel);
-            X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.BaseType.GetMethod("Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart", DebugEnabled);
+            X86.IL.Call.DoExecute(Assembler, null, aEntrypoint.DeclaringType.GetTypeInfo().BaseType.GetMethod("Start"), null, xCurLabel, CosmosAssembler.EntryPointName + ".AfterStart", DebugEnabled);
             XS.Label(CosmosAssembler.EntryPointName + ".AfterStart");
             XS.Pop(EBP);
             XS.Return();
@@ -1574,7 +1574,7 @@ namespace Cosmos.IL2CPU
                 {
                     if (TraceAssemblies < TraceAssemblies.All)
                     {
-                        if (aNamespace.StartsWith("System.", StringComparison.InvariantCultureIgnoreCase))
+                        if (aNamespace.StartsWith("System.", StringComparison.OrdinalIgnoreCase))
                         {
                             return;
                         }
@@ -1582,7 +1582,7 @@ namespace Cosmos.IL2CPU
                         {
                             return;
                         }
-                        if (aNamespace.StartsWith("Microsoft.", StringComparison.InvariantCultureIgnoreCase))
+                        if (aNamespace.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase))
                         {
                             return;
                         }
@@ -1591,7 +1591,7 @@ namespace Cosmos.IL2CPU
                     if (TraceAssemblies < TraceAssemblies.Cosmos)
                     {
                         //TODO: Maybe an attribute that could be used to turn tracing on and off
-                        if (aNamespace.StartsWith("Cosmos.", StringComparison.InvariantCultureIgnoreCase))
+                        if (aNamespace.StartsWith("Cosmos.", StringComparison.OrdinalIgnoreCase))
                         {
                             return;
                         }
@@ -1636,7 +1636,7 @@ namespace Cosmos.IL2CPU
                     throw new Exception("Make recursive");
                 }
             }
-            var xLocation = xMethodBase.DeclaringType.Assembly.Location;
+            var xLocation = xMethodBase.DeclaringType.GetTypeInfo().Assembly.Location;
             ModuleDefinition xModule = null;
             if (!mLoadedModules.TryGetValue(xLocation, out xModule))
             {

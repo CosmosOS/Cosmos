@@ -48,7 +48,7 @@
     </None>
     <None Include=".editorconfig" />
     <None Include="ILOpCodes\.editorconfig" />
-    <None Include="project.json" />
+    <None Include="Cosmos.IL2CPU.project.json" />
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
