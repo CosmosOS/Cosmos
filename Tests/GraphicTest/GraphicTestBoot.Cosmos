@@ -26,6 +26,16 @@
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.HAL\Cosmos.HAL.csproj">
+      <Name>Cosmos.HAL</Name>
+      <Project>{6a991d03-1435-4005-9809-b8bacdf3b021}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
+      <Name>Cosmos.System</Name>
+      <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj">
       <Name>Cosmos.TestRunner.Core</Name>
       <Project>{758faf24-9974-4db8-82ef-1b64daf2f0bc}</Project>

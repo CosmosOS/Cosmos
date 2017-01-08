@@ -1,23 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace Cosmos.System.Graphics
 {
     /*
-     * This struct represents a video mode in term of its number of columns, rows and color_depth
+     * This class represents a video mode in term of its number of columns, rows and color_depth
      */
     //public struct Mode : IEquatable<Mode>, IComparable<Mode>
-    public struct Mode
+    //[StructLayout(LayoutKind.Explicit, Size = 12)]
+    public class Mode
     {
+        //[FieldOffset(0)]
         int columns;
+        //[FieldOffset(4)]
         int rows;
+        //[FieldOffset(8)]
         ColorDepth color_depth;
 
         public bool Equals(Mode other)
         {
+            if ((object)other == null)
+                return false;
+
             if (this.columns == other.columns && this.rows == other.rows && this.color_depth == other.color_depth)
                 return true;
 
@@ -26,6 +30,9 @@ namespace Cosmos.System.Graphics
 
         public override bool Equals(Object obj)
         {
+            if (obj == null)
+                return false;
+
             if (!(obj is Mode))
             {
                 return false;
@@ -62,6 +69,9 @@ namespace Cosmos.System.Graphics
 
         public static bool operator ==(Mode mode_a, Mode mode_b)
         {
+            if ((object)mode_a == (object)mode_b)
+                return true;
+
             return mode_a.Equals(mode_b);
         }
 
@@ -107,6 +117,7 @@ namespace Cosmos.System.Graphics
 
             if (result == 0 || result < 0)
                 return true;
+
             return false;
         }
 
@@ -144,7 +155,7 @@ namespace Cosmos.System.Graphics
 
         public override String ToString()
         {
-            return $"{columns}x{rows}@{color_depth}";
+            return $"{columns}x{rows}@{(int)color_depth}";
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Cosmos.HAL.Drivers;
+﻿//#define COSMOSDEBUG
+using Cosmos.HAL.Drivers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,30 +18,20 @@ namespace Cosmos.System
 
         public VBEScreen() : base()
         {
+            Global.mDebugger.SendInternal($"Creating new VBEScreen() with default mode {defaultGraphicMode}");
+
             // We don't need to add a Control for defaultGraphicMode we assume it to be always a valid mode
-            VBEDriver = new VBEDriver((ushort)defaultGraphicMode.Rows, (ushort)defaultGraphicMode.Columns, (ushort)defaultGraphicMode.ColorDepth);
+            VBEDriver = new VBEDriver((ushort)defaultGraphicMode.Columns, (ushort)defaultGraphicMode.Rows, (ushort)defaultGraphicMode.ColorDepth);
         }
 
         public VBEScreen(Mode mode) : base(mode)
         {
-            if (!IsModeValid(mode))
-                throw new ArgumentOutOfRangeException($"Mode {mode} is not supported by VBE Driver");
+            //Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {mode}");
 
-            VBEDriver = new VBEDriver((ushort)mode.Rows, (ushort)mode.Columns, (ushort)mode.ColorDepth);
+            ThrowIfModeIsNotValid(mode);
+
+            VBEDriver = new VBEDriver((ushort)mode.Columns, (ushort)mode.Rows, (ushort)mode.ColorDepth);
         }
-
-        /// <summary>
-        /// The current Width of the screen in pixels
-        /// </summary>
-        public int ScreenWidth { get; set; }
-        /// <summary>
-        /// The current Height of the screen in pixels
-        /// </summary>
-        public int ScreenHeight { get; set; }
-        /// <summary>
-        /// The current Bytes per pixel
-        /// </summary>
-        public int ScreenBpp { get; set; }
 
         public override Mode Mode
         {
@@ -56,32 +47,31 @@ namespace Cosmos.System
             }
         }
 
-        #region Display
-
+#region Display
         /// <summary>
-        /// All the avalible screen resolutions
+        /// All the aviable screen modes VBE supports, I would like to query the hardware and obtain from it the list but I have
+        /// not yet find how to do it! For now I hardcode the most used VESA modes, VBE seems to support until HDTV resolution
+        /// without problems that is well... excellent :-)
         /// </summary>
-        public enum ScreenSize
-        {
-            Size320x200,
-            Size640x400,
-            Size640x480,
-            Size800x600,
-            Size1024x768,
-            Size1280x1024
-        }
-
         public override List<Mode> getAviableModes()
         {
-            /* I hardcode for now 1024x768@32 (the default mode) so the check does not fails */
-            return new List<Mode> { new Mode(1024, 768, ColorDepth.ColorDepth32) };
-#if false
-            /*
-             * The real VBE has a command to obtain all aviable modes to see if the "fake" Bochs VBE has a way to get this
-             * or if I have to hardcode them
-             */
-            throw new NotImplementedException();
-#endif
+            return new List<Mode>
+                {
+                  new Mode(320, 240, ColorDepth.ColorDepth32),
+                  new Mode(640, 480, ColorDepth.ColorDepth32),
+                  new Mode(800, 600, ColorDepth.ColorDepth32),
+                  new Mode(1024, 768, ColorDepth.ColorDepth32),
+                  /* The so called HD-Ready resolution */
+                  new Mode(1280, 720, ColorDepth.ColorDepth32),
+                  new Mode(1280, 1024, ColorDepth.ColorDepth32),
+                  /* A lot of HD-Ready screen uses this instead of 1280x720 */
+                  new Mode(1366, 768, ColorDepth.ColorDepth32),
+                  new Mode(1680, 1050, ColorDepth.ColorDepth32),
+                  /* HDTV resolution */
+                  new Mode(1920, 1080, ColorDepth.ColorDepth32),
+                  /* HDTV resolution (16:10 AR) */
+                  new Mode(1920, 1200, ColorDepth.ColorDepth32),
+            };
         }
 
         protected override Mode getDefaultGraphicMode() => new Mode(1024, 768, ColorDepth.ColorDepth32);
@@ -92,40 +82,77 @@ namespace Cosmos.System
         /// <param name="Mode">The desired Mode resolution</param>
         private void SetMode(Mode mode)
         {
-            if (!IsModeValid(mode))
-                throw new ArgumentOutOfRangeException($"Mode {mode} is not supported by VBE Driver");
+            ThrowIfModeIsNotValid(mode);
 
-            ushort xres = (ushort)Mode.Rows;
-            ushort yres = (ushort)Mode.Columns;
+
+            ushort xres = (ushort)Mode.Columns;
+            ushort yres = (ushort)Mode.Rows;
             ushort bpp = (ushort)Mode.ColorDepth;
 
             //set the screen
            VBEDriver.VBESet(xres, yres, bpp);
         }
+#endregion
 
-        #endregion
+#region Drawing
 
-        #region Drawing
-
-        public override void DrawPoint(Pen pen, int x, int y)
+        public override void Clear(Color color)
         {
-            int where = x * ((int)mode.ColorDepth / 8) + y * (mode.Columns * ((int)mode.ColorDepth / 8));
+            Global.mDebugger.SendInternal($"Clearing the Screen with Color {color}");
+            //if (color == null)
+            //   throw new ArgumentNullException(nameof(color));
 
             /*
-             * The old VBEScreen used directly the RGB colors ignoring the selected ColorDepth I don't think this is correct
-             * for now we can Draw only if the ColorDepth is 32 bit, we will throw otherwise
+             * TODO this version of Clear() works only when mode.ColorDepth == ColorDepth.ColorDepth32
+             * in the other cases you should before convert color and then call the opportune ClearVRAM() overload
+             * (the one that takes ushort for ColorDepth.ColorDepth16 and the one that takes byte for ColorDepth.ColorDepth8)
+             * For ColorDepth.ColorDepth24 you should mask the Alpha byte.
              */
-             switch (ColorDepth.ColorDepth32)
+            VBEDriver.ClearVRAM((uint)color.ToArgb());
+        }
+
+        /*
+         * As DrawPoint() is the basic block of DrawLine() and DrawRect() and in theory of all the future other methods that will
+         * be implemented is better to not check the validity of the arguments here or it will repeat the check for any point
+         * to be drawn slowing down all.
+         */ 
+        public override void DrawPoint(Pen pen, int x, int y)
+        {
+            Color color = pen.Color;
+            uint pitch;
+            uint stride;
+            uint offset;
+            uint ColorDepthInBytes = (uint)mode.ColorDepth / 8;
+
+            /*
+             * For now we can Draw only if the ColorDepth is 32 bit, we will throw otherwise.
+             *
+             * How to support other ColorDepth? The offset calculation should be the same (and so could be done out of the switch)
+             * adding support ColorDepth.ColorDepth24 is easier as you need can use the version of SetVRAM() that take a byte
+             * and call it 3 time for the B, G and R component (the Color class has properties to do this!), the problem is
+             * for ColorDepth.ColorDepth16 and ColorDepth.ColorDepth8 than need a conversion from color (an ARGB32 color) to the RGB16 and RGB8
+             * how to do this conversion faster maybe using pre-computed tables? What happens if the color cannot be converted? We will throw?
+             */
+            switch (mode.ColorDepth)
             {
                 case ColorDepth.ColorDepth32:
-                    VBEDriver.SetVRAM((uint)where, pen.Color.B);       // BLUE
-                    VBEDriver.SetVRAM((uint)where + 1, pen.Color.G);   // GREEN
-                    VBEDriver.SetVRAM((uint)where + 2, pen.Color.R);   // RED
+                    Global.mDebugger.SendInternal("Computing offset...");
+                    pitch = (uint)mode.Columns * ColorDepthInBytes;
+                    stride = ColorDepthInBytes;
+                    //offset = ((uint)x * pitch) + ((uint)y * stride);
+                    offset = ((uint)x * stride) + ((uint)y * pitch);
 
+                    Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
+
+                    VBEDriver.SetVRAM(offset, (uint)color.ToArgb());
+
+                    Global.mDebugger.SendInternal("Point drawn");
                     break;
 
                 default:
-                    throw new NotImplementedException();
+                    String errorMsg = "DrawPoint() with ColorDepth " + (int)Mode.ColorDepth + " not yet supported";
+                    throw new NotImplementedException(errorMsg);
+
             }
         }
 
@@ -133,12 +160,12 @@ namespace Cosmos.System
         {
             throw new NotImplementedException();
         }
-        #endregion
+#endregion
 
-        #region Reading
+#region Reading
         // TODO add to Canvas GetPointColor()
 
-        #endregion
+#endregion
 
     }
 }

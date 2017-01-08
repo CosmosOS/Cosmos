@@ -1,4 +1,5 @@
-﻿using Cosmos.System.Graphics;
+﻿//#define COSMOSDEBUG
+using Cosmos.System.Graphics;
 
 namespace Cosmos.System.Graphics
 {
@@ -13,6 +14,8 @@ namespace Cosmos.System.Graphics
 
         public static Canvas GetFullScreenCanvas(Mode mode)
         {
+            Global.mDebugger.SendInternal("GetFullScreenCanvas() with mode " + mode);
+
             if (MyVideoDriver == null)
                 return MyVideoDriver = new VBEScreen(mode);
 
@@ -23,6 +26,7 @@ namespace Cosmos.System.Graphics
 
         public static Canvas GetFullScreenCanvas()
         {
+            Global.mDebugger.SendInternal($"GetFullScreenCanvas() with default mode");
             if (MyVideoDriver == null)
                 return new VBEScreen();
 

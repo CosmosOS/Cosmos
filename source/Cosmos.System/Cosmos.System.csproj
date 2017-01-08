@@ -102,8 +102,10 @@
     <Compile Include="FileSystem\VFS\VFSManager.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="Graphics\Canvas.cs" />
+    <Compile Include="Graphics\Color.cs" />
     <Compile Include="Graphics\ColorDepth.cs" />
     <Compile Include="Graphics\FullScreenCanvas.cs" />
+    <Compile Include="Graphics\KnownColorTable.cs" />
     <Compile Include="Graphics\Mode.cs" />
     <Compile Include="Graphics\Pen.cs" />
     <Compile Include="Graphics\VBEScreen.cs" />

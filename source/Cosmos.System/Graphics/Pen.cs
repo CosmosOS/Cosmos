@@ -34,12 +34,12 @@ namespace Cosmos.System.Graphics
         {
             get
             {
-                return Color;
+                return color;
             }
 
             set
             {
-                Color = value;
+                color = value;
             }
         }
 
