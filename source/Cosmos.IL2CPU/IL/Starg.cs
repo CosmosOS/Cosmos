@@ -1,4 +1,6 @@
 using System;
+using System.Reflection;
+
 using Cosmos.IL2CPU.ILOpCodes;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
@@ -32,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
         if (aParam == 0u)
         {
           xArgType = aMethod.MethodBase.DeclaringType;
-          if (xArgType.IsValueType)
+          if (xArgType.GetTypeInfo().IsValueType)
           {
             xArgType = xArgType.MakeByRefType();
           }

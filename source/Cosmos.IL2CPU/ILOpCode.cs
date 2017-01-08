@@ -365,7 +365,7 @@ namespace Cosmos.IL2CPU
             {
                 if (CurrentExceptionRegion.Value.Kind != ExceptionRegionKind.Finally)
                 {
-                    aStack.Push(CurrentExceptionRegion.Value.CatchType);
+                    aStack.Push(CurrentExceptionRegion.Value.GetCatchType());
                 }
             }
 

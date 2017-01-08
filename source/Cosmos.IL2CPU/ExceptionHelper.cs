@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection;
+
 using FieldInfo = System.Reflection.FieldInfo;
 
 namespace Cosmos.IL2CPU {
@@ -22,7 +24,7 @@ namespace Cosmos.IL2CPU {
       public static readonly FieldInfo CurrentExceptionRef;
 
       static ExceptionHelperRefs() {
-          CurrentExceptionRef = typeof(ExceptionHelper).GetField("CurrentException");
+          CurrentExceptionRef = typeof(ExceptionHelper).GetTypeInfo().GetField("CurrentException");
       }
   }
 }

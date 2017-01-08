@@ -18,6 +18,7 @@ using Cosmos.IL2CPU.X86.IL;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 
+using SysReflection = System.Reflection;
 using Call = Cosmos.Assembler.x86.Call;
 using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
 using Label = Cosmos.Assembler.Label;
@@ -118,7 +119,7 @@ namespace Cosmos.IL2CPU
                         XS.Comment(String.Format("Argument[{3}] {0} at EBP+{1}, size = {2}", xParams[i].Name, xOffset, xSize, (xIdxOffset + i)));
                     }
 
-                    var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
+                    var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
                     if (xMethodInfo != null)
                     {
                         var xSize = ILOp.Align(ILOp.SizeOfType(xMethodInfo.ReturnType), 4);
@@ -313,7 +314,7 @@ namespace Cosmos.IL2CPU
             XS.Comment("End Method: " + aMethod.MethodBase.Name);
 
             uint xReturnSize = 0;
-            var xMethInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
+            var xMethInfo = aMethod.MethodBase as SysReflection.MethodInfo;
             if (xMethInfo != null)
             {
                 xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
@@ -346,7 +347,7 @@ namespace Cosmos.IL2CPU
             if (aMethod.PluggedMethod != null)
             {
                 xReturnSize = 0;
-                xMethInfo = aMethod.PluggedMethod.MethodBase as System.Reflection.MethodInfo;
+                xMethInfo = aMethod.PluggedMethod.MethodBase as SysReflection.MethodInfo;
                 if (xMethInfo != null)
                 {
                     xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
@@ -843,12 +844,12 @@ namespace Cosmos.IL2CPU
                 XS.Sub(ESP, xSize);
             }
             XS.Call(ILOp.GetMethodLabel(aTargetMethod));
-            var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
+            var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
 
             uint xReturnsize = 0;
             if (xMethodInfo != null)
             {
-                xReturnsize = ILOp.SizeOfType(((System.Reflection.MethodInfo)aMethod.MethodBase).ReturnType);
+                xReturnsize = ILOp.SizeOfType(((SysReflection.MethodInfo)aMethod.MethodBase).ReturnType);
             }
 
             ILOp.EmitExceptionLogic(Assembler, aMethod, null, true,
@@ -1143,7 +1144,7 @@ namespace Cosmos.IL2CPU
             XS.Return();
         }
 
-        public void ProcessField(System.Reflection.FieldInfo aField)
+        public void ProcessField(SysReflection.FieldInfo aField)
         {
             string xFieldName = LabelName.GetFullName(aField);
             xFieldName = DataMember.GetStaticFieldName(aField);

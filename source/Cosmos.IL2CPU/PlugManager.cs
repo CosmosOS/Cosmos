@@ -86,7 +86,7 @@ namespace Cosmos.IL2CPU
             // class and throw an exception if any method, field, member etc is missing.
             foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if (!xAsm.GlobalAssemblyCache)
+                if (true/*!xAsm.GlobalAssemblyCache*/)
                 {
                     //if (xAsm.GetName().Name == "Cosmos.IL2CPU.X86") {
                     //  // skip this assembly for now. at the moment we introduced the AssemblerMethod.AssembleNew method, for allowing those to work

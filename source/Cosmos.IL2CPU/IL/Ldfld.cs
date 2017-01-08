@@ -1,15 +1,9 @@
 using System;
 using System.Linq;
-// using System.Collections.Generic;
-// using System.IO;
-//
-// using CPU = Cosmos.Assembler.x86;
-// using System.Reflection;
-using Cosmos.Assembler;
-using Cosmos.IL2CPU.ILOpCodes;
+using System.Reflection;
+
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
-using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -78,7 +72,7 @@ namespace Cosmos.IL2CPU.X86.IL
             XS.Comment("TypeOnStack: " + aTypeOnStack.FullName);
             XS.Comment("Offset: " + xOffset + " (includes object header)");
 
-            if (aDeclaringType.IsValueType && aTypeOnStack == aDeclaringType)
+            if (aDeclaringType.GetTypeInfo().IsValueType && aTypeOnStack == aDeclaringType)
             {
                 #region Read struct value from stack
 

@@ -40,7 +40,13 @@
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsmGenerator.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Token.cs" />
+    <Compile Include="TokenList.cs" />
+    <Compile Include="TokenPatterns.cs" />
     <Compile Include="XS.cs" />
     <Compile Include="XS.FPU.cs">
       <DependentUpon>XS.cs</DependentUpon>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
@@ -381,13 +382,13 @@ namespace Cosmos.IL2CPU
                 }
                 else
                 {
-                    foreach (var xManifestName in typeof(ReferenceHelper).Assembly.GetManifestResourceNames())
+                    foreach (var xManifestName in typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceNames())
                     {
                         if (!xManifestName.EndsWith(".xs", StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
                         }
-                        using (var xStream = typeof(ReferenceHelper).Assembly.GetManifestResourceStream(xManifestName))
+                        using (var xStream = typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(xManifestName))
                         {
                             using (var xReader = new StreamReader(xStream))
                             {

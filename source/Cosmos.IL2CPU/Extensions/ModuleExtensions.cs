@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Cosmos.Debug.Symbols
+namespace Cosmos.IL2CPU
 {
     public static class ModuleExtensions
     {
+        // TODO: All this methods will be available in .NET Standard 2.0
         public static FieldInfo ResolveField(this Module aThis, int metadataToken, Type[] genericTypeArguments, Type[] genericMethodArguments)
         {
             throw new Exception("NetCore Fix Me");

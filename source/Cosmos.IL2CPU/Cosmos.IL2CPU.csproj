@@ -62,6 +62,8 @@
     <Compile Include="ElfHash.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="Extensions\ExceptionRegionExtensions.cs" />
+    <Compile Include="Extensions\ModuleExtensions.cs" />
     <Compile Include="GCImplementationRefs.cs" />
     <Compile Include="Heap.cs" />
     <Compile Include="ILOp.cs" />

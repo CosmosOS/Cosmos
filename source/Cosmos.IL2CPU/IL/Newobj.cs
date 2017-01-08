@@ -42,7 +42,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 }
             }
 
-            if (objectType.IsValueType)
+            if (objectType.GetTypeInfo().IsValueType)
             {
                 #region Valuetypes
 

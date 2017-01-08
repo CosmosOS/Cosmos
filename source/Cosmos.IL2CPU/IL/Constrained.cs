@@ -1,7 +1,8 @@
 using System;
 using System.Reflection;
-using Cosmos.Assembler;
+
 using Cosmos.IL2CPU.ILOpCodes;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -20,12 +21,14 @@ namespace Cosmos.IL2CPU.X86.IL
 
     private void DoExecute(Assembler.Assembler assembler, MethodInfo aMethod, ILOpCode aOpCode, OpType aTargetType, bool debugEnabled)
     {
-      new Comment(assembler, $"Type = {aTargetType.Value}");
-      if (aTargetType.Value.BaseType == typeof(ValueType))
+      var xType = aTargetType.Value;
+
+      XS.Comment($"Type = {aTargetType.Value}");
+      if (xType.GetTypeInfo().BaseType == typeof(ValueType))
       {
 
       }
-      else if (aTargetType.Value.BaseType == typeof(object))
+      else if (xType.GetTypeInfo().BaseType == typeof(object))
       {
         throw new NotImplementedException($"Constrained not implemented for {aTargetType.Value}");
       }

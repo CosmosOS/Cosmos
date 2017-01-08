@@ -470,7 +470,7 @@ namespace Cosmos.IL2CPU
                     var xCompilerExtensionsMetas = xAssembly.GetCustomAttributes<CompilerExtensionAttribute>();
                     foreach (var xMeta in xCompilerExtensionsMetas)
                     {
-                        mLoadedExtensions.Add((CompilerExtensionBase) Activator.CreateInstance(xMeta.Type));
+                        mLoadedExtensions.Add((CompilerExtensionBase)Activator.CreateInstance(xMeta.Type));
                     }
                 }
             }

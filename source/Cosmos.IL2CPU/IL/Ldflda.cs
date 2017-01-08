@@ -1,9 +1,8 @@
 using System;
-using System.Linq;
 using System.Reflection;
-using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.Assembler;
+
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -33,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
             int xExtraOffset = 0;
             var xType = aMethod.MethodBase.DeclaringType;
 
-            bool xNeedsGC = aDeclaringType.IsClass && !aDeclaringType.IsValueType;
+            bool xNeedsGC = aDeclaringType.GetTypeInfo().IsClass && !aDeclaringType.GetTypeInfo().IsValueType;
 
             if (xNeedsGC)
             {
@@ -43,10 +42,10 @@ namespace Cosmos.IL2CPU.X86.IL
             var xActualOffset = aField.Offset + xExtraOffset;
             var xSize = aField.Size;
             if ((!aTypeOnStack.IsPointer)
-                && (aDeclaringType.IsClass))
+                && (aDeclaringType.GetTypeInfo().IsClass))
             {
                 DoNullReferenceCheck(Assembler, aDebugEnabled, 4);
-                XS.Add(XSRegisters.ESP, 4);
+                XS.Add(ESP, 4);
             }
             else
             {
@@ -55,13 +54,13 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (aDerefValue && aField.IsExternalValue)
             {
-                XS.Set(XSRegisters.ESP, XSRegisters.EAX, destinationIsIndirect: true);
+                XS.Set(ESP, EAX, destinationIsIndirect: true);
             }
             else
             {
-                XS.Pop(XSRegisters.EAX);
-                XS.Add(XSRegisters.EAX, (uint)(xActualOffset));
-                XS.Push(XSRegisters.EAX);
+                XS.Pop(EAX);
+                XS.Add(EAX, (uint)(xActualOffset));
+                XS.Push(EAX);
             }
         }
     }
