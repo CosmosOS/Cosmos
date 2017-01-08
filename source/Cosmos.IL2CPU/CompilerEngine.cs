@@ -1,13 +1,14 @@
 ﻿#define COSMOSDEBUG
 
-using Cosmos.Build.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Cosmos.Debug.Common;
+
+using Cosmos.Build.Common;
+using Cosmos.Debug.Symbols;
 
 namespace Cosmos.IL2CPU
 {
@@ -203,7 +204,7 @@ namespace Cosmos.IL2CPU
             }
 
             // Add UserKit dirs for asms to load from.
-            mSearchDirs.Add(Path.GetDirectoryName(typeof(CompilerEngine).Assembly.Location));
+            mSearchDirs.Add(Path.GetDirectoryName(typeof(CompilerEngine).GetTypeInfo().Assembly.Location));
             mSearchDirs.Add(CosmosPaths.UserKit);
             mSearchDirs.Add(CosmosPaths.Kernel);
 
@@ -219,7 +220,7 @@ namespace Cosmos.IL2CPU
             }
             else
             {
-                if (!Enum.GetNames(typeof(TraceAssemblies)).Contains(TraceAssemblies, StringComparer.InvariantCultureIgnoreCase))
+                if (!Enum.GetNames(typeof(TraceAssemblies)).Contains(TraceAssemblies, StringComparer.OrdinalIgnoreCase))
                 {
                     LogError("Invalid TraceAssemblies specified");
                     return false;

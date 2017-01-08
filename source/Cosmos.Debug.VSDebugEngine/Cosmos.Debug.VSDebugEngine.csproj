@@ -121,6 +121,14 @@
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="System.IO.FileSystem, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.IO.FileSystem.4.3.0\lib\net46\System.IO.FileSystem.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.IO.FileSystem.Primitives, Version=4.0.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.IO.FileSystem.Primitives.4.3.0\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -187,6 +195,10 @@
       <Project>{c9826909-2e5e-4453-93fa-b6be4503df02}</Project>
       <Name>Cosmos.Debug.Hosts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Debug.Net462\Cosmos.Debug.Net462.csproj">
+      <Project>{a0c60e14-7520-48cc-b624-8eb1d798e1a6}</Project>
+      <Name>Cosmos.Debug.Net462</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj">
       <Project>{2e740096-911f-47d0-a46d-998dbb76fc5d}</Project>
       <Name>Cosmos.Debug.Symbols</Name>
@@ -198,6 +210,7 @@
     </None>
     <None Include=".editorconfig" />
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

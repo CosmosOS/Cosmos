@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Reflection;
+using System.Reflection.Metadata;
 
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpToken : ILOpCode {
@@ -41,8 +39,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
         }
     }
 
-    public OpToken(Code aOpCode, int aPos, int aNextPos, Int32 aValue, Module aModule, Type[] aTypeGenericArgs, Type[] aMethodGenericArgs, ExceptionHandlingClause aCurrentExceptionHandler)
-      : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
+    public OpToken(Code aOpCode, int aPos, int aNextPos, Int32 aValue, Module aModule, Type[] aTypeGenericArgs, Type[] aMethodGenericArgs, ExceptionRegion aCurrentExceptionRegion)
+      : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       Value = aValue;
       if (ValueIsField)
       {

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
+
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.ILOpCodes {
@@ -12,8 +14,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
     public MethodBase BaseMethod;
     public uint BaseMethodUID;
 
-    public OpMethod(Code aOpCode, int aPos, int aNextPos, MethodBase aValue, ExceptionHandlingClause aCurrentExceptionHandler)
-      : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
+    public OpMethod(Code aOpCode, int aPos, int aNextPos, MethodBase aValue, ExceptionRegion aCurrentExceptionRegion)
+      : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       Value = aValue;
     }
 
@@ -78,9 +80,9 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           if (xMethodInfo != null && xMethodInfo.ReturnType != typeof(void))
           {
             StackPushTypes[0] = xMethodInfo.ReturnType;
-            if (StackPushTypes[0].IsEnum)
+            if (StackPushTypes[0].GetTypeInfo().IsEnum)
             {
-              StackPushTypes[0] = StackPushTypes[0].GetEnumUnderlyingType();
+              StackPushTypes[0] = StackPushTypes[0].GetTypeInfo().GetEnumUnderlyingType();
             }
           }
           break;

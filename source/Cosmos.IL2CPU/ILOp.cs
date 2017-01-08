@@ -1,18 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
+
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.Assembler;
 using CPU = Cosmos.Assembler.x86;
-using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Debug.Common;
+using Cosmos.Debug.Symbols;
 using Cosmos.IL2CPU.X86.IL;
-using System.Runtime.InteropServices;
 using XSharp.Compiler;
 using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
-using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU
 {
@@ -35,7 +34,7 @@ namespace Cosmos.IL2CPU
     public static string GetTypeIDLabel(Type aType)
     {
       return "VMT__TYPE_ID_HOLDER__" +
-             DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(aType) + " ASM_IS__" +
+             DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(aType.GetTypeInfo()) + " ASM_IS__" +
                                                       aType.GetTypeInfo().Assembly.GetName().Name);
     }
 
@@ -119,13 +118,13 @@ namespace Cosmos.IL2CPU
     {
       var xBody = aMethod.MethodBase.GetMethodBody();
       uint xOffset = 4;
-      for (int i = 0; i < xBody.LocalVariables.Count; i++)
+      for (int i = 0; i < xBody.GetLocalVariablesInfo().Count; i++)
       {
         if (i == localIndex)
         {
           break;
         }
-        var xField = xBody.LocalVariables[i];
+        var xField = xBody.GetLocalVariablesInfo()[i];
         xOffset += GetStackCountForLocal(aMethod, xField) * 4;
       }
       return xOffset;
@@ -221,7 +220,7 @@ namespace Cosmos.IL2CPU
       // because the memory is read in positive direction, we need to add additional size if greater than 4
       uint xOffset = GetEBPOffsetForLocal(aMethod, localIndex);
       var xBody = aMethod.MethodBase.GetMethodBody();
-      var xField = xBody.LocalVariables[localIndex];
+      var xField = xBody.GetLocalVariablesInfo()[localIndex];
       xOffset += GetStackCountForLocal(aMethod, xField) * 4 - 4;
       return xOffset;
     }
@@ -231,9 +230,8 @@ namespace Cosmos.IL2CPU
       XS.Push(LdStr.GetContentsArrayName(aMessage));
       new CPU.Call
       {
-        DestinationLabel =
-          LabelName.Get(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowNotImplemented",
-            BindingFlags.Static | BindingFlags.Public))
+        DestinationLabel = LabelName.Get(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowNotImplemented",
+                                         BindingFlags.Static | BindingFlags.Public))
       };
     }
 
@@ -241,9 +239,8 @@ namespace Cosmos.IL2CPU
     {
       new CPU.Call
       {
-        DestinationLabel =
-          LabelName.Get(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public,
-            null, new Type[] { }, null))
+        DestinationLabel = LabelName.Get(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowOverflow",
+                           BindingFlags.Static | BindingFlags.Public))
       };
     }
 
@@ -274,10 +271,10 @@ namespace Cosmos.IL2CPU
         xInfo.Field = xField;
 
         var xFieldOffsetAttrib =
-          xField.GetReflectionOnlyCustomAttributes<FieldOffsetAttribute>(true).FirstOrDefault();
+          xField.GetCustomAttributes<FieldOffsetAttribute>(true).FirstOrDefault();
         if (xFieldOffsetAttrib != null)
         {
-          xInfo.Offset = (uint)xFieldOffsetAttrib.GetArgumentValue<int>("Value");
+          xInfo.Offset = (uint)xFieldOffsetAttrib.Value;
         }
 
         aFields.Add(xInfo);
@@ -433,29 +430,29 @@ namespace Cosmos.IL2CPU
         aJumpTargetNoException = GetLabel(aMethodInfo, aCurrentOpCode.NextPosition);
       }
       string xJumpTo = null;
-      if (aCurrentOpCode != null && aCurrentOpCode.CurrentExceptionHandler != null)
+      if (aCurrentOpCode != null && aCurrentOpCode.CurrentExceptionRegion != null)
       {
         // todo add support for nested handlers, see comment in Engine.cs
         //if (!((aMethodInfo.CurrentHandler.HandlerOffset < aCurrentOpOffset) || (aMethodInfo.CurrentHandler.HandlerLength + aMethodInfo.CurrentHandler.HandlerOffset) <= aCurrentOpOffset)) {
         XS.Comment(String.Format("CurrentOffset = {0}, HandlerStartOffset = {1}", aCurrentOpCode.Position,
-          aCurrentOpCode.CurrentExceptionHandler.HandlerOffset));
-        if (aCurrentOpCode.CurrentExceptionHandler.HandlerOffset > aCurrentOpCode.Position)
+          aCurrentOpCode.CurrentExceptionRegion.Value.HandlerOffset));
+        if (aCurrentOpCode.CurrentExceptionRegion.Value.HandlerOffset > aCurrentOpCode.Position)
         {
-          switch (aCurrentOpCode.CurrentExceptionHandler.Flags)
+          switch (aCurrentOpCode.CurrentExceptionRegion.Value.Kind)
           {
-            case ExceptionHandlingClauseOptions.Clause:
+            case ExceptionRegionKind.Catch:
               {
-                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
+                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionRegion.Value.HandlerOffset);
                 break;
               }
-            case ExceptionHandlingClauseOptions.Finally:
+            case ExceptionRegionKind.Finally:
               {
-                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionHandler.HandlerOffset);
+                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionRegion.Value.HandlerOffset);
                 break;
               }
             default:
               {
-                throw new Exception("ExceptionHandlerType '" + aCurrentOpCode.CurrentExceptionHandler.Flags.ToString() +
+                throw new Exception("ExceptionHandlerType '" + aCurrentOpCode.CurrentExceptionRegion.Value.Kind.ToString() +
                                     "' not supported yet!");
               }
           }

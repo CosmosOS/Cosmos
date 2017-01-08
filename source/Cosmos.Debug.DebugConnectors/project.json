@@ -8,11 +8,6 @@
     "System.Threading.Thread": "4.3.0"
   },
   "frameworks": {
-    "net462": {
-      "dependencies": {
-        "System": "4.0.0"
-      }
-    },
     "netstandard1.5": {}
   }
 }

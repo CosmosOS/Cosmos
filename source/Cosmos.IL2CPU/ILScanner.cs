@@ -224,13 +224,13 @@ namespace Cosmos.IL2CPU
             Queue(GCImplementationRefs.DecRefCountRef, null, "Explicit Entry");
             Queue(GCImplementationRefs.AllocNewObjectRef, null, "Explicit Entry");
             // for now, to ease runtime exception throwing
-            Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public, null, new Type[] {typeof(string)}, null), null, "Explicit Entry");
-            Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public, null, new Type[] {}, null), null, "Explicit Entry");
+            Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowNotImplemented", new Type[] {typeof(string)}, null), null, "Explicit Entry");
+            Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowOverflow", new Type[] {}, null), null, "Explicit Entry");
             Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
             Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
             // register system types:
             Queue(typeof(Array).GetTypeInfo(), null, "Explicit Entry");
-            Queue(typeof(Array).GetTypeInfo().GetConstructor(BindingFlags.NonPublic | BindingFlags.Instance, null, Type.EmptyTypes, null), null, "Explicit Entry");
+            Queue(typeof(Array).GetTypeInfo().GetConstructor(Type.EmptyTypes), null, "Explicit Entry");
 
             var xThrowHelper = Type.GetType("System.ThrowHelper", true, false);
             Queue(xThrowHelper.GetTypeInfo().GetMethod("ThrowInvalidOperationException", BindingFlags.NonPublic | BindingFlags.Static), null, "Explicit Entry");
@@ -422,7 +422,7 @@ namespace Cosmos.IL2CPU
                     }
                     else
                     {
-                        xNewVirtMethod = xVirtType.GetTypeInfo().GetMethod(aMethod.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, xParamTypes, null);
+                        xNewVirtMethod = xVirtType.GetTypeInfo().GetMethod(aMethod.Name, xParamTypes, null);
                         if (xNewVirtMethod != null)
                         {
                             if (!xNewVirtMethod.IsVirtual)
@@ -464,7 +464,7 @@ namespace Cosmos.IL2CPU
                             var xType = (Type) mItemsList[i];
                             if (xType.GetTypeInfo().IsSubclassOf(xVirtMethod.DeclaringType) || (xVirtMethod.DeclaringType.GetTypeInfo().IsInterface && xVirtMethod.DeclaringType.GetTypeInfo().IsAssignableFrom(xType)))
                             {
-                                var xNewMethod = xType.GetTypeInfo().GetMethod(aMethod.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, xParamTypes, null);
+                                var xNewMethod = xType.GetTypeInfo().GetMethod(aMethod.Name, xParamTypes, null);
                                 if (xNewMethod != null)
                                 {
                                     // We need to check IsVirtual, a non virtual could
@@ -638,7 +638,7 @@ namespace Cosmos.IL2CPU
                 {
                     if (!aType.IsInterface && aType.GetInterfaces().Contains(xVirt.DeclaringType))
                     {
-                        var xIntfMapping = aType.GetInterfaceMap(xVirt.DeclaringType);
+                        var xIntfMapping = aType.GetRuntimeInterfaceMap(xVirt.DeclaringType);
                         if ((xIntfMapping.InterfaceMethods != null) && (xIntfMapping.TargetMethods != null))
                         {
                             var xIdx = Array.IndexOf(xIntfMapping.InterfaceMethods, xVirt);
@@ -720,8 +720,6 @@ namespace Cosmos.IL2CPU
                 }
                 aCurrentInspectedType = aCurrentInspectedType.GetTypeInfo().BaseType;
                 MethodBase xFoundMethod = aCurrentInspectedType.GetTypeInfo().GetMethod(aMethod.Name,
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance,
-                    Type.DefaultBinder,
                     aMethodParams,
                     new ParameterModifier[0]);
                 if (xFoundMethod == null)

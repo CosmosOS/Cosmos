@@ -343,10 +343,10 @@ namespace Cosmos.Debug.Symbols
         // This gets the Sequence Points.
         // Sequence Points are spots that identify what the compiler/debugger says is a spot
         // that a breakpoint can occur one. Essentially, an atomic source line in C#
-        //public SequencePointCollection GetSequencePoints(MethodBase aMethod, bool aFilterHiddenLines = false)
-        //{
-        //    return GetSequencePoints(aMethod.DeclaringType.GetTypeInfo().Assembly.Location, aMethod.MetadataToken, aFilterHiddenLines);
-        //}
+        public SequencePoint[] GetSequencePoints(MethodBase aMethod, bool aFilterHiddenLines = false)
+        {
+            return GetSequencePoints(aMethod.DeclaringType.GetTypeInfo().Assembly.Location, aMethod.MetadataToken, aFilterHiddenLines);
+        }
 
         public SequencePoint[] GetSequencePoints(string aAsmPathname, int aMethodToken, bool aFilterHiddenLines = false)
         {

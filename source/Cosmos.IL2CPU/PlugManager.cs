@@ -99,7 +99,7 @@ namespace Cosmos.IL2CPU
                     foreach (var xPlugType in xAsm.GetTypes())
                     {
                         // Foreach, it is possible there could be one plug class with mult plug targets
-                        foreach (PlugAttribute xAttrib in xPlugType.GetCustomAttributes(typeof(PlugAttribute), false))
+                        foreach (PlugAttribute xAttrib in xPlugType.GetTypeInfo().GetCustomAttributes<PlugAttribute>(false))
                         {
                             var xTargetType = xAttrib.Target;
                             // If no type is specified, try to find by a specified name.
@@ -125,7 +125,7 @@ namespace Cosmos.IL2CPU
                             if (!xAttrib.IsMonoOnly)
                             {
                                 Dictionary<Type, List<Type>> mPlugs;
-                                if (xTargetType.ContainsGenericParameters)
+                                if (xTargetType.GetTypeInfo().ContainsGenericParameters)
                                 {
                                     mPlugs = xAttrib.Inheritable ? mGenericPlugImplsInhrt : mGenericPlugImpls;
                                 }
@@ -397,14 +397,14 @@ namespace Cosmos.IL2CPU
                 }
                 // Plugs methods must be static, and public
                 // Search for non signature matches first since signature searches are slower
-                xResult = xImpl.GetTypeInfo().GetMethod(aMethod.Name, BindingFlags.Static | BindingFlags.Public, null, xParamTypes, null);
+                xResult = xImpl.GetTypeInfo().GetMethod(aMethod.Name, xParamTypes, null);
                 if (xResult == null && aMethod.Name == ".ctor")
                 {
-                    xResult = xImpl.GetTypeInfo().GetMethod("Ctor", BindingFlags.Static | BindingFlags.Public, null, xParamTypes, null);
+                    xResult = xImpl.GetTypeInfo().GetMethod("Ctor", xParamTypes, null);
                 }
                 if (xResult == null && aMethod.Name == ".cctor")
                 {
-                    xResult = xImpl.GetTypeInfo().GetMethod("CCtor", BindingFlags.Static | BindingFlags.Public, null, xParamTypes, null);
+                    xResult = xImpl.GetTypeInfo().GetMethod("CCtor", xParamTypes, null);
                 }
 
                 if (xResult == null)
@@ -528,11 +528,11 @@ namespace Cosmos.IL2CPU
                             {
                                 if (string.Compare(xSigMethod.Name, "ctor", StringComparison.OrdinalIgnoreCase) == 0)
                                 {
-                                    xTargetMethod = aTargetType.GetTypeInfo().GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+                                    xTargetMethod = aTargetType.GetTypeInfo().GetConstructor(xTypesInst);
                                 }
                                 else
                                 {
-                                    xTargetMethod = aTargetType.GetTypeInfo().GetMethod(xSigMethod.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesInst, null);
+                                    xTargetMethod = aTargetType.GetTypeInfo().GetMethod(xSigMethod.Name, xTypesInst, null);
                                 }
                             }
                             // Not an instance method, try static
@@ -540,11 +540,11 @@ namespace Cosmos.IL2CPU
                             {
                                 if (string.Compare(xSigMethod.Name, "cctor", StringComparison.OrdinalIgnoreCase) == 0 || string.Compare(xSigMethod.Name, "ctor", StringComparison.OrdinalIgnoreCase) == 0)
                                 {
-                                    xTargetMethod = aTargetType.GetTypeInfo().GetConstructor(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+                                    xTargetMethod = aTargetType.GetTypeInfo().GetConstructor(xTypesStatic);
                                 }
                                 else
                                 {
-                                    xTargetMethod = aTargetType.GetTypeInfo().GetMethod(xSigMethod.Name, BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic, null, CallingConventions.Any, xTypesStatic, null);
+                                    xTargetMethod = aTargetType.GetTypeInfo().GetMethod(xSigMethod.Name, xTypesStatic, null);
                                 }
                             }
                             if (xTargetMethod == aMethod)

@@ -33,9 +33,9 @@
 *.docstates
 *.vsp
 *.pdb
+*.lock.json
 Thumbs.db
 build.force
-project.lock.json
 
 Build/VSIP/
 Setup/Output/

@@ -1,6 +1,5 @@
 ﻿using System;
-
-using global::System.Diagnostics;
+using System.Diagnostics;
 
 namespace Cosmos.IL2CPU
 {

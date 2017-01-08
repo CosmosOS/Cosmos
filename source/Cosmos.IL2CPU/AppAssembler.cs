@@ -4,23 +4,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text;
+
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
-using Cosmos.Debug.Common;
+using Cosmos.Debug.Symbols;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.Plugs.System;
 using Cosmos.IL2CPU.X86.IL;
-using Mono.Cecil;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
+
 using Call = Cosmos.Assembler.x86.Call;
 using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
 using Label = Cosmos.Assembler.Label;
-using SysReflection = System.Reflection;
 
 
 namespace Cosmos.IL2CPU
@@ -89,14 +89,15 @@ namespace Cosmos.IL2CPU
                 if (aMethod.MethodAssembler == null && !aMethod.IsInlineAssembler)
                 {
                     // the body of aMethod is getting emitted
-                    var xBody = aMethod.MethodBase.GetMethodBody();
-                    if (xBody != null)
+                    var xMethodBody = aMethod.MethodBase.GetMethodBody();
+                    if (xMethodBody != null)
                     {
-                        foreach (var localVariable in xBody.LocalVariables)
+                        foreach (var localVariable in xMethodBody.GetLocalVariablesInfo())
                         {
                             XS.Comment(String.Format("Local {0} at EBP-{1}", localVariable.LocalIndex, ILOp.GetEBPOffsetForLocal(aMethod, localVariable.LocalIndex)));
                         }
                     }
+
                     var xIdxOffset = 0u;
                     if (!aMethod.MethodBase.IsStatic)
                     {
@@ -117,7 +118,7 @@ namespace Cosmos.IL2CPU
                         XS.Comment(String.Format("Argument[{3}] {0} at EBP+{1}, size = {2}", xParams[i].Name, xOffset, xSize, (xIdxOffset + i)));
                     }
 
-                    var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
+                    var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
                     if (xMethodInfo != null)
                     {
                         var xSize = ILOp.Align(ILOp.SizeOfType(xMethodInfo.ReturnType), 4);
@@ -175,7 +176,7 @@ namespace Cosmos.IL2CPU
             if (aMethod.MethodBase.IsStatic && aMethod.MethodBase is ConstructorInfo)
             {
                 XS.Comment("Static constructor. See if it has been called already, return if so.");
-                var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + LabelName.GetFullName(aMethod.MethodBase.DeclaringType));
+                var xName = DataMember.FilterStringForIncorrectChars("CCTOR_CALLED__" + LabelName.GetFullName(aMethod.MethodBase.DeclaringType.GetTypeInfo()));
                 XS.DataMember(xName, 0);
                 XS.Compare(xName, 1, destinationIsIndirect: true, size: RegisterSize.Byte8);
                 XS.Jump(ConditionalTestEnum.Equal, ".BeforeQuickReturn");
@@ -224,12 +225,13 @@ namespace Cosmos.IL2CPU
             if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
             {
                 // the body of aMethod is getting emitted
-                var xBody = aMethod.MethodBase.GetMethodBody();
-                if (xBody != null)
+                var xMethodBody = aMethod.MethodBase.GetMethodBody();
+                if (xMethodBody != null)
                 {
                     var xLocalsOffset = mLocals_Arguments_Infos.Count;
                     aMethod.LocalVariablesSize = 0;
-                    foreach (var xLocal in xBody.LocalVariables)
+
+                    foreach (var xLocal in xMethodBody.GetLocalVariablesInfo())
                     {
                         var xInfo = new LOCAL_ARGUMENT_INFO
                         {
@@ -250,16 +252,15 @@ namespace Cosmos.IL2CPU
                         }
                         aMethod.LocalVariablesSize += xSize;
                         //new Sub { DestinationReg = Registers.ESP, SourceValue = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4) };
-                    }
-                    var xCecilMethod = GetCecilMethodDefinitionForSymbolReading(aMethod.MethodBase);
-                    if (xCecilMethod != null && xCecilMethod.Body != null)
-                    {
+
+                        var xMethodBase = aMethod.MethodBase;
+
                         // mLocals_Arguments_Infos is one huge list, so ourlatest additions are at the end
-                        for (int i = 0; i < xCecilMethod.Body.Variables.Count; i++)
+                        for (int i = 0; i < xMethodBase.GetLocalVariables().Count; i++)
                         {
-                            mLocals_Arguments_Infos[xLocalsOffset + i].NAME = xCecilMethod.Body.Variables[i].Name;
+                            mLocals_Arguments_Infos[xLocalsOffset + i].NAME = xMethodBase.GetLocalVariableName(i);
                         }
-                        for (int i = xLocalsOffset + xCecilMethod.Body.Variables.Count - 1; i >= xLocalsOffset; i--)
+                        for (int i = xLocalsOffset + xMethodBase.GetLocalVariables().Count - 1; i >= xLocalsOffset; i--)
                         {
                             if (mLocals_Arguments_Infos[i].NAME.Contains('$'))
                             {
@@ -312,7 +313,7 @@ namespace Cosmos.IL2CPU
             XS.Comment("End Method: " + aMethod.MethodBase.Name);
 
             uint xReturnSize = 0;
-            var xMethInfo = aMethod.MethodBase as SysReflection.MethodInfo;
+            var xMethInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
             if (xMethInfo != null)
             {
                 xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
@@ -345,7 +346,7 @@ namespace Cosmos.IL2CPU
             if (aMethod.PluggedMethod != null)
             {
                 xReturnSize = 0;
-                xMethInfo = aMethod.PluggedMethod.MethodBase as SysReflection.MethodInfo;
+                xMethInfo = aMethod.PluggedMethod.MethodBase as System.Reflection.MethodInfo;
                 if (xMethInfo != null)
                 {
                     xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
@@ -379,13 +380,14 @@ namespace Cosmos.IL2CPU
             XS.Label(xLabelExc);
             if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
             {
-                var xBody = aMethod.MethodBase.GetMethodBody();
-                if (xBody != null)
+                var xMethodBody = aMethod.MethodBase.GetMethodBody();
+                if (xMethodBody != null)
                 {
                     uint xLocalsSize = 0;
-                    for (int j = xBody.LocalVariables.Count - 1; j >= 0; j--)
+
+                    for (int j = xMethodBody.GetLocalVariablesInfo().Count - 1; j >= 0; j--)
                     {
-                        xLocalsSize += ILOp.Align(ILOp.SizeOfType(xBody.LocalVariables[j].LocalType), 4);
+                        xLocalsSize += ILOp.Align(ILOp.SizeOfType(xMethodBody.GetLocalVariablesInfo()[j].LocalType), 4);
 
                         if (xLocalsSize >= 256)
                         {
@@ -594,24 +596,24 @@ namespace Cosmos.IL2CPU
 
                 #region Exception handling support code
 
-                ExceptionHandlingClause xCurrentHandler = null;
+                ExceptionRegion? xCurrentRegion = null;
                 var xBody = aMethod.MethodBase.GetMethodBody();
                 // todo: add support for nested handlers using a stack or so..
-                foreach (ExceptionHandlingClause xHandler in xBody.ExceptionHandlingClauses)
+                foreach (ExceptionRegion xHandler in xBody.ExceptionRegions)
                 {
                     if (xHandler.TryOffset > 0)
                     {
                         if (xHandler.TryOffset <= xNextPosition && (xHandler.TryLength + xHandler.TryOffset) > xNextPosition)
                         {
-                            if (xCurrentHandler == null)
+                            if (xCurrentRegion == null)
                             {
-                                xCurrentHandler = xHandler;
+                                xCurrentRegion = xHandler;
                                 continue;
                             }
-                            else if (xHandler.TryOffset > xCurrentHandler.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentHandler.TryLength + xCurrentHandler.TryOffset))
+                            else if (xHandler.TryOffset > xCurrentRegion.Value.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentRegion.Value.TryLength + xCurrentRegion.Value.TryOffset))
                             {
                                 // only replace if the current found handler is narrower
-                                xCurrentHandler = xHandler;
+                                xCurrentRegion = xHandler;
                                 continue;
                             }
                         }
@@ -620,34 +622,34 @@ namespace Cosmos.IL2CPU
                     {
                         if (xHandler.HandlerOffset <= xNextPosition && (xHandler.HandlerOffset + xHandler.HandlerLength) > xNextPosition)
                         {
-                            if (xCurrentHandler == null)
+                            if (xCurrentRegion == null)
                             {
-                                xCurrentHandler = xHandler;
+                                xCurrentRegion = xHandler;
                                 continue;
                             }
-                            else if (xHandler.HandlerOffset > xCurrentHandler.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentHandler.HandlerOffset + xCurrentHandler.HandlerLength))
+                            else if (xHandler.HandlerOffset > xCurrentRegion.Value.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentRegion.Value.HandlerOffset + xCurrentRegion.Value.HandlerLength))
                             {
                                 // only replace if the current found handler is narrower
-                                xCurrentHandler = xHandler;
+                                xCurrentRegion = xHandler;
                                 continue;
                             }
                         }
                     }
-                    if (xHandler.Flags.HasFlag(ExceptionHandlingClauseOptions.Filter))
+                    if (xHandler.Kind.HasFlag(ExceptionRegionKind.Filter))
                     {
                         if (xHandler.FilterOffset > 0)
                         {
                             if (xHandler.FilterOffset <= xNextPosition)
                             {
-                                if (xCurrentHandler == null)
+                                if (xCurrentRegion == null)
                                 {
-                                    xCurrentHandler = xHandler;
+                                    xCurrentRegion = xHandler;
                                     continue;
                                 }
-                                else if (xHandler.FilterOffset > xCurrentHandler.FilterOffset)
+                                else if (xHandler.FilterOffset > xCurrentRegion.Value.FilterOffset)
                                 {
                                     // only replace if the current found handler is narrower
-                                    xCurrentHandler = xHandler;
+                                    xCurrentRegion = xHandler;
                                     continue;
                                 }
                             }
@@ -657,7 +659,7 @@ namespace Cosmos.IL2CPU
 
                 #endregion
 
-                var xNeedsExceptionPush = (xCurrentHandler != null) && (((xCurrentHandler.HandlerOffset > 0 && xCurrentHandler.HandlerOffset == xOpCode.Position) || ((xCurrentHandler.Flags & ExceptionHandlingClauseOptions.Filter) > 0 && xCurrentHandler.FilterOffset > 0 && xCurrentHandler.FilterOffset == xOpCode.Position)) && (xCurrentHandler.Flags == ExceptionHandlingClauseOptions.Clause));
+                var xNeedsExceptionPush = (xCurrentRegion != null) && (((xCurrentRegion.Value.HandlerOffset > 0 && xCurrentRegion.Value.HandlerOffset == xOpCode.Position) || (xCurrentRegion.Value.Kind.HasFlag(ExceptionRegionKind.Filter) && xCurrentRegion.Value.FilterOffset > 0 && xCurrentRegion.Value.FilterOffset == xOpCode.Position)) && (xCurrentRegion.Value.Kind == ExceptionRegionKind.Catch));
                 if (xNeedsExceptionPush)
                 {
                     Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
@@ -773,15 +775,17 @@ namespace Cosmos.IL2CPU
 
         protected virtual void InitILOps(Type aAssemblerBaseOp)
         {
-            foreach (var xType in aAssemblerBaseOp.Assembly.GetExportedTypes())
+            foreach (var xType in aAssemblerBaseOp.GetTypeInfo().Assembly.GetExportedTypes())
             {
-                if (xType.IsSubclassOf(aAssemblerBaseOp))
+                var xTypeInfo = xType.GetTypeInfo();
+
+                if (xTypeInfo.IsSubclassOf(aAssemblerBaseOp))
                 {
-                    var xAttribs = xType.GetCustomAttributes<OpCodeAttribute>(false);
+                    var xAttribs = xTypeInfo.GetCustomAttributes<OpCodeAttribute>(false);
                     foreach (var xAttrib in xAttribs)
                     {
                         var xOpCode = (ushort)xAttrib.OpCode;
-                        var xCtor = xType.GetConstructor(new Type[] { typeof(Assembler.Assembler) });
+                        var xCtor = xTypeInfo.GetConstructor(new Type[] { typeof(Assembler.Assembler) });
                         var xILOp = (ILOp)xCtor.Invoke(new object[] { Assembler });
                         if (xOpCode <= 0xFF)
                         {
@@ -839,12 +843,12 @@ namespace Cosmos.IL2CPU
                 XS.Sub(ESP, xSize);
             }
             XS.Call(ILOp.GetMethodLabel(aTargetMethod));
-            var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
+            var xMethodInfo = aMethod.MethodBase as System.Reflection.MethodInfo;
 
             uint xReturnsize = 0;
             if (xMethodInfo != null)
             {
-                xReturnsize = ILOp.SizeOfType(((SysReflection.MethodInfo)aMethod.MethodBase).ReturnType);
+                xReturnsize = ILOp.SizeOfType(((System.Reflection.MethodInfo)aMethod.MethodBase).ReturnType);
             }
 
             ILOp.EmitExceptionLogic(Assembler, aMethod, null, true,
@@ -971,7 +975,7 @@ namespace Cosmos.IL2CPU
                             {
                                 if (!xIntf.GetTypeInfo().IsGenericType)
                                 {
-                                    var xMap = xType.GetInterfaceMap(xIntf);
+                                    var xMap = xType.GetRuntimeInterfaceMap(xIntf);
                                     for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
                                     {
                                         if (xMap.InterfaceMethods[k] == xMethodIntf)
@@ -1049,7 +1053,7 @@ namespace Cosmos.IL2CPU
                     Push(xDataName);
                     Push(0);
                     xData = new byte[16 + Encoding.Unicode.GetByteCount(xType.FullName + ", " + xType.Module.Assembly.GetName().FullName)];
-                    xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array)));
+                    xTemp = BitConverter.GetBytes(aGetTypeID(typeof(Array).GetTypeInfo()));
                     Array.Copy(xTemp, 0, xData, 0, 4);
                     xTemp = BitConverter.GetBytes(0x80000002); // embedded array
                     Array.Copy(xTemp, 0, xData, 4, 4);
@@ -1091,7 +1095,7 @@ namespace Cosmos.IL2CPU
                             {
                                 try
                                 {
-                                    var xMap = xType.GetInterfaceMap(xMethod.DeclaringType);
+                                    var xMap = xType.GetRuntimeInterfaceMap(xMethod.DeclaringType);
                                     for (int k = 0; k < xMap.InterfaceMethods.Length; k++)
                                     {
                                         if (xMap.InterfaceMethods[k] == xMethod)
@@ -1139,7 +1143,7 @@ namespace Cosmos.IL2CPU
             XS.Return();
         }
 
-        public void ProcessField(SysReflection.FieldInfo aField)
+        public void ProcessField(System.Reflection.FieldInfo aField)
         {
             string xFieldName = LabelName.GetFullName(aField);
             xFieldName = DataMember.GetStaticFieldName(aField);
@@ -1453,11 +1457,12 @@ namespace Cosmos.IL2CPU
                 xMLSymbol.StackDiff = -1;
                 if (aMethod.MethodBase != null)
                 {
-                    var xBody = aMethod.MethodBase.GetMethodBody();
-                    if (xBody != null)
+                    var xMethodBody = aMethod.MethodBase.GetMethodBody();
+                    if (xMethodBody != null)
                     {
-                        var xLocalsSize = (from item in xBody.LocalVariables
+                        var xLocalsSize = (from item in xMethodBody.GetLocalVariablesInfo()
                                            select ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
+
                         xMLSymbol.StackDiff = checked((int)(xLocalsSize + xStackSize));
                         xStackDifference = (uint?)xMLSymbol.StackDiff;
                     }
@@ -1623,57 +1628,58 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        protected MethodDefinition GetCecilMethodDefinitionForSymbolReading(MethodBase methodBase)
-        {
-            var xMethodBase = methodBase;
-            if (xMethodBase.IsGenericMethod)
-            {
-                var xMethodInfo = (SysReflection.MethodInfo)xMethodBase;
-                xMethodBase = xMethodInfo.GetGenericMethodDefinition();
-                if (xMethodBase.IsGenericMethod && !xMethodBase.IsGenericMethod)
-                {
-                    // apparently, a generic method can be derived from a generic method..
-                    throw new Exception("Make recursive");
-                }
-            }
-            var xLocation = xMethodBase.DeclaringType.GetTypeInfo().Assembly.Location;
-            ModuleDefinition xModule = null;
-            if (!mLoadedModules.TryGetValue(xLocation, out xModule))
-            {
-                // if not in cache, try loading.
-                if (xMethodBase.DeclaringType.Assembly.GlobalAssemblyCache || !File.Exists(xLocation))
-                {
-                    // file doesn't exist, so assume no symbols
-                    mLoadedModules.Add(xLocation, null);
-                    return null;
-                }
-                else
-                {
-                    try
-                    {
-                        xModule = ModuleDefinition.ReadModule(xLocation, new ReaderParameters { ReadSymbols = true, SymbolReaderProvider = new Mono.Cecil.Pdb.PdbReaderProvider() });
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        throw new Exception("Please check that dll and pdb file is matching on location: " + xLocation);
-                    }
-                    if (xModule.HasSymbols)
-                    {
-                        mLoadedModules.Add(xLocation, xModule);
-                    }
-                    else
-                    {
-                        mLoadedModules.Add(xLocation, null);
-                        return null;
-                    }
-                }
-            }
-            if (xModule == null)
-            {
-                return null;
-            }
-            // todo: cache MethodDefinition ?
-            return xModule.LookupToken(xMethodBase.MetadataToken) as MethodDefinition;
-        }
+        //protected MethodDefinition GetCecilMethodDefinitionForSymbolReading(MethodBase methodBase)
+        //{
+        //    var xMethodBase = methodBase;
+        //    if (xMethodBase.IsGenericMethod)
+        //    {
+        //        var xMethodInfo = (SysReflection.MethodInfo)xMethodBase;
+        //        xMethodBase = xMethodInfo.GetGenericMethodDefinition();
+        //        if (xMethodBase.IsGenericMethod && !xMethodBase.IsGenericMethod)
+        //        {
+        //            // apparently, a generic method can be derived from a generic method..
+        //            throw new Exception("Make recursive");
+        //        }
+        //    }
+        //    var xLocation = xMethodBase.DeclaringType.GetTypeInfo().Assembly.Location;
+        //    ModuleDefinition xModule;
+        //    if (!mLoadedModules.TryGetValue(xLocation, out xModule))
+        //    {
+        //        // if not in cache, try loading.
+        //        if (xMethodBase.DeclaringType.GetTypeInfo().Assembly.GlobalAssemblyCache || !File.Exists(xLocation))
+        //        {
+        //            // file doesn't exist, so assume no symbols
+        //            mLoadedModules.Add(xLocation, new ModuleDefinition());
+        //            return new MethodDefinition();
+        //        }
+        //        else
+        //        {
+        //            try
+        //            {
+        //                xModule = ModuleDefinition.ReadModule(xLocation, new ReaderParameters { ReadSymbols = true, SymbolReaderProvider = new Mono.Cecil.Pdb.PdbReaderProvider() });
+        //                xModule = DebugSymbolReader.GetReader(xLocation).GetModuleDefintition();
+        //            }
+        //            catch (InvalidOperationException)
+        //            {
+        //                throw new Exception("Please check that dll and pdb file is matching on location: " + xLocation);
+        //            }
+        //            if (xModule.HasSymbols)
+        //            {
+        //                mLoadedModules.Add(xLocation, xModule);
+        //            }
+        //            else
+        //            {
+        //                mLoadedModules.Add(xLocation, null);
+        //                return null;
+        //            }
+        //        }
+        //    }
+        //    if (xModule == null)
+        //    {
+        //        return null;
+        //    }
+        //    // todo: cache MethodDefinition ?
+        //    return xModule.LookupToken(xMethodBase.MetadataToken) as MethodDefinition;
+        //}
     }
 }

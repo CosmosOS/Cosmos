@@ -3,14 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpBranch : ILOpCode {
     public readonly int Value;
 
-    public OpBranch(Code aOpCode, int aPos, int aNextPos, int aValue, ExceptionHandlingClause aCurrentExceptionHandler)
-      : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
+    public OpBranch(Code aOpCode, int aPos, int aNextPos, int aValue, ExceptionRegion aCurrentExceptionRegion)
+      : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       Value = aValue;
     }
 
@@ -98,11 +99,11 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-          if (xPopType.IsClass)
+          if (xPopType.GetTypeInfo().IsClass)
           {
             return;
           }
-          if (xPopType.IsInterface)
+          if (xPopType.GetTypeInfo().IsInterface)
           {
             return;
           }
@@ -164,8 +165,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-          if (xValue1.IsClass &&
-              xValue2.IsClass)
+          if (xValue1.GetTypeInfo().IsClass &&
+              xValue2.GetTypeInfo().IsClass)
           {
             return;
           }

@@ -297,9 +297,33 @@
       <Project>{0462e82b-8c29-41a9-8265-9c89038adb29}</Project>
       <Name>Cosmos.Build.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj">
+      <Project>{b0957633-03c5-4531-9358-14d520f7ff78}</Project>
+      <Name>Cosmos.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Core.Common\Cosmos.Core.Common.csproj">
+      <Project>{5a38be55-d402-4de6-bb2b-f0360da1c1bd}</Project>
+      <Name>Cosmos.Core.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Debug.DebugStub\Cosmos.Debug.DebugStub.csproj">
+      <Project>{72eefbfe-af88-4e16-ad6c-7d9857cdc32c}</Project>
+      <Name>Cosmos.Debug.DebugStub</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{dc93aed0-a9bf-42c4-ac7b-fa9b2063e5d1}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj">
+      <Project>{2e740096-911f-47d0-a46d-998dbb76fc5d}</Project>
+      <Name>Cosmos.Debug.Symbols</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
       <Project>{12a519aa-7af2-4873-8ad1-fab5a76448b1}</Project>
       <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cosmos.System\Cosmos.System.csproj">
+      <Project>{19d31813-caf2-42d9-a1e3-448913de6ce2}</Project>
+      <Name>Cosmos.System</Name>
     </ProjectReference>
     <ProjectReference Include="..\XSharp.Common\XSharp.Common.csproj">
       <Project>{73428975-9677-48a6-8481-6d5c39c64e4a}</Project>

@@ -1,10 +1,8 @@
 {
-  "supports": {
-    "netcoreapp1.0.app": {}
-  },
+  "supports": {},
   "dependencies": {
     "NETStandard.Library": "1.6.1",
-    "Microsoft.Data.SQLite": "1.1.0",
+    "Microsoft.Data.Sqlite": "1.1.0",
     "System.ComponentModel.Annotations": "4.3.0",
     "System.Reflection.Metadata": "1.4.1",
     "System.Runtime.Serialization.Primitives": "4.3.0",

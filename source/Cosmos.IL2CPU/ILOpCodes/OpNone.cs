@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 
 using SysReflection = System.Reflection;
 
@@ -9,8 +10,8 @@ namespace Cosmos.IL2CPU.ILOpCodes
   public class OpNone : ILOpCode
   {
 
-    public OpNone(Code aOpCode, int aPos, int aNextPos, ExceptionHandlingClause aCurrentExceptionHandler)
-      : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler)
+    public OpNone(Code aOpCode, int aPos, int aNextPos, ExceptionRegion aCurrentExceptionRegion)
+      : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion)
     {
     }
 

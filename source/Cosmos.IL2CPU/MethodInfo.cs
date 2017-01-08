@@ -44,12 +44,12 @@ namespace Cosmos.IL2CPU
             PlugMethod = aPlugMethod;
             IsInlineAssembler = isInlineAssembler;
 
-            var attribs = aMethodBase.GetReflectionOnlyCustomAttributes<DebugStubAttribute>(false);
+            var attribs = aMethodBase.GetCustomAttributes<DebugStubAttribute>(false).ToList();
             if (attribs.Any())
             {
                 DebugStubAttribute attrib = new DebugStubAttribute
                                             {
-                                                Off = attribs[0].GetArgumentValue<bool>("Off"),
+                                                Off = attribs[0].Off,
                                             };
                 DebugStubOff = attrib.Off;
             }

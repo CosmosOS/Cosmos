@@ -2,7 +2,7 @@
 
 namespace Cosmos.Debug.Hosts
 {
-  public class IntelEdison: Host
+  public class IntelEdison : Host
   {
     public IntelEdison(Dictionary<string, string> aParams, bool aUseGDB) : base(aParams, aUseGDB)
     {

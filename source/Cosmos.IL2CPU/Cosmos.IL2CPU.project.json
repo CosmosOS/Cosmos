@@ -1,8 +1,9 @@
 {
   "supports": {},
   "dependencies": {
-    "Microsoft.NETCore.Portable.Compatibility": "1.0.1",
-    "NETStandard.Library": "1.6.0"
+    "Microsoft.NETCore.Portable.Compatibility": "1.0.2",
+    "NETStandard.Library": "1.6.1",
+    "System.Reflection.Metadata": "1.4.2"
   },
   "frameworks": {
     "netstandard1.5": {}

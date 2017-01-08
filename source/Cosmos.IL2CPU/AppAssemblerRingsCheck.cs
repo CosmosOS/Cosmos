@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+
 using Cosmos.Assembler;
 using Cosmos.Common;
-using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU
 {
@@ -13,8 +13,7 @@ namespace Cosmos.IL2CPU
         {
             string xName = assembly.GetName().Name;
 
-            if (assembly.GlobalAssemblyCache ||
-                (xName == "Cosmos.Debug.Kernel") ||
+            if ((xName == "Cosmos.Debug.Kernel") ||
                 (xName == "Cosmos.Debug.Kernel.Plugs") ||
                 (xName == "Cosmos.IL2CPU") ||
                 (xName == "Cosmos.Common") ||
@@ -115,9 +114,9 @@ namespace Cosmos.IL2CPU
 
         private static bool HasAssemblyPlugs(Assembly assembly)
         {
-            foreach (var xTypes in assembly.GetTypes())
+            foreach (var xType in assembly.GetTypes())
             {
-                if (xTypes.IsSubclassOf(typeof(AssemblerMethod)))
+                if (xType.GetTypeInfo().IsSubclassOf(typeof(AssemblerMethod)))
                 {
                     return true;
                 }
@@ -156,13 +155,14 @@ namespace Cosmos.IL2CPU
 
         private static Ring GetRingFromAssembly(Assembly assembly)
         {
-            var xRingAttrib = assembly.GetReflectionOnlyCustomAttribute<RingAttribute>();
+            var xRingAttrib = assembly.GetCustomAttribute<RingAttribute>();
+
             if (xRingAttrib == null)
             {
                 return Ring.User;
             }
 
-            return xRingAttrib.GetArgumentValue<Ring>("Ring");
+            return xRingAttrib.Ring;
         }
 
         private static void RingsWriteLine(string line, params object[] args)

@@ -13,8 +13,8 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
-            XS.DataMember(aMethod.MethodBase.GetFullName() + "_" + "LeaveAddress_" + aOpCode.CurrentExceptionHandler.HandlerOffset.ToString("X2"), 0);
-            XS.Set(EAX, aMethod.MethodBase.GetFullName() + "_" + "LeaveAddress_" + aOpCode.CurrentExceptionHandler.HandlerOffset.ToString("X2"));
+            XS.DataMember(aMethod.MethodBase.GetFullName() + "_" + "LeaveAddress_" + aOpCode.CurrentExceptionRegion.Value.HandlerOffset.ToString("X2"), 0);
+            XS.Set(EAX, aMethod.MethodBase.GetFullName() + "_" + "LeaveAddress_" + aOpCode.CurrentExceptionRegion.Value.HandlerOffset.ToString("X2"));
             new CPUx86.Jump { DestinationReg = EAX, DestinationIsIndirect = true };
         }
     }

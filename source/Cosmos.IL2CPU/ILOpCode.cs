@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
-using SR = System.Reflection;
 
 namespace Cosmos.IL2CPU
 {
@@ -256,14 +257,14 @@ namespace Cosmos.IL2CPU
         // position of the next instruction
         public readonly int NextPosition;
 
-        public readonly SR.ExceptionHandlingClause CurrentExceptionHandler;
+        public readonly ExceptionRegion? CurrentExceptionRegion;
 
-        protected ILOpCode(Code aOpCode, int aPos, int aNextPos, SR.ExceptionHandlingClause aCurrentExceptionHandler)
+        protected ILOpCode(Code aOpCode, int aPos, int aNextPos, ExceptionRegion? aCurrentExceptionRegion)
         {
             OpCode = aOpCode;
             Position = aPos;
             NextPosition = aNextPos;
-            CurrentExceptionHandler = aCurrentExceptionHandler;
+            CurrentExceptionRegion = aCurrentExceptionRegion;
         }
 
         public override string ToString()
@@ -278,27 +279,27 @@ namespace Cosmos.IL2CPU
         /// So a 100byte struct is 1 pop, even though it might be multiple 32-bit or 64-bit words on the stack.
         /// </summary>
         /// <param name="aMethod"></param>
-        public abstract int GetNumberOfStackPops(SR.MethodBase aMethod);
+        public abstract int GetNumberOfStackPops(MethodBase aMethod);
 
         /// <summary>
         /// Returns the number of items pushed to the stack. This is the logical stack, not physical items.
         /// So a 100byte struct is 1 pop, even though it might be multiple 32-bit or 64-bit words on the stack.
         /// </summary>
         /// <param name="aMethod"></param>
-        public abstract int GetNumberOfStackPushes(SR.MethodBase aMethod);
+        public abstract int GetNumberOfStackPushes(MethodBase aMethod);
 
         public Type[] StackPopTypes { get; private set; }
 
         public Type[] StackPushTypes { get; private set; }
 
-        internal void InitStackAnalysis(SR.MethodBase aMethod)
+        internal void InitStackAnalysis(MethodBase aMethod)
         {
             StackPopTypes = new Type[GetNumberOfStackPops(aMethod)];
             StackPushTypes = new Type[GetNumberOfStackPushes(aMethod)];
             DoInitStackAnalysis(aMethod);
         }
 
-        protected virtual void DoInitStackAnalysis(SR.MethodBase aMethod)
+        protected virtual void DoInitStackAnalysis(MethodBase aMethod)
         {
         }
 
@@ -360,11 +361,11 @@ namespace Cosmos.IL2CPU
             }
 
             // if current instruction is the first instruction of a catch statement, "push" the exception type now
-            if (CurrentExceptionHandler != null && CurrentExceptionHandler.HandlerOffset == Position)
+            if (CurrentExceptionRegion != null && CurrentExceptionRegion.Value.HandlerOffset == Position)
             {
-                if (CurrentExceptionHandler.Flags != SR.ExceptionHandlingClauseOptions.Finally)
+                if (CurrentExceptionRegion.Value.Kind != ExceptionRegionKind.Finally)
                 {
-                    aStack.Push(CurrentExceptionHandler.CatchType);
+                    aStack.Push(CurrentExceptionRegion.Value.CatchType);
                 }
             }
 

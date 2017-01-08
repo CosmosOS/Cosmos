@@ -52,6 +52,8 @@
     <Compile Include="DebugInfo.cs" />
     <Compile Include="DebugModel.cs" />
     <Compile Include="DebugSymbolReader.cs" />
+    <Compile Include="MethodBaseExtensions.cs" />
+    <Compile Include="MethodBodyBlockExtensions.cs" />
     <Compile Include="ObjectReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SourceInfo.cs" />

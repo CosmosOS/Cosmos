@@ -7,11 +7,6 @@
     "System.ServiceProcess.ServiceController": "4.3.0"
   },
   "frameworks": {
-    "netstandard1.5": {},
-    "net462": {
-      "frameworkAssemblies": {
-        "System": "4.0.0"
-      }
-    }
+    "netstandard1.5": {}
   }
 }
