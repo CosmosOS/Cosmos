@@ -103,8 +103,8 @@
       <Link>Cosmos.snk</Link>
     </None>
     <None Include=".editorconfig" />
+    <None Include="Cosmos.System.project.json" />
     <None Include="Network\.editorconfig" />
-    <None Include="project.json" />
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>

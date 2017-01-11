@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpInt : ILOpCode {
     public readonly int Value;
 
-    public OpInt(Code aOpCode, int aPos, int aNextPos, int aValue, ExceptionRegion aCurrentExceptionRegion)
+    public OpInt(Code aOpCode, int aPos, int aNextPos, int aValue, ExceptionRegion? aCurrentExceptionRegion)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       Value = aValue;
     }

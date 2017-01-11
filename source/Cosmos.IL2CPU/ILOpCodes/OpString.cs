@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpString : ILOpCode {
     public readonly string Value;
 
-    public OpString(Code aOpCode, int aPos, int aNextPos, string aValue, ExceptionRegion aCurrentExceptionRegion)
+    public OpString(Code aOpCode, int aPos, int aNextPos, string aValue, ExceptionRegion? aCurrentExceptionRegion)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       Value = aValue;
     }

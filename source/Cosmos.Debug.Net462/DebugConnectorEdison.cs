@@ -151,7 +151,7 @@ namespace Cosmos.Debug.DebugConnectors
                 if (aPacket[0] == 67)
                 {
                     // start sending
-                    mKernelFileStream = new FileStream(mKernelFile, FileMode.Open);
+                    mKernelFileStream = File.Open(mKernelFile, FileMode.Open);
                     SendRawData(ConstructNextLargePacket());
                     SendTextToConsole(".");
                     return false;

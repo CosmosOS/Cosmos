@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
   public class OpNone : ILOpCode
   {
 
-    public OpNone(Code aOpCode, int aPos, int aNextPos, ExceptionRegion aCurrentExceptionRegion)
+    public OpNone(Code aOpCode, int aPos, int aNextPos, ExceptionRegion? aCurrentExceptionRegion)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion)
     {
     }

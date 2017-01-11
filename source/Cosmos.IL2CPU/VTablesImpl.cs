@@ -140,11 +140,9 @@ namespace Cosmos.IL2CPU
       while (true);
       //}
       EnableDebug = true;
-      Debugger.DoSend("Type");
-      Debugger.DoSendNumber(aType);
-      Debugger.DoSend("MethodId");
-      Debugger.DoSendNumber(aMethodId);
-      Debugger.DoSend("Not FOUND!");
+      DebugHex("Type", aType);
+      DebugHex("MethodId", aMethodId);
+      Debug("Not FOUND!");
       Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodNotFound);
       while (true)
         ;

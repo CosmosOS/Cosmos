@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
+using Microsoft.Extensions.DependencyModel;
 
 using Cosmos.Build.Common;
 using Cosmos.Debug.Symbols;
@@ -71,105 +73,105 @@ namespace Cosmos.IL2CPU
             OnLogException?.Invoke(e);
         }
 
-        private string CurrentDomain_AssemblyPath(string aShortName, Assembly aRequestingAssembly)
-        {
-            // Check nuget packages.
-            foreach (var xRef in AdditionalReferences)
-            {
-                var xAssemblyName = AssemblyName.GetAssemblyName(xRef);
-                if (xAssemblyName.Name == aShortName)
-                {
-                    return xRef;
-                }
-            }
+        //private string CurrentDomain_AssemblyPath(string aShortName, Assembly aRequestingAssembly)
+        //{
+        //    // Check nuget packages.
+        //    foreach (var xRef in AdditionalReferences)
+        //    {
+        //        var xAssemblyName = AssemblyName.GetAssemblyName(xRef);
+        //        if (xAssemblyName.Name == aShortName)
+        //        {
+        //            return xRef;
+        //        }
+        //    }
 
-            // Check search directories.
-            foreach (var xDir in mSearchDirs)
-            {
-                var xPath = Path.Combine(xDir, aShortName + ".dll");
-                if (File.Exists(xPath))
-                {
-                    return xPath;
-                }
-                xPath = Path.Combine(xDir, aShortName + ".exe");
-                if (File.Exists(xPath))
-                {
-                    return xPath;
-                }
-            }
+        //    // Check search directories.
+        //    foreach (var xDir in mSearchDirs)
+        //    {
+        //        var xPath = Path.Combine(xDir, aShortName + ".dll");
+        //        if (File.Exists(xPath))
+        //        {
+        //            return xPath;
+        //        }
+        //        xPath = Path.Combine(xDir, aShortName + ".exe");
+        //        if (File.Exists(xPath))
+        //        {
+        //            return xPath;
+        //        }
+        //    }
 
-            if (aRequestingAssembly != null)
-            {
+        //    if (aRequestingAssembly != null)
+        //    {
 
-                // check for path in as requested dll is stored, this makes refrenced dll project working
-                var xPathAsRequested = Path.Combine(Path.GetDirectoryName(aRequestingAssembly.Location), aShortName + ".dll");
-                if (File.Exists(xPathAsRequested))
-                {
-                    return xPathAsRequested;
-                }
-            }
-            return null;
-        }
+        //        // check for path in as requested dll is stored, this makes refrenced dll project working
+        //        var xPathAsRequested = Path.Combine(Path.GetDirectoryName(aRequestingAssembly.Location), aShortName + ".dll");
+        //        if (File.Exists(xPathAsRequested))
+        //        {
+        //            return xPathAsRequested;
+        //        }
+        //    }
+        //    return null;
+        //}
 
-        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            CompilerHelpers.Debug($"Resolving assembly '{args.Name}'.");
+        //private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        //{
+        //    CompilerHelpers.Debug($"Resolving assembly '{args.Name}'.");
 
-            var xShortName = args.Name;
-            if (xShortName.Contains(','))
-            {
-                xShortName = xShortName.Substring(0, xShortName.IndexOf(','));
-            }
+        //    var xShortName = args.Name;
+        //    if (xShortName.Contains(','))
+        //    {
+        //        xShortName = xShortName.Substring(0, xShortName.IndexOf(','));
+        //    }
 
-            // Check already loaded assemblies.
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                var xLoadedShortName = assembly.GetName().Name;
-                if (xLoadedShortName == xShortName)
-                {
-                    return assembly;
-                }
-            }
+        //    // Check already loaded assemblies.
+        //    foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        //    {
+        //        var xLoadedShortName = assembly.GetName().Name;
+        //        if (xLoadedShortName == xShortName)
+        //        {
+        //            return assembly;
+        //        }
+        //    }
 
-            string xPath = CurrentDomain_AssemblyPath(xShortName, args.RequestingAssembly);
-            if (!string.IsNullOrWhiteSpace(xPath))
-            {
-                return Assembly.LoadFrom(xPath);
-            }
+        //    string xPath = CurrentDomain_AssemblyPath(xShortName, args.RequestingAssembly);
+        //    if (!string.IsNullOrWhiteSpace(xPath))
+        //    {
+        //        return Assembly.LoadFrom(xPath);
+        //    }
 
-            mStaticLog?.Invoke($"Assembly '{args.Name}' not resolved!");
-            return null;
-        }
+        //    mStaticLog?.Invoke($"Assembly '{args.Name}' not resolved!");
+        //    return null;
+        //}
 
-        private Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            CompilerHelpers.Debug($"Resolving assembly '{args.Name}'.");
+        //private Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
+        //{
+        //    CompilerHelpers.Debug($"Resolving assembly '{args.Name}'.");
 
-            var xShortName = args.Name;
-            if (xShortName.Contains(','))
-            {
-                xShortName = xShortName.Substring(0, xShortName.IndexOf(','));
-            }
+        //    var xShortName = args.Name;
+        //    if (xShortName.Contains(','))
+        //    {
+        //        xShortName = xShortName.Substring(0, xShortName.IndexOf(','));
+        //    }
 
-            // Check already loaded assemblies.
-            foreach (var assembly in AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies())
-            {
-                var xLoadedShortName = assembly.GetName().Name;
-                if (xLoadedShortName == xShortName)
-                {
-                    return assembly;
-                }
-            }
+        //    // Check already loaded assemblies.
+        //    foreach (var assembly in AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies())
+        //    {
+        //        var xLoadedShortName = assembly.GetName().Name;
+        //        if (xLoadedShortName == xShortName)
+        //        {
+        //            return assembly;
+        //        }
+        //    }
 
-            string xPath = CurrentDomain_AssemblyPath(xShortName, args.RequestingAssembly);
-            if (!string.IsNullOrWhiteSpace(xPath))
-            {
-                return Assembly.ReflectionOnlyLoadFrom(xPath);
-            }
+        //    string xPath = CurrentDomain_AssemblyPath(xShortName, args.RequestingAssembly);
+        //    if (!string.IsNullOrWhiteSpace(xPath))
+        //    {
+        //        return Assembly.ReflectionOnlyLoadFrom(xPath);
+        //    }
 
-            mStaticLog?.Invoke($"Assembly '{args.Name}' not resolved!");
-            return null;
-        }
+        //    mStaticLog?.Invoke($"Assembly '{args.Name}' not resolved!");
+        //    return null;
+        //}
 
         private bool EnsureCosmosPathsInitialization()
         {
@@ -208,10 +210,8 @@ namespace Cosmos.IL2CPU
             mSearchDirs.Add(CosmosPaths.UserKit);
             mSearchDirs.Add(CosmosPaths.Kernel);
 
-            PlugManager.AdditionalReferences = AdditionalReferences;
-
-            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
+            //AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            //AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
 
             mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
             if (string.IsNullOrEmpty(TraceAssemblies))
@@ -342,8 +342,10 @@ namespace Cosmos.IL2CPU
             {
                 LogException(ex);
                 LogMessage("Loaded assemblies: ");
-                foreach (var xAsm in AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies())
+                foreach (var xLib in DependencyContext.Default.CompileLibraries)
                 {
+                    var xAsm = AssemblyLoadContext.Default.LoadFromAssemblyPath(xLib.Path);
+
                     // HACK: find another way to skip dynamic assemblies (which belong to dynamic methods)
                     if (xAsm.IsDynamic)
                     {
@@ -380,46 +382,45 @@ namespace Cosmos.IL2CPU
             return new AppAssembler(DebugCom, AssemblerLog);
         }
 
-        private void LoadReferences(Assembly xAssembly)
-        {
-            foreach (var a in xAssembly.GetReferencedAssemblies())
-            {
-                string s = null;
-                foreach (var xAsm in AdditionalReferences)
-                {
-                    try
-                    {
+        //private void LoadReferences(Assembly xAssembly)
+        //{
+        //    foreach (var a in xAssembly.GetReferencedAssemblies())
+        //    {
+        //        AssemblyName xAsmName = null;
+        //        foreach (var xAsm in AdditionalReferences)
+        //        {
+        //            try
+        //            {
+        //                xAsmName = AssemblyLoadContext.GetAssemblyName(xAsm); //AssemblyName.GetAssemblyName(xAsm);
+        //                if (xAsmName == null || xAsmName.Name != a.Name)
+        //                {
+        //                    xAsmName = null;
+        //                }
+        //            }
+        //            catch (BadImageFormatException e)
+        //            {
+        //            }
+        //        }
+        //        if (DependencyContext.Default.GetDefaultAssemblyNames().FirstOrDefault(m => m.Name == a.Name) == null)
+        //        {
+        //            if (xAsmName != null)
+        //            {
+        //                var xAsm = Assembly.Load(xAsmName); //Assembly.ReflectionOnlyLoadFrom(s);
+        //                x.Add(xAsm);
+        //                if (xAsm.GetReferencedAssemblies().Any())
+        //                {
+        //                    LoadReferences(xAsm);
+        //                }
+        //            }
+        //            else
+        //            {
 
-                        s = AssemblyName.GetAssemblyName(xAsm).Name;
-                        if (s == null || s != a.Name)
-                        {
-                            s = null;
-                        }
-                    }
-                    catch (BadImageFormatException e)
-                    {
-                    }
-                }
-                if (AppDomain.CurrentDomain.ReflectionOnlyGetAssemblies().FirstOrDefault(m => m.GetName().Name == a.Name) == null)
-                {
-                    if (s != null)
-                    {
-                        var xAsm = Assembly.ReflectionOnlyLoadFrom(s);
-                        x.Add(xAsm);
-                        if (xAsm.GetReferencedAssemblies().Any())
-                        {
-                            LoadReferences(xAsm);
-                        }
-                    }
-                    else
-                    {
+        //            }
+        //        }
+        //    }
 
-                    }
-                }
-            }
-
-        }
-        List<Assembly> x = new List<Assembly>();
+        //}
+        //List<Assembly> x = new List<Assembly>();
 
         /// <summary>Load every refernced assemblies that have an associated FullPath property and seek for
         /// the kernel default constructor.</summary>
@@ -443,13 +444,13 @@ namespace Cosmos.IL2CPU
             {
                 if (File.Exists(xReference))
                 {
-                    var xAssembly = Assembly.ReflectionOnlyLoadFrom(xReference);
+                    var xAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(xReference);
 
                     CompilerHelpers.Debug($"Looking for kernel in '{xAssembly}'");
 
                     foreach (var xType in xAssembly.ExportedTypes)
                     {
-                        if (!xType.IsGenericTypeDefinition && !xType.IsAbstract)
+                        if (!xType.GetTypeInfo().IsGenericTypeDefinition && !xType.GetTypeInfo().IsAbstract)
                         {
                             CompilerHelpers.Debug($"Checking type '{xType.FullName}'");
 
@@ -462,6 +463,7 @@ namespace Cosmos.IL2CPU
                                     LogError($"Two kernels found! '{xType.AssemblyQualifiedName}' and '{xKernelType.AssemblyQualifiedName}'");
                                     return null;
                                 }
+
                                 xKernelType = xType;
                             }
                         }

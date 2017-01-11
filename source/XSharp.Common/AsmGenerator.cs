@@ -74,7 +74,7 @@ namespace XSharp.Compiler {
     {
       try
       {
-        using (var xInput = new StreamReader(new FileStream(aSrcPathname, FileMode.Open)))
+        using (var xInput = new StreamReader(File.Open(aSrcPathname, FileMode.Open)))
         {
           return Generate(xInput);
         }
@@ -94,9 +94,9 @@ namespace XSharp.Compiler {
       new Assembler(false);
       try
       {
-        using (var xInput = new StreamReader(new FileStream(aSrcPathname, FileMode.Open)))
+        using (var xInput = new StreamReader(File.Open(aSrcPathname, FileMode.Open)))
         {
-          using (var xOutput = new StreamWriter(new FileStream(Path.ChangeExtension(aSrcPathname, ".asm"), FileMode.OpenOrCreate)))
+          using (var xOutput = new StreamWriter(File.Open(Path.ChangeExtension(aSrcPathname, ".asm"), FileMode.OpenOrCreate)))
           {
             xOutput.WriteLine("; Generated at {0}", DateTime.Now.ToString(new CultureInfo("en-US")));
 

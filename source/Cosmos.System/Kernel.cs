@@ -133,7 +133,7 @@ namespace Cosmos.System
 
         public Kernel()
         {
-            Debugger.DoSend("In Cosmos.System.Kernel..ctor");
+            Global.mDebugger.Send("In Cosmos.System.Kernel..ctor");
         }
 
         // Shutdown and restart

@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpSig : ILOpCode {
     public readonly int Value;
 
-    public OpSig(Code aOpCode, int aPos, int aNextPos, int aValue, ExceptionRegion aCurrentExceptionRegion)
+    public OpSig(Code aOpCode, int aPos, int aNextPos, int aValue, ExceptionRegion? aCurrentExceptionRegion)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       Value = aValue;
     }

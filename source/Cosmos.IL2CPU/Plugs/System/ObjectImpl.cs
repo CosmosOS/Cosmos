@@ -7,9 +7,11 @@ namespace Cosmos.IL2CPU.Plugs.System
     [Plug(Target = typeof(object))]
     public static class ObjectImpl
     {
+        private static Debugger mDebugger = new Debugger("IL2CPU", "ObjectImpl");
+
         public static string ToString(object aThis)
         {
-            Debugger.DoSend("<Object.ToString not yet implemented!>");
+            mDebugger.Send("<Object.ToString not yet implemented!>");
             return "<Object.ToString not yet implemented!>";
         }
 

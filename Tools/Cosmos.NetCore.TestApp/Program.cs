@@ -11,21 +11,54 @@ namespace Cosmos.NetCore.TestApp
     {
         public static void Main(string[] args)
         {
-            var xType = Type.GetType("System.Object");
+            //var xType = Type.GetType("System.Object");
 
-            var ctx = DependencyContext.Default;
+            //var ctx = DependencyContext.Default;
 
-            Console.WriteLine("--- Native libraries ---");
-            foreach (var r in ctx.GetDefaultNativeAssets())
+            //Console.WriteLine("--- Native libraries ---");
+            //foreach (var r in ctx.GetDefaultNativeAssets())
+            //{
+            //    Console.WriteLine($"    {r}");
+
+
+            //}
+            //Console.WriteLine();
+
+
+            //Console.ReadKey();
+
+            var xArgs = new string[]
             {
-                        Console.WriteLine($"    {r}");
+                "DebugEnabled:False",
+                "StackCorruptionDetectionEnabled:False",
+                "StackCorruptionDetectionLevel:",
+                "DebugMode:Source",
+                "TraceAssemblies:Cosmos",
+                "DebugCom:1",
+                "UseNAsm:True",
+                @"OutputFilename:path\to\GuessKernel.asm",
+                "EnableLogging:True",
+                "EmitDebugSymbols:True",
+                "IgnoreDebugStubAttribute:False",
+                @"References:path\to\GuessKernel.dll",
+                @"References:path\to\Cosmos.Core.Plugs.dll",
+                @"References:path\to\Cosmos.Debug.Kernel.Plugs.dll",
+                @"References:path\to\Cosmos.System.Plugs.dll"
+            };
 
+            global::IL2CPU.Program.Run(xArgs, LogMessage, LogError);
 
-                }
-                Console.WriteLine();
+            Console.ReadLine();
+        }
 
+        public static void LogMessage(string aMessage)
+        {
+            Console.WriteLine("Message: " + aMessage);
+        }
 
-            Console.ReadKey();
+        public static void LogError(string aError)
+        {
+            Console.WriteLine("Error: " + aError);
         }
     }
 }

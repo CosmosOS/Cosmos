@@ -77,7 +77,8 @@ namespace Cosmos.Debug.Symbols
             }
 
             // Manually register the data provider. Do not remove this otherwise the data provider doesn't register properly.
-            mConnStr = string.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;BinaryGuid=false", aPathname);
+            //mConnStr = string.Format("data source={0};journal mode=Memory;synchronous=Off;foreign keys=True;BinaryGuid=false", aPathname);
+            mConnStr = string.Format("data source={0}", aPathname);
             // Use the SQLiteConnectionFactory as the default database connection
             // Do not open mConnection before mEntities.CreateDatabase
             mConnection = new SqliteConnection(mConnStr);

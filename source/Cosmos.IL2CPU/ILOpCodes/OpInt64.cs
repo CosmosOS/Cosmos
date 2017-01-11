@@ -8,7 +8,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
   {
     public readonly UInt64 Value;
 
-    public OpInt64(Code aOpCode, int aPos, int aNextPos, UInt64 aValue, ExceptionRegion aCurrentExceptionRegion)
+    public OpInt64(Code aOpCode, int aPos, int aNextPos, UInt64 aValue, ExceptionRegion? aCurrentExceptionRegion)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion)
     {
       Value = aValue;

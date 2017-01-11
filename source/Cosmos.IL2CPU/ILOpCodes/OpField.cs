@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
     {
         public readonly FieldInfo Value;
 
-        public OpField(Code aOpCode, int aPos, int aNextPos, FieldInfo aValue, ExceptionRegion aCurrentExceptionRegion)
+        public OpField(Code aOpCode, int aPos, int aNextPos, FieldInfo aValue, ExceptionRegion? aCurrentExceptionRegion)
           : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion)
         {
             Value = aValue;

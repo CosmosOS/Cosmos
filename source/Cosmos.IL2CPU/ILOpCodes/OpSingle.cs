@@ -6,7 +6,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpSingle : ILOpCode {
     public readonly Single Value;
 
-    public OpSingle(Code aOpCode, int aPos, int aNextPos, Single aValue, ExceptionRegion aCurrentExceptionRegion)
+    public OpSingle(Code aOpCode, int aPos, int aNextPos, Single aValue, ExceptionRegion? aCurrentExceptionRegion)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       Value = aValue;
     }

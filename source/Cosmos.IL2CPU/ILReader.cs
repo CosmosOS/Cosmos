@@ -43,8 +43,8 @@ namespace Cosmos.IL2CPU {
       var xResult = new List<ILOpCode>();
       var xBody = aMethod.GetMethodBody();
       // Cache for use in field and method resolution
-      Type[] xTypeGenArgs = null;
-      Type[] xMethodGenArgs = null;
+      Type[] xTypeGenArgs = Type.EmptyTypes;
+      Type[] xMethodGenArgs = Type.EmptyTypes;
       if (aMethod.DeclaringType.GetTypeInfo().IsGenericType) {
         xTypeGenArgs = aMethod.DeclaringType.GetTypeInfo().GetGenericArguments();
       }
@@ -142,79 +142,79 @@ namespace Cosmos.IL2CPU {
                 {
                     #region Inline none options
                     // These shortcut translation regions expand shortcut ops into full ops
-              // This elminates the amount of code required in the assemblers
-              // by allowing them to ignore the shortcuts
-              switch (xOpCodeVal) {
-                case ILOpCode.Code.Ldarg_0:
-                      xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, xOpPos, xPos, 0, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldarg_1:
-                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, xOpPos, xPos, 1, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldarg_2:
-                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, xOpPos, xPos, 2, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldarg_3:
-                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, xOpPos, xPos, 3, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldc_I4_0:
-                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 0, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldc_I4_1:
-                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 1, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldc_I4_2:
-                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 2, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldc_I4_3:
-                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 3, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldc_I4_4:
-                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 4, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldc_I4_5:
-                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 5, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldc_I4_6:
-                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 6, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldc_I4_7:
-                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 7, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldc_I4_8:
-                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 8, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldc_I4_M1:
-                  xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, -1, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldloc_0:
-                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, xOpPos, xPos, 0, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldloc_1:
-                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, xOpPos, xPos, 1, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldloc_2:
-                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, xOpPos, xPos, 2, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Ldloc_3:
-                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, xOpPos, xPos, 3, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Stloc_0:
-                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, xOpPos, xPos, 0, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Stloc_1:
-                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, xOpPos, xPos, 1, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Stloc_2:
-                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, xOpPos, xPos, 2, xCurrentExceptionRegion.Value);
-                  break;
-                case ILOpCode.Code.Stloc_3:
-                  xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, xOpPos, xPos, 3, xCurrentExceptionRegion.Value);
-                  break;
-                default:
-                  xILOpCode = new ILOpCodes.OpNone(xOpCodeVal, xOpPos, xPos, xCurrentExceptionRegion.Value);
-                  break;
-              }
+                    // This elminates the amount of code required in the assemblers
+                    // by allowing them to ignore the shortcuts
+                    switch (xOpCodeVal) {
+                    case ILOpCode.Code.Ldarg_0:
+                            xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, xOpPos, xPos, 0, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldarg_1:
+                        xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, xOpPos, xPos, 1, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldarg_2:
+                        xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, xOpPos, xPos, 2, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldarg_3:
+                        xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, xOpPos, xPos, 3, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldc_I4_0:
+                        xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 0, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldc_I4_1:
+                        xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 1, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldc_I4_2:
+                        xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 2, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldc_I4_3:
+                        xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 3, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldc_I4_4:
+                        xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 4, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldc_I4_5:
+                        xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 5, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldc_I4_6:
+                        xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 6, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldc_I4_7:
+                        xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 7, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldc_I4_8:
+                        xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, 8, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldc_I4_M1:
+                        xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos, -1, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldloc_0:
+                        xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, xOpPos, xPos, 0, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldloc_1:
+                        xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, xOpPos, xPos, 1, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldloc_2:
+                        xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, xOpPos, xPos, 2, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Ldloc_3:
+                        xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, xOpPos, xPos, 3, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Stloc_0:
+                        xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, xOpPos, xPos, 0, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Stloc_1:
+                        xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, xOpPos, xPos, 1, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Stloc_2:
+                        xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, xOpPos, xPos, 2, xCurrentExceptionRegion);
+                        break;
+                    case ILOpCode.Code.Stloc_3:
+                        xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, xOpPos, xPos, 3, xCurrentExceptionRegion);
+                        break;
+                    default:
+                        xILOpCode = new ILOpCodes.OpNone(xOpCodeVal, xOpPos, xPos, xCurrentExceptionRegion);
+                        break;
+                    }
                     #endregion
               break;
           }
@@ -230,49 +230,49 @@ namespace Cosmos.IL2CPU {
                     switch (xOpCodeVal)
                     {
                         case ILOpCode.Code.Beq_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Beq, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Beq, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Bge_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bge, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bge, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Bge_Un_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bge_Un, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bge_Un, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Bgt_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bgt, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bgt, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Bgt_Un_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bgt_Un, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bgt_Un, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Ble_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Ble, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Ble, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Ble_Un_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Ble_Un, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Ble_Un, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Blt_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Blt, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Blt, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Blt_Un_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Blt_Un, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Blt_Un, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Bne_Un_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bne_Un, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Bne_Un, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Br_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Br, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Br, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Brfalse_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Brfalse, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Brfalse, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Brtrue_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Brtrue, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Brtrue, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         case ILOpCode.Code.Leave_S:
-                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Leave, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(ILOpCode.Code.Leave, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                         default:
-                            xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion.Value);
+                            xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xOpPos, xPos + 1, xTarget, xCurrentExceptionRegion);
                             break;
                     }
                     xPos = xPos + 1;
@@ -282,7 +282,7 @@ namespace Cosmos.IL2CPU {
           case OperandType.InlineBrTarget: {
               int xTarget = xPos + 4 + ReadInt32(xIL, xPos);
               CheckBranch(xTarget, xIL.Length);
-              xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xOpPos, xPos + 4, xTarget, xCurrentExceptionRegion.Value);
+              xILOpCode = new ILOpCodes.OpBranch(xOpCodeVal, xOpPos, xPos + 4, xTarget, xCurrentExceptionRegion);
               xPos = xPos + 4;
               break;
             }
@@ -290,36 +290,36 @@ namespace Cosmos.IL2CPU {
           case OperandType.ShortInlineI:
             switch (xOpCodeVal) {
               case ILOpCode.Code.Ldc_I4_S:
-                    xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos + 1, ((sbyte)xIL[xPos]), xCurrentExceptionRegion.Value);
+                    xILOpCode = new ILOpCodes.OpInt(ILOpCode.Code.Ldc_I4, xOpPos, xPos + 1, ((sbyte)xIL[xPos]), xCurrentExceptionRegion);
                 break;
               default:
-                xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xOpPos, xPos + 1, ((sbyte)xIL[xPos]), xCurrentExceptionRegion.Value);
+                xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xOpPos, xPos + 1, ((sbyte)xIL[xPos]), xCurrentExceptionRegion);
                 break;
             }
             xPos = xPos + 1;
             break;
           case OperandType.InlineI:
-            xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xOpPos, xPos + 4, ReadInt32(xIL, xPos), xCurrentExceptionRegion.Value);
+            xILOpCode = new ILOpCodes.OpInt(xOpCodeVal, xOpPos, xPos + 4, ReadInt32(xIL, xPos), xCurrentExceptionRegion);
             xPos = xPos + 4;
             break;
           case OperandType.InlineI8:
-            xILOpCode = new ILOpCodes.OpInt64(xOpCodeVal, xOpPos, xPos + 8, ReadUInt64(xIL, xPos), xCurrentExceptionRegion.Value);
+            xILOpCode = new ILOpCodes.OpInt64(xOpCodeVal, xOpPos, xPos + 8, ReadUInt64(xIL, xPos), xCurrentExceptionRegion);
             xPos = xPos + 8;
             break;
 
           case OperandType.ShortInlineR:
-            xILOpCode = new ILOpCodes.OpSingle(xOpCodeVal, xOpPos, xPos + 4, BitConverter.ToSingle(xIL, xPos), xCurrentExceptionRegion.Value);
+            xILOpCode = new ILOpCodes.OpSingle(xOpCodeVal, xOpPos, xPos + 4, BitConverter.ToSingle(xIL, xPos), xCurrentExceptionRegion);
             xPos = xPos + 4;
             break;
           case OperandType.InlineR:
-            xILOpCode = new ILOpCodes.OpDouble(xOpCodeVal, xOpPos, xPos + 8, BitConverter.ToDouble(xIL, xPos), xCurrentExceptionRegion.Value);
+            xILOpCode = new ILOpCodes.OpDouble(xOpCodeVal, xOpPos, xPos + 8, BitConverter.ToDouble(xIL, xPos), xCurrentExceptionRegion);
             xPos = xPos + 8;
             break;
 
           // The operand is a 32-bit metadata token.
           case OperandType.InlineField: {
               var xValue = aMethod.Module.ResolveField(ReadInt32(xIL, xPos), xTypeGenArgs, xMethodGenArgs);
-              xILOpCode = new ILOpCodes.OpField(xOpCodeVal, xOpPos, xPos + 4, xValue, xCurrentExceptionRegion.Value);
+              xILOpCode = new ILOpCodes.OpField(xOpCodeVal, xOpPos, xPos + 4, xValue, xCurrentExceptionRegion);
               xPos = xPos + 4;
               break;
             }
@@ -327,19 +327,19 @@ namespace Cosmos.IL2CPU {
           // The operand is a 32-bit metadata token.
           case OperandType.InlineMethod: {
               var xValue = aMethod.Module.ResolveMethod(ReadInt32(xIL, xPos), xTypeGenArgs, xMethodGenArgs);
-              xILOpCode = new ILOpCodes.OpMethod(xOpCodeVal, xOpPos, xPos + 4, xValue, xCurrentExceptionRegion.Value);
+              xILOpCode = new ILOpCodes.OpMethod(xOpCodeVal, xOpPos, xPos + 4, xValue, xCurrentExceptionRegion);
               xPos = xPos + 4;
               break;
             }
 
           // 32-bit metadata signature token.
           case OperandType.InlineSig:
-            xILOpCode = new ILOpCodes.OpSig(xOpCodeVal, xOpPos, xPos + 4, ReadInt32(xIL, xPos), xCurrentExceptionRegion.Value);
+            xILOpCode = new ILOpCodes.OpSig(xOpCodeVal, xOpPos, xPos + 4, ReadInt32(xIL, xPos), xCurrentExceptionRegion);
             xPos = xPos + 4;
             break;
 
           case OperandType.InlineString:
-            xILOpCode = new ILOpCodes.OpString(xOpCodeVal, xOpPos, xPos + 4, aMethod.Module.ResolveString(ReadInt32(xIL, xPos)), xCurrentExceptionRegion.Value);
+            xILOpCode = new ILOpCodes.OpString(xOpCodeVal, xOpPos, xPos + 4, aMethod.Module.ResolveString(ReadInt32(xIL, xPos)), xCurrentExceptionRegion);
             xPos = xPos + 4;
             break;
 
@@ -352,21 +352,21 @@ namespace Cosmos.IL2CPU {
                 xBranchLocations[i] = xNextOpPos + ReadInt32(xIL, xPos + i * 4);
                 CheckBranch(xBranchLocations[i], xIL.Length);
               }
-              xILOpCode = new ILOpCodes.OpSwitch(xOpCodeVal, xOpPos, xNextOpPos, xBranchLocations, xCurrentExceptionRegion.Value);
+              xILOpCode = new ILOpCodes.OpSwitch(xOpCodeVal, xOpPos, xNextOpPos, xBranchLocations, xCurrentExceptionRegion);
               xPos = xNextOpPos;
               break;
             }
 
           // The operand is a FieldRef, MethodRef, or TypeRef token.
           case OperandType.InlineTok:
-              xILOpCode = new ILOpCodes.OpToken(xOpCodeVal, xOpPos, xPos + 4, ReadInt32(xIL, xPos), aMethod.Module, xTypeGenArgs, xMethodGenArgs, xCurrentExceptionRegion.Value);
+              xILOpCode = new ILOpCodes.OpToken(xOpCodeVal, xOpPos, xPos + 4, ReadInt32(xIL, xPos), aMethod.Module, xTypeGenArgs, xMethodGenArgs, xCurrentExceptionRegion);
             xPos = xPos + 4;
             break;
 
           // 32-bit metadata token.
           case OperandType.InlineType: {
               var xValue = aMethod.Module.ResolveType(ReadInt32(xIL, xPos), xTypeGenArgs, xMethodGenArgs);
-              xILOpCode = new ILOpCodes.OpType(xOpCodeVal, xOpPos, xPos + 4, xValue, xCurrentExceptionRegion.Value);
+              xILOpCode = new ILOpCodes.OpType(xOpCodeVal, xOpPos, xPos + 4, xValue, xCurrentExceptionRegion);
               xPos = xPos + 4;
               break;
             }
@@ -374,31 +374,31 @@ namespace Cosmos.IL2CPU {
           case OperandType.ShortInlineVar:
             switch (xOpCodeVal) {
               case ILOpCode.Code.Ldloc_S:
-                    xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion.Value);
+                    xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloc, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion);
                 break;
               case ILOpCode.Code.Ldloca_S:
-                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloca, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion.Value);
+                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldloca, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion);
                 break;
               case ILOpCode.Code.Ldarg_S:
-                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion.Value);
+                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarg, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion);
                 break;
               case ILOpCode.Code.Ldarga_S:
-                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarga, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion.Value);
+                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Ldarga, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion);
                 break;
               case ILOpCode.Code.Starg_S:
-                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Starg, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion.Value);
+                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Starg, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion);
                 break;
               case ILOpCode.Code.Stloc_S:
-                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion.Value);
+                xILOpCode = new ILOpCodes.OpVar(ILOpCode.Code.Stloc, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion);
                 break;
               default:
-                xILOpCode = new ILOpCodes.OpVar(xOpCodeVal, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion.Value);
+                xILOpCode = new ILOpCodes.OpVar(xOpCodeVal, xOpPos, xPos + 1, xIL[xPos], xCurrentExceptionRegion);
                 break;
             }
             xPos = xPos + 1;
             break;
           case OperandType.InlineVar:
-            xILOpCode = new ILOpCodes.OpVar(xOpCodeVal, xOpPos, xPos + 2, ReadUInt16(xIL, xPos), xCurrentExceptionRegion.Value);
+            xILOpCode = new ILOpCodes.OpVar(xOpCodeVal, xOpPos, xPos + 2, ReadUInt16(xIL, xPos), xCurrentExceptionRegion);
             xPos = xPos + 2;
             break;
 

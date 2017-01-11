@@ -143,10 +143,10 @@ namespace Cosmos.Debug.Hosts {
       // We also need to make changes based on project / debug settings.
       // Finally we do not want to create VCS checkins based on local user changes.
       // Because of this we use Cosmos.vmx as a template and output a Debug.vmx on every run.
-      using (var xSrc = new StreamReader(new FileStream(Path.Combine(mDir, "Cosmos.vmx"), FileMode.OpenOrCreate))) {
+      using (var xSrc = new StreamReader(File.Open(Path.Combine(mDir, "Cosmos.vmx"), FileMode.OpenOrCreate))) {
         try {
           // Write out Debug.vmx
-          using (var xDest = new StreamWriter(new FileStream(mVmxPath, FileMode.Open))) {
+          using (var xDest = new StreamWriter(File.Open(mVmxPath, FileMode.Open))) {
             string xLine;
             while ((xLine = xSrc.ReadLine()) != null) {
               var xParts = xLine.Split('=');

@@ -48,9 +48,9 @@ namespace Cosmos.Debug.Common
             try
             {
                 int i = 0;
-                using (var reader = new StreamReader(new FileStream(xInputFile, FileMode.Open)))
+                using (var reader = new StreamReader(File.Open(xInputFile, FileMode.Open)))
                 {
-                    using (var writer = new StreamWriter(new FileStream(xOutputFile, FileMode.OpenOrCreate)))
+                    using (var writer = new StreamWriter(File.Open(xOutputFile, FileMode.OpenOrCreate)))
                     {
                         bool startSymbolTable = false;
                         while (!reader.EndOfStream)

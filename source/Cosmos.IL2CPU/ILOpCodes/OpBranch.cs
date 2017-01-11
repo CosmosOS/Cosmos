@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpBranch : ILOpCode {
     public readonly int Value;
 
-    public OpBranch(Code aOpCode, int aPos, int aNextPos, int aValue, ExceptionRegion aCurrentExceptionRegion)
+    public OpBranch(Code aOpCode, int aPos, int aNextPos, int aValue, ExceptionRegion? aCurrentExceptionRegion)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       Value = aValue;
     }

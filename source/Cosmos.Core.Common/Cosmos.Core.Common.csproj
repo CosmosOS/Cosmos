@@ -110,7 +110,10 @@
     <None Include="..\..\Cosmos.snk">
       <Link>Cosmos.snk</Link>
     </None>
-    <None Include="project.json" />
+    <Content Include="Cosmos.Core.Common.project.json" />
+    <Content Include="project - Copy.lock.json">
+      <DependentUpon>Cosmos.Core.Common.project.json</DependentUpon>
+    </Content>
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>

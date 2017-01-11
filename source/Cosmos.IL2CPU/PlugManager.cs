@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
+using Microsoft.Extensions.DependencyModel;
+
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs;
+
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU
@@ -84,8 +88,10 @@ namespace Cosmos.IL2CPU
             // TODO: Allow whole class plugs? ie, a class that completely replaces another class
             // and is substituted on the fly? Plug scanner would direct all access to that
             // class and throw an exception if any method, field, member etc is missing.
-            foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (var xLib in DependencyContext.Default.CompileLibraries)
             {
+                var xAsm = AssemblyLoadContext.Default.LoadFromAssemblyPath(xLib.Path);
+
                 if (true/*!xAsm.GlobalAssemblyCache*/)
                 {
                     //if (xAsm.GetName().Name == "Cosmos.IL2CPU.X86") {

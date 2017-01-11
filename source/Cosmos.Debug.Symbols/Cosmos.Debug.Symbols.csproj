@@ -45,7 +45,7 @@
     <None Include="..\..\Cosmos.snk">
       <Link>Cosmos.snk</Link>
     </None>
-    <None Include="project.json" />
+    <None Include="Cosmos.Debug.Symbols.project.json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CacheHelper.cs" />

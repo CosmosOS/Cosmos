@@ -229,8 +229,8 @@ namespace Cosmos.IL2CPU
             Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
             Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
             // register system types:
-            Queue(typeof(Array).GetTypeInfo(), null, "Explicit Entry");
-            Queue(typeof(Array).GetTypeInfo().GetConstructor(Type.EmptyTypes), null, "Explicit Entry");
+            //Queue(typeof(Array).GetTypeInfo(), null, "Explicit Entry");
+            //Queue(typeof(Array).GetTypeInfo().GetConstructor(Type.EmptyTypes), null, "Explicit Entry");
 
             var xThrowHelper = Type.GetType("System.ThrowHelper", true, false);
             Queue(xThrowHelper.GetTypeInfo().GetMethod("ThrowInvalidOperationException", BindingFlags.NonPublic | BindingFlags.Static), null, "Explicit Entry");

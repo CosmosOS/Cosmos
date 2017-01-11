@@ -18,7 +18,7 @@ namespace Cosmos.Debug.Symbols
 
         private DebugSymbolReader(string aFilePath)
         {
-            mPEReader = new PEReader(File.Open(aFilePath, FileMode.Open));
+            mPEReader = new PEReader(File.OpenRead(aFilePath));
             mMetadataReader = mPEReader.GetMetadataReader();
         }
 
@@ -103,7 +103,7 @@ namespace Cosmos.Debug.Symbols
 
             if (!xDocument.Name.IsNil)
             {
-                return mMetadataReader.GetBlobReader(xDocument.Name).ReadSerializedString();
+                return mMetadataReader.GetString(xDocument.Name);
             }
 
             return "";
@@ -152,6 +152,24 @@ namespace Cosmos.Debug.Symbols
         public IList<LocalVariableInfo> GetLocalVariablesInfo(MethodBodyBlock aMethodBodyBlock)
         {
             throw new Exception("NetCore Fix Me");
+        }
+
+        public string GetString(int aMetadataToken)
+        {
+            var xHandle = MetadataTokens.Handle(aMetadataToken);
+
+            if (!xHandle.IsNil)
+            {
+                var xOffset = mMetadataReader.GetHeapOffset(xHandle);
+                var xStringHandle = MetadataTokens.UserStringHandle(xOffset);
+
+                if (!xStringHandle.IsNil)
+                {
+                    return mMetadataReader.GetUserString(xStringHandle);
+                }
+            }
+
+            return null;
         }
     }
 }

@@ -1,14 +1,24 @@
-{
-  "supports": {},
+﻿{
+  "buildOptions": {
+    "embed": {
+      "include": [
+        "SQLite.sql",
+        "SQLiteIndexes.sql"
+      ]
+    }
+  },
   "dependencies": {
-    "NETStandard.Library": "1.6.1",
+    "Dapper": "1.50.2",
     "Microsoft.Data.Sqlite": "1.1.0",
+    "NETStandard.Library": "1.6.1",
     "System.ComponentModel.Annotations": "4.3.0",
-    "System.Reflection.Metadata": "1.4.1",
+    "System.Reflection.Metadata": "1.4.2",
     "System.Runtime.Serialization.Primitives": "4.3.0",
-    "Dapper": "1.50.2"
+    "DapperExtensionsDNXCore": "1.0.0"
   },
   "frameworks": {
-    "netstandard1.5": {}
+    "netstandard1.5": {
+      "imports": "dnxcore50"
+    }
   }
 }
