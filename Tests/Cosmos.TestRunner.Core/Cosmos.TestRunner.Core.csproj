@@ -11,7 +11,6 @@
     <AssemblyName>Cosmos.TestRunner.Core</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -231,10 +230,6 @@
     <Compile Include="TestKernelSets.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
-      <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
-      <Name>Cosmos.Build.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.csproj">
       <Project>{BC6AE974-1F18-4A19-A956-5062E4D3FD53}</Project>
       <Name>Cosmos.Build.MSBuild</Name>

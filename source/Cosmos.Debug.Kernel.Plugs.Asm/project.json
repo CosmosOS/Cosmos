@@ -1,10 +1,22 @@
 {
-  "supports": {},
+  "buildOptions": {
+    "allowUnsafe": true,
+    "publicSign": true,
+    "keyFile": "../../Cosmos.snk"
+  },
   "dependencies": {
-    "Microsoft.NETCore.Portable.Compatibility": "1.0.2",
-    "NETStandard.Library": "1.6.1"
+    "NETStandard.Library": "1.6.1",
+    "Cosmos.Debug.Kernel": {
+      "target": "project"
+    },
+    "Cosmos.IL2CPU.Plugs": {
+      "target": "project"
+    },
+    "XSharp.Common": {
+      "target": "project"
+    }
   },
   "frameworks": {
-    "netstandard1.5": {}
+    "netstandard1.6": {}
   }
 }

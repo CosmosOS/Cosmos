@@ -8,7 +8,6 @@
     <Name>FrotzKernelBoot</Name>
     <BinFormat>elf</BinFormat>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Profile>VMware</Profile>

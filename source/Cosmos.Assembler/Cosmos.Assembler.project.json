@@ -1,0 +1,11 @@
+{
+  "runtimes": {
+    "win": {}
+  },
+  "dependencies": {
+    "System.Threading.Thread": "4.3.0"
+  },
+  "frameworks": {
+    "net462": {}
+  }
+}

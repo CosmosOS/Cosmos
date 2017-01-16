@@ -35,7 +35,7 @@ namespace Cosmos.Debug.Symbols
     {
         [Key]
         [DataMember()]
-    	public long ID
+        public long ID
         {
             get;
             set;
@@ -91,7 +91,7 @@ namespace Cosmos.Debug.Symbols
         /// </summary>
         [DataMember()]
         [Key]
-		public long ID
+        public long ID
         {
             get;
             set;
@@ -147,7 +147,7 @@ namespace Cosmos.Debug.Symbols
         /// No Metadata Documentation available.
         /// </summary>
         [DataMember()]
-		public long ID
+        public long ID
         {
             get;
             set;
@@ -245,7 +245,7 @@ namespace Cosmos.Debug.Symbols
         /// </summary>
         [Key]
         [DataMember()]
-		public long ID
+        public long ID
         {
             get;
             set;
@@ -263,7 +263,7 @@ namespace Cosmos.Debug.Symbols
         /// </summary>
         [DataMember()]
         [Key]
-		public long ID
+        public long ID
         {
             get;
             set;
@@ -293,7 +293,7 @@ namespace Cosmos.Debug.Symbols
         /// No Metadata Documentation available.
         /// </summary>
         [DataMember()]
-		public long AssemblyFileID
+        public long AssemblyFileID
         {
             get;
             set;
@@ -323,7 +323,7 @@ namespace Cosmos.Debug.Symbols
         /// No Metadata Documentation available.
         /// </summary>
         [DataMember()]
-		public long DocumentID
+        public long DocumentID
         {
             get;
             set;
@@ -333,7 +333,7 @@ namespace Cosmos.Debug.Symbols
         /// No Metadata Documentation available.
         /// </summary>
         [DataMember()]
-		public long? LabelStartID
+        public long? LabelStartID
         {
             get;
             set;
@@ -343,7 +343,7 @@ namespace Cosmos.Debug.Symbols
         /// No Metadata Documentation available.
         /// </summary>
         [DataMember()]
-		public long? LabelEndID
+        public long? LabelEndID
         {
             get;
             set;
@@ -371,7 +371,7 @@ namespace Cosmos.Debug.Symbols
         /// </summary>
         [Key]
         [DataMember()]
-			public long ID
+            public long ID
         {
             get;
             set;
@@ -411,7 +411,7 @@ namespace Cosmos.Debug.Symbols
         /// No Metadata Documentation available.
         /// </summary>
         [DataMember()]
-		public long? MethodID
+        public long? MethodID
         {
             get;
             set;
@@ -438,7 +438,7 @@ namespace Cosmos.Debug.Symbols
         /// No Metadata Documentation available.
         /// </summary>
         [DataMember()]
-				public long MethodID
+                public long MethodID
         {
             get;
             set;

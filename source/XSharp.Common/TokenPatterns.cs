@@ -814,7 +814,6 @@ namespace XSharp.Compiler {
                                                      mBlocks.Start(aTokens, false);
                                                      XS.Label(BlockLabel("Begin"));
 
-                                                     int xIdx = 1;
                                                      Token xComparison = xCompare.Value(1, aTokens);
 
                                                      XS.Jump(GetJump(xComparison.RawValue, true), BlockLabel("End"));
@@ -847,7 +846,6 @@ namespace XSharp.Compiler {
           AddPattern("if " + xCompare.Key + " " + xTail,
                      delegate(TokenList aTokens)
                      {
-                       int xIdx = 1;
                        Token xComparison = xCompare.Value(1, aTokens);
 
                        HandleIf(aTokens, xComparison.RawValue);

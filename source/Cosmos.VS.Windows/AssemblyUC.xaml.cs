@@ -10,15 +10,16 @@ using System.Collections.Generic;
 using Cosmos.Debug.Common;
 using System.Windows.Threading;
 using System.Windows.Shapes;
+using Cosmos.Debug.DebugConnectors;
 
 namespace Cosmos.VS.Windows
 {
     /// This class implements the tool window exposed by this package and hosts a user control.
     ///
-    /// In Visual Studio tool windows are composed of a frame (implemented by the shell) and a pane, 
+    /// In Visual Studio tool windows are composed of a frame (implemented by the shell) and a pane,
     /// usually implemented by the package implementer.
     ///
-    /// This class derives from the ToolWindowPane class provided from the MPF in order to use its 
+    /// This class derives from the ToolWindowPane class provided from the MPF in order to use its
     /// implementation of the IVsUIElementPane interface.
 
     [Guid("f019fb29-c2c2-4d27-9abf-739533c939be")]
@@ -38,7 +39,7 @@ namespace Cosmos.VS.Windows
             BitmapIndex = 1;
 
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
-            // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
+            // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
             // the object returned by the Content property.
             mUserControl = new AssemblyUC();
             Content = mUserControl;
@@ -69,7 +70,7 @@ namespace Cosmos.VS.Windows
             butnStepOver.Click += new RoutedEventHandler(butnStepOver_Click);
             butnStepInto.Click += new RoutedEventHandler(butnStepInto_Click);
             butnStepMode.Click += new RoutedEventHandler(butnStepMode_Click);
-            
+
             Update(null, mData);
         }
 
@@ -106,7 +107,7 @@ namespace Cosmos.VS.Windows
         }
 
         protected bool canStepOver = false;
-        
+
         void butnFilter_Click(object sender, RoutedEventArgs e)
         {
             mFilter = !mFilter;
@@ -168,7 +169,7 @@ namespace Cosmos.VS.Windows
                             xLabelPrefixes.Add(xLabelParts[0] + ".");
                             foundMETHOD_Prefix = true;
                         }
-                        else if(!foundMethodName && !xAsmLabel.Label.StartsWith("METHOD_") 
+                        else if(!foundMethodName && !xAsmLabel.Label.StartsWith("METHOD_")
                                                  && !xAsmLabel.Label.StartsWith("GUID_"))
                         {
                             var xLabelParts = xAsmLabel.Label.Split(':');
@@ -290,7 +291,7 @@ namespace Cosmos.VS.Windows
                 mCode.AppendLine(xDisplayLine);
             }
             Log("Display - Done processing lines");
-            //EdMan196: This line of code was worked out by trial and error. 
+            //EdMan196: This line of code was worked out by trial and error.
             double offset = mCurrentLineNumber * 13.1;
             Log("Display - Scroll to offset");
             ASMScrollViewer.ScrollToVerticalOffset(offset);
@@ -339,7 +340,7 @@ namespace Cosmos.VS.Windows
                 mASMBPs.Add(lineId);
             }
         }
-        
+
         protected void OnASMCodeTextMouseUp(object aSender, System.Windows.Input.MouseButtonEventArgs aArgs)
         {
             try
@@ -379,7 +380,7 @@ namespace Cosmos.VS.Windows
                     xRun.Foreground = Brushes.WhiteSmoke;
                     xRun.Background = Brushes.Blue;
                 }
-                
+
                 //Show state for that line
                 //IL Labels should be unique for any given section
                 var asmLine = mRunsToLines[xRun];
@@ -668,7 +669,7 @@ namespace Cosmos.VS.Windows
                         Log("DoUpdate - Done");
                     }
 
-                    if (mParams != null && mParams.Length > 1) 
+                    if (mParams != null && mParams.Length > 1)
                     {
                         if (mParams[1] == "AsmStepMode")
                         {

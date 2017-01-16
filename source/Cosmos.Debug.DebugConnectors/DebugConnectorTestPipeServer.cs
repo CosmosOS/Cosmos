@@ -47,7 +47,7 @@ namespace Cosmos.Debug.DebugConnectors
                 throw new Exception("Unable to connect pipe");
             }
 
-            mPipe = File.Open(mHandle, FileAccess.ReadWrite, 8192, false);
+            mPipe = new FileStream(mHandle, FileAccess.ReadWrite, 8192, false);
             Start(mPipe);
         }
 

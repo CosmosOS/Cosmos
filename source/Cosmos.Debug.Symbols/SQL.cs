@@ -1,7 +1,7 @@
-﻿using Microsoft.Data.Sqlite;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.Data.Sqlite;
 
 namespace Cosmos.Debug.Symbols
 {

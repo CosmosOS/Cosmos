@@ -1,21 +1,19 @@
 {
   "buildOptions": {
-    "allowUnsafe": true
+    "allowUnsafe": true,
+    "publicSign": true,
+    "keyFile": "../../Cosmos.snk"
   },
   "dependencies": {
-    "Microsoft.NETCore.Portable.Compatibility": "1.0.2",
-    "NETStandard.Library": "1.6.1"
+    "NETStandard.Library": "1.6.1",
+    "Cosmos.Common": {
+      "target": "project"
+    },
+    "Cosmos.IL2CPU.Plugs": {
+      "target": "project"
+    }
   },
   "frameworks": {
-    "netstandard1.5": {
-      "dependencies": {
-        "Cosmos.Common": {
-          "target": "project"
-        },
-        "Cosmos.IL2CPU.Plugs": {
-          "target": "project"
-        }
-      }
-    }
+    "netstandard1.6": {}
   }
 }

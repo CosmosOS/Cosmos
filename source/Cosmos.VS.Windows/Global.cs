@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.Debug.Common;
+using Cosmos.Debug.DebugConnectors;
 
 namespace Cosmos.VS.Windows {
   static public class Global {

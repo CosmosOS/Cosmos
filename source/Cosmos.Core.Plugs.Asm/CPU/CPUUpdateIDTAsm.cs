@@ -29,7 +29,7 @@ namespace Cosmos.IL2CPU.Plugs.Assemblers
 
         private static MethodBase GetInterruptHandler(byte aInterrupt)
         {
-            return GetMethodDef(Type.GetType("Cosmos.Core.INTs").Assembly, Type.GetType("Cosmos.Core.INTs").FullName
+            return GetMethodDef(Type.GetType("Cosmos.Core.INTs").GetTypeInfo().Assembly, Type.GetType("Cosmos.Core.INTs").FullName
                 , "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
         }
 
@@ -94,7 +94,7 @@ namespace Cosmos.IL2CPU.Plugs.Assemblers
                 MethodBase xHandler = GetInterruptHandler((byte)j);
                 if (xHandler == null)
                 {
-                    xHandler = GetMethodDef(Type.GetType("Cosmos.Core.INTs").Assembly, Type.GetType("Cosmos.Core.INTs").FullName, "HandleInterrupt_Default", true);
+                    xHandler = GetMethodDef(Type.GetType("Cosmos.Core.INTs").GetTypeInfo().Assembly, Type.GetType("Cosmos.Core.INTs").FullName, "HandleInterrupt_Default", true);
                 }
                 XS.Call(CPUAll.LabelName.Get(xHandler));
                 XS.Pop(XSRegisters.EAX);

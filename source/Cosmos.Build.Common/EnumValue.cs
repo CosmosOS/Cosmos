@@ -96,7 +96,7 @@ namespace Cosmos.Build.Common
         {
             if (this.Value != null)
             {
-                DescriptionAttribute.GetDescription(this.Value);
+                return DescriptionAttribute.GetDescription(this.Value);
             }
             return base.ToString();
         }

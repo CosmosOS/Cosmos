@@ -1,24 +1,21 @@
-﻿{
+{
   "buildOptions": {
+    "publicSign": true,
+    "keyFile": "../../Cosmos.snk",
     "embed": {
-      "include": [
-        "SQLite.sql",
-        "SQLiteIndexes.sql"
-      ]
+      "include": "**/*.sql"
     }
   },
   "dependencies": {
-    "Dapper": "1.50.2",
+    "Dapper.StrongName": "1.50.2",
+    "DapperExtensions.DotnetCore": "1.0.1",
     "Microsoft.Data.Sqlite": "1.1.0",
     "NETStandard.Library": "1.6.1",
     "System.ComponentModel.Annotations": "4.3.0",
     "System.Reflection.Metadata": "1.4.2",
-    "System.Runtime.Serialization.Primitives": "4.3.0",
-    "DapperExtensionsDNXCore": "1.0.0"
+    "System.Runtime.Serialization.Primitives": "4.3.0"
   },
   "frameworks": {
-    "netstandard1.5": {
-      "imports": "dnxcore50"
-    }
+    "netstandard1.6": {}
   }
 }

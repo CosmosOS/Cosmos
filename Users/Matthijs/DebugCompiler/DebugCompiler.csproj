@@ -11,8 +11,6 @@
     <RootNamespace>DebugCompiler</RootNamespace>
     <AssemblyName>DebugCompiler</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
   </PropertyGroup>
@@ -22,7 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -94,10 +91,6 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
-      <Project>{0462E82B-8C29-41A9-8265-9C89038ADB29}</Project>
-      <Name>Cosmos.Build.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Tests\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj">
       <Project>{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}</Project>
       <Name>Cosmos.TestRunner.Core</Name>

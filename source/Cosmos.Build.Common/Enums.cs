@@ -10,19 +10,27 @@ namespace Cosmos.Build.Common
 
     public enum DeploymentType
     {
-        [Description("ISO Image")] ISO,
-        [Description("USB Device")] USB,
-        [Description("PXE Network Boot")] PXE,
+        [Description("ISO Image")]
+        ISO,
+        [Description("USB Device")]
+        USB,
+        [Description("PXE Network Boot")]
+        PXE,
         BinaryImage
     }
 
     public enum LaunchType
     {
-        [Description("None")] None,
-        [Description("VMware")] VMware,
-        [Description("Attached Slave (CanaKit)")] Slave,
-        [Description("Bochs")] Bochs,
-        [Description("Intel Edison")] IntelEdison,
+        [Description("None")]
+        None,
+        [Description("VMware")]
+        VMware,
+        [Description("Attached Slave (CanaKit)")]
+        Slave,
+        [Description("Bochs")]
+        Bochs,
+        [Description("Intel Edison")]
+        IntelEdison,
     }
 
     public enum VMwareEdition
@@ -38,7 +46,8 @@ namespace Cosmos.Build.Common
 
     public enum Framework
     {
-        [Description("Microsoft .NET")] MicrosoftNET,
+        [Description("Microsoft .NET")]
+        MicrosoftNET,
         Mono
     }
 
@@ -66,8 +75,10 @@ namespace Cosmos.Build.Common
 
     public enum StackCorruptionDetectionLevel
     {
-        [Description("All Instructions")] AllInstructions,
-        [Description("Method Footers Only")] MethodFooters
+        [Description("All Instructions")]
+        AllInstructions,
+        [Description("Method Footers Only")]
+        MethodFooters
     }
 
     public sealed class DescriptionAttribute : Attribute
@@ -76,29 +87,20 @@ namespace Cosmos.Build.Common
         {
             Type valueType = value.GetType();
             MemberInfo[] valueMemberInfo;
-            List<Attribute> valueMemberAttribute;
+            DescriptionAttribute valueMemberAttribute;
 
             if (valueType.GetTypeInfo().IsEnum)
             {
-                valueMemberInfo = valueType.GetTypeInfo().GetMember(value.ToString());
-
-                if ((valueMemberInfo != null) && (valueMemberInfo.Length > 0))
+                var xTypeInfo = valueType.GetTypeInfo();
+                var xMemberInfo = xTypeInfo.GetMember(value.ToString());
+                if (xMemberInfo.Any())
                 {
-                    valueMemberAttribute = valueMemberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false)?.ToList();
-                    if ((valueMemberAttribute != null) && (valueMemberAttribute.Any()))
-                    {
-                        return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
-                    }
+                    valueMemberInfo = valueType.GetTypeInfo().GetMember(value.ToString());
+                    valueMemberAttribute = valueMemberInfo[0].GetCustomAttribute<DescriptionAttribute>();
+                    return valueMemberAttribute.Description;
                 }
             }
-
-            valueMemberAttribute = valueType.GetTypeInfo().GetCustomAttributes(typeof(DescriptionAttribute), false)?.ToList();
-            if ((valueMemberAttribute != null) && (valueMemberAttribute.Any()))
-            {
-                return ((DescriptionAttribute)valueMemberAttribute[0]).Description;
-            }
-
-            return value.ToString();
+            return null;
         }
 
         private string emDescription;

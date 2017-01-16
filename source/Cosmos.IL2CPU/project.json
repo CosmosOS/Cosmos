@@ -1,17 +1,16 @@
 {
   "buildOptions": {
-    "allowUnsafe": true
+    "allowUnsafe": true,
+    "publicSign": true,
+    "keyFile": "../../Cosmos.snk"
   },
   "dependencies": {
-    "Microsoft.NETCore.Portable.Compatibility": "1.0.2",
     "NETStandard.Library": "1.6.1",
-    "System.Reflection.Metadata": "1.4.2",
     "System.Runtime.Loader": "4.3.0",
     "Microsoft.Extensions.DependencyModel": "1.1.0"
   },
   "frameworks": {
     "netstandard1.6": {
-      "imports": "dnxcore50",
       "dependencies": {
         "Cosmos.Assembler": {
           "target": "project"
@@ -25,13 +24,16 @@
         "Cosmos.Core.Common": {
           "target": "project"
         },
+        "Cosmos.Debug.Common": {
+          "target": "project"
+        },
         "Cosmos.Debug.DebugStub": {
           "target": "project"
         },
-        "Cosmos.Debug.Kernel": {
+        "Cosmos.Debug.Symbols": {
           "target": "project"
         },
-        "Cosmos.Debug.Symbols": {
+        "Cosmos.Debug.Kernel": {
           "target": "project"
         },
         "Cosmos.IL2CPU.Plugs": {
@@ -43,6 +45,7 @@
         "XSharp.Common": {
           "target": "project"
         }
+
       }
     }
   }

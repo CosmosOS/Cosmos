@@ -11,9 +11,24 @@
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
   </PropertyGroup>
-
   <PropertyGroup>
     <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
+  <ItemGroup>
+    <DnxInvisibleContent Include="AsmBreak.asm" />
+    <DnxInvisibleContent Include="CmdMisc.asm" />
+    <DnxInvisibleContent Include="CmdProcess.asm" />
+    <DnxInvisibleContent Include="CmdSend.asm" />
+    <DnxInvisibleContent Include="Consts.asm" />
+    <DnxInvisibleContent Include="Cosmos.Debug.DebugStub.project.json" />
+    <DnxInvisibleContent Include="DebugStub.asm" />
+    <DnxInvisibleContent Include="Init.asm" />
+    <DnxInvisibleContent Include="Screen.asm" />
+    <DnxInvisibleContent Include="Serial.asm" />
+    <DnxInvisibleContent Include="SerialHelpers.asm" />
+    <DnxInvisibleContent Include="SerialIO.asm" />
+    <DnxInvisibleContent Include="TracerEntry.asm" />
+    <DnxInvisibleContent Include="Utilities.asm" />
+  </ItemGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

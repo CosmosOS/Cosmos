@@ -1,12 +1,13 @@
 {
   "buildOptions": {
-    "allowUnsafe": true
+    "allowUnsafe": true,
+    "publicSign": true,
+    "keyFile": "../../Cosmos.snk"
   },
   "dependencies": {
-    "Microsoft.NETCore.Portable.Compatibility": "1.0.2",
     "NETStandard.Library": "1.6.1"
   },
   "frameworks": {
-    "netstandard1.5": {}
+    "netstandard1.6": {}
   }
 }

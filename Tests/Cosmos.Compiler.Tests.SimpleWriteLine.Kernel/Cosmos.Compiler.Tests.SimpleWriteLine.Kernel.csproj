@@ -12,7 +12,6 @@
     <AssemblyName>Cosmos.Compiler.Tests.SimpleWriteLine.Kernel</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>

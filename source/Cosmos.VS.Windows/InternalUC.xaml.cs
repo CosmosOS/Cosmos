@@ -19,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Cosmos.Debug.Common;
+using Cosmos.Debug.DebugConnectors;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -35,7 +36,7 @@ namespace Cosmos.VS.Windows {
       Content = mUserControl;
     }
   }
-  
+
   public partial class InternalUC : DebuggerUC {
     public InternalUC() {
       InitializeComponent();

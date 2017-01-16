@@ -1,6 +1,5 @@
-﻿#if NET462
-
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
 using System.Threading;
@@ -14,7 +13,7 @@ namespace Cosmos.Debug.Hosts {
     SerialPort mPort;
     Thread mPowerStateThread;
 
-    public Slave(NameValueCollection aParams, bool aUseGDB)
+    public Slave(Dictionary<string, string> aParams, bool aUseGDB)
       : base(aParams, aUseGDB) {
       var xPort = mParams[BuildPropertyNames.SlavePortString];
       if (xPort == "None") {
@@ -119,5 +118,3 @@ namespace Cosmos.Debug.Hosts {
     }
   }
 }
-
-#endif

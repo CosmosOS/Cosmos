@@ -1,15 +1,15 @@
 {
+  "buildOptions": {
+    "publicSign": true,
+    "keyFile": "../../Cosmos.snk"
+  },
   "dependencies": {
-    "Microsoft.NETCore.Portable.Compatibility": "1.0.2",
-    "NETStandard.Library": "1.6.1"
+    "NETStandard.Library": "1.6.1",
+    "Cosmos.Debug.Kernel": {
+      "target": "project"
+    }
   },
   "frameworks": {
-    "netstandard1.5": {
-      "dependencies": {
-        "Cosmos.Debug.Kernel": {
-          "target": "project"
-        }
-      }
-    }
+    "netstandard1.6": {}
   }
 }

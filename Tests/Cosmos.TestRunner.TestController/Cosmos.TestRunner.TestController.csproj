@@ -11,7 +11,6 @@
     <AssemblyName>Cosmos.TestRunner.TestController</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -95,12 +94,6 @@
     <None Include="..\..\Cosmos.snk">
       <Link>Cosmos.snk</Link>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
-      <Project>{dc93aed0-a9bf-42c4-ac7b-fa9b2063e5d1}</Project>
-      <Name>Cosmos.Debug.Kernel</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

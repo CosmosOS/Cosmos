@@ -10,8 +10,6 @@
     <OutputType>Library</OutputType>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
     <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <BinFormat>elf</BinFormat>
     <ResolveNuGetPackages>False</ResolveNuGetPackages>
@@ -47,6 +45,8 @@
     <VMware_StackCorruptionDetectionEnabled>True</VMware_StackCorruptionDetectionEnabled>
     <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
     <VMware_CosmosDebugPort>Serial: COM1</VMware_CosmosDebugPort>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <None Include="project.json" />
@@ -58,16 +58,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
-      <Name>Cosmos.Core.Plugs</Name>
-      <Project>{09273ea1-d3ea-4ccf-aabc-4a209eb367b7}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
-      <Name>Cosmos.System.Plugs</Name>
-      <Project>{e52f6162-5094-49f4-a685-d08e5480bac2}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\Guess\GuessKernel.csproj">
       <Name>GuessKernel</Name>
       <Project>{1780684c-6b7f-4360-81c0-69204e343a08}</Project>

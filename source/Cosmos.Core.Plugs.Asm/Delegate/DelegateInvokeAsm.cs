@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.X86.IL;
 using XSharp.Compiler;

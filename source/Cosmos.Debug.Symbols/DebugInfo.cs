@@ -482,7 +482,7 @@ namespace Cosmos.Debug.Symbols
                     using (var xBulkCopy = new SqliteBulkCopy(mConnection))
                     {
                         xBulkCopy.DestinationTableName = aTableName;
-                        #region debug
+#region debug
                         // for now dump to disk:
                         //using (var reader = new ObjectReader<T>(aList.ToArray()))
                         //{
@@ -519,7 +519,7 @@ namespace Cosmos.Debug.Symbols
                         //    }
                         //  }
                         //}
-                        #endregion region debug
+#endregion region debug
                         //using (var db = DB())
                         //{
                         //    db.Set(typeof(T)).AddRange(aList);
