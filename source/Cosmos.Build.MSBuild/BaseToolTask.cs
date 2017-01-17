@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.Utilities;
 using System.Diagnostics;
-using MessageImportance = Microsoft.Build.Framework.MessageImportance;
+using Microsoft.Build.Utilities;
 using Microsoft.Build.Framework;
 
 namespace Cosmos.Build.MSBuild
@@ -81,7 +78,7 @@ namespace Cosmos.Build.MSBuild
     }
 
 
-	public abstract class BaseToolTask : AppDomainIsolatedTask
+	public abstract class BaseToolTask : Task
 	{
 	    public static bool ExecuteTool(string workingDir, string filename, string arguments, string name, Action<string> errorReceived, Action<string> outputReceived)
 	    {

@@ -68,7 +68,7 @@
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BoxingTests\BoxingTests.csproj">
+    <ProjectReference Include="..\BoxingTests\BoxingTests.xproj">
       <Name>BoxingTests</Name>
       <Project>{f8889473-5866-4913-86ac-8072a1a2558c}</Project>
       <Private>True</Private>

@@ -8,6 +8,7 @@
     <Name>Cosmos.Kernel.Tests.IOBoot</Name>
     <BinFormat>elf</BinFormat>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Profile>Bochs</Profile>
@@ -49,7 +50,7 @@
     <Bochs_IgnoreDebugStubAttribute>False</Bochs_IgnoreDebugStubAttribute>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj">
+    <ProjectReference Include="..\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.xproj">
       <Name>Cosmos.Kernel.Tests.IO</Name>
       <Project>{47b1a772-4a53-4a53-9bad-31df119b1725}</Project>
       <Private>True</Private>

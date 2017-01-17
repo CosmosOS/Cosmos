@@ -52,7 +52,7 @@
     <Bochs_TraceAssemblies>Cosmos</Bochs_TraceAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include=".\Cosmos.Compiler.Tests.MethodTests.csproj">
+    <ProjectReference Include=".\Cosmos.Compiler.Tests.MethodTests.xproj">
       <Name>Cosmos.Compiler.Tests.MethodTests</Name>
       <Project>{fe8b9f39-7c96-4866-9a18-386735895cee}</Project>
     </ProjectReference>

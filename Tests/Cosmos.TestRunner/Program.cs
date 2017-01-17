@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using Cosmos.TestRunner.Core;
+//using System.Windows.Forms;
 using Microsoft.Win32;
+
+using Cosmos.TestRunner.Core;
 
 namespace Cosmos.TestRunner.Console
 {
@@ -31,14 +32,14 @@ namespace Cosmos.TestRunner.Console
             var xResult = global::System.Console.ReadLine();
             if (xResult != null && xResult.Trim().Equals("yes", StringComparison.OrdinalIgnoreCase))
             {
-                var xSaveDialog = new SaveFileDialog();
-                xSaveDialog.Filter = "XML documents|*.xml";
-                if (xSaveDialog.ShowDialog() != DialogResult.OK)
+                //var xSaveDialog = new SaveFileDialog();
+                //xSaveDialog.Filter = "XML documents|*.xml";
+                //if (xSaveDialog.ShowDialog() != DialogResult.OK)
                 {
                     return;
                 }
 
-                xOutputXml.SaveToFile(xSaveDialog.FileName);
+                //xOutputXml.SaveToFile(xSaveDialog.FileName);
             }
         }
     }

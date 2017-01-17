@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Linq;
+using System.Reflection;
+
 using Cosmos.Build.Common;
 
 namespace Cosmos.TestRunner.Core
@@ -34,9 +35,9 @@ namespace Cosmos.TestRunner.Core
             //engine.StartBochsDebugGui = true;
 
             // Select kernels to be tested by adding them to the engine
-            foreach (var xPath in TestKernelSets.GetNetCoreKernelPaths())
+            foreach (var xType in TestKernelSets.GetStableKernelTypes())
             {
-                engine.AddKernel(xPath);
+                engine.AddKernel(xType.GetTypeInfo().Assembly.Location);
             }
 
             //engine.AddKernel(typeof(VGACompilerCrash.Kernel).Assembly.Location);
@@ -59,7 +60,7 @@ namespace Cosmos.TestRunner.Core
             // double check: this check is in the engine, but lets put it here as well
             if (engine.RunIL2CPUInProcess)
             {
-                if (engine.KernelsToRun.Count() > 1 || engine.RunTargets.Count == 0 || engine.RunTargets.Count > 1)
+                if (engine.KernelsToRun.Count > 1 || engine.RunTargets.Count == 0 || engine.RunTargets.Count > 1)
                 {
                     throw new InvalidOperationException("Can only run 1 kernel if IL2CPU is ran in-process!");
                 }

@@ -102,15 +102,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlaygroundHAL", "Users\Matt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.TestsBase", "Tests\Cosmos.Compiler.TestsBase\Cosmos.Compiler.TestsBase.csproj", "{C264460F-C9C8-41C3-8C26-9BDF4710744C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.SimpleWriteLine.Kernel", "Tests\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.csproj", "{57045FE8-B0FE-4FC1-810F-7C3914AEF1DE}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.Compiler.Tests.SimpleWriteLine", "Tests\Cosmos.Compiler.Tests.SimpleWriteLine\Cosmos.Compiler.Tests.SimpleWriteLine.xproj", "{57045FE8-B0FE-4FC1-810F-7C3914AEF1DE}"
 EndProject
-Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot", "Tests\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel\Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot.Cosmos", "{73D29A51-072A-4310-B3D1-539AA92094AA}"
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.SimpleWriteLineBoot", "Tests\Cosmos.Compiler.Tests.SimpleWriteLine\Cosmos.Compiler.Tests.SimpleWriteLineBoot.Cosmos", "{73D29A51-072A-4310-B3D1-539AA92094AA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests", "Tests\Cosmos.Compiler.Tests\Cosmos.Compiler.Tests.csproj", "{220BFCDD-0747-4A3D-B022-51D4CFB373BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.Interfaces.Kernel", "Tests\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.Kernel.csproj", "{BDC011BE-6041-4A58-A6E7-0F592E78CB27}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.Compiler.Tests.Interfaces", "Tests\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.xproj", "{BDC011BE-6041-4A58-A6E7-0F592E78CB27}"
 EndProject
-Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.Interfaces.KernelBoot", "Tests\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.KernelBoot.Cosmos", "{7E059184-F2C5-4CC6-B86D-FA12590C3C40}"
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.InterfacesBoot", "Tests\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.InterfacesBoot.Cosmos", "{7E059184-F2C5-4CC6-B86D-FA12590C3C40}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlaygroundCore", "Users\Matthijs\PlaygroundCore\PlaygroundCore.csproj", "{AB869246-4887-4117-851D-766EB9FF1E29}"
 EndProject
@@ -118,49 +118,49 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Common.Tests", "Test
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestRunner", "TestRunner", "{79173AE7-4596-4D33-866F-6F94A2314BE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.TestRunner.Core", "Tests\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj", "{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.TestRunner.Core", "Tests\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.xproj", "{EBEAE8DF-31D3-41FF-8BEC-310ABD9B1452}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.TestRunner", "Tests\Cosmos.TestRunner\Cosmos.TestRunner.csproj", "{78304B1E-C323-4A78-9E7D-2578E58311B6}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.TestRunner", "Tests\Cosmos.TestRunner\Cosmos.TestRunner.xproj", "{78304B1E-C323-4A78-9E7D-2578E58311B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.TestRunner.TestController", "Tests\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj", "{E6D3B644-C487-472D-A978-C1A82D0C099B}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.TestRunner.TestController", "Tests\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.xproj", "{E6D3B644-C487-472D-A978-C1A82D0C099B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Staging", "Staging", "{25C3C6E4-1EDD-4542-A663-CAC7A1F40B3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleStructsAndArraysTest", "Tests\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj", "{839EDC9D-6D2E-4892-A7F0-17861BA9FA0C}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "SimpleStructsAndArraysTest", "Tests\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.xproj", "{839EDC9D-6D2E-4892-A7F0-17861BA9FA0C}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "SimpleStructsAndArraysTestBoot", "Tests\SimpleStructsAndArraysTest\SimpleStructsAndArraysTestBoot.Cosmos", "{431643CB-006C-49EF-8E0F-1540F994C936}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VGACompilerCrash", "Tests\VGACompilerCrash\VGACompilerCrash.csproj", "{21915A7E-CC84-4836-8B87-857B6149D496}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VGACompilerCrash", "Tests\VGACompilerCrash\VGACompilerCrash.xproj", "{21915A7E-CC84-4836-8B87-857B6149D496}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "VGACompilerCrashBoot", "Tests\VGACompilerCrash\VGACompilerCrashBoot.Cosmos", "{78AC2B12-8185-4033-80F0-DA5BF874BE5E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.TestRunner.UI", "Tests\Cosmos.TestRunner.UI\Cosmos.TestRunner.UI.csproj", "{0B20C26F-CA92-4D88-8211-EC7B0A261337}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BoxingTests", "Tests\BoxingTests\BoxingTests.csproj", "{F8889473-5866-4913-86AC-8072A1A2558C}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "BoxingTests", "Tests\BoxingTests\BoxingTests.xproj", "{F8889473-5866-4913-86AC-8072A1A2558C}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "BoxingTestsBoot", "Tests\BoxingTests\BoxingTestsBoot.Cosmos", "{444098BC-8F72-4030-A8C0-118D2DD93EB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.SingleEchoTest", "Tests\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTest.csproj", "{3E28CFD9-25D4-4EBB-86E3-4A4A8A8936FE}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.Compiler.Tests.SingleEchoTest", "Tests\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTest.xproj", "{3E28CFD9-25D4-4EBB-86E3-4A4A8A8936FE}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.SingleEchoTestBoot", "Tests\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTestBoot.Cosmos", "{41EFAEB7-7D53-4F6B-AE63-CFDA84A22A38}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.Bcl", "Tests\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj", "{31E3F8E2-7CC0-426C-ACCB-77B3319AF5D3}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.Compiler.Tests.Bcl", "Tests\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.xproj", "{31E3F8E2-7CC0-426C-ACCB-77B3319AF5D3}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.BclBoot", "Tests\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.BclBoot.Cosmos", "{ACD31367-B823-44E2-BABB-1605F26DB107}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kernel", "Kernel", "{DC374FBC-4005-472F-BBF4-CEA608B86FB2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Tests.Fat", "Tests\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj", "{A0893493-D4F0-4B9F-9826-86319E143D86}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.Kernel.Tests.Fat", "Tests\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.xproj", "{A0893493-D4F0-4B9F-9826-86319E143D86}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Kernel.Tests.FatBoot", "Tests\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.FatBoot.Cosmos", "{C006CC79-7FFD-45F1-AD8C-57AC879CC29F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.Exceptions", "Tests\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj", "{9DF5C0A9-B91C-4647-B939-E47513743A0C}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.Compiler.Tests.Exceptions", "Tests\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.xproj", "{9DF5C0A9-B91C-4647-B939-E47513743A0C}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.ExceptionsBoot", "Tests\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.ExceptionsBoot.Cosmos", "{85E13410-C85A-4B0C-BEE5-F9A120ECC94E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.LinqTests", "Tests\Cosmos.Kernel.Tests.LinqTests\Cosmos.Compiler.Tests.LinqTests.csproj", "{85B11F78-39BC-4CFC-9033-FC84AB14CD03}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.Compiler.Tests.LinqTests", "Tests\Cosmos.Compiler.Tests.LinqTests\Cosmos.Compiler.Tests.LinqTests.xproj", "{85B11F78-39BC-4CFC-9033-FC84AB14CD03}"
 EndProject
-Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.LinqTestsBoot", "Tests\Cosmos.Kernel.Tests.LinqTests\Cosmos.Compiler.Tests.LinqTestsBoot.Cosmos", "{BA23CC1E-ACA2-4E1E-B10F-FD543393BEE6}"
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.LinqTestsBoot", "Tests\Cosmos.Compiler.Tests.LinqTests\Cosmos.Compiler.Tests.LinqTestsBoot.Cosmos", "{BA23CC1E-ACA2-4E1E-B10F-FD543393BEE6}"
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "Docs\", "{67E7DEF0-1CEE-4ED6-A22D-97E5EA61157A}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -184,14 +184,13 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "Docs\", "{67E7DEF0-
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "8987"
-		SlnRelativePath = "Docs\"
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Tests", "Unit Tests", "{9637A680-F8E9-4925-A4E4-00045205EC04}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Build.Common.Tests", "Tests\Cosmos.Build.Common.Tests\Cosmos.Build.Common.Tests.csproj", "{C1D525C4-B072-4F2F-94BF-4862E6727C4B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.MethodTests", "Tests\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTests.csproj", "{FE8B9F39-7C96-4866-9A18-386735895CEE}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.Compiler.Tests.MethodTests", "Tests\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTests.xproj", "{FE8B9F39-7C96-4866-9A18-386735895CEE}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.MethodTestsBoot", "Tests\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTestsBoot.Cosmos", "{0FEE977D-AE52-4381-B513-71C5C1982ED4}"
 EndProject
@@ -214,11 +213,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zConsole", "Demos\zMachine\Frotz.Net\source\zConsole\zConsole.csproj", "{3E4A8079-AAC0-429D-B042-0B5151E0E5BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Compiler.Tests.Encryption", "Tests\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj", "{48EBDEB2-6A6A-4DF2-B5F1-DB6D299401F2}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.Compiler.Tests.Encryption", "Tests\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.xproj", "{48EBDEB2-6A6A-4DF2-B5F1-DB6D299401F2}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Compiler.Tests.EncryptionBoot", "Tests\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.EncryptionBoot.Cosmos", "{CCF11819-C8F9-4A74-ACAE-1421B06720B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Kernel.Tests.IO", "Tests\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj", "{47B1A772-4A53-4A53-9BAD-31DF119B1725}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.Kernel.Tests.IO", "Tests\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.xproj", "{47B1A772-4A53-4A53-9BAD-31DF119B1725}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos.Kernel.Tests.IOBoot", "Tests\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IOBoot.Cosmos", "{DC2CB877-EC23-463D-A870-054CA42DF48C}"
 EndProject
@@ -232,9 +231,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.Windows.Test", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Test", "Tests\XSharp.Test\XSharp.Test.csproj", "{2A59517C-356E-4B55-B155-50335BF482FB}"
 EndProject
-Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GuessBoot", "Demos\Guess\GuessBoot.Cosmos", "{5B2C0369-7A84-4113-892C-F71B50E1DA12}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "GuessKernel", "Demos\Guess\GuessKernel.xproj", "{1780684C-6B7F-4360-81C0-69204E343A08}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuessKernel", "Demos\Guess\GuessKernel.csproj", "{1780684C-6B7F-4360-81C0-69204E343A08}"
+Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "GuessBoot", "Demos\Guess\GuessBoot.Cosmos", "{5B2C0369-7A84-4113-892C-F71B50E1DA12}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.NetCore.TestApp", "Tools\Cosmos.NetCore.TestApp\Cosmos.NetCore.TestApp.xproj", "{4F330BC3-7B51-4547-9BD0-6125305E5C36}"
 EndProject
@@ -311,6 +310,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Assembler", "source\Cosmos.Assembler\Cosmos.Assembler.csproj", "{F82F4769-4362-40C4-A8C1-4CE6A56344BF}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.IL2CPU.Profiler", "Tools\Cosmos.IL2CPU.Profiler\Cosmos.IL2CPU.Profiler.xproj", "{0306438C-F94F-4D7D-9547-11B64EFD215A}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.Build.MSBuild", "source\Cosmos.Build.MSBuild\Cosmos.Build.MSBuild.xproj", "{FDA5D609-B634-4C02-89A6-74E68D9B2EBA}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Cosmos.Debug.Hosts", "source\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.xproj", "{24AB9FAE-4021-4D76-99D3-07A3971DDBB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -424,10 +427,10 @@ Global
 		{0D2DCE1C-2A34-4CFF-9A33-E9D9B8518D50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D2DCE1C-2A34-4CFF-9A33-E9D9B8518D50}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{0D2DCE1C-2A34-4CFF-9A33-E9D9B8518D50}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EBEAE8DF-31D3-41FF-8BEC-310ABD9B1452}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EBEAE8DF-31D3-41FF-8BEC-310ABD9B1452}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EBEAE8DF-31D3-41FF-8BEC-310ABD9B1452}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EBEAE8DF-31D3-41FF-8BEC-310ABD9B1452}.Release|Any CPU.Build.0 = Release|Any CPU
 		{78304B1E-C323-4A78-9E7D-2578E58311B6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{78304B1E-C323-4A78-9E7D-2578E58311B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78304B1E-C323-4A78-9E7D-2578E58311B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -536,8 +539,10 @@ Global
 		{CCF11819-C8F9-4A74-ACAE-1421B06720B6}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{CCF11819-C8F9-4A74-ACAE-1421B06720B6}.Release|Any CPU.ActiveCfg = Debug|x86
 		{CCF11819-C8F9-4A74-ACAE-1421B06720B6}.Release|Any CPU.Build.0 = Debug|x86
-		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Release|Any CPU.ActiveCfg = Debug|x86
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47B1A772-4A53-4A53-9BAD-31DF119B1725}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Debug|Any CPU.ActiveCfg = Debug|x86
 		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Release|Any CPU.ActiveCfg = Debug|x86
 		{DC2CB877-EC23-463D-A870-054CA42DF48C}.Release|Any CPU.Build.0 = Debug|x86
@@ -561,14 +566,14 @@ Global
 		{2A59517C-356E-4B55-B155-50335BF482FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A59517C-356E-4B55-B155-50335BF482FB}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{2A59517C-356E-4B55-B155-50335BF482FB}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{5B2C0369-7A84-4113-892C-F71B50E1DA12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B2C0369-7A84-4113-892C-F71B50E1DA12}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5B2C0369-7A84-4113-892C-F71B50E1DA12}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{5B2C0369-7A84-4113-892C-F71B50E1DA12}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{1780684C-6B7F-4360-81C0-69204E343A08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1780684C-6B7F-4360-81C0-69204E343A08}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1780684C-6B7F-4360-81C0-69204E343A08}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1780684C-6B7F-4360-81C0-69204E343A08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B2C0369-7A84-4113-892C-F71B50E1DA12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B2C0369-7A84-4113-892C-F71B50E1DA12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B2C0369-7A84-4113-892C-F71B50E1DA12}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B2C0369-7A84-4113-892C-F71B50E1DA12}.Release|Any CPU.Build.0 = Debug|Any CPU
 		{4F330BC3-7B51-4547-9BD0-6125305E5C36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4F330BC3-7B51-4547-9BD0-6125305E5C36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F330BC3-7B51-4547-9BD0-6125305E5C36}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -689,6 +694,14 @@ Global
 		{0306438C-F94F-4D7D-9547-11B64EFD215A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0306438C-F94F-4D7D-9547-11B64EFD215A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0306438C-F94F-4D7D-9547-11B64EFD215A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDA5D609-B634-4C02-89A6-74E68D9B2EBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDA5D609-B634-4C02-89A6-74E68D9B2EBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDA5D609-B634-4C02-89A6-74E68D9B2EBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDA5D609-B634-4C02-89A6-74E68D9B2EBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24AB9FAE-4021-4D76-99D3-07A3971DDBB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24AB9FAE-4021-4D76-99D3-07A3971DDBB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24AB9FAE-4021-4D76-99D3-07A3971DDBB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24AB9FAE-4021-4D76-99D3-07A3971DDBB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -704,7 +717,7 @@ Global
 		{CAF5EB57-6CAD-446D-8FC7-4C03D4B996A6} = {4D3F3613-E112-4013-AB81-B8CCED78A555}
 		{F104F6BC-EF8E-4408-A786-D570D7565231} = {A06B122A-4AB7-4090-B41A-35028A293450}
 		{0462E82B-8C29-41A9-8265-9C89038ADB29} = {70B7B4A9-4E2A-451F-8CA1-C61B904DE928}
-		{BC6AE974-1F18-4A19-A956-5062E4D3FD53} = {D95021E1-A2C9-4829-819E-ED433AF13162}
+		{BC6AE974-1F18-4A19-A956-5062E4D3FD53} = {70B7B4A9-4E2A-451F-8CA1-C61B904DE928}
 		{AB24E403-54F3-4F67-B5E0-119A7227AAC1} = {1D739435-50AE-4FEE-8D16-326AB37F12D2}
 		{6D2688FE-6FD8-44A8-B96A-6037457F72A7} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
 		{61535AF6-4A1E-4691-B2BC-039851EF4850} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
@@ -735,7 +748,7 @@ Global
 		{AB869246-4887-4117-851D-766EB9FF1E29} = {A0073D91-D9D3-4A90-9845-10E5CDBA5511}
 		{0D2DCE1C-2A34-4CFF-9A33-E9D9B8518D50} = {9637A680-F8E9-4925-A4E4-00045205EC04}
 		{79173AE7-4596-4D33-866F-6F94A2314BE8} = {A06B122A-4AB7-4090-B41A-35028A293450}
-		{758FAF24-9974-4DB8-82EF-1B64DAF2F0BC} = {79173AE7-4596-4D33-866F-6F94A2314BE8}
+		{EBEAE8DF-31D3-41FF-8BEC-310ABD9B1452} = {79173AE7-4596-4D33-866F-6F94A2314BE8}
 		{78304B1E-C323-4A78-9E7D-2578E58311B6} = {79173AE7-4596-4D33-866F-6F94A2314BE8}
 		{E6D3B644-C487-472D-A978-C1A82D0C099B} = {79173AE7-4596-4D33-866F-6F94A2314BE8}
 		{25C3C6E4-1EDD-4542-A663-CAC7A1F40B3A} = {A06B122A-4AB7-4090-B41A-35028A293450}
@@ -777,8 +790,8 @@ Global
 		{AAA0328F-60E1-442D-B949-A13DD34BD0AD} = {9637A680-F8E9-4925-A4E4-00045205EC04}
 		{EA63FDF9-057F-4E67-9060-74F4E7A09AE0} = {9637A680-F8E9-4925-A4E4-00045205EC04}
 		{2A59517C-356E-4B55-B155-50335BF482FB} = {9637A680-F8E9-4925-A4E4-00045205EC04}
-		{5B2C0369-7A84-4113-892C-F71B50E1DA12} = {C4941654-3D7A-484B-9F5C-3D331AB8F585}
 		{1780684C-6B7F-4360-81C0-69204E343A08} = {C4941654-3D7A-484B-9F5C-3D331AB8F585}
+		{5B2C0369-7A84-4113-892C-F71B50E1DA12} = {C4941654-3D7A-484B-9F5C-3D331AB8F585}
 		{4F330BC3-7B51-4547-9BD0-6125305E5C36} = {B521E2A2-81E4-4B2D-A471-7AB550E9551E}
 		{69E08155-F075-4728-8387-1549CFD4FA97} = {7AB4AFE1-05D8-4693-B346-BD7753D0E1E5}
 		{F3025446-D2C7-4FEA-AB03-C707F7B48B43} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
@@ -786,7 +799,7 @@ Global
 		{3C45A898-4AA9-476F-8302-63391D6ED044} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{2E740096-911F-47D0-A46D-998DBB76FC5D} = {1D739435-50AE-4FEE-8D16-326AB37F12D2}
 		{BC91BCEF-D146-4EB0-BE63-C637880C5800} = {1D739435-50AE-4FEE-8D16-326AB37F12D2}
-		{C9826909-2E5E-4453-93FA-B6BE4503DF02} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
+		{C9826909-2E5E-4453-93FA-B6BE4503DF02} = {1D739435-50AE-4FEE-8D16-326AB37F12D2}
 		{69A29A94-BBF8-46EF-98E5-6656C9788E1B} = {36BC87BD-FAE2-4017-844A-17F440D9657F}
 		{36BC87BD-FAE2-4017-844A-17F440D9657F} = {FF5BAFDE-AE9D-438D-935A-86B33EE0A758}
 		{7B7EE75F-DD04-4E33-B670-A38BB7FA7668} = {CAF5EB57-6CAD-446D-8FC7-4C03D4B996A6}
@@ -817,5 +830,7 @@ Global
 		{1C3564EE-54BE-4D28-BDD8-483347A4B7BF} = {612401E0-F733-40DB-95D5-E22D332DDAAA}
 		{F82F4769-4362-40C4-A8C1-4CE6A56344BF} = {575D6C2A-49F1-45CB-9310-6D3CE38C18BA}
 		{0306438C-F94F-4D7D-9547-11B64EFD215A} = {B521E2A2-81E4-4B2D-A471-7AB550E9551E}
+		{FDA5D609-B634-4C02-89A6-74E68D9B2EBA} = {72617CB8-C572-4F39-A815-A2F6C21F4889}
+		{24AB9FAE-4021-4D76-99D3-07A3971DDBB7} = {36BC87BD-FAE2-4017-844A-17F440D9657F}
 	EndGlobalSection
 EndGlobal

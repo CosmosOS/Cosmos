@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Cosmos.Debug.Symbols
 {
-    [DataContract(IsReference=true)]
+    [DataContract(IsReference = true)]
     public partial class AssemblyFile
     {
 
@@ -14,7 +14,8 @@ namespace Cosmos.Debug.Symbols
         [DataMember()]
         public long ID
         {
-            get;set;
+            get;
+            set;
         }
 
         /// <summary>
@@ -23,14 +24,15 @@ namespace Cosmos.Debug.Symbols
         [DataMember()]
         public string Pathname
         {
-          get;set;
+            get;
+            set;
         }
     }
 
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
-    [DataContract(IsReference=true)]
+    [DataContract(IsReference = true)]
     public partial class Document
     {
         [Key]
@@ -53,7 +55,7 @@ namespace Cosmos.Debug.Symbols
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
-    [DataContract(IsReference=true)]
+    [DataContract(IsReference = true)]
     public partial class FIELD_INFO
     {
         /// <summary>
@@ -82,7 +84,7 @@ namespace Cosmos.Debug.Symbols
         [DataMember()]
         public string NAME
         {
-           get;
+            get;
             set;
         }
 
@@ -102,7 +104,7 @@ namespace Cosmos.Debug.Symbols
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
-    [DataContract(IsReference=true)]
+    [DataContract(IsReference = true)]
     public partial class FIELD_MAPPING
     {
         /// <summary>
@@ -140,7 +142,7 @@ namespace Cosmos.Debug.Symbols
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
-    [DataContract(IsReference=true)]
+    [DataContract(IsReference = true)]
     public partial class Label
     {
         /// <summary>
@@ -177,7 +179,7 @@ namespace Cosmos.Debug.Symbols
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
-    [DataContract(IsReference=true)]
+    [DataContract(IsReference = true)]
     public partial class LOCAL_ARGUMENT_INFO
     {
         /// <summary>
@@ -255,7 +257,7 @@ namespace Cosmos.Debug.Symbols
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
-    [DataContract(IsReference=true)]
+    [DataContract(IsReference = true)]
     public partial class Method
     {
         /// <summary>
@@ -363,7 +365,7 @@ namespace Cosmos.Debug.Symbols
     /// <summary>
     /// No Metadata Documentation available.
     /// </summary>
-    [DataContract(IsReference=true)]
+    [DataContract(IsReference = true)]
     public partial class MethodIlOp
     {
         /// <summary>
@@ -371,7 +373,7 @@ namespace Cosmos.Debug.Symbols
         /// </summary>
         [Key]
         [DataMember()]
-            public long ID
+        public long ID
         {
             get;
             set;
@@ -438,7 +440,7 @@ namespace Cosmos.Debug.Symbols
         /// No Metadata Documentation available.
         /// </summary>
         [DataMember()]
-                public long MethodID
+        public long MethodID
         {
             get;
             set;

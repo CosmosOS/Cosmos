@@ -41,7 +41,7 @@
       <Link>Cosmos.snk</Link>
     </None>
     <None Include=".editorconfig" />
-    <None Include="packages.config" />
+    <None Include="Cosmos.Debug.Hosts.project.json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Host.cs" />

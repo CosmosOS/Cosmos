@@ -444,7 +444,7 @@ namespace Cosmos.IL2CPU
             {
                 if (File.Exists(xReference))
                 {
-                    var xAssembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(xReference);
+                    var xAssembly = Assembly.Load(AssemblyLoadContext.GetAssemblyName(xReference));
 
                     CompilerHelpers.Debug($"Looking for kernel in '{xAssembly}'");
 

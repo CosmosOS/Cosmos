@@ -10,7 +10,7 @@ using Cosmos.Debug.Symbols;
 
 namespace Cosmos.Build.MSBuild {
 
-  public class ReadNAsmMapToDebugInfo : AppDomainIsolatedTask {
+  public class ReadNAsmMapToDebugInfo : BaseToolTask {
     [Required]
     public string InputBaseDir { get; set; }
 

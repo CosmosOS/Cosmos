@@ -52,7 +52,7 @@
     <Bochs_StartCosmosGDB>false</Bochs_StartCosmosGDB>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj">
+    <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.xproj">
       <Name>SimpleStructsAndArraysTest</Name>
       <Project>{839edc9d-6d2e-4892-a7f0-17861ba9fa0c}</Project>
       <Private>True</Private>

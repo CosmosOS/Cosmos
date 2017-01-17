@@ -59,7 +59,7 @@
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj">
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.xproj">
       <Name>Cosmos.Compiler.Tests.Bcl</Name>
       <Project>{31e3f8e2-7cc0-426c-accb-77b3319af5d3}</Project>
       <Private>True</Private>

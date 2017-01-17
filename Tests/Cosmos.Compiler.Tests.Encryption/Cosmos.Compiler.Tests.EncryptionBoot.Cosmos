@@ -8,6 +8,7 @@
     <Name>Cosmos.Compiler.Tests.EncryptionBoot</Name>
     <BinFormat>elf</BinFormat>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Profile>VMware</Profile>
@@ -30,7 +31,7 @@
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj">
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.xproj">
       <Name>Cosmos.Compiler.Tests.Encryption</Name>
       <Project>{48ebdeb2-6a6a-4df2-b5f1-db6d299401f2}</Project>
       <Private>True</Private>

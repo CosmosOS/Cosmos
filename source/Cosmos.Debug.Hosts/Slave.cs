@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NETSTANDARD1_6
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Text;
@@ -118,3 +119,4 @@ namespace Cosmos.Debug.Hosts {
     }
   }
 }
+#endif

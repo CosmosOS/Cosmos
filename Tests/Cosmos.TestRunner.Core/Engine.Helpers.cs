@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using Microsoft.Win32;
+
 using Cosmos.Build.Common;
 using Cosmos.Build.MSBuild;
 using Cosmos.IL2CPU;
 using IL2CPU;
-using Microsoft.Win32;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -32,90 +34,91 @@ namespace Cosmos.TestRunner.Core
         }
 
         // TODO: Move this and GetProjectReferences to an msbuild task.
-        private string GetProjectJsonLockFilePath(string kernelFileName)
-        {
-            string xProjectJsonPath = null;
-            var xParent = Directory.GetParent(kernelFileName);
-            while (xParent != null)
-            {
-                var xProjectJson = xParent.GetFiles("project.lock.json");
-                if (xProjectJson.Any())
-                {
-                    xProjectJsonPath = xProjectJson[0].FullName;
-                    break;
-                }
-                xParent = xParent.Parent;
-            }
-            if (!string.IsNullOrWhiteSpace(xProjectJsonPath))
-            {
-                return xProjectJsonPath;
-            }
-            throw new FileNotFoundException("Project json lock file not found!");
-        }
+        //private string GetProjectJsonLockFilePath(string kernelFileName)
+        //{
+        //    string xProjectJsonPath = null;
+        //    var xParent = Directory.GetParent(kernelFileName);
+        //    while (xParent != null)
+        //    {
+        //        var xProjectJson = xParent.GetFiles("project.lock.json");
+        //        if (xProjectJson.Any())
+        //        {
+        //            xProjectJsonPath = xProjectJson[0].FullName;
+        //            break;
+        //        }
+        //        xParent = xParent.Parent;
+        //    }
+        //    if (!string.IsNullOrWhiteSpace(xProjectJsonPath))
+        //    {
+        //        return xProjectJsonPath;
+        //    }
+        //    throw new FileNotFoundException("Project json lock file not found!");
+        //}
 
-        private void GetProjectReferences(string kernelFileName)
-        {
-            string xLockFilePath = GetProjectJsonLockFilePath(kernelFileName);
-            if (File.Exists(xLockFilePath))
-            {
-                var xLockFile = NuGet.ProjectModel.LockFileUtilities.GetLockFile(xLockFilePath, null);
-                if (xLockFile != null)
-                {
-                    var pathContext = NuGet.Configuration.NuGetPathContext.Create(Path.GetDirectoryName(xLockFilePath));
-                    if (xLockFile.Libraries.Any())
-                    {
-                        var lockFileTarget = xLockFile.Targets.First(x => x.RuntimeIdentifier != null);
-                        if (lockFileTarget == null)
-                        {
-                            throw new Exception("No runtime targets found in the jernel project.");
-                        }
+        //private void GetProjectReferences(string kernelFileName)
+        //{
+        //    string xLockFilePath = GetProjectJsonLockFilePath(kernelFileName);
+        //    if (File.Exists(xLockFilePath))
+        //    {
+        //        var xLockFile = NuGet.ProjectModel.LockFileUtilities.GetLockFile(xLockFilePath, null);
+        //        if (xLockFile != null)
+        //        {
+        //            var pathContext = NuGet.Configuration.NuGetPathContext.Create(Path.GetDirectoryName(xLockFilePath));
+        //            if (xLockFile.Libraries.Any())
+        //            {
+        //                var lockFileTarget = xLockFile.Targets.First(x => x.RuntimeIdentifier != null);
+        //                if (lockFileTarget == null)
+        //                {
+        //                    throw new Exception("No runtime targets found in the jernel project.");
+        //                }
 
-                        foreach (var lockFileTargetLibrary in lockFileTarget.Libraries)
-                        {
-                            if (!lockFileTargetLibrary.NativeLibraries.Any())
-                            {
-                                foreach (var assembly in lockFileTargetLibrary.RuntimeAssemblies)
-                                {
-                                    var lockFileLibrary = xLockFile.GetLibrary(lockFileTargetLibrary.Name, lockFileTargetLibrary.Version);
-                                    string xAssemblyPath = Path.Combine(pathContext.UserPackageFolder, lockFileLibrary.Path, assembly.Path);
-                                    var fileInfo = new FileInfo(xAssemblyPath);
-                                    if (fileInfo.Exists && fileInfo.Length > 0 && AdditionalReferences.FirstOrDefault(x => x.Contains(fileInfo.Name)) == null)
-                                    {
-                                        AdditionalReferences.Add(fileInfo.FullName);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                foreach (var assembly in lockFileTargetLibrary.NativeLibraries)
-                                {
-                                    var lockFileLibrary = xLockFile.GetLibrary(lockFileTargetLibrary.Name, lockFileTargetLibrary.Version);
-                                    string xAssemblyPath = Path.Combine(pathContext.UserPackageFolder, lockFileLibrary.Path, assembly.Path);
-                                    var fileInfo = new FileInfo(xAssemblyPath);
-                                    if (fileInfo.Exists && fileInfo.Length > 0 && AdditionalReferences.FirstOrDefault(x => x.Contains(fileInfo.Name)) == null)
-                                    {
-                                        AdditionalReferences.Add(fileInfo.FullName);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //                foreach (var lockFileTargetLibrary in lockFileTarget.Libraries)
+        //                {
+        //                    if (!lockFileTargetLibrary.NativeLibraries.Any())
+        //                    {
+        //                        foreach (var assembly in lockFileTargetLibrary.RuntimeAssemblies)
+        //                        {
+        //                            var lockFileLibrary = xLockFile.GetLibrary(lockFileTargetLibrary.Name, lockFileTargetLibrary.Version);
+        //                            string xAssemblyPath = Path.Combine(pathContext.UserPackageFolder, lockFileLibrary.Path, assembly.Path);
+        //                            var fileInfo = new FileInfo(xAssemblyPath);
+        //                            if (fileInfo.Exists && fileInfo.Length > 0 && AdditionalReferences.FirstOrDefault(x => x.Contains(fileInfo.Name)) == null)
+        //                            {
+        //                                AdditionalReferences.Add(fileInfo.FullName);
+        //                            }
+        //                        }
+        //                    }
+        //                    else
+        //                    {
+        //                        foreach (var assembly in lockFileTargetLibrary.NativeLibraries)
+        //                        {
+        //                            var lockFileLibrary = xLockFile.GetLibrary(lockFileTargetLibrary.Name, lockFileTargetLibrary.Version);
+        //                            string xAssemblyPath = Path.Combine(pathContext.UserPackageFolder, lockFileLibrary.Path, assembly.Path);
+        //                            var fileInfo = new FileInfo(xAssemblyPath);
+        //                            if (fileInfo.Exists && fileInfo.Length > 0 && AdditionalReferences.FirstOrDefault(x => x.Contains(fileInfo.Name)) == null)
+        //                            {
+        //                                AdditionalReferences.Add(fileInfo.FullName);
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
             References = new List<string>();
-            AdditionalReferences = new List<string>();
-            AdditionalSearchDirs = new List<string>();
+            //AdditionalReferences = new List<string>();
+            //AdditionalSearchDirs = new List<string>();
 
-            GetProjectReferences(kernelFileName);
-
-            AdditionalSearchDirs.Add(Path.GetDirectoryName(kernelFileName));
+            //GetProjectReferences(kernelFileName);
+            var a = GetType().GetTypeInfo().Assembly.Location;
+            //AdditionalSearchDirs.Add(Path.GetDirectoryName(kernelFileName));
             References.Add(kernelFileName);
             // TODO: Need a better way to do this.
-            foreach (var xFile in new DirectoryInfo(Path.GetDirectoryName(kernelFileName)).GetFiles("*Plugs*.dll"))
+            //foreach (var xFile in new DirectoryInfo(Path.GetDirectoryName(kernelFileName)).GetFiles("*Plugs*.dll"))
+            foreach (var xFile in new DirectoryInfo(Path.GetDirectoryName(GetType().GetTypeInfo().Assembly.Location)).GetFiles("*Plugs*.dll"))
             {
                 References.Add(xFile.FullName);
             }
@@ -137,8 +140,8 @@ namespace Cosmos.TestRunner.Core
                                  "IgnoreDebugStubAttribute:False"
                              };
             xArguments.AddRange(References.Select(xRef => "References:" + xRef));
-            xArguments.AddRange(AdditionalSearchDirs.Select(xDir => "AdditionalSearchDirs:" + xDir));
-            xArguments.AddRange(AdditionalReferences.Select(xRef => "AdditionalReferences:" + xRef));
+            //xArguments.AddRange(AdditionalSearchDirs.Select(xDir => "AdditionalSearchDirs:" + xDir));
+            //xArguments.AddRange(AdditionalReferences.Select(xRef => "AdditionalReferences:" + xRef));
 
             //xArguments.Add("References:" + typeof(CPUImpl).Assembly.Location);
             //xArguments.Add("References:" + typeof(DebugBreak).Assembly.Location);
@@ -159,7 +162,7 @@ namespace Cosmos.TestRunner.Core
             }
             else
             {
-                RunProcess(typeof(Program).Assembly.Location,
+                RunProcess(typeof(Program).GetTypeInfo().Assembly.Location,
                            mBaseWorkingDirectory,
                            xArguments.ToArray());
             }

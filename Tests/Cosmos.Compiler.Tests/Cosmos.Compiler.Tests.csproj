@@ -100,13 +100,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.Kernel.csproj">
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.xproj">
       <Project>{bdc011be-6041-4a58-a6e7-0f592e78cb27}</Project>
-      <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>
+      <Name>Cosmos.Compiler.Tests.Interfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.csproj">
+    <ProjectReference Include="..\Cosmos.Compiler.Tests.SimpleWriteLine\Cosmos.Compiler.Tests.SimpleWriteLine.xproj">
       <Project>{57045fe8-b0fe-4fc1-810f-7c3914aef1de}</Project>
-      <Name>Cosmos.Compiler.Tests.SimpleWriteLine.Kernel</Name>
+      <Name>Cosmos.Compiler.Tests.SimpleWriteLine</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Compiler.TestsBase\Cosmos.Compiler.TestsBase.csproj">
       <Project>{C264460F-C9C8-41C3-8C26-9BDF4710744C}</Project>

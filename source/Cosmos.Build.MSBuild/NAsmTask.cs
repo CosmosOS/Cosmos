@@ -31,7 +31,7 @@ namespace Cosmos.Build.MSBuild
 
             var xFormat = IsELF ? "elf" : "bin";
             var xResult = BaseToolTask.ExecuteTool(Path.GetDirectoryName(OutputFile), ExePath,
-                                                   String.Format("-g -f {0} -o \"{1}\" -D{3}_COMPILATION -O0 \"{2}\"", xFormat, Path.Combine(Environment.CurrentDirectory, OutputFile), Path.Combine(Environment.CurrentDirectory, InputFile), xFormat.ToUpper()),
+                                                   String.Format("-g -f {0} -o \"{1}\" -D{3}_COMPILATION -O0 \"{2}\"", xFormat, Path.Combine(Directory.GetCurrentDirectory(), OutputFile), Path.Combine(Directory.GetCurrentDirectory(), InputFile), xFormat.ToUpper()),
                                                    "NAsm", LogError, LogMessage);
 
             if (xResult)

@@ -80,7 +80,7 @@
     <VMware_StackCorruptionDetectionLevel>MethodFooters</VMware_StackCorruptionDetectionLevel>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj">
+    <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.xproj">
       <Name>Cosmos.Kernel.Tests.Fat</Name>
       <Project>{a0893493-d4f0-4b9f-9826-86319e143d86}</Project>
       <Private>True</Private>
