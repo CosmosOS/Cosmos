@@ -10,6 +10,22 @@
         },
         "Cosmos.System": {
           "target": "project"
+        },
+        "Cosmos.Debug.Kernel.Plugs.Asm": {
+          "target": "project",
+          "type": "build"
+        },
+        "Cosmos.Core.Plugs": {
+          "target": "project",
+          "type": "build"
+        },
+        "Cosmos.Core.Plugs.Asm": {
+          "target": "project",
+          "type": "build"
+        },
+        "Cosmos.System.Plugs": {
+          "target": "project",
+          "type": "build"
         }
       }
     }

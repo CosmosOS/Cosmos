@@ -33,11 +33,9 @@
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Kernel.Tests.LinqTests\Cosmos.Compiler.Tests.LinqTests.xproj">
-      <Name>Cosmos.Compiler.Tests.LinqTests</Name>
-      <Project>{85b11f78-39bc-4cfc-9033-fc84ab14cd03}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+    <Content Include="Cosmos.Compiler.Tests.LinqTestsBoot.project.json">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <!--<ItemGroup>
     <Content Include="Cosmos.bxrc">

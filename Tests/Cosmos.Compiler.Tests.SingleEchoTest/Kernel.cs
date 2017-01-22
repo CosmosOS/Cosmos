@@ -10,7 +10,6 @@ namespace Cosmos.Compiler.Tests.SingleEchoTest
 {
     public class Kernel : Sys.Kernel
     {
-        internal static Debugger mDebugger = new Debugger("Common", "Console");
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");

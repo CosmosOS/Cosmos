@@ -28,11 +28,9 @@
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTest.xproj">
-      <Name>Cosmos.Compiler.Tests.SingleEchoTest</Name>
-      <Project>{3e28cfd9-25d4-4ebb-86e3-4a4a8a8936fe}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+    <Content Include="Cosmos.Compiler.Tests.SingleEchoTestBoot.project.json">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <!--<ItemGroup>
     <Content Include="Cosmos.bxrc">

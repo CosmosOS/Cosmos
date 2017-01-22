@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-*",
+
   "buildOptions": {
     "emitEntryPoint": true,
     "publicSign": true,
@@ -13,7 +13,6 @@
   },
   "frameworks": {
     "netcoreapp1.0": {
-      "imports": "dnxcore50",
       "dependencies": {
         "Cosmos.TestRunner.Core": {
           "target": "project"

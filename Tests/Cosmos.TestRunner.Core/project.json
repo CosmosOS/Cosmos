@@ -1,5 +1,4 @@
 {
-  "version": "1.0.0-*",
   "buildOptions": {
     "publicSign": true,
     "keyFile": "../../Cosmos.snk"
@@ -8,74 +7,76 @@
     "NETStandard.Library": "1.6.1",
     "System.Xml.XmlDocument": "4.3.0",
     "System.Xml.XPath.XmlDocument": "4.3.0",
-    "Microsoft.Win32.Registry": "4.3.0",
-    "Cosmos.Build.Common": {
-      "target": "project"
-    },
-    "Cosmos.Build.MSBuild": {
-      "target": "project"
-    },
-    "Cosmos.Debug.DebugConnectors": {
-      "target": "project"
-    },
-    "Cosmos.Debug.Hosts": {
-      "target": "project"
-    },
-    "Cosmos.IL2CPU": {
-      "target": "project"
-    },
-    "IL2CPU": {
-      "target": "project"
-    },
-    "Cosmos.Core.Plugs": {
-      "target": "project"
-    },
-    "Cosmos.IL2CPU.Plugs": {
-      "target": "project"
-    },
-    "Cosmos.System.Plugs": {
-      "target": "project"
-    },
-    "BoxingTests": {
-      "target": "project"
-    },
-    "Cosmos.Compiler.Tests.Bcl": {
-      "target": "project"
-    },
-    "Cosmos.Compiler.Tests.Encryption": {
-      "target": "project"
-    },
-    "Cosmos.Compiler.Tests.Exceptions": {
-      "target": "project"
-    },
-    "Cosmos.Compiler.Tests.LinqTests": {
-      "target": "project"
-    },
-    "Cosmos.Compiler.Tests.MethodTests": {
-      "target": "project"
-    },
-    "Cosmos.Compiler.Tests.SimpleWriteLine": {
-      "target": "project"
-    },
-    "Cosmos.Compiler.Tests.SingleEchoTest": {
-      "target": "project"
-    },
-    "Cosmos.Kernel.Tests.Fat": {
-      "target": "project"
-    },
-    "Cosmos.Kernel.Tests.IO": {
-      "target": "project"
-    },
-    "SimpleStructsAndArraysTest": {
-      "target": "project"
-    },
-    "VGACompilerCrash": {
-      "target": "project"
-    }
+    "Microsoft.Win32.Registry": "4.3.0"
   },
   "frameworks": {
     "netstandard1.6": {
-      "imports": "netcoreapp1.0"
+      "imports": "netcoreapp1.0",
+      "dependencies": {
+        "Cosmos.Build.Common": {
+          "target": "project"
+        },
+        "Cosmos.Build.MSBuild": {
+          "target": "project"
+        },
+        "Cosmos.Debug.DebugConnectors": {
+          "target": "project"
+        },
+        "Cosmos.Debug.Hosts": {
+          "target": "project"
+        },
+        "Cosmos.IL2CPU": {
+          "target": "project"
+        },
+        "IL2CPU": {
+          "target": "project"
+        },
+        "Cosmos.Core.Plugs": {
+          "target": "project"
+        },
+        "Cosmos.IL2CPU.Plugs": {
+          "target": "project"
+        },
+        "Cosmos.System.Plugs": {
+          "target": "project"
+        },
+        "BoxingTests": {
+          "target": "project"
+        },
+        "Cosmos.Compiler.Tests.Bcl": {
+          "target": "project"
+        },
+        "Cosmos.Compiler.Tests.Encryption": {
+          "target": "project"
+        },
+        "Cosmos.Compiler.Tests.Exceptions": {
+          "target": "project"
+        },
+        "Cosmos.Compiler.Tests.LinqTests": {
+          "target": "project"
+        },
+        "Cosmos.Compiler.Tests.MethodTests": {
+          "target": "project"
+        },
+        "Cosmos.Compiler.Tests.SimpleWriteLine": {
+          "target": "project"
+        },
+        "Cosmos.Compiler.Tests.SingleEchoTest": {
+          "target": "project"
+        },
+        "Cosmos.Kernel.Tests.Fat": {
+          "target": "project"
+        },
+        "Cosmos.Kernel.Tests.IO": {
+          "target": "project"
+        },
+        "SimpleStructsAndArraysTest": {
+          "target": "project"
+        },
+        "VGACompilerCrash": {
+          "target": "project"
+        }
+      }
     }
   }
 }

@@ -15,7 +15,8 @@
     <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <ItemGroup>
-    <DnxInvisibleContent Include="Cosmos.Compiler.Tests.SimpleWriteLine.KernelBoot.Cosmos" />
+    <DnxInvisibleContent Include="Cosmos.Compiler.Tests.SimpleWriteLineBoot.Cosmos" />
+    <DnxInvisibleContent Include="Cosmos.Compiler.Tests.SimpleWriteLineBoot.project.json" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

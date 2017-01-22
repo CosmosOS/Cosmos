@@ -4,21 +4,24 @@
     "keyFile": "../../Cosmos.snk"
   },
   "dependencies": {
-    "NETStandard.Library": "1.6.1",
-    "Cosmos.Common": {
-      "target": "project"
-    },
-    "Cosmos.Debug.Kernel": {
-      "target": "project"
-    },
-    "Cosmos.HAL": {
-      "target": "project"
-    },
-    "Cosmos.IL2CPU.Plugs": {
-      "target": "project"
-    }
+    "NETStandard.Library": "1.6.1"
   },
   "frameworks": {
-    "netstandard1.6": {}
+    "netstandard1.6": {
+      "dependencies": {
+        "Cosmos.Common": {
+          "target": "project"
+        },
+        "Cosmos.Debug.Kernel": {
+          "target": "project"
+        },
+        "Cosmos.HAL": {
+          "target": "project"
+        },
+        "Cosmos.IL2CPU.Plugs": {
+          "target": "project"
+        }
+      }
+    }
   }
 }

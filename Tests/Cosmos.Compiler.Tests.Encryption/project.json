@@ -1,25 +1,17 @@
 {
-  "version": "1.0.0-*",
-  "buildOptions": {
-    "publicSign": true,
-    "keyFile": "../../Cosmos.snk"
-  },
   "dependencies": {
-    "NETStandard.Library": "1.6.1"
+    "NETStandard.Library": "1.6.1",
+    "Cosmos.Debug.Kernel": {
+      "target": "project"
+    },
+    "Cosmos.System": {
+      "target": "project"
+    },
+    "Cosmos.TestRunner.TestController": {
+      "target": "project"
+    }
   },
   "frameworks": {
-    "netstandard1.6": {
-      "dependencies": {
-        "Cosmos.Debug.Kernel": {
-          "target": "project"
-        },
-        "Cosmos.System": {
-          "target": "project"
-        },
-        "Cosmos.TestRunner.TestController": {
-          "target": "project"
-        }
-      }
-    }
+    "netstandard1.6": {}
   }
 }

@@ -86,6 +86,11 @@
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Cosmos.Kernel.Tests.FatBoot.project.json">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
   <!--<ItemGroup>
     <Content Include="Cosmos.bxrc">
       <SubType>Content</SubType>

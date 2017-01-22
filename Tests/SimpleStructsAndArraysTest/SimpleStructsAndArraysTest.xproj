@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <DnxInvisibleContent Include="SimpleStructsAndArraysTestBoot.Cosmos" />
+    <DnxInvisibleContent Include="SimpleStructsAndArraysTestBoot.project.json" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

@@ -73,11 +73,9 @@
     <ISO_EnableBochsDebug>True</ISO_EnableBochsDebug>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Compiler.Tests.SimpleWriteLine.Kernel\Cosmos.Compiler.Tests.SimpleWriteLine.xproj">
-      <Name>Cosmos.Compiler.Tests.SimpleWriteLine.Kernel</Name>
-      <Project>{57045fe8-b0fe-4fc1-810f-7c3914aef1de}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+    <Content Include="Cosmos.Compiler.Tests.SimpleWriteLineBoot.project.json">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <!--<ItemGroup>
     <Content Include="Cosmos.bxrc">

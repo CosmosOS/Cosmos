@@ -55,11 +55,9 @@
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.xproj">
-      <Name>Cosmos.Compiler.Tests.Interfaces.Kernel</Name>
-      <Project>{bdc011be-6041-4a58-a6e7-0f592e78cb27}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+    <Content Include="Cosmos.Compiler.Tests.InterfacesBoot.project.json">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <!--<ItemGroup>
     <Content Include="Cosmos.bxrc">

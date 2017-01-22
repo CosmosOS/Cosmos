@@ -1,5 +1,4 @@
 {
-  "version": "1.0.0-*",
   "buildOptions": {
     "publicSign": true,
     "keyFile": "../../Cosmos.snk"
@@ -23,3 +22,4 @@
     }
   }
 }
+

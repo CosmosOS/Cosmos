@@ -184,6 +184,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "Docs\", "{67E7DEF0-
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "8987"
+		SlnRelativePath = "Docs\"
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Tests", "Unit Tests", "{9637A680-F8E9-4925-A4E4-00045205EC04}"
@@ -207,7 +208,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{57B83EE4-164F-4BB2-8AFA-76445333A0E4}"
 	ProjectSection(SolutionItems) = preProject
 		..\Demos\zMachine\Frotz.Net\source\ColorPicker.dll = ..\Demos\zMachine\Frotz.Net\source\ColorPicker.dll
+		global.json = global.json
 		..\Demos\zMachine\Frotz.Net\source\Notes.txt = ..\Demos\zMachine\Frotz.Net\source\Notes.txt
+		nuget.config = nuget.config
 		..\Demos\zMachine\Frotz.Net\source\todos.txt = ..\Demos\zMachine\Frotz.Net\source\todos.txt
 	EndProjectSection
 EndProject

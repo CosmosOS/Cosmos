@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <DnxInvisibleContent Include="VGACompilerCrashBoot.Cosmos" />
+    <DnxInvisibleContent Include="VGACompilerCrashBoot.project.json" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

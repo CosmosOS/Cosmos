@@ -15,7 +15,10 @@
     <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <ItemGroup>
+    <DnxInvisibleContent Include="Cosmos.Compiler.Tests.EncryptionBoot.project.json" />
+    <DnxInvisibleContent Include="Cosmos.Compiler.Tests.ExceptionBoot.project.json" />
     <DnxInvisibleContent Include="Cosmos.Compiler.Tests.ExceptionsBoot.Cosmos" />
+    <DnxInvisibleContent Include="Cosmos.Compiler.Tests.ExceptionsBoot.project.json" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

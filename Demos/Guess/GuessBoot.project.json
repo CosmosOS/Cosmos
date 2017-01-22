@@ -1,0 +1,8 @@
+{
+  "runtimes": {
+    "win": {}
+  },
+  "frameworks": {
+    "netstandard1.6": {}
+  }
+}

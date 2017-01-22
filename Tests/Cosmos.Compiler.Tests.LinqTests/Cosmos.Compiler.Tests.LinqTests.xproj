@@ -16,6 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <DnxInvisibleContent Include="Cosmos.Compiler.Tests.LinqTestsBoot.Cosmos" />
+    <DnxInvisibleContent Include="Cosmos.Compiler.Tests.LinqTestsBoot.project.json" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" Condition="'$(VSToolsPath)' != ''" />
 </Project>

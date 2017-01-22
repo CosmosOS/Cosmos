@@ -5,15 +5,18 @@
     "keyFile": "../../Cosmos.snk"
   },
   "dependencies": {
-    "NETStandard.Library": "1.6.1",
-    "Cosmos.Build.Common": {
-      "target": "project"
-    },
-    "Cosmos.Debug.Common": {
-      "target": "project"
-    }
+    "NETStandard.Library": "1.6.1"
   },
   "frameworks": {
-    "netstandard1.6": {}
+    "netstandard1.6": {
+      "dependencies": {
+        "Cosmos.Build.Common": {
+          "target": "project"
+        },
+        "Cosmos.Debug.Common": {
+          "target": "project"
+        }
+      }
+    }
   }
 }
