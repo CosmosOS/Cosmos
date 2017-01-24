@@ -1,8 +1,9 @@
 using System;
+
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -27,25 +28,27 @@ namespace Cosmos.IL2CPU.X86.IL
             {
                 throw new ArgumentNullException("type");
             }
-            XS.Pop(XSRegisters.EAX);
+
+            XS.Pop(EAX);
+
             var xObjSize = GetStorageSize(type);
 
             switch (xObjSize % 4)
             {
                 case 1:
                 {
-                    XS.Xor(XSRegisters.EBX, XSRegisters.EBX);
-                    XS.Set(XSRegisters.BL, XSRegisters.EAX, sourceDisplacement: (int)(xObjSize - 1));
+                    XS.Xor(EBX, EBX);
+                    XS.Set(BL, EAX, sourceDisplacement: (int)(xObjSize - 1));
                     //XS.ShiftLeft(XSRegisters.EBX, 24);
-                    XS.Push(XSRegisters.EBX);
+                    XS.Push(EBX);
                     break;
                 }
                 case 2:
                 {
-                    XS.Xor(XSRegisters.EBX, XSRegisters.EBX);
-                    XS.Set(XSRegisters.BX, XSRegisters.EAX, sourceDisplacement: (int)(xObjSize - 2));
+                    XS.Xor(EBX, EBX);
+                    XS.Set(BX, EAX, sourceDisplacement: (int)(xObjSize - 2));
                     //XS.ShiftLeft(XSRegisters.EBX, 16);
-                    XS.Push(XSRegisters.EBX);
+                    XS.Push(EBX);
                     break;
                 }
                 case 0:

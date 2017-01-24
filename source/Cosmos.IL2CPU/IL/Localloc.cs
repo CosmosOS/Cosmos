@@ -1,14 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using CPU = Cosmos.Assembler.x86;
-using CPUx86 = Cosmos.Assembler.x86;
-using System.Reflection;
-using Cosmos.IL2CPU.X86;
-using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler;
-
-
 namespace Cosmos.IL2CPU.X86.IL
 {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Localloc)]
@@ -23,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
       //TODO: free heap in method footer.
       string xCurrentMethodLabel = GetLabel(aMethod, aOpCode);
-      IL.Call.DoExecute(Assembler, aMethod, GCImplementationRefs.AllocNewObjectRef, aOpCode, xCurrentMethodLabel, DebugEnabled);
+      Call.DoExecute(Assembler, aMethod, GCImplementationRefs.AllocNewObjectRef, aOpCode, xCurrentMethodLabel, DebugEnabled);
     }
   }
 }

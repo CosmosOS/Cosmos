@@ -1330,7 +1330,12 @@ namespace XSharp.Compiler
 
     public static void MoveSignExtend(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
     {
-      Do<MoveSignExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, skipSizeCheck: true);
+      if (size == null && !sourceIsIndirect)
+      {
+        size = source.Size;
+      }
+
+      Do<MoveSignExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, true, size);
     }
 
     #endregion MoveSignExtend
@@ -1364,7 +1369,12 @@ namespace XSharp.Compiler
 
     public static void MoveZeroExtend(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
     {
-      Do<MoveZeroExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, skipSizeCheck: true);
+      if (size == null && !sourceIsIndirect)
+      {
+        size = source.Size;
+      }
+
+      Do<MoveZeroExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, true, size);
     }
 
     #endregion MoveZeroExtend

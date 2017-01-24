@@ -1,11 +1,10 @@
 using System;
-using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU.X86;
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
-using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
 using SysReflection = System.Reflection;
+
+using Cosmos.Assembler.x86;
+using Cosmos.IL2CPU.ILOpCodes;
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -132,21 +131,22 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
       if (xArgRealSize < 4)
       {
-        new MoveSignExtend
+        if (IsIntegerSigned(xType))
         {
-          DestinationReg = RegistersEnum.EAX,
-          Size = (byte) (xArgRealSize * 8),
-          SourceReg = RegistersEnum.EBP,
-          SourceIsIndirect = true,
-          SourceDisplacement = xDisplacement
-        };
-        XS.Push(XSRegisters.EAX);
+          XS.MoveSignExtend(EAX, EBP, sourceDisplacement: xDisplacement, size: (RegisterSize)(xArgRealSize * 8));
+        }
+        else
+        {
+          XS.MoveZeroExtend(EAX, EBP, sourceDisplacement: xDisplacement, size: (RegisterSize)(xArgRealSize * 8));
+        }
+
+        XS.Push(EAX);
       }
       else
       {
         for (int i = 0; i < (xArgSize / 4); i++)
         {
-          XS.Push(XSRegisters.EBP, isIndirect: true, displacement: (xDisplacement - (i * 4)));
+          XS.Push(EBP, isIndirect: true, displacement: (xDisplacement - (i * 4)));
         }
       }
     }

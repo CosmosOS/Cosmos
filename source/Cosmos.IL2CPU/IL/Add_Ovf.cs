@@ -1,8 +1,6 @@
 using System;
-using CPUx86 = Cosmos.Assembler.x86;
+
 using Cosmos.Assembler.x86;
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86.SSE;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 
@@ -35,27 +33,26 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             else
             {
-				var xBaseLabel = GetLabel(aMethod, aOpCode) + ".";
-				var xSuccessLabel = xBaseLabel + "Success";
+				        var xBaseLabel = GetLabel(aMethod, aOpCode) + ".";
+				        var xSuccessLabel = xBaseLabel + "Success";
                 if (xSize > 4) // long
                 {
-                    XS.Pop(XSRegisters.EDX); // low part
-                    XS.Pop(XSRegisters.EAX); // high part
+                    XS.Pop(EDX); // low part
+                    XS.Pop(EAX); // high part
                     XS.Add(ESP, EDX, destinationIsIndirect: true);
-					XS.AddWithCarry(ESP, EAX, destinationDisplacement: 4);
-                   
+					          XS.AddWithCarry(ESP, EAX, destinationDisplacement: 4);
                 }
                 else //integer
                 {
 
-                    XS.Pop(XSRegisters.EAX);
+                    XS.Pop(EAX);
                     XS.Add(ESP, EAX, destinationIsIndirect: true);
                 }
 
                 // Let's check if we add overflow and if so throw OverflowException
                 XS.Jump(ConditionalTestEnum.NoOverflow, xSuccessLabel);
-			    ThrowOverflowException();
-				XS.Label(xSuccessLabel);
+			          ThrowOverflowException();
+				        XS.Label(xSuccessLabel);
             }
         }
     }

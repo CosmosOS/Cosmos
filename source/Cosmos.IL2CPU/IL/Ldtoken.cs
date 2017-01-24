@@ -1,7 +1,6 @@
 using System;
+
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Cosmos.Assembler.x86;
-using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using XSharp.Compiler;
 
@@ -22,14 +21,14 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (xToken.ValueIsType)
             {
-                xTokenAddress = ILOp.GetTypeIDLabel(xToken.ValueType);
+                xTokenAddress = GetTypeIDLabel(xToken.ValueType);
             }
             if (xToken.ValueIsField)
             {
                 xTokenAddress= DataMember.GetStaticFieldName(xToken.ValueField);
             }
 
-            if (String.IsNullOrEmpty(xTokenAddress))
+            if (string.IsNullOrEmpty(xTokenAddress))
             {
                 throw new Exception("Ldtoken not implemented!");
             }

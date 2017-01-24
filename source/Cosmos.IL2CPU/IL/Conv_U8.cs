@@ -24,20 +24,30 @@ namespace Cosmos.IL2CPU.X86.IL
             switch (xSourceSize)
             {
                 case 1:
+                    XS.Pop(EAX);
+                    XS.MoveZeroExtend(EAX, AL);
+                    XS.Push(0);
+                    XS.Push(EAX);
+                    break;
                 case 2:
+                    XS.Pop(EAX);
+                    XS.MoveZeroExtend(EAX, AX);
+                    XS.Push(0);
+                    XS.Push(EAX);
+                    break;
                 case 4:
                     {
                         if (TypeIsFloat(xSource))
                         {
                             XS.FPU.FloatLoad(ESP, destinationIsIndirect: true, size: RegisterSize.Int32);
-                            XS.Sub(XSRegisters.ESP, 4);
+                            XS.Sub(ESP, 4);
                             XS.FPU.IntStoreWithTruncate(ESP, isIndirect: true, size: RegisterSize.Long64);
                         }
                         else
                         {
-                            XS.Pop(XSRegisters.EAX);
+                            XS.Pop(EAX);
                             XS.Push(0);
-                            XS.Push(XSRegisters.EAX);
+                            XS.Push(EAX);
                         }
                         break;
                     }
@@ -54,7 +64,6 @@ namespace Cosmos.IL2CPU.X86.IL
                         break;
                     }
                 default:
-                    //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U8: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_U8.cs->Unknown size of variable on the top of the stack.");
             }
         }

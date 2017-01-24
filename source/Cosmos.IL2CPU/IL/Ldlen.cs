@@ -16,7 +16,6 @@ namespace Cosmos.IL2CPU.X86.IL
             DoNullReferenceCheck(Assembler, DebugEnabled, 4);
             XS.Add(XSRegisters.ESP, 4);
             XS.Pop(XSRegisters.EAX);
-
             XS.Push(XSRegisters.EAX, displacement: 8);
         }
 

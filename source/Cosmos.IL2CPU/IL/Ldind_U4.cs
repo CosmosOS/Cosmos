@@ -1,6 +1,5 @@
-using System;
 using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -15,8 +14,8 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
-            XS.Pop(XSRegisters.EAX);
-            XS.Push(XSRegisters.EAX, isIndirect: true);
+            XS.Pop(EAX);
+            XS.Push(EAX, isIndirect: true);
         }
     }
 }

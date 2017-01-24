@@ -58,14 +58,9 @@ namespace Cosmos.Common
             {
                 int xValue = aValue;
 
-                if (aValue < 0)
+                while (xValue != 0)
                 {
-                    xValue *= -1;
-                }
-
-                while (xValue > 0)
-                {
-                    int xValue2 = xValue % 10;
+                    int xValue2 = Math.Abs(xValue % 10);
                     xResult = string.Concat(xChars[xValue2], xResult);
                     xValue /= 10;
                 }

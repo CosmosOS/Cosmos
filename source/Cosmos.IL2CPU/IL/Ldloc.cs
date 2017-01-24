@@ -1,9 +1,8 @@
-using System;
-using System.Drawing;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Cosmos.Assembler.x86;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
+
+using CPUx86 = Cosmos.Assembler.x86;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -31,14 +30,13 @@ namespace Cosmos.IL2CPU.X86.IL
       {
         case 1:
         case 2:
-          bool xSigned = IsIntegerSigned(xVar.LocalType);
-          if (xSigned)
+          if (IsIntegerSigned(xVar.LocalType))
           {
-            new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - xEBPOffset) };
+            XS.MoveSignExtend(EAX, EBP, sourceDisplacement: 0 - xEBPOffset, size: (RegisterSize)(xSize * 8));
           }
           else
           {
-            new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - xEBPOffset) };
+            XS.MoveZeroExtend(EAX, EBP, sourceDisplacement: 0 - xEBPOffset, size: (RegisterSize)(xSize * 8));
           }
           XS.Push(EAX);
           break;

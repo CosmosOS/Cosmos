@@ -1,6 +1,3 @@
-using System;
-using CPUx86 = Cosmos.Assembler.x86;
-
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Stelem_I4 )]
@@ -19,11 +16,11 @@ namespace Cosmos.IL2CPU.X86.IL
 
         // using System;
         // using System.IO;
-        // 
-        // 
+        //
+        //
         // using CPU = Cosmos.Assembler.x86;
         // using CPUx86 = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stelem_I4)]
         // 	public class Stelem_I4: Op {
@@ -38,7 +35,7 @@ namespace Cosmos.IL2CPU.X86.IL
         // 		    mCurLabel = IL.Op.GetInstructionLabel(aReader);
         //             mNextLabel = IL.Op.GetInstructionLabel(aReader.NextPosition);
         // 		}
-        // 
+        //
         // 		public override void DoAssemble() {
         //             Stelem_Ref.Assemble(Assembler, 4, GetServiceProvider(), mCurLabel, mMethodInformation, mCurOffset, mNextLabel);
         // 		}

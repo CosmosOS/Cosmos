@@ -49,10 +49,42 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Comment("Arg type = " + xArgType);
       XS.Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
 
-      for (int i = (int)(xArgSize / 4) - 1; i >= 0; i--)
+      if (xArgRealSize < 4)
       {
+        Register xRegister;
+
+        switch (xArgRealSize)
+        {
+          case 1:
+            xRegister = AL;
+            break;
+          case 2:
+            xRegister = AX;
+            break;
+          default:
+            throw new NotImplementedException();
+        }
+
         XS.Pop(EAX);
-        XS.Set(EBP, EAX, destinationIsIndirect: true, destinationDisplacement: xDisplacement - (i * 4));
+
+        if (IsIntegerSigned(xArgType))
+        {
+          XS.MoveSignExtend(EAX, xRegister);
+        }
+        else
+        {
+          XS.MoveZeroExtend(EAX, xRegister);
+        }
+
+        XS.Set(EBP, EAX, destinationDisplacement: xDisplacement);
+      }
+      else
+      {
+        for (int i = (int)(xArgSize / 4) - 1; i >= 0; i--)
+        {
+          XS.Pop(EAX);
+          XS.Set(EBP, EAX, destinationDisplacement: xDisplacement - (i * 4));
+        }
       }
     }
   }

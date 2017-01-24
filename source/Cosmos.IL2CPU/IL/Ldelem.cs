@@ -1,4 +1,3 @@
-using System;
 using Cosmos.IL2CPU.ILOpCodes;
 
 namespace Cosmos.IL2CPU.X86.IL {
@@ -15,9 +14,11 @@ namespace Cosmos.IL2CPU.X86.IL {
       {
         Ldelema.Assemble(Assembler, xOpType, xSize, DebugEnabled);
         Ldobj.DoAssemble(xOpType.Value);
-        return;
       }
-      Ldelem_Ref.Assemble(Assembler, xSize, false, aMethod, aOpCode, DebugEnabled);
+      else
+      {
+        Ldelem_Ref.Assemble(Assembler, xSize, false, aMethod, aOpCode, DebugEnabled);
+      }
     }
   }
 }

@@ -1,7 +1,5 @@
 using System;
-using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.Assembler.x86;
-using Cosmos.Assembler.x86.SSE;
+
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 
@@ -27,7 +25,6 @@ namespace Cosmos.IL2CPU.X86.IL
       {
         if (xSize > 8)
         {
-          //EmitNotImplementedException( Assembler, aServiceProvider, "Size '" + xSize.Size + "' not supported (add)", aCurrentLabel, aCurrentMethodInfo, aCurrentOffset, aNextLabel );
           throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Add.cs->Error: StackSize > 8 not supported");
         }
         else
@@ -47,8 +44,8 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             else // long
             {
-              XS.Pop(XSRegisters.EDX); // low part
-              XS.Pop(XSRegisters.EAX); // high part
+              XS.Pop(EDX); // low part
+              XS.Pop(EAX); // high part
               XS.Add(ESP, EDX, destinationIsIndirect: true);
               XS.AddWithCarry(ESP, EAX, destinationDisplacement: 4);
             }
@@ -58,14 +55,14 @@ namespace Cosmos.IL2CPU.X86.IL
             if (xIsFloat) //float
             {
               XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-              XS.Add(XSRegisters.ESP, 4);
+              XS.Add(ESP, 4);
               XS.SSE.MoveSS(XMM1, ESP, sourceIsIndirect: true);
               XS.SSE.AddSS(XMM1, XMM0);
               XS.SSE.MoveSS(ESP, XMM1, destinationIsIndirect: true);
             }
             else //integer
             {
-              XS.Pop(XSRegisters.EAX);
+              XS.Pop(EAX);
               XS.Add(ESP, EAX, destinationIsIndirect: true);
             }
           }

@@ -1,5 +1,3 @@
-using System;
-using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -17,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
           var xOpType = (OpType)aOpCode;
           var xSize = SizeOfType(xOpType.Value);
 
-          Stelem_Ref.Assemble(Assembler, (uint)xSize, aMethod, aOpCode, DebugEnabled);
+          Stelem_Ref.Assemble(Assembler, xSize, aMethod, aOpCode, DebugEnabled);
         }
 
 

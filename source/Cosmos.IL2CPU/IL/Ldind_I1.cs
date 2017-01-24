@@ -1,6 +1,5 @@
-using System;
 using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -15,9 +14,9 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
-            XS.Pop(XSRegisters.ECX);
-            new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = 8, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
-            XS.Push(XSRegisters.EAX);
+            XS.Pop(EAX);
+            XS.MoveSignExtend(EAX, EAX, sourceIsIndirect: true, size: RegisterSize.Byte8);
+            XS.Push(EAX);
         }
     }
 }

@@ -1,8 +1,5 @@
-using System;
-using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Cosmos.Assembler.x86;
-using System.Collections.Generic;
+using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -11,12 +8,15 @@ namespace Cosmos.IL2CPU.X86.IL
     {
         public Ldc_I8( Cosmos.Assembler.Assembler aAsmblr ) : base( aAsmblr ) { }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode ) {
+        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        {
             var xOp = (OpInt64)aOpCode;
-			// push high part
-            new CPUx86.Push { DestinationValue = BitConverter.ToUInt32(BitConverter.GetBytes(xOp.Value), 4) };
-			// push low part
-			new CPUx86.Push { DestinationValue = BitConverter.ToUInt32(BitConverter.GetBytes(xOp.Value), 0) };
+			      // push high part
+            XS.Push((uint)(xOp.Value >> 32));
+            //new CPUx86.Push { DestinationValue = BitConverter.ToUInt32(BitConverter.GetBytes(xOp.Value), 4) };
+            // push low part
+            XS.Push((uint)(xOp.Value & uint.MaxValue));
+			      //new CPUx86.Push { DestinationValue = BitConverter.ToUInt32(BitConverter.GetBytes(xOp.Value), 0) };
         }
     }
 }

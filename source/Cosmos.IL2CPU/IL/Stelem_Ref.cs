@@ -1,8 +1,8 @@
 using System;
-using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.Assembler;
+
 using Cosmos.IL2CPU.Plugs.System;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -14,11 +14,16 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
+    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    {
+      Assemble(Assembler, 8, aMethod, aOpCode, DebugEnabled);
+    }
+
     public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
     {
       // stack     == the new value
       // stack + 1 == the index
-      // stack + 2 == the array
+      // stack + 3 == the array
       DoNullReferenceCheck(aAssembler, debugEnabled, (int)(8 + Align(aElementSize, 4)));
 
       uint xStackSize = aElementSize;
@@ -28,37 +33,39 @@ namespace Cosmos.IL2CPU.X86.IL
       }
 
       // calculate element offset into array memory (including header)
-      XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize); // the index
-      XS.Set(XSRegisters.EDX, aElementSize);
-      XS.Multiply(XSRegisters.EDX);
-      XS.Add(XSRegisters.EAX, ObjectImpl.FieldDataOffset + 4);
+      XS.Set(EAX, ESP, sourceDisplacement: (int)xStackSize); // the index
+      XS.Set(EDX, aElementSize);
+      XS.Multiply(EDX);
+      XS.Add(EAX, ObjectImpl.FieldDataOffset + 4);
 
-      XS.Set(XSRegisters.EDX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize + 8); // the array
-      XS.Add(XSRegisters.EDX, XSRegisters.EAX);
-      XS.Push(XSRegisters.EDX);
+      XS.Set(EDX, ESP, sourceDisplacement: (int)xStackSize + 8); // the array
+      XS.Add(EDX, EAX);
+      XS.Push(EDX);
 
-      XS.Pop(XSRegisters.ECX);
+      XS.Pop(ECX);
+
       for (int i = (int)(aElementSize / 4) - 1; i >= 0; i -= 1)
       {
-        new Comment(aAssembler, "Start 1 dword");
-        XS.Pop(XSRegisters.EBX);
-        XS.Set(XSRegisters.ECX, XSRegisters.EBX, destinationIsIndirect: true);
-        XS.Add(XSRegisters.ECX, 4);
+        XS.Comment("Start 1 dword");
+        XS.Pop(EBX);
+        XS.Set(ECX, EBX, destinationIsIndirect: true);
+        XS.Add(ECX, 4);
       }
+
       switch (aElementSize % 4)
       {
         case 1:
           {
-            new Comment(aAssembler, "Start 1 byte");
-            XS.Pop(XSRegisters.EBX);
-            XS.Set(XSRegisters.ECX, XSRegisters.BL, destinationIsIndirect: true);
+            XS.Comment("Start 1 byte");
+            XS.Pop(EBX);
+            XS.Set(ECX, BL, destinationIsIndirect: true);
             break;
           }
         case 2:
           {
-            new Comment(aAssembler, "Start 1 word");
-            XS.Pop(XSRegisters.EBX);
-            XS.Set(XSRegisters.ECX, XSRegisters.BX, destinationIsIndirect: true);
+            XS.Comment("Start 1 word");
+            XS.Pop(EBX);
+            XS.Set(ECX, BX, destinationIsIndirect: true);
             break;
           }
         case 0:
@@ -66,14 +73,10 @@ namespace Cosmos.IL2CPU.X86.IL
             break;
           }
         default:
-          throw new Exception("Remainder size " + (aElementSize % 4) + " not supported!");
+          throw new NotImplementedException("Remainder size " + (aElementSize % 4) + " not supported!");
 
       }
-      XS.Add(XSRegisters.ESP, 12);
-    }
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
-    {
-      Assemble(Assembler, 8, aMethod, aOpCode, DebugEnabled);
+      XS.Add(ESP, 12);
     }
   }
 }

@@ -1,6 +1,8 @@
 using System;
+
 using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Conv_Ovf_I )]
@@ -20,12 +22,17 @@ namespace Cosmos.IL2CPU.X86.IL
             switch (xSourceSize)
             {
                 case 8:
-                    XS.Pop(XSRegisters.EAX);
-                    XS.Add(XSRegisters.ESP, 4);
-                    XS.Push(XSRegisters.EAX);
+                    if (TypeIsReferenceType(xSource))
+                    {
+                        throw new NotImplementedException();
+                    }
+
+                    XS.Pop(EAX);
+                    XS.Add(ESP, 4);
+                    XS.Push(EAX);
                     break;
                 default:
-                    throw new NotImplementedException();
+                  throw new NotImplementedException();
             }
         }
 

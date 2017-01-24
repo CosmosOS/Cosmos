@@ -6,9 +6,9 @@ using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	/// <summary>
-	/// Convert top Stack element to UInt16 and extends it to Int32.
-	/// </summary>
+	  /// <summary>
+	  /// Convert top Stack element to UInt16 and extends it to Int32.
+	  /// </summary>
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Conv_U2 )]
     public class Conv_U2 : ILOp
     {
@@ -42,27 +42,28 @@ namespace Cosmos.IL2CPU.X86.IL
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_U2.cs->Unknown size of floating point value.");
                 }
             }
-            else {
-                switch( xSourceSize )
+            else
+            {
+                switch (xSourceSize)
                 {
-                    case 2:
-                        break;
                     case 1:
+						            XS.Pop(EAX);
+						            XS.MoveZeroExtend(EAX, AL);
+                        XS.Push(EAX);
+                        break;
+                    case 2:
                     case 4:
-						    XS.Pop(EAX);
-						    XS.MoveZeroExtend(EAX, AX);
-                            XS.Push(EAX);
-						    break;
+						            XS.Pop(EAX);
+						            XS.MoveZeroExtend(EAX, AX);
+                        XS.Push(EAX);
+						            break;
                     case 8:
-                        {
-                            XS.Pop(EAX);
-                            XS.Pop(ECX);
-                            XS.MoveZeroExtend(EAX, AX);
-                            XS.Push(EAX);
-                            break;
-                        }
+                        XS.Pop(EAX);
+                        XS.Add(ESP, 4);
+                        XS.MoveZeroExtend(EAX, AX);
+                        XS.Push(EAX);
+                        break;
                     default:
-                        //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_U2: SourceSize " + xSource + " not yet supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                         throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_U2.cs->Unknown size of variable on the top of the stack.");
                 }
             }

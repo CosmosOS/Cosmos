@@ -15,11 +15,8 @@
 				aOutput.Write(" ");
 				aOutput.Write(this.GetDestinationAsString());
 				aOutput.Write(", ");
-			    if (SourceIsIndirect)
-			    {
-			        aOutput.Write(SizeToString(Size));
-			        aOutput.Write(" ");
-			    }
+			    aOutput.Write(SizeToString(Size));
+			    aOutput.Write(" ");
 			    aOutput.Write(this.GetSourceAsString());
 			}
 		}

@@ -41,27 +41,24 @@ namespace Cosmos.IL2CPU.X86.IL
                 {
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I1.cs->Unknown size of floating point value.");
                 }
-            } 
+            }
 
             switch (xSourceSize)
             {
                 case 1:
-                    throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I1.cs->The size 1 could not exist, because always is pushed Int32 or Int64!");
                 case 2:
-                    throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I1.cs->The size 2 could not exist, because always is pushed Int32 or Int64!");
                 case 4:
-                    XS.Pop(XSRegisters.EAX);
-                    XS.MoveSignExtend(XSRegisters.EAX, XSRegisters.AL);
-                    XS.Push(XSRegisters.EAX);
+                    XS.Pop(EAX);
+                    XS.MoveSignExtend(EAX, AL);
+                    XS.Push(EAX);
                     break;
                 case 8:
-                    XS.Pop(XSRegisters.EAX);
-                    XS.Pop(XSRegisters.EBX);
-                    XS.MoveSignExtend(XSRegisters.EAX, XSRegisters.AL);
-                    XS.Push(XSRegisters.EAX);
+                    XS.Pop(EAX);
+                    XS.Pop(EBX);
+                    XS.MoveSignExtend(EAX, AL);
+                    XS.Push(EAX);
                     break;
                 default:
-                    //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I1: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
                     throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_I1.cs->Unknown size of variable on the top of the stack.");
             }
         }

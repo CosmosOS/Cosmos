@@ -1,11 +1,9 @@
 using System;
-using System.Linq;
-using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.Assembler;
-using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU.Plugs.System;
+
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
+
+using ObjectInfo = Cosmos.IL2CPU.Plugs.System.ObjectImpl;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -32,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Pop(EAX);
       XS.Set(EDX, aElementSize);
       XS.Multiply(EDX);
-      XS.Add(EAX, ObjectImpl.FieldDataOffset + 4);
+      XS.Add(EAX, ObjectInfo.FieldDataOffset + 4);
 
       if (aElementSize > 4)
       {
@@ -61,22 +59,22 @@ namespace Cosmos.IL2CPU.X86.IL
           case 1:
             if (isSigned)
             {
-              new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 8, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              XS.MoveSignExtend(ECX, EDX, sourceIsIndirect: true, size: (RegisterSize)8);
             }
             else
             {
-              new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 8, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              XS.MoveZeroExtend(ECX, EDX, sourceIsIndirect: true, size: (RegisterSize)8);
             }
             XS.Push(ECX);
             break;
           case 2:
             if (isSigned)
             {
-              new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 16, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              XS.MoveSignExtend(ECX, EDX, sourceIsIndirect: true, size: (RegisterSize)16);
             }
             else
             {
-              new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 16, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              XS.MoveZeroExtend(ECX, EDX, sourceIsIndirect: true, size: (RegisterSize)16);
             }
             XS.Push(ECX);
             break;

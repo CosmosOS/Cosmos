@@ -1,7 +1,6 @@
 using System;
-using CPU = Cosmos.Assembler.x86;
+
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler;
 using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -16,10 +15,10 @@ namespace Cosmos.IL2CPU.X86.IL
 
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
-      OpDouble xOp = (OpDouble)aOpCode;
-      byte[] xBytes = BitConverter.GetBytes(xOp.Value);
-      new CPU.Push { DestinationValue = BitConverter.ToUInt32(xBytes, 4) };
-      new CPU.Push { DestinationValue = BitConverter.ToUInt32(xBytes, 0) };
+        OpDouble xOp = (OpDouble)aOpCode;
+        byte[] xBytes = BitConverter.GetBytes(xOp.Value);
+        XS.Push (BitConverter.ToUInt32(xBytes, 4));
+        XS.Push (BitConverter.ToUInt32(xBytes, 0));
     }
 
 

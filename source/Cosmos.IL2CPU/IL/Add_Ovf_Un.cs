@@ -12,14 +12,14 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Add_Ovf_Un )]
     public class Add_Ovf_Un : ILOp
     {
-		public Add_Ovf_Un(Cosmos.Assembler.Assembler aAsmblr)
+		    public Add_Ovf_Un(Cosmos.Assembler.Assembler aAsmblr)
             : base( aAsmblr )
         {
         }
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-			// TODO overflow check for float
+			      // TODO overflow check for float
             var xType = aOpCode.StackPopTypes[0];
             var xSize = SizeOfType(xType);
             var xIsFloat = TypeIsFloat(xType);
@@ -36,25 +36,25 @@ namespace Cosmos.IL2CPU.X86.IL
             }
             else
             {
-				var xBaseLabel = GetLabel(aMethod, aOpCode) + ".";
-				var xSuccessLabel = xBaseLabel + "Success";
+				        var xBaseLabel = GetLabel(aMethod, aOpCode) + ".";
+				        var xSuccessLabel = xBaseLabel + "Success";
                 if (xSize > 4) // long
                 {
-                    XS.Pop(XSRegisters.EDX); // low part
-                    XS.Pop(XSRegisters.EAX); // high part
+                    XS.Pop(EDX); // low part
+                    XS.Pop(EAX); // high part
                     XS.Add(ESP, EDX, destinationIsIndirect: true);
-					XS.AddWithCarry(ESP, EAX, destinationDisplacement: 4);
+					          XS.AddWithCarry(ESP, EAX, destinationDisplacement: 4);
                 }
                 else //integer
                 {
-                    XS.Pop(XSRegisters.EAX);
+                    XS.Pop(EAX);
                     XS.Add(ESP, EAX, destinationIsIndirect: true);
                 }
 
                 // Let's check if we add overflow and if so throw OverflowException
-				XS.Jump(ConditionalTestEnum.NotCarry, xSuccessLabel);
+				        XS.Jump(ConditionalTestEnum.NotCarry, xSuccessLabel);
                 ThrowOverflowException();
-			    XS.Label(xSuccessLabel);
+			          XS.Label(xSuccessLabel);
             }
         }
     }
