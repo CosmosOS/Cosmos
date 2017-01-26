@@ -8,8 +8,20 @@ using Cosmos.Common.Extensions;
 
 namespace Cosmos.Core.CPUInfo
 {
-    class SMBIOS
+    public unsafe class SMBIOS
     {
+        public static CPUInfo.EntryPointTable BeginParseSMBIOS()
+        {
+            byte* memPtr = SMBIOSHandler.SearchEntryPointTable();
+
+            CPUInfo.EntryPointTable entry =  SMBIOSHandler.ParseEntryTable(memPtr);
+
+            //entry.GetTableAddress();
+            DebugSMBIOS.DebugEntryPoint(entry);
+            BIOSInfo bios = SMBIOSHandler.ParseStructures(entry);
+            DebugSMBIOS.DebugBIOSInfo(bios);
+            return entry;
+        }
 
     }
 

@@ -15,7 +15,6 @@ namespace Cosmos.Core
         /// Returns the Processor's vendor name
         /// </summary>
         /// <returns>CPU Vendor name</returns>
-        /*
         public static string GetVendorName()
         {
             if (CanReadCPUID() > 0)
@@ -43,20 +42,7 @@ namespace Cosmos.Core
             else
                 return "\0";
         }
-        */
 
-        public static CPUInfo.EntryPointTable BeginParseSMBIOS()
-        {
-            byte* memPtr = SMBIOSHandler.SearchEntryPointTable();
-
-            CPUInfo.EntryPointTable entry =  SMBIOSHandler.ParseEntryTable(memPtr);
-
-            //entry.GetTableAddress();
-            DebugSMBIOS.DebugEntryPoint(entry);
-            BIOSInfo bios = SMBIOSHandler.ParseStructures(entry);
-            DebugSMBIOS.DebugBIOSInfo(bios);
-            return entry;
-        }
 
 
         internal static int CanReadCPUID() => 0; //plugged

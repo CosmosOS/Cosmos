@@ -9,10 +9,16 @@ namespace Cosmos.System
 {
     public class CPUInfo
     {
-        public static string GetVendorName()
+        public static string ParseSMBIOS()
         {
             CPUHALInfo.ParseSMBIOS();
             return "shit";
+        }
+
+        public static string GetVendorName()
+        {
+            CPUHALInfo.ParseSMBIOS(); //FIXME: For debugging purposes
+            return CPUHALInfo.GetVendorName();
         }
     }
 }

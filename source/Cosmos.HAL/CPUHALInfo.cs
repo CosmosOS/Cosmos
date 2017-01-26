@@ -12,8 +12,13 @@ namespace Cosmos.HAL
     {
         public static string ParseSMBIOS()
         {
-            EntryPointTable entry = ProcessorInformation.BeginParseSMBIOS();
+            SMBIOS.BeginParseSMBIOS();
             return "shit";
+        }
+
+        public static string GetVendorName()
+        {
+            return ProcessorInformation.GetVendorName();
         }
     }
 }
