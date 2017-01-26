@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Win32;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -7,6 +8,7 @@ namespace Cosmos.TestRunner.Core
     {
         public static IEnumerable<Type> GetStableKernelTypes()
         {
+            /*
             yield return typeof(Cosmos.Compiler.Tests.Bcl.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.SimpleWriteLine.Kernel.Kernel);
@@ -17,7 +19,9 @@ namespace Cosmos.TestRunner.Core
             yield return typeof(VGACompilerCrash.Kernel);
             yield return typeof(Cosmos.Kernel.Tests.IO.Kernel);
             yield return typeof(Cosmos.Kernel.Tests.Fat.Kernel);
+            */
 
+            yield return typeof(Cosmos.Kernel.Tests.CPUInfo.Kernel);
             //yield return typeof(Cosmos.Compiler.Tests.Encryption.Kernel);
             //yield return typeof(FrotzKernel.Kernel);
         }

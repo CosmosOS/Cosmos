@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="RIDER_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/../../../Demos/Guess">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Demos/Guess" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Demos/Guess/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Demos/Guess/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/ColorPicker.dll">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/ColorPicker.dll" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/Desktop/FrotzBase">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/Desktop/FrotzBase" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/Desktop/FrotzBase/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/Desktop/FrotzBase/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/FrotzKernel/FrotzKernel/FrotzKernel">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/FrotzKernel/FrotzKernel/FrotzKernel" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/FrotzKernel/FrotzKernel/FrotzKernel/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/FrotzKernel/FrotzKernel/FrotzKernel/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/Notes.txt">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/Notes.txt" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/todos.txt">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/todos.txt" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/zConsole">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/zConsole" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/zConsole/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Demos/zMachine/Frotz.Net/source/zConsole/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Docs">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Docs" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/BoxingTests">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/BoxingTests" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/BoxingTests/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/BoxingTests/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Common.Tests">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Common.Tests" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Common.Tests/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Common.Tests/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Bcl">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Bcl" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Bcl/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Bcl/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Encryption">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Encryption" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Encryption/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Encryption/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Exceptions">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Exceptions" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Exceptions/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Exceptions/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Interfaces">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Interfaces" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Interfaces/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.Interfaces/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.MethodTests">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.MethodTests" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.MethodTests/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.MethodTests/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.SimpleWriteLine.Kernel">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.SimpleWriteLine.Kernel" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.SimpleWriteLine.Kernel/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.SimpleWriteLine.Kernel/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.SingleEchoTest">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.SingleEchoTest" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.SingleEchoTest/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.Tests.SingleEchoTest/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.TestsBase">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.TestsBase" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.TestsBase/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Compiler.TestsBase/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Kernel.Tests.Fat">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Kernel.Tests.Fat" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Kernel.Tests.Fat/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Kernel.Tests.Fat/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Kernel.Tests.IO">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Kernel.Tests.IO" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Kernel.Tests.IO/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Kernel.Tests.IO/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.Kernel.Tests.LinqTests">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Kernel.Tests.LinqTests" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Kernel.Tests.LinqTests/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.Kernel.Tests.LinqTests/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner.Core">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner.Core" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner.Core/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner.Core/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner.TestController">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner.TestController" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner.TestController/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner.TestController/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner.UI">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner.UI" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner.UI/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/Cosmos.TestRunner.UI/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/SimpleStructsAndArraysTest">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/SimpleStructsAndArraysTest" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/SimpleStructsAndArraysTest/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/SimpleStructsAndArraysTest/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Tests/VGACompilerCrash">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Tests/VGACompilerCrash" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/VGACompilerCrash/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Tests/VGACompilerCrash/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Users/Emile/Emile.TestApp">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Users/Emile/Emile.TestApp" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Emile/Emile.TestApp/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Emile/Emile.TestApp/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Users/Emile/TestBed/TestBed">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Users/Emile/TestBed/TestBed" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Emile/TestBed/TestBed/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Emile/TestBed/TestBed/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Users/Kudzu/Breakpoints">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Users/Kudzu/Breakpoints" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Kudzu/Breakpoints/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Kudzu/Breakpoints/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Users/Kudzu/Hive/Kudzu.Hive">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Users/Kudzu/Hive/Kudzu.Hive" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Kudzu/Hive/Kudzu.Hive/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Kudzu/Hive/Kudzu.Hive/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Users/Matthijs/DebugCompiler">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/DebugCompiler" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/DebugCompiler/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/DebugCompiler/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Users/Matthijs/Playground">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/Playground" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/Playground/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/Playground/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Users/Matthijs/PlaygroundCore">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/PlaygroundCore" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/PlaygroundCore/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/PlaygroundCore/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Users/Matthijs/PlaygroundHAL">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/PlaygroundHAL" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/PlaygroundHAL/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/PlaygroundHAL/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../../Users/Matthijs/PlaygroundSystem">
+      <sourceFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/PlaygroundSystem" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/PlaygroundSystem/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../Users/Matthijs/PlaygroundSystem/obj" />
+    </content>
+    <content url="file://$MODULE_DIR$/../..">
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Assembler" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Build.Common" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Build.Common.Tests" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Build.MSBuild" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Common" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Common.ReadMe.html" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Core" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Core.Memory" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Core.Memory.Test" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Core.Plugs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Core.Tests" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.Common" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.DebugStub" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.GDB" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.Kernel" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.Kernel.Plugs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.VSDebugEngine" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Deploy.Pixie" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.Deploy.USB" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.HAL" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.IL2CPU" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.IL2CPU.Plugs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.IL2CPU.Profiler" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.snk" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.System" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.System.Plugs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.System.Tests" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.VS.Package" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.VS.ReadMe.html" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.VS.Windows" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.VS.Windows.Test" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Cosmos.VS.Wizards" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ElfMap2DebugDb" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../ERamaMKernel" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../IL2CPU" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/AssemblyReferenceNode.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Attributes.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/AutomationScope.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OAFileItem.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OAFolderItem.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OANavigableProjectItems.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OANestedProjectItem.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OANullProperty.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OAProject.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OAProjectItem.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OAProjectItems.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OAProperties.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OAProperty.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OAReferenceFolderItem.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OAReferenceItem.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/OASolutionFolder.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/VSProject/OAAssemblyReference.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/VSProject/OABuildManager.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/VSProject/OAComReference.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/VSProject/OAProjectReference.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/VSProject/OAReferenceBase.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/VSProject/OAReferences.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/VSProject/OAVSProject.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Automation/VSProject/OAVSProjectItem.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/BuildDependency.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/BuildPropertyPage.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ComReferenceNode.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ConfigProvider.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ConfigurationProperties.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/DataObject.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/DependentFileNode.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/DesignPropertyDescriptor.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/DesignTimeAssemblyResolution.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Diagrams/AutomationClasses.cd" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Diagrams/ConfigurationClasses.cd" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Diagrams/DocumentManagerClasses.cd" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Diagrams/HierarchyClasses.cd" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Diagrams/PropertiesClasses.cd" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Diagrams/ReferenceClasses.cd" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/DocumentManager.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/EnumDependencies.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/FileChangeManager.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/FileDocumentManager.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/FileNode.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/FolderNode.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/GlobalSuppressions.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/HierarchyNode.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/IDEBuildLogger.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ImageHandler.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Interfaces.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/LocalizableProperties.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Misc/ConnectionPointContainer.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Misc/ExternDll.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Misc/NativeMethods.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Misc/UnsafeNativeMethods.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/NestedProjectBuildDependency.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/NestedProjectNode.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/NodeProperties.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/OleServiceProvider.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Output.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/OutputGroup.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectConfig.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectContainerNode.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectDesignerDocumentManager.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectDocumentsListener.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectElement.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectFactory.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectFileConstants.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectNode.CopyPaste.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectNode.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectNode.Events.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectOptions.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectPackage.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ProjectReferenceNode.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/PropertiesEditorLauncher.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ReferenceContainerNode.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/ReferenceNode.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/RegisteredProjectType.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Resources/imagelis.bmp" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/SelectionListener.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/SettingsPage.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/SingleFileGenerator.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/SingleFileGeneratorFactory.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/SolutionListener.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/SolutionListenerForBuildDependencyUpdate.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/SolutionListenerForProjectEvents.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/SolutionListenerForProjectOpen.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/SolutionListenerForProjectReferenceUpdate.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/StructuresEnums.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/SuspendFileChanges.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/TokenProcessor.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Tracing.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/TrackDocumentsHelper.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/TypeConverters.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/UIThread.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/UpdateSolutionEventsListener.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Url.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/Utilities.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/VisualStudio.Project.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/VisualStudio.Project.resx" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/VsCommands.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../MPF/10.0/Src/CSharp/VSShellUtilities.cs" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Tools/File2ByteArray Converter" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Tools/ILSpyPlugAddIn" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../Tools/PlugsInspector" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../VMWareLib" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../XSharp Projects.txt" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../XSharp.Compiler" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../XSharp.Nasm" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../XSharp.Test" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../XSharp.VS" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Assembler/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Assembler/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Build.Common.Tests/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Build.Common.Tests/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Build.Common/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Build.Common/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Build.MSBuild/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Build.MSBuild/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Common/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Common/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Core.Memory.Test/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Core.Memory.Test/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Core.Memory/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Core.Memory/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Core.Plugs/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Core.Plugs/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Core.Tests/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Core.Tests/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Core/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Core/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.Common/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.Common/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.DebugStub/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.DebugStub/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.GDB/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.GDB/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.Kernel.Plugs/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.Kernel.Plugs/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.Kernel/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.Kernel/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.VSDebugEngine/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Debug.VSDebugEngine/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Deploy.Pixie/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Deploy.Pixie/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Deploy.USB/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.Deploy.USB/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.HAL/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.HAL/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.IL2CPU.Plugs/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.IL2CPU.Plugs/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.IL2CPU.Profiler/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.IL2CPU.Profiler/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.IL2CPU/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.IL2CPU/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.System.Plugs/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.System.Plugs/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.System.Tests/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.System.Tests/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.System/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.System/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.VS.Package/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.VS.Package/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.VS.Windows.Test/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.VS.Windows.Test/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.VS.Windows/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.VS.Windows/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.VS.Wizards/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Cosmos.VS.Wizards/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ERamaMKernel/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ERamaMKernel/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ElfMap2DebugDb/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../ElfMap2DebugDb/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../IL2CPU/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../IL2CPU/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Tools/File2ByteArray Converter/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Tools/File2ByteArray Converter/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Tools/ILSpyPlugAddIn/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Tools/ILSpyPlugAddIn/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Tools/PlugsInspector/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../Tools/PlugsInspector/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../VMWareLib/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../VMWareLib/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../XSharp.Compiler/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../XSharp.Compiler/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../XSharp.Nasm/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../XSharp.Nasm/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../XSharp.Test/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../XSharp.Test/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../XSharp.VS/bin" />
+      <excludeFolder url="file://$MODULE_DIR$/../../XSharp.VS/obj" />
+      <excludeFolder url="file://$MODULE_DIR$/../../packages" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>
