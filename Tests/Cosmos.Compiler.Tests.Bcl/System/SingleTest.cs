@@ -62,7 +62,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             expectedResult = "-42.42";
 
             Assert.IsTrue((result == expectedResult), "Single.ToString of negative number doesn't work");
-            
+
             /* A big value (to be correct toString should convert it in scientific notation) */
             value = 9223372036854775808f;
 
@@ -73,7 +73,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             /* OK now a normal value */
             value = 42.42F; // It exists Single.MaxValue but it is a too big value an can be represented only on Scientific notation but then how to confront with a String?
-           
+
             result = value.ToString();
             expectedResult = "42.42";
 
@@ -159,17 +159,29 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((Single.IsNaN(OperationResult)), "float operator/(0/0) doesn't work");
 
             // Now test some castings operations
+            sbyte valueAsSByte = (sbyte)value;
+            Assert.IsTrue((valueAsSByte == (sbyte)42), "float (sbyte) operator doesn't work");
+
             byte valueAsByte = (byte)value;
             Assert.IsTrue((valueAsByte == (byte)42), "float (byte) operator doesn't work");
 
             short valueAsShort = (short)value;
-            Assert.IsTrue((valueAsByte == (short)42), "float (short) operator doesn't work");
+            Assert.IsTrue((valueAsShort == (short)42), "float (short) operator doesn't work");
+
+            ushort valueAsUShort = (ushort)value;
+            Assert.IsTrue((valueAsUShort == (ushort)42), "float (ushort) operator doesn't work");
 
             int valueAsInt = (int)value;
             Assert.IsTrue((valueAsInt == (int)42), "float (int) operator doesn't work");
 
+            uint valueAsUInt = (uint)value;
+            Assert.IsTrue((valueAsUInt == (uint)42), "float (uint) operator doesn't work");
+
             long valueAsLong = (long)value;
-            Assert.IsTrue((valueAsInt == (long)42), "float (long) operator doesn't work");
+            Assert.IsTrue((valueAsLong == (long)42), "float (long) operator doesn't work");
+
+            ulong valueAsULong = (ulong)value;
+            Assert.IsTrue((valueAsULong == (ulong)42), "float (ulong) operator doesn't work");
 
             // Let's continue with casting but the other way around
             valueAsInt = 69;

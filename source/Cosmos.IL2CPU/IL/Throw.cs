@@ -1,30 +1,27 @@
-using System;
-using CPU = Cosmos.Assembler.x86;
-using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Throw )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Throw)]
     public class Throw : ILOp
     {
-        public Throw( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Throw(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
 #warning TODO: Implement exception
             DoNullReferenceCheck(Assembler, DebugEnabled, 4);
-            XS.Add(XSRegisters.ESP, 4);
-            XS.Pop(XSRegisters.EAX);
-            new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New( DataMember.GetStaticFieldName( ExceptionHelperRefs.CurrentExceptionRef ) ), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
+            XS.Add(ESP, 4);
+            XS.Pop(EAX);
+            XS.Set(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), EAX, destinationIsIndirect: true);
             XS.Call("SystemExceptionOccurred");
-            XS.Set(XSRegisters.ECX, 3);
-            Call.EmitExceptionLogic( Assembler,aMethod, aOpCode, false, null );
-
+            XS.Set(ECX, 3);
+            EmitExceptionLogic(Assembler,aMethod, aOpCode, false, null);
         }
 
         // namespace Cosmos.IL2CPU.IL.X86 {

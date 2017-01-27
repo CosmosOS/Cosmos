@@ -1,10 +1,8 @@
 using System;
-using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.Assembler;
+
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler.x86;
 using XSharp.Compiler;
-using SysReflection = System.Reflection;
+using static XSharp.Compiler.XSRegisters;
 
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -106,10 +104,10 @@ namespace Cosmos.IL2CPU.X86.IL
             xDisplacement -= (int)(xArgSize - 4);
             XS.Comment("Real displacement " + xDisplacement);
 
-            XS.Set(XSRegisters.EAX, XSRegisters.EBP);
-            XS.Set(XSRegisters.EBX, (uint)(xDisplacement));
-            XS.Add(XSRegisters.EAX, XSRegisters.EBX);
-            XS.Push(XSRegisters.EAX);
+            XS.Set(EAX, EBP);
+            XS.Set(EBX, (uint)(xDisplacement));
+            XS.Add(EAX, EBX);
+            XS.Push(EAX);
         }
     }
 }

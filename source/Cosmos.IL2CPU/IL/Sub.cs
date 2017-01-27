@@ -1,7 +1,5 @@
 using System;
-using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.Assembler.x86;
-using Cosmos.Assembler.x86.x87;
+
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 
@@ -44,10 +42,10 @@ namespace Cosmos.IL2CPU.X86.IL
                     }
                     else
                     {
-                        XS.Pop(XSRegisters.ECX);
-                        XS.Pop(XSRegisters.EAX);
-                        XS.Sub(XSRegisters.EAX, XSRegisters.ECX);
-                        XS.Push(XSRegisters.EAX);
+                        XS.Pop(ECX);
+                        XS.Pop(EAX);
+                        XS.Sub(EAX, ECX);
+                        XS.Push(EAX);
                     }
                     break;
                 case 8:

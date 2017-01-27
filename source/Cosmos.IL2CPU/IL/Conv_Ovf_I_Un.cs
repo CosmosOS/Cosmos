@@ -1,7 +1,7 @@
-using System;
+using Cosmos.Assembler.x86;
 using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
-using Label = Cosmos.Assembler.Label;
+using static XSharp.Compiler.XSRegisters;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_Ovf_I_Un)]
@@ -12,39 +12,40 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 		}
 
-		public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
-			//TODO: What if the last ILOp in a method was Conv_Ovf_I_Un or an other?
-            var xSource = aOpCode.StackPopTypes[0];
-            var xSourceSize = SizeOfType(xSource);
-            var xSourceIsFloat = TypeIsFloat(xSource);
-			if(xSourceIsFloat)
-				ThrowNotImplementedException("Conv_Ovf_I_Un throws an ArgumentException, because float is not implemented!");
+		public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    {
+			  //TODO: What if the last ILOp in a method was Conv_Ovf_I_Un or an other?
+        var xSource = aOpCode.StackPopTypes[0];
+        var xSourceSize = SizeOfType(xSource);
+        var xSourceIsFloat = TypeIsFloat(xSource);
 
-			switch (xSourceSize)
-			{
-				case 1:
-				case 2:
-				case 4:
-					break;
-				case 8:
-					{
-						string NoOverflowLabel = GetLabel(aMethod, aOpCode) + "__NoOverflow";
-						XS.Pop(XSRegisters.EAX);
-						// EBX is high part and should be zero for unsigned, so we test it on zero
-						{
-							XS.Pop(XSRegisters.EBX);
-							XS.Compare(XSRegisters.EBX, 0);
-							XS.Jump(CPUx86.ConditionalTestEnum.Equal, NoOverflowLabel);
+	      if(xSourceIsFloat)
+        {
+            ThrowNotImplementedException("Conv_Ovf_I_Un throws an ArgumentException, because float is not implemented!");
+        }
+
+			  switch (xSourceSize)
+			  {
+				  case 1:
+				  case 2:
+				  case 4:
+					    break;
+				  case 8:
+						  string NoOverflowLabel = GetLabel(aMethod, aOpCode) + "__NoOverflow";
+						  XS.Pop(EAX);
+						  // EBX is high part and should be zero for unsigned, so we test it on zero
+							XS.Pop(EBX);
+							XS.Compare(EBX, 0);
+							XS.Jump(ConditionalTestEnum.Equal, NoOverflowLabel);
 							ThrowNotImplementedException("Conv_Ovf_I_Un throws an overflow exception, which is not implemented!");
-						}
-						XS.Label(NoOverflowLabel);
-						XS.Push(XSRegisters.EAX);
-						break;
-					}
-				default:
-					ThrowNotImplementedException("Conv_Ovf_I_Un not implemented for this size!");
-					break;
-			}
+
+						  XS.Label(NoOverflowLabel);
+						  XS.Push(EAX);
+						  break;
+				  default:
+					    ThrowNotImplementedException("Conv_Ovf_I_Un not implemented for this size!");
+					    break;
+			  }
 		}
 
 		// using System;
@@ -108,6 +109,5 @@ namespace Cosmos.IL2CPU.X86.IL
 		//         }
 		//     }
 		// }
-
-	}
+	  }
 }

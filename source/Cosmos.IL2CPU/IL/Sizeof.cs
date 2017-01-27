@@ -1,7 +1,4 @@
-using System;
-using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler;
 using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -9,15 +6,15 @@ namespace Cosmos.IL2CPU.X86.IL
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Sizeof )]
     public class Sizeof : ILOp
     {
-        public Sizeof( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Sizeof(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
-            OpType xType = ( OpType )aOpCode;
-            uint xSize = SizeOfType( xType.Value );
+            OpType xType = (OpType)aOpCode;
+            uint xSize = SizeOfType(xType.Value);
             XS.Push(xSize);
         }
 

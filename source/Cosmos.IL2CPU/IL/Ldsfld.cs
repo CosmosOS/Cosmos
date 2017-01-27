@@ -1,12 +1,13 @@
 using System;
+using System.Linq;
+using System.Reflection;
+
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Cosmos.Assembler.x86;
-using System.Reflection;
-using System.Linq;
 using XSharp.Compiler;
-using SysReflection = System.Reflection;
+using static XSharp.Compiler.XSRegisters;
 
+using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -60,22 +61,23 @@ namespace Cosmos.IL2CPU.X86.IL
         {
           //	Pop("eax");
           //	Move(Assembler, "dword [" + mDataName + " + 0x" + (i * 4).ToString("X") + "]", "eax");
-          new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New(xDataName), DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize - (i * 4)) };
+          XS.Push(xDataName, displacement: (int)(xSize - (i * 4)));
+          //new CPUx86.Push { DestinationRef = Cosmos.Assembler.ElementReference.New(xDataName), DestinationIsIndirect = true, DestinationDisplacement = (int)(xSize - (i * 4)) };
         }
         switch (xSize % 4)
         {
           case 1:
             {
-              XS.Set(XSRegisters.EAX, 0);
-              XS.Set(XSRegisters.AL, xDataName, sourceIsIndirect: true);
-              XS.Push(XSRegisters.EAX);
+              XS.Set(EAX, 0);
+              XS.Set(AL, xDataName, sourceIsIndirect: true);
+              XS.Push(EAX);
               break;
             }
           case 2:
             {
-              XS.Set(XSRegisters.EAX, 0);
-              XS.Set(XSRegisters.AX, xDataName, sourceIsIndirect: true);
-              XS.Push(XSRegisters.EAX);
+              XS.Set(EAX, 0);
+              XS.Set(AX, xDataName, sourceIsIndirect: true);
+              XS.Push(EAX);
               break;
             }
           case 0:
@@ -94,16 +96,16 @@ namespace Cosmos.IL2CPU.X86.IL
         {
           case 1:
             {
-              XS.Set(XSRegisters.EAX, 0);
-              XS.Set(XSRegisters.AL, xDataName, sourceIsIndirect: true);
-              XS.Push(XSRegisters.EAX);
+              XS.Set(EAX, 0);
+              XS.Set(AL, xDataName, sourceIsIndirect: true);
+              XS.Push(EAX);
               break;
             }
           case 2:
             {
-              XS.Set(XSRegisters.EAX, 0);
-              XS.Set(XSRegisters.AX, xDataName, sourceIsIndirect: true);
-              XS.Push(XSRegisters.EAX);
+              XS.Set(EAX, 0);
+              XS.Set(AX, xDataName, sourceIsIndirect: true);
+              XS.Push(EAX);
               break;
             }
           case 0:
@@ -111,9 +113,7 @@ namespace Cosmos.IL2CPU.X86.IL
               break;
             }
           default:
-            //EmitNotImplementedException( Assembler, GetServiceProvider(), "Ldsfld: Remainder size " + ( xSize % 4 ) + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
             throw new NotImplementedException();
-            //break;
         }
       }
     }

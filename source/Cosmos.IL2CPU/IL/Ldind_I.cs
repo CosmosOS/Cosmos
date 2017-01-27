@@ -1,7 +1,6 @@
-using System;
-using Cosmos.Assembler;
 using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Ldind_I)]
@@ -24,10 +23,11 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Comment("address at: [esp]");
       DoNullReferenceCheck(aAssembler, debugEnabled, 0);
 
-      XS.Pop(XSRegisters.EAX);
+      XS.Pop(EAX);
+
       for (int i = xAlignedSize - 4; i >= 0; i -= 4)
       {
-        XS.Push(XSRegisters.EAX, isIndirect: true, displacement: i);
+        XS.Push(EAX, isIndirect: true, displacement: i);
       }
     }
   }

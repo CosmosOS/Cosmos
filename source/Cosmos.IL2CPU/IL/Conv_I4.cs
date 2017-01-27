@@ -5,8 +5,8 @@ using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	  /// <summary>
-	  /// Convert top Stack element to Int32.
+	/// <summary>
+	/// Convert top Stack element to Int32.
     /// </summary>
     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_I)] // x86 is a 32-bit system, so this is the op-code that we should be using, for an x64 target, use Conv_I8 instead.
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Conv_I4 )]
@@ -20,51 +20,43 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xSource = aOpCode.StackPopTypes[0];
-            var xSourceSize = SizeOfType(xSource);
-            var xSourceIsFloat = TypeIsFloat(xSource);
-            switch (xSourceSize)
+            var xSize = SizeOfType(xSource);
+            var xIsFloat = TypeIsFloat(xSource);
+
+            if (xSize > 8)
             {
-                case 1:
-                    XS.Pop(EAX);
-                    XS.MoveSignExtend(EAX, AL);
-                    XS.Push(EAX);
-                    break;
-                case 2:
-                    XS.Pop(EAX);
-                    XS.MoveSignExtend(EAX, AX);
-                    XS.Push(EAX);
-                    break;
-                case 4:
-						        if (xSourceIsFloat)
-						        {
-                        XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                        XS.SSE.ConvertSS2SIAndTruncate(EAX, XMM0);
+                throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_I4.cs->Error: StackSize > 8 not supported");
+            }
+
+            if (xSize <= 4)
+            {
+                if (xIsFloat)
+                {
+                    XS.SSE.ConvertSS2SIAndTruncateIndirectSource(EAX, ESP);
+                    XS.Set(ESP, EAX, destinationIsIndirect: true);
+                }
+            }
+            else if (xSize <= 8)
+            {
+                if (TypeIsReferenceType(xSource))
+                {
+                    XS.Add(ESP, 4);
+                }
+                else
+                {
+                    if (xIsFloat)
+                    {
+                        XS.SSE2.ConvertSD2SIAndTruncateIndirectSource(EAX, ESP);
+                        XS.Add(ESP, 4);
                         XS.Set(ESP, EAX, destinationIsIndirect: true);
                     }
-                    break;
-                case 8:
+                    else
                     {
-                        if(TypeIsReferenceType(xSource))
-                        {
-                            XS.Add(ESP, 4);
-                        }
-                        else
-                        {
-						                if (xSourceIsFloat)
-						                {
-                                XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
-                                XS.SSE2.ConvertSD2SIAndTruncate(EAX, XMM0);
-                                XS.Set(ESP, EAX, destinationIsIndirect: true);
-                            }
-
-                            XS.Pop(EAX);
-                            XS.Add(ESP, 4);
-                            XS.Push(EAX);
-                        }
-                        break;
+                        XS.Pop(EAX);
+                        XS.Add(ESP, 4);
+                        XS.Push(EAX);
                     }
-                default:
-                    throw new NotImplementedException();
+                }
             }
         }
     }

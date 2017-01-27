@@ -52,6 +52,17 @@ namespace XSharp.Compiler
         };
       }
 
+      public static void ConvertSD2SIAndTruncateIndirectSource(Register32 destination, Register32 source, int sourceDisplacement = 0)
+      {
+        new ConvertSD2SIAndTruncate
+        {
+          DestinationReg = destination,
+          SourceReg = source,
+          SourceIsIndirect = true,
+          SourceDisplacement = sourceDisplacement
+        };
+      }
+
       public static void ConvertSD2SS(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
       {
         new ConvertSD2SS()

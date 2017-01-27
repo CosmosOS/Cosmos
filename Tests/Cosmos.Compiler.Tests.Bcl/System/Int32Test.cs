@@ -124,8 +124,27 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((long)minValue == -0x80000000, "Conv_I8 for Int32 doesn't work");
 
             // Test Conv_U8
-            Assert.IsTrue((ulong)maxValue == 0x7FFFFFFF, "Conv_U8 for Int32 doesn't work");
-            //Assert.IsTrue((ulong)minValue == 0x80000000, "Conv_U8 for Int32 doesn't work");
+            Assert.IsTrue((ulong)maxValue == 0x000000007FFFFFFF, "Conv_U8 for Int32 doesn't work");
+            Assert.IsTrue((ulong)minValue == 0xFFFFFFFF80000000, "Conv_U8 for Int32 doesn't work");
+
+            // Test Methods
+            val2 = TestMethod(value);
+            Assert.IsTrue(value == 60, "Passing an Int32 as a method parameter doesn't work");
+            Assert.IsTrue(val2 == 61, "Returning an Int32 value from a method doesn't work");
+
+            ByRefTestMethod(ref value);
+            Assert.IsTrue(value == 61, "Passing an Int32 by ref to a method doesn't work");
+        }
+
+        public static int TestMethod(int aParam)
+        {
+            aParam++;
+            return aParam;
+        }
+
+        public static void ByRefTestMethod(ref int aParam)
+        {
+            aParam++;
         }
     }
 }

@@ -76,8 +76,12 @@ namespace Cosmos.IL2CPU.ILOpCodes
         case Code.Sub:
         case Code.Rem:
         case Code.Rem_Un:
+        case Code.And:
+        case Code.Or:
         case Code.Xor:
           return 2;
+        case Code.Not:
+          return 1;
         case Code.Ldind_I:
         case Code.Ldind_I1:
         case Code.Ldind_I2:
@@ -109,11 +113,8 @@ namespace Cosmos.IL2CPU.ILOpCodes
           return 2;
         case Code.Throw:
           return 1;
-        case Code.Or:
-        case Code.And:
-          return 2;
-        case Code.Not:
-          return 1;
+        case Code.Rethrow:
+          return 0;
         case Code.Stelem_Ref:
         case Code.Stelem_I:
         case Code.Stelem_I1:
@@ -148,6 +149,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
           return 1;
         case Code.Volatile:
           return 0;
+        case Code.Endfilter:
         case Code.Endfinally:
           return 0;
         default:
@@ -209,6 +211,9 @@ namespace Cosmos.IL2CPU.ILOpCodes
         case Code.Sub:
         case Code.Rem:
         case Code.Rem_Un:
+        case Code.And:
+        case Code.Not:
+        case Code.Or:
         case Code.Xor:
           return 1;
         case Code.Ldind_I:
@@ -241,11 +246,8 @@ namespace Cosmos.IL2CPU.ILOpCodes
         case Code.Ceq:
           return 1;
         case Code.Throw:
+        case Code.Rethrow:
           return 0;
-        case Code.Or:
-        case Code.And:
-        case Code.Not:
-          return 1;
         case Code.Stelem_I:
         case Code.Stelem_I1:
         case Code.Stelem_I2:
@@ -280,6 +282,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
           return 2;
         case Code.Volatile:
           return 0;
+        case Code.Endfilter:
         case Code.Endfinally:
           return 0;
         default:

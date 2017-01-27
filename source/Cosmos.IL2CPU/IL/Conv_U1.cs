@@ -1,7 +1,6 @@
 using System;
-using Cosmos.Assembler.x86.SSE;
+
 using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
 using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -20,48 +19,42 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xSource = aOpCode.StackPopTypes[0];
-            var xSourceIsFloat = TypeIsFloat(xSource);
-            var xSourceSize = SizeOfType(xSource);
-            if (xSourceIsFloat)
+            var xSize = SizeOfType(xSource);
+            var xIsFloat = TypeIsFloat(xSource);
+
+            if (xSize > 8)
             {
-                if (xSourceSize == 4)
+                throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_U1.cs->Error: StackSize > 8 not supported");
+            }
+
+            if (xSize <= 4)
+            {
+                if (xIsFloat)
                 {
-                    XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                    XS.SSE.ConvertSS2SIAndTruncate(EAX, XMM0);
-                    XS.Set(ESP, EAX, destinationIsIndirect: true);
-                }
-                else if (xSourceSize == 8)
-                {
-                    XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
-                    XS.SSE2.ConvertSD2SIAndTruncate(EAX, XMM0);
-                    // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
-                    XS.Add(ESP, 4);
+                    XS.SSE.ConvertSS2SIAndTruncateIndirectSource(EAX, ESP);
                     XS.Set(ESP, EAX, destinationIsIndirect: true);
                 }
                 else
                 {
-                    throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_U1.cs->Unknown size of floating point value.");
+                    XS.Pop(EAX);
+                    XS.MoveZeroExtend(EAX, AL);
+                    XS.Push(EAX);
                 }
             }
-            else
+            else if (xSize <= 8)
             {
-                switch (xSourceSize)
+                if (xIsFloat)
                 {
-                    case 1:
-                    case 2:
-                    case 4:
-                        XS.Pop(EAX);
-                        XS.MoveZeroExtend(EAX, AL);
-                        XS.Push(EAX);
-                        break;
-                    case 8:
-                        XS.Pop(EAX);
-                        XS.Add(ESP, 4);
-                        XS.MoveZeroExtend(EAX, AL);
-                        XS.Push(EAX);
-                        break;
-                    default:
-                        throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_U1.cs->Unknown size of variable on the top of the stack.");
+                    XS.SSE2.ConvertSD2SIAndTruncateIndirectSource(EAX, ESP);
+                    XS.Add(ESP, 8);
+                    XS.Push(EAX);
+                }
+                else
+                {
+                    XS.Pop(EAX);
+                    XS.Add(ESP, 4);
+                    XS.MoveZeroExtend(EAX, AL);
+                    XS.Push(EAX);
                 }
             }
         }

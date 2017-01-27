@@ -1,6 +1,6 @@
-using System;
 using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
     [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Ldlen )]
@@ -14,9 +14,9 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             DoNullReferenceCheck(Assembler, DebugEnabled, 4);
-            XS.Add(XSRegisters.ESP, 4);
-            XS.Pop(XSRegisters.EAX);
-            XS.Push(XSRegisters.EAX, displacement: 8);
+            XS.Add(ESP, 4);
+            XS.Pop(EAX);
+            XS.Push(EAX, displacement: 8);
         }
 
 

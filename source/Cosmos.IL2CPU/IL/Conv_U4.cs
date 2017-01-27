@@ -1,68 +1,64 @@
 using System;
-using Cosmos.Assembler.x86.SSE;
+
 using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
 using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
-	  /// <summary>
-	  /// Convert top Stack element to UInt32 and change its type to Int32.
+    /// <summary>
+    /// Convert top Stack element to UInt32 and change its type to Int32.
     /// </summary>
     [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_U)] // x86 is a 32-bit system, so this is the op-code that we should be using, for an x64 target, use Conv_U8 instead.
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Conv_U4 )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_U4)]
     public class Conv_U4 : ILOp
     {
-        public Conv_U4( Cosmos.Assembler.Assembler aAsmblr )
-            : base( aAsmblr )
+        public Conv_U4(Cosmos.Assembler.Assembler aAsmblr)
+            : base(aAsmblr)
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xSource = aOpCode.StackPopTypes[0];
-            var xSourceSize = SizeOfType(xSource);
-            switch (xSourceSize)
+            var xSize = SizeOfType(xSource);
+            var xIsFloat = TypeIsFloat(xSource);
+
+            if (xSize > 8)
             {
-                case 1:
-                    XS.Pop(EAX);
-                    XS.MoveZeroExtend(EAX, AL);
-                    XS.Push(EAX);
-                    break;
-                case 2:
-                    XS.Pop(EAX);
-                    XS.MoveZeroExtend(EAX, AX);
-                    XS.Push(EAX);
-                    break;
-                case 4:
-					          if (TypeIsFloat(xSource))
-					          {
-                        XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                        XS.SSE.ConvertSS2SIAndTruncate(EAX, XMM0);
-                        XS.Set(ESP, EAX, destinationIsIndirect: true);
-                    }
-					          break;
-                case 8:
-					          if (TypeIsFloat(xSource))
-					          {
-                        XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
-                        XS.SSE2.ConvertSD2SIAndTruncate(EAX, XMM0);
+                throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_U4.cs->Error: StackSize > 8 not supported");
+            }
+
+            if (xSize <= 4)
+            {
+                if (xIsFloat)
+                {
+                    XS.SSE.ConvertSS2SIAndTruncateIndirectSource(EAX, ESP);
+                    XS.Set(ESP, EAX, destinationIsIndirect: true);
+                }
+            }
+            else if (xSize <= 8)
+            {
+                if (TypeIsReferenceType(xSource))
+                {
+                    throw new NotImplementedException("");
+                    XS.Add(ESP, 4);
+                }
+                else
+                {
+                    if (xIsFloat)
+                    {
+                        XS.SSE2.ConvertSD2SIAndTruncateIndirectSource(EAX, ESP);
                         // We need to move the stack pointer of 4 Byte to "eat" the second double that is yet in the stack or we get a corrupted stack!
-                        XS.Add(ESP, 4);
-                        XS.Set(ESP, EAX, destinationIsIndirect: true);
-                        // Is this really needed? Conv.U2 and Conv.U1 did not this! In reality they should call the same code...
-                        //XS.Push(EAX);
-                        break;
-					          }
-					          else
+                        XS.Add(ESP, 8);
+                        XS.Push(EAX);
+                    }
+                    else
                     {
                         XS.Pop(EAX);
                         XS.Add(ESP, 4);
                         XS.Push(EAX);
-                        break;
                     }
-                default:
-                    throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_U4.cs->Unknown size of variable on the top of the stack.");
+                }
             }
         }
     }

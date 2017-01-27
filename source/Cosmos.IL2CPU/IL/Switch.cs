@@ -1,6 +1,6 @@
-using System;
+using Cosmos.Assembler.x86;
 using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
+using static XSharp.Compiler.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -15,13 +15,13 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
         {
             ILOpCodes.OpSwitch OpSw = ( ILOpCodes.OpSwitch )aOpCode;
-            XS.Pop(XSRegisters.EAX);
+            XS.Pop(EAX);
             for( int i = 0; i < OpSw.BranchLocations.Length; i++ )
             {
-                XS.Compare(XSRegisters.EAX, ( uint )i);
+                XS.Compare(EAX, ( uint )i);
                 //string DestLabel = AssemblerNasm.TmpBranchLabel( aMethod, new ILOpCodes.OpBranch( ILOpCode.Code.Jmp, aOpCode.Position, OpSw.BranchLocations[ i ] ) );
                 string xDestLabel = AppAssembler.TmpPosLabel(aMethod, OpSw.BranchLocations[i]);
-                XS.Jump(CPUx86.ConditionalTestEnum.Equal, xDestLabel);
+                XS.Jump(ConditionalTestEnum.Equal, xDestLabel);
             }
         }
 

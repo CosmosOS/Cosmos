@@ -1,18 +1,12 @@
 using System;
-using System.Linq;
-using Cosmos.IL2CPU.ILOpCodes;
-// using System.Collections.Generic;
-// using System.IO;
-// using System.Linq;
-//
-// using IL2CPU=Cosmos.IL2CPU;
-using CPU = Cosmos.Assembler.x86;
-using CPUx86 = Cosmos.Assembler.x86;
 using System.Reflection;
-using Cosmos.Assembler;
-using XSharp.Compiler;
-using SysReflection = System.Reflection;
 
+using Cosmos.Assembler;
+using Cosmos.IL2CPU.ILOpCodes;
+using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
+
+using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -94,7 +88,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
         public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, bool debugEnabled)
         {
-            DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, ILOp.GetLabel(aCurrentMethod, aCurrent.NextPosition), debugEnabled);
+            DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, GetLabel(aCurrentMethod, aCurrent.NextPosition), debugEnabled);
         }
 
         public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aOp, string currentLabel, string nextLabel, bool debugEnabled)
@@ -125,7 +119,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
             if (xExtraStackSize > 0)
             {
-                XS.Sub(XSRegisters.ESP, (uint)xExtraStackSize);
+                XS.Sub(ESP, xExtraStackSize);
             }
             XS.Call(xNormalAddress);
 
@@ -153,7 +147,7 @@ namespace Cosmos.IL2CPU.X86.IL
                                            xResultSize += 4 - (xResultSize % 4);
                                        }
 
-                                       ILOp.EmitExceptionCleanupAfterCall(Assembler, xResultSize, xStackOffsetBefore, xPopSize);
+                                       EmitExceptionCleanupAfterCall(Assembler, xResultSize, xStackOffsetBefore, xPopSize);
                                    }, nextLabel);
 
             }

@@ -1,7 +1,7 @@
 using System.Reflection;
 
+using Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
-using CPUx86 = Cosmos.Assembler.x86;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 
@@ -27,21 +27,21 @@ namespace Cosmos.IL2CPU.X86.IL
             XS.Set(EAX, ESP, sourceDisplacement: 4);
 
             XS.Compare(EAX, 0);
-            XS.Jump(CPUx86.ConditionalTestEnum.Zero, xReturnNullLabel);
+            XS.Jump(ConditionalTestEnum.Zero, xReturnNullLabel);
             XS.Push(EAX, isIndirect: true);
             XS.Push(xTypeID, isIndirect: true);
-            
+
             MethodBase xMethodIsInstance = VTablesImplRefs.IsInstanceRef;
-            
+
             Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, xCurrentMethodLabel, xAfterIsInstanceCallLabel, DebugEnabled);
-            
+
             XS.Label(xAfterIsInstanceCallLabel);
-            
+
             XS.Pop(EAX);
 
             XS.Compare(EAX, 0);
-            XS.Jump(CPUx86.ConditionalTestEnum.Equal, xReturnNullLabel);
-            
+            XS.Jump(ConditionalTestEnum.Equal, xReturnNullLabel);
+
             XS.Jump(xNextPositionLabel);
             XS.Label(xReturnNullLabel);
             XS.Add(ESP, 8);

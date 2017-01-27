@@ -1,54 +1,54 @@
 using System;
+
+using Cosmos.IL2CPU.ILOpCodes;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
-using CPUx86 = Cosmos.Assembler.x86;
+
 namespace Cosmos.IL2CPU.X86.IL
 {
-    [Cosmos.IL2CPU.OpCode( ILOpCode.Code.Initobj )]
+    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Initobj)]
     public class Initobj : ILOp
     {
-        public Initobj( Cosmos.Assembler.Assembler aAsmblr )
+        public Initobj(Cosmos.Assembler.Assembler aAsmblr)
             : base( aAsmblr )
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             // MtW: for now, disable this instruction. To me, it's unclear in what context it's being used.
-            uint mObjSize = 0;
+            uint xObjSize = 0;
 
-            Type mType = (( Cosmos.IL2CPU.ILOpCodes.OpType )aOpCode).Value;
-            mObjSize = SizeOfType( mType );
+            Type xType = ((OpType)aOpCode).Value;
+            xObjSize = SizeOfType(xType);
 
-            XS.Pop(XSRegisters.EAX);
-            for( int i = 0; i < ( mObjSize / 4 ); i++ )
+            XS.Pop(EAX);
+
+            for(int i = 0; i < (xObjSize / 4); i++)
             {
                 XS.Set(EAX, 0, destinationDisplacement: i * 4, size: RegisterSize.Int32);
             }
-            switch( mObjSize % 4 )
+
+            switch(xObjSize % 4)
             {
-                case 1:
-                    {
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ( int )( ( mObjSize / 4 ) * 4 ), SourceValue = 0, Size = 8 };
-                        break;
-                    }
-                case 2:
-                    {
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ( int )( ( mObjSize / 4 ) * 4 ), SourceValue = 0, Size = 16 };
-                        break;
-                    }
-                case 3:
-                    {
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ( int )( ( mObjSize / 4 ) * 4 ), SourceValue = 0, Size = 8 };
-                        new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ( int )( ( ( mObjSize / 4 ) * 4 ) + 1 ), SourceValue = 0, Size = 16 };
-                        break;
-                    }
                 case 0:
                     break;
+                case 1:
+                    //new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ( int )( ( xObjSize / 4 ) * 4 ), SourceValue = 0, Size = 8 };
+                    XS.Set(EAX, 0, destinationDisplacement: (int)((xObjSize / 4) * 4), size: RegisterSize.Byte8);
+                    break;
+                case 2:
+                    //new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ( int )( ( xObjSize / 4 ) * 4 ), SourceValue = 0, Size = 16 };
+                    XS.Set(EAX, 0, destinationDisplacement: (int)((xObjSize / 4) * 4), size: RegisterSize.Short16);
+                    break;
+                case 3:
+                    //new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ( int )( ( xObjSize / 4 ) * 4 ), SourceValue = 0, Size = 8 };
+                    //new CPUx86.Mov { DestinationReg = CPUx86.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ( int )( ( ( xObjSize / 4 ) * 4 ) + 1 ), SourceValue = 0, Size = 16 };
+                    XS.Set(EAX, 0, destinationDisplacement: (int)((xObjSize / 4) * 4), size: RegisterSize.Short16);
+                    XS.Set(EAX, 0, destinationDisplacement: (int)((xObjSize / 4) * 4 + 2), size: RegisterSize.Byte8);
+                    break;
                 default:
-                    {
-                        throw new NotImplementedException( "Remainder size " + mObjSize % 4 + " not supported yet! (Type = '" + mType.FullName + "')" );
-                    }
+                    throw new NotImplementedException("Remainder size " + xObjSize % 4 + " not supported yet! (Type = '" + xType.FullName + "')");
             }
         }
 

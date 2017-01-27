@@ -126,6 +126,25 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Test Conv_U8
             Assert.IsTrue((ulong)maxValue == 0xFFFF, "Conv_U8 for UInt16 doesn't work");
             Assert.IsTrue((ulong)minValue == 0x0000, "Conv_U8 for UInt16 doesn't work");
+
+            // Test Methods
+            val2 = TestMethod(value);
+            Assert.IsTrue(value == 60, "Passing an UInt16 as a method parameter doesn't work");
+            Assert.IsTrue(val2 == 61, "Returning an UInt16 value from a method doesn't work");
+
+            ByRefTestMethod(ref value);
+            Assert.IsTrue(value == 61, "Passing an UInt16 by ref to a method doesn't work");
+        }
+
+        public static ushort TestMethod(ushort aParam)
+        {
+            aParam++;
+            return aParam;
+        }
+
+        public static void ByRefTestMethod(ref ushort aParam)
+        {
+            aParam++;
         }
     }
 }

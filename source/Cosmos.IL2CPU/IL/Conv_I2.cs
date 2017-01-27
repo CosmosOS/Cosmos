@@ -1,9 +1,7 @@
 using System;
-using Cosmos.Assembler.x86.SSE;
+
 using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
 using static XSharp.Compiler.XSRegisters;
-using static Cosmos.Assembler.x86.SSE.ComparePseudoOpcodes;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -21,49 +19,45 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xSource = aOpCode.StackPopTypes[0];
-            var xSourceSize = SizeOfType(xSource);
-            var xSourceIsFloat = TypeIsFloat(xSource);
-            if (xSourceIsFloat)
+            var xSize = SizeOfType(xSource);
+            var xIsFloat = TypeIsFloat(xSource);
+
+            if (xSize > 8)
             {
-                if (xSourceSize == 4)
+                throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_I2.cs->Error: StackSize > 8 not supported");
+            }
+
+            if (xSize <= 4)
+            {
+                if (xIsFloat)
                 {
-                    XS.SSE.MoveSS(XMM0, ESP, sourceIsIndirect: true);
-                    XS.SSE.ConvertSS2SIAndTruncate(EAX, XMM0);
-                    XS.Set(ESP, EAX, destinationIsIndirect: true);
-                }
-                else if (xSourceSize == 8)
-                {
-                    XS.SSE2.MoveSD(XMM0, ESP, sourceIsIndirect: true);
-                    XS.SSE2.ConvertSD2SIAndTruncate(EAX, XMM0);
+                    XS.SSE.ConvertSS2SIAndTruncateIndirectSource(EAX, ESP);
+                    XS.MoveSignExtend(EAX, AX);
                     XS.Set(ESP, EAX, destinationIsIndirect: true);
                 }
                 else
                 {
-                    throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I2.cs->Unknown size of floating point value.");
-                }
-            }
-
-            switch (xSourceSize)
-            {
-                case 1:
-                    XS.Pop(EAX);
-                    XS.MoveSignExtend(EAX, AL);
-                    XS.Push(EAX);
-                    break;
-                case 2:
-                case 4:
                     XS.Pop(EAX);
                     XS.MoveSignExtend(EAX, AX);
                     XS.Push(EAX);
-                    break;
-                case 8:
+                }
+            }
+            else if (xSize <= 8)
+            {
+                if (xIsFloat)
+                {
+                    XS.SSE2.ConvertSD2SIAndTruncateIndirectSource(EAX, ESP);
+                    XS.Add(ESP, 4);
+                    XS.MoveSignExtend(EAX, AX);
+                    XS.Set(ESP, EAX, destinationIsIndirect: true);
+                }
+                else
+                {
                     XS.Pop(EAX);
                     XS.Pop(EBX);
                     XS.MoveSignExtend(EAX, AX);
                     XS.Push(EAX);
-                    break;
-                default:
-                    throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Conv_I2.cs->SourceSize " + xSource + " not supported!");
+                }
             }
         }
     }

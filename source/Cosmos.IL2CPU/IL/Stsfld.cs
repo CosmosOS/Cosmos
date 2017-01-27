@@ -1,11 +1,12 @@
 using System;
-using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.Assembler;
 using System.Reflection;
 using System.Linq;
-using System.Xml.Linq;
-using Cosmos.IL2CPU.ILOpCodes;
+
+using Cosmos.Assembler;
+using CPUx86 = Cosmos.Assembler.x86;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
+
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -57,28 +58,28 @@ namespace Cosmos.IL2CPU.X86.IL
       string xDataName = DataMember.GetStaticFieldName(xField);
       if (xIsReferenceType)
       {
-        XS.Add(XSRegisters.ESP, 4);
-        XS.Pop(XSRegisters.EAX);
-        XS.Set(ElementReference.New(xDataName).Name, XSRegisters.EAX, destinationIsIndirect: true, destinationDisplacement: 4);
+        XS.Add(ESP, 4);
+        XS.Pop(EAX);
+        XS.Set(ElementReference.New(xDataName).Name, EAX, destinationIsIndirect: true, destinationDisplacement: 4);
         return;
       }
       for (int i = 0; i < (xSize / 4); i++)
       {
-        XS.Pop(XSRegisters.EAX);
-        new CPUx86.Mov { DestinationRef = ElementReference.New(xDataName, i * 4), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.EAX };
+        XS.Pop(EAX);
+        new CPUx86.Mov { DestinationRef = ElementReference.New(xDataName, i * 4), DestinationIsIndirect = true, SourceReg = EAX };
       }
       switch (xSize % 4)
       {
         case 1:
           {
-            XS.Pop(XSRegisters.EAX);
-            new CPUx86.Mov { DestinationRef = ElementReference.New(xDataName, (int)((xSize / 4) * 4)), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.AL };
+            XS.Pop(EAX);
+            new CPUx86.Mov { DestinationRef = ElementReference.New(xDataName, (int)((xSize / 4) * 4)), DestinationIsIndirect = true, SourceReg = AL };
             break;
           }
         case 2:
           {
-            XS.Pop(XSRegisters.EAX);
-            new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xDataName, (int)((xSize / 4) * 4)), DestinationIsIndirect = true, SourceReg = CPUx86.RegistersEnum.AX };
+            XS.Pop(EAX);
+            new CPUx86.Mov { DestinationRef = Cosmos.Assembler.ElementReference.New(xDataName, (int)((xSize / 4) * 4)), DestinationIsIndirect = true, SourceReg = AX };
             break;
           }
         case 0:

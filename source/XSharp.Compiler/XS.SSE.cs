@@ -115,6 +115,17 @@ namespace XSharp.Compiler
         };
       }
 
+      public static void ConvertSS2SIAndTruncateIndirectSource(Register32 destination, Register32 source, int sourceDisplacement = 0)
+      {
+        new ConvertSS2SIAndTruncate
+        {
+          DestinationReg = destination,
+          SourceReg = source,
+          SourceIsIndirect = true,
+          SourceDisplacement = sourceDisplacement
+        };
+      }
+
       public static void DivPS(RegisterXMM destination, RegisterXMM source)
       {
         new DivPS

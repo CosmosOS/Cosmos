@@ -1,10 +1,9 @@
-using System;
-using CPU = Cosmos.Assembler.x86;
-using CPUx86 = Cosmos.Assembler.x86;
+using Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler;
-using Cosmos.IL2CPU.Plugs.System;
 using XSharp.Compiler;
+using static XSharp.Compiler.XSRegisters;
+
+using ObjectInfo = Cosmos.IL2CPU.Plugs.System.ObjectImpl;
 using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -26,18 +25,18 @@ namespace Cosmos.IL2CPU.X86.IL
       string mReturnNullLabel = xBaseLabel + "_ReturnNull";
       uint xTypeSize = SizeOfType(xType.Value);
 
-      XS.Compare(XSRegisters.EAX, 0);
-      XS.Jump(CPU.ConditionalTestEnum.Zero, mReturnNullLabel);
-      XS.Set(XSRegisters.EAX, XSRegisters.EAX, sourceIsIndirect: true);
-      XS.Push(XSRegisters.EAX, isIndirect: true);
+      XS.Compare(EAX, 0);
+      XS.Jump(ConditionalTestEnum.Zero, mReturnNullLabel);
+      XS.Set(EAX, EAX, sourceIsIndirect: true);
+      XS.Push(EAX, isIndirect: true);
       XS.Push(xTypeID, isIndirect: true);
       SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.UInt32", "System.UInt32");
       Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, GetLabel(aMethod, aOpCode), xBaseLabel + "_After_IsInstance_Call", DebugEnabled);
       XS.Label(xBaseLabel + "_After_IsInstance_Call");
-      XS.Pop(XSRegisters.EAX);
-      XS.Compare(XSRegisters.EAX, 0);
-      XS.Jump(CPU.ConditionalTestEnum.Equal, mReturnNullLabel);
-      XS.Pop(XSRegisters.EAX);
+      XS.Pop(EAX);
+      XS.Compare(EAX, 0);
+      XS.Jump(ConditionalTestEnum.Equal, mReturnNullLabel);
+      XS.Pop(EAX);
       uint xSize = xTypeSize;
       if (xSize % 4 > 0)
       {
@@ -46,11 +45,12 @@ namespace Cosmos.IL2CPU.X86.IL
       int xItems = (int)xSize / 4;
       for (int i = xItems - 1; i >= 0; i--)
       {
-        new CPU.Push { DestinationReg = CPU.RegistersEnum.EAX, DestinationIsIndirect = true, DestinationDisplacement = ((i * 4) + ObjectImpl.FieldDataOffset) };
+        XS.Push(EAX, displacement: (i * 4) + ObjectInfo.FieldDataOffset);
+        //new Push { DestinationReg = EAX, DestinationIsIndirect = true, DestinationDisplacement = ((i * 4) + ObjectInfo.FieldDataOffset) };
       }
-      new CPU.Jump { DestinationLabel = GetLabel(aMethod, aOpCode.NextPosition) };
+      XS.Jump(GetLabel(aMethod, aOpCode.NextPosition));
       XS.Label(mReturnNullLabel);
-      XS.Add(XSRegisters.ESP, 4);
+      XS.Add(ESP, 4);
       XS.Push(0);
     }
   }

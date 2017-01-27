@@ -114,20 +114,39 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((ushort)minValue == 0x8000, "Conv_U2 for Int16 doesn't work");
 
             // Test Conv_I4
-            Assert.IsTrue((int)maxValue == 0x7FFF, "Conv_I4 for Int16 doesn't work");
-            Assert.IsTrue((int)minValue == -0x8000, "Conv_I4 for Int16 doesn't work");
+            Assert.IsTrue((int)maxValue == 0x00007FFF, "Conv_I4 for Int16 doesn't work");
+            Assert.IsTrue((int)minValue == -0x00008000, "Conv_I4 for Int16 doesn't work");
 
             // Test Conv_U4
-            Assert.IsTrue((uint)maxValue == 0x7FFF, "Conv_U4 for Int16 doesn't work");
-            //Assert.IsTrue((uint)minValue == 0x8000, "Conv_U4 for Int16 doesn't work");
+            Assert.IsTrue((uint)maxValue == 0x00007FFF, "Conv_U4 for Int16 doesn't work");
+            Assert.IsTrue((uint)minValue == 0xFFFF8000, "Conv_U4 for Int16 doesn't work");
 
             // Test Conv_I8
-            Assert.IsTrue((long)maxValue == 0x7FFF, "Conv_I8 for Int16 doesn't work");
-            Assert.IsTrue((long)minValue == -0x8000, "Conv_I8 for Int16 doesn't work");
+            Assert.IsTrue((long)maxValue == 0x0000000000007FFF, "Conv_I8 for Int16 doesn't work");
+            Assert.IsTrue((long)minValue == -0x0000000000008000, "Conv_I8 for Int16 doesn't work");
 
             // Test Conv_U8
-            Assert.IsTrue((ulong)maxValue == 0x7FFF, "Conv_U8 for Int16 doesn't work");
-            //Assert.IsTrue((ulong)minValue == 0x8000, "Conv_U8 for Int16 doesn't work");
+            Assert.IsTrue((ulong)maxValue == 0x0000000000007FFF, "Conv_U8 for Int16 doesn't work");
+            Assert.IsTrue((ulong)minValue == 0xFFFFFFFFFFFF8000, "Conv_U8 for Int16 doesn't work");
+
+            // Test Methods
+            val2 = TestMethod(value);
+            Assert.IsTrue(value == 60, "Passing an Int16 as a method parameter doesn't work");
+            Assert.IsTrue(val2 == 61, "Returning an Int16 value from a method doesn't work");
+
+            ByRefTestMethod(ref value);
+            Assert.IsTrue(value == 61, "Passing an Int16 by ref to a method doesn't work");
+        }
+
+        public static short TestMethod(short aParam)
+        {
+            aParam++;
+            return aParam;
+        }
+
+        public static void ByRefTestMethod(ref short aParam)
+        {
+            aParam++;
         }
     }
 }

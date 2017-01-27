@@ -105,28 +105,47 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((byte)minValue == 0x80, "Conv_U1 for SByte doesn't work");
 
             // Test Conv_I2
-            Assert.IsTrue((short)maxValue == 0x7F, "Conv_I2 for SByte doesn't work");
-            Assert.IsTrue((short)minValue == -0x80, "Conv_I2 for SByte doesn't work");
+            Assert.IsTrue((short)maxValue == 0x007F, "Conv_I2 for SByte doesn't work");
+            Assert.IsTrue((short)minValue == -0x0080, "Conv_I2 for SByte doesn't work");
 
             // Test Conv_U2
-            Assert.IsTrue((ushort)maxValue == 0x7F, "Conv_U2 for SByte doesn't work");
-            Assert.IsTrue((ushort)minValue == 0x80, "Conv_U2 for SByte doesn't work");
+            Assert.IsTrue((ushort)maxValue == 0x007F, "Conv_U2 for SByte doesn't work");
+            Assert.IsTrue((ushort)minValue == 0xFF80, "Conv_U2 for SByte doesn't work");
 
             // Test Conv_I4
-            Assert.IsTrue((int)maxValue == 0x7F, "Conv_I4 for SByte doesn't work");
-            Assert.IsTrue((int)minValue == -0x80, "Conv_I4 for SByte doesn't work");
+            Assert.IsTrue((int)maxValue == 0x0000007F, "Conv_I4 for SByte doesn't work");
+            Assert.IsTrue((int)minValue == -0x00000080, "Conv_I4 for SByte doesn't work");
 
             // Test Conv_U4
-            Assert.IsTrue((uint)maxValue == 0x7F, "Conv_U4 for SByte doesn't work");
-            //Assert.IsTrue((uint)minValue == 0x80, "Conv_U4 for SByte doesn't work");
+            Assert.IsTrue((uint)maxValue == 0x0000007F, "Conv_U4 for SByte doesn't work");
+            Assert.IsTrue((uint)minValue == 0xFFFFFF80, "Conv_U4 for SByte doesn't work");
 
             // Test Conv_I8
-            Assert.IsTrue((long)maxValue == 0x7F, "Conv_I8 for SByte doesn't work");
-            Assert.IsTrue((long)minValue == -0x80, "Conv_I8 for SByte doesn't work");
+            Assert.IsTrue((long)maxValue == 0x000000000000007F, "Conv_I8 for SByte doesn't work");
+            Assert.IsTrue((long)minValue == -0x0000000000000080, "Conv_I8 for SByte doesn't work");
 
             // Test Conv_U8
-            Assert.IsTrue((ulong)maxValue == 0x7F, "Conv_U8 for SByte doesn't work");
-            //Assert.IsTrue((ulong)minValue == 0x80, "Conv_U8 for SByte doesn't work");
+            Assert.IsTrue((ulong)maxValue == 0x000000000000007F, "Conv_U8 for SByte doesn't work");
+            Assert.IsTrue((ulong)minValue == 0xFFFFFFFFFFFFFF80, "Conv_U8 for SByte doesn't work");
+
+            // Test Methods
+            val2 = TestMethod(value);
+            Assert.IsTrue(value == 60, "Passing an SByte as a method parameter doesn't work");
+            Assert.IsTrue(val2 == 61, "Returning an SByte value from a method doesn't work");
+
+            ByRefTestMethod(ref value);
+            Assert.IsTrue(value == 61, "Passing an SByte by ref to a method doesn't work");
+        }
+
+        public static sbyte TestMethod(sbyte aParam)
+        {
+            aParam++;
+            return aParam;
+        }
+
+        public static void ByRefTestMethod(ref sbyte aParam)
+        {
+            aParam++;
         }
     }
 }
