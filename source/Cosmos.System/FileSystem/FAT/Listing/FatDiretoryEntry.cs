@@ -288,7 +288,9 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         public void DeleteDirectoryEntry()
         {
             if (mEntryType == DirectoryEntryTypeEnum.Unknown)
+            {
                 throw new NotImplementedException();
+            }
 
             if (mParent != null)
             {
@@ -304,8 +306,15 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
                 ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
             }
+            else
+            {
+                throw new Exception("Parent directory is null");
+            }
 
             SetDirectoryEntryMetadataValue(FatDirectoryEntryMetadata.FirstByte, FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry);
+
+            // GetFatTable calls GetFatChain, which "refreshes" the FAT table and clusters
+            GetFatTable();
         }
 
         /// <summary>
@@ -390,6 +399,9 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                         case 0x05:
                             // Japanese characters - We dont handle these
                             break;
+                        case 0x2E:
+                            // Dot entry
+                            continue;
                         case FatDirectoryEntryAttributeConsts.UnusedOrDeletedEntry:
                             // Empty slot, skip it
                             continue;
