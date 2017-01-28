@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using Cosmos.Common.Extensions;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core.CPUInfo
 {
@@ -17,10 +18,29 @@ namespace Cosmos.Core.CPUInfo
             CPUInfo.EntryPointTable entry =  SMBIOSHandler.ParseEntryTable(memPtr);
 
             //entry.GetTableAddress();
-            DebugSMBIOS.DebugEntryPoint(entry);
             BIOSInfo bios = SMBIOSHandler.ParseStructures(entry);
-            DebugSMBIOS.DebugBIOSInfo(bios);
             return entry;
+        }
+
+        /// <summary>
+        /// Parses a string of type smbios and stores the result in the variable "variable"
+        /// This function stops when found a nul byte (i.e, \0)
+        /// Note that the contents of variable will be overwritten.
+        /// </summary>
+        /// <param name="beginningAddress">Address in which we start searching</param>
+        /// <param name="variable">Variable in which we will store the result</param>
+        /// <returns>Offset of the search (i.e, the number of position searched)</returns>
+        public static byte* ParseString(byte* beginningAddress, out string variable)
+        {
+            variable = "";
+            var i = 0;
+            while (beginningAddress[i] != '\0')
+            {
+                variable = variable + (char)beginningAddress[i];
+                i++;
+            }
+            //We need to add one to skip the \0
+            return beginningAddress + i + 1;
         }
 
     }
@@ -94,6 +114,9 @@ namespace Cosmos.Core.CPUInfo
         public static BIOSInfo ParseStructures(EntryPointTable entryPointTable)
         {
             BIOSInfo biosInfo = new BIOSInfo(entryPointTable, entryPointTable.GetTableAddress());
+            byte* newMem = biosInfo.Parse();
+            Debugger.DoSend("New table: " + newMem[0]);
+            //Continue parsing
             return biosInfo;
         }
 

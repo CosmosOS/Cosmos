@@ -9,10 +9,10 @@ namespace Cosmos.Core.CPUInfo
 {
     public unsafe class BIOSInfo : SMBIOSTable
     {
-        //TODO: convert to private
-        public byte VendorID;
-        public byte VersionID;
-        public byte ReleaseDateID;
+        private byte VendorID;
+        private byte VersionID;
+        private byte ReleaseDateID;
+        private EntryPointTable EntryPointTable;
 
         public string Vendor{ get; set; }
         public string Version { get; set; }
@@ -33,6 +33,16 @@ namespace Cosmos.Core.CPUInfo
         //TODO: independice the hardcoded numbers with a variable (which we will use to move through memory)
         public BIOSInfo(EntryPointTable entryPointTable, byte* BeginningAddress) : base(BeginningAddress)
         {
+            this.BeginningAddress = BeginningAddress;
+            this.EntryPointTable = entryPointTable;
+        }
+
+        //We go byte by byte MANUALLY to parse the table.
+        //The field that is assigned is autodocumented
+        //We use the BitConverter for qwords and words (2 bytes and 8 bytes, respectively);
+        public override byte* Parse()
+        {
+            byte* newAddress =  BeginningAddress;
             int i;
             int j;
 
@@ -63,12 +73,19 @@ namespace Cosmos.Core.CPUInfo
             }
             Characteristics = BitConverter.ToUInt64(tmp, 0);
 
-            if (entryPointTable.IsVersionGreaterThan(2, 4))
+            newAddress = BeginningAddress + 18;
+
+            if (EntryPointTable.IsVersionGreaterThan(2, 4))
             {
                 //Begin to parse the optional characteristics
                 //Since it is an optional field, we need to calculate its size first
                 //Formula: Length - 12h == Length - 18
-                var size = Length - 18;
+                //var size = Length - 18;
+
+                //I dont know if the specification is incorrect but i count 22 bytes, not 18 (you must 
+                // count the system bios bytes and firmware (since they are 22 bytes).
+                // Fucking engineers. Need discrete math 101 to learn to count.
+                var size = Length - 22;
                 //If there is no optional characteristic, skip
                 if (size > 0)
                 {
@@ -77,7 +94,6 @@ namespace Cosmos.Core.CPUInfo
                     for (int k = 0; k < size; k++)
                     {
                         OptionalCharacteristics[k] = BeginningAddress[k + 18];
-                        Debugger.DoSend("CHARACT: " + k);
                     }
                 }
 
@@ -87,6 +103,8 @@ namespace Cosmos.Core.CPUInfo
                 EmbeddedControllerFirmwareMinorRelease = BeginningAddress[size + 21];
 
                 //This will not work in bochs since its version is 2.4
+                //I will comment it
+                /*
                 if (entryPointTable.IsVersionGreaterThan(3, 1))
                 {
                     size += 2;
@@ -95,16 +113,68 @@ namespace Cosmos.Core.CPUInfo
                     tmp[1] = BeginningAddress[size + 23];
                     ExtendedBiosROMSize = BitConverter.ToUInt16(tmp, 0);
                 }
+                */
                 
                 //We have finished parsing the formatted area
                 //We start now the unformatted area
-                Debugger.DoSend("Unformatted area (first char): " + BeginningAddress[size + 22 - 8]);
-                for (int k = 0; k < 60; k++)
-                {
-                    Debugger.DoSend("" + (char)*(((byte*)BeginningAddress) + k + size + 22 - 8));
-                }
+                newAddress = BeginningAddress + size + 22;
             }
 
+            //TODO: improve this (we asume that there's always a vendor a version and a date). Besides, doing it this way...
+            //Parse the first string
+            string tmpString = "";
+            if (VendorID == 0)
+            {
+                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
+                Vendor = (string)tmpString.Clone();
+            }
+            else if (VersionID == 0)
+            {
+                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
+                Version = tmpString;
+            }
+            else
+            {
+                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
+                ReleaseDate = tmpString;
+            }
+
+            if (VendorID == 1)
+            {
+                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
+                Vendor = tmpString;
+            }
+            else if (VersionID == 1)
+            {
+                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
+                Version = tmpString;
+            }
+            else
+            {
+                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
+                ReleaseDate = tmpString;
+            }
+
+            if (VendorID == 2)
+            {
+                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
+                Vendor = tmpString;
+            }
+            else if (VersionID == 2)
+            {
+                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
+                Version = tmpString;
+            }
+            else
+            {
+                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
+                ReleaseDate = tmpString;
+            }
+
+            //To skip the double null
+
+            return newAddress + 1;
         }
     }
 }
+

@@ -42,16 +42,16 @@ namespace Cosmos.Core.CPUInfo
             Debugger.DoSend("Type: " + bios.Type); 
             Debugger.DoSend("Legnth: " + bios.Length);
             Debugger.DoSend("Handle: " + bios.Handle);
-            Debugger.DoSend("Vendor: " + bios.VendorID);
-            Debugger.DoSend("Bios Version: " + bios.VersionID);
             Debugger.DoSend("Bios Starting Address Segment: " + bios.StartingAddressSegment);
-            Debugger.DoSend("Bios release date: " + bios.ReleaseDateID);
             Debugger.DoSend("Bios rom size: " + 64 * (bios.ROMSize + 1) + "K");
             Debugger.DoSend("Bios characteristics: " + bios.Characteristics);
             Debugger.DoSend("Bios extension bytes characteristics (length): " + bios.OptionalCharacteristics.Length);
             Debugger.DoSend("System bios release: " + bios.SystemBiosMajorRelease + "." + bios.SystemBiosMinorRelease);
             Debugger.DoSend("Firmware release: " + bios.EmbeddedControllerFirmwareMajorRelease + "." + bios.EmbeddedControllerFirmwareMinorRelease);
             Debugger.DoSend("Extended bios rom size: " + bios.ExtendedBiosROMSize);
+            Debugger.DoSend("Vendor: " + bios.Vendor);
+            Debugger.DoSend("Release date: " + bios.ReleaseDate);
+            Debugger.DoSend("Version: " + bios.Version);
         }
     }
 }

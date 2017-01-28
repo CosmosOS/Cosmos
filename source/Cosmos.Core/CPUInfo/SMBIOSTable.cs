@@ -17,5 +17,7 @@ namespace Cosmos.Core.CPUInfo
         {
             this.BeginningAddress = BeginningAddress;
         }
+
+        public abstract byte* Parse();
     }
 }
