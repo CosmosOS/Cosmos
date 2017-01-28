@@ -16,10 +16,9 @@ namespace Cosmos.IL2CPU.Extensions
             return LabelName.GetFullName(aMethod);
         }
 
-        public static List<LocalVariableInfo> GetLocalVariables(this MethodBase aThis)
+        public static IList<Type> GetLocalVariables(this MethodBase aThis)
         {
-            var xBody = DebugSymbolReader.GetMethodBodyBlock(aThis.Module, aThis.MetadataToken);
-            return DebugSymbolReader.GetLocalVariableInfos(aThis.Module, xBody);
+            return DebugSymbolReader.GetLocalVariableInfos(aThis);
         }
 
         public static MethodBodyBlock GetMethodBody(this MethodBase aThis)

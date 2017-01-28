@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define COSMOSDEBUG
+
+using System;
 using System.Diagnostics;
 
 namespace Cosmos.IL2CPU

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Reflection.Metadata;
@@ -205,23 +206,39 @@ namespace Cosmos.Debug.Symbols
                 string xLocation = aModule.Assembly.Location;
                 var xReader = GetReader(xLocation);
                 var xMethodDefinition = xReader.mMetadataReader.GetMethodDefinition(xMethodDefHandle);
-                int xRelativeVirtualAddress = xMethodDefinition.RelativeVirtualAddress;
-                return xReader.mPEReader.GetMethodBody(xRelativeVirtualAddress);
+                if (xMethodDefinition.RelativeVirtualAddress > 0)
+                {
+                    int xRelativeVirtualAddress = xMethodDefinition.RelativeVirtualAddress;
+                    return xReader.mPEReader.GetMethodBody(xRelativeVirtualAddress);
+                }
             }
             return null;
         }
 
-        public static List<LocalVariableInfo> GetLocalVariableInfos(Module aModule, MethodBodyBlock aMethodBody)
+        public static IList<Type> GetLocalVariableInfos(MethodBase aMethodBase)
         {
-            var xLocalVariables = new List<LocalVariableInfo>();
-            if (!aMethodBody.LocalSignature.IsNil)
-            {
-                string xLocation = aModule.Assembly.Location;
-                var xReader = DebugSymbolReader.GetReader(xLocation);
-                var xSig = xReader.mMetadataReader.GetStandaloneSignature(aMethodBody.LocalSignature);
-                var xLocals = xSig.DecodeLocalSignature(new LocalTypeProvider(), null);
-            }
+            var xLocalVariables = new List<Type>();
 
+#if NETSTANDARD1_6
+            var xMethodBody = GetMethodBodyBlock(aMethodBase.Module, aMethodBase.MetadataToken);
+            if (!xMethodBody.LocalSignature.IsNil)
+            {
+                string xLocation = aMethodBase.Module.Assembly.Location;
+                var xReader = GetReader(xLocation);
+                var xSig = xReader.mMetadataReader.GetStandaloneSignature(xMethodBody.LocalSignature);
+                var xLocals = xSig.DecodeLocalSignature(new LocalTypeProvider(aMethodBase.Module), null);
+                foreach (var xLocal in xLocals)
+                {
+                    xLocalVariables.Add(xLocal);
+                }
+            }
+#else
+            var xLocals = aMethodBase.GetMethodBody().LocalVariables;
+            foreach (var xLocal in xLocals)
+            {
+                xLocalVariables.Add(xLocal.LocalType);
+            }
+#endif
             return xLocalVariables;
         }
     }

@@ -1,4 +1,6 @@
 //#define VMT_DEBUG
+#define COSMOSDEBUG
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -99,9 +101,10 @@ namespace Cosmos.IL2CPU
                 if (aMethod.MethodAssembler == null && !aMethod.IsInlineAssembler)
                 {
                     // the body of aMethod is getting emitted
-                    foreach (var localVariable in aMethod.MethodBase.GetLocalVariables())
+                    var xLocals = aMethod.MethodBase.GetLocalVariables();
+                    for (int i = 0; i < xLocals.Count; i++)
                     {
-                        XS.Comment(String.Format("Local {0} at EBP-{1}", localVariable.LocalIndex, ILOp.GetEBPOffsetForLocal(aMethod, localVariable.LocalIndex)));
+                        XS.Comment(String.Format("Local {0} at EBP-{1}", i, ILOp.GetEBPOffsetForLocal(aMethod, i)));
                     }
 
                     var xIdxOffset = 0u;
@@ -231,27 +234,26 @@ namespace Cosmos.IL2CPU
             if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
             {
                 // the body of aMethod is getting emitted
-                var xBody = aMethod.MethodBase.GetMethodBody();
-                if (xBody != null)
-                {
                     var xLocalsOffset = mLocals_Arguments_Infos.Count;
                     aMethod.LocalVariablesSize = 0;
-                    foreach (var xLocal in aMethod.MethodBase.GetLocalVariables())
+                var xLocals = DebugSymbolReader.GetLocalVariableInfos(aMethod.MethodBase);
+                for (int i = 0; i < xLocals.Count; i++)
+                {
                     {
                         var xInfo = new LOCAL_ARGUMENT_INFO
-                        {
-                            METHODLABELNAME = xMethodLabel,
-                            IsArgument = false,
-                            INDEXINMETHOD = xLocal.LocalIndex,
-                            NAME = "Local" + xLocal.LocalIndex,
-                            OFFSET = 0 - (int)ILOp.GetEBPOffsetForLocalForDebugger(aMethod, xLocal.LocalIndex),
-                            TYPENAME = xLocal.LocalType.AssemblyQualifiedName
-                        };
+                                    {
+                                        METHODLABELNAME = xMethodLabel,
+                                        IsArgument = false,
+                                        INDEXINMETHOD = i,
+                                        NAME = "Local" + i,
+                                        OFFSET = 0 - (int) ILOp.GetEBPOffsetForLocalForDebugger(aMethod, i),
+                                        TYPENAME = xLocals[i].AssemblyQualifiedName
+                                    };
                         mLocals_Arguments_Infos.Add(xInfo);
 
-                        var xSize = ILOp.Align(ILOp.SizeOfType(xLocal.LocalType), 4);
-                        XS.Comment(String.Format("Local {0}, Size {1}", xLocal.LocalIndex, xSize));
-                        for (int i = 0; i < xSize / 4; i++)
+                        var xSize = ILOp.Align(ILOp.SizeOfType(xLocals[i]), 4);
+                        XS.Comment(String.Format("Local {0}, Size {1}", i, xSize));
+                        for (int j = 0; j < xSize / 4; j++)
                         {
                             XS.Push(0);
                         }
@@ -369,14 +371,11 @@ namespace Cosmos.IL2CPU
             XS.Label(xLabelExc);
             if (aMethod.MethodAssembler == null && aMethod.PlugMethod == null && !aMethod.IsInlineAssembler)
             {
-                var xMethodBody = aMethod.MethodBase.GetMethodBody();
-                if (xMethodBody != null)
-                {
                     uint xLocalsSize = 0;
-                    var xLocalInfos = aMethod.MethodBase.GetLocalVariables();
+                    var xLocalInfos = DebugSymbolReader.GetLocalVariableInfos(aMethod.MethodBase);
                     for (int j = xLocalInfos.Count - 1; j >= 0; j--)
                     {
-                        xLocalsSize += ILOp.Align(ILOp.SizeOfType(xLocalInfos[j].LocalType), 4);
+                        xLocalsSize += ILOp.Align(ILOp.SizeOfType(xLocalInfos[j]), 4);
 
                         if (xLocalsSize >= 256)
                         {
@@ -389,7 +388,7 @@ namespace Cosmos.IL2CPU
                         XS.Add(ESP, xLocalsSize);
                     }
                 }
-            }
+
             if (DebugEnabled && StackCorruptionDetection)
             {
                 // if debugstub is active, emit a stack corruption detection. at this point EBP and ESP should have the same value.
@@ -1446,14 +1445,11 @@ namespace Cosmos.IL2CPU
                 xMLSymbol.StackDiff = -1;
                 if (aMethod.MethodBase != null)
                 {
-                    var xMethodBody = aMethod.MethodBase.GetMethodBody();
-                    if (xMethodBody != null)
-                    {
-                        var xLocalsSize = (from item in aMethod.MethodBase.GetLocalVariables()
-                                           select ILOp.Align(ILOp.SizeOfType(item.LocalType), 4)).Sum();
+                    var xLocals = DebugSymbolReader.GetLocalVariableInfos(aMethod.MethodBase);
+                        var xLocalsSize = (from item in xLocals
+                                           select ILOp.Align(ILOp.SizeOfType(item), 4)).Sum();
                         xMLSymbol.StackDiff = checked((int)(xLocalsSize + xStackSize));
                         xStackDifference = (uint?)xMLSymbol.StackDiff;
-                    }
                 }
                 xMLSymbol.IlOffset = aOpCode.Position;
                 xMLSymbol.MethodID = mCurrentMethodGuid;

@@ -366,6 +366,7 @@ namespace Cosmos.IL2CPU
 
         protected void ScanMethod(MethodBase aMethod, bool aIsPlug, string sourceItem)
         {
+            CompilerHelpers.Debug($"ILScanner: ScanMethod - Method '{aMethod}', IsPlug '{aIsPlug}', Source '{sourceItem}'");
             var xParams = aMethod.GetParameters();
             var xParamTypes = new Type[xParams.Length];
             // Dont use foreach, enum generaly keeps order but
@@ -392,7 +393,7 @@ namespace Cosmos.IL2CPU
             {
                 Queue(((SysReflection.MethodInfo) aMethod).ReturnType.GetTypeInfo(), aMethod, "Return Type");
             }
-            if (aMethod.GetFullName().IndexOf("CreateComparer", StringComparison.OrdinalIgnoreCase)!=-1)
+            if (aMethod.GetFullName().IndexOf("Run", StringComparison.OrdinalIgnoreCase)!=-1)
             {
                 ;
             }
@@ -654,6 +655,7 @@ namespace Cosmos.IL2CPU
             while (mQueue.Count > 0)
             {
                 var xItem = mQueue.Dequeue();
+                CompilerHelpers.Debug($"ILScanner: ScanQueue - '{xItem}'");
                 // Check for MethodBase first, they are more numerous
                 // and will reduce compares
                 if (xItem.Item is MethodBase)

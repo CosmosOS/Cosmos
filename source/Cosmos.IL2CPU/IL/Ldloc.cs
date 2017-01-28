@@ -19,12 +19,12 @@ namespace Cosmos.IL2CPU.X86.IL
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
       var xOpVar = (OpVar)aOpCode;
-      var xVar = aMethod.MethodBase.GetLocalVariables()[xOpVar.Value];
+      var xVar = DebugSymbolReader.GetLocalVariableInfos(aMethod.MethodBase)[xOpVar.Value];
       var xStackCount = (int)GetStackCountForLocal(aMethod, xVar);
       var xEBPOffset = (int)GetEBPOffsetForLocal(aMethod, xOpVar.Value);
-      var xSize = SizeOfType(xVar.LocalType);
+      var xSize = SizeOfType(xVar);
 
-      XS.Comment("Local type = " + xVar.LocalType);
+      XS.Comment("Local type = " + xVar);
       XS.Comment("Local EBP offset = " + xEBPOffset);
       XS.Comment("Local size = " + xSize);
 
@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
       {
         case 1:
         case 2:
-          bool xSigned = IsIntegerSigned(xVar.LocalType);
+          bool xSigned = IsIntegerSigned(xVar);
           if (xSigned)
           {
             new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - xEBPOffset) };

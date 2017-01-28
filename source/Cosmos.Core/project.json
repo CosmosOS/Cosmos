@@ -16,6 +16,9 @@
         "Cosmos.Core.Common": {
           "target": "project"
         },
+        "Cosmos.Core.Memory": {
+          "target": "project"
+        },
         "Cosmos.Debug.Kernel": {
           "target": "project"
         },

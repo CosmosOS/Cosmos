@@ -97,9 +97,9 @@ namespace Cosmos.IL2CPU
       XS.Jump(GetLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal);
     }
 
-    public static uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField)
+    public static uint GetStackCountForLocal(MethodInfo aMethod, Type aField)
     {
-      var xSize = SizeOfType(aField.LocalType);
+      var xSize = SizeOfType(aField);
       var xResult = xSize / 4;
       if (xSize % 4 != 0)
       {

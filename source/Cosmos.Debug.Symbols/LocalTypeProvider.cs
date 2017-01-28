@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 
@@ -7,6 +9,13 @@ namespace Cosmos.Debug.Symbols
 {
     public class LocalTypeProvider : ISignatureTypeProvider<Type, LocalTypeGenericContext>
     {
+        private Module mModule;
+
+        public LocalTypeProvider(Module aModule)
+        {
+            mModule = aModule;
+        }
+
         public Type GetPrimitiveType(PrimitiveTypeCode typeCode)
         {
             switch (typeCode)
@@ -57,11 +66,7 @@ namespace Cosmos.Debug.Symbols
             if (!handle.IsNil)
             {
                 int xToken = MetadataTokens.GetToken(handle);
-                var xTypeReference = reader.GetTypeReference(handle);
-
-                string xName = reader.GetString(xTypeReference.Name);
-                string xNamespace = reader.GetString(xTypeReference.Namespace);
-                return Type.GetType(xName);
+                return mModule.ResolveType(xToken, null, null);
             }
             return null;
         }
@@ -71,22 +76,19 @@ namespace Cosmos.Debug.Symbols
             if (!handle.IsNil)
             {
                 int xToken = MetadataTokens.GetToken(handle);
-                var xTypeDefinition = reader.GetTypeDefinition(handle);
-                string xName = reader.GetString(xTypeDefinition.Name);
-                string xNamespace = reader.GetString(xTypeDefinition.Namespace);
-                return Type.GetType(xName);
+                return mModule.ResolveType(xToken, null, null);
             }
             return null;
         }
 
         public Type GetSZArrayType(Type elementType)
         {
-            throw new NotImplementedException();
+            return elementType.MakeArrayType();
         }
 
         public Type GetGenericInstantiation(Type genericType, ImmutableArray<Type> typeArguments)
         {
-            throw new NotImplementedException();
+            return mModule.ResolveType(genericType.GetTypeInfo().MetadataToken, typeArguments.ToArray(), null);
         }
 
         public Type GetArrayType(Type elementType, ArrayShape shape)

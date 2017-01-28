@@ -56,17 +56,18 @@ namespace Cosmos.IL2CPU.ILOpCodes
 
       var xArgIndexCorrection = 0;
       var xParams = aMethod.GetParameters();
+      var xLocals = DebugSymbolReader.GetLocalVariableInfos(aMethod);
       switch (OpCode)
       {
         case Code.Ldloc:
-            StackPushTypes[0] = aMethod.GetLocalVariables()[Value].LocalType;
+            StackPushTypes[0] = xLocals[Value];
             if (StackPushTypes[0].GetTypeInfo().IsEnum)
             {
               StackPushTypes[0] = StackPushTypes[0].GetTypeInfo().GetEnumUnderlyingType();
             }
           return;
         case Code.Ldloca:
-            StackPushTypes[0] = aMethod.GetLocalVariables()[Value].LocalType.MakeByRefType();
+            StackPushTypes[0] = xLocals[Value].MakeByRefType();
           return;
         case Code.Ldarg:
           if (!aMethod.IsStatic)
