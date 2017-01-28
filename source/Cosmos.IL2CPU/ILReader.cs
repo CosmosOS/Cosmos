@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using System.Reflection.Metadata;
 
 using Cosmos.Debug.Symbols;
+using Cosmos.IL2CPU.Extensions;
 
 namespace Cosmos.IL2CPU {
   public class ILReader {

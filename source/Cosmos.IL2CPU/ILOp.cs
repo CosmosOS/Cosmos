@@ -9,6 +9,7 @@ using Cosmos.IL2CPU.Plugs;
 using Cosmos.Assembler;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Debug.Symbols;
+using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.X86.IL;
 using XSharp.Compiler;
 using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
@@ -18,9 +19,9 @@ namespace Cosmos.IL2CPU
   public abstract class ILOp
   {
     public static PlugManager mPlugManager;
-    protected readonly Cosmos.Assembler.Assembler Assembler;
+    protected readonly Assembler.Assembler Assembler;
 
-    protected ILOp(Cosmos.Assembler.Assembler aAsmblr)
+    protected ILOp(Assembler.Assembler aAsmblr)
     {
       Assembler = aAsmblr;
     }
@@ -31,11 +32,9 @@ namespace Cosmos.IL2CPU
     // could be used for other things, profiling, analysis, reporting, etc
     public abstract void Execute(MethodInfo aMethod, ILOpCode aOpCode);
 
-    public static string GetTypeIDLabel(Type aType)
+      public static string GetTypeIDLabel(Type aType)
     {
-      return "VMT__TYPE_ID_HOLDER__" +
-             DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(aType.GetTypeInfo()) + " ASM_IS__" +
-                                                      aType.GetTypeInfo().Assembly.GetName().Name);
+      return "VMT__TYPE_ID_HOLDER__" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(aType) + " ASM_IS__" + aType.GetTypeInfo().Assembly.GetName().Name);
     }
 
     public static uint Align(uint aSize, uint aAlign)
@@ -50,7 +49,7 @@ namespace Cosmos.IL2CPU
 
     public static int SignedAlign(int aSize, int aAlign)
     {
-      var xSize = aSize;
+      int xSize = aSize;
       if ((xSize % aAlign) != 0)
       {
         xSize += aAlign - (xSize % aAlign);
@@ -63,26 +62,23 @@ namespace Cosmos.IL2CPU
       return GetLabel(aMethod, aOpCode.Position);
     }
 
-    public static string GetMethodLabel(MethodBase aMethod)
+    public static string GetLabel(MethodBase aMethod)
     {
       return LabelName.Get(aMethod);
     }
 
-    public static string GetMethodLabel(MethodInfo aMethod)
+    public static string GetLabel(MethodInfo aMethod)
     {
       if (aMethod.PluggedMethod != null)
       {
-        return "PLUG_FOR___" + GetMethodLabel(aMethod.PluggedMethod.MethodBase);
+        return "PLUG_FOR___" + GetLabel(aMethod.PluggedMethod.MethodBase);
       }
-      else
-      {
-        return GetMethodLabel(aMethod.MethodBase);
-      }
+      return GetLabel(aMethod.MethodBase);
     }
 
     public static string GetLabel(MethodInfo aMethod, int aPos)
     {
-      return LabelName.Get(GetMethodLabel(aMethod), aPos);
+      return LabelName.Get(GetLabel(aMethod), aPos);
     }
 
     public override string ToString()
@@ -93,14 +89,12 @@ namespace Cosmos.IL2CPU
     protected static void Jump_Exception(MethodInfo aMethod)
     {
       // todo: port to numeric labels
-      XS.Jump (GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameException);
-      //new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameException };
+      XS.Jump(GetLabel(aMethod) + AppAssembler.EndOfMethodLabelNameException);
     }
 
     protected static void Jump_End(MethodInfo aMethod)
     {
-      XS.Jump(GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal);
-      //new CPU.Jump { DestinationLabel = GetMethodLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal };
+      XS.Jump(GetLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal);
     }
 
     public static uint GetStackCountForLocal(MethodInfo aMethod, LocalVariableInfo aField)
@@ -114,113 +108,28 @@ namespace Cosmos.IL2CPU
       return xResult;
     }
 
-    public static uint GetEBPOffsetForLocal(MethodInfo aMethod, int localIndex)
+     public static uint GetEBPOffsetForLocal(MethodInfo aMethod, int localIndex)
     {
-      var xBody = aMethod.MethodBase.GetMethodBody();
+      var xLocalInfos = aMethod.MethodBase.GetLocalVariables();
       uint xOffset = 4;
-      for (int i = 0; i < xBody.GetLocalVariablesInfo().Count; i++)
+      for (int i = 0; i < xLocalInfos.Count; i++)
       {
         if (i == localIndex)
         {
           break;
         }
-        var xField = xBody.GetLocalVariablesInfo()[i];
+        var xField = xLocalInfos[i];
         xOffset += GetStackCountForLocal(aMethod, xField) * 4;
       }
       return xOffset;
-    }
-
-    public static uint SizeOfType(Type aType)
-    {
-      if (aType == null)
-      {
-        throw new ArgumentNullException("aType");
-      }
-      if (aType.IsPointer || aType.IsByRef)
-      {
-        return 4;
-      }
-      if (aType.FullName == "System.Void")
-      {
-        return 0;
-      }
-      if (TypeIsReferenceType(aType))
-      {
-        return 8;
-      }
-      switch (aType.FullName)
-      {
-        case "System.Char":
-          return 2;
-        case "System.Byte":
-        case "System.SByte":
-          return 1;
-        case "System.UInt16":
-        case "System.Int16":
-          return 2;
-        case "System.UInt32":
-        case "System.Int32":
-          return 4;
-        case "System.UInt64":
-        case "System.Int64":
-          return 8;
-        //TODO: for now hardcode IntPtr and UIntPtr to be 32-bit
-        case "System.UIntPtr":
-        case "System.IntPtr":
-          return 4;
-        case "System.Boolean":
-          return 1;
-        case "System.Single":
-          return 4;
-        case "System.Double":
-          return 8;
-        case "System.Decimal":
-          return 16;
-        case "System.Guid":
-          return 16;
-        case "System.Enum":
-          return 4;
-        case "System.DateTime":
-          return 8;
-      }
-      if (aType.FullName != null && aType.FullName.EndsWith("*"))
-      {
-        // pointer
-        return 4;
-      }
-      // array
-      //TypeSpecification xTypeSpec = aType as TypeSpecification;
-      //if (xTypeSpec != null) {
-      //    return 4;
-      //}
-      if (aType.GetTypeInfo().IsEnum)
-      {
-        return SizeOfType(aType.GetTypeInfo().GetField("value__").FieldType);
-      }
-      if (aType.GetTypeInfo().IsValueType)
-      {
-        var xSla = aType.GetTypeInfo().StructLayoutAttribute;
-        if ((xSla != null) && (xSla.Size > 0))
-        {
-          return (uint)xSla.Size;
-        }
-        return (uint)(from item in GetFieldsInfo(aType, false)
-                      select (int)item.Size).Sum();
-      }
-      return 4;
-    }
-
-    public static bool TypeIsFloat(Type type)
-    {
-      return type == typeof(float) || type == typeof(double);
     }
 
     public static uint GetEBPOffsetForLocalForDebugger(MethodInfo aMethod, int localIndex)
     {
       // because the memory is read in positive direction, we need to add additional size if greater than 4
       uint xOffset = GetEBPOffsetForLocal(aMethod, localIndex);
-      var xBody = aMethod.MethodBase.GetMethodBody();
-      var xField = xBody.GetLocalVariablesInfo()[localIndex];
+      var xLocalInfos = aMethod.MethodBase.GetLocalVariables();
+      var xField = xLocalInfos[localIndex];
       xOffset += GetStackCountForLocal(aMethod, xField) * 4 - 4;
       return xOffset;
     }
@@ -230,8 +139,7 @@ namespace Cosmos.IL2CPU
       XS.Push(LdStr.GetContentsArrayName(aMessage));
       new CPU.Call
       {
-        DestinationLabel = LabelName.Get(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowNotImplemented",
-                                         BindingFlags.Static | BindingFlags.Public))
+        DestinationLabel = LabelName.Get(typeof(ExceptionHelper).GetMethod("ThrowNotImplemented", BindingFlags.Static | BindingFlags.Public))
       };
     }
 
@@ -239,20 +147,19 @@ namespace Cosmos.IL2CPU
     {
       new CPU.Call
       {
-        DestinationLabel = LabelName.Get(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowOverflow",
-                           BindingFlags.Static | BindingFlags.Public))
+        DestinationLabel = LabelName.Get(typeof(ExceptionHelper).GetMethod("ThrowOverflow", BindingFlags.Static | BindingFlags.Public))
       };
     }
 
-    private static void DoGetFieldsInfo(Type aType, List<X86.IL.FieldInfo> aFields, bool includeStatic)
+    private static void DoGetFieldsInfo(Type aType, List<FieldInfo> aFields, bool includeStatic)
     {
-      var xCurList = new Dictionary<string, X86.IL.FieldInfo>();
+      var xCurList = new Dictionary<string, FieldInfo>();
       var xBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
       if (includeStatic)
       {
         xBindingFlags |= BindingFlags.Static;
       }
-      var xFields = (from item in aType.GetTypeInfo().GetFields(xBindingFlags)
+      var xFields = (from item in aType.GetFields(xBindingFlags)
                      orderby item.Name, item.DeclaringType.ToString()
                      select item).ToArray();
       for (int i = 0; i < xFields.Length; i++)
@@ -266,7 +173,7 @@ namespace Cosmos.IL2CPU
 
         string xId = xField.GetFullName();
 
-        var xInfo = new X86.IL.FieldInfo(xId, SizeOfType(xField.FieldType), aType, xField.FieldType);
+        var xInfo = new FieldInfo(xId, SizeOfType(xField.FieldType), aType, xField.FieldType);
         xInfo.IsStatic = xField.IsStatic;
         xInfo.Field = xField;
 
@@ -287,7 +194,7 @@ namespace Cosmos.IL2CPU
       {
         foreach (var xPlugField in xPlugFields)
         {
-          X86.IL.FieldInfo xPluggedField = null;
+          FieldInfo xPluggedField = null;
           if (xCurList.TryGetValue(xPlugField.Key, out xPluggedField))
           {
             // plugfield modifies an already existing field
@@ -302,22 +209,23 @@ namespace Cosmos.IL2CPU
           }
           else
           {
-            xPluggedField = new X86.IL.FieldInfo(xPlugField.Value.FieldId, SizeOfType(xPlugField.Value.FieldType), aType,
+            xPluggedField = new FieldInfo(xPlugField.Value.FieldId, SizeOfType(xPlugField.Value.FieldType), aType,
               xPlugField.Value.FieldType);
             aFields.Add(xPluggedField);
           }
         }
       }
 
-      if (aType.GetTypeInfo().BaseType != null)
+      Type xBase = aType.GetTypeInfo().BaseType;
+      if (xBase != null)
       {
-        DoGetFieldsInfo(aType.GetTypeInfo().BaseType, aFields, includeStatic);
+        DoGetFieldsInfo(xBase, aFields, includeStatic);
       }
     }
 
-    public static List<X86.IL.FieldInfo> GetFieldsInfo(Type aType, bool includeStatic)
+    public static List<FieldInfo> GetFieldsInfo(Type aType, bool includeStatic)
     {
-      var xResult = new List<X86.IL.FieldInfo>(16);
+      var xResult = new List<FieldInfo>(16);
       DoGetFieldsInfo(aType, xResult, includeStatic);
       xResult.Reverse();
       uint xOffset = 0;
@@ -349,10 +257,9 @@ namespace Cosmos.IL2CPU
       return xResult;
     }
 
-    private static void GetFieldMapping(List<X86.IL.FieldInfo> aFieldInfs, List<DebugInfo.Field_Map> aFieldMapping,
-      Type aType)
+    private static void GetFieldMapping(List<FieldInfo> aFieldInfs, List<DebugInfo.Field_Map> aFieldMapping, Type aType)
     {
-      DebugInfo.Field_Map xFMap = new DebugInfo.Field_Map();
+      var xFMap = new DebugInfo.Field_Map();
       xFMap.TypeName = aType.AssemblyQualifiedName;
       foreach (var xInfo in aFieldInfs)
       {
@@ -361,7 +268,7 @@ namespace Cosmos.IL2CPU
       aFieldMapping.Add(xFMap);
     }
 
-    private static string GetNameForField(X86.IL.FieldInfo inf)
+    private static string GetNameForField(FieldInfo inf)
     {
       // First we need to separate out the
       // actual name of field from the type of the field.
@@ -383,12 +290,10 @@ namespace Cosmos.IL2CPU
               select item.Offset + item.Size).FirstOrDefault();
     }
 
-
     /// <summary>
     /// Emits cleanup code for when an exception occurred inside a method call.
     /// </summary>
-    public static void EmitExceptionCleanupAfterCall(Assembler.Assembler aAssembler, uint aReturnSize,
-      uint aStackSizeBeforeCall, uint aTotalArgumentSizeOfMethod)
+    public static void EmitExceptionCleanupAfterCall(Assembler.Assembler aAssembler, uint aReturnSize, uint aStackSizeBeforeCall, uint aTotalArgumentSizeOfMethod)
     {
       XS.Comment("aStackSizeBeforeCall = " + aStackSizeBeforeCall);
       XS.Comment("aTotalArgumentSizeOfMethod = " + aTotalArgumentSizeOfMethod);
@@ -422,8 +327,7 @@ namespace Cosmos.IL2CPU
       }
     }
 
-    public static void EmitExceptionLogic(Assembler.Assembler aAssembler, MethodInfo aMethodInfo,
-      ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException = null)
+    public static void EmitExceptionLogic(Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException = null)
     {
       if (aJumpTargetNoException == null)
       {
@@ -482,8 +386,7 @@ namespace Cosmos.IL2CPU
           aCleanup();
           if (xJumpTo == null)
           {
-            XS.Jump(CPU.ConditionalTestEnum.NotEqual,
-              GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException);
+            XS.Jump(CPU.ConditionalTestEnum.NotEqual, GetLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException);
           }
           else
           {
@@ -494,8 +397,7 @@ namespace Cosmos.IL2CPU
         {
           if (xJumpTo == null)
           {
-            XS.Jump(CPU.ConditionalTestEnum.NotEqual,
-              GetMethodLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException);
+            XS.Jump(CPU.ConditionalTestEnum.NotEqual, GetLabel(aMethodInfo) + AppAssembler.EndOfMethodLabelNameException);
           }
           else
           {
@@ -505,22 +407,8 @@ namespace Cosmos.IL2CPU
       }
     }
 
-    public static bool IsIntegerSigned(Type aType)
-    {
-      switch (aType.FullName)
-      {
-        case "System.SByte":
-        case "System.Int16":
-        case "System.Int32":
-        case "System.Int64":
-          //TODO not sure about this case "System.IntPtr":
-          //TODO not sure aobut this case "System.Enum":
-          return true;
-      }
-      return false;
-    }
 
-    public static void DoNullReferenceCheck(Assembler.Assembler assembler, bool debugEnabled, int stackOffsetToCheck)
+    protected static void DoNullReferenceCheck(Assembler.Assembler assembler, bool debugEnabled, int stackOffsetToCheck)
     {
       if (stackOffsetToCheck != SignedAlign(stackOffsetToCheck, 4))
       {
@@ -590,9 +478,128 @@ namespace Cosmos.IL2CPU
       }
     }
 
-    public static bool TypeIsReferenceType(Type type)
+    // Compat shim
+    public static bool TypeIsReferenceType(Type aType)
     {
-      return !type.GetTypeInfo().IsValueType && !type.IsPointer && !type.IsByRef;
+      return TypeIsReferenceType(aType.GetTypeInfo());
+    }
+
+    private static bool TypeIsReferenceType(TypeInfo aType)
+    {
+      return !aType.IsValueType && !aType.IsPointer && !aType.IsByRef;
+    }
+
+    public static bool IsIntegerSigned(Type aType)
+    {
+      return aType.FullName == "System.SByte" || aType.FullName == "System.Int16" || aType.FullName == "System.Int32" || aType.FullName == "System.Int64";
+    }
+
+    public static bool IsIntegralType(Type type)
+    {
+      return type == typeof(byte) || type == typeof(sbyte) || type == typeof(ushort) || type == typeof(short)
+             || type == typeof(int) || type == typeof(uint) || type == typeof(long) || type == typeof(ulong)
+             || type == typeof(char) || type == typeof(IntPtr) || type == typeof(UIntPtr);
+    }
+
+    public static bool IsIntegralTypeOrPointer(Type type)
+    {
+      return IsIntegralType(type) || type.IsPointer || type.IsByRef;
+    }
+
+    public static bool IsPointer(Type aPointer)
+    {
+      return aPointer.IsPointer || aPointer.IsByRef || aPointer == typeof(IntPtr) || aPointer == typeof(UIntPtr);
+    }
+
+    // Compat shim.
+    public static uint SizeOfType(Type aType)
+    {
+      return SizeOfType(aType.GetTypeInfo());
+    }
+
+    private static uint SizeOfType(TypeInfo aType)
+    {
+      if (aType == null)
+      {
+        throw new ArgumentNullException("aType");
+      }
+      if (aType.IsPointer || aType.IsByRef)
+      {
+        return 4;
+      }
+      if (aType.FullName == "System.Void")
+      {
+        return 0;
+      }
+      if (TypeIsReferenceType(aType))
+      {
+        return 8;
+      }
+      switch (aType.FullName)
+      {
+        case "System.Char":
+          return 2;
+        case "System.Byte":
+        case "System.SByte":
+          return 1;
+        case "System.UInt16":
+        case "System.Int16":
+          return 2;
+        case "System.UInt32":
+        case "System.Int32":
+          return 4;
+        case "System.UInt64":
+        case "System.Int64":
+          return 8;
+        //TODO: for now hardcode IntPtr and UIntPtr to be 32-bit
+        case "System.UIntPtr":
+        case "System.IntPtr":
+          return 4;
+        case "System.Boolean":
+          return 1;
+        case "System.Single":
+          return 4;
+        case "System.Double":
+          return 8;
+        case "System.Decimal":
+          return 16;
+        case "System.Guid":
+          return 16;
+        case "System.Enum":
+          return 4;
+        case "System.DateTime":
+          return 8;
+      }
+      if (aType.FullName != null && aType.FullName.EndsWith("*"))
+      {
+        // pointer
+        return 4;
+      }
+      // array
+      //TypeSpecification xTypeSpec = aType as TypeSpecification;
+      //if (xTypeSpec != null) {
+      //    return 4;
+      //}
+      if (aType.IsEnum)
+      {
+        return SizeOfType(aType.GetField("value__").FieldType);
+      }
+      if (aType.IsValueType)
+      {
+        var xSla = aType.StructLayoutAttribute;
+        if ((xSla != null) && (xSla.Size > 0))
+        {
+          return (uint)xSla.Size;
+        }
+        return (uint)(from item in GetFieldsInfo(aType.AsType(), false)
+                      select (int)item.Size).Sum();
+      }
+      return 4;
+    }
+
+    protected static bool TypeIsFloat(Type type)
+    {
+      return type == typeof(float) || type == typeof(double);
     }
   }
 }

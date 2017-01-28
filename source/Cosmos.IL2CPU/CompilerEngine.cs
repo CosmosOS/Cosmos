@@ -342,11 +342,8 @@ namespace Cosmos.IL2CPU
             {
                 LogException(ex);
                 LogMessage("Loaded assemblies: ");
-                foreach (var xLib in DependencyContext.Default.CompileLibraries)
+                foreach (var xAsm in AssemblyLoadContext.Default.GetLoadedAssemblies())
                 {
-                    var xAsm = AssemblyLoadContext.Default.LoadFromAssemblyPath(xLib.Path);
-
-                    // HACK: find another way to skip dynamic assemblies (which belong to dynamic methods)
                     if (xAsm.IsDynamic)
                     {
                         continue;
@@ -420,7 +417,6 @@ namespace Cosmos.IL2CPU
         //    }
 
         //}
-        //List<Assembly> x = new List<Assembly>();
 
         /// <summary>Load every refernced assemblies that have an associated FullPath property and seek for
         /// the kernel default constructor.</summary>
@@ -437,6 +433,15 @@ namespace Cosmos.IL2CPU
             // will not be tried on them, but will on ASMs they reference.
             //
 
+            AssemblyLoadContext.Default.Resolving += (context, name) =>
+            {
+                if (!string.IsNullOrWhiteSpace(name.FullName))
+                {
+                    var xName = AssemblyLoadContext.GetAssemblyName(name.FullName);
+                    return AssemblyLoadContext.Default.LoadFromAssemblyName(xName);
+                }
+                return Assembly.GetEntryAssembly();
+            };
             mLoadedExtensions = new List<CompilerExtensionBase>();
             Type xKernelType = null;
 
@@ -444,7 +449,7 @@ namespace Cosmos.IL2CPU
             {
                 if (File.Exists(xReference))
                 {
-                    var xAssembly = Assembly.Load(AssemblyLoadContext.GetAssemblyName(xReference));
+                    var xAssembly = AssemblyLoadContext.Default.LoadFromAssemblyCacheOrPath(xReference);
 
                     CompilerHelpers.Debug($"Looking for kernel in '{xAssembly}'");
 

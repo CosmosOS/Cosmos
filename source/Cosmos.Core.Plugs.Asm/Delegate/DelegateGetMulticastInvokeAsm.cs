@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.Plugs.Assemblers
             var xMethodInfo = (MethodInfo)aMethodInfo;
             var xDelegate = typeof(global::System.Delegate);
             var xMethod = xDelegate.GetMethod("GetInvokeMethod", BindingFlags.NonPublic | BindingFlags.Instance);
-            XS.Push(ILOp.GetMethodLabel(xMethod));
+            XS.Push(ILOp.GetLabel(xMethod));
         }
     }
 }

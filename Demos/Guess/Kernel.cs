@@ -15,6 +15,7 @@ namespace Guess
 
         public GuessOS()
         {
+
             // Didnt check if tickcount is working yet.. can change this later
             //var xRandom = new Random(234243534);
             //mMagicNo = xRandom.Next(1, 100);

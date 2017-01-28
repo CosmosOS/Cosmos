@@ -190,8 +190,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             return;
           }
 
-          if (IsIntegralType(StackPopTypes[0]) &&
-              IsIntegralType(Value))
+          if (ILOp.IsIntegralType(StackPopTypes[0]) &&
+              ILOp.IsIntegralType(Value))
           {
             StackPushTypes[0] = typeof(Box<>).MakeGenericType(Value);
             aSituationChanged = true;

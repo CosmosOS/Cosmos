@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
@@ -13,16 +15,16 @@ namespace Cosmos.Debug.Symbols
         private static string mCurrentFile;
         private static DebugSymbolReader mCurrentDebugSymbolReader;
 
-        private PEReader mPEReader;
-        private MetadataReader mMetadataReader;
+        private readonly PEReader mPEReader;
+        private readonly MetadataReader mMetadataReader;
 
         private DebugSymbolReader(string aFilePath)
         {
-            mPEReader = new PEReader(File.OpenRead(aFilePath));
+            mPEReader = new PEReader(File.OpenRead(aFilePath), PEStreamOptions.PrefetchEntireImage);
             mMetadataReader = mPEReader.GetMetadataReader();
         }
 
-        public static DebugSymbolReader GetReader(string aFilePath)
+        internal static DebugSymbolReader GetReader(string aFilePath)
         {
             if (File.Exists(aFilePath))
             {
@@ -44,9 +46,136 @@ namespace Cosmos.Debug.Symbols
             return null;
         }
 
-        public MethodDebugInformation GetMethodDebugInformation(int aMethodToken)
+        private string ResolveEntity(EntityHandle aEntityHandle)
         {
-            var xHandle = (MethodDebugInformationHandle)MetadataTokens.Handle(aMethodToken);
+            switch (aEntityHandle.Kind)
+            {
+                case HandleKind.AssemblyReference:
+                    var xAssemblyRef = mMetadataReader.GetAssemblyReference((AssemblyReferenceHandle)aEntityHandle);
+                    return ResolveAssemblyReference(xAssemblyRef);
+                case HandleKind.FieldDefinition:
+                    var xFieldDef = mMetadataReader.GetFieldDefinition((FieldDefinitionHandle)aEntityHandle);
+                    return ResolveFieldDefinition(xFieldDef);
+                case HandleKind.MethodDefinition:
+                    var xMethodDef = mMetadataReader.GetMethodDefinition((MethodDefinitionHandle)aEntityHandle);
+                    return ResolveMethodDefinition(xMethodDef);
+                case HandleKind.MemberReference:
+                    var xMemberRef = mMetadataReader.GetMemberReference((MemberReferenceHandle)aEntityHandle);
+                    return ResolveMemberReference(xMemberRef);
+                case HandleKind.TypeReference:
+                    var xTypeRef = mMetadataReader.GetTypeReference((TypeReferenceHandle)aEntityHandle);
+                    return ResolveTypeReference(xTypeRef);
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public static string ResolveString(Module aModule, int aMetadataToken)
+        {
+            var xHandle = MetadataTokens.Handle(aMetadataToken);
+            if (!xHandle.IsNil)
+            {
+                string xLocation = aModule.Assembly.Location;
+                var xReader = GetReader(xLocation);
+                var xOffset = xReader.mMetadataReader.GetHeapOffset(xHandle);
+                var xStringHandle = MetadataTokens.UserStringHandle(xOffset);
+
+                if (!xStringHandle.IsNil)
+                {
+                    return xReader.mMetadataReader.GetUserString(xStringHandle);
+                }
+            }
+
+            return null;
+        }
+
+        private string ResolveAssemblyReference(AssemblyReference aMemberRef)
+        {
+            string xFullTypeName = string.Empty;
+            if (!aMemberRef.Name.IsNil)
+            {
+                xFullTypeName = mMetadataReader.GetString(aMemberRef.Name);
+            }
+            return xFullTypeName;
+        }
+
+        private string ResolveMemberReference(MemberReference aMemberRef)
+        {
+            string xFullTypeName = string.Empty;
+            if (!aMemberRef.Parent.IsNil)
+            {
+                xFullTypeName = ResolveEntity(aMemberRef.Parent);
+            }
+            return xFullTypeName;
+        }
+
+        private string ResolveTypeReference(TypeReference aTypeRef)
+        {
+            string xFullTypeName = string.Empty;
+            if (!aTypeRef.ResolutionScope.IsNil)
+            {
+                xFullTypeName = ResolveEntity(aTypeRef.ResolutionScope);
+            }
+            if (!aTypeRef.Name.IsNil)
+            {
+                xFullTypeName = xFullTypeName + "." + mMetadataReader.GetString(aTypeRef.Name);
+            }
+            return xFullTypeName;
+        }
+
+        private string ResolveFieldDefinition(FieldDefinition aFieldDef)
+        {
+            string xFullTypeName = string.Empty;
+            var xTypeDefHandle = aFieldDef.GetDeclaringType();
+            if (!xTypeDefHandle.IsNil)
+            {
+                var xTypeDef = mMetadataReader.GetTypeDefinition(xTypeDefHandle);
+                xFullTypeName = ResolveTypeDefinition(xTypeDef);
+            }
+            return xFullTypeName;
+        }
+
+        private string ResolveMethodDefinition(MethodDefinition aMethodDef)
+        {
+            string xFullTypeName = string.Empty;
+            var xTypeDefHandle = aMethodDef.GetDeclaringType();
+            if (!xTypeDefHandle.IsNil)
+            {
+                var xTypeDef = mMetadataReader.GetTypeDefinition(xTypeDefHandle);
+                xFullTypeName = ResolveTypeDefinition(xTypeDef);
+            }
+            return xFullTypeName;
+        }
+
+        private string ResolveTypeDefinition(TypeDefinition aTypeDef)
+        {
+            string xFullTypeName = string.Empty;
+            var xNSDefHandle = aTypeDef.NamespaceDefinition;
+            if (!xNSDefHandle.IsNil)
+            {
+                var xNSDef = mMetadataReader.GetNamespaceDefinition(xNSDefHandle);
+                xFullTypeName = ResolveNamespaceDefinition(xNSDef);
+            }
+            xFullTypeName = xFullTypeName + "." + mMetadataReader.GetString(aTypeDef.Name);
+            xFullTypeName = xFullTypeName.Trim('.');
+            return xFullTypeName;
+        }
+
+        private string ResolveNamespaceDefinition(NamespaceDefinition aNamespaceDef)
+        {
+            string xName = string.Empty;
+            if (!aNamespaceDef.Parent.IsNil)
+            {
+                var xParent = mMetadataReader.GetNamespaceDefinition(aNamespaceDef.Parent);
+                xName = ResolveNamespaceDefinition(xParent);
+            }
+            xName = xName + "." + mMetadataReader.GetString(aNamespaceDef.Name);
+            return xName;
+        }
+
+        public MethodDebugInformation GetMethodDebugInformation(int aMetadataToken)
+        {
+            var xHandle = MetadataTokens.MethodDebugInformationHandle(aMetadataToken);
 
             if (!xHandle.IsNil)
             {
@@ -54,47 +183,6 @@ namespace Cosmos.Debug.Symbols
             }
 
             return new MethodDebugInformation();
-        }
-
-        public MethodDefinition GetMethodDefinition(int aMethodToken)
-        {
-            var xHandle = (MethodDefinitionHandle)MetadataTokens.Handle(aMethodToken);
-
-            if (!xHandle.IsNil)
-            {
-                return mMetadataReader.GetMethodDefinition(xHandle);
-            }
-
-            return new MethodDefinition();
-        }
-
-        public MethodImplementation GetMethodImplementation(int aMethodToken)
-        {
-            var xHandle = (MethodImplementationHandle)MetadataTokens.Handle(aMethodToken);
-
-            if (!xHandle.IsNil)
-            {
-                return mMetadataReader.GetMethodImplementation(xHandle);
-            }
-
-            return new MethodImplementation();
-        }
-
-        public MethodSpecification GetMethodSpecification(int aMethodToken)
-        {
-            var xHandle = (MethodSpecificationHandle)MetadataTokens.Handle(aMethodToken);
-
-            if (!xHandle.IsNil)
-            {
-                return mMetadataReader.GetMethodSpecification(xHandle);
-            }
-
-            return new MethodSpecification();
-        }
-
-        public ModuleDefinition GetModuleDefintition()
-        {
-            return mMetadataReader.GetModuleDefinition();
         }
 
         public string GetDocumentPath(DocumentHandle aHandle)
@@ -109,67 +197,32 @@ namespace Cosmos.Debug.Symbols
             return "";
         }
 
-        public MethodBodyBlock GetMethodBodyBlock(int aMethodToken)
+        public static MethodBodyBlock GetMethodBodyBlock(Module aModule, int aMetadataToken)
         {
-            var xMethodDefinition = GetMethodDefinition(aMethodToken);
-            var xRelativeVirtualAddress = xMethodDefinition.RelativeVirtualAddress;
-
-            return mPEReader.GetMethodBody(xRelativeVirtualAddress);
-        }
-
-        public SequencePointCollection GetSequencePoints(int aMethodToken)
-        {
-            var xDebugInformation = GetMethodDebugInformation(aMethodToken);
-
-            return xDebugInformation.GetSequencePoints();
-        }
-
-        public IList<LocalVariable> GetLocalVariables(int aMethodToken)
-        {
-            var xLocalVariables = new List<LocalVariable>();
-            var xMethodDefinitionHandle = (MethodDefinitionHandle)MetadataTokens.Handle(aMethodToken);
-
-            foreach (var xLocalScopeHandle in mMetadataReader.GetLocalScopes(xMethodDefinitionHandle))
+            var xMethodDefHandle = MetadataTokens.MethodDefinitionHandle(aMetadataToken);
+            if (!xMethodDefHandle.IsNil)
             {
-                var xLocalScope = mMetadataReader.GetLocalScope(xLocalScopeHandle);
+                string xLocation = aModule.Assembly.Location;
+                var xReader = GetReader(xLocation);
+                var xMethodDefinition = xReader.mMetadataReader.GetMethodDefinition(xMethodDefHandle);
+                int xRelativeVirtualAddress = xMethodDefinition.RelativeVirtualAddress;
+                return xReader.mPEReader.GetMethodBody(xRelativeVirtualAddress);
+            }
+            return null;
+        }
 
-                foreach (var xLocalVariableHandle in xLocalScope.GetLocalVariables())
-                {
-                    xLocalVariables.Add(mMetadataReader.GetLocalVariable(xLocalVariableHandle));
-                }
+        public static List<LocalVariableInfo> GetLocalVariableInfos(Module aModule, MethodBodyBlock aMethodBody)
+        {
+            var xLocalVariables = new List<LocalVariableInfo>();
+            if (!aMethodBody.LocalSignature.IsNil)
+            {
+                string xLocation = aModule.Assembly.Location;
+                var xReader = DebugSymbolReader.GetReader(xLocation);
+                var xSig = xReader.mMetadataReader.GetStandaloneSignature(aMethodBody.LocalSignature);
+                var xLocals = xSig.DecodeLocalSignature(new LocalTypeProvider(), null);
             }
 
             return xLocalVariables;
-        }
-
-        public string GetLocalVariableName(int aMethodToken, int aIndex)
-        {
-            var xLocalVariables = GetLocalVariables(aMethodToken);
-
-            return mMetadataReader.GetString(xLocalVariables[aIndex].Name);
-        }
-
-        public IList<LocalVariableInfo> GetLocalVariablesInfo(MethodBodyBlock aMethodBodyBlock)
-        {
-            throw new Exception("NetCore Fix Me");
-        }
-
-        public string GetString(int aMetadataToken)
-        {
-            var xHandle = MetadataTokens.Handle(aMetadataToken);
-
-            if (!xHandle.IsNil)
-            {
-                var xOffset = mMetadataReader.GetHeapOffset(xHandle);
-                var xStringHandle = MetadataTokens.UserStringHandle(xOffset);
-
-                if (!xStringHandle.IsNil)
-                {
-                    return mMetadataReader.GetUserString(xStringHandle);
-                }
-            }
-
-            return null;
         }
     }
 }

@@ -12,7 +12,12 @@ namespace Cosmos.Build.Common
 
         static BuildProperties()
         {
-            foreach (var xField in typeof(BuildPropertyNames).GetTypeInfo().GetFields())
+#if NETSTANDARD1_6
+            var xFields = typeof(BuildPropertyNames).GetTypeInfo().GetFields();
+#else
+            var xFields = typeof(BuildPropertyNames).GetFields();
+#endif
+            foreach (var xField in xFields)
             {
                 // IsLiteral determines if its value is written at compile time and not changeable.
                 // Consts are static even if we dont use static keyword.

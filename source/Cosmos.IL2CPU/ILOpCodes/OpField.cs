@@ -128,8 +128,8 @@ namespace Cosmos.IL2CPU.ILOpCodes
                     {
                         return;
                     }
-                    if (IsIntegralType(expectedType) &&
-                        IsIntegralType(StackPopTypes[1]))
+                    if (ILOp.IsIntegralType(expectedType) &&
+                        ILOp.IsIntegralType(StackPopTypes[1]))
                     {
                         return;
                     }
@@ -157,25 +157,25 @@ namespace Cosmos.IL2CPU.ILOpCodes
                     {
                         return;
                     }
-                    if (IsIntegralType(Value.FieldType) &&
-                        IsIntegralType(StackPopTypes[0]))
+                    if (ILOp.IsIntegralType(Value.FieldType) &&
+                        ILOp.IsIntegralType(StackPopTypes[0]))
                     {
                         return;
                     }
                     if (Value.FieldType == typeof(bool) &&
-                        IsIntegralType(StackPopTypes[0]))
+                        ILOp.IsIntegralType(StackPopTypes[0]))
                     {
                         return;
                     }
                     if (Value.FieldType.GetTypeInfo().IsEnum)
                     {
-                        if (IsIntegralType(StackPopTypes[0]))
+                        if (ILOp.IsIntegralType(StackPopTypes[0]))
                         {
                             return;
                         }
                     }
-                    if (IsPointer(Value.FieldType) &&
-                        IsPointer(StackPopTypes[0]))
+                    if (ILOp.IsPointer(Value.FieldType) &&
+                        ILOp.IsPointer(StackPopTypes[0]))
                     {
                         return;
                     }
@@ -201,8 +201,8 @@ namespace Cosmos.IL2CPU.ILOpCodes
                     {
                         return;
                     }
-                    if (IsIntegralType(expectedType) &&
-                        IsIntegralType(StackPopTypes[0]))
+                    if (ILOp.IsIntegralType(expectedType) &&
+                        ILOp.IsIntegralType(StackPopTypes[0]))
                     {
                         return;
                     }

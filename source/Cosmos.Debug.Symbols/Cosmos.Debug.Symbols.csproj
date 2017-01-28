@@ -47,8 +47,11 @@
     <Compile Include="DebugInfo.cs" />
     <Compile Include="DebugModel.cs" />
     <Compile Include="DebugSymbolReader.cs" />
-    <Compile Include="MethodBaseExtensions.cs" />
-    <Compile Include="MethodBodyBlockExtensions.cs" />
+    <Compile Include="ITokenResolver.cs" />
+    <Compile Include="LocalTypeGenericContext.cs" />
+    <Compile Include="LocalTypeProvider.cs" />
+    <Compile Include="ModuleExtensions.cs" />
+    <Compile Include="ModuleScopeTokenResolver.cs" />
     <Compile Include="ObjectReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SourceInfo.cs" />

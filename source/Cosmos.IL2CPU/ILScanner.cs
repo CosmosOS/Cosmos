@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Cosmos.Assembler;
+using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.Plugs;
 using SR = System.Reflection;
 using SysReflection = System.Reflection;
@@ -215,7 +216,6 @@ namespace Cosmos.IL2CPU
             // Pull in extra implementations, GC etc.
             Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
             Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
-            //Queue(typeof(CosmosAssembler).GetMethod("PrintException"), null, "Explicit Entry");
             Queue(VTablesImplRefs.SetMethodInfoRef, null, "Explicit Entry");
             Queue(VTablesImplRefs.IsInstanceRef, null, "Explicit Entry");
             Queue(VTablesImplRefs.SetTypeInfoRef, null, "Explicit Entry");
@@ -226,15 +226,12 @@ namespace Cosmos.IL2CPU
             // for now, to ease runtime exception throwing
             Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowNotImplemented", new Type[] {typeof(string)}, null), null, "Explicit Entry");
             Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowOverflow", new Type[] {}, null), null, "Explicit Entry");
+            Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowInvalidOperation", new Type[] {typeof(string)}, null), null, "Explicit Entry");
             Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
             Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
             // register system types:
             Queue(typeof(Array).GetTypeInfo(), null, "Explicit Entry");
-            Queue(typeof(Array).GetTypeInfo().GetConstructor(Type.EmptyTypes), null, "Explicit Entry");
-
-            var xThrowHelper = Type.GetType("System.ThrowHelper", true, false);
-            Queue(xThrowHelper.GetTypeInfo().GetMethod("ThrowInvalidOperationException", BindingFlags.NonPublic | BindingFlags.Static), null, "Explicit Entry");
-
+            Queue(typeof(Array).GetTypeInfo().GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).First(), null, "Explicit Entry");
             Queue(typeof(MulticastDelegate).GetTypeInfo().GetMethod("GetInvocationList"), null, "Explicit Entry");
             Queue(ExceptionHelperRefs.CurrentExceptionRef, null, "Explicit Entry");
 
@@ -373,7 +370,7 @@ namespace Cosmos.IL2CPU
             var xParamTypes = new Type[xParams.Length];
             // Dont use foreach, enum generaly keeps order but
             // isn't guaranteed.
-            //string xMethodFullName = LabelName.GenerateFullName(aMethod);
+            //string xMethodFullName = LabelName.GetFullName(aMethod);
 
             for (int i = 0; i < xParams.Length; i++)
             {
@@ -520,7 +517,7 @@ namespace Cosmos.IL2CPU
                 }
                 if (xNeedsPlug)
                 {
-                    throw new Exception("Native code encountered, plug required. Please see https://github.com/CosmosOS/Cosmos/wiki/Plugs). " + LabelName.GenerateFullName(aMethod) + "." + Environment.NewLine + " Called from :" + Environment.NewLine + sourceItem);
+                    throw new Exception("Native code encountered, plug required. Please see https://github.com/CosmosOS/Cosmos/wiki/Plugs). " + LabelName.GetFullName(aMethod) + "." + Environment.NewLine + " Called from :" + Environment.NewLine + sourceItem);
                 }
 
                 //TODO: As we scan each method, we could update or put in a new list

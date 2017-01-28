@@ -6,8 +6,6 @@ using Cosmos.IL2CPU.Plugs.Assemblers.Delegate;
 namespace Cosmos.Core.Plugs.Asm
 {
     [Plug(Target = typeof(Delegate), Inheritable = true)]
-    [PlugField(FieldType = typeof(int), FieldId = "$$ArgSize$$")]
-    [PlugField(FieldType = typeof(int), FieldId = "$$ReturnsValue$$")]
     public static class DelegateImpl
     {
         [PlugMethod(Assembler = typeof(DelegateCtorAsm), IsWildcard = true, WildcardMatchParameters = true)]

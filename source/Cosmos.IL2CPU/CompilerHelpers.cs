@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU
             }
             else
             {
-                global::System.Diagnostics.Debug.WriteLine(message);
+                Console.WriteLine(message);
             }
         }
 

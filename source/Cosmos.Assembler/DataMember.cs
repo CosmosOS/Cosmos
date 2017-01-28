@@ -116,7 +116,7 @@ namespace Cosmos.Assembler
 
         public static string GetStaticFieldName(FieldInfo aField)
         {
-            return FilterStringForIncorrectChars("static_field__" + LabelName.GetFullName(aField.DeclaringType.GetTypeInfo()) + "." + aField.Name);
+            return FilterStringForIncorrectChars("static_field__" + LabelName.GetFullName(aField.DeclaringType) + "." + aField.Name);
         }
 
         public static string FilterStringForIncorrectChars(string aName)

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
-
+using Cosmos.IL2CPU.Extensions;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 

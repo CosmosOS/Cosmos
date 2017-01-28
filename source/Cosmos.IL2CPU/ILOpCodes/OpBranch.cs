@@ -95,7 +95,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-          if (IsIntegralType(xPopType))
+          if (ILOp.IsIntegralType(xPopType))
           {
             return;
           }
@@ -133,7 +133,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           {
             return;
           }
-          if (IsIntegralTypeOrPointer(xValue1) && IsIntegralTypeOrPointer(xValue2))
+          if (ILOp.IsIntegralTypeOrPointer(xValue1) && ILOp.IsIntegralTypeOrPointer(xValue2))
           {
             return;
           }

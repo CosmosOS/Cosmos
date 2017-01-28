@@ -1,4 +1,5 @@
 using Cosmos.Debug.Symbols;
+using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.ILOpCodes;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
@@ -16,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
     public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
     {
       var xOpVar = (OpVar)aOpCode;
-      var xVar = aMethod.MethodBase.GetMethodBody().GetLocalVariablesInfo()[xOpVar.Value];
+      var xVar = aMethod.MethodBase.GetLocalVariables()[xOpVar.Value];
       var xEBPOffset = GetEBPOffsetForLocal(aMethod, xOpVar.Value);
       xEBPOffset += (uint)(((int)GetStackCountForLocal(aMethod, xVar) - 1) * 4);
 

@@ -1,5 +1,5 @@
 using System.Reflection.Metadata;
-
+using Cosmos.IL2CPU.Extensions;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 

@@ -6,6 +6,7 @@ using System.Runtime.Loader;
 using Microsoft.Extensions.DependencyModel;
 
 using Cosmos.Assembler;
+using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.Plugs;
 
 using SysReflection = System.Reflection;
@@ -66,7 +67,7 @@ namespace Cosmos.IL2CPU
 
         private static string BuildMethodKeyName(MethodBase m)
         {
-            return LabelName.GenerateFullName(m);
+            return LabelName.GetFullName(m);
         }
 
         public PlugManager(LogExceptionDelegate aLogException, Action<string> aLogWarning)
@@ -88,68 +89,57 @@ namespace Cosmos.IL2CPU
             // TODO: Allow whole class plugs? ie, a class that completely replaces another class
             // and is substituted on the fly? Plug scanner would direct all access to that
             // class and throw an exception if any method, field, member etc is missing.
-            foreach (var xLib in DependencyContext.Default.CompileLibraries)
-            {
-                var xAsm = AssemblyLoadContext.Default.LoadFromAssemblyPath(xLib.Path);
 
-                if (true/*!xAsm.GlobalAssemblyCache*/)
+            foreach (var xAsm in AssemblyLoadContext.Default.GetLoadedAssemblies())
+            {
+                // Find all classes marked as a Plug
+                foreach (var xPlugType in xAsm.GetTypes())
                 {
-                    //if (xAsm.GetName().Name == "Cosmos.IL2CPU.X86") {
-                    //  // skip this assembly for now. at the moment we introduced the AssemblerMethod.AssembleNew method, for allowing those to work
-                    //  // with the Cosmos.IL2CPU* stack, we found we could not use the Cosmos.IL2CPU.X86 plugs, as they contained some AssemblerMethods.
-                    //  // This would result in a circular reference, thus we copied them to a new assembly. While the Cosmos.IL2CPU.X86 assembly is being
-                    //  // referenced, we need to skip it here.
-                    //  continue;
-                    //}
-                    // Find all classes marked as a Plug
-                    foreach (var xPlugType in xAsm.GetTypes())
+                    // Foreach, it is possible there could be one plug class with mult plug targets
+                    foreach (PlugAttribute xAttrib in xPlugType.GetTypeInfo().GetCustomAttributes<PlugAttribute>(false))
                     {
-                        // Foreach, it is possible there could be one plug class with mult plug targets
-                        foreach (PlugAttribute xAttrib in xPlugType.GetTypeInfo().GetCustomAttributes<PlugAttribute>(false))
+                        var xTargetType = xAttrib.Target;
+                        // If no type is specified, try to find by a specified name.
+                        // This is needed in cross assembly references where the
+                        // plug cannot reference the assembly of the target type
+                        if (xTargetType == null)
                         {
-                            var xTargetType = xAttrib.Target;
-                            // If no type is specified, try to find by a specified name.
-                            // This is needed in cross assembly references where the
-                            // plug cannot reference the assembly of the target type
-                            if (xTargetType == null)
+                            try
                             {
-                                try
-                                {
-                                    xTargetType = Type.GetType(xAttrib.TargetName, true, false);
-                                }
-                                catch (Exception ex)
-                                {
-                                    if (!xAttrib.IsOptional)
-                                    {
-                                        throw new Exception("Error", ex);
-                                    }
-                                    continue;
-                                }
+                                xTargetType = Type.GetType(xAttrib.TargetName, true, false);
                             }
-                            // Only keep this plug if its for MS.NET.
-                            // TODO: Integrate with builder options to allow Mono support again.
-                            if (!xAttrib.IsMonoOnly)
+                            catch (Exception ex)
                             {
-                                Dictionary<Type, List<Type>> mPlugs;
-                                if (xTargetType.GetTypeInfo().ContainsGenericParameters)
+                                if (!xAttrib.IsOptional)
                                 {
-                                    mPlugs = xAttrib.Inheritable ? mGenericPlugImplsInhrt : mGenericPlugImpls;
+                                    throw new Exception("Error", ex);
                                 }
-                                else
-                                {
-                                    mPlugs = xAttrib.Inheritable ? mPlugImplsInhrt : mPlugImpls;
-                                }
-                                List<Type> xImpls;
-                                if (mPlugs.TryGetValue(xTargetType, out xImpls))
-                                {
-                                    xImpls.Add(xPlugType);
-                                }
-                                else
-                                {
-                                    xImpls = new List<Type>();
-                                    xImpls.Add(xPlugType);
-                                    mPlugs.Add(xTargetType, xImpls);
-                                }
+                                continue;
+                            }
+                        }
+                        // Only keep this plug if its for MS.NET.
+                        // TODO: Integrate with builder options to allow Mono support again.
+                        if (!xAttrib.IsMonoOnly)
+                        {
+                            Dictionary<Type, List<Type>> mPlugs;
+                            if (xTargetType.GetTypeInfo().ContainsGenericParameters)
+                            {
+                                mPlugs = xAttrib.Inheritable ? mGenericPlugImplsInhrt : mGenericPlugImpls;
+                            }
+                            else
+                            {
+                                mPlugs = xAttrib.Inheritable ? mPlugImplsInhrt : mPlugImpls;
+                            }
+                            List<Type> xImpls;
+                            if (mPlugs.TryGetValue(xTargetType, out xImpls))
+                            {
+                                xImpls.Add(xPlugType);
+                            }
+                            else
+                            {
+                                xImpls = new List<Type>();
+                                xImpls.Add(xPlugType);
+                                mPlugs.Add(xTargetType, xImpls);
                             }
                         }
                     }
@@ -560,7 +550,7 @@ namespace Cosmos.IL2CPU
                             }
                             if (xAttrib?.Signature != null)
                             {
-                                var xName = DataMember.FilterStringForIncorrectChars(LabelName.GenerateFullName(aMethod));
+                                var xName = DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(aMethod));
                                 if (string.Compare(xName, xAttrib.Signature, true) == 0)
                                 {
                                     xResult = xSigMethod;
@@ -637,7 +627,7 @@ namespace Cosmos.IL2CPU
                     return null;
                 }
                 //else if (xAttrib.Signature != null) {
-                //  var xName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xResult));
+                //  var xName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xResult));
                 //  if (string.Compare(xName, xAttrib.Signature, true) != 0) {
                 //    xResult = null;
                 //  }
@@ -655,7 +645,7 @@ namespace Cosmos.IL2CPU
             //    bool xEnabled=true;
             //    foreach (var xTargetMethod in xTargetMethods)
             //    {
-            //        string sName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GenerateFullName(xTargetMethod));
+            //        string sName = DataMember.FilterStringForIncorrectChars(MethodInfoLabelGenerator.GetFullName(xTargetMethod));
             //        if (string.Compare(sName, xAttrib.Signature, true) == 0)
             //        {
             //            //uint xUID = QueueMethod(xPlugImpl.Plug, "Plug", xMethod, true);

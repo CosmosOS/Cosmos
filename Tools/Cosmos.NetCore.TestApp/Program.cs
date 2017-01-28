@@ -1,9 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
+using System.Reflection.PortableExecutable;
 using System.Threading.Tasks;
+using Cosmos.Debug.Symbols;
+using Microsoft.DiaSymReader;
 using Microsoft.Extensions.DependencyModel;
+using AssemblyFile = System.Reflection.Metadata.AssemblyFile;
 
 namespace Cosmos.NetCore.TestApp
 {
@@ -11,21 +19,7 @@ namespace Cosmos.NetCore.TestApp
     {
         public static void Main(string[] args)
         {
-            //var xType = Type.GetType("System.Object");
-
-            //var ctx = DependencyContext.Default;
-
-            //Console.WriteLine("--- Native libraries ---");
-            //foreach (var r in ctx.GetDefaultNativeAssets())
-            //{
-            //    Console.WriteLine($"    {r}");
-
-
-            //}
-            //Console.WriteLine();
-
-
-            //Console.ReadKey();
+            string xKernelPath = Path.GetFullPath(@"..\..\Demos\Guess\bin\Debug\netstandard1.6");
 
             var xArgs = new string[]
             {
@@ -36,14 +30,15 @@ namespace Cosmos.NetCore.TestApp
                 "TraceAssemblies:Cosmos",
                 "DebugCom:1",
                 "UseNAsm:True",
-                @"OutputFilename:path\to\GuessKernel.asm",
+                @"OutputFilename:" + Path.Combine(xKernelPath, "GuessKernel.asm"),
                 "EnableLogging:True",
                 "EmitDebugSymbols:True",
                 "IgnoreDebugStubAttribute:False",
-                @"References:path\to\GuessKernel.dll",
-                @"References:path\to\Cosmos.Core.Plugs.dll",
-                @"References:path\to\Cosmos.Debug.Kernel.Plugs.dll",
-                @"References:path\to\Cosmos.System.Plugs.dll"
+                @"References:" + Path.Combine(xKernelPath, "Guess.dll"),
+                @"References:" + Path.Combine(xKernelPath, "Cosmos.Core.Plugs.dll"),
+                @"References:" + Path.Combine(xKernelPath, "Cosmos.Core.Plugs.Asm.dll"),
+                @"References:" + Path.Combine(xKernelPath, "Cosmos.Debug.Kernel.Plugs.Asm.dll"),
+                @"References:" + Path.Combine(xKernelPath, "Cosmos.System.Plugs.dll")
             };
 
             global::IL2CPU.Program.Run(xArgs, LogMessage, LogError);
