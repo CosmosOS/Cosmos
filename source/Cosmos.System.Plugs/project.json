@@ -11,6 +11,12 @@
       "dependencies": {
         "Cosmos.Common": {
           "target": "project"
+        },
+        "Cosmos.IL2CPU.Plugs": {
+          "target": "project"
+        },
+        "Cosmos.System": {
+          "target": "project"
         }
       }
     }
