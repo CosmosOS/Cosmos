@@ -366,7 +366,11 @@ namespace Cosmos.IL2CPU
 
         protected void ScanMethod(MethodBase aMethod, bool aIsPlug, string sourceItem)
         {
-            CompilerHelpers.Debug($"ILScanner: ScanMethod - Method '{aMethod}', IsPlug '{aIsPlug}', Source '{sourceItem}'");
+            CompilerHelpers.Debug($"ILScanner: ScanMethod");
+            CompilerHelpers.Debug($"Method = '{aMethod}'");
+            CompilerHelpers.Debug($"IsPlug = '{aIsPlug}'");
+            CompilerHelpers.Debug($"Source = '{sourceItem}'");
+
             var xParams = aMethod.GetParameters();
             var xParamTypes = new Type[xParams.Length];
             // Dont use foreach, enum generaly keeps order but
@@ -586,6 +590,9 @@ namespace Cosmos.IL2CPU
 
         protected void ScanType(TypeInfo aType)
         {
+            CompilerHelpers.Debug($"ILScanner: ScanMethod");
+            CompilerHelpers.Debug($"Type = '{aType}'");
+
             // Add immediate ancestor type
             // We dont need to crawl up farther, when the BaseType is scanned
             // it will add its BaseType, and so on.
@@ -660,11 +667,12 @@ namespace Cosmos.IL2CPU
                 // and will reduce compares
                 if (xItem.Item is MethodBase)
                 {
-                    ScanMethod((MethodBase) xItem.Item, false, xItem.SourceItem);
+                    var xMethod = (MethodBase)xItem.Item;
+                    ScanMethod(xMethod, false, xItem.SourceItem);
                 }
-                else if (xItem.Item.MemberType == MemberTypes.TypeInfo)
+                else if (xItem.Item is TypeInfo)
                 {
-                    var xType = (TypeInfo) xItem.Item;
+                    var xType = (TypeInfo)xItem.Item;
                     ScanType(xType);
 
                     // Methods and fields cant exist without types, so we only update
