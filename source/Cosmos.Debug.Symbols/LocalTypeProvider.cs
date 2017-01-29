@@ -63,22 +63,76 @@ namespace Cosmos.Debug.Symbols
 
         public Type GetTypeFromReference(MetadataReader reader, TypeReferenceHandle handle, byte rawTypeKind)
         {
-            if (!handle.IsNil)
+            TypeReference xReference = reader.GetTypeReference(handle);
+            Handle scope = xReference.ResolutionScope;
+
+            string xName = xReference.Namespace.IsNil
+                ? reader.GetString(xReference.Name)
+                : reader.GetString(xReference.Namespace) + "." + reader.GetString(xReference.Name);
+
+            var xType = Type.GetType(xName);
+            if (xType != null)
             {
-                int xToken = MetadataTokens.GetToken(handle);
-                return mModule.ResolveType(xToken, null, null);
+                return xType;
             }
-            return null;
+
+            try
+            {
+                xType = mModule.ResolveType(MetadataTokens.GetToken(handle), null, null);
+                return xType;
+            }
+            catch
+            {
+                switch (scope.Kind)
+                {
+                    case HandleKind.ModuleReference:
+                        string xModule = "[.module  " + reader.GetString(reader.GetModuleReference((ModuleReferenceHandle) scope).Name) + "]" + xName;
+                        return null;
+                    case HandleKind.AssemblyReference:
+                        var assemblyReferenceHandle = (AssemblyReferenceHandle) scope;
+                        var assemblyReference = reader.GetAssemblyReference(assemblyReferenceHandle);
+                        string xAssembly = "[" + reader.GetString(assemblyReference.Name) + "]" + xName;
+                        return null;
+                    case HandleKind.TypeReference:
+                        return GetTypeFromReference(reader, (TypeReferenceHandle) scope, 0);
+                    default:
+                        // rare cases:  ModuleDefinition means search within defs of current module (used by WinMDs for projections)
+                        //              nil means search exported types of same module (haven't seen this in practice). For the test
+                        //              purposes here, it's sufficient to format both like defs.
+                        return null;
+                }
+            }
         }
 
         public Type GetTypeFromDefinition(MetadataReader reader, TypeDefinitionHandle handle, byte rawTypeKind)
         {
-            if (!handle.IsNil)
+            TypeDefinition xDefinition = reader.GetTypeDefinition(handle);
+
+            string xName = xDefinition.Namespace.IsNil
+                               ? reader.GetString(xDefinition.Name)
+                               : reader.GetString(xDefinition.Namespace) + "." + reader.GetString(xDefinition.Name);
+
+            if (xDefinition.Attributes.HasFlag(TypeAttributes.NestedPublic | TypeAttributes.NestedPrivate))
             {
-                int xToken = MetadataTokens.GetToken(handle);
-                return mModule.ResolveType(xToken, null, null);
+                TypeDefinitionHandle declaringTypeHandle = xDefinition.GetDeclaringType();
+                return GetTypeFromDefinition(reader, declaringTypeHandle, 0);
             }
-            return null;
+
+            var xType = Type.GetType(xName);
+            if (xType != null)
+            {
+                return xType;
+            }
+
+            try
+            {
+                xType = mModule.ResolveType(MetadataTokens.GetToken(handle), null, null);
+                return xType;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public Type GetSZArrayType(Type elementType)
@@ -88,12 +142,12 @@ namespace Cosmos.Debug.Symbols
 
         public Type GetGenericInstantiation(Type genericType, ImmutableArray<Type> typeArguments)
         {
-            return mModule.ResolveType(genericType.GetTypeInfo().MetadataToken, typeArguments.ToArray(), null);
+            return genericType.MakeGenericType(typeArguments.ToArray());
         }
 
         public Type GetArrayType(Type elementType, ArrayShape shape)
         {
-            throw new NotImplementedException();
+            return elementType.MakeArrayType();
         }
 
         public Type GetByReferenceType(Type elementType)
@@ -103,7 +157,7 @@ namespace Cosmos.Debug.Symbols
 
         public Type GetPointerType(Type elementType)
         {
-            throw new NotImplementedException();
+            return elementType.MakePointerType();
         }
 
         public Type GetFunctionPointerType(MethodSignature<Type> signature)
@@ -118,7 +172,7 @@ namespace Cosmos.Debug.Symbols
 
         public Type GetTypeFromSpecification(MetadataReader reader, LocalTypeGenericContext genericContext, TypeSpecificationHandle handle, byte rawTypeKind)
         {
-            throw new NotImplementedException();
+            return reader.GetTypeSpecification(handle).DecodeSignature(this, genericContext);
         }
 
         public Type GetModifiedType(Type modifier, Type unmodifiedType, bool isRequired)
