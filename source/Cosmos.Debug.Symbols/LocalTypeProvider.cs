@@ -49,11 +49,11 @@ namespace Cosmos.Debug.Symbols
                 case PrimitiveTypeCode.String:
                     return typeof(string);
                 case PrimitiveTypeCode.TypedReference:
-                    return typeof(System.Type);
+                    return typeof(Type);
                 case PrimitiveTypeCode.IntPtr:
-                    return typeof(System.IntPtr);
+                    return typeof(IntPtr);
                 case PrimitiveTypeCode.UIntPtr:
-                    return typeof(System.UIntPtr);
+                    return typeof(UIntPtr);
                 case PrimitiveTypeCode.Object:
                     return typeof(object);
                 default:
@@ -152,7 +152,7 @@ namespace Cosmos.Debug.Symbols
 
         public Type GetByReferenceType(Type elementType)
         {
-            throw new NotImplementedException();
+            return elementType.MakeByRefType();
         }
 
         public Type GetPointerType(Type elementType)
@@ -167,7 +167,7 @@ namespace Cosmos.Debug.Symbols
 
         public Type GetPinnedType(Type elementType)
         {
-            throw new NotImplementedException();
+            return elementType;
         }
 
         public Type GetTypeFromSpecification(MetadataReader reader, LocalTypeGenericContext genericContext, TypeSpecificationHandle handle, byte rawTypeKind)
@@ -182,12 +182,20 @@ namespace Cosmos.Debug.Symbols
 
         public Type GetGenericTypeParameter(LocalTypeGenericContext genericContext, int index)
         {
-            throw new NotImplementedException();
+            if (index > -1 && genericContext.TypeParameters.Length > index)
+            {
+                return genericContext.TypeParameters[index];
+            }
+            return null;
         }
 
         public Type GetGenericMethodParameter(LocalTypeGenericContext genericContext, int index)
         {
-            throw new NotImplementedException();
+            if (index > -1 && genericContext.MethodParameters.Length > index)
+            {
+                return genericContext.MethodParameters[index];
+            }
+            return null;
         }
     }
 

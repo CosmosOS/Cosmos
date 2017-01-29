@@ -218,15 +218,19 @@ namespace Cosmos.Debug.Symbols
         public static IList<Type> GetLocalVariableInfos(MethodBase aMethodBase)
         {
             var xLocalVariables = new List<Type>();
-
 #if NETSTANDARD1_6
+            var xGenericArgs = new Type[0];
+            if (aMethodBase.IsGenericMethod)
+            {
+                xGenericArgs = aMethodBase.GetGenericArguments();
+            }
             var xMethodBody = GetMethodBodyBlock(aMethodBase.Module, aMethodBase.MetadataToken);
             if (!xMethodBody.LocalSignature.IsNil)
             {
                 string xLocation = aMethodBase.Module.Assembly.Location;
                 var xReader = GetReader(xLocation);
                 var xSig = xReader.mMetadataReader.GetStandaloneSignature(xMethodBody.LocalSignature);
-                var xLocals = xSig.DecodeLocalSignature(new LocalTypeProvider(aMethodBase.Module), null);
+                var xLocals = xSig.DecodeLocalSignature(new LocalTypeProvider(aMethodBase.Module), new LocalTypeGenericContext(new ImmutableArray<Type>(), xGenericArgs.ToImmutableArray()));
                 foreach (var xLocal in xLocals)
                 {
                     xLocalVariables.Add(xLocal);
