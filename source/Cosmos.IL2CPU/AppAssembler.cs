@@ -3,35 +3,25 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Xml;
-using System.Xml.Serialization;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
-using Cosmos.Assembler.x86._486AndUp;
 using Cosmos.Build.Common;
-using Cosmos.Common;
-using Cosmos.Debug.Common;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.Plugs.System;
 using Cosmos.IL2CPU.X86.IL;
 using Cosmos.Debug.Symbols;
 using Cosmos.IL2CPU.Extensions;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
-using Add = Cosmos.Assembler.x86.Add;
 using Call = Cosmos.Assembler.x86.Call;
 using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
 using Label = Cosmos.Assembler.Label;
-using Pop = Cosmos.Assembler.x86.Pop;
-using Sub = Cosmos.Assembler.x86.Sub;
 using SysReflection = System.Reflection;
 
 

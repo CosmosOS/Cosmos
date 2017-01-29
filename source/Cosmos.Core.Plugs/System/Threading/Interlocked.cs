@@ -1,7 +1,7 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
+using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.IL2CPU.Plugs.System.Threading
+namespace Cosmos.Core.Plugs.System.Threading
 {
     [Plug(Target = typeof(Interlocked))]
     public static class InterlockedImpl

@@ -4,9 +4,7 @@ using CPU = Cosmos.Assembler;
 using System.Text;
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.Plugs.System;
 using XSharp.Compiler;
 
 namespace Cosmos.IL2CPU.X86.IL

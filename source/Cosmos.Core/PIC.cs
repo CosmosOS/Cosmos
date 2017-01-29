@@ -10,8 +10,8 @@ namespace Cosmos.Core
         // This is here and not in BaseGroups for 2 reasons.
         // 1) Its needed before the other Basegroups are created.
         // 2) Its only used by this class, and it also exists in Core.
-        protected Common.IOGroup.PIC Master = new Common.IOGroup.PIC(false);
-        protected Common.IOGroup.PIC Slave = new Common.IOGroup.PIC(true);
+        protected IOGroup.PIC Master = new IOGroup.PIC(false);
+        protected IOGroup.PIC Slave = new IOGroup.PIC(true);
 
         protected enum Cmd
         {
@@ -100,7 +100,7 @@ namespace Cosmos.Core
             IOPort.Wait();
         }
 
-        protected void Init(Common.IOGroup.PIC aPIC, byte aBase, byte aIDunno, byte aMask)
+        protected void Init(IOGroup.PIC aPIC, byte aBase, byte aIDunno, byte aMask)
         {
             // We need to remap the PIC interrupt lines to the CPU. The BIOS sets
             // them in a way compatible for 16 bit mode, but in a way that causes problems

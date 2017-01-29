@@ -1,10 +1,6 @@
-using System;
 using CPU = Cosmos.Assembler.x86;
-using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.Plugs.System;
 using XSharp.Compiler;
 using SysReflection = System.Reflection;
 
