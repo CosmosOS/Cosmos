@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 using Microsoft.Data.Sqlite;
 
 using Dapper;
@@ -351,33 +352,8 @@ namespace Cosmos.Debug.Symbols
 
         public SequencePoint[] GetSequencePoints(string aAsmPathname, int aMethodToken, bool aFilterHiddenLines = false)
         {
-            var xReader = DebugSymbolReader.GetReader(aAsmPathname);
-
-            if (xReader == null)
-            {
-                return new SequencePoint[0];
-            }
-
-            var xSeqPoints = xReader.GetMethodDebugInformation(aMethodToken).GetSequencePoints().ToList();
-
-            if (xSeqPoints.Count() == 0)
-            {
-                return new SequencePoint[0];
-            }
-
-            List<SequencePoint> xSeqPointList = new List<SequencePoint>();
-
-            xSeqPoints.ForEach(xSeqPoint => xSeqPointList.Add(new SequencePoint()
-                                                     {
-                                                         Document = xReader.GetDocumentPath(xSeqPoint.Document),
-                                                         ColStart = xSeqPoint.StartColumn,
-                                                         ColEnd = xSeqPoint.EndColumn,
-                                                         LineStart = xSeqPoint.StartLine,
-                                                         LineEnd = xSeqPoint.EndLine,
-                                                         Offset = xSeqPoint.Offset
-                                                     }));
-
-            return xSeqPointList.ToArray();
+            var xSeqPoints = DebugSymbolReader.GetSequencePoints(aAsmPathname, aMethodToken);
+            return xSeqPoints.ToArray();
         }
 
         protected List<Method> mMethods = new List<Method>();

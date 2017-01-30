@@ -71,25 +71,6 @@ namespace Cosmos.Debug.Symbols
             }
         }
 
-        public static string ResolveString(Module aModule, int aMetadataToken)
-        {
-            var xHandle = MetadataTokens.Handle(aMetadataToken);
-            if (!xHandle.IsNil)
-            {
-                string xLocation = aModule.Assembly.Location;
-                var xReader = GetReader(xLocation);
-                var xOffset = xReader.mMetadataReader.GetHeapOffset(xHandle);
-                var xStringHandle = MetadataTokens.UserStringHandle(xOffset);
-
-                if (!xStringHandle.IsNil)
-                {
-                    return xReader.mMetadataReader.GetUserString(xStringHandle);
-                }
-            }
-
-            return null;
-        }
-
         private string ResolveAssemblyReference(AssemblyReference aMemberRef)
         {
             string xFullTypeName = string.Empty;
@@ -174,16 +155,90 @@ namespace Cosmos.Debug.Symbols
             return xName;
         }
 
-        public MethodDebugInformation GetMethodDebugInformation(int aMetadataToken)
+        private static PEReader TryGetPEReader(string assemblyPath, IntPtr loadedPeAddress, int loadedPeSize)
         {
-            var xHandle = MetadataTokens.MethodDebugInformationHandle(aMetadataToken);
+            // TODO: https://github.com/dotnet/corefx/issues/11406
+            //if (loadedPeAddress != IntPtr.Zero && loadedPeSize > 0)
+            //{
+            //    return new PEReader((byte*)loadedPeAddress, loadedPeSize, isLoadedImage: true);
+            //}
 
-            if (!xHandle.IsNil)
+            Stream peStream = TryOpenFile(assemblyPath);
+            if (peStream != null)
             {
-                return mMetadataReader.GetMethodDebugInformation(xHandle);
+                return new PEReader(peStream);
             }
 
-            return new MethodDebugInformation();
+            return null;
+        }
+
+        private static MetadataReaderProvider TryOpenReaderFromAssemblyFile(string assemblyPath, IntPtr loadedPeAddress, int loadedPeSize)
+        {
+            using (var peReader = TryGetPEReader(assemblyPath, loadedPeAddress, loadedPeSize))
+            {
+                if (peReader == null)
+                {
+                    return null;
+                }
+
+                string pdbPath;
+                MetadataReaderProvider provider;
+                if (peReader.TryOpenAssociatedPortablePdb(assemblyPath, TryOpenFile, out provider, out pdbPath))
+                {
+                    // TODO:
+                    // Consider caching the provider in a global cache (accross stack traces) if the PDB is embedded (pdbPath == null),
+                    // as decompressing embedded PDB takes some time.
+                    return provider;
+                }
+            }
+
+            return null;
+        }
+
+        private static Stream TryOpenFile(string path)
+        {
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+
+            try
+            {
+                return File.OpenRead(path);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public static DebugInfo.SequencePoint[] GetSequencePoints(string aAssemblyPath, int aMetadataToken)
+        {
+            IntPtr aAddress = IntPtr.Zero;
+            int aLoadedSize = 0;
+            var xReaderProvider = TryOpenReaderFromAssemblyFile(aAssemblyPath, aAddress, aLoadedSize);
+            //var xReader = xReaderProvider.GetMetadataReader(MetadataReaderOptions.Default, MetadataStringDecoder.DefaultUTF8);
+            //var xHandle = MetadataTokens.MethodDebugInformationHandle(aMetadataToken);
+            var xSeqPoints = new List<DebugInfo.SequencePoint>();
+
+            //if (!xHandle.IsNil)
+            //{
+            //    var xDebugInfo = xReader.GetMethodDebugInformation(xHandle);
+            //    foreach (var xSequencePoint in xDebugInfo.GetSequencePoints())
+            //    {
+            //        xSeqPoints.Add(new DebugInfo.SequencePoint
+            //                       {
+            //                           Document = xReader.GetDocumentPath(xSequencePoint.Document),
+            //                           ColStart = xSequencePoint.StartColumn,
+            //                           ColEnd = xSequencePoint.EndColumn,
+            //                           LineStart = xSequencePoint.StartLine,
+            //                           LineEnd = xSequencePoint.EndLine,
+            //                           Offset = xSequencePoint.Offset
+            //                       });
+            //    }
+            //}
+
+            return xSeqPoints.ToArray();
         }
 
         public string GetDocumentPath(DocumentHandle aHandle)
