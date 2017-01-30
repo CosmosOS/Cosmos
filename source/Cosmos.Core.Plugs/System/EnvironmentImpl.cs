@@ -1,6 +1,7 @@
 ﻿using System;
+using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.IL2CPU.Plugs.System
+namespace Cosmos.Core.Plugs.System
 {
     [Plug(Target = typeof(Environment))]
     public static class EnvironmentImpl

@@ -12,6 +12,13 @@ namespace Cosmos.Core.Plugs.System
             global::System.Buffer.BlockCopy((Array)(object)*src, 0, (Array)(object)*dest, 0, count);
         }
 
+        [PlugMethod(IsOptional = true)]
+        public static unsafe void __Memcpy(byte* src, byte* dest, long count)
+        {
+            // TODO: Cast could cause a loss of data.
+            global::System.Buffer.BlockCopy((Array)(object)*src, 0, (Array)(object)*dest, 0, (int) count);
+        }
+
         /// <summary>
         /// The memmove() function copies n bytes from memory area src to memory area dest.
         /// The memory areas may overlap: copying takes place as though the bytes in src
@@ -137,6 +144,22 @@ namespace Cosmos.Core.Plugs.System
                     while (--t != 0);
                 }
             }
+        }
+
+        /// <summary>
+        /// The memmove() function copies n bytes from memory area src to memory area dest.
+        /// The memory areas may overlap: copying takes place as though the bytes in src
+        /// are first copied into a temporary array that does not overlap src or dest,
+        /// and the bytes are then copied from the temporary array to dest.
+        /// </summary>
+        /// <param name="dest">Destination address to copy data into.</param>
+        /// <param name="src">Source address from where copy data.</param>
+        /// <param name="count">Count of bytes to copy.</param>
+        [PlugMethod(IsOptional = true)]
+        public static unsafe void __Memmove(byte* dest, byte* src, ulong count)
+        {
+            // TODO: Cast could cause a loss of data.
+            __Memmove(dest, src, (uint)count);
         }
 
         public static void InternalBlockCopy(Array src, int srcOffset, Array dst, int dstOffset, int count)
