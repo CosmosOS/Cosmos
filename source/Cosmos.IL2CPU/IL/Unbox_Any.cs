@@ -1,8 +1,8 @@
+using System.Reflection;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.IL2CPU.Plugs;
 using XSharp.Compiler;
-using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       DoNullReferenceCheck(Assembler, DebugEnabled, 0);
       OpType xType = (OpType)aOpCode;
@@ -28,7 +28,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceIsIndirect: true);
       XS.Push(XSRegisters.EAX, isIndirect: true);
       XS.Push(xTypeID, isIndirect: true);
-      SysReflection.MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.UInt32", "System.UInt32");
+      MethodBase xMethodIsInstance = ReflectionUtilities.GetMethodBase(typeof(VTablesImpl), "IsInstance", "System.UInt32", "System.UInt32");
       Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, GetLabel(aMethod, aOpCode), xBaseLabel + "_After_IsInstance_Call", DebugEnabled);
       XS.Label(xBaseLabel + "_After_IsInstance_Call");
       XS.Pop(XSRegisters.EAX);

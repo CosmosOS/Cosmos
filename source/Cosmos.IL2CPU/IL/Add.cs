@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86.SSE;
@@ -15,7 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xType = aOpCode.StackPopTypes[0];
             var xSize = SizeOfType(xType);

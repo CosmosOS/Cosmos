@@ -3,7 +3,7 @@ using Cosmos.IL2CPU.Plugs;
 using XSharp.Compiler;
 using CPUx86 = Cosmos.Assembler.x86;
 
-namespace Cosmos.Core.Plugs.Asm.RuntimeHelpers
+namespace Cosmos.Core.Plugs.Asm
 {
     [Plug(Target = typeof(global::System.Runtime.CompilerServices.RuntimeHelpers))]
     public static class RuntimeHelpersImpl

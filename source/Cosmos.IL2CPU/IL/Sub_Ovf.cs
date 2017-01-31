@@ -10,7 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		public Sub_Ovf(Cosmos.Assembler.Assembler aAsmblr):base(aAsmblr) {
 		}
 
-		public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
+		public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode) {
             //if (Assembler.Stack.Peek().IsFloat) {
             //    throw new NotImplementedException("Sub_Ovf: TODO need to call Sub IL");
             //}

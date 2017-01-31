@@ -1,9 +1,10 @@
 using System.Reflection;
 using Cosmos.Assembler;
+using Cosmos.IL2CPU;
 using Cosmos.IL2CPU.X86.IL;
 using XSharp.Compiler;
 
-namespace Cosmos.IL2CPU.Plugs.Assemblers.Delegate
+namespace Cosmos.Core.Plugs.Asm
 {
     public class DelegateCtorAsm : AssemblerMethod
     {
@@ -11,7 +12,7 @@ namespace Cosmos.IL2CPU.Plugs.Assemblers.Delegate
         {
             // method signature: $this, object @object, IntPtr method
             var xAssembler = aAssembler;
-            var xMethodInfo = (MethodInfo)aMethodInfo;
+            var xMethodInfo = (_MethodInfo)aMethodInfo;
             XS.Comment("Save target ($this) to field");
             XS.Comment("-- ldarg 0");
             Ldarg.DoExecute(xAssembler, xMethodInfo, 0);

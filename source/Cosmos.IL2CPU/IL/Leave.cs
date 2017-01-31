@@ -13,14 +13,14 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             // apparently, Roslyn changed something to the output. We now have to figure out where to jump to.
-            if (aOpCode.CurrentExceptionRegion.Value.Kind.HasFlag(ExceptionRegionKind.Finally)
-              && aOpCode.CurrentExceptionRegion.Value.HandlerOffset > aOpCode.Position)
+            if (aOpCode.CurrentExceptionRegion.Kind.HasFlag(ExceptionRegionKind.Finally)
+              && aOpCode.CurrentExceptionRegion.HandlerOffset > aOpCode.Position)
             {
-                XS.Set(aMethod.MethodBase.GetFullName() + "_" + "LeaveAddress_" + aOpCode.CurrentExceptionRegion.Value.HandlerOffset.ToString("X2"), Assembler.CurrentIlLabel + "." + (Assembler.AsmIlIdx + 2).ToString("X2"), destinationIsIndirect: true, size: RegisterSize.Int32);
-                XS.Jump(AppAssembler.TmpPosLabel(aMethod, aOpCode.CurrentExceptionRegion.Value.HandlerOffset));
+                XS.Set(aMethod.MethodBase.GetFullName() + "_" + "LeaveAddress_" + aOpCode.CurrentExceptionRegion.HandlerOffset.ToString("X2"), Assembler.CurrentIlLabel + "." + (Assembler.AsmIlIdx + 2).ToString("X2"), destinationIsIndirect: true, size: RegisterSize.Int32);
+                XS.Jump(AppAssembler.TmpPosLabel(aMethod, aOpCode.CurrentExceptionRegion.HandlerOffset));
                 //new CPUx86.Jump {DestinationLabel = AppAssembler.TmpPosLabel(aMethod, aOpCode.CurrentExceptionHandler.HandlerOffset + aOpCode.CurrentExceptionHandler.HandlerLength) };
             }
 

@@ -14,12 +14,12 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       Assemble(Assembler, 8, false, aMethod, aOpCode, DebugEnabled);
     }
 
-    public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, bool isSigned, MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
+    public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, bool isSigned, _MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
     {
       //  stack     = index
       //  stack + 2 = array

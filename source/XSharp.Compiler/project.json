@@ -1,9 +1,11 @@
 {
+  "version": "1.0.0-*",
   "buildOptions": {
     "emitEntryPoint": true,
     "publicSign": true,
     "keyFile": "../../Cosmos.snk",
-    "outputName": "XSC"
+    "outputName": "XSC",
+    "debugType": "portable"
   },
   "dependencies": {
     "Microsoft.NETCore.App": {

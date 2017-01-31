@@ -26,5 +26,12 @@ namespace Cosmos.IL2CPU.Extensions
             return DebugSymbolReader.GetMethodBodyBlock(aThis.Module, aThis.MetadataToken);
         }
 
+        public static IEnumerable<_ExceptionRegionInfo> GetExceptionRegionInfos(this MethodBodyBlock aThis, Module aModule)
+        {
+            foreach (var x in aThis.ExceptionRegions)
+            {
+                yield return new _ExceptionRegionInfo(aModule, x);
+            }
+        }
     }
 }

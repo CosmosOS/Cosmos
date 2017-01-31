@@ -18,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             OpMethod xMethod = (OpMethod)aOpCode;
             string xCurrentLabel = GetLabel(aMethod, aOpCode);
@@ -27,7 +27,7 @@ namespace Cosmos.IL2CPU.X86.IL
             Assemble(Assembler, aMethod, xMethod, xCurrentLabel, xType, xMethod.Value);
         }
 
-        public static void Assemble(Assembler.Assembler aAssembler, MethodInfo aMethod, OpMethod xMethod, string currentLabel, Type objectType, MethodBase constructor)
+        public static void Assemble(Assembler.Assembler aAssembler, _MethodInfo aMethod, OpMethod xMethod, string currentLabel, Type objectType, MethodBase constructor)
         {
             // call cctor:
             if (aMethod != null)

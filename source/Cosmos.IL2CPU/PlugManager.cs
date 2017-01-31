@@ -9,8 +9,6 @@ using Cosmos.Assembler;
 using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.Plugs;
 
-using SysReflection = System.Reflection;
-
 namespace Cosmos.IL2CPU
 {
     public class PlugManager
@@ -215,7 +213,7 @@ namespace Cosmos.IL2CPU
                                     var posMethods = xPlug.Key.GetTypeInfo()
                                         .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
                                         .Where(x => x.Name == xMethod.Name);
-                                    foreach (SysReflection.MethodInfo posInf in posMethods)
+                                    foreach (MethodInfo posInf in posMethods)
                                     {
                                         // If static, no this param
                                         // Otherwise, take into account first param is this param
@@ -512,7 +510,7 @@ namespace Cosmos.IL2CPU
                                     xCurIdx++;
                                 }
                             }
-                            SysReflection.MethodBase xTargetMethod = null;
+                            MethodBase xTargetMethod = null;
                             // TODO: In future make rule that all ctor plugs are called
                             // ctor by name, or use a new attrib
                             //TODO: Document all the plug stuff in a document on website

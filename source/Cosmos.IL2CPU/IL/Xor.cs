@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xSize = Math.Max(SizeOfType(aOpCode.StackPopTypes[0]), SizeOfType(aOpCode.StackPopTypes[1]));
             XS.Pop(XSRegisters.EAX);

@@ -11,6 +11,130 @@ using System.Reflection.PortableExecutable;
 
 namespace Cosmos.Debug.Symbols
 {
+    internal static class MetadataHelper
+    {
+        private static readonly Dictionary<string, MetadataReaderProvider> mMetadataCache;
+
+        static MetadataHelper()
+        {
+            mMetadataCache = new Dictionary<string, MetadataReaderProvider>();
+        }
+
+        public static MetadataReader TryGetReader(string aAssemblyPath)
+        {
+            MetadataReaderProvider provider;
+            if (mMetadataCache.TryGetValue(aAssemblyPath, out provider))
+            {
+                return provider.GetMetadataReader();
+            }
+
+            provider = TryOpenReaderFromAssemblyFile(aAssemblyPath);
+
+            if (provider == null)
+            {
+                return null;
+            }
+
+            mMetadataCache.Add(aAssemblyPath, provider);
+
+            // The reader has already been open, so this doesn't throw:
+            return provider.GetMetadataReader();
+        }
+
+        public static Type GetTypeFromReference(MetadataReader reader, Module aModule, TypeReferenceHandle handle, byte rawTypeKind)
+        {
+            int xToken = MetadataTokens.GetToken(handle);
+            return aModule.ResolveType(xToken, null, null);
+            TypeReference xReference = reader.GetTypeReference(handle);
+            Handle scope = xReference.ResolutionScope;
+
+            string xName = xReference.Namespace.IsNil
+                ? reader.GetString(xReference.Name)
+                : reader.GetString(xReference.Namespace) + "." + reader.GetString(xReference.Name);
+
+            var xType = Type.GetType(xName);
+            if (xType != null)
+            {
+                return xType;
+            }
+
+            try
+            {
+                xType = aModule.ResolveType(MetadataTokens.GetToken(handle), null, null);
+                return xType;
+            }
+            catch
+            {
+                switch (scope.Kind)
+                {
+                    case HandleKind.ModuleReference:
+                        string xModule = "[.module  " + reader.GetString(reader.GetModuleReference((ModuleReferenceHandle)scope).Name) + "]" + xName;
+                        return null;
+                    case HandleKind.AssemblyReference:
+                        var assemblyReferenceHandle = (AssemblyReferenceHandle)scope;
+                        var assemblyReference = reader.GetAssemblyReference(assemblyReferenceHandle);
+                        string xAssembly = "[" + reader.GetString(assemblyReference.Name) + "]" + xName;
+                        return null;
+                    case HandleKind.TypeReference:
+                        return GetTypeFromReference(reader, aModule, (TypeReferenceHandle)scope, 0);
+                    default:
+                        // rare cases:  ModuleDefinition means search within defs of current module (used by WinMDs for projections)
+                        //              nil means search exported types of same module (haven't seen this in practice). For the test
+                        //              purposes here, it's sufficient to format both like defs.
+                        return null;
+                }
+            }
+        }
+
+        private static PEReader TryGetPEReader(string aAssemblyPath)
+        {
+            var peStream = TryOpenFile(aAssemblyPath);
+            if (peStream != null)
+            {
+                return new PEReader(peStream);
+            }
+
+            return null;
+        }
+
+        private static MetadataReaderProvider TryOpenReaderFromAssemblyFile(string aAssemblyPath)
+        {
+            using (var peReader = TryGetPEReader(aAssemblyPath))
+            {
+                if (peReader == null)
+                {
+                    return null;
+                }
+
+                string pdbPath;
+                MetadataReaderProvider provider;
+                if (peReader.TryOpenAssociatedPortablePdb(aAssemblyPath, TryOpenFile, out provider, out pdbPath))
+                {
+                    return provider;
+                }
+            }
+
+            return null;
+        }
+
+        private static Stream TryOpenFile(string aPath)
+        {
+            if (!File.Exists(aPath))
+            {
+                return null;
+            }
+
+            try
+            {
+                return File.OpenRead(aPath);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+    }
+
     public class DebugSymbolReader
     {
         private static string mCurrentFile;
@@ -47,210 +171,53 @@ namespace Cosmos.Debug.Symbols
             return null;
         }
 
-        private string ResolveEntity(EntityHandle aEntityHandle)
-        {
-            switch (aEntityHandle.Kind)
-            {
-                case HandleKind.AssemblyReference:
-                    var xAssemblyRef = mMetadataReader.GetAssemblyReference((AssemblyReferenceHandle)aEntityHandle);
-                    return ResolveAssemblyReference(xAssemblyRef);
-                case HandleKind.FieldDefinition:
-                    var xFieldDef = mMetadataReader.GetFieldDefinition((FieldDefinitionHandle)aEntityHandle);
-                    return ResolveFieldDefinition(xFieldDef);
-                case HandleKind.MethodDefinition:
-                    var xMethodDef = mMetadataReader.GetMethodDefinition((MethodDefinitionHandle)aEntityHandle);
-                    return ResolveMethodDefinition(xMethodDef);
-                case HandleKind.MemberReference:
-                    var xMemberRef = mMetadataReader.GetMemberReference((MemberReferenceHandle)aEntityHandle);
-                    return ResolveMemberReference(xMemberRef);
-                case HandleKind.TypeReference:
-                    var xTypeRef = mMetadataReader.GetTypeReference((TypeReferenceHandle)aEntityHandle);
-                    return ResolveTypeReference(xTypeRef);
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private string ResolveAssemblyReference(AssemblyReference aMemberRef)
-        {
-            string xFullTypeName = string.Empty;
-            if (!aMemberRef.Name.IsNil)
-            {
-                xFullTypeName = mMetadataReader.GetString(aMemberRef.Name);
-            }
-            return xFullTypeName;
-        }
-
-        private string ResolveMemberReference(MemberReference aMemberRef)
-        {
-            string xFullTypeName = string.Empty;
-            if (!aMemberRef.Parent.IsNil)
-            {
-                xFullTypeName = ResolveEntity(aMemberRef.Parent);
-            }
-            return xFullTypeName;
-        }
-
-        private string ResolveTypeReference(TypeReference aTypeRef)
-        {
-            string xFullTypeName = string.Empty;
-            if (!aTypeRef.ResolutionScope.IsNil)
-            {
-                xFullTypeName = ResolveEntity(aTypeRef.ResolutionScope);
-            }
-            if (!aTypeRef.Name.IsNil)
-            {
-                xFullTypeName = xFullTypeName + "." + mMetadataReader.GetString(aTypeRef.Name);
-            }
-            return xFullTypeName;
-        }
-
-        private string ResolveFieldDefinition(FieldDefinition aFieldDef)
-        {
-            string xFullTypeName = string.Empty;
-            var xTypeDefHandle = aFieldDef.GetDeclaringType();
-            if (!xTypeDefHandle.IsNil)
-            {
-                var xTypeDef = mMetadataReader.GetTypeDefinition(xTypeDefHandle);
-                xFullTypeName = ResolveTypeDefinition(xTypeDef);
-            }
-            return xFullTypeName;
-        }
-
-        private string ResolveMethodDefinition(MethodDefinition aMethodDef)
-        {
-            string xFullTypeName = string.Empty;
-            var xTypeDefHandle = aMethodDef.GetDeclaringType();
-            if (!xTypeDefHandle.IsNil)
-            {
-                var xTypeDef = mMetadataReader.GetTypeDefinition(xTypeDefHandle);
-                xFullTypeName = ResolveTypeDefinition(xTypeDef);
-            }
-            return xFullTypeName;
-        }
-
-        private string ResolveTypeDefinition(TypeDefinition aTypeDef)
-        {
-            string xFullTypeName = string.Empty;
-            var xNSDefHandle = aTypeDef.NamespaceDefinition;
-            if (!xNSDefHandle.IsNil)
-            {
-                var xNSDef = mMetadataReader.GetNamespaceDefinition(xNSDefHandle);
-                xFullTypeName = ResolveNamespaceDefinition(xNSDef);
-            }
-            xFullTypeName = xFullTypeName + "." + mMetadataReader.GetString(aTypeDef.Name);
-            xFullTypeName = xFullTypeName.Trim('.');
-            return xFullTypeName;
-        }
-
-        private string ResolveNamespaceDefinition(NamespaceDefinition aNamespaceDef)
-        {
-            string xName = string.Empty;
-            if (!aNamespaceDef.Parent.IsNil)
-            {
-                var xParent = mMetadataReader.GetNamespaceDefinition(aNamespaceDef.Parent);
-                xName = ResolveNamespaceDefinition(xParent);
-            }
-            xName = xName + "." + mMetadataReader.GetString(aNamespaceDef.Name);
-            return xName;
-        }
-
-        private static PEReader TryGetPEReader(string assemblyPath, IntPtr loadedPeAddress, int loadedPeSize)
-        {
-            // TODO: https://github.com/dotnet/corefx/issues/11406
-            //if (loadedPeAddress != IntPtr.Zero && loadedPeSize > 0)
-            //{
-            //    return new PEReader((byte*)loadedPeAddress, loadedPeSize, isLoadedImage: true);
-            //}
-
-            Stream peStream = TryOpenFile(assemblyPath);
-            if (peStream != null)
-            {
-                return new PEReader(peStream);
-            }
-
-            return null;
-        }
-
-        private static MetadataReaderProvider TryOpenReaderFromAssemblyFile(string assemblyPath, IntPtr loadedPeAddress, int loadedPeSize)
-        {
-            using (var peReader = TryGetPEReader(assemblyPath, loadedPeAddress, loadedPeSize))
-            {
-                if (peReader == null)
-                {
-                    return null;
-                }
-
-                string pdbPath;
-                MetadataReaderProvider provider;
-                if (peReader.TryOpenAssociatedPortablePdb(assemblyPath, TryOpenFile, out provider, out pdbPath))
-                {
-                    // TODO:
-                    // Consider caching the provider in a global cache (accross stack traces) if the PDB is embedded (pdbPath == null),
-                    // as decompressing embedded PDB takes some time.
-                    return provider;
-                }
-            }
-
-            return null;
-        }
-
-        private static Stream TryOpenFile(string path)
-        {
-            if (!File.Exists(path))
-            {
-                return null;
-            }
-
-            try
-            {
-                return File.OpenRead(path);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
         public static DebugInfo.SequencePoint[] GetSequencePoints(string aAssemblyPath, int aMetadataToken)
         {
-            IntPtr aAddress = IntPtr.Zero;
-            int aLoadedSize = 0;
-            var xReaderProvider = TryOpenReaderFromAssemblyFile(aAssemblyPath, aAddress, aLoadedSize);
-            //var xReader = xReaderProvider.GetMetadataReader(MetadataReaderOptions.Default, MetadataStringDecoder.DefaultUTF8);
-            //var xHandle = MetadataTokens.MethodDebugInformationHandle(aMetadataToken);
-            var xSeqPoints = new List<DebugInfo.SequencePoint>();
-
-            //if (!xHandle.IsNil)
-            //{
-            //    var xDebugInfo = xReader.GetMethodDebugInformation(xHandle);
-            //    foreach (var xSequencePoint in xDebugInfo.GetSequencePoints())
-            //    {
-            //        xSeqPoints.Add(new DebugInfo.SequencePoint
-            //                       {
-            //                           Document = xReader.GetDocumentPath(xSequencePoint.Document),
-            //                           ColStart = xSequencePoint.StartColumn,
-            //                           ColEnd = xSequencePoint.EndColumn,
-            //                           LineStart = xSequencePoint.StartLine,
-            //                           LineEnd = xSequencePoint.EndLine,
-            //                           Offset = xSequencePoint.Offset
-            //                       });
-            //    }
-            //}
-
-            return xSeqPoints.ToArray();
-        }
-
-        public string GetDocumentPath(DocumentHandle aHandle)
-        {
-            var xDocument = mMetadataReader.GetDocument(aHandle);
-
-            if (!xDocument.Name.IsNil)
+            var xSequencePoints = new List<DebugInfo.SequencePoint>();
+            try
             {
-                return mMetadataReader.GetString(xDocument.Name);
+                var xReader = MetadataHelper.TryGetReader(aAssemblyPath);
+                if (xReader == null)
+                {
+                    return xSequencePoints.ToArray();
+                }
+
+                var xMethodDebugInfoHandle = MetadataTokens.MethodDebugInformationHandle(aMetadataToken);
+                if (!xMethodDebugInfoHandle.IsNil)
+                {
+                    var xDebugInfo = xReader.GetMethodDebugInformation(xMethodDebugInfoHandle);
+                    var xDebugInfoSequencePoints = xDebugInfo.GetSequencePoints();
+                    foreach (var xSequencePoint in xDebugInfoSequencePoints)
+                    {
+                        string xDocumentName = string.Empty;
+                        if (!xSequencePoint.Document.IsNil)
+                        {
+                            var xDocument = xReader.GetDocument(xSequencePoint.Document);
+                            if (!xDocument.Name.IsNil)
+                            {
+                                xDocumentName = xReader.GetString(xDocument.Name);
+                            }
+                        }
+
+                        xSequencePoints.Add(new DebugInfo.SequencePoint
+                        {
+                            Document = xDocumentName,
+                            ColStart = xSequencePoint.StartColumn,
+                            ColEnd = xSequencePoint.EndColumn,
+                            LineStart = xSequencePoint.StartLine,
+                            LineEnd = xSequencePoint.EndLine,
+                            Offset = xSequencePoint.Offset
+                        });
+                    }
+
+                }
+            }
+            catch(Exception ex)
+            {
+
             }
 
-            return "";
+            return xSequencePoints.ToArray();
         }
 
         public static MethodBodyBlock GetMethodBodyBlock(Module aModule, int aMetadataToken)
@@ -274,6 +241,7 @@ namespace Cosmos.Debug.Symbols
         {
             var xLocalVariables = new List<Type>();
 #if NETSTANDARD1_6
+            string xLocation = aMethodBase.Module.Assembly.Location;
             var xGenericMethodParameters = new Type[0];
             var xGenericTypeParameters = new Type[0];
             if (aMethodBase.IsGenericMethod)
@@ -285,18 +253,17 @@ namespace Cosmos.Debug.Symbols
                 xGenericTypeParameters = aMethodBase.DeclaringType.GetTypeInfo().GetGenericArguments();
             }
 
-            var xMethodBody = GetMethodBodyBlock(aMethodBase.Module, aMethodBase.MetadataToken);
-            if (!xMethodBody.LocalSignature.IsNil)
-            {
-                string xLocation = aMethodBase.Module.Assembly.Location;
-                var xReader = GetReader(xLocation);
-                var xSig = xReader.mMetadataReader.GetStandaloneSignature(xMethodBody.LocalSignature);
-                var xLocals = xSig.DecodeLocalSignature(new LocalTypeProvider(aMethodBase.Module), new LocalTypeGenericContext(xGenericTypeParameters.ToImmutableArray(), xGenericMethodParameters.ToImmutableArray()));
-                foreach (var xLocal in xLocals)
-                {
-                    xLocalVariables.Add(xLocal);
-                }
-            }
+            // TODO: Read from pdb.
+            //var xReader = MetadataHelper.TryGetReader(xLocation);
+            //if (xReader != null)
+            //{
+            //    xLocalVariables = ResolveLocalsFromPdb(xReader, aMethodBase, xGenericTypeParameters, xGenericMethodParameters).ToList();
+            //}
+            //else
+            //{
+            var xReader = GetReader(xLocation).mMetadataReader;
+            xLocalVariables = ResolveLocalsFromSignature(xReader, aMethodBase, xGenericTypeParameters, xGenericMethodParameters).ToList();
+            //}
 #else
             var xLocals = aMethodBase.GetMethodBody().LocalVariables;
             foreach (var xLocal in xLocals)
@@ -305,6 +272,94 @@ namespace Cosmos.Debug.Symbols
             }
 #endif
             return xLocalVariables;
+        }
+
+        private static IList<Type> ResolveLocalsFromPdb(MetadataReader aReader, MethodBase aMethodBase, Type[] aGenericTypeParameters, Type[] aGenericMethodParameters)
+        {
+            var xLocalVariables = new List<Type>();
+
+            // TODO
+
+            return xLocalVariables;
+        }
+
+        private static IList<Type> ResolveLocalsFromSignature(MetadataReader aReader, MethodBase aMethodBase, Type[] aGenericTypeParameters, Type[] aGenericMethodParameters)
+        {
+            var xLocalVariables = new List<Type>();
+            var xMethodBody = GetMethodBodyBlock(aMethodBase.Module, aMethodBase.MetadataToken);
+            if (xMethodBody != null && !xMethodBody.LocalSignature.IsNil)
+            {
+                var xSig = aReader.GetStandaloneSignature(xMethodBody.LocalSignature);
+                var xLocals = xSig.DecodeLocalSignature(new LocalTypeProvider(aMethodBase.Module), new LocalTypeGenericContext(aGenericTypeParameters.ToImmutableArray(), aGenericMethodParameters.ToImmutableArray()));
+                foreach (var xLocal in xLocals)
+                {
+                    xLocalVariables.Add(xLocal);
+                }
+            }
+            return xLocalVariables;
+        }
+
+        public static Type GetCatchType(Module aModule, ExceptionRegion aRegion)
+        {
+            string xLocation = aModule.Assembly.Location;
+            var xReader = MetadataHelper.TryGetReader(xLocation);
+            switch (aRegion.CatchType.Kind)
+            {
+                case HandleKind.TypeReference:
+                    return MetadataHelper.GetTypeFromReference(xReader, aModule, (TypeReferenceHandle) aRegion.CatchType, 0);
+                    break;
+                case HandleKind.TypeDefinition:
+                    break;
+                case HandleKind.FieldDefinition:
+                    break;
+                case HandleKind.MethodDefinition:
+                    break;
+                case HandleKind.Parameter:
+                    break;
+                case HandleKind.InterfaceImplementation:
+                    break;
+                case HandleKind.MemberReference:
+                    break;
+                case HandleKind.Constant:
+                    break;
+                case HandleKind.CustomAttribute:
+                    break;
+                case HandleKind.DeclarativeSecurityAttribute:
+                    break;
+                case HandleKind.StandaloneSignature:
+                    break;
+                case HandleKind.EventDefinition:
+                    break;
+                case HandleKind.PropertyDefinition:
+                    break;
+                case HandleKind.MethodImplementation:
+                    break;
+                case HandleKind.ModuleReference:
+                    break;
+                case HandleKind.TypeSpecification:
+                    break;
+                case HandleKind.AssemblyDefinition:
+                    break;
+                case HandleKind.AssemblyFile:
+                    break;
+                case HandleKind.AssemblyReference:
+                    break;
+                case HandleKind.ExportedType:
+                    break;
+                case HandleKind.GenericParameter:
+                    break;
+                case HandleKind.MethodSpecification:
+                    break;
+                case HandleKind.GenericParameterConstraint:
+                    break;
+                case HandleKind.MethodDebugInformation:
+                    break;
+                case HandleKind.CustomDebugInformation:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            throw new NotImplementedException();
         }
     }
 }

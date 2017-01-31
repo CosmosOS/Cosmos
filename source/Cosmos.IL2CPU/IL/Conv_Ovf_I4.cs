@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       ThrowNotImplementedException("Conv_Ovf_I4 is not yet implemented");
     }

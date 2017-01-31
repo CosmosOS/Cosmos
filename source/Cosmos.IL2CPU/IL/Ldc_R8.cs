@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       OpDouble xOp = (OpDouble)aOpCode;
       byte[] xBytes = BitConverter.GetBytes(xOp.Value);

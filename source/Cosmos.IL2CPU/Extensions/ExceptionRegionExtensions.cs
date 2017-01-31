@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Reflection;
 using System.Reflection.Metadata;
+using Cosmos.Debug.Symbols;
 
 namespace Cosmos.IL2CPU
 {
     public static class ExceptionRegionExtensions
     {
-        public static Type GetCatchType(this ExceptionRegion aThis)
+        public static Type GetCatchType(this _ExceptionRegionInfo aThis)
         {
-            throw new NotImplementedException();
+            return DebugSymbolReader.GetCatchType(aThis.Module, aThis.ExceptionRegion);
         }
     }
 }

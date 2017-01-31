@@ -63,45 +63,7 @@ namespace Cosmos.Debug.Symbols
 
         public Type GetTypeFromReference(MetadataReader reader, TypeReferenceHandle handle, byte rawTypeKind)
         {
-            TypeReference xReference = reader.GetTypeReference(handle);
-            Handle scope = xReference.ResolutionScope;
-
-            string xName = xReference.Namespace.IsNil
-                ? reader.GetString(xReference.Name)
-                : reader.GetString(xReference.Namespace) + "." + reader.GetString(xReference.Name);
-
-            var xType = Type.GetType(xName);
-            if (xType != null)
-            {
-                return xType;
-            }
-
-            try
-            {
-                xType = mModule.ResolveType(MetadataTokens.GetToken(handle), null, null);
-                return xType;
-            }
-            catch
-            {
-                switch (scope.Kind)
-                {
-                    case HandleKind.ModuleReference:
-                        string xModule = "[.module  " + reader.GetString(reader.GetModuleReference((ModuleReferenceHandle) scope).Name) + "]" + xName;
-                        return null;
-                    case HandleKind.AssemblyReference:
-                        var assemblyReferenceHandle = (AssemblyReferenceHandle) scope;
-                        var assemblyReference = reader.GetAssemblyReference(assemblyReferenceHandle);
-                        string xAssembly = "[" + reader.GetString(assemblyReference.Name) + "]" + xName;
-                        return null;
-                    case HandleKind.TypeReference:
-                        return GetTypeFromReference(reader, (TypeReferenceHandle) scope, 0);
-                    default:
-                        // rare cases:  ModuleDefinition means search within defs of current module (used by WinMDs for projections)
-                        //              nil means search exported types of same module (haven't seen this in practice). For the test
-                        //              purposes here, it's sufficient to format both like defs.
-                        return null;
-                }
-            }
+            return MetadataHelper.GetTypeFromReference(reader, mModule, handle, rawTypeKind);
         }
 
         public Type GetTypeFromDefinition(MetadataReader reader, TypeDefinitionHandle handle, byte rawTypeKind)

@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xStackTop = aOpCode.StackPopTypes[0];
             var xStackTop2 = aOpCode.StackPopTypes[0];

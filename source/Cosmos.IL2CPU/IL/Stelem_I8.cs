@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
           Stelem_Ref.Assemble(Assembler, 8, aMethod, aOpCode, DebugEnabled);
         }

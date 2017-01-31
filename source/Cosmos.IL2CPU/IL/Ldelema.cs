@@ -34,7 +34,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Push(EDX);
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       var xOpType = (OpType)aOpCode;
       var xSize = SizeOfType(xOpType.Value);

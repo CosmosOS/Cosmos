@@ -6,7 +6,6 @@ using System.Linq;
 using System.Xml.Linq;
 using Cosmos.IL2CPU.ILOpCodes;
 using XSharp.Compiler;
-using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -18,11 +17,11 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       var xType = aMethod.MethodBase.DeclaringType;
       var xOpCode = (ILOpCodes.OpField)aOpCode;
-      SysReflection.FieldInfo xField = xOpCode.Value;
+      FieldInfo xField = xOpCode.Value;
       var xIsReferenceType = TypeIsReferenceType(xField.FieldType);
 
       // call cctor:
@@ -47,7 +46,7 @@ namespace Cosmos.IL2CPU.X86.IL
 
       var xFields = xField.DeclaringType.GetFields();
 
-      foreach (SysReflection.FieldInfo xInfo in xFields)
+      foreach (FieldInfo xInfo in xFields)
       {
         if (xInfo == xField)
           break;

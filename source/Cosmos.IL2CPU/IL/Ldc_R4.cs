@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
             OpSingle xOp = ( OpSingle )aOpCode; 
             new CPU.Push { DestinationValue = BitConverter.ToUInt32( BitConverter.GetBytes( xOp.Value ), 0 ) };

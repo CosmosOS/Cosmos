@@ -3,14 +3,12 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata;
 
-using SysReflection = System.Reflection;
-
 namespace Cosmos.IL2CPU.ILOpCodes
 {
   public class OpNone : ILOpCode
   {
 
-    public OpNone(Code aOpCode, int aPos, int aNextPos, ExceptionRegion? aCurrentExceptionRegion)
+    public OpNone(Code aOpCode, int aPos, int aNextPos, _ExceptionRegionInfo aCurrentExceptionRegion)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion)
     {
     }
@@ -24,7 +22,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
         case Code.Nop:
           return 0;
         case Code.Ret:
-          var methodInfo = aMethod as SysReflection.MethodInfo;
+          var methodInfo = aMethod as MethodInfo;
           if (methodInfo != null && methodInfo.ReturnType != typeof(void))
           {
             return 1;

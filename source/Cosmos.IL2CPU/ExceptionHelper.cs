@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Reflection;
 
-using FieldInfo = System.Reflection.FieldInfo;
-
 namespace Cosmos.IL2CPU
 {
     public static class ExceptionHelper

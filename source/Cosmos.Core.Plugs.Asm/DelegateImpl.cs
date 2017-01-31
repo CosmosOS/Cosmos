@@ -1,7 +1,5 @@
 ﻿using System;
 using Cosmos.IL2CPU.Plugs;
-using Cosmos.IL2CPU.Plugs.Assemblers;
-using Cosmos.IL2CPU.Plugs.Assemblers.Delegate;
 
 namespace Cosmos.Core.Plugs.Asm
 {

@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -259,9 +259,9 @@ namespace Cosmos.IL2CPU
     // position of the next instruction
     public readonly int NextPosition;
 
-    public readonly ExceptionRegion? CurrentExceptionRegion;
+    public readonly _ExceptionRegionInfo CurrentExceptionRegion;
 
-    protected ILOpCode(Code aOpCode, int aPos, int aNextPos, ExceptionRegion? aCurrentExceptionRegion)
+    protected ILOpCode(Code aOpCode, int aPos, int aNextPos, _ExceptionRegionInfo aCurrentExceptionRegion)
     {
       OpCode = aOpCode;
       Position = aPos;
@@ -359,11 +359,11 @@ namespace Cosmos.IL2CPU
       }
 
       // if current instruction is the first instruction of a catch statement, "push" the exception type now
-      if (CurrentExceptionRegion != null && CurrentExceptionRegion.Value.HandlerOffset == Position)
+      if (CurrentExceptionRegion != null && CurrentExceptionRegion.HandlerOffset == Position)
       {
-        if (CurrentExceptionRegion.Value.Kind != ExceptionRegionKind.Finally)
+        if (CurrentExceptionRegion.Kind != ExceptionRegionKind.Finally)
         {
-          aStack.Push(CurrentExceptionRegion.Value.GetCatchType());
+          aStack.Push(CurrentExceptionRegion.GetCatchType());
         }
       }
 

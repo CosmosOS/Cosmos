@@ -1,7 +1,7 @@
 using Cosmos.Assembler;
 using XSharp.Compiler;
 
-namespace Cosmos.IL2CPU.Plugs.Assemblers.Array
+namespace Cosmos.Core.Plugs.Asm
 {
     public class ArrayGetLengthAsm : AssemblerMethod
     {

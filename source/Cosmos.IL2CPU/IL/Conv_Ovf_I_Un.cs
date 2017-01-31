@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
 		{
 		}
 
-		public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
+		public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode) {
 			//TODO: What if the last ILOp in a method was Conv_Ovf_I_Un or an other?
             var xSource = aOpCode.StackPopTypes[0];
             var xSourceSize = SizeOfType(xSource);

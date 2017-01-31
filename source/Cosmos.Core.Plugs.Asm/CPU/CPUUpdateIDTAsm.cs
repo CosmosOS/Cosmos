@@ -1,13 +1,13 @@
 using System;
 using System.Reflection;
+using Cosmos.Assembler;
+using Cosmos.Assembler.x86;
 using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
-using CPUAll = Cosmos.Assembler;
 
-namespace Cosmos.IL2CPU.Plugs.Assemblers
+namespace Cosmos.Core.Plugs.Asm
 {
     //TODO: This asm refs Hardware.. should not.. its a higher ring
-    public class CPUUpdateIDTAsm : CPUAll.AssemblerMethod
+    public class CPUUpdateIDTAsm : AssemblerMethod
     {
         private static MethodBase GetMethodDef(Assembly aAssembly, string aType, string aMethodName, bool aErrorWhenNotFound)
         {
@@ -29,11 +29,11 @@ namespace Cosmos.IL2CPU.Plugs.Assemblers
 
         private static MethodBase GetInterruptHandler(byte aInterrupt)
         {
-            return GetMethodDef(Type.GetType("Cosmos.Core.INTs").GetTypeInfo().Assembly, Type.GetType("Cosmos.Core.INTs").FullName
+            return GetMethodDef(typeof(Cosmos.Core.INTs).GetTypeInfo().Assembly, typeof(Cosmos.Core.INTs).FullName
                 , "HandleInterrupt_" + aInterrupt.ToString("X2"), false);
         }
 
-        public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
+        public override void AssembleNew(Assembler.Assembler aAssembler, object aMethodInfo)
         {
             // IDT is already initialized but just for base hooks, and asm only.
             // ie Int 1, 3 and GPF
@@ -94,9 +94,9 @@ namespace Cosmos.IL2CPU.Plugs.Assemblers
                 MethodBase xHandler = GetInterruptHandler((byte)j);
                 if (xHandler == null)
                 {
-                    xHandler = GetMethodDef(Type.GetType("Cosmos.Core.INTs").GetTypeInfo().Assembly, Type.GetType("Cosmos.Core.INTs").FullName, "HandleInterrupt_Default", true);
+                    xHandler = GetMethodDef(typeof(Cosmos.Core.INTs).GetTypeInfo().Assembly, typeof(Cosmos.Core.INTs).FullName, "HandleInterrupt_Default", true);
                 }
-                XS.Call(CPUAll.LabelName.Get(xHandler));
+                XS.Call(LabelName.Get(xHandler));
                 XS.Pop(XSRegisters.EAX);
                 XS.SSE.FXRestore(XSRegisters.ESP, isIndirect: true);
 
@@ -106,7 +106,7 @@ namespace Cosmos.IL2CPU.Plugs.Assemblers
                 XS.PopAllRegisters();
 
                 XS.Add(XSRegisters.ESP, 8);
-                new CPUAll.Label("__ISR_Handler_" + j.ToString("X2") + "_END");
+                XS.Label("__ISR_Handler_" + j.ToString("X2") + "_END");
                 XS.InterruptReturn();
             }
             XS.Label("__INTERRUPT_OCCURRED__");
@@ -115,7 +115,7 @@ namespace Cosmos.IL2CPU.Plugs.Assemblers
             XS.Noop();
             XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8);
             XS.Compare(XSRegisters.EAX, 0);
-            XS.Jump(CPUx86.ConditionalTestEnum.Zero, ".__AFTER_ENABLE_INTERRUPTS");
+            XS.Jump(ConditionalTestEnum.Zero, ".__AFTER_ENABLE_INTERRUPTS");
 
             // reload interrupt list
             XS.Set(XSRegisters.EAX, "_NATIVE_IDT_Pointer");

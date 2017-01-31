@@ -158,13 +158,15 @@ namespace Cosmos.Assembler
             {
                 xBuilder.Append(GetFullName(xMethodInfo.ReturnType));
             }
-            else {
+            else
+            {
                 var xCtor = aMethod as ConstructorInfo;
                 if (xCtor != null)
                 {
                     xBuilder.Append(typeof(void).FullName);
                 }
-                else {
+                else
+                {
                     xBuilder.Append(xParts[0]);
                 }
             }

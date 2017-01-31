@@ -14,19 +14,19 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xOpCode = (ILOpCodes.OpField) aOpCode;
             DoExecute(Assembler, aMethod, xOpCode.Value.DeclaringType, xOpCode.Value.GetFullName(), true, DebugEnabled, aOpCode.StackPopTypes[0]);
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, string aField, bool aDerefValue, bool aDebugEnabled, Type aTypeOnStack)
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, _MethodInfo aMethod, Type aDeclaringType, string aField, bool aDerefValue, bool aDebugEnabled, Type aTypeOnStack)
         {
           var xFieldInfo = ResolveField(aDeclaringType, aField, true);
           DoExecute(Assembler, aMethod, aDeclaringType, xFieldInfo, aDerefValue, aDebugEnabled, aTypeOnStack);
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, Type aDeclaringType, FieldInfo aField, bool aDerefValue, bool aDebugEnabled, Type aTypeOnStack)
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, _MethodInfo aMethod, Type aDeclaringType, _FieldInfo aField, bool aDerefValue, bool aDebugEnabled, Type aTypeOnStack)
         {
             XS.Comment("Field: " + aField.Id);
             int xExtraOffset = 0;

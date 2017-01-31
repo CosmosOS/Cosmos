@@ -1,10 +1,13 @@
 {
+  "version": "1.0.0-*",
   "buildOptions": {
+    "allowUnsafe": true,
     "publicSign": true,
     "keyFile": "../../Cosmos.snk",
     "embed": {
       "include": "**/*.sql"
-    }
+    },
+    "debugType": "portable"
   },
   "dependencies": {
     "Dapper.StrongName": "1.50.2",

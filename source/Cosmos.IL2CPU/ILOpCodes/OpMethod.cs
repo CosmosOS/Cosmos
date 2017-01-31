@@ -5,8 +5,6 @@ using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
 
-using SysReflection = System.Reflection;
-
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpMethod: ILOpCode {
     public MethodBase Value;
@@ -14,7 +12,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
     public MethodBase BaseMethod;
     public uint BaseMethodUID;
 
-    public OpMethod(Code aOpCode, int aPos, int aNextPos, MethodBase aValue, ExceptionRegion? aCurrentExceptionRegion)
+    public OpMethod(Code aOpCode, int aPos, int aNextPos, MethodBase aValue, _ExceptionRegionInfo aCurrentExceptionRegion)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       Value = aValue;
     }
@@ -50,7 +48,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       {
         case Code.Call:
         case Code.Callvirt:
-          var methodInfo = Value as SysReflection.MethodInfo;
+          var methodInfo = Value as MethodInfo;
           if (methodInfo != null && methodInfo.ReturnType != typeof (void))
           {
             return 1;
@@ -76,7 +74,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
       {
         case Code.Call:
         case Code.Callvirt:
-          var xMethodInfo = Value as SysReflection.MethodInfo;
+          var xMethodInfo = Value as MethodInfo;
           if (xMethodInfo != null && xMethodInfo.ReturnType != typeof(void))
           {
             StackPushTypes[0] = xMethodInfo.ReturnType;

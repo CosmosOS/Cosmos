@@ -1,5 +1,5 @@
 //#define VMT_DEBUG
-#define COSMOSDEBUG
+//#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
@@ -20,10 +20,7 @@ using Cosmos.IL2CPU.Extensions;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
 using Call = Cosmos.Assembler.x86.Call;
-using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
 using Label = Cosmos.Assembler.Label;
-using SysReflection = System.Reflection;
-
 
 namespace Cosmos.IL2CPU
 {
@@ -77,7 +74,7 @@ namespace Cosmos.IL2CPU
             GC.SuppressFinalize(this);
         }
 
-        protected void MethodBegin(MethodInfo aMethod)
+        protected void MethodBegin(_MethodInfo aMethod)
         {
             XS.Comment("---------------------------------------------------------");
             XS.Comment("Assembly: " + aMethod.MethodBase.DeclaringType.GetTypeInfo().Assembly.FullName);
@@ -117,7 +114,7 @@ namespace Cosmos.IL2CPU
                         XS.Comment(String.Format("Argument[{3}] {0} at EBP+{1}, size = {2}", xParams[i].Name, xOffset, xSize, (xIdxOffset + i)));
                     }
 
-                    var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
+                    var xMethodInfo = aMethod.MethodBase as MethodInfo;
                     if (xMethodInfo != null)
                     {
                         var xSize = ILOp.Align(ILOp.SizeOfType(xMethodInfo.ReturnType), 4);
@@ -289,12 +286,12 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        protected void MethodEnd(MethodInfo aMethod)
+        protected void MethodEnd(_MethodInfo aMethod)
         {
             XS.Comment("End Method: " + aMethod.MethodBase.Name);
 
             uint xReturnSize = 0;
-            var xMethInfo = aMethod.MethodBase as SysReflection.MethodInfo;
+            var xMethInfo = aMethod.MethodBase as MethodInfo;
             if (xMethInfo != null)
             {
                 xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
@@ -327,7 +324,7 @@ namespace Cosmos.IL2CPU
             if (aMethod.PluggedMethod != null)
             {
                 xReturnSize = 0;
-                xMethInfo = aMethod.PluggedMethod.MethodBase as SysReflection.MethodInfo;
+                xMethInfo = aMethod.PluggedMethod.MethodBase as MethodInfo;
                 if (xMethInfo != null)
                 {
                     xReturnSize = ILOp.Align(ILOp.SizeOfType(xMethInfo.ReturnType), 4);
@@ -437,14 +434,14 @@ namespace Cosmos.IL2CPU
             return xOffset;
         }
 
-        public void ProcessMethod(MethodInfo aMethod, List<ILOpCode> aOpCodes)
+        public void ProcessMethod(_MethodInfo aMethod, List<ILOpCode> aOpCodes)
         {
             try
             {
                 // We check this here and not scanner as when scanner makes these
                 // plugs may still have not yet been scanned that it will depend on.
                 // But by the time we make it here, they have to be resolved.
-                if (aMethod.Type == MethodInfo.TypeEnum.NeedsPlug && aMethod.PlugMethod == null)
+                if (aMethod.Type == _MethodInfo.TypeEnum.NeedsPlug && aMethod.PlugMethod == null)
                 {
                     throw new Exception("Method needs plug, but no plug was assigned.");
                 }
@@ -520,12 +517,12 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        private void BeforeEmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
+        private void BeforeEmitInstructions(_MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
         {
             // do optimizations
         }
 
-        private void AfterEmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
+        private void AfterEmitInstructions(_MethodInfo aMethod, List<ILOpCode> aCurrentGroup)
         {
             // do optimizations
 
@@ -541,7 +538,7 @@ namespace Cosmos.IL2CPU
         }
 
         //private static bool mDebugStackErrors = true;
-        private void EmitInstructions(MethodInfo aMethod, List<ILOpCode> aCurrentGroup, ref bool emitINT3)
+        private void EmitInstructions(_MethodInfo aMethod, List<ILOpCode> aCurrentGroup, ref bool emitINT3)
         {
             ILOpCode.ILInterpretationDebugLine(() => "---- Group");
             InterpretInstructionsToDetermineStackTypes(aCurrentGroup);
@@ -574,10 +571,10 @@ namespace Cosmos.IL2CPU
 
                 #region Exception handling support code
 
-                ExceptionRegion? xCurrentRegion = null;
+                _ExceptionRegionInfo xCurrentRegion = null;
                 var xBody = aMethod.MethodBase.GetMethodBody();
                 // todo: add support for nested handlers using a stack or so..
-                foreach (ExceptionRegion xHandler in xBody.ExceptionRegions)
+                foreach (_ExceptionRegionInfo xHandler in xBody.GetExceptionRegionInfos(aMethod.MethodBase.DeclaringType.GetTypeInfo().Module))
                 {
                     if (xHandler.TryOffset > 0)
                     {
@@ -588,7 +585,7 @@ namespace Cosmos.IL2CPU
                                 xCurrentRegion = xHandler;
                                 continue;
                             }
-                            else if (xHandler.TryOffset > xCurrentRegion.Value.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentRegion.Value.TryLength + xCurrentRegion.Value.TryOffset))
+                            else if (xHandler.TryOffset > xCurrentRegion.TryOffset && (xHandler.TryLength + xHandler.TryOffset) < (xCurrentRegion.TryLength + xCurrentRegion.TryOffset))
                             {
                                 // only replace if the current found handler is narrower
                                 xCurrentRegion = xHandler;
@@ -605,7 +602,7 @@ namespace Cosmos.IL2CPU
                                 xCurrentRegion = xHandler;
                                 continue;
                             }
-                            else if (xHandler.HandlerOffset > xCurrentRegion.Value.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentRegion.Value.HandlerOffset + xCurrentRegion.Value.HandlerLength))
+                            else if (xHandler.HandlerOffset > xCurrentRegion.HandlerOffset && (xHandler.HandlerOffset + xHandler.HandlerLength) < (xCurrentRegion.HandlerOffset + xCurrentRegion.HandlerLength))
                             {
                                 // only replace if the current found handler is narrower
                                 xCurrentRegion = xHandler;
@@ -624,7 +621,7 @@ namespace Cosmos.IL2CPU
                                     xCurrentRegion = xHandler;
                                     continue;
                                 }
-                                else if (xHandler.FilterOffset > xCurrentRegion.Value.FilterOffset)
+                                else if (xHandler.FilterOffset > xCurrentRegion.FilterOffset)
                                 {
                                     // only replace if the current found handler is narrower
                                     xCurrentRegion = xHandler;
@@ -637,7 +634,7 @@ namespace Cosmos.IL2CPU
 
                 #endregion
 
-                var xNeedsExceptionPush = (xCurrentRegion != null) && (((xCurrentRegion.Value.HandlerOffset > 0 && xCurrentRegion.Value.HandlerOffset == xOpCode.Position) || (xCurrentRegion.Value.Kind.HasFlag(ExceptionRegionKind.Filter) && xCurrentRegion.Value.FilterOffset > 0 && xCurrentRegion.Value.FilterOffset == xOpCode.Position)) && (xCurrentRegion.Value.Kind == ExceptionRegionKind.Catch));
+                var xNeedsExceptionPush = (xCurrentRegion != null) && (((xCurrentRegion.HandlerOffset > 0 && xCurrentRegion.HandlerOffset == xOpCode.Position) || (xCurrentRegion.Kind.HasFlag(ExceptionRegionKind.Filter) && xCurrentRegion.FilterOffset > 0 && xCurrentRegion.FilterOffset == xOpCode.Position)) && (xCurrentRegion.Kind == ExceptionRegionKind.Catch));
                 if (xNeedsExceptionPush)
                 {
                     Push(DataMember.GetStaticFieldName(ExceptionHelperRefs.CurrentExceptionRef), true);
@@ -802,17 +799,17 @@ namespace Cosmos.IL2CPU
             XS.Jump(aLabelName);
         }
 
-        protected FieldInfo ResolveField(MethodInfo method, string fieldId, bool aOnlyInstance)
+        protected _FieldInfo ResolveField(_MethodInfo method, string fieldId, bool aOnlyInstance)
         {
             return ILOp.ResolveField(method.MethodBase.DeclaringType, fieldId, aOnlyInstance);
         }
 
-        protected void Ldarg(MethodInfo aMethod, int aIndex)
+        protected void Ldarg(_MethodInfo aMethod, int aIndex)
         {
             X86.IL.Ldarg.DoExecute(Assembler, aMethod, (ushort)aIndex);
         }
 
-        protected void Call(MethodInfo aMethod, MethodInfo aTargetMethod, string aNextLabel)
+        protected void Call(_MethodInfo aMethod, _MethodInfo aTargetMethod, string aNextLabel)
         {
             var xSize = X86.IL.Call.GetStackSizeToReservate(aTargetMethod.MethodBase);
             if (xSize > 0)
@@ -820,12 +817,12 @@ namespace Cosmos.IL2CPU
                 XS.Sub(ESP, xSize);
             }
             XS.Call(ILOp.GetLabel(aTargetMethod));
-            var xMethodInfo = aMethod.MethodBase as SysReflection.MethodInfo;
+            var xMethodInfo = aMethod.MethodBase as MethodInfo;
 
             uint xReturnsize = 0;
             if (xMethodInfo != null)
             {
-                xReturnsize = ILOp.SizeOfType(((SysReflection.MethodInfo)aMethod.MethodBase).ReturnType);
+                xReturnsize = ILOp.SizeOfType(((MethodInfo)aMethod.MethodBase).ReturnType);
             }
 
             ILOp.EmitExceptionLogic(Assembler, aMethod, null, true,
@@ -843,12 +840,12 @@ namespace Cosmos.IL2CPU
                      }, aNextLabel);
         }
 
-        protected void Ldflda(MethodInfo aMethod, FieldInfo aFieldInfo)
+        protected void Ldflda(_MethodInfo aMethod, _FieldInfo aFieldInfo)
         {
             X86.IL.Ldflda.DoExecute(Assembler, aMethod, aMethod.MethodBase.DeclaringType, aFieldInfo, false, false, aFieldInfo.DeclaringType);
         }
 
-        protected void Ldsflda(MethodInfo aMethod, FieldInfo aFieldInfo)
+        protected void Ldsflda(_MethodInfo aMethod, _FieldInfo aFieldInfo)
         {
             X86.IL.Ldsflda.DoExecute(Assembler, aMethod, DataMember.GetStaticFieldName(aFieldInfo.Field), aMethod.MethodBase.DeclaringType, null);
         }
@@ -1121,7 +1118,7 @@ namespace Cosmos.IL2CPU
             XS.Return();
         }
 
-        public void ProcessField(SysReflection.FieldInfo aField)
+        public void ProcessField(FieldInfo aField)
         {
             string xFieldName = LabelName.GetFullName(aField);
             xFieldName = DataMember.GetStaticFieldName(aField);
@@ -1227,7 +1224,7 @@ namespace Cosmos.IL2CPU
         /// </summary>
         /// <param name="aFrom">The method to forward to the plug</param>
         /// <param name="aTo">The plug</param>
-        internal void GenerateMethodForward(MethodInfo aFrom, MethodInfo aTo)
+        internal void GenerateMethodForward(_MethodInfo aFrom, _MethodInfo aTo)
         {
             var xMethodLabel = ILOp.GetLabel(aFrom);
             var xEndOfMethodLabel = xMethodLabel + EndOfMethodLabelNameNormal;
@@ -1324,17 +1321,17 @@ namespace Cosmos.IL2CPU
 
         // These are all temp functions until we move to the new assembler.
         // They are used to clean up the old assembler slightly while retaining compatibiltiy for now
-        public static string TmpPosLabel(MethodInfo aMethod, int aOffset)
+        public static string TmpPosLabel(_MethodInfo aMethod, int aOffset)
         {
             return ILOp.GetLabel(aMethod, aOffset);
         }
 
-        public static string TmpPosLabel(MethodInfo aMethod, ILOpCode aOpCode)
+        public static string TmpPosLabel(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             return TmpPosLabel(aMethod, aOpCode.Position);
         }
 
-        public static string TmpBranchLabel(MethodInfo aMethod, ILOpCode aOpCode)
+        public static string TmpBranchLabel(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             return TmpPosLabel(aMethod, ((OpBranch)aOpCode).Value);
         }
@@ -1399,11 +1396,11 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        protected void AfterOp(MethodInfo aMethod, ILOpCode aOpCode)
+        protected void AfterOp(_MethodInfo aMethod, ILOpCode aOpCode)
         {
         }
 
-        protected void BeforeOp(MethodInfo aMethod, ILOpCode aOpCode, bool emitInt3NotNop, out bool INT3Emitted, bool hasSourcePoint)
+        protected void BeforeOp(_MethodInfo aMethod, ILOpCode aOpCode, bool emitInt3NotNop, out bool INT3Emitted, bool hasSourcePoint)
         {
             string xLabel = TmpPosLabel(aMethod, aOpCode);
             Assembler.CurrentIlLabel = xLabel;
@@ -1506,7 +1503,7 @@ namespace Cosmos.IL2CPU
             }
         }
 
-        protected void EmitTracer(MethodInfo aMethod, ILOpCode aOp, string aNamespace, bool emitInt3NotNop, out bool INT3Emitted, out bool INT3PlaceholderEmitted, bool isNewSourcePoint)
+        protected void EmitTracer(_MethodInfo aMethod, ILOpCode aOp, string aNamespace, bool emitInt3NotNop, out bool INT3Emitted, out bool INT3PlaceholderEmitted, bool isNewSourcePoint)
         {
             // NOTE - These if statements can be optimized down - but clarity is
             // more important than the optimizations. Furthermore the optimizations available

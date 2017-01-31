@@ -1,4 +1,4 @@
-﻿#define COSMOSDEBUG
+﻿//#define COSMOSDEBUG
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -58,7 +58,7 @@ namespace Cosmos.Compiler.Tests.SingleEchoTest
                 TestController.Completed();
             }
             catch (Exception e)
-	        {
+            {
                 mDebugger.Send("Caught exception: " + e.ToString());
             }
         }

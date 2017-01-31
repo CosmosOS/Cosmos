@@ -16,7 +16,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
         {
 #if false
             var xOpVar = (OpVar)aOpCode;
@@ -66,7 +66,7 @@ namespace Cosmos.IL2CPU.X86.IL
             DoExecute(Assembler, aMethod, xOpVar.Value);
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, ushort aParam)
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, _MethodInfo aMethod, ushort aParam)
         {
             var xDisplacement = Ldarg.GetArgumentDisplacement(aMethod, aParam);
             //var xType = Ldarg.GetArgumentType(aMethod, aParam);

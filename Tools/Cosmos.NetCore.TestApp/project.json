@@ -1,10 +1,12 @@
 {
+  "version": "1.0.0-*",
   "buildOptions": {
     "emitEntryPoint": true,
     "publicSign": true,
     "allowUnsafe": true,
     "keyFile": "../../Cosmos.snk",
-    "define": [ "COSMOSDEBUG" ]
+    "define": [ "COSMOSDEBUG" ],
+    "debugType": "portable"
   },
   "dependencies": {
     "Microsoft.DiaSymReader": "1.0.8",

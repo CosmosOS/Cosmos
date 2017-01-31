@@ -9,7 +9,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpDouble : ILOpCode {
     public readonly double Value;
 
-    public OpDouble(Code aOpCode, int aPos, int aNextPos, double aValue, ExceptionRegion? aCurrentExceptionRegion)
+    public OpDouble(Code aOpCode, int aPos, int aNextPos, double aValue, _ExceptionRegionInfo aCurrentExceptionRegion)
       : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       Value = aValue;
     }

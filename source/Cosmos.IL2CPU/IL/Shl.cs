@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
             XS.Pop(XSRegisters.ECX); // shift amount
             var xStackItem_ShiftAmount = aOpCode.StackPopTypes[0];

@@ -1,9 +1,9 @@
-using System;
 using System.Reflection;
 using Cosmos.Assembler;
+using Cosmos.IL2CPU;
 using XSharp.Compiler;
 
-namespace Cosmos.IL2CPU.Plugs.Assemblers
+namespace Cosmos.Core.Plugs.Asm
 {
     public class DelegateGetMulticastInvokeAsm : AssemblerMethod
     {

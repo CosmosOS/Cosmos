@@ -7,7 +7,6 @@ using System.Reflection;
 using Cosmos.IL2CPU.Plugs;
 using XSharp.Compiler;
 using static XSharp.Compiler.XSRegisters;
-using SysReflection = System.Reflection;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -19,13 +18,13 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xOpMethod = aOpCode as OpMethod;
             DoExecute(Assembler, aMethod, xOpMethod.Value, xOpMethod.ValueUID, aOpCode, DebugEnabled);
         }
 
-        public static void DoExecute(Assembler.Assembler Assembler, MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp, bool debugEnabled)
+        public static void DoExecute(Assembler.Assembler Assembler, _MethodInfo aMethod, MethodBase aTargetMethod, uint aTargetMethodUID, ILOpCode aOp, bool debugEnabled)
         {
             string xCurrentMethodLabel = GetLabel(aMethod, aOp.Position);
             Type xPopType = aOp.StackPopTypes.Last();
@@ -37,7 +36,7 @@ namespace Cosmos.IL2CPU.X86.IL
             }
 
             uint xReturnSize = 0;
-            var xMethodInfo = aTargetMethod as SysReflection.MethodInfo;
+            var xMethodInfo = aTargetMethod as MethodInfo;
             if (xMethodInfo != null)
             {
                 xReturnSize = Align(SizeOfType(xMethodInfo.ReturnType), 4);

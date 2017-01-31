@@ -1,7 +1,7 @@
 using Cosmos.Assembler;
 using XSharp.Compiler;
 
-namespace Cosmos.IL2CPU.Plugs.Assemblers.CPU
+namespace Cosmos.Core.Plugs.Asm
 {
     public class CPUZeroFillAsm : AssemblerMethod
     {

@@ -14,7 +14,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
+    public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, _MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
     {
       // stack     == the new value
       // stack + 1 == the index
@@ -71,7 +71,7 @@ namespace Cosmos.IL2CPU.X86.IL
       }
       XS.Add(XSRegisters.ESP, 12);
     }
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       Assemble(Assembler, 8, aMethod, aOpCode, DebugEnabled);
     }

@@ -11,7 +11,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
         public Ldc_I8( Cosmos.Assembler.Assembler aAsmblr ) : base( aAsmblr ) { }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode ) {
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode ) {
             var xOp = (OpInt64)aOpCode;
 			// push high part
             new CPUx86.Push { DestinationValue = BitConverter.ToUInt32(BitConverter.GetBytes(xOp.Value), 4) };

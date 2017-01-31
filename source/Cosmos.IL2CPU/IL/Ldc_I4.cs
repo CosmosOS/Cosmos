@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
         public Ldc_I4( Cosmos.Assembler.Assembler aAsmblr ) : base( aAsmblr ) { }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
           XS.Push((uint)((OpInt)aOpCode).Value);
         }

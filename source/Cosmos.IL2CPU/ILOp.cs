@@ -12,7 +12,6 @@ using Cosmos.Debug.Symbols;
 using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.X86.IL;
 using XSharp.Compiler;
-using FieldInfo = Cosmos.IL2CPU.X86.IL.FieldInfo;
 
 namespace Cosmos.IL2CPU
 {
@@ -30,7 +29,7 @@ namespace Cosmos.IL2CPU
 
     // This is called execute and not assemble, as the scanner
     // could be used for other things, profiling, analysis, reporting, etc
-    public abstract void Execute(MethodInfo aMethod, ILOpCode aOpCode);
+    public abstract void Execute(_MethodInfo aMethod, ILOpCode aOpCode);
 
       public static string GetTypeIDLabel(Type aType)
     {
@@ -57,7 +56,7 @@ namespace Cosmos.IL2CPU
       return xSize;
     }
 
-    public static string GetLabel(MethodInfo aMethod, ILOpCode aOpCode)
+    public static string GetLabel(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       return GetLabel(aMethod, aOpCode.Position);
     }
@@ -67,7 +66,7 @@ namespace Cosmos.IL2CPU
       return LabelName.Get(aMethod);
     }
 
-    public static string GetLabel(MethodInfo aMethod)
+    public static string GetLabel(_MethodInfo aMethod)
     {
       if (aMethod.PluggedMethod != null)
       {
@@ -76,7 +75,7 @@ namespace Cosmos.IL2CPU
       return GetLabel(aMethod.MethodBase);
     }
 
-    public static string GetLabel(MethodInfo aMethod, int aPos)
+    public static string GetLabel(_MethodInfo aMethod, int aPos)
     {
       return LabelName.Get(GetLabel(aMethod), aPos);
     }
@@ -86,18 +85,18 @@ namespace Cosmos.IL2CPU
       return GetType().Name;
     }
 
-    protected static void Jump_Exception(MethodInfo aMethod)
+    protected static void Jump_Exception(_MethodInfo aMethod)
     {
       // todo: port to numeric labels
       XS.Jump(GetLabel(aMethod) + AppAssembler.EndOfMethodLabelNameException);
     }
 
-    protected static void Jump_End(MethodInfo aMethod)
+    protected static void Jump_End(_MethodInfo aMethod)
     {
       XS.Jump(GetLabel(aMethod) + AppAssembler.EndOfMethodLabelNameNormal);
     }
 
-    public static uint GetStackCountForLocal(MethodInfo aMethod, Type aField)
+    public static uint GetStackCountForLocal(_MethodInfo aMethod, Type aField)
     {
       var xSize = SizeOfType(aField);
       var xResult = xSize / 4;
@@ -108,7 +107,7 @@ namespace Cosmos.IL2CPU
       return xResult;
     }
 
-     public static uint GetEBPOffsetForLocal(MethodInfo aMethod, int localIndex)
+     public static uint GetEBPOffsetForLocal(_MethodInfo aMethod, int localIndex)
     {
       var xLocalInfos = aMethod.MethodBase.GetLocalVariables();
       uint xOffset = 4;
@@ -124,7 +123,7 @@ namespace Cosmos.IL2CPU
       return xOffset;
     }
 
-    public static uint GetEBPOffsetForLocalForDebugger(MethodInfo aMethod, int localIndex)
+    public static uint GetEBPOffsetForLocalForDebugger(_MethodInfo aMethod, int localIndex)
     {
       // because the memory is read in positive direction, we need to add additional size if greater than 4
       uint xOffset = GetEBPOffsetForLocal(aMethod, localIndex);
@@ -151,9 +150,9 @@ namespace Cosmos.IL2CPU
       };
     }
 
-    private static void DoGetFieldsInfo(Type aType, List<FieldInfo> aFields, bool includeStatic)
+    private static void DoGetFieldsInfo(Type aType, List<_FieldInfo> aFields, bool includeStatic)
     {
-      var xCurList = new Dictionary<string, FieldInfo>();
+      var xCurList = new Dictionary<string, _FieldInfo>();
       var xBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
       if (includeStatic)
       {
@@ -173,7 +172,7 @@ namespace Cosmos.IL2CPU
 
         string xId = xField.GetFullName();
 
-        var xInfo = new FieldInfo(xId, SizeOfType(xField.FieldType), aType, xField.FieldType);
+        var xInfo = new _FieldInfo(xId, SizeOfType(xField.FieldType), aType, xField.FieldType);
         xInfo.IsStatic = xField.IsStatic;
         xInfo.Field = xField;
 
@@ -194,7 +193,7 @@ namespace Cosmos.IL2CPU
       {
         foreach (var xPlugField in xPlugFields)
         {
-          FieldInfo xPluggedField = null;
+          _FieldInfo xPluggedField = null;
           if (xCurList.TryGetValue(xPlugField.Key, out xPluggedField))
           {
             // plugfield modifies an already existing field
@@ -209,7 +208,7 @@ namespace Cosmos.IL2CPU
           }
           else
           {
-            xPluggedField = new FieldInfo(xPlugField.Value.FieldId, SizeOfType(xPlugField.Value.FieldType), aType,
+            xPluggedField = new _FieldInfo(xPlugField.Value.FieldId, SizeOfType(xPlugField.Value.FieldType), aType,
               xPlugField.Value.FieldType);
             aFields.Add(xPluggedField);
           }
@@ -223,9 +222,9 @@ namespace Cosmos.IL2CPU
       }
     }
 
-    public static List<FieldInfo> GetFieldsInfo(Type aType, bool includeStatic)
+    public static List<_FieldInfo> GetFieldsInfo(Type aType, bool includeStatic)
     {
-      var xResult = new List<FieldInfo>(16);
+      var xResult = new List<_FieldInfo>(16);
       DoGetFieldsInfo(aType, xResult, includeStatic);
       xResult.Reverse();
       uint xOffset = 0;
@@ -257,7 +256,7 @@ namespace Cosmos.IL2CPU
       return xResult;
     }
 
-    private static void GetFieldMapping(List<FieldInfo> aFieldInfs, List<DebugInfo.Field_Map> aFieldMapping, Type aType)
+    private static void GetFieldMapping(List<_FieldInfo> aFieldInfs, List<DebugInfo.Field_Map> aFieldMapping, Type aType)
     {
       var xFMap = new DebugInfo.Field_Map();
       xFMap.TypeName = aType.AssemblyQualifiedName;
@@ -268,7 +267,7 @@ namespace Cosmos.IL2CPU
       aFieldMapping.Add(xFMap);
     }
 
-    private static string GetNameForField(FieldInfo inf)
+    private static string GetNameForField(_FieldInfo inf)
     {
       // First we need to separate out the
       // actual name of field from the type of the field.
@@ -327,7 +326,7 @@ namespace Cosmos.IL2CPU
       }
     }
 
-    public static void EmitExceptionLogic(Assembler.Assembler aAssembler, MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException = null)
+    public static void EmitExceptionLogic(Assembler.Assembler aAssembler, _MethodInfo aMethodInfo, ILOpCode aCurrentOpCode, bool aDoTest, Action aCleanup, string aJumpTargetNoException = null)
     {
       if (aJumpTargetNoException == null)
       {
@@ -339,24 +338,24 @@ namespace Cosmos.IL2CPU
         // todo add support for nested handlers, see comment in Engine.cs
         //if (!((aMethodInfo.CurrentHandler.HandlerOffset < aCurrentOpOffset) || (aMethodInfo.CurrentHandler.HandlerLength + aMethodInfo.CurrentHandler.HandlerOffset) <= aCurrentOpOffset)) {
         XS.Comment(String.Format("CurrentOffset = {0}, HandlerStartOffset = {1}", aCurrentOpCode.Position,
-          aCurrentOpCode.CurrentExceptionRegion.Value.HandlerOffset));
-        if (aCurrentOpCode.CurrentExceptionRegion.Value.HandlerOffset > aCurrentOpCode.Position)
+          aCurrentOpCode.CurrentExceptionRegion.HandlerOffset));
+        if (aCurrentOpCode.CurrentExceptionRegion.HandlerOffset > aCurrentOpCode.Position)
         {
-          switch (aCurrentOpCode.CurrentExceptionRegion.Value.Kind)
+          switch (aCurrentOpCode.CurrentExceptionRegion.Kind)
           {
             case ExceptionRegionKind.Catch:
               {
-                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionRegion.Value.HandlerOffset);
+                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionRegion.HandlerOffset);
                 break;
               }
             case ExceptionRegionKind.Finally:
               {
-                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionRegion.Value.HandlerOffset);
+                xJumpTo = GetLabel(aMethodInfo, aCurrentOpCode.CurrentExceptionRegion.HandlerOffset);
                 break;
               }
             default:
               {
-                throw new Exception("ExceptionHandlerType '" + aCurrentOpCode.CurrentExceptionRegion.Value.Kind.ToString() +
+                throw new Exception("ExceptionHandlerType '" + aCurrentOpCode.CurrentExceptionRegion.Kind.ToString() +
                                     "' not supported yet!");
               }
           }
@@ -435,7 +434,7 @@ namespace Cosmos.IL2CPU
       }
     }
 
-    public static FieldInfo ResolveField(Type aDeclaringType, string aField, bool aOnlyInstance)
+    public static _FieldInfo ResolveField(Type aDeclaringType, string aField, bool aOnlyInstance)
     {
       var xFields = GetFieldsInfo(aDeclaringType, !aOnlyInstance);
       var xFieldInfo = (from item in xFields

@@ -1,8 +1,10 @@
 {
+  "version": "1.0.0-*",
   "buildOptions": {
     "emitEntryPoint": true,
     "publicSign": true,
-    "keyFile": "../../Cosmos.snk"
+    "keyFile": "../../Cosmos.snk",
+    "debugType": "portable"
   },
   "dependencies": {
     "Microsoft.NETCore.App": {

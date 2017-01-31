@@ -12,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
             // MtW: for now, disable this instruction. To me, it's unclear in what context it's being used.
             uint mObjSize = 0;

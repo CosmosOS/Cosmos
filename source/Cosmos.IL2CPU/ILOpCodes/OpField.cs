@@ -5,15 +5,13 @@ using System.Reflection;
 using System.Reflection.Metadata;
 using System.Text;
 
-using FieldInfo = System.Reflection.FieldInfo;
-
 namespace Cosmos.IL2CPU.ILOpCodes
 {
     public class OpField : ILOpCode
     {
         public readonly FieldInfo Value;
 
-        public OpField(Code aOpCode, int aPos, int aNextPos, FieldInfo aValue, ExceptionRegion? aCurrentExceptionRegion)
+        public OpField(Code aOpCode, int aPos, int aNextPos, FieldInfo aValue, _ExceptionRegionInfo aCurrentExceptionRegion)
           : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion)
         {
             Value = aValue;

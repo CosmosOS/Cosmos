@@ -1,7 +1,9 @@
 {
+  "version": "1.0.0-*",
   "buildOptions": {
     "publicSign": true,
-    "keyFile": "../../Cosmos.snk"
+    "keyFile": "../../Cosmos.snk",
+    "debugType": "portable"
   },
   "dependencies": {
     "NETStandard.Library": "1.6.1",
