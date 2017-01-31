@@ -15,7 +15,6 @@ namespace Cosmos.TestRunner.Core
             OutputHandler.ExecuteKernelStart(assemblyFileName);
             try
             {
-
                 var xAssemblyFile = Path.Combine(mBaseWorkingDirectory, "Kernel.asm");
                 var xObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.obj");
                 var xTempObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.o");

@@ -27,13 +27,19 @@
         "Cosmos.Debug.Hosts": {
           "target": "project"
         },
-        "Cosmos.IL2CPU": {
-          "target": "project"
-        },
         "IL2CPU": {
           "target": "project"
         },
+        "Cosmos.IL2CPU": {
+          "target": "project"
+        },
         "Cosmos.Core.Plugs": {
+          "target": "project"
+        },
+        "Cosmos.Core.Plugs.Asm": {
+          "target": "project"
+        },
+        "Cosmos.Debug.Kernel.Plugs.Asm": {
           "target": "project"
         },
         "Cosmos.IL2CPU.Plugs": {

@@ -1,6 +1,7 @@
 {
   "version": "1.0.0-*",
   "buildOptions": {
+    "keyFile": "../../Cosmos.snk",
     "debugType": "portable"
   },
   "dependencies": {
@@ -9,27 +10,14 @@
   "frameworks": {
     "netstandard1.6": {
       "dependencies": {
-        "Cosmos.Debug.Kernel": {
-          "target": "project"
-        },
         "Cosmos.System": {
           "target": "project"
         },
-        "Cosmos.Debug.Kernel.Plugs.Asm": {
-          "target": "project",
-          "type": "build"
+        "Cosmos.Debug.Kernel": {
+          "target": "project"
         },
-        "Cosmos.Core.Plugs": {
-          "target": "project",
-          "type": "build"
-        },
-        "Cosmos.Core.Plugs.Asm": {
-          "target": "project",
-          "type": "build"
-        },
-        "Cosmos.System.Plugs": {
-          "target": "project",
-          "type": "build"
+        "Cosmos.TestRunner.TestController": {
+          "target": "project"
         }
       }
     }

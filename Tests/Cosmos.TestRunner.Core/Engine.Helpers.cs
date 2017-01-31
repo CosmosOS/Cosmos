@@ -199,13 +199,20 @@ namespace Cosmos.TestRunner.Core
 
         private static string GetCosmosUserkitFolder()
         {
-            //$([MSBuild]::GetRegistryValue("HKEY_LOCAL_MACHINE\Software\Cosmos", "UserKit"))
-            using (var xReg = Registry.LocalMachine.OpenSubKey("Software\\Cosmos"))
+            string xResult = string.Empty;
+            using (var xSoftware = Registry.LocalMachine.OpenSubKey("Software"))
             {
-                var xResult = (xReg.GetValue("UserKit") ?? "").ToString();
-                if (!Directory.Exists(xResult))
+                using (var xSysWow = xSoftware.OpenSubKey("WOW6432Node"))
                 {
-                    throw new Exception("Unable to retrieve Cosmos userkit folder!");
+                    using (var xCosmos = xSysWow.OpenSubKey("Cosmos"))
+                    {
+                        xResult = (xCosmos.GetValue("UserKit") ?? "").ToString();
+                        if (!Directory.Exists(xResult))
+                        {
+                            throw new Exception("Unable to retrieve Cosmos userkit folder!");
+                        }
+                        return xResult;
+                    }
                 }
                 return xResult;
             }

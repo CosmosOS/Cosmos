@@ -15,19 +15,7 @@
         "Cosmos.System": {
           "target": "project"
         },
-        "Cosmos.System.Plugs": {
-          "target": "project"
-        },
         "Cosmos.Debug.Kernel": {
-          "target": "project"
-        },
-        "Cosmos.Debug.Kernel.Plugs.Asm": {
-          "target": "project"
-        },
-        "Cosmos.Core.Plugs": {
-          "target": "project"
-        },
-        "Cosmos.Core.Plugs.Asm": {
           "target": "project"
         },
         "Cosmos.TestRunner.TestController": {

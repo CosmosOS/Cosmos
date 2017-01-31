@@ -109,9 +109,6 @@ namespace Cosmos.IL2CPU
             mSearchDirs.Add(CosmosPaths.UserKit);
             mSearchDirs.Add(CosmosPaths.Kernel);
 
-            //AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
-            //AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
-
             mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
             if (string.IsNullOrEmpty(TraceAssemblies))
             {
@@ -278,45 +275,6 @@ namespace Cosmos.IL2CPU
             return new AppAssembler(DebugCom, AssemblerLog);
         }
 
-        //private void LoadReferences(Assembly xAssembly)
-        //{
-        //    foreach (var a in xAssembly.GetReferencedAssemblies())
-        //    {
-        //        AssemblyName xAsmName = null;
-        //        foreach (var xAsm in AdditionalReferences)
-        //        {
-        //            try
-        //            {
-        //                xAsmName = AssemblyLoadContext.GetAssemblyName(xAsm); //AssemblyName.GetAssemblyName(xAsm);
-        //                if (xAsmName == null || xAsmName.Name != a.Name)
-        //                {
-        //                    xAsmName = null;
-        //                }
-        //            }
-        //            catch (BadImageFormatException e)
-        //            {
-        //            }
-        //        }
-        //        if (DependencyContext.Default.GetDefaultAssemblyNames().FirstOrDefault(m => m.Name == a.Name) == null)
-        //        {
-        //            if (xAsmName != null)
-        //            {
-        //                var xAsm = Assembly.Load(xAsmName); //Assembly.ReflectionOnlyLoadFrom(s);
-        //                x.Add(xAsm);
-        //                if (xAsm.GetReferencedAssemblies().Any())
-        //                {
-        //                    LoadReferences(xAsm);
-        //                }
-        //            }
-        //            else
-        //            {
-
-        //            }
-        //        }
-        //    }
-
-        //}
-
         private Assembly Default_Resolving(AssemblyLoadContext aContext, AssemblyName aName)
         {
             var xRequestingAssembly = Assembly.GetEntryAssembly();
@@ -372,14 +330,6 @@ namespace Cosmos.IL2CPU
             //
 
             AssemblyLoadContext.Default.Resolving += Default_Resolving;
-            //{
-            //    if (!string.IsNullOrWhiteSpace(name.FullName))
-            //    {
-            //        var xName = AssemblyLoadContext.GetAssemblyName(name.FullName);
-            //        return AssemblyLoadContext.Default.LoadFromAssemblyName(xName);
-            //    }
-            //    return Assembly.GetEntryAssembly();
-            //};
             mLoadedExtensions = new List<CompilerExtensionBase>();
             Type xKernelType = null;
 

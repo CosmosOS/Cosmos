@@ -17,14 +17,23 @@ namespace Cosmos.IL2CPU
 
         public static Assembly LoadFromAssemblyCacheOrPath(this AssemblyLoadContext aContext, string aFullPath)
         {
-            string xAssemblyName = Path.GetFileNameWithoutExtension(aFullPath);
-            if (mLoadedAssemblies.ContainsKey(xAssemblyName))
+            string xAssemblyShortName = Path.GetFileNameWithoutExtension(aFullPath);
+            if (mLoadedAssemblies.ContainsKey(xAssemblyShortName))
             {
-                return mLoadedAssemblies[xAssemblyName];
+                return mLoadedAssemblies[xAssemblyShortName];
             }
 
-            var xAssembly = aContext.LoadFromAssemblyPath(aFullPath);
-            mLoadedAssemblies.Add(xAssemblyName, xAssembly);
+            Assembly xAssembly = null;
+            var xAssemblyName = AssemblyLoadContext.GetAssemblyName(aFullPath);
+            if (xAssemblyName != null)
+            {
+                xAssembly = aContext.LoadFromAssemblyName(xAssemblyName);
+            }
+            if (xAssembly == null)
+            {
+                xAssembly = aContext.LoadFromAssemblyPath(aFullPath);
+            }
+            mLoadedAssemblies.Add(xAssemblyShortName, xAssembly);
             return xAssembly;
         }
     }
