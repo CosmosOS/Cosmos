@@ -199,23 +199,8 @@ namespace Cosmos.TestRunner.Core
 
         private static string GetCosmosUserkitFolder()
         {
-            string xResult = string.Empty;
-            using (var xSoftware = Registry.LocalMachine.OpenSubKey("Software"))
-            {
-                using (var xSysWow = xSoftware.OpenSubKey("WOW6432Node"))
-                {
-                    using (var xCosmos = xSysWow.OpenSubKey("Cosmos"))
-                    {
-                        xResult = (xCosmos.GetValue("UserKit") ?? "").ToString();
-                        if (!Directory.Exists(xResult))
-                        {
-                            throw new Exception("Unable to retrieve Cosmos userkit folder!");
-                        }
-                        return xResult;
-                    }
-                }
-                return xResult;
-            }
+            CosmosPaths.Initialize();
+            return CosmosPaths.UserKit;
         }
 
         private void MakeIso(string objectFile, string isoFile)
