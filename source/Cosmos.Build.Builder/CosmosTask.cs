@@ -21,15 +21,13 @@ namespace Cosmos.Build.Builder
         protected int mReleaseNo;
         protected string mInnoFile;
         protected string mInnoPath;
-        // Instead of throwing every exception, we collect them in a list
         protected List<string> mExceptionList = new List<string>();
         public string InnoScriptTargetFile = "Current.iss";
 
         public CosmosTask(string aCosmosDir, int aReleaseNo)
         {
             mCosmosDir = aCosmosDir;
-            mAppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "Cosmos User Kit");
+            mAppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cosmos User Kit");
             mReleaseNo = aReleaseNo;
             mInnoFile = Path.Combine(mCosmosDir, @"Setup\Cosmos.iss");
         }
@@ -126,20 +124,20 @@ namespace Cosmos.Build.Builder
                 {
                     Echo("all checks succeeded");
                 }
-                //Cleanup();                                   
+                //Cleanup();
 
-                //CompileCosmos();                             
-                //CopyTemplates();                             
+                //CompileCosmos();
+                //CopyTemplates();
                 //if (App.IsUserKit)
                 //{
-                //    CreateUserKitScript();                   
+                //    CreateUserKitScript();
                 //}
-                //CreateSetup();                               
+                //CreateSetup();
                 //if (!App.IsUserKit)
                 //{
-                //    RunSetup();                              
-                //    WriteDevKit();                           
-                //    if (!App.DoNotLaunchVS) { LaunchVS(); }  
+                //    RunSetup();
+                //    WriteDevKit();
+                //    if (!App.DoNotLaunchVS) { LaunchVS(); }
                 //}
 
                 //Done();
@@ -386,7 +384,7 @@ namespace Cosmos.Build.Builder
             CheckForInno();
             bool vmWareInstalled = IsVMWareInstalled();
             bool bochsInstalled = IsBochsInstalled();
-            
+
             if (!vmWareInstalled && !bochsInstalled)
             {
                 NotFound("VMWare or Bochs");
@@ -564,7 +562,7 @@ namespace Cosmos.Build.Builder
         {
             Section("Compiling Cosmos");
 
-            MsBuild(Path.Combine(mCosmosDir, @"source\Build.sln"), "Debug");
+            MsBuild(Path.Combine(mCosmosDir, @"Build.sln"), "Debug");
         }
 
         void CopyTemplates()
@@ -634,7 +632,7 @@ namespace Cosmos.Build.Builder
 
             Echo("Launching Visual Studio");
             // Fix issue #15565
-            Start(xVisualStudio, Quoted(mCosmosDir + @"\source\Cosmos.sln"), false, true);
+            Start(xVisualStudio, Quoted(mCosmosDir + @"Cosmos.sln"), false, true);
         }
 
         void RunSetup()

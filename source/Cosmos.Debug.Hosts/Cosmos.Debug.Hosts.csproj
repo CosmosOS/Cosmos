@@ -57,6 +57,8 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj">
       <Project>{0462e82b-8c29-41a9-8265-9c89038adb29}</Project>
       <Name>Cosmos.Build.Common</Name>
