@@ -62,31 +62,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.Deploy.Pixie", "sour
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XSharp.Nasm", "source\XSharp.Nasm\XSharp.Nasm.csproj", "{841A734E-9606-4AAB-9C4A-74E7E303FF5D}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Docs", "Docs\", "{67E7DEF0-1CEE-4ED6-A22D-97E5EA61157A}"
-	ProjectSection(WebsiteProperties) = preProject
-		SccProjectName = "SAK"
-		SccAuxPath = "SAK"
-		SccLocalPath = "SAK"
-		SccProvider = "SAK"
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5.2"
-		Debug.AspNetCompiler.VirtualPath = "/Docs"
-		Debug.AspNetCompiler.PhysicalPath = "Docs\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\Docs\"
-		Debug.AspNetCompiler.Updateable = "true"
-		Debug.AspNetCompiler.ForceOverwrite = "true"
-		Debug.AspNetCompiler.FixedNames = "false"
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/Docs"
-		Release.AspNetCompiler.PhysicalPath = "Docs\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\Docs\"
-		Release.AspNetCompiler.Updateable = "true"
-		Release.AspNetCompiler.ForceOverwrite = "true"
-		Release.AspNetCompiler.FixedNames = "false"
-		Release.AspNetCompiler.Debug = "False"
-		VWDPort = "8987"
-		SlnRelativePath = "Docs\"
-	EndProjectSection
-EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "XSharp.Compiler", "source\XSharp.Compiler\XSharp.Compiler.xproj", "{69E08155-F075-4728-8387-1549CFD4FA97}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "IL2CPU", "source\IL2CPU\IL2CPU.xproj", "{F3025446-D2C7-4FEA-AB03-C707F7B48B43}"
