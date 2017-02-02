@@ -13,7 +13,7 @@ namespace Cosmos.IL2CPU.Extensions
     {
         public static string GetFullName(this MethodBase aMethod)
         {
-            return LabelName.GetFullName(aMethod);
+            return LabelName.Get(aMethod);
         }
 
         public static IList<Type> GetLocalVariables(this MethodBase aThis)
