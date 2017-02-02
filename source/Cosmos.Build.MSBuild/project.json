@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "1.0.0-*",
   "buildOptions": {
     "publicSign": true,
@@ -7,7 +7,6 @@
   },
   "dependencies": {
     "NETStandard.Library": "1.6.1",
-    "Microsoft.Build.Framework": "14.3.0",
     "Microsoft.Build.Utilities.Core": "14.3.0",
     "Cosmos.Build.Common": {
       "target": "project"
@@ -17,7 +16,10 @@
     },
     "Cosmos.Debug.Symbols": {
       "target": "project"
-    }
+    },
+    "Microsoft.Build": "14.3.0",
+    "Microsoft.Build.Tasks.Core": "14.3.0",
+    "Microsoft.Build.Framework": "14.3.0"
   },
   "frameworks": {
     "netstandard1.6": {}

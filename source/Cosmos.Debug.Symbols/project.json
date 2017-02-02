@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "Dapper.StrongName": "1.50.2",
-    "DapperExtensions.DotnetCore": "1.0.1",
+    "DapperExtensions.StrongName": "1.50.2",
     "Microsoft.Data.Sqlite": "1.1.0",
     "NETStandard.Library": "1.6.1",
     "System.ComponentModel.Annotations": "4.3.0",

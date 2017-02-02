@@ -110,12 +110,6 @@ Type: filesandordirs; Name: "{userdocs}\Visual Studio {#VsVersionHuman}\Template
 Type: filesandordirs; Name: "{code:GetCSharpExpress2013ProjectTemplatePath}\*Cosmos*.*"; Check: IsCSharpExpress2013Installed('dummy')
 
 [Files]
-; Cecil dll, pdb
-#define MonoCecilPath ".\Resources\Dependencies\Mono.Cecil.0.9.6.1"
-Source: "{#MonoCecilPath}\Mono.Cecil.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: "{#MonoCecilPath}\Mono.Cecil.Pdb.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: "{#MonoCecilPath}\Mono.Cecil.Rocks.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-
 ; Tools
 Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ignoreversion uninsremovereadonly
@@ -127,12 +121,9 @@ Source: ".\Build\VSIP\*.pdb"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversio
 
 ;
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\Dapper\*.*"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\System.Data.SQLite.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-;
 Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-
+Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
+;
 ; Kernel assemblies
 Source: ".\Build\VSIP\Cosmos.Debug.Kernel.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Core.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
@@ -145,12 +136,6 @@ Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremo
 
 ; XSharp Source
 Source: ".\source\Cosmos.Debug.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
-
-; System.Data.SQLite library
-Source: ".\Resources\Dependencies\Dapper\*.*"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\System.Data.SQLite.dll"; DestDir: "{app}\Build\VSIP"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\Dapper\*.*"; DestDir: "{app}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\System.Data.SQLite.dll"; DestDir: "{app}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
 
 ; VSIP stuff
 Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
@@ -173,9 +158,6 @@ Source: ".\Build\VSIP\Interop.VixCOM.dll"; DestDir: "{app}\Build\VSIP\"; Flags: 
 Source: ".\Build\VSIP\Cosmos.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.IL2CPU.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Resources\Dependencies\Microsoft.Samples.Debugging.CorApi.1.4.0.0\*.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly             
-;Source: ".\Build\VSIP\corapi.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-;Source: ".\Build\VSIP\raw.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-;Source: ".\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs

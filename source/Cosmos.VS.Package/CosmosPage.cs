@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.IO;
 using System.IO.Ports;
 using System.Drawing;
-using System.Data;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;

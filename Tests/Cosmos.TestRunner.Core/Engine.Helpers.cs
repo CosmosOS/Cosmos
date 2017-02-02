@@ -7,6 +7,8 @@ using Microsoft.Win32;
 
 using Cosmos.Build.Common;
 using Cosmos.Build.MSBuild;
+using Cosmos.Core.Plugs.Asm;
+using Cosmos.Debug.Kernel.Plugs.Asm;
 using Cosmos.IL2CPU;
 using IL2CPU;
 
@@ -108,22 +110,13 @@ namespace Cosmos.TestRunner.Core
 
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
+            string xPath = Path.GetDirectoryName(kernelFileName);
             References = new List<string>();
-            //AdditionalReferences = new List<string>();
-            //AdditionalSearchDirs = new List<string>();
-
-            //GetProjectReferences(kernelFileName);
-            var a = GetType().GetTypeInfo().Assembly.Location;
-            //AdditionalSearchDirs.Add(Path.GetDirectoryName(kernelFileName));
             References.Add(kernelFileName);
-            // TODO: Need a better way to do this.
-            //foreach (var xFile in new DirectoryInfo(Path.GetDirectoryName(kernelFileName)).GetFiles("*Plugs*.dll"))
-            foreach (var xFile in new DirectoryInfo(Path.GetDirectoryName(GetType().GetTypeInfo().Assembly.Location)).GetFiles("*Plugs*.dll"))
-            {
-                References.Add(xFile.FullName);
-            }
-            //References.Add(typeof(Cosmos.Debug.Kernel.Plugs.Asm.DebugBreak).Assembly.Location);
-            //References.Add(typeof(Cosmos.Core.Plugs.Asm.ArrayImpl).Assembly.Location);
+            References.Add(Path.Combine(xPath, "Cosmos.Core.Plugs.dll"));
+            References.Add(Path.Combine(xPath, "Cosmos.Core.Plugs.Asm.dll"));
+            References.Add(Path.Combine(xPath, "Cosmos.System.Plugs.dll"));
+            References.Add(Path.Combine(xPath, "Cosmos.Debug.Kernel.Plugs.Asm.dll"));
 
             var xArguments = new List<string>
                              {
@@ -140,11 +133,6 @@ namespace Cosmos.TestRunner.Core
                                  "IgnoreDebugStubAttribute:False"
                              };
             xArguments.AddRange(References.Select(xRef => "References:" + xRef));
-            //xArguments.AddRange(AdditionalSearchDirs.Select(xDir => "AdditionalSearchDirs:" + xDir));
-            //xArguments.AddRange(AdditionalReferences.Select(xRef => "AdditionalReferences:" + xRef));
-
-            //xArguments.Add("References:" + typeof(CPUImpl).Assembly.Location);
-            //xArguments.Add("References:" + typeof(DebugBreak).Assembly.Location);
 
             if (RunIL2CPUInProcess)
             {
@@ -162,7 +150,7 @@ namespace Cosmos.TestRunner.Core
             }
             else
             {
-                RunProcess(typeof(Program).GetTypeInfo().Assembly.Location,
+                RunProcess(typeof(global::IL2CPU.Program).GetTypeInfo().Assembly.Location,
                            mBaseWorkingDirectory,
                            xArguments.ToArray());
             }
@@ -170,16 +158,18 @@ namespace Cosmos.TestRunner.Core
 
         private void RunNasm(string inputFile, string outputFile, bool isElf)
         {
-            var xNasmTask = new NAsmTask();
-            xNasmTask.InputFile = inputFile;
-            xNasmTask.OutputFile = outputFile;
-            xNasmTask.IsELF = isElf;
-            xNasmTask.ExePath = Path.Combine(GetCosmosUserkitFolder(), "build", "tools", "nasm", "nasm.exe");
-            xNasmTask.LogMessage = OutputHandler.LogMessage;
-            xNasmTask.LogError = OutputHandler.LogError;
-            if (!xNasmTask.Execute())
+            NASM.Program.LogMessage = OutputHandler.LogMessage;
+            NASM.Program.LogError = OutputHandler.LogError;
+            int xResult =NASM.Program.Run(new[]
+                             {
+                                 $"InputFile:{inputFile}",
+                                 $"OutputFile:{outputFile}",
+                                 $"IsElf:{isElf}",
+                                 $"ExePath:{Path.Combine(GetCosmosUserkitFolder(), "build", "tools", "nasm", "nasm.exe")}"
+                             }, OutputHandler.LogMessage, OutputHandler.LogError);
+            if (xResult != 0)
             {
-                throw new Exception("Error running nasm!");
+                throw new Exception("Error running Nasm");
             }
         }
 

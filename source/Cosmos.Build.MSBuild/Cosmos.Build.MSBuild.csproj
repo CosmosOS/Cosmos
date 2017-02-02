@@ -60,7 +60,6 @@
       <Link>Cosmos.snk</Link>
     </None>
     <None Include=".editorconfig" />
-    <None Include="App.config" />
     <None Include="Cosmos.Build.MSBuild.project.json" />
     <None Include="Cosmos.targets">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

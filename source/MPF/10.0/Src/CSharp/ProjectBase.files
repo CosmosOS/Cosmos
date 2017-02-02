@@ -11,15 +11,6 @@
       <SpecificVersion>False</SpecificVersion>
       <Aliases>global</Aliases>
     </Reference>
-    <Reference Include="Microsoft.Build">
-      <Aliases>global</Aliases>
-    </Reference>
-    <Reference Include="Microsoft.Build.Framework">
-      <Aliases>global</Aliases>
-    </Reference>
-    <Reference Include="Microsoft.Build.Utilities.v4.0">
-      <Aliases>global</Aliases>
-    </Reference>
     <Reference Include="Microsoft.VisualStudio.VSHelp"/>
     <Reference Include="Microsoft.VisualStudio.Shell.Design" />
     <Reference Include="Microsoft.VisualStudio.ProjectAggregator" />
