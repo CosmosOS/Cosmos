@@ -11,7 +11,8 @@ namespace Cosmos.Core.Memory.Test {
       xRAM[0] = 1;
       fixed (byte* xPtr = xRAM) {
         RAT.Debug = true;
-        RAT.Init(xPtr, (Native)xRAM.LongLength);
+        //RAT.Init(xPtr, (Native)xRAM.LongLength);
+        RAT.Init(xPtr, (Native)xRAM.Length);
 
         Native xRatPages = RAT.GetPageCount(RAT.PageType.RAT);
         Assert.IsTrue(xRatPages > 0);

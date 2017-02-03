@@ -1,0 +1,25 @@
+﻿{
+  "version": "1.0.0-*",
+  "buildOptions": {
+    "allowUnsafe": true
+  },
+  "testRunner": "mstest",
+  "dependencies": {
+    "NETStandard.Library": "1.6.1",
+    "MSTest.TestFramework": "1.0.8-rc2",
+    "dotnet-test-mstest": "1.1.2-preview"
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": [ "netcoreapp1.0", "dnxcore50" ],
+      "dependencies": {
+        "Cosmos.Core.Memory": {
+          "target": "project"
+        }
+      }
+    }
+  },
+  "runtimes": {
+    "win7-x64": {}
+  }
+}

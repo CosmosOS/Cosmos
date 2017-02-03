@@ -75,7 +75,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Cosmos.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ApprovalTests">
@@ -108,14 +108,12 @@
       <Project>{57045fe8-b0fe-4fc1-810f-7c3914aef1de}</Project>
       <Name>Cosmos.Compiler.Tests.SimpleWriteLine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Cosmos.Compiler.TestsBase\Cosmos.Compiler.TestsBase.csproj">
-      <Project>{C264460F-C9C8-41C3-8C26-9BDF4710744C}</Project>
-      <Name>Cosmos.Compiler.TestsBase</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Cosmos.snk">
+      <Link>Cosmos.snk</Link>
+    </None>
     <None Include="app.config" />
-    <None Include="Cosmos.snk" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

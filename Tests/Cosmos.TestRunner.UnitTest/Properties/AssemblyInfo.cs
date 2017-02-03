@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Cosmos.Compiler.TestsBase")]
+[assembly: AssemblyProduct("Cosmos.TestRunner.UnitTest")]
 [assembly: AssemblyTrademark("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
@@ -16,4 +16,4 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("c264460f-c9c8-41c3-8c26-9bdf4710744c")]
+[assembly: Guid("8337ec69-5b63-4c19-89dc-42981fd13378")]

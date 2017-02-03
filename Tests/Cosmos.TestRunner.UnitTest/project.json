@@ -1,0 +1,23 @@
+﻿{
+  "version": "1.0.0-*",
+  "testRunner": "nunit",
+  "dependencies": {
+    "NETStandard.Library": "1.6.1",
+    "NUnit": "3.6.0",
+    "dotnet-test-nunit": "3.4.0-beta-3",
+    "Microsoft.DotNet.InternalAbstractions": "1.0.500-preview2-1-003177"
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "netcoreapp1.0",
+      "dependencies": {
+        "Cosmos.TestRunner.Core": {
+          "target": "project"
+        }
+      }
+    }
+  },
+  "runtimes": {
+    "win7-x64": {}
+  }
+}
