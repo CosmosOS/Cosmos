@@ -481,7 +481,11 @@ namespace Cosmos.IL2CPU
                             var xType = (Type) mItemsList[i];
                             if (xType.GetTypeInfo().IsSubclassOf(xVirtMethod.DeclaringType) || (xVirtMethod.DeclaringType.GetTypeInfo().IsInterface && xVirtMethod.DeclaringType.GetTypeInfo().IsAssignableFrom(xType)))
                             {
-                                var xNewMethod = xType.GetTypeInfo().GetMethod(aMethod.Name, xParamTypes, null);
+                                //var xNewMethod = xType.GetTypeInfo().GetMethod(aMethod.Name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, xParamTypes, null);
+                                var xNewMethod = xType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                                                                    .Where(method => method.Name == aMethod.Name
+                                                                           && method.GetParameters().Select(param => param.ParameterType).SequenceEqual(xParamTypes))
+                                                                    .SingleOrDefault();
                                 if (xNewMethod != null)
                                 {
                                     // We need to check IsVirtual, a non virtual could
