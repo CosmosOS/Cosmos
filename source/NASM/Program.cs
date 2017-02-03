@@ -87,6 +87,9 @@ namespace NASM
                                              xFormat.ToUpper());
 
                 var xProcess = Process.Start(ExePath, xArgs);
+
+                xProcess.WaitForExit();
+
                 int xResult = xProcess.ExitCode;
                 if (xResult != 0)
                 {

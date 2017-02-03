@@ -175,16 +175,31 @@ namespace Cosmos.TestRunner.Core
 
         private void RunLd(string inputFile, string outputFile)
         {
-            RunProcess(Path.Combine(GetCosmosUserkitFolder(), "build", "tools", "cygwin", "ld.exe"),
-                       mBaseWorkingDirectory,
-                       new[]
+            string[] arguments = new[]
                        {
                            "-Ttext", "0x2000000",
                            "-Tdata", " 0x1000000",
                            "-e", "Kernel_Start",
                            "-o",outputFile.Replace('\\', '/'),
                            inputFile.Replace('\\', '/')
-                       });
+                       };
+
+            var xArgsString = arguments.Aggregate("", (a, b) => a + " \"" + b + "\"");
+
+            var xProcess = global::System.Diagnostics.Process.Start(Path.Combine(GetCosmosUserkitFolder(), "build", "tools", "cygwin", "ld.exe"), xArgsString);
+
+            xProcess.WaitForExit();
+
+            //RunProcess(Path.Combine(GetCosmosUserkitFolder(), "build", "tools", "cygwin", "ld.exe"),
+            //           mBaseWorkingDirectory,
+            //           new[]
+            //           {
+            //               "-Ttext", "0x2000000",
+            //               "-Tdata", " 0x1000000",
+            //               "-e", "Kernel_Start",
+            //               "-o",outputFile.Replace('\\', '/'),
+            //               inputFile.Replace('\\', '/')
+            //           });
         }
 
         private static string GetCosmosUserkitFolder()

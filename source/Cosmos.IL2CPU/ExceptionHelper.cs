@@ -7,16 +7,22 @@ namespace Cosmos.IL2CPU
     {
         public static Exception CurrentException;
 
-        public static void ThrowNotImplemented(string aError)
+        public static void ThrowArgumentOutOfRange(string aError)
         {
             Console.WriteLine(aError);
-            throw new NotImplementedException(aError);
+            throw new ArgumentOutOfRangeException(aError);
         }
 
         public static void ThrowInvalidOperation(string aError)
         {
             Console.WriteLine(aError);
             throw new InvalidOperationException(aError);
+        }
+
+        public static void ThrowNotImplemented(string aError)
+        {
+            Console.WriteLine(aError);
+            throw new NotImplementedException(aError);
         }
 
         public static void ThrowOverflow()

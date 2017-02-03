@@ -103,10 +103,10 @@ namespace Cosmos.IL2CPU
             var xMemInfo = aItem as MemberInfo;
             //TODO: fix this, as each label/symbol should also contain an assembly specifier.
 
-            if ((xMemInfo != null) && (xMemInfo.DeclaringType != null)
-                && (xMemInfo.DeclaringType.FullName == "System.ThrowHelper")
-                && (xMemInfo.DeclaringType.GetTypeInfo().Assembly.GetName().Name != "mscorlib"))
-            {
+            //if ((xMemInfo != null) && (xMemInfo.DeclaringType != null)
+            //    && (xMemInfo.DeclaringType.FullName == "System.ThrowHelper")
+            //    && (xMemInfo.DeclaringType.GetTypeInfo().Assembly.GetName().Name != "mscorlib"))
+            //{
                 // System.ThrowHelper exists in MS .NET twice...
                 // Its an internal class that exists in both mscorlib and system assemblies.
                 // They are separate types though, so normally the scanner scans both and
@@ -125,8 +125,8 @@ namespace Cosmos.IL2CPU
                 //
                 // Do nothing
                 //
-            }
-            else if (!mItems.Contains(aItem))
+            //}
+            /*else*/ if (!mItems.Contains(aItem))
             {
                 if (mLogEnabled)
                 {
@@ -226,9 +226,20 @@ namespace Cosmos.IL2CPU
             Queue(GCImplementationRefs.DecRefCountRef, null, "Explicit Entry");
             Queue(GCImplementationRefs.AllocNewObjectRef, null, "Explicit Entry");
             // for now, to ease runtime exception throwing
-            Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowNotImplemented", new Type[] {typeof(string)}, null), null, "Explicit Entry");
-            Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowOverflow", new Type[] {}, null), null, "Explicit Entry");
-            Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowInvalidOperation", new Type[] {typeof(string)}, null), null, "Explicit Entry");
+            Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowNotImplemented", new Type[] { typeof(string) }, null), null, "Explicit Entry");
+            Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowOverflow", new Type[] { }, null), null, "Explicit Entry");
+            Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowInvalidOperation", new Type[] { typeof(string) }, null), null, "Explicit Entry");
+            Queue(typeof(ExceptionHelper).GetTypeInfo().GetMethod("ThrowArgumentOutOfRange", new Type[] { typeof(string) }, null), null, "Explicit Entry");
+
+            //Type.GetType("System.ThrowHelper").GetMethods(BindingFlags.NonPublic | BindingFlags.Static).ToList()
+            //    .ForEach(method =>
+            //                      {
+            //                          if (method.Name.Contains("ArgumentOutOfRange"))
+            //                          {
+            //                              Queue(method, null, "Explicit Entry");
+            //                          }
+            //                      });
+
             Queue(RuntimeEngineRefs.InitializeApplicationRef, null, "Explicit Entry");
             Queue(RuntimeEngineRefs.FinalizeApplicationRef, null, "Explicit Entry");
             // register system types:

@@ -130,15 +130,15 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
       if (xArgRealSize < 4)
       {
-        XS.MoveSignExtend(EAX, EBP, sourceDisplacement: xDisplacement, size: (RegisterSize)(xArgRealSize * 8));
-        //new MoveSignExtend
-        //{
-        //  DestinationReg = EAX,
-        //  Size = (byte) (xArgRealSize * 8),
-        //  SourceReg = EBP,
-        //  SourceIsIndirect = true,
-        //  SourceDisplacement = xDisplacement
-        //};
+        //XS.MoveSignExtend(EAX, EBP, sourceDisplacement: xDisplacement, size: (RegisterSize)(xArgRealSize * 8));
+        new Cosmos.Assembler.x86.MoveSignExtend
+        {
+          DestinationReg = EAX,
+          Size = (byte)(xArgRealSize * 8),
+          SourceReg = EBP,
+          SourceIsIndirect = true,
+          SourceDisplacement = xDisplacement
+        };
         XS.Push(EAX);
       }
       else

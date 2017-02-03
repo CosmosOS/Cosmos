@@ -3,7 +3,6 @@ using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core.Plugs.System
 {
-
     [Plug(Target = typeof(Exception))]
     public static class ExceptionImpl
     {
