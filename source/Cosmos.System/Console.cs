@@ -94,7 +94,11 @@ namespace Cosmos.System {
                     NewLine();
                 } else if (aText[i] == '\r') {
                 } else if (aText[i] == '\t') {
-                    Write("    ");
+                    //Write("    ");
+                    WriteChar(' ');
+                    WriteChar(' ');
+                    WriteChar(' ');
+                    WriteChar(' ');
                 } else {
                     WriteChar(aText[i]);
                 }
