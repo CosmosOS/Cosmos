@@ -9,6 +9,8 @@ using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Xml;
+
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
@@ -864,7 +866,6 @@ namespace Cosmos.IL2CPU
             XS.Set(EBP, ESP);
             mSequences = new DebugInfo.SequencePoint[0];
 
-            var xSetTypeInfoRef = VTablesImplRefs.SetTypeInfoRef;
             var xTypesFieldRef = VTablesImplRefs.VTablesImplDef.GetField("mTypes",
                                                                          BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
             string xTheName = DataMember.GetStaticFieldName(xTypesFieldRef);
@@ -890,7 +891,7 @@ namespace Cosmos.IL2CPU
             XS.DataMember(xTheName, 1, "db", "0, 0, 0, 0, 0, 0, 0, 0");
             XS.Set(xTheName, xTheName + "_Contents", destinationIsIndirect: true, destinationDisplacement: 4);
 #if VMT_DEBUG
-            using (var xVmtDebugOutput = XmlWriter.Create(@"vmt_debug.xml"))
+            using (var xVmtDebugOutput = XmlWriter.Create(File.OpenWrite(@"vmt_debug.xml")))
             {
                 xVmtDebugOutput.WriteStartDocument();
                 xVmtDebugOutput.WriteStartElement("VMT");
@@ -903,7 +904,7 @@ namespace Cosmos.IL2CPU
                     xVmtDebugOutput.WriteAttributeString("TypeId", aGetTypeID(xType).ToString());
                     if (xType.BaseType != null)
                     {
-                        xVmtDebugOutput.WriteAttributeString("BaseTypeId", aGetTypeID(xType.BaseType).ToString());
+                        xVmtDebugOutput.WriteAttributeString("BaseTypeId", aGetTypeID(xType.BaseType.GetTypeInfo()).ToString());
                     }
                     xVmtDebugOutput.WriteAttributeString("Name", xType.FullName);
 #endif
@@ -1039,7 +1040,7 @@ namespace Cosmos.IL2CPU
                     xDataName = "____SYSTEM____TYPE___" + DataMember.FilterStringForIncorrectChars(LabelName.GetFullName(xType) + " ASM_IS__" + xType.Assembly.GetName().Name);
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xDataName, xData));
                     Push("0" + xEmittedMethods.Count.ToString("X") + "h");
-                    Call(xSetTypeInfoRef);
+                    Call(VTablesImplRefs.SetTypeInfoRef);
                 }
                 for (int j = 0; j < xEmittedMethods.Count; j++)
                 {
@@ -1087,10 +1088,10 @@ namespace Cosmos.IL2CPU
                             xMethod = xNewMethod;
                         }
 
-                        Push((uint)aGetTypeID(xType));
+                        Push(aGetTypeID(xType));
                         Push((uint)j);
 
-                        Push((uint)xMethodId);
+                        Push(xMethodId);
                         if (xMethod.IsAbstract)
                         {
                             // abstract methods dont have bodies, oiw, are not emitted

@@ -13,9 +13,6 @@
     "Cosmos.Build.Common": {
       "target": "project"
     },
-    "Cosmos.Build.MSBuild": {
-      "target": "project"
-    },
     "Cosmos.Debug.DebugConnectors": {
       "target": "project"
     },

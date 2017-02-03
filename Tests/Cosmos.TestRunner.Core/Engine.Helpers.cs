@@ -4,12 +4,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Win32;
 
 using Cosmos.Build.Common;
-using Cosmos.Build.MSBuild;
-using Cosmos.Core.Plugs.Asm;
-using Cosmos.Debug.Kernel.Plugs.Asm;
+//using Cosmos.Build.MSBuild;
 using Cosmos.IL2CPU;
 using IL2CPU;
 
@@ -17,19 +14,19 @@ namespace Cosmos.TestRunner.Core
 {
     partial class Engine
     {
-        private void RunProcess(string fileName, string workingDirectory, string[] arguments)
-        {
-            if (arguments == null)
-            {
-                throw new ArgumentNullException("arguments");
-            }
-            var xArgsString = arguments.Aggregate("", (a, b) => a + " \"" + b + "\"");
-            var xResult = BaseToolTask.ExecuteTool(workingDirectory, fileName, xArgsString, "IL2CPU", OutputHandler.LogError, OutputHandler.LogMessage);
-            if (!xResult)
-            {
-                throw new Exception("Error running process!");
-            }
-        }
+        //private void RunProcess(string fileName, string workingDirectory, string[] arguments)
+        //{
+        //    if (arguments == null)
+        //    {
+        //        throw new ArgumentNullException("arguments");
+        //    }
+        //    var xArgsString = arguments.Aggregate("", (a, b) => a + " \"" + b + "\"");
+        //    var xResult = BaseToolTask.ExecuteTool(workingDirectory, fileName, xArgsString, "IL2CPU", OutputHandler.LogError, OutputHandler.LogMessage);
+        //    if (!xResult)
+        //    {
+        //        throw new Exception("Error running process!");
+        //    }
+        //}
 
         public static string RunObjDump(string cosmosBuildDir, string workingDir, string inputFile, Action<string> errorReceived, Action<string> outputReceived)
         {
@@ -181,9 +178,10 @@ namespace Cosmos.TestRunner.Core
             }
             else
             {
-                RunProcess(typeof(global::IL2CPU.Program).GetTypeInfo().Assembly.Location,
-                           mBaseWorkingDirectory,
-                           xArguments.ToArray());
+                throw new NotImplementedException();
+                //RunProcess(typeof(Program).GetTypeInfo().Assembly.Location,
+                //           mBaseWorkingDirectory,
+                //           xArguments.ToArray());
             }
         }
 
