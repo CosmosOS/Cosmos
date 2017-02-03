@@ -38,6 +38,8 @@ namespace Cosmos.Debug.DebugConnectors
 
         protected void Start()
         {
+            mCancellationTokenSource = new CancellationTokenSource();
+
             mBackgroundThread = new Thread(() => ThreadMethod(mCancellationTokenSource.Token));
             mBackgroundThread.Name = "CosmosDebugConnectorBackgroundThread";
 

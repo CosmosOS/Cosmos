@@ -102,7 +102,7 @@ namespace Cosmos.Debug.Hosts
       }
       _bochsStartInfo.Arguments = string.Format("-q {1} -f \"{0}\"", _bochsConfigurationFile.FullName, xExtraLog);
       _bochsStartInfo.WorkingDirectory = _bochsConfigurationFile.Directory.FullName;
-      _bochsStartInfo.UseShellExecute = true;
+      //_bochsStartInfo.UseShellExecute = true;
       if (RedirectOutput)
       {
         if (LogOutput == null)

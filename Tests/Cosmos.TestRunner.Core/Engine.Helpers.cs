@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -30,9 +31,39 @@ namespace Cosmos.TestRunner.Core
             }
         }
 
+        public static string RunObjDump(string cosmosBuildDir, string workingDir, string inputFile, Action<string> errorReceived, Action<string> outputReceived)
+        {
+            var xMapFile = Path.ChangeExtension(inputFile, "map");
+            File.Delete(xMapFile);
+            if (File.Exists(xMapFile))
+            {
+                throw new Exception("Could not delete " + xMapFile);
+            }
+
+            var xTempBatFile = Path.Combine(workingDir, "ExtractElfMap.bat");
+            File.WriteAllText(xTempBatFile, "@ECHO OFF\r\n\"" + Path.Combine(cosmosBuildDir, @"tools\cygwin\objdump.exe") + "\" --wide --syms \"" + inputFile + "\" > \"" + Path.GetFileName(xMapFile) + "\"");
+
+            var xProcessStartInfo = new ProcessStartInfo();
+            xProcessStartInfo.WorkingDirectory = workingDir;
+            xProcessStartInfo.FileName = xTempBatFile;
+            xProcessStartInfo.Arguments = "";
+            xProcessStartInfo.UseShellExecute = false;
+            xProcessStartInfo.RedirectStandardOutput = true;
+            xProcessStartInfo.RedirectStandardError = true;
+            xProcessStartInfo.CreateNoWindow = true;
+
+            var xProcess = Process.Start(xProcessStartInfo);
+
+            xProcess.WaitForExit();
+
+            File.Delete(xTempBatFile);
+
+            return xMapFile;
+        }
+
         private void RunExtractMapFromElfFile(string workingDir, string kernelFileName)
         {
-            ExtractMapFromElfFile.RunObjDump(CosmosPaths.Build, workingDir, kernelFileName, OutputHandler.LogError, OutputHandler.LogMessage);
+            RunObjDump(CosmosPaths.Build, workingDir, kernelFileName, OutputHandler.LogError, OutputHandler.LogMessage);
         }
 
         // TODO: Move this and GetProjectReferences to an msbuild task.
@@ -186,7 +217,7 @@ namespace Cosmos.TestRunner.Core
 
             var xArgsString = arguments.Aggregate("", (a, b) => a + " \"" + b + "\"");
 
-            var xProcess = global::System.Diagnostics.Process.Start(Path.Combine(GetCosmosUserkitFolder(), "build", "tools", "cygwin", "ld.exe"), xArgsString);
+            var xProcess = Process.Start(Path.Combine(GetCosmosUserkitFolder(), "build", "tools", "cygwin", "ld.exe"), xArgsString);
 
             xProcess.WaitForExit();
 
