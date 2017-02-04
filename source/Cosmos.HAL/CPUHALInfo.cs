@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Cosmos.Core;
-using Cosmos.Core.CPUInfo;
+using Cosmos.Core.SMBIOS;
 
 namespace Cosmos.HAL
 {

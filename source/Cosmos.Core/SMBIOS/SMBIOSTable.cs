@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Cosmos.Core.CPUInfo
+﻿namespace Cosmos.Core.SMBIOS
 {
+    /// <summary>
+    /// This class acts as a base layer for each type of smbios table
+    /// </summary>
     public unsafe abstract class SMBIOSTable
     {
         public byte* BeginningAddress { get; set; }
@@ -15,7 +12,6 @@ namespace Cosmos.Core.CPUInfo
 
         protected SMBIOSTable(byte* BeginningAddress)
         {
-            this.BeginningAddress = BeginningAddress;
         }
 
         public abstract byte* Parse();

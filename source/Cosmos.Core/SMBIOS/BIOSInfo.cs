@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cosmos.Debug.Kernel;
 
-namespace Cosmos.Core.CPUInfo
+namespace Cosmos.Core.SMBIOS
 {
     public unsafe class BIOSInfo : SMBIOSTable
     {
@@ -103,9 +98,7 @@ namespace Cosmos.Core.CPUInfo
                 EmbeddedControllerFirmwareMinorRelease = BeginningAddress[size + 21];
 
                 //This will not work in bochs since its version is 2.4
-                //I will comment it
-                /*
-                if (entryPointTable.IsVersionGreaterThan(3, 1))
+                if (EntryPointTable.IsVersionGreaterThan(3, 1))
                 {
                     size += 2;
                     tmp = new byte[2];
@@ -113,7 +106,6 @@ namespace Cosmos.Core.CPUInfo
                     tmp[1] = BeginningAddress[size + 23];
                     ExtendedBiosROMSize = BitConverter.ToUInt16(tmp, 0);
                 }
-                */
                 
                 //We have finished parsing the formatted area
                 //We start now the unformatted area

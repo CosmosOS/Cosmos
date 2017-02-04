@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Cosmos.Core.CPUInfo;
 using Sys = Cosmos.System;
 using Cosmos.TestRunner;
 

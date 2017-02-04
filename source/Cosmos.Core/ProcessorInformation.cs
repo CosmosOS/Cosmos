@@ -4,7 +4,6 @@ using System.CodeDom;
 using System.Diagnostics;
 using System.Globalization;
 using System.Xml.Schema;
-using Cosmos.Core.CPUInfo;
 using Debugger = Cosmos.Debug.Kernel.Debugger;
 
 namespace Cosmos.Core
