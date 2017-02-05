@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
+
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core.Plugs.System.Globalization
@@ -14,6 +16,11 @@ namespace Cosmos.Core.Plugs.System.Globalization
         public static CultureInfo get_InvariantCulture()
         {
             return null;
+        }
+
+        public static int GetHashCode(CultureInfo aThis)
+        {
+            throw new NotImplementedException();
         }
 
         public static void CCtor()

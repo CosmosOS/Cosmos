@@ -26,10 +26,7 @@
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include=".\$KernelName$.$ProjectTypeExtension$">
-      <Name>$KernelName$</Name>
-      <Project>$KernelGuid$</Project>
-    </ProjectReference>
+    <None Include="$CosmosProjectName$.project.json"></None>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983"/>

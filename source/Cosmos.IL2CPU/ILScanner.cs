@@ -442,7 +442,7 @@ namespace Cosmos.IL2CPU
                         xNewVirtMethod = xVirtType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                                                   .Where(method => method.Name == aMethod.Name
                                                                    && method.GetParameters().Select(param => param.ParameterType)
-                                                                            .SequenceEqual(xParamTypes))
+                                                                                            .SequenceEqual(xParamTypes))
                                                   .SingleOrDefault();
                         if (xNewVirtMethod != null)
                         {
@@ -748,9 +748,11 @@ namespace Cosmos.IL2CPU
                     break;
                 }
                 aCurrentInspectedType = aCurrentInspectedType.GetTypeInfo().BaseType;
-                MethodBase xFoundMethod = aCurrentInspectedType.GetTypeInfo().GetMethod(aMethod.Name,
-                                                                                        aMethodParams,
-                                                                                        new ParameterModifier[0]);
+                MethodBase xFoundMethod = aCurrentInspectedType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                                                                             .Where(method => method.Name == aMethod.Name
+                                                                                              && method.GetParameters().Select(param => param.ParameterType)
+                                                                                                                       .SequenceEqual(aMethodParams))
+                                                                             .SingleOrDefault();
                 if (xFoundMethod == null)
                 {
                     break;

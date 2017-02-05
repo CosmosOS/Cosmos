@@ -28,7 +28,7 @@
     </CreateItem>
   </Target>
 
-  <Target Name="CosmosCompile" DependsOnTargets="CosmosDetectDependencies" AfterTargets="Build">
+  <Target Name="CoreCompile" DependsOnTargets="CosmosDetectDependencies" AfterTargets="Build">
     <Error Text="File %(Compile.Identity) is set to compile, but .Cosmos projects don't compile any source themselves!" Condition="$(Compile) != ''"/>
     <CreateProperty Value="true" Condition="$(BinFormat) == 'elf'">
       <Output PropertyName="IsELF" TaskParameter="Value"/>

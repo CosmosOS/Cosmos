@@ -210,9 +210,8 @@ namespace Cosmos.IL2CPU
                                         return result;
                                     }).ToArray();
 
-                                    var posMethods = xPlug.Key.GetTypeInfo()
-                                        .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-                                        .Where(x => x.Name == xMethod.Name);
+                                    var posMethods = xPlug.Key.GetTypeInfo().GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
+                                                                            .Where(x => x.Name == xMethod.Name);
                                     foreach (MethodInfo posInf in posMethods)
                                     {
                                         // If static, no this param
@@ -391,7 +390,12 @@ namespace Cosmos.IL2CPU
                 }
                 // Plugs methods must be static, and public
                 // Search for non signature matches first since signature searches are slower
-                xResult = xImpl.GetTypeInfo().GetMethod(aMethod.Name, xParamTypes, null);
+                xResult = xImpl.GetTypeInfo().GetMethods()
+                                             .Where(method => method.Name == aMethod.Name
+                                                              && method.GetParameters().Select(param => param.ParameterType)
+                                                                                       .SequenceEqual(xParamTypes))
+                                             .SingleOrDefault();
+
                 if (xResult == null && aMethod.Name == ".ctor")
                 {
                     xResult = xImpl.GetTypeInfo().GetMethod("Ctor", xParamTypes, null);
@@ -526,7 +530,11 @@ namespace Cosmos.IL2CPU
                                 }
                                 else
                                 {
-                                    xTargetMethod = aTargetType.GetTypeInfo().GetMethod(xSigMethod.Name, xTypesInst, null);
+                                    xTargetMethod = aTargetType.GetTypeInfo().GetMethods()
+                                                                             .Where(method => method.Name == xSigMethod.Name
+                                                                                    && method.GetParameters().Select(param => param.ParameterType)
+                                                                                                             .SequenceEqual(xTypesInst))
+                                                                             .SingleOrDefault();
                                 }
                             }
                             // Not an instance method, try static
@@ -538,7 +546,12 @@ namespace Cosmos.IL2CPU
                                 }
                                 else
                                 {
-                                    xTargetMethod = aTargetType.GetTypeInfo().GetMethod(xSigMethod.Name, xTypesStatic, null);
+
+                                    xTargetMethod = aTargetType.GetTypeInfo().GetMethods()
+                                                                             .Where(method => method.Name == xSigMethod.Name
+                                                                                    && method.GetParameters().Select(param => param.ParameterType)
+                                                                                                             .SequenceEqual(xTypesStatic))
+                                                                             .SingleOrDefault();
                                 }
                             }
                             if (xTargetMethod == aMethod)

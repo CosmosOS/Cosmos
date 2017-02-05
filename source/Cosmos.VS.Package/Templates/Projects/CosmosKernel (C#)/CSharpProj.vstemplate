@@ -11,7 +11,7 @@
 		<ProvideDefaultName>true</ProvideDefaultName>
     </TemplateData>
     <TemplateContent>
-        <Project File="CSharpProject.csproj" ReplaceParameters="true">
+        <Project File="CSharpProject.xproj" ReplaceParameters="true">
             <ProjectItem ReplaceParameters="true">AssemblyInfo.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" OpenInEditor="true">Kernel.cs</ProjectItem>
         </Project>

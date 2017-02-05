@@ -125,11 +125,13 @@ Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Fl
 Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 ;
 ; Kernel assemblies
-Source: ".\Build\VSIP\Cosmos.Debug.Kernel.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.Core.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.HAL.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.System.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.Common.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+; Source: ".\Build\VSIP\Cosmos.Debug.Kernel.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+; Source: ".\Build\VSIP\Cosmos.Core.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+; Source: ".\Build\VSIP\Cosmos.HAL.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+; Source: ".\Build\VSIP\Cosmos.System.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+; Source: ".\Build\VSIP\Cosmos.Common.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\netcoreapp1.0\*"; DestDir: "{app}\Build\VSIP\netcoreapp1.0"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\netstandard1.6\*"; DestDir: "{app}\Build\VSIP\netstandard1.6"; Flags: ignoreversion uninsremovereadonly
 
 ; Icon
 Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
@@ -145,19 +147,19 @@ Source: ".\Build\VSIP\Cosmos.VS.Wizards.*"; DestDir: "{code:VSNET2013_PATH}\Priv
 Source: ".\Build\VSIP\Cosmos.Debug.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Assembler.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\XSC.exe"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+; Source: ".\Build\VSIP\XSC.exe"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\XSharp.Nasm.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\XSharp.VS.pdb"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\XSharp.VS.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
 Source: ".\Build\VSIP\Cosmos.Debug.VSDebugEngine.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Vestris.VMWareLib.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Interop.VixCOM.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+; Source: ".\Build\VSIP\Vestris.VMWareLib.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+; Source: ".\Build\VSIP\Interop.VixCOM.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
 ; ?? If we have this do we need the others?
 Source: ".\Build\VSIP\Cosmos.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.IL2CPU.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Resources\Dependencies\Microsoft.Samples.Debugging.CorApi.1.4.0.0\*.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly             
+; Source: ".\Build\VSIP\Cosmos.IL2CPU.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+; Source: ".\Resources\Dependencies\Microsoft.Samples.Debugging.CorApi.1.4.0.0\*.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly             
 
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs

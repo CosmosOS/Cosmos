@@ -6,16 +6,16 @@
         <ProjectType>Cosmos</ProjectType>
         <CreateNewFolder>true</CreateNewFolder>
         <DefaultName>CosmosKernel</DefaultName>
-        <ProvideDefaultName>true</ProvideDefaultName>
+  		  <ProvideDefaultName>true</ProvideDefaultName>
     </TemplateData>
     <TemplateContent>
-        <Project File="CSharpProject.csproj" ReplaceParameters="true">
+        <Project File="CSharpProject.xproj" ReplaceParameters="true">
             <ProjectItem ReplaceParameters="true">AssemblyInfo.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" OpenInEditor="true">Kernel.cs</ProjectItem>
         </Project>
     </TemplateContent>
-    <WizardExtension>
-        <Assembly>Cosmos.VS.Wizards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ca09551317f1435</Assembly>
-        <FullClassName>Cosmos.VS.Package.Templates.GenerateCosmosProjectWizard</FullClassName>
-    </WizardExtension>
+  <WizardExtension>
+    <Assembly>Cosmos.VS.Wizards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ca09551317f1435</Assembly>
+    <FullClassName>Cosmos.VS.Package.Templates.GenerateCosmosProjectWizard</FullClassName>
+  </WizardExtension>
 </VSTemplate>

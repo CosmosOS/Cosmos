@@ -206,7 +206,10 @@
     <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\Kernel.cs">
       <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
     </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\CSharpProject.csproj">
+    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\CSharpProj.project.json">
+        <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\CSharpProject.xproj">
       <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
     </ZipItem>
     <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\CSharpProj.vstemplate">
@@ -218,10 +221,13 @@
     <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Readme.txt">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CSharpProj.vstemplate">
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CSharpProj.project.json">
+        <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CSharpProject.xproj">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CSharpProject.csproj">
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CSharpProj.vstemplate">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>
     <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\AssemblyInfo.cs">
