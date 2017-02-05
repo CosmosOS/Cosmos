@@ -10,12 +10,12 @@ namespace Cosmos.Core.SMBIOS
     {
         private EntryPointTable entryPointTable;
         //TODO: convert to private
-        public byte SocketDesignationID;
-        public byte ProcessorManufacturerID;
-        public byte ProcessorVersionID;
-        public byte SerialNumberID;
-        public byte AssetTagID;
-        public byte PartNumberID;
+        public byte SocketDesignationID = 0xff;
+        public byte ProcessorManufacturerID = 0xff;
+        public byte ProcessorVersionID = 0xff;
+        public byte SerialNumberID = 0xff;
+        public byte AssetTagID = 0xff;
+        public byte PartNumberID = 0xff;
 
         private byte* beginningAddress;
         
@@ -209,9 +209,9 @@ namespace Cosmos.Core.SMBIOS
             //Array.Sort goes shit
             for (int i = 0; i < 8; i++)
             {
-                for (int j = 1; j < 8; j++)
+                for (int j = 1; j < 8 - i; j++)
                 {
-                    if (arr[j - 1] < arr[j])
+                    if (arr[j - 1] > arr[j])
                     {
                         var tmp = arr[j - 1];
                         arr[j - 1] = arr[j];
@@ -221,7 +221,7 @@ namespace Cosmos.Core.SMBIOS
             }
             foreach(int x in arr)
             {
-                if (x < 0 || x == 255) //If it doesnt exist
+                if (x <= 0 || x == 255) //If it doesnt exist
                     continue;
                 current = CompareStringN(current, x);
             }

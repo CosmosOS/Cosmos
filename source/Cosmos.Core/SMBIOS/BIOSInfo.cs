@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core.SMBIOS
 {
     public unsafe class BIOSInfo : SMBIOSTable
     {
-        private byte VendorID;
-        private byte VersionID;
-        private byte ReleaseDateID;
+        private byte VendorID = 0xff;
+        private byte VersionID = 0xff;
+        private byte ReleaseDateID = 0xff;
         private EntryPointTable EntryPointTable;
 
         public string Vendor{ get; set; }
@@ -112,59 +114,42 @@ namespace Cosmos.Core.SMBIOS
                 newAddress = BeginningAddress + size + 22;
             }
 
-            //TODO: improve this (we asume that there's always a vendor a version and a date). Besides, doing it this way...
             //Parse the first string
             string tmpString = "";
-            if (VendorID == 0)
+            int[] tmpArray = new int[3];
+            tmpArray[0] = VendorID;
+            tmpArray[1] = ReleaseDateID;
+            tmpArray[2] = VersionID;
+            //TODO: method for this
+            for (int q = 0; q < 3; q++)
             {
-                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
-                Vendor = (string)tmpString.Clone();
+                for (int w = 1; w < 3 - q; w++)
+                {
+                    if (tmpArray[w - 1] > tmpArray[w])
+                    {
+                        var tmp2 =  tmpArray[w - 1];
+                        tmpArray[w - 1] = tmpArray[w];
+                        tmpArray[w] = tmp2;
+                    }
+                } 
             }
-            else if (VersionID == 0)
+            foreach (int t in tmpArray)
             {
+                if (t == 255 | t == 0)
+                    continue;
                 newAddress = SMBIOS.ParseString(newAddress, out tmpString);
-                Version = tmpString;
-            }
-            else
-            {
-                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
-                ReleaseDate = tmpString;
-            }
-
-            if (VendorID == 1)
-            {
-                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
-                Vendor = tmpString;
-            }
-            else if (VersionID == 1)
-            {
-                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
-                Version = tmpString;
-            }
-            else
-            {
-                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
-                ReleaseDate = tmpString;
-            }
-
-            if (VendorID == 2)
-            {
-                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
-                Vendor = tmpString;
-            }
-            else if (VersionID == 2)
-            {
-                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
-                Version = tmpString;
-            }
-            else
-            {
-                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
-                ReleaseDate = tmpString;
+                if(t == VendorID)
+                    Vendor = tmpString;
+                else if (t == ReleaseDateID)
+                    ReleaseDate = tmpString;
+                else if (t == VersionID)
+                    Version = tmpString;
+                else
+                    continue;
             }
 
-            //To skip the double null
-
+            //ParseString leaves the pointer after the first \0
+            //So we need to skip the double null
             return newAddress + 1;
         }
     }
