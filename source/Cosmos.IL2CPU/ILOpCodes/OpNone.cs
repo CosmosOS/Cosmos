@@ -108,6 +108,8 @@ namespace Cosmos.IL2CPU.ILOpCodes
           return 2;
         case Code.Throw:
           return 1;
+        case Code.Rethrow:
+          return 0;
         case Code.Or:
         case Code.And:
           return 2;
@@ -240,6 +242,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
         case Code.Ceq:
           return 1;
         case Code.Throw:
+        case Code.Rethrow:
           return 0;
         case Code.Or:
         case Code.And:

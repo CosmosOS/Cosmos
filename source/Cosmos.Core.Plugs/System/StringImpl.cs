@@ -861,6 +861,11 @@ namespace Cosmos.Core.Plugs.System
             throw new ArgumentNullException();
         }
 
+        public static int CompareOrdinalHelper(string strA, int indexA, int countA, string strB, int indexB, int countB)
+        {
+            throw new NotImplementedException();
+        }
+
         public static int GetHashCode(string aThis)
         {
             throw new NotImplementedException("String.GetHashCode()");

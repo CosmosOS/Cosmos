@@ -1,0 +1,22 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Cosmos.IL2CPU.Plugs;
+
+namespace Cosmos.Core.Plugs.System
+{
+    //[Plug(TargetName = "System.SR, System, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089", IsMicrosoftdotNETOnly = true)]
+    public static class SRImpl
+    {
+        public static string GetString(string aString)
+        {
+            return aString;
+        }
+
+        public static string GetString(string aString, params object[] aArgs)
+        {
+            return aString;
+        }
+    }
+}

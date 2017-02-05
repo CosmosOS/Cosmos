@@ -1,8 +1,10 @@
+using System;
+using System.Runtime.CompilerServices;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core.Plugs.System.Runtime.CompilerServices
 {
-    [Plug(Target = typeof(global::System.Runtime.CompilerServices.RuntimeHelpers))]
+    [Plug(Target = typeof(RuntimeHelpers))]
     public static class RuntimeHelpersImpl
     {
         public static void cctor()
@@ -27,6 +29,11 @@ namespace Cosmos.Core.Plugs.System.Runtime.CompilerServices
         public static void ProbeForSufficientStack()
         {
             // no implementation yet, before threading not needed
+        }
+
+        public static int GetHashCode(object o)
+        {
+            throw new NotImplementedException();
         }
     }
 }

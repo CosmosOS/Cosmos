@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "NETStandard.Library": "1.6.1",
+    "System.Globalization": "4.3.0",
     "System.Threading.Thread": "4.3.0"
   },
   "frameworks": {

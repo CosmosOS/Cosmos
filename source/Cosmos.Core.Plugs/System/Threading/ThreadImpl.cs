@@ -1,10 +1,16 @@
-﻿using Cosmos.IL2CPU.Plugs;
+﻿using System.Threading;
+using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core.Plugs.System.Threading
 {
-    [Plug(Target = typeof(global::System.Threading.Thread))]
+    [Plug(Target = typeof(Thread))]
     public static class ThreadImpl
     {
+        public static Thread GetCurrentThreadNative()
+        {
+            return null;
+        }
+
         public static void MemoryBarrier()
         {
 
