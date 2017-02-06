@@ -27,7 +27,7 @@ namespace Cosmos.System.PCInfo
             string returnProc = "";
             foreach (var x in ListProcessors)
             {
-                //TODO I dont know how this is done
+                //TODO I dont know how this is done really in proc/cpuinfo
                 returnProc += "processor: " + x.SocketDesignation + "\n";
                 returnProc += "vendor_id: " + x.Manufacturer + "\n";
                 returnProc += "model name: " + x.ProcessorVersion + "\n";

@@ -211,12 +211,6 @@ namespace Cosmos.Core.SMBIOS
                     }
                 } 
             }
-            Debugger.DoSend("Sorted array");
-            for (int i = 0; i < 8; i++)
-            {
-                Debugger.DoSend("Element: " + arr[i]);
-            }
-            Debugger.DoSend("End sort");
             for (int i = 0; i < 8; i++)
             {
                 if (arr[i] == 0 || arr[i] == 255)

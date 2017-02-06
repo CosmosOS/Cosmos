@@ -61,19 +61,19 @@ namespace Cosmos.Core.SMBIOS
                         {
                             smbiosStructure.BiosInfo = new BIOSInfo(entryPointTable, currentAddress);
                             currentAddress = smbiosStructure.BiosInfo.Parse();
-                            DebugSMBIOS.DebugBIOSInfo(smbiosStructure.BiosInfo);
+                            //DebugSMBIOS.DebugBIOSInfo(smbiosStructure.BiosInfo);
                         }
                         else
                         {
+                            //If we fail skipping the table
                             currentAddress = currentAddress + 1;
-                            Debugger.DoSend("Skippking Bios? table");
                         }
                         break;
                     case 4:
                         CPUInfo cpuInfo = new CPUInfo(entryPointTable, currentAddress);
                         currentAddress = cpuInfo.Parse();
                         smbiosStructure.CpuInfoList.Add(cpuInfo);
-                        DebugSMBIOS.DebugCPUInfo(cpuInfo);
+                        //DebugSMBIOS.DebugCPUInfo(cpuInfo);
                         break;
                     default:
                         //In [1] we have the length of the formatted section.

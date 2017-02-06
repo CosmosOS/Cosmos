@@ -10,6 +10,7 @@ namespace Cosmos.Kernel.Tests.CPUInfo
     {
         protected override void BeforeRun()
         {
+            Console.WriteLine(Sys.PCInfo.ProcessorInfo.ProcCpuinfo());
             Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
         }
 
