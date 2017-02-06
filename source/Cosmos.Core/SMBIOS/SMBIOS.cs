@@ -57,20 +57,6 @@ namespace Cosmos.Core.SMBIOS
             for (int i = 0; i < entryPointTable.NumberOfStructures; i++)
             {
                 /*
-                if (i == 1)
-                {
-                    Debugger.DoSend("=========MEM DUMP: 1==========");
-                    for (int j = 0; j < 27; j++)
-                    {
-                        Debugger.DoSend(currentAddress[j] + " | " + (char)currentAddress[j]); 
-                    }
-                    Debugger.DoSend("End formatted section");
-                    for(int j = 27; j < 200; j++)
-                    {
-                        Debugger.DoSend(currentAddress[j] + " | " + (char)currentAddress[j]);
-                    }
-                    Debugger.DoSend("==========END DUMP========");
-                }
                 */
 
                 //We need to compare the type (which will be always the 0 fo current address)
@@ -89,136 +75,15 @@ namespace Cosmos.Core.SMBIOS
                             Debugger.DoSend("Skippking Bios? table");
                         }
                         break;
-                    case 1:
-                        Debugger.DoSend("Skipping table 1");
-                        if (entryPointTable.IsVersionGreaterThan(2, 4))
-                        {
-                            currentAddress = SkipTable(27, currentAddress);
-                            break;
-                        }
-                        if (entryPointTable.IsVersionGreaterThan(2, 1))
-                        {
-                            currentAddress = SkipTable(25, currentAddress);
-                            break;
-                        }
-                        if(entryPointTable.IsVersionGreaterThan(2,0))
-                        {
-                            currentAddress = SkipTable(8, currentAddress);
-                            break;
-                        }
-                        break;
-                    case 2:
-                        Debugger.DoSend("Skipping table 2");
-                        //Check smbios specification (this could be 15, not 08)
-                        //15 its the value put by vmware
-                        currentAddress = SkipTable(15, currentAddress);
-                        break;
-                    case 3:
-                        Debugger.DoSend("Skipping table 3");
-                        if (entryPointTable.IsVersionGreaterThan(2, 3))
-                        {
-                            currentAddress = SkipTable(19 + currentAddress[19] * currentAddress[20], currentAddress);
-                            break;
-                        }
-                        if (entryPointTable.IsVersionGreaterThan(2, 1))
-                        {
-                            currentAddress = SkipTable(13, currentAddress);
-                            break;
-                        }
-                        else
-                        {
-                            currentAddress = SkipTable(9, currentAddress);
-                            break;
-                        }
                     case 4:
                         CPUInfo cpuInfo = new CPUInfo(entryPointTable, currentAddress);
                         currentAddress = cpuInfo.Parse();
                         smbiosStructure.CpuInfoList.Add(cpuInfo);
                         DebugSMBIOS.DebugCPUInfo(cpuInfo);
                         break;
-                    case 5:
-                        Debugger.DoSend("Skiping table 5");
-                        if (entryPointTable.IsVersionGreaterThan(2, 1))
-                        {
-                            currentAddress = SkipTable(16 + (2 * currentAddress[14]), currentAddress);
-                            break;
-                        }
-                        currentAddress = SkipTable(15 + (2 * currentAddress[14]), currentAddress);
-                        break;
-                    case 6:
-                        Debugger.DoSend("Skiping table 6");
-                        currentAddress = SkipTable(12, currentAddress);
-                        break;
-                    case 7:
-                        Debugger.DoSend("Skipping table 7");
-                        if (entryPointTable.IsVersionGreaterThan(2, 1))
-                        {
-                            currentAddress = SkipTable(19, currentAddress);
-                            break;
-                        }
-                        currentAddress = SkipTable(15, currentAddress);
-                        break;
-                    case 8:
-                        Debugger.DoSend("Skipping table 8");
-                        currentAddress = SkipTable(9, currentAddress);
-                        break;
-                    case 9:
-                        Debugger.DoSend("Skipping table 9");
-                        if (entryPointTable.IsVersionGreaterThan(2, 6))
-                        {
-                            currentAddress = SkipTable(17, currentAddress);
-                            break;
-                        }
-                        if (entryPointTable.IsVersionGreaterThan(2, 1))
-                        {
-                            currentAddress = SkipTable(13, currentAddress);
-                            break;
-                        }
-                        currentAddress = SkipTable(12, currentAddress);
-                        break;
-                    case 11:
-                        currentAddress = SkipTable(5, currentAddress);
-                        Debugger.DoSend("Skipping table 11");
-                        break;
-                    case 12:
-                        currentAddress = SkipTable(5, currentAddress);
-                        Debugger.DoSend("Skipping table 12");
-                        break;
-                    case 13:
-                        currentAddress = SkipTable(16, currentAddress);
-                        Debugger.DoSend("Skipping table 13");
-                        break;
-
-                    case 15:
-                        Debugger.DoSend("Skipping table 15");
-                        if (entryPointTable.IsVersionGreaterThan(2, 1))
-                        {
-                            currentAddress = SkipTable(17 + currentAddress[21] * currentAddress[22], currentAddress);
-                            break;
-                        }
-                        currentAddress = SkipTable(20, currentAddress);
-                        break;
-                    case 16:
-                        if (entryPointTable.IsVersionGreaterThan(2, 7))
-                        {
-                            currentAddress = SkipTable(23, currentAddress);
-                            break;
-                        }
-                        if (entryPointTable.IsVersionGreaterThan(2, 1))
-                        {
-                            currentAddress = SkipTable(15, currentAddress);
-                            break;
-                        }
-                        Debugger.DoSend("Skipping table 16");
-                        break;
                     default:
-                        Debugger.DoSend("Skipping default:" + currentAddress[0]);
-                        if (currentAddress[0] == 0)
-                        {
-                            currentAddress = currentAddress + 1;
-                            break;
-                        }
-                        currentAddress = SkipTable(0, currentAddress);
+                        Debugger.DoSend("Skipping table:" + currentAddress[0]);
+                        currentAddress = SkipTable(currentAddress[1], currentAddress);
                         break;
                 }
             }
@@ -241,7 +106,6 @@ namespace Cosmos.Core.SMBIOS
 
             for (;;)
             {
-                i++;
                 /*
                 if(length == 27)
                     Debugger.DoSend("" + beginningAddress[i] + " | " + (char)beginningAddress[i]);
@@ -261,6 +125,7 @@ namespace Cosmos.Core.SMBIOS
                     //We sum 2 to skip this
                     return beginningAddress + i + 2;
                 }
+                i++;
             }
 
         }
