@@ -13,7 +13,8 @@ build_script:
 
 
     nuget restore "Cosmos.sln"
-
+    
+    dotnet restore
 
     msbuild "Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
 
