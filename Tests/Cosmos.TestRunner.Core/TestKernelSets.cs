@@ -18,7 +18,6 @@ namespace Cosmos.TestRunner.Core
             yield return typeof(VGACompilerCrash.Kernel);
             yield return typeof(Cosmos.Kernel.Tests.IO.Kernel);
             yield return typeof(Cosmos.Kernel.Tests.Fat.Kernel);
-            yield return typeof(Cosmos.Kernel.Tests.CPUInfo.Kernel);
             //yield return typeof(Cosmos.Compiler.Tests.Encryption.Kernel);
             //yield return typeof(FrotzKernel.Kernel);
         }
