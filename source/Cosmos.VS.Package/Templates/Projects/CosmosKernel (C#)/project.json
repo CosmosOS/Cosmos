@@ -14,9 +14,6 @@
         },
         "Cosmos.System": {
           "target": "project"
-        },
-        ".\\$KernelName$.$ProjectTypeExtension$": {
-          "target": "project"
         }
       }
     }
