@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using Cosmos.Debug.Kernel;
@@ -85,107 +86,98 @@ namespace Cosmos.Core.SMBIOS
             ProcessorID = BitConverter.ToUInt64(tmp, 0);
             
 
-            ProcessorVersionID = beginningAddress[15];
-            Voltage = beginningAddress[16];
+            ProcessorVersionID = beginningAddress[16];
+            Voltage = beginningAddress[17];
 
             tmp = new byte[2];
-            tmp[0] = beginningAddress[17];
-            tmp[1] = beginningAddress[18];
+            tmp[0] = beginningAddress[18];
+            tmp[1] = beginningAddress[19];
             ExternalClock = BitConverter.ToUInt16(tmp, 0);
 
             tmp = new byte[2];
-            tmp[0] = beginningAddress[19];
-            tmp[1] = beginningAddress[20];
+            tmp[0] = beginningAddress[20];
+            tmp[1] = beginningAddress[21];
             MaxSpeed = BitConverter.ToUInt16(tmp, 0);
 
             tmp = new byte[2];
-            tmp[0] = beginningAddress[21];
-            tmp[1] = beginningAddress[22];
+            tmp[0] = beginningAddress[22];
+            tmp[1] = beginningAddress[23];
             CurrentSpeed = BitConverter.ToUInt16(tmp, 0);
 
-            Status = beginningAddress[23];
-            ProcessorUpgrade = beginningAddress[24];
+            Status = beginningAddress[24];
+            ProcessorUpgrade = beginningAddress[25];
 
-            currentAddress = beginningAddress + 25;
 
             if (entryPointTable.IsVersionGreaterThan(2, 1))
             {
                 tmp = new byte[2];
-                tmp[0] = beginningAddress[25];
-                tmp[1] = beginningAddress[26];
+                tmp[0] = beginningAddress[26];
+                tmp[1] = beginningAddress[27];
                 L1HandleCache = BitConverter.ToUInt16(tmp, 0);
 
                 tmp = new byte[2];
-                tmp[0] = beginningAddress[27];
-                tmp[1] = beginningAddress[28];
+                tmp[0] = beginningAddress[28];
+                tmp[1] = beginningAddress[29];
                 L2HandleCache = BitConverter.ToUInt16(tmp, 0);
 
                 tmp = new byte[2];
-                tmp[0] = beginningAddress[29];
-                tmp[1] = beginningAddress[30];
+                tmp[0] = beginningAddress[30];
+                tmp[1] = beginningAddress[31];
                 L3HandleCache = BitConverter.ToUInt16(tmp, 0);
 
-                currentAddress = beginningAddress + 31;
 
                 if (entryPointTable.IsVersionGreaterThan(2, 3))
                 {
-                    SerialNumberID = beginningAddress[31];
-                    AssetTagID = beginningAddress[32];
-                    PartNumberID = beginningAddress[33];
+                    SerialNumberID = beginningAddress[32];
+                    AssetTagID = beginningAddress[33];
+                    PartNumberID = beginningAddress[34];
 
-                    currentAddress = beginningAddress + 34;
 
                     if (entryPointTable.IsVersionGreaterThan(2, 5))
                     {
-                        CoreCount = beginningAddress[34];
-                        CoreEnabled = beginningAddress[35];
-                        ThreadCount = beginningAddress[36];
+                        CoreCount = beginningAddress[35];
+                        CoreEnabled = beginningAddress[36];
+                        ThreadCount = beginningAddress[37];
     
                         tmp = new byte[2];
-                        tmp[0] = beginningAddress[37];
-                        tmp[1] = beginningAddress[38];
+                        tmp[0] = beginningAddress[38];
+                        tmp[1] = beginningAddress[39];
                         ProcessorCharacteristics = BitConverter.ToUInt16(tmp, 0);
 
-                        currentAddress = beginningAddress + 39;
 
                         if (entryPointTable.IsVersionGreaterThan(2, 6))
                         {
                             tmp = new byte[2];
-                            tmp[0] = beginningAddress[39];
-                            tmp[1] = beginningAddress[40];
+                            tmp[0] = beginningAddress[40];
+                            tmp[1] = beginningAddress[41];
                             ProcessorFamily2 = BitConverter.ToUInt16(tmp, 0);
 
-                            currentAddress = beginningAddress + 41;
 
                             if (entryPointTable.IsVersionGreaterThan(3, 0))
                             {
                                 tmp = new byte[2];
-                                tmp[0] = beginningAddress[41];
-                                tmp[1] = beginningAddress[42];
+                                tmp[0] = beginningAddress[42];
+                                tmp[1] = beginningAddress[43];
                                 CoreCount2 = BitConverter.ToUInt16(tmp, 0);
 
                                 tmp = new byte[2];
-                                tmp[0] = beginningAddress[43];
-                                tmp[1] = beginningAddress[44];
+                                tmp[0] = beginningAddress[44];
+                                tmp[1] = beginningAddress[45];
                                 CoreEnabled2 = BitConverter.ToUInt16(tmp, 0);
 
                                 tmp = new byte[2];
-                                tmp[0] = beginningAddress[45];
-                                tmp[1] = beginningAddress[46];
+                                tmp[0] = beginningAddress[46];
+                                tmp[1] = beginningAddress[47];
                                 ThreadCount2 = BitConverter.ToUInt16(tmp, 0);
-
                             }
                         }
                     }
                 }
             }
 
-            //Funnily, bochs smbios version is 2.4 but doesnt implement 
-            //3 fields of the cpu table (which are version 2.3) (length should be 35, not 32)
-            //We must do it this way
-            //currentAddress = beginningAddress + Convert.ToInt32(Length);
-            if(Convert.ToInt32(Length) != 0)
-                currentAddress = beginningAddress + Convert.ToInt32(Length);
+            //We substract one so as not to skip one string
+            //This is really fucked up in bochs but works nice in vmware.
+            currentAddress = beginningAddress + Convert.ToInt32(Length) - 1;
 
             currentAddress = ParseStrings(currentAddress);
 
@@ -219,11 +211,23 @@ namespace Cosmos.Core.SMBIOS
                     }
                 } 
             }
-            foreach(int x in arr)
+            Debugger.DoSend("Sorted array");
+            for (int i = 0; i < 8; i++)
             {
-                if (x <= 0 || x == 255) //If it doesnt exist
+                Debugger.DoSend("Element: " + arr[i]);
+            }
+            Debugger.DoSend("End sort");
+            for (int i = 0; i < 8; i++)
+            {
+                if (arr[i] == 0 || arr[i] == 255)
+                {
                     continue;
-                current = CompareStringN(current, x);
+                }
+                else
+                {
+                    current = CompareStringN(current, arr[i]);
+                }
+                
             }
             return current;
         }
@@ -231,7 +235,7 @@ namespace Cosmos.Core.SMBIOS
         public byte* CompareStringN(byte* beginningAddress, int position)
         {
             string var;
-            var memPtr = SMBIOS.ParseString(beginningAddress, out var);
+            var memPtr = Core.SMBIOS.SMBIOS.ParseString(beginningAddress, out var);
             //I'm not able to work out a switch here (wtf)
             if (AssetTagID == position)
                 AssetTag = var;

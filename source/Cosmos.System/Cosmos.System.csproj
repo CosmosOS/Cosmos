@@ -88,7 +88,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Console.cs" />
-    <Compile Include="CPUInfo.cs" />
+    <Compile Include="PCInfo\Processor.cs" />
+    <Compile Include="PCInfo\ProcessorInfo.cs" />
     <Compile Include="FileSystem\CosmosVFS.cs" />
     <Compile Include="FileSystem\FAT\FatFileSystem.cs" />
     <Compile Include="FileSystem\FAT\FatStream.cs" />

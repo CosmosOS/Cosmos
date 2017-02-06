@@ -36,7 +36,7 @@ namespace Cosmos.Core.SMBIOS
 
         //We go byte by byte MANUALLY to parse the table.
         //The field that is assigned is autodocumented
-        //We use the BitConverter for qwords and words (2 bytes and 8 bytes, respectively);
+        //We use the BitConverter for words and qwords (2 bytes and 8 bytes, respectively);
         public override byte* Parse()
         {
             byte* newAddress =  BeginningAddress;
@@ -137,7 +137,7 @@ namespace Cosmos.Core.SMBIOS
             {
                 if (t == 255 | t == 0)
                     continue;
-                newAddress = SMBIOS.ParseString(newAddress, out tmpString);
+                newAddress = Core.SMBIOS.SMBIOS.ParseString(newAddress, out tmpString);
                 if(t == VendorID)
                     Vendor = tmpString;
                 else if (t == ReleaseDateID)

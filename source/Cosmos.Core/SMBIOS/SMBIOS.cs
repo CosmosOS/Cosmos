@@ -5,11 +5,14 @@ using Cosmos.Debug.Kernel;
 
 namespace Cosmos.Core.SMBIOS
 {
+
+    //This class contains the parser for the entry point table.
+    //TODO: do checks for versions.
     public unsafe class SMBIOS
     {
         public static SMBIOSStructure BeginParseSMBIOS()
         {
-            byte* memPtr = SMBIOSHandler.SearchEntryPointTable();
+            byte* memPtr = SMBIOS.SearchEntryPointTable();
 
             EntryPointTable entry =  new EntryPointTable();
             //We dont return an address since we need to use a pointer that
@@ -17,7 +20,7 @@ namespace Cosmos.Core.SMBIOS
             entry.Parse(memPtr);
 
             //entry.GetTableAddress();
-            SMBIOSStructure smbiosStructure = SMBIOSHandler.ParseStructures(entry);
+            SMBIOSStructure smbiosStructure = SMBIOS.ParseStructures(entry);
             smbiosStructure.EntryPointTable = entry;
             return smbiosStructure;
         }
@@ -43,12 +46,6 @@ namespace Cosmos.Core.SMBIOS
             return beginningAddress + i + 1;
         }
 
-    }
-
-    //This class contains the parser for the entry point table.
-    //TODO: do checks for versions.
-    unsafe class SMBIOSHandler
-    {
         public static SMBIOSStructure ParseStructures(EntryPointTable entryPointTable)
         {
             SMBIOSStructure smbiosStructure = new SMBIOSStructure();
@@ -56,9 +53,6 @@ namespace Cosmos.Core.SMBIOS
             byte* currentAddress = entryPointTable.GetTableAddress();
             for (int i = 0; i < entryPointTable.NumberOfStructures; i++)
             {
-                /*
-                */
-
                 //We need to compare the type (which will be always the 0 fo current address)
                 switch (Convert.ToUInt32((currentAddress)[0]))
                 {
@@ -82,7 +76,7 @@ namespace Cosmos.Core.SMBIOS
                         DebugSMBIOS.DebugCPUInfo(cpuInfo);
                         break;
                     default:
-                        Debugger.DoSend("Skipping table:" + currentAddress[0]);
+                        //In [1] we have the length of the formatted section.
                         currentAddress = SkipTable(currentAddress[1], currentAddress);
                         break;
                 }
@@ -101,30 +95,22 @@ namespace Cosmos.Core.SMBIOS
         public static byte* SkipTable(int length, byte* beginningAddress)
         {
             int i;
-            //The double null marks the separation between tables
+            //Skip the formatted section
             for (i = 0; i < length; i++) ;
 
+            //Skip the unformatted section (bunch of strings)
             for (;;)
             {
-                /*
-                if(length == 27)
-                    Debugger.DoSend("" + beginningAddress[i] + " | " + (char)beginningAddress[i]);
-                    */
+                //If we found the double null we finished the table
                 if (beginningAddress[i] == 0 && beginningAddress[i + 1] == 0)
                 {
-                    /*
-                    if (length == 27)
-                    {
-                    Debugger.DoSend("FINISHING");
-                    Debugger.DoSend("Current: " + beginningAddress[i]);
-                    Debugger.DoSend("next: " + beginningAddress[i+1]);
-                    Debugger.DoSend("REAL: " + beginningAddress[i+2]);
-                    }
-                    */
                     //The pointer will be situated under the first null
                     //We sum 2 to skip this
                     return beginningAddress + i + 2;
                 }
+                //We need to increment here.
+                //If we increment before checking for double null it doesnt work
+                //for tables without strings
                 i++;
             }
 

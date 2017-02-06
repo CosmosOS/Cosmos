@@ -9,7 +9,7 @@ namespace Eramam
     {
         protected override void BeforeRun()
         {
-            Cosmos.System.CPUInfo.GetVendorName();
+            Console.WriteLine(Cosmos.System.PCInfo.ProcessorInfo.ProcCpuinfo());
             Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
         }
 
