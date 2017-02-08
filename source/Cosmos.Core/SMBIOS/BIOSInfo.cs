@@ -79,11 +79,11 @@ namespace Cosmos.Core.SMBIOS
                 //Formula: Length - 12h == Length - 18
                 //var size = Length - 18;
 
-                //I dont know if the specification is incorrect but i count 22 bytes, not 18 (you must 
+                // I dont know if the specification is incorrect but i count 22 bytes, not 18 (you must 
                 // count the system bios bytes and firmware (since they are 22 bytes).
-                // Fucking engineers. Need discrete math 101 to learn to count.
+                // Might be a misintrepretation of the specification
                 var size = Length - 22;
-                //If there is no optional characteristic, skip
+                // If there is no optional characteristic, skip
                 if (size > 0)
                 {
                     OptionalCharacteristics = new byte[size];
@@ -115,7 +115,6 @@ namespace Cosmos.Core.SMBIOS
             }
 
             //Parse the first string
-            string tmpString = "";
             int[] tmpArray = new int[3];
             tmpArray[0] = VendorID;
             tmpArray[1] = ReleaseDateID;
@@ -133,24 +132,30 @@ namespace Cosmos.Core.SMBIOS
                     }
                 } 
             }
+            //Array of strings from the formatted section
+            string[] stringArray = Core.SMBIOS.SMBIOS.ParseStrings(newAddress);
+            int iteration = -1;
             foreach (int t in tmpArray)
             {
                 if (t == 255 | t == 0)
                     continue;
-                newAddress = Core.SMBIOS.SMBIOS.ParseString(newAddress, out tmpString);
-                if(t == VendorID)
-                    Vendor = tmpString;
+                //We increment the index first so the first string is 0
+                //The numbers doesn't have to be correlative i.e
+                //Doesn;'t have to be 1,2,3 it could be 1,2,15
+                //Thus, we cannot use t to index the array
+                iteration++;
+                if (t == VendorID)
+                    Vendor = stringArray[iteration];
                 else if (t == ReleaseDateID)
-                    ReleaseDate = tmpString;
+                    ReleaseDate = stringArray[iteration];
                 else if (t == VersionID)
-                    Version = tmpString;
+                    Version = stringArray[iteration];
                 else
                     continue;
             }
 
-            //ParseString leaves the pointer after the first \0
-            //So we need to skip the double null
-            return newAddress + 1;
+            //We need to recompute the pointer after parsing.
+            return SMBIOS.RecomputePointer(newAddress, stringArray);
         }
     }
 }

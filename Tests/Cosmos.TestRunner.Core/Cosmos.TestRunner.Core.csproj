@@ -153,9 +153,9 @@
       <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
       <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.Kernel.Tests.CPUInfo\Cosmos.Kernel.Tests.CPUInfo.csproj">
-      <Project>{1783490d-0a73-4c82-b346-fc8c000f4eba}</Project>
-      <Name>Cosmos.Kernel.Tests.CPUInfo</Name>
+    <ProjectReference Include="..\..\source\Cosmos.Kernel.Tests.SMBIOS\Cosmos.Kernel.Tests.SMBIOS.csproj">
+      <Project>{9fb1372f-e25d-4310-b10e-4e69e77b83f0}</Project>
+      <Name>Cosmos.Kernel.Tests.SMBIOS</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
       <Project>{7C64B97F-516D-4A6D-B9E1-3FE48F561409}</Project>

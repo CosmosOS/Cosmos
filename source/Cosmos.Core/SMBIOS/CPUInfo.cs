@@ -175,19 +175,27 @@ namespace Cosmos.Core.SMBIOS
                 }
             }
 
-            //We substract one so as not to skip one string
-            //This is really fucked up in bochs but works nice in vmware.
-            currentAddress = beginningAddress + Convert.ToInt32(Length) - 1;
+            // Since bochs has this "b_u_g" that states incorrectly the length, it will fail in bochs
+            currentAddress = beginningAddress + Convert.ToInt32(Length);
 
-            currentAddress = ParseStrings(currentAddress);
+            var stringArray = Core.SMBIOS.SMBIOS.ParseStrings(currentAddress);
+            foreach (string str in stringArray)
+            {
+                Debugger.DoSend("String CPU:" + str);
+            }
+            StoreStrings(stringArray);
 
-            return currentAddress;
+            return SMBIOS.RecomputePointer(currentAddress, stringArray);
         }
 
 
-        public byte* ParseStrings(byte* beginningAddress)
+        /// <summary>
+        /// Store the strings in their respective variables according to their id
+        /// </summary>
+        /// <param name="stringArray">Array of strings parsed from the SMBIOS</param>
+        /// <returns></returns>
+        public void StoreStrings(string[] stringArray)
         {
-            var current = CompareStringN(beginningAddress, 0);
             int[] arr = new int[8];
             arr[0] = AssetTagID;
             arr[1] = PartNumberID;
@@ -197,8 +205,8 @@ namespace Cosmos.Core.SMBIOS
             arr[5] = ProcessorVersionID;
             arr[6] = SocketDesignationID;
             arr[7] = PartNumberID;
-            //Some shitty bubble sort
-            //Array.Sort goes shit
+            //Instead of doing an Array.Sort plug (too much responsability)
+            //I will code the bubblesort here directly (besides, bubblesort its quite inneficient).
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 1; j < 8 - i; j++)
@@ -211,41 +219,45 @@ namespace Cosmos.Core.SMBIOS
                     }
                 } 
             }
+            //We need to reference the string int the stringArray
+            //We cannot use i since we need to skip some arr[i]
+            int iteration = 0;
             for (int i = 0; i < 8; i++)
             {
                 if (arr[i] == 0 || arr[i] == 255)
-                {
                     continue;
-                }
                 else
                 {
-                    current = CompareStringN(current, arr[i]);
+                    CompareStringN(arr[i], stringArray[iteration]);
+                    iteration++;
                 }
                 
             }
-            return current;
         }
 
-        public byte* CompareStringN(byte* beginningAddress, int position)
+        /// <summary>
+        /// Compares to the Nth string of the stringArray
+        /// A simple switch
+        /// </summary>
+        /// <param name="position">TagID of the string obtained form SMBIOS</param>
+        /// <param name="currentString">String to be stored in the table</param>
+        public void CompareStringN(int position, string currentString)
         {
-            string var;
-            var memPtr = Core.SMBIOS.SMBIOS.ParseString(beginningAddress, out var);
             //I'm not able to work out a switch here (wtf)
             if (AssetTagID == position)
-                AssetTag = var;
+                AssetTag = currentString;
             else if (PartNumberID == position)
-                PartNumber = var;
+                PartNumber = currentString;
             else if (ProcessorManufacturerID == position)
-                ProcessorManufacturer = var;
+                ProcessorManufacturer = currentString;
             else if (ProcessorVersionID == position)
-                ProcessorVersion = var;
+                ProcessorVersion = currentString;
             else if (SerialNumberID == position)
-                SerialNumber = var;
+                SerialNumber = currentString;
             else if (SocketDesignationID == position)
-                SocketDesignation = var;
-            else return beginningAddress; //We do as we did nothing
-
-            return memPtr; //If everything goes well this method should end here
+                SocketDesignation = currentString;
+            else
+                return;
         }
     }
 }

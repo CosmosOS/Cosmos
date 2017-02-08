@@ -26,25 +26,53 @@ namespace Cosmos.Core.SMBIOS
         }
 
         /// <summary>
-        /// Parses a string of type smbios and stores the result in the variable "variable"
-        /// This function stops when found a nul byte (i.e, \0)
-        /// Note that the contents of variable will be overwritten.
+        /// This fucntion parses the array of strings of the unformatted part of the structure
+        /// Stops when found the end of the table. THE ADDRESS NEEDS TO BE RECOMPUTED.
+        /// The start of the next table needs to be recomputed as the sum of the length of the parsed strings;
+        /// NOTE: assumes that the start of the unformatted section will be provided
         /// </summary>
         /// <param name="beginningAddress">Address in which we start searching</param>
         /// <param name="variable">Variable in which we will store the result</param>
         /// <returns>Offset of the search (i.e, the number of position searched)</returns>
-        public static byte* ParseString(byte* beginningAddress, out string variable)
+        public static string[] ParseStrings(byte* beginningAddress)
         {
-            variable = "";
+            List<string> stringList = new List<string>();
             var i = 0;
+            //While we don't find the double null...
             while (beginningAddress[i] != '\0')
             {
-                variable = variable + (char)beginningAddress[i];
-                i++;
+                string parsedString = "";
+                //While we don't find the null that indicates the end of the string...
+                while (beginningAddress[i] != '\0')
+                {
+                    //Create new string appending chars
+                    parsedString = parsedString + ((char)beginningAddress[i]);
+                    i++;
+                }
+                stringList.Add(parsedString);
+                i++; //Skip the first null or the null that indicates end of string
             }
-            //We need to add one to skip the \0
-            return beginningAddress + i + 1;
+            return stringList.ToArray();
         }
+
+        /// <summary>
+        /// Recomputes the pointer after parsing the strings of the unformatted section.
+        /// </summary>
+        /// <param name="beginningAddress">Address after parsing the formatted section</param>
+        /// <param name="stringArray">Array of strings parsed from the unformatted section</param>
+        /// <returns>Starting address of the next table</returns>
+        public static byte* RecomputePointer(byte* beginningAddress, string[] stringArray)
+        {
+            int charLength = 0; //sum of the length of the strings contained in stringArray
+            foreach (var str in stringArray)
+                charLength += str.Length;
+            //The next address will be
+            return beginningAddress +
+                   charLength + //The sum of the length of all the strings
+                   stringArray.Length + //The number of null bytes related to the strings
+                   1; //The second null byte in the double null part
+        }
+    
 
         public static SMBIOSStructure ParseStructures(EntryPointTable entryPointTable)
         {
@@ -67,6 +95,7 @@ namespace Cosmos.Core.SMBIOS
                         {
                             //If we fail skipping the table
                             currentAddress = currentAddress + 1;
+                            //Debugger.DoSend("Skipping not bios table");
                         }
                         break;
                     case 4:
@@ -87,7 +116,7 @@ namespace Cosmos.Core.SMBIOS
 
         /// <summary>
         /// Skip a table with length x
-        ///We need the length since the table can contain double nulls inside the formatted section
+        /// We need the length since the table can contain double nulls inside the formatted section
         /// </summary>
         /// <param name="length">Length of the table to skip</param>
         /// <param name="beginningAddress">Address to search</param>
