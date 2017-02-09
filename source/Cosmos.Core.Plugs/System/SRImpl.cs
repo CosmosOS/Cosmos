@@ -6,8 +6,8 @@ using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core.Plugs.System
 {
-    //[Plug(TargetName = "System.SR, System.Collections, Version=4.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", IsMicrosoftdotNETOnly = true)]
-    [Plug(TargetName = "System.SR, System.Runtime.Extensions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", IsMicrosoftdotNETOnly = true)]
+    [Plug(TargetName = "System.SR, System.Collections, Version=4.0.12.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", IsMicrosoftdotNETOnly = true)]
+    //[Plug(TargetName = "System.SR, System.Runtime.Extensions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", IsMicrosoftdotNETOnly = true)]
     public static class SRImpl
     {
         //public static string GetString(string aString)

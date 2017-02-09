@@ -51,7 +51,7 @@ namespace Cosmos.TestRunner.Core
 
             var xProcess = Process.Start(xProcessStartInfo);
 
-            xProcess.WaitForExit();
+            xProcess.WaitForExit(20000);
 
             File.Delete(xTempBatFile);
 
@@ -217,7 +217,7 @@ namespace Cosmos.TestRunner.Core
 
             var xProcess = Process.Start(Path.Combine(GetCosmosUserkitFolder(), "build", "tools", "cygwin", "ld.exe"), xArgsString);
 
-            xProcess.WaitForExit();
+            xProcess.WaitForExit(10000);
 
             //RunProcess(Path.Combine(GetCosmosUserkitFolder(), "build", "tools", "cygwin", "ld.exe"),
             //           mBaseWorkingDirectory,

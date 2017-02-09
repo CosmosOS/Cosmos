@@ -17,7 +17,7 @@ namespace Cosmos.Core.Plugs.System
 
         public static unsafe void Ctor(
             string aThis,
-            [ObjectPointerAccess] char* aChars,
+            char* aChars,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
             [FieldAccess(Name = "System.Int32 System.String.m_stringLength")] ref int aStringLength,
             [FieldAccess(Name = "System.Char System.String.m_firstChar")] char* aFirstChar)
@@ -38,7 +38,7 @@ namespace Cosmos.Core.Plugs.System
 
         public static unsafe void Ctor(
             string aThis,
-            [ObjectPointerAccess] char* aChars,
+            char* aChars,
             int start,
             int length,
             [FieldAccess(Name = "System.String System.String.Empty")] ref string aStringEmpty,
