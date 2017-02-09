@@ -1175,46 +1175,52 @@ namespace Cosmos.IL2CPU
                 }
                 else
                 {
-                    uint xTheSize;
+                    uint xFieldSize;
                     //string theType = "db";
-                    var xFieldTypeDef = aField.FieldType.GetTypeInfo();
-                    if (!xFieldTypeDef.IsClass || xFieldTypeDef.IsValueType)
-                    {
-                        xTheSize = ILOp.SizeOfType(aField.FieldType);
-                    }
-                    else
-                    {
-                        xTheSize = 8;
-                    }
-                    byte[] xData = new byte[xTheSize];
-                    try
-                    {
-                        object xValue = aField.GetValue(null);
-                        if (xValue != null)
-                        {
+                    var xFieldType = aField.FieldType.GetTypeInfo();
+                    //if (!xFieldType.IsClass || xFieldType.IsValueType)
+                    //{
+                        xFieldSize = ILOp.SizeOfType(aField.FieldType);
+                    //}
+                    //else
+                    //{
+                    //    xTheSize = 8;
+                    //}
+                    byte[] xData = new byte[xFieldSize];
+
+                    //try
+                    //{
+                    //    object xValue = aField.GetValue(null);
+                    //    if (xValue != null)
+                    //    {
                             try
                             {
-                                Type xTyp = xValue.GetType();
-                                if (xTyp.GetTypeInfo().IsEnum)
+                                //if (xFieldType.IsEnum)
+                                //{
+                                //    xValue = Convert.ChangeType(xValue, Enum.GetUnderlyingType(aField.FieldType));
+                                //}
+                                //if (xTyp.GetTypeInfo().IsValueType)
+                                //{
+                                //    for (int x = 4; x < xTheSize; x++)
+                                //    {
+                                //        xData[x] = Marshal.ReadByte(xValue, x);
+                                //    }
+                                //}
+                                if (xFieldType.IsValueType)
                                 {
-                                    xValue = Convert.ChangeType(xValue, Enum.GetUnderlyingType(xTyp));
-                                }
-                                if (xTyp.GetTypeInfo().IsValueType)
-                                {
-                                    for (int x = 4; x < xTheSize; x++)
-                                    {
-                                        xData[x] = Marshal.ReadByte(xValue, x);
-                                    }
+                                    DebugSymbolReader.TryGetStaticFieldValue(aField.Module, aField.MetadataToken, ref xData);
                                 }
                             }
                             catch
                             {
+                                throw;
                             }
-                        }
-                    }
-                    catch
-                    {
-                    }
+                    //    }
+                    //}
+                    //catch
+                    //{
+                    //    throw;
+                    //}
                     Cosmos.Assembler.Assembler.CurrentInstance.DataMembers.Add(new DataMember(xFieldName, xData));
                 }
             }

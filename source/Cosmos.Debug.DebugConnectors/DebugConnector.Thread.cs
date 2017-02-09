@@ -120,7 +120,13 @@ namespace Cosmos.Debug.DebugConnectors
                 Next(1, WaitForSignature);
                 while (true)
                 {
-                    if (!GetIsConnectedToDebugStub() || aCancellationToken.IsCancellationRequested)
+                    if (aCancellationToken.IsCancellationRequested)
+                    {
+                        ConnectionLost(new OperationCanceledException(aCancellationToken));
+                        return;
+                    }
+
+                    if (!GetIsConnectedToDebugStub())
                     {
                         ConnectionLost(null);
                         return;
@@ -128,22 +134,21 @@ namespace Cosmos.Debug.DebugConnectors
                     ProcessPendingActions();
                 }
             }
-            // Thread.Abort is not supported in .net core, so ThreadAbortException isn't supported too
-            //catch (ThreadAbortException)
-            //{
-            //    while (true)
-            //    {
-            //        Outgoing xPendingOutgoing;
-            //        if (!mPendingWrites.TryTake(out xPendingOutgoing))
-            //        {
-            //            break;
-            //        }
-            //        xPendingOutgoing.Packet = null;
-            //        xPendingOutgoing.Completed.Set();
-            //    }
+            catch (OperationCanceledException)
+            {
+                while (true)
+                {
+                    Outgoing xPendingOutgoing;
+                    if (!mPendingWrites.TryTake(out xPendingOutgoing))
+                    {
+                        break;
+                    }
+                    xPendingOutgoing.Packet = null;
+                    xPendingOutgoing.Completed.Set();
+                }
 
-            //    return;
-            //}
+                return;
+            }
             catch (Exception E)
             {
                 CmdMessageBox("Error occurred in DebugConnector.ThreadMethod: " + E.ToString());

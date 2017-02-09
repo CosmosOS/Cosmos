@@ -6,18 +6,19 @@ namespace Cosmos.Core.Plugs.System
     [Plug(Target = typeof(Buffer))]
     public class BufferImpl
     {
-        [PlugMethod(IsOptional = true)]
-        public static unsafe void __Memcpy(byte* src, byte* dest, int count)
-        {
-            global::System.Buffer.BlockCopy((Array)(object)*src, 0, (Array)(object)*dest, 0, count);
-        }
+        // __Memcpy doesn't exist in net core
+        //[PlugMethod(IsOptional = true)]
+        //public static unsafe void __Memcpy(byte* src, byte* dest, int count)
+        //{
+        //    Buffer.BlockCopy((Array)(object)*src, 0, (Array)(object)*dest, 0, count);
+        //}
 
-        [PlugMethod(IsOptional = true)]
-        public static unsafe void __Memcpy(byte* src, byte* dest, long count)
-        {
-            // TODO: Cast could cause a loss of data.
-            global::System.Buffer.BlockCopy((Array)(object)*src, 0, (Array)(object)*dest, 0, (int) count);
-        }
+        //[PlugMethod(IsOptional = true)]
+        //public static unsafe void __Memcpy(byte* src, byte* dest, long count)
+        //{
+        //    // TODO: Cast could cause a loss of data.
+        //    Buffer.BlockCopy((Array)(object)*src, 0, (Array)(object)*dest, 0, (int) count);
+        //}
 
         /// <summary>
         /// The memmove() function copies n bytes from memory area src to memory area dest.
@@ -41,7 +42,7 @@ namespace Cosmos.Core.Plugs.System
                 return;
             }
 
-            if ((ulong)dest < (ulong)src)
+            if ((uint)dest < (uint)src)
             {
                 /* Copy forward. */
                 t = (uint)src;
@@ -164,7 +165,7 @@ namespace Cosmos.Core.Plugs.System
 
         public static void InternalBlockCopy(Array src, int srcOffset, Array dst, int dstOffset, int count)
         {
-            global::System.Buffer.BlockCopy(src, srcOffset, dst, dstOffset, count);
+            Buffer.BlockCopy(src, srcOffset, dst, dstOffset, count);
         }
     }
 }

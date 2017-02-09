@@ -361,5 +361,32 @@ namespace Cosmos.Debug.Symbols
             }
             throw new NotImplementedException();
         }
+
+        public static bool TryGetStaticFieldValue(Module aModule, int aMetadataToken, ref byte[] aBuffer)
+        {
+            var xAssemblyPath = aModule.Assembly.Location;
+            var xMetadataReader = GetReader(xAssemblyPath).mMetadataReader;
+            var xPEReader = GetReader(xAssemblyPath).mPEReader;
+
+            var xHandle = (FieldDefinitionHandle)MetadataTokens.Handle(aMetadataToken);
+
+            if (!xHandle.IsNil)
+            {
+                var xFieldDefinition = xMetadataReader.GetFieldDefinition(xHandle);
+                var xRVA = xFieldDefinition.GetRelativeVirtualAddress();
+
+                if (xFieldDefinition.Attributes.HasFlag(FieldAttributes.HasFieldRVA))
+                {
+                    var xBytes = xPEReader.GetSectionData(xRVA).GetContent();
+
+                    for (int i = 0; i < aBuffer.Length; i++)
+                    {
+                        aBuffer[i] = xBytes[i];
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }

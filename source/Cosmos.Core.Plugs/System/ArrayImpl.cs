@@ -6,7 +6,6 @@ namespace Cosmos.Core.Plugs.System
     [Plug(Target = typeof(Array))]
     public class ArrayImpl
     {
-
         [PlugMethod(Signature = "System_Void__System_Array_Clear_System_Array__System_Int32__System_Int32_")]
         public static unsafe void Clear([ObjectPointerAccess] uint* aArray, uint aIndex, uint aLength)
         {
