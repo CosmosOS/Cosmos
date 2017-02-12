@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Resources;
-using System.Threading.Tasks;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core.Plugs.System.Resources
@@ -14,12 +11,14 @@ namespace Cosmos.Core.Plugs.System.Resources
         {
         }
 
-        public static void Ctor(ResourceManager aThis)
+
+        public static void Ctor(Type aResourceSource)
         {
         }
 
-        public static void SetAppXConfiguration(ResourceManager aThis)
+        public static string GetString(string aString)
         {
+            return EnvironmentImpl.GetResourceString(aString);
         }
     }
 }

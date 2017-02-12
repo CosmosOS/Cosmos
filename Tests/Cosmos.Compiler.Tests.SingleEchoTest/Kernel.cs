@@ -64,4 +64,3 @@ namespace Cosmos.Compiler.Tests.SingleEchoTest
         }
     }
 }
-

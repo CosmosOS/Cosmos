@@ -28,6 +28,77 @@ namespace Cosmos.TestRunner.Core
         //    }
         //}
 
+        private void RunIL2CPUProcess(string fileName, string workingDirectory, string[] arguments)
+        {
+            if (arguments == null)
+            {
+                throw new ArgumentNullException("arguments");
+            }
+
+            var xArgsString = arguments.Aggregate("", (a, b) => a + " \"" + b + "\"");
+
+            Action<string> errorReceived = OutputHandler.LogError;
+            Action<string> outputReceived = OutputHandler.LogMessage;
+
+            bool xResult;
+            string name = "IL2CPU";
+
+            var xProcessStartInfo = new ProcessStartInfo();
+            xProcessStartInfo.WorkingDirectory = workingDirectory;
+            xProcessStartInfo.FileName = fileName;
+            xProcessStartInfo.Arguments = xArgsString;
+            xProcessStartInfo.UseShellExecute = false;
+            xProcessStartInfo.RedirectStandardOutput = true;
+            xProcessStartInfo.RedirectStandardError = true;
+            xProcessStartInfo.CreateNoWindow = true;
+
+            outputReceived(string.Format("Executing command line \"{0}\"{1}", fileName, xArgsString));
+            outputReceived(string.Format("Working directory = '{0}'", workingDirectory));
+
+            using (var xProcess = new Process())
+            {
+                xProcess.ErrorDataReceived += delegate (object sender, DataReceivedEventArgs e)
+                {
+                    if (e.Data != null)
+                    {
+                        errorReceived(e.Data);
+                    }
+                };
+                xProcess.OutputDataReceived += delegate (object sender, DataReceivedEventArgs e)
+                {
+                    if (e.Data != null)
+                    {
+                        outputReceived(e.Data);
+                    }
+                };
+                xProcess.StartInfo = xProcessStartInfo;
+                xProcess.Start();
+                xProcess.BeginErrorReadLine();
+                xProcess.BeginOutputReadLine();
+                xProcess.WaitForExit(15 * 60 * 1000); // wait 15 minutes
+                if (!xProcess.HasExited)
+                {
+                    xProcess.Kill();
+                    errorReceived(string.Format("{0} timed out.", name));
+                    xResult = false;
+                }
+                else
+                {
+                    if (xProcess.ExitCode != 0)
+                    {
+                        errorReceived(string.Format("Error occurred while invoking {0}.", name));
+                        xResult = false;
+                    }
+                }
+                xResult = true;
+            }
+
+            if (!xResult)
+            {
+                throw new Exception("Error running process!");
+            }
+        }
+
         public static string RunObjDump(string cosmosBuildDir, string workingDir, string inputFile, Action<string> errorReceived, Action<string> outputReceived)
         {
             var xMapFile = Path.ChangeExtension(inputFile, "map");
@@ -178,10 +249,10 @@ namespace Cosmos.TestRunner.Core
             }
             else
             {
-                throw new NotImplementedException();
-                //RunProcess(typeof(Program).GetTypeInfo().Assembly.Location,
-                //           mBaseWorkingDirectory,
-                //           xArguments.ToArray());
+                xArguments.Insert(0, typeof(Program).GetTypeInfo().Assembly.Location);
+                RunIL2CPUProcess("dotnet",
+                                 mBaseWorkingDirectory,
+                                 xArguments.ToArray());
             }
         }
 
