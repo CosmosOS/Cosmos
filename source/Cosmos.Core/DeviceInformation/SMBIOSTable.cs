@@ -1,4 +1,4 @@
-﻿namespace Cosmos.Core.SMBIOS
+﻿namespace Cosmos.Core.DeviceInformation
 {
     /// <summary>
     /// This class acts as a base layer for each type of smbios table

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cosmos.Core.DeviceInformation;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.HAL.PCInfo
 {
@@ -37,17 +40,62 @@ namespace Cosmos.HAL.PCInfo
         /// <summary>
         /// Processor family
         /// </summary>
-        /// <param name="SMBIOSProcessor"></param>
+        /// <param name="ProcessorFamily"></param>
         public string ProcessorFamily { get; set; }
+        /// <summary>
+        /// Flags of the processor (sse, fpu and so on)
+        /// </summary>
+        /// <param name="Flags"></param>
+        public List<int> Flags { get; set; }
 
-        public Processor(Cosmos.Core.SMBIOS.CPUInfo SMBIOSProcessor)
+        public Processor(CPUInfo SMBIOSProcessor)
         {
             Speed = SMBIOSProcessor.CurrentSpeed;
             ProcessorType = ParseType(SMBIOSProcessor.ProcessorType);
-            ProcessorFamily = ParseFamily(SMBIOSProcessor.ProcessorFamily);
+            //ProcessorFamily = ParseFamily(SMBIOSProcessor.ProcessorFamily);
             SocketDesignation = SMBIOSProcessor.SocketDesignation;
             Manufacturer = SMBIOSProcessor.ProcessorManufacturer;
             ProcessorVersion = SMBIOSProcessor.ProcessorVersion;
+            Flags = ParseFlags(SMBIOSProcessor.CPUIDEAX, SMBIOSProcessor.CPUIDEDX);
+        }
+
+        /// <summary>
+        /// Parse the flags for an x86 machine
+        /// TODO: in the future will need to overload this method with a variant for amr32 and arm64.
+        /// </summary>
+        /// <returns></returns>
+        public List<int> ParseFlags(uint eax, uint edx)
+        {
+            //List of the every possible flag
+            //Its impossible to do a list of enums (il2cpu errors). 
+            //You cannot cast by using methods like ToList()...
+            //So we use the old friend "int".
+            List<int> listOfFlags = new List<int>();
+
+            //We need to convert edx to something that can be traslated to a bit array safely
+            //We can't do (int)eax
+            var edxBytes = BitConverter.GetBytes(edx);
+            BitArray bitArrayEdx = new BitArray(edxBytes);
+            var eaxBytes = BitConverter.GetBytes(eax);
+            BitArray bitArrayEax = new BitArray(eaxBytes);
+
+            //See: https://en.wikipedia.org/wiki/CPUID (this is where i got the information).
+
+            Debugger.DoSend("Bits parsed. Adding enums to table");
+            //TODO: this gives ilcpu error
+            //Go byte by byte in eax
+            int offset = 0;
+            for (int i = 0; i < 32; i++)
+            {
+                if (i == 10 || i == 20)
+                {
+                    offset--; 
+                    continue;
+                }
+                if (bitArrayEdx[i]) listOfFlags.Add(i+offset);
+            }
+            Debugger.DoSend("Strings added and parsed.");
+            return listOfFlags;
         }
 
         public string ParseType(byte type)

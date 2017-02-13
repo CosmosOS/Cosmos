@@ -1,10 +1,7 @@
 ﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
 using Cosmos.Debug.Kernel;
 
-namespace Cosmos.Core.SMBIOS
+namespace Cosmos.Core.DeviceInformation
 {
 
     public unsafe class CPUInfo : SMBIOSTable
@@ -44,15 +41,19 @@ namespace Cosmos.Core.SMBIOS
         public ushort CoreCount2 { get; set; }
         public ushort CoreEnabled2 { get; set; }
         public ushort ThreadCount2 { get; set; }
-        
+
+        //Gets the EAX register of CPUID (its part of ProcessorID)
+        public uint CPUIDEAX { get; set; }
+        //Get the EDX register of CPUID (it is part of ProcessorID)
+        public uint CPUIDEDX { get; set; }
+
+
         public string SocketDesignation {get; set;}
         public string ProcessorManufacturer {get; set;}
         public string ProcessorVersion {get; set;}
         public string SerialNumber {get; set;}
         public string AssetTag {get; set;}
         public string PartNumber {get; set;}
-
-
 
         public CPUInfo(EntryPointTable entryPointTable, byte* BeginningAddress) : base(BeginningAddress)
         {
@@ -84,7 +85,25 @@ namespace Cosmos.Core.SMBIOS
                 tmp[i] = beginningAddress[i + 8];
             }
             ProcessorID = BitConverter.ToUInt64(tmp, 0);
-            
+
+            //Processor id is the result of doing the CPUID instruction in x86
+            //Processor ID (in x86) its compound of two parts
+            //The first DWORD is the EAX part when the EAX part is put to 1
+            //The second DWORD is the EDX part.
+            //Store the EAX part of ProcessorID (since in x86 its as doing a CPUID instruction)
+            tmp = new byte[4];
+            for (int i = 0; i < 4; i++)
+            {
+                tmp[i] = beginningAddress[i + 8];
+            }
+            CPUIDEAX = BitConverter.ToUInt32(tmp, 0);
+            //Store the EDX part of ProcessorID
+            tmp = new byte[4];
+            for (int i = 4; i < 8; i++)
+            {
+                tmp[i - 4] = beginningAddress[i + 8];
+            }
+            CPUIDEDX = BitConverter.ToUInt32(tmp, 0);
 
             ProcessorVersionID = beginningAddress[16];
             Voltage = beginningAddress[17];
@@ -178,7 +197,7 @@ namespace Cosmos.Core.SMBIOS
             // Since bochs has this "b_u_g" that states incorrectly the length, it will fail in bochs
             currentAddress = beginningAddress + Convert.ToInt32(Length);
 
-            var stringArray = Core.SMBIOS.SMBIOS.ParseStrings(currentAddress);
+            var stringArray = SMBIOS.ParseStrings(currentAddress);
             foreach (string str in stringArray)
             {
                 Debugger.DoSend("String CPU:" + str);

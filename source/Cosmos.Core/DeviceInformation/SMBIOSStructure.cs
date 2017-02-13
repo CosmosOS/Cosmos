@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace Cosmos.Core.SMBIOS
+namespace Cosmos.Core.DeviceInformation
 {
     /// <summary>
     /// This class is a container for each table of the smbios structure

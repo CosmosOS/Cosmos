@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Cosmos.Core;
-using Cosmos.Core.SMBIOS;
 
 namespace Cosmos.HAL.PCInfo
 {

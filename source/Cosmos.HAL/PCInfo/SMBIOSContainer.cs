@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Cosmos.Core.SMBIOS;
+using Cosmos.Core.DeviceInformation;
 
 namespace Cosmos.HAL.PCInfo
 {

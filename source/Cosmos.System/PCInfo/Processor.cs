@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cosmos.HAL.PCInfo;
 
 namespace Cosmos.System.PCInfo
 {
@@ -34,6 +35,11 @@ namespace Cosmos.System.PCInfo
         /// <param name="SMBIOSProcessor"></param>
         public string ProcessorFamily { get; set; }
 
+        /// <summary>
+        /// Get the flags of the processor
+        /// </summary>
+        public List<int> Flags { get; set; }
+
         public Processor(Cosmos.HAL.PCInfo.Processor processor)
         {
             this.Manufacturer = processor.Manufacturer;
@@ -42,6 +48,8 @@ namespace Cosmos.System.PCInfo
             this.ProcessorVersion = processor.ProcessorVersion;
             this.SocketDesignation = processor.SocketDesignation;
             this.Speed = processor.Speed;
+            this.Flags = processor.Flags;
         }
+
     }
 }

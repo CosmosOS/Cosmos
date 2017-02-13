@@ -10,12 +10,21 @@ namespace Cosmos.Kernel.Tests.SMBIOS
     {
         protected override void BeforeRun()
         {
-            Console.WriteLine(Sys.PCInfo.ProcessorInfo.ProcCpuinfo());
+            try
+            {
+                Console.WriteLine(Sys.PCInfo.ProcessorInfo.ProcCpuinfo());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message); 
+            }
             Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
         }
 
         protected override void Run()
         {
+            Console.WriteLine("Press enter to continue...");
+            Console.ReadLine();
             TestController.Completed();
         }
     }

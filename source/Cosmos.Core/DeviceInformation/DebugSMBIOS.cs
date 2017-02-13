@@ -1,6 +1,6 @@
 ﻿using Cosmos.Debug.Kernel;
 
-namespace Cosmos.Core.SMBIOS
+namespace Cosmos.Core.DeviceInformation
 {
     public unsafe class DebugSMBIOS
     {

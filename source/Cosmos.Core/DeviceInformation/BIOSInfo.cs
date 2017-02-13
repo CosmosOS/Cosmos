@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using Cosmos.Debug.Kernel;
 
-namespace Cosmos.Core.SMBIOS
+namespace Cosmos.Core.DeviceInformation
 {
     public unsafe class BIOSInfo : SMBIOSTable
     {
@@ -133,7 +131,7 @@ namespace Cosmos.Core.SMBIOS
                 } 
             }
             //Array of strings from the formatted section
-            string[] stringArray = Core.SMBIOS.SMBIOS.ParseStrings(newAddress);
+            string[] stringArray = SMBIOS.ParseStrings(newAddress);
             int iteration = -1;
             foreach (int t in tmpArray)
             {
