@@ -775,10 +775,10 @@ namespace Cosmos.Core.Plugs.System
             return true;
         }
 
-        public static string Remove(string aThis, int aStart, int aCount)
-        {
-            return aThis.Substring(0, aStart) + aThis.Substring(aStart + aCount, aThis.Length - (aStart + aCount));
-        }
+        //public static string Remove(string aThis, int aStart, int aCount)
+        //{
+        //    return aThis.Substring(0, aStart) + aThis.Substring(aStart + aCount, aThis.Length - (aStart + aCount));
+        //}
 
         public static string Replace(string aThis, string oldValue, string newValue)
         {
