@@ -120,11 +120,7 @@ namespace Cosmos.Debug.DebugConnectors
                 Next(1, WaitForSignature);
                 while (true)
                 {
-                    if (aCancellationToken.IsCancellationRequested)
-                    {
-                        ConnectionLost(new OperationCanceledException(aCancellationToken));
-                        return;
-                    }
+                    aCancellationToken.ThrowIfCancellationRequested();
 
                     if (!GetIsConnectedToDebugStub())
                     {

@@ -3,6 +3,8 @@ using Cosmos.TestRunner.Core;
 
 namespace Cosmos.TestRunner.Console
 {
+    using Console = global::System.Console;
+
     class Program
     {
         [STAThread]
@@ -19,17 +21,31 @@ namespace Cosmos.TestRunner.Console
 
             xEngine.Execute();
 
-            global::System.Console.WriteLine("Do you want to save test run details?");
-            global::System.Console.Write("Type yes, or nothing to just exit: ");
-            var xResult = global::System.Console.ReadLine();
+            Console.WriteLine("Do you want to save test run details?");
+            Console.Write("Type yes, or nothing to just exit: ");
+            var xResult = Console.ReadLine();
             if (xResult != null && xResult.Trim().Equals("yes", StringComparison.OrdinalIgnoreCase))
             {
+                Console.Write("Path: ");
+                xResult = Console.ReadLine();
+
+                try
+                {
+                    xOutputXml.SaveToFile(xResult);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Exception: " + ex.Message);
+                }
+
+                Console.ReadLine();
+
                 //var xSaveDialog = new SaveFileDialog();
                 //xSaveDialog.Filter = "XML documents|*.xml";
                 //if (xSaveDialog.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
+                //{
+                //    return;
+                //}
 
                 //xOutputXml.SaveToFile(xSaveDialog.FileName);
             }
