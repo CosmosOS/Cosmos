@@ -75,7 +75,7 @@ namespace Cosmos.Core.Plugs.System
             return false;
         }
 
-        public static unsafe int get_Rank(int* aThis)
+        public static unsafe int get_Rank([ObjectPointerAccess]int* aThis)
         {
             return 1;
         }

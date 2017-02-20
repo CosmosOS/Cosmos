@@ -1,7 +1,8 @@
 ﻿//#define COSMOSDEBUG
 
-using global::System;
-using global::System.IO;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 using Cosmos.Common.Extensions;
 using Cosmos.Debug.Kernel;
@@ -119,13 +120,13 @@ namespace Cosmos.System.Plugs.System.IO
             return result;
         }
 
-        public static void WriteAllLines(string aFile, string[] contents)
+        public static void WriteAllLines(string aFile, IEnumerable<string> contents)
         {
-            String text = null;
+            string text = null;
 
-            for (int i = 0; i < contents.Length; i++)
+            foreach (var line in contents)
             {
-                text = string.Concat(text, contents[i], Environment.NewLine);
+                text = string.Concat(text, line, Environment.NewLine);
             }
 
             Global.mFileSystemDebugger.SendInternal("Writing contents");
@@ -169,9 +170,9 @@ namespace Cosmos.System.Plugs.System.IO
             }
         }
 
-        public static void InternalDelete(string aPath, bool checkHost)
+        public static void Delete(string aPath)
         {
-            String xFullPath = Path.GetFullPath(aPath);
+            string xFullPath = Path.GetFullPath(aPath);
 
             VFSManager.DeleteFile(xFullPath);
         }

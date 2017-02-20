@@ -56,7 +56,7 @@ namespace Cosmos.IL2CPU.ILOpCodes
 
       var xArgIndexCorrection = 0;
       var xParams = aMethod.GetParameters();
-      var xLocals = DebugSymbolReader.GetLocalVariableInfos(aMethod);
+      var xLocals = aMethod.GetLocalVariables();
       switch (OpCode)
       {
         case Code.Ldloc:

@@ -76,8 +76,20 @@ namespace Cosmos.Debug.Symbols
 
             if (xDefinition.Attributes.HasFlag(TypeAttributes.NestedPublic | TypeAttributes.NestedPrivate))
             {
-                TypeDefinitionHandle declaringTypeHandle = xDefinition.GetDeclaringType();
-                return GetTypeFromDefinition(reader, declaringTypeHandle, 0);
+                TypeDefinitionHandle xDeclaringTypeHandle;
+                TypeDefinition xDeclaringTypeDefinition;
+
+                do
+                {
+                    xDeclaringTypeHandle = xDefinition.GetDeclaringType();
+                    xDeclaringTypeDefinition = reader.GetTypeDefinition(xDeclaringTypeHandle);
+
+                    string xDeclaringTypeName = xDeclaringTypeDefinition.Namespace.IsNil
+                                                ? reader.GetString(xDeclaringTypeDefinition.Name)
+                                                : reader.GetString(xDeclaringTypeDefinition.Namespace) + "." + reader.GetString(xDeclaringTypeDefinition.Name);
+
+                    xName = xDeclaringTypeName + "+" + xName;
+                } while (xDeclaringTypeDefinition.Attributes.HasFlag(TypeAttributes.NestedPublic | TypeAttributes.NestedPrivate));
             }
 
             var xType = Type.GetType(xName);
