@@ -224,6 +224,9 @@
     <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\project.json">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>
+    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CosmosProject.project.json">
+      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
+    </ZipItem>
     <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CSharpProject.xproj">
       <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
     </ZipItem>
