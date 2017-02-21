@@ -51,9 +51,9 @@ namespace Cosmos.TestRunner.UnitTest
             {
                 throw;
             }
-            catch(Exception E)
+            catch (Exception e)
             {
-                Console.WriteLine("Exception occurred: " + E.ToString());
+                Console.WriteLine("Exception occurred: " + e.ToString());
                 Assert.Fail();
             }
         }
@@ -62,7 +62,8 @@ namespace Cosmos.TestRunner.UnitTest
         {
             protected override void Log(string message)
             {
-                TestContext.WriteLine(String.Concat(DateTime.Now.ToString("hh:mm:ss.ffffff "), new String(' ', mLogLevel * 2), message));
+                // NUnit Issue: https://github.com/nunit/nunit/issues/1952
+                //TestContext.WriteLine(string.Concat(DateTime.Now.ToString("hh:mm:ss.ffffff "), new string(' ', mLogLevel * 2), message));
             }
         }
     }
