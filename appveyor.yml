@@ -50,11 +50,11 @@ build_script:
 
     msbuild "Cosmos.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
 
-test: off
-  assemblies:
+#test: off
+#  assemblies:
 #  - Cosmos.Core.Memory.Test.dll
 #  - DebugCompiler.dll
-  - Cosmos.TestRunner.UnitTest.dll
+#  - Cosmos.TestRunner.UnitTest.dll
 
 test_script:
   - dotnet test Tests\Cosmos.TestRunner.UnitTest
