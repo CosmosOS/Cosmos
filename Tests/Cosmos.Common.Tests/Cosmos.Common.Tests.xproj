@@ -6,8 +6,8 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>8332f402-5438-49e4-8b62-e67f2f0cb375</ProjectGuid>
-    <RootNamespace>Cosmos.Core.Memory.Test</RootNamespace>
+    <ProjectGuid>0d2dce1c-2a34-4cff-9a33-e9d9b8518d50</ProjectGuid>
+    <RootNamespace>Cosmos.Common.Tests</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
     <TargetFrameworkVersion>4.6.2</TargetFrameworkVersion>

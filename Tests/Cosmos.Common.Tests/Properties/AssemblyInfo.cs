@@ -1,19 +1,19 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Cosmos.Common.Tests")]
-[assembly: AssemblyDescription("")]
+// General Information about an assembly is controlled through the following
+// set of attributes. Change these attribute values to modify the information
+// associated with an assembly.
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Cosmos")]
 [assembly: AssemblyProduct("Cosmos.Common.Tests")]
-[assembly: AssemblyCopyright("Copyright © Cosmos 2015")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
+// Setting ComVisible to false makes the types in this assembly not visible
+// to COM components.  If you need to access a type in this assembly from
+// COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
 
-// Если данный проект доступен для модели COM, следующий GUID используется в качестве идентификатора библиотеки типов
-[assembly: Guid("0d2dce1c-2a34-4cff-9a33-e9d9b8518d50")]
-
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+// The following GUID is for the ID of the typelib if this project is exposed to COM
+[assembly: Guid("901ea2c4-5e9c-44e8-b6d2-3b23dee6d61b")]

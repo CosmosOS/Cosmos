@@ -1,8 +1,5 @@
 ﻿{
   "version": "1.0.0-*",
-  "buildOptions": {
-    "allowUnsafe": true
-  },
   "testRunner": "mstest",
   "dependencies": {
     "MSTest.TestFramework": "1.0.8-rc2",
@@ -16,7 +13,7 @@
           "type": "platform",
           "version": "1.1.0"
         },
-        "Cosmos.Core.Memory": {
+        "Cosmos.Common": {
           "target": "project"
         }
       }
