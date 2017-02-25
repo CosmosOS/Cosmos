@@ -103,11 +103,11 @@ namespace Cosmos.Build.MSBuild
                         into xFile
                      select Convert.ToString(xFile)).ToList();
 
-                string Arguments = args.Aggregate("", (current, arg) => current + "\"" + arg.Key + ":" + arg.Value + "\" ");
+                string Arguments = "\"" + Path.Combine(CosmosBuildDir, @"IL2CPU\netcore\IL2CPU.dll") + "\" " + args.Aggregate("", (current, arg) => current + "\"" + arg.Key + ":" + arg.Value + "\" ");
                 Arguments = refs.Aggregate(Arguments, (current, Ref) => current + "\"References:" + Ref + "\" ");
 
                 Log.LogMessage(MessageImportance.High, $"Invoking il2cpu.exe {Arguments}");
-                return ExecuteTool(WorkingDir, Path.Combine(CosmosBuildDir, @"IL2CPU\IL2CPU.exe"), Arguments, "IL2CPU");
+                return ExecuteTool(WorkingDir, "dotnet", Arguments, "IL2CPU");
             }
             finally
             {

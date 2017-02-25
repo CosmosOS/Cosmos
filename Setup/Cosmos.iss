@@ -1,7 +1,7 @@
 ; Do NOT change this next line in Dev Kit
 #define ChangeSetVersion "20150130"
 
-#ifndef BuildConfiguration   
+#ifndef BuildConfiguration
 ; Currently we dont use "UserKit" but this allows us to test/compile from Inno
 ; IDE so that we don't get an undefined error.
 ; We default to devkit so we dont have to wait on compression.
@@ -45,7 +45,7 @@
 #if BuildConfiguration == "Devkit"
 	; devkit releases are not compressed
 	#pragma warning "Building Devkit release"
-#else 
+#else
 	; userkit releases get compressed, and get languages included
 	#pragma message "Building Userkit release"
 	#define Compress true
@@ -105,7 +105,7 @@ Name: {app}; Flags: uninsalwaysuninstall
 Type: filesandordirs; Name: "{app}"
 Type: files; Name: "{code:VSNET2013_PATH}\PrivateAssemblies\Cosmos.*"
 Type: filesandordirs; Name: "{code:VSNET2013_PATH}\ProjectTemplates\Cosmos"
-Type: filesandordirs; Name: "{userdocs}\Visual Studio {#VsVersionHuman}\Templates\ProjectTemplates\Cosmos"; 
+Type: filesandordirs; Name: "{userdocs}\Visual Studio {#VsVersionHuman}\Templates\ProjectTemplates\Cosmos";
 Type: filesandordirs; Name: "{userdocs}\Visual Studio {#VsVersionHuman}\Templates\ItemTemplates\Visual C#\Cosmos";
 Type: filesandordirs; Name: "{code:GetCSharpExpress2013ProjectTemplatePath}\*Cosmos*.*"; Check: IsCSharpExpress2013Installed('dummy')
 
@@ -115,9 +115,10 @@ Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversio
 Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\Tools\mkisofs\*"; DestDir: "{app}\Build\Tools\mkisofs"; Flags: ignoreversion uninsremovereadonly overwritereadonly
-Source: ".\Build\VSIP\*.dll"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\*.exe"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\*.pdb"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\*.dll"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\*.exe"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\*.pdb"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\netcore\*"; DestDir: "{app}\Build\IL2CPU\netcore"; Flags: ignoreversion uninsremovereadonly
 
 ;
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
@@ -125,11 +126,11 @@ Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Fl
 Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 ;
 ; Kernel assemblies
-Source: ".\Build\VSIP\netstandard1.6\Cosmos.Debug.Kernel.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\netstandard1.6\Cosmos.Core.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\netstandard1.6\Cosmos.HAL.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\netstandard1.6\Cosmos.System.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\netstandard1.6\Cosmos.Common.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\netcore\Cosmos.Debug.Kernel.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\netcore\Cosmos.Core.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\netcore\Cosmos.HAL.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\netcore\Cosmos.System.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\netcore\Cosmos.Common.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 
 ; Icon
 Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
@@ -156,8 +157,8 @@ Source: ".\Build\VSIP\Cosmos.Debug.VSDebugEngine.*"; DestDir: "{app}\Build\VSIP\
 
 ; ?? If we have this do we need the others?
 Source: ".\Build\VSIP\Cosmos.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-; Source: ".\Build\VSIP\Cosmos.IL2CPU.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-; Source: ".\Resources\Dependencies\Microsoft.Samples.Debugging.CorApi.1.4.0.0\*.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly             
+Source: ".\Build\VSIP\netcore\Cosmos.IL2CPU.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+; Source: ".\Resources\Dependencies\Microsoft.Samples.Debugging.CorApi.1.4.0.0\*.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
@@ -272,7 +273,7 @@ Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; 
 
 ; X# custom tool registration
 Root: HKLM; SubKey: {#VsRegRoot}\Generators\{{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}\CosmosXSharpGenerator; ValueType: none; Flags: uninsdeletekey
-Root: HKLM; SubKey: {#VsRegRoot}\Generators\{{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}\CosmosXSharpGenerator; ValueType: string; ValueName: CLSID; ValueData: {{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; 
+Root: HKLM; SubKey: {#VsRegRoot}\Generators\{{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}\CosmosXSharpGenerator; ValueType: string; ValueName: CLSID; ValueData: {{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA};
 Root: HKLM; SubKey: {#VsRegRoot}\Generators\{{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}\CosmosXSharpGenerator; ValueType: dword; ValueName: GeneratesDesignTimeSource; ValueData: 1
 ; X# file generator type
 Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; ValueType: none; Flags: uninsdeletekey
@@ -355,6 +356,6 @@ Root: HKLM; Subkey: {#VsRegRoot}\Services\{{3fb852ed-3562-3da4-98dc-55759744328c
 	; /setup without nosetupvstemplates takes a LONG time... so we dont run it every time.. for DevKit users, they will need to run it one time first as user kit - see new note above in X# template
 	; Filename: {code:VSNET2013_PATH}\devenv.exe; Parameters: /setup Flags: waituntilterminated
 	Filename: {code:VSNET2013_PATH}\devenv.exe; Parameters: /setup /nosetupvstemplates; Flags: waituntilterminated
-#else 
+#else
 	Filename: {code:VSNET2013_PATH}\devenv.exe; Parameters: /setup; Flags: waituntilterminated
 #endif

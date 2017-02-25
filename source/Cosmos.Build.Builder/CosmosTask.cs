@@ -566,22 +566,14 @@ namespace Cosmos.Build.Builder
 
       MsBuild(Path.Combine(mCosmosDir, @"Build.sln"), "Debug");
 
+      Directory.CreateDirectory(Path.Combine(mOutputDir, "netcore"));
+      
       foreach (var xDir in new DirectoryInfo(Path.Combine(mOutputDir, "source")).EnumerateDirectories())
       {
         new DirectoryInfo(Path.Combine(xDir.FullName, @"bin\Debug\")).EnumerateDirectories()
-                                                                     .ToList().ForEach(dir => {
-                                                                                                if (!Directory.Exists(Path.Combine(mOutputDir, dir.Name)))
-                                                                                                {
-                                                                                                  Directory.CreateDirectory(Path.Combine(mOutputDir, dir.Name));
-                                                                                                }
-                                                                                                
-                                                                                                //File.Copy(Path.Combine(dir.FullName, xDir.Name + ".dll"), Path.Combine(mOutputDir, dir.Name, xDir.Name + ".dll"));
-                                                                                                dir.EnumerateFiles("*.dll").ToList().ForEach(file => {
-                                                                                                                                                        File.Copy(file.FullName, Path.Combine(mOutputDir, dir.Name, file.Name), true);
-                                                                                                                                                      });
-                                                                                              });
+                                                                     .ToList().ForEach(dir => dir.EnumerateFiles().ToList().ForEach(file => File.Copy(file.FullName, Path.Combine(mOutputDir, "netcore", file.Name), true)));
       }
-      
+
       Directory.Delete(Path.Combine(mOutputDir, "source"), true);
     }
 

@@ -2,7 +2,8 @@
   "version": "1.0.0-*",
   "buildOptions": {
     "keyFile": "../../Cosmos.snk",
-    "debugType": "portable"
+    "debugType": "portable",
+    "preserveCompilationContext": true
   },
   "dependencies": {
     "NETStandard.Library": "1.6.1"
@@ -14,9 +15,6 @@
           "target": "project"
         },
         "Cosmos.Debug.Kernel": {
-          "target": "project"
-        },
-        "Cosmos.TestRunner.TestController": {
           "target": "project"
         }
       }

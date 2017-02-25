@@ -56,9 +56,19 @@
       <Project>{2a24da41-0d3a-48a6-83d5-8584a1d4ca94}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.xproj">
+      <Name>Cosmos.Core.Plugs</Name>
+      <Project>{89db6325-2c81-467d-be8a-c4aebb6540a5}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.xproj">
       <Name>Cosmos.Debug.Kernel.Plugs.Asm</Name>
       <Project>{7549d7f8-58a3-4f4f-8544-def2abf79a0b}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.xproj">
+      <Name>Cosmos.System.Plugs</Name>
+      <Project>{9a327db7-42e2-4c82-9537-0d995b9171ff}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\Guess\GuessKernel.xproj">

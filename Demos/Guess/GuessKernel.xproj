@@ -16,7 +16,6 @@
   </PropertyGroup>
   <ItemGroup>
     <DnxInvisibleContent Include="Cosmos.bxrc" />
-    <DnxInvisibleContent Include="Cosmos.targets" />
     <DnxInvisibleContent Include="GuessBoot.Cosmos" />
     <DnxInvisibleContent Include="GuessBoot.project.json" />
   </ItemGroup>
