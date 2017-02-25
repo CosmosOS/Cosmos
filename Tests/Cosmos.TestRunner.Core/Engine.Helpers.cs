@@ -251,12 +251,12 @@ namespace Cosmos.TestRunner.Core
             {
                 string xRootPath = @"..\";
 
+                Directory.SetCurrentDirectory(AppContext.BaseDirectory);
+
                 while (new DirectoryInfo(xRootPath).GetFiles().Where(file => file.Name == "Cosmos.sln").SingleOrDefault() == null)
                 {
                     xRootPath += @"..\";
                 }
-
-                Directory.SetCurrentDirectory(AppContext.BaseDirectory);
 
                 File.Copy(xRootPath + @"source\IL2CPU\bin\Debug\netcoreapp1.0\IL2CPU.deps.json", @"IL2CPU.deps.json", true);
                 File.Copy(xRootPath + @"source\IL2CPU\bin\Debug\netcoreapp1.0\IL2CPU.runtimeconfig.json", @"IL2CPU.runtimeconfig.json", true);
