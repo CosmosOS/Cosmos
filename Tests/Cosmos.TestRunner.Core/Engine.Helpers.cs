@@ -249,9 +249,18 @@ namespace Cosmos.TestRunner.Core
             }
             else
             {
-                File.Copy(@"..\..\source\IL2CPU\bin\Debug\netcoreapp1.0\IL2CPU.deps.json", @"bin\Debug\netcoreapp1.0\IL2CPU.deps.json", true);
-                File.Copy(@"..\..\source\IL2CPU\bin\Debug\netcoreapp1.0\IL2CPU.runtimeconfig.json", @"bin\Debug\netcoreapp1.0\IL2CPU.runtimeconfig.json", true);
-                File.Copy(@"..\..\source\IL2CPU\bin\Debug\netcoreapp1.0\IL2CPU.runtimeconfig.dev.json", @"bin\Debug\netcoreapp1.0\IL2CPU.runtimeconfig.dev.json", true);
+                string xRootPath = @"..\";
+
+                while (new DirectoryInfo(xRootPath).GetFiles().Where(file => file.Name == "Cosmos.sln").SingleOrDefault() == null)
+                {
+                    xRootPath += @"..\";
+                }
+
+                Directory.SetCurrentDirectory(AppContext.BaseDirectory);
+
+                File.Copy(xRootPath + @"source\IL2CPU\bin\Debug\netcoreapp1.0\IL2CPU.deps.json", @"IL2CPU.deps.json", true);
+                File.Copy(xRootPath + @"source\IL2CPU\bin\Debug\netcoreapp1.0\IL2CPU.runtimeconfig.json", @"IL2CPU.runtimeconfig.json", true);
+                File.Copy(xRootPath + @"source\IL2CPU\bin\Debug\netcoreapp1.0\IL2CPU.runtimeconfig.dev.json", @"IL2CPU.runtimeconfig.dev.json", true);
 
                 xArguments.Insert(0, typeof(Program).GetTypeInfo().Assembly.Location);
                 RunIL2CPUProcess("dotnet",
