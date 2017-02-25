@@ -34,7 +34,7 @@ namespace Cosmos.TestRunner.UnitTest
                 //xEngine.RunWithGDB = true;
                 // If you're working on the compiler (or other lower parts), you can choose to run the compiler in process
                 // one thing to keep in mind though, is that this only works with 1 kernel at a time!
-                xEngine.RunIL2CPUInProcess = true;
+                xEngine.RunIL2CPUInProcess = false;
                 xEngine.TraceAssembliesLevel = TraceAssemblies.User;
 
                 xEngine.EnableStackCorruptionChecks = true;
@@ -63,7 +63,15 @@ namespace Cosmos.TestRunner.UnitTest
             protected override void Log(string message)
             {
                 // NUnit Issue: https://github.com/nunit/nunit/issues/1952
-                //TestContext.WriteLine(string.Concat(DateTime.Now.ToString("hh:mm:ss.ffffff "), new string(' ', mLogLevel * 2), message));
+                // Probably it will be fixed in NUnit 3.7.0: https://github.com/nunit/nunit/pull/2055
+                try
+                {
+                    TestContext.WriteLine(string.Concat(DateTime.Now.ToString("hh:mm:ss.ffffff "), new string(' ', mLogLevel * 2), message));
+                }
+                catch
+                {
+
+                }
             }
         }
     }
