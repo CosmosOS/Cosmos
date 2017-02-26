@@ -182,10 +182,6 @@ namespace Cosmos.TestRunner.Core
                     OutputHandler.SetKernelTestResult(true, null);
                     OutputHandler.SetKernelSucceededAssertionsCount(mSucceededAssertions);
                 }
-                else
-                {
-                    KernelTestFailed();
-                }
             }
             finally
             {
