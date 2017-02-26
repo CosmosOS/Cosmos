@@ -9,12 +9,12 @@
   "frameworks": {
     "netcoreapp1.0": {
       "dependencies": {
-        "Cosmos.TestRunner.Core": {
-          "target": "project"
-        },
         "Microsoft.NETCore.App": {
           "type": "platform",
           "version": "1.1.0"
+        },
+        "Cosmos.TestRunner.Core": {
+          "target": "project"
         }
       }
     }
