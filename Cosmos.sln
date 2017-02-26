@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{1698DD83
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Visual Studio", "Visual Studio", "{CD3F5E45-8B24-424F-ADF1-0211712F4CB7}"
 	ProjectSection(SolutionItems) = preProject
-		Cosmos.VS.ReadMe.html = Cosmos.VS.ReadMe.html
+		source\Cosmos.VS.ReadMe.html = source\Cosmos.VS.ReadMe.html
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Guess", "Guess", "{C4941654-3D7A-484B-9F5C-3D331AB8F585}"
@@ -26,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deploy", "Deploy", "{FD4284
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "XSharp", "XSharp", "{9C8A3E55-9045-44CA-BFD4-16D5B4343A90}"
 	ProjectSection(SolutionItems) = preProject
-		XSharp Projects.txt = XSharp Projects.txt
+		source\XSharp Projects.txt = source\XSharp Projects.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Users", "Users", "{8CE8178D-F3CB-44B9-8D5D-8763139DBA30}"
@@ -45,7 +45,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 System", "2 System", "{05
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{CAF5EB57-6CAD-446D-8FC7-4C03D4B996A6}"
 	ProjectSection(SolutionItems) = preProject
-		Cosmos.Common.ReadMe.html = Cosmos.Common.ReadMe.html
+		source\Cosmos.Common.ReadMe.html = source\Cosmos.Common.ReadMe.html
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assembler", "Assembler", "{612401E0-F733-40DB-95D5-E22D332DDAAA}"
@@ -207,11 +207,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrotzNetDLL", "Demos\zMachi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{57B83EE4-164F-4BB2-8AFA-76445333A0E4}"
 	ProjectSection(SolutionItems) = preProject
-		..\Demos\zMachine\Frotz.Net\source\ColorPicker.dll = ..\Demos\zMachine\Frotz.Net\source\ColorPicker.dll
+		Demos\zMachine\Frotz.Net\source\ColorPicker.dll = Demos\zMachine\Frotz.Net\source\ColorPicker.dll
 		global.json = global.json
-		..\Demos\zMachine\Frotz.Net\source\Notes.txt = ..\Demos\zMachine\Frotz.Net\source\Notes.txt
+		Demos\zMachine\Frotz.Net\source\Notes.txt = Demos\zMachine\Frotz.Net\source\Notes.txt
 		nuget.config = nuget.config
-		..\Demos\zMachine\Frotz.Net\source\todos.txt = ..\Demos\zMachine\Frotz.Net\source\todos.txt
+		Demos\zMachine\Frotz.Net\source\todos.txt = Demos\zMachine\Frotz.Net\source\todos.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "zConsole", "Demos\zMachine\Frotz.Net\source\zConsole\zConsole.csproj", "{3E4A8079-AAC0-429D-B042-0B5151E0E5BE}"

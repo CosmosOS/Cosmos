@@ -70,6 +70,12 @@ namespace Cosmos.TestRunner.Core
                     }
                     catch (Exception e)
                     {
+                        if (!mKernelResultSet)
+                        {
+                            OutputHandler.SetKernelTestResult(false, e.ToString());
+                            mKernelResult = false;
+                            xResult = false;
+                        }
                         OutputHandler.UnhandledException(e);
                     }
                     finally
