@@ -1,23 +1,22 @@
-﻿{
+{
   "version": "1.0.0-*",
   "buildOptions": {
     "allowUnsafe": true
   },
   "testRunner": "mstest",
   "dependencies": {
-    "MSTest.TestFramework": "1.0.8-rc2",
     "dotnet-test-mstest": "1.1.2-preview"
   },
   "frameworks": {
     "netcoreapp1.0": {
       "imports": "dnxcore50",
       "dependencies": {
+        "Cosmos.Core.Memory": {
+          "target": "project"
+        },
         "Microsoft.NETCore.App": {
           "type": "platform",
           "version": "1.1.0"
-        },
-        "Cosmos.Core.Memory": {
-          "target": "project"
         }
       }
     }

@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cosmos.Debug.Kernel;
+
 using Cosmos.TestRunner;
 using Sys = Cosmos.System;
 
-namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
+namespace Cosmos.Compiler.Tests.SimpleWriteLine
 {
     public class Kernel : Sys.Kernel
     {

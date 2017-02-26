@@ -1,6 +1,6 @@
 ﻿using Cosmos.TestRunner;
 
-namespace Cosmos.Compiler.Tests.SimpleWriteLine.Kernel
+namespace Cosmos.Compiler.Tests.SimpleWriteLine
 {
     public static class TestTryFinally
     {

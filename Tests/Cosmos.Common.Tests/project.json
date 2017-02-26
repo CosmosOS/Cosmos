@@ -1,8 +1,7 @@
-﻿{
+{
   "version": "1.0.0-*",
   "testRunner": "mstest",
   "dependencies": {
-    "MSTest.TestFramework": "1.0.8-rc2",
     "dotnet-test-mstest": "1.1.2-preview"
   },
   "frameworks": {

@@ -62,16 +62,7 @@ namespace Cosmos.TestRunner.UnitTest
         {
             protected override void Log(string message)
             {
-                // NUnit Issue: https://github.com/nunit/nunit/issues/1952
-                // Probably it will be fixed in NUnit 3.7.0: https://github.com/nunit/nunit/pull/2055
-                try
-                {
-                    TestContext.WriteLine(string.Concat(DateTime.Now.ToString("hh:mm:ss.ffffff "), new string(' ', mLogLevel * 2), message));
-                }
-                catch
-                {
-
-                }
+                TestContext.WriteLine(string.Concat(DateTime.Now.ToString("hh:mm:ss.ffffff "), new string(' ', mLogLevel * 2), message));
             }
         }
     }
