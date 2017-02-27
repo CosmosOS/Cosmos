@@ -102,6 +102,7 @@
     <Compile Include="DeviceInformation\SMBIOS.cs" />
     <Compile Include="DeviceInformation\SMBIOSStructure.cs" />
     <Compile Include="DeviceInformation\SMBIOSTable.cs" />
+    <Compile Include="DeviceInformation\SMBIOSTypes.cs" />
     <Compile Include="IOGroup\COM.cs" />
     <Compile Include="IOGroup\Network\AMDPCNetIIIOGroup.cs" />
     <Compile Include="IOGroup\PCSpeaker.cs" />

@@ -153,6 +153,10 @@
       <Project>{239E33A7-F0C3-4801-85CA-4D8F89A31DC0}</Project>
       <Name>Cosmos.IL2CPU</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Kernel.Tests.DeviceInformation\Cosmos.Kernel.Tests.DeviceInformation.csproj">
+      <Project>{f0925802-5431-4d65-bbe1-11d03f0bfdfe}</Project>
+      <Name>Cosmos.Kernel.Tests.DeviceInformation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
       <Project>{7C64B97F-516D-4A6D-B9E1-3FE48F561409}</Project>
       <Name>Cosmos.System.Plugs</Name>

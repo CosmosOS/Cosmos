@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Cosmos.Core.DeviceInformation
 {
@@ -41,37 +42,52 @@ namespace Cosmos.Core.DeviceInformation
             int i;
             int j;
 
+            //Begin the header parse
             this.Type = BeginningAddress[0];
-
             this.Length = BeginningAddress[1];
-
             byte[] tmp = new byte[2];
             tmp[0] = BeginningAddress[2];
             tmp[1] = BeginningAddress[3];
             this.Handle = BitConverter.ToUInt16(tmp, 0);
 
-            VendorID = BeginningAddress[4];
-            VersionID = BeginningAddress[5];
-
-            tmp[0] = BeginningAddress[6];
-            tmp[1] = BeginningAddress[7];
-            StartingAddressSegment = BitConverter.ToUInt16(tmp, 0);
-
-            ReleaseDateID = BeginningAddress[8];
-            ROMSize = BeginningAddress[9];
-
-            tmp = new byte[8];
-            for (int k = 0; k < 8; k++)
+            //Create a new byte array in which we will do the parsing 
+            //This array will contain the formatted section of the table 
+            byte[] parseArray = new byte[Convert.ToInt32(this.Length)];
+            for (int k = 0; k < this.Length; k++)
             {
-                //Since we left in 10...
-                tmp[k] = BeginningAddress[k + 10];
+                //Copy the formatted section byte to byte
+                parseArray[k] = BeginningAddress[k];
             }
-            Characteristics = BitConverter.ToUInt64(tmp, 0);
+            
 
-            newAddress = BeginningAddress + 18;
-
-            if (EntryPointTable.IsVersionGreaterThan(2, 4))
+            //Start parsing the formatted section using the previously created array
+            //We do a 'best effort parse' which means that we parse until we go out of bounds of the array
+            //Then we finish with an exception
+            //This has two main advantages:
+            //1. No need to check for versions since we do the parsing in function of the length
+            //2. The parsing is quite robust since we do using the length parameter (which we assume it is 
+            //always right)
+            //TODO: method for this try
+            try
             {
+                VendorID = parseArray[4];
+                VersionID = parseArray[5];
+
+                tmp[0] = parseArray[6];
+                tmp[1] = parseArray[7];
+                StartingAddressSegment = BitConverter.ToUInt16(tmp, 0);
+
+                ReleaseDateID = parseArray[8];
+                ROMSize = parseArray[9];
+
+                tmp = new byte[8];
+                for (int k = 0; k < 8; k++)
+                {
+                    //Since we left in 10...
+                    tmp[k] = parseArray[k + 10];
+                }
+                Characteristics = BitConverter.ToUInt64(tmp, 0);
+
                 //Begin to parse the optional characteristics
                 //Since it is an optional field, we need to calculate its size first
                 //Formula: Length - 12h == Length - 18
@@ -88,29 +104,28 @@ namespace Cosmos.Core.DeviceInformation
                     //We start whre we left (18)
                     for (int k = 0; k < size; k++)
                     {
-                        OptionalCharacteristics[k] = BeginningAddress[k + 18];
+                        OptionalCharacteristics[k] = parseArray[k + 18];
                     }
                 }
 
-                SystemBiosMajorRelease = BeginningAddress[size + 18];
-                SystemBiosMinorRelease = BeginningAddress[size + 19];
-                EmbeddedControllerFirmwareMajorRelease = BeginningAddress[size + 20];
-                EmbeddedControllerFirmwareMinorRelease = BeginningAddress[size + 21];
+                SystemBiosMajorRelease = parseArray[size + 18];
+                SystemBiosMinorRelease = parseArray[size + 19];
+                EmbeddedControllerFirmwareMajorRelease = parseArray[size + 20];
+                EmbeddedControllerFirmwareMinorRelease = parseArray[size + 21];
 
                 //This will not work in bochs since its version is 2.4
-                if (EntryPointTable.IsVersionGreaterThan(3, 1))
-                {
-                    size += 2;
-                    tmp = new byte[2];
-                    tmp[0] = BeginningAddress[size + 22];
-                    tmp[1] = BeginningAddress[size + 23];
-                    ExtendedBiosROMSize = BitConverter.ToUInt16(tmp, 0);
-                }
-                
-                //We have finished parsing the formatted area
-                //We start now the unformatted area
-                newAddress = BeginningAddress + size + 22;
+                size += 2;
+                tmp = new byte[2];
+                tmp[0] = parseArray[size + 22];
+                tmp[1] = parseArray[size + 23];
+                ExtendedBiosROMSize = BitConverter.ToUInt16(tmp, 0);
             }
+            catch (IndexOutOfRangeException ex) { }
+
+            //We have finished parsing the formatted area so we need to recompute the pointer
+            //We start now the unformatted area
+            //NOTE: we cannot sum this.Length directly. Gives IL2CPU error.
+            newAddress = BeginningAddress + Convert.ToInt32(this.Length);
 
             //Parse the first string
             int[] tmpArray = new int[3];

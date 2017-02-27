@@ -59,149 +59,152 @@ namespace Cosmos.Core.DeviceInformation
         {
             this.beginningAddress = BeginningAddress;
             this.entryPointTable = entryPointTable;
+            AssetTag = "";
+            PartNumber = "";
+            SerialNumber = "";
+            ProcessorVersion = "";
+            ProcessorManufacturer = "";
+            SocketDesignation = "";
         }
 
         public override unsafe byte* Parse()
         {
             byte* currentAddress;
-
             //We need a function to do parse a word
+
+            //Parse the header
             Type = beginningAddress[0];
             Length = beginningAddress[1];
-
             byte[] tmp = new byte[2];
             tmp[0] = beginningAddress[2];
             tmp[1] = beginningAddress[3];
             Handle = BitConverter.ToUInt16(tmp, 0);
 
-            SocketDesignationID = beginningAddress[4];
-            ProcessorType = beginningAddress[5];
-            ProcessorFamily = beginningAddress[6];
-            ProcessorManufacturerID = beginningAddress[7];
+            //Create the array in which we will do the parsing
+            //Se biosInfo.cs comment
 
-            tmp = new byte[8];
-            for (int i = 0; i < 8; i++)
+            //byte[] parseArray = new byte[Convert.ToInt32(this.Length)];
+            byte[] parseArray = new byte[this.Length];
+            for (int i = 0; i < this.Length; i++)
             {
-                tmp[i] = beginningAddress[i + 8];
+                parseArray[i] = beginningAddress[i];
             }
-            ProcessorID = BitConverter.ToUInt64(tmp, 0);
 
-            //Processor id is the result of doing the CPUID instruction in x86
-            //Processor ID (in x86) its compound of two parts
-            //The first DWORD is the EAX part when the EAX part is put to 1
-            //The second DWORD is the EDX part.
-            //Store the EAX part of ProcessorID (since in x86 its as doing a CPUID instruction)
-            tmp = new byte[4];
-            for (int i = 0; i < 4; i++)
+            //Parse using parseArray
+
+            try
             {
-                tmp[i] = beginningAddress[i + 8];
-            }
-            CPUIDEAX = BitConverter.ToUInt32(tmp, 0);
-            //Store the EDX part of ProcessorID
-            tmp = new byte[4];
-            for (int i = 4; i < 8; i++)
-            {
-                tmp[i - 4] = beginningAddress[i + 8];
-            }
-            CPUIDEDX = BitConverter.ToUInt32(tmp, 0);
+                SocketDesignationID = parseArray[4];
+                ProcessorType = parseArray[5];
+                ProcessorFamily = parseArray[6];
+                ProcessorManufacturerID = parseArray[7];
 
-            ProcessorVersionID = beginningAddress[16];
-            Voltage = beginningAddress[17];
+                tmp = new byte[8];
+                for (int i = 0; i < 8; i++)
+                {
+                    tmp[i] = parseArray[i + 8];
+                }
+                ProcessorID = BitConverter.ToUInt64(tmp, 0);
 
-            tmp = new byte[2];
-            tmp[0] = beginningAddress[18];
-            tmp[1] = beginningAddress[19];
-            ExternalClock = BitConverter.ToUInt16(tmp, 0);
+                //Processor id is the result of doing the CPUID instruction in x86
+                //Processor ID (in x86) its compound of two parts
+                //The first DWORD is the EAX part when the EAX part is put to 1
+                //The second DWORD is the EDX part.
+                //Store the EAX part of ProcessorID (since in x86 its as doing a CPUID instruction)
+                tmp = new byte[4];
+                for (int i = 0; i < 4; i++)
+                {
+                    tmp[i] = parseArray[i + 8];
+                }
+                CPUIDEAX = BitConverter.ToUInt32(tmp, 0);
+                //Store the EDX part of ProcessorID
+                tmp = new byte[4];
+                for (int i = 4; i < 8; i++)
+                {
+                    tmp[i - 4] = parseArray[i + 8];
+                }
+                CPUIDEDX = BitConverter.ToUInt32(tmp, 0);
 
-            tmp = new byte[2];
-            tmp[0] = beginningAddress[20];
-            tmp[1] = beginningAddress[21];
-            MaxSpeed = BitConverter.ToUInt16(tmp, 0);
+                ProcessorVersionID = parseArray[16];
+                Voltage = parseArray[17];
 
-            tmp = new byte[2];
-            tmp[0] = beginningAddress[22];
-            tmp[1] = beginningAddress[23];
-            CurrentSpeed = BitConverter.ToUInt16(tmp, 0);
-
-            Status = beginningAddress[24];
-            ProcessorUpgrade = beginningAddress[25];
-
-
-            if (entryPointTable.IsVersionGreaterThan(2, 1))
-            {
                 tmp = new byte[2];
-                tmp[0] = beginningAddress[26];
-                tmp[1] = beginningAddress[27];
+                tmp[0] = parseArray[18];
+                tmp[1] = parseArray[19];
+                ExternalClock = BitConverter.ToUInt16(tmp, 0);
+
+                tmp = new byte[2];
+                tmp[0] = parseArray[20];
+                tmp[1] = parseArray[21];
+                MaxSpeed = BitConverter.ToUInt16(tmp, 0);
+
+                tmp = new byte[2];
+                tmp[0] = parseArray[22];
+                tmp[1] = parseArray[23];
+                CurrentSpeed = BitConverter.ToUInt16(tmp, 0);
+
+                Status = parseArray[24];
+                ProcessorUpgrade = parseArray[25];
+
+
+                tmp = new byte[2];
+                tmp[0] = parseArray[26];
+                tmp[1] = parseArray[27];
                 L1HandleCache = BitConverter.ToUInt16(tmp, 0);
 
                 tmp = new byte[2];
-                tmp[0] = beginningAddress[28];
-                tmp[1] = beginningAddress[29];
+                tmp[0] = parseArray[28];
+                tmp[1] = parseArray[29];
                 L2HandleCache = BitConverter.ToUInt16(tmp, 0);
 
                 tmp = new byte[2];
-                tmp[0] = beginningAddress[30];
-                tmp[1] = beginningAddress[31];
+                tmp[0] = parseArray[30];
+                tmp[1] = parseArray[31];
                 L3HandleCache = BitConverter.ToUInt16(tmp, 0);
 
+                SerialNumberID = parseArray[32];
+                AssetTagID = parseArray[33];
+                PartNumberID = parseArray[34];
 
-                if (entryPointTable.IsVersionGreaterThan(2, 3))
-                {
-                    SerialNumberID = beginningAddress[32];
-                    AssetTagID = beginningAddress[33];
-                    PartNumberID = beginningAddress[34];
+                CoreCount = parseArray[35];
+                CoreEnabled = parseArray[36];
+                ThreadCount = parseArray[37];
 
+                tmp = new byte[2];
+                tmp[0] = parseArray[38];
+                tmp[1] = parseArray[39];
+                ProcessorCharacteristics = BitConverter.ToUInt16(tmp, 0);
 
-                    if (entryPointTable.IsVersionGreaterThan(2, 5))
-                    {
-                        CoreCount = beginningAddress[35];
-                        CoreEnabled = beginningAddress[36];
-                        ThreadCount = beginningAddress[37];
-    
-                        tmp = new byte[2];
-                        tmp[0] = beginningAddress[38];
-                        tmp[1] = beginningAddress[39];
-                        ProcessorCharacteristics = BitConverter.ToUInt16(tmp, 0);
+                tmp = new byte[2];
+                tmp[0] = parseArray[40];
+                tmp[1] = parseArray[41];
+                ProcessorFamily2 = BitConverter.ToUInt16(tmp, 0);
 
+                tmp = new byte[2];
+                tmp[0] = parseArray[42];
+                tmp[1] = parseArray[43];
+                CoreCount2 = BitConverter.ToUInt16(tmp, 0);
 
-                        if (entryPointTable.IsVersionGreaterThan(2, 6))
-                        {
-                            tmp = new byte[2];
-                            tmp[0] = beginningAddress[40];
-                            tmp[1] = beginningAddress[41];
-                            ProcessorFamily2 = BitConverter.ToUInt16(tmp, 0);
+                tmp = new byte[2];
+                tmp[0] = parseArray[44];
+                tmp[1] = parseArray[45];
+                CoreEnabled2 = BitConverter.ToUInt16(tmp, 0);
 
+                tmp = new byte[2];
+                tmp[0] = parseArray[46];
+                tmp[1] = parseArray[47];
+                ThreadCount2 = BitConverter.ToUInt16(tmp, 0);
+            }
+            catch (IndexOutOfRangeException ex)
+            {
 
-                            if (entryPointTable.IsVersionGreaterThan(3, 0))
-                            {
-                                tmp = new byte[2];
-                                tmp[0] = beginningAddress[42];
-                                tmp[1] = beginningAddress[43];
-                                CoreCount2 = BitConverter.ToUInt16(tmp, 0);
-
-                                tmp = new byte[2];
-                                tmp[0] = beginningAddress[44];
-                                tmp[1] = beginningAddress[45];
-                                CoreEnabled2 = BitConverter.ToUInt16(tmp, 0);
-
-                                tmp = new byte[2];
-                                tmp[0] = beginningAddress[46];
-                                tmp[1] = beginningAddress[47];
-                                ThreadCount2 = BitConverter.ToUInt16(tmp, 0);
-                            }
-                        }
-                    }
-                }
             }
 
-            // Since bochs has this "b_u_g" that states incorrectly the length, it will fail in bochs
+
+            
             currentAddress = beginningAddress + Convert.ToInt32(Length);
 
             var stringArray = SMBIOS.ParseStrings(currentAddress);
-            foreach (string str in stringArray)
-            {
-                Debugger.DoSend("String CPU:" + str);
-            }
             StoreStrings(stringArray);
 
             return SMBIOS.RecomputePointer(currentAddress, stringArray);
@@ -236,7 +239,15 @@ namespace Cosmos.Core.DeviceInformation
                         arr[j - 1] = arr[j];
                         arr[j] = tmp;
                     }
-                } 
+                }
+            }
+            for (int i = 0; i < arr.Length; i++)
+            {
+                Debugger.DoSend("arr: " + i + ", val: " + arr[i]);
+            }
+            foreach (var s in stringArray)
+            {
+                Debugger.DoSend("String: " + s); 
             }
             //We need to reference the string int the stringArray
             //We cannot use i since we need to skip some arr[i]
@@ -250,7 +261,7 @@ namespace Cosmos.Core.DeviceInformation
                     CompareStringN(arr[i], stringArray[iteration]);
                     iteration++;
                 }
-                
+
             }
         }
 

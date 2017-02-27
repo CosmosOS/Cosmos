@@ -77,38 +77,40 @@ namespace Cosmos.Core.DeviceInformation
             SMBIOSStructure smbiosStructure = new SMBIOSStructure();
             List<CPUInfo> cpuList = new List<CPUInfo>();
             byte* currentAddress = entryPointTable.GetTableAddress();
+
+            DebugSMBIOS.DebugEntryPoint(entryPointTable);
             for (int i = 0; i < entryPointTable.NumberOfStructures; i++)
             {
                 //We need to compare the type (which will be always the 0 fo current address)
-                switch (Convert.ToUInt32((currentAddress)[0]))
+                if (currentAddress[0] == SMBIOSTypes.BiosTable)
                 {
-                    case 0:
                         if (smbiosStructure.BiosInfo == null)
                         {
                             smbiosStructure.BiosInfo = new BIOSInfo(entryPointTable, currentAddress);
                             currentAddress = smbiosStructure.BiosInfo.Parse();
-                            //DebugSMBIOS.DebugBIOSInfo(smbiosStructure.BiosInfo);
+                            DebugSMBIOS.DebugBIOSInfo(smbiosStructure.BiosInfo);
                         }
                         else
                         {
                             //If we fail skipping the table
                             currentAddress = currentAddress + 1;
-                            //Debugger.DoSend("Skipping not bios table");
+                            Cosmos.Debug.Kernel.Debugger.DoSend("Skipping not bios table");
                         }
-                        break;
-                    case 4:
-                        CPUInfo cpuInfo = new CPUInfo(entryPointTable, currentAddress);
-                        currentAddress = cpuInfo.Parse();
-                        smbiosStructure.CpuInfoList.Add(cpuInfo);
-                        //DebugSMBIOS.DebugCPUInfo(cpuInfo);
-                        break;
-                    default:
-                        //In [1] we have the length of the formatted section.
-                        currentAddress = SkipTable(currentAddress[1], currentAddress);
-                        break;
+                    continue;
                 }
+                if (currentAddress[0] == SMBIOSTypes.ProcessorTable)
+                {
+                    CPUInfo cpuInfo = new CPUInfo(entryPointTable, currentAddress);
+                    currentAddress = cpuInfo.Parse();
+                    smbiosStructure.CpuInfoList.Add(cpuInfo);
+                    DebugSMBIOS.DebugCPUInfo(cpuInfo);
+                    continue;
+                }
+                //In [1] we have the length of the formatted section.
+                Cosmos.Debug.Kernel.Debugger.DoSend("Skipping table type: " + currentAddress[0] + " Length: " + currentAddress[1]);
+                Cosmos.Debug.Kernel.Debugger.DoSend("Is 4?" + (currentAddress[0] == 4));
+                currentAddress = SkipTable(currentAddress[1], currentAddress);
             }
-
             return smbiosStructure;
         }
 

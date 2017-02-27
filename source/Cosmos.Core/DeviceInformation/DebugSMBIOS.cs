@@ -78,7 +78,7 @@ namespace Cosmos.Core.DeviceInformation
             Debugger.DoSend("Thread Count: " + cpuInfo.ThreadCount);
             Debugger.DoSend("Processor characteristics: " + cpuInfo.ProcessorCharacteristics);
             Debugger.DoSend("Processor family 2: " + cpuInfo.ProcessorFamily2);
-            Debugger.DoSend("===========STRINGS==========");
+            Debugger.DoSend("  ===========STRINGS==========");
             Debugger.DoSend("Asset Tag: " + cpuInfo.AssetTag);
             Debugger.DoSend("PartNumber: " + cpuInfo.PartNumber);
             Debugger.DoSend("ProcessorManufacturer: " + cpuInfo.ProcessorManufacturer);
@@ -86,7 +86,7 @@ namespace Cosmos.Core.DeviceInformation
             Debugger.DoSend("SerialNumber: " + cpuInfo.SerialNumber);
             Debugger.DoSend("SocketDesignation: " + cpuInfo.SocketDesignation);
             Debugger.DoSend("Part Number: " + cpuInfo.PartNumber);
-            Debugger.DoSend("===================================================\n");
+            Debugger.DoSend("  ===================================================\n");
         }
     }
 }
