@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cosmos.Core.DeviceInformation;
+﻿using Cosmos.Core.SMBIOS;
 
-namespace Cosmos.HAL.PCInfo
+namespace Cosmos.HAL.SMBIOS
 {
     /// <summary>
     /// This class contains the smbios structure parsed only once
@@ -21,7 +16,7 @@ namespace Cosmos.HAL.PCInfo
                 //Furthermore, the parsing remains transparent to the user.
                 if (_smbiosStructure == null)
                 {
-                    _smbiosStructure = SMBIOS.BeginParseSMBIOS();
+                    _smbiosStructure = Core.SMBIOS.SMBIOS.BeginParseSMBIOS();
                 }
                 return _smbiosStructure;
             }

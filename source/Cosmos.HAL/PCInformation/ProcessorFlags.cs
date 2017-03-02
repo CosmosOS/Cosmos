@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cosmos.HAL.PCInfo
+namespace Cosmos.HAL.PCInformation
 {
     /// <summary>
     /// Unknown needs to be always the last

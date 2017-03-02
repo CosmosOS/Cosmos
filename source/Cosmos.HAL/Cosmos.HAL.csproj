@@ -97,11 +97,11 @@
     <Compile Include="BlockDevice\MBR.cs" />
     <Compile Include="BlockDevice\Partition.cs" />
     <Compile Include="Bootstrap.cs" />
-    <Compile Include="PCInfo\ProcessorFlags.cs" />
-    <Compile Include="PCInfo\ProcessorHALInfo.cs" />
+    <Compile Include="PCInformation\ProcessorFlags.cs" />
+    <Compile Include="SMBIOS\ProcessorHALInfo.cs" />
     <Compile Include="DebugTextScreen.cs" />
-    <Compile Include="PCInfo\Processor.cs" />
-    <Compile Include="PCInfo\SMBIOSContainer.cs" />
+    <Compile Include="PCInformation\Processor.cs" />
+    <Compile Include="SMBIOS\SMBIOSContainer.cs" />
     <Compile Include="PS2Keyboard.cs" />
     <Compile Include="Device.cs" />
     <Compile Include="Drivers\PCI\Audio\ES1370\Components\DACak4531.cs" />

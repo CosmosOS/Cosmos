@@ -95,14 +95,15 @@
   <ItemGroup>
     <Compile Include="BaseIOGroups.cs" />
     <Compile Include="Bootstrap.cs" />
-    <Compile Include="DeviceInformation\BIOSInfo.cs" />
-    <Compile Include="DeviceInformation\CPUInfo.cs" />
-    <Compile Include="DeviceInformation\DebugSMBIOS.cs" />
-    <Compile Include="DeviceInformation\EntryPointTable.cs" />
-    <Compile Include="DeviceInformation\SMBIOS.cs" />
-    <Compile Include="DeviceInformation\SMBIOSStructure.cs" />
-    <Compile Include="DeviceInformation\SMBIOSTable.cs" />
-    <Compile Include="DeviceInformation\SMBIOSTypes.cs" />
+    <Compile Include="PCInformation\CPUIDOperation.cs" />
+    <Compile Include="SMBIOS\BIOSInfo.cs" />
+    <Compile Include="SMBIOS\CPUInfo.cs" />
+    <Compile Include="SMBIOS\DebugSMBIOS.cs" />
+    <Compile Include="SMBIOS\EntryPointTable.cs" />
+    <Compile Include="SMBIOS\SMBIOS.cs" />
+    <Compile Include="SMBIOS\SMBIOSStructure.cs" />
+    <Compile Include="SMBIOS\SMBIOSTable.cs" />
+    <Compile Include="SMBIOS\SMBIOSTypes.cs" />
     <Compile Include="IOGroup\COM.cs" />
     <Compile Include="IOGroup\Network\AMDPCNetIIIOGroup.cs" />
     <Compile Include="IOGroup\PCSpeaker.cs" />
@@ -125,7 +126,7 @@
     <Compile Include="IOPort.cs" />
     <Compile Include="MemoryBlock.cs" />
     <Compile Include="PIC.cs" />
-    <Compile Include="ProcessorInformation.cs" />
+    <Compile Include="PCInformation\ProcessorInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

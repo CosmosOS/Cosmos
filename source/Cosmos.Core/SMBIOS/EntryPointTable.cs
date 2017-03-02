@@ -1,7 +1,7 @@
 ﻿using System;
 using Cosmos.Common.Extensions;
 
-namespace Cosmos.Core.DeviceInformation
+namespace Cosmos.Core.SMBIOS
 {
     public unsafe class EntryPointTable
     {

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using Cosmos.Core;
+using Cosmos.Core.PCInformation;
+using Cosmos.HAL.PCInformation;
 
-namespace Cosmos.HAL.PCInfo
+namespace Cosmos.HAL.SMBIOS
 {
     /// <summary>
     /// This class converts the data from smbios cpu to a human readable form.
@@ -36,14 +37,15 @@ namespace Cosmos.HAL.PCInfo
             //Parse every single processor
             foreach (var x in structure.CpuInfoList)
             {
-                var info = new Processor(x);
-                _listProcessor.Add(info); 
+                //var info = new Processor(x);
+                //_listProcessor.Add(info); 
             }
         }
 
         public static string GetVendorName()
         {
-            return ProcessorInformation.GetVendorName();
+            //return ProcessorInformation.GetVendorName();
+            return null;
         }
     }
 }

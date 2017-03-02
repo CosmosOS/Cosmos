@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Cosmos.Core.DeviceInformation
+namespace Cosmos.Core.SMBIOS
 {
 
     //This class contains the parser for the entry point table.

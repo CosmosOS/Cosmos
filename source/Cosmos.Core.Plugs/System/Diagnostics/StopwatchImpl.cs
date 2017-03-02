@@ -2,6 +2,7 @@
 
 using System;
 using System.Diagnostics;
+using Cosmos.Core.PCInformation;
 
 namespace Cosmos.Core.Plugs.System.Diagnostics
 {

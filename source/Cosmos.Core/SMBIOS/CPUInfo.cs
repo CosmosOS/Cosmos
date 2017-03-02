@@ -1,7 +1,8 @@
 ﻿using System;
+using Cosmos.Core.PCInformation;
 using Cosmos.Debug.Kernel;
 
-namespace Cosmos.Core.DeviceInformation
+namespace Cosmos.Core.SMBIOS
 {
 
     public unsafe class CPUInfo : SMBIOSTable
@@ -200,9 +201,6 @@ namespace Cosmos.Core.DeviceInformation
 
             }
 
-            Debugger.DoSend("Vendor: " + ProcessorInformation.GetVendorName());
-
-            
             currentAddress = beginningAddress + Convert.ToInt32(Length);
 
             var stringArray = SMBIOS.ParseStrings(currentAddress);

@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace Cosmos.Core.DeviceInformation
+namespace Cosmos.Core.SMBIOS
 {
     public unsafe class BIOSInfo : SMBIOSTable
     {

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cosmos.Core.DeviceInformation;
+using System.Net;
+using Cosmos.Core.PCInformation;
+using Cosmos.Core.SMBIOS;
 using Cosmos.Debug.Kernel;
 
-namespace Cosmos.HAL.PCInfo
+namespace Cosmos.HAL.PCInformation
 {
     /// <summary>
     /// This class represents one processor of the machine
@@ -18,38 +17,30 @@ namespace Cosmos.HAL.PCInfo
     public class Processor
     {
         /// <summary>
-        /// Type of processor (e.g Inter i5)
-        /// </summary>
-        public string ProcessorVersion { get; set; }
-        /// <summary>
-        /// Manufacturer of the processor
+        /// Manufacturer of the procesor (on intel: genuine intel)
         /// </summary>
         public string Manufacturer { get; set; }
         /// <summary>
-        /// Number of the processor inside the cpu
+        /// Processor family number
         /// </summary>
-        public string SocketDesignation { get; set; }
-        /// <summary>
-        /// Current speed in mhz
-        /// </summary>
-        public int Speed { get; set; }
-        /// <summary>
-        /// Processor type (central, math, dsp or video)
-        /// </summary>
-        public string ProcessorType { get; set; }
-        /// <summary>
-        /// Processor family
-        /// </summary>
-        /// <param name="ProcessorFamily"></param>
-        public string ProcessorFamily { get; set; }
+        public int Family{ get; set; }
         /// <summary>
         /// Flags of the processor (sse, fpu and so on)
         /// </summary>
-        /// <param name="Flags"></param>
         public List<int> Flags { get; set; }
+        /// <summary>
+        /// Stepping of the processor
+        /// </summary>
+        public int Stepping { get; set; }
+        /// <summary>
+        /// Model number
+        /// </summary>
+        public int ModelNumber { get; set; }
 
-        public Processor(CPUInfo SMBIOSProcessor)
+        public Processor()
         {
+            //Old smbios calls
+            /*
             Speed = SMBIOSProcessor.CurrentSpeed;
             ProcessorType = ParseType(SMBIOSProcessor.ProcessorType);
             ProcessorFamily = ParseFamily(SMBIOSProcessor.ProcessorFamily);
@@ -57,6 +48,60 @@ namespace Cosmos.HAL.PCInfo
             Manufacturer = SMBIOSProcessor.ProcessorManufacturer;
             ProcessorVersion = SMBIOSProcessor.ProcessorVersion;
             Flags = ParseFlags(SMBIOSProcessor.CPUIDEAX, SMBIOSProcessor.CPUIDEDX);
+            */
+            this.Manufacturer = GetVendorName();
+            this.Flags = ParseFlags();
+            ParseInformation();
+        }
+
+        /// <summary>
+        /// Parses multiple information using eax = 1 and the returned eax register
+        /// </summary>
+        public void ParseInformation()
+        {
+            uint[] raw = ProcessorInformation.GetCPUID(CPUIDOperation.GetProcessorInformation);
+            ///Position of the 96 bit signature
+            uint eax = raw[0];
+            //NOTE: these equations are taken from the intel manual
+            //We need the AND to get only the important bits
+            //Get the first 4 bits
+            this.Stepping = (int) eax & 15;
+            //Sum the extended model to the standard model
+            //Extended model: get bits 19:16 (base zero) and shift them 4 to the left
+            //Standard model: get bits 7:4.
+            this.ModelNumber = (((int)eax >> 16) & 15) << 4 + ((int) eax >> 4) & 15;
+            //Get bits 27:20 of the extended family
+            //Get bits 11:8 of the standard family
+            this.Family = (((int) eax >> 20) & 511) + (((int) eax >> 8) & 15);
+
+        }
+
+        public string GetVendorName()
+        {
+            if (ProcessorInformation.CanReadCPUID() > 0)
+            {
+                uint[] raw = ProcessorInformation.GetCPUID(CPUIDOperation.GetVendorID);
+                uint ebx = raw[0];
+                uint ecx = raw[1];
+                uint edx = raw[2];
+                return new string(new char[] {
+                    (char)(ebx & 0xff),
+                    (char)((ebx >> 8) & 0xff),
+                    (char)((ebx >> 16) & 0xff),
+                    (char)(ebx >> 24),
+                    (char)(edx & 0xff),
+                    (char)((edx >> 8) & 0xff),
+                    (char)((edx >> 16) & 0xff),
+                    (char)(edx >> 24),
+                    (char)(ecx & 0xff),
+                    (char)((ecx >> 8) & 0xff),
+                    (char)((ecx >> 16) & 0xff),
+                    (char)(ecx >> 24),
+                });
+
+            }
+            else
+                return "\0";
         }
 
         /// <summary>
@@ -64,26 +109,29 @@ namespace Cosmos.HAL.PCInfo
         /// TODO: in the future will need to overload this method with a variant for amr32 and arm64.
         /// </summary>
         /// <returns></returns>
-        public List<int> ParseFlags(uint eax, uint edx)
+        public List<int> ParseFlags()
         {
+            uint[] raw = ProcessorInformation.GetCPUID(CPUIDOperation.GetFlags);
             //List of the every possible flag
             //Its impossible to do a list of enums (il2cpu errors). 
             //You cannot cast by using methods like ToList()...
             //So we use the old friend "int".
             List<int> listOfFlags = new List<int>();
 
+            uint ecx = raw[0];
+            //Regular flags
+            uint edx = raw[1];
+
             //We need to convert edx to something that can be traslated to a bit array safely
             //We can't do (int)eax
             var edxBytes = BitConverter.GetBytes(edx);
             BitArray bitArrayEdx = new BitArray(edxBytes);
-            var eaxBytes = BitConverter.GetBytes(eax);
-            BitArray bitArrayEax = new BitArray(eaxBytes);
 
             //See: https://en.wikipedia.org/wiki/CPUID (this is where i got the information).
 
             Debugger.DoSend("Bits parsed. Adding enums to table");
             //TODO: this gives ilcpu error
-            //Go byte by byte in eax
+            //Go byte by byte in edx
             int offset = 0;
             for (int i = 0; i < 32; i++)
             {
@@ -92,7 +140,8 @@ namespace Cosmos.HAL.PCInfo
                     offset--; 
                     continue;
                 }
-                if (bitArrayEdx[i]) listOfFlags.Add(i+offset);
+                Debugger.DoSend("EDX: " + ((int)edx & (1 << i)));
+                if (((int)edx & (1 << i)) > 0) listOfFlags.Add(i+offset);
             }
             Debugger.DoSend("Strings added and parsed.");
             return listOfFlags;

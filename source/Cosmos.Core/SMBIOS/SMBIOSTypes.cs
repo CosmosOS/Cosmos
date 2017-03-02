@@ -1,4 +1,4 @@
-﻿namespace Cosmos.Core.DeviceInformation
+﻿namespace Cosmos.Core.SMBIOS
 {
     public class SMBIOSTypes
     {

@@ -3,6 +3,7 @@
 using System;
 using System.Threading;
 using System.Diagnostics;
+using Cosmos.Core.PCInformation;
 
 namespace Cosmos.Core.Plugs.System.Threading
 {

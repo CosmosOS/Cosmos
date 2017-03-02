@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Xml.Schema;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
+using Cosmos.Core.PCInformation;
 using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
@@ -102,7 +103,6 @@ namespace Cosmos.Core.Plugs
             __cyclesrdtscptr = target;
 
             string intname = LabelName.GetFullName(typeof(CPUImpl).GetField(nameof(__cyclesrdtscptr)));
-
             XS.Push(XSRegisters.EAX);
             XS.Push(XSRegisters.ECX);
             XS.Push(XSRegisters.EDX);
@@ -157,9 +157,18 @@ namespace Cosmos.Core.Plugs
         }
 
         [Inline]
-        public static int FetchCPUVendorEBX()
+        public static uint GetCPUIDEAX(uint eaxOperation)
         {
-            XS.Set(XSRegisters.EAX, 0);
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8);
+            XS.Cpuid();
+            XS.Push(XSRegisters.EAX);
+            return 0;
+        }
+
+        [Inline]
+        public static uint GetCPUIDEBX(uint eaxOperation)
+        {
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8);
             XS.Cpuid();
             XS.Set(XSRegisters.EAX, XSRegisters.EBX);
             XS.Push(XSRegisters.EAX);
@@ -167,9 +176,9 @@ namespace Cosmos.Core.Plugs
         }
 
         [Inline]
-        public static int FetchCPUVendorEDX()
+        public static uint GetCPUIDEDX(uint eaxOperation)
         {
-            XS.Set(XSRegisters.EAX, 0);
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8);
             XS.Cpuid();
             XS.Set(XSRegisters.EAX, XSRegisters.EDX);
             XS.Push(XSRegisters.EAX);
@@ -177,9 +186,9 @@ namespace Cosmos.Core.Plugs
         }
 
         [Inline]
-        public static int FetchCPUVendorECX()
+        public static uint GetCPUIDECX(uint eaxOperation)
         {
-            XS.Set(XSRegisters.EAX, 0);
+            XS.Set(XSRegisters.EAX, XSRegisters.EBP, sourceDisplacement: 8);
             XS.Cpuid();
             XS.Set(XSRegisters.EAX, XSRegisters.ECX);
             XS.Push(XSRegisters.EAX);

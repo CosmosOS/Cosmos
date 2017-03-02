@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Cosmos.Core.DeviceInformation
+namespace Cosmos.Core.SMBIOS
 {
     /// <summary>
     /// This class is a container for each table of the smbios structure
