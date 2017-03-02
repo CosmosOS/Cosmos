@@ -200,6 +200,7 @@ namespace Cosmos.Core.DeviceInformation
 
             }
 
+            Debugger.DoSend("Vendor: " + ProcessorInformation.GetVendorName());
 
             
             currentAddress = beginningAddress + Convert.ToInt32(Length);

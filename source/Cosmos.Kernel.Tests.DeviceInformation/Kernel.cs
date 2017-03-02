@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using Sys = Cosmos.System;
 
 namespace Cosmos.Kernel.Tests.DeviceInformation
@@ -15,9 +16,8 @@ namespace Cosmos.Kernel.Tests.DeviceInformation
 
         protected override void Run()
         {
-            Console.WriteLine("\n\nPress any key to continue");
-            Console.ReadKey();
             Cosmos.TestRunner.TestController.Completed();
         }
     }
+
 }

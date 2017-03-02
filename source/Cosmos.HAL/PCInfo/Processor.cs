@@ -52,7 +52,7 @@ namespace Cosmos.HAL.PCInfo
         {
             Speed = SMBIOSProcessor.CurrentSpeed;
             ProcessorType = ParseType(SMBIOSProcessor.ProcessorType);
-            //ProcessorFamily = ParseFamily(SMBIOSProcessor.ProcessorFamily);
+            ProcessorFamily = ParseFamily(SMBIOSProcessor.ProcessorFamily);
             SocketDesignation = SMBIOSProcessor.SocketDesignation;
             Manufacturer = SMBIOSProcessor.ProcessorManufacturer;
             ProcessorVersion = SMBIOSProcessor.ProcessorVersion;

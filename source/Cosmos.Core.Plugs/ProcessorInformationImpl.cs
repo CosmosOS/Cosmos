@@ -1,11 +1,16 @@
-﻿using Cosmos.Assembler;
+﻿using System;
+using System.Runtime.CompilerServices;
+using System.Xml.Schema;
+using Cosmos.Assembler;
+using Cosmos.Assembler.x86;
+using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
 using XSharp.Compiler;
 
 namespace Cosmos.Core.Plugs
 {
-    [Plug(Target = typeof(global::Cosmos.Core.ProcessorInformation))]
+    [Plug(Target = typeof(ProcessorInformation))]
     public unsafe class ProcessorInformationImpl
     {
         /* The following three int*-pointers are needed for the lea instruction due to the following reason:
@@ -150,9 +155,40 @@ namespace Cosmos.Core.Plugs
             XS.Xor(XSRegisters.EAX, XSRegisters.EAX); // XS.Set(XSRegisters.EAX, 0);
             XS.Return();
         }
-        
+
         [Inline]
-        internal static void FetchCPUVendor(int* target)
+        public static int FetchCPUVendorEBX()
+        {
+            XS.Set(XSRegisters.EAX, 0);
+            XS.Cpuid();
+            XS.Set(XSRegisters.EAX, XSRegisters.EBX);
+            XS.Push(XSRegisters.EAX);
+            return 0;
+        }
+
+        [Inline]
+        public static int FetchCPUVendorEDX()
+        {
+            XS.Set(XSRegisters.EAX, 0);
+            XS.Cpuid();
+            XS.Set(XSRegisters.EAX, XSRegisters.EDX);
+            XS.Push(XSRegisters.EAX);
+            return 0;
+        }
+
+        [Inline]
+        public static int FetchCPUVendorECX()
+        {
+            XS.Set(XSRegisters.EAX, 0);
+            XS.Cpuid();
+            XS.Set(XSRegisters.EAX, XSRegisters.ECX);
+            XS.Push(XSRegisters.EAX);
+            return 0;
+        }
+        
+        /*
+        [Inline]
+        public static void FetchCPUVendor(int* target)
         {
             /*
              * lea esi, target
@@ -163,20 +199,22 @@ namespace Cosmos.Core.Plugs
              * mov [esi + 8], ecx
              * ret
              */
-            __vendortargetptr = target;
 
-            string intname = LabelName.GetFullName(typeof(CPUImpl).GetField(nameof(__vendortargetptr)));
-            
-            XS.Lea(XSRegisters.ESI, intname); // new Lea { DestinationReg = RegistersEnum.ESI, SourceRef = ElementReference.New(intname) };
+            //__vendortargetptr = target;
+            //string intname = LabelName.GetFullName(typeof(CPUImpl).GetField(nameof(__vendortargetptr)));
+            //XS.Lea(XSRegisters.ESI, intname); // new Lea { DestinationReg = RegistersEnum.ESI, SourceRef = ElementReference.New(intname) };
+            /*
             XS.Cpuid();
             XS.Set(XSRegisters.ESI, XSRegisters.EBX, destinationIsIndirect: true);
             XS.Set(XSRegisters.ESI, XSRegisters.EDX, destinationIsIndirect: true, destinationDisplacement: 4);
             XS.Set(XSRegisters.ESI, XSRegisters.ECX, destinationIsIndirect: true, destinationDisplacement: 8);
             XS.Return();
         }
+            */
 
-        [Inline]
-        internal static int CanReadCPUID()
+
+        [PlugMethod(Assembler = typeof(CPUIDAsm), Enabled = true)]
+        public static int CanReadCPUID()
         {
             /*
              * pushfd
@@ -189,18 +227,8 @@ namespace Cosmos.Core.Plugs
              * and eax, 00200000h
              * ret
              */
-            XS.Pushfd();
-            XS.Pushfd();
-            XS.Xor(XSRegisters.ESP, 0x00200000, destinationIsIndirect: true);
-            XS.Popfd();
-            XS.Pushfd();
-            XS.Pop(XSRegisters.EAX);
-            XS.Xor(XSRegisters.EAX, XSRegisters.ESP, destinationIsIndirect: true);
-            XS.Popfd();
-            XS.And(XSRegisters.EAX, 0x00200000);
-            XS.Return();
 
-            return 0; // should be ignored by the compiler
+            return 0;
         }
     }
 }
