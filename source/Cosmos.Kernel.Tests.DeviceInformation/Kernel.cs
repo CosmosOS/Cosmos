@@ -16,6 +16,7 @@ namespace Cosmos.Kernel.Tests.DeviceInformation
 
         protected override void Run()
         {
+            Console.ReadKey();
             Cosmos.TestRunner.TestController.Completed();
         }
     }

@@ -51,6 +51,7 @@ namespace Cosmos.HAL.PCInformation
             */
             this.Manufacturer = GetVendorName();
             this.Flags = ParseFlags();
+            //Parses stepping, model and family
             ParseInformation();
         }
 
@@ -131,10 +132,11 @@ namespace Cosmos.HAL.PCInformation
 
             Debugger.DoSend("Bits parsed. Adding enums to table");
             //TODO: this gives ilcpu error
-            //Go byte by byte in edx
             int offset = 0;
+            //Foreach bit in ea
             for (int i = 0; i < 32; i++)
             {
+                //Skip reserved flags
                 if (i == 10 || i == 20)
                 {
                     offset--; 
@@ -142,6 +144,16 @@ namespace Cosmos.HAL.PCInformation
                 }
                 Debugger.DoSend("EDX: " + ((int)edx & (1 << i)));
                 if (((int)edx & (1 << i)) > 0) listOfFlags.Add(i+offset);
+            }
+
+            for (int i = 0; i < 32; i++)
+            {
+                //Skip reserved flag
+                if (i == 16)
+                {
+                    offset--;
+                }
+                if (((int) ecx & (1 << i)) > 0) listOfFlags.Add(i + offset + 32);
             }
             Debugger.DoSend("Strings added and parsed.");
             return listOfFlags;
