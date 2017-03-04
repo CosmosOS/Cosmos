@@ -20,25 +20,37 @@ namespace Cosmos.Core.PCInformation
         /// <returns></returns>
         public static uint[] GetCPUID(CPUIDOperation operation)
         {
+
+            uint ptr = 0;
+            TryModify(&ptr);
+            Debugger.DoSend("Pointer mod: " + ptr);
+
+            uint eax;
+            uint ebx;
+            uint ecx;
+            uint edx;
             uint[] returnValue;
             switch (operation)
             {
                 case CPUIDOperation.GetVendorID:
                     returnValue = new uint[3];
-                    returnValue[0] = GetCPUIDEBX(0);
-                    returnValue[1] = GetCPUIDECX(0);
-                    returnValue[2] = GetCPUIDEDX(0);
+                    CPUID(0, &eax, &ebx, &ecx, &edx);
+                    returnValue[0] = ebx;
+                    returnValue[1] = ecx;
+                    returnValue[2] = edx;
                     return returnValue;
                 case CPUIDOperation.GetProcessorInformation:
                     //Returns the signature
                     returnValue = new uint[1];
-                    returnValue[0] = GetCPUIDEAX(1);
+                    CPUID(1, &eax, &ebx, &ecx, &edx);
+                    returnValue[0] = eax;
                     return returnValue;
                 case CPUIDOperation.GetFlags:
                     Debug.Kernel.Debugger.DoSend("Parse flags");
                     returnValue = new uint[2];
-                    returnValue[0] = GetCPUIDECX(1);
-                    returnValue[1] = GetCPUIDEDX(1);
+                    CPUID(1, &eax, &ebx, &ecx, &edx);
+                    returnValue[0] = ecx;
+                    returnValue[1] = edx;
                     return returnValue;
                 default:
                     return null;
@@ -46,34 +58,10 @@ namespace Cosmos.Core.PCInformation
         }
 
         [PlugMethod(PlugRequired = true)]
+        public static void CPUID(uint eaxOperation, uint* eax, uint* ebx, uint* ecx, uint* edx) { }
+
+        [PlugMethod(PlugRequired = true)]
         public static int CanReadCPUID() => 0; //plugged
-
-        //TODO Ideally, we would get the registers in one call. But i don't know how to do it
-        /// <summary>
-        /// Gets the cpuid eax register using the specified initial eax
-        /// </summary>
-        /// <remarks>This method is public only to be plugged. DON´T USE IT IN HAL</remarks>
-        [PlugMethod(PlugRequired = true)]
-        public static uint GetCPUIDEAX(uint eaxOperation) => 0; //Plugged
-        /// <summary>
-        /// Gets the cpuid ebx register using the specified initial eax
-        /// </summary>
-        /// <remarks>This method is public only to be plugged. DON´T USE IT IN HAL</remarks>
-        [PlugMethod(PlugRequired = true)]
-        public static uint GetCPUIDEBX(uint eaxOperation) => 0; //Plugged
-        /// <summary>
-        /// Gets the cpuid ecx register using the specified initial eax
-        /// </summary>
-        /// <remarks>This method is public only to be plugged. DON´T USE IT IN HAL</remarks>
-        [PlugMethod(PlugRequired = true)]
-        public static uint GetCPUIDECX(uint eaxOperation) => 0; //Plugged
-        /// <summary>
-        /// Gets the cpuid edx register using the specified initial eax
-        /// </summary>
-        /// <remarks>This method is public only to be plugged. DON´T USE IT IN HAL</remarks>
-        [PlugMethod(PlugRequired = true)]
-        public static uint GetCPUIDEDX(uint eaxOperation) => 0; //Plugged
-
 
         /// <summary>
         /// Returns the number of CPU cycles since startup of the current CPU core

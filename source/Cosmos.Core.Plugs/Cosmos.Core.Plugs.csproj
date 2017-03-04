@@ -93,7 +93,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CPUIDAsm.cs" />
     <Compile Include="CPUImpl.cs" />
     <Compile Include="FetchCPUVendorAsm.cs" />
     <Compile Include="IOPortImpl.cs" />
