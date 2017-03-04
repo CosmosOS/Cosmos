@@ -22,9 +22,6 @@ namespace Cosmos.Core.PCInformation
         {
 
             uint ptr = 0;
-            TryModify(&ptr);
-            Debugger.DoSend("Pointer mod: " + ptr);
-
             uint eax;
             uint ebx;
             uint ecx;
@@ -62,6 +59,15 @@ namespace Cosmos.Core.PCInformation
 
         [PlugMethod(PlugRequired = true)]
         public static int CanReadCPUID() => 0; //plugged
+
+        [PlugMethod(PlugRequired = true)]
+        public static int __maxrate() => 0;
+
+        [PlugMethod(PlugRequired = true)]
+        public static void __cyclesrdtsc(uint* rdtsc_hi, uint* rdtsc_lo) { }
+
+        [PlugMethod(PlugRequired = true)]
+        public static void __raterdmsr(uint* mperf_hi, uint* mperf_lo, uint* aperf_hi, uint* aperf_lo) { }
 
         /// <summary>
         /// Returns the number of CPU cycles since startup of the current CPU core

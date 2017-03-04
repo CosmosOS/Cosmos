@@ -21,21 +21,16 @@ namespace Cosmos.Core.Plugs
          *      difficult with reflection, if these variables reside in the local function scope. For this reason, I move the
          *      pointer to class scope to access them quicker and more easily
          */
-        private static int* __cyclesrdtscptr, __raterdmsrptr, __vendortargetptr;
-        private static long __ticktate = -1;
-
         /// <summary>
         /// Returns the number of CPU cycles since startup
         /// </summary>
         /// <returns>Number of CPU cycles</returns>
         public static long GetCycleCount()
         {
-            int[] val = new int[2];
+            uint rdtsc_hi, rdtsc_lo;
+            __cyclesrdtsc(&rdtsc_hi, &rdtsc_lo);
 
-            fixed (int* ptr = val)
-                __cyclesrdtsc(ptr);
-
-            return ((long)val[0] << 32) | (uint)val[1];
+            return ((long)(rdtsc_hi << 32) | rdtsc_lo);
         }
 
         /// <summary>
@@ -44,28 +39,24 @@ namespace Cosmos.Core.Plugs
         /// <returns>CPU cycle rate</returns>
         public static long GetCycleRate()
         {
-            if (__ticktate == -1)
-            {
-                int[] raw = new int[4];
+            long __tickrate;
+            uint mperf_hi, mperf_lo, aperf_hi, aperf_lo;
+            __raterdmsr(&mperf_hi, &mperf_lo, &aperf_hi, &aperf_lo);
 
-                fixed (int* ptr = raw)
-                    __raterdmsr(ptr);
+            ulong l1 = (ulong)__maxrate();
+            ulong l2 = ((ulong)mperf_hi << 32) | mperf_lo;
+            ulong l3 = ((ulong)aperf_hi << 32) | aperf_lo;
 
-                ulong l1 = (ulong)__maxrate();
-                ulong l2 = ((ulong)raw[0] << 32) | (uint)raw[1];
-                ulong l3 = ((ulong)raw[2] << 32) | (uint)raw[3];
+            __tickrate = (long)l2; // (long)((double)l1 * l3 / l2);
 
-                __ticktate = (long)l2; // (long)((double)l1 * l3 / l2);
-            }
-
-            return __ticktate;
+            return __tickrate;
         }
 
         /// <summary>
         /// Copies the maximum cpu rate set by the bios at startup to the given int pointer
         /// </summary>
         [Inline]
-        private static int __maxrate()
+        public static int __maxrate()
         {
             /*
              * mov eax, 16h
@@ -77,7 +68,7 @@ namespace Cosmos.Core.Plugs
             XS.Set(XSRegisters.EAX, 0x00000016);
             XS.Cpuid();
             XS.And(XSRegisters.EAX, 0x0000ffff);
-            XS.Return();
+            XS.Push(XSRegisters.EAX); //Return the read eax
 
             return 0;
         }
@@ -86,8 +77,12 @@ namespace Cosmos.Core.Plugs
         /// Copies the cycle count to the given int pointer
         /// </summary>
         [Inline]
-        private static void __cyclesrdtsc(int* target)
+        public static void __cyclesrdtsc(uint *rdtsc_hi, uint *rdtsc_lo)
         {
+            /*
+             * eax returns the highest part and edx the lowest part
+             */
+
             /*
              * push eax
              * push ecx
@@ -101,32 +96,33 @@ namespace Cosmos.Core.Plugs
              * pop eax
              * ret
              */
-            __cyclesrdtscptr = target;
 
-            string intname = LabelName.GetFullName(typeof(CPUImpl).GetField(nameof(__cyclesrdtscptr)));
             XS.Push(XSRegisters.EAX);
             XS.Push(XSRegisters.ECX);
             XS.Push(XSRegisters.EDX);
-            XS.Lea(XSRegisters.ESI, intname);
             XS.Rdtsc();
-            XS.Set(XSRegisters.ESI, XSRegisters.EAX, destinationIsIndirect: true, destinationDisplacement: 4);
-            XS.Set(XSRegisters.ESI, XSRegisters.EDX, destinationIsIndirect: true);
+            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 12); //Get the pointer to rdtsc_hi
+            XS.Set(XSRegisters.EBX, XSRegisters.EAX, destinationIsIndirect: true);
+            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 8);
+            XS.Set(XSRegisters.EBX, XSRegisters.EDX, destinationIsIndirect: true);
             XS.Push(XSRegisters.EDX);
             XS.Push(XSRegisters.ECX);
             XS.Push(XSRegisters.EAX);
-            XS.Return();
         }
 
         /// <summary>
         /// Copies the cycle rate to the given int pointer
         /// </summary>
         [Inline]
-        private static void __raterdmsr(int* target)
+        public static void __raterdmsr(uint *mperf_hi, uint *mperf_lo, uint *aperf_hi, uint *aperf_lo)
         {
             /*
+             * mperf = maximum frequency clock count
+             * aperf = actual frequency clock count
+             * the lowest part is retured by eax
+             * the highest part by edx 
+
              * ; esi register layout: (mperf_hi, mperf_lo, aperf_hi, aperf_lo)
-             * ;
-             * ; int* ptr = new int[4];
              * ;
              * lea esi,        ptr  ;equivalent with `mov esi, &ptr`
              * mov ecx,        e7h
@@ -140,21 +136,25 @@ namespace Cosmos.Core.Plugs
              * xor eax,        eax
              * ret
              */
-            __raterdmsrptr = target;
-
-            string intname = LabelName.GetFullName(typeof(CPUImpl).GetField(nameof(__raterdmsrptr)));
-
-            XS.Lea(XSRegisters.ESI, intname);
+            /*
+             * Relevant link: http://www.sandpile.org/x86/msr.htm
+             */
             XS.Set(XSRegisters.ECX, 0xe7);
+            //Read the msr: maximum clock rate
             XS.Rdmsr();
-            XS.Set(XSRegisters.EAX, XSRegisters.ESI, destinationIsIndirect: true, destinationDisplacement: 4);
-            XS.Set(XSRegisters.EDX, XSRegisters.ESI, destinationIsIndirect: true, destinationDisplacement: 0);
+            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 20); //Get the pointer to mperf_hi
+            XS.Set(XSRegisters.EBX, XSRegisters.EAX, destinationIsIndirect: true);
+            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 16); //Get the pointer to mperf_lo
+            XS.Set(XSRegisters.EBX, XSRegisters.EDX, destinationIsIndirect: true);
+            //Read the next msr (actual clock rate)
             XS.Set(XSRegisters.ECX, 0xe8);
             XS.Rdmsr();
-            XS.Set(XSRegisters.EAX, XSRegisters.ESI, destinationIsIndirect: true, destinationDisplacement: 12);
-            XS.Set(XSRegisters.EDX, XSRegisters.ESI, destinationIsIndirect: true, destinationDisplacement: 8);
+            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 12); //Get the pointer to aperf_hi
+            XS.Set(XSRegisters.ESI, XSRegisters.EAX, destinationIsIndirect: true);
+            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 8); //Get the pointer to aperf_lo
+            XS.Set(XSRegisters.ESI, XSRegisters.EDX, destinationIsIndirect: true);
+            //Clear eax?
             XS.Xor(XSRegisters.EAX, XSRegisters.EAX); // XS.Set(XSRegisters.EAX, 0);
-            XS.Return();
         }
 
         /// <summary>
@@ -240,4 +240,4 @@ namespace Cosmos.Core.Plugs
             return 0;
         }
     }
-}
+} 
