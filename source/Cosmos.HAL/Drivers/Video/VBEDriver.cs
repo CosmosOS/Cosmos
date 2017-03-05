@@ -43,6 +43,17 @@ namespace Cosmos.HAL.Drivers
 
         public VBEDriver(ushort xres, ushort yres, ushort bpp)
         {
+            /*
+             * XXX Why this simple test is killing the CPU? It is not working in Bochs too... probably it was neither
+             * tested... bah! Removing it for now.
+             */
+#if false
+            if (HAL.PCI.GetDevice(1234, 1111) == null)
+            {
+                throw new NotSupportedException("No BGA adapter found..");
+            }
+#endif
+
             Global.mDebugger.SendInternal($"Creating VBEDriver with Mode {xres}*{yres}@{bpp}");
             VBESet(xres, yres, bpp);
         }
