@@ -22,8 +22,8 @@ namespace Cosmos.HAL.Drivers
             VBEDisplayBankMode,
             VBEDisplayVirtualWidth,
             VBEDisplayVirtualHeight,
-            VBEDisPlayXOffset,
-            VBEDislyYOffset
+            VBEDisplayXOffset,
+            VBEDisplayYOffset
         };
 
         [Flags]

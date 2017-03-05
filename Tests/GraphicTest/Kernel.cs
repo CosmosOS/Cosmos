@@ -3,6 +3,16 @@ using Sys = Cosmos.System;
 using Cosmos.TestRunner;
 using Cosmos.System.Graphics;
 
+/*
+ * Please note this is an atypical TestRunner:
+ * - no Assertion can be done
+ * - it cannot be executed automatically
+ * 
+ * it exists to make easier tests while changing low level stuff (it would be better and faster to use the Demo kernel but
+ * sometimes it is a problem to make it see modifications done at low level)
+ *
+ * Remember to comment this test again on TestKernelSet.cs when you are ready to merge your modifications!
+ */ 
 namespace GraphicTest
 {
     public class Kernel : Sys.Kernel
@@ -14,6 +24,7 @@ namespace GraphicTest
             Console.WriteLine("Cosmos booted successfully. Let's go in Graphic Mode");
 
             canvas = FullScreenCanvas.GetFullScreenCanvas();
+
             canvas.Clear(Color.Blue);
         }
 
@@ -47,9 +58,9 @@ namespace GraphicTest
 
                 /* Let's try to change mode...*/
                 canvas.Mode = new Mode(800, 600, ColorDepth.ColorDepth32);
-  
-                /* A Coral rectangle */
-                pen.Color = Color.Coral;
+
+                /* A LimeGreen rectangle */
+                pen.Color = Color.LimeGreen;
                 canvas.DrawRectangle(pen, 450, 450, 80, 60);
 
                 Console.ReadKey();

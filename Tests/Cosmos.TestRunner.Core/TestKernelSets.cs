@@ -7,8 +7,7 @@ namespace Cosmos.TestRunner.Core
     {
         public static IEnumerable<Type> GetStableKernelTypes()
         {
-            yield return typeof(GraphicTest.Kernel);
-#if false
+            yield return typeof(Cosmos.Compiler.Tests.Bcl.Kernel);
             yield return typeof(VGACompilerCrash.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.Bcl.Kernel);
             yield return typeof(Cosmos.Compiler.Tests.SingleEchoTest.Kernel);
@@ -22,7 +21,9 @@ namespace Cosmos.TestRunner.Core
 
             //yield return typeof(Cosmos.Compiler.Tests.Encryption.Kernel);
             //yield return typeof(FrotzKernel.Kernel);
-#endif
+
+            /* Please see the notes on the kernel itself before enabling it */
+            //yield return typeof(GraphicTest.Kernel);
         }
     }
 }

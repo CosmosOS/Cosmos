@@ -96,6 +96,26 @@ namespace XSharp.Compiler
           DoDestinationSource<MoveSS>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
       }
 
+      public static void MoveUPS(Register32 destination, RegisterXMM source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      {
+        DoDestinationSource<MoveUPS>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+      }
+
+#if false
+      public static void MoveUPS(Register32 destination, RegisterXMM source, bool destinationIsIndirect = false, Register32 destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      {
+        //DoDestinationSource<MoveUPS>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+        new MoveUPS()
+        {
+          DestinationReg = destination,
+          DestinationIsIndirect = destinationIsIndirect,
+          DestinationDisplacement = (int)destinationDisplacement,
+          SourceDisplacement = sourceDisplacement,
+          SourceReg = source
+        };
+      }
+#endif
+
       public static void ConvertSS2SD(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
       {
         new ConvertSS2SD()
@@ -148,6 +168,16 @@ namespace XSharp.Compiler
         {
           DestinationReg = destination,
           DestinationIsIndirect = isIndirect
+        };
+      }
+
+      public static void Shufps(RegisterXMM destination, RegisterXMM source, int bitmask)
+      {
+        new Shufps()
+        {
+          DestinationReg = destination,
+          SourceReg = source,
+          pseudoOpcode = (byte)bitmask
         };
       }
     }
