@@ -41,7 +41,7 @@
       <Project>{758faf24-9974-4db8-82ef-1b64daf2f0bc}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include=".\GraphicTest.">
+    <ProjectReference Include=".\GraphicTest.csproj">
       <Name>GraphicTest</Name>
       <Project>{fb23bd72-aec3-485e-b86c-8e7db0b3bb9b}</Project>
     </ProjectReference>
