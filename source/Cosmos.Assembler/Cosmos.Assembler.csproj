@@ -271,6 +271,7 @@
     <Compile Include="x86\SSE2\Psrld.cs" />
     <Compile Include="x86\SSEAndMMX2\OrPs.cs" />
     <Compile Include="x86\SSEAndMMX2\POR.cs" />
+    <Compile Include="x86\SSEAndMMX2\Shufps.cs" />
     <Compile Include="x86\SSEAndMMX2\SSEInit.cs" />
     <Compile Include="x86\SSEAndMMX2\SubPS.cs" />
     <Compile Include="x86\SSEAndMMX2\SubSS.cs" />

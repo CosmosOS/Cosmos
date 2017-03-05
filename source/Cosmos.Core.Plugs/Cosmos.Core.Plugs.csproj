@@ -95,6 +95,7 @@
   <ItemGroup>
     <Compile Include="CPUImpl.cs" />
     <Compile Include="IOPortImpl.cs" />
+    <Compile Include="MemoryOperations\MemoryOperationsFillFastAsm.cs" />
     <Compile Include="ProcessorInformationImpl.cs" />
     <Compile Include="System\ArrayImpl.cs" />
     <Compile Include="System\Buffer.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="System\DelegateImpl.cs" />
     <Compile Include="System\Diagnostics\StopwatchImpl.cs" />
     <Compile Include="System\IO\PathHelperImpl.cs" />
+    <Compile Include="MemoryOperations\MemoryOperationsImpl.cs" />
     <Compile Include="System\MulticastDelegateImpl.cs" />
     <Compile Include="System\ObjectImpl.cs" />
     <Compile Include="System\Runtime\InteropServices\MarshalImpl.cs" />
