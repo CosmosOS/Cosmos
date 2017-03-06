@@ -43,6 +43,7 @@ namespace Cosmos.Debug.VSDebugEngine.Host
                                        + "cpuid: mmx=1, apic=xapic, simd=sse2, sse4a=0, misaligned_sse=0, sep=1, movbe=0, adx=0, vendor_string=\"GenuineIntel\", brand_string=\"Intel(R) Pentium(R) 4 CPU\"\n"
                                        + "cpuid: aes=0, sha=0, xsave=0, xsaveopt=0, x86_64=0, 1g_pages=0, pcid=0, fsgsbase=0\n"
                                        + "cpuid: smep=0, smap=0, mwait=1, vmx=1\n"
+                                       + "clock: sync=slowdown, time0=local\n"
                                        + "print_timestamps: enabled=0\n" + "port_e9_hack: enabled=0\n"
                                        + "private_colormap: enabled=0\n" + "clock: sync=none, time0=local, rtc_sync=0\n"
                                        + "# no cmosimage\n" + "# no loader\n" + "log: -\n" + "logprefix: %t%e%d\n"

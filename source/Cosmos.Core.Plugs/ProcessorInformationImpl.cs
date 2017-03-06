@@ -15,146 +15,24 @@ namespace Cosmos.Core.Plugs
     [Plug(Target = typeof(ProcessorInformation))]
     public unsafe class ProcessorInformationImpl
     {
-        /* The following three int*-pointers are needed for the lea instruction due to the following reason:
-         *      When comiling, the IL-code will be translated into x86-ASM, which has specific and unique names for local variables.
-         *      To access these local variables, I have to pass their excat name to the instruction in question. This is rather
-         *      difficult with reflection, if these variables reside in the local function scope. For this reason, I move the
-         *      pointer to class scope to access them quicker and more easily
-         */
-        /// <summary>
-        /// Returns the number of CPU cycles since startup
-        /// </summary>
-        /// <returns>Number of CPU cycles</returns>
-        public static long GetCycleCount()
-        {
-            uint rdtsc_hi, rdtsc_lo;
-            __cyclesrdtsc(&rdtsc_hi, &rdtsc_lo);
-
-            return ((long)(rdtsc_hi << 32) | rdtsc_lo);
-        }
 
         /// <summary>
-        /// Returns the CPU cycle rate (in cycles/µs)
+        /// Use the rdtsc instruction to read the current time stamp counter
+        /// In edx will be stored the highest part of the rtdsc
+        /// In eax the lowest part of the rtdsc
         /// </summary>
-        /// <returns>CPU cycle rate</returns>
-        public static long GetCycleRate()
-        {
-            long __tickrate;
-            uint mperf_hi, mperf_lo, aperf_hi, aperf_lo;
-            __raterdmsr(&mperf_hi, &mperf_lo, &aperf_hi, &aperf_lo);
-
-            ulong l1 = (ulong)__maxrate();
-            ulong l2 = ((ulong)mperf_hi << 32) | mperf_lo;
-            ulong l3 = ((ulong)aperf_hi << 32) | aperf_lo;
-
-            __tickrate = (long)l2; // (long)((double)l1 * l3 / l2);
-
-            return __tickrate;
-        }
-
-        /// <summary>
-        /// Copies the maximum cpu rate set by the bios at startup to the given int pointer
-        /// </summary>
+        /// <param name="edx">Lowest part of rtdsc</param>
+        /// <param name="eax">Highest part of rtdsc</param>
         [Inline]
-        public static int __maxrate()
+        public static void GetCurrentTimeStampCounter(uint* edx, uint* eax)
         {
-            /*
-             * mov eax, 16h
-             * cpuid
-             * and eax, ffffh
-             * ret
-             */
-            
-            XS.Set(XSRegisters.EAX, 0x00000016);
-            XS.Cpuid();
-            XS.And(XSRegisters.EAX, 0x0000ffff);
-            XS.Push(XSRegisters.EAX); //Return the read eax
-
-            return 0;
-        }
-
-        /// <summary>
-        /// Copies the cycle count to the given int pointer
-        /// </summary>
-        [Inline]
-        public static void __cyclesrdtsc(uint *rdtsc_hi, uint *rdtsc_lo)
-        {
-            /*
-             * eax returns the highest part and edx the lowest part
-             */
-
-            /*
-             * push eax
-             * push ecx
-             * push edx
-             * lea esi, target
-             * rdtsc
-             * mov [esi+4], eax
-             * mov [esi], edx
-             * pop edx
-             * pop ecx
-             * pop eax
-             * ret
-             */
-
-            XS.Push(XSRegisters.EAX);
-            XS.Push(XSRegisters.ECX);
-            XS.Push(XSRegisters.EDX);
             XS.Rdtsc();
-            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 12); //Get the pointer to rdtsc_hi
-            XS.Set(XSRegisters.EBX, XSRegisters.EAX, destinationIsIndirect: true);
+            //Get the edx pointer
             XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 8);
+            //Store the value on the variable edx
             XS.Set(XSRegisters.EBX, XSRegisters.EDX, destinationIsIndirect: true);
-            XS.Push(XSRegisters.EDX);
-            XS.Push(XSRegisters.ECX);
-            XS.Push(XSRegisters.EAX);
-        }
-
-        /// <summary>
-        /// Copies the cycle rate to the given int pointer
-        /// </summary>
-        [Inline]
-        public static void __raterdmsr(uint *mperf_hi, uint *mperf_lo, uint *aperf_hi, uint *aperf_lo)
-        {
-            /*
-             * mperf = maximum frequency clock count
-             * aperf = actual frequency clock count
-             * the lowest part is retured by eax
-             * the highest part by edx 
-
-             * ; esi register layout: (mperf_hi, mperf_lo, aperf_hi, aperf_lo)
-             * ;
-             * lea esi,        ptr  ;equivalent with `mov esi, &ptr`
-             * mov ecx,        e7h
-             * rdmsr
-             * mov [esi + 4],  eax
-             * mov [esi],      edx
-             * mov ecx,        e8h
-             * rdmsr
-             * mov [esi + 12], eax
-             * mov [esi + 8],  edx
-             * xor eax,        eax
-             * ret
-             */
-            /*
-             * Relevant link: http://www.sandpile.org/x86/msr.htm
-             */
-            XS.Set(XSRegisters.ECX, 0xe7);
-            //Read the msr: maximum clock rate
-            XS.Rdmsr();
-            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 20); //Get the pointer to mperf_hi
+            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 12);
             XS.Set(XSRegisters.EBX, XSRegisters.EAX, destinationIsIndirect: true);
-            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 16); //Get the pointer to mperf_lo
-            XS.Set(XSRegisters.EBX, XSRegisters.EDX, destinationIsIndirect: true);
-            //Read the next msr (actual clock rate)
-            XS.Set(XSRegisters.ECX, 0xe8);
-            XS.Rdmsr();
-            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 12); //Get the pointer to aperf_hi
-            XS.Set(XSRegisters.ESI, XSRegisters.EAX, destinationIsIndirect: true);
-            XS.Set(XSRegisters.EBX, XSRegisters.EBP, sourceDisplacement: 8); //Get the pointer to aperf_lo
-            XS.Set(XSRegisters.ESI, XSRegisters.EDX, destinationIsIndirect: true);
-            //Clear eax?
-            XS.Xor(XSRegisters.EAX, XSRegisters.EAX); // XS.Set(XSRegisters.EAX, 0);
         }
 
         /// <summary>

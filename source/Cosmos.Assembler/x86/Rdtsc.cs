@@ -10,7 +10,7 @@ namespace Cosmos.Assembler.x86
     /// </summary>
     [Cosmos.Assembler.OpCode("rdtsc")]
     public class Rdtsc
-        : InstructionWithDestinationAndSourceAndSize
+        : Instruction
     {
         public Rdtsc() : base("rdtsc")
         {
