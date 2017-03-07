@@ -36,12 +36,20 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Cosmos.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
-    <Reference Include="Cosmos.Debug.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Kernel.cs" />
     <Compile Include="AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{61607f1e-58f9-41cf-972f-128384f3e115}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
+      <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
+      <Name>Cosmos.System</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

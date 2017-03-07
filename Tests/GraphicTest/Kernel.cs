@@ -7,12 +7,12 @@ using Cosmos.System.Graphics;
  * Please note this is an atypical TestRunner:
  * - no Assertion can be done
  * - it cannot be executed automatically
- * 
+ *
  * it exists to make easier tests while changing low level stuff (it would be better and faster to use the Demo kernel but
  * sometimes it is a problem to make it see modifications done at low level)
  *
  * Remember to comment this test again on TestKernelSet.cs when you are ready to merge your modifications!
- */ 
+ */
 namespace GraphicTest
 {
     public class Kernel : Sys.Kernel

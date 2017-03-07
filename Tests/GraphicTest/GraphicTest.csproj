@@ -38,29 +38,19 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
-    <Reference Include="Cosmos.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
-    <Reference Include="Cosmos.Debug.Kernel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Kernel.cs" />
     <Compile Include="AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.Common\Cosmos.Common.csproj">
-      <Project>{1fac100c-d732-4ea4-b518-5af4baf64f2e}</Project>
-      <Name>Cosmos.Common</Name>
+    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj">
+      <Project>{61607f1e-58f9-41cf-972f-128384f3e115}</Project>
+      <Name>Cosmos.Debug.Kernel</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
-      <Project>{d9a87aad-fcc9-4517-b31d-e904dad00784}</Project>
-      <Name>Cosmos.Core.Plugs</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.Core\Cosmos.Core.csproj">
-      <Project>{5ac4773c-cb4e-4cd9-8d50-02e10a07dee6}</Project>
-      <Name>Cosmos.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
-      <Project>{C801F19C-A9D3-42D5-9A57-9FFDF9B4D05E}</Project>
-      <Name>Cosmos.IL2CPU.Plugs</Name>
+    <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj">
+      <Project>{3def0461-08ab-471a-8f03-a9c556652a0f}</Project>
+      <Name>Cosmos.System</Name>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj">
       <Project>{e6d3b644-c487-472d-a978-c1a82d0c099b}</Project>
