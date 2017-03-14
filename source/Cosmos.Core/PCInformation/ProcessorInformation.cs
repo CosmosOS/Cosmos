@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Runtime.CompilerServices;
 using Cosmos.Core.IOGroup;
 using Cosmos.IL2CPU.Plugs;
@@ -8,6 +9,7 @@ namespace Cosmos.Core.PCInformation
 {
     public unsafe class ProcessorInformation
     {
+        private static int irq0Counter = 0;
         /// <summary>
         /// Returns the Processor's vendor name
         /// </summary>
@@ -19,8 +21,9 @@ namespace Cosmos.Core.PCInformation
         /// EAX, EBX, ECX, EDX
         /// </summary>
         /// <param name="operation"></param>
+        /// <remarks>There is not a 1:1 correspondence between the enum and the cpuid call.</remarks>
         /// <returns></returns>
-        public static uint[] GetCPUID(CPUIDOperation operation)
+        public static uint[] CPUID(CPUIDOperation operation)
         {
 
             uint ptr = 0;
@@ -29,7 +32,6 @@ namespace Cosmos.Core.PCInformation
             uint ecx;
             uint edx;
             uint[] returnValue;
-            GetFrequency();
             switch (operation)
             {
                 case CPUIDOperation.GetVendorID:
@@ -120,7 +122,7 @@ namespace Cosmos.Core.PCInformation
             return frequency;
         }
 
-            /*
+        /*
         /// <summary>
         /// Get the frequency of the processor
         /// </summary>
@@ -129,54 +131,37 @@ namespace Cosmos.Core.PCInformation
         public static double GetFrequency()
         {
             uint eaxPrev, edxPrev, eaxNext, edxNext;
-            byte countNextLo, countNextHi;
-            ulong ciclesPrev, ciclesNext;
-            int pitPrev, pitNext;
-            double ticks = 0;
-            RTC rtc = new RTC();
+            //INTs.SetIntHandler(0x20, aHandler: AHandler);
+            CPU.EnableInterrupts();
+            INTs.SetIrqHandler(0, AHandler);
+            PIT pit = new PIT();
+            int currentCounter;
 
-            //Tell the cmos to get the seconds
-            rtc.Address.Byte = (0 << 7) | 0x00;
-            for (int i = 0; i < 500; i++) { }
-            byte seconds = rtc.Data.Byte;
-            rtc.Address.Byte = (0 << 7) | 0x02;
-            for (int i = 0; i < 500; i++) { }
-            byte minutes = rtc.Data.Byte;
-            rtc.Address.Byte = (0 << 7) | 0x04;
-            for (int i = 0; i < 500; i++) { }
-            byte hour = rtc.Data.Byte;
-            Debugger.DoSend("Current time: " + hour + ":" + minutes + ":" + seconds);
-            
+            //Put a frequency of 100 hz
+
+            pit.Command.Byte = 0;
+            pit.Data0.Byte = 0;
+            pit.Data0.Byte = 0;
+
+            pit.Command.Byte = 0x32;
+            pit.Data0.Byte = 11931 >> 8;
+            pit.Data0.Byte = 11931 & 0xff;
+
             GetCurrentTimeStampCounter(&edxPrev, &eaxPrev);
-
-            //Wait a Little
-            //This avoids errors produced by cicles wasted trying to get the cicles and loading the pit
-            for (int i = 1; i < 20001; i++)
-            {
-
-            }
-
+            while (irq0Counter < 5) { Debugger.DoSend("Counter" + irq0Counter); }
+            currentCounter = irq0Counter;
             GetCurrentTimeStampCounter(&edxNext, &eaxNext);
-            
-            //Since we finished getting the values, now we calculate the cicles and time
-            ciclesPrev = (edxPrev << 32) + eaxPrev;
-            ciclesNext = (edxNext << 32) + eaxNext;
-            //pitNext = 
 
-            //The cicles will be the substraction of the two read values
-            ulong totalCicles = ciclesNext - ciclesPrev;
-            //The elapsed ticks will be the stating counter minus the read pit.
-            //ticks = (0x10000 - pitNext);
-            Debugger.DoSend("Ticks: " + ticks);
-            Debugger.DoSend("totalCicles: " + totalCicles);
-            //Since we know that a tic will happen every 1 / 1193180 sec, its easy to get the freq (cicles per second)
-            //We use 1.19 to get mhz directly
-            double frequency = (totalCicles) * 1.193180 / ticks;
-            Debugger.DoSend("Frequency: " + frequency + " mhz");
-               
-            return frequency;
+            ulong ciclos = ((edxNext << 32) + eaxNext) - ((edxPrev << 32) + eaxPrev);
+            return ciclos / (currentCounter * 0.01);
         }
         */
+
+        private static void AHandler(ref INTs.IRQContext aContext)
+        {
+            Debugger.DoSend("Interrupt Called");
+            irq0Counter++;
+        }
 
 
         [PlugMethod(PlugRequired = true)]

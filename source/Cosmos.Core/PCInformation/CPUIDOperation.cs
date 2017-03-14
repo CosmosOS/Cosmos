@@ -25,6 +25,10 @@
         /// </summary>
         GetCacheInformation,
         GetTopology,
-        GetExtendedFeatures
+        GetExtendedFeatures,
+        /// <summary>
+        /// Returns the processor brand. Consists in 3 calls to cpuid.
+        /// </summary>
+        GetProcessorBrand
     }
 }

@@ -60,7 +60,7 @@ namespace Cosmos.HAL.PCInformation
         /// </summary>
         public void ParseInformation()
         {
-            uint[] raw = ProcessorInformation.GetCPUID(CPUIDOperation.GetProcessorInformation);
+            uint[] raw = ProcessorInformation.CPUID(CPUIDOperation.GetProcessorInformation);
             ///Position of the 96 bit signature
             uint eax = raw[0];
             //NOTE: these equations are taken from the intel manual
@@ -81,7 +81,7 @@ namespace Cosmos.HAL.PCInformation
         {
             if (ProcessorInformation.CanReadCPUID() > 0)
             {
-                uint[] raw = ProcessorInformation.GetCPUID(CPUIDOperation.GetVendorID);
+                uint[] raw = ProcessorInformation.CPUID(CPUIDOperation.GetVendorID);
                 uint ebx = raw[0];
                 uint ecx = raw[1];
                 uint edx = raw[2];
@@ -112,7 +112,7 @@ namespace Cosmos.HAL.PCInformation
         /// <returns></returns>
         public List<int> ParseFlags()
         {
-            uint[] raw = ProcessorInformation.GetCPUID(CPUIDOperation.GetFlags);
+            uint[] raw = ProcessorInformation.CPUID(CPUIDOperation.GetFlags);
             //List of the every possible flag
             //Its impossible to do a list of enums (il2cpu errors). 
             //You cannot cast by using methods like ToList()...
