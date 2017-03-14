@@ -18,7 +18,7 @@ namespace Cosmos.Core.PCInformation
         /// <summary>
         /// Gets the information related to a certain cpuid operation
         /// The order of the registers returned is as follows (a register can be omited if it is not returned):
-        /// EAX, EBX, ECX, EDX
+        /// EAX, EBX, ECX, EDX. If there is more than one call the order stays the same: EAX, EBX, ECX, EDX, EAX...
         /// </summary>
         /// <param name="operation"></param>
         /// <remarks>There is not a 1:1 correspondence between the enum and the cpuid call.</remarks>
@@ -43,9 +43,10 @@ namespace Cosmos.Core.PCInformation
                     return returnValue;
                 case CPUIDOperation.GetProcessorInformation:
                     //Returns the signature
-                    returnValue = new uint[1];
+                    returnValue = new uint[2];
                     CPUID(1, &eax, &ebx, &ecx, &edx);
                     returnValue[0] = eax;
+                    returnValue[1] = ebx;
                     return returnValue;
                 case CPUIDOperation.GetFlags:
                     Debug.Kernel.Debugger.DoSend("Parse flags");
@@ -54,11 +55,38 @@ namespace Cosmos.Core.PCInformation
                     returnValue[0] = ecx;
                     returnValue[1] = edx;
                     return returnValue;
+                case CPUIDOperation.GetProcessorBrand:
+                    returnValue = new uint[12];
+                    uint eax1, eax2, eax3, ebx1, ebx2, ebx3, ecx1, ecx2, ecx3, edx1, edx2, edx3;
+                    //If greater than four the string is present
+                    Debugger.DoSend("Highest func: " + GetHighestExtendedFunctionSupported());
+                    if (GetHighestExtendedFunctionSupported() > 0x80000004)
+                    {
+                        CPUID(0x80000002, &eax1, &ebx1, &ecx1, &edx1);
+                        CPUID(0x80000003, &eax2, &ebx2, &ecx2, &edx2);
+                        CPUID(0x80000004, &eax3, &ebx3, &ecx3, &edx3);
+                        returnValue[0] = eax1;
+                        returnValue[1] = ebx1;
+                        returnValue[2] = ecx1;
+                        returnValue[3] = edx1;
+
+                        returnValue[4] = eax2;
+                        returnValue[5] = ebx2;
+                        returnValue[6] = ecx2;
+                        returnValue[7] = edx2;
+
+                        returnValue[8] = eax2;
+                        returnValue[9] = ebx2;
+                        returnValue[10] = ecx2;
+                        returnValue[11] = edx2;
+                    }
+                    return returnValue;
                 default:
                     return null;
             }
         }
 
+        #region frequencyMethods
         /// <summary>
         /// Get the frequency of the processor
         /// Notes: needs bochs: "clock: sync=slowdown, time0=local\n" line to work (well, seems to).
@@ -162,6 +190,7 @@ namespace Cosmos.Core.PCInformation
             Debugger.DoSend("Interrupt Called");
             irq0Counter++;
         }
+        #endregion
 
 
         [PlugMethod(PlugRequired = true)]
@@ -185,5 +214,12 @@ namespace Cosmos.Core.PCInformation
         /// </summary>
         /// <returns>Number of CPU cycles per seconds</returns>
         public static long GetCycleRate() => 0; //plugged
+
+        /// <summary>
+        /// Returns the highest extended function supported by cpuid
+        /// </summary>
+        /// <returns>The highest function supported (eax)</returns>
+        [PlugMethod(PlugRequired = true)]
+        public static uint GetHighestExtendedFunctionSupported() => 0; //plugged
     }
 }

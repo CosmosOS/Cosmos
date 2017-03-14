@@ -5,6 +5,7 @@ using System.Net;
 using Cosmos.Core.PCInformation;
 using Cosmos.Core.SMBIOS;
 using Cosmos.Debug.Kernel;
+using Microsoft.SqlServer.Server;
 
 namespace Cosmos.HAL.PCInformation
 {
@@ -75,6 +76,7 @@ namespace Cosmos.HAL.PCInformation
             //Get bits 11:8 of the standard family
             this.Family = (((int) eax >> 20) & 511) + (((int) eax >> 8) & 15);
 
+            ProcessorInformation.CPUID(CPUIDOperation.GetProcessorBrand);
         }
 
         public string GetVendorName()
@@ -85,24 +87,43 @@ namespace Cosmos.HAL.PCInformation
                 uint ebx = raw[0];
                 uint ecx = raw[1];
                 uint edx = raw[2];
-                return new string(new char[] {
-                    (char)(ebx & 0xff),
-                    (char)((ebx >> 8) & 0xff),
-                    (char)((ebx >> 16) & 0xff),
-                    (char)(ebx >> 24),
-                    (char)(edx & 0xff),
-                    (char)((edx >> 8) & 0xff),
-                    (char)((edx >> 16) & 0xff),
-                    (char)(edx >> 24),
-                    (char)(ecx & 0xff),
-                    (char)((ecx >> 8) & 0xff),
-                    (char)((ecx >> 16) & 0xff),
-                    (char)(ecx >> 24),
-                });
-
+                //A little more inefficient but a lot clearer
+                return ConvertIntegerToString(ebx) + ConvertIntegerToString(edx) + ConvertIntegerToString(ecx);
             }
             else
                 return "\0";
+        }
+
+        public string GetBrandName()
+        {
+            if (ProcessorInformation.CanReadCPUID() > 0)
+            {
+                uint[] raw = ProcessorInformation.CPUID(CPUIDOperation.GetProcessorBrand);
+                return ConvertIntegerToString(raw[0]) +
+                       ConvertIntegerToString(raw[1]) +
+                       ConvertIntegerToString(raw[2]) +
+                       ConvertIntegerToString(raw[3]) +
+                       ConvertIntegerToString(raw[4]) +
+                       ConvertIntegerToString(raw[5]) +
+                       ConvertIntegerToString(raw[6]) +
+                       ConvertIntegerToString(raw[8]) +
+                       ConvertIntegerToString(raw[9]) +
+                       ConvertIntegerToString(raw[10]) +
+                       ConvertIntegerToString(raw[11]);
+            }
+            else
+                return "\0";
+        }
+
+        public string ConvertIntegerToString(uint integer)
+        {
+            return new string(new char[]
+            {
+                (char) (integer & 0xff),
+                (char) ((integer >> 8) & 0xff),
+                (char) ((integer >> 16) & 0xff),
+                (char) (integer >> 24)
+            });
         }
 
         /// <summary>

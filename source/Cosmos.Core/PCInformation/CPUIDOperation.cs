@@ -12,8 +12,7 @@
         /// <summary>
         /// Returns general information related with the processor with cpuid <c>eax</c> = 1
         /// </summary>
-        /// <remarks>Returns the first 32 bits of eax and the next 64 bits of eax. This is corresponding
-        /// to the Processor Signature</remarks>
+        /// <remarks>Returns the first 32 bits of eax (processor signature) and additional information.</remarks>
         GetProcessorInformation,
         /// <summary>
         /// Returns the flags and extended flags of the processor with cpuid <c>eax</c> = 1

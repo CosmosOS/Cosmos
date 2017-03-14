@@ -43,5 +43,13 @@ namespace Cosmos.Core.Plugs
 
         [PlugMethod(Assembler = typeof(CanReadCPUID))]
         public static int CanReadCPUID() { return 0; }
+
+        /// <summary>
+        /// The returned integer is like 0x8000000X so we need uint to avoid getting negative numbers (since its binary
+        /// representation)
+        /// </summary>
+        /// <returns></returns>
+        [PlugMethod(Assembler = typeof(GetHighestExtendedFunctionSupported))]
+        public static uint GetHighestExtendedFunctionSupported() { return 0; }
     }
 } 

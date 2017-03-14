@@ -29,6 +29,10 @@ namespace Cosmos.System.PCInfo
         /// Model number
         /// </summary>
         public int ModelNumber { get; set; }
+        /// <summary>
+        /// Brand of the processor
+        /// </summary>
+        public string Brand { get; set; }
 
         public Processor()
         {
@@ -38,6 +42,7 @@ namespace Cosmos.System.PCInfo
             this.Family = processor.Family;
             this.ModelNumber = processor.ModelNumber;
             this.Stepping = processor.Stepping;
+            this.Brand = processor.GetBrandName();
         }
 
     }

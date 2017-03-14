@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Xml.Schema;
+using Cosmos.Debug.Kernel;
 
 namespace Cosmos.System.PCInfo
 {
@@ -33,7 +34,6 @@ namespace Cosmos.System.PCInfo
                 /*
                 //returnProc += "model family: " + x.ProcessorFamily + "\n";
                 //in proc cpu info there is the raw type
-                returnProc += "cpu family: " + x.ProcessorType + "\n";
                 returnProc += "cpu MHz: " + x.Speed + "\n";
                 */
                 returnProc += "flags count: " + x.Flags.Count + "\n";
@@ -45,6 +45,9 @@ namespace Cosmos.System.PCInfo
                         Cosmos.HAL.PCInformation.ProcessorFlagsExtensions.ConvertIntToEnum(x.Flags[i])
                     ) + " ";
                 }
+                //Appending brand crashes deleting the entire string
+                //returnProc += "Brand: " + new String(x.Brand.ToCharArray());
+                Debugger.DoSend("Brand: " + x.Brand);
                 returnProc += "\n";
                 returnProc += "\n";
             }

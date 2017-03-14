@@ -12,11 +12,12 @@ namespace Cosmos.Kernel.Tests.DeviceInformation
         {
             Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
             Console.WriteLine(Cosmos.System.PCInfo.ProcessorInfo.ProcCpuinfo());
+            Console.WriteLine("Out brand: " + Cosmos.System.PCInfo.ProcessorInfo.ListProcessors[0].Brand);
         }
 
         protected override void Run()
         {
-            //Console.ReadKey();
+            Console.ReadLine();
             Cosmos.TestRunner.TestController.Completed();
         }
     }
