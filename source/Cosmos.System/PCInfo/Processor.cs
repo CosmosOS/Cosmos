@@ -12,27 +12,27 @@ namespace Cosmos.System.PCInfo
         /// <summary>
         /// Manufacturer of the procesor (on intel: genuine intel)
         /// </summary>
-        public string Manufacturer { get; set; }
+        public string Manufacturer { get; private set; }
         /// <summary>
         /// Processor family number
         /// </summary>
-        public int Family{ get; set; }
+        public int Family{ get; private set; }
         /// <summary>
         /// Flags of the processor (sse, fpu and so on)
         /// </summary>
-        public List<int> Flags { get; set; }
+        public List<int> Flags { get; private set; }
         /// <summary>
         /// Stepping of the processor
         /// </summary>
-        public int Stepping { get; set; }
+        public int Stepping { get; private set; }
         /// <summary>
         /// Model number
         /// </summary>
-        public int ModelNumber { get; set; }
+        public int ModelNumber { get; private set; }
         /// <summary>
         /// Brand of the processor
         /// </summary>
-        public string Brand { get; set; }
+        public string Brand { get; private set; }
 
         public Processor()
         {

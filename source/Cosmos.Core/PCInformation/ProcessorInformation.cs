@@ -10,11 +10,6 @@ namespace Cosmos.Core.PCInformation
     public unsafe class ProcessorInformation
     {
         /// <summary>
-        /// Returns the Processor's vendor name
-        /// </summary>
-        /// <returns>CPU Vendor name</returns>
-
-        /// <summary>
         /// Gets the information related to a certain cpuid operation
         /// The order of the registers returned is as follows (a register can be omited if it is not returned):
         /// EAX, EBX, ECX, EDX. If there is more than one call the order stays the same: EAX, EBX, ECX, EDX, EAX...

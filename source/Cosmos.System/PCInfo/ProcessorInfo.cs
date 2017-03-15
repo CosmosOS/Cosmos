@@ -13,6 +13,8 @@ namespace Cosmos.System.PCInfo
         {
             get
             {
+                //This is to allow multiprocessor on a future
+                //TODO: search a list of processors based on the topology
                 if (_listProcessors == null)
                 {
                     _listProcessors = new List<Processor>();
@@ -22,36 +24,40 @@ namespace Cosmos.System.PCInfo
             }
         }
 
-        public static string ProcCpuinfo()
+        public delegate void WriteLine(string str);
+
+        /// <summary>
+        /// Debugging method that tries to emulate /proc/cpuinfo of linux
+        /// Prints on the delegate passed as a parameter
+        /// </summary>
+        /// <remark>Use getters of processor instead and don't try to parse this.</remark>
+        public static void ProcCpuinfo(WriteLine writeLineFunc)
         {
-            string returnProc = "";
             foreach (var x in ListProcessors)
             {
-                returnProc += "vendor_id: " + x.Manufacturer + "\n";
-                returnProc += "cpu family: " + x.Family + "\n";
-                returnProc += "model: " + x.ModelNumber + "\n";
-                returnProc += "stepping: " + x.Stepping + "\n";
+                writeLineFunc("vendor_id: " + x.Manufacturer + "\n");
+                writeLineFunc("cpu family: " + x.Family + "\n");
+                writeLineFunc("model: " + x.ModelNumber + "\n");
+                writeLineFunc("stepping: " + x.Stepping + "\n");
                 /*
                 //returnProc += "model family: " + x.ProcessorFamily + "\n";
                 //in proc cpu info there is the raw type
                 returnProc += "cpu MHz: " + x.Speed + "\n";
                 */
-                returnProc += "flags count: " + x.Flags.Count + "\n";
-                returnProc += "flags: ";
+                writeLineFunc("flags count: " + x.Flags.Count + "\n");
+                writeLineFunc("flags: ");
                 for(int i = 0; i < x.Flags.Count; i++)
                 {
                     //Convert Here to string
-                    returnProc += Cosmos.HAL.PCInformation.ProcessorFlagsExtensions.ConvertEnumToString(
+                    writeLineFunc(Cosmos.HAL.PCInformation.ProcessorFlagsExtensions.ConvertEnumToString(
                         Cosmos.HAL.PCInformation.ProcessorFlagsExtensions.ConvertIntToEnum(x.Flags[i])
-                    ) + " ";
+                    ) + "\n");
                 }
                 //Appending brand crashes deleting the entire string
                 //returnProc += "Brand: " + new String(x.Brand.ToCharArray());
-                Debugger.DoSend("Brand: " + x.Brand);
-                returnProc += "\n";
-                returnProc += "\n";
+                writeLineFunc("Brand: " + x.Brand + "\n");
+                writeLineFunc("\n\n");
             }
-            return returnProc;
         }
 
 

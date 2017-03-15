@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using Cosmos.System.PCInfo;
 using Sys = Cosmos.System;
 
 namespace Cosmos.Kernel.Tests.DeviceInformation
@@ -11,13 +12,13 @@ namespace Cosmos.Kernel.Tests.DeviceInformation
         protected override void BeforeRun()
         {
             Console.WriteLine("Cosmos booted successfully. Type a line of text to get it echoed back.");
-            Console.WriteLine(Cosmos.System.PCInfo.ProcessorInfo.ProcCpuinfo());
+            ProcessorInfo.WriteLine del = Console.Write;
+            ProcessorInfo.ProcCpuinfo(del);
             Console.WriteLine("Out brand: " + Cosmos.System.PCInfo.ProcessorInfo.ListProcessors[0].Brand);
         }
 
         protected override void Run()
         {
-            Console.ReadLine();
             Cosmos.TestRunner.TestController.Completed();
         }
     }
