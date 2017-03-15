@@ -10,7 +10,7 @@ namespace Cosmos.Assembler.x86
     /// </summary>
     [Cosmos.Assembler.OpCode("rdmsr")]
     public class Rdmsr
-        : InstructionWithDestinationAndSourceAndSize
+        : Instruction
     {
         public Rdmsr() : base("rdmsr")
         {

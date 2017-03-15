@@ -96,6 +96,7 @@
     <Compile Include="BaseIOGroups.cs" />
     <Compile Include="Bootstrap.cs" />
     <Compile Include="PCInformation\CPUIDOperation.cs" />
+    <Compile Include="PCInformation\RDMSROperation.cs" />
     <Compile Include="SMBIOS\BIOSInfo.cs" />
     <Compile Include="SMBIOS\CPUInfo.cs" />
     <Compile Include="SMBIOS\DebugSMBIOS.cs" />

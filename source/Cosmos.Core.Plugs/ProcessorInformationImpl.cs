@@ -51,5 +51,15 @@ namespace Cosmos.Core.Plugs
         /// <returns></returns>
         [PlugMethod(Assembler = typeof(GetHighestExtendedFunctionSupported))]
         public static uint GetHighestExtendedFunctionSupported() { return 0; }
+
+
+        /// <summary>
+        /// Read the model specific register using the rdmsr instruction.
+        /// </summary>
+        /// <param name="ecxOperation">ECX parameter passed to the rdmsr instruction</param>
+        /// <param name="eax">Lower part of rdmsr</param>
+        /// <param name="edx">Higher part of rdmsr</param>
+        [PlugMethod(Assembler = typeof(RDMSR))]
+        public static void RDMSR(uint ecxOperation, uint* eax, uint* edx) { }
     }
 } 

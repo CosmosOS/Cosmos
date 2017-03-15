@@ -9,7 +9,6 @@ namespace Cosmos.Core.PCInformation
 {
     public unsafe class ProcessorInformation
     {
-        private static int irq0Counter = 0;
         /// <summary>
         /// Returns the Processor's vendor name
         /// </summary>
@@ -25,7 +24,6 @@ namespace Cosmos.Core.PCInformation
         /// <returns></returns>
         public static uint[] CPUID(CPUIDOperation operation)
         {
-
             uint ptr = 0;
             uint eax;
             uint ebx;
@@ -34,27 +32,7 @@ namespace Cosmos.Core.PCInformation
             uint[] returnValue;
             switch (operation)
             {
-                case CPUIDOperation.GetVendorID:
-                    returnValue = new uint[3];
-                    CPUID(0, &eax, &ebx, &ecx, &edx);
-                    returnValue[0] = ebx;
-                    returnValue[1] = ecx;
-                    returnValue[2] = edx;
-                    return returnValue;
-                case CPUIDOperation.GetProcessorInformation:
-                    //Returns the signature
-                    returnValue = new uint[2];
-                    CPUID(1, &eax, &ebx, &ecx, &edx);
-                    returnValue[0] = eax;
-                    returnValue[1] = ebx;
-                    return returnValue;
-                case CPUIDOperation.GetFlags:
-                    Debug.Kernel.Debugger.DoSend("Parse flags");
-                    returnValue = new uint[2];
-                    CPUID(1, &eax, &ebx, &ecx, &edx);
-                    returnValue[0] = ecx;
-                    returnValue[1] = edx;
-                    return returnValue;
+                //Special case: this requires more than one call
                 case CPUIDOperation.GetProcessorBrand:
                     returnValue = new uint[12];
                     uint eax1, eax2, eax3, ebx1, ebx2, ebx3, ecx1, ecx2, ecx3, edx1, edx2, edx3;
@@ -82,7 +60,14 @@ namespace Cosmos.Core.PCInformation
                     }
                     return returnValue;
                 default:
-                    return null;
+                    //In some cases this will return garbage. Caller's problem.
+                    CPUID((uint) operation, &eax, &ebx, &ecx, &edx);
+                    returnValue = new uint[4];
+                    returnValue[0] = eax;
+                    returnValue[1] = ebx;
+                    returnValue[2] = ecx;
+                    returnValue[3] = edx;
+                    return returnValue;
             }
         }
 
@@ -183,37 +168,41 @@ namespace Cosmos.Core.PCInformation
             ulong ciclos = ((edxNext << 32) + eaxNext) - ((edxPrev << 32) + eaxPrev);
             return ciclos / (currentCounter * 0.01);
         }
-        */
 
         private static void AHandler(ref INTs.IRQContext aContext)
         {
             Debugger.DoSend("Interrupt Called");
             irq0Counter++;
         }
+        */
         #endregion
 
 
+        /// <summary>
+        /// Get the current cicle count using rtdsc instruction
+        /// </summary>
+        /// <param name="eax">eax containing the low </param>
+        /// <param name="edx"></param>
         [PlugMethod(PlugRequired = true)]
-        public static void GetCurrentTimeStampCounter(uint* eax, uint* edx)
+        private static void GetCurrentTimeStampCounter(uint* eax, uint* edx)
         { }
 
+        /// <summary>
+        /// Calls cpuid and returns the registers modified by the instruction.
+        /// </summary>
+        /// <param name="eaxOperation">Initial value of eax (before calling cpuid)</param>
+        /// <param name="eax">Returned eax</param>
+        /// <param name="ebx">Returned ebx</param>
+        /// <param name="ecx">Returned ecx</param>
+        /// <param name="edx">Returned edx</param>
         [PlugMethod(PlugRequired = true)]
-        public static void CPUID(uint eaxOperation, uint* eax, uint* ebx, uint* ecx, uint* edx) { }
+        private static void CPUID(uint eaxOperation, uint* eax, uint* ebx, uint* ecx, uint* edx) { }
+
+        [PlugMethod(PlugRequired = true)]
+        private static void RDMSR(uint ecxOperation, uint* eax, uint* edx) { }
 
         [PlugMethod(PlugRequired = true)]
         public static int CanReadCPUID() => 0; //plugged
-
-        /// <summary>
-        /// Returns the number of CPU cycles since startup of the current CPU core
-        /// </summary>
-        /// <returns>Number of CPU cycles since startup</returns>
-        public static long GetCycleCount() => 0; //plugged
-
-        /// <summary>
-        /// Returns the number of CPU cycles per seconds
-        /// </summary>
-        /// <returns>Number of CPU cycles per seconds</returns>
-        public static long GetCycleRate() => 0; //plugged
 
         /// <summary>
         /// Returns the highest extended function supported by cpuid
@@ -221,5 +210,23 @@ namespace Cosmos.Core.PCInformation
         /// <returns>The highest function supported (eax)</returns>
         [PlugMethod(PlugRequired = true)]
         public static uint GetHighestExtendedFunctionSupported() => 0; //plugged
+
+        /// <summary>
+        /// Read the specific rdmsr register.
+        /// The value will be returned as an integer array
+        /// Can be used to get the frequency but probably will return 0
+        /// </summary>
+        /// <param name="operation">Retuned eax and edx (in that order)</param>
+        public static uint[] RDMSR(RDMSROperation operation)
+        {
+            uint eax, edx;
+            uint[] returnValue = new uint[2];
+            RDMSR((uint)operation, &eax, &edx);
+            Debugger.DoSend("Sent eax: " + eax);
+            Debugger.DoSend("Sent edx: " + edx);
+            returnValue[0] = eax;
+            returnValue[1] = edx;
+            return returnValue;
+        }
     }
 }

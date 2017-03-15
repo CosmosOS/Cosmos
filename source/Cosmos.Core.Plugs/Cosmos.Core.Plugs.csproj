@@ -98,6 +98,7 @@
     <Compile Include="CPUInformationPlugs\CPUID.cs" />
     <Compile Include="CPUInformationPlugs\GetCurrentTimeStampCounter.cs" />
     <Compile Include="CPUInformationPlugs\GetHighestExtendedFunctionSupported.cs" />
+    <Compile Include="CPUInformationPlugs\RDMSR.cs" />
     <Compile Include="IOPortImpl.cs" />
     <Compile Include="ProcessorInformationImpl.cs" />
     <Compile Include="System\ArrayImpl.cs" />
