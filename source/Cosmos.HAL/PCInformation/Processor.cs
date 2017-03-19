@@ -11,9 +11,6 @@ namespace Cosmos.HAL.PCInformation
 {
     /// <summary>
     /// This class represents one processor of the machine
-    /// There is a LOT of information in this class
-    /// This contains the same information as "dmidecode -t 4"
-    /// TODO: parse the rest of the information
     /// </summary>
     public class Processor
     {
@@ -37,6 +34,10 @@ namespace Cosmos.HAL.PCInformation
         /// Model number
         /// </summary>
         public int ModelNumber { get; private set; }
+        /// <summary>
+        /// Frequency of the processor in mhz
+        /// </summary>
+        public double Frequency { get; private set; }
 
         public Processor()
         {
@@ -54,6 +55,7 @@ namespace Cosmos.HAL.PCInformation
             this.Flags = ParseFlags();
             //Parses stepping, model and family
             ParseInformation();
+            this.Frequency = ProcessorInformation.GetFrequency();
         }
 
         /// <summary>

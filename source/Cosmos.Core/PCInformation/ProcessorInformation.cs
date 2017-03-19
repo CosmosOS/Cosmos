@@ -9,6 +9,8 @@ namespace Cosmos.Core.PCInformation
 {
     public unsafe class ProcessorInformation
     {
+        private static int irq0Counter = 0;
+
         /// <summary>
         /// Gets the information related to a certain cpuid operation
         /// The order of the registers returned is as follows (a register can be omited if it is not returned):
@@ -68,13 +70,14 @@ namespace Cosmos.Core.PCInformation
 
         #region frequencyMethods
         /// <summary>
-        /// Get the frequency of the processor
+        /// WARNING: may produce inacurate results (specially in emulators).
+        /// Get the frequency of the processor without using interrupts.
         /// Notes: needs bochs: "clock: sync=slowdown, time0=local\n" line to work (well, seems to).
         /// </summary>
         /// <remarks>Credit to: http://wiki.osdev.org/Detecting_CPU_Speed#Without_Interrupts . In emulators the PIT
         /// can go much more quicker than expected giving absurdly big values.
         /// </remarks>
-        /// <returns></returns>
+        /// <returns>Frequency in MHz</returns>
         public static double GetFrequency()
         {
             uint eaxPrev, edxPrev, eaxNext, edxNext;
@@ -130,12 +133,13 @@ namespace Cosmos.Core.PCInformation
             return frequency;
         }
 
-        /*
+        // TODO: implement this method correctly
         /// <summary>
-        /// Get the frequency of the processor
+        /// Get the frequency of the processor (using interrupts)
         /// </summary>
         /// <remarks>Credit to: http://wiki.osdev.org/Detecting_CPU_Speed#Without_Interrupts </remarks>
         /// <returns></returns>
+        /*
         public static double GetFrequency()
         {
             uint eaxPrev, edxPrev, eaxNext, edxNext;

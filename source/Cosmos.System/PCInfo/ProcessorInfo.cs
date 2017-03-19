@@ -51,11 +51,13 @@ namespace Cosmos.System.PCInfo
                     //Convert Here to string
                     writeLineFunc(Cosmos.HAL.PCInformation.ProcessorFlagsExtensions.ConvertEnumToString(
                         Cosmos.HAL.PCInformation.ProcessorFlagsExtensions.ConvertIntToEnum(x.Flags[i])
-                    ) + "\n");
+                    ) + " ");
                 }
+                writeLineFunc("\n");
                 //Appending brand crashes deleting the entire string
                 //returnProc += "Brand: " + new String(x.Brand.ToCharArray());
                 writeLineFunc("Brand: " + x.Brand + "\n");
+                writeLineFunc("Frequency: " + x.Frequency + "\n");
                 writeLineFunc("\n\n");
             }
         }

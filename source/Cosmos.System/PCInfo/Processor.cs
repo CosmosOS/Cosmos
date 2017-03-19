@@ -34,6 +34,11 @@ namespace Cosmos.System.PCInfo
         /// </summary>
         public string Brand { get; private set; }
 
+        /// <summary>
+        /// Frequency in mhz
+        /// </summary>
+        public double Frequency { get; private set; }
+
         public Processor()
         {
             Cosmos.HAL.PCInformation.Processor processor = new HAL.PCInformation.Processor();
@@ -43,6 +48,7 @@ namespace Cosmos.System.PCInfo
             this.ModelNumber = processor.ModelNumber;
             this.Stepping = processor.Stepping;
             this.Brand = processor.GetBrandName();
+            this.Frequency = processor.Frequency;
         }
 
     }
