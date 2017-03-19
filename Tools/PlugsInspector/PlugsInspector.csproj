@@ -11,6 +11,7 @@
     <AssemblyName>PlugsInspector</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -67,18 +68,19 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj">
+      <Project>{34aeeb7c-fd5d-4b15-a830-b429681844bd}</Project>
+      <Name>Cosmos.IL2CPU.Plugs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj">
+      <Project>{4f903492-cca6-4fd9-a1b6-5e4cc0ce7767}</Project>
+      <Name>Cosmos.IL2CPU</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -5,8 +5,9 @@ using Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86.SSE;
 using Cosmos.Assembler.x86.x87;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 using static Cosmos.Assembler.x86.SSE.ComparePseudoOpcodes;
 
 namespace Cosmos.IL2CPU.X86.IL

@@ -98,18 +98,18 @@ namespace Cosmos.Assembler
             return GetFullName(aType.GetTypeInfo());
         }
 
-        public static string GetFullName(TypeInfo aType)
+        public static string GetFullName(TypeInfo aTypeInfo)
         {
-            if (aType.IsGenericParameter)
+            if (aTypeInfo.IsGenericParameter)
             {
-                return aType.FullName;
+                return aTypeInfo.FullName;
             }
             StringBuilder xSB = new StringBuilder(256);
-            if (aType.IsArray)
+            if (aTypeInfo.IsArray)
             {
-                xSB.Append(GetFullName(aType.GetElementType()));
+                xSB.Append(GetFullName(aTypeInfo.GetElementType()));
                 xSB.Append("[");
-                int xRank = aType.GetArrayRank();
+                int xRank = aTypeInfo.GetArrayRank();
                 while (xRank > 1)
                 {
                     xSB.Append(",");
@@ -118,21 +118,21 @@ namespace Cosmos.Assembler
                 xSB.Append("]");
                 return xSB.ToString();
             }
-            if (aType.IsByRef && aType.HasElementType)
+            if (aTypeInfo.IsByRef && aTypeInfo.HasElementType)
             {
-                return "&" + GetFullName(aType.GetElementType());
+                return "&" + GetFullName(aTypeInfo.GetElementType());
             }
-            if (aType.IsGenericType && !aType.IsGenericTypeDefinition)
+            if (aTypeInfo.IsGenericType && !aTypeInfo.IsGenericTypeDefinition)
             {
-                xSB.Append(GetFullName(aType.GetGenericTypeDefinition()));
+                xSB.Append(GetFullName(aTypeInfo.GetGenericTypeDefinition()));
             }
             else {
-                xSB.Append(aType.FullName);
+                xSB.Append(aTypeInfo.FullName);
             }
-            if (aType.IsGenericType)
+            if (aTypeInfo.IsGenericType)
             {
                 xSB.Append("<");
-                var xArgs = aType.GetGenericArguments();
+                var xArgs = aTypeInfo.GenericTypeArguments;
                 for (int i = 0; i < xArgs.Length - 1; i++)
                 {
                     xSB.Append(GetFullName(xArgs[i]));

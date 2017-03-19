@@ -1,25 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Vsix Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
-  <Identifier Id="a82b45e9-2a89-43bd-925d-c7f0edd212aa">
-    <Name>Cosmos.VS.Windows</Name>
-    <Author>Cosmos</Author>
-    <Version>1.0</Version>
-    <Description xml:space="preserve">Cosmos Tool Windows Package</Description>
-    <Locale>1033</Locale>
-    <InstalledByMsi>false</InstalledByMsi>
-    <SupportedProducts>
-      <VisualStudio Version="10.0">
-        <Edition>Pro</Edition>
-      </VisualStudio>
-    </SupportedProducts>
-    <SupportedFrameworkRuntimeEdition MinVersion="4.0" MaxVersion="4.0" />
-  </Identifier>
-  <References>
-        <Reference Id="Microsoft.VisualStudio.MPF" MinVersion="10.0">
-            <Name>Visual Studio MPF</Name>
-        </Reference>
-  </References>
-  <Content>
-    <VsPackage>|%CurrentProject%;PkgdefProjectOutputGroup|</VsPackage>
-  </Content>
-</Vsix>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+    <Metadata>
+        <Identity Id="Cosmos.VS.Windows" Version="1.0" Language="en-US" Publisher="Cosmos" />
+        <DisplayName>Cosmos.VS.Windows</DisplayName>
+        <Description xml:space="preserve">Visual Studio Windows for Cosmos</Description>
+    </Metadata>
+    <Installation>
+        <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0]" />
+    </Installation>
+    <Dependencies>
+        <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
+    </Dependencies>
+    <Assets>
+        <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    </Assets>
+    <Prerequisites>
+        <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />
+    </Prerequisites>
+</PackageManifest>

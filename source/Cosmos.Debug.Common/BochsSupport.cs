@@ -8,7 +8,7 @@ using Microsoft.Win32;
 
 namespace Cosmos.Debug.Common
 {
-    /// <summary>An helper class that is used from both Cosmos.VS.Package and Cosmos.VS.DebugEngine for
+    /// <summary>An helper class that is used from both Cosmos.VS.ProjectSystem and Cosmos.VS.DebugEngine for
     /// Bochs emulator support.</summary>
     public static class BochsSupport
     {

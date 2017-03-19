@@ -11,7 +11,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 
-namespace XSharp.VS {
+namespace XSharp.VS
+{
   /// This is the class that implements the package exposed by this assembly.
   ///
   /// The minimum requirement for a class to be considered a valid package for Visual Studio
@@ -21,26 +22,8 @@ namespace XSharp.VS {
   /// IVsPackage interface and uses the registration attributes defined in the framework to
   /// register itself and its components with the shell.
   //
-  // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is a package.
-  //[PackageRegistration(UseManagedResourcesOnly = true)]
-  //// This attribute is used to register the informations needed to show the this package
-  //// in the Help/About dialog of Visual Studio.
-  //[InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
-  //[Guid(Guids.guidCosmos_VS_XSharpPkgString)]
-
-  //// Registering a Language Service (MPF)
-  //// http://msdn.microsoft.com/en-us/library/bb166498
-  //[ProvideServiceAttribute(typeof(XSharpLanguageService), ServiceName = "X# Language Service")]
-  //[ProvideLanguageServiceAttribute(typeof(XSharpLanguageService), "X#",
-  //  106, // Resource ID of localized language name
-  //  CodeSense = false, // IntelliSense
-  //  RequestStockColors = true,
-  //  EnableCommenting = false, // Commenting out code
-  //  EnableAsyncCompletion = true // Background parsing
-  //)]
-  //[ProvideLanguageExtensionAttribute(typeof(XSharpLanguageService), ".xs")]
-
-  public sealed class Cosmos_VS_XSharpPackage : Package, IOleComponent {
+  public sealed class Cosmos_VS_XSharpPackage : Package, IOleComponent
+  {
     uint mComponentID;
 
     // Default constructor of the package.
@@ -48,12 +31,14 @@ namespace XSharp.VS {
     // any Visual Studio service because at this point the package object is created but
     // not sited yet inside Visual Studio environment. The place to do all the other
     // initialization is the Initialize method.
-    public Cosmos_VS_XSharpPackage() {
+    public Cosmos_VS_XSharpPackage()
+    {
     }
 
     /// Initialization of the package; this method is called right after the package is sited, so this is the place
     /// where you can put all the initilaization code that rely on services provided by VisualStudio.
-    protected override void Initialize() {
+    protected override void Initialize()
+    {
       base.Initialize();
       // Proffer the service.
       var serviceContainer = this as IServiceContainer;
@@ -63,7 +48,8 @@ namespace XSharp.VS {
 
       // Register a timer to call our language service during idle periods.
       var xMgr = GetService(typeof(SOleComponentManager)) as IOleComponentManager;
-      if (mComponentID == 0 && xMgr != null) {
+      if (mComponentID == 0 && xMgr != null)
+      {
         OLECRINFO[] crinfo = new OLECRINFO[1];
         crinfo[0].cbSize = (uint)Marshal.SizeOf(typeof(OLECRINFO));
         crinfo[0].grfcrf = (uint)_OLECRF.olecrfNeedIdleTime | (uint)_OLECRF.olecrfNeedPeriodicIdleTime;
@@ -73,10 +59,13 @@ namespace XSharp.VS {
       }
     }
 
-    protected override void Dispose(bool disposing) {
-      if (mComponentID != 0) {
+    protected override void Dispose(bool disposing)
+    {
+      if (mComponentID != 0)
+      {
         var xMgr = GetService(typeof(SOleComponentManager)) as IOleComponentManager;
-        if (xMgr != null) {
+        if (xMgr != null)
+        {
           xMgr.FRevokeComponent(mComponentID);
         }
         mComponentID = 0;
@@ -84,33 +73,40 @@ namespace XSharp.VS {
       base.Dispose(disposing);
     }
 
-    public int FDoIdle(uint grfidlef) {
+    public int FDoIdle(uint grfidlef)
+    {
       bool bPeriodic = (grfidlef & (uint)_OLEIDLEF.oleidlefPeriodic) != 0;
       // Use typeof(TestLanguageService) because we need to reference the GUID for our language service.
       LanguageService xService = GetService(typeof(XSharpLanguageService)) as LanguageService;
-      if (xService != null) {
+      if (xService != null)
+      {
         xService.OnIdle(bPeriodic);
       }
       return 0;
     }
 
-    public int FContinueMessageLoop(uint uReason, IntPtr pvLoopData, MSG[] pMsgPeeked) {
+    public int FContinueMessageLoop(uint uReason, IntPtr pvLoopData, MSG[] pMsgPeeked)
+    {
       return 1;
     }
 
-    public int FPreTranslateMessage(MSG[] pMsg) {
+    public int FPreTranslateMessage(MSG[] pMsg)
+    {
       return 0;
     }
 
-    public int FQueryTerminate(int fPromptUser) {
+    public int FQueryTerminate(int fPromptUser)
+    {
       return 1;
     }
 
-    public int FReserved1(uint dwReserved, uint message, IntPtr wParam, IntPtr lParam) {
+    public int FReserved1(uint dwReserved, uint message, IntPtr wParam, IntPtr lParam)
+    {
       return 1;
     }
 
-    public IntPtr HwndGetWindow(uint dwWhich, uint dwReserved) {
+    public IntPtr HwndGetWindow(uint dwWhich, uint dwReserved)
+    {
       return IntPtr.Zero;
     }
 

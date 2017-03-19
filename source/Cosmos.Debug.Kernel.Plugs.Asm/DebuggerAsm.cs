@@ -1,6 +1,6 @@
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.Plugs;
-using XSharp.Compiler;
+using XSharp.Common;
 
 namespace Cosmos.Debug.Kernel.Plugs.Asm
 {

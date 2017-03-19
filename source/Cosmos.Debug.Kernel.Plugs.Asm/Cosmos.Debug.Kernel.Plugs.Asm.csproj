@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard1.5</TargetFramework>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj" />
+      <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+      <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj" />
+      <ProjectReference Include="..\XSharp.Common\XSharp.Common.csproj" />
+    </ItemGroup>
+
+</Project>

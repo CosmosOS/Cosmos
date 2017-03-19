@@ -4,8 +4,9 @@ using Cosmos.Assembler;
 using System.Reflection;
 using System.Linq;
 using System.Xml.Linq;
+
 using Cosmos.IL2CPU.ILOpCodes;
-using XSharp.Compiler;
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL
 {

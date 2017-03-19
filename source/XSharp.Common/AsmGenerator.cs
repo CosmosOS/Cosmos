@@ -1,14 +1,16 @@
-﻿using System;
+﻿using Cosmos.Assembler;
+using System;
 using System.Globalization;
-using System.Text;
 using System.IO;
-using Cosmos.Assembler;
+using System.Text;
 
-namespace XSharp.Compiler {
+namespace XSharp.Common
+{
   // This class performs the translation from X# source code into a target
   // assembly language. At current time the only supported assembler syntax is NASM.
 
-  public class AsmGenerator {
+  public class AsmGenerator
+  {
     protected TokenPatterns mPatterns = new TokenPatterns();
 
     /// <summary>Should we keep the user comments in the generated target assembly program ?</summary>
@@ -18,8 +20,10 @@ namespace XSharp.Compiler {
 
     /// <summary>Invoke this method when end of source code file is reached to make sure the last
     /// function or interrupt handler has well balanced opening/closing curly braces.</summary>
-    private void AssertLastFunctionComplete() {
-      if (!mPatterns.InFunctionBody) {
+    private void AssertLastFunctionComplete()
+    {
+      if (!mPatterns.InFunctionBody)
+      {
         return;
       }
       throw new Exception("The last function or interrupt handler from source code file is missing a curly brace.");
@@ -86,7 +90,8 @@ namespace XSharp.Compiler {
     /// assembly language. The two generated files contain target assembler source and target
     /// assembler data respectively.</summary>
     /// <param name="aSrcPathname">X# source code file.</param>
-    public void GenerateToFiles(string aSrcPathname) {
+    public void GenerateToFiles(string aSrcPathname)
+    {
       mPathname = Path.GetFileName(aSrcPathname);
       new Assembler(false);
       try
@@ -112,14 +117,17 @@ namespace XSharp.Compiler {
     /// <param name="aInput">A reader to acquire X# source code from.</param>
     /// <param name="aOutputData">A writer that will receive target assembler data.</param>
     /// <param name="aOutputCode">A writer that will receive target assembler code.</param>
-    public void Generate(TextReader aInput, TextWriter aOutput) {
+    public void Generate(TextReader aInput, TextWriter aOutput)
+    {
       mPatterns.EmitUserComments = EmitUserComments;
       mLineNo = 0;
       // Read one X# source code line at a time and process it.
-      while (true) {
+      while (true)
+      {
         mLineNo++;
         string xLine = aInput.ReadLine();
-        if (xLine == null) {
+        if (xLine == null)
+        {
           break;
         }
 
@@ -136,17 +144,21 @@ namespace XSharp.Compiler {
     /// <param name="lineNumber">Line number for debugging and diagnostic messages.</param>
     /// <returns>The resulting target assembler content. The returned object contains
     /// a code and a data block.</returns>
-    protected void ProcessLine(string aLine, int lineNumber) {
+    protected void ProcessLine(string aLine, int lineNumber)
+    {
       aLine = aLine.Trim();
-      if (String.IsNullOrEmpty(aLine) || aLine == "//") {
+      if (String.IsNullOrEmpty(aLine) || aLine == "//")
+      {
         return;
       }
 
       // Currently we use a new assembler for every line.
       // If we dont it could create a really large in memory object.
-      if (!mPatterns.GetCode(aLine, lineNumber)) {
+      if (!mPatterns.GetCode(aLine, lineNumber))
+      {
         var xMsg = new StringBuilder();
-        if (mPathname != "") {
+        if (mPathname != "")
+        {
           xMsg.Append("File " + mPathname + ", ");
         }
         xMsg.Append("Line " + mLineNo + ", ");

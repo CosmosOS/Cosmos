@@ -19,8 +19,8 @@ using Cosmos.IL2CPU.Plugs;
 using Cosmos.IL2CPU.X86.IL;
 using Cosmos.Debug.Symbols;
 using Cosmos.IL2CPU.Extensions;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 using Call = Cosmos.Assembler.x86.Call;
 using Label = Cosmos.Assembler.Label;
 

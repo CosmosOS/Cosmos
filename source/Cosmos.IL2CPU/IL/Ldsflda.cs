@@ -4,7 +4,8 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using System.Reflection;
 using System.Linq;
-using XSharp.Compiler;
+
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL
 {

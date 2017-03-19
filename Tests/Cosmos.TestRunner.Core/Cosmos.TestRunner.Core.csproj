@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    
+    <PropertyGroup>
+        <TargetFramework>netstandard1.6</TargetFramework>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="System.Xml.XmlDocument" Version="4.3.0" />
+        <PackageReference Include="System.Xml.XPath.XmlDocument" Version="4.3.0" />
+        <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\source\Cosmos.Assembler\Cosmos.Assembler.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.Core.Plugs.Asm\Cosmos.Core.Plugs.Asm.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj" />
+        <ProjectReference Include="..\BoxingTests\BoxingTests.csproj" />
+        <ProjectReference Include="..\Cosmos.Compiler.Tests.Bcl\Cosmos.Compiler.Tests.Bcl.csproj" />
+        <ProjectReference Include="..\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj" />
+        <ProjectReference Include="..\Cosmos.Compiler.Tests.Exceptions\Cosmos.Compiler.Tests.Exceptions.csproj" />
+        <ProjectReference Include="..\Cosmos.Compiler.Tests.Interfaces\Cosmos.Compiler.Tests.Interfaces.csproj" />
+        <ProjectReference Include="..\Cosmos.Compiler.Tests.LinqTests\Cosmos.Compiler.Tests.LinqTests.csproj" />
+        <ProjectReference Include="..\Cosmos.Compiler.Tests.MethodTests\Cosmos.Compiler.Tests.MethodTests.csproj" />
+        <ProjectReference Include="..\Cosmos.Compiler.Tests.SimpleWriteLine\Cosmos.Compiler.Tests.SimpleWriteLine.csproj" />
+        <ProjectReference Include="..\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTest.csproj" />
+        <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj" />
+        <ProjectReference Include="..\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj" />
+        <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj" />
+        <ProjectReference Include="..\VGACompilerCrash\VGACompilerCrash.csproj" />
+    </ItemGroup>
+
+</Project>

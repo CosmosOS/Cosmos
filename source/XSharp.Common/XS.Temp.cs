@@ -1,4 +1,4 @@
-﻿namespace XSharp.Compiler
+﻿namespace XSharp.Common
 {
   partial class XS
   {

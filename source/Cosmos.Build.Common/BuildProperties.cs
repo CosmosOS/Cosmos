@@ -12,11 +12,8 @@ namespace Cosmos.Build.Common
 
         static BuildProperties()
         {
-#if NETSTANDARD1_6
-            var xFields = typeof(BuildPropertyNames).GetTypeInfo().GetFields();
-#else
-            var xFields = typeof(BuildPropertyNames).GetFields();
-#endif
+            var xFields = typeof(BuildPropertyNames).GetRuntimeFields();
+
             foreach (var xField in xFields)
             {
                 // IsLiteral determines if its value is written at compile time and not changeable.

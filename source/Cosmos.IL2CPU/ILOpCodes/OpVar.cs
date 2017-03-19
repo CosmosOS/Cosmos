@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Reflection.Metadata;
 using Cosmos.Debug.Symbols;
+
 using Cosmos.IL2CPU.Extensions;
 
 namespace Cosmos.IL2CPU.ILOpCodes

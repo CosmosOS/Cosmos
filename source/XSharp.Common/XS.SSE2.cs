@@ -1,20 +1,19 @@
 ﻿using System;
 using Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86.SSE;
-using static XSharp.Compiler.XSRegisters;
 
-namespace XSharp.Compiler
+namespace XSharp.Common
 {
   partial class XS
   {
     public static class SSE2
     {
-      public static void AddSD(RegisterXMM destination, RegisterXMM source)
+      public static void AddSD(XSRegisters.RegisterXMM destination, XSRegisters.RegisterXMM source)
       {
         DoDestinationSource<AddSD>(destination, source);
       }
 
-      public static void DivSD(RegisterXMM destination, RegisterXMM source)
+      public static void DivSD(XSRegisters.RegisterXMM destination, XSRegisters.RegisterXMM source)
       {
         new DivSD
         {
@@ -23,17 +22,17 @@ namespace XSharp.Compiler
         };
       }
 
-      public static void MulSD(RegisterXMM destination, RegisterXMM source)
+      public static void MulSD(XSRegisters.RegisterXMM destination, XSRegisters.RegisterXMM source)
       {
           DoDestinationSource<MulSD>(destination, source);
       }
 
-      public static void SubSD(RegisterXMM destination, RegisterXMM source)
+      public static void SubSD(XSRegisters.RegisterXMM destination, XSRegisters.RegisterXMM source)
       {
           DoDestinationSource<SubSD>(destination, source);
       }
 
-      public static void CompareSD(RegisterXMM destination, RegisterXMM source, ComparePseudoOpcodes comparision)
+      public static void CompareSD(XSRegisters.RegisterXMM destination, XSRegisters.RegisterXMM source, ComparePseudoOpcodes comparision)
       {
        new CompareSD()
        {
@@ -43,7 +42,7 @@ namespace XSharp.Compiler
        };
       }
 
-      public static void ConvertSD2SIAndTruncate(Register32 destination, RegisterXMM source)
+      public static void ConvertSD2SIAndTruncate(XSRegisters.Register32 destination, XSRegisters.RegisterXMM source)
       {
         new ConvertSD2SIAndTruncate
         {
@@ -52,7 +51,7 @@ namespace XSharp.Compiler
         };
       }
 
-      public static void ConvertSD2SS(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
+      public static void ConvertSD2SS(XSRegisters.RegisterXMM destination, XSRegisters.Register32 source, bool sourceIsIndirect = false)
       {
         new ConvertSD2SS()
         {
@@ -62,7 +61,7 @@ namespace XSharp.Compiler
         };
      }
 
-     public static void ConvertSI2SD(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false, int? sourceDisplacement = null, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+     public static void ConvertSI2SD(XSRegisters.RegisterXMM destination, XSRegisters.Register32 source, bool sourceIsIndirect = false, int? sourceDisplacement = null, bool destinationIsIndirect = false, int? destinationDisplacement = null)
      {
          new ConvertSI2SD()
          {
@@ -75,7 +74,7 @@ namespace XSharp.Compiler
          };
       }
 
-      public static void MoveD(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      public static void MoveD(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
       {
         DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
       }
@@ -90,22 +89,22 @@ namespace XSharp.Compiler
         DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
       }
 
-      public static void MoveD(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      public static void MoveD(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
       {
         DoDestinationSource<MoveD>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
       }
 
-      public static void MoveD(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      public static void MoveD(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
       {
         DoDestinationSource<MoveD>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
       }
 
-      public static void MoveD(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      public static void MoveD(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
       {
         DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
       }
 
-      public static void MoveSD(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
+      public static void MoveSD(XSRegisters.RegisterXMM destination, XSRegisters.Register32 source, bool sourceIsIndirect = false)
       {
         new MoveSD()
         {
@@ -115,7 +114,7 @@ namespace XSharp.Compiler
         };
       }
 
-      public static void MoveSD(Register32 destination, RegisterXMM source, bool destinationIsIndirect = false)
+      public static void MoveSD(XSRegisters.Register32 destination, XSRegisters.RegisterXMM source, bool destinationIsIndirect = false)
       {
         new MoveSD()
         {
@@ -125,12 +124,12 @@ namespace XSharp.Compiler
         };
       }
 
-      public static void XorPD(RegisterXMM destination, RegisterXMM source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      public static void XorPD(XSRegisters.RegisterXMM destination, XSRegisters.RegisterXMM source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
       {
           DoDestinationSource<XorPD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
       }
 
-      public static void XorPD(RegisterXMM destination, String sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+      public static void XorPD(XSRegisters.RegisterXMM destination, String sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
       {
          DoDestinationSource<XorPD>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
       }

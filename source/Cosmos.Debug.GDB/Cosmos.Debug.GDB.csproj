@@ -12,6 +12,7 @@
     <AssemblyName>Cosmos.Debug.GDB</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -143,21 +144,7 @@
     <EmbeddedResource Include="FormWatches.resx">
       <DependentUpon>FormWatches.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <None Include="SettingsDS.xsc">
       <DependentUpon>SettingsDS.xsd</DependentUpon>
     </None>
@@ -169,11 +156,6 @@
     <None Include="SettingsDS.xss">
       <DependentUpon>SettingsDS.xsd</DependentUpon>
     </None>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsDS.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -196,7 +178,7 @@
   <PropertyGroup>
     <InstallPath>$(registry:HKEY_LOCAL_MACHINE\SOFTWARE\Cosmos)</InstallPath>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>-->

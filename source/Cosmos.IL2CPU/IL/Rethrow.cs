@@ -1,5 +1,6 @@
 using System;
 
+
 namespace Cosmos.IL2CPU.X86.IL
 {
 	[OpCode(ILOpCode.Code.Rethrow)]

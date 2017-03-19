@@ -1,31 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">14.0.25420</VisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-  </PropertyGroup>
-  <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
-  <PropertyGroup Label="Globals">
-    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <TargetFramework>netstandard1.5</TargetFramework>
     <ProjectGuid>{5b2c0369-7a84-4113-892c-f71b50e1da12}</ProjectGuid>
-    <TargetFrameworkIdentifier>.NETStandard</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v1.6</TargetFrameworkVersion>
-    <TargetFramework>netstandard1.6</TargetFramework>
-    <BaseNuGetRuntimeIdentifier>win</BaseNuGetRuntimeIdentifier>
-    <NoStdLib>true</NoStdLib>
-    <NoWarn>$(NoWarn);1701</NoWarn>
-    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj\</BaseIntermediateOutputPath>
-    <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
   </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
     <DebugEnabled>True</DebugEnabled>
     <DebugMode>Source</DebugMode>
     <TraceMode>User</TraceMode>
@@ -41,52 +20,21 @@
     <Profile>VMware</Profile>
     <Description>Use VMware Player or Workstation to deploy and debug.</Description>
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="GuessBoot.project.json" />
-  </ItemGroup>
+
   <ItemGroup>
     <Content Include="Cosmos.bxrc">
       <SubType>Content</SubType>
     </Content>
     <None Include="Cosmos.targets" />
   </ItemGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs.Asm\Cosmos.Core.Plugs.Asm.xproj">
-      <Name>Cosmos.Core.Plugs.Asm</Name>
-      <Project>{2a24da41-0d3a-48a6-83d5-8584a1d4ca94}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.xproj">
-      <Name>Cosmos.Core.Plugs</Name>
-      <Project>{89db6325-2c81-467d-be8a-c4aebb6540a5}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.xproj">
-      <Name>Cosmos.Debug.Kernel.Plugs.Asm</Name>
-      <Project>{7549d7f8-58a3-4f4f-8544-def2abf79a0b}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.xproj">
-      <Name>Cosmos.System.Plugs</Name>
-      <Project>{9a327db7-42e2-4c82-9537-0d995b9171ff}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Guess\GuessKernel.xproj">
-      <Name>GuessKernel</Name>
-      <Project>{1780684c-6b7f-4360-81c0-69204e343a08}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs.Asm\Cosmos.Core.Plugs.Asm.csproj" />
+    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj" />
+    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj" />
+    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj" />
+    <ProjectReference Include="..\Guess\GuessKernel.csproj" />
   </ItemGroup>
-  <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.targets" Condition="'$(VSToolsPath)' != ''" />
+
   <Import Project="Cosmos.targets" />
-  <!--<Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />-->
-  <PropertyGroup>
-    <NuGetTargetMoniker>.NETStandard,Version=v1.6</NuGetTargetMoniker>
-    <!-- We don't use any of MSBuild's resolution logic for resolving the framework, so just set these two
-            properties to any folder that exists to skip the GetReferenceAssemblyPaths task (not target) and
-            to prevent it from outputting a warning (MSB3644).
-        -->
-    <_TargetFrameworkDirectories>$(MSBuildThisFileDirectory)</_TargetFrameworkDirectories>
-    <_FullFrameworkReferenceAssemblyPaths>$(MSBuildThisFileDirectory)</_FullFrameworkReferenceAssemblyPaths>
-  </PropertyGroup>
 </Project>

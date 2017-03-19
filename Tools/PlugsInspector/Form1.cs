@@ -72,14 +72,7 @@ namespace PlugsInspector
             AssembliesPreloader.LoadAllAssemblies();
 
             plugManager = new PlugManager(
-                (Exception ex) =>
-                {
-                    AddExceptionEntry(ex.Message);
-                }, warning =>
-                {
-
-                });
-             plugManager.ThrowExceptions = false;
+                ex => { AddExceptionEntry(ex.Message); }, warning => { }) {ThrowExceptions = false};
         }
 
         private void LoadPlugsButton_Click(object sender, EventArgs e)

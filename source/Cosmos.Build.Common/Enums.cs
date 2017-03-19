@@ -81,39 +81,13 @@ namespace Cosmos.Build.Common
         MethodFooters
     }
 
-    public sealed class DescriptionAttribute : Attribute
+    public static class EnumHelper
     {
-        public static String GetDescription(object value)
+        public static string GetDescription(this Enum value)
         {
-            Type valueType = value.GetType();
-            MemberInfo[] valueMemberInfo;
-            DescriptionAttribute valueMemberAttribute;
-
-            if (valueType.GetTypeInfo().IsEnum)
-            {
-                var xTypeInfo = valueType.GetTypeInfo();
-                var xMemberInfo = xTypeInfo.GetMember(value.ToString());
-                if (xMemberInfo.Any())
-                {
-                    valueMemberInfo = valueType.GetTypeInfo().GetMember(value.ToString());
-                    valueMemberAttribute = valueMemberInfo[0].GetCustomAttribute<DescriptionAttribute>();
-                    return valueMemberAttribute.Description;
-                }
-            }
-            return null;
-        }
-
-        private string emDescription;
-
-        public DescriptionAttribute(String description)
-        {
-            emDescription = description;
-        }
-
-        public String Description
-        {
-            get { return emDescription; }
+            FieldInfo field = value.GetType().GetRuntimeField(value.ToString());
+            DescriptionAttribute attribute = field.GetCustomAttribute<DescriptionAttribute>();
+            return attribute == null ? value.ToString() : attribute.Description;
         }
     }
-
 }

@@ -1,69 +1,21 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AB24E403-54F3-4F67-B5E0-119A7227AAC1}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.Debug.Common</RootNamespace>
-    <AssemblyName>Cosmos.Debug.Common</AssemblyName>
-    <DefaultLanguage>en-US</DefaultLanguage>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <OutputPath>bin\Debug\net462\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\net462\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Include="..\..\Cosmos.snk">
-      <Link>Cosmos.snk</Link>
-    </None>
-    <None Include="Cosmos.Debug.Common.project.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="BochsSupport.cs" />
-    <Compile Include="DebugInfoDictionaryHelper.cs" />
-    <Compile Include="ObjDump.cs" />
-    <Compile Include="PipeClient.cs" />
-    <Compile Include="PipeServer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <ProjectReference Include="..\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj">
-      <Project>{2e740096-911f-47d0-a46d-998dbb76fc5d}</Project>
-      <Name>Cosmos.Debug.Symbols</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard1.5</TargetFramework>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+        <PackageName>Cosmos.Debug.Common</PackageName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Win32.Registry" Version="4.3.0" />
+        <PackageReference Include="System.Diagnostics.Process" Version="4.3.0" />
+        <PackageReference Include="System.IO.Pipes" Version="4.3.0" />
+        <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+    </ItemGroup>
+
 </Project>

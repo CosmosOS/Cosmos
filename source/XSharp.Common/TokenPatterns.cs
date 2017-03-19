@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
-using Instruction = Cosmos.Assembler.Instruction;
-using static XSharp.Compiler.XSRegisters;
 
-namespace XSharp.Compiler {
+namespace XSharp.Common {
   /// <summary>This class is able to translate a single X# source code line into one or more
   /// target assembler source code and data lines. The class is a group of pattern each of
   /// which defines a transformation function from the X# syntax to the target assembler
@@ -220,7 +217,7 @@ namespace XSharp.Compiler {
       if (mInIntHandler) {
         XS.InterruptReturn();
       } else {
-        XS.Set("static_field__Cosmos_Core_INTs_mLastKnownAddress", GetNamespace() + "_" + mFuncName + "_Exit", destinationIsIndirect: true, size: RegisterSize.Int32);
+        XS.Set("static_field__Cosmos_Core_INTs_mLastKnownAddress", GetNamespace() + "_" + mFuncName + "_Exit", destinationIsIndirect: true, size: XSRegisters.RegisterSize.Int32);
         XS.Return();
       }
       mFuncName = null;
@@ -230,35 +227,35 @@ namespace XSharp.Compiler {
       return GetLabel(aToken);
     }
 
-    private static RegisterSize GetSize(Token aToken)
+    private static XSRegisters.RegisterSize GetSize(Token aToken)
     {
       return GetSize(aToken.RawValue);
     }
 
-    private static RegisterSize GetSize(string value)
+    private static XSRegisters.RegisterSize GetSize(string value)
     {
       switch (value)
       {
         case "byte":
-          return RegisterSize.Byte8;
+          return XSRegisters.RegisterSize.Byte8;
         case "word":
-          return RegisterSize.Short16;
+          return XSRegisters.RegisterSize.Short16;
         case "dword":
-          return RegisterSize.Int32;
+          return XSRegisters.RegisterSize.Int32;
         default:
           throw new Exception($"Invalid size '{value}'");
       }
     }
 
-    private static string GetSizeString(RegisterSize size)
+    private static string GetSizeString(XSRegisters.RegisterSize size)
     {
       switch (size)
       {
-        case RegisterSize.Byte8:
+        case XSRegisters.RegisterSize.Byte8:
           return "byte";
-        case RegisterSize.Short16:
+        case XSRegisters.RegisterSize.Short16:
           return "word";
-        case RegisterSize.Int32:
+        case XSRegisters.RegisterSize.Int32:
           return "dword";
         default:
           throw new ArgumentOutOfRangeException(nameof(size), size, null);
@@ -461,7 +458,7 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
-                            RegisterSize? xTypedSize = null;
+                            XSRegisters.RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
                               xTypedSize = GetSize(tokenList[xOffset]);
@@ -474,7 +471,7 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
-                            RegisterSize? xTypedSize = null;
+                            XSRegisters.RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
                               xTypedSize = GetSize(tokenList[xOffset]);
@@ -531,7 +528,7 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
-                            RegisterSize? xTypedSize = null;
+                            XSRegisters.RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
                               xTypedSize = GetSize(tokenList[xOffset]);
@@ -544,7 +541,7 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
-                            RegisterSize? xTypedSize = null;
+                            XSRegisters.RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
                               xTypedSize = GetSize(tokenList[xOffset]);
@@ -579,7 +576,7 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
-                            RegisterSize? xTypedSize = null;
+                            XSRegisters.RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
                               xTypedSize = GetSize(tokenList[xOffset]);
@@ -592,7 +589,7 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
-                            RegisterSize? xTypedSize = null;
+                            XSRegisters.RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
                               xTypedSize = GetSize(tokenList[xOffset]);
@@ -605,13 +602,13 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
-                            RegisterSize? xTypedSize = null;
+                            XSRegisters.RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
                               xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
-                            XS.Compare(GetLabel(tokenList[xOffset + 0]), tokenList[xOffset + 2].IntValue, destinationIsIndirect: true, size: xTypedSize.GetValueOrDefault(RegisterSize.Int32));
+                            XS.Compare(GetLabel(tokenList[xOffset + 0]), tokenList[xOffset + 2].IntValue, destinationIsIndirect: true, size: xTypedSize.GetValueOrDefault(XSRegisters.RegisterSize.Int32));
                             return xComparisonToken;
                           });
             xCompares.Add(xSize + " _ABC " + xComparison + " _REG",
@@ -629,13 +626,13 @@ namespace XSharp.Compiler {
                           (tokenOffset, tokenList) =>
                           {
                             var xOffset = tokenOffset;
-                            RegisterSize? xTypedSize = null;
+                            XSRegisters.RegisterSize? xTypedSize = null;
                             if (tokenList[xOffset].Type != TokenType.Register)
                             {
                               xTypedSize = GetSize(tokenList[xOffset]);
                               xOffset += 1;
                             }
-                            XS.Compare(GetSimpleRef(tokenList[xOffset + 0]), ConstLabel(tokenList[xOffset + 3]), destinationIsIndirect: true, size: xTypedSize.GetValueOrDefault(RegisterSize.Int32));
+                            XS.Compare(GetSimpleRef(tokenList[xOffset + 0]), ConstLabel(tokenList[xOffset + 3]), destinationIsIndirect: true, size: xTypedSize.GetValueOrDefault(XSRegisters.RegisterSize.Int32));
                             return xComparisonToken;
                           });
           }
@@ -910,11 +907,11 @@ namespace XSharp.Compiler {
                                });
       AddPattern("_REGADDR[1] = 123", delegate(TokenList aTokens)
                                       {
-                                        XS.Set(aTokens[0].Register, aTokens[5].IntValue, destinationDisplacement: (int)aTokens[2].IntValue, size: RegisterSize.Int32);
+                                        XS.Set(aTokens[0].Register, aTokens[5].IntValue, destinationDisplacement: (int)aTokens[2].IntValue, size: XSRegisters.RegisterSize.Int32);
                                       });
       AddPattern("_REGADDR[-1] = 123", delegate(TokenList aTokens)
                                        {
-                                         XS.Set(aTokens[0].Register, aTokens[5].IntValue, destinationDisplacement: -(int)aTokens[2].IntValue, size: RegisterSize.Int32);
+                                         XS.Set(aTokens[0].Register, aTokens[5].IntValue, destinationDisplacement: -(int)aTokens[2].IntValue, size: XSRegisters.RegisterSize.Int32);
                                        });
 
       AddPattern("_REG = #_ABC", delegate(TokenList aTokens)
@@ -1010,7 +1007,7 @@ namespace XSharp.Compiler {
 
       AddPattern("+123", delegate(TokenList aTokens)
                          {
-                           XS.Push(aTokens[0].IntValue, size: RegisterSize.Int32);
+                           XS.Push(aTokens[0].IntValue, size: XSRegisters.RegisterSize.Int32);
                          });
       AddPattern(new string[]
                  {
@@ -1030,7 +1027,7 @@ namespace XSharp.Compiler {
                    "+#_ABC", "+#_ABC as byte", "+#_ABC as word", "+#_ABC as dword"
                  }, delegate(TokenList aTokens)
                     {
-                      RegisterSize xSize = RegisterSize.Int32;
+                      XSRegisters.RegisterSize xSize = XSRegisters.RegisterSize.Int32;
                       if (aTokens.Count > 2)
                       {
                         xSize = GetSize(aTokens[3]);
@@ -1056,7 +1053,7 @@ namespace XSharp.Compiler {
                                 });
       AddPattern("_ABC = #_ABC", delegate(TokenList aTokens)
                                  {
-                                   XS.Set(GetLabel(aTokens[0]), ConstLabel(aTokens[3]), destinationIsIndirect: true, size: RegisterSize.Int32);
+                                   XS.Set(GetLabel(aTokens[0]), ConstLabel(aTokens[3]), destinationIsIndirect: true, size: XSRegisters.RegisterSize.Int32);
                                  });
       AddPattern("_ABC = 123", delegate(TokenList aTokens)
                                {

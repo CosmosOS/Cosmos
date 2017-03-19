@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DapperExtensions.Sql
 {
@@ -20,7 +22,7 @@ namespace DapperExtensions.Sql
         }
 
         public override string GetPagingSql(string sql, int page, int resultsPerPage, IDictionary<string, object> parameters)
-        {
+        {            
             int startValue = page * resultsPerPage;
             return GetSetSql(sql, startValue, resultsPerPage, parameters);
         }

@@ -1,4 +1,4 @@
-﻿#if !NETSTANDARD1_6
+﻿#if SERIAL_PORT
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;

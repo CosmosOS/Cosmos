@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Microsoft.Build.Utilities;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 
 namespace Cosmos.Build.MSBuild
 {

@@ -43,7 +43,7 @@ namespace Cosmos.Build.Common
             {
                 if (item is EnumValue)
                 {
-                    if (Object.Equals(((EnumValue)item).Value, value) == true)
+                    if (Equals(((EnumValue)item).Value, value) == true)
                     {
                         return (EnumValue)item;
                     }
@@ -87,16 +87,16 @@ namespace Cosmos.Build.Common
 
         public EnumValue(Enum value)
         {
-            this.Value = value;
+            Value = value;
         }
 
         public Enum Value { get; set; }
 
         public override string ToString()
         {
-            if (this.Value != null)
+            if (Value != null)
             {
-                return DescriptionAttribute.GetDescription(this.Value);
+                return Value.GetDescription();
             }
             return base.ToString();
         }

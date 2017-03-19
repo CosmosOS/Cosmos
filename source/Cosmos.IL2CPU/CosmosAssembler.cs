@@ -7,7 +7,7 @@ using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
 using Cosmos.Debug.DebugStub;
-using XSharp.Compiler;
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU
 {

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using static XSharp.Compiler.XSRegisters;
 
-namespace XSharp.Compiler {
+namespace XSharp.Common {
   /// <summary>
   /// Parser recognizes the following tokens:
   /// - _123      -> Number
@@ -55,12 +53,12 @@ namespace XSharp.Compiler {
       + ",word,while"
     ).ToUpper().Split(mComma);
 
-    public static readonly Dictionary<string, Register> Registers;
-    public static readonly Dictionary<string, Register> RegistersAddr;
-    public static readonly Dictionary<string, Register> Registers8;
-    public static readonly Dictionary<string, Register> Registers16;
-    public static readonly Dictionary<string, Register> Registers32;
-    public static readonly Dictionary<string, Register> RegistersIdx;
+    public static readonly Dictionary<string, XSRegisters.Register> Registers;
+    public static readonly Dictionary<string, XSRegisters.Register> RegistersAddr;
+    public static readonly Dictionary<string, XSRegisters.Register> Registers8;
+    public static readonly Dictionary<string, XSRegisters.Register> Registers16;
+    public static readonly Dictionary<string, XSRegisters.Register> Registers32;
+    public static readonly Dictionary<string, XSRegisters.Register> RegistersIdx;
     public static readonly string[] RegisterPatterns = "_REG,_REG8,_REG16,_REG32,_REGIDX,_REGADDR".Split(mComma);
     public static readonly string[] Delimiters = ",".Split(mSpace);
     // _.$ are AlphaNum. See comments in Parser
@@ -69,49 +67,49 @@ namespace XSharp.Compiler {
     public static readonly string[] Operators = "( ) () ! = != >= <= [ [- ] + - * : { } < > ?= ?& @ ~> <~ >> << ++ -- # +# & | ^".Split(mSpace);
 
     static Parser() {
-      Registers8 = new Dictionary<string, Register>(){
-        {"AL", AL },
-        {"AH", AH },
-        {"BL", BL },
-        {"BH", BH },
-        {"CL", CL },
-        {"CH", CH },
-        {"DL", DL },
-        {"DH", DH },
+      Registers8 = new Dictionary<string, XSRegisters.Register>(){
+        {"AL", XSRegisters.AL },
+        {"AH", XSRegisters.AH },
+        {"BL", XSRegisters.BL },
+        {"BH", XSRegisters.BH },
+        {"CL", XSRegisters.CL },
+        {"CH", XSRegisters.CH },
+        {"DL", XSRegisters.DL },
+        {"DH", XSRegisters.DH },
                  };
 
-      Registers16 = new Dictionary<string, Register>()
+      Registers16 = new Dictionary<string, XSRegisters.Register>()
                     {
-        {"AX", AX },
-        {"BX", BX },
-        {"CX", CX },
-        {"DX", DX },
+        {"AX", XSRegisters.AX },
+        {"BX", XSRegisters.BX },
+        {"CX", XSRegisters.CX },
+        {"DX", XSRegisters.DX },
                     };
 
-      Registers32 = new Dictionary<string, Register>()
+      Registers32 = new Dictionary<string, XSRegisters.Register>()
                     {
-        {"EAX", EAX },
-        {"EBX", EBX },
-        {"ECX", ECX },
-        {"EDX", EDX },
+        {"EAX", XSRegisters.EAX },
+        {"EBX", XSRegisters.EBX },
+        {"ECX", XSRegisters.ECX },
+        {"EDX", XSRegisters.EDX },
                     };
 
-      RegistersIdx = new Dictionary<string, Register>()
+      RegistersIdx = new Dictionary<string, XSRegisters.Register>()
                     {
-        {"ESI", ESI },
-        {"EDI", EDI },
-        {"ESP", ESP },
-        {"EBP", EBP },
+        {"ESI", XSRegisters.ESI },
+        {"EDI", XSRegisters.EDI },
+        {"ESP", XSRegisters.ESP },
+        {"EBP", XSRegisters.EBP },
                     };
 
-      var xRegisters = new Dictionary<string, Register>();
+      var xRegisters = new Dictionary<string, XSRegisters.Register>();
       xRegisters.AddRange(Registers8);
       xRegisters.AddRange(Registers16);
       xRegisters.AddRange(Registers32);
       xRegisters.AddRange(RegistersIdx);
       Registers = xRegisters;
 
-      var xRegistersAddr = new Dictionary<string, Register>();
+      var xRegistersAddr = new Dictionary<string, XSRegisters.Register>();
       xRegistersAddr.AddRange(Registers32);
       xRegistersAddr.AddRange(RegistersIdx);
       RegistersAddr = xRegistersAddr;
@@ -228,7 +226,7 @@ namespace XSharp.Compiler {
 
           if (xToken.Type == TokenType.Unknown)
           {
-            Register xRegister;
+            XSRegisters.Register xRegister;
             if (Registers.TryGetValue(xUpper, out xRegister)) {
               xToken.Type = TokenType.Register;
               xToken.SetRegister(xRegister);

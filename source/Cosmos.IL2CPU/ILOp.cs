@@ -9,9 +9,10 @@ using Cosmos.IL2CPU.Plugs;
 using Cosmos.Assembler;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Debug.Symbols;
+
 using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.X86.IL;
-using XSharp.Compiler;
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU
 {

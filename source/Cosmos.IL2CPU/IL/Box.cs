@@ -1,8 +1,9 @@
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
+
 using Cosmos.IL2CPU.Plugs;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {

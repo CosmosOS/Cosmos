@@ -1,5 +1,5 @@
 using Cosmos.Assembler;
-using XSharp.Compiler;
+using XSharp.Common;
 
 namespace Cosmos.Core.Plugs.Asm
 {

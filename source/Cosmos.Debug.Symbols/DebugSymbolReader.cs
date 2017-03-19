@@ -45,45 +45,6 @@ namespace Cosmos.Debug.Symbols
         {
             int xToken = MetadataTokens.GetToken(handle);
             return aModule.ResolveType(xToken, null, null);
-            TypeReference xReference = reader.GetTypeReference(handle);
-            Handle scope = xReference.ResolutionScope;
-
-            string xName = xReference.Namespace.IsNil
-                ? reader.GetString(xReference.Name)
-                : reader.GetString(xReference.Namespace) + "." + reader.GetString(xReference.Name);
-
-            var xType = Type.GetType(xName);
-            if (xType != null)
-            {
-                return xType;
-            }
-
-            try
-            {
-                xType = aModule.ResolveType(MetadataTokens.GetToken(handle), null, null);
-                return xType;
-            }
-            catch
-            {
-                switch (scope.Kind)
-                {
-                    case HandleKind.ModuleReference:
-                        string xModule = "[.module  " + reader.GetString(reader.GetModuleReference((ModuleReferenceHandle)scope).Name) + "]" + xName;
-                        return null;
-                    case HandleKind.AssemblyReference:
-                        var assemblyReferenceHandle = (AssemblyReferenceHandle)scope;
-                        var assemblyReference = reader.GetAssemblyReference(assemblyReferenceHandle);
-                        string xAssembly = "[" + reader.GetString(assemblyReference.Name) + "]" + xName;
-                        return null;
-                    case HandleKind.TypeReference:
-                        return GetTypeFromReference(reader, aModule, (TypeReferenceHandle)scope, 0);
-                    default:
-                        // rare cases:  ModuleDefinition means search within defs of current module (used by WinMDs for projections)
-                        //              nil means search exported types of same module (haven't seen this in practice). For the test
-                        //              purposes here, it's sufficient to format both like defs.
-                        return null;
-                }
-            }
         }
 
         private static PEReader TryGetPEReader(string aAssemblyPath)
@@ -240,7 +201,7 @@ namespace Cosmos.Debug.Symbols
         public static IList<Type> GetLocalVariableInfos(MethodBase aMethodBase)
         {
             var xLocalVariables = new List<Type>();
-#if NETSTANDARD1_6
+
             string xLocation = aMethodBase.Module.Assembly.Location;
             var xGenericMethodParameters = new Type[0];
             var xGenericTypeParameters = new Type[0];
@@ -264,13 +225,13 @@ namespace Cosmos.Debug.Symbols
             var xReader = GetReader(xLocation).mMetadataReader;
             xLocalVariables = ResolveLocalsFromSignature(xReader, aMethodBase, xGenericTypeParameters, xGenericMethodParameters).ToList();
             //}
-#else
-            var xLocals = aMethodBase.GetMethodBody().LocalVariables;
-            foreach (var xLocal in xLocals)
-            {
-                xLocalVariables.Add(xLocal.LocalType);
-            }
-#endif
+
+            //var xLocals = aMethodBase.GetMethodBody().LocalVariables;
+            //foreach (var xLocal in xLocals)
+            //{
+            //    xLocalVariables.Add(xLocal.LocalType);
+            //}
+
             return xLocalVariables;
         }
 

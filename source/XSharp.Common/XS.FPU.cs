@@ -1,16 +1,13 @@
 ﻿using System;
-using Cosmos.Assembler.x86;
-using Cosmos.Assembler.x86.SSE;
 using Cosmos.Assembler.x86.x87;
-using static XSharp.Compiler.XSRegisters;
 
-namespace XSharp.Compiler
+namespace XSharp.Common
 {
   public partial class XS
   {
     public static class FPU
     {
-      public static void FloatCompareAndSet(RegisterFPU register)
+      public static void FloatCompareAndSet(XSRegisters.RegisterFPU register)
       {
         new FloatCompareAndSet
         {
@@ -18,7 +15,7 @@ namespace XSharp.Compiler
         };
       }
 
-      public static void FloatStoreAndPop(Register32 register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+      public static void FloatStoreAndPop(XSRegisters.Register32 register, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize? size = null)
       {
         if (displacement != null)
         {
@@ -47,7 +44,7 @@ namespace XSharp.Compiler
         };
       }
 
-      public static void FloatStoreAndPop(RegisterFPU register)
+      public static void FloatStoreAndPop(XSRegisters.RegisterFPU register)
       {
         new FloatStoreAndPop
         {
@@ -55,7 +52,7 @@ namespace XSharp.Compiler
         };
       }
 
-      public static void FloatLoad(Register32 register, bool destinationIsIndirect = false, int? displacement = null, RegisterSize? size = null)
+      public static void FloatLoad(XSRegisters.Register32 register, bool destinationIsIndirect = false, int? displacement = null, XSRegisters.RegisterSize? size = null)
       {
         Do<FloatLoad>(register, isIndirect: destinationIsIndirect, displacement: displacement, size: size);
       }
@@ -75,7 +72,7 @@ namespace XSharp.Compiler
         new FloatNegate();
       }
 
-      public static void FloatAdd(Register32 destination, bool isIndirect = false, RegisterSize? size = null)
+      public static void FloatAdd(XSRegisters.Register32 destination, bool isIndirect = false, XSRegisters.RegisterSize? size = null)
       {
         if (size == null)
         {
@@ -94,7 +91,7 @@ namespace XSharp.Compiler
         };
       }
 
-      public static void IntLoad(Register32 destination, bool isIndirect = false, RegisterSize? size = null)
+      public static void IntLoad(XSRegisters.Register32 destination, bool isIndirect = false, XSRegisters.RegisterSize? size = null)
       {
         if (size == null)
         {
@@ -113,7 +110,7 @@ namespace XSharp.Compiler
         };
       }
 
-      public static void IntStoreWithTruncate(Register32 destination, bool isIndirect = false, RegisterSize? size = null)
+      public static void IntStoreWithTruncate(XSRegisters.Register32 destination, bool isIndirect = false, XSRegisters.RegisterSize? size = null)
       {
         if (size == null)
         {

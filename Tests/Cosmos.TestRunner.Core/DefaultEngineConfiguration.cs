@@ -24,7 +24,7 @@ namespace Cosmos.TestRunner.Core
 
             // If you're working on the compiler (or other lower parts), you can choose to run the compiler in process
             // one thing to keep in mind though, is that this only works with 1 kernel at a time!
-            engine.RunIL2CPUInProcess = false;
+            engine.DebugIL2CPU = false;
             engine.TraceAssembliesLevel = TraceAssemblies.User;
             //engine.EnableStackCorruptionChecks = false;
 
@@ -58,7 +58,7 @@ namespace Cosmos.TestRunner.Core
             // end of known bugs
 
             // double check: this check is in the engine, but lets put it here as well
-            if (engine.RunIL2CPUInProcess)
+            if (engine.DebugIL2CPU)
             {
                 if (engine.KernelsToRun.Count > 1 || engine.RunTargets.Count == 0 || engine.RunTargets.Count > 1)
                 {

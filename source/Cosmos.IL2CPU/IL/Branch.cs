@@ -2,8 +2,9 @@ using System;
 using Cosmos.IL2CPU.X86;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
+
 using Cosmos.IL2CPU.ILOpCodes;
-using XSharp.Compiler;
+using XSharp.Common;
 using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU.X86.IL

@@ -1,15 +1,12 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection.Emit;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
-using Cosmos.Assembler.x86.x87;
-using static XSharp.Compiler.XSRegisters;
 using Label = Cosmos.Assembler.Label;
 
 //TODO: Fix indentaion and formatting in this file: ideal would be 4space-indent
 
-namespace XSharp.Compiler
+namespace XSharp.Common
 {
     [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
     public static partial class XS
@@ -31,7 +28,7 @@ namespace XSharp.Compiler
 
         #region InstructionWithDestinationAndSourceAndSize
 
-        private static void Do<T>(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        private static void Do<T>(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
             where T : InstructionWithDestinationAndSourceAndSize, new()
         {
             if (destinationDisplacement != null)
@@ -67,7 +64,7 @@ namespace XSharp.Compiler
             };
         }
 
-        private static void Do<T>(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        private static void Do<T>(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
             where T : InstructionWithDestinationAndSourceAndSize, new()
         {
             if (destinationDisplacement != null)
@@ -103,7 +100,7 @@ namespace XSharp.Compiler
             };
         }
 
-        private static void Do<T>(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        private static void Do<T>(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
             where T : InstructionWithDestinationAndSourceAndSize, new()
         {
             if (destinationDisplacement != null)
@@ -139,7 +136,7 @@ namespace XSharp.Compiler
             };
         }
 
-        private static void Do<T>(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        private static void Do<T>(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
             where T : InstructionWithDestinationAndSourceAndSize, new()
         {
             if (destinationDisplacement != null)
@@ -180,7 +177,7 @@ namespace XSharp.Compiler
             };
         }
 
-        private static void Do<T>(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        private static void Do<T>(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
             where T : InstructionWithDestinationAndSourceAndSize, new()
         {
             if (destinationDisplacement != null)
@@ -205,7 +202,7 @@ namespace XSharp.Compiler
             {
                 if (destinationIsIndirect)
                 {
-                    size = RegisterSize.Int32;
+                    size = XSRegisters.RegisterSize.Int32;
                 }
                 else
                 {
@@ -225,7 +222,7 @@ namespace XSharp.Compiler
             };
         }
 
-        private static void Do<T>(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, bool skipSizeCheck = false, RegisterSize? size = null)
+        private static void Do<T>(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, bool skipSizeCheck = false, XSRegisters.RegisterSize? size = null)
             where T : InstructionWithDestinationAndSourceAndSize, new()
         {
             if (destinationDisplacement != null)
@@ -280,7 +277,7 @@ namespace XSharp.Compiler
 
         #region InstructionWithDestinationAndSize
 
-        private static void Do<T>(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        private static void Do<T>(uint destinationValue, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
             where T : InstructionWithDestinationAndSize, new()
         {
             if (displacement != null)
@@ -301,7 +298,7 @@ namespace XSharp.Compiler
             };
         }
 
-        private static void Do<T>(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+        private static void Do<T>(XSRegisters.Register register, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize? size = null)
             where T : InstructionWithDestinationAndSize, new()
         {
             if (displacement != null)
@@ -329,7 +326,7 @@ namespace XSharp.Compiler
             };
         }
 
-        private static void Do<T>(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        private static void Do<T>(string label, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
             where T : InstructionWithDestinationAndSize, new()
         {
             if (displacement != null)
@@ -354,7 +351,7 @@ namespace XSharp.Compiler
 
         #region InstructionWithDestinationAndSource
 
-        private static void DoDestinationSource<T>(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+        private static void DoDestinationSource<T>(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
             where T : InstructionWithDestinationAndSource, new()
         {
             if (destinationDisplacement != null)
@@ -459,7 +456,7 @@ namespace XSharp.Compiler
             };
         }
 
-        private static void DoDestinationSource<T>(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+        private static void DoDestinationSource<T>(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
             where T : InstructionWithDestinationAndSource, new()
         {
             if (destinationDisplacement != null)
@@ -490,7 +487,7 @@ namespace XSharp.Compiler
             };
         }
 
-        private static void DoDestinationSource<T>(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+        private static void DoDestinationSource<T>(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
             where T : InstructionWithDestinationAndSource, new()
         {
             if (destinationDisplacement != null)
@@ -522,8 +519,8 @@ namespace XSharp.Compiler
             };
         }
 
-        private static void DoDestinationSource<T>(Register destination,
-                                                   Register source,
+        private static void DoDestinationSource<T>(XSRegisters.Register destination,
+                                                   XSRegisters.Register source,
                                                    bool destinationIsIndirect = false,
                                                    int? destinationDisplacement = null,
                                                    bool sourceIsIndirect = false,
@@ -566,32 +563,32 @@ namespace XSharp.Compiler
 
         #region Mov
 
-        public static void Set(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Set(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Mov>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Set(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Set(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Mov>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Set(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Set(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Mov>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Set(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Set(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Mov>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Set(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Set(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Mov>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Set(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Set(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Mov>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size: size);
         }
@@ -605,32 +602,32 @@ namespace XSharp.Compiler
 
         #region Lea
 
-        public static void Lea(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Lea(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Lea>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Lea(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Lea(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Lea>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Lea(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Lea(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Lea>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Lea(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Lea(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Lea>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Lea(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Lea(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Lea>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Lea(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Lea(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Lea>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size: size);
         }
@@ -657,7 +654,7 @@ namespace XSharp.Compiler
             new Call {DestinationLabel = target};
         }
 
-        public static void Call(Register32 register)
+        public static void Call(XSRegisters.Register32 register)
         {
             new Call {DestinationReg = register.RegEnum};
         }
@@ -687,52 +684,52 @@ namespace XSharp.Compiler
             Assembler.CurrentInstance.DataMembers.Add(new DataMember(name, size, value));
         }
 
-        public static void RotateRight(Register register, uint bitCount)
+        public static void RotateRight(XSRegisters.Register register, uint bitCount)
         {
             Do<RotateRight>(register, bitCount);
         }
 
-        public static void RotateLeft(Register register, uint bitCount)
+        public static void RotateLeft(XSRegisters.Register register, uint bitCount)
         {
             Do<RotateLeft>(register, bitCount);
         }
 
-        public static void ShiftRight(Register destination, byte bitCount)
+        public static void ShiftRight(XSRegisters.Register destination, byte bitCount)
         {
             Do<ShiftRight>(destination, bitCount);
         }
 
-        public static void ShiftRight(Register destination, Register8 source, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
+        public static void ShiftRight(XSRegisters.Register destination, XSRegisters.Register8 source, bool destinationIsIndirect = false, int? destinationDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
-            if (source != CL)
+            if (source != XSRegisters.CL)
             {
                 throw new InvalidOperationException();
             }
             Do<ShiftRight>(destination, source, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
         }
 
-        public static void ShiftLeft(Register destination, byte bitCount)
+        public static void ShiftLeft(XSRegisters.Register destination, byte bitCount)
         {
             Do<ShiftLeft>(destination, bitCount);
         }
 
-        public static void ShiftLeft(Register destination, Register8 bitCount, bool destinationIsIndirect = false, RegisterSize size = RegisterSize.Int32)
+        public static void ShiftLeft(XSRegisters.Register destination, XSRegisters.Register8 bitCount, bool destinationIsIndirect = false, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
-            if (bitCount != CL)
+            if (bitCount != XSRegisters.CL)
             {
                 throw new InvalidOperationException();
             }
             Do<ShiftLeft>(destination, bitCount, destinationIsIndirect: destinationIsIndirect, size: size);
         }
 
-        public static void ShiftRightArithmetic(Register destination, byte bitCount)
+        public static void ShiftRightArithmetic(XSRegisters.Register destination, byte bitCount)
         {
             Do<ShiftRightArithmetic>(destination, bitCount);
         }
 
-        public static void ShiftRightArithmetic(Register destination, Register8 source, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
+        public static void ShiftRightArithmetic(XSRegisters.Register destination, XSRegisters.Register8 source, bool destinationIsIndirect = false, int? destinationDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
-            if (source != CL)
+            if (source != XSRegisters.CL)
             {
                 throw new InvalidOperationException();
             }
@@ -740,21 +737,21 @@ namespace XSharp.Compiler
             Do<ShiftRightArithmetic>(destination, source, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
         }
 
-        public static void ShiftLeftArithmetic(Register destination, byte bitCount)
+        public static void ShiftLeftArithmetic(XSRegisters.Register destination, byte bitCount)
         {
             Do<ShiftLeftArithmetic>(destination, bitCount);
         }
 
-        public static void ShiftLeftArithmetic(Register destination, Register8 bitCount, bool destinationIsIndirect = false, RegisterSize size = RegisterSize.Int32)
+        public static void ShiftLeftArithmetic(XSRegisters.Register destination, XSRegisters.Register8 bitCount, bool destinationIsIndirect = false, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
-            if (bitCount != CL)
+            if (bitCount != XSRegisters.CL)
             {
                 throw new InvalidOperationException();
             }
             Do<ShiftLeftArithmetic>(destination, bitCount, skipSizeCheck: true, destinationIsIndirect: destinationIsIndirect, size: size);
         }
 
-        public static void WriteToPortDX(Register value)
+        public static void WriteToPortDX(XSRegisters.Register value)
         {
             new OutToDX()
             {
@@ -762,7 +759,7 @@ namespace XSharp.Compiler
             };
         }
 
-        public static void ReadFromPortDX(Register value)
+        public static void ReadFromPortDX(XSRegisters.Register value)
         {
             new InFromDX
             {
@@ -770,17 +767,17 @@ namespace XSharp.Compiler
             };
         }
 
-        public static void Push(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Push(uint destinationValue, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Push>(destinationValue, isIndirect, displacement, size);
         }
 
-        public static void Push(Register register, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Push(XSRegisters.Register register, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Push>(register, isIndirect, displacement, size);
         }
 
-        public static void Push(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Push(string label, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Push>(label, isIndirect, displacement, size);
         }
@@ -795,134 +792,134 @@ namespace XSharp.Compiler
             new Popfd();
         }
 
-        public static void Pop(Register value)
+        public static void Pop(XSRegisters.Register value)
         {
             Do<Pop>(value);
         }
 
-        public static void Increment(Register value)
+        public static void Increment(XSRegisters.Register value)
         {
             Do<INC>(value);
         }
 
-        public static void Decrement(Register value)
+        public static void Decrement(XSRegisters.Register value)
         {
             Do<Dec>(value);
         }
 
-        public static void Add(Register register, uint valueToAdd)
+        public static void Add(XSRegisters.Register register, uint valueToAdd)
         {
             Do<Add>(register, valueToAdd);
         }
 
-        public static void Add(Register register, uint valueToAdd, bool destinationIsIndirect = false)
+        public static void Add(XSRegisters.Register register, uint valueToAdd, bool destinationIsIndirect = false)
         {
             Do<Add>(register, valueToAdd, destinationIsIndirect: destinationIsIndirect);
         }
 
-        public static void Add(Register register, Register valueToAdd, bool destinationIsIndirect = false)
+        public static void Add(XSRegisters.Register register, XSRegisters.Register valueToAdd, bool destinationIsIndirect = false)
         {
             Do<Add>(register, valueToAdd, destinationIsIndirect: destinationIsIndirect);
         }
 
-        public static void Sub(Register register, uint valueToAdd)
+        public static void Sub(XSRegisters.Register register, uint valueToAdd)
         {
             Do<Sub>(register, valueToAdd);
         }
 
-        public static void Sub(Register register, Register valueToAdd, bool destinationIsIndirect = false)
+        public static void Sub(XSRegisters.Register register, XSRegisters.Register valueToAdd, bool destinationIsIndirect = false)
         {
             Do<Sub>(register, valueToAdd, destinationIsIndirect: destinationIsIndirect);
         }
 
-        public static void SubWithCarry(Register register, uint valueToAdd)
+        public static void SubWithCarry(XSRegisters.Register register, uint valueToAdd)
         {
             Do<SubWithCarry>(register, valueToAdd);
         }
 
-        public static void SubWithCarry(Register register, Register valueToAdd, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+        public static void SubWithCarry(XSRegisters.Register register, XSRegisters.Register valueToAdd, bool destinationIsIndirect = false, int? destinationDisplacement = null)
         {
             Do<SubWithCarry>(register, valueToAdd, destinationDisplacement: destinationDisplacement, destinationIsIndirect: destinationIsIndirect);
         }
 
-        public static void And(Register register, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void And(XSRegisters.Register register, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<And>(register, value, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
         }
 
-        public static void And(Register register, Register value, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
+        public static void And(XSRegisters.Register register, XSRegisters.Register value, bool destinationIsIndirect = false, int? destinationDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<And>(register, value, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
         }
 
-        public static void Xor(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Xor(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Xor>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Xor(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Xor(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Xor>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Xor(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Xor(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Xor>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Xor(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Xor(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Xor>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Xor(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Xor(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Xor>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Xor(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+        public static void Xor(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
             Do<Xor>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
-        public static void IntegerMultiply(Register register, uint valueToAdd)
+        public static void IntegerMultiply(XSRegisters.Register register, uint valueToAdd)
         {
             Do<Imul>(register, valueToAdd);
         }
 
-        public static void IntegerMultiply(Register register, Register registerToAdd)
+        public static void IntegerMultiply(XSRegisters.Register register, XSRegisters.Register registerToAdd)
         {
             Do<Imul>(register, registerToAdd);
         }
 
         #region Compare
 
-        public static void Compare(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Compare(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Compare>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Compare(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Compare(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Compare>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Compare(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Compare(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Compare>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Compare(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Compare(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Compare>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Compare(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Compare(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Compare>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Compare(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+        public static void Compare(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
             Do<Compare>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
@@ -934,7 +931,7 @@ namespace XSharp.Compiler
             new LiteralAssemblerCode(code);
         }
 
-        public static void Test(Register destination, uint source)
+        public static void Test(XSRegisters.Register destination, uint source)
         {
             new Test
             {
@@ -943,7 +940,7 @@ namespace XSharp.Compiler
             };
         }
 
-        public static void Test(Register destination, string sourceRef, bool sourceIsIndirect = false)
+        public static void Test(XSRegisters.Register destination, string sourceRef, bool sourceIsIndirect = false)
         {
             new Test
             {
@@ -953,7 +950,7 @@ namespace XSharp.Compiler
             };
         }
 
-        public static void Test(Register destination, Register sourceReg, bool sourceIsIndirect = false)
+        public static void Test(XSRegisters.Register destination, XSRegisters.Register sourceReg, bool sourceIsIndirect = false)
         {
             if (!sourceIsIndirect)
             {
@@ -970,142 +967,142 @@ namespace XSharp.Compiler
             };
         }
 
-        public static void Divide(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Divide(uint destinationValue, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Divide>(destinationValue, isIndirect, displacement, size);
         }
 
-        public static void Divide(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+        public static void Divide(XSRegisters.Register register, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Divide>(register, isIndirect, displacement, size);
         }
 
-        public static void Divide(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Divide(string label, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Divide>(label, isIndirect, displacement, size);
         }
 
-        public static void IntegerDivide(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void IntegerDivide(uint destinationValue, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<IDivide>(destinationValue, isIndirect, displacement, size);
         }
 
-        public static void IntegerDivide(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+        public static void IntegerDivide(XSRegisters.Register register, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<IDivide>(register, isIndirect, displacement, size);
         }
 
-        public static void IntegerDivide(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void IntegerDivide(string label, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<IDivide>(label, isIndirect, displacement, size);
         }
 
-        public static void Multiply(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Multiply(uint destinationValue, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Multiply>(destinationValue, isIndirect, displacement, size);
         }
 
-        public static void Multiply(Register register, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Multiply(XSRegisters.Register register, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Multiply>(register, isIndirect, displacement, size);
         }
 
-        public static void Multiply(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Multiply(string label, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Multiply>(label, isIndirect, displacement, size);
         }
 
-        public static void Negate(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Negate(uint destinationValue, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Neg>(destinationValue, isIndirect, displacement, size);
         }
 
-        public static void Negate(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+        public static void Negate(XSRegisters.Register register, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Neg>(register, isIndirect, displacement, size);
         }
 
-        public static void Negate(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Negate(string label, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Neg>(label, isIndirect, displacement, size);
         }
 
-        public static void Not(uint destinationValue, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Not(uint destinationValue, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Not>(destinationValue, isIndirect, displacement, size);
         }
 
-        public static void Not(Register register, bool isIndirect = false, int? displacement = null, RegisterSize? size = null)
+        public static void Not(XSRegisters.Register register, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Not>(register, isIndirect, displacement, size);
         }
 
-        public static void Not(string label, bool isIndirect = false, int? displacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Not(string label, bool isIndirect = false, int? displacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Not>(label, isIndirect, displacement, size);
         }
 
-        public static void AddWithCarry(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void AddWithCarry(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<AddWithCarry>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void AddWithCarry(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void AddWithCarry(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<AddWithCarry>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void AddWithCarry(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void AddWithCarry(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<AddWithCarry>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void AddWithCarry(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void AddWithCarry(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<AddWithCarry>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void AddWithCarry(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void AddWithCarry(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<AddWithCarry>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void AddWithCarry(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+        public static void AddWithCarry(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
             Do<AddWithCarry>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
-        public static void Or(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Or(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Or>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Or(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Or(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Or>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Or(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void Or(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<Or>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Or(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Or(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Or>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Or(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void Or(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<Or>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void Or(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+        public static void Or(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
             Do<Or>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
-        public static void SignExtendAX(RegisterSize size)
+        public static void SignExtendAX(XSRegisters.RegisterSize size)
         {
             new SignExtendAX
             {
@@ -1113,7 +1110,7 @@ namespace XSharp.Compiler
             };
         }
 
-        public static void Exchange(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+        public static void Exchange(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null)
         {
             Do<Xchg>(destination, source, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement);
         }
@@ -1178,7 +1175,7 @@ namespace XSharp.Compiler
             new StoreWordInString();
         }
 
-        public static void LoadGdt(Register32 destination, bool isIndirect = false)
+        public static void LoadGdt(XSRegisters.Register32 destination, bool isIndirect = false)
         {
             new Lgdt
             {
@@ -1187,7 +1184,7 @@ namespace XSharp.Compiler
             };
         }
 
-        public static void LoadIdt(Register32 destination, bool isIndirect = false)
+        public static void LoadIdt(XSRegisters.Register32 destination, bool isIndirect = false)
         {
             new Lidt
             {
@@ -1196,37 +1193,37 @@ namespace XSharp.Compiler
             };
         }
 
-        public static void RotateThroughCarryRight(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void RotateThroughCarryRight(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<RotateThroughCarryRight>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void RotateThroughCarryRight(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void RotateThroughCarryRight(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<RotateThroughCarryRight>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void RotateThroughCarryRight(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void RotateThroughCarryRight(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<RotateThroughCarryRight>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void RotateThroughCarryRight(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void RotateThroughCarryRight(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<RotateThroughCarryRight>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void RotateThroughCarryRight(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void RotateThroughCarryRight(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<RotateThroughCarryRight>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void RotateThroughCarryRight(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void RotateThroughCarryRight(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<RotateThroughCarryRight>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size: size);
         }
 
-        public static void ShiftRightDouble(Register destination, Register source, uint argumentValue)
+        public static void ShiftRightDouble(XSRegisters.Register destination, XSRegisters.Register source, uint argumentValue)
         {
             new ShiftRightDouble()
             {
@@ -1236,9 +1233,9 @@ namespace XSharp.Compiler
             };
         }
 
-        public static void ShiftRightDouble(Register destination, Register source, Register8 argumentReg, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+        public static void ShiftRightDouble(XSRegisters.Register destination, XSRegisters.Register source, XSRegisters.Register8 argumentReg, bool destinationIsIndirect = false, int? destinationDisplacement = null)
         {
-            if (argumentReg != CL)
+            if (argumentReg != XSRegisters.CL)
             {
                 throw new InvalidOperationException("Argument needs to be CL!");
             }
@@ -1260,7 +1257,7 @@ namespace XSharp.Compiler
             };
         }
 
-        public static void ShiftLeftDouble(Register destination, Register source, uint argumentValue)
+        public static void ShiftLeftDouble(XSRegisters.Register destination, XSRegisters.Register source, uint argumentValue)
         {
             new ShiftRightDouble()
             {
@@ -1270,9 +1267,9 @@ namespace XSharp.Compiler
             };
         }
 
-        public static void ShiftLeftDouble(Register destination, Register source, Register8 argumentReg, bool destinationIsIndirect = false, int? destinationDisplacement = null)
+        public static void ShiftLeftDouble(XSRegisters.Register destination, XSRegisters.Register source, XSRegisters.Register8 argumentReg, bool destinationIsIndirect = false, int? destinationDisplacement = null)
         {
-            if (argumentReg != CL)
+            if (argumentReg != XSRegisters.CL)
             {
                 throw new InvalidOperationException("Argument needs to be CL!");
             }
@@ -1305,32 +1302,32 @@ namespace XSharp.Compiler
 
         #region MoveSignExtend
 
-        public static void MoveSignExtend(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void MoveSignExtend(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<MoveSignExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void MoveSignExtend(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void MoveSignExtend(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<MoveSignExtend>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void MoveSignExtend(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void MoveSignExtend(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<MoveSignExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void MoveSignExtend(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void MoveSignExtend(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<MoveSignExtend>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void MoveSignExtend(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void MoveSignExtend(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<MoveSignExtend>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void MoveSignExtend(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void MoveSignExtend(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<MoveSignExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, skipSizeCheck: true);
         }
@@ -1339,32 +1336,32 @@ namespace XSharp.Compiler
 
         #region MoveZeroExtend
 
-        public static void MoveZeroExtend(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void MoveZeroExtend(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<MoveZeroExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void MoveZeroExtend(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void MoveZeroExtend(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<MoveZeroExtend>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void MoveZeroExtend(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
+        public static void MoveZeroExtend(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
         {
             Do<MoveZeroExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void MoveZeroExtend(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void MoveZeroExtend(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<MoveZeroExtend>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void MoveZeroExtend(Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void MoveZeroExtend(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<MoveZeroExtend>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
         }
 
-        public static void MoveZeroExtend(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
+        public static void MoveZeroExtend(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
             Do<MoveZeroExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, skipSizeCheck: true);
         }

@@ -1,72 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{12A519AA-7AF2-4873-8AD1-FAB5A76448B1}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Cosmos.IL2CPU.Plugs</RootNamespace>
-    <AssemblyName>Cosmos.IL2CPU.Plugs</AssemblyName>
-    <DefaultLanguage>en-US</DefaultLanguage>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
-    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <ItemGroup>
-    <None Include="..\..\Cosmos.snk">
-      <Link>Cosmos.snk</Link>
-    </None>
-    <None Include=".editorconfig" />
-    <None Include="project.json" />
-    <!-- A reference to the entire .NET Framework is automatically included -->
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="DebugStubAttribute.cs" />
-    <Compile Include="FieldAccessAttribute.cs" />
-    <Compile Include="FieldTypeAttribute.cs" />
-    <Compile Include="InlineAttribute.cs" />
-    <Compile Include="ObjectPointerAccessAttribute.cs" />
-    <Compile Include="ObjectUtilities.cs" />
-    <Compile Include="PlugAttribute.cs" />
-    <Compile Include="PlugFieldAttribute.cs" />
-    <Compile Include="PlugMethodAttribute.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="ReadMe.html" />
-  </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard1.5</TargetFramework>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
 </Project>

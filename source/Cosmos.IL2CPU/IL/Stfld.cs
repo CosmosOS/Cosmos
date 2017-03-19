@@ -3,8 +3,9 @@ using System.Linq;
 using System.Reflection;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
+
 using Cosmos.IL2CPU.Extensions;
-using XSharp.Compiler;
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stfld)]

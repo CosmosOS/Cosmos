@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
-using Microsoft.Extensions.DependencyModel;
-
 using Cosmos.Assembler;
 using Cosmos.IL2CPU.Extensions;
 using Cosmos.IL2CPU.Plugs;

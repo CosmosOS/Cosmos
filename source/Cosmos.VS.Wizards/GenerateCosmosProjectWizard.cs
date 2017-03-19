@@ -7,7 +7,7 @@ using System.IO;
 using EnvDTE;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.VS.Package.Templates {
+namespace Cosmos.VS.ProjectSystem.Templates {
   public class GenerateCosmosProjectWizard : IWizard {
     private const string BochsConfigurationFileName = "Cosmos.bxrc";
 
@@ -134,7 +134,7 @@ namespace Cosmos.VS.Package.Templates {
         UIHierarchyItem xHierarchyItem = (UIHierarchyItem)xEnumerator.Current;
         if (xHierarchyItem.Name == p.Name) {
           dynamic node = xHierarchyItem.Object;
-          dynamic nodeArg = p.Object; // Cosmos.VS.Package.VSProjectNode
+          dynamic nodeArg = p.Object; // Cosmos.VS.ProjectSystem.VSProjectNode
 
           try {
             if (node.Object.Project.ProjectIDGuid == nodeArg.ProjectIDGuid)

@@ -140,25 +140,17 @@ Source: ".\source\Cosmos.Debug.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub
 
 ; VSIP stuff
 Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.VS.Package.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.VS.Windows.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.VS.Wizards.*"; DestDir: "{code:VSNET2013_PATH}\PrivateAssemblies"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Debug.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Assembler.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-; Source: ".\Build\VSIP\XSC.exe"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\XSharp.Nasm.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\XSharp.VS.pdb"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\XSharp.VS.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
-Source: ".\Build\VSIP\Cosmos.Debug.VSDebugEngine.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-; Source: ".\Build\VSIP\Vestris.VMWareLib.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-; Source: ".\Build\VSIP\Interop.VixCOM.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
 ; ?? If we have this do we need the others?
 Source: ".\Build\VSIP\Cosmos.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\netcore\Cosmos.IL2CPU.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-; Source: ".\Resources\Dependencies\Microsoft.Samples.Debugging.CorApi.1.4.0.0\*.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
@@ -216,10 +208,10 @@ Root: HKLM; SubKey: {#VsRegRoot}\InstalledProducts\Cosmos Visual Studio Integrat
 Root: HKLM; SubKey: {#VsRegRoot}\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: string; ValueName: Package; ValueData: {{4cae44ed-88b9-4b7c-822b-b040f18fcee3}
 Root: HKLM; SubKey: {#VsRegRoot}\InstalledProducts\Cosmos Visual Studio Integration Package; ValueType: dword; ValueName: UseInterface; ValueData: 1
 Root: HKLM; SubKey: {#VsRegRoot}\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: none; Flags: uninsdeletekey
-Root: HKLM; SubKey: {#VsRegRoot}\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.VSProject, Cosmos.VS.Package, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f4d94ac959d59ec3
+Root: HKLM; SubKey: {#VsRegRoot}\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.ProjectSystem.VSProject, Cosmos.VS.ProjectSystem, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f4d94ac959d59ec3
 Root: HKLM; SubKey: {#VsRegRoot}\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
-Root: HKLM; SubKey: {#VsRegRoot}\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.VSProject
-Root: HKLM; SubKey: {#VsRegRoot}\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
+Root: HKLM; SubKey: {#VsRegRoot}\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.ProjectSystem.VSProject
+Root: HKLM; SubKey: {#VsRegRoot}\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.VS.ProjectSystem.dll
 Root: HKLM; SubKey: {#VsRegRoot}\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: dword; ValueName: ID; ValueData: $000003E9
 Root: HKLM; SubKey: {#VsRegRoot}\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: MinEdition; ValueData: Standard
 Root: HKLM; SubKey: {#VsRegRoot}\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3}; ValueType: string; ValueName: ProductVersion; ValueData: 1.0
@@ -229,10 +221,10 @@ Root: HKLM; SubKey: {#VsRegRoot}\Packages\{{4cae44ed-88b9-4b7c-822b-b040f18fcee3
 ; Project Properties Cosmos Page configuration page
 ; If we use the vsinstaller - do we still need these?
 Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: none; Flags: uninsdeletekey
-Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.Package.CosmosPage
+Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: ; ValueData: Cosmos.VS.ProjectSystem.CosmosPage
 Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\MSCOREE.DLL
-Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.Package.CosmosPage
-Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\cosmos.vs.package.dll
+Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.ProjectSystem.CosmosPage
+Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.VS.ProjectSystem.dll
 Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{d33a2d29-c4fd-4e12-a510-4c01a14d63e1}; ValueType: string; ValueName: ThreadingModel; ValueData: Both
 
 ; Old configuration pages
@@ -266,10 +258,10 @@ Root: HKLM; SubKey: {#VsRegRoot}\AD7Metrics\Engine\{{FA1DA3A6-66FF-4c65-B077-E65
 
 ; Debug engine
 Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: none; Flags: uninsdeletekey
-Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.Debug.VSDebugEngine
-Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: string; ValueName: Class; ValueData: Cosmos.Debug.VSDebugEngine.AD7Engine
+Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.VS.DebugEngine
+Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.DebugEngine.AD7Engine
 Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
-Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.Debug.VSDebugEngine.dll
+Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{DC8503AB-7EE6-456C-A209-66C690D9F6F4}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.VS.DebugEngine.dll
 
 ; X# custom tool registration
 Root: HKLM; SubKey: {#VsRegRoot}\Generators\{{FAE04EC1-301F-11D3-BF4B-00C04F79EFBC}\CosmosXSharpGenerator; ValueType: none; Flags: uninsdeletekey
@@ -284,10 +276,10 @@ Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{D6F57DE8-E50E-4C91-99E1-FA2E262BC4EA}; 
 
 ; program provider
 Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: none; Flags: uninsdeletekey
-Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.Debug.VSDebugEngine
-Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: Class; ValueData: Cosmos.Debug.VSDebugEngine.AD7ProgramProvider
+Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: Assembly; ValueData: Cosmos.VS.DebugEngine
+Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: Class; ValueData: Cosmos.VS.DebugEngine.AD7ProgramProvider
 Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: InprocServer32; ValueData: {sys}\mscoree.dll
-Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.Debug.VSDebugEngine.dll
+Root: HKLM; SubKey: {#VsRegRoot}\CLSID\{{B4DE9307-C062-45F1-B1AF-9A5FB25402D5}; ValueType: string; ValueName: CodeBase; ValueData: {app}\build\vsip\Cosmos.VS.DebugEngine.dll
 
 ; debug window
 Root: HKLM; SubKey: {#VsRegRoot}\InstalledProducts\Cosmos_VS_WindowsPackage; ValueType: none; Flags: uninsdeletekey

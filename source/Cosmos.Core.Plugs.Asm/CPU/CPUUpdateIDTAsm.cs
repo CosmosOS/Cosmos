@@ -2,7 +2,7 @@ using System;
 using System.Reflection;
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
-using XSharp.Compiler;
+using XSharp.Common;
 
 namespace Cosmos.Core.Plugs.Asm
 {

@@ -10,7 +10,8 @@ using CPU = Cosmos.Assembler.x86;
 using CPUx86 = Cosmos.Assembler.x86;
 using System.Reflection;
 using Cosmos.Assembler;
-using XSharp.Compiler;
+
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL
 {

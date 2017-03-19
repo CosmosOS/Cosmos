@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard1.5</TargetFramework>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
+      <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj" />
+      <ProjectReference Include="..\Cosmos.System\Cosmos.System.csproj" />
+    </ItemGroup>
+
+</Project>

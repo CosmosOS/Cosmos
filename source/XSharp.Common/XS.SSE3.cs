@@ -1,13 +1,12 @@
 ﻿using Cosmos.Assembler.x86.SSE;
-using static XSharp.Compiler.XSRegisters;
 
-namespace XSharp.Compiler
+namespace XSharp.Common
 {
   partial class XS
   {
     public static class SSE3
     {
-      public static void MoveDoubleAndDuplicate(RegisterXMM destination, Register32 source, bool sourceIsIndirect = false)
+      public static void MoveDoubleAndDuplicate(XSRegisters.RegisterXMM destination, XSRegisters.Register32 source, bool sourceIsIndirect = false)
       {
         new MoveDoubleAndDuplicate()
         {

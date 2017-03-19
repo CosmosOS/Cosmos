@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Reflection.Metadata;
 
+
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpSingle : ILOpCode {
     public readonly Single Value;

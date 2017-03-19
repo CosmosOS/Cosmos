@@ -10,7 +10,7 @@ namespace Cosmos.TestRunner.Core
     public partial class Engine
     {
         // configuration: in process eases debugging, but means certain errors (like stack overflow) kill the test runner.
-        public bool RunIL2CPUInProcess = false;
+        public bool DebugIL2CPU = false;
         public bool RunWithGDB = false;
         public bool StartBochsDebugGui = false;
         public bool EnableStackCorruptionChecks = true;

@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using static XSharp.Compiler.XSRegisters;
 
-namespace XSharp.Compiler {
+namespace XSharp.Common {
   public class TokenList : List<Token> {
 
     public new Token this[int aIdx] {
@@ -44,7 +40,7 @@ namespace XSharp.Compiler {
       return xResult;
     }
 
-    protected bool RegistersMatch(string aThisUpper, string aThatUpper, string aPattern, IDictionary<string, Register> aRegisters) {
+    protected bool RegistersMatch(string aThisUpper, string aThatUpper, string aPattern, IDictionary<string, XSRegisters.Register> aRegisters) {
       // ONLY check if its our pattern. We need to return true to continue other pattern checks
       // if not current pattern.
       if (aThisUpper == aPattern || aThatUpper == aPattern) {

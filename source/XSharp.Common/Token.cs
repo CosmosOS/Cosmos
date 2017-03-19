@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace XSharp.Compiler {
-  public enum TokenType {
+namespace XSharp.Common
+{
+  public enum TokenType
+  {
     // Line based
     Comment, LiteralAsm
     //
@@ -18,7 +17,8 @@ namespace XSharp.Compiler {
     , Unknown
   }
 
-  public class Token {
+  public class Token
+  {
     public TokenType Type = TokenType.Unknown;
     public string RawValue;
     public int SrcPosStart;
@@ -60,15 +60,18 @@ namespace XSharp.Compiler {
     /// <summary>Get line number this token belongs to.</summary>
     public int LineNumber { get; private set; }
 
-    public Token(int lineNumber) {
-        LineNumber = lineNumber;
+    public Token(int lineNumber)
+    {
+      LineNumber = lineNumber;
     }
 
-    public override string ToString() {
+    public override string ToString()
+    {
       return RawValue;
     }
 
-    public bool Matches(string aText) {
+    public bool Matches(string aText)
+    {
       return string.Equals(RawValue, aText, StringComparison.OrdinalIgnoreCase);
     }
   }

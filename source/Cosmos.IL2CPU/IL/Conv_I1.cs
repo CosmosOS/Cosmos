@@ -1,8 +1,9 @@
 using System;
 using Cosmos.Assembler.x86.SSE;
-using XSharp.Compiler;
+
+using XSharp.Common;
 using CPUx86 = Cosmos.Assembler.x86;
-using static XSharp.Compiler.XSRegisters;
+using static XSharp.Common.XSRegisters;
 using static Cosmos.Assembler.x86.SSE.ComparePseudoOpcodes;
 
 namespace Cosmos.IL2CPU.X86.IL

@@ -61,9 +61,9 @@ namespace Microsoft.VisualStudio.Project
         IProjectEventsProvider,
         IReferenceContainerProvider,
         IVsProjectSpecialFiles,
-		IVsProjectUpgrade,
-		IVsDesignTimeAssemblyResolution,
-		IVsSetTargetFrameworkWorkerCallback
+        IVsProjectUpgrade,
+        IVsDesignTimeAssemblyResolution,
+        IVsSetTargetFrameworkWorkerCallback
     {
         #region nested types
 
@@ -154,27 +154,27 @@ namespace Microsoft.VisualStudio.Project
         /// The user file extension.
         /// </summary>
         internal const string PerUserFileExtension = ".user";
-     
-		private Guid GUID_MruPage = new Guid("{19B97F03-9594-4c1c-BE28-25FF030113B3}");
+
+        private Guid GUID_MruPage = new Guid("{19B97F03-9594-4c1c-BE28-25FF030113B3}");
 
         /// <summary>
         /// The VS command that allows projects to open Windows Explorer to the project directory.
         /// </summary>
         private const VsCommands2K ExploreFolderInWindowsCommand = (VsCommands2K)1635;
-		
-		#endregion
+
+        #endregion
 
         #region fields
 
         private static readonly FrameworkName DefaultTargetFrameworkMoniker = new FrameworkName(".NETFramework", new Version(4, 0));
 
-		private static Guid addComponentLastActiveTab = VSConstants.GUID_SolutionPage;
+        private static Guid addComponentLastActiveTab = VSConstants.GUID_SolutionPage;
 
-		private static uint addComponentDialogSizeX = 0;
+        private static uint addComponentDialogSizeX = 0;
 
-		private static uint addComponentDialogSizeY = 0;
+        private static uint addComponentDialogSizeY = 0;
 
-		/// <summary>
+        /// <summary>
         /// List of output groups names and their associated target
         /// </summary>
         private static KeyValuePair<string, string>[] outputGroupNames =
@@ -747,10 +747,10 @@ namespace Microsoft.VisualStudio.Project
         {
             get
             {
-				if (this.options == null)
-				{
-					GetProjectOptions();
-				}
+                if (this.options == null)
+                {
+                    GetProjectOptions();
+                }
                 if (this.options != null)
                 {
                     return this.options.TargetFrameworkMoniker ?? DefaultTargetFrameworkMoniker;
@@ -763,14 +763,14 @@ namespace Microsoft.VisualStudio.Project
 
             set
             {
-				if (this.options == null)
-				{
-					GetProjectOptions();
-				}
-
-				if (value == null)
+                if (this.options == null)
                 {
-					value = DefaultTargetFrameworkMoniker;
+                    GetProjectOptions();
+                }
+
+                if (value == null)
+                {
+                    value = DefaultTargetFrameworkMoniker;
                 }
 
                 if (this.options.TargetFrameworkMoniker != value)
@@ -855,21 +855,21 @@ namespace Microsoft.VisualStudio.Project
             }
         }
 
-		protected bool IsIdeInCommandLineMode
-		{
-			get
-			{
-				bool cmdline = false;
-				var shell = this.site.GetService(typeof(SVsShell)) as IVsShell;
-				if (shell != null)
-				{
-					object obj;
-					Marshal.ThrowExceptionForHR(shell.GetProperty((int)__VSSPROPID.VSSPROPID_IsInCommandLineMode, out obj));
-					cmdline = (bool)obj;
-				}
-				return cmdline;
-			}
-		}
+        protected bool IsIdeInCommandLineMode
+        {
+            get
+            {
+                bool cmdline = false;
+                var shell = this.site.GetService(typeof(SVsShell)) as IVsShell;
+                if (shell != null)
+                {
+                    object obj;
+                    Marshal.ThrowExceptionForHR(shell.GetProperty((int)__VSSPROPID.VSSPROPID_IsInCommandLineMode, out obj));
+                    cmdline = (bool)obj;
+                }
+                return cmdline;
+            }
+        }
 
         /// <summary>
         /// Gets the configuration provider.
@@ -1144,7 +1144,7 @@ namespace Microsoft.VisualStudio.Project
         {
             CCITracing.TraceCall();
             this.site = new ServiceProvider(site);
-			ServiceProvider = this.site;
+            ServiceProvider = this.site;
 
             if (taskProvider != null)
             {
@@ -1667,31 +1667,31 @@ namespace Microsoft.VisualStudio.Project
 
             IVsComponentSelectorDlg4 componentDialog;
             string strBrowseLocations = Path.GetDirectoryName(this.BaseURI.Uri.LocalPath);
-			var tabInitList = new List<VSCOMPONENTSELECTORTABINIT>()
-			{
-				new VSCOMPONENTSELECTORTABINIT {
-					guidTab = VSConstants.GUID_COMPlusPage,
-					varTabInitInfo = GetComponentPickerDirectories(),
-				},
+            var tabInitList = new List<VSCOMPONENTSELECTORTABINIT>()
+            {
+                new VSCOMPONENTSELECTORTABINIT {
+                    guidTab = VSConstants.GUID_COMPlusPage,
+                    varTabInitInfo = GetComponentPickerDirectories(),
+                },
                 new VSCOMPONENTSELECTORTABINIT {
                     guidTab = VSConstants.GUID_COMClassicPage,
                 },
-				new VSCOMPONENTSELECTORTABINIT {
-		            // Tell the Add Reference dialog to call hierarchies GetProperty with the following
-		            // propID to enablefiltering out ourself from the Project to Project reference
-					varTabInitInfo = (int)__VSHPROPID.VSHPROPID_ShowProjInSolutionPage,
-					guidTab = VSConstants.GUID_SolutionPage,
-				},
-	            // Add the Browse for file page            
-				new VSCOMPONENTSELECTORTABINIT {
-					varTabInitInfo = 0,
-					guidTab = VSConstants.GUID_BrowseFilePage,
-				},
-				new VSCOMPONENTSELECTORTABINIT {
-				    guidTab = GUID_MruPage,
-				},
-			};
-			tabInitList.ForEach(tab => tab.dwSize = (uint)Marshal.SizeOf(typeof(VSCOMPONENTSELECTORTABINIT)));
+                new VSCOMPONENTSELECTORTABINIT {
+                    // Tell the Add Reference dialog to call hierarchies GetProperty with the following
+                    // propID to enablefiltering out ourself from the Project to Project reference
+                    varTabInitInfo = (int)__VSHPROPID.VSHPROPID_ShowProjInSolutionPage,
+                    guidTab = VSConstants.GUID_SolutionPage,
+                },
+                // Add the Browse for file page            
+                new VSCOMPONENTSELECTORTABINIT {
+                    varTabInitInfo = 0,
+                    guidTab = VSConstants.GUID_BrowseFilePage,
+                },
+                new VSCOMPONENTSELECTORTABINIT {
+                    guidTab = GUID_MruPage,
+                },
+            };
+            tabInitList.ForEach(tab => tab.dwSize = (uint)Marshal.SizeOf(typeof(VSCOMPONENTSELECTORTABINIT)));
 
             componentDialog = this.GetService(typeof(IVsComponentSelectorDlg)) as IVsComponentSelectorDlg4;
             try
@@ -1707,17 +1707,17 @@ namespace Microsoft.VisualStudio.Project
                         (System.UInt32)(__VSCOMPSELFLAGS.VSCOMSEL_MultiSelectMode | __VSCOMPSELFLAGS.VSCOMSEL_IgnoreMachineName),
                         (IVsComponentUser)this,
                         0,
-						null,
-						SR.GetString(SR.AddReferenceDialogTitle, CultureInfo.CurrentUICulture),   // Title
+                        null,
+                        SR.GetString(SR.AddReferenceDialogTitle, CultureInfo.CurrentUICulture),   // Title
                         "VS.AddReference",                          // Help topic
                         addComponentDialogSizeX,
                         addComponentDialogSizeY,
                         (uint)tabInitList.Count,
                         tabInitList.ToArray(),
                         ref addComponentLastActiveTab,
-						browseFilters,
+                        browseFilters,
                         ref strBrowseLocations,
-						this.TargetFrameworkMoniker.FullName));
+                        this.TargetFrameworkMoniker.FullName));
                 }
             }
             catch (COMException e)
@@ -2123,9 +2123,9 @@ namespace Microsoft.VisualStudio.Project
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]
         public virtual ProjectOptions GetProjectOptions(string config = null)
         {
-			if (string.IsNullOrEmpty(config))
-			{
-				EnvDTE.Project automationObject = this.GetAutomationObject() as EnvDTE.Project;
+            if (string.IsNullOrEmpty(config))
+            {
+                EnvDTE.Project automationObject = this.GetAutomationObject() as EnvDTE.Project;
                 try
                 {
                     config = Utilities.GetActiveConfigurationName(automationObject);
@@ -2134,37 +2134,37 @@ namespace Microsoft.VisualStudio.Project
                 {
                     // Can't figure out the active configuration.  Perhaps during solution load, or in a unit test.
                 }
-				catch (COMException)
-				{
-					// We may be in solution load and don't have an active config yet.
-				}
-			}
+                catch (COMException)
+                {
+                    // We may be in solution load and don't have an active config yet.
+                }
+            }
 
-			if (this.options != null && String.Equals(this.options.Config, config, StringComparison.OrdinalIgnoreCase))
-				return this.options;
+            if (this.options != null && String.Equals(this.options.Config, config, StringComparison.OrdinalIgnoreCase))
+                return this.options;
 
             ProjectOptions options = CreateProjectOptions();
-			options.Config = config;
+            options.Config = config;
 
-			string targetFrameworkMoniker = GetProjectProperty("TargetFrameworkMoniker", false);
+            string targetFrameworkMoniker = GetProjectProperty("TargetFrameworkMoniker", false);
 
-			if (!string.IsNullOrEmpty(targetFrameworkMoniker))
-			{
-				try
-				{
-					options.TargetFrameworkMoniker = new FrameworkName(targetFrameworkMoniker);
-				}
-				catch (ArgumentException e)
-				{
-					Trace.WriteLine("Exception : " + e.Message);
-				}
-			}
+            if (!string.IsNullOrEmpty(targetFrameworkMoniker))
+            {
+                try
+                {
+                    options.TargetFrameworkMoniker = new FrameworkName(targetFrameworkMoniker);
+                }
+                catch (ArgumentException e)
+                {
+                    Trace.WriteLine("Exception : " + e.Message);
+                }
+            }
 
-			if (config == null)
-			{
-				this.options = options;
-				return options;
-			}
+            if (config == null)
+            {
+                this.options = options;
+                return options;
+            }
 
             options.GenerateExecutable = true;
 
@@ -2340,22 +2340,22 @@ namespace Microsoft.VisualStudio.Project
                 }
             }
 
-			this.options = options; // do this AFTER setting configuration so it doesn't clear it.
-			return options;
+            this.options = options; // do this AFTER setting configuration so it doesn't clear it.
+            return options;
         }
 
         public virtual void OnTargetFrameworkMonikerChanged(ProjectOptions options, FrameworkName currentTargetFramework, FrameworkName newTargetFramework)
         {
-			if (currentTargetFramework == null)
-			{
-				throw new ArgumentNullException("currentTargetFramework");
-			}
-			if (newTargetFramework == null)
-			{
-				throw new ArgumentNullException("newTargetFramework");
-			}
+            if (currentTargetFramework == null)
+            {
+                throw new ArgumentNullException("currentTargetFramework");
+            }
+            if (newTargetFramework == null)
+            {
+                throw new ArgumentNullException("newTargetFramework");
+            }
 
-			var retargetingService = this.site.GetService(typeof(SVsTrackProjectRetargeting)) as IVsTrackProjectRetargeting;
+            var retargetingService = this.site.GetService(typeof(SVsTrackProjectRetargeting)) as IVsTrackProjectRetargeting;
             if (retargetingService == null)
             {
                 // Probably in a unit test.
@@ -2366,7 +2366,7 @@ namespace Microsoft.VisualStudio.Project
             {
                 Marshal.ThrowExceptionForHR(retargetingService.OnSetTargetFramework(this, currentTargetFramework.FullName, newTargetFramework.FullName, this, true));
             }
-		}
+        }
 
         [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", MessageId = "Attr")]
         [SuppressMessage("Microsoft.Naming", "CA1720:IdentifiersShouldNotContainTypeNames", MessageId = "bool")]
@@ -3577,15 +3577,15 @@ namespace Microsoft.VisualStudio.Project
                 this.currentConfig = this.buildProject.CreateProjectInstance();
             }
 
-			if (propertiesChanged || this.designTimeAssemblyResolution == null)
-			{
-				if (this.designTimeAssemblyResolution == null)
-				{
-					this.designTimeAssemblyResolution = new DesignTimeAssemblyResolution();
-				}
+            if (propertiesChanged || this.designTimeAssemblyResolution == null)
+            {
+                if (this.designTimeAssemblyResolution == null)
+                {
+                    this.designTimeAssemblyResolution = new DesignTimeAssemblyResolution();
+                }
 
-				this.designTimeAssemblyResolution.Initialize(this);
-			}
+                this.designTimeAssemblyResolution.Initialize(this);
+            }
 
             this.options = null;
         }
@@ -3935,15 +3935,15 @@ namespace Microsoft.VisualStudio.Project
             return this.GetProjectProperty(propertyName, true);
         }
 
-		/// <summary>
-		/// Gets the unevaluated value of a project property.
-		/// </summary>
-		/// <param name="propertyName">The name of the property to retrieve.</param>
-		/// <returns>Unevaluated value of the property.</returns>
-		public string GetProjectPropertyUnevaluated(string propertyName)
-		{
-			return this.buildProject.GetProperty(propertyName).UnevaluatedValue;
-		}
+        /// <summary>
+        /// Gets the unevaluated value of a project property.
+        /// </summary>
+        /// <param name="propertyName">The name of the property to retrieve.</param>
+        /// <returns>Unevaluated value of the property.</returns>
+        public string GetProjectPropertyUnevaluated(string propertyName)
+        {
+            return this.buildProject.GetProperty(propertyName).UnevaluatedValue;
+        }
 
         /// <summary>
         /// Set dirty state of project
@@ -5800,40 +5800,40 @@ namespace Microsoft.VisualStudio.Project
 
         #endregion
 
-		#region IVsDesignTimeAssemblyResolution methods
+        #region IVsDesignTimeAssemblyResolution methods
 
-		public int GetTargetFramework(out string ppTargetFramework)
-		{
-			ppTargetFramework = this.ProjectMgr.TargetFrameworkMoniker.FullName;
-			return VSConstants.S_OK;
-		}
+        public int GetTargetFramework(out string ppTargetFramework)
+        {
+            ppTargetFramework = this.ProjectMgr.TargetFrameworkMoniker.FullName;
+            return VSConstants.S_OK;
+        }
 
-		public int ResolveAssemblyPathInTargetFx(string[] prgAssemblySpecs, uint cAssembliesToResolve, VsResolvedAssemblyPath[] prgResolvedAssemblyPaths, out uint pcResolvedAssemblyPaths)
-		{
-			if (prgAssemblySpecs == null || cAssembliesToResolve == 0 || prgResolvedAssemblyPaths == null)
-			{
-				throw new ArgumentException("One or more of the arguments are invalid.");
-			}
+        public int ResolveAssemblyPathInTargetFx(string[] prgAssemblySpecs, uint cAssembliesToResolve, VsResolvedAssemblyPath[] prgResolvedAssemblyPaths, out uint pcResolvedAssemblyPaths)
+        {
+            if (prgAssemblySpecs == null || cAssembliesToResolve == 0 || prgResolvedAssemblyPaths == null)
+            {
+                throw new ArgumentException("One or more of the arguments are invalid.");
+            }
 
-			pcResolvedAssemblyPaths = 0;
+            pcResolvedAssemblyPaths = 0;
 
-			try
-			{
-				var results = designTimeAssemblyResolution.Resolve(prgAssemblySpecs.Take((int)cAssembliesToResolve));
-				results.CopyTo(prgResolvedAssemblyPaths, 0);
-				pcResolvedAssemblyPaths = (uint)results.Length;
-			}
-			catch (Exception ex)
-			{
-				return Marshal.GetHRForException(ex);
-			}
+            try
+            {
+                var results = designTimeAssemblyResolution.Resolve(prgAssemblySpecs.Take((int)cAssembliesToResolve));
+                results.CopyTo(prgResolvedAssemblyPaths, 0);
+                pcResolvedAssemblyPaths = (uint)results.Length;
+            }
+            catch (Exception ex)
+            {
+                return Marshal.GetHRForException(ex);
+            }
 
-			return VSConstants.S_OK;
-		}
+            return VSConstants.S_OK;
+        }
 
-		#endregion
+        #endregion
 
-		#region private helper methods
+        #region private helper methods
 
         /// <summary>
         /// Initialize projectNode
@@ -6339,179 +6339,179 @@ namespace Microsoft.VisualStudio.Project
             this.buildInProcess = false;
         }
 
-		private string GetComponentPickerDirectories()
-		{
-			IVsComponentEnumeratorFactory4 enumFactory = this.site.GetService(typeof(SCompEnumService)) as IVsComponentEnumeratorFactory4;
-			if (enumFactory == null)
-			{
-				throw new InvalidOperationException("Missing the SCompEnumService service.");
-			}
+        private string GetComponentPickerDirectories()
+        {
+            IVsComponentEnumeratorFactory4 enumFactory = this.site.GetService(typeof(SCompEnumService)) as IVsComponentEnumeratorFactory4;
+            if (enumFactory == null)
+            {
+                throw new InvalidOperationException("Missing the SCompEnumService service.");
+            }
 
-			IEnumComponents enumerator;
-			Marshal.ThrowExceptionForHR(enumFactory.GetReferencePathsForTargetFramework(this.TargetFrameworkMoniker.FullName, out enumerator));
-			if (enumerator == null)
-			{
-				throw new ApplicationException("IVsComponentEnumeratorFactory4.GetReferencePathsForTargetFramework returned null.");
-			}
+            IEnumComponents enumerator;
+            Marshal.ThrowExceptionForHR(enumFactory.GetReferencePathsForTargetFramework(this.TargetFrameworkMoniker.FullName, out enumerator));
+            if (enumerator == null)
+            {
+                throw new ApplicationException("IVsComponentEnumeratorFactory4.GetReferencePathsForTargetFramework returned null.");
+            }
 
-			StringBuilder paths = new StringBuilder();
-			VSCOMPONENTSELECTORDATA[] data = new VSCOMPONENTSELECTORDATA[1];
-			uint fetchedCount;
-			while (enumerator.Next(1, data, out fetchedCount) == VSConstants.S_OK && fetchedCount == 1)
-			{
-				Debug.Assert(data[0].type == VSCOMPONENTTYPE.VSCOMPONENTTYPE_Path);
-				paths.Append(data[0].bstrFile);
-				paths.Append(";");
-			}
+            StringBuilder paths = new StringBuilder();
+            VSCOMPONENTSELECTORDATA[] data = new VSCOMPONENTSELECTORDATA[1];
+            uint fetchedCount;
+            while (enumerator.Next(1, data, out fetchedCount) == VSConstants.S_OK && fetchedCount == 1)
+            {
+                Debug.Assert(data[0].type == VSCOMPONENTTYPE.VSCOMPONENTTYPE_Path);
+                paths.Append(data[0].bstrFile);
+                paths.Append(";");
+            }
 
-			// Trim off the last semicolon.
-			if (paths.Length > 0)
-			{
-				paths.Length -= 1;
-			}
+            // Trim off the last semicolon.
+            if (paths.Length > 0)
+            {
+                paths.Length -= 1;
+            }
 
-			return paths.ToString();
-		}
+            return paths.ToString();
+        }
 
-		#endregion
+        #endregion
 
-		public int UpdateTargetFramework(IVsHierarchy pHier, string currentTargetFramework, string newTargetFramework)
-		{
-			FrameworkName moniker = new FrameworkName(newTargetFramework);
-			SetProjectProperty("TargetFrameworkIdentifier", moniker.Identifier);
-			SetProjectProperty("TargetFrameworkVersion", "v" + moniker.Version);
-			SetProjectProperty("TargetFrameworkProfile", moniker.Profile);
-			return VSConstants.S_OK;
-		}
+        public int UpdateTargetFramework(IVsHierarchy pHier, string currentTargetFramework, string newTargetFramework)
+        {
+            FrameworkName moniker = new FrameworkName(newTargetFramework);
+            SetProjectProperty("TargetFrameworkIdentifier", moniker.Identifier);
+            SetProjectProperty("TargetFrameworkVersion", "v" + moniker.Version);
+            SetProjectProperty("TargetFrameworkProfile", moniker.Profile);
+            return VSConstants.S_OK;
+        }
 
-		public int UpgradeProject(uint grfUpgradeFlags)
-		{
-			int hr = VSConstants.S_OK;
+        public int UpgradeProject(uint grfUpgradeFlags)
+        {
+            int hr = VSConstants.S_OK;
 
-			if (!PerformTargetFrameworkCheck())
-			{
-				// Just return OLE_E_PROMPTSAVECANCELLED here which will cause the shell
-				// to leave the project in an unloaded state.
-				hr = VSConstants.OLE_E_PROMPTSAVECANCELLED;
-			}
+            if (!PerformTargetFrameworkCheck())
+            {
+                // Just return OLE_E_PROMPTSAVECANCELLED here which will cause the shell
+                // to leave the project in an unloaded state.
+                hr = VSConstants.OLE_E_PROMPTSAVECANCELLED;
+            }
 
-			return hr;
-		}
+            return hr;
+        }
 
-		private bool PerformTargetFrameworkCheck()
-		{
-			if (this.IsFrameworkOnMachine())
-			{
-				// Nothing to do since the framework is present.
-				return true;
-			}
+        private bool PerformTargetFrameworkCheck()
+        {
+            if (this.IsFrameworkOnMachine())
+            {
+                // Nothing to do since the framework is present.
+                return true;
+            }
 
-			return ShowRetargetingDialog();
-		}
+            return ShowRetargetingDialog();
+        }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns>
-		/// <c>true</c> if the project will be retargeted.  <c>false</c> to load project in unloaded state.
-		/// </returns>
-		private bool ShowRetargetingDialog()
-		{
-			var retargetDialog = this.site.GetService(typeof(SVsFrameworkRetargetingDlg)) as IVsFrameworkRetargetingDlg;
-			if (retargetDialog == null)
-			{
-				throw new InvalidOperationException("Missing SVsFrameworkRetargetingDlg service.");
-			}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if the project will be retargeted.  <c>false</c> to load project in unloaded state.
+        /// </returns>
+        private bool ShowRetargetingDialog()
+        {
+            var retargetDialog = this.site.GetService(typeof(SVsFrameworkRetargetingDlg)) as IVsFrameworkRetargetingDlg;
+            if (retargetDialog == null)
+            {
+                throw new InvalidOperationException("Missing SVsFrameworkRetargetingDlg service.");
+            }
 
-			// We can only display the retargeting dialog if the IDE is not in command-line mode.
-			if (IsIdeInCommandLineMode)
-			{
-				string message = SR.GetString(SR.CannotLoadUnknownTargetFrameworkProject, this.FileName, this.TargetFrameworkMoniker);
-				var outputWindow = this.site.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
-				if (outputWindow != null)
-				{
-					IVsOutputWindowPane outputPane;
-					Guid outputPaneGuid = VSConstants.GUID_BuildOutputWindowPane;
-					if (outputWindow.GetPane(ref outputPaneGuid, out outputPane) >= 0 && outputPane != null)
-					{
-						Marshal.ThrowExceptionForHR(outputPane.OutputString(message));
-					}
-				}
+            // We can only display the retargeting dialog if the IDE is not in command-line mode.
+            if (IsIdeInCommandLineMode)
+            {
+                string message = SR.GetString(SR.CannotLoadUnknownTargetFrameworkProject, this.FileName, this.TargetFrameworkMoniker);
+                var outputWindow = this.site.GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+                if (outputWindow != null)
+                {
+                    IVsOutputWindowPane outputPane;
+                    Guid outputPaneGuid = VSConstants.GUID_BuildOutputWindowPane;
+                    if (outputWindow.GetPane(ref outputPaneGuid, out outputPane) >= 0 && outputPane != null)
+                    {
+                        Marshal.ThrowExceptionForHR(outputPane.OutputString(message));
+                    }
+                }
 
-				throw new InvalidOperationException(message);
-			}
-			else
-			{
-				uint outcome;
-				int dontShowAgain;
-				Marshal.ThrowExceptionForHR(retargetDialog.ShowFrameworkRetargetingDlg(
-					this.Package.ProductUserContext,
-					this.FileName,
-					this.TargetFrameworkMoniker.FullName,
-					(uint)__FRD_FLAGS.FRDF_DEFAULT,
-					out outcome,
-					out dontShowAgain));
-				switch ((__FRD_OUTCOME)outcome)
-				{
-					case __FRD_OUTCOME.FRDO_GOTO_DOWNLOAD_SITE:
-						Marshal.ThrowExceptionForHR(retargetDialog.NavigateToFrameworkDownloadUrl());
-						return false;
-					case __FRD_OUTCOME.FRDO_LEAVE_UNLOADED:
-						return false;
-					case __FRD_OUTCOME.FRDO_RETARGET_TO_40:
-						// If we are retargeting to 4.0, then set the flag to set the appropriate Target Framework.
-						// This will dirty the project file, so we check it out of source control now -- so that
-						// the user can associate getting the checkout prompt with the "No Framework" dialog.
-						if (QueryEditProjectFile(false /* bSuppressUI */))
-						{
-							var retargetingService = this.site.GetService(typeof(SVsTrackProjectRetargeting)) as IVsTrackProjectRetargeting;
-							if (retargetingService != null)
-							{
-								// We surround our batch retargeting request with begin/end because in individual project load
-								// scenarios the solution load context hasn't done it for us.
-								Marshal.ThrowExceptionForHR(retargetingService.BeginRetargetingBatch());
-								Marshal.ThrowExceptionForHR(retargetingService.BatchRetargetProject(this, DefaultTargetFrameworkMoniker.FullName, true));
-								Marshal.ThrowExceptionForHR(retargetingService.EndRetargetingBatch());
-							}
-							else
-							{
-								// Just setting the moniker to null will allow the default framework (.NETFX 4.0) to assert itself.
-								this.TargetFrameworkMoniker = null;
-							}
+                throw new InvalidOperationException(message);
+            }
+            else
+            {
+                uint outcome;
+                int dontShowAgain;
+                Marshal.ThrowExceptionForHR(retargetDialog.ShowFrameworkRetargetingDlg(
+                    this.Package.ProductUserContext,
+                    this.FileName,
+                    this.TargetFrameworkMoniker.FullName,
+                    (uint)__FRD_FLAGS.FRDF_DEFAULT,
+                    out outcome,
+                    out dontShowAgain));
+                switch ((__FRD_OUTCOME)outcome)
+                {
+                    case __FRD_OUTCOME.FRDO_GOTO_DOWNLOAD_SITE:
+                        Marshal.ThrowExceptionForHR(retargetDialog.NavigateToFrameworkDownloadUrl());
+                        return false;
+                    case __FRD_OUTCOME.FRDO_LEAVE_UNLOADED:
+                        return false;
+                    case __FRD_OUTCOME.FRDO_RETARGET_TO_40:
+                        // If we are retargeting to 4.0, then set the flag to set the appropriate Target Framework.
+                        // This will dirty the project file, so we check it out of source control now -- so that
+                        // the user can associate getting the checkout prompt with the "No Framework" dialog.
+                        if (QueryEditProjectFile(false /* bSuppressUI */))
+                        {
+                            var retargetingService = this.site.GetService(typeof(SVsTrackProjectRetargeting)) as IVsTrackProjectRetargeting;
+                            if (retargetingService != null)
+                            {
+                                // We surround our batch retargeting request with begin/end because in individual project load
+                                // scenarios the solution load context hasn't done it for us.
+                                Marshal.ThrowExceptionForHR(retargetingService.BeginRetargetingBatch());
+                                Marshal.ThrowExceptionForHR(retargetingService.BatchRetargetProject(this, DefaultTargetFrameworkMoniker.FullName, true));
+                                Marshal.ThrowExceptionForHR(retargetingService.EndRetargetingBatch());
+                            }
+                            else
+                            {
+                                // Just setting the moniker to null will allow the default framework (.NETFX 4.0) to assert itself.
+                                this.TargetFrameworkMoniker = null;
+                            }
 
-							return true;
-						}
-						else
-						{
-							return false;
-						}
-					default:
-						throw new ArgumentException("Unexpected outcome from retargeting dialog.");
-				}
-			}
-		}
+                            return true;
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    default:
+                        throw new ArgumentException("Unexpected outcome from retargeting dialog.");
+                }
+            }
+        }
 
-		private bool IsFrameworkOnMachine()
-		{
-			var multiTargeting = this.site.GetService(typeof(SVsFrameworkMultiTargeting)) as IVsFrameworkMultiTargeting;
-			Array frameworks;
-			Marshal.ThrowExceptionForHR(multiTargeting.GetSupportedFrameworks(out frameworks));
-			foreach (string fx in frameworks)
-			{
-				uint compat;
-				int hr = multiTargeting.CheckFrameworkCompatibility(this.TargetFrameworkMoniker.FullName, fx, out compat);
-				if (hr < 0)
-				{
-					break;
-				}
+        private bool IsFrameworkOnMachine()
+        {
+            var multiTargeting = this.site.GetService(typeof(SVsFrameworkMultiTargeting)) as IVsFrameworkMultiTargeting;
+            Array frameworks;
+            Marshal.ThrowExceptionForHR(multiTargeting.GetSupportedFrameworks(out frameworks));
+            foreach (string fx in frameworks)
+            {
+                uint compat;
+                int hr = multiTargeting.CheckFrameworkCompatibility(this.TargetFrameworkMoniker.FullName, fx, out compat);
+                if (hr < 0)
+                {
+                    break;
+                }
 
-				if ((__VSFRAMEWORKCOMPATIBILITY)compat == __VSFRAMEWORKCOMPATIBILITY.VSFRAMEWORKCOMPATIBILITY_COMPATIBLE)
-				{
-					return true;
-				}
-			}
+                if ((__VSFRAMEWORKCOMPATIBILITY)compat == __VSFRAMEWORKCOMPATIBILITY.VSFRAMEWORKCOMPATIBILITY_COMPATIBLE)
+                {
+                    return true;
+                }
+            }
 
-			return false;
-		}
-	}
+            return false;
+        }
+    }
 }

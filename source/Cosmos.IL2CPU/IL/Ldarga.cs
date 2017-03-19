@@ -2,8 +2,8 @@ using System;
 using System.Reflection;
 
 using Cosmos.IL2CPU.ILOpCodes;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 
 namespace Cosmos.IL2CPU.X86.IL

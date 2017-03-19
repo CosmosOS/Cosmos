@@ -1,4 +1,5 @@
-using XSharp.Compiler;
+
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL
 {

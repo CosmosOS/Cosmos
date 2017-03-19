@@ -2,7 +2,7 @@ using System;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
-using XSharp.Compiler;
+
 
 namespace Cosmos.IL2CPU.X86.IL
 {

@@ -567,7 +567,7 @@ namespace Cosmos.Build.Builder
       MsBuild(Path.Combine(mCosmosDir, @"Build.sln"), "Debug");
 
       Directory.CreateDirectory(Path.Combine(mOutputDir, "netcore"));
-      
+
       foreach (var xDir in new DirectoryInfo(Path.Combine(mOutputDir, "source")).EnumerateDirectories())
       {
         new DirectoryInfo(Path.Combine(xDir.FullName, @"bin\Debug\")).EnumerateDirectories()
@@ -582,7 +582,7 @@ namespace Cosmos.Build.Builder
       Section("Copying Templates");
 
       CD(mOutputDir);
-      SrcPath = Path.Combine(mCosmosDir, @"source\Cosmos.VS.Package\obj\Debug");
+      SrcPath = Path.Combine(mCosmosDir, @"source\Cosmos.VS.ProjectSystem\obj\Debug");
       Copy("CosmosProject (C#).zip", true);
       Copy("CosmosKernel (C#).zip", true);
       Copy("CosmosProject (F#).zip", true);

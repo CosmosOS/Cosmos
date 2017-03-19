@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DapperExtensions.Sql
@@ -62,7 +63,7 @@ namespace DapperExtensions.Sql
             string result = string.Format("{0} OFFSET @firstResult ROWS FETCH NEXT @maxResults ROWS ONLY", sql);
             parameters.Add("@firstResult", firstResult);
             parameters.Add("@maxResults", maxResults);
-            return result;
+            return result;            
         }
     }
 }
