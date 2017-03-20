@@ -126,13 +126,14 @@ namespace Cosmos.Assembler
             {
                 xSB.Append(GetFullName(aTypeInfo.GetGenericTypeDefinition()));
             }
-            else {
+            else
+            {
                 xSB.Append(aTypeInfo.FullName);
             }
             if (aTypeInfo.IsGenericType)
             {
                 xSB.Append("<");
-                var xArgs = aTypeInfo.GenericTypeArguments;
+                var xArgs = aTypeInfo.GetGenericArguments();
                 for (int i = 0; i < xArgs.Length - 1; i++)
                 {
                     xSB.Append(GetFullName(xArgs[i]));

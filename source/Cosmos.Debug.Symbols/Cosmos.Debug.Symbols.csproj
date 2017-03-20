@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="SQLite.sql" />
+    <EmbeddedResource Include="SQLiteIndexes.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper.StrongName" Version="1.50.2" />
     <PackageReference Include="DapperExtensions.StrongName" Version="1.50.2" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="1.1.0" />
