@@ -99,7 +99,6 @@ Source: ".\Build\VSIP\Cosmos.Common.*"; DestDir: "{app}\Kernel"; Flags: ignoreve
 
 ; Icon
 Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Artwork\XSharp\XSharp.ico"; DestDir: "{app}\XSharp"; Flags: ignoreversion uninsremovereadonly
 
 ; XSharp Source
 Source: ".\source\Cosmos.Debug.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
