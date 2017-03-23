@@ -43,6 +43,7 @@ else
     }
 }
 
+Start-Process "Build\Tools\nuget.exe" "restore", "Builder.sln" -Wait
 Start-Process "dotnet" "restore", "Cosmos.sln" -Wait
 
 $MSBuildPath = [System.IO.Path]::Combine($CurrentInstance.InstallationPath, "MSBuild", "15.0", "Bin", "MSBuild.exe")

@@ -86,7 +86,7 @@ namespace Cosmos.Debug.Hosts {
         // Options must come beore the vmx, and cannot use shellexecute
         xPSI.Arguments = "-x -q " + xVmxPath;
       }
-      xPSI.UseShellExecute = true;  //must be true to allow elevate the process, sometimes needed if vmware only runs with admin rights
+      xPSI.UseShellExecute = false;  //must be true to allow elevate the process, sometimes needed if vmware only runs with admin rights
       mProcess.EnableRaisingEvents = true;
       mProcess.Exited += delegate(Object aSender, EventArgs e) {
         if (OnShutDown != null) {
@@ -146,7 +146,7 @@ namespace Cosmos.Debug.Hosts {
       using (var xSrc = new StreamReader(File.Open(Path.Combine(mDir, "Cosmos.vmx"), FileMode.OpenOrCreate))) {
         try {
           // Write out Debug.vmx
-          using (var xDest = new StreamWriter(File.Open(mVmxPath, FileMode.Open))) {
+          using (var xDest = new StreamWriter(File.Open(mVmxPath, FileMode.Create))) {
             string xLine;
             while ((xLine = xSrc.ReadLine()) != null) {
               var xParts = xLine.Split('=');

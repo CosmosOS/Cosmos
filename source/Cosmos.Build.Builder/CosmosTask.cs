@@ -579,6 +579,7 @@ namespace Cosmos.Build.Builder
       string xVSIPDir = Path.Combine(mCosmosDir, "Build", "VSIP");
 
       DotnetPublish(@"source\IL2CPU", "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "IL2CPU"));
+      DotnetPublish(@"Tools\NASM", "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "NASM"));
       DotnetPublish(@"source\XSharp.Compiler", "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "XSharp"));
 
       MSBuild(Path.Combine(mCosmosDir, @"Build.sln"), "Debug");

@@ -163,7 +163,6 @@ namespace Cosmos.TestRunner.Core
 
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
-
             References = new List<string>
             {
                 kernelFileName,
@@ -173,7 +172,7 @@ namespace Cosmos.TestRunner.Core
                 Assembly.Load(new AssemblyName("Cosmos.System.Plugs")).Location
             };
 
-            var xArguments = new List<string>
+            var xArgs = new List<string>
             {
                 "DebugEnabled:true",
                 "StackCorruptionDetectionEnabled:" + EnableStackCorruptionChecks,
@@ -187,24 +186,40 @@ namespace Cosmos.TestRunner.Core
                 "EmitDebugSymbols:True",
                 "IgnoreDebugStubAttribute:False"
             };
-            xArguments.AddRange(References.Select(aReference => "References:" + aReference));
-
-            if (DebugIL2CPU)
-            {
-                if (KernelsToRun.Count > 1)
+            xArgs.AddRange(References.Select(aReference => "References:" + aReference));
+            
+                bool xUsingUserkit = false;
+                string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "source", "IL2CPU");
+                if (!Directory.Exists(xIL2CPUPath))
                 {
-                    throw new Exception("Cannot run multiple kernels with in-process compilation!");
+                    xUsingUserkit = true;
+                    xIL2CPUPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "IL2CPU");
                 }
 
-                // ensure we're using the referenced (= solution) version
-                Cosmos.IL2CPU.CosmosAssembler.ReadDebugStubFromDisk = false;
-
-                Program.Run(xArguments.ToArray(), OutputHandler.LogMessage, OutputHandler.LogError);
+            if (xUsingUserkit)
+            {
+                RunProcess("IL2CPU.exe", xIL2CPUPath, xArgs, DebugIL2CPU);
             }
             else
             {
-                string xIL2CPUPath = GetCosmosUserkitFolder();
-                RunProcess("IL2CPU", xIL2CPUPath, xArguments, DebugIL2CPU);
+                if (DebugIL2CPU)
+                {
+                    if (KernelsToRun.Count > 1)
+                    {
+                        throw new Exception("Cannot run multiple kernels with in-process compilation!");
+                    }
+
+                    // ensure we're using the referenced (= solution) version
+                    Cosmos.IL2CPU.CosmosAssembler.ReadDebugStubFromDisk = false;
+
+                    Program.Run(xArgs.ToArray(), OutputHandler.LogMessage, OutputHandler.LogError);
+                }
+                else
+                {
+                    xArgs.Insert(0, "run");
+                    xArgs.Insert(1, " -- ");
+                    RunProcess("dotnet", xIL2CPUPath, xArgs);
+                }
             }
         }
 
@@ -215,7 +230,7 @@ namespace Cosmos.TestRunner.Core
             if (!Directory.Exists(xNasmPath))
             {
                 xUsingUserkit = true;
-                xNasmPath = Path.Combine(GetCosmosUserkitFolder(), "Tools", "NASM");
+                xNasmPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "NASM");
             }
             if (!Directory.Exists(xNasmPath))
             {
@@ -232,7 +247,7 @@ namespace Cosmos.TestRunner.Core
 
             if (xUsingUserkit)
             {
-                RunProcess("NASM", xNasmPath, xArgs);
+                RunProcess("NASM.exe", xNasmPath, xArgs);
             }
             else
             {
