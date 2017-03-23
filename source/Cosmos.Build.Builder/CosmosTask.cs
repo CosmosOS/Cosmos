@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+
 using Microsoft.Win32;
 
 using Cosmos.Build.Installer;
@@ -41,12 +42,12 @@ namespace Cosmos.Build.Builder
     public static string GetSetupName(int releaseNumber)
     {
       var setupName = "CosmosUserKit-" + releaseNumber;
-      switch (App.VsVersion)
-      {
-        case VsVersion.Vs2015:
-          setupName += "-vs2015";
-          break;
 
+      switch (App.VSVersion)
+      {
+        case VSVersion.VS2017:
+          setupName += "-vs2017";
+          break;
       }
 
       if (App.UseVsHive)
@@ -86,6 +87,7 @@ namespace Cosmos.Build.Builder
     protected override List<string> DoRun()
     {
       mOutputDir = Path.Combine(mCosmosDir, @"Build\VSIP");
+
       if (!App.TestMode)
       {
         CheckPrereqs();
@@ -97,7 +99,7 @@ namespace Cosmos.Build.Builder
           CleanupVSIPFolder();
 
           CompileCosmos();
-          CopyTemplates();
+          //CopyTemplates();
 
           CreateScriptToUseChangesetWhichTaskIsUse();
 
@@ -113,6 +115,7 @@ namespace Cosmos.Build.Builder
             }
           }
         }
+
         Done();
       }
       else
@@ -146,9 +149,9 @@ namespace Cosmos.Build.Builder
       return mExceptionList;
     }
 
-    protected void MsBuild(string aSlnFile, string aBuildCfg)
+    protected void MSBuild(string aSlnFile, string aBuildCfg)
     {
-      string xMsBuild = Path.Combine(Paths.ProgFiles32, @"MSBuild\14.0\Bin\msbuild.exe");
+      string xMSBuild = Path.Combine(Paths.VSInstall, "MSBuild", "15.0", "Bin", "msbuild.exe");
       string xParams = $"{Quoted(aSlnFile)} " +
                        "/nologo " +
                        "/maxcpucount " +
@@ -156,11 +159,11 @@ namespace Cosmos.Build.Builder
                        $"/p:Platform={Quoted("Any CPU")} " +
                        $"/p:OutputPath={Quoted(mOutputDir)}";
 
-      if (!App.NoMsBuildClean)
+      if (!App.NoMSBuildClean)
       {
-        StartConsole(xMsBuild, $"/t:Clean {xParams}");
+        StartConsole(xMSBuild, $"/t:Clean {xParams}");
       }
-      StartConsole(xMsBuild, $"/t:Build {xParams}");
+      StartConsole(xMSBuild, $"/t:Build {xParams}");
     }
 
     protected int NumProcessesContainingName(string name)
@@ -314,7 +317,7 @@ namespace Cosmos.Build.Builder
       }
     }
 
-    protected void CheckIsVsRunning()
+    protected void CheckIfVSRunning()
     {
       int xSeconds = 500;
       if (App.IgnoreVS)
@@ -360,7 +363,7 @@ namespace Cosmos.Build.Builder
       Echo("Note: This check only prerequisites for building, please see website for full list.");
 
       Echo("Checking for x86 run.");
-      if (!AmRunning32Bit())
+      if (Environment.Is64BitProcess)
       {
         mExceptionList.Add("Builder must run as x86");
         mBuildState = BuildState.PrerequisiteMissing;
@@ -370,22 +373,14 @@ namespace Cosmos.Build.Builder
 
       CheckOS();
       CheckIfUserKitRunning();
-      CheckIsVsRunning();
+      CheckIfVSRunning();
       CheckIfBuilderRunning();
 
-      switch (App.VsVersion)
-      {
-        case VsVersion.Vs2015:
-          CheckVs2015();
-          CheckForInstall("Microsoft Visual Studio 2015 SDK - ENU", true);
-          break;
-        default:
-          throw new NotImplementedException();
-      }
-
       //works also without, only close of VMWare is not working!
-      CheckNet35Sp1(); // Required by VMWareLib and other stuff
-      CheckNet403();
+      //shouldn't be needed to check for .NET 4.6.2, as it is necessary to build the builder
+      //CheckNet403();
+      CheckForNetCore();
+      CheckForVisualStudioExtensionTools();
       CheckForInno();
       bool vmWareInstalled = IsVMWareInstalled();
       bool bochsInstalled = IsBochsInstalled();
@@ -500,20 +495,25 @@ namespace Cosmos.Build.Builder
       }
     }
 
-    void CheckVs2015()
+    void CheckForNetCore()
     {
-      Echo("Checking for Visual Studio 2015");
-      string key = @"SOFTWARE\Microsoft\VisualStudio\14.0";
-      if (Environment.Is64BitOperatingSystem)
-        key = @"SOFTWARE\Wow6432Node\Microsoft\VisualStudio\14.0";
-      using (var xKey = Registry.LocalMachine.OpenSubKey(key))
+      Echo("Checking for .NET Core");
+
+      if (!Paths.VSInstancePackages.Contains("Microsoft.VisualStudio.Workload.NetCoreTools"))
       {
-        string xDir = (string) xKey.GetValue("InstallDir");
-        if (String.IsNullOrWhiteSpace(xDir))
-        {
-          mExceptionList.Add("Visual Studio 2015 not detected!");
-          mBuildState = BuildState.PrerequisiteMissing;
-        }
+        mExceptionList.Add(".NET Core not detected.");
+        mBuildState = BuildState.PrerequisiteMissing;
+      }
+    }
+
+    void CheckForVisualStudioExtensionTools()
+    {
+      Echo("Checking for Visual Studio Extension Tools");
+      
+      if (!Paths.VSInstancePackages.Contains("Microsoft.VisualStudio.Workload.VisualStudioExtension"))
+      {
+        mExceptionList.Add("Visual Studio Extension tools not detected.");
+        mBuildState = BuildState.PrerequisiteMissing;
       }
     }
 
@@ -560,21 +560,28 @@ namespace Cosmos.Build.Builder
       }
     }
 
+    void DotnetPublish(string project, string framework, string runtime, string destDir)
+    {
+      string xParams = $"publish {project} -f {framework} -r {runtime} -o {destDir}";
+
+      if (!App.NoMSBuildClean)
+      {
+        StartConsole("dotnet", $"clean {project}");
+      }
+
+      StartConsole("dotnet", xParams);
+    }
+
     void CompileCosmos()
     {
       Section("Compiling Cosmos");
 
-      MsBuild(Path.Combine(mCosmosDir, @"Build.sln"), "Debug");
+      string xVSIPDir = Path.Combine(mCosmosDir, "Build", "VSIP");
 
-      Directory.CreateDirectory(Path.Combine(mOutputDir, "netcore"));
+      DotnetPublish(@"source\IL2CPU", "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "IL2CPU"));
+      DotnetPublish(@"source\XSharp.Compiler", "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "XSharp"));
 
-      foreach (var xDir in new DirectoryInfo(Path.Combine(mOutputDir, "source")).EnumerateDirectories())
-      {
-        new DirectoryInfo(Path.Combine(xDir.FullName, @"bin\Debug\")).EnumerateDirectories()
-                                                                     .ToList().ForEach(dir => dir.EnumerateFiles().ToList().ForEach(file => File.Copy(file.FullName, Path.Combine(mOutputDir, "netcore", file.Name), true)));
-      }
-
-      Directory.Delete(Path.Combine(mOutputDir, "source"), true);
+      MSBuild(Path.Combine(mCosmosDir, @"Build.sln"), "Debug");
     }
 
     void CopyTemplates()
@@ -582,7 +589,7 @@ namespace Cosmos.Build.Builder
       Section("Copying Templates");
 
       CD(mOutputDir);
-      SrcPath = Path.Combine(mCosmosDir, @"source\Cosmos.VS.ProjectSystem\obj\Debug");
+      SrcPath = Path.Combine(mCosmosDir, @"source\Cosmos.VS.Package\obj\Debug");
       Copy("CosmosProject (C#).zip", true);
       Copy("CosmosKernel (C#).zip", true);
       Copy("CosmosProject (F#).zip", true);
@@ -596,19 +603,20 @@ namespace Cosmos.Build.Builder
     {
       Section("Creating Setup");
 
-
       string xISCC = Path.Combine(mInnoPath, "ISCC.exe");
       if (!File.Exists(xISCC))
       {
         mExceptionList.Add("Cannot find Inno setup.");
         return;
       }
+
       string xCfg = App.IsUserKit ? "UserKit" : "DevKit";
       string vsVersionConfiguration = "vs2015";
-      switch (App.VsVersion)
+
+      switch (App.VSVersion)
       {
-        case VsVersion.Vs2015:
-          vsVersionConfiguration = "vs2015";
+        case VSVersion.VS2017:
+          vsVersionConfiguration = "vs2017";
           break;
       }
       // Use configuration which will instal to the VS Exp Hive
@@ -629,7 +637,7 @@ namespace Cosmos.Build.Builder
     {
       Section("Launching Visual Studio");
 
-      string xVisualStudio = Paths.VSInstall + @"\devenv.exe";
+      string xVisualStudio = Path.Combine(Paths.VSInstall, "Common7", "IDE", "devenv.exe");
       if (!File.Exists(xVisualStudio))
       {
         mExceptionList.Add("Cannot find Visual Studio.");
