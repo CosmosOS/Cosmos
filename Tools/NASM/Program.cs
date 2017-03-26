@@ -41,6 +41,9 @@ namespace NASM
                 }
             }
 
+            LogError = logError;
+            LogMessage = logMessage;
+
             try
             {
                 if (string.IsNullOrWhiteSpace(InputFile) || string.IsNullOrWhiteSpace(OutputFile) ||

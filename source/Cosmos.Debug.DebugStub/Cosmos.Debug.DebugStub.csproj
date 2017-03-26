@@ -7,6 +7,22 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <EmbeddedResource Include="AsmBreak.xs" />
+      <EmbeddedResource Include="CmdMisc.xs" />
+      <EmbeddedResource Include="CmdProcess.xs" />
+      <EmbeddedResource Include="CmdSend.xs" />
+      <EmbeddedResource Include="Consts.xs" />
+      <EmbeddedResource Include="DebugStub.xs" />
+      <EmbeddedResource Include="Init.xs" />
+      <EmbeddedResource Include="Screen.xs" />
+      <EmbeddedResource Include="Serial.xs" />
+      <EmbeddedResource Include="SerialHelpers.xs" />
+      <EmbeddedResource Include="SerialIO.xs" />
+      <EmbeddedResource Include="TracerEntry.xs" />
+      <EmbeddedResource Include="Utilities.xs" />
+    </ItemGroup>
+
+    <ItemGroup>
       <None Update="AsmBreak.asm">
         <DependentUpon>AsmBreak.xs</DependentUpon>
       </None>

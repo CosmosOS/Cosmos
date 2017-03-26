@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+
 using Cosmos.Build.Common;
+using Cosmos.IL2CPU;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -160,32 +163,16 @@ namespace Cosmos.TestRunner.Core
 
         private void RunIL2CPU(string kernelFileName, string outputFile)
         {
-            bool xUsingUserkit = false;
-            string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "source\\IL2CPU");
-            if (!Directory.Exists(xIL2CPUPath))
-            {
-                xUsingUserkit = true;
-                xIL2CPUPath = GetCosmosUserkitFolder();
-            }
-            if (!Directory.Exists(xIL2CPUPath))
-            {
-                throw new DirectoryNotFoundException("IL2CPU not found.");
-            }
-
-            //if (!xUsingUserkit)
-            //{
-            //    RunDotnetPublish(xIL2CPUPath, AppContext.BaseDirectory, "win7-x86");
-            //    xIL2CPUPath = AppContext.BaseDirectory;
-            //}
-
             References = new List<string>
             {
                 kernelFileName,
-                "Cosmos.Core.Plugs.Asm.dll",
-                "Cosmos.Debug.Kernel.Plugs.Asm.dll"
+                Assembly.Load(new AssemblyName("Cosmos.Core.Plugs")).Location,
+                Assembly.Load(new AssemblyName("Cosmos.Core.Plugs.Asm")).Location,
+                Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location,
+                Assembly.Load(new AssemblyName("Cosmos.System.Plugs")).Location
             };
 
-            var xArguments = new List<string>
+            var xArgs = new List<string>
             {
                 "DebugEnabled:true",
                 "StackCorruptionDetectionEnabled:" + EnableStackCorruptionChecks,
@@ -199,52 +186,60 @@ namespace Cosmos.TestRunner.Core
                 "EmitDebugSymbols:True",
                 "IgnoreDebugStubAttribute:False"
             };
-            xArguments.AddRange(References.Select(aReference => "References:" + aReference));
-
-            if (DebugIL2CPU)
-            {
-                if (KernelsToRun.Count > 1)
+            xArgs.AddRange(References.Select(aReference => "References:" + aReference));
+            
+                bool xUsingUserkit = false;
+                string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "source", "IL2CPU");
+                if (!Directory.Exists(xIL2CPUPath))
                 {
-                    throw new Exception("Cannot run multiple kernels with in-process compilation!");
+                    xUsingUserkit = true;
+                    xIL2CPUPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "IL2CPU");
                 }
-
-                // ensure we're using the referenced (= solution) version
-                Cosmos.IL2CPU.CosmosAssembler.ReadDebugStubFromDisk = false;
-            }
 
             if (xUsingUserkit)
             {
-                RunProcess("IL2CPU", xIL2CPUPath, xArguments, DebugIL2CPU);
+                RunProcess("IL2CPU.exe", xIL2CPUPath, xArgs, DebugIL2CPU);
             }
             else
             {
-                xArguments.Insert(0, "run");
-                xArguments.Insert(1, " -- ");
-                RunProcess("dotnet", xIL2CPUPath, xArguments);
+                if (DebugIL2CPU)
+                {
+                    if (KernelsToRun.Count > 1)
+                    {
+                        throw new Exception("Cannot run multiple kernels with in-process compilation!");
+                    }
+
+                    // ensure we're using the referenced (= solution) version
+                    Cosmos.IL2CPU.CosmosAssembler.ReadDebugStubFromDisk = false;
+
+                    Program.Run(xArgs.ToArray(), OutputHandler.LogMessage, OutputHandler.LogError);
+                }
+                else
+                {
+                    xArgs.Insert(0, "run");
+                    xArgs.Insert(1, " -- ");
+                    RunProcess("dotnet", xIL2CPUPath, xArgs);
+                }
             }
         }
 
         private void RunNasm(string inputFile, string outputFile, bool isElf)
         {
             bool xUsingUserkit = false;
-            string xNasmPath = Path.Combine(FindCosmosRoot(), "Tools\\NASM");
+            string xNasmPath = Path.Combine(FindCosmosRoot(), "Tools", "NASM");
             if (!Directory.Exists(xNasmPath))
             {
-                xNasmPath = Path.Combine(GetCosmosUserkitFolder(), "Tools");
+                xUsingUserkit = true;
+                xNasmPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "NASM");
             }
             if (!Directory.Exists(xNasmPath))
             {
                 throw new DirectoryNotFoundException("NASM path not found.");
             }
 
-            //if (!xUsingUserkit)
-            //{
-            //    RunDotnetPublish(xNasmPath, AppContext.BaseDirectory, "win7-x86");
-            //    xNasmPath = AppContext.BaseDirectory;
-            //}
-
             var xArgs = new List<string>
             {
+                $"ExePath:{Path.Combine(xUsingUserkit ? GetCosmosUserkitFolder() : FindCosmosRoot(), "Build", "Tools", "NAsm", "nasm.exe")}",
                 $"InputFile:{inputFile}",
                 $"OutputFile:{outputFile}",
                 $"IsELF:{isElf}"
@@ -252,12 +247,12 @@ namespace Cosmos.TestRunner.Core
 
             if (xUsingUserkit)
             {
-                RunProcess("NASM", xNasmPath, xArgs);
+                RunProcess("NASM.exe", xNasmPath, xArgs);
             }
             else
             {
                 xArgs.Insert(0, "run");
-                xArgs.Insert(1," -- ");
+                xArgs.Insert(1, " -- ");
                 RunProcess("dotnet", xNasmPath, xArgs);
             }
         }

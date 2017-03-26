@@ -36,6 +36,8 @@
 *.vsp
 *.pdb
 *.lock.json
+*.nuget.props
+*.nuget.targets
 Thumbs.db
 build.force
 

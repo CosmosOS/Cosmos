@@ -12,14 +12,6 @@ begin
   Result := sUnInstallString;
 end;
 
-
-/////////////////////////////////////////////////////////////////////
-function IsUpgrade(): Boolean;
-begin
-  Result := (GetUninstallString() <> '');
-end;
-
-
 /////////////////////////////////////////////////////////////////////
 // Uninstall previously installed application.
 /////////////////////////////////////////////////////////////////////
@@ -47,31 +39,3 @@ begin
   end else
     Result := 1;
 end;
-
-/////////////////////////////////////////////////////////////////////
-// Uninstall previously installed application.
-/////////////////////////////////////////////////////////////////////
-procedure CleanupInterferringWithPyToolsGuid;
-begin
-  if not PythonTools2013_Installed then
-  begin
-    // Remove interferring registry string.
-    RegDeleteKeyIncludingSubkeys(HKLM, 'SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\CLSID\{8355452D-6D2F-41B0-89B8-BB2AA2529E94}')
-    RegDeleteKeyIncludingSubkeys(HKLM, 'Software\Microsoft\VisualStudio\12.0\CLSID\{8355452D-6D2F-41B0-89B8-BB2AA2529E94}');
-  end;
-end;
-
-/////////////////////////////////////////////////////////////////////
-procedure CurStepChanged(CurStep: TSetupStep);
-begin
-  if (CurStep=ssInstall) then
-  begin
-    if (IsUpgrade()) then
-    begin
-      CleanupInterferringWithPyToolsGuid();
-    end;
-  end;
-end;
-
-[Run]
-  Filename: {code:VSNET2013_PATH}\devenv.exe; Parameters: /setup; Flags: waituntilterminated;
