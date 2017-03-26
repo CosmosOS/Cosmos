@@ -19,12 +19,12 @@
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
-    <GeneratePkgDefFile>false</GeneratePkgDefFile>
+    <GeneratePkgDefFile>true</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
-    <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>
-    <IncludeDebugSymbolsInLocalVSIXDeployment>false</IncludeDebugSymbolsInLocalVSIXDeployment>
-    <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
-    <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
+    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
+    <IncludeDebugSymbolsInLocalVSIXDeployment>true</IncludeDebugSymbolsInLocalVSIXDeployment>
+    <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
+    <CopyOutputSymbolsToOutputDirectory>true</CopyOutputSymbolsToOutputDirectory>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -107,108 +107,10 @@
   <ItemGroup>
     <None Include="Resources\Refresh_16x.png" />
     <Content Include="PLKResponse.html" />
-    <Content Include="Resources\Cosmos.ico" />
-    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\AssemblyInfo.vb">
-      <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\Kernel.ico">
-      <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\Kernel.vb">
-      <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\VBProj.vstemplate">
-      <RootPath>Templates\Projects\CosmosKernel %28VB%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosKernel %28VB%29\VBProjKernel.vbproj">
-      <RootPath>templates\Projects\CosmosKernel %28VB%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\AssemblyInfo.vb">
-      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\Kernel.ico">
-      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\Kernel.vb">
-      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\VBProj.vstemplate">
-      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28VB%29\VBProjKernel.vbproj">
-      <RootPath>Templates\Projects\CosmosProject %28VB%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\Readme.txt" />
-    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\Readme.txt">
-      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\Kernel.ico">
-      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\AssemblyInfo.cs">
-      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\Kernel.cs">
-      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\project.json">
-      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\CSharpProject.xproj">
-      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosKernel %28C#%29\CSharpProj.vstemplate">
-      <RootPath>Templates\Projects\CosmosKernel %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Kernel.ico">
-      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Readme.txt">
-      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\project.json">
-      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CosmosProject.project.json">
-      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CSharpProject.xproj">
-      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\CSharpProj.vstemplate">
-      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\AssemblyInfo.cs">
-      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28C#%29\Kernel.cs">
-      <RootPath>Templates\Projects\CosmosProject %28C#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\Cosmos\Kernel.ico">
-      <RootPath>Templates\Projects\Cosmos</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\Cosmos\Cosmos.vstemplate">
-      <RootPath>Templates\Projects\Cosmos</RootPath>
-      <SubType>Designer</SubType>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\Cosmos\CosmosProject.project.json">
-      <RootPath>Templates\Projects\Cosmos</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28F#%29\Kernel.ico">
-      <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28F#%29\FSharpProj.vstemplate">
-      <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28F#%29\FSharpProject.fsproj">
-      <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28F#%29\AssemblyInfo.fs">
-      <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
-    </ZipItem>
-    <ZipItem Include="Templates\Projects\CosmosProject %28F#%29\Kernel.fs">
-      <RootPath>Templates\Projects\CosmosProject %28F#%29</RootPath>
-    </ZipItem>
+    <Content Include="Resources\Cosmos.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <EmbeddedResource Include="CosmosPage.resx">
       <DependentUpon>CosmosPage.cs</DependentUpon>
     </EmbeddedResource>
@@ -232,6 +134,33 @@
       <Project>{ab24e403-54f3-4f67-b5e0-119a7227aac1}</Project>
       <Name>Cosmos.Debug.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.VS.Wizards\Cosmos.VS.Wizards.csproj">
+      <Project>{2259402E-3EAB-448D-9CC6-E5C1C2C716A5}</Project>
+      <Name>Cosmos.VS.Wizards</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
+    <ProjectReference Include="..\Templates\CosmosKernel %28CSharp%29\CosmosKernel %28CSharp%29.csproj">
+      <Project>{A6657508-E787-42E4-B594-555659A06E41}</Project>
+      <Name>CosmosKernel %28CSharp%29</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
+    <ProjectReference Include="..\Templates\CosmosProject %28CSharp%29\CosmosProject %28CSharp%29.csproj">
+      <Project>{0B296F4B-27DD-4379-822A-092F2D6B8080}</Project>
+      <Name>CosmosProject %28CSharp%29</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
+    <ProjectReference Include="..\Templates\Cosmos\Cosmos.csproj">
+      <Project>{9DB332B8-2129-48A8-9362-0438C650CB28}</Project>
+      <Name>Cosmos</Name>
+      <VSIXSubPath>ProjectTemplates</VSIXSubPath>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>TemplateProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
@@ -239,6 +168,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <RegisterOutputPackage>true</RegisterOutputPackage>
     <RegisterWithCodebase>true</RegisterWithCodebase>

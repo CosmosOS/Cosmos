@@ -17,7 +17,6 @@
     "Microsoft.VisualStudio.Threading": "15.0.240",
     "Microsoft.VisualStudio.Utilities": "15.0.26201",
     "Microsoft.VisualStudio.Validation": "15.0.82",
-    "Microsoft.VSSDK.BuildTools": "15.0.26201",
     "System.Diagnostics.Debug": "4.3.0",
     "System.IO.Pipes": "4.3.0",
     "System.ServiceProcess.ServiceController": "4.3.0"

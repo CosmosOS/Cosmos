@@ -14,7 +14,8 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio;
 
-namespace Cosmos.VS.ProjectSystem {
+namespace Cosmos.VS.ProjectSystem
+{
   /// This is the class that implements the package exposed by this assembly.
   ///
   /// The minimum requirement for a class to be considered a valid package for Visual Studio
@@ -25,15 +26,15 @@ namespace Cosmos.VS.ProjectSystem {
   /// register itself and its components with the shell.
   //
   [PackageRegistration(UseManagedResourcesOnly = true)]
-  [DefaultRegistryRoot("Software\\Microsoft\\VisualStudio\\12.0")]
   [InstalledProductRegistration(
-        "Cosmos Visual Studio Integration Package",
+        "Cosmos Visual Studio Project System",
         "www.gocosmos.org",
         "1.0",
         IconResourceID = 400,
-        LanguageIndependentName = "Cosmos Visual Studio Integration Package")]
-  [ProvideLoadKey("Standard", "1.0", "Cosmos Visual Studio Integration Package", "Cosmos", 1001)]
+        LanguageIndependentName = "Cosmos Visual Studio Project System Package")]
+  [ProvideLoadKey("Standard", "1.0", "Cosmos Visual Studio Project System", "Cosmos", 1001)]
   [ProvideObject(typeof(CosmosPage), RegisterUsing = RegistrationMethod.CodeBase)]
+  [ProvideProjectFactory(typeof(VSProjectFactory), "Cosmos", "", "Cosmos", "Cosmos", @"\NullPath", LanguageVsTemplate = "Cosmos")]
   [Guid(Guids.guidProjectPkgString)]
   public sealed class VSProject : ProjectPackage, IVsInstalledProduct {
     /// Default constructor of the package.

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Project" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>C# Operating System</Name>
+    <Description>A project for creating a Cosmos kernel.</Description>
+    <Icon>Kernel.ico</Icon>
+    <ProjectType>Cosmos</ProjectType>
+    <TemplateID>04cfa4f1-fc37-4e74-bddc-b7e4def1ef6e</TemplateID>
+    <CreateNewFolder>true</CreateNewFolder>
+    <DefaultName>CosmosProject</DefaultName>
+    <ProvideDefaultName>true</ProvideDefaultName>
+  </TemplateData>
+  <TemplateContent>
+    <Project File="ProjectTemplate.csproj" ReplaceParameters="true">
+      <ProjectItem ReplaceParameters="true" OpenInEditor="true">Kernel.cs</ProjectItem>
+    </Project>
+  </TemplateContent>
+    <WizardExtension>
+        <Assembly>Cosmos.VS.Wizards, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983</Assembly>
+        <FullClassName>Cosmos.VS.Wizards.CosmosProjectWizard</FullClassName>
+    </WizardExtension>
+</VSTemplate>

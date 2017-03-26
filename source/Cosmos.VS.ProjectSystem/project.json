@@ -3,7 +3,6 @@
     "net462": {}
   },
   "dependencies": {
-    "EnvDTE": "8.0.1",
     "EnvDTE80": "8.0.1",
     "Microsoft.Build": "15.1.548",
     "Microsoft.Build.Framework": "15.1.548",
@@ -25,8 +24,7 @@
     "Microsoft.VisualStudio.TextManager.Interop.8.0": "8.0.50727",
     "Microsoft.VisualStudio.Threading": "15.0.240",
     "Microsoft.VisualStudio.Utilities": "15.0.26201",
-    "Microsoft.VisualStudio.Validation": "15.0.82",
-    "Microsoft.VSSDK.BuildTools": "15.0.26201"
+    "Microsoft.VisualStudio.Validation": "15.0.82"
   },
   "runtimes": {
     "win": {}
