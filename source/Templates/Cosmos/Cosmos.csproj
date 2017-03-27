@@ -65,7 +65,7 @@
     <Content Include="Kernel.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Cosmos.Cosmos" />
+    <Content Include="CosmosProject.Cosmos" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
