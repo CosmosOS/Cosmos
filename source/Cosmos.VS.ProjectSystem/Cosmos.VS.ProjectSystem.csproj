@@ -56,9 +56,6 @@
     <Content Include="ProjectTemplates\CosmosKernel %28CSharp%29\Kernel.cs">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="ProjectTemplates\CosmosProject %28CSharp%29\AssemblyInfo.cs">
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
     <Content Include="ProjectTemplates\CosmosProject %28CSharp%29\Kernel.cs">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

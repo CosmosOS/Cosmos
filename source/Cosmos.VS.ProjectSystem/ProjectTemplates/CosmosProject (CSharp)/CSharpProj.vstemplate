@@ -10,7 +10,6 @@
     </TemplateData>
     <TemplateContent>
         <Project File="CSharpProject.csproj" ReplaceParameters="true">
-            <ProjectItem ReplaceParameters="true">AssemblyInfo.cs</ProjectItem>
             <ProjectItem ReplaceParameters="true" OpenInEditor="true">Kernel.cs</ProjectItem>
         </Project>
     </TemplateContent>
