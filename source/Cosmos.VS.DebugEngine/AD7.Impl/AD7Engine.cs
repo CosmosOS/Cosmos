@@ -84,7 +84,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 mEngineCallback = new EngineCallback(this, aAD7Callback);
 
                 var xDebugInfo = new Dictionary<string, string>();
-                DebugInfoDictionaryHelper.LoadFromString(xDebugInfo, aDebugInfo);
+                DictionaryHelper.LoadFromString(xDebugInfo, aDebugInfo);
 
                 //TODO: In the future we might support command line args for kernel etc
                 //string xCmdLine = EngineUtils.BuildCommandLine(exe, args);

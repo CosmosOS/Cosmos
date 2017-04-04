@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Cosmos.Debug.Common
 {
-    public static class DebugInfoDictionaryHelper
+    public static class DictionaryHelper
     {
       /// <summary>Build a string from collection content. Each collection item is used to produce
       /// a 'key=value' string. Pairs are separated by a semi colon.</summary>
