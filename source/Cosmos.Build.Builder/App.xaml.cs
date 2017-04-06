@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 
@@ -15,51 +16,42 @@ namespace Cosmos.Build.Builder
     public static bool UseTask;
     public static bool NoMSBuildClean;
     public static bool InstallTask;
-    public static bool IgnoreVS;
-    public static bool TestMode = false;
-    public static bool HasParams = false;
-
-    /// <summary>
-    /// Version of Visual Studio to use.
-    /// </summary>
-    public static VSVersion VSVersion;
-
-    /// <summary>
-    /// Use Visual Studio Experimental Hive for installing Cosmos Kit.
-    /// </summary>
     public static bool UseVsHive;
+    public static Dictionary<string, string> mArgs = new Dictionary<string, string>();
 
     protected override void OnStartup(StartupEventArgs e)
     {
-      HasParams = e.Args.Length > 0;
-
-      var xArgs = new string[e.Args.Length];
-      for (int i = 0; i < xArgs.Length; i++)
+      foreach (string arg in e.Args)
       {
-        xArgs[i] = e.Args[i].ToUpper();
-      }
-      IsUserKit = xArgs.Contains("-USERKIT");
-      ResetHive = xArgs.Contains("-RESETHIVE");
-      StayOpen = xArgs.Contains("-STAYOPEN");
-      UseTask = !xArgs.Contains("-NOTASK");
-      NoMSBuildClean = xArgs.Contains("-NOCLEAN");
-      InstallTask = xArgs.Contains("-INSTALLTASK");
-      DoNotLaunchVS = xArgs.Contains("-NOVSLAUNCH");
-      // For use during dev of Builder only.
-      IgnoreVS = xArgs.Contains("-IGNOREVS");
-      TestMode = xArgs.Contains("-TESTMODE");
-
-      if (xArgs.Contains("-VS2017") || xArgs.Contains("/VS2017"))
-      {
-        VSVersion = VSVersion.VS2017;
+        string[] keyValue = arg.Split('=');
+        if (keyValue.Length > 0)
+        {
+          string key = keyValue[0].ToUpper().Remove(0, 1);
+          mArgs.Add(key, "");
+          if (keyValue.Length > 1)
+          {
+            mArgs[key] = keyValue[1];
+          }
+        }
       }
 
-      Paths.VSVersion = VSVersion;
+      IsUserKit = mArgs.ContainsKey("USERKIT");
+      ResetHive = mArgs.ContainsKey("RESETHIVE");
+      StayOpen = mArgs.ContainsKey("STAYOPEN");
+      UseTask = !mArgs.ContainsKey("NOTASK");
+      NoMSBuildClean = mArgs.ContainsKey("NOCLEAN");
+      InstallTask = mArgs.ContainsKey("INSTALLTASK");
+      DoNotLaunchVS = mArgs.ContainsKey("NOVSLAUNCH");
+      UseVsHive = mArgs.ContainsKey("VSEXPHIVE");
 
-      Paths.VSInstanceID = xArgs.Where(arg => arg.StartsWith("-VSINSTANCE=") || arg.StartsWith("/VSINSTANCE=")).SingleOrDefault()?.Substring(12).ToLowerInvariant();
+      if (!mArgs.ContainsKey("VSPATH"))
+      {
+        throw new ArgumentNullException(nameof(e.Args), "Visual Studio path must be provided. (-VSPATH or /VSPATH)");
+      }
 
-      UseVsHive = xArgs.Contains("-VSEXPHIVE") || xArgs.Contains("/VSEXPHIVE");
-
+        Paths.VSPath = mArgs["VSPATH"];
+Paths.UpdateVSPath();
+      
       base.OnStartup(e);
     }
   }

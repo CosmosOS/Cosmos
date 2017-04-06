@@ -4,8 +4,6 @@ cls
 set NuGet=Build\Tools\nuget.exe
 set VSWhere=Build\Tools\vswhere.exe
 
-goto :MSBuild
-
 :NuGet
 echo Running NuGet restore
 %NuGet% restore Builder.sln
@@ -25,4 +23,4 @@ if exist %MSBuild% (
   %MSBuild% Builder.sln /nologo /maxcpucount /p:Configuration="Debug" /p:Platform="Any CPU"
 )
 
-"source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe" "-bat" "-VS2017" "%InstallDir%"
+"source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe" "-bat" "-VS2017" "-VSPATH=%InstallDir%"

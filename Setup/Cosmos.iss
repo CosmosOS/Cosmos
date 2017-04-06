@@ -13,6 +13,14 @@
   #define VSVersion "vs2017"
 #endif
 
+#ifndef VSPath
+  #define VSPath ""
+#endif
+
+#ifndef VSInstance
+  #define VSInstance ""
+#endif
+
 #if BuildConfiguration == "Devkit"
 	; devkit releases are not compressed
 	#pragma warning "Building Devkit release"
@@ -23,15 +31,11 @@
 	#define IncludeUILanguages true
 #endif
 
-; Cosmos Registry key
-; Install assemblies
-; Delete old user kit installer and task asm
-
 [Setup]
 AppId=CosmosUserKit
 AppName=Cosmos User Kit
 AppVerName=Cosmos User Kit v{#ChangeSetVersion}
-AppCopyright=Copyright © 2007-2015 The Cosmos Project
+AppCopyright=Copyright � 2007-2017 The Cosmos Project
 AppPublisher=Cosmos Project
 AppPublisherURL=http://www.goCosmos.org/
 AppSupportURL=http://www.goCosmos.org/
@@ -55,17 +59,11 @@ WizardImageFile=.\setup\images\cosmos.bmp
 ;Small Image should be 55x55
 WizardSmallImageFile=.\setup\images\cosmos_small.bmp
 AllowCancelDuringInstall=false
-
-; If you want all languages to be listed in the "Select Setup Language"
-; dialog, even those that can't be displayed in the active code page,
-; uncomment the following two lines.
 UninstallLogMode=overwrite
-
-; we're changing file associations, so we need to set this
 ChangesAssociations=yes
-
-#include "Events.inc"
-#include "Localization.inc"
+DisableWelcomePage=True
+DisableReadyPage=True
+DisableReadyMemo=True
 
 [Dirs]
 Name: {app}; Flags: uninsalwaysuninstall
@@ -79,45 +77,25 @@ Source: ".\Build\Tools\*.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversio
 Source: ".\Build\Tools\NAsm\*.exe"; DestDir: "{app}\Build\Tools\NAsm"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\Tools\Cygwin\*"; DestDir: "{app}\Build\Tools\cygwin"; Flags: ignoreversion uninsremovereadonly overwritereadonly
 Source: ".\Build\Tools\mkisofs\*"; DestDir: "{app}\Build\Tools\mkisofs"; Flags: ignoreversion uninsremovereadonly overwritereadonly
-;Source: ".\Build\VSIP\*.dll"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly
-;Source: ".\Build\VSIP\*.exe"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly
-;Source: ".\Build\VSIP\*.pdb"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\IL2CPU\*"; DestDir: "{app}\Build\IL2CPU"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\NASM\*"; DestDir: "{app}\Build\NASM"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\XSharp\*"; DestDir: "{app}\Build\XSharp"; Flags: ignoreversion uninsremovereadonly
-
-;
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-
+Source: ".\Build\VSIP\Cosmos.Assembler.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Build.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.Debug.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 ; Kernel assemblies
 Source: ".\Build\VSIP\Cosmos.Debug.Kernel.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Core.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.HAL.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.System.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Common.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
-
 ; Icon
 Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
-
 ; XSharp Source
 Source: ".\source\Cosmos.Debug.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
-
-; VSIP stuff
-;Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{pf32}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.Assembler.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.Build.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.Debug.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-;Source: ".\Build\VSIP\Cosmos.VS.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-;Source: ".\Build\VSIP\XSharp.Nasm.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-;Source: ".\Build\VSIP\XSharp.VS.pdb"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-;Source: ".\Build\VSIP\XSharp.VS.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-
-
-; ?? If we have this do we need the others?
-;Source: ".\Build\VSIP\Cosmos.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; ISO
@@ -125,35 +103,150 @@ Source: ".\Build\ISO\*"; DestDir: "{app}\Build\ISO"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\ISO\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\ISO\"
 ; USB
-;Source: ".\Build\USB\*"; DestDir: "{app}\Build\USB"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\USB\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\USB\"
 ; PXE
 Source: ".\Build\PXE\*"; DestDir: "{app}\Build\PXE"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
+; VSIP
+Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{param:VSPath}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.Windows.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\XSharp.VS.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 
 [Registry]
-
-; Register .Cosmos file association:
-Root: HKCR; SubKey: ".Cosmos"; ValueType: string; ValueName: ; ValueData: "Cosmos.ProjectFile"; Flags: uninsdeletevalue
-Root: HKCR; SubKey: "Cosmos.ProjectFile"; ValueType: string; ValueName: ; ValueData: "Cosmos Project File"; Flags: uninsdeletekey
-Root: HKCR; SubKey: "Cosmos.ProjectFile\DefaultIcon"; ValueType: string; ValueName: ; ValueData: "{app}\Cosmos.ico"
-Root: HKCR; SubKey: "Cosmos.ProjectFile\shell\open\command"; ValueType: string; ValueName: ; ValueData: """{pf32}\Common Files\Microsoft Shared\MSEnv\VSLauncher.exe"" ""%1"""
-
-; Regiter .xs Extension
-Root: HKCR; Subkey: ".xs"; ValueType: string; ValueName: ""; ValueData: "XSharp"; Flags: uninsdeletevalue
-Root: HKCR; Subkey: "XSharp"; ValueType: string; ValueName: ""; ValueData: "X# source file"; Flags: uninsdeletekey
-Root: HKCR; Subkey: "XSharp\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\Build\XSharp\XSC.exe,0"
-Root: HKCR; Subkey: "XSharp\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Build\XSharp\XSC.exe"" ""%1"""
-
-;Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v4.5\AssemblyFoldersEx\Cosmos; ValueType: none; Flags: uninsdeletekey
-;Root: HKLM; Subkey: Software\Microsoft\.NETFramework\v4.5\AssemblyFoldersEx\Cosmos; ValueType: string; ValueName: ; ValueData: {app}\Kernel\; Flags: uninsdeletevalue
-
 ; User Kit Folder
 Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "UserKit"; ValueData: {app}; Flags: uninsdeletekey
-
 ; Dev Kit Folder - Set by builder only, but we delete it here. See comments in builder.
 ; HKCU because Builder doesn't run as admin
 ; Note HKCU is not part of registry redirection
 Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags: deletekey
+
+[ThirdParty]
+UseRelativePaths=True
+
+[Run]
+Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\Cosmos.VS.ProjectSystem.vsix"""; StatusMsg: "Installing Visual Studio Project System"
+Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\Cosmos.VS.DebugEngine.vsix"""; StatusMsg: "Installing Visual Studio Cosmos Debug Engine"
+Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\Cosmos.VS.Windows.vsix"""; StatusMsg: "Installing Visual Studio Cosmos Tool Windows"
+Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\XSharp.VS.vsix"""; StatusMsg: "Installing Visual Studio X# Language Service"
+
+[UninstallRun]
+Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; StatusMsg: "Removing Visual Studio Project System"
+Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; StatusMsg: "Removing Visual Studio Cosmos Debugger"
+Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:Cosmos.VS.Windows"; StatusMsg: "Removing Visual Studio Cosmos Tool Windows"
+Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:XSharp.VS"; StatusMsg: "Removing Visual Studio X# Language Service"
+
+[Code]
+/////////////////////////////////////////////////////////////////////
+function GetUninstallString(): String;
+var
+  sUnInstPath: String;
+  sUnInstallString: String;
+begin
+  sUnInstPath := ExpandConstant('Software\Microsoft\Windows\CurrentVersion\Uninstall\{#emit SetupSetting("AppId")}_is1');
+  sUnInstallString := '';
+  if not RegQueryStringValue(HKLM, sUnInstPath, 'UninstallString', sUnInstallString) then
+    RegQueryStringValue(HKCU, sUnInstPath, 'UninstallString', sUnInstallString);
+  Result := sUnInstallString;
+end;
+
+/////////////////////////////////////////////////////////////////////
+// Uninstall previously installed application.
+/////////////////////////////////////////////////////////////////////
+function UnInstallOldVersion(): Integer;
+var
+  sUnInstallString: String;
+  iResultCode: Integer;
+begin
+// Return Values:
+// 1 - uninstall string is empty
+// 2 - error executing the UnInstallString
+// 3 - successfully executed the UnInstallString
+
+  // default return value
+  Result := 0;
+
+  // get the uninstall string of the old app
+  sUnInstallString := GetUninstallString();
+  if sUnInstallString <> '' then begin
+    sUnInstallString := RemoveQuotes(sUnInstallString);
+    if Exec(sUnInstallString, '/SILENT /NORESTART /SUPPRESSMSGBOXES','', SW_HIDE, ewWaitUntilTerminated, iResultCode) then
+      Result := 3
+    else
+      Result := 2;
+  end else
+    Result := 1;
+end;
+
+[Languages]
+Name: en; MessagesFile: compiler:Default.isl; InfoBeforeFile: .\setup\Readme.txt
+#ifdef IncludeUILanguages
+Name: eu; MessagesFile: .\setup\Languages\Basque-1-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: ca; MessagesFile: .\setup\Languages\Catalan-4-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: cs; MessagesFile: .\setup\Languages\Czech-5-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: da; MessagesFile: .\setup\Languages\Danish-4-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: nl; MessagesFile: .\setup\Languages\Dutch-8-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: fi; MessagesFile: .\setup\Languages\Finnish-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: fr; MessagesFile: .\setup\Languages\French-15-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: de; MessagesFile: .\setup\Languages\German-2-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: hu; MessagesFile: .\setup\Languages\Hungarian-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: it; MessagesFile: .\setup\Languages\Italian-14-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: no; MessagesFile: .\setup\Languages\Norwegian-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: pl; MessagesFile: .\setup\Languages\Polish-8-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: pt; MessagesFile: .\setup\Languages\PortugueseStd-1-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: ru; MessagesFile: .\setup\Languages\Russian-19-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: sk; MessagesFile: .\setup\Languages\Slovak-6-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: sl; MessagesFile: .\setup\Languages\Slovenian-3-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+;Unofficial:
+Name: bg; MessagesFile: .\setup\Languages\InOfficial\Bulgarian-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: el; MessagesFile: .\setup\Languages\InOfficial\Greek-4-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: is; MessagesFile: .\setup\Languages\InOfficial\Icelandic-1-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: id; MessagesFile: .\setup\Languages\InOfficial\Indonesian-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: ja; MessagesFile: .\setup\Languages\InOfficial\Japanese-5-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: ko; MessagesFile: .\setup\Languages\InOfficial\Korean-5-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: ms; MessagesFile: .\setup\Languages\InOfficial\Malaysian-2-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: es; MessagesFile: .\setup\Languages\InOfficial\SpanishStd-2-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: sv; MessagesFile: .\setup\Languages\InOfficial\Swedish-8-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: tr; MessagesFile: .\setup\Languages\InOfficial\Turkish-3-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: uk; MessagesFile: .\setup\Languages\InOfficial\Ukrainian-5-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: cn; MessagesFile: .\setup\Languages\InOfficial\ChineseSimp-11-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+Name: tw; MessagesFile: .\setup\Languages\InOfficial\ChineseTrad-2-5.1.0.isl; InfoBeforeFile: .\setup\Readme.txt
+#endif
+
+[Messages]
+en.BeveledLabel=English
+#ifdef IncludeUILanguages
+eu.BeveledLabel=Basque
+ca.BeveledLabel=Catalan
+cs.BeveledLabel=Czech
+da.BeveledLabel=Danish
+nl.BeveledLabel=Dutch
+fi.BeveledLabel=Finnish
+fr.BeveledLabel=French
+de.BeveledLabel=German
+hu.BeveledLabel=Hungarian
+it.BeveledLabel=Italian
+no.BeveledLabel=Norwegian
+pl.BeveledLabel=Polish
+pt.BeveledLabel=Portuguese
+ru.BeveledLabel=Russian
+sk.BeveledLabel=Slovak
+sl.BeveledLabel=Slovenian
+;Unofficial:
+bg.BeveledLabel=Bulgarian
+el.BeveledLabel=Greek
+is.BeveledLabel=Icelandic
+id.BeveledLabel=Indonesian
+ja.BeveledLabel=Japanese
+ko.BeveledLabel=Korean
+ms.BeveledLabel=Malaysian
+es.BeveledLabel=Spanish
+sv.BeveledLabel=Swedish
+tr.BeveledLabel=Turkish
+uk.BeveledLabel=Ukrainian
+cn.BeveledLabel=Chinese Simplified
+tw.BeveledLabel=Chinese Traditional
+#endif

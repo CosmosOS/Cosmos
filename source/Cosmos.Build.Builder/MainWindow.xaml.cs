@@ -139,10 +139,7 @@ namespace Cosmos.Build.Builder
         xPSI.UseShellExecute = true;
         xPSI.FileName = Assembly.GetEntryAssembly().GetName().CodeBase.Replace("file:///", "");
         xPSI.Arguments = "-InstallTask";
-        if (App.VSVersion == VSVersion.VS2017)
-        {
-          xPSI.Arguments += " -VS2017";
-        }
+        xPSI.Arguments += " -VS2017";
 
         xPSI.Verb = "runas";
         try
@@ -330,7 +327,7 @@ namespace Cosmos.Build.Builder
     protected bool mLoaded = false;
     void Window_Loaded(object sender, RoutedEventArgs e)
     {
-      if (!App.HasParams)
+      if (!App.mArgs.Any())
       {
         MessageBox.Show("Builder not meant to be called directly. Use install.bat instead.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         Close();

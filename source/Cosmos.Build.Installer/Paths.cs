@@ -34,7 +34,7 @@ namespace Cosmos.Build.Installer
     /// <summary>
     /// Gets the path where Visual Studio installed
     /// </summary>
-    public static string VSInstall { get; private set; }
+    public static string VSPath { get; set; }
 
     /// <summary>
     /// Gets the ID of the instance of Visual Studio to use
@@ -63,48 +63,34 @@ namespace Cosmos.Build.Installer
     public static List<string> VSInstancePackages { get; private set; }
 
     /// <summary>
-    /// Version of Visual Studio for which paths should be detected.
-    /// </summary>
-    public static VSVersion VSVersion;
-
-    /// <summary>
     /// Updates path to VS version
     /// </summary>
-    private static void UpdateVSPath()
+    public static void UpdateVSPath()
     {
-      switch (VSVersion)
+      List<ISetupInstance2> xInstances = GetInstances();
+
+      ISetupInstance2 xCurrentInstance;
+
+      if (xInstances.Count == 0)
       {
-        case VSVersion.VS2017:
-          List<ISetupInstance2> xInstances = GetInstances();
-
-          ISetupInstance2 xCurrentInstance;
-
-          if (xInstances.Count == 0)
-          {
-            throw new Exception("No Visual Studio 2017 instances found!");
-          }
-          else if (xInstances.Count == 1)
-          {
-            xCurrentInstance = xInstances[0];
-          }
-          else
-          {
-            xCurrentInstance = xInstances.Find(instance => instance.GetInstanceId() == VSInstanceID);
-
-            if (xCurrentInstance == null)
-            {
-              throw new Exception("The Visual Studio instance ID is invalid!");
-            }
-          }
-
-          VSInstance = xCurrentInstance;
-          VSInstall = xCurrentInstance.GetInstallationPath();
-          VSInstancePackages = xCurrentInstance.GetPackages().Select(package => package.GetId()).ToList();
-
-          break;
-        default:
-          throw new NotSupportedException("Versions of VS other than " + string.Join(",", Enum.GetNames(typeof(VSVersion))) + " are not supported.");
+        throw new Exception("No Visual Studio 2017 instances found!");
       }
+      else if (xInstances.Count == 1)
+      {
+        xCurrentInstance = xInstances[0];
+      }
+      else
+      {
+        xCurrentInstance = xInstances.Find(i => string.Equals(i.GetInstallationPath(), VSPath, StringComparison.OrdinalIgnoreCase));
+
+        if (xCurrentInstance == null)
+        {
+          throw new Exception("The Visual Studio instance is invalid!");
+        }
+      }
+
+      VSInstance = xCurrentInstance;
+      VSInstancePackages = xCurrentInstance.GetPackages().Select(package => package.GetId()).ToList();
     }
 
     // Code adapted from: https://github.com/Microsoft/vssetup.powershell/blob/develop/src/VSSetup.PowerShell/PowerShell/GetInstanceCommand.cs#L112
@@ -116,7 +102,6 @@ namespace Cosmos.Build.Installer
 
       do
       {
-        fetched = 0;
         ISetupInstance[] instances = new ISetupInstance[1];
 
         xEnumerator.Next(1, instances, out fetched);
