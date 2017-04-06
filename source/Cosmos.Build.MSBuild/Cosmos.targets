@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
   <PropertyGroup>
     <DebugMode Condition="$(DebugMode) == ''">Source</DebugMode>
     <DebugEnabled Condition="$(DebugEnabled) == ''">True</DebugEnabled>
@@ -22,13 +22,7 @@
   <UsingTask TaskName="Cosmos.Build.MSBuild.Ld" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.ReadNAsmMapToDebugInfo" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
 
-  <Target Name="CosmosDetectDependencies" Outputs="@(CosmosReferences)">
-    <CreateItem Include="$(TargetDir)$(Configuration)\$(TargetFramework)\*.dll">
-      <Output TaskParameter="Include" ItemName="CosmosReferences"/>
-    </CreateItem>
-  </Target>
-
-  <Target Name="CosmosCompile" DependsOnTargets="CosmosDetectDependencies" AfterTargets="Build">
+  <Target Name="CosmosCompile" AfterTargets="Build">
     <Error Text="File %(Compile.Identity) is set to compile, but .Cosmos projects don't compile any source themselves!" Condition="$(Compile) != ''"/>
     <CreateProperty Value="true" Condition="$(BinFormat) == 'elf'">
       <Output PropertyName="IsELF" TaskParameter="Value"/>
@@ -54,4 +48,5 @@
     <!-- <MakeISO InputFile="$(TargetDir)$(MSBuildProjectName).bin" OutputFile="$(TargetDir)$(MSBuildProjectName).iso" CosmosBuildDir="$(CosmosDir)\Build" /> -->
     <Delete Files="$(TargetDir)$(MSBuildProjectName).iso"/>
   </Target>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

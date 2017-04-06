@@ -84,21 +84,20 @@ namespace Cosmos.Build.Builder
         CleanupVSIPFolder();
 
         CompileCosmos();
-        //CopyTemplates();
 
-        //CreateScriptToUseChangesetWhichTaskIsUse();
+        CreateScriptToUseChangesetWhichTaskIsUse();
 
-        //CreateSetup();
-        //if (!App.IsUserKit)
-        //{
-        //  CleanupAlreadyInstalled();
-        //  RunSetup();
-        //  WriteDevKit();
-        //  if (!App.DoNotLaunchVS)
-        //  {
-        //    LaunchVS();
-        //  }
-        //}
+        CreateSetup();
+        if (!App.IsUserKit)
+        {
+          CleanupAlreadyInstalled();
+          RunSetup();
+          WriteDevKit();
+          if (!App.DoNotLaunchVS)
+          {
+            LaunchVS();
+          }
+        }
 
         Done();
       }
@@ -126,76 +125,6 @@ namespace Cosmos.Build.Builder
     protected int NumProcessesContainingName(string name)
     {
       return (from x in Process.GetProcesses() where x.ProcessName.Contains(name) select x).Count();
-    }
-
-    protected bool IsVMWareInstalled()
-    {
-      //Check registry keys
-      if (CheckForInstall("VMware Workstation", false))
-      {
-        return true;
-      }
-      if (CheckForInstall("VMware Player", false))
-      {
-        return true;
-      }
-      if (CheckForInstall("VMwarePlayer_x64", false))
-      {
-        return true;
-      }
-
-      try //Try/catch block since the reg key might not exist, we might not have perms etc.
-      {
-        using (var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\VMware, Inc.\VMware Player"))
-        {
-          return true; //Just assume that because we have the key, we've installed
-          //return (key.GetValue("ProductCode") != null); //On successful install, ProductCode should be set (we don't care what the value is, but we care that it exists)
-        }
-      }
-      catch
-      {
-        //TODO: check directories?
-        return false;
-      }
-    }
-
-    protected bool CheckForInstall(string aCheck, bool aCanThrow)
-    {
-      return CheckForProduct(aCheck, aCanThrow, @"SOFTWARE\Classes\Installer\Products\", "ProductName");
-    }
-
-    protected bool CheckForProduct(string aCheck, bool aCanThrow, string aKey, string aValueName)
-    {
-      Echo("Checking for " + aCheck);
-      string xCheck = aCheck.ToUpper();
-      string[] xKeys;
-      using (var xKey = Registry.LocalMachine.OpenSubKey(aKey, false))
-      {
-        xKeys = xKey.GetSubKeyNames();
-      }
-      foreach (string xSubKey in xKeys)
-      {
-        using (var xKey = Registry.LocalMachine.OpenSubKey(aKey + xSubKey))
-        {
-          string xValue = (string) xKey.GetValue(aValueName);
-          if (xValue != null && xValue.ToUpper().Contains(xCheck))
-          {
-            if (mBuildState != BuildState.PrerequisiteMissing)
-            {
-              mBuildState = BuildState.Running;
-              return true;
-            }
-            else
-              return false;
-          }
-        }
-      }
-
-      if (aCanThrow)
-      {
-        NotFound(aCheck);
-      }
-      return false;
     }
 
     protected void CheckIfBuilderRunning()
@@ -260,85 +189,6 @@ namespace Cosmos.Build.Builder
       CheckForNetCore();
       CheckForVisualStudioExtensionTools();
       CheckForInno();
-
-      bool vmWareInstalled = IsVMWareInstalled();
-      bool bochsInstalled = IsBochsInstalled();
-
-      if (!vmWareInstalled && !bochsInstalled)
-      {
-        NotFound("VMWare or Bochs");
-      }
-    }
-
-    private static bool IsBochsInstalled()
-    {
-      try
-      {
-        using (
-          var runCommandRegistryKey = Registry.ClassesRoot.OpenSubKey(@"BochsConfigFile\shell\Run\command",
-            false))
-        {
-          if (null == runCommandRegistryKey)
-          {
-            return false;
-          }
-          string commandLine = (string) runCommandRegistryKey.GetValue(null, null);
-          if (null != commandLine)
-          {
-            commandLine = commandLine.Trim();
-          }
-          if (string.IsNullOrEmpty(commandLine))
-          {
-            return false;
-          }
-          // Now perform some parsing on command line to discover full exe path.
-          string candidateFilePath;
-          int commandLineLength = commandLine.Length;
-          if ('"' == commandLine[0])
-          {
-            // Seek for a non escaped double quote.
-            int lastDoubleQuoteIndex = 1;
-            for (; lastDoubleQuoteIndex < commandLineLength; lastDoubleQuoteIndex++)
-            {
-              if ('"' != commandLine[lastDoubleQuoteIndex])
-              {
-                continue;
-              }
-              if ('\\' != commandLine[lastDoubleQuoteIndex - 1])
-              {
-                break;
-              }
-            }
-            if (lastDoubleQuoteIndex >= commandLineLength)
-            {
-              return false;
-            }
-            candidateFilePath = commandLine.Substring(1, lastDoubleQuoteIndex - 1);
-          }
-          else
-          {
-            // Seek for first separator character.
-            int firstSeparatorIndex = 0;
-            for (; firstSeparatorIndex < commandLineLength; firstSeparatorIndex++)
-            {
-              if (char.IsSeparator(commandLine[firstSeparatorIndex]))
-              {
-                break;
-              }
-            }
-            if (firstSeparatorIndex >= commandLineLength)
-            {
-              return false;
-            }
-            candidateFilePath = commandLine.Substring(0, firstSeparatorIndex);
-          }
-          return File.Exists(candidateFilePath);
-        }
-      }
-      catch
-      {
-        return false;
-      }
     }
 
     private void CheckForInno()
@@ -426,6 +276,10 @@ namespace Cosmos.Build.Builder
             {
               xDest.WriteLine("#define ChangeSetVersion " + Quoted(mReleaseNo.ToString()));
             }
+            else if (xLine.StartsWith("#define VSPath ", StringComparison.InvariantCultureIgnoreCase))
+            {
+              xDest.WriteLine("#define VSPath " + Quoted(Paths.VSPath));
+            }
             else
             {
               xDest.WriteLine(xLine);
@@ -497,7 +351,8 @@ namespace Cosmos.Build.Builder
       {
         vsVersionConfiguration += "Exp";
       }
-      StartConsole(xISCC, $"/Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVsVersion={vsVersionConfiguration} /VSPath={Paths.VSPath}");
+      Echo($"  {xISCC} /Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)}");
+      StartConsole(xISCC, $"/Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)}");
 
       if (App.IsUserKit)
       {

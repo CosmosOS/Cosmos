@@ -17,10 +17,6 @@
   #define VSPath ""
 #endif
 
-#ifndef VSInstance
-  #define VSInstance ""
-#endif
-
 #if BuildConfiguration == "Devkit"
 	; devkit releases are not compressed
 	#pragma warning "Building Devkit release"
@@ -35,7 +31,7 @@
 AppId=CosmosUserKit
 AppName=Cosmos User Kit
 AppVerName=Cosmos User Kit v{#ChangeSetVersion}
-AppCopyright=Copyright � 2007-2017 The Cosmos Project
+AppCopyright=Copyright (c) 2007-2017 The Cosmos Project
 AppPublisher=Cosmos Project
 AppPublisherURL=http://www.goCosmos.org/
 AppSupportURL=http://www.goCosmos.org/
@@ -64,6 +60,12 @@ ChangesAssociations=yes
 DisableWelcomePage=True
 DisableReadyPage=True
 DisableReadyMemo=True
+FlatComponentsList=False
+AlwaysShowComponentsList=False
+ShowComponentSizes=False
+LicenseFile=LICENSE.txt
+SetupIconFile=Artwork\Cosmos.ico
+DisableDirPage=yes
 
 [Dirs]
 Name: {app}; Flags: uninsalwaysuninstall
@@ -110,7 +112,7 @@ Source: ".\Build\PXE\*"; DestDir: "{app}\Build\PXE"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
 ; VSIP
-Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{param:VSPath}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{#VSPath}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Windows.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
@@ -128,16 +130,16 @@ Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags
 UseRelativePaths=True
 
 [Run]
-Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\Cosmos.VS.ProjectSystem.vsix"""; StatusMsg: "Installing Visual Studio Project System"
-Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\Cosmos.VS.DebugEngine.vsix"""; StatusMsg: "Installing Visual Studio Cosmos Debug Engine"
-Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\Cosmos.VS.Windows.vsix"""; StatusMsg: "Installing Visual Studio Cosmos Tool Windows"
-Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\XSharp.VS.vsix"""; StatusMsg: "Installing Visual Studio X# Language Service"
+Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\Cosmos.VS.ProjectSystem.vsix"""; StatusMsg: "Installing Visual Studio Project System"
+Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\Cosmos.VS.DebugEngine.vsix"""; StatusMsg: "Installing Visual Studio Cosmos Debug Engine"
+Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\Cosmos.VS.Windows.vsix"""; StatusMsg: "Installing Visual Studio Cosmos Tool Windows"
+Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\XSharp.VS.vsix"""; StatusMsg: "Installing Visual Studio X# Language Service"
 
 [UninstallRun]
-Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; StatusMsg: "Removing Visual Studio Project System"
-Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; StatusMsg: "Removing Visual Studio Cosmos Debugger"
-Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:Cosmos.VS.Windows"; StatusMsg: "Removing Visual Studio Cosmos Tool Windows"
-Filename: "{param:VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:XSharp.VS"; StatusMsg: "Removing Visual Studio X# Language Service"
+Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; StatusMsg: "Removing Visual Studio Project System"
+Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; StatusMsg: "Removing Visual Studio Cosmos Debugger"
+Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:Cosmos.VS.Windows"; StatusMsg: "Removing Visual Studio Cosmos Tool Windows"
+Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:XSharp.VS"; StatusMsg: "Removing Visual Studio X# Language Service"
 
 [Code]
 /////////////////////////////////////////////////////////////////////
