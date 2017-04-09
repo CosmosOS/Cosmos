@@ -13,10 +13,6 @@
   #define VSVersion "vs2017"
 #endif
 
-#ifndef VSPath
-  #define VSPath ""
-#endif
-
 #if BuildConfiguration == "Devkit"
 	; devkit releases are not compressed
 	#pragma warning "Building Devkit release"
@@ -64,7 +60,6 @@ FlatComponentsList=False
 AlwaysShowComponentsList=False
 ShowComponentSizes=False
 LicenseFile=LICENSE.txt
-SetupIconFile=Artwork\Cosmos.ico
 DisableDirPage=yes
 
 [Dirs]
@@ -112,8 +107,8 @@ Source: ".\Build\PXE\*"; DestDir: "{app}\Build\PXE"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
 ; VSIP
-Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{#VSPath}\MSBuild\Cosmos"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly;
 Source: ".\Build\VSIP\Cosmos.VS.Windows.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\XSharp.VS.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
@@ -130,19 +125,100 @@ Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags
 UseRelativePaths=True
 
 [Run]
-Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\Cosmos.VS.ProjectSystem.vsix"""; StatusMsg: "Installing Visual Studio Project System"
-Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\Cosmos.VS.DebugEngine.vsix"""; StatusMsg: "Installing Visual Studio Cosmos Debug Engine"
-Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\Cosmos.VS.Windows.vsix"""; StatusMsg: "Installing Visual Studio Cosmos Tool Windows"
-Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q ""{app}\XSharp.VS.vsix"""; StatusMsg: "Installing Visual Studio X# Language Service"
+Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixInstallParams|Cosmos.VS.ProjectSystem.vsix}"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
+Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixInstallParams|Cosmos.VS.DebugEngine.vsix}"; Description: "Install Cosmos Debug Engine"; StatusMsg: "Installing Visual Studio Extension: Cosmos Debug Engine"
+Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixInstallParams|Cosmos.VS.Windows.vsix}"; Description: "Install Cosmos Debug Engine Windows"; StatusMsg: "Installing Visual Studio Extension: Cosmos Debug Engine Windows"
+Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixInstallParams|XSharp.VS.vsix}"; Description: "Install Cosmos X# Language Service"; StatusMsg: "Installing Visual Studio Extension: Cosmos X# Language Service"
 
 [UninstallRun]
-Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; StatusMsg: "Removing Visual Studio Project System"
-Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:Cosmos.VS.DebugEngine"; StatusMsg: "Removing Visual Studio Cosmos Debugger"
-Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:Cosmos.VS.Windows"; StatusMsg: "Removing Visual Studio Cosmos Tool Windows"
-Filename: "{#VSPath}\Common7\IDE\VSIXInstaller.exe"; Parameters: "/q /u:XSharp.VS"; StatusMsg: "Removing Visual Studio X# Language Service"
+Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|Cosmos.VS.ProjectSystem}"
+Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|Cosmos.VS.DebugEngine}"
+Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|Cosmos.VS.Windows}"
+Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|XSharp.VS}"
 
 [Code]
-/////////////////////////////////////////////////////////////////////
+function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
+  const Wait: TExecWait; var ResultCode: Integer; var ResultString: String): Boolean;
+var
+  TempFilename: String;
+  Command: String;
+begin
+  TempFilename :=
+    ExpandConstant('{tmp}\~execwithresult.txt');
+  Command := 
+    Format('"%s" /S /C ""%s" %s > "%s""', [ExpandConstant('{cmd}'), Filename, Params, TempFilename]);
+  Result := 
+    Exec(ExpandConstant('{cmd}'), Command, WorkingDir, ShowCmd, Wait, ResultCode);
+  if not Result then
+    Exit;
+  LoadStringFromFile(TempFilename, ResultString);
+  DeleteFile(TempFilename);
+  if (Length(ResultString) >= 2) and (ResultString[Length(ResultString) - 1] = #13) and (ResultString[Length(ResultString)] = #10) then
+    Delete(ResultString, Length(ResultString) - 1, 2);
+end;
+
+function ExecWithoutResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
+  const Wait: TExecWait; var ResultCode: Integer): Boolean;
+var
+  Command: String;
+begin
+  Command := 
+    Format('"%s" /S /C ""%s" %s"', [ExpandConstant('{cmd}'), Filename, Params]);
+  Result := 
+    Exec(ExpandConstant('{cmd}'), Command, WorkingDir, ShowCmd, Wait, ResultCode);
+  if not Result then
+    Exit;
+end;
+
+function GetVSPath(): String;
+var
+  Command: String;
+  Params: String;
+  Success: Boolean;
+  ResultCode: Integer;
+  ResultText: String;
+begin
+  Command := ExpandConstant('{app}\Build\Tools\vswhere.exe');
+  Params := '-latest -version "[15.0,16.0)" -requires Microsoft.Component.MSBuild -property installationPath';
+  Success :=
+    ExecWithResult(Command, Params, '', SW_HIDE, ewWaitUntilTerminated, ResultCode, ResultText)
+      or (ResultCode <> 0);
+  if Success then
+    Result := ResultText;
+end;
+
+function GetVsixInstallerPath(): String;
+var
+  VsPath: String;
+begin
+  VsPath := GetVSPath();
+  Result := VsPath + '\Common7\IDE\vsixinstaller.exe';
+end;
+
+function GetVsixInstallCommand(Param: String): String;
+var
+  Command: String;
+begin
+  Command := GetVsixInstallerPath();
+  Result := Command;
+end;
+
+function GetVsixInstallParams(const Filename: String): String;
+var
+  Params: String;
+begin
+  Params := '/quiet "' + ExpandConstant('{app}\') + Filename + '"';
+  Result := Params;
+end;
+
+function GetVsixUninstallParams(const Filename: String): String;
+var
+  Params: String;
+begin
+  Params := '/quiet /uninstall:"' + Filename + '"';
+  Result := Params;
+end;
+
 function GetUninstallString(): String;
 var
   sUnInstPath: String;
