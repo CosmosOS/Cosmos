@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
@@ -18,33 +19,20 @@ using Microsoft.Win32;
 
 namespace Cosmos.VS.Windows
 {
-    /// This is the class that implements the package exposed by this assembly.
-    ///
-    /// The minimum requirement for a class to be considered a valid package for Visual Studio
-    /// is to implement the IVsPackage interface and register itself with the shell.
-    /// This package uses the helper classes defined inside the Managed Package Framework (MPF)
-    /// to do it: it derives from the Package class that provides the implementation of the
-    /// IVsPackage interface and uses the registration attributes defined in the framework to
-    /// register itself and its components with the shell.
-    ///
-    // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
-    // a package.
+    [ProvideMenuResource(1000, 1)]
+
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules",
+        "SA1650:ElementDocumentationMustBeSpelledCorrectly",
+        Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [PackageRegistration(UseManagedResourcesOnly = true)]
-
-    // This attribute is used to register the informations needed to show the this package
-    // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
-
-    // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
-
-    // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(AssemblyTW))]
     [ProvideToolWindow(typeof(RegistersTW))]
     [ProvideToolWindow(typeof(StackTW))]
     [ProvideToolWindow(typeof(InternalTW))]
     [ProvideToolWindow(typeof(ConsoleTW))]
-    [Guid(GuidList.guidCosmos_VS_WindowsPkgString)]
+    [Guid(Guids.guidCosmos_VS_WindowsPkgString)]
     public sealed class Cosmos_VS_WindowsPackage : Package
     {
         Queue<ushort> mCommand;
@@ -195,7 +183,7 @@ namespace Cosmos.VS.Windows
         private void AddCommand(OleMenuCommandService aMcs, uint aCmdID, EventHandler aHandler)
         {
             // Create the command for the assembly tool window
-            var xCmdID = new CommandID(GuidList.guidCosmosMenu, (int)aCmdID);
+            var xCmdID = new CommandID(Guids.guidCosmosMenu, (int)aCmdID);
             var xMenuCmd = new MenuCommand(aHandler, xCmdID);
             aMcs.AddCommand(xMenuCmd);
         }

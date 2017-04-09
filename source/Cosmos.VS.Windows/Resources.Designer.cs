@@ -61,6 +61,24 @@ namespace Cosmos.VS.Windows {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cosmos Visual Studio Debug Engine Windows.
+        /// </summary>
+        internal static string _110 {
+            get {
+                return ResourceManager.GetString("110", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Visual Studio debug engine windows for the Cosmos Operating System..
+        /// </summary>
+        internal static string _112 {
+            get {
+                return ResourceManager.GetString("112", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Can not create tool window..
         /// </summary>
         internal static string CanNotCreateWindow {

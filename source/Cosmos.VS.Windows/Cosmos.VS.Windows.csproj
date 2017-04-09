@@ -121,9 +121,6 @@
       <Link>Cosmos.snk</Link>
     </None>
     <None Include=".editorconfig" />
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="project.json" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
@@ -143,7 +140,10 @@
     <Resource Include="Images\StepOut.png" />
     <Resource Include="Images\StepInto.png" />
     <Resource Include="Images\StepMode.png" />
-    <Content Include="Resources\Cosmos.ico" />
+    <Content Include="Resources\Cosmos.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Page Include="AssemblyUC.xaml">

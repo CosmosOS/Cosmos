@@ -3,7 +3,7 @@
 using System;
 
 namespace Cosmos.VS.Windows {
-  static class GuidList {
+  static class Guids {
     public const string guidCosmos_VS_WindowsPkgString = "a82b45e9-2a89-43bd-925d-c7f0edd212aa";
     // What is guidToolWindowPersistanceString used for?
     public const string guidToolWindowPersistanceString = "f019fb29-c2c2-4d27-9abf-739533c939be";
