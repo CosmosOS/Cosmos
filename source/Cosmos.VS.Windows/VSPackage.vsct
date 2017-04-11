@@ -11,10 +11,30 @@
           <CommandName>Cosmos</CommandName>
         </Strings>
       </Menu>
+      <Menu guid="guidIDEToolbar" id="Toolbar" type="Toolbar">
+        <CommandFlag>DefaultDocked</CommandFlag>
+        <Strings>
+          <ButtonText>Cosmos</ButtonText>
+          <CommandName>Cosmos Debugger Toolbar</CommandName>
+        </Strings>
+      </Menu>
+      <Menu guid="guidAsmToolbar" id="AsmToolbar" type="ToolWindowToolbar">
+        <CommandFlag>DefaultDocked</CommandFlag>
+        <Strings>
+          <ButtonText>Cosmos Assembly</ButtonText>
+          <CommandName>Cosmos Assembly Toolbar</CommandName>
+        </Strings>
+      </Menu>
     </Menus>
     <Groups>
       <Group guid="guidCosmosMenu" id="TopLevelMenuGroup" priority="0x0600">
         <Parent guid="guidCosmosMenu" id="TopLevelMenu" />
+      </Group>
+      <Group guid="guidIDEToolbar" id="ToolbarGroup" priority="0x0000">
+        <Parent guid="guidIDEToolbar" id="Toolbar" />
+      </Group>
+      <Group guid="guidAsmToolbar" id="AsmToolbarGroup" priority="0x0000">
+        <Parent guid="guidAsmToolbar" id="AsmToolbar" />
       </Group>
     </Groups>
     <Buttons>
@@ -69,7 +89,17 @@
       <IDSymbol name="TopLevelMenu" value="0x1020" />
       <IDSymbol name="TopLevelMenuGroup" value="0x1021" />
     </GuidSymbol>
-    
+
+    <GuidSymbol name="guidAsmToolbar" value="{1A98FB64-8FC8-4D24-95E4-E507700BA23C}">
+      <IDSymbol name="AsmToolbar" value="0x1001" />
+      <IDSymbol name="AsmToolbarGroup" value="0x1002" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidIDEToolbar" value="{425C500B-AB24-44B0-812A-74ECA127E6A1}">
+      <IDSymbol name="Toolbar" value="0x1000" />
+      <IDSymbol name="ToolbarGroup" value="0x1050" />
+    </GuidSymbol>
+
     <GuidSymbol name="guidCosmosMenuCmdSet" value="{3247C3E4-34B8-4DB0-8748-AD62495A5222}">
       <IDSymbol name="cmdidCosmosAssembly" value="0x0100" />
       <IDSymbol name="cmdidCosmosRegisters" value="0x0101" />
@@ -78,7 +108,16 @@
       <IDSymbol name="cmdidCosmosShowAll" value="0x0104" />
     </GuidSymbol>
 
-    <GuidSymbol name="guidImages" value="{aa9d88d9-acd2-4f2c-ab40-92887bdce774}">
+    <GuidSymbol name="guidIDEToolbarCmdSet" value="{3D4B3F35-36E7-4CEA-8ACC-D9601E45C0B5}">
+    </GuidSymbol>
+
+    <GuidSymbol name="guidAsmToolbarCmdSet" value="{A875EA24-689A-4EAB-B9C2-DAC3EACB9501}">
+      <IDSymbol name="cmdidAsmFilter" value="0x0105" />
+      <IDSymbol name="cmdidAsmStep" value="0x0106" />
+      <IDSymbol name="cmdidAsmCopy" value="0x0107" />
+    </GuidSymbol>
+
+    <GuidSymbol name="guidImages" value="{AA9D88D9-ACD2-4F2C-AB40-92887BDCE774}">
       <IDSymbol name="bmpCosmosIcon" value="1" />
       <IDSymbol name="bmpAssemblyIcon" value="2" />
       <IDSymbol name="bmpRegisterIcon" value="3" />

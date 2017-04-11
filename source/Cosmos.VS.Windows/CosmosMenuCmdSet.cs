@@ -22,20 +22,20 @@ namespace Cosmos.VS.Windows
         {
             this.package = package ?? throw new ArgumentNullException(nameof(package));
 
-            AddCommand(CosmosAssemblyCmdID);
-            AddCommand(CosmosRegistersCmdID);
-            AddCommand(CosmosStackCmdID);
-            AddCommand(CosmosInternalCmdID);
-            AddCommand(CosmosShowAllCmdID);
+            AddCommand(CosmosAssemblyCmdID, ShowWindowAssembly);
+            AddCommand(CosmosRegistersCmdID, ShowWindowRegisters);
+            AddCommand(CosmosStackCmdID, ShowWindowStack);
+            AddCommand(CosmosInternalCmdID, ShowWindowInternal);
+            AddCommand(CosmosShowAllCmdID, ShowWindowAll);
         }
 
-        private void AddCommand(int id)
+        private void AddCommand(int cmdId, EventHandler handler)
         {
             OleMenuCommandService commandService = this.ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (commandService != null)
             {
-                var menuCommandID = new CommandID(Guids.AsmToolbarCmdSetGuid, id);
-                var menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
+                var menuCommandID = new CommandID(Guids.CosmosMenuCmdSetGuid, cmdId);
+                var menuItem = new MenuCommand(handler, menuCommandID);
                 commandService.AddCommand(menuItem);
             }
         }
@@ -51,20 +51,6 @@ namespace Cosmos.VS.Windows
         public static void Initialize(CosmosVSWindowsPackage package)
         {
             Instance = new CosmosMenuCmdSet(package);
-        }
-
-        private void MenuItemCallback(object sender, EventArgs e)
-        {
-            string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "AssemblyCommand";
-
-            VsShellUtilities.ShowMessageBox(
-                this.ServiceProvider,
-                message,
-                title,
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
         }
 
         private void ShowWindow(Type aWindowType)
