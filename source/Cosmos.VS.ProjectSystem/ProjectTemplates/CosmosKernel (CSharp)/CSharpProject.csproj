@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.Net.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>$KernelProjectName$</AssemblyName>3
+    <TargetFramework>netstandard1.5</TargetFramework>
+    <AssemblyName>$KernelProjectName$</AssemblyName>
     <ProjectGuid>$KernelProjectGuid$</ProjectGuid>
-    <OutputType>Library</OutputType>
   </PropertyGroup>
   
   <ItemGroup>
