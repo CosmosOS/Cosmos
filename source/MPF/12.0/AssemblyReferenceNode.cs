@@ -60,6 +60,7 @@ using MSBuild = Microsoft.Build.Evaluation;
 using MSBuildExecution = Microsoft.Build.Execution;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Execution;
 
 namespace Microsoft.VisualStudio.Project
 {
@@ -378,56 +379,44 @@ namespace Microsoft.VisualStudio.Project
 
         private void SetHintPathAndPrivateValue()
         {
+			// Private means local copy; we want to know if it is already set to not override the default
+			string privateValue = this.ItemNode.GetMetadata(ProjectFileConstants.Private);
+
+            // Get the list of items which require HintPath
+            ICollection<ProjectItemInstance> references = this.ProjectMgr.CurrentConfig.GetItems(MsBuildGeneratedItemType.ReferenceCopyLocalPaths);
+
             // Remove the HintPath, we will re-add it below if it is needed
             if(!String.IsNullOrEmpty(this.assemblyPath))
             {
                 this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, null);
             }
 
-            // Get the list of items which require HintPath
-            IEnumerable<MSBuild.ProjectItem> references = this.ProjectMgr.BuildProject.GetItems(MsBuildGeneratedItemType.ReferenceCopyLocalPaths);
-
             // Now loop through the generated References to find the corresponding one
-            foreach (MSBuild.ProjectItem reference in references)
+            foreach (ProjectItemInstance reference in references)
             {
                 string fileName = Path.GetFileNameWithoutExtension(reference.EvaluatedInclude);
                 if(String.Compare(fileName, this.assemblyName.Name, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     // We found it, now set some properties based on this.
                     string hintPath = reference.GetMetadataValue(ProjectFileConstants.HintPath);
-                    this.SetHintPathAndPrivateValue(hintPath);
+                    if (!string.IsNullOrEmpty(hintPath))
+                    {
+                        if(Path.IsPathRooted(hintPath))
+						{
+							hintPath = PackageUtilities.GetPathDistance(this.ProjectMgr.BaseURI.Uri, new Uri(hintPath));
+						}
+
+						this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, hintPath);
+
+						// If this is not already set, we default to true
+						if(String.IsNullOrEmpty(privateValue))
+						{
+							this.ItemNode.SetMetadata(ProjectFileConstants.Private, true.ToString());
+						}
+                    }
                     break;
                 }
 
-            }
-        }
-
-        /// <summary>
-        /// Sets the hint path to the provided value. 
-        /// It also sets the private value to true if it has not been already provided through the associated project element.
-        /// </summary>
-        /// <param name="hintPath">The hint path to set.</param>
-        private void SetHintPathAndPrivateValue(string hintPath)
-        {
-            if (String.IsNullOrEmpty(hintPath))
-            {
-                return;
-            }
-
-            if (Path.IsPathRooted(hintPath))
-            {
-                hintPath = PackageUtilities.GetPathDistance(this.ProjectMgr.BaseURI.Uri, new Uri(hintPath));
-            }
-
-            this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, hintPath);
-
-            // Private means local copy; we want to know if it is already set to not override the default
-            string privateValue = this.ItemNode != null ? this.ItemNode.GetMetadata(ProjectFileConstants.Private) : null;
-
-            // If this is not already set, we default to true
-            if (String.IsNullOrEmpty(privateValue))
-            {
-                this.ItemNode.SetMetadata(ProjectFileConstants.Private, true.ToString());
             }
         }
 
@@ -436,13 +425,6 @@ namespace Microsoft.VisualStudio.Project
         /// </summary>
         private void SetReferenceProperties()
         {
-            // If there is an assembly path then just set the hint path
-            if (!string.IsNullOrEmpty(this.assemblyPath))
-            {
-                this.SetHintPathAndPrivateValue(this.assemblyPath);
-                return;
-            }
-
             // Set a default HintPath for msbuild to be able to resolve the reference.
             this.ItemNode.SetMetadata(ProjectFileConstants.HintPath, this.assemblyPath);
 
@@ -454,10 +436,11 @@ namespace Microsoft.VisualStudio.Project
             }
 
             // Check if we have to resolve again the path to the assembly.			
-            this.ResolveReference();
-
-            // Make sure that the hint path if set (if needed).
-            this.SetHintPathAndPrivateValue();
+            if (!string.IsNullOrEmpty(this.assemblyPath))
+            {
+                ResolveReference();
+                SetHintPathAndPrivateValue();
+            }
         }
 
         /// <summary>

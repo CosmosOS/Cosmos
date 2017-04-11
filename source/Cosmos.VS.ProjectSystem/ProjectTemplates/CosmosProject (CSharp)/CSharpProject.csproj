@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.Net.Sdk">
 
   <PropertyGroup>
+    <AssemblyName>$KernelProjectName$</AssemblyName>
+    <ProjectGuid>$KernelProjectGuid$</ProjectGuid>
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
