@@ -43,13 +43,45 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <Import Project="..\RequiredNetFXFacadeAssemblies.targets" />
   <ItemGroup>
     <Compile Include="CosmosConfigProvider.cs" />
+    <Compile Include="ProfilePresets.cs" />
+    <Compile Include="PropertyPages\CosmosPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PropertyPages\CosmosPage.Designer.cs">
+      <DependentUpon>CosmosPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="CosmosProjectConfig.cs" />
     <Compile Include="CosmosProjectNode.cs" />
     <Compile Include="CosmosProjectFactory.cs" />
     <Compile Include="CosmosProjectPackage.cs" />
+    <Compile Include="PropertyPages\CustomPropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PropertyPages\CustomPropertyPage.Designer.cs">
+      <DependentUpon>CustomPropertyPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="Guids.cs" />
+    <Compile Include="PropertyPages\PropPageEnvironment.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PropertyPages\PropPageEnvironment.Designer.cs">
+      <DependentUpon>PropPageEnvironment.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PropertyPages\TitleDivision.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PropertyPages\TitleDivision.Designer.cs">
+      <DependentUpon>TitleDivision.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\UnsavedConfigChangesDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\UnsavedConfigChangesDialog.Designer.cs">
+      <DependentUpon>UnsavedConfigChangesDialog.cs</DependentUpon>
+    </Compile>
     <Content Include="ProjectTemplates\CosmosKernel %28CSharp%29\Kernel.cs">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -135,6 +167,16 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <EmbeddedResource Include="PropertyPages\CosmosPage.resx">
+      <DependentUpon>CosmosPage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PropertyPages\CustomPropertyPage.resx">
+      <DependentUpon>CustomPropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PropertyPages\PropPageEnvironment.resx">
+      <DependentUpon>PropPageEnvironment.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\CosmosProjectNode.bmp" />
     <EmbeddedResource Include="Resources\Refresh_16x.png" />
   </ItemGroup>
@@ -150,12 +192,14 @@
     </Content>
     <Content Include="ProjectTemplates\Cosmos\CosmosProject.Cosmos">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <SubType>Designer</SubType>
     </Content>
     <None Include="app.config" />
     <None Include="packages.config" />
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
+    <None Include="..\RequiredNetFXFacadeAssemblies.targets" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -193,6 +237,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.VisualStudio.CommandBars, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
@@ -316,6 +361,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="PropertyPages\TitleDivision.resx">
+      <DependentUpon>TitleDivision.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\UnsavedConfigChangesDialog.resx">
+      <DependentUpon>UnsavedConfigChangesDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
@@ -325,6 +376,9 @@
     <ProjectBasePath>..\MPF\12.0\</ProjectBasePath>
     <RegisterWithCodebase>true</RegisterWithCodebase>
   </PropertyGroup>
+  <ItemGroup>
+    <VSIXSourceItem Include="@(RequiredNetFXFacadeAssemblies)" />
+  </ItemGroup>
   <Import Project="$(ProjectBasePath)\ProjectBase.Files" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />

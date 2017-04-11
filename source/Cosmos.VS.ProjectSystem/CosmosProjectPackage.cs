@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using Cosmos.VS.ProjectSystem.PropertyPages;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Project;
 
@@ -11,6 +12,7 @@ namespace Cosmos.VS.ProjectSystem
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     [ProvideProjectFactory(typeof(CosmosProjectFactory), null, "Cosmos Project Files (*.Cosmos);*.Cosmos", "Cosmos", "Cosmos", @".\NullPath", LanguageVsTemplate = "Cosmos")]
+    [ProvideObject(typeof(CosmosPage), RegisterUsing = RegistrationMethod.CodeBase)]
     [Guid(Guids.guidCosmosProjectPkgString)]
     public sealed class CosmosProjectPackage : ProjectPackage
     {
