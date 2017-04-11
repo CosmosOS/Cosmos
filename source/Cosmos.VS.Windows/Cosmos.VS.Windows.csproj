@@ -90,7 +90,7 @@
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
     </None>
-    <None Include="RequiredNetFXFacadeAssemblies.targets" />
+    <None Include="..\RequiredNetFXFacadeAssemblies.targets" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Cosmos.VS.Windows.html" />
