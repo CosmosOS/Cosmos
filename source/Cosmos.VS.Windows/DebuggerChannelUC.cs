@@ -9,18 +9,7 @@ namespace Cosmos.VS.Windows
 {
     public class DebuggerChannelUC: UserControl
     {
-        protected Cosmos_VS_WindowsPackage mPackage;
-        public Cosmos_VS_WindowsPackage Package
-        {
-            get
-            {
-                return mPackage;
-            }
-            set
-            {
-                mPackage = value;
-            }
-        }
+        public CosmosVSWindowsPackage Package { get; set; }
 
         protected virtual void HandleChannelMessage(byte aChannel, byte aCommand, byte[] aData)
         {

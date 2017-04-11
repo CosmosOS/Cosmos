@@ -9,15 +9,20 @@ namespace Cosmos.VS.Windows
 {
     public class ToolWindowPaneChannel : ToolWindowPane
     {
+        public event EventHandler UpdateWindow;
+
         protected DebuggerChannelUC mUserControl;
-        public DebuggerChannelUC UserControl
-        {
-            get { return mUserControl; }
-        }
+
+        public DebuggerChannelUC UserControl => mUserControl;
 
         public ToolWindowPaneChannel()
             : base(null)
         {
+        }
+
+        protected virtual void OnUpdateWindow(EventArgs e)
+        {
+            UpdateWindow?.Invoke(this, e);
         }
     }
 }
