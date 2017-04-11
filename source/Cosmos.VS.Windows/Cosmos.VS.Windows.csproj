@@ -45,7 +45,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <Import Project="RequiredNetFXFacadeAssemblies.targets" />
+  <Import Project="..\RequiredNetFXFacadeAssemblies.targets" />
   <ItemGroup>
     <Compile Include="AsmLine.cs" />
     <Compile Include="AssemblyUC.xaml.cs">
@@ -152,8 +152,14 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
+    <Reference Include="System.Diagnostics.Process, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Diagnostics.Process.4.1.0\lib\net461\System.Diagnostics.Process.dll</HintPath>
+    </Reference>
     <Reference Include="System.Drawing" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.IO, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.IO.4.1.0\lib\net462\System.IO.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Runtime.4.1.0\lib\net462\System.Runtime.dll</HintPath>
     </Reference>
@@ -285,10 +291,12 @@
     <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj">
       <Project>{ab24e403-54f3-4f67-b5e0-119a7227aac1}</Project>
       <Name>Cosmos.Debug.Common</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;BuiltProjectOutputGroupDependencies;GetCopyToOutputDirectoryItems;SatelliteDllsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
     </ProjectReference>
     <ProjectReference Include="..\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj">
       <Project>{bc91bcef-d146-4eb0-be63-c637880c5800}</Project>
       <Name>Cosmos.Debug.DebugConnectors</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup;BuiltProjectOutputGroupDependencies;GetCopyToOutputDirectoryItems;SatelliteDllsProjectOutputGroup;</IncludeOutputGroupsInVSIX>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
