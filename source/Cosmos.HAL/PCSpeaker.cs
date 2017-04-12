@@ -26,7 +26,7 @@ namespace Cosmos.HAL
             }
         }
 
-        public void nosound()
+        public void noSound()
         {
             byte tmp = (byte)(BaseIOGroups.PCSpeaker.p61.Byte & 0xFC);
 
