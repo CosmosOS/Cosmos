@@ -92,7 +92,9 @@ namespace Microsoft.VisualStudio.Project
 
                 IVsUIHierarchy parentHierarchy = this.Node.ProjectMgr.GetProperty((int)__VSHPROPID.VSHPROPID_ParentHierarchy) as IVsUIHierarchy;
 
-                uint parentHierarchyItemId = (uint)this.Node.ProjectMgr.GetProperty((int)__VSHPROPID.VSHPROPID_ParentHierarchyItemid);
+                object id = this.Node.ProjectMgr.GetProperty((int)__VSHPROPID.VSHPROPID_ParentHierarchyItemid);
+                uint parentHierarchyItemId = UInt32.Parse(id.ToString());
+
 
                 ErrorHandler.ThrowOnFailure(uiShellOpenDocument.OpenSpecificEditor(editorFlags, fullPath, ref editorType, physicalView, ref logicalView, caption, parentHierarchy, parentHierarchyItemId, docDataExisting, serviceProvider, out frame));
 

@@ -52,20 +52,16 @@ namespace Cosmos.VS.ProjectSystem
 
         protected override Guid[] GetConfigurationIndependentPropertyPages()
         {
-            // Default C# property pages
-            // Unfortunately just adding them to the list does not work.
-            // It causes AV's, but its specific to each page
-            // loading and getting confused under a different project type.
-            // Maybe they need to be added as Dependent instead of Independent pages?
-            // Adding them as dependent ones is better, but at least build events is added, but is disabled.
-            //
-            //5E9A8AC2-4F34-4521-858F-4C248BA31532 - Application
-            //43E38D2E-43B8-4204-8225-9357316137A4 - Services
-            //031911C8-6148-4E25-B1B1-44BCA9A0C45C - Reference Paths
-            //F8D6553F-F752-4DBF-ACB6-F291B744A792 - Signing
-            //1E78F8DB-6C07-4D61-A18F-7514010ABD56 - Build Events
+            Guid[] result = new Guid[1];
+            result[0] = typeof(CosmosPage).GUID;
+            return result;
+        }
 
-            return new Guid[] { typeof(CosmosPage).GUID };
+        protected override Guid[] GetPriorityProjectDesignerPages()
+        {
+            Guid[] result = new Guid[1];
+            result[0] = typeof(CosmosPage).GUID;
+            return result;
         }
 
         public override Guid ProjectGuid => Guids.guidCosmosProjectFactory;
