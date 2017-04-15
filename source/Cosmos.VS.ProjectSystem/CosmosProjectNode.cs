@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
-using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using Cosmos.VS.ProjectSystem.PropertyPages;
-using Microsoft.Build.Evaluation;
-using Microsoft.VisualStudio;
+using EnvDTE;
 using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio.Shell.Interop;
 
@@ -17,9 +12,9 @@ namespace Cosmos.VS.ProjectSystem
 {
     public class CosmosProjectNode : ProjectNode
     {
-        private static ImageList imageList;
-        internal static int imageIndex;
-        EnvDTE.BuildEvents buildEvents;
+        private static readonly ImageList mImageList;
+        internal static int mImageIndex;
+        readonly BuildEvents mBuildEvents;
 
         protected override bool SupportsProjectDesigner
         {
@@ -29,22 +24,23 @@ namespace Cosmos.VS.ProjectSystem
 
         static CosmosProjectNode()
         {
-            imageList =
-                Utilities.GetImageList(
-                    typeof(CosmosProjectNode).Assembly.GetManifestResourceStream(
-                        "Cosmos.VS.ProjectSystem.Resources.CosmosProjectNode.bmp"));
+            Logger.TraceMethod(MethodBase.GetCurrentMethod());
+
+            mImageList = Utilities.GetImageList(typeof(CosmosProjectNode).Assembly.GetManifestResourceStream("Cosmos.VS.ProjectSystem.Resources.CosmosProjectNode.bmp"));
         }
 
         public CosmosProjectNode(CosmosProjectPackage package)
         {
-            this.Package = package;
-            var dte = (EnvDTE.DTE)((IServiceProvider)this.Package).GetService(typeof(EnvDTE.DTE));
-            buildEvents = dte.Events.BuildEvents;
-            buildEvents.OnBuildProjConfigDone += buildEvents_OnBuildProjConfigDone;
+            Logger.TraceMethod(MethodBase.GetCurrentMethod());
 
-            imageIndex = ImageHandler.ImageList.Images.Count;
+            Package = package;
+            var dte = (DTE)((IServiceProvider)Package).GetService(typeof(DTE));
+            mBuildEvents = dte.Events.BuildEvents;
+            mBuildEvents.OnBuildProjConfigDone += OnBuildProjConfigDone;
 
-            foreach (Image img in imageList.Images)
+            mImageIndex = ImageHandler.ImageList.Images.Count;
+
+            foreach (Image img in mImageList.Images)
             {
                 ImageHandler.AddImage(img);
             }
@@ -64,34 +60,72 @@ namespace Cosmos.VS.ProjectSystem
             return result;
         }
 
+
+        //public override int GetProperty(uint itemId, int propId, out object property)
+        //{
+        //    switch ((__VSHPROPID2)propId)
+        //    {
+        //        case __VSHPROPID2.VSHPROPID_CfgPropertyPagesCLSIDList:
+        //        {
+        //            var res = base.GetProperty(itemId, propId, out property);
+        //            if (ErrorHandler.Succeeded(res))
+        //            {
+        //                var guids = GetGuidsFromList(property as string);
+        //                guids.RemoveAll(g => CfgSpecificPropertyPagesToRemove.Contains(g));
+        //                guids.AddRange(CfgSpecificPropertyPagesToAdd);
+        //                property = MakeListFromGuids(guids);
+        //            }
+        //            return res;
+        //        }
+        //        case __VSHPROPID2.VSHPROPID_PropertyPagesCLSIDList:
+        //        {
+        //            var res = base.GetProperty(itemId, propId, out property);
+        //            if (ErrorHandler.Succeeded(res))
+        //            {
+        //                var guids = GetGuidsFromList(property as string);
+        //                guids.RemoveAll(g => PropertyPagesToRemove.Contains(g));
+        //                guids.AddRange(PropertyPagesToAdd);
+        //                property = MakeListFromGuids(guids);
+        //            }
+        //            return res;
+        //        }
+        //    }
+
+        //    return base.GetProperty(itemId, propId, out property);
+        //}
+
         public override Guid ProjectGuid => Guids.guidCosmosProjectFactory;
 
         public override Guid ProjectIDGuid { get; set; }
 
         public override string ProjectType => "Cosmos";
 
-        public override int ImageIndex => imageIndex;
+        public override int ImageIndex => mImageIndex;
 
         protected override ConfigProvider CreateConfigProvider()
         {
+            Logger.TraceMethod(MethodBase.GetCurrentMethod());
+
             return new CosmosConfigProvider(this);
         }
 
-        void buildEvents_OnBuildProjConfigDone(string Project, string ProjectConfig, string Platform,
-            string SolutionConfig, bool Success)
+        private void OnBuildProjConfigDone(string Project, string ProjectConfig, string Platform, string SolutionConfig, bool Success)
         {
+            Logger.TraceMethod(MethodBase.GetCurrentMethod());
+
             if (false == Success)
             {
-                var dte = (EnvDTE.DTE)((IServiceProvider)this.Package).GetService(typeof(EnvDTE.DTE));
+                var dte = (DTE)((IServiceProvider)Package).GetService(typeof(DTE));
                 dte.DTE.ExecuteCommand("Build.Cancel");
             }
         }
 
-        internal override void BuildAsync(uint vsopts, string config, IVsOutputWindowPane output, string target,
-            Action<MSBuildResult, string> uiThreadCallback)
+        internal override void BuildAsync(uint vsopts, string config, IVsOutputWindowPane output, string target, Action<MSBuildResult, string> uiThreadCallback)
         {
-            var xSolutionBuildManager = (IVsSolutionBuildManager)this.GetService(typeof(IVsSolutionBuildManager));
-            var xSolution = (IVsSolution)this.GetService(typeof(IVsSolution));
+            Logger.TraceMethod(MethodBase.GetCurrentMethod());
+
+            var xSolutionBuildManager = (IVsSolutionBuildManager)GetService(typeof(IVsSolutionBuildManager));
+            var xSolution = (IVsSolution)GetService(typeof(IVsSolution));
             if (xSolutionBuildManager != null && xSolution != null)
             {
                 IVsHierarchy xStartupProj;
@@ -103,7 +137,7 @@ namespace Cosmos.VS.ProjectSystem
                     xSolution.GetGuidOfProject(xStartupProj, out xGuid);
                     if (xGuid != Guid.Empty)
                     {
-                        if (xGuid != this.ProjectIDGuid)
+                        if (xGuid != ProjectIDGuid)
                         {
                             uiThreadCallback(MSBuildResult.Successful, "Skipped");
                             output.OutputStringThreadSafe("Project skipped, as it's not necessary for running\r\n\r\n");
@@ -117,6 +151,8 @@ namespace Cosmos.VS.ProjectSystem
 
         public override void AddFileFromTemplate(string source, string target)
         {
+            Logger.TraceMethod(MethodBase.GetCurrentMethod());
+
             string nameSpace = FileTemplateProcessor.GetFileNamespace(target, this);
             string className = Path.GetFileNameWithoutExtension(target);
 

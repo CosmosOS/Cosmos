@@ -9,33 +9,25 @@ using Cosmos.Build.Common;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Project;
+using Microsoft.VisualStudio.Project.Automation;
 using Microsoft.VisualStudio.Shell.Interop;
-using IServiceProvider = System.IServiceProvider;
 
 namespace Cosmos.VS.ProjectSystem.PropertyPages
 {
     public partial class CustomPropertyPage : UserControl, IPropertyPage
     {
-        private static List<CustomPropertyPage> _pageList = new List<CustomPropertyPage>();
-
-        protected static CustomPropertyPage[] Pages
-        {
-            get { return CustomPropertyPage._pageList.ToArray(); }
-        }
-
-        private ProjectNode _projectMgr;
-        private ProjectConfig[] _projectConfigs;
-        private IPropertyPageSite _site;
+        private static readonly List<CustomPropertyPage> _pageList = new List<CustomPropertyPage>();
         private bool _dirty;
-        private string _title;
         private string _helpKeyword;
-        private Microsoft.VisualStudio.Project.Automation.OAProject _project;
+
+        private IPropertyPageSite _site;
+        private string _title;
 
         public CustomPropertyPage()
         {
-            _projectMgr = null;
-            _projectConfigs = null;
-            _project = null;
+            ProjectMgr = null;
+            ProjectConfigs = null;
+            Project = null;
             _site = null;
             _dirty = false;
             IgnoreDirty = false;
@@ -43,22 +35,19 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
             _helpKeyword = string.Empty;
         }
 
-        public virtual PropertiesBase Properties
-        {
-            get { return null; }
-        }
+        protected static CustomPropertyPage[] Pages => _pageList.ToArray();
+
+        public virtual PropertiesBase Properties => null;
 
         public virtual string Title
         {
             get
             {
                 if (_title == null)
-                {
                     _title = string.Empty;
-                }
                 return _title;
             }
-            set { _title = value; }
+            set => _title = value;
         }
 
         protected virtual string HelpKeyword
@@ -66,12 +55,10 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
             get
             {
                 if (_helpKeyword == null)
-                {
                     _helpKeyword = string.Empty;
-                }
                 return _helpKeyword;
             }
-            set { _title = value; }
+            set => _title = value;
         }
 
         public bool IsDirty
@@ -79,156 +66,23 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
             get { return _dirty; }
             set
             {
-                if (this.IgnoreDirty == false)
-                {
+                if (IgnoreDirty == false)
                     if (_dirty != value)
                     {
                         _dirty = value;
                         if (_site != null)
-                        {
                             _site.OnStatusChange((uint) (_dirty ? PropPageStatus.Dirty : PropPageStatus.Clean));
-                        }
                     }
-                }
             }
         }
 
         public bool IgnoreDirty { get; set; }
 
-        public ProjectNode ProjectMgr
-        {
-            get { return _projectMgr; }
-        }
+        public ProjectNode ProjectMgr { get; private set; }
 
-        protected ProjectConfig[] ProjectConfigs
-        {
-            get { return _projectConfigs; }
-        }
+        protected ProjectConfig[] ProjectConfigs { get; private set; }
 
-        protected Microsoft.VisualStudio.Project.Automation.OAProject Project
-        {
-            get { return _project; }
-        }
-
-        protected virtual void FillProperties()
-        {
-        }
-
-        protected virtual void FillConfigurations()
-        {
-        }
-
-        public virtual void ApplyChanges()
-        {
-            if (this.Properties != null)
-            {
-                var properties = Properties.GetProperties();
-                var independentProperties = Properties.ProjectIndependentProperties;
-                foreach (KeyValuePair<String, String> pair in properties)
-                {
-                    var propertyName = pair.Key;
-                    if (independentProperties.Contains(propertyName))
-                    {
-                        SetProjectProperty(pair.Key, pair.Value);
-                    }
-                    else
-                    {
-                        SetConfigProperty(pair.Key, pair.Value);
-                    }
-                }
-
-                this.IsDirty = false;
-            }
-        }
-
-        /// <summary>
-        /// Sets project specific property.
-        /// </summary>
-        /// <param name="name">Name of the property to set.</param>
-        /// <param name="value">Value of the property.</param>
-        public virtual void SetProjectProperty(String name, String value)
-        {
-            CCITracing.TraceCall();
-            if (value == null)
-            {
-                value = String.Empty;
-            }
-
-            if (this.ProjectMgr != null)
-            {
-                this.ProjectMgr.SetProjectProperty(name, value);
-            }
-        }
-
-        public virtual void SetConfigProperty(String name, String value)
-        {
-            CCITracing.TraceCall();
-            if (value == null)
-            {
-                value = String.Empty;
-            }
-
-            if (this.ProjectMgr != null)
-            {
-                foreach (ProjectConfig config in this.ProjectConfigs)
-                {
-                    config.SetConfigurationProperty(name, value);
-                }
-                this.ProjectMgr.SetProjectFileDirty(true);
-            }
-        }
-
-        public virtual String GetConfigProperty(string aName)
-        {
-            return ProjectConfigs[0].GetConfigurationProperty(aName, true);
-        }
-
-        protected virtual void Initialize()
-        {
-        }
-
-        protected virtual bool CheckInput()
-        {
-            return true;
-        }
-
-        protected void MarkPageChanged()
-        {
-            IsDirty = true;
-        }
-
-        protected string GetComboValue(ComboBox comboBox)
-        {
-            string selectedItem = comboBox.SelectedItem as string;
-            if (selectedItem != null)
-            {
-                return selectedItem;
-            }
-            return string.Empty;
-        }
-
-        protected void AddComboBoxItems(ComboBox comboBox, params string[] items)
-        {
-            foreach (string item in items)
-            {
-                comboBox.Items.Add(item);
-            }
-        }
-
-        private bool ParseBoolean(string value, bool defaultValue)
-        {
-            if (!string.IsNullOrEmpty(value))
-            {
-                try
-                {
-                    return bool.Parse(value);
-                }
-                catch
-                {
-                }
-            }
-            return defaultValue;
-        }
+        protected OAProject Project { get; private set; }
 
         void IPropertyPage.SetPageSite(IPropertyPageSite pPageSite)
         {
@@ -241,17 +95,17 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
             Initialize();
             NativeMethods.SetParent(Handle, hWndParent);
 
-            CustomPropertyPage._pageList.Add(this);
+            _pageList.Add(this);
             FillConfigurations();
 
-            this.IgnoreDirty = true;
+            IgnoreDirty = true;
             FillProperties();
-            this.IgnoreDirty = false;
+            IgnoreDirty = false;
         }
 
         void IPropertyPage.Deactivate()
         {
-            CustomPropertyPage._pageList.Remove(this);
+            _pageList.Remove(this);
             Dispose();
         }
 
@@ -259,7 +113,7 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
         {
             PROPPAGEINFO info = new PROPPAGEINFO();
 
-            this.Size = new Size(492, 288);
+            Size = new Size(492, 288);
 
             info.cb = (uint) Marshal.SizeOf(typeof(PROPPAGEINFO));
             info.dwHelpContext = 0;
@@ -281,61 +135,51 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
                     for (int i = 0; i < count; i++)
                     {
                         ProjectConfig config = (ProjectConfig) punk[i];
-                        if (_projectMgr == null)
-                        {
-                            _projectMgr = config.ProjectMgr;
-                        }
+                        if (ProjectMgr == null)
+                            ProjectMgr = config.ProjectMgr;
                         configs.Add(config);
                     }
-                    _projectConfigs = (ProjectConfig[]) configs.ToArray(typeof(ProjectConfig));
+                    ProjectConfigs = (ProjectConfig[]) configs.ToArray(typeof(ProjectConfig));
 
                     // For ProjectNodes we will get one of these
                 }
                 else if (punk[0] is NodeProperties)
                 {
-                    if (_projectMgr == null)
-                    {
-                        _projectMgr = (punk[0] as NodeProperties).Node.ProjectMgr;
-                    }
+                    if (ProjectMgr == null)
+                        ProjectMgr = (punk[0] as NodeProperties).Node.ProjectMgr;
 
-                    Dictionary<string, ProjectConfig> configsMap = new Dictionary<string, ProjectConfig>();
+                    var configsMap = new Dictionary<string, ProjectConfig>();
 
                     for (int i = 0; i < count; i++)
                     {
                         NodeProperties property = (NodeProperties) punk[i];
                         IVsCfgProvider provider;
                         ErrorHandler.ThrowOnFailure(property.Node.ProjectMgr.GetCfgProvider(out provider));
-                        uint[] expected = new uint[1];
+                        var expected = new uint[1];
                         ErrorHandler.ThrowOnFailure(provider.GetCfgs(0, null, expected, null));
                         if (expected[0] > 0)
                         {
-                            ProjectConfig[] configs = new ProjectConfig[expected[0]];
-                            uint[] actual = new uint[1];
+                            var configs = new ProjectConfig[expected[0]];
+                            var actual = new uint[1];
                             provider.GetCfgs(expected[0], configs, actual, null);
 
                             foreach (ProjectConfig config in configs)
-                            {
                                 if (!configsMap.ContainsKey(config.ConfigName))
-                                {
                                     configsMap.Add(config.ConfigName, config);
-                                }
-                            }
                         }
                     }
 
                     if (configsMap.Count > 0)
                     {
-                        if (_projectConfigs == null)
-                        {
-                            _projectConfigs = new ProjectConfig[configsMap.Keys.Count];
-                        }
-                        configsMap.Values.CopyTo(_projectConfigs, 0);
+                        if (ProjectConfigs == null)
+                            ProjectConfigs = new ProjectConfig[configsMap.Keys.Count];
+                        configsMap.Values.CopyTo(ProjectConfigs, 0);
                     }
                 }
             }
             else
             {
-                _projectMgr = null;
+                ProjectMgr = null;
             }
 
             /* This code calls FillProperties without Initialize call
@@ -345,10 +189,8 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
             }
             */
 
-            if ((_projectMgr != null) && (_project == null))
-            {
-                _project = new Microsoft.VisualStudio.Project.Automation.OAProject(_projectMgr);
-            }
+            if (ProjectMgr != null && Project == null)
+                Project = new OAProject(ProjectMgr);
         }
 
         void IPropertyPage.Show(uint nCmdShow)
@@ -367,7 +209,7 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
 
         int IPropertyPage.IsPageDirty()
         {
-            return (IsDirty ? VSConstants.S_OK : VSConstants.S_FALSE);
+            return IsDirty ? VSConstants.S_OK : VSConstants.S_FALSE;
         }
 
         int IPropertyPage.Apply()
@@ -395,15 +237,15 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
 
         void IPropertyPage.Help(string pszHelpDir)
         {
-        //    IServiceProvider serviceProvider = _site as IServiceProvider;
-        //    if (serviceProvider != null)
-        //    {
-        //        Help helpService = serviceProvider.GetService(typeof(Help)) as Help;
-        //        if (helpService != null)
-        //        {
-        //            helpService.DisplayTopicFromF1Keyword(HelpKeyword);
-        //        }
-        //    }
+            //    IServiceProvider serviceProvider = _site as IServiceProvider;
+            //    if (serviceProvider != null)
+            //    {
+            //        Help helpService = serviceProvider.GetService(typeof(Help)) as Help;
+            //        if (helpService != null)
+            //        {
+            //            helpService.DisplayTopicFromF1Keyword(HelpKeyword);
+            //        }
+            //    }
         }
 
         int IPropertyPage.TranslateAccelerator(MSG[] pMsg)
@@ -412,12 +254,111 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
 
             if ((msg.message < NativeMethods.WM_KEYFIRST || msg.message > NativeMethods.WM_KEYLAST) &&
                 (msg.message < NativeMethods.WM_MOUSEFIRST || msg.message > NativeMethods.WM_MOUSELAST))
-            {
                 return 1;
-            }
 
-            return (NativeMethods.IsDialogMessageA(Handle, ref msg)) ? 0 : 1;
+            return NativeMethods.IsDialogMessageA(Handle, ref msg) ? 0 : 1;
         }
 
+        protected virtual void FillProperties()
+        {
+        }
+
+        protected virtual void FillConfigurations()
+        {
+        }
+
+        public virtual void ApplyChanges()
+        {
+            if (Properties != null)
+            {
+                var properties = Properties.GetProperties();
+                var independentProperties = Properties.ProjectIndependentProperties;
+                foreach (var pair in properties)
+                {
+                    string propertyName = pair.Key;
+                    if (independentProperties.Contains(propertyName))
+                        SetProjectProperty(pair.Key, pair.Value);
+                    else
+                        SetConfigProperty(pair.Key, pair.Value);
+                }
+
+                IsDirty = false;
+            }
+        }
+
+        /// <summary>
+        ///     Sets project specific property.
+        /// </summary>
+        /// <param name="name">Name of the property to set.</param>
+        /// <param name="value">Value of the property.</param>
+        public virtual void SetProjectProperty(string name, string value)
+        {
+            CCITracing.TraceCall();
+            if (value == null)
+                value = string.Empty;
+
+            if (ProjectMgr != null)
+                ProjectMgr.SetProjectProperty(name, value);
+        }
+
+        public virtual void SetConfigProperty(string name, string value)
+        {
+            CCITracing.TraceCall();
+            if (value == null)
+                value = string.Empty;
+
+            if (ProjectMgr != null)
+            {
+                foreach (ProjectConfig config in ProjectConfigs)
+                    config.SetConfigurationProperty(name, value);
+                ProjectMgr.SetProjectFileDirty(true);
+            }
+        }
+
+        public virtual string GetConfigProperty(string aName)
+        {
+            return ProjectConfigs[0].GetConfigurationProperty(aName, true);
+        }
+
+        protected virtual void Initialize()
+        {
+        }
+
+        protected virtual bool CheckInput()
+        {
+            return true;
+        }
+
+        protected void MarkPageChanged()
+        {
+            IsDirty = true;
+        }
+
+        protected string GetComboValue(ComboBox comboBox)
+        {
+            string selectedItem = comboBox.SelectedItem as string;
+            if (selectedItem != null)
+                return selectedItem;
+            return string.Empty;
+        }
+
+        protected void AddComboBoxItems(ComboBox comboBox, params string[] items)
+        {
+            foreach (string item in items)
+                comboBox.Items.Add(item);
+        }
+
+        private bool ParseBoolean(string value, bool defaultValue)
+        {
+            if (!string.IsNullOrEmpty(value))
+                try
+                {
+                    return bool.Parse(value);
+                }
+                catch
+                {
+                }
+            return defaultValue;
+        }
     }
 }

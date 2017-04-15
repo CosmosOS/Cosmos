@@ -30,7 +30,7 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
     // So instead we keep our own list of profiles, and when the user selects them we write out a copy of its values
     // to the active configuration (all since we are not configuration dependent) for MSBuild and other code to use.
 
-    [Guid(Guids.guidCosmosPage)]
+    [Guid(Guids.guidCosmosPropertyPageString)]
     public partial class CosmosPage : CustomPropertyPage
     {
         protected class ProfileItem
@@ -48,30 +48,303 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
         }
 
         protected ProfilePresets mPresets = new ProfilePresets();
-
-        /// <summary>The index in the <see cref="cmboVisualStudioDebugPort"/> combo for the pipe name used by both
-        /// Bochs and VMware environment to communicate with Vsiual Studio debugger.</summary>
         protected int mVMwareAndBochsDebugPipe;
-
         protected bool mShowTabBochs;
-
         protected bool mShowTabDebug;
-
         protected bool mShowTabDeployment;
-
         protected bool mShowTabLaunch;
-
         protected bool mShowTabVMware;
-
         protected bool mShowTabPXE;
-
         protected bool mShowTabUSB;
-
         protected bool mShowTabISO;
-
         protected bool mShowTabSlave;
-
         protected bool FreezeEvents;
+
+        public CosmosPage()
+        {
+            InitializeComponent();
+
+            # region Profile
+
+            butnProfileClone.Click += new EventHandler(butnProfileClone_Click);
+            butnProfileDelete.Click += new EventHandler(butnProfileDelete_Click);
+            butnProfileRename.Click += new EventHandler(butnProfileRename_Click);
+
+            lboxProfile.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            {
+                var xProfile = (ProfileItem)lboxProfile.SelectedItem;
+                if (xProfile.Prefix != mProps.Profile)
+                {
+                    // Save existing profile
+                    mProps.SaveProfile(mProps.Profile);
+                    // Load newly selected profile
+                    mProps.LoadProfile(xProfile.Prefix);
+                    mProps.Profile = xProfile.Prefix;
+
+                    IsDirty = true;
+                    UpdateUI();
+                }
+            };
+
+            #endregion
+
+            # region Deploy
+
+            lboxDeployment.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            {
+                var xValue = (DeploymentType)((EnumValue)lboxDeployment.SelectedItem).Value;
+                if (xValue != mProps.Deployment)
+                {
+                    mProps.Deployment = xValue;
+                    IsDirty = true;
+                }
+            };
+
+            #endregion
+
+            # region Launch
+
+            lboxLaunch.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            {
+                var xValue = (LaunchType)((EnumValue)lboxLaunch.SelectedItem).Value;
+                if (xValue != mProps.Launch)
+                {
+                    mProps.Launch = xValue;
+                    IsDirty = true;
+                    // Bochs requires an ISO. Force Deployment property.
+                    if (LaunchType.Bochs == xValue)
+                    {
+                        if (DeploymentType.ISO != mProps.Deployment)
+                        {
+                            foreach (EnumValue scannedValue in lboxDeployment.Items)
+                            {
+                                if (DeploymentType.ISO == (DeploymentType)scannedValue.Value)
+                                {
+                                    lboxDeployment.SelectedItem = scannedValue;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            #endregion
+
+            #region Compile
+
+            comboFramework.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                var value = (Framework)((EnumValue)comboFramework.SelectedItem).Value;
+                if (value != mProps.Framework)
+                {
+                    mProps.Framework = value;
+                    IsDirty = true;
+                }
+            };
+            comboBinFormat.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                var value = (BinFormat)((EnumValue)comboBinFormat.SelectedItem).Value;
+                if (value != mProps.BinFormat)
+                {
+                    mProps.BinFormat = value;
+                    IsDirty = true;
+                }
+            };
+
+            textOutputPath.TextChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                string value = textOutputPath.Text;
+                if (!string.Equals(value, mProps.OutputPath, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    mProps.OutputPath = textOutputPath.Text;
+                    IsDirty = true;
+                }
+            };
+
+            #endregion
+
+            #region Assembler
+
+            checkUseInternalAssembler.CheckedChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                bool value = checkUseInternalAssembler.Checked;
+                if (value != mProps.UseInternalAssembler)
+                {
+                    mProps.UseInternalAssembler = value;
+                    IsDirty = true;
+                }
+            };
+
+            #endregion
+
+
+            #region VMware
+
+            cmboVMwareEdition.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                var x = (VMwareEdition)((EnumValue)cmboVMwareEdition.SelectedItem).Value;
+                if (x != mProps.VMwareEdition)
+                {
+                    mProps.VMwareEdition = x;
+                    IsDirty = true;
+                }
+            };
+
+            #endregion
+
+            #region PXE
+
+            comboPxeInterface.TextChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                var x = comboPxeInterface.Text.Trim();
+                if (x != mProps.PxeInterface)
+                {
+                    mProps.PxeInterface = x;
+                    IsDirty = true;
+                }
+            };
+
+            cmboSlavePort.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                var x = (string)cmboSlavePort.SelectedItem;
+                if (x != mProps.SlavePort)
+                {
+                    mProps.SlavePort = x;
+                    IsDirty = true;
+                }
+            };
+
+            butnPxeRefresh.Click += new EventHandler(butnPxeRefresh_Click);
+
+            #endregion
+
+            #region Debug
+
+            comboDebugMode.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                var x = (Cosmos.Build.Common.DebugMode)((EnumValue)comboDebugMode.SelectedItem).Value;
+                if (x != mProps.DebugMode)
+                {
+                    mProps.DebugMode = x;
+                    IsDirty = true;
+                }
+            };
+
+            chckEnableDebugStub.CheckedChanged += delegate (object aSender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                panlDebugSettings.Enabled = chckEnableDebugStub.Checked;
+                mProps.DebugEnabled = chckEnableDebugStub.Checked;
+                IsDirty = true;
+            };
+
+            comboTraceMode.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                var x = (TraceAssemblies)((EnumValue)comboTraceMode.SelectedItem).Value;
+                if (x != mProps.TraceAssemblies)
+                {
+                    mProps.TraceAssemblies = x;
+                    IsDirty = true;
+                }
+            };
+
+            checkIgnoreDebugStubAttribute.CheckedChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                bool x = checkIgnoreDebugStubAttribute.Checked;
+                if (x != mProps.IgnoreDebugStubAttribute)
+                {
+                    mProps.IgnoreDebugStubAttribute = x;
+                    IsDirty = true;
+                }
+            };
+
+            cmboCosmosDebugPort.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                var x = (string)cmboCosmosDebugPort.SelectedItem;
+                if (x != mProps.CosmosDebugPort)
+                {
+                    mProps.CosmosDebugPort = x;
+                    IsDirty = true;
+                }
+            };
+
+            cmboVisualStudioDebugPort.SelectedIndexChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                var x = (string)cmboVisualStudioDebugPort.SelectedItem;
+                if (x != mProps.VisualStudioDebugPort)
+                {
+                    mProps.VisualStudioDebugPort = x;
+                    IsDirty = true;
+                }
+            };
+
+            #endregion
+
+            checkEnableGDB.CheckedChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                bool x = checkEnableGDB.Checked;
+                if (x != mProps.EnableGDB)
+                {
+                    mProps.EnableGDB = x;
+                    IsDirty = true;
+                }
+                checkStartCosmosGDB.Enabled = x;
+                checkStartCosmosGDB.Checked = x;
+            };
+
+            checkStartCosmosGDB.CheckedChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                bool x = checkStartCosmosGDB.Checked;
+                if (x != mProps.StartCosmosGDB)
+                {
+                    mProps.StartCosmosGDB = x;
+                    IsDirty = true;
+                }
+            };
+
+            checkEnableBochsDebug.CheckedChanged += delegate (Object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                bool x = checkEnableBochsDebug.Checked;
+                if (x != mProps.EnableBochsDebug)
+                {
+                    mProps.EnableBochsDebug = x;
+                    IsDirty = true;
+                }
+                checkStartBochsDebugGui.Enabled = x;
+
+                if (x == false)
+                {
+                    checkStartBochsDebugGui.Checked = x;
+                }
+            };
+
+            checkStartBochsDebugGui.CheckedChanged += delegate (object sender, EventArgs e)
+            {
+                if (FreezeEvents) return;
+                bool x = checkStartBochsDebugGui.Checked;
+                if (x != mProps.StartBochsDebugGui)
+                {
+                    mProps.StartBochsDebugGui = x;
+                    IsDirty = true;
+                }
+            };
+        }
 
         public override void ApplyChanges()
         {
@@ -308,292 +581,6 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
                     FillProfile(i);
                 }
             }
-        }
-
-        public CosmosPage()
-        {
-            InitializeComponent();
-
-            # region Profile
-
-            butnProfileClone.Click += new EventHandler(butnProfileClone_Click);
-            butnProfileDelete.Click += new EventHandler(butnProfileDelete_Click);
-            butnProfileRename.Click += new EventHandler(butnProfileRename_Click);
-
-            lboxProfile.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-                {
-                    var xProfile = (ProfileItem)lboxProfile.SelectedItem;
-                    if (xProfile.Prefix != mProps.Profile)
-                    {
-                        // Save existing profile
-                        mProps.SaveProfile(mProps.Profile);
-                        // Load newly selected profile
-                        mProps.LoadProfile(xProfile.Prefix);
-                        mProps.Profile = xProfile.Prefix;
-
-                        IsDirty = true;
-                        UpdateUI();
-                    }
-                };
-
-            #endregion
-
-            # region Deploy
-
-            lboxDeployment.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-                {
-                    var xValue = (DeploymentType)((EnumValue)lboxDeployment.SelectedItem).Value;
-                    if (xValue != mProps.Deployment)
-                    {
-                        mProps.Deployment = xValue;
-                        IsDirty = true;
-                    }
-                };
-
-            #endregion
-
-            # region Launch
-
-            lboxLaunch.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-                {
-                    var xValue = (LaunchType)((EnumValue)lboxLaunch.SelectedItem).Value;
-                    if (xValue != mProps.Launch)
-                    {
-                        mProps.Launch = xValue;
-                        IsDirty = true;
-                        // Bochs requires an ISO. Force Deployment property.
-                        if (LaunchType.Bochs == xValue)
-                        {
-                            if (DeploymentType.ISO != mProps.Deployment)
-                            {
-                                foreach (EnumValue scannedValue in lboxDeployment.Items)
-                                {
-                                    if (DeploymentType.ISO == (DeploymentType)scannedValue.Value)
-                                    {
-                                        lboxDeployment.SelectedItem = scannedValue;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                };
-
-            #endregion
-
-            #region Compile
-
-            comboFramework.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    var value = (Framework)((EnumValue)comboFramework.SelectedItem).Value;
-                    if (value != mProps.Framework)
-                    {
-                        mProps.Framework = value;
-                        IsDirty = true;
-                    }
-                };
-            comboBinFormat.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    var value = (BinFormat)((EnumValue)comboBinFormat.SelectedItem).Value;
-                    if (value != mProps.BinFormat)
-                    {
-                        mProps.BinFormat = value;
-                        IsDirty = true;
-                    }
-                };
-
-            textOutputPath.TextChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    string value = textOutputPath.Text;
-                    if (!string.Equals(value, mProps.OutputPath, StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        mProps.OutputPath = textOutputPath.Text;
-                        IsDirty = true;
-                    }
-                };
-
-            #endregion
-
-            #region Assembler
-
-            checkUseInternalAssembler.CheckedChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    bool value = checkUseInternalAssembler.Checked;
-                    if (value != mProps.UseInternalAssembler)
-                    {
-                        mProps.UseInternalAssembler = value;
-                        IsDirty = true;
-                    }
-                };
-
-            #endregion
-
-
-            #region VMware
-
-            cmboVMwareEdition.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    var x = (VMwareEdition)((EnumValue)cmboVMwareEdition.SelectedItem).Value;
-                    if (x != mProps.VMwareEdition)
-                    {
-                        mProps.VMwareEdition = x;
-                        IsDirty = true;
-                    }
-                };
-
-            #endregion
-
-            #region PXE
-
-            comboPxeInterface.TextChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    var x = comboPxeInterface.Text.Trim();
-                    if (x != mProps.PxeInterface)
-                    {
-                        mProps.PxeInterface = x;
-                        IsDirty = true;
-                    }
-                };
-
-            cmboSlavePort.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    var x = (string)cmboSlavePort.SelectedItem;
-                    if (x != mProps.SlavePort)
-                    {
-                        mProps.SlavePort = x;
-                        IsDirty = true;
-                    }
-                };
-
-            butnPxeRefresh.Click += new EventHandler(butnPxeRefresh_Click);
-
-            #endregion
-
-            #region Debug
-
-            comboDebugMode.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    var x = (Cosmos.Build.Common.DebugMode)((EnumValue)comboDebugMode.SelectedItem).Value;
-                    if (x != mProps.DebugMode)
-                    {
-                        mProps.DebugMode = x;
-                        IsDirty = true;
-                    }
-                };
-
-            chckEnableDebugStub.CheckedChanged += delegate(object aSender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    panlDebugSettings.Enabled = chckEnableDebugStub.Checked;
-                    mProps.DebugEnabled = chckEnableDebugStub.Checked;
-                    IsDirty = true;
-                };
-
-            comboTraceMode.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    var x = (TraceAssemblies)((EnumValue)comboTraceMode.SelectedItem).Value;
-                    if (x != mProps.TraceAssemblies)
-                    {
-                        mProps.TraceAssemblies = x;
-                        IsDirty = true;
-                    }
-                };
-
-            checkIgnoreDebugStubAttribute.CheckedChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    bool x = checkIgnoreDebugStubAttribute.Checked;
-                    if (x != mProps.IgnoreDebugStubAttribute)
-                    {
-                        mProps.IgnoreDebugStubAttribute = x;
-                        IsDirty = true;
-                    }
-                };
-
-            cmboCosmosDebugPort.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    var x = (string)cmboCosmosDebugPort.SelectedItem;
-                    if (x != mProps.CosmosDebugPort)
-                    {
-                        mProps.CosmosDebugPort = x;
-                        IsDirty = true;
-                    }
-                };
-
-            cmboVisualStudioDebugPort.SelectedIndexChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    var x = (string)cmboVisualStudioDebugPort.SelectedItem;
-                    if (x != mProps.VisualStudioDebugPort)
-                    {
-                        mProps.VisualStudioDebugPort = x;
-                        IsDirty = true;
-                    }
-                };
-
-            #endregion
-
-            checkEnableGDB.CheckedChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    bool x = checkEnableGDB.Checked;
-                    if (x != mProps.EnableGDB)
-                    {
-                        mProps.EnableGDB = x;
-                        IsDirty = true;
-                    }
-                    checkStartCosmosGDB.Enabled = x;
-                    checkStartCosmosGDB.Checked = x;
-                };
-
-            checkStartCosmosGDB.CheckedChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    bool x = checkStartCosmosGDB.Checked;
-                    if (x != mProps.StartCosmosGDB)
-                    {
-                        mProps.StartCosmosGDB = x;
-                        IsDirty = true;
-                    }
-                };
-
-            checkEnableBochsDebug.CheckedChanged += delegate(Object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    bool x = checkEnableBochsDebug.Checked;
-                    if (x != mProps.EnableBochsDebug)
-                    {
-                        mProps.EnableBochsDebug = x;
-                        IsDirty = true;
-                    }
-                    checkStartBochsDebugGui.Enabled = x;
-
-                    if (x == false)
-                    {
-                        checkStartBochsDebugGui.Checked = x;
-                    }
-                };
-
-            checkStartBochsDebugGui.CheckedChanged += delegate(object sender, EventArgs e)
-                {
-                    if (FreezeEvents) return;
-                    bool x = checkStartBochsDebugGui.Checked;
-                    if (x != mProps.StartBochsDebugGui)
-                    {
-                        mProps.StartBochsDebugGui = x;
-                        IsDirty = true;
-                    }
-                };
         }
 
         void butnProfileRename_Click(object sender, EventArgs e)

@@ -1,10 +1,11 @@
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <RequiredNetFXFacadeAssemblies Include="..\..\packages\System.Diagnostics.Process.4.1.0\lib\net461\System.Diagnostics.Process.dll"/>
+    <!--<RequiredNetFXFacadeAssemblies Include="..\..\packages\System.Diagnostics.Process.4.3.0\lib\net461\System.Diagnostics.Process.dll"/>
     <RequiredNetFXFacadeAssemblies Include="..\..\packages\System.Threading.Thread.4.3.0\lib\net46\System.Threading.Thread.dll"/>
-    <RequiredNetFXFacadeAssemblies Include="..\..\packages\System.Runtime.4.1.0\lib\net462\System.Runtime.dll"/>
-    <RequiredNetFXFacadeAssemblies Include="..\..\packages\System.Runtime.InteropServices.4.1.0\lib\net462\System.Runtime.InteropServices.dll"/>
-    <RequiredNetFXFacadeAssemblies Include="..\..\packages\System.IO.4.1.0\lib\net462\System.IO.dll"/>
-    <RequiredNetFXFacadeAssemblies Include="..\..\packages\Microsoft.Win32.Registry.4.3.0\lib\net46\Microsoft.Win32.Registry.dll" />
+    <RequiredNetFXFacadeAssemblies Include="..\..\packages\System.Runtime.4.3.0\lib\net462\System.Runtime.dll"/>
+    <RequiredNetFXFacadeAssemblies Include="..\..\packages\System.Runtime.InteropServices.4.3.0\lib\net462\System.Runtime.InteropServices.dll"/>
+    <RequiredNetFXFacadeAssemblies Include="..\..\packages\System.IO.4.3.0\lib\net462\System.IO.dll"/>
+    <RequiredNetFXFacadeAssemblies Include="..\..\packages\Microsoft.Win32.Registry.4.3.0\lib\net46\Microsoft.Win32.Registry.dll" />-->
   </ItemGroup>
 </Project>

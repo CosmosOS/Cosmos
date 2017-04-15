@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Project;
-using Microsoft.VisualStudio.Shell;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace Cosmos.VS.ProjectSystem
@@ -9,20 +9,23 @@ namespace Cosmos.VS.ProjectSystem
     [Guid(Guids.guidCosmosProjectFactoryString)]
     class CosmosProjectFactory : ProjectFactory
     {
-        private CosmosProjectPackage package;
+        private readonly CosmosProjectPackage mPackage;
 
-        public CosmosProjectFactory(CosmosProjectPackage package)
-            : base(package)
+        public CosmosProjectFactory(CosmosProjectPackage aPackage)
+            : base(aPackage)
         {
-            this.package = package;
+            Logger.TraceMethod(MethodBase.GetCurrentMethod());
+
+            mPackage = aPackage;
         }
 
         protected override ProjectNode CreateProject()
         {
-            CosmosProjectNode project = new CosmosProjectNode(this.package);
+            Logger.TraceMethod(MethodBase.GetCurrentMethod());
 
-            project.SetSite((IOleServiceProvider)((IServiceProvider)this.package).GetService(typeof(IOleServiceProvider)));
-            return project;
+            var xProject = new CosmosProjectNode(mPackage);
+            xProject.SetSite((IOleServiceProvider)((IServiceProvider)mPackage).GetService(typeof(IOleServiceProvider)));
+            return xProject;
         }
     }
 }

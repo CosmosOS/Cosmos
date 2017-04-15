@@ -214,7 +214,7 @@ namespace Microsoft.VisualStudio.Project.Automation
                 }
             }
 
-            throw new ArgumentException(SR.GetString(SR.InvalidParameter, CultureInfo.CurrentUICulture), "index");
+            return new OANullProperty(null);
         }
         /// <summary>
         /// Gets the immediate parent object of a Properties collection.

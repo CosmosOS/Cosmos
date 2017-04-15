@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
@@ -18,10 +18,13 @@ namespace Cosmos.VS.ProjectSystem
         public CosmosProjectConfig(ProjectNode project, string configuration)
             : base(project, configuration)
         {
+            Logger.TraceMethod(MethodBase.GetCurrentMethod());
         }
 
         public override int DebugLaunch(uint aLaunch)
         {
+            Logger.TraceMethod(MethodBase.GetCurrentMethod());
+
             try
             {
                 var xDeployment = (DeploymentType)Enum.Parse(typeof(DeploymentType), GetConfigurationProperty(BuildPropertyNames.DeploymentString, true));
