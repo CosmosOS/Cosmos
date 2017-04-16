@@ -2,13 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
+    <Name>$KernelProjectName$</Name>
     <AssemblyName>$KernelProjectName$</AssemblyName>
     <ProjectGuid>$KernelProjectGuid$</ProjectGuid>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="$CosmosProjectName$.Cosmos" />
-  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Cosmos.System, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983, processorArchitecture=MSIL" />

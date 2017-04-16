@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <TargetFramework>netstandard1.5</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
     <AssemblyName>$CosmosProjectName$</AssemblyName>
     <ProjectGuid>$CosmosProjectGuid$</ProjectGuid>
     <Name>$CosmosProjectName$</Name>
@@ -18,20 +18,20 @@
     <StartCosmosGDB>false</StartCosmosGDB>
     <VMWareEdition>Player</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
-    <Name>$KernelName$Boot</Name>
     <Description>Use VMware Player or Workstation to deploy and debug.</Description>
     <Deployment>ISO</Deployment>
     <Launch>VMware</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
   </PropertyGroup>
   <ItemGroup>
+
     <ProjectReference Include=".\$KernelProjectName$.$ProjectTypeExtension$">
       <Name>$KernelProjectName$</Name>
       <Project>$KernelProjectGuid$</Project>
     </ProjectReference>
   </ItemGroup>
 
-    <ItemGroup>
+  <ItemGroup>
     <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983"/>
     <Reference Include="Cosmos.System.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983"/>
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983"/>

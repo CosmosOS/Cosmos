@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <TargetFramework>netstandard1.5</TargetFramework>
+    <TargetFramework>net462</TargetFramework>
     <AssemblyName>$CosmosProjectName$</AssemblyName>
     <ProjectGuid>$CosmosProjectGuid$</ProjectGuid>
     <Name>$CosmosProjectName$</Name>
@@ -18,7 +18,6 @@
     <StartCosmosGDB>false</StartCosmosGDB>
     <VMWareEdition>Player</VMWareEdition>
     <OutputPath>bin\Debug\</OutputPath>
-    <Name>$KernelName$Boot</Name>
     <Description>Use VMware Player or Workstation to deploy and debug.</Description>
     <Deployment>ISO</Deployment>
     <Launch>VMware</Launch>
