@@ -116,7 +116,7 @@ namespace Cosmos.VS.ProjectSystem
             if (false == Success)
             {
                 var dte = (DTE)((IServiceProvider)Package).GetService(typeof(DTE));
-                dte.DTE.ExecuteCommand("Build.Cancel");
+                dte.ExecuteCommand("Build.Cancel");
             }
         }
 
