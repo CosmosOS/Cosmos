@@ -24,7 +24,7 @@ namespace Cosmos.VS.Windows
     [ProvideToolWindow(typeof(ConsoleTW))]
     [Guid(Guids.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
-    public sealed class CosmosVSWindowsPackage: Package
+    public sealed class CosmosWindowsPackage: Package
     {
         private readonly Queue<ushort> mCommand;
         private readonly Queue<byte[]> mMessage;
@@ -37,7 +37,7 @@ namespace Cosmos.VS.Windows
 
         private readonly Type[] mAllChannelWindowTypes = { typeof(ConsoleTW) };
 
-        public CosmosVSWindowsPackage()
+        public CosmosWindowsPackage()
         {
             StateStorer = new StateStorer();
 

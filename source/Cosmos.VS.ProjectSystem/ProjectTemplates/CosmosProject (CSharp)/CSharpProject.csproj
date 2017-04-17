@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
-    <Name>$KernelProjectName$</Name>
-    <AssemblyName>$KernelProjectName$</AssemblyName>
+    <AssemblyName>$safeprojectname$</AssemblyName>
+    <PackageId>$safeprojectname$</PackageId>
     <ProjectGuid>$KernelProjectGuid$</ProjectGuid>
   </PropertyGroup>
 

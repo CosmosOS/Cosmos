@@ -11,7 +11,7 @@ namespace Cosmos.VS.Windows
     {
         protected byte[] mData = new byte[0];
 
-        public CosmosVSWindowsPackage Package { get; set; }
+        public CosmosWindowsPackage Package { get; set; }
 
         public virtual void Update(string aTag, byte[] aData)
         {

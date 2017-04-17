@@ -22,7 +22,7 @@
   <UsingTask TaskName="Cosmos.Build.MSBuild.Ld" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.ReadNAsmMapToDebugInfo" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
 
-  <Target Name="CosmosCompile" AfterTargets="Build">
+  <Target Name="CoreCompile">
     <Error Text="File %(Compile.Identity) is set to compile, but .Cosmos projects don't compile any source themselves!" Condition="$(Compile) != ''"/>
     <CreateProperty Value="true" Condition="$(BinFormat) == 'elf'">
       <Output PropertyName="IsELF" TaskParameter="Value"/>

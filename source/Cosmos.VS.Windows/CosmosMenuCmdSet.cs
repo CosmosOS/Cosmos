@@ -16,9 +16,9 @@ namespace Cosmos.VS.Windows
         public const int CosmosInternalCmdID = 0x0103;
         public const int CosmosShowAllCmdID = 0x0104;
 
-        private readonly CosmosVSWindowsPackage package;
+        private readonly CosmosWindowsPackage package;
 
-        private CosmosMenuCmdSet(CosmosVSWindowsPackage package)
+        private CosmosMenuCmdSet(CosmosWindowsPackage package)
         {
             this.package = package ?? throw new ArgumentNullException(nameof(package));
 
@@ -48,7 +48,7 @@ namespace Cosmos.VS.Windows
 
         private IServiceProvider ServiceProvider => package;
 
-        public static void Initialize(CosmosVSWindowsPackage package)
+        public static void Initialize(CosmosWindowsPackage package)
         {
             Instance = new CosmosMenuCmdSet(package);
         }
