@@ -9,7 +9,6 @@ using Cosmos.Debug.Symbols;
 
 namespace Cosmos.Build.MSBuild
 {
-
     public class ReadNAsmMapToDebugInfo : BaseToolTask
     {
         [Required]

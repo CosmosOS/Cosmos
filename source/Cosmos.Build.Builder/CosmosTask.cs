@@ -41,7 +41,7 @@ namespace Cosmos.Build.Builder
     /// <returns>Name of the setup file.</returns>
     public static string GetSetupName(int releaseNumber)
     {
-      string setupName = "CosmosUserKit-" + releaseNumber;
+      string setupName = $"CosmosUserKit-{releaseNumber}-vs2017";
 
       if (App.UseVsHive)
       {

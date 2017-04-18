@@ -22,6 +22,10 @@ namespace XSharp.VS
   /// IVsPackage interface and uses the registration attributes defined in the framework to
   /// register itself and its components with the shell.
   //
+  [PackageRegistration(UseManagedResourcesOnly = true)]
+  [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+  [ProvideLanguageService(typeof(XSharpLanguageService), "X#", 0, RequestStockColors = true)]
+  [Guid(Guids.guidCosmos_VS_XSharpPkgString)]
   public sealed class Cosmos_VS_XSharpPackage : Package, IOleComponent
   {
     uint mComponentID;

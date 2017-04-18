@@ -25,7 +25,9 @@ build_script:
 
     xcopy /Y "%APPVEYOR_BUILD_FOLDER%\Build\VSIP\Cosmos.targets" "%ProgramFiles(x86)%\MSBuild\Cosmos\"
 
-    xcopy /Y "c:\Cosmos\Build\VSIP" "c:\CosmosRun\Build\IL2CPU\"
+    xcopy /Y "c:\Cosmos\Build\VSIP\IL2CPU" "c:\CosmosRun\Build\IL2CPU\"
+        
+    xcopy /Y "c:\Cosmos\Build\VSIP\XSharp" "c:\CosmosRun\Build\XSharp\"
 
     xcopy /Y "c:\Cosmos\Build\VSIP" "c:\CosmosRun\Kernel\"
 
@@ -44,7 +46,7 @@ build_script:
     xcopy /Y /S "c:\Cosmos\Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
 
 
-    reg add HKLM\SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.5\AssemblyFoldersEx\Cosmos /ve /d c:\CosmosRun\Build\VSIP\
+    #reg add HKLM\SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.5\AssemblyFoldersEx\Cosmos /ve /d c:\CosmosRun\Build\VSIP\
 
     reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d c:\CosmosRun\
 
@@ -60,7 +62,7 @@ build_script:
 #  - Cosmos.TestRunner.UnitTest.dll
 
 test_script:
-  - dotnet test Tests\Cosmos.TestRunner.UnitTest
+  - dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj
 
 notifications:
 - provider: Webhook

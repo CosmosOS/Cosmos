@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
   <PropertyGroup>
-    <DebugMode Condition="$(DebugMode) == ''">Source</DebugMode>
+    <!--<DebugMode Condition="$(DebugMode) == ''">Source</DebugMode>
     <DebugEnabled Condition="$(DebugEnabled) == ''">True</DebugEnabled>
     <StackCorruptionDetectionEnabled Condition="$(StackCorruptionDetectionEnabled) == ''">True</StackCorruptionDetectionEnabled>
     <StackCorruptionDetectionLevel Condition="$(StackCorruptionDetectionLevel) == ''">All</StackCorruptionDetectionLevel>
     <IgnoreDebugStubAttribute Condition="$(IgnoreDebugStubAttribute) == ''">False</IgnoreDebugStubAttribute>
-    <TraceAssemblies Condition="$(TraceAssemblies) == ''">All</TraceAssemblies>
+    <TraceAssemblies Condition="$(TraceAssemblies) == ''">All</TraceAssemblies>-->
     <CosmosDir Condition="$(CosmosDir) == ''">$([MSBuild]::GetRegistryValue("HKEY_LOCAL_MACHINE\Software\Cosmos", "UserKit"))</CosmosDir>
     <BuildToolsDir Condition="$(BuildToolsDir) == ''">$(CosmosDir)\Build\Tools</BuildToolsDir>
     <VSIPDir Condition="$(VSIPDir) == ''">$(CosmosDir)\Build\VSIP</VSIPDir>

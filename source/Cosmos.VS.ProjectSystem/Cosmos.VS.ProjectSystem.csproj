@@ -91,11 +91,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Content Include="Resources\CosmosTestPropertiesWindowCommand.png" />
-    <VSCTCompile Include="CosmosProject.vsct">
-      <ResourceName>Menus.ctmenu</ResourceName>
-      <SubType>Designer</SubType>
-    </VSCTCompile>
     <Content Include="ProjectTemplates\CosmosKernel %28CSharp%29\CSharpProj.vstemplate">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

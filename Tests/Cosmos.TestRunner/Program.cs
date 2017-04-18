@@ -35,10 +35,8 @@ namespace Cosmos.TestRunner.Console
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Exception: " + ex.Message);
+                    Console.WriteLine("Exception: " + ex.ToString());
                 }
-
-                Console.ReadLine();
 
                 //var xSaveDialog = new SaveFileDialog();
                 //xSaveDialog.Filter = "XML documents|*.xml";

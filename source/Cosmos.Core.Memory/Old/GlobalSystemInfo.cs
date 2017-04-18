@@ -8,8 +8,6 @@ namespace Cosmos.Core.Memory.Old
 {
     internal static unsafe class GlobalSystemInfo
     {
-        private static Debugger mDebugger = new Debugger("Core", "Memory");
-
         private static volatile GlobalInformationTable* mGlobalInformationTable;
         public static GlobalInformationTable* GlobalInformationTable
         {
@@ -31,11 +29,11 @@ namespace Cosmos.Core.Memory.Old
                 CPU.ZeroFill(xEndOfKernel, (uint)(sizeof(GlobalInformationTable) + TotalDataLookupTableSize) * 4);
                 mGlobalInformationTable = (GlobalInformationTable*)xEndOfKernel;
                 uint xFirstDataLookupLocation = (uint)(xEndOfKernel + sizeof(GlobalInformationTable));
-                mDebugger.Send("Setting FirstDataLookupTable to ");
-                mDebugger.SendNumber(xFirstDataLookupLocation);
+                Debugger.DoSend("Setting FirstDataLookupTable to ");
+                Debugger.DoSendNumber(xFirstDataLookupLocation);
                 mGlobalInformationTable->FirstDataLookupTable = (DataLookupTable*)xFirstDataLookupLocation;
-                mDebugger.Send("FirstDataLookupTable was set to ");
-                mDebugger.SendNumber((uint)mGlobalInformationTable->FirstDataLookupTable);
+                Debugger.DoSend("FirstDataLookupTable was set to ");
+                Debugger.DoSendNumber((uint)mGlobalInformationTable->FirstDataLookupTable);
             }
         }
 

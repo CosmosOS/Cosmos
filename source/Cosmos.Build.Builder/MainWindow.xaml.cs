@@ -15,8 +15,6 @@ using System.Windows.Threading;
 using Microsoft.VisualBasic;
 using TaskScheduler;
 
-using Cosmos.Build.Installer;
-
 namespace Cosmos.Build.Builder
 {
   public partial class MainWindow : Window

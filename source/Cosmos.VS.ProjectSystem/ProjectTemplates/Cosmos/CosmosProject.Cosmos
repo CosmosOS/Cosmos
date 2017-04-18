@@ -1,15 +1,11 @@
 <Project Sdk="Microsoft.Net.Sdk">
 
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <TargetFramework>net462</TargetFramework>
-    <AssemblyName>$CosmosProjectName$</AssemblyName>
-    <ProjectGuid>$CosmosProjectGuid$</ProjectGuid>
-    <Name>$CosmosProjectName$</Name>
-    <BinFormat>elf</BinFormat>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+  <PropertyGroup>
+    <BinFormat>elf</BinFormat>
     <Profile>VMware</Profile>
     <DebugEnabled>true</DebugEnabled>
     <DebugMode>Source</DebugMode>
@@ -23,14 +19,8 @@
     <Launch>VMware</Launch>
     <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include=".\$KernelProjectName$.$ProjectTypeExtension$">
-      <Name>$KernelProjectName$</Name>
-      <Project>$KernelProjectGuid$</Project>
-    </ProjectReference>
-  </ItemGroup>
 
-    <ItemGroup>
+  <ItemGroup>
     <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983"/>
     <Reference Include="Cosmos.System.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983"/>
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983"/>

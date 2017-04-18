@@ -53,7 +53,7 @@ namespace Cosmos.VS.Wizards
             }
 
             // set project extension for reference
-            string extension = project.UniqueName.Split('.')[1];
+            string extension = Path.GetExtension(project.UniqueName);
 
             xInputString = xInputString.Replace("$KernelProjectGuid$", mGuidKernel.ToString("b"));
             xInputString = xInputString.Replace("$CosmosProjectGuid$", mGuidCosmosProj.ToString("b"));

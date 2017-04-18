@@ -44,13 +44,15 @@ namespace Cosmos.Build.Builder
       DoNotLaunchVS = mArgs.ContainsKey("NOVSLAUNCH");
       UseVsHive = mArgs.ContainsKey("VSEXPHIVE");
 
-      if (!mArgs.ContainsKey("VSPATH"))
+      if (mArgs.ContainsKey("VSPATH"))
+      {
+        Paths.VSPath = mArgs["VSPATH"];
+        Paths.UpdateVSPath();
+      }
+      else if(!InstallTask)
       {
         throw new ArgumentNullException(nameof(e.Args), "Visual Studio path must be provided. (-VSPATH or /VSPATH)");
       }
-
-        Paths.VSPath = mArgs["VSPATH"];
-Paths.UpdateVSPath();
       
       base.OnStartup(e);
     }

@@ -5,7 +5,6 @@ namespace Cosmos.VS.ProjectSystem
 {
     public class CosmosConfigProvider : ConfigProvider
     {
-
         public CosmosConfigProvider(CosmosProjectNode manager) : base(manager)
         {
             Logger.TraceMethod(MethodBase.GetCurrentMethod());
