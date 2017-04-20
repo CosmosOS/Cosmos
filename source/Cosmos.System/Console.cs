@@ -63,8 +63,7 @@ namespace Cosmos.System {
             mX = 0;
             if (mY == mText.Rows) {
                 mText.ScrollUp();
-                mY = mText.Rows - 1;
-                mX = 0;
+                mY--;
             }
             UpdateCursor();
         }
