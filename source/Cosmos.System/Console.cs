@@ -92,6 +92,8 @@ namespace Cosmos.System {
                 if (aText[i] == '\n') {
                     NewLine();
                 } else if (aText[i] == '\r') {
+                    mX = 0;
+                    UpdateCursor();
                 } else if (aText[i] == '\t') {
                     //Write("    ");
                     WriteChar(' ');
