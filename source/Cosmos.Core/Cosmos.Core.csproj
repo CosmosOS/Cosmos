@@ -116,6 +116,7 @@
     <Compile Include="IOGroup\VGA.cs" />
     <Compile Include="IOPort.cs" />
     <Compile Include="MemoryBlock.cs" />
+    <Compile Include="MemoryOperations.cs" />
     <Compile Include="PIC.cs" />
     <Compile Include="ProcessorInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
