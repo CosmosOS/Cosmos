@@ -33,7 +33,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         internal AD7Process mProcess;
         // A unique identifier for the program being debugged.
         Guid mProgramID;
-        public const string ID = "FA1DA3A6-66FF-4c65-B077-E65F7164EF83";
+        public const string ID = "FA1DA3A6-66FF-4C65-B077-E65F7164EF83";
         internal AD7Module mModule;
         internal AD7Thread mThread;
         private AD7ProgramNode mProgNode;

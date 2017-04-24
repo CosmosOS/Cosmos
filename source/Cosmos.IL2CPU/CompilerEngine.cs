@@ -288,7 +288,7 @@ namespace Cosmos.IL2CPU
                 }
             }
 
-            foreach (var xRef in AdditionalReferences)
+            foreach (var xRef in References)
             {
                 var xName = AssemblyLoadContext.GetAssemblyName(xRef);
                 if (xName.Name == aName.Name)

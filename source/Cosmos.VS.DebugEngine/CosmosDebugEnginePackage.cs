@@ -15,7 +15,7 @@ namespace Cosmos.VS.DebugEngine
 {
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
-    [ProvideMenuResource("Menus.ctmenu", 1)]
+    //[ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(Guids.guidPackageString)]
     public sealed class CosmosDebugEnginePackage : Package, IOleCommandTarget
     {

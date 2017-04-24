@@ -449,8 +449,5 @@ namespace Microsoft.VisualStudio.Project
             return base.GetHashCode();
         }
         #endregion
-
-
-
     }
 }

@@ -2,7 +2,6 @@
 
   <PropertyGroup>
       <TargetFramework>netstandard1.5</TargetFramework>
-      <PackageTargetFallback>net462</PackageTargetFallback>
       <SignAssembly>True</SignAssembly>
       <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>

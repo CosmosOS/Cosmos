@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
+    <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -13,6 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="NETStandard.Library" Version="1.6.0" />
+    <PackageReference Include="System.Data.Common" Version="4.1.0.0" />
     <PackageReference Include="Microsoft.Build" Version="15.1.1012" />
     <PackageReference Include="Microsoft.Build.Framework" Version="15.1.1012" />
     <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.1.1012" />

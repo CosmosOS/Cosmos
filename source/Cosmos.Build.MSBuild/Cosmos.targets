@@ -1,12 +1,17 @@
 <?xml version="1.0"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
   <PropertyGroup>
-    <!--<DebugMode Condition="$(DebugMode) == ''">Source</DebugMode>
-    <DebugEnabled Condition="$(DebugEnabled) == ''">True</DebugEnabled>
-    <StackCorruptionDetectionEnabled Condition="$(StackCorruptionDetectionEnabled) == ''">True</StackCorruptionDetectionEnabled>
-    <StackCorruptionDetectionLevel Condition="$(StackCorruptionDetectionLevel) == ''">All</StackCorruptionDetectionLevel>
-    <IgnoreDebugStubAttribute Condition="$(IgnoreDebugStubAttribute) == ''">False</IgnoreDebugStubAttribute>
-    <TraceAssemblies Condition="$(TraceAssemblies) == ''">All</TraceAssemblies>-->
+    <_TargetFrameworkDirectories>$(MSBuildThisFileDirectory)</_TargetFrameworkDirectories>
+    <_FullFrameworkReferenceAssemblyPaths>$(MSBuildThisFileDirectory)</_FullFrameworkReferenceAssemblyPaths>
+    <CopyBuildOutputToOutputDirectory>False</CopyBuildOutputToOutputDirectory>
+    <DisableImplicitFrameworkReferences>True</DisableImplicitFrameworkReferences>
+    <ImplicitlyExpandDesignTimeFacades>False</ImplicitlyExpandDesignTimeFacades>
+    <NoStdLib>true</NoStdLib>
+  </PropertyGroup>
+  
+  <PropertyGroup>
     <CosmosDir Condition="$(CosmosDir) == ''">$([MSBuild]::GetRegistryValue("HKEY_LOCAL_MACHINE\Software\Cosmos", "UserKit"))</CosmosDir>
     <BuildToolsDir Condition="$(BuildToolsDir) == ''">$(CosmosDir)\Build\Tools</BuildToolsDir>
     <VSIPDir Condition="$(VSIPDir) == ''">$(CosmosDir)\Build\VSIP</VSIPDir>
@@ -30,7 +35,7 @@
     <CreateProperty Value="false" Condition="$(BinFormat) == 'bin'">
       <Output PropertyName="IsELF" TaskParameter="Value"/>
     </CreateProperty>
-    <Cosmos.Build.MSBuild.IL2CPU DebugMode="$(DebugMode)" DebugEnabled="$(DebugEnabled)" StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)" StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)" TraceAssemblies="$(TraceAssemblies)" IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)" DebugCom="1" UseNAsm="true" References="@(CosmosReferences)" OutputFilename="$(TargetDir)$(MSBuildProjectName).asm" EnableLogging="true" EmitDebugSymbols="$(DebugSymbols)" CosmosBuildDir="$(CosmosDir)\Build" WorkingDir="$(TargetDir)"/>
+    <Cosmos.Build.MSBuild.IL2CPU DebugMode="$(DebugMode)" DebugEnabled="$(DebugEnabled)" StackCorruptionDetectionEnabled="$(StackCorruptionDetectionEnabled)" StackCorruptionDetectionLevel="$(StackCorruptionDetectionLevel)" TraceAssemblies="$(TraceAssemblies)" IgnoreDebugStubAttribute="$(IgnoreDebugStubAttribute)" DebugCom="1" UseNAsm="true" References="@(ReferencePath)" OutputFilename="$(TargetDir)$(MSBuildProjectName).asm" EnableLogging="true" EmitDebugSymbols="$(DebugSymbols)" CosmosBuildDir="$(CosmosDir)\Build" WorkingDir="$(TargetDir)"/>
     <Cosmos.Build.MSBuild.NAsm InputFile="$(TargetDir)$(MSBuildProjectName).asm" OutputFile="$(TargetDir)$(MSBuildProjectName).obj" IsELF="$(IsELF)" ExePath="$(NasmFile)"/>
     <!-- ELF only -->
     <!-- 16 MB 0x1000000 as per hpa (syslinux) is a good spot. For now just put some dummy values. 16 and 32 MB. Later size better. -->
@@ -48,5 +53,4 @@
     <!-- <MakeISO InputFile="$(TargetDir)$(MSBuildProjectName).bin" OutputFile="$(TargetDir)$(MSBuildProjectName).iso" CosmosBuildDir="$(CosmosDir)\Build" /> -->
     <Delete Files="$(TargetDir)$(MSBuildProjectName).iso"/>
   </Target>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

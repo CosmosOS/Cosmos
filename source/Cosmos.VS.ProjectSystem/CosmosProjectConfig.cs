@@ -81,7 +81,7 @@ namespace Cosmos.VS.ProjectSystem
                     var xValues = new Dictionary<string, string>();
                     xValues.Add("ProjectFile", Path.Combine(ProjectMgr.ProjectFolder, ProjectMgr.ProjectFile));
                     xValues.Add("ISOFile", xIsoFile);
-                    xValues.Add("BinFormat", GetConfigurationProperty("BinFormat", false));
+                    //xValues.Add("BinFormat", GetConfigurationProperty("BinFormat", false));
                     foreach (var xName in BuildProperties.PropNames)
                     {
                         xValues.Add(xName, GetConfigurationProperty(xName, false));

@@ -25,9 +25,9 @@ build_script:
 
     xcopy /Y "%APPVEYOR_BUILD_FOLDER%\Build\VSIP\Cosmos.targets" "%ProgramFiles(x86)%\MSBuild\Cosmos\"
 
-    xcopy /Y "c:\Cosmos\Build\VSIP\IL2CPU" "c:\CosmosRun\Build\IL2CPU\"
+    dotnet publish source/IL2CPU -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
         
-    xcopy /Y "c:\Cosmos\Build\VSIP\XSharp" "c:\CosmosRun\Build\XSharp\"
+    dotnet publish source/XSharp.Compiler -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\XSharp\"
 
     xcopy /Y "c:\Cosmos\Build\VSIP" "c:\CosmosRun\Kernel\"
 

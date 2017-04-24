@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
-using Microsoft.Build.Framework;
 using System.IO;
+using Microsoft.Build.Framework;
 
 namespace Cosmos.Build.MSBuild {
   public class NAsm : BaseToolTask {

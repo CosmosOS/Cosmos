@@ -97,7 +97,7 @@ namespace Cosmos.VS.Windows
             ShowWindowAssembly(aCommand, e);
             ShowWindowRegisters(aCommand, e);
             ShowWindowStack(aCommand, e);
-            ShowWindowConsole(aCommand, e);
+            //ShowWindowConsole(aCommand, e);
             // Dont show Internal Window, most Cosmos users wont use it.
         }
 

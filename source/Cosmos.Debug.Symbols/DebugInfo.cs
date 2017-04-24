@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
 using Microsoft.Data.Sqlite;
 
 using Dapper;
@@ -100,6 +100,11 @@ namespace Cosmos.Debug.Symbols
                 {
                     this.CreateIndexes();
                 }
+            }
+
+            if (mConnection.State == ConnectionState.Closed)
+            {
+                mConnection.Open();
             }
         }
 

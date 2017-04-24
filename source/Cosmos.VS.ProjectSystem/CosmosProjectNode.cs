@@ -36,7 +36,7 @@ namespace Cosmos.VS.ProjectSystem
             Package = package;
             var dte = (DTE)((IServiceProvider)Package).GetService(typeof(DTE));
             mBuildEvents = dte.Events.BuildEvents;
-            mBuildEvents.OnBuildProjConfigDone += OnBuildProjConfigDone;
+            //mBuildEvents.OnBuildProjConfigDone += OnBuildProjConfigDone;
 
             mImageIndex = ImageHandler.ImageList.Images.Count;
 
@@ -116,7 +116,7 @@ namespace Cosmos.VS.ProjectSystem
             if (false == Success)
             {
                 var dte = (DTE)((IServiceProvider)Package).GetService(typeof(DTE));
-                dte.ExecuteCommand("Build.Cancel");
+                dte.DTE.ExecuteCommand("Build.Cancel");
             }
         }
 

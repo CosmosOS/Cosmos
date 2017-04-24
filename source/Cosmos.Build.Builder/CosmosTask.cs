@@ -310,6 +310,7 @@ namespace Cosmos.Build.Builder
       {
         Directory.CreateDirectory(xVSIPDir);
       }
+      DotnetPublish(Path.Combine(mCosmosDir, "source", "Cosmos.Build.MSBuild"), "net462", "win7-x86", Path.Combine(xVSIPDir, "MSBuild"));
       DotnetPublish(Path.Combine(mCosmosDir, "source", "IL2CPU"), "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "IL2CPU"));
       DotnetPublish(Path.Combine(mCosmosDir, "Tools", "NASM"), "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "NASM"));
       DotnetPublish(Path.Combine(mCosmosDir, "source", "XSharp.Compiler"), "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "XSharp"));
