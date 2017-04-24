@@ -46,8 +46,6 @@ build_script:
     xcopy /Y /S "c:\Cosmos\Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
 
 
-    #reg add HKLM\SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.5\AssemblyFoldersEx\Cosmos /ve /d c:\CosmosRun\Build\VSIP\
-
     reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d c:\CosmosRun\
 
     reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
