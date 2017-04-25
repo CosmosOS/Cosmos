@@ -438,13 +438,20 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                                 }
                                 else
                                 {
-                                    string xEntry = xData.GetAsciiString(i, 11);
-                                    xName = xEntry.Substring(0, 8).TrimEnd();
-                                    string xExt = xEntry.Substring(8, 3).TrimEnd();
-
-                                    if (xExt.Length > 0)
+                                    if (xAttrib == FatDirectoryEntryAttributeConsts.File)
                                     {
-                                        xName = xName + "." + xExt;
+                                        string xEntry = xData.GetAsciiString(i, 11);
+                                        xName = xEntry.Substring(0, 8).TrimEnd();
+                                        string xExt = xEntry.Substring(8, 3).TrimEnd();
+
+                                        if (xExt.Length > 0)
+                                        {
+                                            xName = xName + "." + xExt;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        xName = xData.GetAsciiString(i, 11).TrimEnd();
                                     }
                                 }
                             }
