@@ -406,6 +406,8 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                             // Empty slot, skip it
                             continue;
                         default:
+                            int xTest = xAttrib & (FatDirectoryEntryAttributeConsts.Directory | FatDirectoryEntryAttributeConsts.VolumeID);
+
                             if (xStatus >= 0x20)
                             {
                                 if (xLongName.Length > 0)
@@ -438,7 +440,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                                 }
                                 else
                                 {
-                                    if (xAttrib == FatDirectoryEntryAttributeConsts.File)
+                                    if (xTest == 0)
                                     {
                                         string xEntry = xData.GetAsciiString(i, 11);
                                         xName = xEntry.Substring(0, 8).TrimEnd();
@@ -455,48 +457,41 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                                     }
                                 }
                             }
+
+                            uint xFirstCluster = (uint)(xData.ToUInt16(i + 20) << 16 | xData.ToUInt16(i + 26));
+                            
+                            if (xTest == 0)
+                            {
+                                uint xSize = xData.ToUInt32(i + 28);
+
+                                if (xSize == 0 && xName.Length == 0)
+                                {
+                                    continue;
+                                }
+
+                                string xFullPath = Path.Combine(mFullPath, xName);
+                                var xEntry = new FatDirectoryEntry(((FatFileSystem)mFileSystem), xParent, xFullPath, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.File);
+                                xResult.Add(xEntry);
+                                Global.mFileSystemDebugger.SendInternal(xEntry.mName + " - " + xEntry.mSize + " bytes");
+                            }
+                            else if (xTest == FatDirectoryEntryAttributeConsts.Directory)
+                            {
+                                string xFullPath = Path.Combine(mFullPath, xName);
+                                uint xSize = xData.ToUInt32(i + 28);
+                                var xEntry = new FatDirectoryEntry(((FatFileSystem)mFileSystem), xParent, xFullPath, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.Directory);
+                                Global.mFileSystemDebugger.SendInternal(xEntry.mName + " <DIR> " + xEntry.mSize + " bytes : Attrib = " + xAttrib + ", Status = " + xStatus);
+                                xResult.Add(xEntry);
+                            }
+                            else if (xTest == FatDirectoryEntryAttributeConsts.VolumeID)
+                            {
+                                Global.mFileSystemDebugger.SendInternal("<VOLUME ID> : Attrib = " + xAttrib + ", Status = " + xStatus);
+                            }
+                            else
+                            {
+                                Global.mFileSystemDebugger.SendInternal("<INVALID ENTRY> : Attrib = " + xAttrib + ", Status = " + xStatus);
+                            }
                             break;
                     }
-                }
-
-                uint xFirstCluster = (uint)(xData.ToUInt16(i + 20) << 16 | xData.ToUInt16(i + 26));
-
-                int xTest = xAttrib & (FatDirectoryEntryAttributeConsts.Directory | FatDirectoryEntryAttributeConsts.VolumeID);
-
-                if (xAttrib == FatDirectoryEntryAttributeConsts.LongName)
-                {
-                    // skip adding, as it's a LongFileName entry, meaning the next normal entry is the item with the name.
-                    //Global.mFileSystemDebugger.SendInternal($"Entry was a Long FileName entry. Current LongName = '{xLongName}'");
-                }
-                else if (xTest == 0)
-                {
-                    uint xSize = xData.ToUInt32(i + 28);
-
-                    if (xSize == 0 && xName.Length == 0)
-                    {
-                        continue;
-                    }
-
-                    string xFullPath = Path.Combine(mFullPath, xName);
-                    var xEntry = new FatDirectoryEntry(((FatFileSystem)mFileSystem), xParent, xFullPath, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.File);
-                    xResult.Add(xEntry);
-                    Global.mFileSystemDebugger.SendInternal(xEntry.mName + " - " + xEntry.mSize + " bytes");
-                }
-                else if (xTest == FatDirectoryEntryAttributeConsts.Directory)
-                {
-                    string xFullPath = Path.Combine(mFullPath, xName);
-                    uint xSize = xData.ToUInt32(i + 28);
-                    var xEntry = new FatDirectoryEntry(((FatFileSystem)mFileSystem), xParent, xFullPath, xName, xSize, xFirstCluster, i, DirectoryEntryTypeEnum.Directory);
-                    Global.mFileSystemDebugger.SendInternal(xEntry.mName + " <DIR> " + xEntry.mSize + " bytes : Attrib = " + xAttrib + ", Status = " + xStatus);
-                    xResult.Add(xEntry);
-                }
-                else if (xTest == FatDirectoryEntryAttributeConsts.VolumeID)
-                {
-                    Global.mFileSystemDebugger.SendInternal("<VOLUME ID> : Attrib = " + xAttrib + ", Status = " + xStatus);
-                }
-                else
-                {
-                    Global.mFileSystemDebugger.SendInternal("<INVALID ENTRY> : Attrib = " + xAttrib + ", Status = " + xStatus);
                 }
             }
 
