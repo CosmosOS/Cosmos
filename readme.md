@@ -47,7 +47,7 @@ Articles and Resources
 * [Intro to Plugs](https://github.com/CosmosOS/Cosmos/wiki/Intro-to-Plugs)
 * [X86 Assembly Debugger Preview](https://github.com/CosmosOS/Cosmos/wiki/Visual-Studio-X86-Assembly-Debugger)
 * [Making a Remote PC Slave for Debugging or Fun](http://www.codeproject.com/Articles/413942/Making-a-Remote-PC-Slave-for-Debugging-or-Fun) (old article, code deprecated)
-* [Tutorials for Cosmos](https://int0x10.com/forums/forum-22.html)
+* [Tutorials for Cosmos (in french)](http://www.customprotocol.com/tags/cosmos/)
 * [Projects for Cosmos](https://github.com/CosmosOS/Cosmos/wiki/Cosmos-Projects)
 
 
