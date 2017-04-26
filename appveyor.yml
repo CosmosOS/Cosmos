@@ -70,7 +70,7 @@ build_script:
 #  - Cosmos.TestRunner.UnitTest.dll
 
 test_script:
-  - dotnet run Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj
+  - dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj
 
 notifications:
 - provider: Webhook

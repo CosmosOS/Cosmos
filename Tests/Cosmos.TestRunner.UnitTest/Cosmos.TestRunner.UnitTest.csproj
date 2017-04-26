@@ -2,18 +2,22 @@
 
     <PropertyGroup>
         <TargetFramework>netcoreapp1.0</TargetFramework>
-        <OutputType>Exe</OutputType>
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="NUnit" Version="3.7.0-dev-03852" />
-        <PackageReference Include="NUnitLite" Version="3.7.0-dev-03852" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170425-07" />
+        <PackageReference Include="NUnit" Version="3.7.0-dev-03862" />
+        <PackageReference Include="NUnit3TestAdapter" Version="4.0.0-ci-00452-pr-313" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
     </ItemGroup>
 
 </Project>

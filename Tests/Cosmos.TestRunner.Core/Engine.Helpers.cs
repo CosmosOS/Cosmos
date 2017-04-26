@@ -63,7 +63,7 @@ namespace Cosmos.TestRunner.Core
             Action<string> xErrorReceived = OutputHandler.LogError;
             Action<string> xOutputReceived = OutputHandler.LogMessage;
 
-            bool xResult;
+            bool xResult = false;
 
             var xProcessStartInfo = new ProcessStartInfo
             {
@@ -110,12 +110,15 @@ namespace Cosmos.TestRunner.Core
                 }
                 else
                 {
-                    if (xProcess.ExitCode != 0)
+                    if (xProcess.ExitCode == 0)
+                    {
+                        xResult = true;
+                    }
+                    else
                     {
                         xErrorReceived($"Error invoking '{aProcess}'.");
                     }
                 }
-                xResult = true;
             }
 
             if (!xResult)
@@ -217,8 +220,10 @@ namespace Cosmos.TestRunner.Core
                 else
                 {
                     xArgs.Insert(0, "run");
-                    xArgs.Insert(1, " -- ");
-                    RunProcess("dotnet", xIL2CPUPath, xArgs);
+                    xArgs.Insert(1, "--project");
+                    xArgs.Insert(2, Path.Combine(xIL2CPUPath, "IL2CPU.csproj"));
+                    xArgs.Insert(3, " -- ");
+                    RunProcess("dotnet", Path.GetDirectoryName(kernelFileName), xArgs);
                 }
             }
         }

@@ -4,7 +4,7 @@ using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System
 {
-    [Plug(TargetName = "System.ConsolePal, System.Console, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")]
+    [Plug(TargetName = "System.ConsolePal, System.Console")]
     public class ConsolePalImpl
     {
         // ReadKey() pure CIL

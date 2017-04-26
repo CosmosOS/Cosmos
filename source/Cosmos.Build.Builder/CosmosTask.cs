@@ -291,7 +291,7 @@ namespace Cosmos.Build.Builder
 
     private void DotnetPublish(string project, string framework, string runtime, string destDir)
     {
-      string xParams = $"publish {project} -f {framework} -r {runtime} -o {destDir}";
+      string xParams = $"publish {project} -f {framework} -r {runtime} -c Release -o {Quoted(destDir)}";
 
       if (!App.NoMSBuildClean)
       {

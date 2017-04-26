@@ -288,6 +288,13 @@ namespace Cosmos.IL2CPU
                 }
             }
 
+            // check for assembly in working directory
+            var xPathToCheck = Path.Combine(Directory.GetCurrentDirectory(), aName.Name + ".dll");
+            if (File.Exists(xPathToCheck))
+            {
+                return aContext.LoadFromAssemblyPath(xPathToCheck);
+            }
+
             foreach (var xRef in References)
             {
                 var xName = AssemblyLoadContext.GetAssemblyName(xRef);

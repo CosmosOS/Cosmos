@@ -528,7 +528,7 @@ namespace Cosmos.IL2CPU
                                 }
                                 else
                                 {
-                                    xTargetMethod = aTargetType.GetTypeInfo().GetMethods()
+                                    xTargetMethod = aTargetType.GetTypeInfo().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                                                                              .Where(method => method.Name == xSigMethod.Name
                                                                                     && method.GetParameters().Select(param => param.ParameterType)
                                                                                                              .SequenceEqual(xTypesInst))
