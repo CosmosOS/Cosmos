@@ -235,8 +235,13 @@ namespace Cosmos.System.Graphics
             if (height / 2 * 2 != height)
             {
                 DrawRectangle(pen, x_start, y_start, width, height);
+                height--;
             }
-            height--;
+            if (width / 2 * 2 != width)
+            {
+                DrawRectangle(pen, x_start, y_start, width, height);
+                width--;
+            }
             for (int i; i == height / 2; i++)
             {
                 DrawRectangle(pen, x_start, y_start, width, height);
@@ -244,6 +249,22 @@ namespace Cosmos.System.Graphics
                 height - 2;
                 x_start + 1;
                 y_start + 1;
+            }
+        }
+
+        public void DrawSquare(Pen pen, int x, int y, int sideslength)
+        {
+            DrawRectangle(pen, x, y, sideslength, sideslength);
+        }
+
+        public void DrawFilledSquare(Pen pen, int x, int y, int sideslength)
+        {
+            for (int i; i != sideslength; i++)
+            {
+                DrawSquare(pen, x, y, sideslength);
+                x++;
+                y++;
+                sideslength--;
             }
         }
 
