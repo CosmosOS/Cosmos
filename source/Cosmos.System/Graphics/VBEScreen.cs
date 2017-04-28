@@ -1,193 +1,171 @@
-﻿using Cosmos.HAL.Drivers;
+﻿//#define COSMOSDEBUG
+using Cosmos.HAL.Drivers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cosmos.System.Graphics;
 
 namespace Cosmos.System
 {
-   public class VBEScreen
+   public class VBEScreen : Canvas
     {
         /// <summary>
         /// Driver for Setting vbe modes and ploting/getting pixels
         /// </summary>
-        private VBEDriver _vbe = new VBEDriver();
+        private VBEDriver VBEDriver;
 
-        /// <summary>
-        /// The current Width of the screen in pixels
-        /// </summary>
-        public int ScreenWidth { get; set; }
-        /// <summary>
-        /// The current Height of the screen in pixels
-        /// </summary>
-        public int ScreenHeight { get; set; }
-        /// <summary>
-        /// The current Bytes per pixel
-        /// </summary>
-        public int ScreenBpp { get; set; }
-
-        #region Display
-
-        /// <summary>
-        /// All the avalible screen resolutions
-        /// </summary>
-        public enum ScreenSize
+        public VBEScreen() : base()
         {
-            Size320x200,
-            Size640x400,
-            Size640x480,
-            Size800x600,
-            Size1024x768,
-            Size1280x1024
+            Global.mDebugger.SendInternal($"Creating new VBEScreen() with default mode {defaultGraphicMode}");
 
+            // We don't need to add a Control for defaultGraphicMode we assume it to be always a valid mode
+            VBEDriver = new VBEDriver((ushort)defaultGraphicMode.Columns, (ushort)defaultGraphicMode.Rows, (ushort)defaultGraphicMode.ColorDepth);
         }
-        /// <summary>
-        /// All the suported Bytes per pixel
-        /// </summary>
-        public enum Bpp
+
+        public VBEScreen(Mode mode) : base(mode)
         {
-            Bpp15,
-            Bpp16,
-            Bpp24,
-            Bpp32
+            //Global.mDebugger.SendInternal($"Creating new VBEScreen() with mode {mode}");
+
+            ThrowIfModeIsNotValid(mode);
+
+            VBEDriver = new VBEDriver((ushort)mode.Columns, (ushort)mode.Rows, (ushort)mode.ColorDepth);
         }
+
+        public override Mode Mode
+        {
+            get
+            {
+                return mode;
+            }
+
+            set
+            {
+                mode = value;
+                SetMode(mode);
+            }
+        }
+
+#region Display
+        /// <summary>
+        /// All the aviable screen modes VBE supports, I would like to query the hardware and obtain from it the list but I have
+        /// not yet find how to do it! For now I hardcode the most used VESA modes, VBE seems to support until HDTV resolution
+        /// without problems that is well... excellent :-)
+        /// </summary>
+        public override List<Mode> getAviableModes()
+        {
+            return new List<Mode>
+                {
+                  new Mode(320, 240, ColorDepth.ColorDepth32),
+                  new Mode(640, 480, ColorDepth.ColorDepth32),
+                  new Mode(800, 600, ColorDepth.ColorDepth32),
+                  new Mode(1024, 768, ColorDepth.ColorDepth32),
+                  /* The so called HD-Ready resolution */
+                  new Mode(1280, 720, ColorDepth.ColorDepth32),
+                  new Mode(1280, 1024, ColorDepth.ColorDepth32),
+                  /* A lot of HD-Ready screen uses this instead of 1280x720 */
+                  new Mode(1366, 768, ColorDepth.ColorDepth32),
+                  new Mode(1680, 1050, ColorDepth.ColorDepth32),
+                  /* HDTV resolution */
+                  new Mode(1920, 1080, ColorDepth.ColorDepth32),
+                  /* HDTV resolution (16:10 AR) */
+                  new Mode(1920, 1200, ColorDepth.ColorDepth32),
+            };
+        }
+
+        protected override Mode getDefaultGraphicMode() => new Mode(1024, 768, ColorDepth.ColorDepth32);
 
         /// <summary>
         /// Use this to setup the screen, this will disable the console.
         /// </summary>
-        /// <param name="aSize">The dezired screen resolution</param>
-        /// <param name="aBpp">The dezired Bytes per pixel</param>
-        public void SetMode(ScreenSize aSize, Bpp aBpp)
+        /// <param name="Mode">The desired Mode resolution</param>
+        private void SetMode(Mode mode)
         {
-            //Get screen size
-            switch (aSize)
-            {
-                case ScreenSize.Size320x200:
-                    ScreenWidth = 320;
-                    ScreenHeight = 200;
-                    break;
-                case ScreenSize.Size640x400:
-                    ScreenWidth = 640;
-                    ScreenHeight = 400;
-                    break;
-                case ScreenSize.Size640x480:
-                    ScreenWidth = 640;
-                    ScreenHeight = 480;
-                    break;
-                case ScreenSize.Size800x600:
-                    ScreenWidth = 800;
-                    ScreenHeight = 600;
-                    break;
-                case ScreenSize.Size1024x768:
-                    ScreenWidth = 1024;
-                    ScreenHeight = 768;
-                    break;
-                case ScreenSize.Size1280x1024:
-                    ScreenWidth = 1280;
-                    ScreenHeight = 1024;
-                    break;
-            }
-            //Get bpp
-            switch (aBpp)
-            {
-                case Bpp.Bpp15:
-                    ScreenBpp = 15;
-                    break;
-                case Bpp.Bpp16:
-                    ScreenBpp = 16;
-                    break;
-                case Bpp.Bpp24:
-                    ScreenBpp = 24;
-                    break;
-                case Bpp.Bpp32:
-                    ScreenBpp = 32;
-                    break;
-            }
+            ThrowIfModeIsNotValid(mode);
+
+
+            ushort xres = (ushort)Mode.Columns;
+            ushort yres = (ushort)Mode.Rows;
+            ushort bpp = (ushort)Mode.ColorDepth;
+
             //set the screen
-           _vbe.vbe_set((ushort)ScreenWidth, (ushort)ScreenHeight, (ushort)ScreenBpp);
+           VBEDriver.VBESet(xres, yres, bpp);
+        }
+#endregion
+
+#region Drawing
+
+        public override void Clear(Color color)
+        {
+            Global.mDebugger.SendInternal($"Clearing the Screen with Color {color}");
+            //if (color == null)
+            //   throw new ArgumentNullException(nameof(color));
+
+            /*
+             * TODO this version of Clear() works only when mode.ColorDepth == ColorDepth.ColorDepth32
+             * in the other cases you should before convert color and then call the opportune ClearVRAM() overload
+             * (the one that takes ushort for ColorDepth.ColorDepth16 and the one that takes byte for ColorDepth.ColorDepth8)
+             * For ColorDepth.ColorDepth24 you should mask the Alpha byte.
+             */
+            VBEDriver.ClearVRAM((uint)color.ToArgb());
         }
 
-        #endregion
-
-        #region Drawing
-        //used to convert from rgb to hex color
-        private uint GetIntFromRBG(byte red, byte green, byte blue)
+        /*
+         * As DrawPoint() is the basic block of DrawLine() and DrawRect() and in theory of all the future other methods that will
+         * be implemented is better to not check the validity of the arguments here or it will repeat the check for any point
+         * to be drawn slowing down all.
+         */ 
+        public override void DrawPoint(Pen pen, int x, int y)
         {
-            uint x;
-            x = (blue);
-            x += (uint)(green << 8);
-            x += (uint)(red << 16);
-            return x;
-        }
+            Color color = pen.Color;
+            uint pitch;
+            uint stride;
+            uint offset;
+            uint ColorDepthInBytes = (uint)mode.ColorDepth / 8;
 
-        /// <summary>
-        /// Clear the screen with a given color
-        /// </summary>
-        /// <param name="color">The color in hex</param>
-        public void Clear(uint color)
-        {
-            for (uint x = 0; x < ScreenWidth; x++)
+            /*
+             * For now we can Draw only if the ColorDepth is 32 bit, we will throw otherwise.
+             *
+             * How to support other ColorDepth? The offset calculation should be the same (and so could be done out of the switch)
+             * adding support ColorDepth.ColorDepth24 is easier as you need can use the version of SetVRAM() that take a byte
+             * and call it 3 time for the B, G and R component (the Color class has properties to do this!), the problem is
+             * for ColorDepth.ColorDepth16 and ColorDepth.ColorDepth8 than need a conversion from color (an ARGB32 color) to the RGB16 and RGB8
+             * how to do this conversion faster maybe using pre-computed tables? What happens if the color cannot be converted? We will throw?
+             */
+            switch (mode.ColorDepth)
             {
-                for (uint y = 0; y < ScreenHeight; y++)
-                {
-                    SetPixel(x, y, color);
-                }
+                case ColorDepth.ColorDepth32:
+                    Global.mDebugger.SendInternal("Computing offset...");
+                    pitch = (uint)mode.Columns * ColorDepthInBytes;
+                    stride = ColorDepthInBytes;
+                    //offset = ((uint)x * pitch) + ((uint)y * stride);
+                    offset = ((uint)x * stride) + ((uint)y * pitch);
+
+                    Global.mDebugger.SendInternal($"Drawing Point of color {color} at offset {offset}");
+
+                    VBEDriver.SetVRAM(offset, (uint)color.ToArgb());
+
+                    Global.mDebugger.SendInternal("Point drawn");
+                    break;
+
+                default:
+                    String errorMsg = "DrawPoint() with ColorDepth " + (int)Mode.ColorDepth + " not yet supported";
+                    throw new NotImplementedException(errorMsg);
+
             }
         }
-        /// <summary>
-        /// Clear the screen with a given color
-        /// </summary>
-        /// <param name="red">Red value max is 255</param>
-        /// <param name="green">Green value max is 255</param>
-        /// <param name="blue">Blue value max is 255</param>
-        public void Clear(byte red, byte green, byte blue)
-        {
-            Clear(GetIntFromRBG(red, green, blue));
-        }
 
-        /// <summary>
-        /// Set a pixel at a given point to the give color
-        /// </summary>
-        /// <param name="x">X coordinate</param>
-        /// <param name="y">Y coordinate</param>
-        /// <param name="color">Color in hex</param>
-        public void SetPixel(uint x, uint y, uint color)
+        public override void DrawPoint(Pen pen, float x, float y)
         {
-            uint where = x * ((uint)ScreenBpp  / 8) + y * (uint)(ScreenWidth * ((uint)ScreenBpp / 8));
-            _vbe.set_vram(where, (byte)(color & 255));              // BLUE
-            _vbe.set_vram(where + 1, (byte)((color >> 8) & 255));   // GREEN
-            _vbe.set_vram(where + 2, (byte)((color >> 16) & 255));  // RED
+            throw new NotImplementedException();
         }
+#endregion
 
-        /// <summary>
-        /// Set a pixel at a given point to the give color
-        /// </summary>
-        /// <param name="x">X coordinate</param>
-        /// <param name="y">Y coordinate</param>
-        /// <param name="red">Red value max is 255</param>
-        /// <param name="green">Green value max is 255</param>
-        /// <param name="blue">Blue value max is 255</param>
-        public void SetPixel(uint x, uint y, byte red, byte green, byte blue)
-        {
-            SetPixel(x, y, GetIntFromRBG(red, green, blue));
-        }
-        #endregion
+#region Reading
+        // TODO add to Canvas GetPointColor()
 
-        #region Reading
-
-        /// <summary>
-        /// Get a pixel's color at the given point
-        /// </summary>
-        /// <param name="x">X coordinate</param>
-        /// <param name="y"></param>
-        /// <returns>Returns the color in hex</returns>
-        public uint GetPixel(uint x, uint y)
-        {
-            uint where = x * ((uint)ScreenBpp / 8) + y * (uint)(ScreenWidth * ((uint)ScreenBpp / 8));
-            return GetIntFromRBG(_vbe.get_vram(where + 2), _vbe.get_vram(where + 1), _vbe.get_vram(where));
-        }
-        #endregion
+#endregion
 
     }
 }
