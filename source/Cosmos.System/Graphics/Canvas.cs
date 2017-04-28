@@ -230,6 +230,23 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, xc, yc, xd, yd);
         }
 
+        public void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
+        {
+            if (height / 2 * 2 != height)
+            {
+                DrawRectangle(pen, x_start, y_start, width, height);
+            }
+            height--;
+            for (int i; i == height / 2; i++)
+            {
+                DrawRectangle(pen, x_start, y_start, width, height);
+                width - 2;
+                height - 2;
+                x_start + 1;
+                y_start + 1;
+            }
+        }
+
         public void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
         {
             throw new NotImplementedException();
