@@ -1,11 +1,21 @@
-﻿using System.Collections.Generic;
-using Cosmos.System.FileSystem.Listing;
+﻿using Cosmos.System.FileSystem.Listing;
+using System;
+using System.Collections.Generic;
 
 namespace Cosmos.System.FileSystem.VFS
 {
-    public abstract class VFSBase
+	public abstract class VFSBase
     {
-        public abstract void Initialize();
+		[Obsolete("Use instance method GetDirectorySeparatorChar")]
+		public static char DirectorySeparatorChar { get { return '\\'; } }
+
+		[Obsolete("Use instance method GetAltDirectorySeparatorChar")]
+		public static char AltDirectorySeparatorChar { get { return '/'; } }
+
+		[Obsolete("Use instance method GetVolumeSeparatorChar")]
+		public static char VolumeSeparatorChar { get { return ':'; } }
+
+		public abstract void Initialize();
 
         public abstract DirectoryEntry CreateFile(string aPath);
 
@@ -27,10 +37,32 @@ namespace Cosmos.System.FileSystem.VFS
 
         public abstract List<DirectoryEntry> GetVolumes();
 
-        public static char DirectorySeparatorChar { get { return '\\'; } }
+		public abstract string GetFullPath(DirectoryEntry aEntry);
 
-        public static char AltDirectorySeparatorChar { get { return '/'; } }
+		public abstract List<string> GetLogicalDrives();
 
-        public static char VolumeSeparatorChar { get { return ':'; } }
-    }
+		public abstract char GetAltDirectorySeparatorChar();
+
+		public abstract char GetDirectorySeparatorChar();
+
+		public abstract DirectoryEntry GetParent(string aPath);
+
+		public abstract char[] GetDirectorySeparators();
+
+		public abstract string[] SplitPath(string aPath);
+
+		public abstract char[] GetInvalidFileNameChars();
+
+		public abstract char[] GetInvalidPathCharsWithAdditionalChecks();
+
+		public abstract char GetPathSeparator();
+
+		public abstract int GetMaxPath();
+
+		public abstract char[] GetRealInvalidPathChars();
+
+		public abstract char[] GetTrimEndChars();
+
+		public abstract char GetVolumeSeparatorChar();
+	}
 }

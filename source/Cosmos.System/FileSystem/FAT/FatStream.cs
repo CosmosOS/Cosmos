@@ -78,7 +78,7 @@ namespace Cosmos.System.FileSystem.FAT
                 Global.mFileSystemDebugger.SendInternal("-- FatStream.get_Length --");
                 Global.mFileSystemDebugger.SendInternal("Length =");
                 Global.mFileSystemDebugger.SendInternal(mSize);
-                return (long)mSize;
+                return mSize;
             }
         }
 
@@ -89,7 +89,7 @@ namespace Cosmos.System.FileSystem.FAT
                 Global.mFileSystemDebugger.SendInternal("-- FatStream.get_Position --");
                 Global.mFileSystemDebugger.SendInternal("Position =");
                 Global.mFileSystemDebugger.SendInternal(mPosition);
-                return (long)mPosition;
+                return mPosition;
             }
             set
             {

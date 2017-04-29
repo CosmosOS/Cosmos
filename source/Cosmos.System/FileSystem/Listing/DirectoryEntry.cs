@@ -30,29 +30,77 @@ namespace Cosmos.System.FileSystem.Listing
     /// </summary>
     public abstract class DirectoryEntry
     {
-        public long mSize;
-        public string mFullPath;
-        public string mName;
-        protected readonly FileSystem mFileSystem;
-        public readonly DirectoryEntry mParent;
-        public readonly DirectoryEntryTypeEnum mEntryType;
+		public long mSize;
+		public string mFullPath;
+		public string mName;
+		public readonly FileSystem mFileSystem;
+		public readonly DirectoryEntry mParent;
+		public readonly DirectoryEntryTypeEnum mEntryType;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DirectoryEntry"/> class.
-        /// </summary>
-        /// <param name="aFileSystem">The file system that contains the directory entry.</param>
-        /// <param name="aParent">The parent directory entry or null if the current entry is the root.</param>
-        /// <param name="aFullPath">The full path to the entry.</param>
-        /// <param name="aName">The entry name.</param>
-        /// <param name="aSize">The size of the entry.</param>
-        /// <param name="aEntryType">The ype of the entry.</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="ArgumentException">
-        /// Argument is null or empty
-        /// </exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// </exception>
-        protected DirectoryEntry(FileSystem aFileSystem, DirectoryEntry aParent, string aFullPath, string aName, long aSize, DirectoryEntryTypeEnum aEntryType)
+		public long Size
+		{
+			get
+			{
+				return mSize;
+			}
+		}
+
+		public string FullPath
+		{
+			get
+			{
+				return mFullPath;
+			}
+		}
+
+		public string Name
+		{
+			get
+			{
+				return mName;
+			}
+		}
+
+		public FileSystem FileSystem
+		{
+			get
+			{
+				return mFileSystem;
+			}
+		}
+
+		public DirectoryEntry Parent
+		{
+			get
+			{
+				return mParent;
+			}
+		}
+
+		public DirectoryEntryTypeEnum EntryType
+		{
+			get
+			{
+				return mEntryType;
+			}
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DirectoryEntry"/> class.
+		/// </summary>
+		/// <param name="aFileSystem">The file system that contains the directory entry.</param>
+		/// <param name="aParent">The parent directory entry or null if the current entry is the root.</param>
+		/// <param name="aFullPath">The full path to the entry.</param>
+		/// <param name="aName">The entry name.</param>
+		/// <param name="aSize">The size of the entry.</param>
+		/// <param name="aEntryType">The ype of the entry.</param>
+		/// <exception cref="ArgumentNullException"></exception>
+		/// <exception cref="ArgumentException">
+		/// Argument is null or empty
+		/// </exception>
+		/// <exception cref="ArgumentOutOfRangeException">
+		/// </exception>
+		protected DirectoryEntry(FileSystem aFileSystem, DirectoryEntry aParent, string aFullPath, string aName, long aSize, DirectoryEntryTypeEnum aEntryType)
         {
             if (aFileSystem == null)
             {

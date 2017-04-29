@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.Listing;
@@ -9,6 +8,11 @@ namespace Cosmos.System.FileSystem
 {
     public abstract class FileSystem
     {
+		public static Dictionary<FileSystemType, Func<Partition, bool>> FileSystems = new Dictionary<FileSystemType, Func<Partition, bool>>()
+		{
+			[FileSystemType.FAT] = FatFileSystem.IsDeviceFat
+		};
+
         protected FileSystem(Partition aDevice, string aRootPath)
         {
             mDevice = aDevice;
@@ -17,10 +21,10 @@ namespace Cosmos.System.FileSystem
 
         public static FileSystemType GetFileSystemType(Partition aDevice)
         {
-            if (FatFileSystem.IsDeviceFat(aDevice))
-            {
-                return FileSystemType.FAT;
-            }
+			foreach (var item in FileSystems)
+			{
+				if (item.Value(aDevice)) return item.Key;
+			}
 
             return FileSystemType.Unknown;
         }
@@ -42,5 +46,5 @@ namespace Cosmos.System.FileSystem
         protected Partition mDevice { get; }
 
         public string mRootPath { get; }
-    }
+	}
 }
