@@ -96,7 +96,7 @@ namespace Cosmos.System.Graphics
                 DrawPoint(pen, x1 + i, y1);
         }
 
-        private void DrawVerthicalLine(Pen pen, int dy, int x1, int y1)
+        private void DrawVerticalLine(Pen pen, int dy, int x1, int y1)
         {
             int i;
 
@@ -177,7 +177,7 @@ namespace Cosmos.System.Graphics
 
             if (dx == 0) /* the line is vertical */
             {
-                DrawVerthicalLine(pen, dy, x1, y1);
+                DrawVerticalLine(pen, dy, x1, y1);
                 return;
             }
 
@@ -232,23 +232,10 @@ namespace Cosmos.System.Graphics
 
         public void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
         {
-            if (height / 2 * 2 != height)
+            for (int i; i != width; i++)
             {
-                DrawRectangle(pen, x_start, y_start, width, height);
-                height--;
-            }
-            if (width / 2 * 2 != width)
-            {
-                DrawRectangle(pen, x_start, y_start, width, height);
-                width--;
-            }
-            for (int i; i == height / 2; i++)
-            {
-                DrawRectangle(pen, x_start, y_start, width, height);
-                width - 2;
-                height - 2;
-                x_start + 1;
-                y_start + 1;
+                DrawLine(pen, x_start, y_start, x_start + height, y_start);
+                y_start++;
             }
         }
 
@@ -261,10 +248,8 @@ namespace Cosmos.System.Graphics
         {
             for (int i; i != sideslength; i++)
             {
-                DrawSquare(pen, x, y, sideslength);
-                x++;
+                DrawLine(pen, x, y, x + sideslength, y);
                 y++;
-                sideslength--;
             }
         }
 
