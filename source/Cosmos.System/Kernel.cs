@@ -15,12 +15,12 @@ namespace Cosmos.System
 
         public bool ClearScreen = true;
 
-        // Set after initial start. Can be started and stopped at same time
-        protected bool mStarted = false;
-        // Set to signal stopped
-        protected bool mStopped = false;
+		// Set after initial start. Can be started and stopped at same time
+		private bool mStarted = false;
+		// protected to signal stopped
+		protected bool mStopped = false;
 
-        protected virtual TextScreenBase GetTextScreen()
+		protected virtual TextScreenBase GetTextScreen()
         {
             // null means use default
             return null;
@@ -57,7 +57,7 @@ namespace Cosmos.System
                 }
 
                 Global.mDebugger.Send("HW Bootstrap Init");
-                HAL.Bootstrap.Init();
+				Bootstrap.Init();
 
                 Global.mDebugger.Send("Global Init");
                 Global.Init(GetTextScreen());
@@ -153,5 +153,31 @@ namespace Cosmos.System
                 return HAL.Global.InterruptsEnabled;
             }
         }
-    }
+
+		public bool Started
+		{
+			get
+			{
+				return mStarted;
+			}
+
+			protected set
+			{
+				mStarted = value;
+			}
+		}
+
+		public bool Stopped
+		{
+			get
+			{
+				return mStopped;
+			}
+
+			protected set
+			{
+				mStopped = value;
+			}
+		}
+	}
 }

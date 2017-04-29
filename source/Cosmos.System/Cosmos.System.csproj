@@ -92,9 +92,9 @@
     <Compile Include="FileSystem\CosmosVFS.cs" />
     <Compile Include="FileSystem\FAT\FatFileSystem.cs" />
     <Compile Include="FileSystem\FAT\FatStream.cs" />
+    <Compile Include="FileSystem\FAT\Listing\FatDirectoryEntry.cs" />
     <Compile Include="FileSystem\FAT\Listing\FatDirectoryEntryAttributeConsts.cs" />
     <Compile Include="FileSystem\FAT\Listing\FatDirectoryEntryMetadata.cs" />
-    <Compile Include="FileSystem\FAT\Listing\FatDiretoryEntry.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
     <Compile Include="FileSystem\FileSystemType.cs" />
     <Compile Include="FileSystem\Listing\DirectoryEntry.cs" />
