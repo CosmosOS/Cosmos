@@ -232,24 +232,10 @@ namespace Cosmos.System.Graphics
 
         public void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
         {
-            for (int i; i != width; i++)
+            for (int i = 0; i != width; i++)
             {
                 DrawLine(pen, x_start, y_start, x_start + height, y_start);
                 y_start++;
-            }
-        }
-
-        public void DrawSquare(Pen pen, int x, int y, int sideslength)
-        {
-            DrawRectangle(pen, x, y, sideslength, sideslength);
-        }
-
-        public void DrawFilledSquare(Pen pen, int x, int y, int sideslength)
-        {
-            for (int i; i != sideslength; i++)
-            {
-                DrawLine(pen, x, y, x + sideslength, y);
-                y++;
             }
         }
 
