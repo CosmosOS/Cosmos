@@ -239,6 +239,13 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        public void DrawTriangle(Pen pen, int v1x, int v1y, int v2x, int v2y, int v3x, int v3y)
+        {
+            DrawLine(pen, v1x, v1y, v2x, v2y);
+            DrawLine(pen, v1x, v1y, v3x, v3y);
+            DrawLine(pen, v2x, v2y, v3x, v3y);
+        }
+
         public void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
         {
             throw new NotImplementedException();
