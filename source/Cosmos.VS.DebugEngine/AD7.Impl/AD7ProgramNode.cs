@@ -23,7 +23,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         int IDebugProgramNode2.GetEngineInfo(out string oEngineName, out Guid oEngineGuid)
         {
             oEngineName = Resources.EngineName;
-            oEngineGuid = new Guid(AD7Engine.ID);
+            oEngineGuid = AD7Engine.EngineID;
 
             return VSConstants.S_OK;
         }

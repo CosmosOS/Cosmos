@@ -2,8 +2,9 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
     <Identity Id="Cosmos.VS.DebugEngine" Version="1.0" Language="en-US" Publisher="Cosmos" />
-    <DisplayName>Cosmos.VS.DebugEngine</DisplayName>
+    <DisplayName>Cosmos Visual Studio Debug Engine</DisplayName>
     <Description xml:space="preserve">Visual Studio Debug Engine for Cosmos</Description>
+    <Icon>Resources\Cosmos.ico</Icon>
   </Metadata>
   <Installation>
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0]" />

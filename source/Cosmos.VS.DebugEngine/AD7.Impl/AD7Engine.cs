@@ -25,7 +25,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
     // IDebugEngineProgram2: This interface provides simultanious debugging of multiple threads in a debuggee.
 
     [ComVisible(true)]
-    [Guid("DC8503AB-7EE6-456C-A209-66C690D9F6F4")]
+    [Guid(Guids.guidDebugEngineString)]
     public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2
     {
         internal IDebugProgram2 mProgram;
@@ -33,7 +33,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         internal AD7Process mProcess;
         // A unique identifier for the program being debugged.
         Guid mProgramID;
-        public const string ID = "FA1DA3A6-66FF-4C65-B077-E65F7164EF83";
+        public static readonly Guid EngineID = new Guid("{fa1da3a6-66ff-4c65-b077-e65f7164ef83}");
         internal AD7Module mModule;
         internal AD7Thread mThread;
         private AD7ProgramNode mProgNode;
@@ -256,7 +256,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         int IDebugEngine2.GetEngineId(out Guid oGuidEngine)
         {
             // Gets the GUID of the DebugEngine.
-            oGuidEngine = new Guid(ID);
+            oGuidEngine = EngineID;
             return VSConstants.S_OK;
         }
 
@@ -332,7 +332,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             // Gets the name and identifier of the debug engine (DE) running this program.
 
             engineName = Resources.EngineName;
-            engineGuid = new Guid(AD7Engine.ID);
+            engineGuid = EngineID;
 
             return VSConstants.S_OK;
         }

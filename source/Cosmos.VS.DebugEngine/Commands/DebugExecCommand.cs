@@ -29,7 +29,7 @@ namespace Cosmos.VS.DebugEngine.Commands
                 return hr;
 
             if (string.IsNullOrWhiteSpace(arguments))
-                throw new ArgumentException("Expected an MI command to execute (ex: Debug.MIDebugExec info sharedlibrary)");
+                throw new ArgumentException("Expected a Cosmos command to execute (ex: Debug.CosmosDebugExec info sharedlibrary)");
 
             DebugExec(arguments);
 

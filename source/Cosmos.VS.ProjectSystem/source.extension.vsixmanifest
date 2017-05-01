@@ -2,7 +2,7 @@
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
     <Identity Id="Cosmos.VS.ProjectSystem" Version="1.0" Language="en-US" Publisher="Cosmos" />
-    <DisplayName> Cosmos Visual Studio Project System</DisplayName>
+    <DisplayName>Cosmos Visual Studio Project System</DisplayName>
     <Description xml:space="preserve">The Visual Studio project system for the Cosmos Operating System.</Description>
     <Icon>Resources\Cosmos.ico</Icon>
   </Metadata>

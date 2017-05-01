@@ -1,21 +1,15 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.InteropServices;
-using System.ComponentModel.Design;
-using System.IO;
-using Cosmos.VS.DebugEngine.Commands;
-using Microsoft.Win32;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
+
+using Cosmos.VS.DebugEngine.Commands;
 
 namespace Cosmos.VS.DebugEngine
 {
     [PackageRegistration(UseManagedResourcesOnly = true)]
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
-    //[ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(Guids.guidPackageString)]
     public sealed class CosmosDebugEnginePackage : Package, IOleCommandTarget
     {

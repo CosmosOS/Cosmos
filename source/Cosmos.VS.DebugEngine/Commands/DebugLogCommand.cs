@@ -47,8 +47,8 @@ namespace Cosmos.VS.DebugEngine.Commands
                 return hr;
             if (hr == VSConstants.S_OK || parseCommandLine.HasSwitches() != VSConstants.S_OK)
             {
-                string message = string.Concat("Unexpected syntax for MIDebugLaunch command. Expected:\n",
-                    "Debug.MIDebugLog [/On:<optional_path> [/OutputWindow] | /Off]");
+                string message = string.Concat("Unexpected syntax for CosmosDebugLaunch command. Expected:\n",
+                    "Debug.CosmosDebugLog [/On:<optional_path> [/OutputWindow] | /Off]");
                 throw new ApplicationException(message);
             }
 

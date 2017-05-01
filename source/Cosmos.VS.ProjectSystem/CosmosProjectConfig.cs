@@ -4,12 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Cosmos.Build.Common;
-using Cosmos.Debug.Common;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+
+using Cosmos.Build.Common;
+using Cosmos.Debug.Common;
 
 namespace Cosmos.VS.ProjectSystem
 {
@@ -90,9 +91,9 @@ namespace Cosmos.VS.ProjectSystem
                     xInfo.bstrExe = DictionaryHelper.DumpToString(xValues);
 
                     // Select the debugger
-                    xInfo.clsidCustom = new Guid("{FA1DA3A6-66FF-4c65-B077-E65F7164EF83}"); // Debug engine identifier.
+                    xInfo.clsidCustom = Cosmos.VS.DebugEngine.AD7.Impl.AD7Engine.EngineID; // Debug engine identifier.
                     // ??? This identifier doesn't seems to appear anywhere else in souce code.
-                    xInfo.clsidPortSupplier = new Guid("{708C1ECA-FF48-11D2-904F-00C04FA302A1}");
+                    //xInfo.clsidPortSupplier = new Guid("{708C1ECA-FF48-11D2-904F-00C04FA302A1}");
 
                     VsShellUtilities.LaunchDebugger(ProjectMgr.Site, xInfo);
                 }

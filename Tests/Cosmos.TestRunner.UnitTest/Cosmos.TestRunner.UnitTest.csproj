@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp1.0</TargetFramework>
+        <TargetFramework>netcoreapp1.1</TargetFramework>
         <SignAssembly>True</SignAssembly>
         <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170425-07" />
-        <PackageReference Include="NUnit" Version="3.7.0-dev-03862" />
-        <PackageReference Include="NUnit3TestAdapter" Version="4.0.0-ci-00452-pr-313" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170427-09" />
+        <PackageReference Include="NUnit" Version="3.7.0-dev-03886" />
+        <PackageReference Include="NUnit3TestAdapter" Version="4.0.0-ci-00457-pr-313" />
     </ItemGroup>
 
     <ItemGroup>
