@@ -200,6 +200,10 @@ namespace Cosmos.System
                     return ConsoleKey.Oem1;
                 case ConsoleKeyEx.OEM102:
                     return ConsoleKey.Oem102;
+				case ConsoleKeyEx.LWin:
+                    return ConsoleKey.LeftWindows;
+				case ConsoleKeyEx.RWin:
+                    return ConsoleKey.RightWindows;
                 default:
                     throw new Exception("KeyEx not implemented!");
             }
