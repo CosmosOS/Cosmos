@@ -8,10 +8,7 @@ namespace Cosmos.System.FileSystem
 {
     public abstract class FileSystem
     {
-		public static Dictionary<FileSystemType, Func<Partition, bool>> FileSystems = new Dictionary<FileSystemType, Func<Partition, bool>>()
-		{
-			[FileSystemType.FAT] = FatFileSystem.IsDeviceFat
-		};
+		public static FileSystemResolver Resolver { get; } = new FileSystemResolver();
 
         protected FileSystem(Partition aDevice, string aRootPath)
         {
@@ -21,12 +18,7 @@ namespace Cosmos.System.FileSystem
 
         public static FileSystemType GetFileSystemType(Partition aDevice)
         {
-			foreach (var item in FileSystems)
-			{
-				if (item.Value(aDevice)) return item.Key;
-			}
-
-            return FileSystemType.Unknown;
+			return Resolver.Resolve(aDevice);
         }
 
         public abstract void DisplayFileSystemInfo();

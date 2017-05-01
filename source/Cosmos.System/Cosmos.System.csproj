@@ -96,6 +96,7 @@
     <Compile Include="FileSystem\FAT\Listing\FatDirectoryEntryAttributeConsts.cs" />
     <Compile Include="FileSystem\FAT\Listing\FatDirectoryEntryMetadata.cs" />
     <Compile Include="FileSystem\FileSystem.cs" />
+    <Compile Include="FileSystem\FileSystemResolver.cs" />
     <Compile Include="FileSystem\FileSystemType.cs" />
     <Compile Include="FileSystem\Listing\DirectoryEntry.cs" />
     <Compile Include="FileSystem\VFS\VFSBase.cs" />
