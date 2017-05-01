@@ -1,4 +1,4 @@
-﻿using System;
+set﻿using System;
 using System.Collections.Generic;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
@@ -8,7 +8,7 @@ namespace Cosmos.System.FileSystem
 {
     public abstract class FileSystem
     {
-		public static FileSystemResolver Resolver { get; } = new FileSystemResolver();
+		public static FileSystemResolver Resolver { get; set; } = new FileSystemResolver();
 
         protected FileSystem(Partition aDevice, string aRootPath)
         {
