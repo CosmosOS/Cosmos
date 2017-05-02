@@ -70,7 +70,7 @@ build_script:
 #  - Cosmos.TestRunner.UnitTest.dll
 
 test_script:
-- ps1 >-
+- ps >-
     dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=.\TestResult.xml"
     
     $wc = New-Object 'System.Net.WebClient'
