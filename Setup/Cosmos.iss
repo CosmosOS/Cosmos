@@ -109,8 +109,9 @@ Source: ".\Build\PXE\*"; DestDir: "{app}\Build\PXE"
 Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
 ; VSIP
+Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly;
+Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Windows.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\XSharp.VS.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
@@ -127,15 +128,11 @@ Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags
 UseRelativePaths=True
 
 [Run]
-Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixInstallParams|Cosmos.VS.ProjectSystem.vsix}"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
-Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixInstallParams|Cosmos.VS.DebugEngine.vsix}"; Description: "Install Cosmos Debug Engine"; StatusMsg: "Installing Visual Studio Extension: Cosmos Debug Engine"
-Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixInstallParams|Cosmos.VS.Windows.vsix}"; Description: "Install Cosmos Debug Engine Windows"; StatusMsg: "Installing Visual Studio Extension: Cosmos Debug Engine Windows"
-Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixInstallParams|XSharp.VS.vsix}"; Description: "Install Cosmos X# Language Service"; StatusMsg: "Installing Visual Studio Extension: Cosmos X# Language Service"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/a /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/a Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
 
 [UninstallRun]
 Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|Cosmos.VS.ProjectSystem}"
-Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|Cosmos.VS.DebugEngine}"
-Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|Cosmos.VS.Windows}"
 Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|XSharp.VS}"
 
 [Code]
@@ -147,9 +144,9 @@ var
 begin
   TempFilename :=
     ExpandConstant('{tmp}\~execwithresult.txt');
-  Command := 
+  Command :=
     Format('"%s" /S /C ""%s" %s > "%s""', [ExpandConstant('{cmd}'), Filename, Params, TempFilename]);
-  Result := 
+  Result :=
     Exec(ExpandConstant('{cmd}'), Command, WorkingDir, ShowCmd, Wait, ResultCode);
   if not Result then
     Exit;
@@ -164,9 +161,9 @@ function ExecWithoutResult(const Filename, Params, WorkingDir: String; const Sho
 var
   Command: String;
 begin
-  Command := 
+  Command :=
     Format('"%s" /S /C ""%s" %s"', [ExpandConstant('{cmd}'), Filename, Params]);
-  Result := 
+  Result :=
     Exec(ExpandConstant('{cmd}'), Command, WorkingDir, ShowCmd, Wait, ResultCode);
   if not Result then
     Exit;
@@ -209,7 +206,7 @@ function GetVsixInstallParams(const Filename: String): String;
 var
   Params: String;
 begin
-  Params := '/quiet "' + ExpandConstant('{app}\') + Filename + '"';
+  Params := ' "' + ExpandConstant('{app}\') + Filename + '"';
   Result := Params;
 end;
 
@@ -217,7 +214,7 @@ function GetVsixUninstallParams(const Filename: String): String;
 var
   Params: String;
 begin
-  Params := '/quiet /uninstall:"' + Filename + '"';
+  Params := ' /uninstall:"' + Filename + '"';
   Result := Params;
 end;
 
