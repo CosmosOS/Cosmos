@@ -289,9 +289,21 @@ namespace Cosmos.Build.Builder
       }
     }
 
+    private void DotnetPack(string project, string destDir, string versionSuffix)
+    {
+      string xParams = $"pack {project} --version-suffix {Quoted(versionSuffix)} -o {Quoted(destDir)}";
+
+      if (!App.NoMSBuildClean)
+      {
+        StartConsole("dotnet", $"clean {project}");
+      }
+
+      StartConsole("dotnet", xParams);
+    }
+    
     private void DotnetPublish(string project, string framework, string runtime, string destDir)
     {
-      string xParams = $"publish {project} -f {framework} -r {runtime} -c Release -o {Quoted(destDir)}";
+      string xParams = $"publish {project} -f {framework} -r {runtime} -o {Quoted(destDir)}";
 
       if (!App.NoMSBuildClean)
       {
@@ -306,14 +318,31 @@ namespace Cosmos.Build.Builder
       Section("Compiling Cosmos");
 
       string xVSIPDir = Path.Combine(mCosmosDir, "Build", "VSIP");
+      
       if (!Directory.Exists(xVSIPDir))
       {
         Directory.CreateDirectory(xVSIPDir);
       }
+
       DotnetPublish(Path.Combine(mCosmosDir, "source", "Cosmos.Build.MSBuild"), "net462", "win7-x86", Path.Combine(xVSIPDir, "MSBuild"));
       DotnetPublish(Path.Combine(mCosmosDir, "source", "IL2CPU"), "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "IL2CPU"));
       DotnetPublish(Path.Combine(mCosmosDir, "Tools", "NASM"), "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "NASM"));
       DotnetPublish(Path.Combine(mCosmosDir, "source", "XSharp.Compiler"), "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "XSharp"));
+      
+      string xPackagesDir = Path.Combine(xVSIPDir, "KernelPackages");
+      string xVersionSuffix = App.IsUserKit ? "" : "devkit";
+
+      DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.Common"), xPackagesDir, xVersionSuffix);
+      DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.Core"), xPackagesDir, xVersionSuffix);
+      DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Common"), xPackagesDir, xVersionSuffix);
+      DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Memory"), xPackagesDir, xVersionSuffix);
+      DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Plugs"), xPackagesDir, xVersionSuffix);
+      DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Plugs.Asm"), xPackagesDir, xVersionSuffix);
+      DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.Debug.Kernel"), xPackagesDir, xVersionSuffix);
+      DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.Debug.Kernel.Plugs.Asm"), xPackagesDir, xVersionSuffix);
+      DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.HAL"), xPackagesDir, xVersionSuffix);
+      DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.System"), xPackagesDir, xVersionSuffix);
+      DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.System.Plugs"), xPackagesDir, xVersionSuffix);
 
       MSBuild(Path.Combine(mCosmosDir, @"Build.sln"), "Debug");
     }

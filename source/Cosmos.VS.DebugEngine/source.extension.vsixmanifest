@@ -14,11 +14,6 @@
     <Dependency Id="Microsoft.VisualStudio.MPF.15.0" DisplayName="Visual Studio MPF 15.0" d:Source="Installed" Version="[15.0]" />
   </Dependencies>
   <Assets>
-    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="Cosmos.Debug.Common" Path="|Cosmos.Debug.Common|" AssemblyName="|Cosmos.Debug.Common;AssemblyName|" />
-    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="Cosmos.Build.Common" Path="|Cosmos.Build.Common|" AssemblyName="|Cosmos.Build.Common;AssemblyName|" />
-    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="Cosmos.Debug.DebugConnectors" Path="|Cosmos.Debug.DebugConnectors|" AssemblyName="|Cosmos.Debug.DebugConnectors;AssemblyName|" />
-    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="Cosmos.Debug.Symbols" Path="|Cosmos.Debug.Symbols|" AssemblyName="|Cosmos.Debug.Symbols;AssemblyName|" />
-    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="Cosmos.Debug.Hosts" Path="|Cosmos.Debug.Hosts|" AssemblyName="|Cosmos.Debug.Hosts;AssemblyName|" />
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="Cosmos.VS.Windows" Path="|Cosmos.VS.Windows;PkgdefProjectOutputGroup|" />
   </Assets>

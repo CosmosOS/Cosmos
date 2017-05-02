@@ -24,7 +24,7 @@
     <RootNamespace>Cosmos.VS.DebugEngine</RootNamespace>
     <AssemblyName>Cosmos.VS.DebugEngine</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
-    <GeneratePkgDefFile>true</GeneratePkgDefFile>
+    <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
     <IncludeDebugSymbolsInLocalVSIXDeployment>true</IncludeDebugSymbolsInLocalVSIXDeployment>
@@ -105,6 +105,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Cosmos.VS.DebugEngine.pkgdef">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Resources\Cosmos.ico">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
