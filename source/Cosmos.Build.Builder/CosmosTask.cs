@@ -111,6 +111,7 @@ namespace Cosmos.Build.Builder
       string xParams = $"{Quoted(aSlnFile)} " +
                        "/nologo " +
                        "/maxcpucount " +
+                       "/nr:false " +
                        $"/p:Configuration={Quoted(aBuildCfg)} " +
                        $"/p:Platform={Quoted("Any CPU")} " +
                        $"/p:OutputPath={Quoted(mOutputDir)}";
@@ -291,25 +292,13 @@ namespace Cosmos.Build.Builder
 
     private void DotnetPack(string project, string destDir, string versionSuffix)
     {
-      string xParams = $"pack {project} --version-suffix {Quoted(versionSuffix)} -o {Quoted(destDir)}";
-
-      if (!App.NoMSBuildClean)
-      {
-        StartConsole("dotnet", $"clean {project}");
-      }
-
+      string xParams = $"pack {project} --version-suffix {Quoted(versionSuffix)} -o {Quoted(destDir)} --no-build";
       StartConsole("dotnet", xParams);
     }
     
     private void DotnetPublish(string project, string framework, string runtime, string destDir)
     {
       string xParams = $"publish {project} -f {framework} -r {runtime} -o {Quoted(destDir)}";
-
-      if (!App.NoMSBuildClean)
-      {
-        StartConsole("dotnet", $"clean {project}");
-      }
-
       StartConsole("dotnet", xParams);
     }
 
@@ -323,6 +312,9 @@ namespace Cosmos.Build.Builder
       {
         Directory.CreateDirectory(xVSIPDir);
       }
+
+      // DotnetPack uses --no-build to increase build speed, so Build.sln must be built first
+      MSBuild(Path.Combine(mCosmosDir, @"Build.sln"), "Debug");
 
       DotnetPublish(Path.Combine(mCosmosDir, "source", "Cosmos.Build.MSBuild"), "net462", "win7-x86", Path.Combine(xVSIPDir, "MSBuild"));
       DotnetPublish(Path.Combine(mCosmosDir, "source", "IL2CPU"), "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "IL2CPU"));
@@ -343,8 +335,6 @@ namespace Cosmos.Build.Builder
       DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.HAL"), xPackagesDir, xVersionSuffix);
       DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.System"), xPackagesDir, xVersionSuffix);
       DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.System.Plugs"), xPackagesDir, xVersionSuffix);
-
-      MSBuild(Path.Combine(mCosmosDir, @"Build.sln"), "Debug");
     }
 
     private void CopyTemplates()

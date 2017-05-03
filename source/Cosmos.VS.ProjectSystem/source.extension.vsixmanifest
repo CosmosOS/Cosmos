@@ -24,6 +24,8 @@
   <Assets>
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
     <Asset Type="Microsoft.VisualStudio.ProjectTemplate" d:Source="Project" d:ProjectName="%CurrentProject%" d:TargetPath="|%CurrentProject%;TemplateProjectOutputGroup|" Path="ProjectTemplates" d:VsixSubPath="ProjectTemplates" />
+    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="Project" d:ProjectName="Cosmos.VS.Wizards" Path="|Cosmos.VS.Wizards|" AssemblyName="|Cosmos.VS.Wizards;AssemblyName|" />
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="Cosmos.VS.DebugEngine" Path="|Cosmos.VS.DebugEngine;PkgdefProjectOutputGroup|" />
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="Cosmos.VS.Windows" Path="|Cosmos.VS.Windows;PkgdefProjectOutputGroup|" />
   </Assets>
 </PackageManifest>

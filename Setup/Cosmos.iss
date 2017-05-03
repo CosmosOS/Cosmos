@@ -80,9 +80,6 @@ Source: ".\Build\VSIP\XSharp\*"; DestDir: "{app}\Build\XSharp"; Flags: ignorever
 Source: ".\Build\VSIP\Cosmos.Deploy.USB.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Deploy.Pixie.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Build.Common.dll"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-;Source: ".\Build\VSIP\Cosmos.Assembler.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-;Source: ".\Build\VSIP\Cosmos.Build.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
-;Source: ".\Build\VSIP\Cosmos.Debug.*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\MSBuild\*"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Debug.GDB.exe"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 ; Kernel assemblies
@@ -92,7 +89,7 @@ Source: ".\Build\VSIP\Cosmos.HAL.*"; DestDir: "{app}\Kernel"; Flags: ignoreversi
 Source: ".\Build\VSIP\Cosmos.System.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.Common.*"; DestDir: "{app}\Kernel"; Flags: ignoreversion uninsremovereadonly
 ; Kernel packages
-Source: ".\Build\KernelPackages\*"; DestDir: "{app}\Kernel\packages"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\KernelPackages\*.nupkg"; DestDir: "{app}\Kernel\packages"; Flags: ignoreversion uninsremovereadonly
 ; Icon
 Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 ; XSharp Source
@@ -130,8 +127,8 @@ Root: HKCU; SubKey: Software\Cosmos; ValueType: none; ValueName: "DevKit"; Flags
 UseRelativePaths=True
 
 [Run]
-Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "init {app}\Kernel\packages {app}\Kernel\packages"; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
-Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos"" -Source {app}\Kernel\packages"; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
+Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "init ""{app}\Kernel\packages"" ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
+Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos"" -Source ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/a /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/a Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
 

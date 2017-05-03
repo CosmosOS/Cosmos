@@ -348,6 +348,12 @@
       <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
       <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
     </ProjectReference>
+    <ProjectReference Include="..\Cosmos.VS.Windows\Cosmos.VS.Windows.csproj">
+      <Project>{47E8F3DC-FF3F-4CC7-8643-1807260B0B18}</Project>
+      <Name>Cosmos.VS.Windows</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3bPkgdefProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
     <ProjectReference Include="..\Cosmos.VS.Wizards\Cosmos.VS.Wizards.csproj">
       <Project>{B37F98E5-6D98-48D2-B736-01F0B28D46CE}</Project>
       <Name>Cosmos.VS.Wizards</Name>
