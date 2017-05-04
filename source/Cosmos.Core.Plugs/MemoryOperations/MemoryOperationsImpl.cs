@@ -3,19 +3,12 @@ using System;
 using System.Runtime.CompilerServices;
 
 using Cosmos.IL2CPU.Plugs;
-//using Cosmos.IL2CPU.Plugs.Assemblers.MemoryOperations;
 
 namespace Cosmos.Core.Plugs.MemoryOperations
 {
     [Plug(Target = typeof(Cosmos.Core.MemoryOperations))]
     public unsafe class MemoryOperationsImpl
     {
-        [PlugMethod(Assembler = typeof(MemoryOperationsFill16BlocksAsm))]
-        public static unsafe void Fill16Blocks(byte* dest, int value, int BlocksNum)
-        {
-
-        }
-
         unsafe public static void Fill(byte* dest, int value, int size)
         {
             //Console.WriteLine("Filling array of size " + size + " with value 0x" + value.ToString("X"));
@@ -121,18 +114,25 @@ namespace Cosmos.Core.Plugs.MemoryOperations
 			 * 2. If there are reaming bytes (that is size is not a perfect multiple of size)
 			 *    we do the Fill() using a simple managed for() loop of bytes
 			 */
-            int BlocksNum;
-            int ByteRemaining;
+            int xBlocksNum;
+            int xByteRemaining;
 
-            BlocksNum = Math.DivRem(size, 16, out ByteRemaining);
+#if NETSTANDARD1_5
+            xBlocksNum = size / 16;
+            xByteRemaining = size % 16;
+#else
+            xBlocksNum = Math.DivRem(size, 16, out xByteRemaining);
+#endif
 
             //Global.mDebugger.SendInternal("size " + size + " is composed of " + BlocksNum + " block of 16 bytes with " + ByteRemaining + " remainder");
 
-            for (int i = 0; i < ByteRemaining; i++)
+            for (int i = 0; i < xByteRemaining; i++)
+            {
                 *(dest + i) = (byte)value;
+            }
 
             /* Let's call the assembler version now to do the 16 byte block copies */
-            Fill16Blocks(dest + ByteRemaining, value, BlocksNum);
+            Cosmos.Core.MemoryOperations.Fill16Blocks(dest + xByteRemaining, value, xBlocksNum);
 
             /*
              * If needed there is yet space of optimization here for example:

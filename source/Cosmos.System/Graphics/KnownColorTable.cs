@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
 
 /*
  * This is a straigh copy from NetCore sources, we needed to do this becasue after moving Color in our source (to make it a class)

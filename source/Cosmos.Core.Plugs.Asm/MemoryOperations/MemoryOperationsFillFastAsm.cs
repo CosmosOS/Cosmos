@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cosmos.Assembler;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
-using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.Assembler;
+using Cosmos.Assembler.x86;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
-namespace Cosmos.Core.Plugs.MemoryOperations
+namespace Cosmos.Core.Plugs.Asm.MemoryOperations
 {
     public class MemoryOperationsFill16BlocksAsm : AssemblerMethod
     {
@@ -54,7 +48,7 @@ namespace Cosmos.Core.Plugs.MemoryOperations
             XS.Add(EDI, 16);
             XS.Sub(ECX, 1);
             //XS.LiteralCode("jnz .loop");
-            XS.Jump(CPUx86.ConditionalTestEnum.NotZero, ".loop");
+            XS.Jump(ConditionalTestEnum.NotZero, ".loop");
 
             //XS.Return();
         }

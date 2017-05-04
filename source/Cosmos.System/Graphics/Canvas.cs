@@ -235,15 +235,16 @@ namespace Cosmos.System.Graphics
             throw new NotImplementedException();
         }
 
-        public void DrawImage(Image image, int x, int y)
-        {
-            throw new NotImplementedException();
-        }
+        // Image and Font aren't implemented in .NET Core
+        //public void DrawImage(Image image, int x, int y)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
-        public void DrawString(String str, Font aFont, Brush brush, int x, int y)
-        {
-            throw new NotImplementedException();
-        }
+        //public void DrawString(String str, Font aFont, Brush brush, int x, int y)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         protected bool CheckIfModeIsValid(Mode mode)
         {
