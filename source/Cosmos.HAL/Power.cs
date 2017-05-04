@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +12,11 @@ namespace Cosmos.HAL
         public static void Reboot()
         {
             Core.Global.CPU.Reboot();
+        }
+
+        public static void Shutdown()
+        {
+            Core.Global.CPU.Shutdown();
         }
     }
 }
