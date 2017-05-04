@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Cosmos.IL2CPU.Plugs;
+
 namespace Cosmos.Core {
     // Non hardware class, only used by core and hardware drivers for ports etc.
     public class CPU {
@@ -61,6 +62,13 @@ namespace Cosmos.Core {
             var xResult = mInterruptsEnabled;
             mInterruptsEnabled = false;
             return xResult;
+        }
+
+        public void Shutdown()
+        {
+            ACPI.Shutdown();
+            ACPI.Disable();
+            Cosmos.Core.Global.CPU.Halt();
         }
     }
 }
