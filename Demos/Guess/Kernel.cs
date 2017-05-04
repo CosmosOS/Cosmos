@@ -5,6 +5,10 @@ using System.Text;
 using Cosmos.Debug.Kernel;
 using Sys = Cosmos.System;
 
+/*
+ * Beware Demo Kernels are not recompiled when its dependencies changes!
+ * To force recompilation right click on on the Cosmos icon of the demo solution and do "Build".
+ */
 namespace Guess
 {
     public class GuessOS : Sys.Kernel
@@ -15,7 +19,6 @@ namespace Guess
 
         public GuessOS()
         {
-
             // Didnt check if tickcount is working yet.. can change this later
             //var xRandom = new Random(234243534);
             //mMagicNo = xRandom.Next(1, 100);
@@ -55,6 +58,8 @@ namespace Guess
             else
             {
                 Console.WriteLine("You guessed it!");
+                Console.WriteLine("Press any key to end Guess Demo. Thanks for playing!");
+                Console.ReadKey();
                 Stop();
             }
         }

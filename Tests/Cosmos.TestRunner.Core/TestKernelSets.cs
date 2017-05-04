@@ -21,6 +21,9 @@ namespace Cosmos.TestRunner.Core
             yield return typeof(VGACompilerCrash.Kernel);
 
             //yield return typeof(FrotzKernel.Kernel);
+
+            /* Please see the notes on the kernel itself before enabling it */
+            //yield return typeof(GraphicTest.Kernel);
         }
     }
 }

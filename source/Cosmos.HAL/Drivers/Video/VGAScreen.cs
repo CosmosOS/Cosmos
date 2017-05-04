@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define COSMOSDEBUG
+using System;
+
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 
@@ -38,9 +40,9 @@ namespace Cosmos.HAL
             }
             /* unlock CRTC registers */
             mIO.CRTController_Index.Byte = 0x03;
-            mIO.CRTController_Data.Byte = (byte) (mIO.CRTController_Data.Byte | 0x80);
+            mIO.CRTController_Data.Byte = (byte)(mIO.CRTController_Data.Byte | 0x80);
             mIO.CRTController_Index.Byte = 0x11;
-            mIO.CRTController_Data.Byte = (byte) (mIO.CRTController_Data.Byte & 0x7F);
+            mIO.CRTController_Data.Byte = (byte)(mIO.CRTController_Data.Byte & 0x7F);
 
             /* make sure they remain unlocked */
             registers[0x03] |= 0x80;
@@ -78,7 +80,7 @@ namespace Cosmos.HAL
             byte pmask;
 
             p &= 3;
-            pmask = (byte) (1 << p);
+            pmask = (byte)(1 << p);
             /* set read plane */
             mIO.GraphicsController_Index.Byte = 4;
             mIO.GraphicsController_Data.Byte = p;
@@ -123,7 +125,7 @@ namespace Cosmos.HAL
 
             /* turn off even-odd addressing (set flat addressing)
             assume: chain-4 addressing already off */
-            mIO.Sequencer_Data.Byte = (byte) (seq4 | 0x04);
+            mIO.Sequencer_Data.Byte = (byte)(seq4 | 0x04);
 
             mIO.GraphicsController_Index.Byte = 4;
             gc4 = mIO.GraphicsController_Data.Byte;
@@ -132,13 +134,13 @@ namespace Cosmos.HAL
             gc5 = mIO.GraphicsController_Data.Byte;
 
             /* turn off even-odd addressing */
-            mIO.GraphicsController_Data.Byte = (byte) (gc5 & ~0x10);
+            mIO.GraphicsController_Data.Byte = (byte)(gc5 & ~0x10);
 
             mIO.GraphicsController_Index.Byte = 6;
             gc6 = mIO.GraphicsController_Data.Byte;
 
             /* turn off even-odd addressing */
-            mIO.GraphicsController_Data.Byte = (byte) (gc6 & ~0x02);
+            mIO.GraphicsController_Data.Byte = (byte)(gc6 & ~0x02);
 
             /* write font to plane P4 */
             SetPlane(2);
@@ -269,6 +271,7 @@ namespace Cosmos.HAL
                 case ScreenSize.Size320x200:
                     if (aDepth == ColorDepth.BitDepth8)
                     {
+                        mDebugger.Send("Setting graphic mode to 320x200@256");
                         WriteVGARegisters(g_320x200x8);
 
                         PixelWidth = 320;
@@ -334,7 +337,12 @@ namespace Cosmos.HAL
         //public uint GetPixel320x200x4(uint x, uint y);
         public void SetPixel320x200x8(uint x, uint y, uint c)
         {
-            mIO.VGAMemoryBlock[(y * 320) + x] = (byte) (c & 0xFF);
+            uint where = (y * 320) + x;
+            byte color = (byte)(c & 0xFF);
+
+            mDebugger.Send($"Drawing pixel at {where}, with color {color}");
+            mIO.VGAMemoryBlock[where] = color;
+            mDebugger.Send($"Pixel drawn but you cannot see it!");
         }
 
         public uint GetPixel320x200x8(uint x, uint y)
@@ -347,11 +355,11 @@ namespace Cosmos.HAL
 
         public void SetPixel640x480x4(uint x, uint y, uint c)
         {
-            uint offset = (uint) (x / 8 + (PixelWidth / 8) * y);
+            uint offset = (uint)(x / 8 + (PixelWidth / 8) * y);
 
             x = (x & 7) * 1;
 
-            uint mask = (byte) (0x80 >> (int) x);
+            uint mask = (byte)(0x80 >> (int)x);
             uint pmask = 1;
 
             for (byte p = 0; p < 4; p++)
@@ -360,12 +368,12 @@ namespace Cosmos.HAL
 
                 if ((pmask & c) != 0)
                 {
-                    mIO.VGAMemoryBlock[offset] = (byte) (mIO.VGAMemoryBlock[offset] | mask);
+                    mIO.VGAMemoryBlock[offset] = (byte)(mIO.VGAMemoryBlock[offset] | mask);
                 }
 
                 else
                 {
-                    mIO.VGAMemoryBlock[offset] = (byte) (mIO.VGAMemoryBlock[offset] & ~mask);
+                    mIO.VGAMemoryBlock[offset] = (byte)(mIO.VGAMemoryBlock[offset] & ~mask);
                 }
 
                 pmask <<= 1;
@@ -374,7 +382,7 @@ namespace Cosmos.HAL
 
         public uint GetPixel640x480x4(uint x, uint y)
         {
-            uint offset = (uint) (x / 8 + (PixelWidth / 8) * y);
+            uint offset = (uint)(x / 8 + (PixelWidth / 8) * y);
 
             uint pmask = 1;
 
@@ -397,11 +405,11 @@ namespace Cosmos.HAL
 
         public void SetPixel720x480x4(uint x, uint y, uint c)
         {
-            uint offset = (uint) (x / 8 + (PixelWidth / 8) * y);
+            uint offset = (uint)(x / 8 + (PixelWidth / 8) * y);
 
             x = (x & 7) * 1;
 
-            uint mask = (byte) (0x80 >> (int) x);
+            uint mask = (byte)(0x80 >> (int)x);
             uint pmask = 1;
 
             for (byte p = 0; p < 4; p++)
@@ -410,12 +418,12 @@ namespace Cosmos.HAL
 
                 if ((pmask & c) != 0)
                 {
-                    mIO.VGAMemoryBlock[offset] = (byte) (mIO.VGAMemoryBlock[offset] | mask);
+                    mIO.VGAMemoryBlock[offset] = (byte)(mIO.VGAMemoryBlock[offset] | mask);
                 }
 
                 else
                 {
-                    mIO.VGAMemoryBlock[offset] = (byte) (mIO.VGAMemoryBlock[offset] & ~mask);
+                    mIO.VGAMemoryBlock[offset] = (byte)(mIO.VGAMemoryBlock[offset] & ~mask);
                 }
 
                 pmask <<= 1;
@@ -424,7 +432,7 @@ namespace Cosmos.HAL
 
         public uint GetPixel720x480x4(uint x, uint y)
         {
-            uint offset = (uint) (x / 8 + (PixelWidth / 8) * y);
+            uint offset = (uint)(x / 8 + (PixelWidth / 8) * y);
 
             uint pmask = 1;
 
@@ -468,14 +476,18 @@ namespace Cosmos.HAL
                 SetPaletteEntry(i, i, 0, 0);
                 SetPaletteEntry(i + 64, 63, i, 0);
                 SetPaletteEntry(i + 128, 63, 63, i);
-                SetPaletteEntry(i + 192, (byte) (63 - i), (byte) (63 - i), (byte) (63 - i));
+                SetPaletteEntry(i + 192, (byte)(63 - i), (byte)(63 - i), (byte)(63 - i));
             }
 
             var xSegment = GetFramebufferSegment();
 
             for (uint y = 0; y < PixelHeight; y++)
-            for (uint x = 0; x < PixelWidth; x++)
-                xSegment[(y * 320) + x] = (byte) (x + y);
+            {
+                for (uint x = 0; x < PixelWidth; x++)
+                {
+                    xSegment[(y * 320) + x] = (byte)(x + y);
+                }
+            }
         }
 
         public void Clear(int color)
@@ -484,7 +496,7 @@ namespace Cosmos.HAL
             {
                 for (int x = 0; x < PixelWidth; x++)
                 {
-                    SetPixel((uint) x, (uint) y, (uint) color);
+                    SetPixel((uint)x, (uint)y, (uint)color);
                 }
             }
         }
@@ -500,9 +512,9 @@ namespace Cosmos.HAL
 
         public void SetPalette(int index, byte[] pallete)
         {
-            mIO.DACIndex_Write.Byte = (byte) index;
+            mIO.DACIndex_Write.Byte = (byte)index;
             for (int i = 0; i < pallete.Length; i++)
-                mIO.DAC_Data.Byte = (byte) (pallete[i] >> 2);
+                mIO.DAC_Data.Byte = (byte)(pallete[i] >> 2);
         }
 
         //TODO: .Net Core
@@ -513,10 +525,10 @@ namespace Cosmos.HAL
 
         public void SetPaletteEntry(int index, byte r, byte g, byte b)
         {
-            mIO.DACIndex_Write.Byte = (byte) index;
-            mIO.DAC_Data.Byte = (byte) (r >> 2);
-            mIO.DAC_Data.Byte = (byte) (g >> 2);
-            mIO.DAC_Data.Byte = (byte) (b >> 2);
+            mIO.DACIndex_Write.Byte = (byte)index;
+            mIO.DAC_Data.Byte = (byte)(r >> 2);
+            mIO.DAC_Data.Byte = (byte)(g >> 2);
+            mIO.DAC_Data.Byte = (byte)(b >> 2);
         }
 
 
