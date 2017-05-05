@@ -155,7 +155,7 @@ namespace Cosmos.System.Graphics
          * DrawLine throw if the line goes out of the boundary of the Canvas, probably will be better to draw only the part
          * of line visibile. This is too "smart" to do here better do it in a future Window Manager.
          */
-        public void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
+        public virtual void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
         {
             if (pen == null)
                 throw new ArgumentOutOfRangeException(nameof(pen));
@@ -185,12 +185,12 @@ namespace Cosmos.System.Graphics
             DrawDiagonalLine(pen, dx, dy, x1, y1);
         }
 
-        public void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
+        public virtual void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
         {
             throw new NotImplementedException();
         }
 
-        public void DrawRectangle(Pen pen, int x, int y, int width, int height)
+        public virtual void DrawRectangle(Pen pen, int x, int y, int width, int height)
         {
             /*
              * we must draw four lines connecting any vertex of our rectangle to do this we first obtain the position of these
@@ -245,7 +245,7 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, v1x, v1y, v3x, v3y);
             DrawLine(pen, v2x, v2y, v3x, v3y);
         }
-
+         
         public void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
         {
             throw new NotImplementedException();
