@@ -91,6 +91,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ACPI.cs" />
     <Compile Include="BlockDevice\Ata.cs" />
     <Compile Include="BlockDevice\BlockDevice.cs" />
     <Compile Include="BlockDevice\EBR.cs" />
