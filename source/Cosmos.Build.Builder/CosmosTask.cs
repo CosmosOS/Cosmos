@@ -307,7 +307,9 @@ namespace Cosmos.Build.Builder
       Section("Compiling Cosmos");
 
       string xVSIPDir = Path.Combine(mCosmosDir, "Build", "VSIP");
-      
+      //string xVersionSuffix = App.IsUserKit ? "" : "devkit";
+      string xVersionSuffix = ""; // https://github.com/NuGet/Home/issues/4337
+
       if (!Directory.Exists(xVSIPDir))
       {
         Directory.CreateDirectory(xVSIPDir);
@@ -315,14 +317,13 @@ namespace Cosmos.Build.Builder
 
       // DotnetPack uses --no-build to increase build speed, so Build.sln must be built first
       MSBuild(Path.Combine(mCosmosDir, @"Build.sln"), "Debug");
-
+      
       DotnetPublish(Path.Combine(mCosmosDir, "source", "Cosmos.Build.MSBuild"), "net462", "win7-x86", Path.Combine(xVSIPDir, "MSBuild"));
       DotnetPublish(Path.Combine(mCosmosDir, "source", "IL2CPU"), "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "IL2CPU"));
       DotnetPublish(Path.Combine(mCosmosDir, "Tools", "NASM"), "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "NASM"));
       DotnetPublish(Path.Combine(mCosmosDir, "source", "XSharp.Compiler"), "netcoreapp1.0", "win7-x86", Path.Combine(xVSIPDir, "XSharp"));
       
       string xPackagesDir = Path.Combine(xVSIPDir, "KernelPackages");
-      string xVersionSuffix = App.IsUserKit ? "" : "devkit";
 
       DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.Common"), xPackagesDir, xVersionSuffix);
       DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.Core"), xPackagesDir, xVersionSuffix);
@@ -333,6 +334,7 @@ namespace Cosmos.Build.Builder
       DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.Debug.Kernel"), xPackagesDir, xVersionSuffix);
       DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.Debug.Kernel.Plugs.Asm"), xPackagesDir, xVersionSuffix);
       DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.HAL"), xPackagesDir, xVersionSuffix);
+      DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.IL2CPU.Plugs"), xPackagesDir, xVersionSuffix);
       DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.System"), xPackagesDir, xVersionSuffix);
       DotnetPack(Path.Combine(mCosmosDir, "source", "Cosmos.System.Plugs"), xPackagesDir, xVersionSuffix);
     }

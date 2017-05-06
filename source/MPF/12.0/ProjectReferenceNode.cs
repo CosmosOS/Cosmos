@@ -60,9 +60,9 @@ namespace Microsoft.VisualStudio.Project
 
     public class ProjectReferenceNode : ReferenceNode
     {
-        #region fieds
+        #region fields
         /// <summary>
-        /// The name of the assembly this refernce represents
+        /// The name of the assembly this reference represents
         /// </summary>
         private Guid referencedProjectGuid;
 

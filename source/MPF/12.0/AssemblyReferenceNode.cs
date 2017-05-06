@@ -68,9 +68,9 @@ namespace Microsoft.VisualStudio.Project
     [ComVisible(true)]
     public class AssemblyReferenceNode : ReferenceNode
     {
-        #region fieds
+        #region fields
         /// <summary>
-        /// The name of the assembly this refernce represents
+        /// The name of the assembly this reference represents
         /// </summary>
         private System.Reflection.AssemblyName assemblyName;
         private AssemblyName resolvedAssemblyName;

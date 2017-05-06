@@ -109,11 +109,12 @@ Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
 ; VSIP
 Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.Windows.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\XSharp.VS.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
+; MSBuild targets
+Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{code:GetMSBuildDirectory}\Cosmos"; Flags: ignoreversion uninsremovereadonly
 
 [Registry]
 ; User Kit Folder
@@ -129,8 +130,8 @@ UseRelativePaths=True
 [Run]
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "init ""{app}\Kernel\packages"" ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos"" -Source ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/a /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/a Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
 
 [UninstallRun]
 Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|Cosmos.VS.ProjectSystem}"
@@ -217,6 +218,14 @@ var
 begin
   Params := ' /uninstall:"' + Filename + '"';
   Result := Params;
+end;
+
+function GetMSBuildDirectory(Param: String): String;
+var
+  VSPath: String;
+begin
+  VSPath := GetVSPath();
+  Result := VsPath + '\MSBuild';
 end;
 
 function GetUninstallString(): String;

@@ -9,16 +9,16 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
-      <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj" />
+        <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
+        <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj" />
     </ItemGroup>
 
 </Project>
