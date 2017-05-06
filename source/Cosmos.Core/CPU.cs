@@ -24,17 +24,6 @@ namespace Cosmos.Core {
         public static void ZeroFill(uint aStartAddress, uint aLength) { } // Plugged
         [PlugMethod(PlugRequired = true)]
         public void Halt() { } // Plugged
-        public void Reboot() {
-            // Disable all interrupts
-            DisableInterrupts();
-
-            var myPort = new IOPort(0x64);
-            while ((myPort.Byte & 0x02) != 0)
-            {
-            }
-            myPort.Byte = 0xFE;
-            Halt(); // If it didn't work, Halt the CPU
-        }
 
         private static void DoEnableInterrupts()
         {
@@ -62,13 +51,6 @@ namespace Cosmos.Core {
             var xResult = mInterruptsEnabled;
             mInterruptsEnabled = false;
             return xResult;
-        }
-
-        public void Shutdown()
-        {
-            ACPI.Shutdown();
-            ACPI.Disable();
-            Cosmos.Core.Global.CPU.Halt();
         }
     }
 }
