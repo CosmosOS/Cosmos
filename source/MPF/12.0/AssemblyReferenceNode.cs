@@ -64,7 +64,6 @@ using Microsoft.Build.Execution;
 
 namespace Microsoft.VisualStudio.Project
 {
-
     [ComVisible(true)]
     public class AssemblyReferenceNode : ReferenceNode
     {

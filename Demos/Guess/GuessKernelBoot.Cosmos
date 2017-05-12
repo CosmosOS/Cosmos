@@ -1,10 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.Net.Sdk">
+  
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFramework>net462</TargetFramework>
   </PropertyGroup>
+  
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugEnabled>True</DebugEnabled>
     <DebugMode>Source</DebugMode>
@@ -21,15 +20,25 @@
     <Profile>VMware</Profile>
     <Description>Use VMware Player or Workstation to deploy and debug.</Description>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Cosmos.Core.Plugs" Version="*" />
+    <None Remove="*" />
+    <Compile Remove="*" />
   </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Guess\GuessKernel.csproj">
       <Name>GuessKernel</Name>
       <Project>{e35e0dbf-555f-4d38-8f28-acdfa9dc97bd}</Project>
-      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.Core.Plugs.Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.Debug.Kernel.Plugs.Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.System.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+  </ItemGroup>
+  
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
 </Project>

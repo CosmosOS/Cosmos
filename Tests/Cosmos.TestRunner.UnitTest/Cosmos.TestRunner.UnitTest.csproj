@@ -7,9 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170427-09" />
-        <PackageReference Include="NUnit" Version="3.7.0-dev-03886" />
-        <PackageReference Include="NUnit3TestAdapter" Version="4.0.0-ci-00457-pr-313" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170502-03" />
+        <PackageReference Include="NUnit" Version="3.7.0-dev-03894" />
+        <PackageReference Include="NUnit3TestAdapter" Version="3.8.0-alpha1" />
     </ItemGroup>
 
     <ItemGroup>

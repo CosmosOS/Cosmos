@@ -1,10 +1,6 @@
-<?xml version="1.0"?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0">
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">  
+  
   <PropertyGroup>
-    <_TargetFrameworkDirectories>$(MSBuildThisFileDirectory)</_TargetFrameworkDirectories>
-    <_FullFrameworkReferenceAssemblyPaths>$(MSBuildThisFileDirectory)</_FullFrameworkReferenceAssemblyPaths>
     <CopyBuildOutputToOutputDirectory>False</CopyBuildOutputToOutputDirectory>
     <DisableImplicitFrameworkReferences>True</DisableImplicitFrameworkReferences>
     <ImplicitlyExpandDesignTimeFacades>False</ImplicitlyExpandDesignTimeFacades>
@@ -19,14 +15,15 @@
     <PlatformTarget Condition="'$(PlatformTarget)' == ''">AnyCPU</PlatformTarget>
     <BinFormat Condition="$(BinFormat) == ''">bin</BinFormat>
     <CosmosBuildTaskAssemblyFile Condition="'$(CosmosBuildTaskAssemblyFile)' == ''">$(VSIPDir)\Cosmos.Build.MSBuild.dll</CosmosBuildTaskAssemblyFile>
+    <AssemblySearchPaths>$(CosmosDir)\Kernel</AssemblySearchPaths>
   </PropertyGroup>
-
+  
   <UsingTask TaskName="Cosmos.Build.MSBuild.IL2CPU" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.NAsm" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.MakeISO" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.Ld" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.ReadNAsmMapToDebugInfo" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
-
+  
   <Target Name="CoreCompile">
     <Error Text="File %(Compile.Identity) is set to compile, but .Cosmos projects don't compile any source themselves!" Condition="$(Compile) != ''"/>
     <CreateProperty Value="true" Condition="$(BinFormat) == 'elf'">
@@ -53,4 +50,6 @@
     <!-- <MakeISO InputFile="$(TargetDir)$(MSBuildProjectName).bin" OutputFile="$(TargetDir)$(MSBuildProjectName).iso" CosmosBuildDir="$(CosmosDir)\Build" /> -->
     <Delete Files="$(TargetDir)$(MSBuildProjectName).iso"/>
   </Target>
+  
+  <Target Name="CreateManifestResourceNames" />
 </Project>

@@ -3,10 +3,12 @@ using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
-using Cosmos.VS.ProjectSystem.PropertyPages;
-using EnvDTE;
 using Microsoft.VisualStudio.Project;
 using Microsoft.VisualStudio.Shell.Interop;
+using EnvDTE;
+
+using Cosmos.Build.Common;
+using Cosmos.VS.ProjectSystem.PropertyPages;
 
 namespace Cosmos.VS.ProjectSystem
 {
@@ -101,6 +103,8 @@ namespace Cosmos.VS.ProjectSystem
         public override string ProjectType => "Cosmos";
 
         public override int ImageIndex => mImageIndex;
+
+        internal override string AssemblySearchPaths => CosmosPaths.Kernel;
 
         protected override ConfigProvider CreateConfigProvider()
         {

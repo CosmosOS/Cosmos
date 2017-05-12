@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.Net.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFramework>net462</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -26,10 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cosmos.Core.Plugs" Version="1.0.0" />
-    <PackageReference Include="Cosmos.Core.Plugs.Asm" Version="1.0.0" />
-    <PackageReference Include="Cosmos.System.Plugs" Version="1.0.0" />
-    <PackageReference Include="Cosmos.Debug.Kernel.Plugs.Asm" Version="1.0.0" />
+    <Reference Include="Cosmos.Core.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.Core.Plugs.Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.Debug.Kernel.Plugs.Asm, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
+    <Reference Include="Cosmos.System.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
 
   <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
