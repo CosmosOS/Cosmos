@@ -23,6 +23,7 @@
   <UsingTask TaskName="Cosmos.Build.MSBuild.MakeISO" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.Ld" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   <UsingTask TaskName="Cosmos.Build.MSBuild.ReadNAsmMapToDebugInfo" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
+  <UsingTask TaskName="Cosmos.Build.MSBuild.ExtractMapFromElfFile" AssemblyFile="$(CosmosBuildTaskAssemblyFile)"/>
   
   <Target Name="CoreCompile">
     <Error Text="File %(Compile.Identity) is set to compile, but .Cosmos projects don't compile any source themselves!" Condition="$(Compile) != ''"/>
@@ -52,4 +53,5 @@
   </Target>
   
   <Target Name="CreateManifestResourceNames" />
+  
 </Project>

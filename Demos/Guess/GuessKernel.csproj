@@ -5,13 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="*" />
+    <None Remove="GuessKernelBoot.Cosmos" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cosmos.Common" Version="1.0.0" />
-    <PackageReference Include="Cosmos.System" Version="1.0.0" />
-    <PackageReference Include="Cosmos.Debug.Kernel" Version="1.0.0" />
+    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+    <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj" />
   </ItemGroup>
 
 </Project>

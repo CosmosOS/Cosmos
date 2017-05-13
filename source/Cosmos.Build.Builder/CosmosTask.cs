@@ -142,7 +142,7 @@ namespace Cosmos.Build.Builder
     protected void CheckIfUserKitRunning()
     {
       Echo("Check if User Kit Installer is already running.");
-      if (NumProcessesContainingName("CosmosUserKit") > 1)
+      if (NumProcessesContainingName("CosmosUserKit") > 0)
       {
         throw new Exception("Another instance of the user kit installer is running.");
       }
@@ -292,13 +292,22 @@ namespace Cosmos.Build.Builder
 
     private void DotnetPack(string project, string destDir, string versionSuffix)
     {
-      string xParams = $"pack {project} --version-suffix {Quoted(versionSuffix)} -o {Quoted(destDir)} --no-build";
+      if (String.IsNullOrWhiteSpace(versionSuffix))
+      {
+          versionSuffix = "";
+      }
+      else
+      {
+          versionSuffix = $"--version-suffix {Quoted(versionSuffix)} ";
+      }
+      
+      string xParams = $"pack {Quoted(project)} " + versionSuffix + $"-o {Quoted(destDir)} --no-build";
       StartConsole("dotnet", xParams);
     }
     
     private void DotnetPublish(string project, string framework, string runtime, string destDir)
     {
-      string xParams = $"publish {project} -f {framework} -r {runtime} -o {Quoted(destDir)}";
+      string xParams = $"publish {Quoted(project)} -f {framework} -r {runtime} -o {Quoted(destDir)}";
       StartConsole("dotnet", xParams);
     }
 

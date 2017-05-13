@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26403.7
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assembler", "Assembler", "{BBB4022B-CC17-4A35-8881-65657260442F}"
 EndProject
@@ -634,7 +634,6 @@ Global
 		{E35E0DBF-555F-4D38-8F28-ACDFA9DC97BD}.Release|x86.ActiveCfg = Release|Any CPU
 		{E35E0DBF-555F-4D38-8F28-ACDFA9DC97BD}.Release|x86.Build.0 = Release|Any CPU
 		{77DD08F5-0751-4EFC-B222-78F9F06E1F7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{77DD08F5-0751-4EFC-B222-78F9F06E1F7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{77DD08F5-0751-4EFC-B222-78F9F06E1F7C}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{77DD08F5-0751-4EFC-B222-78F9F06E1F7C}.Debug|x86.Build.0 = Debug|Any CPU
 		{77DD08F5-0751-4EFC-B222-78F9F06E1F7C}.Release|Any CPU.ActiveCfg = Debug|Any CPU

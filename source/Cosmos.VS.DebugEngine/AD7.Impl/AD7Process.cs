@@ -282,7 +282,8 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
         {
             mDbgConnector = null;
 
-            string xPort = mDebugInfo[BuildPropertyNames.VisualStudioDebugPortString];
+            string xPort;
+            mDebugInfo.TryGetValue(BuildPropertyNames.VisualStudioDebugPortString, out xPort);
 
             // using (var xDebug = new StreamWriter(@"e:\debug.info", false))
             // {
@@ -295,7 +296,7 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
 
             if (String.IsNullOrWhiteSpace(xPort))
             {
-                xPort = mDebugInfo[BuildPropertyNames.CosmosDebugPortString];
+                mDebugInfo.TryGetValue(BuildPropertyNames.CosmosDebugPortString, out xPort);
             }
 
             var xParts = (null == xPort) ? null : xPort.Split(' ');
@@ -451,12 +452,19 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                 case LaunchType.Bochs:
                     // The project has been created on another machine or Bochs has been uninstalled since the project has
                     // been created.
-                    if (!BochsSupport.BochsEnabled) { throw new Exception(Resources.BochsIsNotInstalled); }
-                    string bochsConfigurationFileName = mDebugInfo[BuildProperties.BochsEmulatorConfigurationFileString];
+                    if (!BochsSupport.BochsEnabled)
+                    {
+                        throw new Exception(Resources.BochsIsNotInstalled);
+                    }
+
+                    string bochsConfigurationFileName;
+                    mDebugInfo.TryGetValue(BuildProperties.BochsEmulatorConfigurationFileString, out bochsConfigurationFileName);
+
                     if (string.IsNullOrEmpty(bochsConfigurationFileName))
                     {
                         bochsConfigurationFileName = BuildProperties.BochsDefaultConfigurationFileName;
                     }
+
                     if (!Path.IsPathRooted(bochsConfigurationFileName))
                     {
                         // Assume the configuration file name is relative to project output path.
