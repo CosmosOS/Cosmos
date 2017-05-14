@@ -82,12 +82,10 @@ namespace Cosmos.Build.Builder
       if (mBuildState != BuildState.PrerequisiteMissing)
       {
         CleanupVSIPFolder();
-
         CompileCosmos();
-
         CreateScriptToUseChangesetWhichTaskIsUse();
-
         CreateSetup();
+        
         if (!App.IsUserKit)
         {
           CleanupAlreadyInstalled();
@@ -292,17 +290,23 @@ namespace Cosmos.Build.Builder
 
     private void DotnetPack(string project, string destDir, string versionSuffix)
     {
-      if (String.IsNullOrWhiteSpace(versionSuffix))
-      {
-          versionSuffix = "";
-      }
-      else
-      {
-          versionSuffix = $"--version-suffix {Quoted(versionSuffix)} ";
-      }
+      // https://github.com/NuGet/Home/issues/4337
       
-      string xParams = $"pack {Quoted(project)} " + versionSuffix + $"-o {Quoted(destDir)} --no-build";
-      StartConsole("dotnet", xParams);
+      // if (String.IsNullOrWhiteSpace(versionSuffix))
+      // {
+          // versionSuffix = "";
+      // }
+      // else
+      // {
+          // versionSuffix = $"--version-suffix {Quoted(versionSuffix)} ";
+      // }
+      
+      // string xParams = $"pack {Quoted(project)} " + versionSuffix + $"-o {Quoted(destDir)} --no-build";
+      // StartConsole("dotnet", xParams);
+      
+      string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
+      string xParams = $"{Quoted(project)} /t:Restore;Pack /p:VersionSuffix={Quoted(versionSuffix)} /p:PackageOutputPath={Quoted(destDir)}";
+      StartConsole(xMSBuild, xParams);
     }
     
     private void DotnetPublish(string project, string framework, string runtime, string destDir)
@@ -316,8 +320,7 @@ namespace Cosmos.Build.Builder
       Section("Compiling Cosmos");
 
       string xVSIPDir = Path.Combine(mCosmosDir, "Build", "VSIP");
-      //string xVersionSuffix = App.IsUserKit ? "" : "devkit";
-      string xVersionSuffix = ""; // https://github.com/NuGet/Home/issues/4337
+      string xVersionSuffix = App.IsUserKit ? "" : DateTime.Now.ToString("yyyyMMddHHmm");
 
       if (!Directory.Exists(xVSIPDir))
       {
