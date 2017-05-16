@@ -11,7 +11,7 @@ using Cosmos.System.Graphics;
  * it exists to make easier tests while changing low level stuff (it would be better and faster to use the Demo kernel but
  * sometimes it is a problem to make it see modifications done at low level)
  *
- * Remember to comment this test again on TestKernelSet.cs when you are ready to merge your modifications!
+ * Remember to comment this test again on TestKernelSets.cs when you are ready to merge your modifications!
  */
 namespace GraphicTest
 {
