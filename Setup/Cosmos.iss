@@ -92,7 +92,8 @@ Source: ".\Build\VSIP\Cosmos.Common.*"; DestDir: "{app}\Kernel"; Flags: ignoreve
 Source: ".\Build\VSIP\KernelPackages\*.nupkg"; DestDir: "{app}\Kernel\packages"; Flags: ignoreversion uninsremovereadonly
 ; Icon
 Source: ".\Artwork\Cosmos.ico"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
-; XSharp Source
+; XSharp
+Source: ".\Artwork\XSharp\XSharp.ico"; DestDir: "{app}\XSharp\"; Flags: ignoreversion uninsremovereadonly
 Source: ".\source\Cosmos.Debug.DebugStub\*.xs"; DestDir: "{app}\XSharp\DebugStub\"; Flags: ignoreversion uninsremovereadonly
 ; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
@@ -109,14 +110,19 @@ Source: ".\Build\mboot.c32"; DestDir: "{app}\Build\PXE\"
 Source: ".\Build\syslinux.cfg"; DestDir: "{app}\Build\PXE\pxelinux.cfg"; DestName: "default"
 ; VSIP
 Source: ".\Build\Tools\VSIXBootstrapper.exe"; DestDir: "{app}\Build\Tools"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.VS.Windows.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
-Source: ".\Build\VSIP\XSharp.VS.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
+;Source: ".\Build\VSIP\Cosmos.VS.Windows.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
+;Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
+Source: ".\Build\VSIP\XSharp.VS.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
 ; MSBuild targets
 Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{code:GetMSBuildDirectory}\Cosmos"; Flags: ignoreversion uninsremovereadonly
 
 [Registry]
+; Regiter .xs Extension
+Root: HKCR; Subkey: ".xs"; ValueType: string; ValueName: ""; ValueData: "XSharp"; Flags: uninsdeletevalue
+Root: HKCR; Subkey: "XSharp"; ValueType: string; ValueName: ""; ValueData: "X# source file"; Flags: uninsdeletekey
+Root: HKCR; Subkey: "XSharp\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\XSharp\XSharp.ico,0"
+Root: HKCR; Subkey: "XSharp\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\Build\XSharp\XSC.exe"" ""%1"""
 ; User Kit Folder
 Root: HKLM; SubKey: Software\Cosmos; ValueType: string; ValueName: "UserKit"; ValueData: {app}; Flags: uninsdeletekey
 ; Dev Kit Folder - Set by builder only, but we delete it here. See comments in builder.
@@ -131,7 +137,9 @@ UseRelativePaths=True
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "init ""{app}\Kernel\packages"" ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
+;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a /u:XSharp.VS"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos X# Language"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\Extensions\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
+;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a XSharp.VS.vsix"; WorkingDir: "{app}\Extensions\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos X# Language"
 
 [UninstallRun]
 Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|Cosmos.VS.ProjectSystem}"

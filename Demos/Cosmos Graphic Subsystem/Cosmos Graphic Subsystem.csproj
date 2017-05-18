@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
-    <ProjectGuid>{e35e0dbf-555f-4d38-8f28-acdfa9dc97bd}</ProjectGuid>
+    <ProjectGuid>{49f2c01d-d2c5-4564-810b-1ae92236c5c1}</ProjectGuid>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="GuessKernelBoot.Cosmos" />
+    <None Remove="Cosmos Graphic SubsystemBoot.Cosmos" />
   </ItemGroup>
 
   <ItemGroup>

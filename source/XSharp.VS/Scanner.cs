@@ -25,7 +25,7 @@ namespace XSharp.VS
 
     static Scanner()
     {
-      int xEnumMax = Enum.GetValues(typeof(TokenType)).GetUpperBound(0);
+      int xEnumMax = Enum.GetValues(typeof(XSC.TokenType)).GetUpperBound(0);
       mTokenMap = new TokenData[xEnumMax + 1];
 
       // Set Default values

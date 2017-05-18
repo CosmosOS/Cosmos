@@ -2,13 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.5</TargetFramework>
-    <AssemblyName>$safeprojectname$</AssemblyName>
-    <PackageId>$safeprojectname$</PackageId>
     <ProjectGuid>$KernelProjectGuid$</ProjectGuid>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="$CosmosProjectName$.Cosmos" />
+    <None Remove="$safeprojectname$Boot.Cosmos" />
   </ItemGroup>
 
   <ItemGroup>
