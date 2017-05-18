@@ -137,9 +137,9 @@ UseRelativePaths=True
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "init ""{app}\Kernel\packages"" ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
-;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a /u:XSharp.VS"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos X# Language"
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\Extensions\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
-;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a XSharp.VS.vsix"; WorkingDir: "{app}\Extensions\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos X# Language"
+;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a /u:XSharp.VS"; Description: "Remove Cosmos X# Language"; StatusMsg: "Removing Visual Studio Extension: Cosmos X# Language"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
+;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a XSharp.VS.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos X# Language"; StatusMsg: "Installing Visual Studio Extension: Cosmos X# Language"
 
 [UninstallRun]
 Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|Cosmos.VS.ProjectSystem}"
