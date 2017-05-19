@@ -198,7 +198,7 @@ namespace Cosmos.IL2CPU
 
                             AppAssemblerRingsCheck.Execute(xScanner, xInitMethod.DeclaringType.GetTypeInfo().Assembly);
 
-                            using (var xOut = new StreamWriter(File.OpenWrite(OutputFilename), Encoding.ASCII, 128 * 1024))
+                            using (var xOut = new StreamWriter(File.Create(OutputFilename), Encoding.ASCII, 128 * 1024))
                             {
                                 //if (EmitDebugSymbols) {
                                 xAsm.Assembler.FlushText(xOut);

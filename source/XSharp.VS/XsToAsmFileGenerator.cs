@@ -14,13 +14,11 @@ namespace XSharp.VS
   // This class generates .asm files from .xs files.
   //
   // The .asm is not used for actual compiling, but for now we still generate .asm files on save because:
-  // 1) It allow user to syntax check by saving, or running custom tool.
+  // 1) It allows user to syntax check by saving, or running custom tool.
   // 2) It allows easy viewing of the output (XSharp.Test can also be used)
   // When we get .xsproj types, we can eliminate this class.
   public class XsToAsmFileGenerator : IVsSingleFileGenerator
   {
-    // Classname is registered in Cosmos.iss. If renamed, fix in Cosmos.iss.
-
     public int DefaultExtension(out string oDefaultExt)
     {
       oDefaultExt = ".asm";

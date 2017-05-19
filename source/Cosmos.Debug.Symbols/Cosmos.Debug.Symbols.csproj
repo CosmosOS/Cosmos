@@ -14,7 +14,7 @@
   <ItemGroup>
     <PackageReference Include="Dapper.StrongName" Version="1.50.2" />
     <PackageReference Include="DapperExtensions.StrongName" Version="1.50.2" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="1.1.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="1.0.1" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Metadata" Version="1.4.2" />
     <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
