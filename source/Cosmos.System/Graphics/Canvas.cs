@@ -84,6 +84,8 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        
+
         public abstract void DrawPoint(Pen pen, int x, int y);
 
         public abstract void DrawPoint(Pen pen, float x, float y);
@@ -188,6 +190,23 @@ namespace Cosmos.System.Graphics
         public void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
         {
             throw new NotImplementedException();
+        }
+
+        public void DrawCircle(Pen pen, int x_center, int y_center, int radius)
+        {
+            if (pen == null)
+                throw new ArgumentNullException(nameof(pen));
+
+            int r2 = radius * radius;
+
+            for (int i = 0; i <= radius; i++)
+            {
+                int xLocal = i;
+                int xLocal2 = i * i;
+                int yLocal2 = r2 - xLocal2;
+                int yLocal = Math.Sqrt(yLocal2);
+            }
+
         }
 
         public void DrawRectangle(Pen pen, int x, int y, int width, int height)
