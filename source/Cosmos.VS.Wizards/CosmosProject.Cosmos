@@ -39,6 +39,6 @@
     <Reference Include="Cosmos.System.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
 
-  <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
+  <Import Project="$(AppData)\Cosmos User Kit\Build\VSIP\Cosmos.targets" />
 
 </Project>

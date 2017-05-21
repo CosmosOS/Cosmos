@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.Net.Sdk">
-  
+
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <BinFormat>elf</BinFormat>
     <DebugEnabled>True</DebugEnabled>
@@ -26,7 +26,7 @@
     <None Remove="*" />
     <Compile Remove="*" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\..\source\Cosmos.Core.Plugs.Asm\Cosmos.Core.Plugs.Asm.csproj">
       <Name>Cosmos.Core.Plugs.Asm</Name>
@@ -53,7 +53,7 @@
       <Project>{e35e0dbf-555f-4d38-8f28-acdfa9dc97bd}</Project>
     </ProjectReference>
   </ItemGroup>
-  
-  <Import Project="$(MSBuildExtensionsPath)\Cosmos\Cosmos.targets" />
-  
+
+  <Import Project="$(AppData)\Cosmos User Kit\Build\VSIP\Cosmos.targets" />
+
 </Project>

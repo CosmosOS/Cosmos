@@ -115,7 +115,7 @@ Source: ".\Build\VSIP\Cosmos.VS.ProjectSystem.vsix"; DestDir: "{app}\VSIX\"; Fla
 ;Source: ".\Build\VSIP\Cosmos.VS.DebugEngine.vsix"; DestDir: "{app}"; Flags: ignoreversion uninsremovereadonly
 Source: ".\Build\VSIP\XSharp.VS.vsix"; DestDir: "{app}\VSIX\"; Flags: ignoreversion uninsremovereadonly
 ; MSBuild targets
-Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{code:GetMSBuildDirectory}\Cosmos"; Flags: ignoreversion uninsremovereadonly
+;Source: ".\Build\VSIP\Cosmos.targets"; DestDir: "{code:GetMSBuildDirectory}\Cosmos"; Flags: ignoreversion uninsremovereadonly
 
 [Registry]
 ; Regiter .xs Extension
@@ -143,7 +143,7 @@ Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a Cosmos.VS
 
 [UninstallRun]
 Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|Cosmos.VS.ProjectSystem}"
-Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|XSharp.VS}"
+;Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|XSharp.VS}"
 
 [Code]
 function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
