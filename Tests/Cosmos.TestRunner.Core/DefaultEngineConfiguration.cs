@@ -27,6 +27,10 @@ namespace Cosmos.TestRunner.Core
             engine.TraceAssembliesLevel = TraceAssemblies.User;
             //engine.EnableStackCorruptionChecks = false;
 
+            //Use this to get more detailed debugging information
+            //Build is slower
+            //engine.ReadMapToDebugInfo = true;
+
             engine.EnableStackCorruptionChecks = true;
             engine.StackCorruptionChecksLevel = StackCorruptionDetectionLevel.AllInstructions;
 

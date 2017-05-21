@@ -11,6 +11,12 @@ namespace Cosmos.System.Plugs.System
     [Plug(Target = typeof(ValueType))]
     public static class ValueTypeImpl
     {
+//#warning I don't know if this is correctly plugged, so it's commented, but it's here to see other plugs missing for Zork to work
+        //public static bool Equals(ValueType aThis, object aThat)
+        //{
+        //    return (aThis.GetType() == aThat.GetType()) && (aThis == aThat);
+        //}
+
         public static int GetHashCode(ValueType aThis)
         {
             if (aThis is byte)
@@ -28,7 +34,5 @@ namespace Cosmos.System.Plugs.System
         {
             return "<ValueType.ToString not yet implemented!>";
         }
-
     }
-
 }

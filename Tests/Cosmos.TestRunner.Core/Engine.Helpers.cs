@@ -109,6 +109,19 @@ namespace Cosmos.TestRunner.Core
                        });
         }
 
+        private void RunReadNAsmMapToDebugInfo(string debugInfoFile)
+        {
+            var xReadNAsmMapToDebugInfoTask = new ReadNAsmMapToDebugInfoTask();
+
+            xReadNAsmMapToDebugInfoTask.DebugInfoFile = debugInfoFile;
+            xReadNAsmMapToDebugInfoTask.InputBaseDir = mBaseWorkingDirectory;
+
+            if (!xReadNAsmMapToDebugInfoTask.Execute())
+            {
+                throw new Exception("Error running ReadNAsmMapToDebugInfo!");
+            }
+        }
+
         private static string GetCosmosUserkitFolder()
         {
             //$([MSBuild]::GetRegistryValue("HKEY_LOCAL_MACHINE\Software\Cosmos", "UserKit"))

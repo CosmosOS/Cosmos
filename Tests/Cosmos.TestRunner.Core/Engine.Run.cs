@@ -4,6 +4,7 @@ using System.IO;
 using Cosmos.Build.Common;
 using Cosmos.Build.MSBuild;
 using Cosmos.Core.Plugs;
+using Cosmos.Debug.Common;
 using Cosmos.Debug.Kernel;
 using Cosmos.Debug.Kernel.Plugs;
 using Cosmos.System.Plugs.System;
@@ -16,6 +17,9 @@ namespace Cosmos.TestRunner.Core
     {
         public int AllowedSecondsInKernel = 30;
         public List<RunTargetEnum> RunTargets = new List<RunTargetEnum>();
+        public bool ReadMapToDebugInfo = false;
+
+        private DebugInfo mDebugInfoDb;
 
         private bool ExecuteKernel(string assemblyFileName, RunConfiguration configuration)
         {
@@ -23,14 +27,15 @@ namespace Cosmos.TestRunner.Core
             OutputHandler.ExecuteKernelStart(assemblyFileName);
             try
             {
-
                 var xAssemblyFile = Path.Combine(mBaseWorkingDirectory, "Kernel.asm");
                 var xObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.obj");
                 var xTempObjectFile = Path.Combine(mBaseWorkingDirectory, "Kernel.o");
                 var xIsoFile = Path.Combine(mBaseWorkingDirectory, "Kernel.iso");
+                var xDebugFile = Path.Combine(mBaseWorkingDirectory, "Kernel.cdb");
 
                 RunTask("IL2CPU", () => RunIL2CPU(assemblyFileName, xAssemblyFile));
                 RunTask("Nasm", () => RunNasm(xAssemblyFile, xObjectFile, configuration.IsELF));
+
                 if (configuration.IsELF)
                 {
                     File.Move(xObjectFile, xTempObjectFile);
@@ -38,20 +43,29 @@ namespace Cosmos.TestRunner.Core
                     RunTask("Ld", () => RunLd(xTempObjectFile, xObjectFile));
                     RunTask("ExtractMapFromElfFile", () => RunExtractMapFromElfFile(mBaseWorkingDirectory, xObjectFile));
                 }
+                else if(ReadMapToDebugInfo)
+                {
+                    RunTask("ReadNAsmMapToDebugInfo", () => RunReadNAsmMapToDebugInfo(xDebugFile));
+                }
+
                 var xHarddiskPath = Path.Combine(mBaseWorkingDirectory, "Harddisk.vmdk");
                 var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "VMware", "Workstation", "Filesystem.vmdk");
                 File.Copy(xOriginalHarddiskPath, xHarddiskPath);
                 RunTask("MakeISO", () => MakeIso(xObjectFile, xIsoFile));
-                switch (configuration.RunTarget)
+
+                using (mDebugInfoDb = new DebugInfo(xDebugFile))
                 {
-                    case RunTargetEnum.Bochs:
-                        RunTask("RunISO", () => RunIsoInBochs(xIsoFile, xHarddiskPath));
-                        break;
-                    case RunTargetEnum.VMware:
-                        RunTask("RunISO", () => RunIsoInVMware(xIsoFile, xHarddiskPath));
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException("RunTarget " + configuration.RunTarget + " not implemented!");
+                    switch (configuration.RunTarget)
+                    {
+                        case RunTargetEnum.Bochs:
+                            RunTask("RunISO", () => RunIsoInBochs(xIsoFile, xHarddiskPath));
+                            break;
+                        case RunTargetEnum.VMware:
+                            RunTask("RunISO", () => RunIsoInVMware(xIsoFile, xHarddiskPath));
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException("RunTarget " + configuration.RunTarget + " not implemented!");
+                    }
                 }
             }
             catch (Exception e)
@@ -72,6 +86,7 @@ namespace Cosmos.TestRunner.Core
                 OutputHandler.ExecuteKernelEnd(assemblyFileName);
 
             }
+
             xResult = mKernelResult;
             return xResult;
         }
