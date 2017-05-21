@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -141,6 +141,8 @@ namespace Cosmos.IL2CPU.ILOpCodes
         case Code.Ldelem_U1:
         case Code.Ldelem_U2:
         case Code.Ldelem_U4:
+        case Code.Ldelem_R4:
+        case Code.Ldelem_R8:
           return 2;
         case Code.Ldnull:
           return 0;
@@ -273,7 +275,9 @@ namespace Cosmos.IL2CPU.ILOpCodes
         case Code.Ldelem_U1:
         case Code.Ldelem_U2:
         case Code.Ldelem_U4:
-          return 1;
+        case Code.Ldelem_R4:
+        case Code.Ldelem_R8:
+            return 1;
         case Code.Ldnull:
           return 1;
         case Code.Dup:
@@ -467,10 +471,15 @@ namespace Cosmos.IL2CPU.ILOpCodes
         case Code.Ldelem_U4:
           StackPushTypes[0] = typeof(uint);
           return;
+        case Code.Ldelem_R4:
+            StackPushTypes[0] = typeof(float);
+            return;
+        case Code.Ldelem_R8:
+            StackPushTypes[0] = typeof(double);
+            return;
         case Code.Ldnull:
           StackPushTypes[0] = typeof(NullRef);
           return;
-
         case Code.Ldind_I:
           StackPushTypes[0] = typeof(IntPtr);
           return;
