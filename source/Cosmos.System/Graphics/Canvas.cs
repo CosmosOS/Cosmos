@@ -200,7 +200,7 @@ namespace Cosmos.System.Graphics
         }
 
         //https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
-        public void DrawCircle(Pen pen, int x_center, int y_center, int radius)
+        public virtual void DrawCircle(Pen pen, int x_center, int y_center, int radius)
         {
             if (pen == null)
                 throw new ArgumentNullException(nameof(pen));
@@ -234,7 +234,7 @@ namespace Cosmos.System.Graphics
         }
 
         //http://members.chello.at/~easyfilter/bresenham.html
-        public void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
+        public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
         {
             if (pen == null)
                 throw new ArgumentNullException(nameof(pen));
@@ -263,7 +263,7 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public void DrawPolygon(Pen pen, PointsCollection points)
+        public virtual void DrawPolygon(Pen pen, PointsCollection points)
         {
             for (int i = 0; i < points.Count-1; i++)
             {
