@@ -192,88 +192,68 @@ namespace Cosmos.System.Graphics
             throw new NotImplementedException();
         }
 
+        //https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
         public void DrawCircle(Pen pen, int x_center, int y_center, int radius)
         {
             if (pen == null)
                 throw new ArgumentNullException(nameof(pen));
 
-            int r2 = radius * radius;
+            int x = radius;
+            int y = 0;
+            int e = 0;
 
-            for (int i = 0; i < radius; i++)
+            while(x>=y)
             {
-                int xLocal = i;
-                int xLocal2 = i * i;
-                int yLocal2 = r2 - xLocal2;
-                int yLocal = (int)Math.Sqrt(yLocal2);
-                DrawPoint(pen, x_center + xLocal, y_center + yLocal);
-                DrawPoint(pen, x_center - xLocal, y_center + yLocal);
-                DrawPoint(pen, x_center + xLocal, y_center - yLocal);
-                DrawPoint(pen, x_center - xLocal, y_center - yLocal);
-            }
+                DrawPoint(pen, x_center + x, y_center + y);
+                DrawPoint(pen, x_center + y, y_center + x);
+                DrawPoint(pen, x_center - y, y_center + x);
+                DrawPoint(pen, x_center - x, y_center + y);
+                DrawPoint(pen, x_center - x, y_center - y);
+                DrawPoint(pen, x_center - y, y_center - x);
+                DrawPoint(pen, x_center + y, y_center - x);
+                DrawPoint(pen, x_center + x, y_center - y);
 
-            int xLocalEnd = radius;
-            int yLocalEnd = 0;
-            while (xLocalEnd == radius)
-            {
-                DrawPoint(pen, x_center + xLocalEnd, y_center + yLocalEnd);
-                DrawPoint(pen, x_center - xLocalEnd, y_center + yLocalEnd);
-                DrawPoint(pen, x_center + xLocalEnd, y_center - yLocalEnd);
-                DrawPoint(pen, x_center - xLocalEnd, y_center - yLocalEnd);
-                yLocalEnd++;
-                xLocalEnd = (int)Math.Sqrt(r2 - yLocalEnd * yLocalEnd);
+                y++;
+                if(e<=0)
+                {
+                    e += 2 * y + 1;
+                }
+                if(e>0)
+                {
+                    x--;
+                    e -= 2 * x + 1;
+                }
             }
-
         }
 
-        struct Point
-        {
-            public Point(double x, double y)
-            {
-                this.x = x;
-                this.y = y;
-            }
-            public double x;
-            public double y;
-        }
-
-        public void DrawEllipse(Pen pen, int x_center, int y_center, int a_radius, int b_radius, double angle=0)
+        //http://members.chello.at/~easyfilter/bresenham.html
+        public void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
         {
             if (pen == null)
                 throw new ArgumentNullException(nameof(pen));
 
-            int r2 = a_radius * a_radius;
-            double radiusScale = ((double)b_radius) / ((double)a_radius);
+            int a = 2 * x_radius;
+            int b = 2 * y_radius;
+            int b1 = b & 1;
+            int dx = 4 * (1 - a) * b * b;
+            int dy = 4 * (b1 + 1) * a * a;
+            int err = dx + dy + b1 * a * a;
+            int e2;
+            int y = 0;
+            int x = x_radius;
+            a *= 8 * a;
+            b1 = 8 * b * b;
 
-            List<Point> values = new List<Point>(a_radius);
-
-            for (int i = 0; i <= a_radius; i++)
+            while (x>=0)
             {
-                int xLocal = i;
-                int xLocal2 = i * i;
-                int yLocal2 = r2 - xLocal2;
-                double yLocal = Math.Sqrt(yLocal2);
-                values.Add(new Point(xLocal,yLocal));
+                DrawPoint(pen, x_center + x, y_center + y);
+                DrawPoint(pen, x_center - x, y_center + y);
+                DrawPoint(pen, x_center - x, y_center - y);
+                DrawPoint(pen, x_center + x, y_center - y);
+                e2 = 2 * err;
+                if (e2 <= dy) { y++; err += dy += a; }
+                if (e2 >= dx || 2 * err > dy) { x--; err += dx += b1; }
             }
-
-            int xLocalEnd = a_radius;
-            int yLocalEnd = 0;
-            while (xLocalEnd == a_radius)
-            {
-                values.Add(new Point(xLocalEnd, yLocalEnd));
-                yLocalEnd++;
-                xLocalEnd = (int)Math.Sqrt(r2 - yLocalEnd * yLocalEnd);
-            }
-
-            double sinAngle = Math.Sin(angle);
-            double cosAngle = Math.Cos(angle);
-
-            for (int i = 0; i < values.Count; i++)
-            {
-                Point newPoint = new Point(values[i].x*cosAngle - radiusScale*values[i].y*sinAngle, values[i].x*sinAngle + radiusScale*values[i].y*cosAngle);
-                DrawPoint(pen, (int)newPoint.x + x_center, (int)newPoint.y + y_center);
-                values[i] = newPoint;
-            }
-
         }
 
         public void DrawRectangle(Pen pen, int x, int y, int width, int height)
