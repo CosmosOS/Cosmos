@@ -9,6 +9,7 @@ namespace Cosmos.System.Plugs.System.Collections.Generic
     {
         public static EqualityComparer<T> CreateComparer()
         {
+            
             throw new Exception("Create comparer not yet implemented!");
         }
     }
