@@ -48,6 +48,9 @@ namespace Cosmos_Graphic_Subsytem
                 pen.Color = Color.PaleVioletRed;
                 canvas.DrawRectangle(pen, 350, 350, 80, 60);
 
+                pen.Color = Color.Chartreuse;
+                canvas.DrawCircle(pen, 69, 69, 10);
+
                 /*
                  * It will be really beautiful to do here:
                  * canvas.DrawString(pen, "Please press any key to continue the Demo...");

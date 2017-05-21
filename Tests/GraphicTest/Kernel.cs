@@ -54,6 +54,12 @@ namespace GraphicTest
                 pen.Color = Color.PaleVioletRed;
                 canvas.DrawRectangle(pen, 350, 350, 80, 60);
 
+                pen.Color = Color.Chartreuse;
+                canvas.DrawCircle(pen, 69, 69, 10);
+
+                pen.Color = Color.DimGray;
+                canvas.DrawEllipse(pen, 100, 69, 10, 50);
+
                 Console.ReadKey();
 
                 /* Let's try to change mode...*/

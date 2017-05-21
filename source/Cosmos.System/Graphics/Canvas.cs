@@ -199,12 +199,79 @@ namespace Cosmos.System.Graphics
 
             int r2 = radius * radius;
 
-            for (int i = 0; i <= radius; i++)
+            for (int i = 0; i < radius; i++)
             {
                 int xLocal = i;
                 int xLocal2 = i * i;
                 int yLocal2 = r2 - xLocal2;
-                int yLocal = Math.Sqrt(yLocal2);
+                int yLocal = (int)Math.Sqrt(yLocal2);
+                DrawPoint(pen, x_center + xLocal, y_center + yLocal);
+                DrawPoint(pen, x_center - xLocal, y_center + yLocal);
+                DrawPoint(pen, x_center + xLocal, y_center - yLocal);
+                DrawPoint(pen, x_center - xLocal, y_center - yLocal);
+            }
+
+            int xLocalEnd = radius;
+            int yLocalEnd = 0;
+            while (xLocalEnd == radius)
+            {
+                DrawPoint(pen, x_center + xLocalEnd, y_center + yLocalEnd);
+                DrawPoint(pen, x_center - xLocalEnd, y_center + yLocalEnd);
+                DrawPoint(pen, x_center + xLocalEnd, y_center - yLocalEnd);
+                DrawPoint(pen, x_center - xLocalEnd, y_center - yLocalEnd);
+                yLocalEnd++;
+                xLocalEnd = (int)Math.Sqrt(r2 - yLocalEnd * yLocalEnd);
+            }
+
+        }
+
+        struct Point
+        {
+            public Point(double x, double y)
+            {
+                this.x = x;
+                this.y = y;
+            }
+            public double x;
+            public double y;
+        }
+
+        public void DrawEllipse(Pen pen, int x_center, int y_center, int a_radius, int b_radius, double angle=0)
+        {
+            if (pen == null)
+                throw new ArgumentNullException(nameof(pen));
+
+            int r2 = a_radius * a_radius;
+            double radiusScale = ((double)b_radius) / ((double)a_radius);
+
+            List<Point> values = new List<Point>(a_radius);
+
+            for (int i = 0; i <= a_radius; i++)
+            {
+                int xLocal = i;
+                int xLocal2 = i * i;
+                int yLocal2 = r2 - xLocal2;
+                double yLocal = Math.Sqrt(yLocal2);
+                values.Add(new Point(xLocal,yLocal));
+            }
+
+            int xLocalEnd = a_radius;
+            int yLocalEnd = 0;
+            while (xLocalEnd == a_radius)
+            {
+                values.Add(new Point(xLocalEnd, yLocalEnd));
+                yLocalEnd++;
+                xLocalEnd = (int)Math.Sqrt(r2 - yLocalEnd * yLocalEnd);
+            }
+
+            double sinAngle = Math.Sin(angle);
+            double cosAngle = Math.Cos(angle);
+
+            for (int i = 0; i < values.Count; i++)
+            {
+                Point newPoint = new Point(values[i].x*cosAngle - radiusScale*values[i].y*sinAngle, values[i].x*sinAngle + radiusScale*values[i].y*cosAngle);
+                DrawPoint(pen, (int)newPoint.x + x_center, (int)newPoint.y + y_center);
+                values[i] = newPoint;
             }
 
         }
