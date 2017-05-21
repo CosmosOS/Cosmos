@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace Cosmos.System.Graphics
 {
@@ -187,6 +189,11 @@ namespace Cosmos.System.Graphics
             DrawDiagonalLine(pen, dx, dy, x1, y1);
         }
 
+        public void DrawLine(Pen pen, Point p1, Point p2)
+        {
+            DrawLine(pen, p1.X, p1.Y, p2.X, p2.Y);
+        }
+
         public void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
         {
             throw new NotImplementedException();
@@ -254,6 +261,15 @@ namespace Cosmos.System.Graphics
                 if (e2 <= dy) { y++; err += dy += a; }
                 if (e2 >= dx || 2 * err > dy) { x--; err += dx += b1; }
             }
+        }
+
+        public void DrawPolygon(Pen pen, PointsCollection points)
+        {
+            for (int i = 0; i < points.Count-1; i++)
+            {
+                DrawLine(pen, points[i], points[i + 1]);
+            }
+            DrawLine(pen, points[0], points[points.Count - 1]);
         }
 
         public void DrawRectangle(Pen pen, int x, int y, int width, int height)
@@ -368,5 +384,31 @@ namespace Cosmos.System.Graphics
                 throw new ArgumentOutOfRangeException(nameof(y), $"y ({y}) is not between 0 and {Mode.Rows}");
             }
         }
+    }
+
+    public class Point
+    {
+        public Point(int x, int y)
+        {
+            this.X = x;
+            this.Y = y;
+        }
+        int x;
+        public int X
+        {
+            get { return x; }
+            set { x = value; }
+        }
+        int y;
+        public int Y
+        {
+            get { return y; }
+            set { y = value; }
+        }
+    }
+
+    public class PointsCollection : List<Point>
+    {
+
     }
 }
