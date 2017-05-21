@@ -314,7 +314,14 @@ namespace Cosmos.Debug.VSDebugEngine
             switch (xPortType)
             {
                 case "pipe:":
-                    mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer(xPortParam);
+                    if (xLaunch == "HyperV")
+                    {
+                        mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeClient(xPortParam);
+                    }
+                    else
+                    {
+                        mDbgConnector = new Cosmos.Debug.Common.DebugConnectorPipeServer(xPortParam);
+                    }
                     break;
                 case "serial:":
                     if (xLaunch == "IntelEdison")
@@ -445,6 +452,9 @@ namespace Cosmos.Debug.VSDebugEngine
                     break;
                 case LaunchType.IntelEdison:
                     mHost = new Host.IntelEdison(mDebugInfo, false);
+                    break;
+                case LaunchType.HyperV:
+                    mHost = new Host.HyperV(mDebugInfo, false);
                     break;
                 default:
                     throw new Exception("Invalid Launch value: '" + mLaunch + "'.");

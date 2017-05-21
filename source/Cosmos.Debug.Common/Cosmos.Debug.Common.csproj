@@ -152,6 +152,7 @@
       <DependentUpon>DebugConnector.cs</DependentUpon>
     </Compile>
     <Compile Include="DebugConnectorEdison.cs" />
+    <Compile Include="DebugConnectorPipeClient.cs" />
     <Compile Include="DebugConnectorPipeServer.cs" />
     <Compile Include="DebugConnectorSerial.cs" />
     <Compile Include="DebugConnectorStreamWithoutTimeouts.cs" />

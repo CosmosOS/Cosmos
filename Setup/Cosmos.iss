@@ -178,6 +178,8 @@ Source: ".\Resources\Dependencies\Microsoft.Samples.Debugging.CorApi.1.4.0.0\*.d
 ;Source: ".\Resources\Dependencies\Mosa\Mosa.Utility.IsoImage.dll"; DestDir: "{app}\Build\VSIP\"; Flags: ignoreversion uninsremovereadonly
 
 ; VMware
+Source: ".\Build\HyperV\*"; DestDir: "{app}\Build\HyperV"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
+; VMware
 Source: ".\Build\VMware\*"; DestDir: "{app}\Build\VMware"; Flags: ignoreversion uninsremovereadonly overwritereadonly recursesubdirs
 ; ISO
 Source: ".\Build\ISO\*"; DestDir: "{app}\Build\ISO"
