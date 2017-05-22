@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Debugger.Interop;
+
 using Cosmos.Debug.Common;
 using Cosmos.VS.DebugEngine.AD7.Definitions;
 using Cosmos.VS.DebugEngine.Engine.Impl;
 using Cosmos.VS.DebugEngine.Properties;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace Cosmos.VS.DebugEngine.AD7.Impl
 {

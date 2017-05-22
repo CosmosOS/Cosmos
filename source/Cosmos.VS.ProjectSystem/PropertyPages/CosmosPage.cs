@@ -48,16 +48,21 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
         }
 
         protected ProfilePresets mPresets = new ProfilePresets();
+
         protected int mVMwareAndBochsDebugPipe;
+        protected int mHyperVDebugPipe;
+
         protected bool mShowTabBochs;
         protected bool mShowTabDebug;
         protected bool mShowTabDeployment;
         protected bool mShowTabLaunch;
         protected bool mShowTabVMware;
+        protected bool mShowTabHyperV;
         protected bool mShowTabPXE;
         protected bool mShowTabUSB;
         protected bool mShowTabISO;
         protected bool mShowTabSlave;
+
         protected bool FreezeEvents;
 
         public CosmosPage()
@@ -182,7 +187,6 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
 
             #endregion
 
-
             #region VMware
 
             cmboVMwareEdition.SelectedIndexChanged += delegate (Object sender, EventArgs e)
@@ -291,8 +295,6 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
                 }
             };
 
-            #endregion
-
             checkEnableGDB.CheckedChanged += delegate (Object sender, EventArgs e)
             {
                 if (FreezeEvents) return;
@@ -344,6 +346,7 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
                     IsDirty = true;
                 }
             };
+            #endregion
         }
 
         public override void ApplyChanges()
@@ -371,6 +374,7 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
             RemoveTab(tabDeployment);
             RemoveTab(tabLaunch);
             RemoveTab(tabVMware);
+            RemoveTab(tabHyperV);
             RemoveTab(tabPXE);
             RemoveTab(tabUSB);
             RemoveTab(tabISO);
@@ -406,6 +410,10 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
             if (mShowTabVMware)
             {
                 TabControl1.TabPages.Add(tabVMware);
+            }
+            if (mShowTabHyperV)
+            {
+                TabControl1.TabPages.Add(tabHyperV);
             }
             if (mShowTabSlave)
             {
@@ -454,6 +462,15 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
                 cmboVisualStudioDebugPort.Enabled = false;
                 cmboVisualStudioDebugPort.SelectedIndex = mVMwareAndBochsDebugPipe;
 
+            }
+            else if (mProps.Profile == "HyperV")
+            {
+                mShowTabHyperV = true;
+                chckEnableDebugStub.Checked = true;
+                chkEnableStackCorruptionDetection.Checked = true;
+                cmboCosmosDebugPort.Enabled = false;
+                cmboVisualStudioDebugPort.Enabled = false;
+                cmboVisualStudioDebugPort.SelectedIndex = mHyperVDebugPipe;
             }
             else if (mProps.Profile == "PXE")
             {
@@ -546,6 +563,7 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
             mShowTabPXE = mProps.Deployment == DeploymentType.PXE;
             //
             mShowTabVMware = mProps.Launch == LaunchType.VMware;
+            mShowTabHyperV = mProps.Launch == LaunchType.HyperV;
             mShowTabSlave = mProps.Launch == LaunchType.Slave;
             mShowTabBochs = (LaunchType.Bochs == mProps.Launch);
             //
@@ -784,6 +802,7 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
             cmboVisualStudioDebugPort.Items.Clear();
             FillComPorts(cmboVisualStudioDebugPort.Items);
             mVMwareAndBochsDebugPipe = cmboVisualStudioDebugPort.Items.Add(@"Pipe: Cosmos\Serial");
+            mHyperVDebugPipe = cmboVisualStudioDebugPort.Items.Add(@"Pipe: CosmosSerial");
 
             comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(DebugMode), false));
             comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies), false));

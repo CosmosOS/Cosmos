@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using System.ComponentModel;
 
 namespace Cosmos.Build.Common
 {
@@ -31,6 +31,8 @@ namespace Cosmos.Build.Common
         Bochs,
         [Description("Intel Edison")]
         IntelEdison,
+        [Description("Hyper-V")]
+        HyperV
     }
 
     public enum VMwareEdition

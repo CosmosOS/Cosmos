@@ -19,6 +19,7 @@ namespace Cosmos.VS.ProjectSystem
                 Add("Bochs", "Bochs");
             }
             Add("IntelEdison", "Intel Edison Serial boot");
+            Add("HyperV", "Hyper-V");
         }
     }
 }

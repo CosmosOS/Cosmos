@@ -5,18 +5,18 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Cosmos.Debug.DebugConnectors;
-using Cosmos.Debug.Symbols;
-using Cosmos.VS.DebugEngine.Engine.Impl;
-using Cosmos.VS.DebugEngine.Utilities;
 using Microsoft.Internal.VisualStudio.PlatformUI;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using Label = Cosmos.Debug.Symbols.Label;
 using Cosmos.Build.Common;
 using Cosmos.Debug.Common;
+using Cosmos.Debug.DebugConnectors;
 using Cosmos.Debug.Hosts;
+using Cosmos.Debug.Symbols;
+using Cosmos.VS.DebugEngine.Engine.Impl;
 using Cosmos.VS.DebugEngine.Properties;
+using Cosmos.VS.DebugEngine.Utilities;
+using Label = Cosmos.Debug.Symbols.Label;
 
 namespace Cosmos.VS.DebugEngine.AD7.Impl
 {
@@ -316,7 +316,14 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
             switch (xPortType)
             {
                 case "pipe:":
-                    mDbgConnector = new DebugConnectorPipeServer(xPortParam);
+                    if (xLaunch == "HyperV")
+                    {
+                        mDbgConnector = new DebugConnectorPipeClient(xPortParam);
+                    }
+                    else
+                    {
+                        mDbgConnector = new DebugConnectorPipeServer(xPortParam);
+                    }
                     break;
 #if SERIAL_PORT
                 case "serial:":
@@ -480,6 +487,9 @@ namespace Cosmos.VS.DebugEngine.AD7.Impl
                     break;
                 case LaunchType.IntelEdison:
                     mHost = new IntelEdison(mDebugInfo, false);
+                    break;
+                case LaunchType.HyperV:
+                    mHost = new HyperV(mDebugInfo, false);
                     break;
                 default:
                     throw new Exception("Invalid Launch value: '" + mLaunch + "'.");

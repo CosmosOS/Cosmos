@@ -3,6 +3,7 @@
     public enum RunTargetEnum
     {
         Bochs,
-        VMware
+        VMware,
+        HyperV
     }
 }
