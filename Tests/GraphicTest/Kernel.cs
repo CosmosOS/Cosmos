@@ -60,11 +60,8 @@ namespace GraphicTest
                 pen.Color = Color.DimGray;
                 canvas.DrawEllipse(pen, 100, 69, 10, 50);
 
-                var points = new PointsCollection();
-                points.Add(new Point(100, 150));
-                points.Add(new Point(135, 129));
-                points.Add(new Point(149,250));
-                canvas.DrawPolygon(pen, points);
+                pen.Color = Color.MediumPurple;
+                canvas.DrawPolygon(pen, new Point(200, 250), new Point(250, 300), new Point(220, 350), new Point(210, 275));
 
                 Console.ReadKey();
 

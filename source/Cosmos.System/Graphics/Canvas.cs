@@ -204,7 +204,10 @@ namespace Cosmos.System.Graphics
         {
             if (pen == null)
                 throw new ArgumentNullException(nameof(pen));
-
+            ThrowIfCoordNotValid(x_center + radius, y_center);
+            ThrowIfCoordNotValid(x_center - radius, y_center);
+            ThrowIfCoordNotValid(x_center, y_center + radius);
+            ThrowIfCoordNotValid(x_center, y_center - radius);
             int x = radius;
             int y = 0;
             int e = 0;
@@ -238,7 +241,10 @@ namespace Cosmos.System.Graphics
         {
             if (pen == null)
                 throw new ArgumentNullException(nameof(pen));
-
+            ThrowIfCoordNotValid(x_center + x_radius, y_center);
+            ThrowIfCoordNotValid(x_center - x_radius, y_center);
+            ThrowIfCoordNotValid(x_center, y_center + y_radius);
+            ThrowIfCoordNotValid(x_center, y_center - y_radius);
             int a = 2 * x_radius;
             int b = 2 * y_radius;
             int b1 = b & 1;
@@ -263,13 +269,18 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public virtual void DrawPolygon(Pen pen, PointsCollection points)
+        public virtual void DrawPolygon(Pen pen, params Point[] points)
         {
-            for (int i = 0; i < points.Count-1; i++)
+            if (points.Length < 3)
+                throw new ArgumentException("A polygon requires more than 3 points.");
+            if (pen == null)
+                throw new ArgumentNullException(nameof(pen));
+
+            for (int i = 0; i < points.Length - 1; i++)
             {
                 DrawLine(pen, points[i], points[i + 1]);
             }
-            DrawLine(pen, points[0], points[points.Count - 1]);
+            DrawLine(pen, points[0], points[points.Length - 1]);
         }
 
         public void DrawRectangle(Pen pen, int x, int y, int width, int height)
