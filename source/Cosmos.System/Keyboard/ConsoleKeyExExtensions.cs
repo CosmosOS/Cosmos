@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Cosmos.System
 {
@@ -141,6 +141,7 @@ namespace Cosmos.System
                 case ConsoleKeyEx.Sleep:
                     return ConsoleKey.Sleep;
                 case ConsoleKeyEx.BiggerThan:
+				case ConsoleKeyEx.ExclamationPoint:
                 case ConsoleKeyEx.Period:
                     return ConsoleKey.OemPeriod;
                 case ConsoleKeyEx.LowerThan:
@@ -148,10 +149,36 @@ namespace Cosmos.System
                     return ConsoleKey.OemComma;
                 case ConsoleKeyEx.NumPeriod:
                     return ConsoleKey.Decimal;
-                case ConsoleKeyEx.NumPlus:
-                    return ConsoleKey.Add;
                 case ConsoleKeyEx.NumEnter:
                     return ConsoleKey.Enter;
+				case ConsoleKeyEx.Num0:
+					return ConsoleKey.D0;
+				case ConsoleKeyEx.Num1:
+					return ConsoleKey.D1;
+				case ConsoleKeyEx.Num2:
+					return ConsoleKey.D2;
+				case ConsoleKeyEx.Num3:
+					return ConsoleKey.D3;
+				case ConsoleKeyEx.Num4:
+					return ConsoleKey.D4;
+				case ConsoleKeyEx.Num5:
+					return ConsoleKey.D5;
+				case ConsoleKeyEx.Num6:
+					return ConsoleKey.D6;
+				case ConsoleKeyEx.Num7:
+					return ConsoleKey.D7;
+				case ConsoleKeyEx.Num8:
+					return ConsoleKey.D8;
+				case ConsoleKeyEx.Num9:
+					return ConsoleKey.D9;
+				case ConsoleKeyEx.NumDivide:
+					return ConsoleKey.Divide;
+				case ConsoleKeyEx.NumMultiply:
+					return ConsoleKey.Multiply;
+				case ConsoleKeyEx.NumMinus:
+					return ConsoleKey.OemMinus;
+				case ConsoleKeyEx.NumPlus:
+					return ConsoleKey.OemPlus;
                 case ConsoleKeyEx.Backslash:
                     return ConsoleKey.Oem5;
                 case ConsoleKeyEx.LBracket:
@@ -173,6 +200,10 @@ namespace Cosmos.System
                     return ConsoleKey.Oem1;
                 case ConsoleKeyEx.OEM102:
                     return ConsoleKey.Oem102;
+				case ConsoleKeyEx.LWin:
+                    return ConsoleKey.LeftWindows;
+				case ConsoleKeyEx.RWin:
+                    return ConsoleKey.RightWindows;
                 default:
                     throw new Exception("KeyEx not implemented!");
             }

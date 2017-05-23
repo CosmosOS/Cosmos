@@ -95,6 +95,9 @@
     <Compile Include="Engine.VMware.cs">
       <DependentUpon>Engine.cs</DependentUpon>
     </Compile>
+    <Compile Include="Engine.HyperV.cs">
+      <DependentUpon>Engine.cs</DependentUpon>
+    </Compile>
     <Compile Include="Enums.cs" />
     <Compile Include="MultiplexingOutputHandler.cs" />
     <Compile Include="OutputHandlerBase.cs" />

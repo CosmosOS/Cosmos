@@ -102,14 +102,13 @@ namespace Cosmos.Build.Common
                 Description = "Makes a USB device such as a flash drive or external hard disk bootable.";
                 Deployment = DeploymentType.USB;
                 Launch = LaunchType.None;
-
             }
             else if (aName == "VMware")
             {
                 Description = "Use VMware Player or Workstation to deploy and debug.";
                 Deployment = DeploymentType.ISO;
                 Launch = LaunchType.VMware;
-
+                VisualStudioDebugPort = @"Pipe: Cosmos\Serial";
             }
             else if (aName == "PXE")
             {
@@ -124,12 +123,20 @@ namespace Cosmos.Build.Common
                 Description = "Use Bochs emulator to deploy and debug.";
                 Deployment = DeploymentType.ISO;
                 Launch = LaunchType.Bochs;
+                VisualStudioDebugPort = @"Pipe: Cosmos\Serial";
             }
             else if (aName == "IntelEdison")
             {
                 Description = "Connect to Intel Edison device to deploy and debug.";
                 Deployment = DeploymentType.BinaryImage;
                 Launch = LaunchType.IntelEdison;
+            }
+            else if (aName == "HyperV")
+            {
+                Description = "Use Hyper-V to deploy and debug.";
+                Deployment = DeploymentType.ISO;
+                Launch = LaunchType.HyperV;
+                VisualStudioDebugPort = "Pipe: CosmosSerial";
             }
         }
 

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace Cosmos.System.Graphics
 {
@@ -83,6 +85,8 @@ namespace Cosmos.System.Graphics
                 }
             }
         }
+
+        
 
         public abstract void DrawPoint(Pen pen, int x, int y);
 
@@ -187,7 +191,96 @@ namespace Cosmos.System.Graphics
 
         public virtual void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
         {
+            DrawLine(pen, p1.X, p1.Y, p2.X, p2.Y);
+        }
+
+        public void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
+        {
             throw new NotImplementedException();
+        }
+
+        //https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+        public virtual void DrawCircle(Pen pen, int x_center, int y_center, int radius)
+        {
+            if (pen == null)
+                throw new ArgumentNullException(nameof(pen));
+            ThrowIfCoordNotValid(x_center + radius, y_center);
+            ThrowIfCoordNotValid(x_center - radius, y_center);
+            ThrowIfCoordNotValid(x_center, y_center + radius);
+            ThrowIfCoordNotValid(x_center, y_center - radius);
+            int x = radius;
+            int y = 0;
+            int e = 0;
+
+            while(x>=y)
+            {
+                DrawPoint(pen, x_center + x, y_center + y);
+                DrawPoint(pen, x_center + y, y_center + x);
+                DrawPoint(pen, x_center - y, y_center + x);
+                DrawPoint(pen, x_center - x, y_center + y);
+                DrawPoint(pen, x_center - x, y_center - y);
+                DrawPoint(pen, x_center - y, y_center - x);
+                DrawPoint(pen, x_center + y, y_center - x);
+                DrawPoint(pen, x_center + x, y_center - y);
+
+                y++;
+                if(e<=0)
+                {
+                    e += 2 * y + 1;
+                }
+                if(e>0)
+                {
+                    x--;
+                    e -= 2 * x + 1;
+                }
+            }
+        }
+
+        //http://members.chello.at/~easyfilter/bresenham.html
+        public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
+        {
+            if (pen == null)
+                throw new ArgumentNullException(nameof(pen));
+            ThrowIfCoordNotValid(x_center + x_radius, y_center);
+            ThrowIfCoordNotValid(x_center - x_radius, y_center);
+            ThrowIfCoordNotValid(x_center, y_center + y_radius);
+            ThrowIfCoordNotValid(x_center, y_center - y_radius);
+            int a = 2 * x_radius;
+            int b = 2 * y_radius;
+            int b1 = b & 1;
+            int dx = 4 * (1 - a) * b * b;
+            int dy = 4 * (b1 + 1) * a * a;
+            int err = dx + dy + b1 * a * a;
+            int e2;
+            int y = 0;
+            int x = x_radius;
+            a *= 8 * a;
+            b1 = 8 * b * b;
+
+            while (x>=0)
+            {
+                DrawPoint(pen, x_center + x, y_center + y);
+                DrawPoint(pen, x_center - x, y_center + y);
+                DrawPoint(pen, x_center - x, y_center - y);
+                DrawPoint(pen, x_center + x, y_center - y);
+                e2 = 2 * err;
+                if (e2 <= dy) { y++; err += dy += a; }
+                if (e2 >= dx || 2 * err > dy) { x--; err += dx += b1; }
+            }
+        }
+
+        public virtual void DrawPolygon(Pen pen, params Point[] points)
+        {
+            if (points.Length < 3)
+                throw new ArgumentException("A polygon requires more than 3 points.");
+            if (pen == null)
+                throw new ArgumentNullException(nameof(pen));
+
+            for (int i = 0; i < points.Length - 1; i++)
+            {
+                DrawLine(pen, points[i], points[i + 1]);
+            }
+            DrawLine(pen, points[0], points[points.Length - 1]);
         }
 
         public virtual void DrawRectangle(Pen pen, int x, int y, int width, int height)
@@ -317,6 +410,27 @@ namespace Cosmos.System.Graphics
             {
                 throw new ArgumentOutOfRangeException(nameof(y), $"y ({y}) is not between 0 and {Mode.Rows}");
             }
+        }
+    }
+
+    public class Point
+    {
+        public Point(int x, int y)
+        {
+            this.X = x;
+            this.Y = y;
+        }
+        int x;
+        public int X
+        {
+            get { return x; }
+            set { x = value; }
+        }
+        int y;
+        public int Y
+        {
+            get { return y; }
+            set { y = value; }
         }
     }
 }

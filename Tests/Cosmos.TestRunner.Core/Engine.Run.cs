@@ -38,9 +38,21 @@ namespace Cosmos.TestRunner.Core
                     RunTask("Ld", () => RunLd(xTempObjectFile, xObjectFile));
                     RunTask("ExtractMapFromElfFile", () => RunExtractMapFromElfFile(mBaseWorkingDirectory, xObjectFile));
                 }
-                var xHarddiskPath = Path.Combine(mBaseWorkingDirectory, "Harddisk.vmdk");
-                var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "VMware", "Workstation", "Filesystem.vmdk");
-                File.Copy(xOriginalHarddiskPath, xHarddiskPath);
+
+                string xHarddiskPath;
+                if (configuration.RunTarget == RunTargetEnum.HyperV)
+                {
+                    xHarddiskPath = Path.Combine(mBaseWorkingDirectory, "Harddisk.vhdx");
+                    var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "HyperV", "Filesystem.vhdx");
+                    File.Copy(xOriginalHarddiskPath, xHarddiskPath);
+                }
+                else
+                {
+                    xHarddiskPath = Path.Combine(mBaseWorkingDirectory, "Harddisk.vmdk");
+                    var xOriginalHarddiskPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "VMware", "Workstation", "Filesystem.vmdk");
+                    File.Copy(xOriginalHarddiskPath, xHarddiskPath);
+                }
+
                 RunTask("MakeISO", () => MakeIso(xObjectFile, xIsoFile));
                 switch (configuration.RunTarget)
                 {
@@ -49,6 +61,9 @@ namespace Cosmos.TestRunner.Core
                         break;
                     case RunTargetEnum.VMware:
                         RunTask("RunISO", () => RunIsoInVMware(xIsoFile, xHarddiskPath));
+                        break;
+                    case RunTargetEnum.HyperV:
+                        RunTask("RunISO", () => RunIsoInHyperV(xIsoFile, xHarddiskPath));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("RunTarget " + configuration.RunTarget + " not implemented!");

@@ -14,6 +14,7 @@ namespace Cosmos.VS.Package {
       Add("VMware", "VMware");
       if (BochsSupport.BochsEnabled) { Add("Bochs", "Bochs"); }
       Add("IntelEdison", "Intel Edison Serial boot");
+      Add("HyperV", "Hyper-V");
     }
   }
 }

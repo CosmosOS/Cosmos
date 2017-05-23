@@ -59,6 +59,8 @@ namespace Cosmos.VS.Package
         /// Bochs and VMware environment to communicate with Vsiual Studio debugger.</summary>
         protected int mVMwareAndBochsDebugPipe;
 
+        protected int mHyperVDebugPipe;
+
         protected bool mShowTabBochs;
 
         protected bool mShowTabDebug;
@@ -68,6 +70,8 @@ namespace Cosmos.VS.Package
         protected bool mShowTabLaunch;
 
         protected bool mShowTabVMware;
+
+        protected bool mShowTabHyperV;
 
         protected bool mShowTabPXE;
 
@@ -104,6 +108,7 @@ namespace Cosmos.VS.Package
             RemoveTab(tabDeployment);
             RemoveTab(tabLaunch);
             RemoveTab(tabVMware);
+            RemoveTab(tabHyperV);
             RemoveTab(tabPXE);
             RemoveTab(tabUSB);
             RemoveTab(tabISO);
@@ -139,6 +144,10 @@ namespace Cosmos.VS.Package
             if (mShowTabVMware)
             {
                 TabControl1.TabPages.Add(tabVMware);
+            }
+            if (mShowTabHyperV)
+            {
+                TabControl1.TabPages.Add(tabHyperV);
             }
             if (mShowTabSlave)
             {
@@ -187,6 +196,15 @@ namespace Cosmos.VS.Package
                 cmboVisualStudioDebugPort.Enabled = false;
                 cmboVisualStudioDebugPort.SelectedIndex = mVMwareAndBochsDebugPipe;
 
+            }
+            else if (mProps.Profile == "HyperV")
+            {
+                mShowTabHyperV = true;
+                chckEnableDebugStub.Checked = true;
+                chkEnableStackCorruptionDetection.Checked = true;
+                cmboCosmosDebugPort.Enabled = false;
+                cmboVisualStudioDebugPort.Enabled = false;
+                cmboVisualStudioDebugPort.SelectedIndex = mHyperVDebugPipe;
             }
             else if (mProps.Profile == "PXE")
             {
@@ -279,6 +297,7 @@ namespace Cosmos.VS.Package
             mShowTabPXE = mProps.Deployment == DeploymentType.PXE;
             //
             mShowTabVMware = mProps.Launch == LaunchType.VMware;
+            mShowTabHyperV = mProps.Launch == LaunchType.HyperV;
             mShowTabSlave = mProps.Launch == LaunchType.Slave;
             mShowTabBochs = (LaunchType.Bochs == mProps.Launch);
             //
@@ -803,6 +822,7 @@ namespace Cosmos.VS.Package
             cmboVisualStudioDebugPort.Items.Clear();
             FillComPorts(cmboVisualStudioDebugPort.Items);
             mVMwareAndBochsDebugPipe = cmboVisualStudioDebugPort.Items.Add(@"Pipe: Cosmos\Serial");
+            mHyperVDebugPipe = cmboVisualStudioDebugPort.Items.Add(@"Pipe: CosmosSerial");
 
             comboDebugMode.Items.AddRange(EnumValue.GetEnumValues(typeof(DebugMode), false));
             comboTraceMode.Items.AddRange(EnumValue.GetEnumValues(typeof(TraceAssemblies), false));
