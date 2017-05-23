@@ -189,7 +189,7 @@ namespace Cosmos.System.Graphics
             DrawDiagonalLine(pen, dx, dy, x1, y1);
         }
 
-        public virtual void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
+        public void DrawLine(Pen pen, Point p1, Point p2)
         {
             DrawLine(pen, p1.X, p1.Y, p2.X, p2.Y);
         }
@@ -323,7 +323,7 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, xc, yc, xd, yd);
         }
 
-        public void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
+        public virtual void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
         {
             for (int i = 0; i != width; i++)
             {
@@ -332,7 +332,7 @@ namespace Cosmos.System.Graphics
             }
         }
 
-        public void DrawTriangle(Pen pen, int v1x, int v1y, int v2x, int v2y, int v3x, int v3y)
+        public virtual void DrawTriangle(Pen pen, int v1x, int v1y, int v2x, int v2y, int v3x, int v3y)
         {
             DrawLine(pen, v1x, v1y, v2x, v2y);
             DrawLine(pen, v1x, v1y, v3x, v3y);
