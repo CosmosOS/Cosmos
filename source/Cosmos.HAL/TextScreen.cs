@@ -76,7 +76,7 @@ namespace Cosmos.HAL {
 
         public override void SetColors(ConsoleColor aForeground, ConsoleColor aBackground)
         {
-            Color = (byte)((byte)(aForeground) | ((byte)(aBackground) << 4));
+            Color = (byte)((uint)(aForeground) | ((uint)(aBackground) << 4));
             // The Color | the NUL character this is used to Clear the Screen
             mTextClearCellValue = (UInt16)(Color << 8 | 0x00);
         }
