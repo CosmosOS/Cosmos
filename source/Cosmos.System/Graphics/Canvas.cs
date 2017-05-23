@@ -100,7 +100,7 @@ namespace Cosmos.System.Graphics
                 DrawPoint(pen, x1 + i, y1);
         }
 
-        private void DrawVerthicalLine(Pen pen, int dy, int x1, int y1)
+        private void DrawVerticalLine(Pen pen, int dy, int x1, int y1)
         {
             int i;
 
@@ -159,7 +159,7 @@ namespace Cosmos.System.Graphics
          * DrawLine throw if the line goes out of the boundary of the Canvas, probably will be better to draw only the part
          * of line visibile. This is too "smart" to do here better do it in a future Window Manager.
          */
-        public void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
+        public virtual void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
         {
             if (pen == null)
                 throw new ArgumentOutOfRangeException(nameof(pen));
@@ -181,7 +181,7 @@ namespace Cosmos.System.Graphics
 
             if (dx == 0) /* the line is vertical */
             {
-                DrawVerthicalLine(pen, dy, x1, y1);
+                DrawVerticalLine(pen, dy, x1, y1);
                 return;
             }
 
@@ -283,7 +283,7 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, points[0], points[points.Length - 1]);
         }
 
-        public void DrawRectangle(Pen pen, int x, int y, int width, int height)
+        public virtual void DrawRectangle(Pen pen, int x, int y, int width, int height)
         {
             /*
              * we must draw four lines connecting any vertex of our rectangle to do this we first obtain the position of these
@@ -323,6 +323,22 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, xc, yc, xd, yd);
         }
 
+        public virtual void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
+        {
+            for (int i = 0; i != width; i++)
+            {
+                DrawLine(pen, x_start, y_start, x_start + height, y_start);
+                y_start++;
+            }
+        }
+
+        public virtual void DrawTriangle(Pen pen, int v1x, int v1y, int v2x, int v2y, int v3x, int v3y)
+        {
+            DrawLine(pen, v1x, v1y, v2x, v2y);
+            DrawLine(pen, v1x, v1y, v3x, v3y);
+            DrawLine(pen, v2x, v2y, v3x, v3y);
+        }
+         
         public void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
         {
             throw new NotImplementedException();
