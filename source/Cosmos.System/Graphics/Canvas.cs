@@ -417,9 +417,4 @@ namespace Cosmos.System.Graphics
             set { y = value; }
         }
     }
-
-    public class PointsCollection : List<Point>
-    {
-
-    }
 }
