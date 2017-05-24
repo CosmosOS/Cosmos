@@ -475,7 +475,6 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
             else if (mProps.Profile == "PXE")
             {
                 chckEnableDebugStub.Checked = false;
-
             }
             else if (mProps.Profile == "Bochs")
             {
@@ -695,7 +694,7 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
             FillNetworkInterfaces();
         }
 
-    protected BuildProperties mProps = new BuildProperties();
+        protected BuildProperties mProps = new BuildProperties();
 
         public override PropertiesBase Properties
         {
