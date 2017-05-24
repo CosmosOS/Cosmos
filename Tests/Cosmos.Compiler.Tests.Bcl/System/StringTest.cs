@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Cosmos.Debug.Kernel;
 using Cosmos.TestRunner;
@@ -56,6 +56,18 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             string replace_test = "That is a test string.";
             Assert.IsTrue((test.Replace("This", "That") == replace_test), "string.Replace(string, string) does not work.");
+
+            test = "this is a test string." + Environment.NewLine;
+            string new_expected = "this is a test string..";
+            Assert.IsTrue((test.Replace(Environment.NewLine, ".") == new_expected), "string.Replace(Environment.NewLine, string) does not work.(Environment.NewLine)");
+
+			
+            test = @"this is a test string.
+			";
+            new_expected = "this is a test string..";
+            Assert.IsTrue((test.Replace(Environment.NewLine, ".") == new_expected), "string.Replace(Environment.NewLine, string) does not work.(True NewLine)");
+			
+            //Assert.IsTrue((Environment.NewLine == "\r\n"), "");
 
             string char_array_test = "char";
             char[] char_array_expected = { 'c', 'h', 'a', 'r' };
