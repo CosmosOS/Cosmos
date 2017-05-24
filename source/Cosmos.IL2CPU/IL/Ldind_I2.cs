@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
             DoNullReferenceCheck(Assembler, DebugEnabled, 0);
             XS.Pop(XSRegisters.ECX);
-            new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = 16, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
+            new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.ECX, SourceIsIndirect = true };
             XS.Push(XSRegisters.EAX);
         }
     }

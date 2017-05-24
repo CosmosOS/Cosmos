@@ -1302,68 +1302,68 @@ namespace XSharp.Common
 
         #region MoveSignExtend
 
-        public static void MoveSignExtend(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
+        public static void MoveSignExtend(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
-            Do<MoveSignExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+            DoDestinationSource<MoveSignExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
-        public static void MoveSignExtend(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
+        public static void MoveSignExtend(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
-            Do<MoveSignExtend>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+          DoDestinationSource<MoveSignExtend>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
-        public static void MoveSignExtend(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
+        public static void MoveSignExtend(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
-            Do<MoveSignExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+          DoDestinationSource<MoveSignExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
-        public static void MoveSignExtend(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
+        public static void MoveSignExtend(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
-            Do<MoveSignExtend>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+          DoDestinationSource<MoveSignExtend>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
-        public static void MoveSignExtend(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
+        public static void MoveSignExtend(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
-            Do<MoveSignExtend>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+          DoDestinationSource<MoveSignExtend>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
-        public static void MoveSignExtend(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
+        public static void MoveSignExtend(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
-            Do<MoveSignExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, skipSizeCheck: true);
+          DoDestinationSource<MoveSignExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
         #endregion MoveSignExtend
 
         #region MoveZeroExtend
 
-        public static void MoveZeroExtend(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
+        public static void MoveZeroExtend(string destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
-            Do<MoveZeroExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+          DoDestinationSource<MoveZeroExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
-        public static void MoveZeroExtend(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
+        public static void MoveZeroExtend(string destination, UInt32 value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
-            Do<MoveZeroExtend>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+          DoDestinationSource<MoveZeroExtend>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
-        public static void MoveZeroExtend(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize size = XSRegisters.RegisterSize.Int32)
+        public static void MoveZeroExtend(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
-            Do<MoveZeroExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+          DoDestinationSource<MoveZeroExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
-        public static void MoveZeroExtend(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
+        public static void MoveZeroExtend(XSRegisters.Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
-            Do<MoveZeroExtend>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+          DoDestinationSource<MoveZeroExtend>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
-        public static void MoveZeroExtend(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
+        public static void MoveZeroExtend(XSRegisters.Register destination, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
         {
-            Do<MoveZeroExtend>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
+          DoDestinationSource<MoveZeroExtend>(destination, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
         public static void MoveZeroExtend(XSRegisters.Register destination, XSRegisters.Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, XSRegisters.RegisterSize? size = null)
         {
-            Do<MoveZeroExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, skipSizeCheck: true);
+          DoDestinationSource<MoveZeroExtend>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
         }
 
         #endregion MoveZeroExtend

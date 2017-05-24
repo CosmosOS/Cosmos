@@ -134,7 +134,6 @@ namespace Cosmos.IL2CPU.X86.IL
         new Cosmos.Assembler.x86.MoveSignExtend
         {
           DestinationReg = EAX,
-          Size = (byte)(xArgRealSize * 8),
           SourceReg = EBP,
           SourceIsIndirect = true,
           SourceDisplacement = xDisplacement

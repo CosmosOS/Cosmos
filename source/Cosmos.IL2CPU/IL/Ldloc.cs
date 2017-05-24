@@ -36,11 +36,11 @@ namespace Cosmos.IL2CPU.X86.IL
           bool xSigned = IsIntegerSigned(xVar);
           if (xSigned)
           {
-            new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - xEBPOffset) };
+            new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - xEBPOffset) };
           }
           else
           {
-            new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.EAX, Size = (byte)(xSize * 8), SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - xEBPOffset) };
+            new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - xEBPOffset) };
           }
           XS.Push(EAX);
           break;

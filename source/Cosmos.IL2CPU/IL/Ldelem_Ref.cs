@@ -59,22 +59,22 @@ namespace Cosmos.IL2CPU.X86.IL
           case 1:
             if (isSigned)
             {
-              new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 8, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
             }
             else
             {
-              new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 8, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
             }
             XS.Push(ECX);
             break;
           case 2:
             if (isSigned)
             {
-              new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 16, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
             }
             else
             {
-              new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 16, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
             }
             XS.Push(ECX);
             break;
