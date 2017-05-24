@@ -2198,7 +2198,7 @@ namespace Microsoft.VisualStudio.Project
                     throw Marshal.GetExceptionForHR(VSConstants.OLE_E_PROMPTSAVECANCELLED);
                 }
 
-                this.buildProject.SetProperty(propertyName, propertyValue);
+                SetMSBuildProjectProperty(propertyName, propertyValue);
                 RaiseProjectPropertyChanged(propertyName, oldValue, propertyValue);
 
                 // property cache will need to be updated
@@ -2206,6 +2206,11 @@ namespace Microsoft.VisualStudio.Project
                 this.SetProjectFileDirty(true);
             }
             return;
+        }
+
+        protected virtual void SetMSBuildProjectProperty(string propertyName, string propertyValue)
+        {
+            this.buildProject.SetProperty(propertyName, propertyValue);
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Maintainability", "CA1502:AvoidExcessiveComplexity"), System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1308:NormalizeStringsToUppercase")]

@@ -144,8 +144,8 @@ Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a Cosmos.VS
 ;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a XSharp.VS.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos X# Language"; StatusMsg: "Installing Visual Studio Extension: Cosmos X# Language"
 
 [UninstallRun]
-Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|Cosmos.VS.ProjectSystem}"
-;Filename: "{code:GetVsixInstallCommand}"; Parameters: "{code:GetVsixUninstallParams|XSharp.VS}"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a /u:Cosmos.VS.ProjectSystem"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
+;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a /u:XSharp.VS"; StatusMsg: "Removing Visual Studio Extension: Cosmos X# Language"
 
 [Code]
 function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;

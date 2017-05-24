@@ -276,10 +276,13 @@ namespace Cosmos.VS.ProjectSystem.PropertyPages
                 foreach (var pair in properties)
                 {
                     string propertyName = pair.Key;
-                    if (independentProperties.Contains(propertyName))
-                        SetProjectProperty(pair.Key, pair.Value);
-                    else
-                        SetConfigProperty(pair.Key, pair.Value);
+
+                    //if (independentProperties.Contains(propertyName))
+                    //    SetProjectProperty(pair.Key, pair.Value);
+                    //else
+                    //    SetConfigProperty(pair.Key, pair.Value);
+
+                    SetProjectProperty(pair.Key, pair.Value);
                 }
 
                 IsDirty = false;

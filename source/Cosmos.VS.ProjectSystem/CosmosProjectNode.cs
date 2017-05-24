@@ -189,6 +189,26 @@ namespace Cosmos.VS.ProjectSystem
             }
         }
 
+        protected override void SetMSBuildProjectProperty(string propertyName, string propertyValue)
+        {
+            var xPropertyGroupsCount = BuildProject.Xml.PropertyGroups.Count;
+
+            if (xPropertyGroupsCount == 0)
+            {
+                throw new Exception("The Cosmos project is invalid.");
+            }
+
+            if (xPropertyGroupsCount == 1)
+            {
+                var xPropertyGroup = BuildProject.Xml.AddPropertyGroup();
+                xPropertyGroup.SetProperty(propertyName, propertyValue);
+            }
+            else
+            {
+                BuildProject.Xml.PropertyGroups.ElementAt(xPropertyGroupsCount - 1).SetProperty(propertyName, propertyValue);
+            }
+        }
+
         #region IVsReferenceManagerUser methods
 
         public void ChangeReferences(uint operation, IVsReferenceProviderContext changedContext)
