@@ -38,5 +38,9 @@ namespace Cosmos.System.FileSystem
         protected Partition mDevice { get; }
 
         public string mRootPath { get; }
+
+		protected Partition Device { get { return mDevice; } }
+
+		public string RootPath { get { return mRootPath; } }
 	}
 }

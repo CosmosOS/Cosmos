@@ -232,17 +232,17 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetRandomFileName()
         {
-            return "random.tmp";
+            return VFSManager.GetRandomFileName();
         }
 
         public static string GetTempFileName()
         {
-            return "tempfile.tmp";
+            return VFSManager.GetTempFileName();
         }
 
         public static string GetTempPath()
         {
-            return @"\Temp";
+            return VFSManager.GetTempPath();
         }
 
         public static string RemoveLongPathPrefix(string aPath)

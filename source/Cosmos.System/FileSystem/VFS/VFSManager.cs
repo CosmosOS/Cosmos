@@ -282,7 +282,22 @@ namespace Cosmos.System.FileSystem.VFS
             }
         }
 
-        public static bool FileExists(DirectoryEntry aEntry)
+		public static string GetTempPath()
+		{
+			return mVFS.GetTempPath();
+		}
+
+		public static string GetTempFileName()
+		{
+			return mVFS.GetTempFileName();
+		}
+
+		public static string GetRandomFileName()
+		{
+			return mVFS.GetRandomFileName();
+		}
+
+		public static bool FileExists(DirectoryEntry aEntry)
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.FileExists ---");
 
@@ -425,7 +440,6 @@ namespace Cosmos.System.FileSystem.VFS
         public static char[] GetRealInvalidPathChars()
         {
 			return mVFS.GetRealInvalidPathChars();
-
 		}
 
         public static char[] GetTrimEndChars()

@@ -64,5 +64,11 @@ namespace Cosmos.System.FileSystem.VFS
 		public abstract char[] GetTrimEndChars();
 
 		public abstract char GetVolumeSeparatorChar();
+
+		public abstract string GetTempPath();
+
+		public abstract string GetTempFileName();
+
+		public abstract string GetRandomFileName();
 	}
 }

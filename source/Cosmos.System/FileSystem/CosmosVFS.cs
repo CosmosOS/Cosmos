@@ -669,5 +669,20 @@ namespace Cosmos.System.FileSystem
 		{
 			return 260;
 		}
+
+		public override string GetTempPath()
+		{
+			return "/tmp";
+		}
+
+		public override string GetTempFileName()
+		{
+			return "/tmp/file.tmp";
+		}
+
+		public override string GetRandomFileName()
+		{
+			return "random.tmp";
+		}
 	}
 }
