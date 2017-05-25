@@ -7,7 +7,7 @@ development kit which uses Visual Studio as its development environment.
 Despite C# in the name any .NET based language can be used including VB.NET,
 Fortran, Delphi Prism, IronPython, F# and more. Cosmos itself and the kernel
 routines are primarily written in C#, and thus the Cosmos name. Besides that,
-NOSMOS (.NET Open Source Managed Operating System) sounds stupid.
+NOSMOS (.NET Open Source Managed Operating System) is not really good.
 
 Cosmos is not an operating system in the traditional sense, but instead it is
 an "Operating System Kit", or as I like to say "Operating System Legos".
@@ -28,7 +28,7 @@ so overwhelming like the dev kit. This article focuses on the user kit.
 ###  Writing your first Operating System
 
 Create a new project as you would any C# project, but select Cosmos as the
-project type.
+project type, like this :
 
 ![](http://i.imgur.com/mb5ZOEk.png)
 
@@ -54,11 +54,12 @@ Debugging is a major issue with operating system development. The Cosmos team
 was not content enough to simply conquer building and deployment, we want to
 make developing operating system as easy as developing Windows applications.
 Debugging a Cosmos based operating system should feel very familiar to you.
-Lets modify our project a little bit to show the effect, and set a breakpoint.
+Lets modify our project a little bit to show the effect, and set a breakpoint
+like this :
 
 ![](http://i.imgur.com/Hf4LZ3c.png)
 
-Now run the project again.
+Now, run the project again and see what's append :
 
 ![](http://i.imgur.com/YLPmEUf.png)
 
@@ -67,7 +68,7 @@ project has stopped on a breakpoint. Simply press F5 to continue just as you
 would in a normal application!
 
 In addition to breakpoints Cosmos also supports step into (F11) as well. Trace
-over (F10) is not supported yet.
+over (F10) is not supported at the moment.
 
 ###  Debugger Communication
 
@@ -139,7 +140,7 @@ rolled into the mainline Cosmos development as of yet.
 
 Cosmos does not run on Linux. A boot loader called Syslinux is used to boot
 Cosmos. After booting, Syslinux is not used. Syslinux is a bootloader and is
-not a Linux distro.
+not a Linux distribution.
 
 ###  Obtaining Cosmos
 
