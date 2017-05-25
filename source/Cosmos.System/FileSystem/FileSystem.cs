@@ -8,7 +8,7 @@ namespace Cosmos.System.FileSystem
 {
     public abstract class FileSystem
     {
-		public static FileSystemResolver Resolver { get; set; } = new FileSystemResolver();
+        public static FileSystemResolver Resolver { get; set; } = new FileSystemResolver();
 
         protected FileSystem(Partition aDevice, string aRootPath)
         {
@@ -18,7 +18,7 @@ namespace Cosmos.System.FileSystem
 
         public static FileSystemType GetFileSystemType(Partition aDevice)
         {
-			return Resolver.Resolve(aDevice);
+            return Resolver.Resolve(aDevice);
         }
 
         public abstract void DisplayFileSystemInfo();
@@ -38,9 +38,5 @@ namespace Cosmos.System.FileSystem
         protected Partition mDevice { get; }
 
         public string mRootPath { get; }
-
-		protected Partition Device { get { return mDevice; } }
-
-		public string RootPath { get { return mRootPath; } }
-	}
+    }
 }

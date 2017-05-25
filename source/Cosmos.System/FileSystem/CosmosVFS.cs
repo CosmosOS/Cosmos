@@ -496,193 +496,193 @@ namespace Cosmos.System.FileSystem
             return aFS.GetRootDirectory();
         }
 
-		public override string GetFullPath(DirectoryEntry aEntry)
-		{
-			Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.GetFullPath ---");
+        public override string GetFullPath(DirectoryEntry aEntry)
+        {
+            Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.GetFullPath ---");
 
-			if (aEntry == null)
-			{
-				throw new ArgumentNullException(nameof(aEntry));
-			}
+            if (aEntry == null)
+            {
+                throw new ArgumentNullException(nameof(aEntry));
+            }
 
-			Global.mFileSystemDebugger.SendInternal("aEntry.mName =");
-			Global.mFileSystemDebugger.SendInternal(aEntry.mName);
+            Global.mFileSystemDebugger.SendInternal("aEntry.mName =");
+            Global.mFileSystemDebugger.SendInternal(aEntry.mName);
 
-			var xParent = aEntry.mParent;
-			string xPath = aEntry.mName;
+            var xParent = aEntry.mParent;
+            string xPath = aEntry.mName;
 
-			while (xParent != null)
-			{
-				xPath = xParent.mName + xPath;
-				Global.mFileSystemDebugger.SendInternal("xPath =");
-				Global.mFileSystemDebugger.SendInternal(xPath);
+            while (xParent != null)
+            {
+                xPath = xParent.mName + xPath;
+                Global.mFileSystemDebugger.SendInternal("xPath =");
+                Global.mFileSystemDebugger.SendInternal(xPath);
 
-				xParent = xParent.mParent;
-				Global.mFileSystemDebugger.SendInternal("xParent.mName =");
-				Global.mFileSystemDebugger.SendInternal(xParent.mName);
-			}
+                xParent = xParent.mParent;
+                Global.mFileSystemDebugger.SendInternal("xParent.mName =");
+                Global.mFileSystemDebugger.SendInternal(xParent.mName);
+            }
 
-			Global.mFileSystemDebugger.SendInternal("xPath =");
-			Global.mFileSystemDebugger.SendInternal(xPath);
+            Global.mFileSystemDebugger.SendInternal("xPath =");
+            Global.mFileSystemDebugger.SendInternal(xPath);
 
-			return xPath;
-		}
+            return xPath;
+        }
 
-		public override List<string> GetLogicalDrives()
-		{
-			throw new NotImplementedException();
-		}
+        public override List<string> GetLogicalDrives()
+        {
+            throw new NotImplementedException();
+        }
 
-		public override char GetAltDirectorySeparatorChar()
-		{
-			return '/';
-		}
+        public override char GetAltDirectorySeparatorChar()
+        {
+            return '/';
+        }
 
-		public override char GetDirectorySeparatorChar()
-		{
-			return '\\';
-		}
+        public override char GetDirectorySeparatorChar()
+        {
+            return '\\';
+        }
 
-		public override DirectoryEntry GetParent(string aPath)
-		{
-			Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.GetParent ---");
+        public override DirectoryEntry GetParent(string aPath)
+        {
+            Global.mFileSystemDebugger.SendInternal("--- CosmosVFS.GetParent ---");
 
-			if (string.IsNullOrEmpty(aPath))
-			{
-				throw new ArgumentException("Argument is null or empty", nameof(aPath));
-			}
+            if (string.IsNullOrEmpty(aPath))
+            {
+                throw new ArgumentException("Argument is null or empty", nameof(aPath));
+            }
 
-			Global.mFileSystemDebugger.SendInternal("aPath =");
-			Global.mFileSystemDebugger.SendInternal(aPath);
+            Global.mFileSystemDebugger.SendInternal("aPath =");
+            Global.mFileSystemDebugger.SendInternal(aPath);
 
-			if (aPath == Path.GetPathRoot(aPath))
-			{
-				return null;
-			}
+            if (aPath == Path.GetPathRoot(aPath))
+            {
+                return null;
+            }
 
-			string xFileOrDirectory = Path.HasExtension(aPath) ? Path.GetFileName(aPath) : Path.GetDirectoryName(aPath);
-			if (xFileOrDirectory != null)
-			{
-				string xPath = aPath.Remove(aPath.Length - xFileOrDirectory.Length);
-				return GetDirectory(xPath);
-			}
+            string xFileOrDirectory = Path.HasExtension(aPath) ? Path.GetFileName(aPath) : Path.GetDirectoryName(aPath);
+            if (xFileOrDirectory != null)
+            {
+                string xPath = aPath.Remove(aPath.Length - xFileOrDirectory.Length);
+                return GetDirectory(xPath);
+            }
 
-			return null;
-		}
+            return null;
+        }
 
-		public override char[] GetDirectorySeparators()
-		{
-			return new[] { GetDirectorySeparatorChar(), GetAltDirectorySeparatorChar() };
-		}
+        public override char[] GetDirectorySeparators()
+        {
+            return new[] { GetDirectorySeparatorChar(), GetAltDirectorySeparatorChar() };
+        }
 
-		public override string[] SplitPath(string aPath)
-		{
-			return aPath.Split(GetDirectorySeparators(), StringSplitOptions.RemoveEmptyEntries);
-		}
+        public override string[] SplitPath(string aPath)
+        {
+            return aPath.Split(GetDirectorySeparators(), StringSplitOptions.RemoveEmptyEntries);
+        }
 
-		public override char[] GetInvalidFileNameChars()
-		{
-			char[] xReturn =
-			{
-				'"',
-				'<',
-				'>',
-				'|',
-				'\0',
-				'\a',
-				'\b',
-				'\t',
-				'\n',
-				'\v',
-				'\f',
-				'\r',
-				':',
-				'*',
-				'?',
-				'\\',
-				'/'
-			};
-			return xReturn;
-		}
+        public override char[] GetInvalidFileNameChars()
+        {
+            char[] xReturn =
+            {
+                '"',
+                '<',
+                '>',
+                '|',
+                '\0',
+                '\a',
+                '\b',
+                '\t',
+                '\n',
+                '\v',
+                '\f',
+                '\r',
+                ':',
+                '*',
+                '?',
+                '\\',
+                '/'
+            };
+            return xReturn;
+        }
 
-		public override char[] GetInvalidPathCharsWithAdditionalChecks()
-		{
-			char[] xReturn =
-			{
-				'"',
-				'<',
-				'>',
-				'|',
-				'\0',
-				'\a',
-				'\b',
-				'\t',
-				'\n',
-				'\v',
-				'\f',
-				'\r',
-				'*',
-				'?'
-			};
-			return xReturn;
-		}
+        public override char[] GetInvalidPathCharsWithAdditionalChecks()
+        {
+            char[] xReturn =
+            {
+                '"',
+                '<',
+                '>',
+                '|',
+                '\0',
+                '\a',
+                '\b',
+                '\t',
+                '\n',
+                '\v',
+                '\f',
+                '\r',
+                '*',
+                '?'
+            };
+            return xReturn;
+        }
 
-		public override char GetPathSeparator()
-		{
-			return ';';
-		}
+        public override char GetPathSeparator()
+        {
+            return ';';
+        }
 
-		public override char[] GetRealInvalidPathChars()
-		{
-			char[] xReturn =
-			{
-				'"',
-				'<',
-				'>',
-				'|'
-			};
-			return xReturn;
-		}
+        public override char[] GetRealInvalidPathChars()
+        {
+            char[] xReturn =
+            {
+                '"',
+                '<',
+                '>',
+                '|'
+            };
+            return xReturn;
+        }
 
-		public override char[] GetTrimEndChars()
-		{
-			char[] xReturn =
-			{
-				(char) 0x9,
-				(char) 0xA,
-				(char) 0xB,
-				(char) 0xC,
-				(char) 0xD,
-				(char) 0x20,
-				(char) 0x85,
-				(char) 0xA0
-			};
-			return xReturn;
-		}
+        public override char[] GetTrimEndChars()
+        {
+            char[] xReturn =
+            {
+                (char) 0x9,
+                (char) 0xA,
+                (char) 0xB,
+                (char) 0xC,
+                (char) 0xD,
+                (char) 0x20,
+                (char) 0x85,
+                (char) 0xA0
+            };
+            return xReturn;
+        }
 
-		public override char GetVolumeSeparatorChar()
-		{
-			return ':';
-		}
+        public override char GetVolumeSeparatorChar()
+        {
+            return ':';
+        }
 
-		public override int GetMaxPath()
-		{
-			return 260;
-		}
+        public override int GetMaxPath()
+        {
+            return 260;
+        }
 
-		public override string GetTempPath()
-		{
-			return "/tmp";
-		}
+        public override string GetTempPath()
+        {
+            return string.Format("{0}tmp", GetDirectorySeparatorChar());
+        }
 
-		public override string GetTempFileName()
-		{
-			return "/tmp/file.tmp";
-		}
+        public override string GetTempFileName()
+        {
+            return string.Format("{0}tmp{0}file.tmp", GetDirectorySeparatorChar());
+        }
 
-		public override string GetRandomFileName()
-		{
-			return "random.tmp";
-		}
-	}
+        public override string GetRandomFileName()
+        {
+            return "random.tmp";
+        }
+    }
 }
