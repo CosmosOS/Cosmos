@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
 using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System.FileSystem.VFS
@@ -12,9 +11,18 @@ namespace Cosmos.System.FileSystem.VFS
     {
         private static VFSBase mVFS;
 
-        public static void RegisterVFS(VFSBase aVFS)
+		public static VFSBase VFSInstance
+		{
+			get
+			{
+				return mVFS;
+			}
+		}
+
+		public static void RegisterVFS(VFSBase aVFS)
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.RegisterVFS ---");
+
             if (mVFS != null)
             {
                 throw new Exception("Virtual File System Manager already initialized!");
@@ -199,16 +207,7 @@ namespace Cosmos.System.FileSystem.VFS
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetLogicalDrives ---");
 
-            //TODO: Directory.GetLogicalDrives() will call this.
-            return null;
-
-            /*
-            List<string> xDrives = new List<string>();
-            foreach (FilesystemEntry entry in GetVolumes())
-                xDrives.Add(entry.Name + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar);
-
-            return xDrives.ToArray();
-            */
+            return mVFS.GetLogicalDrives();
         }
 
         public static List<string> InternalGetFileDirectoryNames(
@@ -283,7 +282,22 @@ namespace Cosmos.System.FileSystem.VFS
             }
         }
 
-        public static bool FileExists(DirectoryEntry aEntry)
+		public static string GetTempPath()
+		{
+			return mVFS.GetTempPath();
+		}
+
+		public static string GetTempFileName()
+		{
+			return mVFS.GetTempFileName();
+		}
+
+		public static string GetRandomFileName()
+		{
+			return mVFS.GetRandomFileName();
+		}
+
+		public static bool FileExists(DirectoryEntry aEntry)
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.FileExists ---");
 
@@ -373,33 +387,8 @@ namespace Cosmos.System.FileSystem.VFS
         public static string GetFullPath(DirectoryEntry aEntry)
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetFullPath ---");
-
-            if (aEntry == null)
-            {
-                throw new ArgumentNullException(nameof(aEntry));
-            }
-
-            Global.mFileSystemDebugger.SendInternal("aEntry.mName =");
-            Global.mFileSystemDebugger.SendInternal(aEntry.mName);
-
-            var xParent = aEntry.mParent;
-            string xPath = aEntry.mName;
-
-            while (xParent != null)
-            {
-                xPath = xParent.mName + xPath;
-                Global.mFileSystemDebugger.SendInternal("xPath =");
-                Global.mFileSystemDebugger.SendInternal(xPath);
-
-                xParent = xParent.mParent;
-                Global.mFileSystemDebugger.SendInternal("xParent.mName =");
-                Global.mFileSystemDebugger.SendInternal(xParent.mName);
-            }
-
-            Global.mFileSystemDebugger.SendInternal("xPath =");
-            Global.mFileSystemDebugger.SendInternal(xPath);
-
-            return xPath;
+           
+            return mVFS.GetFullPath(aEntry);
         }
 
         public static Stream GetFileStream(string aPathname)
@@ -423,163 +412,67 @@ namespace Cosmos.System.FileSystem.VFS
             return xFileInfo.GetFileStream();
         }
 
-        #region Helpers
-
         public static char GetAltDirectorySeparatorChar()
         {
-            return '/';
+            return mVFS.GetAltDirectorySeparatorChar();
         }
 
         public static char GetDirectorySeparatorChar()
         {
-            return '\\';
+            return mVFS.GetDirectorySeparatorChar();
         }
 
         public static char[] GetInvalidFileNameChars()
         {
-            char[] xReturn =
-            {
-                '"',
-                '<',
-                '>',
-                '|',
-                '\0',
-                '\a',
-                '\b',
-                '\t',
-                '\n',
-                '\v',
-                '\f',
-                '\r',
-                ':',
-                '*',
-                '?',
-                '\\',
-                '/'
-            };
-            return xReturn;
-        }
+			return mVFS.GetInvalidFileNameChars();
+		}
 
         public static char[] GetInvalidPathCharsWithAdditionalChecks()
         {
-            char[] xReturn =
-            {
-                '"',
-                '<',
-                '>',
-                '|',
-                '\0',
-                '\a',
-                '\b',
-                '\t',
-                '\n',
-                '\v',
-                '\f',
-                '\r',
-                '*',
-                '?'
-            };
-            return xReturn;
-        }
+			return mVFS.GetInvalidPathCharsWithAdditionalChecks();
+		}
 
         public static char GetPathSeparator()
         {
-            return ';';
-        }
+			return mVFS.GetPathSeparator();
+		}
 
         public static char[] GetRealInvalidPathChars()
         {
-            char[] xReturn =
-            {
-                '"',
-                '<',
-                '>',
-                '|'
-            };
-            return xReturn;
-        }
+			return mVFS.GetRealInvalidPathChars();
+		}
 
         public static char[] GetTrimEndChars()
         {
-            char[] xReturn =
-            {
-                (char) 0x9,
-                (char) 0xA,
-                (char) 0xB,
-                (char) 0xC,
-                (char) 0xD,
-                (char) 0x20,
-                (char) 0x85,
-                (char) 0xA0
-            };
-            return xReturn;
-        }
+			return mVFS.GetTrimEndChars();
+		}
 
         public static char GetVolumeSeparatorChar()
         {
-            return ':';
-        }
+			return mVFS.GetVolumeSeparatorChar();
+		}
 
         public static int GetMaxPath()
         {
-            return 260;
+			return mVFS.GetMaxPath();
         }
-
-        //public static bool IsAbsolutePath(this string aPath)
-        //{
-        //    return ((aPath[0] == VFSBase.DirectorySeparatorChar) || (aPath[0] == VFSBase.AltDirectorySeparatorChar));
-        //}
-
-        //public static bool IsRelativePath(this string aPath)
-        //{
-        //    return (aPath[0] != VFSBase.DirectorySeparatorChar || aPath[0] != VFSBase.AltDirectorySeparatorChar);
-        //}
 
         public static string[] SplitPath(string aPath)
         {
             //TODO: This should call Path.GetDirectoryName() and then loop calling Directory.GetParent(), but those aren't implemented yet.
-            return aPath.Split(GetDirectorySeparators(), StringSplitOptions.RemoveEmptyEntries);
+            return mVFS.SplitPath(aPath);
         }
 
         private static char[] GetDirectorySeparators()
         {
-            return new[] { GetDirectorySeparatorChar(), GetAltDirectorySeparatorChar() };
+            return mVFS.GetDirectorySeparators();
         }
 
-        #endregion
-
-        /// <summary>
-        /// Gets the parent directory entry from the path.
-        /// </summary>
-        /// <param name="aPath">The full path to the current directory entry.</param>
-        /// <returns>The parent directory entry.</returns>
-        /// <exception cref="ArgumentException">Argument is null or empty</exception>
-        /// <exception cref="NotImplementedException"></exception>
         public static DirectoryEntry GetParent(string aPath)
         {
             Global.mFileSystemDebugger.SendInternal("--- VFSManager.GetParent ---");
 
-            if (string.IsNullOrEmpty(aPath))
-            {
-                throw new ArgumentException("Argument is null or empty", nameof(aPath));
-            }
-
-            Global.mFileSystemDebugger.SendInternal("aPath =");
-            Global.mFileSystemDebugger.SendInternal(aPath);
-
-            if (aPath == Path.GetPathRoot(aPath))
-            {
-                return null;
-            }
-
-            string xFileOrDirectory = Path.HasExtension(aPath) ? Path.GetFileName(aPath) : Path.GetDirectoryName(aPath);
-            if (xFileOrDirectory != null)
-            {
-                string xPath = aPath.Remove(aPath.Length - xFileOrDirectory.Length);
-                return GetDirectory(xPath);
-            }
-
-            return null;
+			return mVFS.GetParent(aPath);
         }
     }
 }

@@ -10,7 +10,7 @@ using Cosmos.System.FileSystem.Listing;
 
 namespace Cosmos.System.FileSystem.FAT
 {
-    internal class FatFileSystem : FileSystem
+    public class FatFileSystem : FileSystem
     {
         internal class Fat
         {
@@ -678,7 +678,7 @@ namespace Cosmos.System.FileSystem.FAT
             xDirectoryEntry.DeleteDirectoryEntry();
         }
 
-        private enum FatTypeEnum
+		private enum FatTypeEnum
         {
             Unknown,
 

@@ -1,6 +1,5 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.Listing;
@@ -9,6 +8,8 @@ namespace Cosmos.System.FileSystem
 {
     public abstract class FileSystem
     {
+        public static FileSystemResolver Resolver { get; set; } = new FileSystemResolver();
+
         protected FileSystem(Partition aDevice, string aRootPath)
         {
             mDevice = aDevice;
@@ -17,12 +18,7 @@ namespace Cosmos.System.FileSystem
 
         public static FileSystemType GetFileSystemType(Partition aDevice)
         {
-            if (FatFileSystem.IsDeviceFat(aDevice))
-            {
-                return FileSystemType.FAT;
-            }
-
-            return FileSystemType.Unknown;
+            return Resolver.Resolve(aDevice);
         }
 
         public abstract void DisplayFileSystemInfo();

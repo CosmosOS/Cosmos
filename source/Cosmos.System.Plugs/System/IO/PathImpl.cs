@@ -97,7 +97,7 @@ namespace Cosmos.System.Plugs.System.IO
             char xC = aPath1[aPath1.Length - 1];
             if (xC != Path.DirectorySeparatorChar && xC != Path.AltDirectorySeparatorChar && xC != Path.VolumeSeparatorChar)
             {
-                xResult = string.Concat(aPath1, "\\", aPath2);
+                xResult = string.Concat(aPath1, Path.DirectorySeparatorChar, aPath2);
                 Global.mFileSystemDebugger.SendInternal($"Path.CombineNoChecks : aPath1 = {aPath1}, aPath2 = {aPath2}, returning {xResult}");
                 return xResult;
             }
@@ -232,17 +232,17 @@ namespace Cosmos.System.Plugs.System.IO
 
         public static string GetRandomFileName()
         {
-            return "random.tmp";
+            return VFSManager.GetRandomFileName();
         }
 
         public static string GetTempFileName()
         {
-            return "tempfile.tmp";
+            return VFSManager.GetTempFileName();
         }
 
         public static string GetTempPath()
         {
-            return @"\Temp";
+            return VFSManager.GetTempPath();
         }
 
         public static string RemoveLongPathPrefix(string aPath)
