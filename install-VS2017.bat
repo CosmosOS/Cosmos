@@ -7,7 +7,6 @@ set VSWhere=Build\Tools\vswhere.exe
 :NuGet
 echo Running NuGet restore
 %NuGet% restore Builder.sln
-%NuGet% restore Cosmos.sln
 
 :MSBuild
 echo Looking for MSBuild

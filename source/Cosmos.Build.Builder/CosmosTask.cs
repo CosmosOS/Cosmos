@@ -288,6 +288,15 @@ namespace Cosmos.Build.Builder
       }
     }
 
+    private void Restore(string project)
+    {
+      string xNuget = Path.Combine(mCosmosDir, "Build", "Tools", "nuget.exe");
+      string xRestoreParams = $"restore {Quoted(project)}";
+      string xUpdateParams = $"update -self";
+      StartConsole(xNuget, xUpdateParams);
+      StartConsole(xNuget, xRestoreParams);
+    }
+
     private void Pack(string project, string destDir, string versionSuffix)
     {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
@@ -298,15 +307,14 @@ namespace Cosmos.Build.Builder
     private void Publish(string project, string destDir)
     {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
-      string xParams = $"{Quoted(project)} /t:Publish /maxcpucount  /p:OutputPath={Quoted(destDir)}";
+      string xParams = $"{Quoted(project)} /t:Publish /maxcpucount /p:RuntimeIdentifier=win7-x86 /p:OutputPath={Quoted(destDir)}";
       StartConsole(xMSBuild, xParams);
     }
 
     private void CompileCosmos()
     {
-      Section("Compiling Cosmos");
-
       string xVSIPDir = Path.Combine(mCosmosDir, "Build", "VSIP");
+      string xPackagesDir = Path.Combine(xVSIPDir, "KernelPackages");
       string xVersionSuffix = App.IsUserKit ? "" : DateTime.Now.ToString("yyyyMMddHHmm");
 
       if (!Directory.Exists(xVSIPDir))
@@ -314,15 +322,19 @@ namespace Cosmos.Build.Builder
         Directory.CreateDirectory(xVSIPDir);
       }
 
+      Section("Restoring Nuget Packages");
+      Restore(Path.Combine(mCosmosDir, @"Cosmos.sln"));
+
+      Section("Compiling Cosmos");
       MSBuild(Path.Combine(mCosmosDir, @"Build.sln"), "Debug");
 
+      Section("Compiling Tools");
       Publish(Path.Combine(mCosmosDir, "source", "Cosmos.Build.MSBuild"), Path.Combine(xVSIPDir, "MSBuild"));
       Publish(Path.Combine(mCosmosDir, "source", "IL2CPU"), Path.Combine(xVSIPDir, "IL2CPU"));
-      Publish(Path.Combine(mCosmosDir, "Tools", "NASM"), Path.Combine(xVSIPDir, "NASM"));
       Publish(Path.Combine(mCosmosDir, "source", "XSharp.Compiler"), Path.Combine(xVSIPDir, "XSharp"));
+      Publish(Path.Combine(mCosmosDir, "Tools", "NASM"), Path.Combine(xVSIPDir, "NASM"));
 
-      string xPackagesDir = Path.Combine(xVSIPDir, "KernelPackages");
-
+      Section("Compiling Kernel Packages");
       Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Common"), xPackagesDir, xVersionSuffix);
       Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Core"), xPackagesDir, xVersionSuffix);
       Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Common"), xPackagesDir, xVersionSuffix);

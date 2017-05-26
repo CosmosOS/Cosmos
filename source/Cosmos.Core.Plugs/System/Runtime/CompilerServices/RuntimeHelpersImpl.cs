@@ -11,7 +11,9 @@ namespace Cosmos.Core.Plugs.System.Runtime.CompilerServices
         {
         }
 
+#pragma warning disable 108,114
         public static bool Equals(object o1, object o2)
+#pragma warning restore 108,114
         {
             if (o1 == null
                 && o2 == null)

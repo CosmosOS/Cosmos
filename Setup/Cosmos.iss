@@ -33,6 +33,7 @@ AppPublisherURL=http://www.goCosmos.org/
 AppSupportURL=http://www.goCosmos.org/
 AppUpdatesURL=http://www.goCosmos.org/
 AppVersion={#ChangeSetVersion}
+SetupMutex=CosmosSetupMutexName,Global\CosmoSetupMutexName
 DefaultDirName={userappdata}\Cosmos User Kit
 DefaultGroupName=Cosmos User Kit
 OutputDir=.\Setup\Output
@@ -138,14 +139,17 @@ UseRelativePaths=True
 [Run]
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "init ""{app}\Kernel\packages"" ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
 Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Add -Name ""Cosmos Local Package Feed"" -Source ""{app}\Kernel\packages"""; WorkingDir: "{app}"; Description: "Install Kernel Packages"; StatusMsg: "Installing Kernel Packages"
+
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
-;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a /u:XSharp.VS"; Description: "Remove Cosmos X# Language"; StatusMsg: "Removing Visual Studio Extension: Cosmos X# Language"
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
-;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a XSharp.VS.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos X# Language"; StatusMsg: "Installing Visual Studio Extension: Cosmos X# Language"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; Description: "Remove Cosmos Project System"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
+;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:XSharp.VS"; Description: "Remove Cosmos X# Language Service"; StatusMsg: "Removing Visual Studio Extension: Cosmos X# Language Service"
+
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.ProjectSystem.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos Project System"; StatusMsg: "Installing Visual Studio Extension: Cosmos Project System"
+;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q XSharp.VS.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos X# Language Service"; StatusMsg: "Installing Visual Studio Extension: Cosmos X# Language Service"
 
 [UninstallRun]
-Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a /u:Cosmos.VS.ProjectSystem"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
-;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /a /u:XSharp.VS"; StatusMsg: "Removing Visual Studio Extension: Cosmos X# Language"
+Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
+;Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:XSharp.VS"; StatusMsg: "Removing Visual Studio Extension: Cosmos X# Language Service"
 
 [Code]
 function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;

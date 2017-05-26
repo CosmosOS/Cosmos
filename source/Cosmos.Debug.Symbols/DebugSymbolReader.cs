@@ -268,7 +268,6 @@ namespace Cosmos.Debug.Symbols
             {
                 case HandleKind.TypeReference:
                     return MetadataHelper.GetTypeFromReference(xReader, aModule, (TypeReferenceHandle) aRegion.CatchType, 0);
-                    break;
                 case HandleKind.TypeDefinition:
                     break;
                 case HandleKind.FieldDefinition:
