@@ -64,8 +64,13 @@ namespace Cosmos.Assembler.x86 {
                 //Console.WriteLine("ERRROR no size set for Instruction - set to 4 InstructionWithDestinationAndSourceAndSize") ;
             }
             aOutput.Write(mMnemonic);
-            aOutput.Write(" ");
-            aOutput.Write(SizeToString(Size));
+
+            if (SourceIsIndirect)
+            {
+                aOutput.Write(" ");
+                aOutput.Write(SizeToString(Size));
+            }
+
             if (!DestinationEmpty)
             {
                 aOutput.Write(" ");

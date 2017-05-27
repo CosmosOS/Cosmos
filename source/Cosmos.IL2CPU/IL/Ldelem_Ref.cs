@@ -59,28 +59,28 @@ namespace Cosmos.IL2CPU.X86.IL
           case 1:
             if (isSigned)
             {
-              new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              XS.MoveSignExtend(ECX,EDX, sourceIsIndirect: true, size: RegisterSize.Byte8);
             }
             else
             {
-              new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              XS.MoveZeroExtend(ECX, EDX, sourceIsIndirect: true, size: RegisterSize.Byte8);
             }
             XS.Push(ECX);
             break;
           case 2:
             if (isSigned)
             {
-              new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              XS.MoveSignExtend(ECX, EDX, sourceIsIndirect: true, size: RegisterSize.Short16);
             }
             else
             {
-              new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              XS.MoveZeroExtend(ECX, EDX, sourceIsIndirect: true, size: RegisterSize.Short16);
             }
             XS.Push(ECX);
             break;
           case 4:
             // copy a full dword
-            XS.Push(EDX, isIndirect: true);
+            XS.Push(EDX, true);
             XS.Sub(EDX, 4); // move to previous 4 bytes
             break;
             //case 8:

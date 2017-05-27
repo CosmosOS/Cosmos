@@ -24,6 +24,7 @@ namespace Cosmos.IL2CPU.X86.IL
       var xStackCount = (int)GetStackCountForLocal(aMethod, xVar);
       var xEBPOffset = (int)GetEBPOffsetForLocal(aMethod, xOpVar.Value);
       var xSize = SizeOfType(xVar);
+      bool xSigned = IsIntegerSigned(xVar);
 
       XS.Comment("Local type = " + xVar);
       XS.Comment("Local EBP offset = " + xEBPOffset);
@@ -32,15 +33,24 @@ namespace Cosmos.IL2CPU.X86.IL
       switch (xSize)
       {
         case 1:
-        case 2:
-          bool xSigned = IsIntegerSigned(xVar);
           if (xSigned)
           {
-            new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - xEBPOffset) };
+            XS.MoveSignExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: (0 - xEBPOffset), size: RegisterSize.Byte8);
           }
           else
           {
-            new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.EAX, SourceReg = CPUx86.RegistersEnum.EBP, SourceIsIndirect = true, SourceDisplacement = (int)(0 - xEBPOffset) };
+            XS.MoveZeroExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: (0 - xEBPOffset), size: RegisterSize.Byte8);
+          }
+          XS.Push(EAX);
+          break;
+        case 2:
+          if (xSigned)
+          {
+            XS.MoveSignExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: (0 - xEBPOffset), size: RegisterSize.Short16);
+          }
+          else
+          {
+            XS.MoveZeroExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: (0 - xEBPOffset), size: RegisterSize.Short16);
           }
           XS.Push(EAX);
           break;
