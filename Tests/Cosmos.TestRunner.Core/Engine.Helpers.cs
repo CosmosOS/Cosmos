@@ -220,9 +220,10 @@ namespace Cosmos.TestRunner.Core
                 else
                 {
                     xArgs.Insert(0, "run");
-                    xArgs.Insert(1, "--project");
-                    xArgs.Insert(2, Path.Combine(xIL2CPUPath, "IL2CPU.csproj"));
-                    xArgs.Insert(3, " -- ");
+                    xArgs.Insert(1, "--no-build");
+                    xArgs.Insert(2, "--project");
+                    xArgs.Insert(3, Path.Combine(xIL2CPUPath, "IL2CPU.csproj"));
+                    xArgs.Insert(4, " -- ");
                     RunProcess("dotnet", Path.GetDirectoryName(kernelFileName), xArgs);
                 }
             }
