@@ -66,18 +66,23 @@ namespace Cosmos.Assembler.x86
 
         }
 
-        public override void WriteText(Cosmos.Assembler.Assembler aAssembler, System.IO.TextWriter aOutput)
+        public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
         {
             if (Size == 0)
             {
                 Size = 32;
                 //Console.WriteLine("ERRROR no size set for Instruction - set to 4 InstructionWithDestinationAndSourceAndSize") ;
             }
-            Console.WriteLine(";test");
             aOutput.Write(mMnemonic);
 
             if (!DestinationEmpty)
             {
+                if (DestinationIsIndirect)
+                {
+                    aOutput.Write(" ");
+                    aOutput.Write(SizeToString(Size));
+                }
+
                 aOutput.Write(" ");
                 aOutput.Write(this.GetDestinationAsString());
                 aOutput.Write(", ");
@@ -88,7 +93,7 @@ namespace Cosmos.Assembler.x86
                     aOutput.Write(" ");
                 }
 
-                aOutput.Write(this.GetSourceAsString());
+                aOutput.Write(GetSourceAsString());
             }
         }
     }
