@@ -190,14 +190,14 @@ namespace Cosmos.TestRunner.Core
                 "IgnoreDebugStubAttribute:False"
             };
             xArgs.AddRange(References.Select(aReference => "References:" + aReference));
-            
-                bool xUsingUserkit = false;
-                string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "source", "IL2CPU");
-                if (!Directory.Exists(xIL2CPUPath))
-                {
-                    xUsingUserkit = true;
-                    xIL2CPUPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "IL2CPU");
-                }
+
+            bool xUsingUserkit = false;
+            string xIL2CPUPath = Path.Combine(FindCosmosRoot(), "source", "IL2CPU");
+            if (!Directory.Exists(xIL2CPUPath))
+            {
+                xUsingUserkit = true;
+                xIL2CPUPath = Path.Combine(GetCosmosUserkitFolder(), "Build", "IL2CPU");
+            }
 
             if (xUsingUserkit)
             {
@@ -220,9 +220,9 @@ namespace Cosmos.TestRunner.Core
                 else
                 {
                     xArgs.Insert(0, "run");
-                    xArgs.Insert(1, "--no-build");
-                    xArgs.Insert(2, "--project");
-                    xArgs.Insert(3, Path.Combine(xIL2CPUPath, "IL2CPU.csproj"));
+                    xArgs.Insert(1, "--project");
+                    xArgs.Insert(2, Path.Combine(xIL2CPUPath, "IL2CPU.csproj"));
+                    xArgs.Insert(3, "--no-build");
                     xArgs.Insert(4, " -- ");
                     RunProcess("dotnet", Path.GetDirectoryName(kernelFileName), xArgs);
                 }
