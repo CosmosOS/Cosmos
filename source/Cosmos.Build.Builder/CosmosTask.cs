@@ -109,7 +109,7 @@ namespace Cosmos.Build.Builder
       string xParams = $"{Quoted(aSlnFile)} " +
                        "/nologo " +
                        "/maxcpucount " +
-                       "/nr:false " +
+                       "/nodeReuse:False " +
                        $"/p:Configuration={Quoted(aBuildCfg)} " +
                        $"/p:Platform={Quoted("Any CPU")} " +
                        $"/p:OutputPath={Quoted(mOutputDir)}";
@@ -300,14 +300,14 @@ namespace Cosmos.Build.Builder
     private void Pack(string project, string destDir, string versionSuffix)
     {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
-      string xParams = $"{Quoted(project)} /t:Pack /maxcpucount /p:VersionSuffix={Quoted(versionSuffix)} /p:PackageOutputPath={Quoted(destDir)}";
+      string xParams = $"{Quoted(project)} /nodeReuse:False /t:Restore;Pack /maxcpucount /p:VersionSuffix={Quoted(versionSuffix)} /p:PackageOutputPath={Quoted(destDir)}";
       StartConsole(xMSBuild, xParams);
     }
 
     private void Publish(string project, string destDir)
     {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
-      string xParams = $"{Quoted(project)} /t:Publish /maxcpucount /p:RuntimeIdentifier=win7-x86 /p:OutputPath={Quoted(destDir)}";
+      string xParams = $"{Quoted(project)} /nodeReuse:False /t:Publish /maxcpucount /p:RuntimeIdentifier=win7-x86 /p:OutputPath={Quoted(destDir)}";
       StartConsole(xMSBuild, xParams);
     }
 
