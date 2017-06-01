@@ -797,8 +797,8 @@ namespace Cosmos.Debug.Symbols
                                                         Predicates = new List<IPredicate>()
                                                                      {
                                                                         Predicates.Field<Method>(q => q.DocumentID, Operator.Eq, aDocID),
-                                                                        Predicates.Field<Method>(q => q.LineColStart, Operator.Eq, aStartPos),
-                                                                        Predicates.Field<Method>(q => q.LineColEnd, Operator.Eq, aEndPos)
+                                                                        Predicates.Field<Method>(q => q.LineColStart, Operator.Le, aStartPos),
+                                                                        Predicates.Field<Method>(q => q.LineColEnd, Operator.Ge, aEndPos)
                                                                      }
                                                       }).Single();
             //Debug("Result.LabelCall = '{0}'", xResult.LabelCall);
