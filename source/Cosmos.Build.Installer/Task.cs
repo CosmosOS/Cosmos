@@ -46,6 +46,14 @@ namespace Cosmos.Build.Installer
       return xList.Length > 0;
     }
 
+    public void KillProcesses(string aName)
+    {
+      foreach (var p in Process.GetProcessesByName(aName))
+      {
+        p.Kill();
+      }
+    }
+
     public bool WaitForStart(string aName, int? aMilliSec = null)
     {
       return WaitForState(aName, true, aMilliSec);

@@ -417,6 +417,9 @@ namespace Cosmos.Build.Builder
     {
       Section("Running Setup");
 
+      KillProcesses("dotnet");
+      KillProcesses("msbuild");
+
       string setupName = GetSetupName(mReleaseNo);
 
       if (App.UseTask)
