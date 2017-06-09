@@ -826,11 +826,6 @@ namespace Cosmos.Core.Plugs.System
             return new string(xChars);
         }
 
-        public static string ToString(string aThis)
-        {
-            return aThis;
-        }
-
         public static string FastAllocateString(int aLength)
         {
             return new string(new char[aLength]);
