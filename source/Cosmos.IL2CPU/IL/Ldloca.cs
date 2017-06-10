@@ -20,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
       var xOpVar = (OpVar)aOpCode;
       var xVar = DebugSymbolReader.GetLocalVariableInfos(aMethod.MethodBase)[xOpVar.Value];
       var xEBPOffset = GetEBPOffsetForLocal(aMethod, xOpVar.Value);
-      xEBPOffset += (uint)(((int)GetStackCountForLocal(aMethod, xVar) - 1) * 4);
+      xEBPOffset += (uint)(((int)GetStackCountForLocal(aMethod, xVar.Type) - 1) * 4);
 
       XS.Comment("Local type = " + xVar);
       XS.Comment("Local EBP offset = " + xEBPOffset);

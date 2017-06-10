@@ -2,14 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard1.5</TargetFramework>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>

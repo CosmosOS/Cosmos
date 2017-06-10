@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
-    <VersionPrefix>1.0.0</VersionPrefix>
-    <DebugType>Full</DebugType>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
     <OutputType>exe</OutputType>

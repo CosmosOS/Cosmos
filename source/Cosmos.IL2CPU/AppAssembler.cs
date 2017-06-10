@@ -233,14 +233,14 @@ namespace Cosmos.IL2CPU
                                     {
                                         METHODLABELNAME = xMethodLabel,
                                         IsArgument = false,
-                                        INDEXINMETHOD = i,
-                                        NAME = "Local" + i,
+                                        INDEXINMETHOD = xLocals[i].Slot,
+                                        NAME = xLocals[i].Name,
                                         OFFSET = 0 - (int) ILOp.GetEBPOffsetForLocalForDebugger(aMethod, i),
-                                        TYPENAME = xLocals[i].AssemblyQualifiedName
+                                        TYPENAME = xLocals[i].Type.AssemblyQualifiedName
                                     };
                         mLocals_Arguments_Infos.Add(xInfo);
 
-                        var xSize = ILOp.Align(ILOp.SizeOfType(xLocals[i]), 4);
+                        var xSize = ILOp.Align(ILOp.SizeOfType(xLocals[i].Type), 4);
                         XS.Comment(String.Format("Local {0}, Size {1}", i, xSize));
                         for (int j = 0; j < xSize / 4; j++)
                         {
@@ -364,7 +364,7 @@ namespace Cosmos.IL2CPU
                     var xLocalInfos = DebugSymbolReader.GetLocalVariableInfos(aMethod.MethodBase);
                     for (int j = xLocalInfos.Count - 1; j >= 0; j--)
                     {
-                        xLocalsSize += ILOp.Align(ILOp.SizeOfType(xLocalInfos[j]), 4);
+                        xLocalsSize += ILOp.Align(ILOp.SizeOfType(xLocalInfos[j].Type), 4);
 
                         if (xLocalsSize >= 256)
                         {
@@ -1441,7 +1441,7 @@ namespace Cosmos.IL2CPU
                 {
                     var xLocals = DebugSymbolReader.GetLocalVariableInfos(aMethod.MethodBase);
                         var xLocalsSize = (from item in xLocals
-                                           select ILOp.Align(ILOp.SizeOfType(item), 4)).Sum();
+                                           select ILOp.Align(ILOp.SizeOfType(item.Type), 4)).Sum();
                         xMLSymbol.StackDiff = checked((int)(xLocalsSize + xStackSize));
                         xStackDifference = (uint?)xMLSymbol.StackDiff;
                 }

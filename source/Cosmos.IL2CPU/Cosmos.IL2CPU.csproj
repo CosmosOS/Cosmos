@@ -1,36 +1,29 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>netstandard1.5</TargetFramework>
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>netstandard1.5</TargetFramework>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Reflection" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-        <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="System.Reflection" Version="4.3.0" />
-        <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj" />
-        <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
-        <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
-        <ProjectReference Include="..\Cosmos.Core.Common\Cosmos.Core.Common.csproj" />
-        <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
-        <ProjectReference Include="..\Cosmos.Debug.DebugStub\Cosmos.Debug.DebugStub.csproj" />
-        <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-        <ProjectReference Include="..\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj" />
-        <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj" />
-        <ProjectReference Include="..\Cosmos.System\Cosmos.System.csproj" />
-        <ProjectReference Include="..\XSharp.Common\XSharp.Common.csproj" />
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj" />
+    <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
+    <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
+    <ProjectReference Include="..\Cosmos.Core.Common\Cosmos.Core.Common.csproj" />
+    <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
+    <ProjectReference Include="..\Cosmos.Debug.DebugStub\Cosmos.Debug.DebugStub.csproj" />
+    <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+    <ProjectReference Include="..\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj" />
+    <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj" />
+    <ProjectReference Include="..\Cosmos.System\Cosmos.System.csproj" />
+    <ProjectReference Include="..\XSharp.Common\XSharp.Common.csproj" />
+  </ItemGroup>
 
 </Project>

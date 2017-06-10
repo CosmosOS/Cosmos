@@ -274,7 +274,7 @@ namespace Cosmos.IL2CPU
     {
       // leave here, makes easier debugging the compiler. Compiler will
       // show for example "IL_0001: ldstr" instead of just ILOpCode
-      return String.Format("IL_{0}: {1}", Position.ToString("X4"), OpCode);
+      return $"IL_{Position:X4}: {OpCode}";
     }
 
     /// <summary>

@@ -4,98 +4,14 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
+using Cosmos.Debug.Symbols.Metadata;
+using Cosmos.Debug.Symbols.Pdb;
 
 namespace Cosmos.Debug.Symbols
 {
-    internal static class MetadataHelper
-    {
-        private static readonly Dictionary<string, MetadataReaderProvider> mMetadataCache;
-
-        static MetadataHelper()
-        {
-            mMetadataCache = new Dictionary<string, MetadataReaderProvider>();
-        }
-
-        public static MetadataReader TryGetReader(string aAssemblyPath)
-        {
-            MetadataReaderProvider provider;
-            if (mMetadataCache.TryGetValue(aAssemblyPath, out provider))
-            {
-                return provider.GetMetadataReader();
-            }
-
-            provider = TryOpenReaderFromAssemblyFile(aAssemblyPath);
-
-            if (provider == null)
-            {
-                return null;
-            }
-
-            mMetadataCache.Add(aAssemblyPath, provider);
-
-            // The reader has already been open, so this doesn't throw:
-            return provider.GetMetadataReader();
-        }
-
-        public static Type GetTypeFromReference(MetadataReader reader, Module aModule, TypeReferenceHandle handle, byte rawTypeKind)
-        {
-            int xToken = MetadataTokens.GetToken(handle);
-            return aModule.ResolveType(xToken, null, null);
-        }
-
-        private static PEReader TryGetPEReader(string aAssemblyPath)
-        {
-            var peStream = TryOpenFile(aAssemblyPath);
-            if (peStream != null)
-            {
-                return new PEReader(peStream);
-            }
-
-            return null;
-        }
-
-        private static MetadataReaderProvider TryOpenReaderFromAssemblyFile(string aAssemblyPath)
-        {
-            using (var peReader = TryGetPEReader(aAssemblyPath))
-            {
-                if (peReader == null)
-                {
-                    return null;
-                }
-
-                string pdbPath;
-                MetadataReaderProvider provider;
-                if (peReader.TryOpenAssociatedPortablePdb(aAssemblyPath, TryOpenFile, out provider, out pdbPath))
-                {
-                    return provider;
-                }
-            }
-
-            return null;
-        }
-
-        private static Stream TryOpenFile(string aPath)
-        {
-            if (!File.Exists(aPath))
-            {
-                return null;
-            }
-
-            try
-            {
-                return File.OpenRead(aPath);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-    }
-
     public class DebugSymbolReader
     {
         private static string mCurrentFile;
@@ -103,10 +19,13 @@ namespace Cosmos.Debug.Symbols
 
         private readonly PEReader mPEReader;
         private readonly MetadataReader mMetadataReader;
+        private readonly PdbSymbolReader mSymbolReader;
+        private static readonly Dictionary<string, List<ILLocalVariable>> xLocalVariableInfosCache = new Dictionary<string, List<ILLocalVariable>>();
 
         private DebugSymbolReader(string aFilePath)
         {
             mPEReader = new PEReader(File.OpenRead(aFilePath), PEStreamOptions.PrefetchEntireImage);
+            mSymbolReader = OpenAssociatedSymbolFile(aFilePath, mPEReader);
             mMetadataReader = mPEReader.GetMetadataReader();
         }
 
@@ -130,6 +49,50 @@ namespace Cosmos.Debug.Symbols
             }
 
             return null;
+        }
+
+        private PdbSymbolReader OpenAssociatedSymbolFile(string peFilePath, PEReader peReader)
+        {
+            // Assume that the .pdb file is next to the binary
+            var pdbFilename = Path.ChangeExtension(peFilePath, ".pdb");
+            string searchPath = "";
+
+                if (!File.Exists(pdbFilename))
+            {
+                pdbFilename = null;
+
+                // If the file doesn't exist, try the path specified in the CodeView section of the image
+                foreach (DebugDirectoryEntry debugEntry in peReader.ReadDebugDirectory())
+                {
+                    if (debugEntry.Type != DebugDirectoryEntryType.CodeView)
+                    {
+                        continue;
+                    }
+
+                    string candidateFileName = peReader.ReadCodeViewDebugDirectoryData(debugEntry).Path;
+                    if (Path.IsPathRooted(candidateFileName) && File.Exists(candidateFileName))
+                    {
+                        pdbFilename = candidateFileName;
+                        searchPath = Path.GetDirectoryName(pdbFilename);
+                        break;
+                    }
+                }
+
+                if (pdbFilename == null)
+                {
+                    return null;
+                }
+            }
+
+            // Try to open the symbol file as portable pdb first
+            PdbSymbolReader reader = PortablePdbSymbolReader.TryOpen(pdbFilename, MetadataHelper.GetMetadataStringDecoder());
+            if (reader == null)
+            {
+                // Fallback to the diasymreader for non-portable pdbs
+                reader = UnmanagedPdbSymbolReader.TryOpenSymbolReaderForMetadataFile(peFilePath, searchPath);
+            }
+
+            return reader;
         }
 
         public static DebugInfo.SequencePoint[] GetSequencePoints(string aAssemblyPath, int aMetadataToken)
@@ -173,7 +136,7 @@ namespace Cosmos.Debug.Symbols
 
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
@@ -198,9 +161,15 @@ namespace Cosmos.Debug.Symbols
             return null;
         }
 
-        public static IList<Type> GetLocalVariableInfos(MethodBase aMethodBase)
+        public static List<ILLocalVariable> GetLocalVariableInfos(MethodBase aMethodBase)
         {
-            var xLocalVariables = new List<Type>();
+            string xMenthodId = $"{aMethodBase.MetadataToken}_{aMethodBase.DeclaringType?.FullName}_{aMethodBase.Name}";
+
+            if (xLocalVariableInfosCache.ContainsKey(xMenthodId))
+            {
+                return xLocalVariableInfosCache[xMenthodId];
+            }
+            var xLocalVariables = new List<ILLocalVariable>();
 
             string xLocation = aMethodBase.Module.Assembly.Location;
             var xGenericMethodParameters = new Type[0];
@@ -214,37 +183,37 @@ namespace Cosmos.Debug.Symbols
                 xGenericTypeParameters = aMethodBase.DeclaringType.GetTypeInfo().GetGenericArguments();
             }
 
-            // TODO: Read from pdb.
-            //var xReader = MetadataHelper.TryGetReader(xLocation);
-            //if (xReader != null)
-            //{
-            //    xLocalVariables = ResolveLocalsFromPdb(xReader, aMethodBase, xGenericTypeParameters, xGenericMethodParameters).ToList();
-            //}
-            //else
-            //{
             var xReader = GetReader(xLocation).mMetadataReader;
-            xLocalVariables = ResolveLocalsFromSignature(xReader, aMethodBase, xGenericTypeParameters, xGenericMethodParameters).ToList();
-            //}
+            List<ILLocalVariable> xLocalVariablesFromPdb = null;
+            try
+            {
+                xLocalVariablesFromPdb = mCurrentDebugSymbolReader.mSymbolReader.GetLocalVariableNamesForMethod(aMethodBase.MetadataToken).ToList();
+            }
+            catch (Exception)
+            {
+            }
 
-            //var xLocals = aMethodBase.GetMethodBody().LocalVariables;
-            //foreach (var xLocal in xLocals)
-            //{
-            //    xLocalVariables.Add(xLocal.LocalType);
-            //}
+            var xTypes = ResolveLocalsFromSignature(xReader, aMethodBase, xGenericTypeParameters, xGenericMethodParameters).ToList();
+            for (int i = 0; i < xTypes.Count; i++)
+            {
+                int xSlot = i;
+                string xName = "Local" + i;
+                bool xCompilerGenerated = true;
+                ILLocalVariable xLocal = xLocalVariablesFromPdb?.FirstOrDefault(x => x.Slot == i);
+                if (xLocal != null)
+                {
+                    xName = xLocal.Name;
+                    xSlot = xLocal.Slot;
+                    xCompilerGenerated = xLocal.CompilerGenerated;
+                }
+                xLocalVariables.Add(new ILLocalVariable(xSlot, xName, xCompilerGenerated, xTypes[i]));
+            }
 
+            xLocalVariableInfosCache.Add(xMenthodId, xLocalVariables);
             return xLocalVariables;
         }
 
-        private static IList<Type> ResolveLocalsFromPdb(MetadataReader aReader, MethodBase aMethodBase, Type[] aGenericTypeParameters, Type[] aGenericMethodParameters)
-        {
-            var xLocalVariables = new List<Type>();
-
-            // TODO
-
-            return xLocalVariables;
-        }
-
-        private static IList<Type> ResolveLocalsFromSignature(MetadataReader aReader, MethodBase aMethodBase, Type[] aGenericTypeParameters, Type[] aGenericMethodParameters)
+        private static List<Type> ResolveLocalsFromSignature(MetadataReader aReader, MethodBase aMethodBase, Type[] aGenericTypeParameters, Type[] aGenericMethodParameters)
         {
             var xLocalVariables = new List<Type>();
             var xMethodBody = GetMethodBodyBlock(aMethodBase.Module, aMethodBase.MetadataToken);
@@ -267,7 +236,8 @@ namespace Cosmos.Debug.Symbols
             switch (aRegion.CatchType.Kind)
             {
                 case HandleKind.TypeReference:
-                    return MetadataHelper.GetTypeFromReference(xReader, aModule, (TypeReferenceHandle) aRegion.CatchType, 0);
+                    return MetadataHelper.GetTypeFromReference(xReader, aModule,
+                        (TypeReferenceHandle) aRegion.CatchType, 0);
                 case HandleKind.TypeDefinition:
                     break;
                 case HandleKind.FieldDefinition:
@@ -328,7 +298,7 @@ namespace Cosmos.Debug.Symbols
             var xMetadataReader = GetReader(xAssemblyPath).mMetadataReader;
             var xPEReader = GetReader(xAssemblyPath).mPEReader;
 
-            var xHandle = (FieldDefinitionHandle)MetadataTokens.Handle(aMetadataToken);
+            var xHandle = (FieldDefinitionHandle) MetadataTokens.Handle(aMetadataToken);
 
             if (!xHandle.IsNil)
             {

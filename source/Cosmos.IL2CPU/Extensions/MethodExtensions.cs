@@ -6,6 +6,7 @@ using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Cosmos.Assembler;
 using Cosmos.Debug.Symbols;
+using Cosmos.Debug.Symbols.Pdb;
 
 namespace Cosmos.IL2CPU.Extensions
 {
@@ -16,7 +17,7 @@ namespace Cosmos.IL2CPU.Extensions
             return LabelName.Get(aMethod);
         }
 
-        public static IList<Type> GetLocalVariables(this MethodBase aThis)
+        public static IList<ILLocalVariable> GetLocalVariables(this MethodBase aThis)
         {
             return DebugSymbolReader.GetLocalVariableInfos(aThis);
         }
