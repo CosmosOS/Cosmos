@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Collections;
+using System.Collections.ObjectModel;
 
 namespace Cosmos.System.Graphics
 {
@@ -84,6 +86,8 @@ namespace Cosmos.System.Graphics
             }
         }
 
+        
+
         public abstract void DrawPoint(Pen pen, int x, int y);
 
         public abstract void DrawPoint(Pen pen, float x, float y);
@@ -96,7 +100,7 @@ namespace Cosmos.System.Graphics
                 DrawPoint(pen, x1 + i, y1);
         }
 
-        private void DrawVerthicalLine(Pen pen, int dy, int x1, int y1)
+        private void DrawVerticalLine(Pen pen, int dy, int x1, int y1)
         {
             int i;
 
@@ -155,7 +159,7 @@ namespace Cosmos.System.Graphics
          * DrawLine throw if the line goes out of the boundary of the Canvas, probably will be better to draw only the part
          * of line visibile. This is too "smart" to do here better do it in a future Window Manager.
          */
-        public void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
+        public virtual void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
         {
             if (pen == null)
                 throw new ArgumentOutOfRangeException(nameof(pen));
@@ -177,7 +181,7 @@ namespace Cosmos.System.Graphics
 
             if (dx == 0) /* the line is vertical */
             {
-                DrawVerthicalLine(pen, dy, x1, y1);
+                DrawVerticalLine(pen, dy, x1, y1);
                 return;
             }
 
@@ -185,12 +189,101 @@ namespace Cosmos.System.Graphics
             DrawDiagonalLine(pen, dx, dy, x1, y1);
         }
 
+        public void DrawLine(Pen pen, Point p1, Point p2)
+        {
+            DrawLine(pen, p1.X, p1.Y, p2.X, p2.Y);
+        }
+
         public void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
         {
             throw new NotImplementedException();
         }
 
-        public void DrawRectangle(Pen pen, int x, int y, int width, int height)
+        //https://en.wikipedia.org/wiki/Midpoint_circle_algorithm
+        public virtual void DrawCircle(Pen pen, int x_center, int y_center, int radius)
+        {
+            if (pen == null)
+                throw new ArgumentNullException(nameof(pen));
+            ThrowIfCoordNotValid(x_center + radius, y_center);
+            ThrowIfCoordNotValid(x_center - radius, y_center);
+            ThrowIfCoordNotValid(x_center, y_center + radius);
+            ThrowIfCoordNotValid(x_center, y_center - radius);
+            int x = radius;
+            int y = 0;
+            int e = 0;
+
+            while(x>=y)
+            {
+                DrawPoint(pen, x_center + x, y_center + y);
+                DrawPoint(pen, x_center + y, y_center + x);
+                DrawPoint(pen, x_center - y, y_center + x);
+                DrawPoint(pen, x_center - x, y_center + y);
+                DrawPoint(pen, x_center - x, y_center - y);
+                DrawPoint(pen, x_center - y, y_center - x);
+                DrawPoint(pen, x_center + y, y_center - x);
+                DrawPoint(pen, x_center + x, y_center - y);
+
+                y++;
+                if(e<=0)
+                {
+                    e += 2 * y + 1;
+                }
+                if(e>0)
+                {
+                    x--;
+                    e -= 2 * x + 1;
+                }
+            }
+        }
+
+        //http://members.chello.at/~easyfilter/bresenham.html
+        public virtual void DrawEllipse(Pen pen, int x_center, int y_center, int x_radius, int y_radius)
+        {
+            if (pen == null)
+                throw new ArgumentNullException(nameof(pen));
+            ThrowIfCoordNotValid(x_center + x_radius, y_center);
+            ThrowIfCoordNotValid(x_center - x_radius, y_center);
+            ThrowIfCoordNotValid(x_center, y_center + y_radius);
+            ThrowIfCoordNotValid(x_center, y_center - y_radius);
+            int a = 2 * x_radius;
+            int b = 2 * y_radius;
+            int b1 = b & 1;
+            int dx = 4 * (1 - a) * b * b;
+            int dy = 4 * (b1 + 1) * a * a;
+            int err = dx + dy + b1 * a * a;
+            int e2;
+            int y = 0;
+            int x = x_radius;
+            a *= 8 * a;
+            b1 = 8 * b * b;
+
+            while (x>=0)
+            {
+                DrawPoint(pen, x_center + x, y_center + y);
+                DrawPoint(pen, x_center - x, y_center + y);
+                DrawPoint(pen, x_center - x, y_center - y);
+                DrawPoint(pen, x_center + x, y_center - y);
+                e2 = 2 * err;
+                if (e2 <= dy) { y++; err += dy += a; }
+                if (e2 >= dx || 2 * err > dy) { x--; err += dx += b1; }
+            }
+        }
+
+        public virtual void DrawPolygon(Pen pen, params Point[] points)
+        {
+            if (points.Length < 3)
+                throw new ArgumentException("A polygon requires more than 3 points.");
+            if (pen == null)
+                throw new ArgumentNullException(nameof(pen));
+
+            for (int i = 0; i < points.Length - 1; i++)
+            {
+                DrawLine(pen, points[i], points[i + 1]);
+            }
+            DrawLine(pen, points[0], points[points.Length - 1]);
+        }
+
+        public virtual void DrawRectangle(Pen pen, int x, int y, int width, int height)
         {
             /*
              * we must draw four lines connecting any vertex of our rectangle to do this we first obtain the position of these
@@ -230,6 +323,22 @@ namespace Cosmos.System.Graphics
             DrawLine(pen, xc, yc, xd, yd);
         }
 
+        public virtual void DrawFilledRectangle(Pen pen, int x_start, int y_start, int width, int height)
+        {
+            for (int i = 0; i != width; i++)
+            {
+                DrawLine(pen, x_start, y_start, x_start + height, y_start);
+                y_start++;
+            }
+        }
+
+        public virtual void DrawTriangle(Pen pen, int v1x, int v1y, int v2x, int v2y, int v3x, int v3y)
+        {
+            DrawLine(pen, v1x, v1y, v2x, v2y);
+            DrawLine(pen, v1x, v1y, v3x, v3y);
+            DrawLine(pen, v2x, v2y, v3x, v3y);
+        }
+         
         public void DrawRectangle(Pen pen, float x_start, float y_start, float width, float height)
         {
             throw new NotImplementedException();
@@ -302,6 +411,27 @@ namespace Cosmos.System.Graphics
             {
                 throw new ArgumentOutOfRangeException(nameof(y), $"y ({y}) is not between 0 and {Mode.Rows}");
             }
+        }
+    }
+
+    public class Point
+    {
+        public Point(int x, int y)
+        {
+            this.X = x;
+            this.Y = y;
+        }
+        int x;
+        public int X
+        {
+            get { return x; }
+            set { x = value; }
+        }
+        int y;
+        public int Y
+        {
+            get { return y; }
+            set { y = value; }
         }
     }
 }

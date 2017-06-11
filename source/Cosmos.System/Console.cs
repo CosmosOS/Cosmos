@@ -63,8 +63,7 @@ namespace Cosmos.System {
             mX = 0;
             if (mY == mText.Rows) {
                 mText.ScrollUp();
-                mY = mText.Rows - 1;
-                mX = 0;
+                mY--;
             }
             UpdateCursor();
         }
@@ -93,8 +92,14 @@ namespace Cosmos.System {
                 if (aText[i] == '\n') {
                     NewLine();
                 } else if (aText[i] == '\r') {
+                    mX = 0;
+                    UpdateCursor();
                 } else if (aText[i] == '\t') {
-                    Write("    ");
+                    //Write("    ");
+                    WriteChar(' ');
+                    WriteChar(' ');
+                    WriteChar(' ');
+                    WriteChar(' ');
                 } else {
                     WriteChar(aText[i]);
                 }
