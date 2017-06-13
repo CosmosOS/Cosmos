@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Cosmos.Common
+﻿namespace Cosmos.Common
 {
     public enum Ring
     {
@@ -12,6 +6,13 @@ namespace Cosmos.Common
         HAL = 1,
         System = 2,
         User = 3,
-        
+
     }
+
+    public enum AssemblyType
+    {
+        Plugs,
+        AssemblerPlugs
+    }
+
 }

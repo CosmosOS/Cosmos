@@ -59,7 +59,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetFatTable --");
 
-            var xFat = ((FatFileSystem)mFileSystem).GetFat(0);
+            var xFat = ((FatFileSystem) mFileSystem).GetFat(0);
             return xFat?.GetFatChain(mFirstClusterNum, mSize);
         }
 
@@ -67,7 +67,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
         {
             Global.mFileSystemDebugger.SendInternal("-- FatDirectoryEntry.GetFileSystem --");
 
-            return ((FatFileSystem)mFileSystem);
+            return ((FatFileSystem) mFileSystem);
         }
 
         public override Stream GetFileStream()
@@ -265,7 +265,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 }
 
                 string xFullPath = Path.Combine(mFullPath, aName);
-                uint xFirstCluster = ((FatFileSystem)mFileSystem).GetFat(0).GetNextUnallocatedFatEntry();
+                uint xFirstCluster = ((FatFileSystem) mFileSystem).GetFat(0).GetNextUnallocatedFatEntry();
                 uint xEntryHeaderDataOffset = GetNextUnallocatedDirectoryEntry();
 
                 Global.mFileSystemDebugger.SendInternal("xFullPath =");
@@ -294,7 +294,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             if (mParent != null)
             {
-                var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
+                var xData = ((FatDirectoryEntry) mParent).GetDirectoryEntryData();
 
                 var xEntryOffset = mEntryHeaderDataOffset - 32;
 
@@ -304,7 +304,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                     xEntryOffset -= 32;
                 }
 
-                ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
+                ((FatDirectoryEntry) mParent).SetDirectoryEntryData(xData);
             }
             else
             {
@@ -532,7 +532,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             if (mEntryType != DirectoryEntryTypeEnum.Unknown)
             {
                 byte[] xData;
-                ((FatFileSystem)mFileSystem).Read(mFirstClusterNum, out xData);
+                ((FatFileSystem) mFileSystem).Read(mFirstClusterNum, out xData);
                 return xData;
             }
 
@@ -557,7 +557,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             if (mEntryType != DirectoryEntryTypeEnum.Unknown)
             {
-                ((FatFileSystem)mFileSystem).Write(mFirstClusterNum, aData);
+                ((FatFileSystem) mFileSystem).Write(mFirstClusterNum, aData);
             }
             else
             {
@@ -573,15 +573,17 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             if (mParent != null)
             {
-                var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
+                var xData = ((FatDirectoryEntry) mParent).GetDirectoryEntryData();
 
                 if (xData.Length > 0)
                 {
                     var xValue = new byte[aEntryMetadata.DataLength];
                     xValue.SetUInt32(0, aValue);
                     uint offset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
-                    Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
-                    ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
+                    //TODO: .Net Core
+                    //Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
+                    Array.Copy(xValue, 0, xData, (int) offset, (int) aEntryMetadata.DataLength);
+                    ((FatDirectoryEntry) mParent).SetDirectoryEntryData(xData);
                 }
             }
             else
@@ -598,17 +600,19 @@ namespace Cosmos.System.FileSystem.FAT.Listing
 
             if (mParent != null)
             {
-                var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
+                var xData = ((FatDirectoryEntry) mParent).GetDirectoryEntryData();
 
                 if (xData.Length > 0)
                 {
                     var xValue = new byte[aEntryMetadata.DataLength];
-                    xValue.SetUInt32(0, (uint)aValue);
+                    xValue.SetUInt32(0, (uint) aValue);
                     uint offset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
                     Global.mFileSystemDebugger.SendInternal("offset =");
                     Global.mFileSystemDebugger.SendInternal(offset);
-                    Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
-                    ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
+                    //TODO: .Net Core
+                    //Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
+                    Array.Copy(xValue, 0, xData, (int) offset, (int) aEntryMetadata.DataLength);
+                    ((FatDirectoryEntry) mParent).SetDirectoryEntryData(xData);
                 }
             }
             else
@@ -623,7 +627,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
             Global.mFileSystemDebugger.SendInternal("aValue =");
             Global.mFileSystemDebugger.SendInternal(aValue);
 
-            var xData = ((FatDirectoryEntry)mParent).GetDirectoryEntryData();
+            var xData = ((FatDirectoryEntry) mParent).GetDirectoryEntryData();
 
             if (xData.Length > 0)
             {
@@ -631,9 +635,11 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 xValue = aValue.GetUtf8Bytes(0, aEntryMetadata.DataLength);
 
                 uint offset = mEntryHeaderDataOffset + aEntryMetadata.DataOffset;
-                Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
+                //TODO: .Net Core
+                //Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
+                Array.Copy(xValue, 0, xData, (int) offset, (int) aEntryMetadata.DataLength);
 
-                ((FatDirectoryEntry)mParent).SetDirectoryEntryData(xData);
+                ((FatDirectoryEntry) mParent).SetDirectoryEntryData(xData);
             }
         }
 
@@ -650,7 +656,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 var xValue = new byte[aEntryMetadata.DataLength];
                 xValue.SetUInt32(0, aValue);
                 uint offset = aEntryHeaderDataOffset + aEntryMetadata.DataOffset;
-                Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
+                Array.Copy(xValue, 0, xData, (int)offset, (int)aEntryMetadata.DataLength);
                 SetDirectoryEntryData(xData);
             }
         }
@@ -670,7 +676,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 uint offset = aEntryHeaderDataOffset + aEntryMetadata.DataOffset;
                 Global.mFileSystemDebugger.SendInternal("offset =");
                 Global.mFileSystemDebugger.SendInternal(offset);
-                Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
+                Array.Copy(xValue, 0, xData, (int)offset, (int)aEntryMetadata.DataLength);
                 SetDirectoryEntryData(xData);
             }
         }
@@ -689,7 +695,7 @@ namespace Cosmos.System.FileSystem.FAT.Listing
                 xValue = aValue.GetUtf16Bytes(0, aEntryMetadata.DataLength / 2);
 
                 uint offset = aEntryHeaderDataOffset + aEntryMetadata.DataOffset;
-                Array.Copy(xValue, 0, xData, offset, aEntryMetadata.DataLength);
+                Array.Copy(xValue, 0, xData, (int)offset, (int)aEntryMetadata.DataLength);
 
                 SetDirectoryEntryData(xData);
             }

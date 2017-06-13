@@ -1,8 +1,9 @@
 using System;
 using Cosmos.Assembler.x86.SSE;
-using XSharp.Compiler;
+
+using XSharp.Common;
 using CPUx86 = Cosmos.Assembler.x86;
-using static XSharp.Compiler.XSRegisters;
+using static XSharp.Common.XSRegisters;
 using static Cosmos.Assembler.x86.SSE.ComparePseudoOpcodes;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -19,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xSource = aOpCode.StackPopTypes[0];
             var xSourceSize = SizeOfType(xSource);
@@ -29,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
                 case 1:
                     throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I4.cs->The size 1 could not exist, because always is pushed Int32 or Int64!");
                 case 2:
-                    throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I4.cs->The size 2 could not exist, because always is pushed Int32 or Int64!");
+                    //throw new Exception("Cosmos.IL2CPU.x86->IL->Conv_I4.cs->The size 2 could not exist, because always is pushed Int32 or Int64!");
                 case 4:
                     {
 						if (xSourceIsFloat)

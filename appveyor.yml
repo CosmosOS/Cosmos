@@ -1,4 +1,5 @@
 version: 0.20150918.{build}
+image: Visual Studio 2017
 configuration: Debug
 platform: AnyCPU
 shallow_clone: true
@@ -12,22 +13,35 @@ build_script:
     rem %APPVEYOR_BUILD_FOLDER%
 
 
-    nuget restore "source\Cosmos.sln"
+    nuget restore "Builder.sln"
+
+    nuget restore "Cosmos.sln"
+
+    msbuild "Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
 
 
-    msbuild "source\Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
-
-
-    msbuild "source\Build.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:OutputPath="%APPVEYOR_BUILD_FOLDER%\Build\VSIP" /p:DeployExtension=false
+    msbuild "Build.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:OutputPath="%APPVEYOR_BUILD_FOLDER%\Build\VSIP" /p:DeployExtension=false
 
 
     xcopy /Y "%APPVEYOR_BUILD_FOLDER%\Build\VSIP\Cosmos.targets" "%ProgramFiles(x86)%\MSBuild\Cosmos\"
 
-    xcopy /Y "c:\Cosmos\Build\VSIP" "c:\CosmosRun\Build\IL2CPU\"
+    dotnet publish source/Cosmos.Build.MSBuild -f net462 -r win7-x86 -o "c:\CosmosRun\Build\VSIP\"
 
-    xcopy /Y "c:\Cosmos\Build\VSIP" "c:\CosmosRun\Kernel\"
+    dotnet publish source/IL2CPU -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\IL2CPU\"
+        
+    dotnet publish source/XSharp.Compiler -f netcoreapp1.0 -r win7-x86 -o "c:\CosmosRun\Build\XSharp\"
 
-    xcopy /Y "c:\Cosmos\Build\VSIP" "c:\CosmosRun\Build\VSIP\"
+    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.Debug.Kernel.*" "c:\CosmosRun\Kernel\"
+    
+    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.Core.*" "c:\CosmosRun\Kernel\"
+    
+    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.HAL.*" "c:\CosmosRun\Kernel\"
+    
+    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.System.*" "c:\CosmosRun\Kernel\"
+    
+    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.Common.*" "c:\CosmosRun\Kernel\"
+
+    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.Debug.GDB.exe" "c:\CosmosRun\Build\VSIP\"
 
     xcopy /Y /S "c:\Cosmos\Build\ISO" "c:\CosmosRun\Build\ISO\"
 
@@ -42,19 +56,26 @@ build_script:
     xcopy /Y /S "c:\Cosmos\Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
 
 
-    reg add HKLM\SOFTWARE\WOW6432Node\Microsoft\.NETFramework\v4.5\AssemblyFoldersEx\Cosmos /ve /d c:\CosmosRun\Build\VSIP\
-
     reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d c:\CosmosRun\
 
     reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
 
 
-    msbuild "source\Cosmos.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
+    msbuild "Cosmos.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
 
-test:
-  assemblies:
+#test: off
+#  assemblies:
 #  - Cosmos.Core.Memory.Test.dll
-  - DebugCompiler.dll
+#  - DebugCompiler.dll
+#  - Cosmos.TestRunner.UnitTest.dll
+
+test_script:
+- cmd: >-
+    dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
+- ps: >-    
+    $wc = New-Object 'System.Net.WebClient'
+    
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", "c:\Cosmos\TestResult.xml")
 
 notifications:
 - provider: Webhook
@@ -68,4 +89,3 @@ matrix:
   
 artifacts:
   - path: '**\TestResult.xml'
-  

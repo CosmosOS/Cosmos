@@ -1,19 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.Utilities;
-using Microsoft.Build.Framework;
-using System.Reflection;
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
-using System.IO;
-using Cosmos.Build.Common;
-using Microsoft.Win32;
-using Cosmos.IL2CPU.X86;
-using Cosmos.IL2CPU;
-using System.Reflection.Emit;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using Microsoft.Build.Framework;
 
 namespace Cosmos.Build.MSBuild
 {
@@ -55,6 +45,10 @@ namespace Cosmos.Build.MSBuild
 
         public bool EmitDebugSymbols { get; set; }
 
+        public string[] AdditionalSearchDirs { get; set; }
+
+        public string[] AdditionalReferences { get; set; }
+
         protected void LogMessage(string aMsg)
         {
             Log.LogMessage(aMsg);
@@ -86,6 +80,7 @@ namespace Cosmos.Build.MSBuild
 
             try
             {
+                //TODO: Add AdditionalReferences and AdditionalSearchDirs here and to log messages below.
                 Dictionary<string, string> args = new Dictionary<string, string>
                 {
                     {"DebugEnabled", Convert.ToString(DebugEnabled)},
@@ -117,8 +112,7 @@ namespace Cosmos.Build.MSBuild
             finally
             {
                 xSW.Stop();
-                Log.LogMessage(MessageImportance.High,
-                    $"IL2CPU invoked with DebugMode='{DebugMode}', DebugEnabled='{DebugEnabled}',StackCorruptionDetectionLevel='{StackCorruptionDetectionLevel ?? "{NULL}"}', TraceAssemblies='{TraceAssemblies ?? "{NULL}"}', IgnoreDebugStub='{IgnoreDebugStubAttribute}'");
+                Log.LogMessage(MessageImportance.High, $"IL2CPU invoked with DebugMode='{DebugMode}', DebugEnabled='{DebugEnabled}',StackCorruptionDetectionLevel='{StackCorruptionDetectionLevel ?? "{NULL}"}', TraceAssemblies='{TraceAssemblies ?? "{NULL}"}', IgnoreDebugStub='{IgnoreDebugStubAttribute}'");
                 Log.LogMessage(MessageImportance.High, "IL2CPU task took {0}", xSW.Elapsed);
             }
         }

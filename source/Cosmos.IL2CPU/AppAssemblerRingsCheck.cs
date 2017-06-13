@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+
+using Cosmos.Assembler;
 using Cosmos.Common;
-using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.IL2CPU
 {
@@ -10,12 +11,25 @@ namespace Cosmos.IL2CPU
     {
         private static bool IsAssemblySkippedDuringRingCheck(Assembly assembly)
         {
+            var xServicable = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Where(x => x.Key == "Serviceable").SingleOrDefault();
+            var xNetFrameworkAssembly = assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Where(x => x.Key == ".NETFrameworkAssembly").SingleOrDefault();
+            var xProduct = assembly.GetCustomAttribute<AssemblyProductAttribute>();
+            var xCopyright = assembly.GetCustomAttribute<AssemblyCopyrightAttribute>();
+            var xCompany = assembly.GetCustomAttribute<AssemblyCompanyAttribute>();
             string xName = assembly.GetName().Name;
 
-            if (assembly.GlobalAssemblyCache ||
-                (xName == "Cosmos.Debug.Kernel") ||
-                (xName == "Cosmos.Debug.Kernel.Plugs") ||
+            if ((xServicable?.Value == "True" || xNetFrameworkAssembly != null) &&
+                ((xProduct != null && xProduct.Product.Contains(".NET Framework"))
+                || (xCopyright != null && xCopyright.Copyright.Contains("Microsoft Corporation"))
+                || (xCompany != null && xCompany.Company.Contains("Microsoft Corporation"))))
+            {
+                return true;
+            }
+
+            if ((xName == "Cosmos.Debug.Kernel") ||
+                (xName == "Cosmos.Debug.Kernel.Plugs.Asm") ||
                 (xName == "Cosmos.IL2CPU") ||
+                (xName == "Cosmos.IL2CPU.Plugs") ||
                 (xName == "Cosmos.Common") ||
                 (xName == "Cosmos.TestRunner.TestController"))
             {
@@ -114,9 +128,9 @@ namespace Cosmos.IL2CPU
 
         private static bool HasAssemblyPlugs(Assembly assembly)
         {
-            foreach (var xTypes in assembly.GetTypes())
+            foreach (var xType in assembly.GetTypes())
             {
-                if (xTypes.IsSubclassOf(typeof(AssemblerMethod)))
+                if (xType.GetTypeInfo().IsSubclassOf(typeof(AssemblerMethod)))
                 {
                     return true;
                 }
@@ -155,7 +169,8 @@ namespace Cosmos.IL2CPU
 
         private static Ring GetRingFromAssembly(Assembly assembly)
         {
-            var xRingAttrib = assembly.GetCustomAttributes<RingAttribute>().SingleOrDefault();
+            var xRingAttrib = assembly.GetCustomAttribute<RingAttribute>();
+
             if (xRingAttrib == null)
             {
                 return Ring.User;

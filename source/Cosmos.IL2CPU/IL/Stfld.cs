@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
-using SysReflection = System.Reflection;
+using System.Reflection;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
-using XSharp.Compiler;
+
+using Cosmos.IL2CPU.Extensions;
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Stfld)]
@@ -11,14 +13,14 @@ namespace Cosmos.IL2CPU.X86.IL {
     public Stfld(Cosmos.Assembler.Assembler aAsmblr) : base(aAsmblr) {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode) {
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode) {
       var xOpCode = (ILOpCodes.OpField)aOpCode;
       var xField = xOpCode.Value;
       XS.Comment("Operand type: " + aOpCode.StackPopTypes[1].ToString());
       DoExecute(Assembler, aMethod, xField, DebugEnabled, TypeIsReferenceType(aOpCode.StackPopTypes[1]));
     }
 
-    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler,  MethodInfo aMethod, string aFieldId, Type aDeclaringObject, bool aNeedsGC, bool debugEnabled) {
+    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler, _MethodInfo aMethod, string aFieldId, Type aDeclaringObject, bool aNeedsGC, bool debugEnabled) {
       var xType = aMethod.MethodBase.DeclaringType;
 
       var xFields = GetFieldsInfo(aDeclaringObject, false);
@@ -97,7 +99,7 @@ namespace Cosmos.IL2CPU.X86.IL {
       }
     }
 
-    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler, MethodInfo aMethod, SysReflection.FieldInfo aField, bool debugEnabled, bool aNeedsGC)
+    public static void DoExecute(Cosmos.Assembler.Assembler aAssembler, _MethodInfo aMethod, FieldInfo aField, bool debugEnabled, bool aNeedsGC)
     {
       DoExecute(aAssembler, aMethod, aField.GetFullName(), aField.DeclaringType, aNeedsGC, debugEnabled);
     }

@@ -2,8 +2,9 @@ using System;
 using Cosmos.IL2CPU.X86;
 using CPU = Cosmos.Assembler.x86;
 using Cosmos.Assembler.x86;
+
 using Cosmos.IL2CPU.ILOpCodes;
-using XSharp.Compiler;
+using XSharp.Common;
 using Label = Cosmos.Assembler.Label;
 
 namespace Cosmos.IL2CPU.X86.IL
@@ -28,7 +29,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       var xIsSingleCompare = true;
       switch (aOpCode.OpCode)

@@ -7,33 +7,37 @@ namespace Cosmos.Assembler
     {
         public readonly string Text;
 
-        public Comment( Assembler aAssembler, string aText )
+        public Comment(Assembler aAssembler, string aText)
             : base() //HACK
         {
-          if (aText.StartsWith(";")) {
-            aText = aText.TrimStart(';').TrimStart();
-          }
-          Text = String.Intern(aText);
-        }
-        public Comment(string aText):base(true) {
-          if (aText.StartsWith(";")) {
-            aText = aText.TrimStart(';').TrimStart();
-          }
-          Text = String.Intern(aText);
-        }
-        
-        public override void WriteText( Assembler aAssembler, System.IO.TextWriter aOutput )
-        {
-            aOutput.Write( "; " );
-            aOutput.Write( Text );
+            if (aText.StartsWith(";"))
+            {
+                aText = aText.TrimStart(';').TrimStart();
+            }
+            Text = aText;
         }
 
-        public override void UpdateAddress( Assembler aAssembler, ref ulong aAddress )
+        public Comment(string aText) : base(true)
         {
-            base.UpdateAddress( aAssembler, ref aAddress );
+            if (aText.StartsWith(";"))
+            {
+                aText = aText.TrimStart(';').TrimStart();
+            }
+            Text = aText;
         }
 
-        public override bool IsComplete( Assembler aAssembler )
+        public override void WriteText(Assembler aAssembler, System.IO.TextWriter aOutput)
+        {
+            aOutput.Write("; ");
+            aOutput.Write(Text);
+        }
+
+        public override void UpdateAddress(Assembler aAssembler, ref ulong aAddress)
+        {
+            base.UpdateAddress(aAssembler, ref aAddress);
+        }
+
+        public override bool IsComplete(Assembler aAssembler)
         {
             return true;
         }

@@ -7,7 +7,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <Name>VGACompilerCrashBoot</Name>
     <BinFormat>elf</BinFormat>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Profile>VMware</Profile>
@@ -30,11 +30,9 @@
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VGACompilerCrash\VGACompilerCrash.csproj">
-      <Name>VGACompilerCrash</Name>
-      <Project>{21915a7e-cc84-4836-8b87-857b6149d496}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+    <Content Include="VGACompilerCrashBoot.project.json">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <!--<ItemGroup>
     <Content Include="Cosmos.bxrc">

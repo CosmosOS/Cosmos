@@ -11,7 +11,7 @@ using Cosmos.System.Graphics;
  * it exists to make easier tests while changing low level stuff (it would be better and faster to use the Demo kernel but
  * sometimes it is a problem to make it see modifications done at low level)
  *
- * Remember to comment this test again on TestKernelSet.cs when you are ready to merge your modifications!
+ * Remember to comment this test again on TestKernelSets.cs when you are ready to merge your modifications!
  */
 namespace GraphicTest
 {
@@ -53,6 +53,15 @@ namespace GraphicTest
                 /* A PaleVioletRed rectangle */
                 pen.Color = Color.PaleVioletRed;
                 canvas.DrawRectangle(pen, 350, 350, 80, 60);
+
+                pen.Color = Color.Chartreuse;
+                canvas.DrawCircle(pen, 69, 69, 10);
+
+                pen.Color = Color.DimGray;
+                canvas.DrawEllipse(pen, 100, 69, 10, 50);
+
+                pen.Color = Color.MediumPurple;
+                canvas.DrawPolygon(pen, new Point(200, 250), new Point(250, 300), new Point(220, 350), new Point(210, 275));
 
                 Console.ReadKey();
 

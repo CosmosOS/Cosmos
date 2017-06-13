@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Cosmos.Build.Common {
@@ -27,10 +28,10 @@ namespace Cosmos.Build.Common {
     }
 
     public void SetProperty(string name, string value) {
-      if (mPropTable.ContainsKey(name) == false) { 
-        mPropTable.Add(name, value); 
-      } else { 
-        mPropTable[name] = value; 
+      if (mPropTable.ContainsKey(name) == false) {
+        mPropTable.Add(name, value);
+      } else {
+        mPropTable[name] = value;
       }
     }
 
@@ -66,7 +67,7 @@ namespace Cosmos.Build.Common {
     /// <param name="name">Get name of the property.</param>
     /// <param name="default">Default value for the proeprty.</param>
     /// <returns>Value of the property with given name.</returns>
-    public T GetProperty<T>(string name, T @default) 
+    public T GetProperty<T>(string name, T @default)
         where T: struct
     {
       T value = @default;
@@ -75,7 +76,7 @@ namespace Cosmos.Build.Common {
         Type valueType = typeof(T);
         string valueTypeName = valueType.Name;
 
-        if (valueType.IsEnum == true) {
+        if (valueType.GetTypeInfo().IsEnum == true) {
             value = EnumValue.Parse(stringValue, @default);
         } else {
           if ((valueTypeName == "Int16") || (valueTypeName == "Short")) {

@@ -3,10 +3,10 @@ using System.Linq;
 using CPU = Cosmos.Assembler;
 using System.Text;
 using Cosmos.Assembler;
+
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.Assembler.x86;
-using Cosmos.IL2CPU.Plugs.System;
-using XSharp.Compiler;
+using Cosmos.IL2CPU.Plugs;
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -17,7 +17,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       var xOpString = aOpCode as OpString;
       string xDataName = GetContentsArrayName(xOpString.Value);
@@ -51,7 +51,7 @@ namespace Cosmos.IL2CPU.X86.IL
       var xBytecount = xEncoding.GetByteCount(aLiteral);
       var xObjectData = new byte[(4 * 4) + (xBytecount)];
       Array.Copy(BitConverter.GetBytes((int)-1), 0, xObjectData, 0, 4);
-      Array.Copy(BitConverter.GetBytes((uint)InstanceTypeEnum.StaticEmbeddedObject), 0, xObjectData, 4, 4);
+      Array.Copy(BitConverter.GetBytes((uint)ObjectUtilities.InstanceTypeEnum.StaticEmbeddedObject), 0, xObjectData, 4, 4);
       Array.Copy(BitConverter.GetBytes((int)1), 0, xObjectData, 8, 4);
       Array.Copy(BitConverter.GetBytes(aLiteral.Length), 0, xObjectData, 12, 4);
       Array.Copy(xEncoding.GetBytes(aLiteral), 0, xObjectData, 16, xBytecount);

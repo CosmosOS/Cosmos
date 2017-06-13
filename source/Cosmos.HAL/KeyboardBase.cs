@@ -11,9 +11,9 @@ namespace Cosmos.HAL
         protected KeyboardBase()
         {
             Initialize();
-            Debugger.DoSend("Initialized");
+            Global.mDebugger.Send("Initialized");
             UpdateLeds();
-            Debugger.DoSend("Leds updated");
+            Global.mDebugger.Send("Leds updated");
         }
 
         /// <summary>

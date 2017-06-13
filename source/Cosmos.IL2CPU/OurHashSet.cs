@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace Cosmos.IL2CPU
@@ -19,7 +20,7 @@ namespace Cosmos.IL2CPU
 	// is that the Contains method in OurHashSet checked only the
 	// default Hashcode. With adding DeclaringType in the Hashcode it runs.
 
-	public class OurHashSet<T> : IEnumerable<T> where T:_MemberInfo
+	public class OurHashSet<T> : IEnumerable<T> where T : MemberInfo
 	{
 		private Dictionary<int, T> mItems = new Dictionary<int, T>();
 

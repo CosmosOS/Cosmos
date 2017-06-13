@@ -1,8 +1,9 @@
 using CPU = Cosmos.Assembler.x86;
 using System.Reflection;
+
 using Cosmos.IL2CPU.ILOpCodes;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -17,7 +18,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             OpType xType = (OpType)aOpCode;
             string xTypeID = GetTypeIDLabel(xType.Value);

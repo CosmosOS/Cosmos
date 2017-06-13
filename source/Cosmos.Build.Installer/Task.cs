@@ -5,55 +5,73 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Cosmos.Build.Installer {
-  public abstract class Task {
+namespace Cosmos.Build.Installer
+{
+  public abstract class Task
+  {
     protected abstract List<string> DoRun();
 
-    public void Run() {
+    public void Run()
+    {
       var exceptions = new List<string>();
       try
       {
-          exceptions.AddRange(DoRun());
+        exceptions.AddRange(DoRun());
       }
-      catch(Exception ex){
+      catch (Exception ex)
+      {
         exceptions.Add(ex.Message);
-        if (ex.InnerException != null){
-            exceptions.Add(ex.InnerException.Message);
+        if (ex.InnerException != null)
+        {
+          exceptions.Add(ex.InnerException.Message);
         }
         exceptions.Add(ex.StackTrace);
       }
 
-      if (exceptions.Any()) {
+      if (exceptions.Any())
+      {
         Log.SetError();
         Log.NewSection("Error");
         //Collect all the exceptions from the build stage, and list them
-        foreach(var msg in exceptions) {
+        foreach (var msg in exceptions)
+        {
           Log.WriteLine(msg);
         }
       }
     }
 
-    public bool AmRunning32Bit() {
-      return IntPtr.Size == 4;
-    }
-
-    public bool IsRunning(string aName) {
+    public bool IsRunning(string aName)
+    {
       var xList = Process.GetProcessesByName(aName);
       return xList.Length > 0;
     }
 
-    public bool WaitForStart(string aName, int? aMilliSec = null) {
+    public void KillProcesses(string aName)
+    {
+      foreach (var p in Process.GetProcessesByName(aName))
+      {
+        p.Kill();
+      }
+    }
+
+    public bool WaitForStart(string aName, int? aMilliSec = null)
+    {
       return WaitForState(aName, true, aMilliSec);
     }
-    public bool WaitForExit(string aName, int? aMilliSec = null) {
+    public bool WaitForExit(string aName, int? aMilliSec = null)
+    {
       return WaitForState(aName, false, aMilliSec);
     }
-    public bool WaitForState(string aName, bool aIsRunning, int? aMilliSec) {
-      while (IsRunning(aName) != aIsRunning) {
+    public bool WaitForState(string aName, bool aIsRunning, int? aMilliSec)
+    {
+      while (IsRunning(aName) != aIsRunning)
+      {
         Thread.Sleep(200);
-        if (aMilliSec.HasValue) {
+        if (aMilliSec.HasValue)
+        {
           aMilliSec = aMilliSec - 200;
-          if (aMilliSec <= 0) {
+          if (aMilliSec <= 0)
+          {
             return true;
           }
         }
@@ -61,7 +79,8 @@ namespace Cosmos.Build.Installer {
       return false;
     }
 
-    public void StartConsole(string aExe, string aParams) {
+    public void StartConsole(string aExe, string aParams)
+    {
       Log.WriteLine("Starting: " + aExe);
       Log.WriteLine("  Params: " + aParams);
 
@@ -73,19 +92,24 @@ namespace Cosmos.Build.Installer {
       xStart.CreateNoWindow = true;
       xStart.RedirectStandardOutput = true;
       xStart.RedirectStandardError = true;
-      using (var xProcess = Process.Start(xStart)) {
-        using (var xReader = xProcess.StandardOutput) {
+      using (var xProcess = Process.Start(xStart))
+      {
+        using (var xReader = xProcess.StandardOutput)
+        {
           string xLine;
-          while (true) {
+          while (true)
+          {
             xLine = xReader.ReadLine();
-            if (xLine == null) {
+            if (xLine == null)
+            {
               break;
             }
             Log.WriteLine(xLine);
           }
         }
         xProcess.WaitForExit();
-        if (xProcess.ExitCode != 0) {
+        if (xProcess.ExitCode != 0)
+        {
           Log.SetError();
           Log.WriteLine(xProcess.StandardError.ReadToEnd());
           throw new Exception("Console returned exit code. (0x" + xProcess.ExitCode.ToString("X8") + ")");
@@ -93,11 +117,13 @@ namespace Cosmos.Build.Installer {
       }
     }
 
-    public void Start(string aExe, string aParams, bool aWait = true, bool aShowWindow = true) {
+    public void Start(string aExe, string aParams, bool aWait = true, bool aShowWindow = true)
+    {
       Log.WriteLine("Starting: " + aExe);
       Log.WriteLine("  Params: " + aParams);
 
-      using (var xProcess = new Process()) {
+      using (var xProcess = new Process())
+      {
         var xPSI = xProcess.StartInfo;
         xPSI.FileName = aExe;
         xPSI.WorkingDirectory = CurrPath;
@@ -105,9 +131,11 @@ namespace Cosmos.Build.Installer {
         xPSI.UseShellExecute = false;
         xPSI.CreateNoWindow = !aShowWindow;
         xProcess.Start();
-        if (aWait) {
+        if (aWait)
+        {
           xProcess.WaitForExit();
-          if (xProcess.ExitCode != 0) {
+          if (xProcess.ExitCode != 0)
+          {
             Log.SetError();
             throw new ApplicationException("Application returned exit code. (0x" + xProcess.ExitCode.ToString("X8") + ")");
           }
@@ -118,46 +146,57 @@ namespace Cosmos.Build.Installer {
     private Log mLog = new Log();
     public Log Log { get { return mLog; } }
 
-    public void Section(string aText) {
+    public void Section(string aText)
+    {
       Log.NewSection(aText);
     }
 
-    public string CurrPath {
+    public string CurrPath
+    {
       get { return Directory.GetCurrentDirectory(); }
       set { Directory.SetCurrentDirectory(value); }
     }
     //
     private string mSrcPath;
-    public string SrcPath {
-      get {
+    public string SrcPath
+    {
+      get
+      {
         return string.IsNullOrWhiteSpace(mSrcPath) ? CurrPath : mSrcPath;
       }
       set { mSrcPath = value; }
     }
 
-    public string Quoted(string aValue) {
+    public string Quoted(string aValue)
+    {
       return "\"" + aValue + "\"";
     }
 
-    public void CD(string aPath) {
+    public void CD(string aPath)
+    {
       ChDir(aPath);
     }
-    public void ChDir(string aPath) {
+    public void ChDir(string aPath)
+    {
       Log.WriteLine("Change Dir: " + aPath);
       CurrPath = aPath;
     }
 
-    public void ResetReadOnly(string aPathname) {
+    public void ResetReadOnly(string aPathname)
+    {
       var xAttrib = File.GetAttributes(aPathname);
-      if ((xAttrib & FileAttributes.ReadOnly) == FileAttributes.ReadOnly) {
+      if ((xAttrib & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
+      {
         File.SetAttributes(aPathname, xAttrib & ~FileAttributes.ReadOnly);
       }
     }
 
-    public void Copy(string aSrcPathname, bool clearReadonlyIfDestExists) {
+    public void Copy(string aSrcPathname, bool clearReadonlyIfDestExists)
+    {
       Copy(aSrcPathname, Path.GetFileName(aSrcPathname), clearReadonlyIfDestExists);
     }
-    public void Copy(string aSrcPathname, string aDestPathname, bool clearReadonlyIfDestExists) {
+    public void Copy(string aSrcPathname, string aDestPathname, bool clearReadonlyIfDestExists)
+    {
       Log.WriteLine("Copy");
 
       string xSrc = Path.Combine(SrcPath, aSrcPathname);
@@ -167,17 +206,21 @@ namespace Cosmos.Build.Installer {
       Log.WriteLine("  To: " + xDest);
 
       // Copying files that are in TFS often they will be read only, so need to kill this file before copy
-      if (clearReadonlyIfDestExists && File.Exists(xDest)) {
+      if (clearReadonlyIfDestExists && File.Exists(xDest))
+      {
         ResetReadOnly(xDest);
       }
       File.Copy(xSrc, xDest, true);
       ResetReadOnly(xDest);
     }
 
-    public void Echo() {
+    public void Echo()
+    {
       Echo("");
     }
-    public void Echo(string aText) {
+
+    public void Echo(string aText)
+    {
       mLog.WriteLine(aText);
     }
   }

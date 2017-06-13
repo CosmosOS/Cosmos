@@ -6,11 +6,14 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Package;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
-using XSC = XSharp.Compiler;
+using XSC = XSharp.Common;
 
-namespace XSharp.VS {
-  internal class Scanner : IScanner {
-    struct TokenData {
+namespace XSharp.VS
+{
+  internal class Scanner : IScanner
+  {
+    struct TokenData
+    {
       public TokenType Type;
       public TokenColor Color;
     }
@@ -20,18 +23,20 @@ namespace XSharp.VS {
     int mTokenIdx;
     static TokenData[] mTokenMap;
 
-    static Scanner() {
+    static Scanner()
+    {
       int xEnumMax = Enum.GetValues(typeof(XSC.TokenType)).GetUpperBound(0);
       mTokenMap = new TokenData[xEnumMax + 1];
 
       // Set Default values
-      foreach(int i in Enum.GetValues(typeof(XSC.TokenType))) {
+      foreach (int i in Enum.GetValues(typeof(XSC.TokenType)))
+      {
         mTokenMap[i].Type = TokenType.Unknown;
         mTokenMap[i].Color = TokenColor.Text;
       }
 
       mTokenMap[(int)XSC.TokenType.Comment] = new TokenData { Type = TokenType.LineComment, Color = TokenColor.Comment };
-      mTokenMap[(int)XSC.TokenType.LiteralAsm] = new TokenData { Type = TokenType.Literal , Color = TokenColor.String };
+      mTokenMap[(int)XSC.TokenType.LiteralAsm] = new TokenData { Type = TokenType.Literal, Color = TokenColor.String };
       mTokenMap[(int)XSC.TokenType.AlphaNum] = new TokenData { Type = TokenType.Identifier, Color = TokenColor.Identifier };
       mTokenMap[(int)XSC.TokenType.ValueInt] = new TokenData { Type = TokenType.Literal, Color = TokenColor.Number };
 
@@ -45,13 +50,16 @@ namespace XSharp.VS {
       mTokenMap[(int)XSC.TokenType.Unknown] = new TokenData { Type = TokenType.Unknown, Color = TokenColor.Text };
     }
 
-    public Scanner(IVsTextBuffer aBuffer) {
+    public Scanner(IVsTextBuffer aBuffer)
+    {
       mBuffer = aBuffer;
     }
 
     // State argument: http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/38939d76-6f8b-473f-9ee1-fc3ae7b59cce
-    bool IScanner.ScanTokenAndProvideInfoAboutIt(TokenInfo aTokenInfo, ref int aState) {
-      if (mTokenIdx == mParser.Tokens.Count) {
+    bool IScanner.ScanTokenAndProvideInfoAboutIt(TokenInfo aTokenInfo, ref int aState)
+    {
+      if (mTokenIdx == mParser.Tokens.Count)
+      {
         return false;
       }
 
@@ -69,7 +77,8 @@ namespace XSharp.VS {
       return true;
     }
 
-    void IScanner.SetSource(string aSource, int aOffset) {
+    void IScanner.SetSource(string aSource, int aOffset)
+    {
       mTokenIdx = 0;
       mParser = new XSC.Parser(aSource, aOffset, true, false);
     }

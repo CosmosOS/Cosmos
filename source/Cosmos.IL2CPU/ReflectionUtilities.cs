@@ -11,11 +11,11 @@ namespace Cosmos.IL2CPU
         public static Type GetType(string aAssembly,
                                    string aType)
         {
-            if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(ReflectionUtilities).Assembly.GetName().Name || aAssembly == typeof(ReflectionUtilities).Assembly.FullName)
+            if (String.IsNullOrEmpty(aAssembly) || aAssembly == typeof(ReflectionUtilities).GetTypeInfo().Assembly.GetName().Name || aAssembly == typeof(ReflectionUtilities).GetTypeInfo().Assembly.FullName)
             {
-                aAssembly = typeof(ReflectionUtilities).Assembly.FullName;
+                aAssembly = typeof(ReflectionUtilities).GetTypeInfo().Assembly.FullName;
             }
-            var xAssemblyDef = Assembly.Load(aAssembly);
+            var xAssemblyDef = Assembly.Load(new AssemblyName(aAssembly));
             return GetType(xAssemblyDef,
                            aType);
         }

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-
-using Encoding = System.Text.Encoding;
-using Plug = Cosmos.IL2CPU.Plugs.PlugAttribute;
+using System.Text;
+using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System
 {

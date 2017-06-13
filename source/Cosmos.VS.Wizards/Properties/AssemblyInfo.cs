@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Cosmos.VS.Wizards")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Cosmos")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Cosmos.VS.Wizards")]
-[assembly: AssemblyCopyright("Copyright © 2010")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -18,9 +18,6 @@ using System.Runtime.InteropServices;
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("891c2055-ba70-4c74-93b3-98caa0677700")]
 
 // Version information for an assembly consists of the following four values:
 //

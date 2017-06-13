@@ -7,9 +7,9 @@ namespace Cosmos.System
     {
         internal static void KeyboardAddFakeScanCode(byte aScanCode, bool aReleased)
         {
-            Debugger.DoSend("Before HandleFakeScanCode");
+            Global.mDebugger.Send("Before HandleFakeScanCode");
             KeyboardManager.HandleFakeScanCode(aScanCode, aReleased);
-            Debugger.DoSend("After HandleFakeScanCode");
+            Global.mDebugger.Send("After HandleFakeScanCode");
         }
     }
 }

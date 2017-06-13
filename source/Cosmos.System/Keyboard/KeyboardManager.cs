@@ -140,7 +140,7 @@ namespace Cosmos.System
         {
             if (_scanMap == null)
             {
-                Debugger.DoSend("No KeyLayout");
+                Global.mDebugger.Send("No KeyLayout");
             }
 
             keyInfo = _scanMap.ConvertScanCode(aScancode, ControlPressed, ShiftPressed, AltPressed, NumLock, CapsLock, ScrollLock);
@@ -186,24 +186,24 @@ namespace Cosmos.System
 
         public static void AddKeyboard(KeyboardBase Keyboard)
         {
-            if (!KeyboardExists(Keyboard.GetType()))
-            {
-                Keyboard.OnKeyPressed = new KeyboardBase.KeyPressedEventHandler(HandleScanCode);
+            //if (!KeyboardExists(Keyboard.GetType()))
+            //{
+                Keyboard.OnKeyPressed = HandleScanCode;
                 Keyboards.Add(Keyboard);
-            }
+            //}
         }
 
-        public static bool KeyboardExists(Type KeyboardType)
-        {
-            foreach (KeyboardBase Keyboard in Keyboards)
-            {
-                if (Keyboard.GetType() == KeyboardType)
-                {
-                    return true;
-                }
-            }
+        //public static bool KeyboardExists(Type KeyboardType)
+        //{
+        //    foreach (KeyboardBase Keyboard in Keyboards)
+        //    {
+        //        if (Keyboard.GetType() == KeyboardType)
+        //        {
+        //            return true;
+        //        }
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
     }
 }

@@ -9,6 +9,7 @@ using Cosmos.IL2CPU.ILOpCodes;
 using Cosmos.Assembler;
 
 
+
 namespace Cosmos.IL2CPU.X86.IL
 {
   [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Localloc)]
@@ -19,7 +20,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       //TODO: free heap in method footer.
       string xCurrentMethodLabel = GetLabel(aMethod, aOpCode);
