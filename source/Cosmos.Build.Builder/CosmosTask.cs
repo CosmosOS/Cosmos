@@ -24,7 +24,6 @@ namespace Cosmos.Build.Builder
     private string mInnoFile;
     private string mInnoPath;
     private List<string> mExceptionList = new List<string>();
-    private string InnoScriptTargetFile = "Current.iss";
 
     public CosmosTask(string aCosmosDir, int aReleaseNo)
     {
@@ -83,7 +82,6 @@ namespace Cosmos.Build.Builder
       {
         CleanupVSIPFolder();
         CompileCosmos();
-        CreateScriptToUseChangesetWhichTaskIsUse();
         CreateSetup();
 
         if (!App.IsUserKit)
@@ -257,37 +255,6 @@ namespace Cosmos.Build.Builder
       }
     }
 
-    private void CreateScriptToUseChangesetWhichTaskIsUse()
-    {
-      Section("Creating Inno Setup Script");
-
-      // Read in iss file
-      using (var xSrc = new StreamReader(mInnoFile))
-      {
-        mInnoFile = Path.Combine(Path.GetDirectoryName(mInnoFile), InnoScriptTargetFile);
-        // Write out new iss
-        using (var xDest = new StreamWriter(mInnoFile))
-        {
-          string xLine;
-          while ((xLine = xSrc.ReadLine()) != null)
-          {
-            if (xLine.StartsWith("#define ChangeSetVersion ", StringComparison.InvariantCultureIgnoreCase))
-            {
-              xDest.WriteLine("#define ChangeSetVersion " + Quoted(mReleaseNo.ToString()));
-            }
-            else if (xLine.StartsWith("#define VSPath ", StringComparison.InvariantCultureIgnoreCase))
-            {
-              xDest.WriteLine("#define VSPath " + Quoted(Paths.VSPath));
-            }
-            else
-            {
-              xDest.WriteLine(xLine);
-            }
-          }
-        }
-      }
-    }
-
     private void Restore(string project)
     {
       string xNuget = Path.Combine(mCosmosDir, "Build", "Tools", "nuget.exe");
@@ -297,17 +264,17 @@ namespace Cosmos.Build.Builder
       StartConsole(xNuget, xRestoreParams);
     }
 
-    private void Pack(string project, string destDir, string versionSuffix)
+    private void Pack(string project, string destDir, string version)
     {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
-      string xParams = $"{Quoted(project)} /nodeReuse:False /t:Restore;Pack /maxcpucount /p:VersionSuffix={Quoted(versionSuffix)} /p:PackageOutputPath={Quoted(destDir)}";
+      string xParams = $"{Quoted(project)} /nodeReuse:False /t:Restore;Pack /maxcpucount /p:Version={Quoted(version)} /p:PackageOutputPath={Quoted(destDir)}";
       StartConsole(xMSBuild, xParams);
     }
 
     private void Publish(string project, string destDir)
     {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
-      string xParams = $"{Quoted(project)} /nodeReuse:False /t:Publish /maxcpucount /p:RuntimeIdentifier=win7-x86 /p:OutputPath={Quoted(destDir)}";
+      string xParams = $"{Quoted(project)} /nodeReuse:False /t:Publish /maxcpucount /p:RuntimeIdentifier=win7-x86 /p:PublishDir={Quoted(destDir)}";
       StartConsole(xMSBuild, xParams);
     }
 
@@ -315,8 +282,13 @@ namespace Cosmos.Build.Builder
     {
       string xVSIPDir = Path.Combine(mCosmosDir, "Build", "VSIP");
       string xPackagesDir = Path.Combine(xVSIPDir, "KernelPackages");
-      string xVersionSuffix = App.IsUserKit ? "" : DateTime.Now.ToString("yyyyMMddHHmm");
+      string xVersion = DateTime.Now.ToString("yyyy.MM.dd");
 
+      if (!App.IsUserKit)
+      {
+          xVersion += DateTime.Now.ToString("-HH.mm");
+      }
+      
       if (!Directory.Exists(xVSIPDir))
       {
         Directory.CreateDirectory(xVSIPDir);
@@ -335,18 +307,18 @@ namespace Cosmos.Build.Builder
       Publish(Path.Combine(mCosmosDir, "Tools", "NASM"), Path.Combine(xVSIPDir, "NASM"));
 
       Section("Compiling Kernel Packages");
-      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Common"), xPackagesDir, xVersionSuffix);
-      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Core"), xPackagesDir, xVersionSuffix);
-      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Common"), xPackagesDir, xVersionSuffix);
-      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Memory"), xPackagesDir, xVersionSuffix);
-      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Plugs"), xPackagesDir, xVersionSuffix);
-      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Plugs.Asm"), xPackagesDir, xVersionSuffix);
-      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Debug.Kernel"), xPackagesDir, xVersionSuffix);
-      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Debug.Kernel.Plugs.Asm"), xPackagesDir, xVersionSuffix);
-      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.HAL"), xPackagesDir, xVersionSuffix);
-      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.IL2CPU.Plugs"), xPackagesDir, xVersionSuffix);
-      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.System"), xPackagesDir, xVersionSuffix);
-      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.System.Plugs"), xPackagesDir, xVersionSuffix);
+      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Common"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Core"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Common"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Memory"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Plugs"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Core.Plugs.Asm"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Debug.Kernel"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.Debug.Kernel.Plugs.Asm"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.HAL"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.IL2CPU.Plugs"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.System"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mCosmosDir, "source", "Cosmos.System.Plugs"), xPackagesDir, xVersion);
     }
 
     private void CopyTemplates()
@@ -383,13 +355,8 @@ namespace Cosmos.Build.Builder
       {
         vsVersionConfiguration += "Exp";
       }
-      Echo($"  {xISCC} /Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)}");
-      StartConsole(xISCC, $"/Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)}");
-
-      if (App.IsUserKit)
-      {
-        File.Delete(mInnoFile);
-      }
+      Echo($"  {xISCC} /Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
+      StartConsole(xISCC, $"/Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
     }
 
     private void LaunchVS()

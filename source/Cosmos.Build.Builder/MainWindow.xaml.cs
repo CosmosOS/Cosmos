@@ -160,18 +160,7 @@ namespace Cosmos.Build.Builder
     {
       if (App.IsUserKit)
       {
-        do
-        {
-          string x = Interaction.InputBox("Enter Release Number", "Cosmos Builder");
-          if (string.IsNullOrEmpty(x))
-          {
-            return false;
-          }
-          if (false == int.TryParse(x, out mReleaseNo))
-            MessageBox.Show("Please use only a number!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-          else
-            break;
-        } while (true);
+        mReleaseNo = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
       }
       else
       {

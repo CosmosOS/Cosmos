@@ -1,5 +1,7 @@
 ; Do NOT change this next line in Dev Kit
+#ifndef ChangeSetVersion
 #define ChangeSetVersion "20150130"
+#endif
 
 #ifndef BuildConfiguration
 ; Currently we dont use "UserKit" but this allows us to test/compile from Inno
