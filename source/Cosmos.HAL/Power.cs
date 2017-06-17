@@ -11,14 +11,12 @@ namespace Cosmos.HAL
     {
         public static void Reboot()
         {
-            ACPI.Reboot();
+            Core.Global.CPU.Reboot();
         }
 
         public static void Shutdown()
         {
-            ACPI.Shutdown();
-            ACPI.Disable();
-            Core.Global.CPU.Halt();
+            Core.Global.CPU.Shutdown();
         }
     }
 }
