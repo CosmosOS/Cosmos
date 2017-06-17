@@ -93,6 +93,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ACPI.cs" />
     <Compile Include="BaseIOGroups.cs" />
     <Compile Include="Bootstrap.cs" />
     <Compile Include="IOGroup\COM.cs" />
