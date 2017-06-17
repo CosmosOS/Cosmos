@@ -282,11 +282,11 @@ namespace Cosmos.Build.Builder
     {
       string xVSIPDir = Path.Combine(mCosmosDir, "Build", "VSIP");
       string xPackagesDir = Path.Combine(xVSIPDir, "KernelPackages");
-      string xVersion = DateTime.Now.ToString("yyyy.MM.dd");
+      string xVersion = "1.0.0";
 
       if (!App.IsUserKit)
       {
-          xVersion += DateTime.Now.ToString("-HH.mm");
+          xVersion += "-" + DateTime.Now.ToString("yyyyMMddHHmm");
       }
       
       if (!Directory.Exists(xVSIPDir))
