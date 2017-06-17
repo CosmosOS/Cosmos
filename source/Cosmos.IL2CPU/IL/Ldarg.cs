@@ -1,11 +1,9 @@
 using System;
+using System.Reflection;
+
 using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU.X86;
-using Cosmos.Assembler;
-using Cosmos.Assembler.x86;
-using XSharp.Compiler;
-using CPUx86 = Cosmos.Assembler.x86;
-using SysReflection = System.Reflection;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -17,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       var xOpVar = (OpVar) aOpCode;
       DoExecute(Assembler, aMethod, xOpVar.Value);
@@ -38,14 +36,14 @@ namespace Cosmos.IL2CPU.X86.IL
     /// <param name="aMethod"></param>
     /// <param name="aParam"></param>
     /// <returns></returns>
-    public static int GetArgumentDisplacement(MethodInfo aMethod, ushort aParam)
+    public static int GetArgumentDisplacement(_MethodInfo aMethod, ushort aParam)
     {
       var xMethodBase = aMethod.MethodBase;
       if (aMethod.PluggedMethod != null)
       {
         xMethodBase = aMethod.PluggedMethod.MethodBase;
       }
-      var xMethodInfo = xMethodBase as SysReflection.MethodInfo;
+      var xMethodInfo = xMethodBase as MethodInfo;
       uint xReturnSize = 0;
       if (xMethodInfo != null)
       {
@@ -63,7 +61,7 @@ namespace Cosmos.IL2CPU.X86.IL
       {
         // return the this parameter, which is not in .GetParameters()
         uint xCurArgSize;
-        if (xMethodBase.DeclaringType.IsValueType)
+        if (xMethodBase.DeclaringType.GetTypeInfo().IsValueType)
         {
           // value types get a reference passed to the actual value, so pointer:
           xCurArgSize = 4;
@@ -120,7 +118,7 @@ namespace Cosmos.IL2CPU.X86.IL
       }
     }
 
-    public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aMethod, ushort aParam)
+    public static void DoExecute(Cosmos.Assembler.Assembler Assembler, _MethodInfo aMethod, ushort aParam)
     {
       var xDisplacement = GetArgumentDisplacement(aMethod, aParam);
       var xType = GetArgumentType(aMethod, aParam);
@@ -132,26 +130,26 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Comment("Arg real size = " + xArgRealSize + " aligned size = " + xArgSize);
       if (xArgRealSize < 4)
       {
-        new MoveSignExtend
+        if (xArgRealSize == 1)
         {
-          DestinationReg = RegistersEnum.EAX,
-          Size = (byte) (xArgRealSize * 8),
-          SourceReg = RegistersEnum.EBP,
-          SourceIsIndirect = true,
-          SourceDisplacement = xDisplacement
-        };
-        XS.Push(XSRegisters.EAX);
+          XS.MoveSignExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: xDisplacement, size: RegisterSize.Byte8);
+        }
+        else
+        {
+          XS.MoveSignExtend(EAX, EBP, sourceIsIndirect: true, sourceDisplacement: xDisplacement, size: RegisterSize.Short16);
+        }
+        XS.Push(EAX);
       }
       else
       {
         for (int i = 0; i < (xArgSize / 4); i++)
         {
-          XS.Push(XSRegisters.EBP, isIndirect: true, displacement: (xDisplacement - (i * 4)));
+          XS.Push(EBP, isIndirect: true, displacement: (xDisplacement - (i * 4)));
         }
       }
     }
 
-    public static Type GetArgumentType(MethodInfo aMethod, ushort aParam)
+    public static Type GetArgumentType(_MethodInfo aMethod, ushort aParam)
     {
       Type xArgType;
       if (aMethod.MethodBase.IsStatic)
@@ -163,7 +161,7 @@ namespace Cosmos.IL2CPU.X86.IL
         if (aParam == 0u)
         {
           xArgType = aMethod.MethodBase.DeclaringType;
-          if (xArgType.IsValueType)
+          if (xArgType.GetTypeInfo().IsValueType)
           {
             xArgType = xArgType.MakeByRefType();
           }

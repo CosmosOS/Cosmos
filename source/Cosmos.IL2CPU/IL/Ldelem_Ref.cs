@@ -1,11 +1,9 @@
 using System;
-using System.Linq;
+
 using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.Assembler;
-using Cosmos.IL2CPU.ILOpCodes;
-using Cosmos.IL2CPU.Plugs.System;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+using Cosmos.IL2CPU.Plugs;
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -17,12 +15,12 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       Assemble(Assembler, 8, false, aMethod, aOpCode, DebugEnabled);
     }
 
-    public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, bool isSigned, MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
+    public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, bool isSigned, _MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
     {
       //  stack     = index
       //  stack + 2 = array
@@ -32,7 +30,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Pop(EAX);
       XS.Set(EDX, aElementSize);
       XS.Multiply(EDX);
-      XS.Add(EAX, ObjectImpl.FieldDataOffset + 4);
+      XS.Add(EAX, ObjectUtilities.FieldDataOffset + 4);
 
       if (aElementSize > 4)
       {
@@ -61,28 +59,28 @@ namespace Cosmos.IL2CPU.X86.IL
           case 1:
             if (isSigned)
             {
-              new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 8, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              XS.MoveSignExtend(ECX,EDX, sourceIsIndirect: true, size: RegisterSize.Byte8);
             }
             else
             {
-              new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 8, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              XS.MoveZeroExtend(ECX, EDX, sourceIsIndirect: true, size: RegisterSize.Byte8);
             }
             XS.Push(ECX);
             break;
           case 2:
             if (isSigned)
             {
-              new CPUx86.MoveSignExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 16, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              XS.MoveSignExtend(ECX, EDX, sourceIsIndirect: true, size: RegisterSize.Short16);
             }
             else
             {
-              new CPUx86.MoveZeroExtend { DestinationReg = CPUx86.RegistersEnum.ECX, Size = 16, SourceReg = CPUx86.RegistersEnum.EDX, SourceIsIndirect = true };
+              XS.MoveZeroExtend(ECX, EDX, sourceIsIndirect: true, size: RegisterSize.Short16);
             }
             XS.Push(ECX);
             break;
           case 4:
             // copy a full dword
-            XS.Push(EDX, isIndirect: true);
+            XS.Push(EDX, true);
             XS.Sub(EDX, 4); // move to previous 4 bytes
             break;
             //case 8:

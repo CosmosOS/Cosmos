@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
+using System.IO;
 using System.Xml;
-using System.Xml.XPath;
 
 namespace Cosmos.TestRunner.Core
 {
@@ -114,7 +112,7 @@ namespace Cosmos.TestRunner.Core
 
         public void SaveToFile(string filename)
         {
-            mDocument.Save(filename);
+            mDocument.Save(File.OpenWrite(filename));
         }
 
         private Stack<XmlElement> mCurrentNode = new Stack<XmlElement>();

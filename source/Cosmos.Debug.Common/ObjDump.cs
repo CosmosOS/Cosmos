@@ -1,41 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Diagnostics;
+using System.Linq;
 using System.IO;
 
-namespace Cosmos.Debug.Common {
-    public class ObjDump {
+using Cosmos.Debug.Symbols;
+
+namespace Cosmos.Debug.Common
+{
+    public class ObjDump
+    {
         [Obsolete("We're not using ELF Format anymore")]
         public static SortedList<uint, string> GetLabelByAddressMapping(string aKernel, string aObjDumpExe)
         {
-			string[] xSymbolsContents;
-			#region Run ObjDump
-			string xTempFile = Path.GetTempFileName();
-			var xRandom = new Random(78367);
-			string xBatFile = String.Empty;
-			do {
-				xBatFile = Path.GetTempPath();
-				xBatFile = Path.Combine(xBatFile, BitConverter.GetBytes(xRandom.NextDouble()).Aggregate<byte, string>("", (r, b) => r += b.ToString("X2").ToUpper()) + ".bat");
-			} while (File.Exists(xBatFile));
-			string xObjDumpFile = aObjDumpExe;
-			File.WriteAllText(xBatFile, String.Format("@ECHO OFF\r\n\"{0}\" --syms --wide \"{1}\" > \"{2}\"", xObjDumpFile, aKernel, xTempFile));
-			using (var xProcess = Process.Start(xBatFile)) {
-				xProcess.WaitForExit();
-			}
-			xSymbolsContents = File.ReadAllLines(xTempFile);
-			File.Delete(xTempFile);
-			File.Delete(xBatFile);
-			#endregion
+            string[] xSymbolsContents;
+            #region Run ObjDump
+            string xTempFile = Path.GetTempFileName();
+            var xRandom = new Random(78367);
+            string xBatFile = String.Empty;
+            do
+            {
+                xBatFile = Path.GetTempPath();
+                xBatFile = Path.Combine(xBatFile, BitConverter.GetBytes(xRandom.NextDouble()).Aggregate<byte, string>("", (r, b) => r += b.ToString("X2").ToUpper()) + ".bat");
+            } while (File.Exists(xBatFile));
+            string xObjDumpFile = aObjDumpExe;
+            File.WriteAllText(xBatFile, String.Format("@ECHO OFF\r\n\"{0}\" --syms --wide \"{1}\" > \"{2}\"", xObjDumpFile, aKernel, xTempFile));
+            using (var xProcess = Process.Start(xBatFile))
+            {
+                xProcess.WaitForExit();
+            }
+            xSymbolsContents = File.ReadAllLines(xTempFile);
+            File.Delete(xTempFile);
+            File.Delete(xBatFile);
+            #endregion
 
             var xResult = new SortedList<uint, string>();
             foreach (var xLabel in ExtractMapSymbolsForElfFile(xSymbolsContents))
             {
-				xResult.Add((uint)xLabel.Address, xLabel.Name);
-			}
-			return xResult;
-		}
+                xResult.Add((uint)xLabel.Address, xLabel.Name);
+            }
+            return xResult;
+        }
 
         /// <summary>
         /// Sequentially parse symbols from the lines sequence.
@@ -114,7 +119,7 @@ namespace Cosmos.Debug.Common {
             using (var xDebugInfo = new DebugInfo(debugFile))
             {
                 // In future instead of loading all labels, save indexes to major labels but not IL.ASM labels.
-                // Then code can find major lables, and use position markers into the map file to parse in between 
+                // Then code can find major lables, and use position markers into the map file to parse in between
                 // as needed.
                 var xLabels = new List<Label>();
                 var xFileLines = File.ReadLines(mapFile);
@@ -128,5 +133,5 @@ namespace Cosmos.Debug.Common {
                 xDebugInfo.CreateIndexes();
             }
         }
-	}
+    }
 }

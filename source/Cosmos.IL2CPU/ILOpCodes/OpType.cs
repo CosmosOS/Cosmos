@@ -1,19 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Windows.Markup;
-using Cosmos.Assembler.x86;
+using System.Reflection.Metadata;
+
 
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpType: ILOpCode
   {
     public readonly Type Value;
 
-    public OpType(Code aOpCode, int aPos, int aNextPos, Type aValue, ExceptionHandlingClause aCurrentExceptionHandler)
-      : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler)
+    public OpType(Code aOpCode, int aPos, int aNextPos, Type aValue, _ExceptionRegionInfo aCurrentExceptionRegion)
+      : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion)
     {
       Value = aValue;
     }
@@ -112,7 +108,7 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           StackPushTypes[0] = typeof(void*);
           return;
         case Code.Box:
-          if (Value.IsPrimitive)
+          if (Value.GetTypeInfo().IsPrimitive)
           {
             StackPushTypes[0] = typeof(Box<>).MakeGenericType(Value);
           }
@@ -140,11 +136,11 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           return;
         case Code.Isinst:
           StackPopTypes[0] = typeof(object);
-          if (Value.IsGenericType && Value.GetGenericTypeDefinition() == typeof(Nullable<>))
+          if (Value.GetTypeInfo().IsGenericType && Value.GetGenericTypeDefinition() == typeof(Nullable<>))
           {
             StackPushTypes[0] = typeof(Box<>).MakeGenericType(Value.GetGenericArguments()[0]);
           }
-          else if (Value.IsValueType)
+          else if (Value.GetTypeInfo().IsValueType)
           {
             StackPushTypes[0] = typeof(Box<>).MakeGenericType(Value);
           }
@@ -154,11 +150,11 @@ namespace Cosmos.IL2CPU.ILOpCodes {
           }
           return;
         case Code.Castclass:
-          if (Value.IsGenericType && Value.GetGenericTypeDefinition() == typeof(Nullable<>))
+          if (Value.GetTypeInfo().IsGenericType && Value.GetGenericTypeDefinition() == typeof(Nullable<>))
           {
             StackPushTypes[0] = typeof(Box<>).MakeGenericType(Value.GetGenericArguments()[0]);
           }
-          else if (Value.IsValueType)
+          else if (Value.GetTypeInfo().IsValueType)
           {
             StackPushTypes[0] = typeof(Box<>).MakeGenericType(Value);
           }
@@ -195,8 +191,8 @@ namespace Cosmos.IL2CPU.ILOpCodes {
             return;
           }
 
-          if (IsIntegralType(StackPopTypes[0]) &&
-              IsIntegralType(Value))
+          if (ILOp.IsIntegralType(StackPopTypes[0]) &&
+              ILOp.IsIntegralType(Value))
           {
             StackPushTypes[0] = typeof(Box<>).MakeGenericType(Value);
             aSituationChanged = true;

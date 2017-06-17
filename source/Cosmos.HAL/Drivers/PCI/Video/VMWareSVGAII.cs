@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Cosmos.Core;
+using Cosmos.Core.Common;
 
 namespace Cosmos.HAL.Drivers.PCI.Video
 {
@@ -132,13 +130,13 @@ namespace Cosmos.HAL.Drivers.PCI.Video
             ScreenObject2 = 0x00800000
         }
 
-        private Cosmos.Core.IOPort IndexPort;
-        private Cosmos.Core.IOPort ValuePort;
-        private Cosmos.Core.IOPort BiosPort;
-        private Cosmos.Core.IOPort IRQPort;
+        private IOPort IndexPort;
+        private IOPort ValuePort;
+        private IOPort BiosPort;
+        private IOPort IRQPort;
 
-        private Cosmos.Core.MemoryBlock Video_Memory;
-        private Cosmos.Core.MemoryBlock FIFO_Memory;
+        private MemoryBlock Video_Memory;
+        private MemoryBlock FIFO_Memory;
 
         private PCIDeviceNormal device;
         private uint height;
@@ -148,7 +146,7 @@ namespace Cosmos.HAL.Drivers.PCI.Video
 
         public VMWareSVGAII()
         {
-            device = (PCIDeviceNormal)(Cosmos.HAL.PCI.GetDevice(0x15AD, 0x0405));
+            device = (PCIDeviceNormal)(HAL.PCI.GetDevice(0x15AD, 0x0405));
             device.EnableMemory(true);
             uint basePort = device.BaseAddresses[0].BaseAddress();
             IndexPort = new IOPort((ushort)(basePort + (uint)IOPortOffset.Index));

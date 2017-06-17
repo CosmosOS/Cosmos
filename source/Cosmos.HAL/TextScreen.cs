@@ -5,18 +5,19 @@ using System.Text;
 using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 
-namespace Cosmos.HAL {
-  // Dont hold state here. This is a raw to hardware class. Virtual screens should be done
-  // by memory moves
+namespace Cosmos.HAL
+{
+    // Dont hold state here. This is a raw to hardware class. Virtual screens should be done
+    // by memory moves
     public class TextScreen : TextScreenBase
     {
-        protected byte   Color = 0x0F; // White
+        protected byte Color = 0x0F; // White
         protected UInt16 mBackgroundClearCellValue;
         protected UInt16 mTextClearCellValue;
         protected UInt32 mRow2Addr;
         protected UInt32 mScrollSize;
-        protected Int32  mCursorSize = 25; // 25 % as C# Console class
-        protected bool   mCursorVisible = true;
+        protected Int32 mCursorSize = 25; // 25 % as C# Console class
+        protected bool mCursorVisible = true;
 
         protected Core.IOGroup.TextScreen IO = new Cosmos.Core.IOGroup.TextScreen();
         protected readonly MemoryBlock08 mRAM;
@@ -26,26 +27,27 @@ namespace Cosmos.HAL {
             if (this is TextScreen)
             {
                 TextScreenHelpers.Debug("this is TextScreen");
-                }
-                else
-                {
+            }
+            else
+            {
                 TextScreenHelpers.Debug("ERROR: This is not of type TextScreen!");
-                }
-                mRAM = IO.Memory.Bytes;
-                // Set the Console default colors: White foreground on Black background, the default value of mClearCellValue is set there too as it is linked with the Color
-                SetColors(ConsoleColor.White, ConsoleColor.Black);
+            }
+            mRAM = IO.Memory.Bytes;
+            // Set the Console default colors: White foreground on Black background, the default value of mClearCellValue is set there too as it is linked with the Color
+            SetColors(ConsoleColor.White, ConsoleColor.Black);
             mBackgroundClearCellValue = mTextClearCellValue;
-                mRow2Addr = (UInt32)(Cols * 2);
-                mScrollSize = (UInt32)(Cols * (Rows - 1) * 2);
-                SetCursorSize(mCursorSize);
-                SetCursorVisible(mCursorVisible);
-                TextScreenHelpers.Debug("End of TextScreen..ctor");
+            mRow2Addr = (UInt32)(Cols * 2);
+            mScrollSize = (UInt32)(Cols * (Rows - 1) * 2);
+            SetCursorSize(mCursorSize);
+            SetCursorVisible(mCursorVisible);
+            TextScreenHelpers.Debug("End of TextScreen..ctor");
         }
 
         public override UInt16 Rows { get { return 25; } }
         public override UInt16 Cols { get { return 80; } }
 
-        public override void Clear() {
+        public override void Clear()
+        {
             TextScreenHelpers.Debug("Clearing screen with value ");
             TextScreenHelpers.DebugNumber(mTextClearCellValue);
             IO.Memory.Fill(mTextClearCellValue);
@@ -56,7 +58,7 @@ namespace Cosmos.HAL {
         {
             IO.Memory.MoveDown(0, mRow2Addr, mScrollSize);
             //IO.Memory.Fill(mScrollSize, mRowSize32, mClearCellValue32);
-            IO.Memory.Fill(mScrollSize, Cols, mBackgroundClearCellValue);
+            IO.Memory.Fill(mScrollSize, mRow2Addr, mBackgroundClearCellValue);
         }
 
         public override char this[int aX, int aY]
@@ -138,7 +140,7 @@ namespace Cosmos.HAL {
 
             // Cursor Vertical Size Register if the bit 5 is set to 1 the cursor is disabled, if 0 is enabled
             IO.Idx3.Byte = 0x0A;
-            IO.Data3.Byte |= (byte) (cursorDisable << 5);
+            IO.Data3.Byte |= (byte)(cursorDisable << 5);
         }
     }
 }

@@ -6,10 +6,11 @@ using System.Security.Cryptography;
 
 namespace Cosmos.IL2CPU
 {
-
-
     public class Elf32 : HashAlgorithm
     {
+        // TODO: Review this when we start using .NET Standard 2.0
+        protected byte[] HashValue;
+
         private UInt32 hash;
 
         public Elf32()
@@ -71,10 +72,11 @@ namespace Cosmos.IL2CPU
         }
     }
 
-
-
     public class Elf64 : HashAlgorithm
     {
+        // TODO: Review this when we start using .NET Standard 2.0
+        protected byte[] HashValue;
+
         private UInt64 hash;
 
         public Elf64()
@@ -128,7 +130,7 @@ namespace Cosmos.IL2CPU
 
         private byte[] UInt64ToBigEndianBytes(UInt64 x)
         {
-            return new byte[] 
+            return new byte[]
             {
             (byte)((x >> 56) & 0xff),
             (byte)((x >> 48) & 0xff),

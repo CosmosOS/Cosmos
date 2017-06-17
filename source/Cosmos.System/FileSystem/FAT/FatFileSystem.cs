@@ -492,7 +492,9 @@ namespace Cosmos.System.FileSystem.FAT
             byte[] xData;
 
             Read(aCluster, out xData);
-            Array.Copy(aData, 0, xData, aOffset, aData.Length);
+            //TODO: .Net Core
+            //Array.Copy(aData, 0, xData, aOffset, aData.Length);
+            Array.Copy(aData, 0, xData, (int) aOffset, aData.Length);
 
             if (mFatType == FatTypeEnum.Fat32)
             {

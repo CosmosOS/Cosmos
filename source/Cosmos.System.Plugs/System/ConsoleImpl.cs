@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-
-using Encoding = System.Text.Encoding;
-using Plug = Cosmos.IL2CPU.Plugs.PlugAttribute;
+using System.Text;
+using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System
 {
@@ -392,19 +391,6 @@ namespace Cosmos.System.Plugs.System
             {
                 return -1;
             }
-        }
-
-        // ReadKey() pure CIL
-
-        public static ConsoleKeyInfo ReadKey(Boolean intercept)
-        {
-            var key = KeyboardManager.ReadKey();
-            if (false == intercept && key.KeyChar != '\0')
-            {
-                Write(key.KeyChar);
-            }
-            // todo: add support for modifiers (ctrl, alt, etc)
-            return new ConsoleKeyInfo(key.KeyChar, key.Key.ToConsoleKey(), false, false, false);
         }
 
         public static String ReadLine()

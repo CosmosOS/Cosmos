@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+
 using Cosmos.Assembler;
 using Cosmos.Assembler.x86;
 using Cosmos.Build.Common;
 using Cosmos.Debug.DebugStub;
-using XSharp.Compiler;
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU
 {
@@ -191,7 +193,7 @@ namespace Cosmos.IL2CPU
 
             if (mComPort > 0)
             {
-                XS.Set("static_field__Cosmos_Core_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true);
+                XS.Set("static_field__Cosmos_Core_Common_CPU_mInterruptsEnabled", 1, destinationIsIndirect: true);
                 XS.LoadIdt(XSRegisters.EAX, isIndirect: true);
             }
             XS.Label("AfterCreateIDT");
@@ -380,13 +382,13 @@ namespace Cosmos.IL2CPU
                 }
                 else
                 {
-                    foreach (var xManifestName in typeof(ReferenceHelper).Assembly.GetManifestResourceNames())
+                    foreach (var xManifestName in typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceNames())
                     {
                         if (!xManifestName.EndsWith(".xs", StringComparison.OrdinalIgnoreCase))
                         {
                             continue;
                         }
-                        using (var xStream = typeof(ReferenceHelper).Assembly.GetManifestResourceStream(xManifestName))
+                        using (var xStream = typeof(ReferenceHelper).GetTypeInfo().Assembly.GetManifestResourceStream(xManifestName))
                         {
                             using (var xReader = new StreamReader(xStream))
                             {

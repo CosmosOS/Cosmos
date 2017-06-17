@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Cosmos.IL2CPU
 {
@@ -18,7 +14,7 @@ namespace Cosmos.IL2CPU
             {
                 throw new ArgumentNullException("type");
             }
-            if (!type.IsSubclassOf(typeof(CompilerExtensionBase)))
+            if (!type.GetTypeInfo().IsSubclassOf(typeof(CompilerExtensionBase)))
             {
                 throw new ArgumentException("CompilerExtensions should inherit from CompilerExtensionBase!", "type");
             }

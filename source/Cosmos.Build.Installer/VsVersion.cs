@@ -1,13 +1,13 @@
 ﻿namespace Cosmos.Build.Installer
 {
+  /// <summary>
+  /// Version of Visual Studio
+  /// </summary>
+  public enum VSVersion
+  {
     /// <summary>
-    /// Version of Visual Studio
+    /// Visual Studio 2017
     /// </summary>
-    public enum VsVersion
-    {
-        /// <summary>
-        /// Visual Studio VS 2015
-        /// </summary>
-        Vs2015
-    }
+    VS2017
+  }
 }

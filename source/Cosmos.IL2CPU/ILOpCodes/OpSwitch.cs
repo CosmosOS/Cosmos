@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Reflection.Metadata;
+
 
 namespace Cosmos.IL2CPU.ILOpCodes {
   public class OpSwitch : ILOpCode {
     public readonly int[] BranchLocations;
 
-    public OpSwitch(Code aOpCode, int aPos, int aNextPos, int[] aBranchLocations, ExceptionHandlingClause aCurrentExceptionHandler)
-      : base(aOpCode, aPos, aNextPos, aCurrentExceptionHandler) {
+    public OpSwitch(Code aOpCode, int aPos, int aNextPos, int[] aBranchLocations, _ExceptionRegionInfo aCurrentExceptionRegion)
+      : base(aOpCode, aPos, aNextPos, aCurrentExceptionRegion) {
       BranchLocations = aBranchLocations;
     }
 

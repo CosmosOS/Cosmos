@@ -7,7 +7,7 @@ using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core.Plugs
 {
-    [Plug(TargetName = "Cosmos.IL2CPU.GCImplementation, Cosmos.IL2CPU")]
+    [Plug(Target = typeof(Cosmos.Core.Common.GCImplementation))]
     public static class GCImplementionImpl
     {
         public static uint AllocNewObject(uint aSize)

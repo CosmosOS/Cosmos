@@ -1,4 +1,6 @@
-using System;
+
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -10,18 +12,23 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute( MethodInfo aMethod, ILOpCode aOpCode )
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
-            Stind_I.Assemble(Assembler, 2, DebugEnabled);
+            XS.Pop(EAX);
+            XS.Pop(EBX);
+
+            XS.Set(EBX, AX, destinationIsIndirect: true);
+
+            //Stind_I.Assemble(Assembler, 2, DebugEnabled);
         }
 
 
         // using System;
         // using System.IO;
-        // 
-        // 
+        //
+        //
         // using CPU = Cosmos.Assembler.x86;
-        // 
+        //
         // namespace Cosmos.IL2CPU.IL.X86 {
         // 	[Cosmos.Assembler.OpCode(OpCodeEnum.Stind_I2)]
         // 	public class Stind_I2: Op {

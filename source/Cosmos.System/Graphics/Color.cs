@@ -580,7 +580,7 @@ namespace Cosmos.System.Graphics
 
         public int ToArgb() => unchecked((int)Value);
 
-        public KnownColor ToKnownColor() => (KnownColor)knownColor;
+        private KnownColor ToKnownColor() => (KnownColor)knownColor;
 
         public override string ToString()
         {

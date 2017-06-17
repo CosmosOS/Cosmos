@@ -7,7 +7,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <Name>Cosmos.Compiler.Tests.EncryptionBoot</Name>
     <BinFormat>elf</BinFormat>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -31,11 +31,9 @@
     <Reference Include="Cosmos.Debug.Kernel.Plugs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=5ae71220097cb983" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Compiler.Tests.Encryption\Cosmos.Compiler.Tests.Encryption.csproj">
-      <Name>Cosmos.Compiler.Tests.Encryption</Name>
-      <Project>{48ebdeb2-6a6a-4df2-b5f1-db6d299401f2}</Project>
-      <Private>True</Private>
-    </ProjectReference>
+    <Content Include="Cosmos.Compiler.Tests.EncryptionBoot.project.json">
+      <SubType>Content</SubType>
+    </Content>
   </ItemGroup>
   <!--<ItemGroup>
     <Content Include="Cosmos.bxrc">

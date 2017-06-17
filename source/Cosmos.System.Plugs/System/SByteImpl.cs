@@ -1,4 +1,5 @@
-﻿using Cosmos.IL2CPU.Plugs;
+﻿using Cosmos.Common;
+using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.System.Plugs.System
 {
@@ -7,7 +8,7 @@ namespace Cosmos.System.Plugs.System
     {
         public static string ToString(ref sbyte aThis)
         {
-            return ((int)(aThis)).ToString();
+            return StringHelper.GetNumberString(aThis);
         }
     }
 }

@@ -1,8 +1,8 @@
-﻿namespace Cosmos.Common.Tests
-{
-    using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Cosmos.Common.Extensions;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Cosmos.Common.Extensions;
 
+namespace Cosmos.Common.Tests
+{
     [TestClass]
     public class ToHexStringTest
     {

@@ -10,9 +10,8 @@ using CPU = Cosmos.Assembler.x86;
 using CPUx86 = Cosmos.Assembler.x86;
 using System.Reflection;
 using Cosmos.Assembler;
-using XSharp.Compiler;
-using SysReflection = System.Reflection;
 
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -27,7 +26,7 @@ namespace Cosmos.IL2CPU.X86.IL
         public static uint GetStackSizeToReservate(MethodBase aMethod, Type aType = null)
         {
 
-            var xMethodInfo = aMethod as SysReflection.MethodInfo;
+            var xMethodInfo = aMethod as MethodInfo;
             uint xReturnSize = 0;
             if (xMethodInfo != null)
             {
@@ -86,20 +85,20 @@ namespace Cosmos.IL2CPU.X86.IL
             return 8;
         }
 
-        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xOpMethod = aOpCode as OpMethod;
             DoExecute(Assembler, aMethod, xOpMethod.Value, aOpCode, LabelName.Get(aMethod.MethodBase), DebugEnabled);
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, bool debugEnabled)
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, _MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aCurrent, string currentLabel, bool debugEnabled)
         {
             DoExecute(Assembler, aCurrentMethod, aTargetMethod, aCurrent, currentLabel, ILOp.GetLabel(aCurrentMethod, aCurrent.NextPosition), debugEnabled);
         }
 
-        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aOp, string currentLabel, string nextLabel, bool debugEnabled)
+        public static void DoExecute(Cosmos.Assembler.Assembler Assembler, _MethodInfo aCurrentMethod, MethodBase aTargetMethod, ILOpCode aOp, string currentLabel, string nextLabel, bool debugEnabled)
         {
-            var xMethodInfo = aTargetMethod as SysReflection.MethodInfo;
+            var xMethodInfo = aTargetMethod as MethodInfo;
             string xNormalAddress = LabelName.Get(aTargetMethod);
             var xParameters = aTargetMethod.GetParameters();
 

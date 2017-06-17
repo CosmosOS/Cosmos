@@ -1,5 +1,6 @@
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+
+using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -11,7 +12,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             var xStackContent = aOpCode.StackPopTypes[0];
             var xStackContentSize = SizeOfType(xStackContent);

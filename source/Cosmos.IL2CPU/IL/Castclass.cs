@@ -1,9 +1,9 @@
 using System.Reflection;
 
 using Cosmos.IL2CPU.ILOpCodes;
+using XSharp.Common;
 using CPUx86 = Cosmos.Assembler.x86;
-using XSharp.Compiler;
-using static XSharp.Compiler.XSRegisters;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -15,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
         {
         }
 
-        public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+        public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
         {
             OpType xType = (OpType)aOpCode;
             string xTypeID = GetTypeIDLabel(xType.Value);
@@ -30,18 +30,18 @@ namespace Cosmos.IL2CPU.X86.IL
             XS.Jump(CPUx86.ConditionalTestEnum.Zero, xReturnNullLabel);
             XS.Push(EAX, isIndirect: true);
             XS.Push(xTypeID, isIndirect: true);
-            
+
             MethodBase xMethodIsInstance = VTablesImplRefs.IsInstanceRef;
-            
+
             Call.DoExecute(Assembler, aMethod, xMethodIsInstance, aOpCode, xCurrentMethodLabel, xAfterIsInstanceCallLabel, DebugEnabled);
-            
+
             XS.Label(xAfterIsInstanceCallLabel);
-            
+
             XS.Pop(EAX);
 
             XS.Compare(EAX, 0);
             XS.Jump(CPUx86.ConditionalTestEnum.Equal, xReturnNullLabel);
-            
+
             XS.Jump(xNextPositionLabel);
             XS.Label(xReturnNullLabel);
             XS.Add(ESP, 8);

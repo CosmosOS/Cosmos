@@ -1,8 +1,9 @@
 using System;
 using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
-using Cosmos.IL2CPU.Plugs.System;
-using XSharp.Compiler;
+
+using Cosmos.IL2CPU.Plugs;
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -14,7 +15,7 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
+    public static void Assemble(Assembler.Assembler aAssembler, uint aElementSize, _MethodInfo aMethod, ILOpCode aOpCode, bool debugEnabled)
     {
       // stack     == the new value
       // stack + 1 == the index
@@ -31,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize); // the index
       XS.Set(XSRegisters.EDX, aElementSize);
       XS.Multiply(XSRegisters.EDX);
-      XS.Add(XSRegisters.EAX, ObjectImpl.FieldDataOffset + 4);
+      XS.Add(XSRegisters.EAX, ObjectUtilities.FieldDataOffset + 4);
 
       XS.Set(XSRegisters.EDX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize + 8); // the array
       XS.Add(XSRegisters.EDX, XSRegisters.EAX);
@@ -71,7 +72,7 @@ namespace Cosmos.IL2CPU.X86.IL
       }
       XS.Add(XSRegisters.ESP, 12);
     }
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       Assemble(Assembler, 8, aMethod, aOpCode, DebugEnabled);
     }

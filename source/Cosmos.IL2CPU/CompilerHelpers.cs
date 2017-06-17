@@ -1,6 +1,7 @@
-﻿using System;
+﻿//#define COSMOSDEBUG
 
-using global::System.Diagnostics;
+using System;
+using System.Diagnostics;
 
 namespace Cosmos.IL2CPU
 {
@@ -16,7 +17,7 @@ namespace Cosmos.IL2CPU
             }
             else
             {
-                global::System.Diagnostics.Debug.WriteLine(message);
+                Console.WriteLine(message);
             }
         }
 

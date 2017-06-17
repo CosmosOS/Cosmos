@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
+
 using Cosmos.Common;
 using Cosmos.Debug.Kernel;
 
@@ -142,11 +140,9 @@ namespace Cosmos.IL2CPU
       while (true);
       //}
       EnableDebug = true;
-      Debugger.DoSend("Type");
-      Debugger.DoSendNumber(aType);
-      Debugger.DoSend("MethodId");
-      Debugger.DoSendNumber(aMethodId);
-      Debugger.DoSend("Not FOUND!");
+      DebugHex("Type", aType);
+      DebugHex("MethodId", aMethodId);
+      Debug("Not FOUND!");
       Debugger.SendKernelPanic(KernelPanicTypes.VMT_MethodNotFound);
       while (true)
         ;

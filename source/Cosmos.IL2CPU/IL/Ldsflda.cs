@@ -4,7 +4,8 @@ using CPUx86 = Cosmos.Assembler.x86;
 using Cosmos.Assembler;
 using System.Reflection;
 using System.Linq;
-using XSharp.Compiler;
+
+using XSharp.Common;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -16,14 +17,14 @@ namespace Cosmos.IL2CPU.X86.IL
     {
     }
 
-    public override void Execute(MethodInfo aMethod, ILOpCode aOpCode)
+    public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode)
     {
       var xOpCode = (ILOpCodes.OpField) aOpCode;
       var xFieldName = DataMember.GetStaticFieldName(xOpCode.Value);
       DoExecute(Assembler, aMethod, xFieldName, xOpCode.Value.DeclaringType, aOpCode);
     }
 
-    public static void DoExecute(Cosmos.Assembler.Assembler assembler, MethodInfo aMethod, string field, Type declaringType, ILOpCode aCurrentOpCode)
+    public static void DoExecute(Cosmos.Assembler.Assembler assembler, _MethodInfo aMethod, string field, Type declaringType, ILOpCode aCurrentOpCode)
     {
       // call cctor:
       var xCctor = (declaringType.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic) ?? new ConstructorInfo[0]).SingleOrDefault();

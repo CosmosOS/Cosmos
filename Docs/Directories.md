@@ -92,7 +92,7 @@ This directory contains the code for the integration with Visual Studio. Adds su
 
 This directory contains the code for the Visual Studio debugger integration.
 
-##### \Source\Cosmos.VS.Package
+##### \Source\Cosmos.VS.ProjectSystem
 
 This directory contains the code for the Visual Studio package of Cosmos.
 

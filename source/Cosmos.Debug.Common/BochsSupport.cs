@@ -8,7 +8,7 @@ using Microsoft.Win32;
 
 namespace Cosmos.Debug.Common
 {
-    /// <summary>An helper class that is used from both Cosmos.VS.Package and Cosmos.VS.DebugEngine for
+    /// <summary>An helper class that is used from both Cosmos.VS.ProjectSystem and Cosmos.VS.DebugEngine for
     /// Bochs emulator support.</summary>
     public static class BochsSupport
     {
@@ -48,9 +48,9 @@ namespace Cosmos.Debug.Common
             try
             {
                 int i = 0;
-                using (var reader = new StreamReader(xInputFile))
+                using (var reader = new StreamReader(File.Open(xInputFile, FileMode.Open)))
                 {
-                    using (var writer = new StreamWriter(xOutputFile))
+                    using (var writer = new StreamWriter(File.Open(xOutputFile, FileMode.OpenOrCreate)))
                     {
                         bool startSymbolTable = false;
                         while (!reader.EndOfStream)

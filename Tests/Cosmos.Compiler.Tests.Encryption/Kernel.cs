@@ -22,10 +22,11 @@ namespace Cosmos.Compiler.Tests.Encryption
 
         public void TestSHA1()
         {
-            byte[] data = new byte[256];
-            byte[] result;
-            var shaM = new SHA1Managed();
-            result = shaM.ComputeHash(data);
+            // TODO: when we use .net standard 2.0, uncomment this
+            //byte[] data = new byte[256];
+            //byte[] result;
+            //var shaM = new SHA1Managed();
+            //result = shaM.ComputeHash(data);
         }
     }
 }

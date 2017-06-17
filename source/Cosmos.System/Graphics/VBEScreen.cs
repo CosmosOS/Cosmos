@@ -47,13 +47,13 @@ namespace Cosmos.System
             }
         }
 
-#region Display
+        #region Display
         /// <summary>
-        /// All the aviable screen modes VBE supports, I would like to query the hardware and obtain from it the list but I have
+        /// All the available screen modes VBE supports, I would like to query the hardware and obtain from it the list but I have
         /// not yet find how to do it! For now I hardcode the most used VESA modes, VBE seems to support until HDTV resolution
         /// without problems that is well... excellent :-)
         /// </summary>
-        public override List<Mode> getAviableModes()
+        public override List<Mode> getAvailableModes()
         {
             return new List<Mode>
                 {
@@ -92,9 +92,9 @@ namespace Cosmos.System
             //set the screen
            VBEDriver.VBESet(xres, yres, bpp);
         }
-#endregion
+        #endregion
 
-#region Drawing
+        #region Drawing
 
         public override void Clear(Color color)
         {
@@ -160,12 +160,12 @@ namespace Cosmos.System
         {
             throw new NotImplementedException();
         }
-#endregion
+        #endregion
 
-#region Reading
+        #region Reading
         // TODO add to Canvas GetPointColor()
 
-#endregion
+        #endregion
 
     }
 }

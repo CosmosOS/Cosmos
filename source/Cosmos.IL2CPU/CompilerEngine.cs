@@ -1,13 +1,15 @@
-﻿using Cosmos.Build.Common;
-using Cosmos.IL2CPU;
+﻿//#define COSMOSDEBUG
+
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Text;
-using Cosmos.Debug.Common;
-using Cosmos.System;
+
+using Cosmos.Build.Common;
+using Cosmos.Debug.Symbols;
 
 namespace Cosmos.IL2CPU
 {
@@ -32,71 +34,42 @@ namespace Cosmos.IL2CPU
         public bool EmitDebugSymbols { get; set; }
         public bool IgnoreDebugStubAttribute { get; set; }
         public string StackCorruptionDetectionLevel { get; set; }
+        public string[] AdditionalSearchDirs { get; set; }
+        public string[] AdditionalReferences { get; set; }
+
+        private List<CompilerExtensionBase> mLoadedExtensions;
+
+        public bool DebugEnabled = false;
+        public bool StackCorruptionDetectionEnabled = false;
+        protected StackCorruptionDetectionLevel mStackCorruptionDetectionLevel = Cosmos.Build.Common.StackCorruptionDetectionLevel.MethodFooters;
+        protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.Source;
+        protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
+        protected static List<string> mSearchDirs = new List<string>();
+
+        public string AssemblerLog = "Cosmos.Assembler.log";
+
+        protected void LogTime(string message)
+        {
+        }
 
         protected void LogMessage(string aMsg)
         {
-            if (OnLogMessage != null)
-            {
-                OnLogMessage(aMsg);
-            }
+            OnLogMessage?.Invoke(aMsg);
         }
 
         protected void LogWarning(string aMsg)
         {
-            if (OnLogWarning != null)
-            {
-                OnLogWarning(aMsg);
-            }
+            OnLogWarning?.Invoke(aMsg);
         }
 
         protected void LogError(string aMsg)
         {
-            if (OnLogError != null)
-            {
-                OnLogError(aMsg);
-            }
+            OnLogError?.Invoke(aMsg);
         }
 
         protected void LogException(Exception e)
         {
-            if (OnLogException != null)
-            {
-                OnLogException(e);
-            }
-        }
-
-        protected static List<string> mSearchDirs = new List<string>();
-        static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            var xShortName = args.Name;
-            if (xShortName.Contains(','))
-            {
-                xShortName = xShortName.Substring(0, xShortName.IndexOf(','));
-            }
-            foreach (var xDir in mSearchDirs)
-            {
-                var xPath = Path.Combine(xDir, xShortName + ".dll");
-                if (File.Exists(xPath))
-                {
-                    return Assembly.LoadFrom(xPath);
-                }
-                xPath = Path.Combine(xDir, xShortName + ".exe");
-                if (File.Exists(xPath))
-                {
-                    return Assembly.LoadFrom(xPath);
-                }
-            }
-            // check for path in as requested dll is stored, this makes refrenced dll project working
-            var xPathAsRequested = Path.Combine(Path.GetDirectoryName(args.RequestingAssembly.Location), xShortName + ".dll");
-            if (File.Exists(xPathAsRequested))
-            {
-                return Assembly.LoadFrom(xPathAsRequested);
-            }
-            if (mStaticLog != null)
-            {
-                mStaticLog(string.Format("Assembly '{0}' not resolved!", args.Name));
-            }
-            return null;
+            OnLogException?.Invoke(e);
         }
 
         private bool EnsureCosmosPathsInitialization()
@@ -121,36 +94,20 @@ namespace Cosmos.IL2CPU
 
         protected bool Initialize()
         {
-            // Add UserKit dirs for asms to load from.
-            mSearchDirs.Add(Path.GetDirectoryName(typeof(CompilerEngine).Assembly.Location));
             if (!EnsureCosmosPathsInitialization())
             {
                 return false;
             }
+
+            if (AdditionalSearchDirs != null)
+            {
+                mSearchDirs.AddRange(AdditionalSearchDirs);
+            }
+
+            // Add UserKit dirs for asms to load from.
+            mSearchDirs.Add(Path.GetDirectoryName(typeof(CompilerEngine).GetTypeInfo().Assembly.Location));
             mSearchDirs.Add(CosmosPaths.UserKit);
             mSearchDirs.Add(CosmosPaths.Kernel);
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
-
-            // This seems to be to try to load plugs on demand from their own dirs, but
-            // it often just causes load conflicts, and weird errors like "implementation not found"
-            // for a method, even when both the output user kit dir and local bin dir have up to date
-            // and same assemblies.
-            // So its removed for now and we should find a better way to dynamically load plugs in
-            // future.
-            // Furthermore, it only scanned plugs/asms reffed from the boot proj, not the kernel proj
-            // so it was bugged there too.
-            //if (References != null) {
-            //  foreach (var xRef in References) {
-            //    if (xRef.MetadataNames.OfType<string>().Contains("FullPath")) {
-            //      var xName = xRef.GetMetadata("FullPath");
-            //      var xDir = Path.GetDirectoryName(xName);
-            //      if (!mSearchPaths.Contains(xDir)) {
-            //        mSearchPaths.Insert(0, xDir);
-            //      }
-            //    }
-            //  }
-            //}
-
 
             mDebugMode = (DebugMode)Enum.Parse(typeof(DebugMode), DebugMode);
             if (string.IsNullOrEmpty(TraceAssemblies))
@@ -159,7 +116,7 @@ namespace Cosmos.IL2CPU
             }
             else
             {
-                if (!Enum.GetNames(typeof(TraceAssemblies)).Contains(TraceAssemblies, StringComparer.InvariantCultureIgnoreCase))
+                if (!Enum.GetNames(typeof(TraceAssemblies)).Contains(TraceAssemblies, StringComparer.OrdinalIgnoreCase))
                 {
                     LogError("Invalid TraceAssemblies specified");
                     return false;
@@ -177,18 +134,6 @@ namespace Cosmos.IL2CPU
             }
 
             return true;
-        }
-
-        public bool DebugEnabled = false;
-        public bool StackCorruptionDetectionEnabled = false;
-        protected StackCorruptionDetectionLevel mStackCorruptionDetectionLevel = Cosmos.Build.Common.StackCorruptionDetectionLevel.MethodFooters;
-        protected DebugMode mDebugMode = Cosmos.Build.Common.DebugMode.Source;
-        protected TraceAssemblies mTraceAssemblies = Cosmos.Build.Common.TraceAssemblies.All;
-
-        public string AssemblerLog = "Cosmos.Assembler.log";
-
-        protected void LogTime(string message)
-        {
         }
 
         public bool Execute()
@@ -248,12 +193,12 @@ namespace Cosmos.IL2CPU
                                     LogWarning("Could not create the file \"" + xLogFile + "\"! No log will be created!");
                                 }
                             }
-                            xScanner.QueueMethod(xInitMethod.DeclaringType.BaseType.GetMethod("Start"));
+                            xScanner.QueueMethod(xInitMethod.DeclaringType.GetTypeInfo().BaseType.GetTypeInfo().GetMethod("Start"));
                             xScanner.Execute(xInitMethod);
 
-                            AppAssemblerRingsCheck.Execute(xScanner, xInitMethod.DeclaringType.Assembly);
+                            AppAssemblerRingsCheck.Execute(xScanner, xInitMethod.DeclaringType.GetTypeInfo().Assembly);
 
-                            using (var xOut = new StreamWriter(OutputFilename, false, Encoding.ASCII, 128 * 1024))
+                            using (var xOut = new StreamWriter(File.Create(OutputFilename), Encoding.ASCII, 128 * 1024))
                             {
                                 //if (EmitDebugSymbols) {
                                 xAsm.Assembler.FlushText(xOut);
@@ -293,9 +238,8 @@ namespace Cosmos.IL2CPU
             {
                 LogException(ex);
                 LogMessage("Loaded assemblies: ");
-                foreach (var xAsm in AppDomain.CurrentDomain.GetAssemblies())
+                foreach (var xAsm in AssemblyLoadContext.Default.GetLoadedAssemblies())
                 {
-                    // HACK: find another way to skip dynamic assemblies (which belong to dynamic methods)
                     if (xAsm.IsDynamic)
                     {
                         continue;
@@ -331,6 +275,52 @@ namespace Cosmos.IL2CPU
             return new AppAssembler(DebugCom, AssemblerLog);
         }
 
+        private Assembly Default_Resolving(AssemblyLoadContext aContext, AssemblyName aName)
+        {
+            var xRequestingAssembly = Assembly.GetEntryAssembly();
+            if (xRequestingAssembly != null)
+            {
+                // check for path in as requested dll is stored, this makes refrenced dll project working
+                var xPathAsRequested = Path.Combine(Path.GetDirectoryName(xRequestingAssembly.Location), aName.Name + ".dll");
+                if (File.Exists(xPathAsRequested))
+                {
+                    return aContext.LoadFromAssemblyPath(xPathAsRequested);
+                }
+            }
+
+            // check for assembly in working directory
+            var xPathToCheck = Path.Combine(Directory.GetCurrentDirectory(), aName.Name + ".dll");
+            if (File.Exists(xPathToCheck))
+            {
+                return aContext.LoadFromAssemblyPath(xPathToCheck);
+            }
+
+            foreach (var xRef in References)
+            {
+                var xName = AssemblyLoadContext.GetAssemblyName(xRef);
+                if (xName.Name == aName.Name)
+                {
+                    return aContext.LoadFromAssemblyPath(xRef);
+                }
+            }
+
+            foreach (var xDir in mSearchDirs)
+            {
+                var xPath = Path.Combine(xDir, aName.Name + ".dll");
+                if (File.Exists(xPath))
+                {
+                    return aContext.LoadFromAssemblyPath(xPath);
+                }
+                xPath = Path.Combine(xDir, aName.Name + ".exe");
+                if (File.Exists(xPath))
+                {
+                    return aContext.LoadFromAssemblyPath(xPath);
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>Load every refernced assemblies that have an associated FullPath property and seek for
         /// the kernel default constructor.</summary>
         /// <returns>The kernel default constructor or a null reference if either none or several such
@@ -345,30 +335,35 @@ namespace Cosmos.IL2CPU
             // Plugs and refs in this list will be loaded absolute (or as proj refs) only. Asm resolution
             // will not be tried on them, but will on ASMs they reference.
             //
-            // TODO - Update to use Load for Reflection only, but note that this wont load references
-            // and we have to do it manually (Probably better for us anyways)
 
-            Type xKernelType = null;
+            AssemblyLoadContext.Default.Resolving += Default_Resolving;
             mLoadedExtensions = new List<CompilerExtensionBase>();
-            foreach (var xRef in References)
+            Type xKernelType = null;
+
+            foreach (string xReference in References)
             {
-                if (File.Exists(xRef))
+                if (File.Exists(xReference))
                 {
-                    var xAssembly = Assembly.LoadFrom(xRef);
-                    foreach (var xType in xAssembly.GetExportedTypes())
+                    var xAssembly = AssemblyLoadContext.Default.LoadFromAssemblyCacheOrPath(xReference);
+
+                    CompilerHelpers.Debug($"Looking for kernel in '{xAssembly}'");
+
+                    foreach (var xType in xAssembly.ExportedTypes)
                     {
-                        if (!xType.IsGenericTypeDefinition
-                            && !xType.IsAbstract)
+                        if (!xType.GetTypeInfo().IsGenericTypeDefinition && !xType.GetTypeInfo().IsAbstract)
                         {
-                            if (xType.IsSubclassOf(typeof(Kernel)))
+                            CompilerHelpers.Debug($"Checking type '{xType.FullName}'");
+
+                            if (xType.GetTypeInfo().IsSubclassOf(typeof(Cosmos.System.Kernel)))
                             {
                                 // found kernel?
                                 if (xKernelType != null)
                                 {
                                     // already a kernel found, which is not supported.
-                                    LogError(string.Format("Two kernels found! '{0}' and '{1}'", xType.AssemblyQualifiedName, xKernelType.AssemblyQualifiedName));
+                                    LogError($"Two kernels found! '{xType.AssemblyQualifiedName}' and '{xKernelType.AssemblyQualifiedName}'");
                                     return null;
                                 }
+
                                 xKernelType = xType;
                             }
                         }
@@ -381,12 +376,13 @@ namespace Cosmos.IL2CPU
                     }
                 }
             }
+
             if (xKernelType == null)
             {
                 LogError("No Kernel found!");
                 return null;
             }
-            var xCtor = xKernelType.GetConstructor(Type.EmptyTypes);
+            var xCtor = xKernelType.GetTypeInfo().GetConstructor(Type.EmptyTypes);
             if (xCtor == null)
             {
                 LogError("Kernel has no public default constructor");
@@ -394,7 +390,5 @@ namespace Cosmos.IL2CPU
             }
             return xCtor;
         }
-
-        private List<CompilerExtensionBase> mLoadedExtensions;
     }
 }
