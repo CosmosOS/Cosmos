@@ -13,8 +13,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             //dont know how else to test this
 
-           Sys.Guid trueGuid = Sys.Guid.NewGuid();
-           
+            Sys.Guid trueGuid = Sys.Guid.NewGuid();
+
             string stringGuid = trueGuid.ToString();
 
             Assert.IsTrue((stringGuid.Length == 36), "invalid Length");
@@ -40,8 +40,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
                 test9thbyte = true;
             }
 
+            Assert.IsTrue(test9thbyte, "9th byte invalid (not 8,9,A,B)");
 
-                Assert.IsTrue(test9thbyte, "9th byte invalid (not 8,9,A,B)");
         }
     }
 }
