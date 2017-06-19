@@ -24,23 +24,23 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((GuidRFC4122.Length == 16), "invalid Length");
 
-            Assert.IsTrue((GuidRFC4122[6].ToString() == "4"), "7th byte invalid (not 4)");
+            Assert.IsTrue((GuidRFC4122[6].ToString().StartsWith("4")), "7th byte invalid (not 4)");
 
             bool test9thbyte = false;
 
-            if (GuidRFC4122[8].ToString() == "8")
+            if (GuidRFC4122[8].ToString().StartsWith("8"))
             {
                 test9thbyte = true;
             }
-            else if (GuidRFC4122[8].ToString() == "9")
+            else if (GuidRFC4122[8].ToString().StartsWith("9"))
             {
                 test9thbyte = true;
             }
-            else if (GuidRFC4122[8].ToString() == "A")
+            else if (GuidRFC4122[8].ToString().StartsWith("A"))
             {
                 test9thbyte = true;
             }
-            else if (GuidRFC4122[8].ToString() == "B")
+            else if (GuidRFC4122[8].ToString().StartsWith("B"))
             {
                 test9thbyte = true;
             }
