@@ -57,7 +57,6 @@ namespace Cosmos.Compiler.Tests.Bcl
                 DelegatesTest.Execute();
                 RandomTests.Execute();
 
-
                 // System.Collections.Generic
                 ListTest.Execute();
                 QueueTest.Execute();

@@ -1,4 +1,4 @@
-﻿using Sys = System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Cosmos.TestRunner;
@@ -13,29 +13,34 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             //dont know how else to test this
 
-            Sys.Guid trueGuid = Sys.Guid.NewGuid();
+            Guid testGuid = Guid.NewGuid();
+            Guid testGuid1 = Guid.NewGuid();
 
-            string stringGuid = trueGuid.ToString();
+            Assert.IsFalse((testGuid == Guid.Empty),"Guid was Empty");
 
-            Assert.IsTrue((stringGuid.Length == 36), "invalid Length");
+            Assert.IsFalse((testGuid == testGuid1), "Guid was not unique");
 
-            Assert.IsTrue((stringGuid.Substring(14, 1) == "4"), "7th byte invalid (not 4)");
+            byte[] GuidRFC4122 = testGuid.ToByteArray();
+
+            Assert.IsTrue((GuidRFC4122.Length == 16), "invalid Length");
+
+            Assert.IsTrue((GuidRFC4122[6].ToString() == "4"), "7th byte invalid (not 4)");
 
             bool test9thbyte = false;
 
-            if (stringGuid.Substring(19, 1) == "8")
+            if (GuidRFC4122[8].ToString() == "8")
             {
                 test9thbyte = true;
             }
-            else if (stringGuid.Substring(19, 1) == "9")
+            else if (GuidRFC4122[8].ToString() == "9")
             {
                 test9thbyte = true;
             }
-            else if (stringGuid.Substring(19, 1) == "A")
+            else if (GuidRFC4122[8].ToString() == "A")
             {
                 test9thbyte = true;
             }
-            else if (stringGuid.Substring(19, 1) == "B")
+            else if (GuidRFC4122[8].ToString() == "B")
             {
                 test9thbyte = true;
             }
