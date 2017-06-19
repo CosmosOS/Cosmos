@@ -24,8 +24,11 @@ namespace Cosmos.System.Plugs.System
             return hexBuffer;
         }
 
+        public static Guid Empty = new Guid(0,0,0,0,0,0,0,0,0,0,0);
+
         public static Guid NewGuid()
         {
+            
             Random rnd = new Random();
             byte[] guid = new byte[16];
             rnd.NextBytes(guid);
