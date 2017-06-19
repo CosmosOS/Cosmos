@@ -44,6 +44,8 @@ namespace Cosmos.Compiler.Tests.Bcl
                 UnsafeCodeTest.Execute();
                 DelegatesTest.Execute();
 
+                GuidTest.Execute();
+
                 System.Collections.Generic.ListTest.Execute();
                 System.Collections.Generic.QueueTest.Execute();
                 //System.Collections.Generic.DictionaryTest.Execute();
