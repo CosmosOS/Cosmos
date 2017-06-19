@@ -13,29 +13,29 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             //dont know how else to test this
 
-           Sys.Guid test = Sys.Guid.NewGuid();
+           Sys.Guid trueGuid = Sys.Guid.NewGuid();
+           
+            string stringGuid = trueGuid.ToString();
 
-            string teststring = test.ToString();
+            Assert.IsTrue((stringGuid.Length == 36), "invalid Length");
 
-            Assert.IsTrue((teststring.Length == 36), "invalid Length");
-
-            Assert.IsTrue((teststring.Substring(14, 1) == "4"), "7th byte invalid (not 4)");
+            Assert.IsTrue((stringGuid.Substring(14, 1) == "4"), "7th byte invalid (not 4)");
 
             bool test9thbyte = false;
 
-            if (teststring.Substring(19, 1) == "8")
+            if (stringGuid.Substring(19, 1) == "8")
             {
                 test9thbyte = true;
             }
-            else if (teststring.Substring(19, 1) == "9")
+            else if (stringGuid.Substring(19, 1) == "9")
             {
                 test9thbyte = true;
             }
-            else if (teststring.Substring(19, 1) == "A")
+            else if (stringGuid.Substring(19, 1) == "A")
             {
                 test9thbyte = true;
             }
-            else if (teststring.Substring(19, 1) == "B")
+            else if (stringGuid.Substring(19, 1) == "B")
             {
                 test9thbyte = true;
             }
