@@ -65,6 +65,8 @@ namespace Cosmos.Compiler.Tests.Bcl
                 // System.Text
                 EncodingTest.Execute();
 
+                GuidTest.Execute();
+
                 TestController.Completed();
             }
             catch (Exception e)
