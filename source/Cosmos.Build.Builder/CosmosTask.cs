@@ -267,7 +267,7 @@ namespace Cosmos.Build.Builder
     private void Pack(string project, string destDir, string version)
     {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
-      string xParams = $"{Quoted(project)} /nodeReuse:False /t:Restore;Pack /maxcpucount /p:Version={Quoted(version)} /p:PackageOutputPath={Quoted(destDir)}";
+      string xParams = $"{Quoted(project)} /nodeReuse:False /t:Restore;Pack /maxcpucount /p:PackageVersion={Quoted(version)} /p:PackageOutputPath={Quoted(destDir)}";
       StartConsole(xMSBuild, xParams);
     }
 
@@ -282,7 +282,7 @@ namespace Cosmos.Build.Builder
     {
       string xVSIPDir = Path.Combine(mCosmosDir, "Build", "VSIP");
       string xPackagesDir = Path.Combine(xVSIPDir, "KernelPackages");
-      string xVersion = "1.0.0";
+      string xVersion = "1.0.1";
 
       if (!App.IsUserKit)
       {
