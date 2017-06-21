@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-      <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+      <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
