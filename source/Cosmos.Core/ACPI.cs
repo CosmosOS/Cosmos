@@ -2,7 +2,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Cosmos.HAL
+namespace Cosmos.Core
 {
     public unsafe class ACPI
     {
