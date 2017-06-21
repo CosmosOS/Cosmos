@@ -9,14 +9,19 @@ namespace Cosmos.HAL
 {
     public class Power
     {
+        //Reboot with CPU
         public static void CPUReboot()
         {
             Core.Global.CPU.Reboot();
         }
+
+        //Reboot with ACPI
         public static void Reboot()
         {
             ACPI.Reboot();
         }
+
+        //Shutdown with ACPI
         public static void Shutdown()
         {
             ACPI.Shutdown();
