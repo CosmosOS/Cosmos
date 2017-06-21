@@ -9,11 +9,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
-            Int64 value;
-            String result;
-            String expectedResult;
+            long value;
+            string result;
+            string expectedResult;
 
-            value = Int64.MaxValue;
+            value = long.MaxValue;
 
             result = value.ToString();
             expectedResult = "9223372036854775807";
@@ -28,7 +28,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Now let's try to use '$ instead of '+'
             result = $"The Maximum value of an Int64 is {value}";
-            
+
             // Actually 'expectedResult' should be the same so...
             Assert.IsTrue((result == expectedResult), "String format (Int64) doesn't work");
 
@@ -36,11 +36,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             int resultAsInt = value.GetHashCode();
             // actually the Hash Code of a Int64 is the value interpolated with XOR to obtain an Int32... so not the same of 'value'!
             int expectedResultAsInt = (unchecked((int)((long)value)) ^ (int)(value >> 32));
-  
-            Assert.IsTrue((resultAsInt == expectedResultAsInt), "Int64.GetHashCode() doesn't work"); 
+
+            Assert.IsTrue((resultAsInt == expectedResultAsInt), "Int64.GetHashCode() doesn't work");
 
             // Let's try to convert a Long in a ULong
-            Int64 val2 = 42;
+            long val2 = 42;
             UInt64 val2AsULong = (ulong)val2;
 
             Assert.IsTrue((val2AsULong == 42), "Int64 to UInt64 conversion does not work");
@@ -74,6 +74,45 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((result == expectedResult), "Int64.ToString(X2) doesn't work");
 #endif
+
+            // Now test conversions
+
+            long maxValue = long.MaxValue;
+            long minValue = long.MinValue;
+
+            // TODO: some convert instructions aren't being emitted, we should find other ways of getting them emitted
+
+            // Test Conv_I1
+            Assert.IsTrue((sbyte)maxValue == -0x01, "Conv_I1 for Int64 doesn't work");
+            Assert.IsTrue((sbyte)minValue == 0x00, "Conv_I1 for Int64 doesn't work");
+
+            // Test Conv_U1
+            Assert.IsTrue((byte)maxValue == 0xFF, "Conv_U1 for Int64 doesn't work");
+            Assert.IsTrue((byte)minValue == 0x00, "Conv_U1 for Int64 doesn't work");
+
+            // Test Conv_I2
+            Assert.IsTrue((short)maxValue == -0x0001, "Conv_I2 for Int64 doesn't work");
+            Assert.IsTrue((short)minValue == 0x0000, "Conv_I2 for Int64 doesn't work");
+
+            // Test Conv_U2
+            Assert.IsTrue((ushort)maxValue == 0xFFFF, "Conv_U2 for Int64 doesn't work");
+            Assert.IsTrue((ushort)minValue == 0x0000, "Conv_U2 for Int64 doesn't work");
+
+            // Test Conv_I4
+            Assert.IsTrue((int)maxValue == -0x00000001, "Conv_I4 for Int64 doesn't work");
+            Assert.IsTrue((int)minValue == 0x00000000, "Conv_I4 for Int64 doesn't work");
+
+            // Test Conv_U4
+            Assert.IsTrue((uint)maxValue == 0xFFFFFFFF, "Conv_U4 for Int64 doesn't work");
+            Assert.IsTrue((uint)minValue == 0x00000000, "Conv_U4 for Int64 doesn't work");
+
+            // Test Conv_I8
+            Assert.IsTrue((long)maxValue == 0x7FFFFFFFFFFFFFFF, "Conv_I8 for Int64 doesn't work");
+            Assert.IsTrue((long)minValue == -0x8000000000000000, "Conv_I8 for Int64 doesn't work");
+
+            // Test Conv_U8
+            Assert.IsTrue((ulong)maxValue == 0x7FFFFFFFFFFFFFFF, "Conv_U8 for Int64 doesn't work");
+            Assert.IsTrue((ulong)minValue == 0x8000000000000000, "Conv_U8 for Int64 doesn't work");
         }
     }
 }

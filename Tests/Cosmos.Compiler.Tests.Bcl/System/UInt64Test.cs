@@ -12,11 +12,11 @@ namespace Cosmos.Compiler.Tests.Bcl.System
     {
         public static void Execute()
         {
-            UInt64 value;
-            String result;
-            String expectedResult;
+            ulong value;
+            string result;
+            string expectedResult;
 
-            value = UInt64.MaxValue;
+            value = ulong.MaxValue;
 
             result = value.ToString();
             expectedResult = "18446744073709551615";
@@ -42,7 +42,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((resultAsInt == expectedResultAsInt), "UInt64.GetHashCode() doesn't work");
 
             // Let's try to convert an ULong in a Long
-            UInt64 val2 = 42;
+            ulong val2 = 42;
             Int64 val2AsLong = (long)val2;
 
             Assert.IsTrue((val2AsLong == 42), "UInt64 to Int64 conversion does not work");
@@ -102,6 +102,45 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             var xTest = TestMethod(0);
             Assert.IsTrue(xTest.Length == 0, "UInt64 test failed.");
 #endif
+
+            // Now test conversions
+
+            ulong maxValue = ulong.MaxValue;
+            ulong minValue = ulong.MinValue;
+
+            // TODO: some convert instructions aren't being emitted, we should find other ways of getting them emitted
+
+            // Test Conv_I1
+            Assert.IsTrue((sbyte)maxValue == -0x01, "Conv_I1 for UInt64 doesn't work");
+            Assert.IsTrue((sbyte)minValue == 0x00, "Conv_I1 for UInt64 doesn't work");
+
+            // Test Conv_U1
+            Assert.IsTrue((byte)maxValue == 0xFF, "Conv_U1 for UInt64 doesn't work");
+            Assert.IsTrue((byte)minValue == 0x00, "Conv_U1 for UInt64 doesn't work");
+
+            // Test Conv_I2
+            Assert.IsTrue((short)maxValue == -0x0001, "Conv_I2 for UInt64 doesn't work");
+            Assert.IsTrue((short)minValue == 0x0000, "Conv_I2 for UInt64 doesn't work");
+
+            // Test Conv_U2
+            Assert.IsTrue((ushort)maxValue == 0xFFFF, "Conv_U2 for UInt64 doesn't work");
+            Assert.IsTrue((ushort)minValue == 0x0000, "Conv_U2 for UInt64 doesn't work");
+
+            // Test Conv_I4
+            Assert.IsTrue((int)maxValue == -0x00000001, "Conv_I4 for UInt64 doesn't work");
+            Assert.IsTrue((int)minValue == 0x00000000, "Conv_I4 for UInt64 doesn't work");
+
+            // Test Conv_U4
+            Assert.IsTrue((uint)maxValue == 0xFFFFFFFF, "Conv_U4 for UInt64 doesn't work");
+            Assert.IsTrue((uint)minValue == 0x00000000, "Conv_U4 for UInt64 doesn't work");
+
+            // Test Conv_I8
+            Assert.IsTrue((long)maxValue == -0x0000000000000001, "Conv_I8 for UInt64 doesn't work");
+            Assert.IsTrue((long)minValue == 0x0000000000000000, "Conv_I8 for UInt64 doesn't work");
+
+            // Test Conv_U8
+            Assert.IsTrue((ulong)maxValue == 0xFFFFFFFFFFFFFFFF, "Conv_U8 for UInt64 doesn't work");
+            Assert.IsTrue((ulong)minValue == 0x0000000000000000, "Conv_U8 for UInt64 doesn't work");
         }
 
         public static ulong[] TestMethod(ulong aParam1, uint aParam2 = 0)
