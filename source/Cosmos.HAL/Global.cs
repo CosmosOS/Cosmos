@@ -138,7 +138,7 @@ namespace Cosmos.HAL
 
     public static void StartACPI()
     {
-      Console.WriteLine("Start ACPI");
+      Console.WriteLine("Starting ACPI");
       Core.ACPI.Start();
     }
 
