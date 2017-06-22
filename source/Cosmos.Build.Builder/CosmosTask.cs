@@ -8,14 +8,12 @@ using Microsoft.Win32;
 
 using Cosmos.Build.Installer;
 
-namespace Cosmos.Build.Builder
-{
+namespace Cosmos.Build.Builder {
   /// <summary>
   /// Cosmos task.
   /// </summary>
   /// <seealso cref="Cosmos.Build.Installer.Task" />
-  public class CosmosTask : Task
-  {
+  public class CosmosTask : Task {
     private string mCosmosDir;
     private string mOutputDir;
     private BuildState mBuildState;
@@ -25,8 +23,7 @@ namespace Cosmos.Build.Builder
     private string mInnoPath;
     private List<string> mExceptionList = new List<string>();
 
-    public CosmosTask(string aCosmosDir, int aReleaseNo)
-    {
+    public CosmosTask(string aCosmosDir, int aReleaseNo) {
       mCosmosDir = aCosmosDir;
       mAppDataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cosmos User Kit");
       mReleaseNo = aReleaseNo;
@@ -38,22 +35,18 @@ namespace Cosmos.Build.Builder
     /// </summary>
     /// <param name="releaseNumber">Release number for the current setup.</param>
     /// <returns>Name of the setup file.</returns>
-    public static string GetSetupName(int releaseNumber)
-    {
+    public static string GetSetupName(int releaseNumber) {
       string setupName = $"CosmosUserKit-{releaseNumber}-vs2017";
 
-      if (App.UseVsHive)
-      {
+      if (App.UseVsHive) {
         setupName += "Exp";
       }
 
       return setupName;
     }
 
-    private void CleanupVSIPFolder()
-    {
-      if (Directory.Exists(mOutputDir))
-      {
+    private void CleanupVSIPFolder() {
+      if (Directory.Exists(mOutputDir)) {
         Section("Cleaning up VSIP directory");
 
         Echo($"  {mOutputDir}");
@@ -61,10 +54,8 @@ namespace Cosmos.Build.Builder
       }
     }
 
-    public void CleanupAlreadyInstalled()
-    {
-      if (Directory.Exists(mAppDataDir))
-      {
+    public void CleanupAlreadyInstalled() {
+      if (Directory.Exists(mAppDataDir)) {
         Section("Cleaning up UserKit directory");
 
         Echo("  " + mAppDataDir);
@@ -72,25 +63,21 @@ namespace Cosmos.Build.Builder
       }
     }
 
-    protected override List<string> DoRun()
-    {
+    protected override List<string> DoRun() {
       mOutputDir = Path.Combine(mCosmosDir, @"Build\VSIP");
 
       CheckPrereqs();
 
-      if (mBuildState != BuildState.PrerequisiteMissing)
-      {
+      if (mBuildState != BuildState.PrerequisiteMissing) {
         CleanupVSIPFolder();
         CompileCosmos();
         CreateSetup();
 
-        if (!App.IsUserKit)
-        {
+        if (!App.IsUserKit) {
           CleanupAlreadyInstalled();
           RunSetup();
           WriteDevKit();
-          if (!App.DoNotLaunchVS)
-          {
+          if (!App.DoNotLaunchVS) {
             LaunchVS();
           }
         }
@@ -101,8 +88,7 @@ namespace Cosmos.Build.Builder
       return mExceptionList;
     }
 
-    protected void MSBuild(string aSlnFile, string aBuildCfg)
-    {
+    protected void MSBuild(string aSlnFile, string aBuildCfg) {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
       string xParams = $"{Quoted(aSlnFile)} " +
                        "/nologo " +
@@ -112,71 +98,57 @@ namespace Cosmos.Build.Builder
                        $"/p:Platform={Quoted("Any CPU")} " +
                        $"/p:OutputPath={Quoted(mOutputDir)}";
 
-      if (!App.NoMSBuildClean)
-      {
+      if (!App.NoMSBuildClean) {
         StartConsole(xMSBuild, $"/t:Clean {xParams}");
       }
       StartConsole(xMSBuild, $"/t:Build {xParams}");
     }
 
-    protected int NumProcessesContainingName(string name)
-    {
+    protected int NumProcessesContainingName(string name) {
       return (from x in Process.GetProcesses() where x.ProcessName.Contains(name) select x).Count();
     }
 
-    protected void CheckIfBuilderRunning()
-    {
+    protected void CheckIfBuilderRunning() {
       //Check for builder process
       Echo("Checking if Builder is already running.");
       // Check > 1 so we exclude ourself.
-      if (NumProcessesContainingName("Cosmos.Build.Builder") > 1)
-      {
+      if (NumProcessesContainingName("Cosmos.Build.Builder") > 1) {
         throw new Exception("Another instance of builder is running.");
       }
     }
 
-    protected void CheckIfUserKitRunning()
-    {
+    protected void CheckIfUserKitRunning() {
       Echo("Check if User Kit Installer is already running.");
-      if (NumProcessesContainingName("CosmosUserKit") > 0)
-      {
+      if (NumProcessesContainingName("CosmosUserKit") > 0) {
         throw new Exception("Another instance of the user kit installer is running.");
       }
     }
 
-    protected void CheckIfVSRunning()
-    {
+    protected void CheckIfVSRunning() {
       int xSeconds = 500;
 
-      if (Debugger.IsAttached)
-      {
+      if (Debugger.IsAttached) {
         Echo("Checking if Visual Studio is running is ignored by debugging of Builder.");
-      }
-      else
-      {
+      } else {
         Echo("Checking if Visual Studio is running.");
-        if (IsRunning("devenv"))
-        {
+        if (IsRunning("devenv")) {
           Echo("--Visual Studio is running.");
           Echo("--Waiting " + xSeconds + " seconds to see if Visual Studio exits.");
           // VS doesnt exit right away and user can try devkit again after VS window has closed but is still running.
           // So we wait a few seconds first.
-          if (WaitForExit("devenv", xSeconds * 1000))
-          {
+          if (WaitForExit("devenv", xSeconds * 1000)) {
             throw new Exception("Visual Studio is running. Please close it or kill it in task manager.");
           }
         }
       }
     }
 
-    protected void NotFound(string aName)
-    {
+    protected void NotFound(string aName) {
       mExceptionList.Add("Prerequisite '" + aName + "' not found.");
       mBuildState = BuildState.PrerequisiteMissing;
     }
 
-    protected void CheckPrereqs()
-    {
+    protected void CheckPrereqs() {
       Section("Checking Prerequisites");
 
       CheckIfUserKitRunning();
@@ -188,20 +160,16 @@ namespace Cosmos.Build.Builder
       CheckForInno();
     }
 
-    private void CheckForInno()
-    {
+    private void CheckForInno() {
       Echo("Checking for Inno Setup");
-      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1", false))
-      {
-        if (xKey == null)
-        {
+      using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1", false)) {
+        if (xKey == null) {
           mExceptionList.Add("Cannot find Inno Setup.");
           mBuildState = BuildState.PrerequisiteMissing;
           return;
         }
-        mInnoPath = (string) xKey.GetValue("InstallLocation");
-        if (string.IsNullOrWhiteSpace(mInnoPath))
-        {
+        mInnoPath = (string)xKey.GetValue("InstallLocation");
+        if (string.IsNullOrWhiteSpace(mInnoPath)) {
           mExceptionList.Add("Cannot find Inno Setup.");
           mBuildState = BuildState.PrerequisiteMissing;
           return;
@@ -209,38 +177,32 @@ namespace Cosmos.Build.Builder
       }
 
       Echo("Checking for Inno Preprocessor");
-      if (!File.Exists(Path.Combine(mInnoPath, "ISPP.dll")))
-      {
+      if (!File.Exists(Path.Combine(mInnoPath, "ISPP.dll"))) {
         mExceptionList.Add("Inno Preprocessor not detected.");
         mBuildState = BuildState.PrerequisiteMissing;
         return;
       }
     }
 
-    private void CheckForNetCore()
-    {
+    private void CheckForNetCore() {
       Echo("Checking for .NET Core");
 
-      if (!Paths.VSInstancePackages.Contains("Microsoft.VisualStudio.Workload.NetCoreTools"))
-      {
+      if (!Paths.VSInstancePackages.Contains("Microsoft.VisualStudio.Workload.NetCoreTools")) {
         mExceptionList.Add(".NET Core not detected.");
         mBuildState = BuildState.PrerequisiteMissing;
       }
     }
 
-    private void CheckForVisualStudioExtensionTools()
-    {
+    private void CheckForVisualStudioExtensionTools() {
       Echo("Checking for Visual Studio Extension Tools");
 
-      if (!Paths.VSInstancePackages.Contains("Microsoft.VisualStudio.Workload.VisualStudioExtension"))
-      {
+      if (!Paths.VSInstancePackages.Contains("Microsoft.VisualStudio.Workload.VisualStudioExtension")) {
         mExceptionList.Add("Visual Studio Extension tools not detected.");
         mBuildState = BuildState.PrerequisiteMissing;
       }
     }
 
-    private void WriteDevKit()
-    {
+    private void WriteDevKit() {
       Section("Writing Dev Kit to Registry");
 
       // Inno deletes this from registry, so we must add this after.
@@ -249,14 +211,12 @@ namespace Cosmos.Build.Builder
       // HKCU instead of HKLM because builder does not run as admin.
       //
       // HKCU is not redirected.
-      using (var xKey = Registry.CurrentUser.CreateSubKey(@"Software\Cosmos"))
-      {
+      using (var xKey = Registry.CurrentUser.CreateSubKey(@"Software\Cosmos")) {
         xKey.SetValue("DevKit", mCosmosDir);
       }
     }
 
-    private void Restore(string project)
-    {
+    private void Restore(string project) {
       string xNuget = Path.Combine(mCosmosDir, "Build", "Tools", "nuget.exe");
       string xRestoreParams = $"restore {Quoted(project)}";
       string xUpdateParams = $"update -self";
@@ -264,33 +224,28 @@ namespace Cosmos.Build.Builder
       StartConsole(xNuget, xRestoreParams);
     }
 
-    private void Pack(string project, string destDir, string version)
-    {
+    private void Pack(string project, string destDir, string version) {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
       string xParams = $"{Quoted(project)} /nodeReuse:False /t:Restore;Pack /maxcpucount /p:PackageVersion={Quoted(version)} /p:PackageOutputPath={Quoted(destDir)}";
       StartConsole(xMSBuild, xParams);
     }
 
-    private void Publish(string project, string destDir)
-    {
+    private void Publish(string project, string destDir) {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
       string xParams = $"{Quoted(project)} /nodeReuse:False /t:Publish /maxcpucount /p:RuntimeIdentifier=win7-x86 /p:PublishDir={Quoted(destDir)}";
       StartConsole(xMSBuild, xParams);
     }
 
-    private void CompileCosmos()
-    {
+    private void CompileCosmos() {
       string xVSIPDir = Path.Combine(mCosmosDir, "Build", "VSIP");
       string xPackagesDir = Path.Combine(xVSIPDir, "KernelPackages");
       string xVersion = "1.0.1";
 
-      if (!App.IsUserKit)
-      {
-          xVersion += "-" + DateTime.Now.ToString("yyyyMMddHHmm");
+      if (!App.IsUserKit) {
+        xVersion += "-" + DateTime.Now.ToString("yyyyMMddHHmm");
       }
-      
-      if (!Directory.Exists(xVSIPDir))
-      {
+
+      if (!Directory.Exists(xVSIPDir)) {
         Directory.CreateDirectory(xVSIPDir);
       }
 
@@ -321,8 +276,7 @@ namespace Cosmos.Build.Builder
       Pack(Path.Combine(mCosmosDir, "source", "Cosmos.System.Plugs"), xPackagesDir, xVersion);
     }
 
-    private void CopyTemplates()
-    {
+    private void CopyTemplates() {
       Section("Copying Templates");
 
       CD(mOutputDir);
@@ -336,13 +290,11 @@ namespace Cosmos.Build.Builder
       Copy(mCosmosDir + @"source\XSharp.VS\Template\XSharpFileItem.zip", true);
     }
 
-    private void CreateSetup()
-    {
+    private void CreateSetup() {
       Section("Creating Setup");
 
       string xISCC = Path.Combine(mInnoPath, "ISCC.exe");
-      if (!File.Exists(xISCC))
-      {
+      if (!File.Exists(xISCC)) {
         mExceptionList.Add("Cannot find Inno setup.");
         return;
       }
@@ -351,27 +303,23 @@ namespace Cosmos.Build.Builder
       string vsVersionConfiguration = "vs2017";
 
       // Use configuration which will instal to the VS Exp Hive
-      if (App.UseVsHive)
-      {
+      if (App.UseVsHive) {
         vsVersionConfiguration += "Exp";
       }
       Echo($"  {xISCC} /Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
       StartConsole(xISCC, $"/Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
     }
 
-    private void LaunchVS()
-    {
+    private void LaunchVS() {
       Section("Launching Visual Studio");
 
       string xVisualStudio = Path.Combine(Paths.VSPath, "Common7", "IDE", "devenv.exe");
-      if (!File.Exists(xVisualStudio))
-      {
+      if (!File.Exists(xVisualStudio)) {
         mExceptionList.Add("Cannot find Visual Studio.");
         return;
       }
 
-      if (App.ResetHive)
-      {
+      if (App.ResetHive) {
         Echo("Resetting hive");
         Start(xVisualStudio, @"/setup /rootsuffix Exp /ranu");
       }
@@ -380,8 +328,7 @@ namespace Cosmos.Build.Builder
       Start(xVisualStudio, Quoted(mCosmosDir + @"Cosmos.sln"), false, true);
     }
 
-    private void RunSetup()
-    {
+    private void RunSetup() {
       Section("Running Setup");
 
       KillProcesses("dotnet");
@@ -389,8 +336,7 @@ namespace Cosmos.Build.Builder
 
       string setupName = GetSetupName(mReleaseNo);
 
-      if (App.UseTask)
-      {
+      if (App.UseTask) {
         // This is a hack to avoid the UAC dialog on every run which can be very disturbing if you run
         // the dev kit a lot.
         Start(@"schtasks.exe", @"/run /tn " + Quoted("CosmosSetup"), true, false);
@@ -401,8 +347,7 @@ namespace Cosmos.Build.Builder
         int xSeconds = 10;
         var xTimed = DateTime.Now;
         Echo("Waiting " + xSeconds + " seconds for Setup to start.");
-        if (WaitForStart(setupName, xSeconds * 1000))
-        {
+        if (WaitForStart(setupName, xSeconds * 1000)) {
           mExceptionList.Add("Setup did not start.");
           return;
         }
@@ -411,15 +356,12 @@ namespace Cosmos.Build.Builder
         // Scheduler starts it an exits, but we need to wait for the setup itself to exit before proceding
         Echo("Waiting for Setup to complete.");
         WaitForExit(setupName);
-      }
-      else
-      {
+      } else {
         Start(mCosmosDir + @"Setup\Output\" + setupName + ".exe", @"/SILENT");
       }
     }
 
-    private void Done()
-    {
+    private void Done() {
       Section("Build Complete!");
     }
   }

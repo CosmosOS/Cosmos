@@ -172,8 +172,9 @@ namespace Cosmos.Build.Builder
           }
         }
       }
-      if (mPreventAutoClose)
+      if (mPreventAutoClose) {
         return true;
+      }
 
       var xTask = new CosmosTask(mCosmosDir, mReleaseNo);
       xTask.Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
