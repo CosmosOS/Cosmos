@@ -82,8 +82,6 @@ namespace Cosmos.Build.Builder {
       return mExceptionList;
     }
 
-    create bin cache if not exist
-
     protected void MSBuild(string aSlnFile, string aBuildCfg) {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
       string xParams = $"{Quoted(aSlnFile)} " +
