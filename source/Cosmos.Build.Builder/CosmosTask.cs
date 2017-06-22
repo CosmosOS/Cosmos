@@ -45,21 +45,12 @@ namespace Cosmos.Build.Builder {
       return setupName;
     }
 
-    private void CleanupVSIPFolder() {
+    private void CleanDirectory(string aName, string aPath) {
       if (Directory.Exists(mOutputDir)) {
-        Section("Cleaning up VSIP directory");
+        Section("Cleaning up " + aName + " directory");
 
-        Echo($"  {mOutputDir}");
-        Directory.Delete(mOutputDir, true);
-      }
-    }
-
-    public void CleanupAlreadyInstalled() {
-      if (Directory.Exists(mAppDataDir)) {
-        Section("Cleaning up UserKit directory");
-
-        Echo("  " + mAppDataDir);
-        Directory.Delete(mAppDataDir, true);
+        Echo("  " + aPath);
+        Directory.Delete(aPath, true);
       }
     }
 
@@ -69,12 +60,12 @@ namespace Cosmos.Build.Builder {
       CheckPrereqs();
 
       if (mBuildState != BuildState.PrerequisiteMissing) {
-        CleanupVSIPFolder();
+        CleanDirectory("VSIP", mOutputDir);
         CompileCosmos();
         CreateSetup();
 
         if (!App.IsUserKit) {
-          CleanupAlreadyInstalled();
+          CleanDirectory("User Kit", mAppDataDir);
           RunSetup();
           WriteDevKit();
           if (!App.DoNotLaunchVS) {
