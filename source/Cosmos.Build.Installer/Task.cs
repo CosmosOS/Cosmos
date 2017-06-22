@@ -139,12 +139,5 @@ namespace Cosmos.Build.Installer {
       return "\"" + aValue + "\"";
     }
 
-    public void Echo() {
-      Echo("");
-    }
-
-    public void Echo(string aText) {
-      Log.WriteLine(aText);
-    }
   }
 }

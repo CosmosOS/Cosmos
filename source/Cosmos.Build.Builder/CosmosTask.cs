@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-
 using Microsoft.Win32;
-
 using Cosmos.Build.Installer;
 
 namespace Cosmos.Build.Builder {
@@ -52,10 +50,12 @@ namespace Cosmos.Build.Builder {
     private void CleanDirectory(string aName, string aPath) {
       if (Directory.Exists(aPath)) {
         Section("Cleaning up " + aName + " directory");
-
-        Echo("  " + aPath);
         Directory.Delete(aPath, true);
+      } else {
+        Section("Creating " + aName + " directory");
+        Directory.CreateDirectory(aPath);
       }
+      Log.WriteLine("  " + aPath);
     }
 
     protected override List<string> DoRun() {
@@ -104,7 +104,7 @@ namespace Cosmos.Build.Builder {
 
     protected void CheckIfBuilderRunning() {
       //Check for builder process
-      Echo("Checking if Builder is already running.");
+      Log.WriteLine("Checking if Builder is already running.");
       // Check > 1 so we exclude ourself.
       if (NumProcessesContainingName("Cosmos.Build.Builder") > 1) {
         throw new Exception("Another instance of builder is running.");
@@ -112,7 +112,7 @@ namespace Cosmos.Build.Builder {
     }
 
     protected void CheckIfUserKitRunning() {
-      Echo("Check if User Kit Installer is already running.");
+      Log.WriteLine("Check if User Kit Installer is already running.");
       if (NumProcessesContainingName("CosmosUserKit") > 0) {
         throw new Exception("Another instance of the user kit installer is running.");
       }
@@ -122,12 +122,12 @@ namespace Cosmos.Build.Builder {
       int xSeconds = 500;
 
       if (Debugger.IsAttached) {
-        Echo("Checking if Visual Studio is running is ignored by debugging of Builder.");
+        Log.WriteLine("Checking if Visual Studio is running is ignored by debugging of Builder.");
       } else {
-        Echo("Checking if Visual Studio is running.");
+        Log.WriteLine("Checking if Visual Studio is running.");
         if (IsRunning("devenv")) {
-          Echo("--Visual Studio is running.");
-          Echo("--Waiting " + xSeconds + " seconds to see if Visual Studio exits.");
+          Log.WriteLine("--Visual Studio is running.");
+          Log.WriteLine("--Waiting " + xSeconds + " seconds to see if Visual Studio exits.");
           // VS doesnt exit right away and user can try devkit again after VS window has closed but is still running.
           // So we wait a few seconds first.
           if (WaitForExit("devenv", xSeconds * 1000)) {
@@ -157,7 +157,7 @@ namespace Cosmos.Build.Builder {
     }
 
     private void CheckForInno() {
-      Echo("Checking for Inno Setup");
+      Log.WriteLine("Checking for Inno Setup");
       using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1", false)) {
         if (xKey == null) {
           mExceptionList.Add("Cannot find Inno Setup.");
@@ -172,7 +172,7 @@ namespace Cosmos.Build.Builder {
         }
       }
 
-      Echo("Checking for Inno Preprocessor");
+      Log.WriteLine("Checking for Inno Preprocessor");
       if (!File.Exists(Path.Combine(mInnoPath, "ISPP.dll"))) {
         mExceptionList.Add("Inno Preprocessor not detected.");
         mBuildState = BuildState.PrerequisiteMissing;
@@ -181,7 +181,7 @@ namespace Cosmos.Build.Builder {
     }
 
     private void CheckForNetCore() {
-      Echo("Checking for .NET Core");
+      Log.WriteLine("Checking for .NET Core");
 
       if (!Paths.VSInstancePackages.Contains("Microsoft.VisualStudio.Workload.NetCoreTools")) {
         mExceptionList.Add(".NET Core not detected.");
@@ -190,7 +190,7 @@ namespace Cosmos.Build.Builder {
     }
 
     private void CheckForVisualStudioExtensionTools() {
-      Echo("Checking for Visual Studio Extension Tools");
+      Log.WriteLine("Checking for Visual Studio Extension Tools");
 
       if (!Paths.VSInstancePackages.Contains("Microsoft.VisualStudio.Workload.VisualStudioExtension")) {
         mExceptionList.Add("Visual Studio Extension tools not detected.");
@@ -307,7 +307,7 @@ namespace Cosmos.Build.Builder {
       if (App.UseVsHive) {
         vsVersionConfiguration += "Exp";
       }
-      Echo($"  {xISCC} /Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
+      Log.WriteLine($"  {xISCC} /Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
       StartConsole(xISCC, $"/Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
     }
 
@@ -321,11 +321,11 @@ namespace Cosmos.Build.Builder {
       }
 
       if (App.ResetHive) {
-        Echo("Resetting hive");
+        Log.WriteLine("Resetting hive");
         Start(xVisualStudio, @"/setup /rootsuffix Exp /ranu");
       }
 
-      Echo("Launching Visual Studio");
+      Log.WriteLine("Launching Visual Studio");
       Start(xVisualStudio, Quoted(mCosmosPath + @"Cosmos.sln"), false, true);
     }
 
@@ -348,15 +348,15 @@ namespace Cosmos.Build.Builder {
         // Some slow user PCs take around 5 seconds to start up the task...
         int xSeconds = 10;
         var xTimed = DateTime.Now;
-        Echo("Waiting " + xSeconds + " seconds for Setup to start.");
+        Log.WriteLine("Waiting " + xSeconds + " seconds for Setup to start.");
         if (WaitForStart(setupName, xSeconds * 1000)) {
           mExceptionList.Add("Setup did not start.");
           return;
         }
-        Echo("Setup is running. " + DateTime.Now.Subtract(xTimed).ToString(@"ss\.fff"));
+        Log.WriteLine("Setup is running. " + DateTime.Now.Subtract(xTimed).ToString(@"ss\.fff"));
 
         // Scheduler starts it and exits, but we need to wait for the setup itself to exit before proceding
-        Echo("Waiting for Setup to complete.");
+        Log.WriteLine("Waiting for Setup to complete.");
         WaitForExit(setupName);
       } else {
         Start(mCosmosPath + @"Setup\Output\" + setupName + ".exe", @"/SILENT");
