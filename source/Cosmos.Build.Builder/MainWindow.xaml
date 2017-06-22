@@ -7,10 +7,10 @@
       <Button Name="butnCopy" Click="butnCopy_Click">Copy</Button>
     </WrapPanel>
     <Rectangle Height="5" DockPanel.Dock="Top"/>
-    <TextBlock Text="Current Task Tail" DockPanel.Dock="Top" Foreground="White" Background="Gray"/>
+    <TextBlock Text="Current Task Tail" DockPanel.Dock="Top" Background="LightGray" FontSize="18" Foreground="Green" FontWeight="ExtraBold"/>
     <StackPanel Name="spnlTail" DockPanel.Dock="Top">
     </StackPanel>
-    <Rectangle Height="5" DockPanel.Dock="Top" Fill="Gray"/>
+    <Rectangle Height="5" DockPanel.Dock="Top" Fill="LightGray"/>
     <ScrollViewer HorizontalScrollBarVisibility="Visible">
       <StackPanel Name="spnlLog" />
     </ScrollViewer>
