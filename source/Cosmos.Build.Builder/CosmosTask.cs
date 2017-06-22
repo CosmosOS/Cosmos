@@ -18,6 +18,7 @@ namespace Cosmos.Build.Builder {
     private string mBinCachePath; // Build/bin
     private string mVsipPath; // Build/VSIP
     private string mAppDataPath; // User Kit in AppData
+    private string mSourcePath; // Cosmos source rood
     private string mInnoPath;
     private string mInnoFile;
 
@@ -27,6 +28,7 @@ namespace Cosmos.Build.Builder {
 
     public CosmosTask(string aCosmosDir, int aReleaseNo) {
       mCosmosPath = aCosmosDir;
+      mSourcePath = Path.Combine(mCosmosPath, "source");
       mAppDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cosmos User Kit");
       mReleaseNo = aReleaseNo;
       mInnoFile = Path.Combine(mCosmosPath, @"Setup\Cosmos.iss");
@@ -234,7 +236,6 @@ namespace Cosmos.Build.Builder {
       string xVSIPDir = Path.Combine(mCosmosPath, "Build", "VSIP");
       string xPackagesDir = Path.Combine(xVSIPDir, "KernelPackages");
       string xVersion = "1.0.1";
-      string xSourcePath = Path.Combine(mCosmosPath, "source");
 
       if (!App.IsUserKit) {
         xVersion += "-" + DateTime.Now.ToString("yyyyMMddHHmm");
@@ -250,24 +251,24 @@ namespace Cosmos.Build.Builder {
       MSBuild(Path.Combine(mCosmosPath, @"Build.sln"), "Debug");
 
       Section("Compiling Tools");
-      Publish(Path.Combine(xSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVSIPDir, "MSBuild"));
-      Publish(Path.Combine(xSourcePath, "IL2CPU"), Path.Combine(xVSIPDir, "IL2CPU"));
-      Publish(Path.Combine(xSourcePath, "XSharp.Compiler"), Path.Combine(xVSIPDir, "XSharp"));
+      Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVSIPDir, "MSBuild"));
+      Publish(Path.Combine(mSourcePath, "IL2CPU"), Path.Combine(xVSIPDir, "IL2CPU"));
+      Publish(Path.Combine(mSourcePath, "XSharp.Compiler"), Path.Combine(xVSIPDir, "XSharp"));
       Publish(Path.Combine(mCosmosPath, "Tools", "NASM"), Path.Combine(xVSIPDir, "NASM"));
 
       Section("Compiling Kernel Packages");
-      Pack(Path.Combine(xSourcePath, "Cosmos.Common"), xPackagesDir, xVersion);
-      Pack(Path.Combine(xSourcePath, "Cosmos.Core"), xPackagesDir, xVersion);
-      Pack(Path.Combine(xSourcePath, "Cosmos.Core.Common"), xPackagesDir, xVersion);
-      Pack(Path.Combine(xSourcePath, "Cosmos.Core.Memory"), xPackagesDir, xVersion);
-      Pack(Path.Combine(xSourcePath, "Cosmos.Core.Plugs"), xPackagesDir, xVersion);
-      Pack(Path.Combine(xSourcePath, "Cosmos.Core.Plugs.Asm"), xPackagesDir, xVersion);
-      Pack(Path.Combine(xSourcePath, "Cosmos.Debug.Kernel"), xPackagesDir, xVersion);
-      Pack(Path.Combine(xSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xPackagesDir, xVersion);
-      Pack(Path.Combine(xSourcePath, "Cosmos.HAL"), xPackagesDir, xVersion);
-      Pack(Path.Combine(xSourcePath, "Cosmos.IL2CPU.Plugs"), xPackagesDir, xVersion);
-      Pack(Path.Combine(xSourcePath, "Cosmos.System"), xPackagesDir, xVersion);
-      Pack(Path.Combine(xSourcePath, "Cosmos.System.Plugs"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Common"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core.Common"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core.Memory"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core.Plugs"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core.Plugs.Asm"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.HAL"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.IL2CPU.Plugs"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.System"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.System.Plugs"), xPackagesDir, xVersion);
 
       Section("Populating bin cache");
       SetCopyPaths(mVsipPath, mBinCachePath);
@@ -278,14 +279,14 @@ namespace Cosmos.Build.Builder {
     private void CopyTemplates() {
       Section("Copying Templates");
 
-      SetCopyPaths(Path.Combine(mCosmosPath, @"source\Cosmos.VS.Package\obj\Debug"), mVsipPath);
+      SetCopyPaths(Path.Combine(mSourcePath, @"Cosmos.VS.Package\obj\Debug"), mVsipPath);
       Copy("CosmosProject (C#).zip");
       Copy("CosmosKernel (C#).zip");
       Copy("CosmosProject (F#).zip");
       Copy("Cosmos.zip");
       Copy("CosmosProject (VB).zip");
       Copy("CosmosKernel (VB).zip");
-      Copy(mCosmosPath + @"source\XSharp.VS\Template\XSharpFileItem.zip");
+      Copy(mSourcePath + @"XSharp.VS\Template\XSharpFileItem.zip");
     }
 
     private void CreateSetup() {
@@ -329,6 +330,7 @@ namespace Cosmos.Build.Builder {
     private void RunSetup() {
       Section("Running Setup");
 
+      // These cache in RAM which cause problems, so we kill them if present.
       KillProcesses("dotnet");
       KillProcesses("msbuild");
 
@@ -351,7 +353,7 @@ namespace Cosmos.Build.Builder {
         }
         Echo("Setup is running. " + DateTime.Now.Subtract(xTimed).ToString(@"ss\.fff"));
 
-        // Scheduler starts it an exits, but we need to wait for the setup itself to exit before proceding
+        // Scheduler starts it and exits, but we need to wait for the setup itself to exit before proceding
         Echo("Waiting for Setup to complete.");
         WaitForExit(setupName);
       } else {

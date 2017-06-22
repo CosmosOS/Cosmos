@@ -31,6 +31,8 @@ namespace Cosmos.Build.Builder {
 
       for (int i = 0; i < mTailLineCount; i++) {
         var xTextBlock = new TextBlock();
+        xTextBlock.Background = Brushes.Black;
+        xTextBlock.Foreground = Brushes.Green;
         xTextBlock.FontSize = 16;
         mTailLines.Add(xTextBlock);
         spnlTail.Children.Add(xTextBlock);

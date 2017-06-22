@@ -22,8 +22,10 @@ namespace Cosmos.Build.Installer {
       }
 
       if (exceptions.Any()) {
-        Log.SetError();
+        Log.SetError(); // Existing section
+
         Log.NewSection("Error");
+        Log.SetError();
         //Collect all the exceptions from the build stage, and list them
         foreach (var msg in exceptions) {
           Log.WriteLine(msg);
