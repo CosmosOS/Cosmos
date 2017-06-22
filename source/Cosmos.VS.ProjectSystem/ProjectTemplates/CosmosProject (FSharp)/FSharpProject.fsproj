@@ -10,8 +10,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Cosmos.Debug.Kernel" Version="1.0.0-*" />
-    <PackageReference Include="Cosmos.System" Version="1.0.0-*" />
+    <PackageReference Include="Cosmos.Debug.Kernel" Version="1.0.*" />
+    <PackageReference Include="Cosmos.System" Version="1.0.*" />
   </ItemGroup>
 
 </Project>
