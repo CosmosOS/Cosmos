@@ -271,22 +271,24 @@ namespace Cosmos.Build.Builder {
       Pack(Path.Combine(mSourcePath, "Cosmos.System.Plugs"), xPackagesDir, xVersion);
 
       Section("Populating bin cache");
-      SetCopyPaths(mVsipPath, mBinCachePath);
-      Copy("Cosmos.Debug.Kernel.dll");
-      Copy("Cosmos.TestRunner.TestController.dll");
+      using (var x = new FileMgr(mVsipPath, mBinCachePath)) {
+        x.Copy("Cosmos.Debug.Kernel.dll");
+        x.Copy("Cosmos.TestRunner.TestController.dll");
+      }
     }
 
     private void CopyTemplates() {
       Section("Copying Templates");
 
-      SetCopyPaths(Path.Combine(mSourcePath, @"Cosmos.VS.Package\obj\Debug"), mVsipPath);
-      Copy("CosmosProject (C#).zip");
-      Copy("CosmosKernel (C#).zip");
-      Copy("CosmosProject (F#).zip");
-      Copy("Cosmos.zip");
-      Copy("CosmosProject (VB).zip");
-      Copy("CosmosKernel (VB).zip");
-      Copy(mSourcePath + @"XSharp.VS\Template\XSharpFileItem.zip");
+      using (var x = new FileMgr(Path.Combine(mSourcePath, @"Cosmos.VS.Package\obj\Debug"), mVsipPath)) {
+        x.Copy("CosmosProject (C#).zip");
+        x.Copy("CosmosKernel (C#).zip");
+        x.Copy("CosmosProject (F#).zip");
+        x.Copy("Cosmos.zip");
+        x.Copy("CosmosProject (VB).zip");
+        x.Copy("CosmosKernel (VB).zip");
+        x.Copy(mSourcePath + @"XSharp.VS\Template\XSharpFileItem.zip");
+      }
     }
 
     private void CreateSetup() {

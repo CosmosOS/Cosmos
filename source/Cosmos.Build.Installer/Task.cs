@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
+using Cosmos.Build.Installer;
 
 namespace Cosmos.Build.Installer {
   public abstract class Task {
@@ -117,9 +118,6 @@ namespace Cosmos.Build.Installer {
       }
     }
 
-    private Log mLog = new Log();
-    public Log Log { get { return mLog; } }
-
     public void Section(string aText) {
       Log.NewSection(aText);
     }
@@ -141,48 +139,12 @@ namespace Cosmos.Build.Installer {
       return "\"" + aValue + "\"";
     }
 
-    public void SetCopyPaths(string aSrcPath, string aDestPath) {
-      Log.WriteLine("Setting copy paths");
-      Log.WriteLine("  Source: " + aSrcPath);
-      Log.WriteLine("  Dest: " + aDestPath);
-
-      mSrcPath = aSrcPath;
-      CurrPath = aDestPath;
-    }
-
-    public void ResetReadOnly(string aPathname) {
-      var xAttrib = File.GetAttributes(aPathname);
-      if ((xAttrib & FileAttributes.ReadOnly) == FileAttributes.ReadOnly) {
-        File.SetAttributes(aPathname, xAttrib & ~FileAttributes.ReadOnly);
-      }
-    }
-
-    public void Copy(string aSrcPathname, bool clearReadonlyIfDestExists = true) {
-      Copy(aSrcPathname, Path.GetFileName(aSrcPathname), clearReadonlyIfDestExists);
-    }
-    public void Copy(string aSrcPathname, string aDestPathname, bool clearReadonlyIfDestExists = true) {
-      Log.WriteLine("Copy");
-
-      string xSrc = Path.Combine(SrcPath, aSrcPathname);
-      Log.WriteLine("  From: " + xSrc);
-
-      string xDest = Path.Combine(CurrPath, aDestPathname);
-      Log.WriteLine("  To: " + xDest);
-
-      // Copying files that are in TFS often they will be read only, so need to kill this file before copy
-      if (clearReadonlyIfDestExists && File.Exists(xDest)) {
-        ResetReadOnly(xDest);
-      }
-      File.Copy(xSrc, xDest, true);
-      ResetReadOnly(xDest);
-    }
-
     public void Echo() {
       Echo("");
     }
 
     public void Echo(string aText) {
-      mLog.WriteLine(aText);
+      Log.WriteLine(aText);
     }
   }
 }

@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Microsoft.VisualBasic;
 using TaskScheduler;
+using Cosmos.Build.Installer;
 
 namespace Cosmos.Build.Builder {
   public partial class MainWindow : Window {
@@ -141,6 +142,10 @@ namespace Cosmos.Build.Builder {
     }
 
     public bool Build() {
+      Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
+      Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
+      Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
+
       if (App.IsUserKit) {
         mReleaseNo = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
       } else {
@@ -155,9 +160,6 @@ namespace Cosmos.Build.Builder {
       }
 
       var xTask = new CosmosTask(mCosmosDir, mReleaseNo);
-      xTask.Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
-      xTask.Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
-      xTask.Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
 
       var xThread = new System.Threading.Thread(delegate () {
         xTask.Run();
