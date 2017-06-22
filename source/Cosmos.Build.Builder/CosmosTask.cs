@@ -48,7 +48,7 @@ namespace Cosmos.Build.Builder {
     }
 
     private void CleanDirectory(string aName, string aPath) {
-      if (Directory.Exists(mVsipPath)) {
+      if (Directory.Exists(aPath)) {
         Section("Cleaning up " + aName + " directory");
 
         Echo("  " + aPath);
@@ -270,6 +270,9 @@ namespace Cosmos.Build.Builder {
       Pack(Path.Combine(xSourcePath, "Cosmos.System.Plugs"), xPackagesDir, xVersion);
 
       Section("Populating bin cache");
+      SetCopyPaths(mVsipPath, mBinCachePath);
+      Copy("Cosmos.Debug.Kernel.dll");
+      Copy("Cosmos.TestRunner.TestController.dll");
     }
 
     private void CopyTemplates() {
