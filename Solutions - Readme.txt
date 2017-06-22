@@ -2,26 +2,27 @@ Solution File ReadMe
 
 --------------------------------------------
 Cosmos
-
-Old monolithic solution.
-Will be removed after all smaller parts split out.
-
-Use of this solution is necessary for some users until all parts are split out.
+-Old monolithic solution.
+-Will be removed after all smaller parts split out.
+-Use of this solution is necessary for some users until all parts are split out.
 
 --------------------------------------------
 Build
-
-Used by the build process (Builder).
-Not meant for direct end user use.
-Do not change unless you know what you are doing.
+-Used by the build process (Builder).
+-Not meant for direct end user use.
+-Do not change unless you know what you are doing.
 
 --------------------------------------------
 Kernel
-
-Kernel, Demos (not  User), Tests
-
+-Kernel, Demos (not  User), Tests
+*Modify tests to use TestRunner as a debug launch action - or change refs to bin ref
 
 --------------------------------------------
+
+Notes 
+-Update build to use bin dir, and post build actions too. A bat which can be called like CT.
+-Cosmos.TestRunner.* needs in some project, was removed from Kernel.
+
 --------------------------------------------
 Builder
 
