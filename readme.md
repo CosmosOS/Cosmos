@@ -1,3 +1,10 @@
+# Cosmos Website
+
+We are working on transitioning all content to our website [www.goCosmos.org](http://www.goCosmos.org)
+
+As we transition we will remove items from this page. 
+
+
 ### Cosmos (C# Open Source Managed Operating System)
 
 [![Build status](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true)](https://ci.appveyor.com/project/CosmosOS/cosmos/branch/master)
@@ -7,17 +14,6 @@
 Cosmos is an operating system "construction kit", built from the ground up around the IL2CPU compiler in C# and our home-brewed language called X#.
 
 It's current stage is only usable for academic work. Some day Cosmos will be ready for production work, but to reach that stage we need more developers. Specifically, we need a few more low-level developers to help the few core developers who are currently overwhelmed with work.
-
-
-Downloads:
----------
-
-Cosmos is available in two flavors:
-* **User Kit** - The User Kit is used to develop your operating system in Visual Studio.
-  If you are new to Cosmos, you can learn [here](https://github.com/CosmosOS/Cosmos/wiki). [Latest Release available.](https://github.com/CosmosOS/Cosmos/releases/latest)
-* **Development Kit (Devkit)** - The Development Kit is the full Cosmos source and build tools.
-  If you need to modify the Cosmos core functions or modify built-in drivers, boot, compiler, etc.. you will need to use Development Kit.
-  [Tutorial for building the Development Kit](https://github.com/CosmosOS/Cosmos/wiki/Devkit) - Building from the source is easy with our automated builder.
 
 
 Getting Started
@@ -77,4 +73,3 @@ We encourage you to add your own Cosmos videos to YouTube. Please add the tags C
 * [Cosmos Tutorial C# Lesson 1 - Part 1 - int0x10.com](https://www.youtube.com/watch?v=oKW3BrclAUY)
 * [Cosmos Tutorial C# Lesson 1 - Part 2 - int0x10.com](https://www.youtube.com/watch?v=V_Bxq0aGs_A)
 * [Cosmos Tutorial C# Lesson 2 - int0x10.com](https://www.youtube.com/watch?v=5Wzp1bGr8o0)
-
