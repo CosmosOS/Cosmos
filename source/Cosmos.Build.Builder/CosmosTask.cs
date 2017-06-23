@@ -26,8 +26,11 @@ namespace Cosmos.Build.Builder {
 
     public CosmosTask(string aCosmosDir, int aReleaseNo) {
       mCosmosPath = aCosmosDir;
+      mVsipPath = Path.Combine(mCosmosPath, @"Build\VSIP");
+      mBinCachePath = Path.Combine(mCosmosPath, @"Build\bin");
       mSourcePath = Path.Combine(mCosmosPath, "source");
       mAppDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cosmos User Kit");
+
       mReleaseNo = aReleaseNo;
       mInnoFile = Path.Combine(mCosmosPath, @"Setup\Cosmos.iss");
     }
@@ -49,27 +52,27 @@ namespace Cosmos.Build.Builder {
 
     private void CleanDirectory(string aName, string aPath) {
       if (Directory.Exists(aPath)) {
-        Section("Cleaning up " + aName + " directory");
+        Log.WriteLine("Cleaning up existing " + aName + " directory.");
         Directory.Delete(aPath, true);
       } else {
-        Section("Creating " + aName + " directory");
+        Log.WriteLine("Creating " + aName + " as " + aPath);
         Directory.CreateDirectory(aPath);
       }
-      Log.WriteLine("  " + aPath);
     }
 
     protected override List<string> DoRun() {
-      mVsipPath = Path.Combine(mCosmosPath, @"Build\VSIP");
-      mBinCachePath = Path.Combine(mCosmosPath, @"Build\bin");
-
       if (PrereqsOK()) {
+        Section("Checking Directories");
         CleanDirectory("VSIP", mVsipPath);
         CleanDirectory("Bin Cache", mBinCachePath);
+        if (!App.IsUserKit) {
+          CleanDirectory("User Kit", mAppDataPath);
+        }
+
         CompileCosmos();
         CreateSetup();
 
         if (!App.IsUserKit) {
-          CleanDirectory("User Kit", mAppDataPath);
           RunSetup();
           WriteDevKit();
           if (!App.DoNotLaunchVS) {
@@ -326,7 +329,7 @@ namespace Cosmos.Build.Builder {
       }
 
       Log.WriteLine("Launching Visual Studio");
-      Start(xVisualStudio, Quoted(mCosmosPath + @"Cosmos.sln"), false, true);
+      Start(xVisualStudio, Quoted(mCosmosPath + @"Kernel.sln"), false, true);
     }
 
     private void RunSetup() {

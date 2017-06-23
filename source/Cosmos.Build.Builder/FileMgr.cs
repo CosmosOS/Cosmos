@@ -23,20 +23,21 @@ namespace Cosmos.Build.Builder {
       }
     }
 
-    public void Copy(string aSrcPathname, bool clearReadonlyIfDestExists = true) {
-      Copy(aSrcPathname, Path.GetFileName(aSrcPathname), clearReadonlyIfDestExists);
+    public void Copy(string aSrcPathname, bool aClearReadonly = true) {
+      Copy(aSrcPathname, Path.GetFileName(aSrcPathname), aClearReadonly);
     }
-    public void Copy(string aSrcPathname, string aDestPathname, bool clearReadonlyIfDestExists = true) {
+    public void Copy(string aSrcPathname, string aDestPathname, bool aClearReadonly = true) {
       Log.WriteLine("Copy");
 
       string xSrc = Path.Combine(SrcPath, aSrcPathname);
       Log.WriteLine("  From: " + xSrc);
 
-      string xDest = Path.Combine(Directory.GetCurrentDirectory(), aDestPathname);
+      string xDest = Path.Combine(DestPath, aDestPathname);
       Log.WriteLine("  To: " + xDest);
 
       // Copying files that are in TFS often they will be read only, so need to kill this file before copy
-      if (clearReadonlyIfDestExists && File.Exists(xDest)) {
+      // We don't use TFS any more.. but left the code.
+      if (aClearReadonly && File.Exists(xDest)) {
         ResetReadOnly(xDest);
       }
       File.Copy(xSrc, xDest, true);
