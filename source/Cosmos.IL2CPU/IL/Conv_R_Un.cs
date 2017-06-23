@@ -11,10 +11,8 @@ namespace Cosmos.IL2CPU.X86.IL
     /// type as the weird 80 bit float of x87). For now we assume it to be always equal to double.
     /// </summary>
     [OpCode(ILOpCode.Code.Conv_R_Un)]
-
     public class Conv_R_Un : ILOp
     {
-
         public Conv_R_Un(Cosmos.Assembler.Assembler aAsmblr)
             : base(aAsmblr)
         {

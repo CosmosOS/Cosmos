@@ -147,7 +147,7 @@ namespace Cosmos.Common
                     mDebugger.SendInternal(xValue);
                 }
             }
-            
+
             if (aValue < 0)
             {
                 xResult = "-" + xResult;
