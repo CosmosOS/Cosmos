@@ -1,8 +1,7 @@
 using System;
 
-using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.IL2CPU.X86;
 using XSharp.Common;
+using static XSharp.Common.XSRegisters;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -17,10 +16,24 @@ namespace Cosmos.IL2CPU.X86.IL
         public override void Execute(_MethodInfo aMethod, ILOpCode aOpCode )
         {
             var xSize = Math.Max(SizeOfType(aOpCode.StackPopTypes[0]), SizeOfType(aOpCode.StackPopTypes[1]));
-            XS.Pop(XSRegisters.EAX);
-            XS.Pop(XSRegisters.EDX);
-            XS.Xor(XSRegisters.EAX, XSRegisters.EDX);
-            XS.Push(XSRegisters.EAX);
+
+            if (xSize > 8)
+            {
+                throw new NotImplementedException("Cosmos.IL2CPU.x86->IL->Xor.cs->Error: StackSize > 8 not supported");
+            }
+
+            if (xSize <= 4)
+            {
+                XS.Pop(EAX);
+                XS.Xor(ESP, EAX, destinationIsIndirect: true);
+            }
+            else if (xSize <= 8)
+            {
+                XS.Pop(EAX);
+                XS.Pop(EDX);
+                XS.Xor(ESP, EAX, destinationIsIndirect: true);
+                XS.Xor(ESP, EDX, destinationDisplacement: 4);
+            }
         }
     }
 }

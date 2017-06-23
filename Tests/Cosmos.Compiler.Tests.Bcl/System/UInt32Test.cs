@@ -90,8 +90,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Now test conversions
 
-            uint maxValue = uint.MaxValue;
-            uint minValue = uint.MinValue;
+            uint maxValue = UInt32.MaxValue;
+            uint minValue = UInt32.MinValue;
 
             // TODO: some convert instructions aren't being emitted, we should find other ways of getting them emitted
 
@@ -126,6 +126,14 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Test Conv_U8
             Assert.IsTrue((ulong)maxValue == 0x00000000FFFFFFFF, "Conv_U8 for UInt32 doesn't work");
             Assert.IsTrue((ulong)minValue == 0x0000000000000000, "Conv_U8 for UInt32 doesn't work");
+
+            // Test Conv_R4
+            Assert.IsTrue((float)maxValue == UInt32.MaxValue, "Conv_R4 for UInt32 doesn't work");
+            Assert.IsTrue((float)minValue == UInt32.MinValue, "Conv_R4 for UInt32 doesn't work");
+
+            // Test Conv_R8
+            Assert.IsTrue((double)maxValue == UInt32.MaxValue, "Conv_R8 for UInt32 doesn't work");
+            Assert.IsTrue((double)minValue == UInt32.MinValue, "Conv_R8 for UInt32 doesn't work");
 
             // Test Methods
             val2 = TestMethod(value);

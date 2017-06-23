@@ -58,22 +58,16 @@ namespace Cosmos.Common
             {
                 int xValue = aValue;
 
-                if (aValue < 0)
+                while (xValue != 0)
                 {
-                    xValue *= -1;
-                }
-
-                while (xValue > 0)
-                {
-                    int xValue2 = xValue % 10;
-                    xResult = string.Concat(xChars[xValue2], xResult);
+                    int xValue2 = Math.Abs(xValue % 10);
+                    xResult = xChars[xValue2] + xResult;
                     xValue /= 10;
                 }
             }
-
             if (aValue < 0)
             {
-                xResult = string.Concat("-", xResult);
+                xResult = "-" + xResult;
             }
 
             return xResult;
@@ -122,7 +116,6 @@ namespace Cosmos.Common
 
             string[] xChars = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
             string xResult = string.Empty;
-            long xValue = aValue;
 
             if (aValue == 0)
             {
@@ -132,6 +125,8 @@ namespace Cosmos.Common
             }
             else
             {
+                long xValue = aValue;
+
                 if (aValue < 0)
                 {
                     xValue *= -1;
@@ -144,7 +139,7 @@ namespace Cosmos.Common
                     long xValue2 = xValue % 10;
                     mDebugger.SendInternal("xValue2 =");
                     mDebugger.SendInternal(xValue2);
-                    xResult = string.Concat(xChars[xValue2], xResult);
+                    xResult = xChars[xValue2] + xResult;
                     mDebugger.SendInternal("xResult =");
                     mDebugger.SendInternal(xResult);
                     xValue /= 10;
@@ -152,10 +147,10 @@ namespace Cosmos.Common
                     mDebugger.SendInternal(xValue);
                 }
             }
-
+            
             if (aValue < 0)
             {
-                xResult = string.Concat("-", xResult);
+                xResult = "-" + xResult;
             }
 
             mDebugger.SendInternal("xResult =");

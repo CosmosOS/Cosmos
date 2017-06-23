@@ -1,19 +1,31 @@
 ; 4-column space indentation
 
-[VTablesImpl.cs]
-indent_size=2
+[AppAssembler.cs]
+indent_size = 4
+
+[AppAssemblerRingsCheck.cs]
+indent_size = 4
+
+[CompilerEngine.cs]
+indent_size = 4
+
+[CompilerExtensionAttribute.cs]
+indent_size = 4
+
+[CompilerExtensionBase.cs]
+indent_size = 4
 
 [ILScanner.cs]
 indent_size = 4
 
+[ILOp.cs]
+indent_size = 2
+
 [ILOpCode.cs]
 indent_size = 2
 
-[ILOpCodes/*.cs]
-indent_size = 2
-
-[ILOp.cs]
-indent_size = 2
+[VTablesImpl.cs]
+indent_size=2
 
 [IL/*.cs]
 indent_size = 2
@@ -22,6 +34,18 @@ indent_size = 2
 indent_size = 4
 
 [IL/Callvirt.cs]
+indent_size = 4
+
+[IL/Castclass.cs]
+indent_size = 4
+
+[IL/Conv*.cs]
+indent_size = 4
+
+[IL/Div*.cs]
+indent_size = 4
+
+[IL/Isinst.cs]
 indent_size = 4
 
 [IL/Ldfld.cs]
@@ -33,29 +57,14 @@ indent_size = 4
 [IL/Newobj.cs]
 indent_size = 4
 
-[AppAssembler.cs]
+[IL/Rem*.cs]
 indent_size = 4
-
-[CompilerExtensionBase.cs]
-indent_size = 4
-
-[CompilerEngine.cs]
-indent_size = 4
-
-[CompilerExtensionAttribute.cs]
-indent_size = 4
-
-[AppAssemblerRingsCheck.cs]
-indent_size = 4
-
-[IL/Stfld.cs]
-indent_size = 2
 
 [IL/Stelem_Ref.cs]
 indent_size = 2
 
-[IL/Isinst.cs]
-indent_size = 4
+[IL/Stfld.cs]
+indent_size = 2
 
-[IL/Castclass.cs]
-indent_size = 4
+[ILOpCodes/*.cs]
+indent_size = 2

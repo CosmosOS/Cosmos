@@ -49,24 +49,24 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             int val2;
 
-            value = 0x0C; // 0b0000_1100
+            value = 0x0C; // low-order bits: 0b0000_1100
 
-            val2 = ~value; // val2 = ~value = 0b1111_0011
+            val2 = ~value; // low-order bits: val2 = ~value = 0b1111_0011
             Assert.IsTrue(val2 == -0x0D, "Int32 bitwise not doesn't work got: " + val2);
 
-            val2 = value & 0x06; // val2 = value & 0b0000_0110 = 0b0000_0100
+            val2 = value & 0x06; // low-order bits: val2 = value & 0b0000_0110 = 0b0000_0100
             Assert.IsTrue(val2 == 0x04, "Int32 bitwise and doesn't work got: " + val2);
 
-            val2 = value | 0x06; // val2 = value | 0b0000_0110 = 0b0000_1110
+            val2 = value | 0x06; // low-order bits: val2 = value | 0b0000_0110 = 0b0000_1110
             Assert.IsTrue(val2 == 0x0E, "Int32 bitwise or doesn't work got: " + val2);
 
-            val2 = value ^ 0x06; // val2 = value ^ 0b0000_0110 = 0b0000_1010
+            val2 = value ^ 0x06; // low-order bits: val2 = value ^ 0b0000_0110 = 0b0000_1010
             Assert.IsTrue(val2 == 0x0A, "Int32 bitwise xor doesn't work got: " + val2);
 
-            val2 = value >> 0x02; // val2 = value >> 0b0000_0010 = 0b0000_0011
+            val2 = value >> 0x02; // low-order bits: val2 = value >> 0b0000_0010 = 0b0000_0011
             Assert.IsTrue(val2 == 0x03, "Int32 left shift doesn't work got: " + val2);
 
-            val2 = value << 0x02; // val2 = value << 0b0000_0010 = 0b0011_0000
+            val2 = value << 0x02; // low-order bits: val2 = value << 0b0000_0010 = 0b0011_0000
             Assert.IsTrue(val2 == 0x30, "Int32 right shift doesn't work got: " + val2);
 
             // basic arithmetic operations
@@ -90,8 +90,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Now test conversions
 
-            int maxValue = int.MaxValue;
-            int minValue = int.MinValue;
+            int maxValue = Int32.MaxValue;
+            int minValue = Int32.MinValue;
 
             // TODO: some convert instructions aren't being emitted, we should find other ways of getting them emitted
 
@@ -125,7 +125,15 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Test Conv_U8
             Assert.IsTrue((ulong)maxValue == 0x00000007FFFFFFF, "Conv_U8 for Int32 doesn't work");
-            Assert.IsTrue((ulong)minValue == 0x0000000080000000, "Conv_U8 for Int32 doesn't work");
+            Assert.IsTrue((ulong)minValue == 0xFFFFFFFF80000000, "Conv_U8 for Int32 doesn't work");
+
+            // Test Conv_R4
+            Assert.IsTrue((float)maxValue == Int32.MaxValue, "Conv_R4 for Int32 doesn't work");
+            Assert.IsTrue((float)minValue == Int32.MinValue, "Conv_R4 for Int32 doesn't work");
+
+            // Test Conv_R8
+            Assert.IsTrue((double)maxValue == Int32.MaxValue, "Conv_R8 for Int32 doesn't work");
+            Assert.IsTrue((double)minValue == Int32.MinValue, "Conv_R8 for Int32 doesn't work");
 
             // Test Methods
             val2 = TestMethod(value);

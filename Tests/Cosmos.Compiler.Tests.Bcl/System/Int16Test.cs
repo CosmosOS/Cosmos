@@ -91,8 +91,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Now test conversions
 
-            short maxValue = short.MaxValue;
-            short minValue = short.MinValue;
+            short maxValue = Int16.MaxValue;
+            short minValue = Int16.MinValue;
 
             // TODO: some convert instructions aren't being emitted, we should find other ways of getting them emitted
 
@@ -118,7 +118,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Test Conv_U4
             Assert.IsTrue((uint)maxValue == 0x00007FFF, "Conv_U4 for Int16 doesn't work");
-            Assert.IsTrue((uint)minValue == 0x00008000, "Conv_U4 for Int16 doesn't work");
+            Assert.IsTrue((uint)minValue == 0xFFFF8000, "Conv_U4 for Int16 doesn't work");
 
             // Test Conv_I8
             Assert.IsTrue((long)maxValue == 0x0000000000007FFF, "Conv_I8 for Int16 doesn't work");
@@ -126,7 +126,15 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Test Conv_U8
             Assert.IsTrue((ulong)maxValue == 0x0000000000007FFF, "Conv_U8 for Int16 doesn't work");
-            Assert.IsTrue((ulong)minValue == 0x0000000000008000, "Conv_U8 for Int16 doesn't work");
+            Assert.IsTrue((ulong)minValue == 0xFFFFFFFFFFFF8000, "Conv_U8 for Int16 doesn't work");
+
+            // Test Conv_R4
+            Assert.IsTrue((float)maxValue == Int16.MaxValue, "Conv_R4 for Int16 doesn't work");
+            Assert.IsTrue((float)minValue == Int16.MinValue, "Conv_R4 for Int16 doesn't work");
+
+            // Test Conv_R8
+            Assert.IsTrue((double)maxValue == Int16.MaxValue, "Conv_R8 for Int16 doesn't work");
+            Assert.IsTrue((double)minValue == Int16.MinValue, "Conv_R8 for Int16 doesn't work");
 
             // Test Methods
             val2 = TestMethod(value);

@@ -50,24 +50,24 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             int val2;
 
-            value = 0x0C; // 0b0000_1100
+            value = 0x0C; // low-order bits: 0b0000_1100
 
-            val2 = ~value; // val2 = ~value = 0b1111_0011
+            val2 = ~value; // low-order bits: val2 = ~value = 0b1111_0011
             Assert.IsTrue(val2 == -0x0D, "SByte bitwise not doesn't work got: " + val2);
 
-            val2 = value & 0x06; // val2 = value & 0b0000_0110 = 0b0000_0100
+            val2 = value & 0x06; // low-order bits: val2 = value & 0b0000_0110 = 0b0000_0100
             Assert.IsTrue(val2 == 0x04, "SByte bitwise and doesn't work got: " + val2);
 
-            val2 = value | 0x06; // val2 = value | 0b0000_0110 = 0b0000_1110
+            val2 = value | 0x06; // low-order bits: val2 = value | 0b0000_0110 = 0b0000_1110
             Assert.IsTrue(val2 == 0x0E, "SByte bitwise or doesn't work got: " + val2);
 
-            val2 = value ^ 0x06; // val2 = value ^ 0b0000_0110 = 0b0000_1010
+            val2 = value ^ 0x06; // low-order bits: val2 = value ^ 0b0000_0110 = 0b0000_1010
             Assert.IsTrue(val2 == 0x0A, "SByte bitwise xor doesn't work got: " + val2);
 
-            val2 = value >> 0x02; // val2 = value >> 0b0000_0010 = 0b0000_0011
+            val2 = value >> 0x02; // low-order bits: val2 = value >> 0b0000_0010 = 0b0000_0011
             Assert.IsTrue(val2 == 0x03, "SByte left shift doesn't work got: " + val2);
 
-            val2 = value << 0x02; // val2 = value << 0b0000_0010 = 0b0011_0000
+            val2 = value << 0x02; // low-order bits: val2 = value << 0b0000_0010 = 0b0011_0000
             Assert.IsTrue(val2 == 0x30, "SByte right shift doesn't work got: " + val2);
 
             // basic arithmetic operations
@@ -93,8 +93,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Now test conversions
 
-            sbyte maxValue = sbyte.MaxValue;
-            sbyte minValue = sbyte.MinValue;
+            sbyte maxValue = SByte.MaxValue;
+            sbyte minValue = SByte.MinValue;
 
             // TODO: some convert instructions aren't being emitted, we should find other ways of getting them emitted
 
@@ -112,7 +112,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Test Conv_U2
             Assert.IsTrue((ushort)maxValue == 0x007F, "Conv_U2 for SByte doesn't work");
-            Assert.IsTrue((ushort)minValue == 0x0080, "Conv_U2 for SByte doesn't work");
+            Assert.IsTrue((ushort)minValue == 0xFF80, "Conv_U2 for SByte doesn't work");
 
             // Test Conv_I4
             Assert.IsTrue((int)maxValue == 0x0000007F, "Conv_I4 for SByte doesn't work");
@@ -120,7 +120,7 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Test Conv_U4
             Assert.IsTrue((uint)maxValue == 0x0000007F, "Conv_U4 for SByte doesn't work");
-            Assert.IsTrue((uint)minValue == 0x00000080, "Conv_U4 for SByte doesn't work");
+            Assert.IsTrue((uint)minValue == 0xFFFFFF80, "Conv_U4 for SByte doesn't work");
 
             // Test Conv_I8
             Assert.IsTrue((long)maxValue == 0x000000000000007F, "Conv_I8 for SByte doesn't work");
@@ -128,7 +128,15 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             // Test Conv_U8
             Assert.IsTrue((ulong)maxValue == 0x000000000000007F, "Conv_U8 for SByte doesn't work");
-            Assert.IsTrue((ulong)minValue == 0x0000000000000080, "Conv_U8 for SByte doesn't work");
+            Assert.IsTrue((ulong)minValue == 0xFFFFFFFFFFFFFF80, "Conv_U8 for SByte doesn't work");
+
+            // Test Conv_R4
+            Assert.IsTrue((float)maxValue == SByte.MaxValue, "Conv_R4 for SByte doesn't work");
+            Assert.IsTrue((float)minValue == SByte.MinValue, "Conv_R4 for SByte doesn't work");
+
+            // Test Conv_R8
+            Assert.IsTrue((double)maxValue == SByte.MaxValue, "Conv_R8 for SByte doesn't work");
+            Assert.IsTrue((double)minValue == SByte.MinValue, "Conv_R8 for SByte doesn't work");
 
             // Test Methods
             val2 = TestMethod(value);

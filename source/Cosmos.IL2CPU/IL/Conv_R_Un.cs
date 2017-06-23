@@ -1,10 +1,8 @@
 using System;
-using CPUx86 = Cosmos.Assembler.x86;
-using Cosmos.Assembler.x86;
 
+using Cosmos.Assembler.x86;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;
-using static Cosmos.Assembler.x86.SSE.ComparePseudoOpcodes;
 
 namespace Cosmos.IL2CPU.X86.IL
 {
@@ -12,7 +10,7 @@ namespace Cosmos.IL2CPU.X86.IL
     /// Converts the unsigned integer value on top of the evaluation stack to F (native float) it can be double or some FPU extended precision Floating Point
     /// type as the weird 80 bit float of x87). For now we assume it to be always equal to double.
     /// </summary>
-    [Cosmos.IL2CPU.OpCode(ILOpCode.Code.Conv_R_Un)]
+    [OpCode(ILOpCode.Code.Conv_R_Un)]
 
     public class Conv_R_Un : ILOp
     {
@@ -102,9 +100,9 @@ namespace Cosmos.IL2CPU.X86.IL
                         break;
 
                     default:
-                       //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
-                       throw new NotImplementedException("Conv_R_Un with type " + xValue + " not supported!");
-                   }
+                        //EmitNotImplementedException( Assembler, GetServiceProvider(), "Conv_I: SourceSize " + xSource + " not supported!", mCurLabel, mMethodInformation, mCurOffset, mNextLabel );
+                        throw new NotImplementedException("Conv_R_Un with type " + xValue + " not supported!");
+                }
             }
             else
             {
@@ -113,4 +111,3 @@ namespace Cosmos.IL2CPU.X86.IL
         }
     }
 }
- 

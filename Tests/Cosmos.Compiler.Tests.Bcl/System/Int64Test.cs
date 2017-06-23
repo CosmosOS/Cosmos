@@ -39,32 +39,8 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsTrue((resultAsInt == expectedResultAsInt), "Int64.GetHashCode() doesn't work");
 
-            // Let's try to convert a Long in a ULong
-            long val2 = 42;
-            UInt64 val2AsULong = (ulong)val2;
-
-            Assert.IsTrue((val2AsULong == 42), "Int64 to UInt64 conversion does not work");
-
-            val2 = long.Parse("42");
-            Assert.IsTrue(val2 == 42, "Parsing Int64 doesn't work.");
-
-            /* Let's test right shift */
-            value = 4631166901565532406;
-
-            val2 = value >> 20;
-            Assert.IsTrue(val2 == 4416624929013, "long right shift does not work");
-
-            val2 = value >> 52;
-            Assert.IsTrue(val2 == 1028, "long right shift (count >=32) does not work");
-
-            /* ... and now left shift */
-            value = 4631166901565532406;
-
-            val2 = value << 20;
-            Assert.IsTrue(val2 == 6640827866535690240, "long left shift does not work got " + val2);
-
-            val2 = value << 52;
-            Assert.IsTrue(val2 == -8115486528521633792, "long left shift (count >=32) does not work got " + val2);
+            value = long.Parse("42");
+            Assert.IsTrue(value == 42, "Parsing Int64 doesn't work.");
 
 #if false
 
@@ -75,10 +51,53 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             Assert.IsTrue((result == expectedResult), "Int64.ToString(X2) doesn't work");
 #endif
 
+            // basic bit operations
+
+            long val2;
+
+            value = 0x0C; // low-order bits: 0b0000_1100
+
+            val2 = ~value; // low-order bits: val2 = ~value = 0b1111_0011
+            Assert.IsTrue(val2 == -0x0D, "Int64 bitwise not doesn't work got: " + val2);
+
+            val2 = value & 0x06; // low-order bits: val2 = value & 0b0000_0110 = 0b0000_0100
+            Assert.IsTrue(val2 == 0x04, "Int64 bitwise and doesn't work got: " + val2);
+
+            val2 = value | 0x06; // low-order bits: val2 = value | 0b0000_0110 = 0b0000_1110
+            Assert.IsTrue(val2 == 0x0E, "Int64 bitwise or doesn't work got: " + val2);
+
+            val2 = value ^ 0x06; // low-order bits: val2 = value ^ 0b0000_0110 = 0b0000_1010
+            Assert.IsTrue(val2 == 0x0A, "Int64 bitwise xor doesn't work got: " + val2);
+
+            val2 = value >> 0x02; // low-order bits: val2 = value >> 0b0000_0010 = 0b0000_0011
+            Assert.IsTrue(val2 == 0x03, "Int64 left shift doesn't work got: " + val2);
+
+            val2 = value << 0x02; // low-order bits: val2 = value << 0b0000_0010 = 0b0011_0000
+            Assert.IsTrue(val2 == 0x30, "Int64 right shift doesn't work got: " + val2);
+
+            // basic arithmetic operations
+
+            value = 60;
+
+            val2 = value + 5;
+            Assert.IsTrue(val2 == 65, "Int64 addition doesn't work got: " + val2);
+
+            val2 = value - 5;
+            Assert.IsTrue(val2 == 55, "Int64 subtraction doesn't work got: " + val2);
+
+            val2 = value * 5;
+            Assert.IsTrue(val2 == 300, "Int64 multiplication doesn't work got: " + val2);
+
+            val2 = value / 5;
+            Assert.IsTrue(val2 == 12, "Int64 division doesn't work got: " + val2);
+
+            val2 = value % 7;
+            Assert.IsTrue(val2 == 4, "Int64 remainder doesn't work got: " + val2);
+
             // Now test conversions
 
-            long maxValue = long.MaxValue;
-            long minValue = long.MinValue;
+            long maxValue = Int64.MaxValue;
+            long minValue = Int64.MinValue;
 
             // TODO: some convert instructions aren't being emitted, we should find other ways of getting them emitted
 
@@ -113,6 +132,33 @@ namespace Cosmos.Compiler.Tests.Bcl.System
             // Test Conv_U8
             Assert.IsTrue((ulong)maxValue == 0x7FFFFFFFFFFFFFFF, "Conv_U8 for Int64 doesn't work");
             Assert.IsTrue((ulong)minValue == 0x8000000000000000, "Conv_U8 for Int64 doesn't work");
+
+            // Test Conv_R4
+            Assert.IsTrue((float)maxValue == Int64.MaxValue, "Conv_R4 for Int64 doesn't work");
+            Assert.IsTrue((float)minValue == Int64.MinValue, "Conv_R4 for Int64 doesn't work");
+
+            // Test Conv_R8
+            Assert.IsTrue((double)maxValue == Int64.MaxValue, "Conv_R8 for Int64 doesn't work");
+            Assert.IsTrue((double)minValue == Int64.MinValue, "Conv_R8 for Int64 doesn't work");
+
+            // Test Methods
+            val2 = TestMethod(value);
+            Assert.IsTrue(value == 60, "Passing an Int64 as a method parameter doesn't work");
+            Assert.IsTrue(val2 == 61, "Returning an Int64 value from a method doesn't work");
+
+            ByRefTestMethod(ref value);
+            Assert.IsTrue(value == 61, "Passing an Int64 by ref to a method doesn't work");
+        }
+
+        public static long TestMethod(long aParam)
+        {
+            aParam++;
+            return aParam;
+        }
+
+        public static void ByRefTestMethod(ref long aParam)
+        {
+            aParam++;
         }
     }
 }

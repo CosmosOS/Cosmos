@@ -714,13 +714,13 @@ namespace XSharp.Common
       Do<ShiftLeft>(destination, bitCount);
     }
 
-    public static void ShiftLeft(Register destination, Register8 bitCount, bool destinationIsIndirect = false, RegisterSize size = RegisterSize.Int32)
+    public static void ShiftLeft(Register destination, Register8 source, bool destinationIsIndirect = false, RegisterSize size = RegisterSize.Int32)
     {
-      if (bitCount != CL)
+      if (source != CL)
       {
         throw new InvalidOperationException();
       }
-      Do<ShiftLeft>(destination, bitCount, destinationIsIndirect: destinationIsIndirect, size: size);
+      Do<ShiftLeft>(destination, source, skipSizeCheck: true,  destinationIsIndirect: destinationIsIndirect,size: size);
     }
 
     public static void ShiftRightArithmetic(Register destination, byte bitCount)
@@ -843,14 +843,14 @@ namespace XSharp.Common
       Do<SubWithCarry>(register, valueToAdd, destinationDisplacement: destinationDisplacement, destinationIsIndirect: destinationIsIndirect);
     }
 
-    public static void And(Register register, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize size = RegisterSize.Int32)
+    public static void And(Register register, uint value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize size = RegisterSize.Int32)
     {
-      Do<And>(register, value, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
+      Do<And>(register, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement, size);
     }
 
-    public static void And(Register register, Register value, bool destinationIsIndirect = false, int? destinationDisplacement = null, RegisterSize? size = null)
+    public static void And(Register register, Register value, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
     {
-      Do<And>(register, value, destinationIsIndirect: destinationIsIndirect, destinationDisplacement: destinationDisplacement, size: size);
+      Do<And>(register, value, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
     }
 
     public static void Xor(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null, RegisterSize? size = null)
@@ -1338,6 +1338,30 @@ namespace XSharp.Common
     }
 
     #endregion MoveZeroExtend
+
+    #region MoveD
+
+    public static void MoveD(string destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+    }
+    
+    public static void MoveD(string destination, string source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+    }
+
+    public static void MoveD(Register destination, string sourceLabel, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      DoDestinationSource<MoveD>(destination, sourceLabel, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+    }
+
+    public static void MoveD(Register destination, Register source, bool destinationIsIndirect = false, int? destinationDisplacement = null, bool sourceIsIndirect = false, int? sourceDisplacement = null)
+    {
+      DoDestinationSource<MoveD>(destination, source, destinationIsIndirect, destinationDisplacement, sourceIsIndirect, sourceDisplacement);
+    }
+
+    #endregion
 
     public static void Cpuid()
     {
