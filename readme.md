@@ -5,7 +5,7 @@ We are working on transitioning all content to our website [www.goCosmos.org](ht
 As we transition we will remove items from this page. 
 
 
-### More Information
+# More Information
 
 Below are links we have yet to transfer to our website.
 
