@@ -5,15 +5,11 @@ We are working on transitioning all content to our website [www.goCosmos.org](ht
 As we transition we will remove items from this page. 
 
 
-### Cosmos (C# Open Source Managed Operating System)
+### More Information
+
+Below are links we have yet to transfer to our website.
 
 [![Build status](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true)](https://ci.appveyor.com/project/CosmosOS/cosmos/branch/master)
-[![Join the chat at https://gitter.im/CosmosOS/Cosmos](https://img.shields.io/badge/GITTER-Join%20Chat-brightgreen.svg)](https://gitter.im/CosmosOS/Cosmos?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-[![GitHub release](https://img.shields.io/github/release/CosmosOS/Cosmos.svg)](https://github.com/CosmosOS/Cosmos/releases)
-
-Cosmos is an operating system "construction kit", built from the ground up around the IL2CPU compiler in C# and our home-brewed language called X#.
-
-It's current stage is only usable for academic work. Some day Cosmos will be ready for production work, but to reach that stage we need more developers. Specifically, we need a few more low-level developers to help the few core developers who are currently overwhelmed with work.
 
 
 Getting Started
@@ -23,17 +19,6 @@ Getting Started
 * Video Tutorial for [using Visual Studio Express Editions](https://www.youtube.com/watch?v=NNl8S2xOtdo)
 * [FAQ (Frequently Asked Questions)](https://github.com/CosmosOS/Cosmos/wiki/FAQ)
 * [Low Hanging Fruit](https://github.com/CosmosOS/Cosmos/issues?q=is%3Aopen+is%3Aissue+label%3Acomplexity_low+sort%3Acreated-asc) - Looking for something easy to do and prove your worth in Cosmos? Here are a few easy tasks we have on our to do list that are also of importance to us.
-
-
-Joining and helping Cosmos
----------
-
-* [Gitter.im](https://gitter.im/CosmosOS/Cosmos) - The Live Chat: Click the green `Join Chat` badge at the top of this file. As with the IRC and CodePlex chat, please be patient if we don't respond immediately (no pinging).
-* [Yahoo Group](https://tech.groups.yahoo.com/group/Cosmos-Dev) - Email Discussion List: To prevent spam-bots from spamming, we ask you introduce yourself to join. Please mention something specific to Cosmos. For example: "Hey, I want to join" won't get you in....
-* [Facebook](http://www.facebook.com/pages/Cosmos-Operating-System/10235842745) - Like us to see frequent updates of what is going on with Cosmos.
-* [YouTube Channel](https://www.youtube.com/channel/UCsSKtqjfpSR0B3Ov4cBIarQ/) - Follow to see useful videos and help you programming your operating system.
-* [Resources](https://github.com/CosmosOS/Cosmos/wiki/Resources) - More Cosmos related links.
-
 
 Articles and Resources
 ---------
