@@ -61,6 +61,11 @@ build_script:
     xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.TestRunner.TestController.dll" "c:\Cosmos\Build\bin\"
 
 
+    dotnet restore Tools/NASM
+
+    dotnet build Tools/NASM
+
+
     dotnet restore Tests/Cosmos.TestRunner.UnitTest
 
     dotnet build Tests/Cosmos.TestRunner.UnitTest
@@ -69,6 +74,8 @@ build_script:
     reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d c:\CosmosRun\
 
     reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
+
+    C:\Program Files (x86)\Inno Setup 5\ISCC.exe Setup/Cosmos.iss /dBuildConfiguration=DevKit /dVSVersion=2017 /dChangeSetVersion=106027
 
 
 #test: off
@@ -99,3 +106,4 @@ matrix:
   
 artifacts:
   - path: '**\TestResult.xml'
+  - path: '**\CosmosUserKit-106027-vs2017.exe'

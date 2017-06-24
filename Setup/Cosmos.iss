@@ -7,20 +7,20 @@
 ; Currently we dont use "UserKit" but this allows us to test/compile from Inno
 ; IDE so that we don't get an undefined error.
 ; We default to devkit so we dont have to wait on compression.
-#define BuildConfiguration "devkit"
-;#define BuildConfiguration "userkit"
+#define BuildConfiguration "DevKit"
+;#define BuildConfiguration "UserKit"
 #endif
 
 #ifndef VSVersion
   #define VSVersion "vs2017"
 #endif
 
-#if BuildConfiguration == "Devkit"
+#if BuildConfiguration == "DevKit"
 	; devkit releases are not compressed
-	#pragma warning "Building Devkit release"
+	#pragma warning "Building Dev Kit release"
 #else
 	; userkit releases get compressed, and get languages included
-	#pragma message "Building Userkit release"
+	#pragma message "Building User Kit release"
 	#define Compress true
 	#define IncludeUILanguages true
 #endif
