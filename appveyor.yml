@@ -28,9 +28,11 @@ build_script:
     dotnet publish source/Cosmos.Build.MSBuild -f net462 -r win7-x86 -o "c:\Cosmos\Build\VSIP\MSBuild"
 
     dotnet publish source/IL2CPU -f netcoreapp1.0 -r win7-x86 -o "c:\Cosmos\Build\VSIP\IL2CPU\"
-        
+
     dotnet publish source/XSharp.Compiler -f netcoreapp1.0 -r win7-x86 -o "c:\Cosmos\Build\VSIP\XSharp\"
-        
+
+    dotnet restore Tools/NASM
+
     dotnet publish Tools/NASM -f netcoreapp1.0 -r win7-x86 -o "c:\Cosmos\Build\VSIP\NASM\"
 
     xcopy /Y "c:\Cosmos\Build\VSIP\MSBuild\*" "c:\CosmosRun\Build\MSBuild\"
