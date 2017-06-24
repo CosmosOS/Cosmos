@@ -1,4 +1,4 @@
-version: 0.20150918.{build}
+version: 0.20170620.{build}
 image: Visual Studio 2017
 configuration: Debug
 platform: AnyCPU
@@ -15,10 +15,10 @@ build_script:
 
     nuget restore "Builder.sln"
 
-    nuget restore "Cosmos.sln"
+    nuget restore "Build.sln"
+
 
     msbuild "Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
-
 
     msbuild "Build.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:OutputPath="%APPVEYOR_BUILD_FOLDER%\Build\VSIP" /p:DeployExtension=false
 
@@ -56,12 +56,20 @@ build_script:
     xcopy /Y /S "c:\Cosmos\Resources\Bochs\*.*" "%ProgramFiles(x86)%\Bochs-2.6.8\"
 
 
+    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.Debug.Kernel.dll" "c:\Cosmos\Build\bin\"
+
+    xcopy /Y "c:\Cosmos\Build\VSIP\Cosmos.TestRunner.TestController.dll" "c:\Cosmos\Build\bin\"
+
+
+    dotnet restore Tests/Cosmos.TestRunner.UnitTest
+
+    dotnet build Tests/Cosmos.TestRunner.UnitTest
+
+
     reg add HKLM\SOFTWARE\WOW6432Node\Cosmos /v UserKit /d c:\CosmosRun\
 
     reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
 
-
-    msbuild "Cosmos.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
 
 #test: off
 #  assemblies:
@@ -72,7 +80,9 @@ build_script:
 test_script:
 - cmd: >-
     dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
-- ps: >-    
+
+on_finish:
+- ps: >-
     $wc = New-Object 'System.Net.WebClient'
     
     $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", "c:\Cosmos\TestResult.xml")
