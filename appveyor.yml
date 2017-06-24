@@ -75,7 +75,7 @@ build_script:
 
     reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
 
-    C:\Program Files (x86)\Inno Setup 5\ISCC.exe Setup/Cosmos.iss /dBuildConfiguration=DevKit /dVSVersion=2017 /dChangeSetVersion=106027
+    "C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Setup/Cosmos.iss /dBuildConfiguration=DevKit /dVSVersion=2017 /dChangeSetVersion=106027
 
 
 #test: off
