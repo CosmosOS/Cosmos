@@ -87,8 +87,36 @@ build_script:
 
     reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
 
-    "C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Setup/Cosmos.iss /dBuildConfiguration=DevKit /dVSVersion=2017 /dChangeSetVersion=106027
+- ps: >-
+    $version = "1.0.1-" + Get-Date -Format yyyyMMddHHss
 
+    msbuild source/Cosmos.Common /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
+
+    msbuild source/Cosmos.Core /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
+
+    msbuild source/Cosmos.Core.Common /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
+
+    msbuild source/Cosmos.Core.Memory /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
+
+    msbuild source/Cosmos.Core.Plugs /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
+
+    msbuild source/Cosmos.Core.Plugs.Asm /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
+
+    msbuild source/Cosmos.Debug.Kernel /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
+
+    msbuild source/Cosmos.Debug.Kernel.Plugs.Asm /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
+
+    msbuild source/Cosmos.HAL /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
+
+    msbuild source/Cosmos.IL2CPU.Plugs /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
+
+    msbuild source/Cosmos.System /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
+
+    msbuild source/Cosmos.System.Plugs /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
+
+
+- cmd: >-
+    "C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Setup/Cosmos.iss /dBuildConfiguration=DevKit /dVSVersion=2017 /dChangeSetVersion=106027
 
 #test: off
 #  assemblies:
