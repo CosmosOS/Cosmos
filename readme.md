@@ -7,4 +7,4 @@ Build status for master branch:
 [![Build status](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true)](https://ci.appveyor.com/project/CosmosOS/cosmos/branch/master)
 
 Build status for netcore branch:
-[![Build status](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/netcore?sv
+[![Build status](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/netcore?svg=true)](https://ci.appveyor.com/project/CosmosOS/cosmos/branch/netcore)
