@@ -88,7 +88,7 @@ build_script:
     reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
 
 - ps: >-
-    $version = "1.0.1-" + Get-Date -Format yyyyMMddHHss
+    $version = "1.0.1-" + (Get-Date -Format yyyyMMddHHss)
 
     msbuild source/Cosmos.Common /t:Restore;Pack /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
 
