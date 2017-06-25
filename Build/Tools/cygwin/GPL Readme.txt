@@ -1,4 +1,4 @@
-GPL is a viral licnese.
+GPL is a viral license.
 
 However we only call these as EXEs and do not wrap them in a reusable exportable manner. We simply call these EXEs to perform the tasks they are built for as a small stage of our build. This is legal under GPL.
 
