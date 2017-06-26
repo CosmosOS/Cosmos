@@ -156,7 +156,7 @@ Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:XSharp.VS
 function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
   const Wait: TExecWait; var ResultCode: Integer; var ResultString: AnsiString): Boolean;
 var
-  TempFilename: String;
+  TempFilename: AnsiString;
   Command: String;
 begin
   TempFilename :=
@@ -188,11 +188,11 @@ end;
 
 function GetVSPath(): String;
 var
-  Command: String;
-  Params: String;
+  Command: AnsiString;
+  Params: AnsiString;
   Success: Boolean;
   ResultCode: Integer;
-  ResultText: String;
+  ResultText: AnsiString;
 begin
   Command := ExpandConstant('{app}\Build\Tools\vswhere.exe');
   Params := '-latest -version "[15.0,16.0)" -requires Microsoft.Component.MSBuild -property installationPath';
