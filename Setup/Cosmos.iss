@@ -154,7 +154,7 @@ Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:XSharp.VS
 
 [Code]
 function ExecWithResult(const Filename, Params, WorkingDir: String; const ShowCmd: Integer;
-  const Wait: TExecWait; var ResultCode: Integer; var ResultString: String): Boolean;
+  const Wait: TExecWait; var ResultCode: Integer; var ResultString: AnsiString): Boolean;
 var
   TempFilename: String;
   Command: String;
