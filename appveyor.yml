@@ -87,6 +87,18 @@ build_script:
 
     reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
 
+
+#test: off
+#  assemblies:
+#  - Cosmos.Core.Memory.Test.dll
+#  - DebugCompiler.dll
+#  - Cosmos.TestRunner.UnitTest.dll
+
+test_script:
+- cmd: >-
+    dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
+
+on_success:
 - ps: |
     $versionSuffix = (Get-Date -Format yyyyMMddHHss)
     $version = "1.0.1-" + $versionSuffix
@@ -103,19 +115,7 @@ build_script:
     & msbuild source/Cosmos.IL2CPU.Plugs /t:"Restore;Pack" /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
     & msbuild source/Cosmos.System /t:"Restore;Pack" /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
     & msbuild source/Cosmos.System.Plugs /t:"Restore;Pack" /maxcpucount /p:PackageVersion=$version /p:PackageOutputPath=c:\Cosmos\Build\VSIP\KernelPackages
-
-#test: off
-#  assemblies:
-#  - Cosmos.Core.Memory.Test.dll
-#  - DebugCompiler.dll
-#  - Cosmos.TestRunner.UnitTest.dll
-
-test_script:
-- cmd: >-
-    dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
-
-on_success:
-- ps: |
+    
     & "C:\Program Files (x86)\Inno Setup 5\ISCC.exe" Setup/Cosmos.iss /dBuildConfiguration=DevKit /dVSVersion=vs2017 "/dChangeSetVersion=$versionSuffix"
 
 on_finish:
@@ -135,4 +135,4 @@ matrix:
 
 artifacts:
   - path: '**\TestResult.xml'
-  - path: 'c:\Cosmos\Setup\Output\*.exe'
+  - path: 'Setup\Output\*.exe'
