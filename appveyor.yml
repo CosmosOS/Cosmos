@@ -95,10 +95,9 @@ build_script:
 #  - Cosmos.TestRunner.UnitTest.dll
 
 test_script:
-- cmd: >-
-    dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
+- cmd: dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
 
-on_success:
+after_test:
 - ps: |
     $versionSuffix = (Get-Date -Format yyyyMMddHHss)
     $version = "1.0.1-" + $versionSuffix
