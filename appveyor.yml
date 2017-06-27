@@ -61,6 +61,8 @@ build_script:
 
     xcopy /Y /S "c:\Cosmos\Build\VMware\*" "c:\CosmosRun\Build\VMware\"
 
+    xcopy /Y /S "c:\Cosmos\Build\HyperV\*" "c:\CosmosRun\Build\HyperV\"
+
     xcopy /Y /S "c:\Cosmos\Build\Tools" "c:\CosmosRun\Build\Tools\"
 
     xcopy /Y "c:\Cosmos\source\Cosmos.Debug.DebugStub\*.xs" "c:\CosmosRun\XSharp\DebugStub\"
