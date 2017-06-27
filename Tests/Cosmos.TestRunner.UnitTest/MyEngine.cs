@@ -28,7 +28,7 @@ namespace Cosmos.TestRunner.UnitTest
                 xEngine.AllowedSecondsInKernel = 1200;
 
                 // If you want to test only specific platforms, add them to the list, like next line. By default, all platforms are run.
-                xEngine.RunTargets.Add(RunTargetEnum.HyperV);
+                xEngine.RunTargets.Add(RunTargetEnum.Bochs);
 
                 //xEngine.StartBochsDebugGui = false;
                 //xEngine.RunWithGDB = true;
