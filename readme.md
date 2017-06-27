@@ -5,6 +5,3 @@ Be sure to visit it at [www.goCosmos.org](http://www.goCosmos.org).
 
 Build status for master branch:
 [![Build status](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/master?svg=true)](https://ci.appveyor.com/project/CosmosOS/cosmos/branch/master)
-
-Build status for netcore branch:
-[![Build status](https://ci.appveyor.com/api/projects/status/kust7g5dlnykhkaf/branch/netcore?svg=true)](https://ci.appveyor.com/project/CosmosOS/cosmos/branch/netcore)
