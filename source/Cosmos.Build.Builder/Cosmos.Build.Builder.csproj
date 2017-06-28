@@ -65,6 +65,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FileMgr.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -98,13 +99,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Cosmos.Build.Installer\Cosmos.Build.Installer.csproj">
-      <Project>{27D94586-FE88-4203-BE6A-C99013FD5018}</Project>
-      <Name>Cosmos.Build.Installer</Name>
-    </ProjectReference>
+    <Resource Include="Cosmos.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Cosmos.ico" />
+    <ProjectReference Include="..\Cosmos.Build.Installer\Cosmos.Build.Installer.csproj">
+      <Project>{27d94586-fe88-4203-be6a-c99013fd5018}</Project>
+      <Name>Cosmos.Build.Installer</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

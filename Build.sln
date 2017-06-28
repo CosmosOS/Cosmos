@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.10
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D95021E1-A2C9-4829-819E-ED433AF13162}"
 EndProject
@@ -103,6 +103,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Common", "source\Cosmos.Common\Cosmos.Common.csproj", "{366C2EC6-B9D8-4676-9C88-98F041B8FC93}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cosmos.VS.DebugEngine", "source\Cosmos.VS.DebugEngine\Cosmos.VS.DebugEngine.csproj", "{535A7E34-AC73-4781-B791-2C81A9066A2C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Runner", "Test Runner", "{D4833110-032D-40E3-ACB3-F11583727B08}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.TestController", "Tests\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj", "{2EEC1BF8-758F-4D9D-B063-8CF005468B24}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -242,6 +246,10 @@ Global
 		{535A7E34-AC73-4781-B791-2C81A9066A2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{535A7E34-AC73-4781-B791-2C81A9066A2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{535A7E34-AC73-4781-B791-2C81A9066A2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EEC1BF8-758F-4D9D-B063-8CF005468B24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EEC1BF8-758F-4D9D-B063-8CF005468B24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EEC1BF8-758F-4D9D-B063-8CF005468B24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EEC1BF8-758F-4D9D-B063-8CF005468B24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -285,5 +293,6 @@ Global
 		{A9469897-4FD8-49E7-97F1-FE420A2B75B9} = {6A15C540-8278-4B9C-B890-FA57FB6AE6A6}
 		{366C2EC6-B9D8-4676-9C88-98F041B8FC93} = {CAF5EB57-6CAD-446D-8FC7-4C03D4B996A6}
 		{535A7E34-AC73-4781-B791-2C81A9066A2C} = {CD3F5E45-8B24-424F-ADF1-0211712F4CB7}
+		{2EEC1BF8-758F-4D9D-B063-8CF005468B24} = {D4833110-032D-40E3-ACB3-F11583727B08}
 	EndGlobalSection
 EndGlobal

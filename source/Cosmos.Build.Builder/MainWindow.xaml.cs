@@ -14,12 +14,11 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Microsoft.VisualBasic;
 using TaskScheduler;
+using Cosmos.Build.Installer;
 
-namespace Cosmos.Build.Builder
-{
-  public partial class MainWindow : Window
-  {
-    protected int mTailLineCount = 5;
+namespace Cosmos.Build.Builder {
+  public partial class MainWindow : Window {
+    protected int mTailLineCount = 10;
     protected int mTailCurrent = 0;
     protected List<TextBlock> mTailLines = new List<TextBlock>();
     protected string mCosmosDir;
@@ -27,14 +26,14 @@ namespace Cosmos.Build.Builder
     // Needs updating with each new release.
     protected int mReleaseNo = 106027;
 
-    public MainWindow()
-    {
+    public MainWindow() {
       InitializeComponent();
       mApp = (App)Application.Current;
 
-      for (int i = 0; i < mTailLineCount; i++)
-      {
+      for (int i = 0; i < mTailLineCount; i++) {
         var xTextBlock = new TextBlock();
+        xTextBlock.Background = Brushes.Black;
+        xTextBlock.Foreground = Brushes.Green;
         xTextBlock.FontSize = 16;
         mTailLines.Add(xTextBlock);
         spnlTail.Children.Add(xTextBlock);
@@ -52,15 +51,13 @@ namespace Cosmos.Build.Builder
 
     // Install the UAC bypass CosmosTask. This must be performed while the program is running under
     // administrator credentials with elevation.
-    void InstallScheduledTask()
-    {
+    void InstallScheduledTask() {
       ITaskService xService = new TaskScheduler.TaskScheduler();
       xService.Connect();
       ITaskFolder xFolder = xService.GetFolder(@"\");
       IRegisteredTask xTask = TryGetInstallScheduledTask(xFolder);
 
-      if (null != xTask)
-      {
+      if (null != xTask) {
         // The first parameter MUST NOT be prefixed with the folder path.
         xFolder.DeleteTask(InstallScheduledTaskName, 0);
       }
@@ -85,22 +82,19 @@ namespace Cosmos.Build.Builder
 
     // Check for task path change. This is invoked in normal user mode (not administrator) and is intended
     // to fix issue #15528
-    bool IsInstallScheduledTaskPathFixRequired(IRegisteredTask existingTask, string expectedPath)
-    {
+    bool IsInstallScheduledTaskPathFixRequired(IRegisteredTask existingTask, string expectedPath) {
       // This is a defensive programming test. This should never happen unless someone modifies
       // the task creation code and forget to fix the task update part.
       if (1 != existingTask.Definition.Actions.Count) { return true; }
       IExecAction xExistingExecAction = null;
       IActionCollection xActions;
 
-      try
-      {
+      try {
         xActions = existingTask.Definition.Actions;
         IEnumerator xActionsEnumerator = xActions.GetEnumerator();
         if (!xActionsEnumerator.MoveNext()) { return true; }
         xExistingExecAction = xActionsEnumerator.Current as IExecAction;
-      }
-      catch { return true; }
+      } catch { return true; }
 
       if (null == xExistingExecAction) { return true; }
       if (0 != string.Compare(xExistingExecAction.Path, expectedPath, true)) { return true; }
@@ -108,8 +102,7 @@ namespace Cosmos.Build.Builder
     }
 
     // http://yoursandmyideas.wordpress.com/2012/01/07/task-scheduler-in-c-net/
-    bool ScheduledTaskIsInstalled()
-    {
+    bool ScheduledTaskIsInstalled() {
       ITaskService xService = new TaskScheduler.TaskScheduler();
       xService.Connect();
 
@@ -122,30 +115,22 @@ namespace Cosmos.Build.Builder
 
     // Attempt to retrieve the CosmosSetup UAC bypass task. If the task can't be retrieved either
     // because it doesn't exist or because access is denied, return a null reference.
-    IRegisteredTask TryGetInstallScheduledTask(ITaskFolder folder)
-    {
-      try { return folder.GetTask(InstallScheduledTaskName); }
-      catch { return null; }
+    IRegisteredTask TryGetInstallScheduledTask(ITaskFolder folder) {
+      try { return folder.GetTask(InstallScheduledTaskName); } catch { return null; }
     }
 
-    void InstallTaskAsAdmin()
-    {
+    void InstallTaskAsAdmin() {
       // Restart with UAC and just install scheduled task
-      using (var xProcess = new Process())
-      {
+      using (var xProcess = new Process()) {
         var xPSI = xProcess.StartInfo;
         xPSI.UseShellExecute = true;
         xPSI.FileName = Assembly.GetEntryAssembly().GetName().CodeBase.Replace("file:///", "");
         xPSI.Arguments = "-InstallTask";
-        xPSI.Arguments += " -VS2017";
 
         xPSI.Verb = "runas";
-        try
-        {
+        try {
           xProcess.Start();
-        }
-        catch (System.ComponentModel.Win32Exception)
-        {
+        } catch (System.ComponentModel.Win32Exception) {
           // happens if user press "cancel" on UAC dialog
           Log_LogSection("Error");
           Log_LogLine("User pressed \"Cancel\" on UAC dialog for install task!");
@@ -156,32 +141,27 @@ namespace Cosmos.Build.Builder
       }
     }
 
-    public bool Build()
-    {
-      if (App.IsUserKit)
-      {
+    public bool Build() {
+      Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
+      Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
+      Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
+
+      if (App.IsUserKit) {
         mReleaseNo = Int32.Parse(DateTime.Now.ToString("yyyyMMdd"));
-      }
-      else
-      {
-        if (App.UseTask)
-        {
-          if (!ScheduledTaskIsInstalled())
-          {
+      } else {
+        if (App.UseTask) {
+          if (!ScheduledTaskIsInstalled()) {
             InstallTaskAsAdmin();
           }
         }
       }
-      if (mPreventAutoClose)
+      if (mPreventAutoClose) {
         return true;
+      }
 
       var xTask = new CosmosTask(mCosmosDir, mReleaseNo);
-      xTask.Log.LogLine += new Installer.Log.LogLineHandler(Log_LogLine);
-      xTask.Log.LogSection += new Installer.Log.LogSectionHandler(Log_LogSection);
-      xTask.Log.LogError += new Installer.Log.LogErrorHandler(Log_LogError);
 
-      var xThread = new System.Threading.Thread(delegate ()
-      {
+      var xThread = new System.Threading.Thread(delegate () {
         xTask.Run();
         ThreadDone();
       });
@@ -190,26 +170,18 @@ namespace Cosmos.Build.Builder
       return true;
     }
 
-    void ThreadDone()
-    {
-      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate ()
-      {
-        if (App.StayOpen == false)
-        {
+    void ThreadDone() {
+      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate () {
+        if (App.StayOpen == false) {
           mCloseTimer = new DispatcherTimer();
           mCloseTimer.Interval = TimeSpan.FromSeconds(5);
-          mCloseTimer.Tick += delegate
-          {
+          mCloseTimer.Tick += delegate {
             mCloseTimer.Stop();
-            if (mPreventAutoClose)
-            {
-              if (WindowState == WindowState.Minimized)
-              {
+            if (mPreventAutoClose) {
+              if (WindowState == WindowState.Minimized) {
                 WindowState = WindowState.Normal;
               }
-            }
-            else
-            {
+            } else {
               Close();
             }
           };
@@ -218,19 +190,15 @@ namespace Cosmos.Build.Builder
       });
     }
 
-    void ClearTail()
-    {
+    void ClearTail() {
       mTailCurrent = 0;
-      foreach (var x in mTailLines)
-      {
+      foreach (var x in mTailLines) {
         x.Text = "";
       }
     }
 
-    void Log_LogError()
-    {
-      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate ()
-      {
+    void Log_LogError() {
+      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate () {
         ClearTail();
 
         mSection.Foreground = Brushes.Red;
@@ -239,10 +207,8 @@ namespace Cosmos.Build.Builder
       });
     }
 
-    void Log_LogLine(string aLine)
-    {
-      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate ()
-      {
+    void Log_LogLine(string aLine) {
+      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate () {
         WriteTail(aLine);
 
         mClipboard.AppendLine(aLine);
@@ -252,10 +218,8 @@ namespace Cosmos.Build.Builder
       });
     }
 
-    void Log_LogSection(string aLine)
-    {
-      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate ()
-      {
+    void Log_LogSection(string aLine) {
+      Dispatcher.Invoke(DispatcherPriority.Normal, (Action)delegate () {
         Title = aLine;
 
         ClearTail();
@@ -282,40 +246,32 @@ namespace Cosmos.Build.Builder
       });
     }
 
-    void mSection_MouseUp(object sender, MouseButtonEventArgs e)
-    {
+    void mSection_MouseUp(object sender, MouseButtonEventArgs e) {
       var xSection = (TextBlock)sender;
       var xContent = (TextBlock)xSection.Tag;
       xContent.Visibility = xContent.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
       mPreventAutoClose = true;
     }
 
-    void ScrollTail()
-    {
-      for (int i = 0; i < mTailLineCount - 1; i++)
-      {
+    void ScrollTail() {
+      for (int i = 0; i < mTailLineCount - 1; i++) {
         mTailLines[i].Text = mTailLines[i + 1].Text;
       }
     }
 
-    void WriteTail(string aText)
-    {
-      if (mTailCurrent == mTailLineCount - 1)
-      {
+    void WriteTail(string aText) {
+      if (mTailCurrent == mTailLineCount - 1) {
         ScrollTail();
       }
       mTailLines[mTailCurrent].Text = aText;
-      if (mTailCurrent < mTailLineCount - 1)
-      {
+      if (mTailCurrent < mTailLineCount - 1) {
         mTailCurrent++;
       }
     }
 
     protected bool mLoaded = false;
-    void Window_Loaded(object sender, RoutedEventArgs e)
-    {
-      if (!App.mArgs.Any())
-      {
+    void Window_Loaded(object sender, RoutedEventArgs e) {
+      if (!App.mArgs.Any()) {
         MessageBox.Show("Builder not meant to be called directly. Use install.bat instead.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         Close();
         return;
@@ -323,55 +279,46 @@ namespace Cosmos.Build.Builder
 
       LoadPosition();
       mLoaded = true;
-      
+
       string xAppPath = AppContext.BaseDirectory;
       mCosmosDir = Path.GetFullPath(xAppPath + @"..\..\..\..\");
       mSetupPath = Path.Combine(mCosmosDir, @"Setup\Output\" + CosmosTask.GetSetupName(mReleaseNo) + ".exe");
-      if (App.InstallTask)
-      {
+      if (App.InstallTask) {
         InstallScheduledTask();
         Close();
-      }
-      else if (!Build())
-      {
+      } else if (!Build()) {
         Close();
       }
     }
 
-    void butnCopy_Click(object sender, RoutedEventArgs e)
-    {
+    void butnCopy_Click(object sender, RoutedEventArgs e) {
       mPreventAutoClose = true;
       Clipboard.SetText(mClipboard.ToString());
     }
 
-    void LoadPosition()
-    {
+    void LoadPosition() {
       Left = Properties.Settings.Default.Location.X;
       Top = Properties.Settings.Default.Location.Y;
       Width = Properties.Settings.Default.Size.Width;
       Height = Properties.Settings.Default.Size.Height;
     }
 
-    protected void SavePosition()
-    {
+    protected void SavePosition() {
       Properties.Settings.Default.Location = new System.Drawing.Point((int)Left, (int)Top);
       Properties.Settings.Default.Size = new System.Drawing.Size((int)Width, (int)Height);
       Properties.Settings.Default.Save();
     }
 
-    private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
+    private void Window_SizeChanged(object sender, SizeChangedEventArgs e) {
       // User had non minimized window, or maximized it, or otherwise manually intervened.
       // Even if starting minimized, this event gets called with Normal before load.
       // This is why we have mLoaded.
-      if (mLoaded && WindowState != System.Windows.WindowState.Minimized)
-      {
+      if (mLoaded && WindowState != System.Windows.WindowState.Minimized) {
         mPreventAutoClose = true;
       }
     }
 
-    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-    {
+    private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
       SavePosition();
     }
   }
