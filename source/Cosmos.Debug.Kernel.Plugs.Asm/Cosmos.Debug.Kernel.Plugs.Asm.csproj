@@ -11,8 +11,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj" />
-        <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
-        <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj" />
         <ProjectReference Include="..\XSharp.Common\XSharp.Common.csproj" />
     </ItemGroup>
 

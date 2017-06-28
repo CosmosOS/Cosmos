@@ -10,10 +10,12 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj" />
-        <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
     </ItemGroup>
 
     <ItemGroup>
+      <Reference Include="Cosmos.Debug.Kernel">
+        <HintPath>..\..\Build\bin\Cosmos.Debug.Kernel.dll</HintPath>
+      </Reference>
       <Reference Include="Cosmos.TestRunner.TestController">
         <HintPath>..\..\Build\bin\Cosmos.TestRunner.TestController.dll</HintPath>
       </Reference>

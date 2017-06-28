@@ -12,7 +12,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
     <ProjectReference Include="..\Cosmos.Core.Common\Cosmos.Core.Common.csproj" />
-    <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Cosmos.Debug.Kernel">
+      <HintPath>..\..\Build\bin\Cosmos.Debug.Kernel.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

@@ -9,7 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+      <Reference Include="Cosmos.Debug.Kernel">
+        <HintPath>..\..\Build\bin\Cosmos.Debug.Kernel.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

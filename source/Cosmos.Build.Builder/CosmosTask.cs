@@ -275,6 +275,7 @@ namespace Cosmos.Build.Builder {
         x.Copy("Cosmos.Debug.Kernel.dll");
         x.Copy("Cosmos.TestRunner.TestController.dll");
         x.Copy("Cosmos.IL2CPU.dll");
+        x.Copy("Cosmos.IL2CPU.Plugs.dll");
         x.Copy("Cosmos.Assembler.dll");
         x.Copy("XSharp.Common.dll");
       }

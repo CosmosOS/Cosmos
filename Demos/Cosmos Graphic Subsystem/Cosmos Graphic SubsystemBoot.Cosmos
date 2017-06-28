@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.Net.Sdk">
-  
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
   </PropertyGroup>
-  
   <PropertyGroup>
     <BinFormat>elf</BinFormat>
     <DebugEnabled>True</DebugEnabled>
@@ -21,12 +19,10 @@
     <Profile>VMware</Profile>
     <Description>Use VMware Player or Workstation to deploy and debug.</Description>
   </PropertyGroup>
-  
   <ItemGroup>
     <None Remove="*" />
     <Compile Remove="*" />
   </ItemGroup>
-  
   <ItemGroup>
     <ProjectReference Include="..\..\source\Cosmos.Core.Plugs.Asm\Cosmos.Core.Plugs.Asm.csproj">
       <Name>Cosmos.Core.Plugs.Asm</Name>
@@ -36,11 +32,6 @@
     <ProjectReference Include="..\..\source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj">
       <Name>Cosmos.Core.Plugs</Name>
       <Project>{1132e689-18b0-4d87-94e8-934d4802c540}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel.Plugs.Asm\Cosmos.Debug.Kernel.Plugs.Asm.csproj">
-      <Name>Cosmos.Debug.Kernel.Plugs.Asm</Name>
-      <Project>{7e450662-b34c-49b0-a826-f45ad3a18891}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
@@ -54,7 +45,5 @@
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
-  
   <Import Project="$(AppData)\Cosmos User Kit\Build\VSIP\Cosmos.targets" />
-  
 </Project>
