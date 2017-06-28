@@ -13,10 +13,6 @@ Build
 -Do not change unless you know what you are doing.
 
 --------------------------------------------
-Kernel
--Kernel, Demos (not  User), Tests
-
---------------------------------------------
 Builder
 
 Projects used to build Cosmos itself. Essentially this is what makes User Kit go.
@@ -28,13 +24,17 @@ Projects used to build Cosmos itself. Essentially this is what makes User Kit go
 ******* Add C.B.Common & C.B.MSBuild or to compiler??
 
 --------------------------------------------
---------------------------------------------
---------------------------------------------
---------------------------------------------
 Compiler
 
 Assembler, Compiler, XSharp (Compiler Parts), Tools (Compiler Parts)
 
+--------------------------------------------
+Kernel
+-Kernel, Demos (not  User), Tests
+
+--------------------------------------------
+--------------------------------------------
+--------------------------------------------
 --------------------------------------------
 IDE
 Debug, Deploy, Visual Studio, XSharp (IDE Parts), Tools (IDE Parts)
