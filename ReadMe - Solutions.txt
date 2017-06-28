@@ -15,7 +15,6 @@ Build
 --------------------------------------------
 Kernel
 -Kernel, Demos (not  User), Tests
-*Modify tests to use TestRunner as a debug launch action - or change refs to bin ref
 
 --------------------------------------------
 Builder

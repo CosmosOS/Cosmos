@@ -38,9 +38,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.IO", "Tests\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj", "{1B72C465-A0F6-4865-836B-2334E3F3376F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FD6DCBF5-6451-4CA0-BD5D-5637BC846929}"
-	ProjectSection(SolutionItems) = preProject
-		nuget.config = nuget.config
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{B56A6119-1B8F-44E4-9446-291E52F47D4C}"
 EndProject
