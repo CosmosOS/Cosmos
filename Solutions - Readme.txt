@@ -1,3 +1,12 @@
+Unable to resolve 'C:\source\Cosmos\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj' for '.NETStandard,Version=v1.5'.
+Unable to resolve 'C:\source\Cosmos\source\XSharp.Common\XSharp.Common.csproj' for '.NETStandard,Version=v1.5'.
+Unable to resolve 'C:\source\Cosmos\source\Cosmos.Assembler\Cosmos.Assembler.csproj' for '.NETStandard,Version=v1.5'.
+Bin refs to core.plugs.asm
+add typeextensions
+
+shorten test kernel names
+-------------------
+
 Solution File ReadMe
 
 TODO
@@ -33,6 +42,9 @@ Projects used to build Cosmos itself. Essentially this is what makes User Kit go
 
 ******* Add C.B.Common & C.B.MSBuild or to compiler??
 
+--------------------------------------------
+--------------------------------------------
+--------------------------------------------
 --------------------------------------------
 Compiler
 
