@@ -1,10 +1,5 @@
 Solution File ReadMe
 
-TODO
--Update project templates to use build\bin for kernel and other refs
--Update build to use bin dir, and post build actions too. A bat which can be called like CT.
--Cosmos.TestRunner.* needs in some project, was removed from Kernel.
-
 --------------------------------------------
 Cosmos
 -Old monolithic solution.
