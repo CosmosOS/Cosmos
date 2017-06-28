@@ -54,10 +54,10 @@ namespace Cosmos.Build.Builder {
       if (Directory.Exists(aPath)) {
         Log.WriteLine("Cleaning up existing " + aName + " directory.");
         Directory.Delete(aPath, true);
-      } else {
-        Log.WriteLine("Creating " + aName + " as " + aPath);
-        Directory.CreateDirectory(aPath);
       }
+
+      Log.WriteLine("Creating " + aName + " as " + aPath);
+      Directory.CreateDirectory(aPath);
     }
 
     protected override List<string> DoRun() {
@@ -243,9 +243,6 @@ namespace Cosmos.Build.Builder {
       if (!App.IsUserKit) {
         xVersion += "-" + DateTime.Now.ToString("yyyyMMddHHmm");
       }
-      if (!Directory.Exists(xVSIPDir)) {
-        Directory.CreateDirectory(xVSIPDir);
-      }
 
       Section("Restoring Nuget Packages");
       Restore(Path.Combine(mCosmosPath, @"Cosmos.sln"));
@@ -277,6 +274,9 @@ namespace Cosmos.Build.Builder {
       using (var x = new FileMgr(mVsipPath, mBinCachePath)) {
         x.Copy("Cosmos.Debug.Kernel.dll");
         x.Copy("Cosmos.TestRunner.TestController.dll");
+        x.Copy("Cosmos.IL2CPU.dll");
+        x.Copy("Cosmos.Assembler.dll");
+        x.Copy("XSharp.Common.dll");
       }
     }
 
