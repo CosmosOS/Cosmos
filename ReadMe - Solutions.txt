@@ -28,19 +28,19 @@ Compiler
 
 Assembler, Compiler, XSharp (Compiler Parts), Tools (Compiler Parts)
 
---------------------------------------------
-Kernel
--Kernel, Demos (not  User), Tests
+In future XSharp may be separated or a SLN with only XSharp parts in it. But it is needed often when using compiler.
+
+TODO
+-Add compiler specific tests back to tests folder
 
 --------------------------------------------
---------------------------------------------
---------------------------------------------
---------------------------------------------
-IDE
+IDE - TODO
 Debug, Deploy, Visual Studio, XSharp (IDE Parts), Tools (IDE Parts)
 
 --------------------------------------------
-XSharp
+Kernel
 
-Recheck - keep or merge with Compiler?
-Links broken - 0 of 4 projects load.
+-Kernel, Demos (not  User), Tests
+
+--------------------------------------------
+
