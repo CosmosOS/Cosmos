@@ -34,7 +34,10 @@ TODO
 -Add compiler specific tests back to tests folder
 
 --------------------------------------------
-IDE - TODO
+IDE
+
+TODO Exists, but needs cleaned up still a lot.
+
 Debug, Deploy, Visual Studio, XSharp (IDE Parts), Tools (IDE Parts)
 
 --------------------------------------------
