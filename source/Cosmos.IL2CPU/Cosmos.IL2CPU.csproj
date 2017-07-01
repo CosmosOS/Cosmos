@@ -27,6 +27,9 @@
     <Reference Include="Cosmos.Debug.Kernel">
       <HintPath>..\..\Build\bin\Cosmos.Debug.Kernel.dll</HintPath>
     </Reference>
+    <Reference Include="Cosmos.System">
+      <HintPath>..\..\Build\bin\Cosmos.System.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
