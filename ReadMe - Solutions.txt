@@ -1,3 +1,6 @@
+CD $(ProjectDir)
+call ..\CopyBins.bat $(OutDir)\Atozed.CrossTalk.Right.dll
+
 Solution File ReadMe
 
 --------------------------------------------

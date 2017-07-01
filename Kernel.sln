@@ -37,8 +37,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.Fat", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Kernel.Tests.IO", "Tests\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj", "{1B72C465-A0F6-4865-836B-2334E3F3376F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FD6DCBF5-6451-4CA0-BD5D-5637BC846929}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Demos", "Demos", "{B56A6119-1B8F-44E4-9446-291E52F47D4C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Guess", "Guess", "{5FF9BF2A-5162-4F12-82B6-1693AD776636}"
@@ -54,6 +52,12 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos Graphic Subsystem", "Demos\Cosmos Graphic Subsystem\Cosmos Graphic Subsystem.csproj", "{49F2C01D-D2C5-4564-810B-1AE92236C5C1}"
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos Graphic SubsystemBoot", "Demos\Cosmos Graphic Subsystem\Cosmos Graphic SubsystemBoot.Cosmos", "{79D68062-46C5-466D-9289-C033F7348485}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.Core", "Tests\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj", "{46AA6780-2F14-4884-BBAC-B6807A6AD0E9}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.UnitTest", "Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj", "{3A58DB47-3F22-415F-AB99-86587C24B03B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.TestRunner.TestController", "Tests\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj", "{C0797BBE-3943-4401-A41F-200A31F28C70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -190,6 +194,30 @@ Global
 		{79D68062-46C5-466D-9289-C033F7348485}.Release|Any CPU.Build.0 = Release|Any CPU
 		{79D68062-46C5-466D-9289-C033F7348485}.Release|x86.ActiveCfg = Release|Any CPU
 		{79D68062-46C5-466D-9289-C033F7348485}.Release|x86.Build.0 = Release|Any CPU
+		{46AA6780-2F14-4884-BBAC-B6807A6AD0E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46AA6780-2F14-4884-BBAC-B6807A6AD0E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46AA6780-2F14-4884-BBAC-B6807A6AD0E9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{46AA6780-2F14-4884-BBAC-B6807A6AD0E9}.Debug|x86.Build.0 = Debug|Any CPU
+		{46AA6780-2F14-4884-BBAC-B6807A6AD0E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46AA6780-2F14-4884-BBAC-B6807A6AD0E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46AA6780-2F14-4884-BBAC-B6807A6AD0E9}.Release|x86.ActiveCfg = Release|Any CPU
+		{46AA6780-2F14-4884-BBAC-B6807A6AD0E9}.Release|x86.Build.0 = Release|Any CPU
+		{3A58DB47-3F22-415F-AB99-86587C24B03B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A58DB47-3F22-415F-AB99-86587C24B03B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A58DB47-3F22-415F-AB99-86587C24B03B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3A58DB47-3F22-415F-AB99-86587C24B03B}.Debug|x86.Build.0 = Debug|Any CPU
+		{3A58DB47-3F22-415F-AB99-86587C24B03B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A58DB47-3F22-415F-AB99-86587C24B03B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A58DB47-3F22-415F-AB99-86587C24B03B}.Release|x86.ActiveCfg = Release|Any CPU
+		{3A58DB47-3F22-415F-AB99-86587C24B03B}.Release|x86.Build.0 = Release|Any CPU
+		{C0797BBE-3943-4401-A41F-200A31F28C70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0797BBE-3943-4401-A41F-200A31F28C70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0797BBE-3943-4401-A41F-200A31F28C70}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C0797BBE-3943-4401-A41F-200A31F28C70}.Debug|x86.Build.0 = Debug|Any CPU
+		{C0797BBE-3943-4401-A41F-200A31F28C70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0797BBE-3943-4401-A41F-200A31F28C70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0797BBE-3943-4401-A41F-200A31F28C70}.Release|x86.ActiveCfg = Release|Any CPU
+		{C0797BBE-3943-4401-A41F-200A31F28C70}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -216,5 +244,8 @@ Global
 		{A9D558E8-B0C7-4FF6-99D8-CB2BC6FEB7C7} = {B56A6119-1B8F-44E4-9446-291E52F47D4C}
 		{49F2C01D-D2C5-4564-810B-1AE92236C5C1} = {A9D558E8-B0C7-4FF6-99D8-CB2BC6FEB7C7}
 		{79D68062-46C5-466D-9289-C033F7348485} = {A9D558E8-B0C7-4FF6-99D8-CB2BC6FEB7C7}
+		{46AA6780-2F14-4884-BBAC-B6807A6AD0E9} = {1A46752C-98F3-4DE3-B1FB-EDCE22E8AF73}
+		{3A58DB47-3F22-415F-AB99-86587C24B03B} = {1A46752C-98F3-4DE3-B1FB-EDCE22E8AF73}
+		{C0797BBE-3943-4401-A41F-200A31F28C70} = {1A46752C-98F3-4DE3-B1FB-EDCE22E8AF73}
 	EndGlobalSection
 EndGlobal

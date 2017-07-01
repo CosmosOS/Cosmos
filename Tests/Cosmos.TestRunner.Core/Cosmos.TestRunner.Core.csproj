@@ -35,6 +35,7 @@
         <ProjectReference Include="..\Cosmos.Compiler.Tests.SingleEchoTest\Cosmos.Compiler.Tests.SingleEchoTest.csproj" />
         <ProjectReference Include="..\Cosmos.Kernel.Tests.Fat\Cosmos.Kernel.Tests.Fat.csproj" />
         <ProjectReference Include="..\Cosmos.Kernel.Tests.IO\Cosmos.Kernel.Tests.IO.csproj" />
+        <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj" />
         <ProjectReference Include="..\GraphicTest\GraphicTest.csproj" />
         <ProjectReference Include="..\SimpleStructsAndArraysTest\SimpleStructsAndArraysTest.csproj" />
         <ProjectReference Include="..\VGACompilerCrash\VGACompilerCrash.csproj" />
