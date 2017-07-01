@@ -265,8 +265,7 @@ namespace Cosmos.IL2CPU
             }
             foreach (var xExt in mLoadedExtensions)
             {
-                AppAssembler xResult;
-                if (xExt.TryCreateAppAssembler(DebugCom, AssemblerLog, out xResult))
+                if (xExt.TryCreateAppAssembler(DebugCom, AssemblerLog, out var xResult))
                 {
                     return xResult;
                 }

@@ -26,12 +26,17 @@ Projects used to build Cosmos itself. Essentially this is what makes User Kit go
 --------------------------------------------
 Compiler
 
-Assembler, Compiler, XSharp (Compiler Parts), Tools (Compiler Parts)
+Parts:
+-Assembler
+-Compiler
+-XSharp (Compiler Parts)
+-Tools (Compiler Parts)
 
-In future XSharp may be separated or a SLN with only XSharp parts in it. But it is needed often when using compiler.
+Notes:
+-In future XSharp may be separated or a SLN with only XSharp parts in it. But it is needed often when using compiler.
 
-TODO
--Add compiler specific tests back to tests folder
+Bin Cache Dependencies:
+
 
 --------------------------------------------
 IDE
