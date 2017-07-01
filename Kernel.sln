@@ -45,6 +45,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos Graphic Subsystem", 
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos Graphic SubsystemBoot", "Demos\Cosmos Graphic Subsystem\Cosmos Graphic SubsystemBoot.Cosmos", "{79D68062-46C5-466D-9289-C033F7348485}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Debug.Kernel", "source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj", "{94DBCFC7-B5D2-4148-BE18-D76654C379E2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -156,6 +158,14 @@ Global
 		{79D68062-46C5-466D-9289-C033F7348485}.Release|Any CPU.Build.0 = Release|Any CPU
 		{79D68062-46C5-466D-9289-C033F7348485}.Release|x86.ActiveCfg = Release|Any CPU
 		{79D68062-46C5-466D-9289-C033F7348485}.Release|x86.Build.0 = Release|Any CPU
+		{94DBCFC7-B5D2-4148-BE18-D76654C379E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94DBCFC7-B5D2-4148-BE18-D76654C379E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94DBCFC7-B5D2-4148-BE18-D76654C379E2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{94DBCFC7-B5D2-4148-BE18-D76654C379E2}.Debug|x86.Build.0 = Debug|Any CPU
+		{94DBCFC7-B5D2-4148-BE18-D76654C379E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94DBCFC7-B5D2-4148-BE18-D76654C379E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94DBCFC7-B5D2-4148-BE18-D76654C379E2}.Release|x86.ActiveCfg = Release|Any CPU
+		{94DBCFC7-B5D2-4148-BE18-D76654C379E2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -179,5 +189,6 @@ Global
 		{A9D558E8-B0C7-4FF6-99D8-CB2BC6FEB7C7} = {B56A6119-1B8F-44E4-9446-291E52F47D4C}
 		{49F2C01D-D2C5-4564-810B-1AE92236C5C1} = {A9D558E8-B0C7-4FF6-99D8-CB2BC6FEB7C7}
 		{79D68062-46C5-466D-9289-C033F7348485} = {A9D558E8-B0C7-4FF6-99D8-CB2BC6FEB7C7}
+		{94DBCFC7-B5D2-4148-BE18-D76654C379E2} = {9A923E6F-FF63-4F02-A4EA-C2D44F9323FD}
 	EndGlobalSection
 EndGlobal
