@@ -1,7 +1,4 @@
-CD $(ProjectDir)
-call ..\CopyBins.bat $(OutDir)\Atozed.CrossTalk.Right.dll
-
-Solution File ReadMe
+================ Solution File ReadMe ================ 
 
 --------------------------------------------
 Cosmos
@@ -22,7 +19,7 @@ Projects used to build Cosmos itself. Essentially this is what makes User Kit go
 
 -C.B.Builder - Essentially the user kit. A C# program which automates the building and installation of Cosmos wtih a GUI.
 
--C.B.Insaller - Think this is the UAC workaround task?
+-C.B.Insaller - This is the UAC workaround task?
 
 ******* Add C.B.Common & C.B.MSBuild or to compiler??
 
