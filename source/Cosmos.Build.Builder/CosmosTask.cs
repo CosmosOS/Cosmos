@@ -272,10 +272,10 @@ namespace Cosmos.Build.Builder {
 
       Section("Populate bin cache");
       using (var x = new FileMgr(mVsipPath, mBinCachePath)) {
+        x.Copy("Cosmos.Assembler.dll");
         x.Copy("Cosmos.Debug.Kernel.dll");
         x.Copy("Cosmos.IL2CPU.dll");
         x.Copy("Cosmos.IL2CPU.Plugs.dll");
-        x.Copy("Cosmos.Assembler.dll");
         x.Copy("XSharp.Common.dll");
       }
     }
