@@ -6,7 +6,7 @@ using Cosmos.Assembler.x86;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;
 
-namespace Cosmos.Core.Plugs.Asm
+namespace Cosmos.Core.Plugs_Asm
 {
     //TODO: This asm refs Hardware.. should not.. its a higher ring
     public class CPUUpdateIDTAsm : AssemblerMethod

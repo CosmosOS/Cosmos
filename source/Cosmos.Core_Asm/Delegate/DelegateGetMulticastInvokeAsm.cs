@@ -3,7 +3,7 @@ using Cosmos.Assembler;
 using Cosmos.IL2CPU;
 using XSharp.Common;
 
-namespace Cosmos.Core.Plugs.Asm
+namespace Cosmos.Core.Plugs_Asm
 {
     public class DelegateGetMulticastInvokeAsm : AssemblerMethod
     {

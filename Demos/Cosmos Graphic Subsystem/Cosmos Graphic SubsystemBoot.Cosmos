@@ -24,8 +24,8 @@
     <Compile Remove="*" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs.Asm\Cosmos.Core.Plugs.Asm.csproj">
-      <Name>Cosmos.Core.Plugs.Asm</Name>
+    <ProjectReference Include="..\..\source\Cosmos.Core.Plugs.Asm\Cosmos.Core.Asm.csproj">
+      <Name>Cosmos.Core.Asm</Name>
       <Project>{3c186d37-21c3-417c-95f1-19be538af88a}</Project>
       <Private>True</Private>
     </ProjectReference>

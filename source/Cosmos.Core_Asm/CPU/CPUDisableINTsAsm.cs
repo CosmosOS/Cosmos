@@ -1,13 +1,13 @@
-﻿using Cosmos.Assembler;
+using Cosmos.Assembler;
 using XSharp.Common;
 
-namespace Cosmos.Core.Plugs.Asm
+namespace Cosmos.Core.Plugs_Asm
 {
-    public class CPUInitSSEAsm : AssemblerMethod
+    public class CPUDisableINTsAsm : AssemblerMethod
     {
         public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
         {
-            XS.SSE.SSEInit();
+            XS.ClearInterruptFlag();
         }
     }
 }

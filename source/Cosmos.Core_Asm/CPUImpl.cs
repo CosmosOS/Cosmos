@@ -1,7 +1,7 @@
 using Cosmos.Core.Common;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.Core.Plugs.Asm
+namespace Cosmos.Core.Plugs_Asm
 {
     [Plug(Target = typeof(CPU))]
     public class CPUImpl

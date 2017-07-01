@@ -247,7 +247,7 @@ namespace Cosmos.Build.Builder {
       Section("Check Nuget Packages");
       Restore(Path.Combine(mCosmosPath, @"Cosmos.sln"));
 
-      Section("Compile Cosmos");
+      Section("Build Cosmos");
       MSBuild(Path.Combine(mCosmosPath, @"Build.sln"), "Debug");
 
       Section("Compile Tools");
@@ -262,7 +262,7 @@ namespace Cosmos.Build.Builder {
       Pack(Path.Combine(mSourcePath, "Cosmos.Core.Common"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core.Memory"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core.Plugs"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Core.Plugs.Asm"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core_Asm"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.HAL"), xPackagesDir, xVersion);
@@ -276,6 +276,7 @@ namespace Cosmos.Build.Builder {
         x.Copy("Cosmos.Debug.Kernel.dll");
         x.Copy("Cosmos.IL2CPU.dll");
         x.Copy("Cosmos.IL2CPU.Plugs.dll");
+        x.Copy("Cosmos.System.dll");
         x.Copy("XSharp.Common.dll");
       }
     }

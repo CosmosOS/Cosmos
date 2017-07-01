@@ -88,7 +88,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Memory", "sourc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs", "source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{89DB6325-2C81-467D-BE8A-C4AEBB6540A5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs.Asm", "source\Cosmos.Core.Plugs.Asm\Cosmos.Core.Plugs.Asm.csproj", "{2A24DA41-0D3A-48A6-83D5-8584A1D4CA94}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Asm", "source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj", "{2A24DA41-0D3A-48A6-83D5-8584A1D4CA94}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System.Plugs", "source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj", "{9A327DB7-42E2-4C82-9537-0D995B9171FF}"
 EndProject

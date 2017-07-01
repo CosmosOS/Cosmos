@@ -1,13 +1,13 @@
 ﻿using Cosmos.Assembler;
 using XSharp.Common;
 
-namespace Cosmos.Core.Plugs.Asm
+namespace Cosmos.Core.Plugs_Asm
 {
-    public class CPUHaltAsm : AssemblerMethod
+    public class CPUInitFloatAsm : AssemblerMethod
     {
         public override void AssembleNew(Cosmos.Assembler.Assembler aAssembler, object aMethodInfo)
         {
-            XS.Halt();
+            XS.FPU.FloatInit();
         }
     }
 }
