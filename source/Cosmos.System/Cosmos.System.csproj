@@ -7,10 +7,6 @@
     <Authors>Cosmos</Authors>
     <Company>Cosmos</Company>
   </PropertyGroup>
-  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>call "$(SolutionDir)UpdateBinCache.bat" "$(TargetPath)" $(TargetFileName)</PostBuildEvent>
-  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />

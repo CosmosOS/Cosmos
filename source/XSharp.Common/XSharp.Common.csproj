@@ -5,10 +5,6 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\Cosmos.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>call "$(SolutionDir)UpdateBinCache.bat" "$(TargetPath)" $(TargetFileName)</PostBuildEvent>
-  </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Cosmos.Assembler\Cosmos.Assembler.csproj" />

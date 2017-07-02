@@ -13,7 +13,6 @@ namespace Cosmos.Build.Builder {
   /// <seealso cref="Cosmos.Build.Installer.Task" />
   public class CosmosTask : Task {
     private string mCosmosPath; // Root Cosmos dir
-    private string mBinCachePath; // Build/bin
     private string mVsipPath; // Build/VSIP
     private string mAppDataPath; // User Kit in AppData
     private string mSourcePath; // Cosmos source rood
@@ -27,7 +26,6 @@ namespace Cosmos.Build.Builder {
     public CosmosTask(string aCosmosDir, int aReleaseNo) {
       mCosmosPath = aCosmosDir;
       mVsipPath = Path.Combine(mCosmosPath, @"Build\VSIP");
-      mBinCachePath = Path.Combine(mCosmosPath, @"Build\bin");
       mSourcePath = Path.Combine(mCosmosPath, "source");
       mAppDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cosmos User Kit");
 
@@ -64,7 +62,6 @@ namespace Cosmos.Build.Builder {
       if (PrereqsOK()) {
         Section("Init Directories");
         CleanDirectory("VSIP", mVsipPath);
-        CleanDirectory("Bin Cache", mBinCachePath);
         if (!App.IsUserKit) {
           CleanDirectory("User Kit", mAppDataPath);
         }
@@ -271,16 +268,6 @@ namespace Cosmos.Build.Builder {
       Pack(Path.Combine(mSourcePath, "Cosmos.IL2CPU.Plugs"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.System"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.System.Plugs"), xPackagesDir, xVersion);
-
-      Section("Populate Bin Cache");
-      using (var x = new FileMgr(mVsipPath, mBinCachePath)) {
-        x.Copy("Cosmos.Assembler.dll");
-        x.Copy("Cosmos.Debug.Kernel.dll");
-        x.Copy("Cosmos.IL2CPU.dll");
-        x.Copy("Cosmos.IL2CPU.Plugs.dll");
-        x.Copy("Cosmos.System.dll");
-        x.Copy("XSharp.Common.dll");
-      }
     }
 
     private void CopyTemplates() {
