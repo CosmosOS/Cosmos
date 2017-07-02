@@ -11,15 +11,13 @@
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
+        <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj" />
         <ProjectReference Include="..\Cosmos.System\Cosmos.System.csproj" />
     </ItemGroup>
 
     <ItemGroup>
       <Reference Include="Cosmos.IL2CPU">
         <HintPath>..\..\Build\bin\Cosmos.IL2CPU.dll</HintPath>
-      </Reference>
-      <Reference Include="Cosmos.IL2CPU.Plugs">
-        <HintPath>..\..\Build\bin\Cosmos.IL2CPU.Plugs.dll</HintPath>
       </Reference>
     </ItemGroup>
 
