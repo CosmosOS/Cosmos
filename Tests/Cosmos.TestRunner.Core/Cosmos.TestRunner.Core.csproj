@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    
+
     <PropertyGroup>
         <TargetFramework>netstandard1.5</TargetFramework>
         <SignAssembly>True</SignAssembly>
@@ -15,7 +15,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\source\Cosmos.Assembler\Cosmos.Assembler.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
-        <ProjectReference Include="..\..\source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.Core.Asm\Cosmos.Core.Asm.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Debug.DebugConnectors\Cosmos.Debug.DebugConnectors.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.Debug.Hosts\Cosmos.Debug.Hosts.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.IL2CPU\Cosmos.IL2CPU.csproj" />

@@ -172,7 +172,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos Graphic Subsystem", 
 EndProject
 Project("{471EC4BB-E47E-4229-A789-D1F5F83B52D4}") = "Cosmos Graphic SubsystemBoot", "Demos\Cosmos Graphic Subsystem\Cosmos Graphic SubsystemBoot.Cosmos", "{79D68062-46C5-466D-9289-C033F7348485}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Asm", "source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj", "{B7077A34-D7F0-4422-BE7C-65DF26C65489}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Asm", "source\Cosmos.Core.Asm\Cosmos.Core.Asm.csproj", "{B7077A34-D7F0-4422-BE7C-65DF26C65489}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
