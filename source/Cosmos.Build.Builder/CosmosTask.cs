@@ -248,15 +248,17 @@ namespace Cosmos.Build.Builder {
       Restore(Path.Combine(mCosmosPath, @"Cosmos.sln"));
 
       Section("Build Cosmos");
+      // Build.sln is the old master but because of how VS manages refs, we have to hack
+      // this short term with the new slns.
       MSBuild(Path.Combine(mCosmosPath, @"Build.sln"), "Debug");
 
-      Section("Compile Tools");
+      Section("Publish Tools");
       Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVSIPDir, "MSBuild"));
       Publish(Path.Combine(mSourcePath, "IL2CPU"), Path.Combine(xVSIPDir, "IL2CPU"));
       Publish(Path.Combine(mSourcePath, "XSharp.Compiler"), Path.Combine(xVSIPDir, "XSharp"));
       Publish(Path.Combine(mCosmosPath, "Tools", "NASM"), Path.Combine(xVSIPDir, "NASM"));
 
-      Section("Compile Kernel");
+      Section("Pack Kernel");
       Pack(Path.Combine(mSourcePath, "Cosmos.Common"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core.Common"), xPackagesDir, xVersion);
@@ -270,7 +272,7 @@ namespace Cosmos.Build.Builder {
       Pack(Path.Combine(mSourcePath, "Cosmos.System"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.System.Plugs"), xPackagesDir, xVersion);
 
-      Section("Populate bin cache");
+      Section("Populate Bin Cache");
       using (var x = new FileMgr(mVsipPath, mBinCachePath)) {
         x.Copy("Cosmos.Assembler.dll");
         x.Copy("Cosmos.Debug.Kernel.dll");
