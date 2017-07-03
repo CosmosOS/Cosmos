@@ -27,8 +27,8 @@ namespace ProjectRenamer {
         public MainWindow() {
             InitializeComponent();
 
-            tboxRenameOldName.Text = "Cosmos.Core.Plugs";
-            tboxRenameNewName.Text = "Cosmos.Core_Plugs";
+            //tboxRenameOldName.Text = "Cosmos.Core.Plugs";
+            //tboxRenameNewName.Text = "Cosmos.Core_Plugs";
 
             mCosmosDir = IO.Path.GetFullPath(IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\.."));
             tblkCosmosDir.Text = tblkCosmosDir.Text + mCosmosDir;
@@ -120,6 +120,23 @@ namespace ProjectRenamer {
             Log();
         }
 
+        void FixCosmos() {
+            Log("Fix in .Cosmos files");
+
+            // Change to mSourceDir after we move tests
+            var xProjs = IO.Directory.GetFiles(mCosmosDir, "*.Cosmos", IO.SearchOption.AllDirectories);
+            foreach (var xProj in xProjs) {
+                string x = IO.File.ReadAllText(xProj);
+                string y = x.Replace(mOld, mNew);
+                if (x != y) {
+                    Log("  " + IO.Path.GetFileName(xProj));
+                    IO.File.WriteAllText(xProj, y);
+                }
+            }
+
+            Log();
+        }
+
         void RenameProj() {
             Log("Renaming project");
 
@@ -185,8 +202,9 @@ namespace ProjectRenamer {
             FixCsprojs(); // After RenameProj()
             FixCs();
             FixIss();
+            FixCosmos();
 
-            ModifySLNs();
+            //ModifySLNs();
 
             MessageBox.Show("Done.");
         }
