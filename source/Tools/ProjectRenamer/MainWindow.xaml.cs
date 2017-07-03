@@ -73,20 +73,21 @@ namespace ProjectRenamer {
                 return;
             }
 
+            // Rename project directory
+            string xProjDir = IO.Path.Combine(mSourceDir, xOld);
+            if (!IO.Directory.Exists(xProjDir)) {
+                MessageBox.Show("Cannot locate directory: " + xProjDir);
+            }
+
+            // Modify project names in each SLN
             foreach (var xSLN in mSlnList) {
                 string xSlnPath = IO.Path.Combine(mCosmosDir, xSLN);
                 var xLines = IO.File.ReadAllLines(xSlnPath);
-                bool xChanged = false;
+                bool xSlnChanged = false;
 
-                // Rename project directory
-                string xProjDir = IO.Path.Combine(mSourceDir, xOld);
-                if (!IO.Directory.Exists(xProjDir)) {
-                    MessageBox.Show("Cannot locate directory: " + xProjDir);
-                }
                 string xNewDir = IO.Path.Combine(mSourceDir, xNew);
                 IO.Directory.Move(xProjDir, xNewDir);
 
-                // Modify project names in each SLN
                 for (int i = 0; i < xLines.Length; i++) {
                     // Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs", "source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
                     string xLine = xLines[i];
@@ -94,14 +95,14 @@ namespace ProjectRenamer {
                         xLine = xLine.Replace(SlnProjectName(xOld), SlnProjectName(xNew));
                         xLine = xLine.Replace(SlnProjectPath(xOld), SlnProjectPath(xNew));
                     }
-                    xChanged = xChanged || (xLine != xLines[i]);
-                    if (xChanged) {
+                    xSlnChanged = xSlnChanged || (xLine != xLines[i]);
+                    if (xSlnChanged) {
                         xLines[i] = xLine;
                     }
                 }
 
                 // Avoid changing timestamp if no actual changes.
-                if (xChanged) {
+                if (xSlnChanged) {
                     IO.File.WriteAllLines(xSlnPath, xLines);
                 }
             }

@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.4
@@ -86,7 +86,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XSharp.Common", "source\XSh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Memory", "source\Cosmos.Core.Memory\Cosmos.Core.Memory.csproj", "{2AF59ABA-AE8B-4C68-A0F9-15810FADC145}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs", "source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{89DB6325-2C81-467D-BE8A-C4AEBB6540A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Plugs", "source\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj", "{89DB6325-2C81-467D-BE8A-C4AEBB6540A5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Asm", "source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj", "{2A24DA41-0D3A-48A6-83D5-8584A1D4CA94}"
 EndProject
