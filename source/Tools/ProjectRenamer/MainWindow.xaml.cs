@@ -68,14 +68,22 @@ namespace ProjectRenamer {
 
             foreach (var xSLN in mSlnList) {
                 var xLines = IO.File.ReadAllLines(xSLN);
-                foreach (var x in xLines) {
+                bool xChanged = false;
+
+                for(int i = 0; i < xLines.Length; i++) {
                     // Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs", "source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
+                    string x = xLines[i];
                     if (x.StartsWith("Project(")) {
-                        x.Replace(SlnProjectName(xOld), SlnProjectName(xNew));
-                        x.Replace(SlnProjectPath(xOld), SlnProjectPath(xNew));
+                        x = x.Replace(SlnProjectName(xOld), SlnProjectName(xNew));
+                        x = x.Replace(SlnProjectPath(xOld), SlnProjectPath(xNew));
                     }
+                    xChanged = (x != xLines[i]) || xChanged;
                 }
-                IO.File.WriteAllLines(xSLN, xLines);
+
+                // Avoid changing timestamp if no actual changes.
+                if (xChanged) {
+                    IO.File.WriteAllLines(xSLN, xLines);
+                }
             }
         }
     }
