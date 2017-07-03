@@ -78,12 +78,12 @@ namespace ProjectRenamer {
             if (!IO.Directory.Exists(xProjDir)) {
                 MessageBox.Show("Cannot locate directory: " + xProjDir);
             }
-            string xNewDir = IO.Path.Combine(mSourceDir, xNew);
-            IO.Directory.Move(xProjDir, xNewDir);
+            string xNewProjDir = IO.Path.Combine(mSourceDir, xNew);
+            IO.Directory.Move(xProjDir, xNewProjDir);
 
             // Rename project file
-            string xProjFile = IO.Path.Combine(xProjDir, xOld + ".csproj");
-            string xNewProjFile = IO.Path.Combine(xProjDir, xNew + ".csproj");
+            string xProjFile = IO.Path.Combine(xNewProjDir, xOld + ".csproj");
+            string xNewProjFile = IO.Path.Combine(xNewProjDir, xNew + ".csproj");
             IO.File.Move(xProjFile, xNewProjFile);
 
             // Modify project names in each SLN
