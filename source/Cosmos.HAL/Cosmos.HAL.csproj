@@ -8,10 +8,6 @@
         <Company>Cosmos</Company>
     </PropertyGroup>
 
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-      <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
-    </PropertyGroup>
-
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
         <ProjectReference Include="..\Cosmos.Core.Common\Cosmos.Core.Common.csproj" />
