@@ -27,7 +27,7 @@ namespace ProjectRenamer {
         public MainWindow() {
             InitializeComponent();
 
-            tboxRenameOldName.Text = "Cosmos.Core_Plugs";
+            tboxRenameOldName.Text = "Cosmos.Core.Plugs";
             tboxRenameNewName.Text = "Cosmos.Core_Plugs";
 
             mCosmosDir = IO.Path.GetFullPath(IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\.."));
@@ -87,6 +87,10 @@ namespace ProjectRenamer {
 
             var xProjs = IO.Directory.GetFiles(mSourceDir, "*.cs", IO.SearchOption.AllDirectories);
             foreach (var xProj in xProjs) {
+                if (IO.Path.GetDirectoryName(xProj).EndsWith(@"\ProjectRenamer")) {
+                    continue;
+                }
+
                 string x = IO.File.ReadAllText(xProj);
                 string y = x.Replace(mOld, mNew);
                 if (x != y) {
