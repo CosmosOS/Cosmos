@@ -78,15 +78,14 @@ namespace ProjectRenamer {
             if (!IO.Directory.Exists(xProjDir)) {
                 MessageBox.Show("Cannot locate directory: " + xProjDir);
             }
+            string xNewDir = IO.Path.Combine(mSourceDir, xNew);
+            IO.Directory.Move(xProjDir, xNewDir);
 
             // Modify project names in each SLN
             foreach (var xSLN in mSlnList) {
                 string xSlnPath = IO.Path.Combine(mCosmosDir, xSLN);
                 var xLines = IO.File.ReadAllLines(xSlnPath);
                 bool xSlnChanged = false;
-
-                string xNewDir = IO.Path.Combine(mSourceDir, xNew);
-                IO.Directory.Move(xProjDir, xNewDir);
 
                 for (int i = 0; i < xLines.Length; i++) {
                     // Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs", "source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
