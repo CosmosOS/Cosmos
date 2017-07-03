@@ -1,4 +1,5 @@
 ﻿using Cosmos.Core.Common;
+using Cosmos.Debug.Kernel;
 using System;
 using System.Runtime.InteropServices;
 
@@ -6,6 +7,8 @@ namespace Cosmos.Core
 {
     public unsafe class ACPI
     {
+
+        public static readonly Debugger mDebugger = new Debugger("System", "Global");
 
         //RSD Table
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -41,13 +44,31 @@ namespace Cosmos.Core
 
         // FACP
         private static byte* Facp = null;
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        struct FACP
+        {
+            public fixed byte Signature[4];
+            public int Length;
+
+            public fixed byte unneded1[40 - 8];
+            public int* DSDT;
+            public fixed byte unneded2[48 - 44];
+            public int* SMI_CMD;
+            public byte ACPI_ENABLE;
+            public byte ACPI_DISABLE;
+            public fixed byte unneded3[64 - 54];
+            public int* PM1a_CNT_BLK;
+            public int* PM1b_CNT_BLK;
+            public fixed byte unneded4[89 - 72];
+            public byte PM1_CNT_LEN;
+        };
 
         //Compare
         static int Compare(string c1, byte* c2)
         {
             for (int i = 0; i < c1.Length; i++)
             {
-                if (c1[i] != (char)c2[i]) { return -1; }
+                if (c1[i] != c2[i]) { return -1; }
             }
             return 0;
         }
@@ -71,7 +92,7 @@ namespace Cosmos.Core
                 Init();
 
             if (enable)
-                Enable();
+            Enable();
         }
 
         // Shutdown
@@ -148,8 +169,6 @@ namespace Cosmos.Core
                     yeuse = (byte*)addr;
                     Facp = yeuse;
 
-                    if (Compare("FACP", Facp) == 0)
-                    {
                         if (acpiCheckHeader((byte*)facpget(0), "DSDT") == 0)
                         {
                             byte* S5Addr = (byte*)facpget(0) + 36;
@@ -158,7 +177,7 @@ namespace Cosmos.Core
                             while (0 < dsdtLength--)
                             {
                                 if (Compare("_S5_", S5Addr) == 0)
-                                    break;
+                                break;
                                 S5Addr++;
                             }
 
@@ -192,9 +211,7 @@ namespace Cosmos.Core
                                 }
                             }
                         }
-                    }
-
-                    ptr += 4;
+                        ptr += 4;
                 }
             }
 
@@ -202,42 +219,16 @@ namespace Cosmos.Core
         }
 
         // Enable ACPI
-        private static bool Enable()
+        public static void Enable()
         {
-            if (pm1aIO.Word == 0)
-            {
-                if (SMI_CMD != null && ACPI_ENABLE != 0)
-                {
-                    smiIO.Word = ACPI_ENABLE;
-
-                    int i;
-                    for (i = 0; i < 300; i++)
-                    {
-                        if ((pm1aIO.Word & 1) == 1)
-                            break;
-                    }
-
-                    if (PM1b_CNT != null)
-                    {
-                        for (; i < 300; i++)
-                        {
-                            if ((pm1bIO.Word & 1) == 1)
-                                break;
-                        }
-                    }
-
-                    if (i < 300) return true;
-                    return false;
-                }
-                return false;
-            }
-            return true;
+            Init();
+            smiIO = new IOPort(ACPI_ENABLE);
         }
 
         // Disable ACPI
         public static void Disable()
         {
-            smiIO.Byte = ACPI_DISABLE;
+            smiIO = new IOPort(ACPI_DISABLE);
         }
 
         // Retrieve the RSDP address

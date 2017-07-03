@@ -20,5 +20,13 @@ namespace Cosmos.System
         {
             HAL.Power.Shutdown();
         }
+        public static void ACPIEnable()
+        {
+            HAL.Power.ACPIEnable();
+        }
+        public static void ACPIDisable()
+        {
+            HAL.Power.ACPIDisable();
+        }
     }
 }

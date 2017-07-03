@@ -26,5 +26,17 @@ namespace Cosmos.HAL
         {
             ACPI.Shutdown();
         }
+
+        //Enable ACPI
+        public static void ACPIEnable()
+        {
+            ACPI.Enable();
+        }
+
+        //Disable ACPI
+        public static void ACPIDisable()
+        {
+            ACPI.Disable();
+        }
     }
 }
