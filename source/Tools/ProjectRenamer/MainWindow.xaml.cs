@@ -48,8 +48,35 @@ namespace ProjectRenamer {
             }
         }
 
+        string SlnProjectName(string aBase) {
+            return "\") = \"" + aBase + "\", ";
+        }
+        string SlnProjectPath(string aBase) {
+            return "";
+        }
         private void butnRename_Click(object sender, RoutedEventArgs e) {
+            // In future may do more of a line parse, but for now its a bit hacky because it works
+            // and this is not a core tool, but simply needs to "work".
 
+            string xOld = tboxRenameOldName.Text.Trim();
+            string xNew = tboxRenameNewName.Text.Trim();
+
+            if (xOld == "" || xNew == "") {
+                MessageBox.Show("Old and new cannot be empty.");
+                return;
+            }
+
+            foreach (var xSLN in mSlnList) {
+                var xLines = IO.File.ReadAllLines(xSLN);
+                foreach (var x in xLines) {
+                    // Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs", "source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
+                    if (x.StartsWith("Project(")) {
+                        x.Replace(SlnProjectName(xOld), SlnProjectName(xNew));
+                        x.Replace(SlnProjectPath(xOld), SlnProjectPath(xNew));
+                    }
+                }
+                IO.File.WriteAllLines(xSLN, xLines);
+            }
         }
     }
 }
