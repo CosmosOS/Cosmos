@@ -169,7 +169,7 @@ namespace Cosmos.TestRunner.Core
             {
                 kernelFileName,
                 Assembly.Load(new AssemblyName("Cosmos.Core_Plugs")).Location,
-                Assembly.Load(new AssemblyName("Cosmos.Core_Plugs.Asm")).Location,
+                Assembly.Load(new AssemblyName("Cosmos.Core_Asm")).Location,
                 Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location,
                 Assembly.Load(new AssemblyName("Cosmos.System.Plugs")).Location
             };
