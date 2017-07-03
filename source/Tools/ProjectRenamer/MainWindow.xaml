@@ -11,6 +11,7 @@
       <Rectangle Height="5"/>
       <TextBlock Text="Parameters" FontWeight="Bold"/>
       <TextBlock Name="tblkCosmosDir" Text="Cosmos Directory: "/>
+      <TextBlock Name="tblkSourceDir" Text="Source Directory: "/>
       <Rectangle Height="5"/>
       <Rectangle Height="2" Fill="CornflowerBlue" />
       <TextBlock Text="Rename Project" FontWeight="Bold"/>
