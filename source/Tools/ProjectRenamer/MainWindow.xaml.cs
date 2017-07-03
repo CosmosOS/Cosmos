@@ -82,6 +82,22 @@ namespace ProjectRenamer {
             Log();
         }
 
+        void FixCs() {
+            Log("Fix namespaces in .cs files");
+
+            var xProjs = IO.Directory.GetFiles(mSourceDir, "*.cs", IO.SearchOption.AllDirectories);
+            foreach (var xProj in xProjs) {
+                string x = IO.File.ReadAllText(xProj);
+                string y = x.Replace(mOld, mNew);
+                if (x != y) {
+                    Log("  " + IO.Path.GetFileName(xProj));
+                    IO.File.WriteAllText(xProj, y);
+                }
+            }
+
+            Log();
+        }
+
         void RenameProj() {
             Log("Renaming project");
 
@@ -144,10 +160,8 @@ namespace ProjectRenamer {
             }
 
             RenameProj();
-            FixCsprojs();
-
-            // TODO Fix namespaces in cs files
-            // Default NS in csproj files too
+            FixCsprojs(); // After RenameProj()
+            FixCs();
 
             ModifySLNs();
 
