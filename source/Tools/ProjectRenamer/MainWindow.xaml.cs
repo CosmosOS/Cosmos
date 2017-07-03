@@ -86,6 +86,9 @@ namespace ProjectRenamer {
             string xNewProjFile = IO.Path.Combine(xNewProjDir, xNew + ".csproj");
             IO.File.Move(xProjFile, xNewProjFile);
 
+            // TODO Fix namespaces in cs files
+            // Default NS in csproj files too
+
             // Modify project names in each SLN
             foreach (var xSLN in mSlnList) {
                 string xSlnPath = IO.Path.Combine(mCosmosDir, xSLN);
