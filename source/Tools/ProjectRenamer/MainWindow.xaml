@@ -5,8 +5,25 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectRenamer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded">
-    <Grid>
-        
-    </Grid>
+        Title="Cosmos Project Tool" Height="350" Width="525">
+  <ScrollViewer>
+    <StackPanel Margin="5">
+      <Rectangle Height="5"/>
+      <TextBlock Text="Parameters" FontWeight="Bold"/>
+      <TextBlock Name="tblkCosmosDir" Text="Cosmos Directory: "/>
+      <Rectangle Height="5"/>
+      <Rectangle Height="2" Fill="CornflowerBlue" />
+      <TextBlock Text="Rename Project" FontWeight="Bold"/>
+      <TextBlock Text="Old Name:"/>
+      <TextBox Name="tboxRenameOldName" Width="250" HorizontalAlignment="Left"/>
+      <TextBlock Text="New Name:"/>
+      <TextBox Name="tboxRenameNewName" Width="250" HorizontalAlignment="Left" GotFocus="tboxRenameNewName_GotFocus"/>
+      <Button Margin="0,5,0,0" Width="75" HorizontalAlignment="Left" Content="Rename" Name="butnRename" Click="butnRename_Click"/>
+      <Rectangle Height="5"/>
+      <Rectangle Height="2" Fill="CornflowerBlue" />
+      <TextBlock Text="Move Project" FontWeight="Bold"/>
+      <Rectangle Height="5"/>
+      <Rectangle Height="2" Fill="CornflowerBlue" />
+    </StackPanel>
+  </ScrollViewer>
 </Window>
