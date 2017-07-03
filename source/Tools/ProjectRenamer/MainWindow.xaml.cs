@@ -27,7 +27,7 @@ namespace ProjectRenamer {
         public MainWindow() {
             InitializeComponent();
 
-            tboxRenameOldName.Text = "Cosmos.Core.Plugs";
+            tboxRenameOldName.Text = "Cosmos.Core_Plugs";
             tboxRenameNewName.Text = "Cosmos.Core_Plugs";
 
             mCosmosDir = IO.Path.GetFullPath(IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\.."));
@@ -61,7 +61,7 @@ namespace ProjectRenamer {
             return xResult;
         }
         string SlnProjectPath(string aBase) {
-            // Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs", "source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
+            // Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Plugs", "source\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
             string xResult = ", \"source\\" + aBase + @"\" + aBase + ".csproj\", ";
             return xResult;
         }
@@ -86,6 +86,22 @@ namespace ProjectRenamer {
             Log("Fix namespaces in .cs files");
 
             var xProjs = IO.Directory.GetFiles(mSourceDir, "*.cs", IO.SearchOption.AllDirectories);
+            foreach (var xProj in xProjs) {
+                string x = IO.File.ReadAllText(xProj);
+                string y = x.Replace(mOld, mNew);
+                if (x != y) {
+                    Log("  " + IO.Path.GetFileName(xProj));
+                    IO.File.WriteAllText(xProj, y);
+                }
+            }
+
+            Log();
+        }
+
+        void FixIss() {
+            Log("Fix in .iss files");
+
+            var xProjs = IO.Directory.GetFiles(mSourceDir, "*.iss", IO.SearchOption.AllDirectories);
             foreach (var xProj in xProjs) {
                 string x = IO.File.ReadAllText(xProj);
                 string y = x.Replace(mOld, mNew);
@@ -127,7 +143,7 @@ namespace ProjectRenamer {
                 bool xSlnChanged = false;
 
                 for (int i = 0; i < xLines.Length; i++) {
-                    // Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs", "source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
+                    // Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Plugs", "source\Cosmos.Core_Plugs\Cosmos.Core_Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
                     string xLine = xLines[i];
                     if (xLine.StartsWith("Project(") && xLine.Contains(mOld)) {
                         xLine = xLine.Replace(SlnProjectName(mOld), SlnProjectName(mNew));
@@ -162,6 +178,7 @@ namespace ProjectRenamer {
             RenameProj();
             FixCsprojs(); // After RenameProj()
             FixCs();
+            FixIss();
 
             ModifySLNs();
 
