@@ -18,6 +18,10 @@ namespace ProjectRenamer {
     public partial class MainWindow : Window {
         string mCosmosDir;
         string mSourceDir;
+
+        string mOld;
+        string mNew;
+
         List<string> mSlnList = new List<string>();
 
         public MainWindow() {
@@ -61,34 +65,35 @@ namespace ProjectRenamer {
             string xResult = ", \"source\\" + aBase + @"\" + aBase + ".csproj\", ";
             return xResult;
         }
-        private void butnRename_Click(object sender, RoutedEventArgs e) {
-            // In future may do more of a line parse, but for now its a bit hacky because it works
-            // and this is not a core tool, but simply needs to "work".
 
-            string xOld = tboxRenameOldName.Text.Trim();
-            string xNew = tboxRenameNewName.Text.Trim();
-
-            if (xOld == "" || xNew == "") {
-                MessageBox.Show("Old and new cannot be empty.");
-                return;
+        void FixCsprojs() {
+            // Fix refs in .csproj files
+            var xProjs = IO.Directory.GetFiles(mSourceDir, "*.csproj", IO.SearchOption.AllDirectories);
+            foreach (var xProj in xProjs) {
+                string x = IO.File.ReadAllText(xProj);
+                string y = x.Replace(mOld, mNew);
+                if (x != y) {
+                    IO.File.WriteAllText(xProj, y);
+                }
             }
+        }
 
+        void RenameProj() {
             // Rename project directory
-            string xProjDir = IO.Path.Combine(mSourceDir, xOld);
+            string xProjDir = IO.Path.Combine(mSourceDir, mOld);
             if (!IO.Directory.Exists(xProjDir)) {
                 MessageBox.Show("Cannot locate directory: " + xProjDir);
             }
-            string xNewProjDir = IO.Path.Combine(mSourceDir, xNew);
+            string xNewProjDir = IO.Path.Combine(mSourceDir, mNew);
             IO.Directory.Move(xProjDir, xNewProjDir);
 
             // Rename project file
-            string xProjFile = IO.Path.Combine(xNewProjDir, xOld + ".csproj");
-            string xNewProjFile = IO.Path.Combine(xNewProjDir, xNew + ".csproj");
-            IO.File.Move(xProjFile, xNewProjFile);
+            string xProjPath = IO.Path.Combine(xNewProjDir, mOld + ".csproj");
+            string xProjPathNew = IO.Path.Combine(xNewProjDir, mNew + ".csproj");
+            IO.File.Move(xProjPath, xProjPathNew);
+        }
 
-            // TODO Fix namespaces in cs files
-            // Default NS in csproj files too
-
+        void ModifySLNs() {
             // Modify project names in each SLN
             foreach (var xSLN in mSlnList) {
                 string xSlnPath = IO.Path.Combine(mCosmosDir, xSLN);
@@ -98,9 +103,9 @@ namespace ProjectRenamer {
                 for (int i = 0; i < xLines.Length; i++) {
                     // Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs", "source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
                     string xLine = xLines[i];
-                    if (xLine.StartsWith("Project(") && xLine.Contains(xOld)) {
-                        xLine = xLine.Replace(SlnProjectName(xOld), SlnProjectName(xNew));
-                        xLine = xLine.Replace(SlnProjectPath(xOld), SlnProjectPath(xNew));
+                    if (xLine.StartsWith("Project(") && xLine.Contains(mOld)) {
+                        xLine = xLine.Replace(SlnProjectName(mOld), SlnProjectName(mNew));
+                        xLine = xLine.Replace(SlnProjectPath(mOld), SlnProjectPath(mNew));
                     }
                     xSlnChanged = xSlnChanged || (xLine != xLines[i]);
                     if (xSlnChanged) {
@@ -113,6 +118,23 @@ namespace ProjectRenamer {
                     IO.File.WriteAllLines(xSlnPath, xLines);
                 }
             }
+        }
+
+        private void butnRename_Click(object sender, RoutedEventArgs e) {
+            mOld = tboxRenameOldName.Text.Trim();
+            mNew = tboxRenameNewName.Text.Trim();
+            if (mOld == "" || mNew == "") {
+                MessageBox.Show("Old and new cannot be empty.");
+                return;
+            }
+
+            RenameProj();
+            FixCsprojs();
+
+            // TODO Fix namespaces in cs files
+            // Default NS in csproj files too
+
+            ModifySLNs();
 
             MessageBox.Show("Done.");
         }
