@@ -81,6 +81,11 @@ namespace ProjectRenamer {
             string xNewDir = IO.Path.Combine(mSourceDir, xNew);
             IO.Directory.Move(xProjDir, xNewDir);
 
+            // Rename project file
+            string xProjFile = IO.Path.Combine(xProjDir, xOld + ".csproj");
+            string xNewProjFile = IO.Path.Combine(xProjDir, xNew + ".csproj");
+            IO.File.Move(xProjFile, xNewProjFile);
+
             // Modify project names in each SLN
             foreach (var xSLN in mSlnList) {
                 string xSlnPath = IO.Path.Combine(mCosmosDir, xSLN);
