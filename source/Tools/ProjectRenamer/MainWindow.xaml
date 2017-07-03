@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectRenamer"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid Loaded="Grid_Loaded">
+        Title="MainWindow" Height="350" Width="525" Loaded="Window_Loaded">
+    <Grid>
         
     </Grid>
 </Window>

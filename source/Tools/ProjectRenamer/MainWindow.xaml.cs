@@ -12,11 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using IO = System.IO;
 
 namespace ProjectRenamer {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window {
         string mCosmosDir;
 
@@ -24,8 +22,9 @@ namespace ProjectRenamer {
             InitializeComponent();
         }
 
-        private void Grid_Loaded(object sender, RoutedEventArgs e) {
-
+        private void Window_Loaded(object sender, RoutedEventArgs e) {
+            mCosmosDir = IO.Path.GetFullPath(IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\.."));
+            tblkCosmosDir.Text = mCosmosDir;
         }
     }
 }
