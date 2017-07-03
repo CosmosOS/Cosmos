@@ -67,19 +67,25 @@ namespace ProjectRenamer {
         }
 
         void FixCsprojs() {
-            // Fix refs in .csproj files
+            Log("Fix references in .csproj files");
+
             var xProjs = IO.Directory.GetFiles(mSourceDir, "*.csproj", IO.SearchOption.AllDirectories);
             foreach (var xProj in xProjs) {
                 string x = IO.File.ReadAllText(xProj);
                 string y = x.Replace(mOld, mNew);
                 if (x != y) {
+                    Log("  " + xProj);
                     IO.File.WriteAllText(xProj, y);
                 }
             }
+
+            Log();
         }
 
         void RenameProj() {
-            // Rename project directory
+            Log("Renaming project");
+
+            Log("  Renaming directory");
             string xProjDir = IO.Path.Combine(mSourceDir, mOld);
             if (!IO.Directory.Exists(xProjDir)) {
                 MessageBox.Show("Cannot locate directory: " + xProjDir);
@@ -88,13 +94,17 @@ namespace ProjectRenamer {
             IO.Directory.Move(xProjDir, xNewProjDir);
 
             // Rename project file
+            Log("  Project: " + mNew);
             string xProjPath = IO.Path.Combine(xNewProjDir, mOld + ".csproj");
             string xProjPathNew = IO.Path.Combine(xNewProjDir, mNew + ".csproj");
             IO.File.Move(xProjPath, xProjPathNew);
+
+            Log();
         }
 
         void ModifySLNs() {
-            // Modify project names in each SLN
+            Log("Modify project names in each SLN.");
+
             foreach (var xSLN in mSlnList) {
                 string xSlnPath = IO.Path.Combine(mCosmosDir, xSLN);
                 var xLines = IO.File.ReadAllLines(xSlnPath);
@@ -115,12 +125,17 @@ namespace ProjectRenamer {
 
                 // Avoid changing timestamp if no actual changes.
                 if (xSlnChanged) {
+                    Log("  " + xSLN);
                     IO.File.WriteAllLines(xSlnPath, xLines);
                 }
             }
+
+            Log();
         }
 
         private void butnRename_Click(object sender, RoutedEventArgs e) {
+            LogClear();
+
             mOld = tboxRenameOldName.Text.Trim();
             mNew = tboxRenameNewName.Text.Trim();
             if (mOld == "" || mNew == "") {
@@ -137,6 +152,14 @@ namespace ProjectRenamer {
             ModifySLNs();
 
             MessageBox.Show("Done.");
+        }
+
+        void LogClear() {
+            tboxLog.Clear();
+        }
+        void Log(string aMsg = "") {
+            tboxLog.Text = tboxLog.Text + aMsg + "\r\n";
+            tboxLog.SelectionStart = tboxLog.Text.Length;
         }
     }
 }
