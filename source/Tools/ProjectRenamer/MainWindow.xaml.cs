@@ -69,7 +69,8 @@ namespace ProjectRenamer {
         void FixCsprojs() {
             Log("Fix references in .csproj files");
 
-            var xProjs = IO.Directory.GetFiles(mSourceDir, "*.csproj", IO.SearchOption.AllDirectories);
+            // Change to mSourceDir after we move tests
+            var xProjs = IO.Directory.GetFiles(mCosmosDir, "*.csproj", IO.SearchOption.AllDirectories);
             foreach (var xProj in xProjs) {
                 string x = IO.File.ReadAllText(xProj);
                 string y = x.Replace(mOld, mNew);
@@ -85,7 +86,8 @@ namespace ProjectRenamer {
         void FixCs() {
             Log("Fix namespaces in .cs files");
 
-            var xProjs = IO.Directory.GetFiles(mSourceDir, "*.cs", IO.SearchOption.AllDirectories);
+            // Change to mSourceDir after we move tests
+            var xProjs = IO.Directory.GetFiles(mCosmosDir, "*.cs", IO.SearchOption.AllDirectories);
             foreach (var xProj in xProjs) {
                 if (IO.Path.GetDirectoryName(xProj).EndsWith(@"\ProjectRenamer")) {
                     continue;
