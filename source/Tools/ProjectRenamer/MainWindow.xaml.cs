@@ -74,7 +74,7 @@ namespace ProjectRenamer {
                 string x = IO.File.ReadAllText(xProj);
                 string y = x.Replace(mOld, mNew);
                 if (x != y) {
-                    Log("  " + xProj);
+                    Log("  " + IO.Path.GetFileName(xProj));
                     IO.File.WriteAllText(xProj, y);
                 }
             }
