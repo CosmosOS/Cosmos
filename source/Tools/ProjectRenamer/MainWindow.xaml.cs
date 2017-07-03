@@ -49,11 +49,13 @@ namespace ProjectRenamer {
         }
 
         string SlnProjectName(string aBase) {
-            return "\") = \"" + aBase + "\", ";
+            string xResult = "\") = \"" + aBase + "\", ";
+            return xResult;
         }
         string SlnProjectPath(string aBase) {
             // Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs", "source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
-            return ", \"source\\" + aBase + ".csproj\", ";
+            string xResult = ", \"source\\" + aBase + ".csproj\", ";
+            return xResult;
         }
         private void butnRename_Click(object sender, RoutedEventArgs e) {
             // In future may do more of a line parse, but for now its a bit hacky because it works
@@ -74,12 +76,15 @@ namespace ProjectRenamer {
 
                 for(int i = 0; i < xLines.Length; i++) {
                     // Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs", "source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
-                    string x = xLines[i];
-                    if (x.StartsWith("Project(")) {
-                        x = x.Replace(SlnProjectName(xOld), SlnProjectName(xNew));
-                        x = x.Replace(SlnProjectPath(xOld), SlnProjectPath(xNew));
+                    string xLine = xLines[i];
+                    if (xLine.StartsWith("Project(") && xLine.Contains(xOld)) {
+                        xLine = xLine.Replace(SlnProjectName(xOld), SlnProjectName(xNew));
+                        xLine = xLine.Replace(SlnProjectPath(xOld), SlnProjectPath(xNew));
                     }
-                    xChanged = (x != xLines[i]) || xChanged;
+                    xChanged = xChanged || (xLine != xLines[i]);
+                    if (xChanged) {
+                        xLines[i] = xLine;
+                    }
                 }
 
                 // Avoid changing timestamp if no actual changes.
@@ -87,6 +92,8 @@ namespace ProjectRenamer {
                     IO.File.WriteAllLines(xSlnPath, xLines);
                 }
             }
+
+            MessageBox.Show("Done.");
         }
     }
 }
