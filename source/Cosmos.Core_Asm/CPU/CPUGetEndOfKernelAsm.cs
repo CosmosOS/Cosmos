@@ -1,7 +1,7 @@
-﻿using Cosmos.Assembler;
+using Cosmos.Assembler;
 using XSharp.Common;
 
-namespace Cosmos.Core.Plugs_Asm
+namespace Cosmos.Core_Plugs_Asm
 {
     public class CPUGetEndOfKernelAsm : AssemblerMethod
     {

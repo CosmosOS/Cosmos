@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,7 +20,7 @@ namespace IL2CPURunner
             System.Reflection.Assembly.Load("Cosmos.Build.Common");
             System.Reflection.Assembly.Load("Cosmos.Compiler.Assembler");
             System.Reflection.Assembly.Load("Cosmos.Compiler.Assembler.X86");
-            System.Reflection.Assembly.Load("Cosmos.Core.Plugs");
+            System.Reflection.Assembly.Load("Cosmos.Core_Plugs");
             System.Reflection.Assembly.Load("Cosmos.Debug.Common");
             System.Reflection.Assembly.Load("Cosmos.Debug.DebugStub");
             System.Reflection.Assembly.Load("Cosmos.Debug.Kernel");

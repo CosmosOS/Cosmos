@@ -6,7 +6,7 @@ using Cosmos.IL2CPU.X86.IL;
 using XSharp.Common;
 
 // ReSharper disable once CheckNamespace
-namespace Cosmos.Core.Plugs_Asm
+namespace Cosmos.Core_Plugs_Asm
 {
     public class DelegateInvokeAsm : AssemblerMethod
     {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -168,8 +168,8 @@ namespace Cosmos.TestRunner.Core
             References = new List<string>
             {
                 kernelFileName,
-                Assembly.Load(new AssemblyName("Cosmos.Core.Plugs")).Location,
-                Assembly.Load(new AssemblyName("Cosmos.Core.Plugs.Asm")).Location,
+                Assembly.Load(new AssemblyName("Cosmos.Core_Plugs")).Location,
+                Assembly.Load(new AssemblyName("Cosmos.Core_Plugs.Asm")).Location,
                 Assembly.Load(new AssemblyName("Cosmos.Debug.Kernel.Plugs.Asm")).Location,
                 Assembly.Load(new AssemblyName("Cosmos.System.Plugs")).Location
             };

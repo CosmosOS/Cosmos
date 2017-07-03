@@ -1,10 +1,10 @@
-﻿#define COSMOSDEBUG
+#define COSMOSDEBUG
 using System;
 
-using Cosmos.Core.Plugs_Asm.MemoryOperations;
+using Cosmos.Core_Plugs_Asm.MemoryOperations;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.Core.Plugs.MemoryOperations
+namespace Cosmos.Core_Plugs.MemoryOperations
 {
     [Plug(Target = typeof(Cosmos.Core.MemoryOperations))]
     public unsafe class MemoryOperationsImpl

@@ -1,10 +1,10 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Cosmos.Assembler;
 using Cosmos.Core.Common;
 using Cosmos.IL2CPU.Plugs;
 using XSharp.Common;
 
-namespace Cosmos.Core.Plugs_Asm
+namespace Cosmos.Core_Plugs_Asm
 {
     [Plug(Target = typeof(ProcessorInformation))]
     public unsafe class ProcessorInformationImpl
