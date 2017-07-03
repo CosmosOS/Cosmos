@@ -201,7 +201,7 @@ namespace ProjectRenamer {
                 return;
             }
 
-            //RenameProj();
+            RenameProj();
             FixCsprojs(); // After RenameProj()
             FixCs();
             FixIss();
