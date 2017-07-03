@@ -28,14 +28,14 @@ namespace ProjectRenamer {
             mCosmosDir = IO.Path.GetFullPath(IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\.."));
             tblkCosmosDir.Text = tblkCosmosDir.Text + mCosmosDir;
 
-            AddSLN(@"Build.sln");
-            AddSLN(@"Builder.sln");
-            AddSLN(@"Compiler.sln");
-            AddSLN(@"Cosmos.sln");
-            AddSLN(@"IDE.sln");
-            AddSLN(@"Kernel.sln");
-            AddSLN(@"XSharp.sln");
-            AddSLN(@"source\Tools\Tools.sln");
+            AddSLN(@"Build");
+            AddSLN(@"Builder");
+            AddSLN(@"Compiler");
+            AddSLN(@"Cosmos");
+            AddSLN(@"IDE");
+            AddSLN(@"Kernel");
+            AddSLN(@"XSharp");
+            AddSLN(@"source\Tools\Tools");
         }
 
         void AddSLN(string aBaseName) {
