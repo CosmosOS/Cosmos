@@ -36,12 +36,15 @@ namespace ProjectRenamer {
             mSourceDir = IO.Path.Combine(mCosmosDir, "source");
             tblkSourceDir.Text = tblkSourceDir.Text + mSourceDir;
 
+            // TODO - Find all SLNs instead?
+            // If so, have to exlude possibly Tools at least.
             AddSLN(@"Build");
             AddSLN(@"Builder");
             AddSLN(@"Compiler");
             AddSLN(@"Cosmos");
             AddSLN(@"IDE");
             AddSLN(@"Kernel");
+            AddSLN(@"Test");
             AddSLN(@"XSharp");
             AddSLN(@"source\Tools\Tools");
         }
