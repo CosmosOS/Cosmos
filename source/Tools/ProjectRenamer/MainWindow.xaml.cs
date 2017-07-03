@@ -52,7 +52,8 @@ namespace ProjectRenamer {
             return "\") = \"" + aBase + "\", ";
         }
         string SlnProjectPath(string aBase) {
-            return "";
+            // Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core.Plugs", "source\Cosmos.Core.Plugs\Cosmos.Core.Plugs.csproj", "{1132E689-18B0-4D87-94E8-934D4802C540}"
+            return ", \"source\\" + aBase + ".csproj\", ";
         }
         private void butnRename_Click(object sender, RoutedEventArgs e) {
             // In future may do more of a line parse, but for now its a bit hacky because it works
@@ -67,7 +68,8 @@ namespace ProjectRenamer {
             }
 
             foreach (var xSLN in mSlnList) {
-                var xLines = IO.File.ReadAllLines(xSLN);
+                string xSlnPath = IO.Path.Combine(mCosmosDir, xSLN);
+                var xLines = IO.File.ReadAllLines(xSlnPath);
                 bool xChanged = false;
 
                 for(int i = 0; i < xLines.Length; i++) {
@@ -82,7 +84,7 @@ namespace ProjectRenamer {
 
                 // Avoid changing timestamp if no actual changes.
                 if (xChanged) {
-                    IO.File.WriteAllLines(xSLN, xLines);
+                    IO.File.WriteAllLines(xSlnPath, xLines);
                 }
             }
         }
