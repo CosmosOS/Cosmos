@@ -30,7 +30,6 @@ namespace Cosmos.TestRunner.Core
 
         private void RunDotnetPublish(string aProjectPath, string aOutputPath, string aRuntimeTarget)
         {
-            bool xResult = true;
             var xArgsString = $"publish \"{aProjectPath}\" -o \"{aOutputPath}\" -r {aRuntimeTarget}";
 
             RunProcess("dotnet", aProjectPath, xArgsString);

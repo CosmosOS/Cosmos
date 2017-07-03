@@ -13,7 +13,6 @@ namespace Cosmos.Build.Builder {
   /// <seealso cref="Cosmos.Build.Installer.Task" />
   public class CosmosTask : Task {
     private string mCosmosPath; // Root Cosmos dir
-    private string mBinCachePath; // Build/bin
     private string mVsipPath; // Build/VSIP
     private string mAppDataPath; // User Kit in AppData
     private string mSourcePath; // Cosmos source rood
@@ -27,7 +26,6 @@ namespace Cosmos.Build.Builder {
     public CosmosTask(string aCosmosDir, int aReleaseNo) {
       mCosmosPath = aCosmosDir;
       mVsipPath = Path.Combine(mCosmosPath, @"Build\VSIP");
-      mBinCachePath = Path.Combine(mCosmosPath, @"Build\bin");
       mSourcePath = Path.Combine(mCosmosPath, "source");
       mAppDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cosmos User Kit");
 
@@ -54,17 +52,16 @@ namespace Cosmos.Build.Builder {
       if (Directory.Exists(aPath)) {
         Log.WriteLine("Cleaning up existing " + aName + " directory.");
         Directory.Delete(aPath, true);
-      } else {
-        Log.WriteLine("Creating " + aName + " as " + aPath);
-        Directory.CreateDirectory(aPath);
       }
+
+      Log.WriteLine("Creating " + aName + " as " + aPath);
+      Directory.CreateDirectory(aPath);
     }
 
     protected override List<string> DoRun() {
       if (PrereqsOK()) {
-        Section("Checking Directories");
+        Section("Init Directories");
         CleanDirectory("VSIP", mVsipPath);
-        CleanDirectory("Bin Cache", mBinCachePath);
         if (!App.IsUserKit) {
           CleanDirectory("User Kit", mAppDataPath);
         }
@@ -107,7 +104,7 @@ namespace Cosmos.Build.Builder {
 
     protected void CheckIfBuilderRunning() {
       //Check for builder process
-      Log.WriteLine("Checking if Builder is already running.");
+      Log.WriteLine("Check if Builder is running.");
       // Check > 1 so we exclude ourself.
       if (NumProcessesContainingName("Cosmos.Build.Builder") > 1) {
         throw new Exception("Another instance of builder is running.");
@@ -125,9 +122,9 @@ namespace Cosmos.Build.Builder {
       int xSeconds = 500;
 
       if (Debugger.IsAttached) {
-        Log.WriteLine("Checking if Visual Studio is running is ignored by debugging of Builder.");
+        Log.WriteLine("Check if Visual Studio is running is ignored by debugging of Builder.");
       } else {
-        Log.WriteLine("Checking if Visual Studio is running.");
+        Log.WriteLine("Check if Visual Studio is running.");
         if (IsRunning("devenv")) {
           Log.WriteLine("--Visual Studio is running.");
           Log.WriteLine("--Waiting " + xSeconds + " seconds to see if Visual Studio exits.");
@@ -146,7 +143,7 @@ namespace Cosmos.Build.Builder {
     }
 
     protected bool PrereqsOK() {
-      Section("Checking Prerequisites");
+      Section("Check Prerequisites");
 
       CheckIfUserKitRunning();
       CheckIfVSRunning();
@@ -160,7 +157,7 @@ namespace Cosmos.Build.Builder {
     }
 
     private void CheckForInno() {
-      Log.WriteLine("Checking for Inno Setup");
+      Log.WriteLine("Check for Inno Setup");
       using (var xKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Inno Setup 5_is1", false)) {
         if (xKey == null) {
           mExceptionList.Add("Cannot find Inno Setup.");
@@ -175,7 +172,7 @@ namespace Cosmos.Build.Builder {
         }
       }
 
-      Log.WriteLine("Checking for Inno Preprocessor");
+      Log.WriteLine("Check for Inno Preprocessor");
       if (!File.Exists(Path.Combine(mInnoPath, "ISPP.dll"))) {
         mExceptionList.Add("Inno Preprocessor not detected.");
         mBuildState = BuildState.PrerequisiteMissing;
@@ -184,7 +181,7 @@ namespace Cosmos.Build.Builder {
     }
 
     private void CheckForNetCore() {
-      Log.WriteLine("Checking for .NET Core");
+      Log.WriteLine("Check for .NET Core");
 
       if (!Paths.VSInstancePackages.Contains("Microsoft.VisualStudio.Workload.NetCoreTools")) {
         mExceptionList.Add(".NET Core not detected.");
@@ -193,7 +190,7 @@ namespace Cosmos.Build.Builder {
     }
 
     private void CheckForVisualStudioExtensionTools() {
-      Log.WriteLine("Checking for Visual Studio Extension Tools");
+      Log.WriteLine("Check for Visual Studio Extension Tools");
 
       if (!Paths.VSInstancePackages.Contains("Microsoft.VisualStudio.Workload.VisualStudioExtension")) {
         mExceptionList.Add("Visual Studio Extension tools not detected.");
@@ -202,7 +199,7 @@ namespace Cosmos.Build.Builder {
     }
 
     private void WriteDevKit() {
-      Section("Writing Dev Kit to Registry");
+      Section("Write Dev Kit to Registry");
 
       // Inno deletes this from registry, so we must add this after.
       // We let Inno delete it, so if user runs it by itself they get
@@ -243,45 +240,38 @@ namespace Cosmos.Build.Builder {
       if (!App.IsUserKit) {
         xVersion += "-" + DateTime.Now.ToString("yyyyMMddHHmm");
       }
-      if (!Directory.Exists(xVSIPDir)) {
-        Directory.CreateDirectory(xVSIPDir);
-      }
 
-      Section("Restoring Nuget Packages");
+      Section("Check Nuget Packages");
       Restore(Path.Combine(mCosmosPath, @"Cosmos.sln"));
 
-      Section("Compiling Cosmos");
+      Section("Build Cosmos");
+      // Build.sln is the old master but because of how VS manages refs, we have to hack
+      // this short term with the new slns.
       MSBuild(Path.Combine(mCosmosPath, @"Build.sln"), "Debug");
 
-      Section("Compiling Tools");
+      Section("Publish Tools");
       Publish(Path.Combine(mSourcePath, "Cosmos.Build.MSBuild"), Path.Combine(xVSIPDir, "MSBuild"));
       Publish(Path.Combine(mSourcePath, "IL2CPU"), Path.Combine(xVSIPDir, "IL2CPU"));
       Publish(Path.Combine(mSourcePath, "XSharp.Compiler"), Path.Combine(xVSIPDir, "XSharp"));
       Publish(Path.Combine(mCosmosPath, "Tools", "NASM"), Path.Combine(xVSIPDir, "NASM"));
 
-      Section("Compiling Kernel Packages");
+      Section("Pack Kernel");
       Pack(Path.Combine(mSourcePath, "Cosmos.Common"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core.Common"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core.Memory"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core.Plugs"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Core.Plugs.Asm"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Core_Asm"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.HAL"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.IL2CPU.Plugs"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.System"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.System.Plugs"), xPackagesDir, xVersion);
-
-      Section("Populating bin cache");
-      using (var x = new FileMgr(mVsipPath, mBinCachePath)) {
-        x.Copy("Cosmos.Debug.Kernel.dll");
-        x.Copy("Cosmos.TestRunner.TestController.dll");
-      }
     }
 
     private void CopyTemplates() {
-      Section("Copying Templates");
+      Section("Copy Templates");
 
       using (var x = new FileMgr(Path.Combine(mSourcePath, @"Cosmos.VS.Package\obj\Debug"), mVsipPath)) {
         x.Copy("CosmosProject (C#).zip");

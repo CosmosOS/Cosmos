@@ -7,12 +7,18 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-        <PackageReference Include="MSTest.TestAdapter" Version="1.1.17" />
-        <PackageReference Include="MSTest.TestFramework" Version="1.1.17" />
+        <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
+        <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\source\Cosmos.Core.Memory\Cosmos.Core.Memory.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Cosmos.Debug.Kernel">
+        <HintPath>..\..\Build\bin\Cosmos.Debug.Kernel.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
     <ItemGroup>
