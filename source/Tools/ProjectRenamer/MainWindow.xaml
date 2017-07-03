@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ProjectRenamer"
         mc:Ignorable="d"
-        Title="Cosmos Project Tool" Height="350" Width="525">
+        Title="Cosmos Project Tool" Height="735.636" Width="633.877">
   <ScrollViewer>
     <DockPanel>
       <StackPanel Margin="5" DockPanel.Dock="Left">
