@@ -7,7 +7,7 @@
       <Button Name="butnCopy" Click="butnCopy_Click">Copy</Button>
     </WrapPanel>
     <Rectangle Height="5" DockPanel.Dock="Top"/>
-    <TextBlock Text="Current Task Tail" DockPanel.Dock="Top" Background="LightGray" FontSize="18" Foreground="Green" FontWeight="ExtraBold"/>
+    <TextBlock Text="Current Task Log Tail" DockPanel.Dock="Top" Background="LightGray" FontSize="18" Foreground="Blue" FontWeight="ExtraBold" Name="tblkTail"/>
     <StackPanel Name="spnlTail" DockPanel.Dock="Top" Margin="5">
     </StackPanel>
     <Rectangle Height="5" DockPanel.Dock="Top" Fill="LightGray"/>

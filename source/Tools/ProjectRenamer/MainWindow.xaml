@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ProjectRenamer"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
-    <Grid>
+    <Grid Loaded="Grid_Loaded">
         
     </Grid>
 </Window>

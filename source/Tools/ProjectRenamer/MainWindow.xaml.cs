@@ -18,8 +18,14 @@ namespace ProjectRenamer {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
+        string mCosmosDir;
+
         public MainWindow() {
             InitializeComponent();
+        }
+
+        private void Grid_Loaded(object sender, RoutedEventArgs e) {
+
         }
     }
 }

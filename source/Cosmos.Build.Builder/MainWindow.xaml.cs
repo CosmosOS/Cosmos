@@ -18,17 +18,20 @@ using Cosmos.Build.Installer;
 
 namespace Cosmos.Build.Builder {
   public partial class MainWindow : Window {
-    protected int mTailLineCount = 10;
-    protected int mTailCurrent = 0;
-    protected List<TextBlock> mTailLines = new List<TextBlock>();
-    protected string mCosmosDir;
-    protected string mSetupPath;
+    int mTailLineCount = 10;
+    int mTailCurrent = 0;
+    List<TextBlock> mTailLines = new List<TextBlock>();
+    string mCosmosDir;
+    string mSetupPath;
     // Needs updating with each new release.
-    protected int mReleaseNo = 106027;
+    int mReleaseNo = 106027;
+    string mTailCaption;
+
 
     public MainWindow() {
       InitializeComponent();
       mApp = (App)Application.Current;
+      mTailCaption = tblkTail.Text + " - ";
 
       for (int i = 0; i < mTailLineCount; i++) {
         var xTextBlock = new TextBlock();
@@ -223,6 +226,7 @@ namespace Cosmos.Build.Builder {
         Title = aLine;
 
         ClearTail();
+        tblkTail.Text = mTailCaption + aLine;
 
         mClipboard.AppendLine();
         mClipboard.AppendLine(new string('=', aLine.Length));
