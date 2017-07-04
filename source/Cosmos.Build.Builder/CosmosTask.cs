@@ -212,14 +212,55 @@ namespace Cosmos.Build.Builder {
       }
     }
 
-    private void Restore(string project) {
+    private void Clean(string project)
+    {
+      string xNuget = Path.Combine(mCosmosPath, "Build", "Tools", "nuget.exe");
+      string xListParams = $"sources List";
+      StartConsole(xNuget, xListParams);
+
+      var xStart = new ProcessStartInfo();
+      xStart.FileName = xNuget;
+      xStart.WorkingDirectory = CurrPath;
+      xStart.Arguments = xListParams;
+      xStart.UseShellExecute = false;
+      xStart.CreateNoWindow = true;
+      xStart.RedirectStandardOutput = true;
+      xStart.RedirectStandardError = true;
+      using (var xProcess = Process.Start(xStart))
+      {
+        using (var xReader = xProcess.StandardOutput)
+        {
+          string xLine;
+          while (true)
+          {
+            xLine = xReader.ReadLine();
+            if (xLine == null)
+            {
+              break;
+            }
+            if (xLine.Contains("Cosmos Local Package Feed"))
+            {
+              string xUninstallParams = $"sources Remove -Name \"Cosmos Local Package Feed\"";
+              StartConsole(xNuget, xUninstallParams);
+            }
+          }
+        }
+      }  
+    }
+
+    private void Restore(string project)
+    {
       string xNuget = Path.Combine(mCosmosPath, "Build", "Tools", "nuget.exe");
       string xRestoreParams = $"restore {Quoted(project)}";
-      string xUpdateParams = $"update -self";
-      StartConsole(xNuget, xUpdateParams);
       StartConsole(xNuget, xRestoreParams);
     }
 
+    private void Update(string project) {
+      string xNuget = Path.Combine(mCosmosPath, "Build", "Tools", "nuget.exe");
+      string xUpdateParams = $"update -self";
+      StartConsole(xNuget, xUpdateParams);
+    }
+      
     private void Pack(string project, string destDir, string version) {
       string xMSBuild = Path.Combine(Paths.VSPath, "MSBuild", "15.0", "Bin", "msbuild.exe");
       string xParams = $"{Quoted(project)} /nodeReuse:False /t:Restore;Pack /maxcpucount /p:PackageVersion={Quoted(version)} /p:PackageOutputPath={Quoted(destDir)}";
@@ -241,8 +282,14 @@ namespace Cosmos.Build.Builder {
         xVersion += "-" + DateTime.Now.ToString("yyyyMMddHHmm");
       }
 
-      Section("Check Nuget Packages");
+      Section("Clear Nuget Local");
+      Clean(Path.Combine(mCosmosPath, @"Cosmos.sln"));
+
+      Section("Restore Nuget Packages");
       Restore(Path.Combine(mCosmosPath, @"Cosmos.sln"));
+
+      Section("Update Nuget Params");
+      Update(Path.Combine(mCosmosPath, @"Cosmos.sln"));
 
       Section("Build Cosmos");
       // Build.sln is the old master but because of how VS manages refs, we have to hack
