@@ -5,20 +5,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="Cosmos.Kernel.Tests.IOBoot.Cosmos" />
+        <None Remove="Cosmos.Kernel.Tests.IOBoot.Cosmos" />
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\source\Cosmos.Common\Cosmos.Common.csproj" />
+        <ProjectReference Include="..\..\source\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
         <ProjectReference Include="..\..\source\Cosmos.System\Cosmos.System.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Cosmos.Debug.Kernel">
-        <HintPath>..\..\Build\bin\Cosmos.Debug.Kernel.dll</HintPath>
-      </Reference>
-      <Reference Include="Cosmos.TestRunner.TestController">
-        <HintPath>..\..\Build\bin\Cosmos.TestRunner.TestController.dll</HintPath>
-      </Reference>
+        <ProjectReference Include="..\Cosmos.TestRunner.TestController\Cosmos.TestRunner.TestController.csproj" />
     </ItemGroup>
 
 </Project>

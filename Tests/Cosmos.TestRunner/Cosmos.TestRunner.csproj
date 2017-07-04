@@ -10,10 +10,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj" />
-        <ProjectReference Include="..\..\source\IL2CPU\IL2CPU.csproj" />
-        <ProjectReference Include="..\..\Tools\ElfMap2DebugDb\ElfMap2DebugDb.csproj" />
-        <ProjectReference Include="..\..\Tools\NASM\NASM.csproj" />
         <ProjectReference Include="..\Cosmos.TestRunner.Core\Cosmos.TestRunner.Core.csproj" />
     </ItemGroup>
 
