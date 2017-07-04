@@ -149,6 +149,8 @@ Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q Cosmos.VS.Pr
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q XSharp.VS.vsix"; WorkingDir: "{app}\VSIX\"; Description: "Install Cosmos X# Language Service"; StatusMsg: "Installing Visual Studio Extension: Cosmos X# Language Service"
 
 [UninstallRun]
+Filename: "{app}\Build\Tools\nuget.exe"; Parameters: "sources Remove -Name ""Cosmos Local Package Feed"""; WorkingDir: "{app}"; StatusMsg: "Uninstalling Kernel Packages"
+
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:Cosmos.VS.ProjectSystem"; StatusMsg: "Removing Visual Studio Extension: Cosmos Project System"
 Filename: "{app}\Build\Tools\VSIXBootstrapper.exe"; Parameters: "/q /u:XSharp.VS"; StatusMsg: "Removing Visual Studio Extension: Cosmos X# Language Service"
 
