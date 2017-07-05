@@ -276,19 +276,19 @@ namespace Cosmos.Build.Builder {
     private void CompileCosmos() {
       string xVSIPDir = Path.Combine(mCosmosPath, "Build", "VSIP");
       string xPackagesDir = Path.Combine(xVSIPDir, "KernelPackages");
-      string xVersion = "1.0.1";
+      string xVersion = "1.0.2";
 
       if (!App.IsUserKit) {
         xVersion += "-" + DateTime.Now.ToString("yyyyMMddHHmm");
       }
 
-      Section("Clear Nuget Local");
+      Section("Clean NuGet Local Feed");
       Clean(Path.Combine(mCosmosPath, @"Cosmos.sln"));
 
-      Section("Restore Nuget Packages");
+      Section("Restore NuGet Packages");
       Restore(Path.Combine(mCosmosPath, @"Cosmos.sln"));
 
-      Section("Update Nuget Params");
+      Section("Update NuGet");
       Update(Path.Combine(mCosmosPath, @"Cosmos.sln"));
 
       Section("Build Cosmos");
@@ -343,12 +343,12 @@ namespace Cosmos.Build.Builder {
       string xCfg = App.IsUserKit ? "UserKit" : "DevKit";
       string vsVersionConfiguration = "vs2017";
 
-      // Use configuration which will instal to the VS Exp Hive
+      // Use configuration which will install to the VS Exp Hive
       if (App.UseVsHive) {
         vsVersionConfiguration += "Exp";
       }
-      Log.WriteLine($"  {xISCC} /Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
-      StartConsole(xISCC, $"/Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dVSPath={Quoted(Paths.VSPath)} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
+      Log.WriteLine($"  {xISCC} /Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
+      StartConsole(xISCC, $"/Q {Quoted(mInnoFile)} /dBuildConfiguration={xCfg} /dVSVersion={vsVersionConfiguration} /dChangeSetVersion={Quoted(mReleaseNo.ToString())}");
     }
 
     private void LaunchVS() {

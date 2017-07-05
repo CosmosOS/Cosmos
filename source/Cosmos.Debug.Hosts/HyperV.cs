@@ -41,7 +41,7 @@ namespace Cosmos.Debug.Hosts
             // Target exe or file
             var info = new ProcessStartInfo(@"C:\Windows\sysnative\VmConnect.exe", @"""localhost"" ""Cosmos""")
             {
-                UseShellExecute = true
+                UseShellExecute = false
             };
 
             mProcess = new Process();
