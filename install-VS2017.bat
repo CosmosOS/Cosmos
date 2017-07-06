@@ -22,4 +22,4 @@ if exist %MSBuild% (
   %MSBuild% Builder.sln /nologo /maxcpucount /nodeReuse:false /p:Configuration="Debug" /p:Platform="Any CPU"
 )
 
-start "Cosmos Builder" "source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe" "-bat" "-VS2017" "-VSPATH=%InstallDir%" %1 %2 %3 %4 %5 %6 %7 %8 %9
+start "Cosmos Builder" "source\Cosmos.Build.Builder\bin\Debug\Cosmos.Build.Builder.exe" "-VSPATH=%InstallDir%" %1 %2 %3 %4 %5 %6 %7 %8 %9

@@ -17,12 +17,10 @@
     <ProjectReference Include="..\Cosmos.Build.Common\Cosmos.Build.Common.csproj" />
     <ProjectReference Include="..\Cosmos.Common\Cosmos.Common.csproj" />
     <ProjectReference Include="..\Cosmos.Core.Common\Cosmos.Core.Common.csproj" />
-    <ProjectReference Include="..\Cosmos.Debug.Common\Cosmos.Debug.Common.csproj" />
     <ProjectReference Include="..\Cosmos.Debug.DebugStub\Cosmos.Debug.DebugStub.csproj" />
     <ProjectReference Include="..\Cosmos.Debug.Kernel\Cosmos.Debug.Kernel.csproj" />
     <ProjectReference Include="..\Cosmos.Debug.Symbols\Cosmos.Debug.Symbols.csproj" />
     <ProjectReference Include="..\Cosmos.IL2CPU.Plugs\Cosmos.IL2CPU.Plugs.csproj" />
-    <ProjectReference Include="..\Cosmos.System\Cosmos.System.csproj" />
     <ProjectReference Include="..\XSharp.Common\XSharp.Common.csproj" />
   </ItemGroup>
 

@@ -72,7 +72,6 @@ namespace Cosmos.TestRunner.Core
             debugConnector.CmdCoreDump = b =>
             {
                 string xCallStack = "";
-                string xRegisters = "";
                 int i = 0;
 
                 OutputHandler.LogMessage("Core dump:");

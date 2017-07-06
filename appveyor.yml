@@ -5,9 +5,6 @@ platform: AnyCPU
 shallow_clone: true
 clone_folder: c:\Cosmos
 
-#install:
-#- ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/install-nuget-3-4-0.ps1'))
-
 build_script:
 - cmd: >-
     rem %APPVEYOR_BUILD_FOLDER%
@@ -15,12 +12,16 @@ build_script:
 
     nuget restore "Builder.sln"
 
-    nuget restore "Cosmos.sln"
+    nuget restore "Build.sln"
 
+    nuget restore "Test.sln"
+
+    
     msbuild "Builder.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
 
-
     msbuild "Build.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:OutputPath="%APPVEYOR_BUILD_FOLDER%\Build\VSIP" /p:DeployExtension=false
+
+    msbuild "Test.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug
 
 
     xcopy /Y "%APPVEYOR_BUILD_FOLDER%\Build\VSIP\Cosmos.targets" "%ProgramFiles(x86)%\MSBuild\Cosmos\"
@@ -61,8 +62,6 @@ build_script:
     reg add HKCR\BochsConfigFile\shell\Run\command /ve /d "\"C:\Program Files (x86)\Bochs-2.6.8\Bochs.exe\" -q -f \"%1\""
 
 
-    msbuild "Cosmos.sln" /maxcpucount /verbosity:normal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Platform="Any CPU" /p:Configuration=Debug /p:DeployExtension=false
-
 #test: off
 #  assemblies:
 #  - Cosmos.Core.Memory.Test.dll
@@ -70,11 +69,11 @@ build_script:
 #  - Cosmos.TestRunner.UnitTest.dll
 
 test_script:
-- cmd: >-
-    dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
-- ps: >-    
+- cmd: dotnet test Tests\Cosmos.TestRunner.UnitTest\Cosmos.TestRunner.UnitTest.csproj --logger "trx;LogFileName=c:\Cosmos\TestResult.xml"
+
+on_finish:
+- ps: |
     $wc = New-Object 'System.Net.WebClient'
-    
     $wc.UploadFile("https://ci.appveyor.com/api/testresults/mstest/$($env:APPVEYOR_JOB_ID)", "c:\Cosmos\TestResult.xml")
 
 notifications:
