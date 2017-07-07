@@ -1,7 +1,7 @@
 #define COSMOSDEBUG
 using System;
 
-using Cosmos.Core_Plugs_Asm.MemoryOperations;
+using Cosmos.Core_Asm.MemoryOperations;
 using Cosmos.IL2CPU.Plugs;
 
 namespace Cosmos.Core_Plugs.MemoryOperations
