@@ -20,32 +20,32 @@ namespace Cosmos.Compiler.Tests.Bcl.System
 
             Assert.IsFalse((testGuid == testGuid1), "Guid was not unique");
 
-            //byte[] GuidRFC4122 = testGuid.ToByteArray();
+            byte[] GuidRFC4122 = testGuid.ToByteArray();
 
-            //Assert.IsTrue((GuidRFC4122.Length == 16), "invalid Length");
+            Assert.IsTrue((GuidRFC4122.Length == 16), "invalid Length");
 
-            //Assert.IsTrue((GuidRFC4122[6].ToString().StartsWith("4")), "7th byte invalid (not 4)");
+            Assert.IsTrue((GuidRFC4122[6].ToString().StartsWith("4")), "7th byte invalid (not 4)");
 
-            //bool test9thbyte = false;
+            bool test9thbyte = false;
 
-            //if (GuidRFC4122[8].ToString().StartsWith("8"))
-            //{
-            //    test9thbyte = true;
-            //}
-            //else if (GuidRFC4122[8].ToString().StartsWith("9"))
-            //{
-            //    test9thbyte = true;
-            //}
-            //else if (GuidRFC4122[8].ToString().StartsWith("A"))
-            //{
-            //    test9thbyte = true;
-            //}
-            //else if (GuidRFC4122[8].ToString().StartsWith("B"))
-            //{
-            //    test9thbyte = true;
-            //}
+            if (GuidRFC4122[8].ToString().StartsWith("8"))
+            {
+                test9thbyte = true;
+            }
+            else if (GuidRFC4122[8].ToString().StartsWith("9"))
+            {
+                test9thbyte = true;
+            }
+            else if (GuidRFC4122[8].ToString().StartsWith("A"))
+            {
+                test9thbyte = true;
+            }
+            else if (GuidRFC4122[8].ToString().StartsWith("B"))
+            {
+                test9thbyte = true;
+            }
 
-            //Assert.IsTrue(test9thbyte, "9th byte invalid (not 8,9,A,B)");
+            Assert.IsTrue(test9thbyte, "9th byte invalid (not 8,9,A,B)");
 
         }
     }
