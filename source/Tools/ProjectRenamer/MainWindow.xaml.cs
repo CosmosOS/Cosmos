@@ -69,13 +69,15 @@ namespace ProjectRenamer {
             return xResult;
         }
 
-        string[] GetFiles(string aDir, string aWildCard) {
-            // exclude source\archive
+        List<string> GetFiles(string aDir, string aWildCard) {
             string xArchive = IO.Path.Combine(aDir, @"source\archive\");
-            var xResult = IO.Directory.GetFiles(aDir, aWildCard, IO.SearchOption.AllDirectories);
-            for (int i = xResult.Length - 1; i >= 0; i--) {
-                string x = xResult[i];
-                //if (x.)
+            var xFiles = IO.Directory.GetFiles(aDir, aWildCard, IO.SearchOption.AllDirectories);
+
+            var xResult = new List<string>();
+            foreach (var x in xFiles) {
+                if (!x.StartsWith(xArchive, StringComparison.InvariantCultureIgnoreCase)) {
+                    xResult.Add(x);
+                }
             }
             return xResult;
         }
