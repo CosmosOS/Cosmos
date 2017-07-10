@@ -207,7 +207,7 @@ namespace ProjectRenamer {
             FixIss();
             FixCosmos();
 
-            //ModifySLNs();
+            ModifySLNs();
 
             MessageBox.Show("Done.");
         }
