@@ -3,7 +3,7 @@ using Cosmos.Assembler.x86;
 using XSharp.Common;
 using static XSharp.Common.XSRegisters;
 
-namespace Cosmos.Core_Plugs_Asm.MemoryOperations
+namespace Cosmos.Core_Asm.MemoryOperations
 {
     public class MemoryOperationsFill16BlocksAsm : AssemblerMethod
     {

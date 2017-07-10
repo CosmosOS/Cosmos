@@ -4,7 +4,7 @@ using Cosmos.Core.Common;
 using Cosmos.IL2CPU.Plugs;
 using XSharp.Common;
 
-namespace Cosmos.Core_Plugs_Asm
+namespace Cosmos.Core_Asm
 {
     [Plug(Target = typeof(ProcessorInformation))]
     public unsafe class ProcessorInformationImpl

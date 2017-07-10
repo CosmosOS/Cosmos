@@ -1,7 +1,7 @@
 using System;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.Core_Plugs_Asm
+namespace Cosmos.Core_Asm
 {
     [Plug(Target = typeof(Buffer))]
     public class BufferImpl
