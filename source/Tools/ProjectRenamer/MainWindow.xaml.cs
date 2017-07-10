@@ -69,11 +69,22 @@ namespace ProjectRenamer {
             return xResult;
         }
 
+        string[] GetFiles(string aDir, string aWildCard) {
+            // exclude source\archive
+            string xArchive = IO.Path.Combine(aDir, @"source\archive\");
+            var xResult = IO.Directory.GetFiles(aDir, aWildCard, IO.SearchOption.AllDirectories);
+            for (int i = xResult.Length - 1; i >= 0; i--) {
+                string x = xResult[i];
+                //if (x.)
+            }
+            return xResult;
+        }
+
         void FixCsprojs() {
             Log("Fix references in .csproj files");
 
             // Change to mSourceDir after we move tests
-            var xProjs = IO.Directory.GetFiles(mCosmosDir, "*.csproj", IO.SearchOption.AllDirectories);
+            var xProjs = GetFiles(mCosmosDir, "*.csproj");
             foreach (var xProj in xProjs) {
                 string x = IO.File.ReadAllText(xProj);
                 string y = x.Replace(mOld, mNew);
@@ -90,7 +101,7 @@ namespace ProjectRenamer {
             Log("Fix namespaces in .cs files");
 
             // Change to mSourceDir after we move tests
-            var xProjs = IO.Directory.GetFiles(mCosmosDir, "*.cs", IO.SearchOption.AllDirectories);
+            var xProjs = GetFiles(mCosmosDir, "*.cs");
             foreach (var xProj in xProjs) {
                 if (IO.Path.GetDirectoryName(xProj).EndsWith(@"\ProjectRenamer")) {
                     continue;
@@ -110,7 +121,7 @@ namespace ProjectRenamer {
         void FixIss() {
             Log("Fix in .iss files");
 
-            var xProjs = IO.Directory.GetFiles(mSourceDir, "*.iss", IO.SearchOption.AllDirectories);
+            var xProjs = GetFiles(mSourceDir, "*.iss");
             foreach (var xProj in xProjs) {
                 string x = IO.File.ReadAllText(xProj);
                 string y = x.Replace(mOld, mNew);
@@ -127,7 +138,7 @@ namespace ProjectRenamer {
             Log("Fix in .Cosmos files");
 
             // Change to mSourceDir after we move tests
-            var xProjs = IO.Directory.GetFiles(mCosmosDir, "*.Cosmos", IO.SearchOption.AllDirectories);
+            var xProjs = GetFiles(mCosmosDir, "*.Cosmos");
             foreach (var xProj in xProjs) {
                 string x = IO.File.ReadAllText(xProj);
                 string y = x.Replace(mOld, mNew);
