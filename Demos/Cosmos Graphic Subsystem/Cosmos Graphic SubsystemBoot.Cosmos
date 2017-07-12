@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Net.Sdk">
+<Project Sdk="Microsoft.Net.Sdk">
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
   </PropertyGroup>
@@ -34,8 +34,8 @@
       <Project>{1132e689-18b0-4d87-94e8-934d4802c540}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
-      <Name>Cosmos.System.Plugs</Name>
+    <ProjectReference Include="..\..\source\Cosmos.System_Plugs\Cosmos.System_Plugs.csproj">
+      <Name>Cosmos.System_Plugs</Name>
       <Project>{9431ff1f-ad75-4a1e-b38a-46e0f109411d}</Project>
       <Private>True</Private>
     </ProjectReference>

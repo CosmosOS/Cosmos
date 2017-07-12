@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.System.Plugs.System
+namespace Cosmos.System_Plugs.System
 {
     [Plug(Target = typeof(IntPtr))]
     public static class IntPtrImpl

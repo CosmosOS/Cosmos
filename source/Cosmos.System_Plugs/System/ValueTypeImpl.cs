@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.System.Plugs.System
+namespace Cosmos.System_Plugs.System
 {
     [Plug(Target = typeof(ValueType))]
     public static class ValueTypeImpl

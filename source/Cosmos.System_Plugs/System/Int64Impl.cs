@@ -1,30 +1,30 @@
-﻿using System;
-
+using System;
 using Cosmos.Common;
 using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.System.Plugs.System
+namespace Cosmos.System_Plugs.System
 {
-    [Plug(Target = typeof(Int32))]
-    public static class Int32Impl
+    [Plug(Target = typeof(Int64))]
+    public class Int64Impl
     {
-        public static string ToString(ref int aThis)
+        public static string ToString(ref long aThis)
         {
             return StringHelper.GetNumberString(aThis);
         }
 
-        public static Int32 Parse(string s)
+        public static Int64 Parse(string s)
         {
             const string digits = "0123456789";
-            Int32 result = 0;
+            Int64 result = 0;
 
             int z = 0;
             bool neg = false;
 
             if (s.Length >= 1)
             {
-                if (s[0] == '+') z = 1;
+                if (s[0] == '+')
+                    z = 1;
                 if (s[0] == '-')
                 {
                     z = 1;
@@ -34,15 +34,16 @@ namespace Cosmos.System.Plugs.System
 
             for (int i = z; i < s.Length; i++)
             {
-                Int32 ind = (Int32)digits.IndexOf(s[i]);
+                Int64 ind = (Int64)digits.IndexOf(s[i]);
                 if (ind == -1)
                 {
                     throw new FormatException();
                 }
-                result = (Int32)((result * 10) + ind);
+                result = (Int64)((result * 10) + ind);
             }
 
-            if (neg) result *= -1;
+            if (neg)
+                result *= -1;
 
             return result;
         }

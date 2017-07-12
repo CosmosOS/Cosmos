@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using Cosmos.System;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.System.Plugs.System
+namespace Cosmos.System_Plugs.System
 {
     [Plug(Target = typeof (global::System.Console))]
     public static class ConsoleImpl
@@ -15,8 +16,7 @@ namespace Cosmos.System.Plugs.System
 
         private static Cosmos.System.Console GetConsole()
         {
-            var result = Global.Console ?? mFallbackConsole;
-            return result;
+            return mFallbackConsole;
         }
 
         public static ConsoleColor get_BackgroundColor()

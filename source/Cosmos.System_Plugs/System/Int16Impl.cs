@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Globalization;
 
 using Cosmos.Common;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.System.Plugs.System
+namespace Cosmos.System_Plugs.System
 {
     [Plug(Target = typeof(short))]
     public static class Int16Impl

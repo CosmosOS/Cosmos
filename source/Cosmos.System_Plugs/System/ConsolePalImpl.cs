@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 
+using Cosmos.System;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.System.Plugs.System
+namespace Cosmos.System_Plugs.System
 {
     [Plug(TargetName = "System.ConsolePal, System.Console")]
     public class ConsolePalImpl

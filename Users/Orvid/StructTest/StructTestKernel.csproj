@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -62,9 +62,9 @@
     <Compile Include="SecondaryKernel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj">
+    <ProjectReference Include="..\..\source\Cosmos.System_Plugs\Cosmos.System_Plugs.csproj">
       <Project>{7C64B97F-516D-4A6D-B9E1-3FE48F561409}</Project>
-      <Name>Cosmos.System.Plugs</Name>
+      <Name>Cosmos.System_Plugs</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\source\Cosmos.Core\Cosmos.Core.csproj">
       <Project>{5AC4773C-CB4E-4CD9-8D50-02E10A07DEE6}</Project>

@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Plugs", "source
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.Core_Asm", "source\Cosmos.Core_Asm\Cosmos.Core_Asm.csproj", "{3C186D37-21C3-417C-95F1-19BE538AF88A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System.Plugs", "source\Cosmos.System.Plugs\Cosmos.System.Plugs.csproj", "{9431FF1F-AD75-4A1E-B38A-46E0F109411D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cosmos.System_Plugs", "source\Cosmos.System_Plugs\Cosmos.System_Plugs.csproj", "{9431FF1F-AD75-4A1E-B38A-46E0F109411D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "0 Core", "0 Core", "{04B18FFC-8EA0-4E9F-9E1B-478527B19AFA}"
 EndProject

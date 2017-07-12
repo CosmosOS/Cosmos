@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.HAL;
 
-namespace Cosmos.System.Plugs.System
+namespace Cosmos.System_Plugs.System
 {
     [Plug(Target = typeof(Random))]
     public class RandomImpl

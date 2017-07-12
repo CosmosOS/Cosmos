@@ -1,15 +1,16 @@
-﻿//#define COSMOSDEBUG
+//#define COSMOSDEBUG
 
 using System;
 using System.IO;
 
+using Cosmos.System;
 using Cosmos.Common;
 using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 
-namespace Cosmos.System.Plugs.System.IO
+namespace Cosmos.System_Plugs.System.IO
 {
     [Plug(Target = typeof(Path))]
     public static class PathImpl

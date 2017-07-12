@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 
 using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 
-namespace Cosmos.System.Plugs.System
+namespace Cosmos.System_Plugs.System
 {
     [Plug(Target = typeof(Math))]
     public static class MathImpl

@@ -1,13 +1,14 @@
-﻿//#define COSMOSDEBUG
+//#define COSMOSDEBUG
 
 using global::System;
 using global::System.IO;
 
+using Cosmos.System;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 
-namespace Cosmos.System.Plugs.System.IO
+namespace Cosmos.System_Plugs.System.IO
 {
     [Plug(Target = typeof(FileStream))]
     [PlugField(FieldId = InnerStreamFieldId, FieldType = typeof(Stream))]

@@ -1,16 +1,17 @@
-﻿//#define COSMOSDEBUG
+//#define COSMOSDEBUG
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 
+using Cosmos.System;
 using Cosmos.Common.Extensions;
 using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.VFS;
 
-namespace Cosmos.System.Plugs.System.IO
+namespace Cosmos.System_Plugs.System.IO
 {
     // TODO A lot of these methods should be implemented using StreamReader / StreamWriter
     [Plug(Target = typeof(File))]

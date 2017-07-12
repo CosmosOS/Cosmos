@@ -1,4 +1,4 @@
-﻿//#define COSMOSDEBUG
+//#define COSMOSDEBUG
 
 using System;
 using System.IO;
@@ -6,11 +6,12 @@ using System.Collections.Generic;
 
 using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.Plugs;
+using Cosmos.System;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.Listing;
 using Cosmos.System.FileSystem.VFS;
 
-namespace Cosmos.System.Plugs.System.IO
+namespace Cosmos.System_Plugs.System.IO
 {
     [Plug(Target = typeof(Directory))]
     public static class DirectoryImpl
