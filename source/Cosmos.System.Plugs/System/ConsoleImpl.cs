@@ -11,9 +11,9 @@ namespace Cosmos.System.Plugs.System
         private static ConsoleColor mForeground = ConsoleColor.White;
         private static ConsoleColor mBackground = ConsoleColor.Black;
 
-        private static readonly Console mFallbackConsole = new Console(null);
+        private static readonly Cosmos.System.Console mFallbackConsole = new Cosmos.System.Console(null);
 
-        private static Console GetConsole()
+        private static Cosmos.System.Console GetConsole()
         {
             var result = Global.Console ?? mFallbackConsole;
             return result;
