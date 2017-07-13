@@ -119,7 +119,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     */
                     // we need to see if $this is a boxed object, and if so, we need to box it
                     XS.Set(EAX, ESP, sourceDisplacement: (int)xThisOffset + 4);
-                    XS.Compare(EAX, (int)ObjectUtilities.InstanceTypeEnum.BoxedValueType, destinationIsIndirect: true, destinationDisplacement: 4, size: RegisterSize.Int32);
+                    XS.Compare(EAX, (int)ObjectUtils.InstanceTypeEnum.BoxedValueType, destinationIsIndirect: true, destinationDisplacement: 4, size: RegisterSize.Int32);
 
                     /*
                     * On the stack now:
@@ -139,7 +139,7 @@ namespace Cosmos.IL2CPU.X86.IL
                     * ECX contains the method to call
                     * EAX contains the type pointer (not the handle!!)
                     */
-                    XS.Add(EAX, (uint)ObjectUtilities.FieldDataOffset);
+                    XS.Add(EAX, (uint)ObjectUtils.FieldDataOffset);
                     XS.Set(ESP, EAX, destinationDisplacement: (int)xThisOffset + 4);
 
                     /*

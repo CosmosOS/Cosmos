@@ -35,7 +35,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Push(EAX);
       XS.Set(EDX, xSize);
       XS.Multiply(EDX); // total element size
-      XS.Add(EAX, ObjectUtilities.FieldDataOffset + 4); // total srray size
+      XS.Add(EAX, ObjectUtils.FieldDataOffset + 4); // total srray size
       XS.Push(EAX);
       XS.Call(LabelName.Get(GCImplementationRefs.AllocNewObjectRef));
       XS.Label(".AfterAlloc");
@@ -49,7 +49,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Pop(EAX);
       XS.Set(EBX, xTypeID, sourceIsIndirect: true);  // array type id
       XS.Set(EAX, EBX, destinationIsIndirect: true); // array type id
-      XS.Set(EAX, (uint)ObjectUtilities.InstanceTypeEnum.Array, destinationDisplacement: 4, destinationIsIndirect: true);
+      XS.Set(EAX, (uint)ObjectUtils.InstanceTypeEnum.Array, destinationDisplacement: 4, destinationIsIndirect: true);
       XS.Set(EAX, ESI, destinationDisplacement: 8, destinationIsIndirect: true);
       XS.Set(EAX, xSize, destinationDisplacement: 12, destinationIsIndirect: true);
       XS.Push(0);

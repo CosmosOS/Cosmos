@@ -25,7 +25,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Pop(EAX);
       XS.Set(EDX, aElementSize);
       XS.Multiply(EDX);
-      XS.Add(EAX, (uint)(ObjectUtilities.FieldDataOffset + 4));
+      XS.Add(EAX, (uint)(ObjectUtils.FieldDataOffset + 4));
 
       // pop the array now
       XS.Add(ESP, 4);

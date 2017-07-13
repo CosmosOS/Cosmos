@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Cosmos.IL2CPU.Plugs
 {
-  public static class ObjectUtilities
+  public static class ObjectUtils
   {
     /// <summary>
     ///		<para>

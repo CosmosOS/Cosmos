@@ -32,7 +32,7 @@ namespace Cosmos.IL2CPU.X86.IL
       XS.Set(XSRegisters.EAX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize); // the index
       XS.Set(XSRegisters.EDX, aElementSize);
       XS.Multiply(XSRegisters.EDX);
-      XS.Add(XSRegisters.EAX, ObjectUtilities.FieldDataOffset + 4);
+      XS.Add(XSRegisters.EAX, ObjectUtils.FieldDataOffset + 4);
 
       XS.Set(XSRegisters.EDX, XSRegisters.ESP, sourceDisplacement: (int)xStackSize + 8); // the array
       XS.Add(XSRegisters.EDX, XSRegisters.EAX);

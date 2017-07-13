@@ -1153,7 +1153,7 @@ namespace Cosmos.IL2CPU
                         }
                         xTarget.Append("0,");
                         // todo: abstract this array code out.
-                        xTarget.Append((uint)ObjectUtilities.InstanceTypeEnum.StaticEmbeddedArray);
+                        xTarget.Append((uint)ObjectUtils.InstanceTypeEnum.StaticEmbeddedArray);
                         xTarget.Append(",");
                         xTarget.Append((int)xStream.Length);
                         xTarget.Append(",");
