@@ -303,17 +303,23 @@ namespace Cosmos.Build.Builder {
       Publish(Path.Combine(mCosmosPath, "Tools", "NASM"), Path.Combine(xVSIPDir, "NASM"));
 
       Section("Pack Kernel");
+      //
       Pack(Path.Combine(mSourcePath, "Cosmos.Common"), xPackagesDir, xVersion);
+      //
       Pack(Path.Combine(mSourcePath, "Cosmos.Core"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core.Memory"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core_Plugs"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.Core_Asm"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xPackagesDir, xVersion);
+      //
       Pack(Path.Combine(mSourcePath, "Cosmos.HAL"), xPackagesDir, xVersion);
-      Pack(Path.Combine(mSourcePath, "Cosmos.IL2CPU.API"), xPackagesDir, xVersion);
+      //
       Pack(Path.Combine(mSourcePath, "Cosmos.System"), xPackagesDir, xVersion);
       Pack(Path.Combine(mSourcePath, "Cosmos.System_Plugs"), xPackagesDir, xVersion);
+      //
+      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel"), xPackagesDir, xVersion);
+      Pack(Path.Combine(mSourcePath, "Cosmos.Debug.Kernel.Plugs.Asm"), xPackagesDir, xVersion);
+      //
+      Pack(Path.Combine(mSourcePath, "Cosmos.IL2CPU.API"), xPackagesDir, xVersion);
     }
 
     private void CopyTemplates() {
