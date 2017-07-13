@@ -1,4 +1,4 @@
-using Cosmos.Core.Common;
+using Cosmos.Core;
 using Cosmos.IL2CPU.API;
 
 namespace Cosmos.Core_Asm

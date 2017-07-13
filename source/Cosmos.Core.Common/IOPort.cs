@@ -1,7 +1,7 @@
 using System;
 using Cosmos.IL2CPU.API;
 
-namespace Cosmos.Core.Common
+namespace Cosmos.Core
 {
     public abstract class IOPortBase
     {

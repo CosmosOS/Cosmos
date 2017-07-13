@@ -5,7 +5,7 @@ using System;
 using System.Diagnostics;
 using Cosmos.IL2CPU.API;
 
-namespace Cosmos.Core.Common
+namespace Cosmos.Core
 {
     [DebuggerStepThrough]
     public static class GCImplementation

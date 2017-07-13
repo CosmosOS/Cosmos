@@ -1,5 +1,5 @@
 using System;
-using Cosmos.Core.Common;
+using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using Cosmos.IL2CPU.API;
 

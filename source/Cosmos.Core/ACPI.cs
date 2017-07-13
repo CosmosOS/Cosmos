@@ -1,4 +1,4 @@
-﻿using Cosmos.Core.Common;
+﻿using Cosmos.Core;
 using Cosmos.Debug.Kernel;
 using System;
 using System.Runtime.InteropServices;

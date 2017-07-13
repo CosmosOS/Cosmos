@@ -1,4 +1,4 @@
-﻿namespace Cosmos.Core.Common
+﻿namespace Cosmos.Core
 {
     public unsafe class ProcessorInformation
     {

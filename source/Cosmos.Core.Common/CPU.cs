@@ -1,7 +1,7 @@
 using System;
 using Cosmos.IL2CPU.API;
 
-namespace Cosmos.Core.Common
+namespace Cosmos.Core
 {
     // Non hardware class, only used by core and hardware drivers for ports etc.
     public class CPU

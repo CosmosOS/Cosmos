@@ -1,7 +1,6 @@
 ﻿using System;
 
 using Cosmos.Core;
-using Cosmos.Core.Common;
 using Cosmos.Debug.Kernel;
 using Cosmos.HAL.BlockDevice;
 
